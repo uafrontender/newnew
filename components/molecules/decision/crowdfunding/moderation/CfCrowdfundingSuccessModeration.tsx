@@ -1,6 +1,4 @@
-import React, {
-  useMemo,
-} from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -13,9 +11,9 @@ import Headline from '../../../../atoms/Headline';
 
 import { formatNumber } from '../../../../../utils/format';
 
-import WinnerIcon from '../../../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
+import assets from '../../../../../constants/assets';
 
 interface ICfCrowdfundingSuccessModeration {
   post: newnewapi.Crowdfunding;
@@ -23,129 +21,139 @@ interface ICfCrowdfundingSuccessModeration {
   currentNumBackers: number;
 }
 
-const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSuccessModeration> = ({
-  post,
-  postStatus,
-  currentNumBackers,
-}) => {
-  const theme = useTheme();
-  const { t } = useTranslation('decision');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isTablet = ['tablet'].includes(resizeMode);
+const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSuccessModeration> =
+  ({ post, postStatus, currentNumBackers }) => {
+    const theme = useTheme();
+    const { t } = useTranslation('decision');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
+    const isTablet = ['tablet'].includes(resizeMode);
 
-  const percentage = (currentNumBackers / post.targetBackerCount) * 100;
-  const size = useMemo(() => (
-    isTablet ? 180 : 240
-  ), [isTablet]);
-  const radius = (size - 12) / 2;
+    // Share
+    const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-  return (
-    <SSectionContainer>
-      {!isMobile ? (
-        <>
-          <SProgressRingContainer>
-            {isTablet ? (
-              <SProgressRingSvg
-                width={size}
-                height={size}
-              >
-                <SBgRingCircle
-                  stroke={theme.colorsThemed.accent.green}
-                  strokeWidth="12px"
-                  strokeLinecap="round"
-                  fill="transparent"
-                  style={{
-                    transform: `rotate(${90 - (percentage !== 0 ? 4 : 0)}deg) scale(-1, 1)`,
-                    transformOrigin: 'center',
-                  }}
-                  r={radius}
-                  cx={size / 2}
-                  cy={size / 2}
-                />
-              </SProgressRingSvg>
+    async function copyPostUrlToClipboard(url: string) {
+      if ('clipboard' in navigator) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        document.execCommand('copy', true, url);
+      }
+    }
 
-            ) : null}
-            <STrophyImg
-              src={WinnerIcon.src}
-            />
-            <STrophyGlow />
-          </SProgressRingContainer>
-        </>
-      ) : null}
-      <SCaptionSection>
-        <SHeadlineNumBackers
-          variant={3}
-        >
-          {currentNumBackers}
-        </SHeadlineNumBackers>
-        <STarget>
-          {t('CfPost.BackersStatsSection.of_backers', {
-            targetBackers: formatNumber(post.targetBackerCount, true),
-          })}
-        </STarget>
-      </SCaptionSection>
-      <SWinnerCard>
-        <SOptionDetails>
-          <SNumBidders
-            variant={3}
-          >
-            <SSpanBold>
+    const handleCopyLink = useCallback(() => {
+      if (window) {
+        const url = `${window.location.origin}/post/${post.postUuid}`;
+
+        copyPostUrlToClipboard(url)
+          .then(() => {
+            setIsCopiedUrl(true);
+            setTimeout(() => {
+              setIsCopiedUrl(false);
+            }, 1500);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    }, [post.postUuid]);
+
+    const percentage = (currentNumBackers / post.targetBackerCount) * 100;
+    const size = useMemo(() => 130, []);
+    const radius = (size - 12) / 2;
+
+    return (
+      <SSectionContainer>
+        <STopSectionWrapper>
+          {!isMobile ? (
+            <>
+              <SProgressRingContainer>
+                {isTablet ? (
+                  <SProgressRingSvg width={size} height={size}>
+                    <SBgRingCircle
+                      stroke={theme.colorsThemed.accent.green}
+                      strokeWidth='6px'
+                      strokeLinecap='round'
+                      fill='transparent'
+                      style={{
+                        transform: `rotate(${
+                          90 - (percentage !== 0 ? 4 : 0)
+                        }deg) scale(-1, 1)`,
+                        transformOrigin: 'center',
+                      }}
+                      r={radius}
+                      cx={size / 2}
+                      cy={size / 2}
+                    />
+                  </SProgressRingSvg>
+                ) : null}
+                <STrophyImg src={assets.decision.trophy} />
+                <STrophyGlow />
+              </SProgressRingContainer>
+            </>
+          ) : null}
+          <SCaptionSection>
+            <SHeadlineNumBackers variant={3}>
+              {currentNumBackers}
+            </SHeadlineNumBackers>
+            <STarget weight={600}>
+              {t('CfPost.BackersStatsSection.of_backers', {
+                targetBackers: formatNumber(post.targetBackerCount, true),
+              })}
+            </STarget>
+          </SCaptionSection>
+        </STopSectionWrapper>
+        <SWinnerCard>
+          <SOptionDetails>
+            <SNumBidders variant={3}>
+              <SSpanBold>{formatNumber(currentNumBackers, true)}</SSpanBold>{' '}
+              <SSpanThin>
+                {currentNumBackers > 1
+                  ? t(
+                      'CfPostModeration.WinnerTab.WinnerOptionCard.backers_told_you'
+                    )
+                  : t(
+                      'CfPostModeration.WinnerTab.WinnerOptionCard.backer_told_you'
+                    )}
+              </SSpanThin>
+            </SNumBidders>
+            <SDetailsHeadline variant={4}>{post.title}</SDetailsHeadline>
+            <SYouMade variant={3}>
+              {t('CfPostModeration.WinnerTab.WinnerOptionCard.you_made')}
+            </SYouMade>
+            <SDetailsHeadline variant={5}>
+              $
               {formatNumber(
-                currentNumBackers,
-                true,
+                post.totalAmount?.usdCents
+                  ? post.totalAmount.usdCents!! / 100
+                  : 100,
+                true
               )}
-            </SSpanBold>
-            {' '}
-            <SSpanThin>
-              {currentNumBackers > 1
-                ? t('CfPostModeration.WinnerTab.WinnerOptionCard.backers_told_you')
-                : t('CfPostModeration.WinnerTab.WinnerOptionCard.backer_told_you')
-              }
-            </SSpanThin>
-          </SNumBidders>
-          <SDetailsHeadline
-            variant={4}
-          >
-            { post.title }
-          </SDetailsHeadline>
-          <SYouMade
-            variant={3}
-          >
-            { t('CfPostModeration.WinnerTab.WinnerOptionCard.you_made') }
-          </SYouMade>
-          <SDetailsHeadline
-            variant={4}
-          >
-            $
-            {formatNumber(
-              post.totalAmount?.usdCents ? (post.totalAmount.usdCents!! / 100) : 100,
-              true,
-            )}
-          </SDetailsHeadline>
-        </SOptionDetails>
-        {isMobile && (
-          <STrophyImgCard
-            src={WinnerIcon.src}
+            </SDetailsHeadline>
+          </SOptionDetails>
+          {isMobile && <STrophyImgCard src={assets.decision.trophy} />}
+        </SWinnerCard>
+        {postStatus === 'succeeded' ? (
+          <PostSuccessBoxModeration
+            title={t('PostSuccessModeration.title')}
+            body={t('PostSuccessModeration.body')}
+            buttonCaption={
+              isCopiedUrl
+                ? t('PostSuccessModeration.ctaButton-copied')
+                : t('PostSuccessModeration.ctaButton')
+            }
+            style={{
+              marginTop: '24px',
+            }}
+            handleButtonClick={() => {
+              handleCopyLink();
+            }}
           />
-        )}
-      </SWinnerCard>
-      {postStatus === 'succeeded' ? (
-        <PostSuccessBoxModeration
-          title={t('PostSuccessModeration.title')}
-          body={t('PostSuccessModeration.body')}
-          buttonCaption={t('PostSuccessModeration.ctaButton')}
-          style={{
-            marginTop: '24px',
-          }}
-          handleButtonClick={() => {
-            console.log('Share')
-          }}
-        />
-      ) : null}
-    </SSectionContainer>
-  );
-};
+        ) : null}
+      </SSectionContainer>
+    );
+  };
 
 export default CfCrowdfundingSuccessModeration;
 
@@ -157,53 +165,61 @@ const SSectionContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  padding-bottom: 64px;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding-bottom: 0;
+  }
+`;
+
+const STopSectionWrapper = styled.div`
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: auto;
+    margin-bottom: auto;
+
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+  }
 `;
 
 const SProgressRingContainer = styled.div`
-  position: absolute;
+  /* position: absolute; */
   left: 24px;
   top: 24px;
 
-
-  width: 180px;
-  height: 180px;
-
   ${({ theme }) => theme.media.laptop} {
-    width: 240px;
-    height: 240px;
   }
 `;
 
 const SProgressRingSvg = styled.svg`
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 24px;
+  left: 48px;
 `;
 
-const SBgRingCircle = styled.circle`
-
-`;
-
+const SBgRingCircle = styled.circle``;
 
 const STrophyImg = styled.img`
   position: absolute;
-  left: calc(50% - 40px);
-  top: calc(50% - 40px);
+  top: 56px;
+  left: 86px;
 
-  width: 80px;
+  width: 60px;
 
   ${({ theme }) => theme.media.laptop} {
-    left: calc(50% - 65px);
-    top: calc(50% - 65px);
-
+    position: static;
     width: 130px;
   }
 `;
 
 const STrophyGlow = styled.div`
   position: absolute;
-  left: calc(50% - 38px);
-  top: calc(50% - 38px);
+  top: 34px;
+  left: 58px;
 
   width: 76px;
   height: 76px;
@@ -214,6 +230,8 @@ const STrophyGlow = styled.div`
   filter: blur(50px);
 
   ${({ theme }) => theme.media.laptop} {
+    top: 24px;
+    left: 144px;
   }
 `;
 
@@ -224,7 +242,9 @@ const SCaptionSection = styled.div`
   margin-bottom: 70px;
 
   ${({ theme }) => theme.media.tablet} {
-    padding-left: 55%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
     margin-bottom: 16px;
 
@@ -242,6 +262,8 @@ const SHeadlineNumBackers = styled(Headline)`
   margin-top: 48px;
   color: ${({ theme }) => theme.colorsThemed.accent.green};
 
+  font-weight: 700;
+
   ${({ theme }) => theme.media.tablet} {
     margin-top: initial;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
@@ -254,12 +276,18 @@ const STarget = styled(Text)`
 
 // Winner card
 const SWinnerCard = styled.div`
+  position: relative;
   height: 218px;
 
   padding: 16px;
   padding-right: 114px;
 
-  background: linear-gradient(76.09deg, #00C291 2.49%, #07DF74 50.67%, #0FF34F 102.41%);
+  background: linear-gradient(
+    76.09deg,
+    #00c291 2.49%,
+    #07df74 50.67%,
+    #0ff34f 102.41%
+  );
   border-radius: 24px;
 
   display: flex;
@@ -267,14 +295,13 @@ const SWinnerCard = styled.div`
   align-items: center;
 
   ${({ theme }) => theme.media.tablet} {
-    position: relative;
-
     height: fit-content;
 
     padding: 24px;
+
+    z-index: 10;
   }
 `;
-
 
 // Option details
 const SOptionDetails = styled.div`
@@ -284,26 +311,25 @@ const SOptionDetails = styled.div`
 `;
 
 const SDetailsHeadline = styled(Headline)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SNumBidders = styled(Text)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SYouMade = styled(Text)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SSpanBold = styled.span`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SSpanThin = styled.span`
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 0.8;
 `;
-
 
 const STrophyImgCard = styled.img`
   position: absolute;

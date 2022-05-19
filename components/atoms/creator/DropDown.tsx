@@ -35,10 +35,13 @@ export const DropDown: React.FC<IDropDown> = (props) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const selectedItem = options.find((el) => el.id === value);
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const ddHeight = (options.length > 6 ? 372 : options.length * (isTablet ? 50 : 52)) + 24;
+  const ddHeight =
+    (options.length > 6 ? 372 : options.length * (isTablet ? 50 : 52)) + 24;
 
   const direction = useDropDownDirection(ref, ddHeight);
 
@@ -86,8 +89,8 @@ export const DropDown: React.FC<IDropDown> = (props) => {
         <SInlineSVG
           svg={ArrowDown}
           fill={theme.colorsThemed.text.secondary}
-          width="24px"
-          height="24px"
+          width='24px'
+          height='24px'
           focused={focused}
         />
       </SLabelButton>
@@ -95,7 +98,7 @@ export const DropDown: React.FC<IDropDown> = (props) => {
         <Modal show={focused} onClose={handleCloseClick}>
           <SMobileListContainer focused={focused}>
             <SMobileList>{options.map(renderItem)}</SMobileList>
-            <SCancelButton view="modalSecondary" onClick={handleCloseClick}>
+            <SCancelButton view='modalSecondary' onClick={handleCloseClick}>
               {t('button-cancel')}
             </SCancelButton>
           </SMobileListContainer>
@@ -136,7 +139,8 @@ const SListHolder = styled.div<ISListHolder>`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   padding-bottom: ${(props) => (props.focused ? '12px' : '0px')};
-  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
+  background-color: ${(props) =>
+    props.theme.colorsThemed.background.backgroundDD};
 
   ${(props) => props.theme.media.tablet} {
     left: unset;
@@ -189,7 +193,8 @@ const SMobileList = styled.div`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   flex-direction: column;
-  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
+  background-color: ${(props) =>
+    props.theme.colorsThemed.background.backgroundDD};
 `;
 
 interface ISButton {

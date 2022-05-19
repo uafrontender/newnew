@@ -6,7 +6,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -25,7 +24,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
-import useScrollGradients from '../../../utils/hooks/useScrollGradients';
+// import useScrollGradients from '../../../utils/hooks/useScrollGradients';
 import {
   deleteMessage,
   getMessages,
@@ -41,12 +40,14 @@ import Text from '../../atoms/Text';
 const CommentsMobileModal = dynamic(() => import('./CommentsModalMobile'));
 
 interface ICommentsTab {
+  postUuid: string;
   commentsRoomId: number;
   canDeleteComments?: boolean;
   handleGoBack: () => void;
 }
 
 const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
+  postUuid,
   canDeleteComments,
   commentsRoomId,
   handleGoBack,
@@ -70,7 +71,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
 
   // Scrolling gradients
   const scrollRef = useRef<HTMLDivElement>();
-  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
+  // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
@@ -469,7 +470,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
   return (
     <>
       <STabContainer
-        key="comments"
+        key='comments'
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -480,10 +481,12 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
           }}
         >
           <CommentForm
+            isRoot
+            postUuid={postUuid}
             ref={(el) => {
               commentFormRef.current = el!!;
             }}
-            position="sticky"
+            position='sticky'
             zIndex={1}
             onSubmit={(newMsg: string) => handleAddComment(newMsg)}
           />
@@ -491,7 +494,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             {comments.length === 0 && !commentsLoading ? (
               <SNoCommentsYet>
                 <SNoCommentsImgContainer>
-                  <img src={NoContentYetImg.src} alt="No content yet" />
+                  <img src={NoContentYetImg.src} alt='No content yet' />
                 </SNoCommentsImgContainer>
                 <SNoCommentsCaption variant={3}>
                   {t('comments.noCommentsCaption')}
@@ -500,7 +503,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
                   <SMakeBidArrowSvg
                     svg={MakeFirstBidArrow}
                     fill={theme.colorsThemed.background.quinary}
-                    width="36px"
+                    width='36px'
                   />
                 )}
               </SNoCommentsYet>
@@ -540,6 +543,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
                 <CommentsMobileModal
                   isVisible={isMobile}
                   comments={comments}
+                  postUuid={postUuid}
                   commentsLoading={commentsLoading}
                   commentsNextPageToken={commentsNextPageToken}
                   commentIdFromUrl={commentIdFromUrl ?? undefined}
@@ -554,12 +558,15 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             )}
           </SCommentsWrapper>
         </SActionSection>
-        <GradientMask
-          gradientType="secondary"
+        {/* <GradientMask
+          gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
           positionTop={heightDelta}
           active={showTopGradient}
         />
-        <GradientMask gradientType="secondary" active={showBottomGradient} />
+        <GradientMask
+          gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+          active={showBottomGradient}
+        /> */}
       </STabContainer>
     </>
   );
@@ -589,6 +596,10 @@ const SActionSection = styled.div`
   max-height: 500px;
 
   overflow-y: auto;
+
+  padding-right: 12px;
+  margin-right: -14px;
+  width: calc(100% + 14px);
 
   // Scrollbar
   &::-webkit-scrollbar {

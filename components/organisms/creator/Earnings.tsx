@@ -1,31 +1,32 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
 
 import Headline from '../../atoms/Headline';
-import Navigation from '../../molecules/creator/Navigation';
-
 import { useAppSelector } from '../../../redux-store/store';
 
-export const Earnings = () => {
+const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
+
+export const Earnings: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   return (
     <SContainer>
       {!isMobile && <Navigation />}
       <SContent>
         <STitleBlock>
-          <STitle variant={4}>
-            {t('earnings.title')}
-          </STitle>
+          <STitle variant={4}>{t('earnings.title')}</STitle>
         </STitleBlock>
       </SContent>
     </SContainer>
   );
-};
+});
 
 export default Earnings;
 

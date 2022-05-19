@@ -9,7 +9,7 @@ interface Props extends SVGMotionProps<any> {
   strokeWidth?: string | number;
 }
 
-export const SortIconAnimated: React.FC<Props> = (props) => {
+const SortIconAnimated: React.FC<Props> = (props) => {
   const {
     width,
     color,
@@ -73,23 +73,23 @@ export const SortIconAnimated: React.FC<Props> = (props) => {
       width={width}
       height={height}
       viewBox={`0 0 ${unitWidth} ${unitHeight}`}
-      overflow="visible"
-      preserveAspectRatio="none"
-      {...rest as any}
+      overflow='visible'
+      preserveAspectRatio='none'
+      {...(rest as any)}
     >
       <motion.line
-        x1="0"
+        x1='0'
         x2={unitWidth}
-        y1="0"
-        y2="0"
+        y1='0'
+        y2='0'
         variants={top}
         {...linePropsCustom}
       />
       <motion.line
         x1={isOpen ? 0 : unitWidth * 0.2}
         x2={isOpen ? unitWidth : unitWidth * 0.8}
-        y1="1.5"
-        y2="1.5"
+        y1='1.5'
+        y2='1.5'
         variants={center}
         {...linePropsCustom}
       />

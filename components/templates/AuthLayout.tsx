@@ -1,40 +1,22 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
-import React, { useState, useEffect, createContext, useContext, useMemo } from 'react';
+import React, { useState, useMemo, createContext } from 'react';
 import { useRouter } from 'next/router';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { useTheme } from 'styled-components';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
 import Logo from '../molecules/Logo';
+import HeroVisual from './HeroVisual';
 import Container from '../atoms/Grid/Container';
 import ErrorBoundary from '../organisms/ErrorBoundary';
 
 import 'react-loading-skeleton/dist/skeleton.css';
 
-// Sign in
-import SignInIntro from '../../public/images/signup/hero-visual/Dark/sign-in-intro-fade.webp';
-import SignInHold from '../../public/images/signup/hero-visual/Dark/Sign-In-Hold-Frame.png';
-import SignInOutro from '../../public/images/signup/hero-visual/Dark/sign-in-outro.webp';
-import SignInIntroLight from '../../public/images/signup/hero-visual/Light/sign-in-intro-fade-light.webp';
-import SignInHoldLight from '../../public/images/signup/hero-visual/Light/Sign-In-Hold-Frame-Light.png';
-import SignInOutroLight from '../../public/images/signup/hero-visual/Light/sign-in-outro-light.webp';
-
-// Email verification
-import BottomGlassSphereImage from '../../public/images/signup/floating-assets/Bottom-Glass-Sphere.png';
-import BottomSphereImage from '../../public/images/signup/floating-assets/Bottom-Sphere.png';
-import CrowdfundingImage from '../../public/images/signup/floating-assets/Crowdfunding.png';
-import LeftGlassSphereImage from '../../public/images/signup/floating-assets/Left-Glass-Sphere.png';
-// import BulbImage from '../../public/images/signup/floating-assets/Light-Bulb.png';
-import BulbImage from '../../public/images/signup/floating-assets/Sub-MC.webp';
-import ChoiceImage from '../../public/images/signup/floating-assets/Multiple-Choice.png';
-import RightGlassSphereImage from '../../public/images/signup/floating-assets/Right-Glass-Sphere.png';
-import TopGlassSphereImage from '../../public/images/signup/floating-assets/Top-Glass-Sphere.png';
-import TopMiddleSphereImage from '../../public/images/signup/floating-assets/Top-Middle-Sphere.png';
-import VotesImage from '../../public/images/signup/floating-assets/Votes.png';
+import assets from '../../constants/assets';
 
 export const AuthLayoutContext = createContext({
   shouldHeroUnmount: false,
@@ -47,14 +29,19 @@ const AuthLayoutContextProvider: React.FC = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       shouldHeroUnmount,
-      setShouldHeroUnmount: (newValue: boolean) => setShouldHeroUnmount(newValue),
+      setShouldHeroUnmount: (newValue: boolean) =>
+        setShouldHeroUnmount(newValue),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [shouldHeroUnmount]
   );
 
-  return <AuthLayoutContext.Provider value={contextValue}>{children}</AuthLayoutContext.Provider>;
-}
+  return (
+    <AuthLayoutContext.Provider value={contextValue}>
+      {children}
+    </AuthLayoutContext.Provider>
+  );
+};
 
 export interface IAuthLayout {}
 
@@ -78,16 +65,16 @@ const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {
         <AuthLayoutContextProvider>
           <SAuthLayout>
             <BackgroundVisual
-              view={router.pathname.includes('verify-email') ? 'verify-email' : 'sign-up'}
+              view={
+                router.pathname.includes('verify-email')
+                  ? 'verify-email'
+                  : 'sign-up'
+              }
             />
-            {
-              !router.pathname.includes('verify-email') ? (
-                <HomeLogoButton />
-              ) : null
-            }
-            <AnimatePresence>
-              {children}
-            </AnimatePresence>
+            {!router.pathname.includes('verify-email') ? (
+              <HomeLogoButton />
+            ) : null}
+            <AnimatePresence>{children}</AnimatePresence>
           </SAuthLayout>
         </AuthLayoutContextProvider>
       </SkeletonTheme>
@@ -128,22 +115,21 @@ interface IBackgroundVisual {
   view: 'verify-email' | 'sign-up';
 }
 
-const BackgroundVisual:React.FunctionComponent<IBackgroundVisual> = ({
+const BackgroundVisual: React.FunctionComponent<IBackgroundVisual> = ({
   view,
 }) => {
-
   return (
     <SBackgroundVisual>
       <AnimatePresence>
         {view === 'sign-up' && (
-          <HeroVisual key="hero-visual"/>
+          <HeroVisualContainer>
+            <HeroVisual key='hero-visual' />
+          </HeroVisualContainer>
         )}
-        {view === 'verify-email' && (
-          <VerifyEmailVisual/>
-        )}
+        {view === 'verify-email' && <VerifyEmailVisual />}
       </AnimatePresence>
     </SBackgroundVisual>
-  )
+  );
 };
 
 const SBackgroundVisual = styled.div`
@@ -165,76 +151,7 @@ const SBackgroundVisual = styled.div`
   }
 `;
 
-const HeroVisual: React.FunctionComponent = () => {
-  const theme = useTheme();
-  const [currentState, setCurrentState] = useState<'intro' | 'hold' | 'outro'>('intro');
-  const [introLoaded, setIntroLoaded] = useState(false);
-
-  const authLayoutContext = useContext(AuthLayoutContext);
-
-  useEffect(() => {
-    if (introLoaded) {
-      setTimeout(() => {
-        setCurrentState('hold');
-      }, 2800);
-    }
-  }, [introLoaded]);
-
-  useEffect(() => {
-    if (authLayoutContext.shouldHeroUnmount) {
-      setCurrentState('outro');
-    }
-  }, [authLayoutContext.shouldHeroUnmount]);
-
-  return (
-    <SHeroVisual
-      exit={{
-        x: -1000,
-        y: 0,
-        opacity: 0,
-        transition: {
-          duration: 0.8
-        }
-      }}
-      onUnmount={() => {
-        setCurrentState('outro');
-      }}
-    >
-      <SImageWrapper
-        style={{
-          opacity: currentState === 'intro' ? 1 : 0,
-        }}
-      >
-        <SImage
-          src={theme.name === 'dark' ? SignInIntro.src : SignInIntroLight.src}
-          onLoad={() => {
-            setIntroLoaded(true);
-          }}
-        />
-      </SImageWrapper>
-      <SImageWrapper
-        style={{
-          opacity: currentState === 'hold' ? 1 : 0,
-        }}
-      >
-        <SImage
-          src={theme.name === 'dark' ? SignInHold.src : SignInHoldLight.src}
-        />
-      </SImageWrapper>
-      <SImageWrapper
-        style={{
-          opacity: currentState === 'outro' ? 1 : 0,
-        }}
-      >
-        <SImage
-          src={theme.name === 'dark' ? SignInOutro.src : SignInOutroLight.src}
-        />
-      </SImageWrapper>
-    </SHeroVisual>
-  )
-};
-
-const SHeroVisual = styled(motion.div)`
+const HeroVisualContainer = styled('div')`
   position: absolute;
   display: none;
 
@@ -242,97 +159,75 @@ const SHeroVisual = styled(motion.div)`
     display: block;
 
     right: 55%;
-    top: 25%
+    top: 25%;
   }
 
   ${({ theme }) => theme.media.laptop} {
     right: 50%;
-    top: 180px;
+    top: 100px;
   }
-`;
-
-const SImageWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-
-  width: 400px;
-  height: 600px;
-
-  ${({ theme }) => theme.media.laptop} {
-    width: 600px;
-    height: 700px;
-  }
-`;
-
-const SImage = styled.img`
-  object-fit: contain;
-
-  max-height: 960px;
-  max-width: 100%;
 `;
 
 const VerifyEmailVisual: React.FunctionComponent = () => {
-
   return (
     <SVerifyEmailBgWrapper>
       <img
-        src={BottomGlassSphereImage.src}
-        alt="background"
-        className="email-bg-BottomGlassSphereImage"
+        src={assets.floatingAssets.bottomGlassSphere}
+        alt='background'
+        className='email-bg-BottomGlassSphereImage'
       />
       <img
-        src={BottomSphereImage.src}
-        alt="background"
-        className="email-bg-BottomSphereImage"
+        src={assets.floatingAssets.bottomSphere}
+        alt='background'
+        className='email-bg-BottomSphereImage'
       />
       <img
-        src={CrowdfundingImage.src}
-        alt="background"
-        className="email-bg-CrowdfundingImage"
+        src={assets.floatingAssets.crowdfunding}
+        alt='background'
+        className='email-bg-CrowdfundingImage'
       />
       <img
-        src={LeftGlassSphereImage.src}
-        alt="background"
-        className="email-bg-LeftGlassSphereImage"
+        src={assets.floatingAssets.leftGlassSphere}
+        alt='background'
+        className='email-bg-LeftGlassSphereImage'
       />
       <img
-        src={BulbImage.src}
-        alt="background"
-        className="email-bg-BulbImage"
+        src={assets.floatingAssets.subMC}
+        alt='background'
+        className='email-bg-BulbImage'
       />
       <img
-        src={ChoiceImage.src}
-        alt="background"
-        className="email-bg-ChoiceImage"
+        src={assets.floatingAssets.multipleChoice}
+        alt='background'
+        className='email-bg-ChoiceImage'
       />
       <img
-        src={RightGlassSphereImage.src}
-        alt="background"
-        className="email-bg-RightGlassSphereImage"
+        src={assets.floatingAssets.rightGlassSphere}
+        alt='background'
+        className='email-bg-RightGlassSphereImage'
       />
       <img
-        src={TopGlassSphereImage.src}
-        alt="background"
-        className="email-bg-TopGlassSphereImage"
+        src={assets.floatingAssets.topGlassSphere}
+        alt='background'
+        className='email-bg-TopGlassSphereImage'
       />
       <img
-        src={TopMiddleSphereImage.src}
-        alt="background"
-        className="email-bg-TopMiddleSphereImage"
+        src={assets.floatingAssets.topMiddleSphere}
+        alt='background'
+        className='email-bg-TopMiddleSphereImage'
       />
       <img
-        src={TopMiddleSphereImage.src}
-        alt="background"
-        className="email-bg-BottomMiddleSphereImage"
+        src={assets.floatingAssets.bottomSphere}
+        alt='background'
+        className='email-bg-BottomMiddleSphereImage'
       />
       <img
-        src={VotesImage.src}
-        alt="background"
-        className="email-bg-VotesImage"
+        src={assets.floatingAssets.votes}
+        alt='background'
+        className='email-bg-VotesImage'
       />
     </SVerifyEmailBgWrapper>
-  )
+  );
 };
 
 const SVerifyEmailBgWrapper = styled.div`
@@ -387,7 +282,8 @@ const SVerifyEmailBgWrapper = styled.div`
 
     transform: rotate(-30deg);
 
-    animation: enter-CrowdfundingImage ease forwards 1.4s, floating-CrowdfundingImage infinite alternate linear 3.2s 1.4s;
+    animation: enter-CrowdfundingImage ease forwards 1.4s,
+      floating-CrowdfundingImage infinite alternate linear 3.2s 1.4s;
   }
 
   .email-bg-LeftGlassSphereImage {
@@ -416,7 +312,8 @@ const SVerifyEmailBgWrapper = styled.div`
     height: 280px;
     object-fit: contain;
 
-    animation: enter-BulbImage ease forwards 1.4s, floating infinite alternate linear 3.6s 1.4s;
+    animation: enter-BulbImage ease forwards 1.4s,
+      floating infinite alternate linear 3.6s 1.4s;
   }
 
   .email-bg-ChoiceImage {
@@ -430,7 +327,8 @@ const SVerifyEmailBgWrapper = styled.div`
     height: 280px;
     object-fit: contain;
 
-    animation: enter-ChoiceImage ease forwards 1.4s, floating infinite alternate ease-out 3.8s 1.4s;
+    animation: enter-ChoiceImage ease forwards 1.4s,
+      floating infinite alternate ease-out 3.8s 1.4s;
   }
 
   .email-bg-RightGlassSphereImage {
@@ -505,9 +403,9 @@ const SVerifyEmailBgWrapper = styled.div`
 
     object-fit: contain;
 
-    animation: enter-VotesImage ease forwards 1.5s, floating infinite alternate ease-in 4s 1.5s;
+    animation: enter-VotesImage ease forwards 1.5s,
+      floating infinite alternate ease-in 4s 1.5s;
   }
-
 
   @keyframes floating {
     0% {

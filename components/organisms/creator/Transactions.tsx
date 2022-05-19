@@ -7,25 +7,25 @@ import Navigation from '../../molecules/creator/Navigation';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-export const Transactions = () => {
+export const Transactions: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   return (
     <SContainer>
       {!isMobile && <Navigation />}
       <SContent>
         <STitleBlock>
-          <STitle variant={4}>
-            {t('transactions.title')}
-          </STitle>
+          <STitle variant={4}>{t('transactions.title')}</STitle>
         </STitleBlock>
       </SContent>
     </SContainer>
   );
-};
+});
 
 export default Transactions;
 

@@ -8,23 +8,18 @@ interface ICfMakeCustomPledgeCard {
   handleOpenMakePledgeForm: () => void;
 }
 
-const CfMakeCustomPledgeCard: React.FunctionComponent<ICfMakeCustomPledgeCard> = ({
-  handleOpenMakePledgeForm,
-}) => {
-  const { t } = useTranslation('decision');
+const CfMakeCustomPledgeCard: React.FunctionComponent<ICfMakeCustomPledgeCard> =
+  ({ handleOpenMakePledgeForm }) => {
+    const { t } = useTranslation('decision');
 
-  return (
-    <SStandardPledgeCard
-      onClick={() => handleOpenMakePledgeForm()}
-    >
-      <SCardInfo>
-        <SCardAmount>
-          { t('CfPost.BackersTab.custom') }
-        </SCardAmount>
-      </SCardInfo>
-    </SStandardPledgeCard>
-  );
-};
+    return (
+      <SStandardPledgeCard onClick={() => handleOpenMakePledgeForm()}>
+        <SCardInfo>
+          <SCardAmount>{t('CfPost.BackersTab.custom')}</SCardAmount>
+        </SCardInfo>
+      </SStandardPledgeCard>
+    );
+  };
 
 export default CfMakeCustomPledgeCard;
 
@@ -39,11 +34,10 @@ const SStandardPledgeCard = styled.button`
   cursor: pointer;
   transition: 0.2s linear;
 
-
   height: 96px;
   width: 96px;
 
-  margin: 0px 6px;
+  margin: 0px 0px;
 
   background-color: transparent;
   border: 1.5px solid ${({ theme }) => theme.colorsThemed.accent.blue};
@@ -51,10 +45,12 @@ const SStandardPledgeCard = styled.button`
 
   padding: 8px;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
-    color: #FFFFFF;
+    color: #ffffff;
   }
 `;
 

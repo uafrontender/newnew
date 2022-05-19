@@ -10,7 +10,7 @@ import AnimatedPresence, { TAnimation } from '../atoms/AnimatedPresence';
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import cookieIcon from '../../public/images/svg/icons/filled/Cookie.svg';
 
-export const Cookie = () => {
+const Cookie = React.memo(() => {
   const theme = useTheme();
   const { t } = useTranslation();
   const [cookies, setCookie] = useCookies();
@@ -18,9 +18,14 @@ export const Cookie = () => {
   const [animateCookie, setAnimateCookie] = useState(false);
 
   const handleClose = () => {
+    const d = new Date();
+
     setAnimation('trans-06-reverse');
     setAnimateCookie(true);
-    setCookie('accepted', true);
+    setCookie('accepted', true, {
+      expires: new Date(d.setFullYear(d.getFullYear() + 1)),
+      path: '/',
+    });
   };
   const handleAnimationEnd = () => {
     setAnimateCookie(false);
@@ -51,38 +56,32 @@ export const Cookie = () => {
       onAnimationEnd={handleAnimationEnd}
       animateWhenInView={false}
     >
-      <SContainer
-        onMouseOver={handleMouseOver}
-        onMouseLeave={handleMouseLeave}
-      >
-        <SText>
-          {t('cookie-text')}
-        </SText>
-        <SInlineSVG
-          svg={cookieIcon}
-          width="20px"
-          height="20px"
-        />
-        <Link href="/cookies">
-          <a>
-            <STextLink>
-              {t('cookie-link')}
-            </STextLink>
-          </a>
-        </Link>
-        <InlineSVG
-          clickable
-          scaleOnClick
-          svg={closeIcon}
-          fill={theme.colorsThemed.text.secondary}
-          width="24px"
-          height="24px"
-          onClick={handleClose}
-        />
-      </SContainer>
+      {cookies.accepted !== 'true' && (
+        <SContainer
+          onMouseOver={handleMouseOver}
+          onMouseLeave={handleMouseLeave}
+        >
+          <SText>{t('cookie-text')}</SText>
+          <SInlineSVG svg={cookieIcon} width='20px' height='20px' />
+          <Link href='/cookies'>
+            <a target='_blank'>
+              <STextLink>{t('cookie-link')}</STextLink>
+            </a>
+          </Link>
+          <InlineSVG
+            clickable
+            scaleOnClick
+            svg={closeIcon}
+            fill={theme.colorsThemed.text.secondary}
+            width='24px'
+            height='24px'
+            onClick={handleClose}
+          />
+        </SContainer>
+      )}
     </AnimatedPresence>
   );
-};
+});
 
 export default Cookie;
 
@@ -91,7 +90,8 @@ const SContainer = styled.div`
   display: flex;
   padding: 12px 12px 12px 20px;
   box-shadow: ${(props) => props.theme.shadows.cookie};
-  background: ${(props) => props.theme.colorsThemed.background.backgroundCookie};
+  background: ${(props) =>
+    props.theme.colorsThemed.background.backgroundCookie};
   align-items: center;
   border-radius: 50px;
   pointer-events: all;
@@ -110,7 +110,12 @@ const SText = styled.div`
 const STextLink = styled.div`
   margin: 0 4px;
   font-size: 14px;
-  background: linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), linear-gradient(0deg, #1D6AFF, #1D6AFF);
+  background: linear-gradient(
+      315deg,
+      rgba(29, 180, 255, 0.85) 0%,
+      rgba(29, 180, 255, 0) 50%
+    ),
+    linear-gradient(0deg, #1d6aff, #1d6aff);
   line-height: 24px;
   font-weight: bold;
   white-space: nowrap;

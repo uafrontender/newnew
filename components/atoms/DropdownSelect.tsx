@@ -52,7 +52,9 @@ const DropdownSelect = <T,>({
 
   useEffect(() => {
     if (isOpen && selected) {
-      const itemTopPos = optionsRefs.current[options.findIndex((o) => o.value === selected)].offsetTop;
+      const itemTopPos =
+        optionsRefs.current[options.findIndex((o) => o.value === selected)]
+          .offsetTop;
 
       if (optionsContainerRef.current) {
         optionsContainerRef.current.scrollTop = itemTopPos;
@@ -77,8 +79,8 @@ const DropdownSelect = <T,>({
         <SInlineSVG
           svg={ArrowDown}
           fill={theme.colorsThemed.text.quaternary}
-          width="24px"
-          height="24px"
+          width='24px'
+          height='24px'
           focused={isOpen}
         />
       </SLabelButton>
@@ -178,7 +180,8 @@ const SLabelButton = styled.button`
   &:focus:active {
     cursor: pointer;
 
-    background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
+    background-color: ${({ theme }) =>
+      theme.colorsThemed.background.quaternary};
   }
 
   &:disabled {
@@ -222,7 +225,8 @@ const SOption = styled.button<{
 
   border: transparent;
   border-radius: ${({ theme }) => theme.borderRadius.smallLg};
-  background-color: ${({ selected, theme }) => (selected ? theme.colorsThemed.background.quinary : 'transparent')};
+  background-color: ${({ selected, theme }) =>
+    selected ? theme.colorsThemed.background.quinary : 'transparent'};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   font-size: 14px;
@@ -250,7 +254,8 @@ const SOption = styled.button<{
     ${({ selected }) =>
       !selected
         ? css`
-            background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
+            background-color: ${({ theme }) =>
+              theme.colorsThemed.background.quaternary};
           `
         : null};
   }

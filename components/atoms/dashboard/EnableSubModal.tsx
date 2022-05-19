@@ -16,7 +16,12 @@ interface IEnableSubModal {
   subEnabled: () => void;
 }
 
-const EnableSubModal: React.FC<IEnableSubModal> = ({ confirmEnableSub, selectedProduct, closeModal, subEnabled }) => {
+const EnableSubModal: React.FC<IEnableSubModal> = ({
+  confirmEnableSub,
+  selectedProduct,
+  closeModal,
+  subEnabled,
+}) => {
   const { t } = useTranslation('creator');
   const handleSubmit = () => {
     subEnabled();
@@ -31,13 +36,15 @@ const EnableSubModal: React.FC<IEnableSubModal> = ({ confirmEnableSub, selectedP
             <CloseModalButton handleClick={closeModal} />
           </SModalHeader>
           <SModalContent>
-            <SText>{t('enableSubModal.text')}</SText>
             <SProductInfo>{`${t('enableSubModal.confirmationTextFirstPart')}
-            $${formatNumber(selectedProduct?.monthlyRate?.usdCents!! / 100 ?? 0, true)}
+            $${formatNumber(
+              selectedProduct?.monthlyRate?.usdCents!! / 100 ?? 0,
+              true
+            )}
             ${t('enableSubModal.confirmationTextSecondPart')}`}</SProductInfo>
             <SNote>{t('enableSubModal.note')}</SNote>
           </SModalContent>
-          <SConfirmButton view="primaryGrad" onClick={handleSubmit}>
+          <SConfirmButton view='primaryGrad' onClick={handleSubmit}>
             {t('enableSubModal.bntText')}
           </SConfirmButton>
         </SModal>
@@ -58,9 +65,13 @@ const SContainer = styled.div`
 const SModal = styled.div`
   width: 100%;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   padding: 0 16px 16px;
   box-sizing: border-box;
   display: flex;
@@ -80,7 +91,7 @@ const SModal = styled.div`
 const SModalHeader = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 22px;
+  margin-bottom: 30px;
   justify-content: space-between;
 `;
 
@@ -90,10 +101,8 @@ const SModalTitle = styled.strong`
   font-weight: 600;
 `;
 
-const SModalContent = styled.div``;
-
-const SText = styled.p`
-  margin-bottom: 20px;
+const SModalContent = styled.div`
+  padding: 0 22px;
 `;
 
 const SProductInfo = styled.div`
@@ -101,6 +110,7 @@ const SProductInfo = styled.div`
   padding: 16px;
   margin: 0 0 6px;
   background: ${(props) => props.theme.colorsThemed.background.quaternary};
+  text-align: center;
 `;
 
 const SNote = styled.p`

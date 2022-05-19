@@ -8,7 +8,7 @@ import AnimatedPresence from '../AnimatedPresence';
 type TNicknameInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   errorCaption: string;
-}
+};
 
 const NicknameInput: React.FunctionComponent<TNicknameInput> = ({
   value,
@@ -47,22 +47,14 @@ const NicknameInput: React.FunctionComponent<TNicknameInput> = ({
         }}
         {...rest}
       />
-      {
-        errorBordersShown ? (
-          <AnimatedPresence
-            animation="t-09"
-          >
-            <SErrorDiv>
-              <InlineSvg
-                svg={AlertIcon}
-                width="16px"
-                height="16px"
-              />
-              { errorCaption }
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null
-      }
+      {errorBordersShown ? (
+        <AnimatedPresence animation='t-09'>
+          <SErrorDiv>
+            <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+            {errorCaption}
+          </SErrorDiv>
+        </AnimatedPresence>
+      ) : null}
     </SWrapper>
   );
 };
@@ -80,7 +72,7 @@ const SWrapper = styled.div`
 `;
 
 interface ISNicknameInput {
-  errorBordersShown?: boolean
+  errorBordersShown?: boolean;
 }
 
 const SNicknameInput = styled.input<ISNicknameInput>`
@@ -98,7 +90,8 @@ const SNicknameInput = styled.input<ISNicknameInput>`
   border-color: ${({ theme, errorBordersShown }) => {
     if (!errorBordersShown) {
       return 'transparent';
-    } return (theme.colorsThemed.accent.error);
+    }
+    return theme.colorsThemed.accent.error;
   }};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
@@ -114,15 +107,18 @@ const SNicknameInput = styled.input<ISNicknameInput>`
     color: ${({ theme }) => theme.colorsThemed.text.quaternary};
   }
 
-  &:hover:enabled, &:focus:enabled, &:active:enabled {
+  &:hover:enabled,
+  &:focus:enabled,
+  &:active:enabled {
     outline: none;
 
     border-color: ${({ theme, errorBordersShown }) => {
-    if (!errorBordersShown) {
-      // NB! Temp
-      return theme.colorsThemed.background.outlines2;
-    } return (theme.colorsThemed.accent.error);
-  }};
+      if (!errorBordersShown) {
+        // NB! Temp
+        return theme.colorsThemed.background.outlines2;
+      }
+      return theme.colorsThemed.accent.error;
+    }};
   }
 
   &:disabled {

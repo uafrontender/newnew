@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
-const NoMessagesYet: React.FC = () => {
+const NoMessagesYet: React.FC = React.memo(() => {
   const { t } = useTranslation('chat');
 
   return (
@@ -14,7 +14,8 @@ const NoMessagesYet: React.FC = () => {
       </div>
     </SWelcomeMessage>
   );
-};
+});
+
 const SWelcomeMessage = styled.div`
   position: absolute;
   left: 0;

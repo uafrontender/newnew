@@ -1,20 +1,20 @@
 {
   "back": "Back",
-  "first-step-title": "Create a decision that gets noticed",
-  "first-step-sub-title": "It takes 2 mins to post your decision, try building one of the following",
-  "first-step-auction-title": "Auction",
-  "first-step-auction-sub-title": "The audience send bids with their suggestions.",
-  "first-step-multiple-choice-title": "Multiple Choice",
-  "first-step-multiple-choice-sub-title": "The audience pay to vote on options presented by you.",
-  "first-step-crowdfunding-title": "Crowdfunding",
-  "first-step-crowdfunding-sub-title": "The audience fund your single goal together.",
-  "second-step-auction-title": "Auction",
-  "second-step-multiple-choice-title": "Multiple Choice",
-  "second-step-crowdfunding-title": "Crowdfunding",
+  "first-step-title": "What will you post?",
+  "first-step-auction-title": "Event",
+  "first-step-auction-sub-title": "People send bids for things they want you to do",
+  "first-step-multiple-choice-title": "Superpoll",
+  "first-step-multiple-choice-sub-title": "People pay to vote and you do the option with the most votes",
+  "first-step-crowdfunding-title": "Goal",
+  "first-step-crowdfunding-sub-title": "People pool money together to back your goal",
+  "second-step-auction-title": "Event",
+  "second-step-multiple-choice-title": "Superpoll",
+  "second-step-crowdfunding-title": "Goal",
+  "video-being-processed-caption": "Your video will be available once processed",
   "tabs": {
-    "auction": "Auction",
-    "multiple-choice": "Multiple Choice",
-    "crowdfunding": "Crowdfunding"
+    "auction": "Event",
+    "multiple-choice": "Superpoll",
+    "crowdfunding": "Goal"
   },
   "firstStep": {
     "meta": {
@@ -23,27 +23,28 @@
   },
   "secondStep": {
     "meta": {
-      "title-auction": "Creation | Auction",
-      "title-multiple-choice": "Creation | Multiple Choice",
-      "title-crowdfunding": "Creation | Crowdfunding"
+      "title-auction": "Creation | Event",
+      "title-multiple-choice": "Creation | Superpoll",
+      "title-crowdfunding": "Creation | Goal"
     },
     "input": {
-      "placeholder": "Title - ex. Where should I get my first tattoo \uD83D\uDE4A"
+      "placeholder": "ex. Where should I get my first tattoo \uD83D\uDE4A"
     },
     "fileUpload": {
-      "description": "Max size of the video 100 MB",
+      "description": "Video can be up to 100 MB",
       "button": "Select file"
     },
     "block": {
       "title": {
-        "file": "Upload file",
-        "decision": "Decision information",
-        "advanced": "Advanced settings",
+        "file": "Upload video",
+        "decision": "Details",
+        "advanced": "Duration",
         "floating": "Preview"
       },
       "subTitle": {
-        "votesInfo": "All votes start at a $1 dollar by default",
-        "floating": "Upload file to preview your brand new decision"
+        "votesInfo": "People will spend a minimum of $2 to vote",
+        "floating": "Upload your video to preview it here",
+        "floating-processing": "Preview will be available after processing"
       }
     },
     "modal": {
@@ -51,8 +52,8 @@
         "message": "Are you sure want to leave this page?"
       },
       "deleteFile": {
-        "title": "Delete file",
-        "description": "Are you sure you want to permanently delete this file? You can’t undo the action."
+        "title": "Delete video",
+        "description": "Are you sure you want to delete this video?"
       }
     },
     "card": {
@@ -62,9 +63,9 @@
       "retry": "Retry",
       "cancel": "Cancel",
       "submit": "Publish",
-      "preview": "Preview post",
+      "preview": "Review",
       "schedule": "Schedule",
-      "delete": "Delete permanently",
+      "delete": "Delete",
       "card": {
         "ac": "Place a bid",
         "mc": "Place a bid",
@@ -77,17 +78,17 @@
         "value": "${{value}}",
         "label": "$",
         "placeholder": "1",
-        "description": "Starting bid is ${{value}}"
+        "description": "the minimum bid a person can place on your event"
       },
       "targetBackerCount": {
         "title": "Minimum backers",
         "value": "{{value}}",
         "label": "",
-        "placeholder": "10",
-        "description": "No less than {{value}}"
+        "placeholder": "ex. 50",
+        "description": "${{value}} is the minimum a backer can contribute"
       },
       "expiresAt": {
-        "title": "Expire after",
+        "title": "Ends in",
         "value": "{{value}}",
         "description": "{{value}}",
         "options": {
@@ -125,18 +126,17 @@
           }
         },
         "tablet": {
-          "title": "Start date",
           "type": {
-            "schedule": "Schedule publishing",
-            "right-away": "Right away after I publish my decision"
+            "schedule": "Schedule for a certain date",
+            "right-away": "Post right away once I publish it"
           }
         }
       },
       "comments": {
-        "title": "Commenting turned on"
+        "title": "Allow comments from everyone"
       },
       "allowSuggestions": {
-        "title": "Allow suggestions from VIP subscribers"
+        "title": "Allow suggestions from subscribers"
       },
       "choices": {
         "add": "Add another option",
@@ -148,12 +148,12 @@
     "video": {
       "error": {
         "minLength": "Video duration too small, choose from 10 seconds",
-        "maxLength": "Video duration too long, choose up to 5 minutes",
+        "maxLength": "Video duration too long, choose up to 10 minutes",
         "maxSize": "Video size too big, choose up to 100mb",
         "title": "Ooops...",
         "description": "There was an error and your file could not be uploaded. Would you like to try again."
       },
-      "setThumbnail": "Set thumbnail",
+      "setThumbnail": "Set a thumbnail",
       "deleteFile": "Delete file",
       "previewFull": "Preview",
       "thumbnail": {
@@ -166,19 +166,26 @@
         "title": "Video preview"
       },
       "loading": {
-        "title": "Just a minute",
-        "description": "Your file is uploading. Just give us a second to finish your upload.",
+        "title": "Uploading video",
+        "description": "Your file is uploading. It won’t take long...",
+        "process": "{{progress}}% • {{time}} left"
+      },
+      "processing": {
+        "title": "You can still fill out the details below and publish your post while the video is being processed!",
+        "description": "Your video is processing",
         "process": "{{progress}}% • {{time}} left"
       }
     }
   },
   "preview": {
     "meta": {
-      "title-auction": "Creation | Auction | Preview",
-      "title-multiple-choice": "Creation | Multiple Choice | Preview",
-      "title-crowdfunding": "Creation | Crowdfunding | Preview"
+      "title-auction": "Creation | Event | Preview",
+      "title-multiple-choice": "Creation | Superpoll | Preview",
+      "title-crowdfunding": "Creation | Goal | Preview"
     },
-    "title": "Post preview",
+    "title-auction": "Review my Event",
+    "title-multiple-choice": "Review my Superpoll",
+    "title-crowdfunding": "Review my Goal",
     "button": {
       "submit": "Publish",
       "edit": "Edit"
@@ -186,30 +193,31 @@
     "settings": {
       "minimalBid": "Minimum bid",
       "targetBackerCount": "Backers",
-      "expiresAt": "Expire after",
+      "expiresAt": "Ends on",
       "startsAt": "Start date",
-      "comments": "Commenting",
+      "comments": "Comments",
       "allowSuggestions": "Suggestions"
     },
     "values": {
       "minimalBid": "${{value}}",
-      "comments-allowed": "Allowed",
-      "comments-forbidden": "Forbidden",
-      "allowSuggestions-allowed": "Allowed",
-      "allowSuggestions-forbidden": "Forbidden"
+      "comments-allowed": "On",
+      "comments-forbidden": "Off",
+      "allowSuggestions-allowed": "On",
+      "allowSuggestions-forbidden": "Off"
     }
   },
   "published": {
     "meta": {
-      "title-auction-published": "Creation | Auction | Published",
-      "title-multiple-choice-published": "Creation | Multiple Choice | Published",
-      "title-crowdfunding-published": "Creation | Crowdfunding | Published",
-      "title-auction-scheduled": "Creation | Auction | Scheduled",
-      "title-multiple-choice-scheduled": "Creation | Multiple Choice | Scheduled",
-      "title-crowdfunding-scheduled": "Creation | Crowdfunding | Scheduled"
+      "title-auction-published": "Creation | Event | Published",
+      "title-multiple-choice-published": "Creation | Superpoll | Published",
+      "title-crowdfunding-published": "Creation | Goal | Published",
+      "title-auction-scheduled": "Creation | Event | Scheduled",
+      "title-multiple-choice-scheduled": "Creation | Superpoll | Scheduled",
+      "title-crowdfunding-scheduled": "Creation | Goal | Scheduled"
     },
     "button": {
-      "submit": "View decision"
+      "submit-published": "See my {{value}}",
+      "submit-scheduled": "See scheduled {{value}}"
     },
     "texts": {
       "subTitle-published": "Expand your reach and share decision with others.",
@@ -218,7 +226,8 @@
         "subTitle-published": "Your decision is successfully created. Expand your reach and share decision with others.",
         "subTitle-scheduled": "Your decision is successfully created and scheduled on {{value}}. Expand your reach and share decision with others."
       },
-      "title": "Let’s show-off a little"
+      "title-published": "It’s live...now share it!",
+      "title-scheduled": "It’s scheduled... share the info!"
     },
     "socials": {
       "twitter": "Twitter",
@@ -229,11 +238,27 @@
       "copied": "Link Copied!"
     }
   },
-  "heroPopupDC": {
-    "title": "Decision Creation",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-  },
-  "heroPopupCommon": {
-    "btnText": "Got it"
+  "tutorials": {
+    "heroPopupCommon": {
+      "heroBtnText": "Let's go"
+    },
+    "heroPopupAC": {
+      "title": "Events",
+      "line1": "1. Open to ideas? Post a video and have the\n audience send you bids on what you should do",
+      "line2": "2. People send bids with their ideas, and\n how much they’ll pay to see you do it",
+      "line3": "3. Choose your favorite bid, then\n upload a video of yourself doing it!"
+    },
+    "heroPopupMC": {
+      "title": "Superpolls",
+      "line1": "1. Post a video poll with a few options\n for the audience to choose from",
+      "line2": "2. People pay to vote on their favorite option",
+      "line3": "3. Upload a video response of you doing\n the option that gets the most votes!"
+    },
+    "heroPopupCF": {
+      "title": "Goals",
+      "line1": "1. Post a video goal and choose the number\n of backers you need to reach that goal",
+      "line2": "2. Every backer will contribute a custom\n dollar amount to your goal",
+      "line3": "3. Upload a video of you fulfilling your\n goal IRL when you get enough backers!"
+    }
   }
 }

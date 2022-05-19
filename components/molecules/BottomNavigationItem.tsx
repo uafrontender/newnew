@@ -3,6 +3,7 @@ import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import Link from 'next/link';
 
 import Caption from '../atoms/Caption';
 import InlineSVG from '../atoms/InlineSVG';
@@ -19,6 +20,7 @@ import dashboardIconFilled from '../../public/images/svg/icons/filled/Earnings.s
 import dashboardIconOutlined from '../../public/images/svg/icons/outlined/Earnings.svg';
 import notificationsIconFilled from '../../public/images/svg/icons/filled/Notifications.svg';
 import notificationsIconOutlined from '../../public/images/svg/icons/outlined/Notifications.svg';
+import iconDirectMessages from '../../public/images/svg/icons/outlined/Comments.svg';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
 
@@ -30,6 +32,7 @@ const icons: any = {
     share: shareIconOutlined,
     dashboard: dashboardIconOutlined,
     notifications: notificationsIconOutlined,
+    dms: iconDirectMessages,
   },
   filled: {
     add: addIconFilled,
@@ -38,22 +41,23 @@ const icons: any = {
     share: shareIconFilled,
     dashboard: dashboardIconFilled,
     notifications: notificationsIconFilled,
+    dms: iconDirectMessages,
   },
 };
 
 export type TBottomNavigationItem = {
-  key: string,
-  url: string,
-  width: string,
-  counter?: number,
+  key: string;
+  url: string;
+  width: string;
+  counter?: number;
   actionHandler?: () => void;
-}
+};
 
 interface IBottomNavigationItem {
   item: TBottomNavigationItem;
 }
 
-export const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
+const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
   const { item } = props;
   const theme = useTheme();
   const { t } = useTranslation();
@@ -68,20 +72,22 @@ export const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => 
         duration: SCROLL_TO_TOP,
         containerId: 'generalScrollContainer',
       });
-    } else {
-      router.push(item.url, item.url);
     }
   };
 
-  return (
-    <SContainer width={item.width} onClick={item?.actionHandler ?? handleClick}>
+  return item?.actionHandler ? (
+    <SContainer width={item.width} onClick={item?.actionHandler}>
       <SSVGContainer>
         <InlineSVG
           key={item.key}
           svg={icons?.[active ? 'filled' : 'outlined']?.[item.key]}
-          fill={active ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
-          width="24px"
-          height="24px"
+          fill={
+            active
+              ? theme.colorsThemed.accent.blue
+              : theme.colorsThemed.text.tertiary
+          }
+          width='24px'
+          height='24px'
         />
         {!!item.counter && (
           <SIndicatorContainer>
@@ -92,6 +98,34 @@ export const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => 
       <SCaption variant={3} active={active}>
         {t(`mobile-bottom-navigation-${item.key}`)}
       </SCaption>
+    </SContainer>
+  ) : (
+    <SContainer width={item.width} onClick={handleClick}>
+      <Link href={item.url}>
+        <a>
+          <SSVGContainer>
+            <InlineSVG
+              key={item.key}
+              svg={icons?.[active ? 'filled' : 'outlined']?.[item.key]}
+              fill={
+                active
+                  ? theme.colorsThemed.accent.blue
+                  : theme.colorsThemed.text.tertiary
+              }
+              width='24px'
+              height='24px'
+            />
+            {!!item.counter && (
+              <SIndicatorContainer>
+                <Indicator minified counter={item.counter} />
+              </SIndicatorContainer>
+            )}
+          </SSVGContainer>
+          <SCaption variant={3} active={active}>
+            {t(`mobile-bottom-navigation-${item.key}`)}
+          </SCaption>
+        </a>
+      </Link>
     </SContainer>
   );
 };
@@ -113,6 +147,13 @@ const SContainer = styled.div<ISContainer>`
   justify-content: center;
 
   max-width: 56px;
+  a {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+  }
 `;
 
 interface ISTitle {
@@ -120,7 +161,8 @@ interface ISTitle {
 }
 
 const SCaption = styled(Caption)<ISTitle>`
-  color: ${(props) => props.theme.colorsThemed.text[props.active ? 'primary' : 'tertiary']};
+  color: ${(props) =>
+    props.theme.colorsThemed.text[props.active ? 'primary' : 'tertiary']};
   width: 100%;
   overflow: hidden;
   position: relative;

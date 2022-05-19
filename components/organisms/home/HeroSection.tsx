@@ -15,17 +15,14 @@ import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
-// import NotificationItem from '../../molecules/NotificationsItem';
 
 import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_EXPLORE } from '../../../constants/timings';
 
-// Assets
-import HeroDarkPlaceholder from '../../../public/images/home/Landing-Page-Hold-Frame-Dark.webp';
-import HeroLightPlaceholder from '../../../public/images/home/Landing-Page-Hold-Frame-Light.webp';
+import assets from '../../../constants/assets';
 
-export const HeroSection = () => {
+export const HeroSection = React.memo(() => {
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('home');
@@ -35,78 +32,30 @@ export const HeroSection = () => {
   const [animateSubTitle, setAnimateSubTitle] = useState(false);
   const [animateButton, setAnimateButton] = useState(false);
 
-  // const notifications = useMemo(() => [
-  //   {
-  //     id: 'uniqueid-1',
-  //     bid: 50,
-  //     bidCurrency: '$',
-  //     bidUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
-  //       nickname: '@sugardaddy',
-  //     },
-  //     bidForUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
-  //       nickname: '@unicornbaby',
-  //     },
-  //   },
-  //   {
-  //     id: 'uniqueid-2',
-  //     bid: 50,
-  //     bidCurrency: '$',
-  //     bidUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
-  //       nickname: '@sugardaddy',
-  //     },
-  //     bidForUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
-  //       nickname: '@unicornbaby',
-  //     },
-  //   },
-  //   {
-  //     id: 'uniqueid-3',
-  //     bid: 50,
-  //     bidCurrency: '$',
-  //     bidUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
-  //       nickname: '@sugardaddy',
-  //     },
-  //     bidForUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
-  //       nickname: '@unicornbaby',
-  //     },
-  //   },
-  //   {
-  //     id: 'uniqueid-4',
-  //     bid: 50,
-  //     bidCurrency: '$',
-  //     bidUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
-  //       nickname: '@sugardaddy',
-  //     },
-  //     bidForUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
-  //       nickname: '@unicornbaby',
-  //     },
-  //   },
-  // ], []);
-
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const handleSignInClick = () => {
     router.push('/sign-up');
   };
   const handleExploreClick = () => {
-    scroller.scrollTo('topSection', {
-      offset: isMobile ? -20 : -100,
-      smooth: 'ease',
-      duration: SCROLL_EXPLORE,
-      containerId: 'generalScrollContainer',
-    });
+    if (document.getElementsByName('topSection').length > 0) {
+      scroller.scrollTo('topSection', {
+        offset: isMobile ? -20 : -100,
+        smooth: 'ease',
+        duration: SCROLL_EXPLORE,
+        containerId: 'generalScrollContainer',
+      });
+    } else {
+      console.log('hey');
+      scroller.scrollTo('ac', {
+        offset: isMobile ? -20 : -100,
+        smooth: 'ease',
+        duration: SCROLL_EXPLORE,
+        containerId: 'generalScrollContainer',
+      });
+    }
   };
-  // const renderItem = (item: any) => (
-  //   <SNotificationItemHolder key={item.id}>
-  //     <NotificationItem item={item} />
-  //   </SNotificationItemHolder>
-  // );
 
   const handleTitleAnimationEnd = useCallback(() => {
     setAnimateSubTitle(true);
@@ -124,12 +73,12 @@ export const HeroSection = () => {
   // Try to pre-fetch the content
   useEffect(() => {
     router.prefetch('/sign-up');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <SWrapper
-      layoutId="heroSection"
+      layoutId='heroSection'
       transition={{
         ease: 'easeInOut',
         duration: 1,
@@ -139,7 +88,7 @@ export const HeroSection = () => {
         <SHeadline>
           <AnimatedPresence
             start={animateTitle}
-            animation="t-08"
+            animation='t-08'
             delay={0.4}
             onAnimationEnd={handleTitleAnimationEnd}
           >
@@ -149,23 +98,20 @@ export const HeroSection = () => {
         <SSubTitle weight={600}>
           <AnimatedPresence
             start={animateSubTitle}
-            animation="t-02"
+            animation='t-02'
             onAnimationEnd={handleSubTitleAnimationEnd}
           >
             {t('hero-block-subTitle')}
           </AnimatedPresence>
         </SSubTitle>
-        <AnimatedPresence
-          start={animateButton}
-          animation="t-01"
-        >
+        <AnimatedPresence start={animateButton} animation='t-01'>
           <SButtonsHolder>
             {isMobile ? (
               <>
                 <SButton
                   withDim
                   withShrink
-                  view="primaryGrad"
+                  view='primaryGrad'
                   onClick={handleSignInClick}
                 >
                   {t('hero-block-sign-in')}
@@ -173,7 +119,7 @@ export const HeroSection = () => {
                 <SButton
                   withDim
                   withShrink
-                  view="secondary"
+                  view='secondary'
                   onClick={handleExploreClick}
                 >
                   {t('hero-block-explore')}
@@ -183,7 +129,7 @@ export const HeroSection = () => {
               <SButton
                 withShrink
                 withShadow
-                view="primaryGrad"
+                view='primaryGrad'
                 onClick={handleExploreClick}
               >
                 {t('hero-block-explore-now')}
@@ -193,26 +139,55 @@ export const HeroSection = () => {
         </AnimatedPresence>
       </STopWrapper>
       <SHeroImage>
-        <video
-          loop
-          muted
-          autoPlay
-          playsInline
-          poster={theme.name === 'light' ? HeroLightPlaceholder.src : HeroDarkPlaceholder.src}
-        >
-          <source
-            src={
+        {isMobile ? (
+          <video
+            key='video-mobile'
+            loop
+            muted
+            autoPlay
+            playsInline
+            poster={
               theme.name === 'light'
-              ? '/images/home/Landing-Page-Light.mp4'
-              : '/images/home/Landing-Page-Dark.mp4'
+                ? assets.home.lightMobileLandingStatic
+                : assets.home.darkMobileLandingStatic
             }
-            type="video/mp4"
-          />
-        </video>
+          >
+            <source
+              src={
+                theme.name === 'light'
+                  ? assets.home.lightMobileLandingAnimated
+                  : assets.home.darkMobileLandingAnimated
+              }
+              type='video/mp4'
+            />
+          </video>
+        ) : (
+          <video
+            key='video-desktop'
+            loop
+            muted
+            autoPlay
+            playsInline
+            poster={
+              theme.name === 'light'
+                ? assets.home.lightLandingStatic
+                : assets.home.darkLandingStatic
+            }
+          >
+            <source
+              src={
+                theme.name === 'light'
+                  ? assets.home.lightLandingAnimated
+                  : assets.home.darkLandingAnimated
+              }
+              type='video/mp4'
+            />
+          </video>
+        )}
       </SHeroImage>
     </SWrapper>
   );
-};
+});
 
 export default HeroSection;
 
@@ -239,12 +214,15 @@ const STopWrapper = styled.div`
   white-space: pre-line;
 
   ${(props) => props.theme.media.laptop} {
-    max-width: 45%
+    max-width: 45%;
   }
 `;
 
 const SHeadline = styled(Headline)`
   text-align: center;
+
+  /* Preserve line break */
+  white-space: pre;
 
   ${(props) => props.theme.media.tablet} {
     max-width: 320px;
@@ -263,7 +241,6 @@ const SSubTitle = styled(Text)`
   text-align: center;
 
   ${(props) => props.theme.media.tablet} {
-
     text-align: left;
   }
 
@@ -300,28 +277,35 @@ const SHeroImage = styled.div`
   order: -1;
 
   flex: 1;
-  margin-top: 24px;
 
   width: 100%;
   height: 300px;
 
   display: flex;
   align-items: center;
+  justify-content: center;
 
   z-index: 1;
 
   video {
     width: 100%;
+    max-width: 360px;
     object-fit: contain;
+
+    position: relative;
+
+    top: -32px;
   }
 
   ${({ theme }) => theme.media.tablet} {
     order: unset;
     height: 642px;
+    margin-top: 24px;
 
     video {
-      position: relative;
       top: -10%;
+
+      max-width: unset;
     }
   }
 `;

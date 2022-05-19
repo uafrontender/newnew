@@ -1,9 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {
-  useState, useRef, useEffect,
-} from 'react';
-import styled from 'styled-components';
+import React, { useState, useRef, useEffect } from 'react';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import { useAppSelector } from '../../../redux-store/store';
@@ -11,37 +9,43 @@ import { useAppSelector } from '../../../redux-store/store';
 import Text from '../../atoms/Text';
 import Headline from '../../atoms/Headline';
 
-// Images
-import Hourglass from '../../../public/images/decision/hourglass-mock.png';
-
 // Utils
 import isBrowser from '../../../utils/isBrowser';
-import { TPostType } from '../../../utils/switchPostType';
 import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
 import Button from '../../atoms/Button';
+import assets from '../../../constants/assets';
+// import assets from '../../../constants/assets';
 
 interface IPostScheduledSection {
+  postType: string;
   timestampSeconds: number;
   isFollowing: boolean;
+  variant: 'decision' | 'moderation';
   handleFollowDecision: () => {};
 }
 
 const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
+  postType,
   timestampSeconds,
   isFollowing,
+  variant,
   handleFollowDecision,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // Timer
   const parsed = (timestampSeconds - Date.now()) / 1000;
   const hasEnded = Date.now() > timestampSeconds;
   const expirationDate = new Date(timestampSeconds);
 
-  const [parsedSeconds, setParsedSeconds] = useState<DHMS>(secondsToDHMS(parsed));
+  const [parsedSeconds, setParsedSeconds] = useState<DHMS>(
+    secondsToDHMS(parsed)
+  );
   const [seconds, setSeconds] = useState(parsed);
   const interval = useRef<number>();
 
@@ -62,87 +66,74 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     <SContainer>
       <SHeadingContainer>
         <SImgContainer>
-          <SHourglassImg
-            src={Hourglass.src}
+          <img
+            className='hourglass-img'
+            src={
+              theme.name === 'light'
+                ? assets.decision.lightHourglassAnimated
+                : assets.decision.darkHourglassAnimated
+            }
+            alt='video is processed'
           />
         </SImgContainer>
         {!isMobile && (
-          <STitle
-            variant={6}
-          >
-            { t('PostScheduled.PostScheduledSection.title') }
+          <STitle variant={6}>
+            {t(`PostScheduled.PostScheduledSection.${variant}.title`)}
           </STitle>
         )}
-        <SSubtitle1
-          variant={2}
-        >
-          { t('PostScheduled.PostScheduledSection.subtitle_1') }
+        <SSubtitle1 variant={2}>
+          {t(`PostScheduled.PostScheduledSection.${variant}.subtitle_1`, {
+            postType: t(`postType.${postType}`),
+          })}
         </SSubtitle1>
-        <SSubtitle2
-          variant={2}
-        >
-          { t('PostScheduled.PostScheduledSection.subtitle_2') }
+        <SSubtitle2 variant={2}>
+          {t(`PostScheduled.PostScheduledSection.${variant}.subtitle_2`)}
         </SSubtitle2>
       </SHeadingContainer>
       <STimer>
         {parsedSeconds.days !== '00' && (
           <STimerItem>
-            <STimerTime>
-              {parsedSeconds.days}
-            </STimerTime>
-            <STimerCaption
-              variant={3}
-            >
-              { t('PostScheduled.PostScheduledSection.timer.days') }
+            <STimerTime>{parsedSeconds.days}</STimerTime>
+            <STimerCaption variant={3}>
+              {t(`PostScheduled.PostScheduledSection.${variant}.timer.days`)}
             </STimerCaption>
           </STimerItem>
         )}
         <STimerItem>
-          <STimerTime>
-            {parsedSeconds.hours}
-          </STimerTime>
-          <STimerCaption
-            variant={3}
-          >
-            { t('PostScheduled.PostScheduledSection.timer.hours') }
+          <STimerTime>{parsedSeconds.hours}</STimerTime>
+          <STimerCaption variant={3}>
+            {t(`PostScheduled.PostScheduledSection.${variant}.timer.hours`)}
           </STimerCaption>
         </STimerItem>
         <STimerItem>
-          <STimerTime>
-            {parsedSeconds.minutes}
-          </STimerTime>
-          <STimerCaption
-            variant={3}
-          >
-            { t('PostScheduled.PostScheduledSection.timer.minutes') }
+          <STimerTime>{parsedSeconds.minutes}</STimerTime>
+          <STimerCaption variant={3}>
+            {t(`PostScheduled.PostScheduledSection.${variant}.timer.minutes`)}
           </STimerCaption>
         </STimerItem>
         {parsedSeconds.days === '00' && (
           <STimerItem>
-            <STimerTime>
-              {parsedSeconds.seconds}
-            </STimerTime>
-            <STimerCaption
-              variant={3}
-            >
-              { t('PostScheduled.PostScheduledSection.timer.seconds') }
+            <STimerTime>{parsedSeconds.seconds}</STimerTime>
+            <STimerCaption variant={3}>
+              {t(`PostScheduled.PostScheduledSection.${variant}.timer.seconds`)}
             </STimerCaption>
           </STimerItem>
         )}
       </STimer>
-      <SCTAButton
-        view="primaryGrad"
-        onClick={() => handleFollowDecision()}
-      >
-        {!isFollowing ? (
-          t('PostScheduled.PostScheduledSection.followBtn')
-        ) : (
-          t('PostScheduled.PostScheduledSection.unfollowBtn')
-        )}
-      </SCTAButton>
+      {/* {variant === 'decision' && (
+        <SCTAButton view='primaryGrad' onClick={() => handleFollowDecision()}>
+          {!isFollowing
+            ? t(`PostScheduled.PostScheduledSection.${variant}.followBtn`, {
+                postType: t(`postType.${postType}`),
+              })
+            : t(`PostScheduled.PostScheduledSection.${variant}.unfollowBtn`, {
+                postType: t(`postType.${postType}`),
+              })}
+        </SCTAButton>
+      )} */}
     </SContainer>
   );
-}
+};
 
 export default PostScheduledSection;
 
@@ -161,7 +152,6 @@ const SContainer = styled.div`
   z-index: 9;
 
   ${({ theme }) => theme.media.tablet} {
-
     position: initial;
     background-color: transparent;
   }
@@ -172,8 +162,7 @@ const SHeadingContainer = styled.div`
   display: grid;
   grid-template-areas:
     'hourglass subtitle_1'
-    'hourglass subtitle_2'
-  ;
+    'hourglass subtitle_2';
 
   grid-template-columns: 60px 1fr;
 
@@ -182,8 +171,7 @@ const SHeadingContainer = styled.div`
       'hourglass'
       'title'
       'subtitle_1'
-      'subtitle_2'
-    ;
+      'subtitle_2';
 
     grid-template-columns: initial;
 
@@ -196,8 +184,7 @@ const SHeadingContainer = styled.div`
     grid-template-areas:
       'hourglass hourglass'
       'title title'
-      'subtitle_1 subtitle_2'
-    ;
+      'subtitle_1 subtitle_2';
   }
 `;
 
@@ -211,6 +198,12 @@ const SImgContainer = styled.div`
   width: 48px;
   height: 48px;
 
+  .hourglass-img {
+    width: 100%;
+    object-fit: contain;
+    position: relative;
+  }
+
   ${({ theme }) => theme.media.tablet} {
     width: 120px;
     height: 120px;
@@ -223,6 +216,9 @@ const SImgContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     width: 160px;
     height: 160px;
+    .hourglass-video {
+      top: -32px;
+    }
   }
 `;
 
@@ -291,7 +287,6 @@ const STimerItem = styled.div`
 
 const STimerTime = styled(Headline)`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-
 `;
 
 const STimerCaption = styled(Text)`
@@ -301,7 +296,6 @@ const STimerCaption = styled(Text)`
 const SCTAButton = styled(Button)`
   height: 56px;
   width: 100%;
-
 
   ${({ theme }) => theme.media.tablet} {
     width: fit-content;

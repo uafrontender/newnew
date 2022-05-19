@@ -1,8 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
-import React, {
-  ReactElement, useCallback, useEffect, useState,
-} from 'react';
+import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSideProps, NextPage } from 'next';
@@ -16,13 +14,13 @@ import { getUserByUsername } from '../../api/endpoints/user';
 import { fetchUsersPosts } from '../../api/endpoints/post';
 
 import PostModal from '../../components/organisms/decision/PostModal';
-import List from '../../components/organisms/see-more/List';
-// import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
-import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
+import PostList from '../../components/organisms/see-more/PostList';
 import InlineSvg from '../../components/atoms/InlineSVG';
 
 import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
 import Text from '../../components/atoms/Text';
+import NoContentCard from '../../components/atoms/profile/NoContentCard';
+import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
 
 interface IUserPageIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -55,14 +53,12 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   const { t } = useTranslation('profile');
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] =
+    useState<newnewapi.IPost | undefined>();
 
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    ref: loadingRef,
-    inView,
-  } = useInView();
+  const { ref: loadingRef, inView } = useInView();
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
@@ -70,60 +66,65 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
     setPostModalOpen(true);
   };
 
-  const handleSetDisplayedPost = (post: newnewapi.IPost) => {
+  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
     setDisplayedPost(post);
-  };
+  }, []);
 
   const handleClosePostModal = () => {
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };
 
-  const loadPosts = useCallback(async (
-    token?: string,
-    needCount?: boolean,
-  ) => {
-    if (isLoading) return;
-    try {
-      setIsLoading(true);
-      setTriedLoading(true);
-      const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
-        userUuid: user.uuid,
-        filter: postsFilter,
-        relation: newnewapi.GetUserPostsRequest.Relation.THEY_CREATED,
-        paging: {
-          ...(token ? { pageToken: token } : {}),
-        },
-        ...(needCount ? {
-          needTotalCount: true,
-        } : {}),
-      });
+  const loadPosts = useCallback(
+    async (token?: string, needCount?: boolean) => {
+      if (isLoading) return;
+      try {
+        setIsLoading(true);
+        setTriedLoading(true);
+        const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
+          userUuid: user.uuid,
+          filter: postsFilter,
+          relation: newnewapi.GetUserPostsRequest.Relation.THEY_CREATED,
+          paging: {
+            ...(token ? { pageToken: token } : {}),
+          },
+          ...(needCount
+            ? {
+                needTotalCount: true,
+              }
+            : {}),
+        });
 
-      const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
+        const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
 
-      if (postsResponse.data && postsResponse.data.posts) {
-        handleSetPosts((curr) => [...curr, ...postsResponse.data?.posts as newnewapi.Post[]]);
-        handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
+        if (postsResponse.data && postsResponse.data.posts) {
+          handleSetPosts((curr) => [
+            ...curr,
+            ...(postsResponse.data?.posts as newnewapi.Post[]),
+          ]);
+          handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
 
-        if (postsResponse.data.totalCount) {
-          handleUpdateCount(postsResponse.data.totalCount);
-        } else if (needCount) {
-          handleUpdateCount(0);
+          if (postsResponse.data.totalCount) {
+            handleUpdateCount(postsResponse.data.totalCount);
+          } else if (needCount) {
+            handleUpdateCount(0);
+          }
         }
+        setIsLoading(false);
+      } catch (err) {
+        setIsLoading(false);
+        console.error(err);
       }
-      setIsLoading(false);
-    } catch (err) {
-      setIsLoading(false);
-      console.error(err);
-    }
-  }, [
-    user.uuid,
-    handleSetPosts,
-    handleUpdatePageToken,
-    handleUpdateCount,
-    postsFilter,
-    isLoading,
-  ]);
+    },
+    [
+      user.uuid,
+      handleSetPosts,
+      handleUpdatePageToken,
+      handleUpdateCount,
+      postsFilter,
+      isLoading,
+    ]
+  );
 
   useEffect(() => {
     if (inView && !isLoading) {
@@ -135,65 +136,54 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
     } else if (!triedLoading && posts?.length === 0) {
       loadPosts(undefined, true);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
-
-  // useUpdateEffect(() => {
-  //   handleUpdatePageToken('');
-  //   handleSetPosts([]);
-  //   loadPosts(undefined, true);
-  // }, [postsFilter]);
 
   return (
     <div>
-      {
-        !user.options?.isCreator && user.options?.isActivityPrivate
-        ? (
-          <SMain>
-            <SAccountPrivate>
-              <SPrivateLock>
-                <InlineSvg
-                  svg={LockIcon}
-                  width="24px"
-                  height="24px"
-                  fill={theme.colorsThemed.text.secondary}
-                />
-              </SPrivateLock>
-              <SAccountPrivateText
-                variant={1}
-              >
-                { t('AccountPrivate', { username: user.nickname ?? user.username }) }
-              </SAccountPrivateText>
-            </SAccountPrivate>
-          </SMain>
-        )
-        : (
-          <SMain>
-            <PostsFilterSection
-              numDecisions={totalCount}
-              isLoading={isLoading}
-              postsFilter={postsFilter}
-              handleUpdateFilter={handleUpdateFilter}
-            />
-            <SCardsSection>
-              {posts && (
-                <List
-                  category=""
-                  loading={isLoading}
-                  collection={posts}
-                  wrapperStyle={{
-                    left: 0,
-                  }}
-                  handlePostClicked={handleOpenPostModal}
-                />
-              )}
-            </SCardsSection>
-            <div
-              ref={loadingRef}
-            />
-          </SMain>
-        )
-      }
+      {!user.options?.isCreator && user.options?.isActivityPrivate ? (
+        <SMain>
+          <SAccountPrivate>
+            <SPrivateLock>
+              <InlineSvg
+                svg={LockIcon}
+                width='24px'
+                height='24px'
+                fill={theme.colorsThemed.text.secondary}
+              />
+            </SPrivateLock>
+            <SAccountPrivateText variant={1}>
+              {t('AccountPrivate', {
+                username: user.nickname ?? user.username,
+              })}
+            </SAccountPrivateText>
+          </SAccountPrivate>
+        </SMain>
+      ) : (
+        <SMain>
+          <SCardsSection>
+            {posts && (
+              <PostList
+                category=''
+                loading={isLoading}
+                collection={posts}
+                wrapperStyle={{
+                  left: 0,
+                }}
+                handlePostClicked={handleOpenPostModal}
+              />
+            )}
+            {posts && posts.length === 0 && !isLoading && (
+              <NoContentCard>
+                <NoContentDescription>
+                  {t('CreatorsDecisions.no-content.description')}
+                </NoContentDescription>
+              </NoContentCard>
+            )}
+          </SCardsSection>
+          <div ref={loadingRef} />
+        </SMain>
+      )}
       {displayedPost && (
         <PostModal
           isOpen={postModalOpen}
@@ -206,14 +196,14 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   );
 };
 
-(UserPageIndex as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  const renderedPage = page.props.user?.options?.isCreator ? (
-    'creatorsDecisions'
-  ) : (
-    page.props.user?.options?.isActivityPrivate ? (
-      'activityHidden'
-    ) : 'activity'
-  );
+(UserPageIndex as NextPageWithLayout).getLayout = function getLayout(
+  page: ReactElement
+) {
+  const renderedPage = page.props.user?.options?.isCreator
+    ? 'creatorsDecisions'
+    : page.props.user?.options?.isActivityPrivate
+    ? 'activityHidden'
+    : 'activity';
 
   return (
     <ProfileLayout
@@ -221,29 +211,31 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
       renderedPage={renderedPage}
       user={page.props.user}
       {...{
-        ...(renderedPage === 'creatorsDecisions' ? {
-          postsCachedCreatorDecisions: page.props.pagedPosts.posts,
-          postsCachedActivelyBiddingOnFilter: newnewapi.Post.Filter.ALL,
-          postsCachedCreatorDecisionsPageToken: page.props.nextPageTokenFromServer,
-          postsCachedCreatorDecisionsCount: page.props.pagedPosts.totalCount,
-        } : (
-          renderedPage !== 'activityHidden' ? (
-            {
+        ...(renderedPage === 'creatorsDecisions'
+          ? {
+              postsCachedCreatorDecisions: page.props.pagedPosts.posts,
+              postsCachedActivelyBiddingOnFilter: newnewapi.Post.Filter.ALL,
+              postsCachedCreatorDecisionsPageToken:
+                page.props.nextPageTokenFromServer,
+              postsCachedCreatorDecisionsCount:
+                page.props.pagedPosts.totalCount,
+            }
+          : renderedPage !== 'activityHidden'
+          ? {
               postsCachedActivity: page.props.pagedPosts.posts,
               postsCachedActivityFilter: newnewapi.Post.Filter.ALL,
               postsCachedActivityPageToken: page.props.nextPageTokenFromServer,
               postsCachedActivityCount: page.props.pagedPosts.totalCount,
             }
-          ) : {
-            postsCachedActivity: [],
-            postsCachedActivityFilter: newnewapi.Post.Filter.ALL,
-            postsCachedActivityPageToken: undefined,
-            postsCachedActivityCount: undefined,
-          }
-        )),
+          : {
+              postsCachedActivity: [],
+              postsCachedActivityFilter: newnewapi.Post.Filter.ALL,
+              postsCachedActivityPageToken: undefined,
+              postsCachedActivityCount: undefined,
+            }),
       }}
     >
-      { page }
+      {page}
     </ProfileLayout>
   );
 };
@@ -252,10 +244,13 @@ export default UserPageIndex;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    ['common', 'profile', 'home', 'decision', 'payment-modal'],
-  );
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'common',
+    'profile',
+    'home',
+    'decision',
+    'payment-modal',
+  ]);
 
   if (!username || Array.isArray(username)) {
     return {
@@ -362,13 +357,10 @@ const SCardsSection = styled.div`
   ${(props) => props.theme.media.tablet} {
     margin-right: -32px !important;
   }
-
 `;
 
 // Account private
-const SAccountPrivate = styled.div`
-
-`;
+const SAccountPrivate = styled.div``;
 
 const SPrivateLock = styled.div`
   display: flex;

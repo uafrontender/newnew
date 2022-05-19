@@ -12,13 +12,17 @@ import Lottie from '../../components/atoms/Lottie';
 
 import {
   signInWithApple,
-  signInWithFacebook, signInWithGoogle,
+  signInWithFacebook,
+  signInWithGoogle,
 } from '../../api/endpoints/auth';
 import { APIResponse } from '../../api/apiConfigs';
 import { SUPPORTED_AUTH_PROVIDERS } from '../../constants/general';
 
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { setUserData, setUserLoggedIn } from '../../redux-store/slices/userStateSlice';
+import {
+  setUserData,
+  setUserLoggedIn,
+} from '../../redux-store/slices/userStateSlice';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
 
@@ -27,18 +31,15 @@ type TAppleResponseBody = {
   code: string;
   id_token: string;
   sub?: string;
-  user?: any
-}
+  user?: any;
+};
 
 interface IAuthRedirectPage {
   provider: string;
   body?: TAppleResponseBody;
 }
 
-const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
-  provider,
-  body,
-}) => {
+const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
   const router = useRouter();
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
@@ -47,7 +48,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
 
   useEffect(() => {
     if (user.loggedIn) router.push('/');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -60,31 +61,31 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
         let res: APIResponse<newnewapi.SignInResponse>;
 
         if (provider === 'google') {
-          const { code } = router.query;
+          const { code, state } = router.query;
 
           if (!code || Array.isArray(code)) throw new Error('No code');
 
           const requestPayload = new newnewapi.GoogleSignInRequest({
             code,
+            state: state as string,
           });
 
           res = await signInWithGoogle(requestPayload);
         } else if (provider === 'fb') {
-          const { code } = router.query;
+          const { code, state } = router.query;
 
           if (!code || Array.isArray(code)) throw new Error('No code');
 
           const requestPayload = new newnewapi.FacebookSignInRequest({
             code,
+            state: state as string,
           });
 
           res = await signInWithFacebook(requestPayload);
         } else if (provider === 'apple') {
           if (!body) throw new Error('No body receieved');
 
-          const {
-            id_token, sub,
-          } = body;
+          const { id_token, sub, state } = body;
 
           if (!id_token || Array.isArray(id_token)) throw new Error('No code');
           if (!sub || Array.isArray(sub)) throw new Error('No user id');
@@ -92,6 +93,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
           const requestPayload = new newnewapi.AppleSignInRequest({
             identityToken: id_token,
             userId: sub,
+            state: state as string,
           });
 
           res = await signInWithApple(requestPayload);
@@ -99,60 +101,57 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
           throw new Error('Provider not supported');
         }
 
-        if (!res!! || res!!.error || !res.data) throw new Error(res!!.error?.message ?? 'An error occured');
+        if (!res!! || res!!.error || !res.data)
+          throw new Error(res!!.error?.message ?? 'An error occured');
 
         const { data } = res!!;
 
-        if (
-          !data
-          || data.status !== newnewapi.SignInResponse.Status.SUCCESS
-        ) throw new Error('No data');
+        if (!data || data.status !== newnewapi.SignInResponse.Status.SUCCESS)
+          throw new Error('No data');
 
-        dispatch(setUserData({
-          username: data.me?.username,
-          nickname: data.me?.nickname,
-          email: data.me?.email,
-          avatarUrl: data.me?.avatarUrl,
-          coverUrl: data.me?.coverUrl,
-          userUuid: data.me?.userUuid,
-          bio: data.me?.bio,
-          dateOfBirth: {
-            day: data.me?.dateOfBirth?.day,
-            month: data.me?.dateOfBirth?.month,
-            year: data.me?.dateOfBirth?.year,
-          },
-          countryCode: data.me?.countryCode,
-          options: {
-            isActivityPrivate: data.me?.options?.isActivityPrivate,
-            isCreator: data.me?.options?.isCreator,
-            isVerified: data.me?.options?.isVerified,
-            creatorStatus: data.me?.options?.creatorStatus,
-          },
-        }));
+        dispatch(
+          setUserData({
+            username: data.me?.username,
+            nickname: data.me?.nickname,
+            email: data.me?.email,
+            avatarUrl: data.me?.avatarUrl,
+            coverUrl: data.me?.coverUrl,
+            userUuid: data.me?.userUuid,
+            bio: data.me?.bio,
+            dateOfBirth: {
+              day: data.me?.dateOfBirth?.day,
+              month: data.me?.dateOfBirth?.month,
+              year: data.me?.dateOfBirth?.year,
+            },
+            countryCode: data.me?.countryCode,
+            options: {
+              isActivityPrivate: data.me?.options?.isActivityPrivate,
+              isCreator: data.me?.options?.isCreator,
+              isVerified: data.me?.options?.isVerified,
+              creatorStatus: data.me?.options?.creatorStatus,
+            },
+          })
+        );
         // Set credential cookies
-        setCookie(
-          'accessToken',
-          data.credential?.accessToken,
-          {
-            expires: new Date((data.credential?.expiresAt?.seconds as number)!! * 1000),
-            path: '/',
-          },
-        );
-        setCookie(
-          'refreshToken',
-          data.credential?.refreshToken,
-          {
-            // Expire in 10 years
-            maxAge: (10 * 365 * 24 * 60 * 60),
-            path: '/',
-          },
-        );
+        setCookie('accessToken', data.credential?.accessToken, {
+          expires: new Date(
+            (data.credential?.expiresAt?.seconds as number)!! * 1000
+          ),
+          path: '/',
+        });
+        setCookie('refreshToken', data.credential?.refreshToken, {
+          // Expire in 10 years
+          maxAge: 10 * 365 * 24 * 60 * 60,
+          path: '/',
+        });
 
         dispatch(setUserLoggedIn(true));
 
         setIsLoading(false);
         if (data.redirectUrl) {
           router.push(data.redirectUrl);
+        } else if (data.me?.options?.isCreator) {
+          router.push('/creator/dashboard');
         } else {
           router.push('/');
         }
@@ -165,7 +164,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
     }
 
     handleAuth();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -228,10 +227,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
 
-  if (!provider
-    || Array.isArray(provider)
-    || SUPPORTED_AUTH_PROVIDERS.indexOf(provider as string) === -1
-    || (provider === 'apple' && (!bodyParsed!! || !bodyParsed.sub))
+  if (
+    !provider ||
+    Array.isArray(provider) ||
+    SUPPORTED_AUTH_PROVIDERS.indexOf(provider as string) === -1 ||
+    (provider === 'apple' && (!bodyParsed!! || !bodyParsed.sub))
   ) {
     return {
       redirect: {

@@ -1,12 +1,13 @@
 import styled from 'styled-components';
 import Button from '../Button';
 import Text from '../Text';
-import Indicator from '../Indicator';
 
 export const SBottomAction = styled.div`
   display: flex;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.tertiary};
   border-radius: ${(props) => props.theme.borderRadius.medium};
   padding: 24px;
   width: 100%;
@@ -48,7 +49,9 @@ export const SBottomActionTitle = styled.strong`
   margin-bottom: 4px;
   font-weight: 600;
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
 `;
 
 export const SBottomActionMessage = styled.span`
@@ -124,10 +127,9 @@ export const SChatItemTime = styled(Text)`
   margin-bottom: 4px;
 `;
 
-export const SChatItemIndicator = styled(Indicator)``;
-
 export const SChatSeparator = styled.div`
-  border-top: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+  border-top: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
   margin-left: 72px;
   border-radius: 2px;
   margin-right: 15px;

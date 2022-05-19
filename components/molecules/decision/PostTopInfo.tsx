@@ -2,36 +2,42 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../redux-store/store';
 
 import { TPostType } from '../../../utils/switchPostType';
 
+import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
+import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
+import PostFailedBox from './PostFailedBox';
+import PostShareMenu from './PostShareMenu';
+import PostShareModal from './PostShareModal';
+import PostEllipseMenu from './PostEllipseMenu';
+import PostEllipseModal from './PostEllipseModal';
 
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 
 import { formatNumber } from '../../../utils/format';
-import PostShareMenu from './PostShareMenu';
-import PostShareModal from './PostShareModal';
-import PostEllipseMenu from './PostEllipseMenu';
-import PostEllipseModal from './PostEllipseModal';
 import { markPost } from '../../../api/endpoints/post';
 import { FollowingsContext } from '../../../contexts/followingContext';
-import { markUser } from '../../../api/endpoints/user';
-import Headline from '../../atoms/Headline';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import getDisplayname from '../../../utils/getDisplayname';
+import assets from '../../../constants/assets';
 
-import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
-import Text from '../../atoms/Text';
-import PostFailedBox from './PostFailedBox';
+const IMAGES = {
+  ac: assets.creation.AcAnimated,
+  cf: assets.creation.CfAnimated,
+  mc: assets.creation.McAnimated,
+};
 
 interface IPostTopInfo {
   postId: string;
@@ -40,9 +46,14 @@ interface IPostTopInfo {
   creator: newnewapi.IUser;
   isFollowingDecisionInitial: boolean;
   postType?: TPostType;
-  startsAtSeconds: number;
-  amountInBids?: number;
   totalVotes?: number;
+  totalPledges?: number;
+  targetPledges?: number;
+  amountInBids?: number;
+  hasWinner: boolean;
+  handleReportOpen: () => void;
+  handleRemovePostFromState?: () => void;
+  handleAddPostToState?: () => void;
 }
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
@@ -50,136 +61,157 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   postStatus,
   title,
   creator,
-  postType,
-  startsAtSeconds,
   isFollowingDecisionInitial,
-  amountInBids,
+  postType,
   totalVotes,
+  totalPledges,
+  targetPledges,
+  amountInBids,
+  hasWinner,
+  handleReportOpen,
+  handleRemovePostFromState,
+  handleAddPostToState,
 }) => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('decision');
-  const startingDateParsed = new Date(startsAtSeconds * 1000);
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const showSelectingWinnerOption = useMemo(() => (
-    postType === 'ac' && postStatus === 'wating_for_decision'
-  ), [postType, postStatus]);
+  const failureReason = useMemo(() => {
+    if (postStatus !== 'failed') return '';
 
-  const { followingsIds, addId, removeId, } = useContext(FollowingsContext);
+    if (postType === 'ac') {
+      if (!hasWinner) {
+        return 'ac-no-winner';
+      }
+      if (amountInBids === 0 || !amountInBids) {
+        return 'ac';
+      }
+    }
 
-  const [isFollowingDecision, setIsFollowingDecision] = useState(isFollowingDecisionInitial)
+    if (postType === 'mc') {
+      if (totalVotes === 0 || !totalVotes) {
+        return 'mc';
+      }
+    }
+
+    if (postType === 'cf') {
+      if (!totalPledges || totalPledges!! < targetPledges!!) {
+        return 'cf';
+      }
+    }
+
+    return 'no-response';
+  }, [
+    postStatus,
+    postType,
+    hasWinner,
+    amountInBids,
+    totalVotes,
+    totalPledges,
+    targetPledges,
+  ]);
+
+  const showSelectingWinnerOption = useMemo(
+    () => postType === 'ac' && postStatus === 'waiting_for_decision',
+    [postType, postStatus]
+  );
+
+  const { followingsIds, addId, removeId } = useContext(FollowingsContext);
+
+  const [isFollowingDecision, setIsFollowingDecision] = useState(
+    isFollowingDecisionInitial
+  );
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
-  const handleRedirectToUser = () => {
-    window?.history.replaceState({
-      ...{...window.history.state},
-      fromPost: true,
-    }, '', '');
-    router.push(`/${creator.username}`);
-  };
-
   const handleOpenShareMenu = () => setShareMenuOpen(true);
-  const handleCloseShareMenu = () => setShareMenuOpen(false);
+  const handleCloseShareMenu = useCallback(() => {
+    setShareMenuOpen(false);
+  }, []);
 
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
-  const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
+  const handleCloseEllipseMenu = useCallback(() => {
+    setEllipseMenuOpen(false);
+  }, []);
 
-  const handleFollowDecision = async () => {
+  const handleFollowDecision = useCallback(async () => {
     try {
       if (!user.loggedIn) {
-        window?.history.replaceState({
-          fromPost: true,
-        }, '', '');
-        router.push(`/sign-up?reason=follow-decision&redirect=${window.location.href}`);
+        router.push(
+          `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
+            window.location.href
+          )}`
+        );
       }
-      const markAsViewedPayload = new newnewapi.MarkPostRequest({
-        markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
+      const markAsFavoritePayload = new newnewapi.MarkPostRequest({
+        markAs: !isFollowingDecision
+          ? newnewapi.MarkPostRequest.Kind.FAVORITE
+          : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
         postUuid: postId,
       });
 
-      const res = await markPost(markAsViewedPayload);
+      const res = await markPost(markAsFavoritePayload);
 
       if (!res.error) {
         setIsFollowingDecision(!isFollowingDecision);
+
+        if (isFollowingDecision) {
+          handleRemovePostFromState?.();
+        } else {
+          handleAddPostToState?.();
+        }
       }
     } catch (err) {
       console.error(err);
     }
-  };
-
-  const handleToggleFollowingCreator = async () => {
-    try {
-      if (!user.loggedIn) {
-        window?.history.replaceState({
-          fromPost: true,
-        }, '', '');
-        router.push(`/sign-up?reason=follow-creator&redirect=${window.location.href}`);
-      }
-
-      const payload = new newnewapi.MarkUserRequest({
-        userUuid: creator.uuid,
-        markAs: followingsIds.includes(creator.uuid as string) ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
-      });
-
-      const res = await markUser(payload);
-
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-      if (followingsIds.includes(creator.uuid as string)) {
-        removeId(creator.uuid as string);
-      } else {
-        addId(creator.uuid as string);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
+  }, [
+    handleAddPostToState,
+    handleRemovePostFromState,
+    isFollowingDecision,
+    postId,
+    router,
+    user.loggedIn,
+  ]);
 
   return (
     <SContainer>
-      <SWrapper
-        showSelectingWinnerOption={showSelectingWinnerOption}
-      >
+      <SWrapper showSelectingWinnerOption={showSelectingWinnerOption}>
         {postType === 'ac' && amountInBids ? (
           <SBidsAmount>
-            <span>
-              $
-              {formatNumber((amountInBids / 100) ?? 0, true)}
-            </span>
-            {' '}
-            { t('AcPost.PostTopInfo.in_bids') }
+            <span>${formatNumber(amountInBids / 100 ?? 0, true)}</span>{' '}
+            {t('AcPost.PostTopInfo.in_bids')}
           </SBidsAmount>
         ) : null}
         {postType === 'mc' && totalVotes ? (
           <SBidsAmount>
-            <span>
-              {formatNumber(totalVotes, true).replaceAll(/,/g, ' ') }
-            </span>
-            {' '}
-            { t('McPost.PostTopInfo.votes') }
+            <span>{formatNumber(totalVotes, true).replaceAll(/,/g, ' ')}</span>{' '}
+            {totalVotes > 1
+              ? t('McPost.PostTopInfo.votes')
+              : t('McPost.PostTopInfo.vote')}
           </SBidsAmount>
         ) : null}
-        <CreatorCard
-          onClick={() => handleRedirectToUser()}
-        >
-          <SAvatarArea>
-            <img
-              src={creator.avatarUrl!! as string}
-              alt={creator.username!!}
-            />
-          </SAvatarArea>
-          <SUsername>
-            { creator.nickname ?? `@${creator.username}` }
-          </SUsername>
+        <CreatorCard>
+          <Link href={`/${creator.username}`}>
+            <SAvatarArea>
+              <img
+                src={creator.avatarUrl!! as string}
+                alt={creator.username!!}
+              />
+            </SAvatarArea>
+          </Link>
+          <Link href={`/${creator.username}`}>
+            <SUsername>{creator.nickname ?? `@${creator.username}`}</SUsername>
+          </Link>
         </CreatorCard>
         <SActionsDiv>
           <SShareButton
-            view="transparent"
+            view='transparent'
             iconOnly
             withDim
             withShrink
@@ -191,20 +223,20 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             <InlineSvg
               svg={ShareIconFilled}
               fill={theme.colorsThemed.text.secondary}
-              width="20px"
-              height="20px"
+              width='20px'
+              height='20px'
             />
           </SShareButton>
           <SMoreButton
-            view="transparent"
+            view='transparent'
             iconOnly
             onClick={() => handleOpenEllipseMenu()}
           >
             <InlineSvg
               svg={MoreIconFilled}
               fill={theme.colorsThemed.text.secondary}
-              width="20px"
-              height="20px"
+              width='20px'
+              height='20px'
             />
           </SMoreButton>
           {/* Share menu */}
@@ -212,7 +244,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             <PostShareMenu
               postId={postId}
               isVisible={shareMenuOpen}
-              handleClose={handleCloseShareMenu}
+              onClose={handleCloseShareMenu}
             />
           )}
           {isMobile && shareMenuOpen ? (
@@ -226,62 +258,59 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           {/* Ellipse menu */}
           {!isMobile && (
             <PostEllipseMenu
-              isFollowing={followingsIds.includes(creator.uuid as string)}
+              postType={postType as string}
               isFollowingDecision={isFollowingDecision}
               isVisible={ellipseMenuOpen}
               handleFollowDecision={handleFollowDecision}
-              handleToggleFollowingCreator={handleToggleFollowingCreator}
-              handleClose={handleCloseEllipseMenu}
+              handleReportOpen={handleReportOpen}
+              onClose={handleCloseEllipseMenu}
             />
           )}
           {isMobile && ellipseMenuOpen ? (
             <PostEllipseModal
-              isFollowing={followingsIds.includes(creator.uuid as string)}
+              postType={postType as string}
               isFollowingDecision={isFollowingDecision}
               zIndex={11}
               isOpen={ellipseMenuOpen}
               handleFollowDecision={handleFollowDecision}
-              handleToggleFollowingCreator={handleToggleFollowingCreator}
+              handleReportOpen={handleReportOpen}
               onClose={handleCloseEllipseMenu}
             />
           ) : null}
         </SActionsDiv>
-        <SPostTitle
-        >
-          <Headline
-            variant={5}
-          >
-            {title}
-          </Headline>
+        <SPostTitle>
+          <Headline variant={5}>{title}</Headline>
         </SPostTitle>
         {showSelectingWinnerOption ? (
           <SSelectingWinnerOption>
-            <SHeadline
-              variant={4}
-            >
-              { t('AcPost.PostTopInfo.SelectWinner.title') }
+            <SHeadline variant={4}>
+              {t('AcPost.PostTopInfo.SelectWinner.title')}
             </SHeadline>
-            <SText
-              variant={3}
-            >
-              { t('AcPost.PostTopInfo.SelectWinner.body') }
+            <SText variant={3}>
+              {t('AcPost.PostTopInfo.SelectWinner.body')}
             </SText>
-            <STrophyImg
-              src={AcSelectWinnerIcon.src}
-            />
+            <STrophyImg src={assets.decision.trophy} />
           </SSelectingWinnerOption>
         ) : null}
       </SWrapper>
       {postStatus === 'failed' && (
         <PostFailedBox
-          title={t('PostFailed.title')}
-          body={t('PostFailed.body.not_reached_goal')}
-          buttonCaption={t('PostFailed.ctaButton')}
+          title={t('PostFailedBox.title', {
+            postType: t(`postType.${postType}`),
+          })}
+          body={t(`PostFailedBox.reason.${failureReason}`, {
+            creator: getDisplayname(creator),
+          })}
+          buttonCaption={t('PostFailedBox.ctaButton', {
+            postTypeMultiple: t(`postType.multiple.${postType}`),
+          })}
+          imageSrc={IMAGES[postType!!]}
           handleButtonClick={() => {
             document.getElementById('post-modal-container')?.scrollTo({
-              top: document.getElementById('recommendations-section-heading')?.offsetTop,
+              top: document.getElementById('recommendations-section-heading')
+                ?.offsetTop,
               behavior: 'smooth',
-            })
+            });
           }}
         />
       )}
@@ -293,6 +322,10 @@ PostTopInfo.defaultProps = {
   postType: undefined,
   amountInBids: undefined,
   totalVotes: undefined,
+  totalPledges: undefined,
+  targetPledges: undefined,
+  handleRemovePostFromState: undefined,
+  handleAddPostToState: undefined,
 };
 
 export default PostTopInfo;
@@ -312,8 +345,6 @@ const SWrapper = styled.div<{
     'title title title'
     'userCard userCard actions'
     'stats stats stats';
-  ;
-
   height: fit-content;
 
   margin-top: 24px;
@@ -321,22 +352,19 @@ const SWrapper = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     width: 100%;
-    ${({ showSelectingWinnerOption }) => (
+    ${({ showSelectingWinnerOption }) =>
       showSelectingWinnerOption
-      ? css`
-        grid-template-areas:
-          'userCard stats actions'
-          'title title title'
-          'selectWinner selectWinner selectWinner'
-        ;
-      `
-      : css`
-        grid-template-areas:
-          'userCard stats actions'
-          'title title title'
-        ;
-      `
-    )}
+        ? css`
+            grid-template-areas:
+              'userCard stats actions'
+              'title title title'
+              'selectWinner selectWinner selectWinner';
+          `
+        : css`
+            grid-template-areas:
+              'userCard stats actions'
+              'title title title';
+          `}
     grid-template-rows: 40px;
     grid-template-columns: 1fr 1fr 100px;
     align-items: center;
@@ -364,9 +392,7 @@ const CreatorCard = styled.div`
 
   display: grid;
   align-items: center;
-  grid-template-areas:
-    'avatar username'
-  ;
+  grid-template-areas: 'avatar username';
   grid-template-columns: 36px 1fr;
 
   height: 36px;
@@ -374,7 +400,7 @@ const CreatorCard = styled.div`
   cursor: pointer;
 
   & > div:nth-child(2) {
-    transition: .2s linear;
+    transition: 0.2s linear;
   }
 
   &:hover {
@@ -427,10 +453,8 @@ const SShareButton = styled(Button)`
   background: none;
   padding: 0px;
   &:focus:enabled {
-    background: ${({
-    theme,
-    view,
-  }) => theme.colorsThemed.button.background[view!!]};
+    background: ${({ theme, view }) =>
+      theme.colorsThemed.button.background[view!!]};
   }
 `;
 
@@ -473,7 +497,6 @@ const SBidsAmount = styled.div`
   }
 `;
 
-
 // Winner option
 const SSelectingWinnerOption = styled.div`
   position: fixed;
@@ -492,7 +515,12 @@ const SSelectingWinnerOption = styled.div`
   padding: 24px 16px;
   padding-right: 134px;
 
-  background: linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;
+  background: linear-gradient(
+      315deg,
+      rgba(29, 180, 255, 0.85) 0%,
+      rgba(29, 180, 255, 0) 50%
+    ),
+    #1d6aff;
   border-radius: 24px;
 
   ${({ theme }) => theme.media.tablet} {
@@ -505,7 +533,6 @@ const SSelectingWinnerOption = styled.div`
     margin-top: 32px;
 
     width: 100%;
-
   }
 `;
 
@@ -516,9 +543,9 @@ const STrophyImg = styled.img`
 `;
 
 const SHeadline = styled(Headline)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SText = styled(Text)`
-  color:#FFFFFF;
+  color: #ffffff;
 `;

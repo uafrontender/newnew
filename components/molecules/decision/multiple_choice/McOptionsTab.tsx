@@ -2,13 +2,13 @@
 /* eslint-disable consistent-return */
 import React, {
   useCallback,
-  useContext,
+  // useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
@@ -18,11 +18,14 @@ import { debounce } from 'lodash';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { validateText } from '../../../../api/endpoints/infrastructure';
-import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
-import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
+// import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
+import {
+  doFreeVote,
+  // voteOnPostWithWallet,
+} from '../../../../api/endpoints/multiple_choice';
 import {
   createPaymentSession,
-  getTopUpWalletWithPaymentPurposeUrl,
+  // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 
 import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
@@ -32,21 +35,27 @@ import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import McOptionCard from './McOptionCard';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
-import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
-import PaymentModal from '../../checkout/PaymentModal';
+// import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
+import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
 import LoadingModal from '../../LoadingModal';
 import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import PaymentSuccessModal from '../PaymentSuccessModal';
 import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
-import { WalletContext } from '../../../../contexts/walletContext';
+// import { WalletContext } from '../../../../contexts/walletContext';
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
+import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
+import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import Headline from '../../../atoms/Headline';
+import assets from '../../../../constants/assets';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
+  postLoading: boolean;
   postStatus: TPostStatusStringified;
   postCreator: string;
   postDeadline: string;
@@ -55,6 +64,9 @@ interface IMcOptionsTab {
   pagingToken: string | undefined | null;
   minAmount: number;
   votePrice: number;
+  canVoteForFree: boolean;
+  canSubscribe: boolean;
+  handleResetFreeVote: () => void;
   handleLoadOptions: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
@@ -63,6 +75,7 @@ interface IMcOptionsTab {
 
 const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   post,
+  postLoading,
   postStatus,
   postCreator,
   postDeadline,
@@ -71,9 +84,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   pagingToken,
   minAmount,
   votePrice,
+  canVoteForFree,
+  canSubscribe,
   handleLoadOptions,
+  handleResetFreeVote,
   handleAddOrUpdateOptionFromResponse,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
@@ -90,7 +107,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     'tablet',
   ].includes(resizeMode);
 
-  const { walletBalance } = useContext(WalletContext);
+  // const { walletBalance } = useContext(WalletContext);
+  const { appConstants } = useGetAppConstants();
 
   const hasVotedOptionId = useMemo(() => {
     const supportedOption = options.find((o) => o.isSupportedByMe);
@@ -107,7 +125,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     useScrollGradients(containerRef);
 
   const [heightDelta, setHeightDelta] = useState(
-    post.isSuggestionsAllowed && !hasVotedOptionId ? 56 : 0
+    post.isSuggestionsAllowed && !hasVotedOptionId && postStatus === 'voting'
+      ? 56
+      : 0
   );
   const actionSectionContainer = useRef<HTMLDivElement>();
 
@@ -119,33 +139,21 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [newOptionText, setNewOptionText] = useState('');
   const [newOptionTextValid, setNewOptionTextValid] = useState(true);
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [newBidAmount, setNewBidAmount] = useState(minAmount.toString());
   // Mobile modal for new option
   const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
   // Payment modal
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+  const [useFreeVoteModalOpen, setUseFreeVoteModalOpen] = useState(false);
+  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
   // Handlers
-  const handleTogglePaymentModalOpen = async () => {
-    if (isAPIValidateLoading) return;
-    if (!user.loggedIn) {
-      router.push(`/${post?.creator?.username}/subscribe`);
-      return;
-    }
-    // Check if subscribed
-    const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-      creatorUuid: post.creator?.uuid,
-    });
 
-    const res = await getSubscriptionStatus(getStatusPayload);
-
-    if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
-      router.push(`/${post.creator?.username}/subscribe`);
-      return;
-    }
-    setPaymentModalOpen(true);
+  // Redirect to user's page
+  const handleRedirectToPostCreator = () => {
+    router.push(`/${post.creator?.username}/subscribe`);
   };
 
   const validateTextViaAPI = useCallback(async (text: string) => {
@@ -193,117 +201,117 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     [setNewOptionText, validateTextViaAPIDebounced]
   );
 
-  const handlePayWithWallet = useCallback(async () => {
-    setLoadingModalOpen(true);
-    try {
-      // Check if user is logged in
-      if (!user.loggedIn) {
-        const getTopUpWalletWithPaymentPurposeUrlPayload =
-          new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-              router.locale !== 'en-US' ? `${router.locale}/` : ''
-            }post/${post.postUuid}`,
-            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-              router.locale !== 'en-US' ? `${router.locale}/` : ''
-            }post/${post.postUuid}`,
-            ...(!user.loggedIn
-              ? {
-                  nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-                }
-              : {}),
-            mcVoteRequest: {
-              votesCount: parseInt(newBidAmount),
-              optionText: newOptionText,
-              postUuid: post.postUuid,
-            },
-          });
+  // const handlePayWithWallet = useCallback(async () => {
+  //   setLoadingModalOpen(true);
+  //   try {
+  //     // Check if user is logged in
+  //     if (!user.loggedIn) {
+  //       const getTopUpWalletWithPaymentPurposeUrlPayload =
+  //         new newnewapi.TopUpWalletWithPurposeRequest({
+  //           successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //           }post/${post.postUuid}`,
+  //           cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //           }post/${post.postUuid}`,
+  //           ...(!user.loggedIn
+  //             ? {
+  //                 nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+  //               }
+  //             : {}),
+  //           mcVoteRequest: {
+  //             votesCount: parseInt(newBidAmount),
+  //             optionText: newOptionText,
+  //             postUuid: post.postUuid,
+  //           },
+  //         });
 
-        const res = await getTopUpWalletWithPaymentPurposeUrl(
-          getTopUpWalletWithPaymentPurposeUrlPayload
-        );
+  //       const res = await getTopUpWalletWithPaymentPurposeUrl(
+  //         getTopUpWalletWithPaymentPurposeUrlPayload
+  //       );
 
-        if (!res.data || !res.data.sessionUrl || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
+  //       if (!res.data || !res.data.sessionUrl || res.error)
+  //         throw new Error(res.error?.message ?? 'Request failed');
 
-        window.location.href = res.data.sessionUrl;
-      } else {
-        const makeBidPayload = new newnewapi.VoteOnPostRequest({
-          votesCount: parseInt(newBidAmount),
-          optionText: newOptionText,
-          postUuid: post.postUuid,
-        });
+  //       window.location.href = res.data.sessionUrl;
+  //     } else {
+  //       const makeBidPayload = new newnewapi.VoteOnPostRequest({
+  //         votesCount: parseInt(newBidAmount),
+  //         optionText: newOptionText,
+  //         postUuid: post.postUuid,
+  //       });
 
-        const res = await voteOnPostWithWallet(makeBidPayload);
+  //       const res = await voteOnPostWithWallet(makeBidPayload);
 
-        if (
-          res.data &&
-          res.data.status ===
-            newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE
-        ) {
-          const getTopUpWalletWithPaymentPurposeUrlPayload =
-            new newnewapi.TopUpWalletWithPurposeRequest({
-              successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-                router.locale !== 'en-US' ? `${router.locale}/` : ''
-              }post/${post.postUuid}`,
-              cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-                router.locale !== 'en-US' ? `${router.locale}/` : ''
-              }post/${post.postUuid}`,
-              mcVoteRequest: {
-                votesCount: parseInt(newBidAmount),
-                optionText: newOptionText,
-                postUuid: post.postUuid,
-              },
-            });
+  //       if (
+  //         res.data &&
+  //         res.data.status ===
+  //           newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE
+  //       ) {
+  //         const getTopUpWalletWithPaymentPurposeUrlPayload =
+  //           new newnewapi.TopUpWalletWithPurposeRequest({
+  //             successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //             }post/${post.postUuid}`,
+  //             cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //             }post/${post.postUuid}`,
+  //             mcVoteRequest: {
+  //               votesCount: parseInt(newBidAmount),
+  //               optionText: newOptionText,
+  //               postUuid: post.postUuid,
+  //             },
+  //           });
 
-          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
-            getTopUpWalletWithPaymentPurposeUrlPayload
-          );
+  //         const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
+  //           getTopUpWalletWithPaymentPurposeUrlPayload
+  //         );
 
-          if (
-            !resStripeRedirect.data ||
-            !resStripeRedirect.data.sessionUrl ||
-            resStripeRedirect.error
-          )
-            throw new Error(
-              resStripeRedirect.error?.message ?? 'Request failed'
-            );
+  //         if (
+  //           !resStripeRedirect.data ||
+  //           !resStripeRedirect.data.sessionUrl ||
+  //           resStripeRedirect.error
+  //         )
+  //           throw new Error(
+  //             resStripeRedirect.error?.message ?? 'Request failed'
+  //           );
 
-          window.location.href = resStripeRedirect.data.sessionUrl;
-          return;
-        }
+  //         window.location.href = resStripeRedirect.data.sessionUrl;
+  //         return;
+  //       }
 
-        if (
-          !res.data ||
-          res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
-          res.error
-        )
-          throw new Error(res.error?.message ?? 'Request failed');
+  //       if (
+  //         !res.data ||
+  //         res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+  //         res.error
+  //       )
+  //         throw new Error(res.error?.message ?? 'Request failed');
 
-        const optionFromResponse = (res.data
-          .option as newnewapi.MultipleChoice.Option)!!;
-        optionFromResponse.isSupportedByMe = true;
-        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+  //       const optionFromResponse = (res.data
+  //         .option as newnewapi.MultipleChoice.Option)!!;
+  //       optionFromResponse.isSupportedByMe = true;
+  //       handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-        setNewBidAmount('');
-        setNewOptionText('');
-        setSuggestNewMobileOpen(false);
-        setPaymentModalOpen(false);
-        setLoadingModalOpen(false);
-        setPaymentSuccesModalOpen(true);
-      }
-    } catch (err) {
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-      console.error(err);
-    }
-  }, [
-    newBidAmount,
-    newOptionText,
-    post.postUuid,
-    user.loggedIn,
-    router.locale,
-    handleAddOrUpdateOptionFromResponse,
-  ]);
+  //       setNewBidAmount('');
+  //       setNewOptionText('');
+  //       setSuggestNewMobileOpen(false);
+  //       setPaymentModalOpen(false);
+  //       setLoadingModalOpen(false);
+  //       setPaymentSuccessModalOpen(true);
+  //     }
+  //   } catch (err) {
+  //     setPaymentModalOpen(false);
+  //     setLoadingModalOpen(false);
+  //     console.error(err);
+  //   }
+  // }, [
+  //   newBidAmount,
+  //   newOptionText,
+  //   post.postUuid,
+  //   user.loggedIn,
+  //   router.locale,
+  //   handleAddOrUpdateOptionFromResponse,
+  // ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
     setLoadingModalOpen(true);
@@ -336,6 +344,49 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     }
   }, [newBidAmount, newOptionText, post.postUuid, router.locale]);
 
+  const handleVoteForFree = useCallback(async () => {
+    setUseFreeVoteModalOpen(false);
+    setLoadingModalOpen(true);
+    try {
+      const payload = new newnewapi.VoteOnPostRequest({
+        votesCount: appConstants.mcFreeVoteCount,
+        optionText: newOptionText,
+        postUuid: post.postUuid,
+      });
+
+      const res = await doFreeVote(payload);
+
+      if (
+        !res.data ||
+        res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+        res.error
+      ) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+
+      const optionFromResponse = (res.data
+        .option as newnewapi.MultipleChoice.Option)!!;
+      optionFromResponse.isSupportedByMe = true;
+      // optionFromResponse.isCreatedBySubscriber = true;
+      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+      setNewOptionText('');
+      setSuggestNewMobileOpen(false);
+      setLoadingModalOpen(false);
+      handleResetFreeVote();
+      setPaymentSuccessModalOpen(true);
+    } catch (err) {
+      console.error(err);
+      setLoadingModalOpen(false);
+    }
+  }, [
+    newOptionText,
+    post.postUuid,
+    appConstants.mcFreeVoteCount,
+    handleResetFreeVote,
+    handleAddOrUpdateOptionFromResponse,
+  ]);
+
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
       handleLoadOptions(pagingToken);
@@ -349,43 +400,49 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         ? entry[0]?.borderBoxSize[0]?.blockSize
         : entry[0]?.contentRect.height;
       if (size) {
-        setHeightDelta(size + (!isMobileOrTablet ? 20 : 0));
+        setHeightDelta(size);
       }
     });
 
-    if (!hasVotedOptionId && post.isSuggestionsAllowed) {
+    if (
+      post.isSuggestionsAllowed &&
+      !postLoading &&
+      !hasVotedOptionId &&
+      postStatus === 'voting' &&
+      actionSectionContainer.current
+    ) {
       resizeObserver.observe(actionSectionContainer.current!!);
     } else {
       setHeightDelta(0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasVotedOptionId, post.isSuggestionsAllowed, isMobileOrTablet]);
+  }, [
+    hasVotedOptionId,
+    postLoading,
+    post.isSuggestionsAllowed,
+    postStatus,
+    isMobileOrTablet,
+  ]);
 
   const goToNextStep = () => {
-    switch (user.userTutorialsProgress.superPollStep) {
-      case 2:
-        dispatch(
-          setUserTutorialsProgress({
-            superPollStep: 3,
-          })
-        );
-        break;
-      case 3:
-        dispatch(
-          setUserTutorialsProgress({
-            superPollStep: 4,
-          })
-        );
-        break;
-      default:
-        return null;
+    if (user.loggedIn) {
+      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![0],
+      });
+      markTutorialStepAsCompleted(payload);
     }
+    dispatch(
+      setUserTutorialsProgress({
+        remainingMcSteps: [
+          ...user.userTutorialsProgress.remainingMcSteps!!,
+        ].slice(1),
+      })
+    );
   };
 
   return (
     <>
       <STabContainer
-        key="options"
+        key='options'
         ref={(el) => {
           mainContainer.current = el!!;
         }}
@@ -402,12 +459,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           {!isMobile ? (
             <>
               <GradientMask
-                gradientType="secondary"
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                 positionTop
                 active={showTopGradient}
               />
               <GradientMask
-                gradientType="secondary"
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                 positionBottom={heightDelta}
                 active={showBottomGradient}
               />
@@ -418,12 +475,19 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               key={option.id.toString()}
               option={option as TMcOptionWithHighestField}
               creator={option.creator ?? post.creator!!}
+              postCreator={postCreator}
+              postText={post.title}
               postId={post.postUuid}
               index={i}
               minAmount={minAmount}
               votePrice={votePrice}
               optionBeingSupported={optionBeingSupported}
               votingAllowed={postStatus === 'voting'}
+              canVoteForFree={canVoteForFree}
+              isCreatorsBid={
+                !option.creator || option.creator?.uuid === post.creator?.uuid
+              }
+              handleResetFreeVote={handleResetFreeVote}
               noAction={
                 (hasVotedOptionId !== undefined &&
                   hasVotedOptionId !== option.id) ||
@@ -433,7 +497,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 setOptionBeingSupported(id)
               }
               handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
-                setPaymentSuccesModalOpen(newValue)
+                setPaymentSuccessModalOpen(newValue)
               }
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
@@ -450,6 +514,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         </SBidsContainer>
         {post.isSuggestionsAllowed &&
         !hasVotedOptionId &&
+        canVoteForFree &&
         postStatus === 'voting' ? (
           <SActionSection
             ref={(el) => {
@@ -464,60 +529,57 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               )}
               onChange={handleUpdateNewOptionText}
             />
-            <VotesAmountTextInput
-              value={newBidAmount}
-              inputAlign="left"
-              disabled={optionBeingSupported !== ''}
-              placeholder={
-                !newBidAmount || parseInt(newBidAmount) > 1
-                  ? t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )
-                  : t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )
-              }
-              onChange={(newValue: string) => setNewBidAmount(newValue)}
-              bottomPlaceholder={
-                !newBidAmount || parseInt(newBidAmount) === 1
-                  ? `${1} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )} = $ ${1 * votePrice}`
-                  : `${newBidAmount} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )} = $ ${parseInt(newBidAmount) * votePrice}`
-              }
-              minAmount={minAmount}
-            />
-            <SPlaceABidButton
-              view="primaryGrad"
-              size="sm"
+            <SAddFreeVoteButton
+              size='sm'
               disabled={
                 !newOptionText ||
-                !newBidAmount ||
-                parseInt(newBidAmount) < minAmount ||
                 optionBeingSupported !== '' ||
                 !newOptionTextValid
               }
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
-              onClick={() => handleTogglePaymentModalOpen()}
+              onClick={() => setUseFreeVoteModalOpen(true)}
             >
               {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
-            </SPlaceABidButton>
-            {!isMobileOrTablet && (
-              <SBottomPlaceholder>
-                {!newBidAmount || parseInt(newBidAmount) === 1
-                  ? `${1} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )} = $ ${1 * votePrice}`
-                  : `${newBidAmount} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )} = $ ${parseInt(newBidAmount) * votePrice}`}
-              </SBottomPlaceholder>
-            )}
+            </SAddFreeVoteButton>
+            <STutorialTooltipTextAreaHolder>
+              <TutorialTooltip
+                isTooltipVisible={
+                  user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+                  newnewapi.McTutorialStep.MC_TEXT_FIELD
+                }
+                closeTooltip={goToNextStep}
+                title={t('tutorials.mc.createYourBid.title')}
+                text={t('tutorials.mc.createYourBid.text')}
+                dotPosition={DotPositionEnum.BottomRight}
+              />
+            </STutorialTooltipTextAreaHolder>
           </SActionSection>
+        ) : post.isSuggestionsAllowed &&
+          !hasVotedOptionId &&
+          !canVoteForFree &&
+          postStatus === 'voting' &&
+          canSubscribe &&
+          !postLoading ? (
+          <SActionSectionSubscribe
+            ref={(el) => {
+              actionSectionContainer.current = el!!;
+            }}
+          >
+            <SText variant={3}>
+              {t('McPost.OptionsTab.ActionSection.subscribeToCreatorCaption', {
+                creator: post.creator?.nickname,
+              })}
+            </SText>
+            <SSubscribeButton
+              onClick={() => {
+                handleRedirectToPostCreator();
+              }}
+            >
+              {t('McPost.OptionsTab.ActionSection.subscribeBtn')}
+            </SSubscribeButton>
+          </SActionSectionSubscribe>
         ) : (
           <div
             ref={(el) => {
@@ -530,7 +592,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         )}
         <STutorialTooltipHolder>
           <TutorialTooltip
-            isTooltipVisible={user.userTutorialsProgress.eventsStep === 2}
+            isTooltipVisible={
+              user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+              newnewapi.McTutorialStep.MC_ALL_OPTIONS
+            }
             closeTooltip={goToNextStep}
             title={t('tutorials.mc.peopleBids.title')}
             text={t('tutorials.mc.peopleBids.text')}
@@ -550,78 +615,86 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               value={newOptionText}
               disabled={optionBeingSupported !== ''}
               autofocus={suggestNewMobileOpen}
-              placeholder="Add a option ..."
+              placeholder='Add a option ...'
               onChange={handleUpdateNewOptionText}
             />
-            <VotesAmountTextInput
-              value={newBidAmount}
-              inputAlign="left"
-              disabled={optionBeingSupported !== ''}
-              placeholder={
-                !newBidAmount || parseInt(newBidAmount) > 1
-                  ? t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )
-                  : t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )
-              }
-              bottomPlaceholder={
-                !newBidAmount || parseInt(newBidAmount) === 1
-                  ? `${1} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )} = $ ${1 * votePrice}`
-                  : `${newBidAmount} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )} = $ ${parseInt(newBidAmount) * votePrice}`
-              }
-              onChange={(newValue: string) => setNewBidAmount(newValue)}
-              minAmount={minAmount}
-            />
-            <Button
-              view="primaryGrad"
-              size="sm"
+            <SAddFreeVoteButton
+              size='sm'
               disabled={
                 !newOptionText ||
-                !newBidAmount ||
-                parseInt(newBidAmount) < minAmount ||
                 optionBeingSupported !== '' ||
                 !newOptionTextValid
               }
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
-              onClick={() => handleTogglePaymentModalOpen()}
+              onClick={() => setUseFreeVoteModalOpen(true)}
             >
               {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
-            </Button>
+            </SAddFreeVoteButton>
           </SSuggestNewContainer>
         </OptionActionMobileModal>
       ) : null}
+      {/* Use Free vote modal */}
+      <McConfirmUseFreeVoteModal
+        isVisible={useFreeVoteModalOpen}
+        handleMakeFreeVote={handleVoteForFree}
+        closeModal={() => setUseFreeVoteModalOpen(false)}
+      />
       {/* Payment Modal */}
       {paymentModalOpen ? (
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${parseInt(newBidAmount) * votePrice}`}
+          // {...(walletBalance?.usdCents &&
+          // walletBalance.usdCents >= parseInt(newBidAmount) * votePrice * 100
+          //   ? {}
+          //   : {
+          //       predefinedOption: 'card',
+          //     })}
           showTocApply={!user?.loggedIn}
-          {...{
-            ...(walletBalance &&
-            walletBalance?.usdCents < parseInt(newBidAmount) * votePrice
-              ? {
-                  predefinedOption: 'card',
-                }
-              : {}),
-          }}
+          // {...{
+          //   ...(walletBalance &&
+          //   walletBalance?.usdCents < parseInt(newBidAmount) * votePrice
+          //     ? {
+          //         predefinedOption: 'card',
+          //       }
+          //     : {}),
+          // }}
+          // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
-          handlePayWithWallet={handlePayWithWallet}
+          // handlePayWithWallet={handlePayWithWallet}
+          bottomCaption={
+            <SPaymentFooter variant={3}>
+              {t('McPost.paymentModalFooter.body')}
+            </SPaymentFooter>
+          }
+          // payButtonCaptionKey={t('McPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
+            <SPaymentModalHeading>
+              <SPaymentModalHeadingPostSymbol>
+                <SPaymentModalHeadingPostSymbolImg
+                  src={assets.decision.votes}
+                />
+              </SPaymentModalHeadingPostSymbol>
+              <SPaymentModalHeadingPostCreator variant={3}>
+                {t('McPost.paymentModalHeader.title', {
+                  creator: postCreator,
+                })}
+              </SPaymentModalHeadingPostCreator>
+            </SPaymentModalHeading>
+            <SPaymentModalPostText variant={2}>
+              {post.title}
+            </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
-              {t('McPost.paymenModalHeader.subtitle')}
+              {t('McPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
-            <SPaymentModalOptionText>{newOptionText}</SPaymentModalOptionText>
+            <SPaymentModalOptionText variant={5}>
+              {newOptionText}
+            </SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>
       ) : null}
@@ -629,8 +702,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}
       <PaymentSuccessModal
-        isVisible={paymentSuccesModalOpen}
-        closeModal={() => setPaymentSuccesModalOpen(false)}
+        postType='mc'
+        isVisible={paymentSuccessModalOpen}
+        closeModal={() => setPaymentSuccessModalOpen(false)}
       >
         {t('PaymentSuccessModal.mc', {
           postCreator,
@@ -641,13 +715,28 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {isMobile &&
       !suggestNewMobileOpen &&
       !hasVotedOptionId &&
-      postStatus === 'voting' ? (
-        <SActionButton
-          view="primaryGrad"
-          onClick={() => setSuggestNewMobileOpen(true)}
-        >
-          {t('McPost.FloatingActionButton.suggestNewBtn')}
-        </SActionButton>
+      postStatus === 'voting' &&
+      canVoteForFree ? (
+        <>
+          <SActionButton
+            view='primaryGrad'
+            onClick={() => setSuggestNewMobileOpen(true)}
+          >
+            {t('McPost.FloatingActionButton.suggestNewBtn')}
+          </SActionButton>
+          <STutorialTooltipHolderMobile>
+            <TutorialTooltip
+              isTooltipVisible={
+                user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+                newnewapi.McTutorialStep.MC_TEXT_FIELD
+              }
+              closeTooltip={goToNextStep}
+              title={t('tutorials.mc.createYourBid.title')}
+              text={t('tutorials.mc.createYourBid.text')}
+              dotPosition={DotPositionEnum.BottomRight}
+            />
+          </STutorialTooltipHolderMobile>
+        </>
       ) : null}
     </>
   );
@@ -662,7 +751,12 @@ const STabContainer = styled(motion.div)`
   width: 100%;
   /* height: calc(100% - 50px); */
 
+  display: flex;
+  flex-direction: column;
+
   ${({ theme }) => theme.media.tablet} {
+    display: initial;
+
     height: calc(100% - 56px);
     height: 100%;
   }
@@ -682,6 +776,11 @@ const SBidsContainer = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+    padding-top: 0px;
+    padding-right: 12px;
+    margin-right: -14px;
+    width: calc(100% + 14px);
+
     // Scrollbar
     &::-webkit-scrollbar {
       width: 4px;
@@ -741,8 +840,22 @@ const SSuggestNewContainer = styled.div`
   }
 `;
 
+const SAddFreeVoteButton = styled(Button)`
+  width: 100%;
+
+  color: ${({ theme }) => theme.colors.dark};
+  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+
+  &:active:enabled,
+  &:hover:enabled,
+  &:focus:enabled {
+    background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+  }
+`;
+
 const SActionSection = styled.div`
   display: none;
+  position: relative;
 
   ${({ theme }) => theme.media.tablet} {
     display: flex;
@@ -758,7 +871,10 @@ const SActionSection = styled.div`
 
     padding-top: 8px;
 
-    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+    background-color: ${({ theme }) =>
+      theme.name === 'dark'
+        ? theme.colorsThemed.background.secondary
+        : theme.colorsThemed.background.primary};
 
     border-top: 1.5px solid
       ${({ theme }) => theme.colorsThemed.background.outlines1};
@@ -767,50 +883,152 @@ const SActionSection = styled.div`
       width: 100%;
     }
   }
+`;
+
+const SActionSectionSubscribe = styled.div`
+  order: -1;
+
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  min-height: 50px;
+  width: 100%;
+  z-index: 5;
+
+  padding-top: 24px;
+
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : theme.colorsThemed.background.primary};
+
+  div {
+    width: 100%;
+    text-align: center;
+  }
+
+  button {
+    width: 100%;
+  }
+  ${({ theme }) => theme.media.tablet} {
+    order: unset;
+
+    padding-top: 18px;
+
+    border-top: 1.5px solid
+      ${({ theme }) => theme.colorsThemed.background.outlines1};
+  }
 
   ${({ theme }) => theme.media.laptop} {
     flex-wrap: nowrap;
     justify-content: initial;
+    gap: 16px;
 
-    textarea {
-      max-width: 277px;
+    div {
+      width: initial;
+      text-align: left;
+    }
+    button {
+      max-width: 130px;
     }
   }
 `;
 
-const SBottomPlaceholder = styled.div`
-  display: none;
+const SText = styled(Text)`
+  height: 100%;
+  align-self: center;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 24px;
+`;
 
-  ${({ theme }) => theme.media.laptop} {
-    display: block;
+const SSubscribeButton = styled(Button)`
+  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
-    position: absolute;
-    bottom: 0px;
+  color: ${({ theme }) => theme.colors.dark};
 
-    font-weight: 600;
-    font-size: 12px;
-    line-height: 16px;
-    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-    width: max-content;
+  :active:enabled,
+  :focus:enabled,
+  :hover:enabled {
+    background: ${({ theme }) => theme.colorsThemed.accent.yellow};
   }
 `;
 
+// const SBottomPlaceholder = styled.div`
+//   display: none;
+
+//   ${({ theme }) => theme.media.laptop} {
+//     display: block;
+
+//     position: absolute;
+//     bottom: 0px;
+
+//     font-weight: 600;
+//     font-size: 12px;
+//     line-height: 16px;
+//     color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+//     width: max-content;
+//   }
+// `;
+
 // Payment modal header
 const SPaymentModalHeader = styled.div``;
+
+const SPaymentModalHeading = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 16px;
+
+  padding-right: 64px;
+  margin-bottom: 24px;
+`;
+
+const SPaymentModalHeadingPostSymbol = styled.div`
+  background: ${({ theme }) => theme.colorsThemed.background.quaternary};
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+`;
+
+const SPaymentModalHeadingPostSymbolImg = styled.img`
+  width: 24px;
+`;
+
+const SPaymentModalHeadingPostCreator = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 24px;
+`;
+
+const SPaymentModalPostText = styled(Text)`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 24px;
+`;
 
 const SPaymentModalTitle = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   margin-bottom: 6px;
 `;
 
-const SPaymentModalOptionText = styled.div`
+const SPaymentModalOptionText = styled(Headline)`
   display: flex;
   align-items: center;
   gap: 8px;
-`;
-
-const SPlaceABidButton = styled(Button)`
-  min-width: 123px;
 `;
 
 const STutorialTooltipHolder = styled.div`
@@ -821,4 +1039,33 @@ const STutorialTooltipHolder = styled.div`
   div {
     width: 190px;
   }
+`;
+
+const STutorialTooltipHolderMobile = styled.div`
+  position: fixed;
+  left: 20%;
+  bottom: 82px;
+  text-align: left;
+  z-index: 999;
+  div {
+    width: 190px;
+  }
+`;
+
+const STutorialTooltipTextAreaHolder = styled.div`
+  position: absolute;
+  left: -140px;
+  bottom: 94%;
+  text-align: left;
+  div {
+    width: 190px;
+  }
+`;
+
+const SPaymentFooter = styled(Text)`
+  margin-top: 24px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
 `;

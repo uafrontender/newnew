@@ -55,6 +55,7 @@ const SContainer = styled.div`
   position: relative;
   background: ${(props) => props.theme.colorsThemed.accent.blue};
   color: ${(props) => props.theme.colors.white};
+  box-shadow: 0px 0px 20px rgba(11, 10, 19);
   font-size: 12px;
   line-height: 16px;
   font-weight: 600;
@@ -72,7 +73,7 @@ const STitle = styled.h3`
   line-height: 24px;
   font-weight: 600;
   margin: 0;
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SText = styled.p`

@@ -19,10 +19,12 @@ import useOverlay from '../../utils/hooks/useOverlay';
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
 import { useAppSelector } from '../../redux-store/store';
 import useScrollDirection from '../../utils/hooks/useScrollDirection';
-import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
+// import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
+import { useNotifications } from '../../contexts/notificationsContext';
+import { useGetChats } from '../../contexts/chatContext';
 
 interface IGeneral {
   children: React.ReactNode;
@@ -37,6 +39,8 @@ export const General: React.FC<IGeneral> = (props) => {
   const { banner, resizeMode } = useAppSelector((state) => state.ui);
   const theme = useTheme();
   const [cookies] = useCookies();
+  const { unreadNotificationCount } = useNotifications();
+  const { unreadCount } = useGetChats();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
 
@@ -72,7 +76,7 @@ export const General: React.FC<IGeneral> = (props) => {
             key: 'notifications',
             url: '/notifications',
             width: '20%',
-            counter: user.notificationsCount,
+            counter: unreadNotificationCount,
           },
           {
             key: 'more',
@@ -90,29 +94,42 @@ export const General: React.FC<IGeneral> = (props) => {
           },
           {
             key: 'add',
-            url: '/creator-onboarding-stage-1',
+            url: '/creator-onboarding',
             width: '33%',
           },
           {
             key: 'notifications',
             url: '/notifications',
             width: '33%',
-            counter: user.notificationsCount,
+            counter: unreadNotificationCount,
+          },
+          {
+            key: 'dms',
+            url: '/direct-messages',
+            width: '33%',
+            counter: unreadCount,
           },
         ];
       }
     }
 
     return bottomNavigationShadow;
-  }, [user.loggedIn, user.notificationsCount, user.userData?.options?.isCreator]);
+  }, [
+    user.loggedIn,
+    unreadNotificationCount,
+    user.userData?.options?.isCreator,
+    unreadCount,
+  ]);
 
   useOverlay(wrapperRef);
   useScrollPosition(wrapperRef);
-  useRefreshOnScrollTop();
+  // useRefreshOnScrollTop();
   const { scrollDirection } = useScrollDirection(wrapperRef);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const [isOpenedChat, setIsOpenedChat] = useState(true);
+  const [isOpenedChat, setIsOpenedChat] = useState(false);
 
   const openChat = () => {
     setIsOpenedChat(true);
@@ -128,22 +145,32 @@ export const General: React.FC<IGeneral> = (props) => {
         baseColor={theme.colorsThemed.background.secondary}
         highlightColor={theme.colorsThemed.background.tertiary}
       >
-        <SWrapper id="generalScrollContainer" ref={wrapperRef} withBanner={!!banner?.show} {...props}>
+        <SWrapper
+          id='generalScrollContainer'
+          ref={wrapperRef}
+          withBanner={!!banner?.show}
+          {...props}
+        >
           <Head>
             <meta
-              name="theme-color"
-              content={specialStatusBarColor ? specialStatusBarColor : theme.colorsThemed.statusBar.background}
+              name='theme-color'
+              content={
+                specialStatusBarColor
+                  ? specialStatusBarColor
+                  : theme.colorsThemed.statusBar.background
+              }
             />
           </Head>
-          <Header visible={!isMobile || (isMobile && scrollDirection !== 'down')} />
+          <Header
+            visible={!isMobile || (isMobile && scrollDirection !== 'down')}
+          />
           <SContent>
             <Container
-              {...(
-                restrictMaxWidth ? {
-                } : {
-                  noMaxContent: true,
-                }
-              )}
+              {...(restrictMaxWidth
+                ? {}
+                : {
+                    noMaxContent: true,
+                  })}
             >
               <Row>
                 <Col>{children}</Col>
@@ -158,22 +185,28 @@ export const General: React.FC<IGeneral> = (props) => {
             visible={isMobile && scrollDirection !== 'down'}
           />
           <SortingContainer
-            id="sorting-container"
+            id='sorting-container'
             withCookie={cookies.accepted !== 'true'}
             bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
           />
-          <CookieContainer bottomNavigationVisible={isMobile && scrollDirection !== 'down'}>
+          <CookieContainer
+            bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+          >
             <Cookie />
           </CookieContainer>
-          {withChat && isMobile && (
-            <ChatContainer bottomNavigationVisible={isMobile && scrollDirection !== 'down'}>
-              {!isOpenedChat ? (
-                <FloatingMessages withCounter openChat={openChat} />
-              ) : (
-                <MobileDashBoardChat closeChat={closeChat} />
-              )}
-            </ChatContainer>
-          )}
+          {withChat &&
+            isMobile &&
+            user.userData?.options?.isOfferingSubscription && (
+              <ChatContainer
+                bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+              >
+                {!isOpenedChat ? (
+                  <FloatingMessages withCounter openChat={openChat} />
+                ) : (
+                  <MobileDashBoardChat closeChat={closeChat} />
+                )}
+              </ChatContainer>
+            )}
         </SWrapper>
       </SkeletonTheme>
     </ErrorBoundary>
@@ -270,7 +303,9 @@ interface ISortingContainer {
 const SortingContainer = styled.div<ISortingContainer>`
   left: 50%;
   bottom: ${(props) =>
-    props.bottomNavigationVisible ? `${props.withCookie ? 128 : 72}` : `${props.withCookie ? 72 : 16}`}px;
+    props.bottomNavigationVisible
+      ? `${props.withCookie ? 128 : 72}`
+      : `${props.withCookie ? 72 : 16}`}px;
   z-index: 10;
   position: fixed;
   transform: translateX(-50%);

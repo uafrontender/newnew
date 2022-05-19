@@ -1,22 +1,27 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
-import { useRouter } from 'next/router';
-import styled from 'styled-components';
+import Link from 'next/link';
+import styled, { useTheme } from 'styled-components';
 import Button from '../Button';
 import Text from '../Text';
 
-import moneyIcon from '../../../public/images/dashboard/money.png';
+import money from '../../../public/images/svg/icons/filled/Money.svg';
+import InlineSVG from '../InlineSVG';
 
 export const MakeDecision = () => {
   const { t } = useTranslation('creator');
-  const router = useRouter();
+  const theme = useTheme();
 
   return (
     <SCashOutContainer>
       <SCashOutTopBlock>
         <SImageWrapper>
-          <Image src={moneyIcon} alt={t('dashboard.earnings.todosIssue.text')} width={48} height={48} />
+          <InlineSVG
+            svg={money}
+            fill={theme.colors.white}
+            width='48px'
+            height='48px'
+          />
         </SImageWrapper>
         <SDescriptionWrapper>
           <SDescription variant={2} weight={600}>
@@ -24,9 +29,11 @@ export const MakeDecision = () => {
           </SDescription>
         </SDescriptionWrapper>
       </SCashOutTopBlock>
-      <SButton view="primaryGrad" onClick={() => router.push('/creation')}>
-        {t('dashboard.earnings.makeDecision.btnText')}
-      </SButton>
+      <Link href='/creation'>
+        <SButton view='primaryGrad'>
+          {t('dashboard.earnings.makeDecision.btnText')}
+        </SButton>
+      </Link>
     </SCashOutContainer>
   );
 };
@@ -72,7 +79,7 @@ const SButton = styled(Button)`
   width: auto;
   display: block;
   flex-shrink: 0;
-  color: #2C2C33;
+  color: #2c2c33;
   padding: 16px 20px;
   margin-top: 16px;
   background: ${(props) => props.theme.colors.white};

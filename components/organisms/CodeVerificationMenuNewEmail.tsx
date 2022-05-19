@@ -1,19 +1,20 @@
-import React, {
-  useCallback, useEffect, useRef, useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import {
-  setUserData,
-} from '../../redux-store/slices/userStateSlice';
+import { setUserData } from '../../redux-store/slices/userStateSlice';
 
 // API
-import { setMyEmail, sendVerificationNewEmail, becomeCreator } from '../../api/endpoints/user';
+import {
+  setMyEmail,
+  sendVerificationNewEmail,
+  becomeCreator,
+} from '../../api/endpoints/user';
 
 // Components
 import Text from '../atoms/Text';
@@ -25,258 +26,255 @@ import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmail
 // Utils
 import secondsToString from '../../utils/secondsToHMS';
 import isBrowser from '../../utils/isBrowser';
-import AnimatedPresence from '../atoms/AnimatedPresence';
+
+const AnimatedPresence = dynamic(() => import('../atoms/AnimatedPresence'));
 
 export interface ICodeVerificationMenuNewEmail {
   expirationTime: number;
   newEmail: string;
-  redirect: 'settings' | 'dashboard',
+  redirect: 'settings' | 'dashboard';
 }
 
-const CodeVerificationMenuNewEmail: React.FunctionComponent<ICodeVerificationMenuNewEmail> = ({
-  expirationTime,
-  newEmail,
-  redirect,
-}) => {
-  const router = useRouter();
-  const { t } = useTranslation('verify-email');
+const CodeVerificationMenuNewEmail: React.FunctionComponent<ICodeVerificationMenuNewEmail> =
+  ({ expirationTime, newEmail, redirect }) => {
+    const router = useRouter();
+    const { t } = useTranslation('verify-email');
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobileOrTablet = [
+      'mobile',
+      'mobileS',
+      'mobileM',
+      'mobileL',
+      'tablet',
+    ].includes(resizeMode);
 
-  // const { signupEmailInput } = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
+    // const { signupEmailInput } = useAppSelector((state) => state.user);
+    const dispatch = useAppDispatch();
 
-  // isSuccess - no bottom sections
-  const [isSucces, setIsSuccess] = useState(false);
+    // isSuccess - no bottom sections
+    const [isSucces, setIsSuccess] = useState(false);
 
-  // Code input
-  const [isSigninWithEmailLoading, setIsSigninWithEmailLoading] = useState(false);
-  const [submitError, setSubmitError] = useState<string>('');
+    // Code input
+    const [isSigninWithEmailLoading, setIsSigninWithEmailLoading] =
+      useState(false);
+    const [submitError, setSubmitError] = useState<string>('');
 
-  // Resend code
-  const [codeInitial, setCodeInital] = useState(new Array(6).join('.').split('.'));
-  const [isResendCodeLoading, setIsResendCodeLoading] = useState(false);
+    // Resend code
+    const [codeInitial, setCodeInital] = useState(
+      new Array(6).join('.').split('.')
+    );
+    const [isResendCodeLoading, setIsResendCodeLoading] = useState(false);
 
-  // Timer
-  const [timerSeconds, setTimerSeconds] = useState(expirationTime);
-  const [timerActive, setTimerActive] = useState(false);
-  const [timerHidden, setTimerHidden] = useState(false);
-  const interval = useRef<number>();
+    // Timer
+    const [timerSeconds, setTimerSeconds] = useState(expirationTime);
+    const [timerActive, setTimerActive] = useState(false);
+    const [timerHidden, setTimerHidden] = useState(false);
+    const interval = useRef<number>();
 
-  const onCodeComplete = useCallback(async (completeCode: string) => {
-    if (!newEmail) return;
-    try {
+    const onCodeComplete = useCallback(
+      async (completeCode: string) => {
+        if (!newEmail) return;
+        try {
+          setSubmitError('');
+          setTimerHidden(true);
+          setIsSigninWithEmailLoading(true);
+
+          const signInRequest = new newnewapi.SetMyEmailRequest({
+            emailAddress: newEmail,
+            verificationCode: completeCode,
+          });
+
+          const { data, error } = await setMyEmail(signInRequest);
+
+          if (
+            data?.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS ||
+            error
+          )
+            throw new Error(error?.message ?? 'Request failed');
+
+          setTimerActive(false);
+
+          if (redirect === 'settings') {
+            dispatch(
+              setUserData({
+                email: newEmail,
+              })
+            );
+          }
+
+          if (redirect === 'dashboard') {
+            const becomeCreatorPayload = new newnewapi.EmptyRequest({});
+
+            const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
+
+            if (!becomeCreatorRes.data || becomeCreatorRes.error)
+              throw new Error('Become creator failed');
+
+            dispatch(
+              setUserData({
+                email: newEmail,
+                options: {
+                  isActivityPrivate:
+                    becomeCreatorRes.data.me?.options?.isActivityPrivate,
+                  isCreator: becomeCreatorRes.data.me?.options?.isCreator,
+                  isVerified: becomeCreatorRes.data.me?.options?.isVerified,
+                  creatorStatus:
+                    becomeCreatorRes.data.me?.options?.creatorStatus,
+                },
+              })
+            );
+          }
+
+          setIsSigninWithEmailLoading(false);
+          setIsSuccess(true);
+
+          if (redirect === 'settings') {
+            router.push('/profile/settings');
+          } else {
+            router.push('/creator/dashboard');
+          }
+        } catch (err: any) {
+          setIsSigninWithEmailLoading(false);
+          setSubmitError(err?.message ?? 'generic_error');
+          setTimerActive(true);
+          setTimerHidden(false);
+        }
+      },
+      [
+        setIsSigninWithEmailLoading,
+        setSubmitError,
+        setTimerActive,
+        newEmail,
+        redirect,
+        dispatch,
+        router,
+      ]
+    );
+
+    const handleResendCode = async () => {
+      setIsResendCodeLoading(true);
       setSubmitError('');
-      setTimerHidden(true);
-      setIsSigninWithEmailLoading(true);
+      try {
+        const payload = new newnewapi.SendVerificationEmailRequest({
+          emailAddress: newEmail,
+          useCase: newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
+        });
 
-      const signInRequest = new newnewapi.SetMyEmailRequest({
-        emailAddress: newEmail,
-        verificationCode: completeCode,
-      });
-
-      const { data, error } = await setMyEmail(signInRequest);
-
-      if (
-        data?.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS
-        || error
-      ) throw new Error(error?.message ?? 'Request failed');
-
-      setTimerActive(false);
-
-      if (redirect === 'settings') {
-        dispatch(setUserData({
-          email: newEmail,
-        }));
-      }
-
-      if (redirect === 'dashboard') {
-        const becomeCreatorPayload = new newnewapi.EmptyRequest({});
-
-        const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
+        const { data, error } = await sendVerificationNewEmail(payload);
 
         if (
-          !becomeCreatorRes.data
-          || becomeCreatorRes.error
-        ) throw new Error('Become creator failed');
+          data?.status !==
+            newnewapi.SendVerificationEmailResponse.Status.SUCCESS ||
+          error
+        )
+          throw new Error(error?.message ?? 'Request failed');
 
-        dispatch(setUserData({
-          email: newEmail,
-          options: {
-            isActivityPrivate: becomeCreatorRes.data.me?.options?.isActivityPrivate,
-            isCreator: becomeCreatorRes.data.me?.options?.isCreator,
-            isVerified: becomeCreatorRes.data.me?.options?.isVerified,
-            creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
-          },
-        }));
+        setIsResendCodeLoading(false);
+        setCodeInital(new Array(6).join('.').split('.'));
+        setTimerSeconds(expirationTime);
+        setTimerActive(true);
+      } catch (err: any) {
+        setIsResendCodeLoading(false);
+        setSubmitError(err?.message ?? 'generic_error');
       }
+    };
 
-      setIsSigninWithEmailLoading(false);
-      setIsSuccess(true);
-
-      if (redirect === 'settings') {
-        router.push('/profile/settings');
-      } else {
-        router.push('/creator/dashboard');
-      }
-    } catch (err: any) {
-      setIsSigninWithEmailLoading(false);
-      setSubmitError(err?.message ?? 'generic_error');
-      setTimerActive(true);
-      setTimerHidden(false);
-    }
-  },
-  [
-    setIsSigninWithEmailLoading,
-    setSubmitError,
-    setTimerActive,
-    newEmail,
-    redirect,
-    dispatch,
-    router,
-  ]);
-
-  const handleResendCode = async () => {
-    setIsResendCodeLoading(true);
-    setSubmitError('');
-    try {
-      const payload = new newnewapi.SendVerificationEmailRequest({
-        emailAddress: newEmail,
-        useCase: newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
-      });
-
-      const { data, error } = await sendVerificationNewEmail(payload);
-
-      if (
-        data?.status !== newnewapi.SendVerificationEmailResponse.Status.SUCCESS
-        || error
-      ) throw new Error(error?.message ?? 'Request failed');
-
-      setIsResendCodeLoading(false);
-      setCodeInital(new Array(6).join('.').split('.'));
-      setTimerSeconds(expirationTime);
-      setTimerActive(true);
-    } catch (err: any) {
-      setIsResendCodeLoading(false);
-      setSubmitError(err?.message ?? 'generic_error');
-    }
-  };
-
-  const handleTryAgain = () => {
-    setSubmitError('');
-    setCodeInital(new Array(6).join('.').split('.'));
-    setTimerActive(true);
-  };
-
-  useEffect(() => {
-    setTimerActive(true);
-  }, []);
-
-  useEffect(() => {
-    if (timerSeconds < 1) {
-      setTimerActive(false);
+    const handleTryAgain = () => {
       setSubmitError('');
       setCodeInital(new Array(6).join('.').split('.'));
-    }
-  }, [
-    timerSeconds,
-    setTimerActive,
-    setSubmitError,
-    setCodeInital,
-  ]);
+      setTimerActive(true);
+    };
 
-  useEffect(() => {
-    if (isBrowser()) {
-      if (timerActive) {
-        interval.current = window.setInterval(() => {
-          setTimerSeconds((seconds) => seconds - 1);
-        }, 1000);
-      } else if (!timerActive) {
-        clearInterval(interval.current);
+    useEffect(() => {
+      setTimerActive(true);
+    }, []);
+
+    useEffect(() => {
+      if (timerSeconds < 1) {
+        setTimerActive(false);
+        setSubmitError('');
+        setCodeInital(new Array(6).join('.').split('.'));
       }
-    }
-    return () => clearInterval(interval.current);
-  }, [timerActive, timerSeconds]);
+    }, [timerSeconds, setTimerActive, setSubmitError, setCodeInital]);
 
-  return (
-    <SCodeVerificationMenuNewEmail
-      onClick={() => {
-        if (submitError) {
-          handleTryAgain();
+    useEffect(() => {
+      if (isBrowser()) {
+        if (timerActive) {
+          interval.current = window.setInterval(() => {
+            setTimerSeconds((seconds) => seconds - 1);
+          }, 1000);
+        } else if (!timerActive) {
+          clearInterval(interval.current);
         }
-      }}
-    >
-      <SBackButton
-        defer={isMobileOrTablet ? 250 : undefined}
-        onClick={() => router.back()}
-      />
-      <AnimatedLogoEmailVerification
-        isLoading={isSigninWithEmailLoading || isResendCodeLoading}
-      />
-      <SHeadline
-        variant={3}
+      }
+      return () => clearInterval(interval.current);
+    }, [timerActive, timerSeconds]);
+
+    return (
+      <SCodeVerificationMenuNewEmail
+        onClick={() => {
+          if (submitError) {
+            handleTryAgain();
+          }
+        }}
       >
-        { t('heading.heading') }
-      </SHeadline>
-      <SSubheading variant={2} weight={600}>
-        {t('heading.subheading')}
-        <br />
-        {/* NB! Temp */}
-        {newEmail}
-      </SSubheading>
-      <VerficationCodeInput
-        initialValue={codeInitial}
-        length={6}
-        disabled={isSigninWithEmailLoading || isResendCodeLoading || (timerSeconds < 1)}
-        error={submitError ? true : undefined}
-        onComplete={onCodeComplete}
-      />
-      {
-        timerActive && !timerHidden && !submitError && !isSucces ? (
-          <STimeoutDiv
-            isAlertColor={timerSeconds < 11}
-          >
-            { secondsToString(timerSeconds, 'm:s') }
+        <SBackButton
+          defer={isMobileOrTablet ? 250 : undefined}
+          onClick={() => router.back()}
+        />
+        <AnimatedLogoEmailVerification
+          isLoading={isSigninWithEmailLoading || isResendCodeLoading}
+        />
+        <SHeadline variant={3}>{t('heading.heading')}</SHeadline>
+        <SSubheading variant={2} weight={600}>
+          {t('heading.subheading')}
+          <br />
+          {/* NB! Temp */}
+          {newEmail}
+        </SSubheading>
+        <VerficationCodeInput
+          initialValue={codeInitial}
+          length={6}
+          disabled={
+            isSigninWithEmailLoading || isResendCodeLoading || timerSeconds < 1
+          }
+          error={submitError ? true : undefined}
+          onComplete={onCodeComplete}
+        />
+        {timerActive && !timerHidden && !submitError && !isSucces ? (
+          <STimeoutDiv isAlertColor={timerSeconds < 11}>
+            {secondsToString(timerSeconds, 'm:s')}
           </STimeoutDiv>
         ) : (
-          !submitError
-          && !isSigninWithEmailLoading
-          && !isResendCodeLoading && (
-          <AnimatedPresence
-            animateWhenInView={false}
-            animation="t-01"
-            delay={0.3}
-          >
-            <STimeExpired>
-              { t('timeExpired.not_receieved') }
-              {' '}
-              <button
-                type="button"
-                onClick={() => handleResendCode()}
-              >
-                { t('timeExpired.resendBtn') }
-              </button>
-            </STimeExpired>
-          </AnimatedPresence>
+          !submitError &&
+          !isSigninWithEmailLoading &&
+          !isResendCodeLoading && (
+            <AnimatedPresence
+              animateWhenInView={false}
+              animation='t-01'
+              delay={0.3}
+            >
+              <STimeExpired>
+                {t('timeExpired.not_receieved')}{' '}
+                <button type='button' onClick={() => handleResendCode()}>
+                  {t('timeExpired.resendBtn')}
+                </button>
+              </STimeExpired>
+            </AnimatedPresence>
           )
-        )
-      }
-      {
-        !isSigninWithEmailLoading && !isResendCodeLoading && submitError && !isSucces ? (
-          <AnimatedPresence
-            animateWhenInView={false}
-            animation="t-09"
-          >
-            <SErrorDiv>
-              { t('errors.invalidCode') }
-            </SErrorDiv>
+        )}
+        {!isSigninWithEmailLoading &&
+        !isResendCodeLoading &&
+        submitError &&
+        !isSucces ? (
+          <AnimatedPresence animateWhenInView={false} animation='t-09'>
+            <SErrorDiv>{t('errors.invalidCode')}</SErrorDiv>
           </AnimatedPresence>
-        ) : null
-      }
-    </SCodeVerificationMenuNewEmail>
-  );
-};
+        ) : null}
+      </SCodeVerificationMenuNewEmail>
+    );
+  };
 
 CodeVerificationMenuNewEmail.defaultProps = {
   expirationTime: 60,
@@ -299,7 +297,7 @@ const SCodeVerificationMenuNewEmail = styled.div`
 
   text-align: center;
 
-  transition: width height .3s ease-in-out;
+  transition: width height 0.3s ease-in-out;
 
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -336,10 +334,9 @@ const SBackButton = styled(GoBackButton)`
     & div > svg {
       transform: scale(0.8);
 
-      transition: .2s ease-in-out;
+      transition: 0.2s ease-in-out;
     }
   }
-
 
   ${({ theme }) => theme.media.tablet} {
     width: fit-content;
@@ -424,16 +421,16 @@ const STimeExpired = styled(Text)`
     font-size: inherit;
     font-weight: 500;
 
-
     color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
     cursor: pointer;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       outline: none;
       color: ${({ theme }) => theme.colorsThemed.text.primary};
 
-      transition: .2s ease;
+      transition: 0.2s ease;
     }
   }
 `;

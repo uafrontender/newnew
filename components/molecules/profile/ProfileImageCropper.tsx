@@ -15,9 +15,11 @@ type TProfileImageCropper = {
   originalImageWidth: number;
   disabled: boolean;
   onCropChange: (location: Point) => void;
-  onCropComplete: ((croppedArea: Area, croppedAreaPixels: Area) => void) | undefined;
+  onCropComplete:
+    | ((croppedArea: Area, croppedAreaPixels: Area) => void)
+    | undefined;
   onZoomChange: ((zoom: number) => void) | undefined;
-}
+};
 
 const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
   zoom,
@@ -31,7 +33,9 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
 }) => {
   const { t } = useTranslation('profile');
   const { ui } = useAppSelector((state) => state);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(ui.resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    ui.resizeMode
+  );
   const [isPressed, setIsPressed] = useState(false);
 
   const handleSetPressed = () => setIsPressed(true);
@@ -65,7 +69,7 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
             height: isMobile ? 375 : 280,
             width: isMobile ? 375 : 280,
           }}
-          cropShape="round"
+          cropShape='round'
           showGrid={false}
           zoom={zoom}
           aspect={1}
@@ -86,10 +90,10 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
 export default ProfileImageCropper;
 
 const SCropperWrapper = styled.div<{
-  x: number,
-  y: number,
-  zoom: number,
-  pseudoElementWidth: number,
+  x: number;
+  y: number;
+  zoom: number;
+  pseudoElementWidth: number;
 }>`
   position: relative;
   height: 500px;
@@ -99,7 +103,6 @@ const SCropperWrapper = styled.div<{
   }
 
   .cropper-container {
-
     &:before {
       content: '';
       position: absolute;
@@ -110,12 +113,12 @@ const SCropperWrapper = styled.div<{
       z-index: 12;
 
       ${({ theme }) => theme.media.tablet} {
-        transform: ${({ x, y, zoom }) => `translate(${x}px, ${y}px) scale(${zoom})`};
+        transform: ${({ x, y, zoom }) =>
+          `translate(${x}px, ${y}px) scale(${zoom})`};
         box-shadow: 0 0 0 9999em;
         color: ${({ theme }) => theme.colorsThemed.background.primary};
       }
     }
-
   }
 
   .cropper-cropArea {
@@ -123,6 +126,5 @@ const SCropperWrapper = styled.div<{
 
     color: ${({ theme }) => theme.colors.dark};
     opacity: 0.45;
-
   }
 `;

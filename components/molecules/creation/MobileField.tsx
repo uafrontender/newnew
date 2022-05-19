@@ -15,13 +15,8 @@ interface IMobileField {
   onChange: (key: string, value: string | boolean) => void;
 }
 
-export const MobileField: React.FC<IMobileField> = (props) => {
-  const {
-    id,
-    type,
-    value,
-    onChange,
-  } = props;
+const MobileField: React.FC<IMobileField> = (props) => {
+  const { id, type, value, onChange } = props;
   const { t } = useTranslation('creation');
   const theme = useTheme();
 
@@ -38,20 +33,15 @@ export const MobileField: React.FC<IMobileField> = (props) => {
       </STitle>
       <SRightPart>
         {type === 'toggle' ? (
-          <Toggle
-            checked={!!value}
-            onChange={handleChange}
-          />
+          <Toggle checked={!!value} onChange={handleChange} />
         ) : (
           <>
-            <SValue>
-              {value}
-            </SValue>
+            <SValue>{value}</SValue>
             <SInlineSVG
               svg={chevronRight}
               fill={theme.colorsThemed.text.secondary}
-              width="24px"
-              height="24px"
+              width='24px'
+              height='24px'
             />
           </>
         )}

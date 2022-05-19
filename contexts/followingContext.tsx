@@ -1,7 +1,11 @@
 /* eslint-disable no-unused-vars */
 import { newnewapi } from 'newnew-api';
 import React, {
-  createContext, useState, useMemo, useEffect,
+  createContext,
+  useState,
+  useMemo,
+  useEffect,
+  useCallback,
 } from 'react';
 
 import { getCreatorsIFollow } from '../api/endpoints/user';
@@ -22,21 +26,24 @@ const FollowingsContextProvider: React.FC = ({ children }) => {
   const [followingsIds, setFollowingsIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const addId = (id: string) => {
+  const addId = useCallback((id: string) => {
     setFollowingsIds((curr) => [...curr, id]);
-  }
+  }, []);
 
-  const removeId = (id: string) => {
+  const removeId = useCallback((id: string) => {
     setFollowingsIds((curr) => curr.filter((i) => i !== id));
-  }
+  }, []);
 
-  const contextValue = useMemo(() => ({
-    followingsIds,
-    isLoading,
-    addId,
-    removeId,
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [followingsIds, removeId, addId, removeId]);
+  const contextValue = useMemo(
+    () => ({
+      followingsIds,
+      isLoading,
+      addId,
+      removeId,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [followingsIds, removeId, addId, removeId]
+  );
 
   useEffect(() => {
     async function fetchIds() {
@@ -48,7 +55,8 @@ const FollowingsContextProvider: React.FC = ({ children }) => {
 
         const res = await getCreatorsIFollow(payload);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
         setFollowingsIds(res.data.userUuids);
 
@@ -62,22 +70,22 @@ const FollowingsContextProvider: React.FC = ({ children }) => {
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+          dispatch(
+            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
+          );
         }
       }
     }
 
     fetchIds();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
 
   return (
-    <FollowingsContext.Provider
-      value={contextValue}
-    >
+    <FollowingsContext.Provider value={contextValue}>
       {children}
     </FollowingsContext.Provider>
   );
-}
+};
 
 export default FollowingsContextProvider;

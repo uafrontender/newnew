@@ -12,25 +12,29 @@
   "mobile-top-navigation-direct-messages": "DMs",
   "mobile-top-navigation-share": "Share",
   "mobile-top-navigation-my-balance": "My Balance: ${{value}}",
+  "mobile-top-navigation-my-balance-tablet": "${{value}}",
   "mobile-top-navigation-my-balance-empty": "Wallet balance",
   "mobile-top-navigation-profile": "Profile",
-  "button-create-decision": "Create decision",
+  "my-link": "My link",
+  "my-link-copied": "Copied!",
+  "button-create-decision": "New post",
   "button-create": "Create",
   "button-login-in": "Log in",
   "button-sign-up": "Sign up",
   "button-dashboard": "Dashboard",
-  "button-create-on-newnew": "Create on NewNew",
+  "button-create-on-newnew": "Create now",
   "button-cancel": "Cancel",
   "footer-top-title": "NewNew",
-  "footer-center-title": "Community",
+  "footer-center-title": "Connect",
   "footer-bottom-title": "Social",
   "footer-about": "About",
   "footer-press": "Press",
-  "footer-jobs": "Jobs",
+  "footer-jobs": "Work @ NewNew",
   "footer-help": "Help",
   "footer-faq": "FAQs",
+  "footer-twitter": "Twitter",
   "footer-how-it-works": "How it works",
-  "footer-guidelines": "Guidelines",
+  "footer-guidelines": "Community Guidelines",
   "footer-accessibility": "Accessibility",
   "footer-suggest-a-feature": "Suggest a feature",
   "footer-inc": "© NewNew Inc",
@@ -57,7 +61,45 @@
     "text": {
       "min": "Text is too short, min {{value}} chars",
       "max": "Text is too long, max {{value}} chars",
-      "badWords": "Text contains swear words"
+      "badWords": "Text contains swear words",
+      "containsLinks": "Links not allowed"
     }
+  },
+  "modal": {
+    "report-user": {
+      "title": "Report",
+      "subtitle": "Help us understand so that we can investigate...",
+      "options": {
+        "spam": "Suspicious or spam",
+        "abuse": "Abusive or harmful",
+        "suicide": "Expresses intentions of self-harm or suicide",
+        "hate-speech": "Hate speech",
+        "harassment": "Harassment or bullying",
+        "copyright": "Copyright",
+        "other": "Other"
+      },
+      "additional-info": {
+        "placeholder": "Please tell us a bit more..."
+      },
+      "button-cancel": "Cancel",
+      "button-confirm": "Report user",
+      "button-confirm-group": "Report group"
+    },
+    "report-sent": {
+      "title": "We’re on it!",
+      "subtitle": "We appreciate you letting us know. We’ll take a look into this ASAP and take the appropriate steps to ensure everyone’s safety.",
+      "button": "Got it"
+    }
+  },
+  "socials": {
+    "copy": "Copy Link",
+    "copied": "Link Copied!"
+  },
+  "search": {
+    "top-posts": "Top Posts",
+    "popular-creators": "Popular Creators"
+  },
+  "creator-card": {
+    "subscription-cost": "${{amount}} Monthly"
   }
 }

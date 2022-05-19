@@ -28,9 +28,12 @@ interface JsonConvertible {
 /**
  * All the protobufjs-generated class **objects** conform to this interface.
  */
-export interface EncDec<T = keyof NewnewapiType> {
+interface EncDec<T = keyof NewnewapiType> {
   encode(message: T, writer?: $protobuf.Writer): $protobuf.Writer;
-  decode(reader: $protobuf.Reader | Uint8Array, length?: number): T & JsonConvertible;
+  decode(
+    reader: $protobuf.Reader | Uint8Array,
+    length?: number
+  ): T & JsonConvertible;
   fromObject(object: { [k: string]: any }): T & JsonConvertible;
 }
 
@@ -39,11 +42,15 @@ export interface EncDec<T = keyof NewnewapiType> {
  * returns an Array Buffer that can be decoded in the outer function.
  * @param response browser Fetch API response
  */
-export const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
+const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
   const contentType = response.headers.get('content-type');
 
   return new Promise((resolve, reject) => {
-    if (response.ok && contentType && contentType.indexOf('application/x-protobuf') !== -1) {
+    if (
+      response.ok &&
+      contentType &&
+      contentType.indexOf('application/x-protobuf') !== -1
+    ) {
       resolve(response.arrayBuffer());
     }
     if (response.status >= 401 && response.status < 404) {
@@ -69,7 +76,10 @@ export const handleProtobufResponse = (response: Response): Promise<ArrayBuffer>
  * @param mode cors mode
  * @param credentials a string indicating whether credentials will be sent with the request
  */
-export async function fetchProtobuf<RequestType = keyof NewnewapiType, ResponseType = keyof NewnewapiType>(
+export async function fetchProtobuf<
+  RequestType = keyof NewnewapiType,
+  ResponseType = keyof NewnewapiType
+>(
   reqT: EncDec<RequestType>,
   resT: EncDec<ResponseType>,
   url: string,
@@ -108,8 +118,11 @@ export async function fetchProtobuf<RequestType = keyof NewnewapiType, ResponseT
 }
 
 // Tries to refresh credentials if access token has expired
-export const refreshCredentials = (payload: newnewapi.RefreshCredentialRequest) =>
-  fetchProtobuf<newnewapi.RefreshCredentialRequest, newnewapi.RefreshCredentialResponse>(
+const refreshCredentials = (payload: newnewapi.RefreshCredentialRequest) =>
+  fetchProtobuf<
+    newnewapi.RefreshCredentialRequest,
+    newnewapi.RefreshCredentialResponse
+  >(
     newnewapi.RefreshCredentialRequest,
     newnewapi.RefreshCredentialResponse,
     `${BASE_URL}/auth/refresh_credential`,
@@ -158,17 +171,26 @@ export async function fetchProtobufProtectedIntercepted<
   // Declare response
   let res: APIResponse<ResponseType>;
   // Try to get tokens - from react-cookie instance or from passed params
-  const accessToken = serverSideTokens?.accessToken ?? cookiesInstance.get('accessToken');
-  const refreshToken = serverSideTokens?.refreshToken ?? cookiesInstance.get('refreshToken');
+  const accessToken =
+    serverSideTokens?.accessToken ?? cookiesInstance.get('accessToken');
+  const refreshToken =
+    serverSideTokens?.refreshToken ?? cookiesInstance.get('refreshToken');
 
   try {
     if (!accessToken && !refreshToken) throw new Error('No token');
     if (!accessToken && refreshToken) throw new Error('Access token invalid');
 
     // Try to make request if access and refresh tokens are present
-    res = await fetchProtobuf<RequestType, ResponseType>(reqT, resT, url, method, payload, {
-      'x-auth-token': accessToken,
-    });
+    res = await fetchProtobuf<RequestType, ResponseType>(
+      reqT,
+      resT,
+      url,
+      method,
+      payload,
+      {
+        'x-auth-token': accessToken,
+      }
+    );
 
     // Throw an error if the access token was invalid
     if (!res.data && res.error?.message === 'Access token invalid') {
@@ -188,27 +210,42 @@ export async function fetchProtobufProtectedIntercepted<
         // Refresh failed, session "expired"
         // (i.e. user probably logged in from another device, or exceeded
         // max number of logged in devices/browsers)
-        if (!resRefresh.data || resRefresh.error) throw new Error('Refresh token invalid');
+        if (!resRefresh.data || resRefresh.error)
+          throw new Error('Refresh token invalid');
 
         // Refreshed succeded, re-set access and refresh tokens
         // Client side
         if (!serverSideTokens) {
-          cookiesInstance.set('accessToken', resRefresh.data.credential?.accessToken, {
-            expires: new Date((resRefresh.data.credential?.expiresAt?.seconds as number)!! * 1000),
-            path: '/',
-          });
-          cookiesInstance.set('refreshToken', resRefresh.data.credential?.refreshToken, {
-            // Expire in 10 years
-            maxAge: 10 * 365 * 24 * 60 * 60,
-            path: '/',
-          });
+          cookiesInstance.set(
+            'accessToken',
+            resRefresh.data.credential?.accessToken,
+            {
+              expires: new Date(
+                (resRefresh.data.credential?.expiresAt?.seconds as number)!! *
+                  1000
+              ),
+              path: '/',
+            }
+          );
+          cookiesInstance.set(
+            'refreshToken',
+            resRefresh.data.credential?.refreshToken,
+            {
+              // Expire in 10 years
+              maxAge: 10 * 365 * 24 * 60 * 60,
+              path: '/',
+            }
+          );
         } else {
           // Server-side
           updateCookieServerSideCallback?.([
             {
               name: 'accessToken',
               value: resRefresh.data.credential?.accessToken!!,
-              expires: new Date((resRefresh.data.credential?.expiresAt?.seconds as number)!! * 1000).toUTCString(),
+              expires: new Date(
+                (resRefresh.data.credential?.expiresAt?.seconds as number)!! *
+                  1000
+              ).toUTCString(),
             },
             {
               name: 'refreshToken',
@@ -218,9 +255,16 @@ export async function fetchProtobufProtectedIntercepted<
           ]);
         }
         // Try request again with new credentials
-        res = await fetchProtobuf<RequestType, ResponseType>(reqT, resT, url, method, payload, {
-          'x-auth-token': resRefresh.data.credential?.accessToken,
-        });
+        res = await fetchProtobuf<RequestType, ResponseType>(
+          reqT,
+          resT,
+          url,
+          method,
+          payload,
+          {
+            'x-auth-token': resRefresh.data.credential?.accessToken,
+          }
+        );
         return res;
       } catch (errSecondAttempt) {
         // If error is auth-related - throw
@@ -233,7 +277,8 @@ export async function fetchProtobufProtectedIntercepted<
       }
     }
     // If error is auth-related - throw
-    if ((errFirstAttempt as Error).message === 'No token') throw new Error((errFirstAttempt as Error).message);
+    if ((errFirstAttempt as Error).message === 'No token')
+      throw new Error((errFirstAttempt as Error).message);
     // Return as APIResponse.error
     return {
       error: errFirstAttempt as Error,

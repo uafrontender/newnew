@@ -27,7 +27,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
   useEffect(() => {
     if (user.loggedIn) router.push('/');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -39,19 +39,23 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
         const requestPayload = new newnewapi.SendVerificationEmailRequest({
           stripeSessionUrl: `session_id=${session_id}`,
-          useCase: newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_STRIPE_SESSION,
+          useCase:
+            newnewapi.SendVerificationEmailRequest.UseCase
+              .SIGN_UP_WITH_STRIPE_SESSION,
         });
 
         const res = await sendVerificationEmail(requestPayload);
 
-        if (!res!! || res!!.error || !res.data) throw new Error(res!!.error?.message ?? 'An error occured');
+        if (!res!! || res!!.error || !res.data)
+          throw new Error(res!!.error?.message ?? 'An error occured');
 
         const { data } = res!!;
 
         if (
-          !data
-          || data.status !== newnewapi.SendVerificationEmailResponse.Status.SUCCESS
-        ) throw new Error('No data');
+          !data ||
+          data.status !== newnewapi.SendVerificationEmailResponse.Status.SUCCESS
+        )
+          throw new Error('No data');
 
         dispatch(setSignupEmailInput(data.emailAddress));
 
@@ -66,7 +70,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
     }
 
     handleSendEmailRequest();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -114,9 +118,7 @@ export default EmailAuthRedirectPage;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { session_id } = context.query;
 
-  if (!session_id
-    || Array.isArray(session_id)
-  ) {
+  if (!session_id || Array.isArray(session_id)) {
     return {
       redirect: {
         destination: '/',

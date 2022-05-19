@@ -3,38 +3,41 @@ import styled from 'styled-components';
 
 interface IText {
   weight?: 500 | 600;
-  variant?: 1 | 2 | 3;
+  variant?: 1 | 2 | 3 | 4 | 5;
   onClick?: (e: any) => void;
+  tone?: 'neutral' | 'error';
   children: React.ReactNode;
 }
 
-const Text: React.FC<IText> = (props) => {
-  const {
-    variant,
-    children,
-    ...rest
-  } = props;
+const Text: React.FC<IText> = React.memo((props) => {
+  const { variant, children, ...rest } = props;
 
   const components = {
     1: SText1,
     2: SText2,
     3: SText3,
+    4: SText4,
+    5: SText5,
   };
   const Component = components[variant ?? 1];
 
   return <Component {...rest}>{children}</Component>;
-};
+});
 
 Text.defaultProps = {
   weight: 500,
   variant: 1,
   onClick: () => {},
+  tone: 'neutral',
 };
 
 export default Text;
 
 const SText = styled.div<IText>`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
+  color: ${(props) =>
+    props.tone === 'error'
+      ? props.theme.colorsThemed.accent.error
+      : props.theme.colorsThemed.text.primary};
   font-weight: ${(props) => props.weight};
 `;
 
@@ -80,5 +83,35 @@ const SText3 = styled(SText)`
   ${({ theme }) => theme.media.laptop} {
     font-size: 14px;
     line-height: 20px;
+  }
+`;
+
+const SText4 = styled(SText)`
+  font-size: 14px;
+  line-height: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    font-size: 24px;
+    line-height: 32px;
+  }
+`;
+
+const SText5 = styled(SText)`
+  font-size: 16px;
+  line-height: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    font-size: 20px;
+    line-height: 28px;
   }
 `;

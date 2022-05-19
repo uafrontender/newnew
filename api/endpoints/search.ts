@@ -1,12 +1,12 @@
 import { newnewapi } from 'newnew-api';
-import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
+import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
-export const BASE_URL_CHAT = `${BASE_URL}/search`;
+const BASE_URL_CHAT = `${BASE_URL}/search`;
 
 export const quickSearchPostsAndCreators = (
   payload: newnewapi.QuickSearchPostsAndCreatorsRequest
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.QuickSearchPostsAndCreatorsRequest,
     newnewapi.QuickSearchPostsAndCreatorsResponse
   >(
@@ -18,10 +18,7 @@ export const quickSearchPostsAndCreators = (
   );
 
 export const searchPosts = (payload: newnewapi.SearchPostsRequest) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.SearchPostsRequest,
-    newnewapi.PagedPostsResponse
-  >(
+  fetchProtobuf<newnewapi.SearchPostsRequest, newnewapi.PagedPostsResponse>(
     newnewapi.SearchPostsRequest,
     newnewapi.PagedPostsResponse,
     `${BASE_URL_CHAT}/search_posts`,
@@ -29,8 +26,8 @@ export const searchPosts = (payload: newnewapi.SearchPostsRequest) =>
     payload
   );
 
-export const SearchCreators = (payload: newnewapi.SearchCreatorsRequest) =>
-  fetchProtobufProtectedIntercepted<
+export const searchCreators = (payload: newnewapi.SearchCreatorsRequest) =>
+  fetchProtobuf<
     newnewapi.SearchCreatorsRequest,
     newnewapi.SearchCreatorsResponse
   >(

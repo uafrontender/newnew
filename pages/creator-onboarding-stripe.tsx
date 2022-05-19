@@ -4,27 +4,34 @@ import React, { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import type { NextPage } from 'next';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useAppSelector } from '../redux-store/store';
 
 import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
 import { getMyOnboardingState } from '../api/endpoints/user';
 import Lottie from '../components/atoms/Lottie';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
-import OnboardingSectionStripe from '../components/molecules/creator-onboarding/OnboardingSectionStripe';
+import { useAppDispatch, useAppSelector } from '../redux-store/store';
+import { setCreatorData } from '../redux-store/slices/userStateSlice';
 
+const OnboardingSectionStripe = dynamic(
+  () =>
+    import('../components/molecules/creator-onboarding/OnboardingSectionStripe')
+);
 
 interface ICreatorOnboardingStripe {}
 
 const CreatorOnboardingStripe: NextPage<ICreatorOnboardingStripe> = () => {
   const { t } = useTranslation('creator-onboarding');
 
-  const [onboardingState, setOnboardingState] = useState<newnewapi.GetMyOnboardingStateResponse>();
+  const [onboardingState, setOnboardingState] =
+    useState<newnewapi.GetMyOnboardingStateResponse>();
   const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
 
   useEffect(() => {
     async function fetchOnboardingState() {
@@ -34,6 +41,14 @@ const CreatorOnboardingStripe: NextPage<ICreatorOnboardingStripe> = () => {
 
         if (res.data) {
           setOnboardingState(res.data);
+          dispatch(
+            setCreatorData({
+              options: {
+                ...user.creatorData?.options,
+                ...res.data,
+              },
+            })
+          );
         }
 
         setIsLoading(false);
@@ -41,19 +56,21 @@ const CreatorOnboardingStripe: NextPage<ICreatorOnboardingStripe> = () => {
         console.error(err);
       }
     }
-
     fetchOnboardingState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <>
       <Head>
-        <title>{ t('meta.title') }</title>
-        <meta name="description" content={t('meta.description')} />
+        <title>{t('meta.title')}</title>
+        <meta name='description' content={t('meta.description')} />
       </Head>
       {!isLoading ? (
         <OnboardingSectionStripe
-          isConnectedToStripe={onboardingState?.isCreatorConnectedToStripe ?? false}
+          isConnectedToStripe={
+            onboardingState?.isCreatorConnectedToStripe ?? false
+          }
         />
       ) : (
         <Lottie
@@ -70,23 +87,24 @@ const CreatorOnboardingStripe: NextPage<ICreatorOnboardingStripe> = () => {
   );
 };
 
-(CreatorOnboardingStripe as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
+(CreatorOnboardingStripe as NextPageWithLayout).getLayout = function getLayout(
+  page: ReactElement
+) {
   return (
-    <CreatorOnboardingLayout
-      hideProgressBar
-    >
-      { page }
+    <CreatorOnboardingLayout hideOnboardingHeader>
+      {page}
     </CreatorOnboardingLayout>
   );
 };
 
 export default CreatorOnboardingStripe;
 
-export async function getStaticProps(context: { locale: string }): Promise<any> {
-  const translationContext = await serverSideTranslations(
-    context.locale,
-    ['creator-onboarding'],
-  );
+export async function getStaticProps(context: {
+  locale: string;
+}): Promise<any> {
+  const translationContext = await serverSideTranslations(context.locale, [
+    'creator-onboarding',
+  ]);
 
   return {
     props: {

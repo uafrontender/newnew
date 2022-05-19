@@ -41,10 +41,17 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   // Tabs
-  const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>('announcement');
+  const [openedTab, setOpenedTab] =
+    useState<'announcement' | 'response'>('announcement');
 
   useEffect(() => {
     async function markResponseAsViewed() {
@@ -56,7 +63,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
 
         const res = await markPost(payload);
 
-        console.log(res)
+        console.log(res);
 
         if (!res.error) {
           handleSetResponseViewed(true);
@@ -66,13 +73,10 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
       }
     }
 
-    if (openedTab === 'response'
-      && user.loggedIn
-      && !responseViewed
-    ) {
+    if (openedTab === 'response' && user.loggedIn && !responseViewed) {
       markResponseAsViewed();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openedTab, postId, user.loggedIn, responseViewed]);
 
   return (
@@ -87,12 +91,16 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
           />
           <SSoundButton
             iconOnly
-            view="transparent"
+            view='transparent'
             onClick={(e) => {
               e.stopPropagation();
               handleToggleMuted();
               if (isSafari()) {
-                (document?.getElementById(`bitmovinplayer-video-${postId}`) as HTMLVideoElement)?.play();
+                (
+                  document?.getElementById(
+                    `bitmovinplayer-video-${postId}`
+                  ) as HTMLVideoElement
+                )?.play();
               }
             }}
           >
@@ -100,7 +108,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
               svg={isMuted ? VolumeOff : VolumeOn}
               width={isMobileOrTablet ? '20px' : '24px'}
               height={isMobileOrTablet ? '20px' : '24px'}
-              fill="#FFFFFF"
+              fill='#FFFFFF'
             />
           </SSoundButton>
         </>
@@ -113,12 +121,16 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
           />
           <SSoundButton
             iconOnly
-            view="transparent"
+            view='transparent'
             onClick={(e) => {
               e.stopPropagation();
               handleToggleMuted();
               if (isSafari()) {
-                (document?.getElementById(`bitmovinplayer-video-${postId}`) as HTMLVideoElement)?.play();
+                (
+                  document?.getElementById(
+                    `bitmovinplayer-video-${postId}`
+                  ) as HTMLVideoElement
+                )?.play();
               }
             }}
           >
@@ -126,7 +138,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
               svg={isMuted ? VolumeOff : VolumeOn}
               width={isMobileOrTablet ? '20px' : '24px'}
               height={isMobileOrTablet ? '20px' : '24px'}
-              fill="#FFFFFF"
+              fill='#FFFFFF'
             />
           </SSoundButton>
         </>
@@ -134,17 +146,15 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
       {response ? (
         <SToggleVideoWidget>
           {openedTab === 'response' ? (
-            <SChangeTabBtn
-              onClick={() => setOpenedTab('announcement')}
-            >
-              { t('PostVideo.tabs.back_to_original') }
+            <SChangeTabBtn onClick={() => setOpenedTab('announcement')}>
+              {t('PostVideo.tabs.back_to_original')}
             </SChangeTabBtn>
           ) : (
             <SChangeTabBtn
               shouldView={!responseViewed}
               onClick={() => setOpenedTab('response')}
             >
-              { t('PostVideo.tabs.back_to_response') }
+              {t('PostVideo.tabs.back_to_response')}
             </SChangeTabBtn>
           )}
         </SToggleVideoWidget>
@@ -241,7 +251,8 @@ const SToggleVideoWidget = styled.div`
 const SChangeTabBtn = styled.button<{
   shouldView?: boolean;
 }>`
-  background: ${({ shouldView }) => (shouldView ? '#FFFFFF' : 'rgba(11, 10, 19, 0.2)')};
+  background: ${({ shouldView }) =>
+    shouldView ? '#FFFFFF' : 'rgba(11, 10, 19, 0.2)'};
   border: transparent;
   border-radius: 16px;
 
@@ -256,7 +267,8 @@ const SChangeTabBtn = styled.button<{
 
   cursor: pointer;
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
   }
 `;

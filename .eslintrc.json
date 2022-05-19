@@ -4,7 +4,13 @@
     "es6": true,
     "node": true
   },
-  "extends": ["airbnb", "airbnb/hooks", "prettier"],
+  "extends": [
+    "airbnb",
+    "airbnb/hooks",
+    "prettier",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
   "rules": {
     "react/prop-types": "off",
     "no-use-before-define": "off",
@@ -18,11 +24,25 @@
     "@typescript-eslint/no-use-before-define": "off",
     "react/default-props-match-prop-types": "off",
 
+    // Useful, but require gradual integration
+    "@typescript-eslint/ban-ts-comment": "off", // DANGEROUS PRACTICE! ignores compilation errors
+    "@typescript-eslint/ban-types": "off", // We use {} type which is non informative
+    "@typescript-eslint/no-non-null-assertion": "off", // We do not check for null properly
+    "@typescript-eslint/no-empty-function": "off", // We forgot to provide a proper function or make parameter optional
+    "@typescript-eslint/no-non-null-asserted-optional-chain": "off", // We do not check for null properly
+    "@typescript-eslint/no-extra-non-null-assertion": "off", // Why do we need multiple no null assertions at all?
+
     // Useful, but ignored so far. TODO: re-enable later
     "no-console": "off",
 
+    // Arguable
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-var-requires": "off",
+
     // Useless
     "radix": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
 
     "@typescript-eslint/no-unused-vars": [
       2,

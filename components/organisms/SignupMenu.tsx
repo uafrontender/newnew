@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-no-target-blank */
+/* eslint-disable no-nested-ternary */
 // Temp disabled until backend is in place
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -11,9 +13,7 @@ import isEmail from 'validator/lib/isEmail';
 
 // Redux
 import { useAppSelector, useAppDispatch } from '../../redux-store/store';
-import {
-  setSignupEmailInput,
-} from '../../redux-store/slices/userStateSlice';
+import { setSignupEmailInput } from '../../redux-store/slices/userStateSlice';
 
 // API
 import { sendVerificationEmail, BASE_URL_AUTH } from '../../api/endpoints/auth';
@@ -43,13 +43,19 @@ import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.
 // Utils
 import isBrowser from '../../utils/isBrowser';
 import { AuthLayoutContext } from '../templates/AuthLayout';
+import isSafari from '../../utils/isSafari';
 
 export interface ISignupMenu {
+  goal?: string;
   reason?: SignupReason;
   redirectURL?: string;
 }
 
-const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason, redirectURL }) => {
+const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
+  goal,
+  reason,
+  redirectURL,
+}) => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('sign-up');
@@ -57,7 +63,9 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason, redirectURL 
   const authLayoutContext = useContext(AuthLayoutContext);
 
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   // const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const { signupEmailInput } = useAppSelector((state) => state.user);
@@ -80,10 +88,13 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason, redirectURL 
     try {
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: emailInput,
-        useCase: newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_EMAIL,
-        ...(redirectURL ? {
-          redirectURL
-        } : {}),
+        useCase:
+          newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_EMAIL,
+        ...(redirectURL
+          ? {
+              redirectUrl: redirectURL,
+            }
+          : {}),
       });
 
       const { data, error } = await sendVerificationEmail(payload);
@@ -95,11 +106,13 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason, redirectURL 
 
       authLayoutContext.setShouldHeroUnmount(true);
 
-      setTimeout(() => {
+      if (!isSafari()) {
+        setTimeout(() => {
+          router.push('/verify-email');
+        }, 1000);
+      } else {
         router.push('/verify-email');
-      }, 1000);
-
-      // router.push('/verify-email');
+      }
     } catch (err: any) {
       setIsSubmitLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
@@ -119,6 +132,10 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason, redirectURL 
     }
   }, [emailInput, setEmailInputValid]);
 
+  const redirectUrlParam = redirectURL
+    ? `?redirect_url=${encodeURIComponent(redirectURL)}`
+    : '';
+
   return (
     <SSignupMenu
       isLoading={isSubmitLoading}
@@ -136,95 +153,106 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason, redirectURL 
         >
           <span>{t('goBackBtn')}</span>
         </SSignInBackButton>
-        <SHeadline
-          variant={3}
-        >
-          {reason && reason !== 'session_expired' ? `${t('heading.sign_in_to')} ${t(`heading.reasons.${reason}`)}` : t('heading.sign_in')}
+        <SHeadline variant={3}>
+          {reason && reason !== 'session_expired'
+            ? `${t('heading.sign-in-to')} ${t(`heading.reasons.${reason}`)}`
+            : goal
+            ? t(`heading.${goal}`)
+            : t('heading.sign-in')}
         </SHeadline>
         <SSubheading variant={2} weight={600}>
-          { reason !== 'session_expired' ? t('heading.subheading') : t('heading.subheadingSessionExpired') }
+          {reason !== 'session_expired'
+            ? t('heading.subheading')
+            : t('heading.subheadingSessionExpired')}
         </SSubheading>
-        <MSContentWrapper
-          variants={container}
-          initial="hidden"
-          animate="show"
-        >
-          <motion.div
-            variants={item}
-          >
+        <MSContentWrapper variants={container} initial='hidden' animate='show'>
+          <motion.div variants={item}>
             <SignInButton
               noRipple
               svg={GoogleIcon}
               hoverBgColor={theme.colorsThemed.social.google.hover}
               pressedBgColor={theme.colorsThemed.social.google.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/google`)}
+              onClick={() =>
+                handleSignupRedirect(
+                  `${BASE_URL_AUTH}/google${redirectUrlParam}`
+                )
+              }
             >
               {t('signupOptions.google')}
             </SignInButton>
           </motion.div>
-          <motion.div
-            variants={item}
-          >
+          <motion.div variants={item}>
             <SignInButton
               noRipple
               svg={AppleIcon}
-              hoverBgColor="#000"
-              hoverContentColor="#FFF"
+              hoverBgColor='#000'
+              hoverContentColor='#FFF'
               pressedBgColor={theme.colorsThemed.social.apple.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/apple`)}
+              onClick={() =>
+                handleSignupRedirect(
+                  `${BASE_URL_AUTH}/apple${redirectUrlParam}`
+                )
+              }
             >
               {t('signupOptions.apple')}
             </SignInButton>
           </motion.div>
-          <motion.div
-            variants={item}
-          >
+          <motion.div variants={item}>
             <SignInButton
               noRipple
               svg={theme.name === 'dark' ? FacebookIcon : FacebookIconLight}
               hoverSvg={FacebookIconLight}
               hoverBgColor={theme.colorsThemed.social.facebook.hover}
               pressedBgColor={theme.colorsThemed.social.facebook.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/fb`)}
+              onClick={() =>
+                handleSignupRedirect(`${BASE_URL_AUTH}/fb${redirectUrlParam}`)
+              }
             >
               {t('signupOptions.facebook')}
             </SignInButton>
           </motion.div>
-          <motion.div
-            variants={item}
-          >
+          <motion.div variants={item}>
             <SignInButton
               noRipple
               svg={TwitterIcon}
               hoverBgColor={theme.colorsThemed.social.twitter.hover}
               pressedBgColor={theme.colorsThemed.social.twitter.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/twitter`)}
+              onClick={() =>
+                handleSignupRedirect(
+                  `${BASE_URL_AUTH}/twitter${redirectUrlParam}`
+                )
+              }
             >
               {t('signupOptions.twitter')}
             </SignInButton>
           </motion.div>
-          <motion.div
-            variants={item}
-          >
+          <motion.div variants={item}>
             <TextWithLine
               lineColor={theme.colorsThemed.background.outlines1}
-              innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
+              innerSpan={
+                <SContinueWithSpan>
+                  {t('signupOptions.or_continue_with')}
+                </SContinueWithSpan>
+              }
             />
           </motion.div>
           <SEmailSignInForm
             onSubmit={(e) => {
               e.preventDefault();
-              if (!emailInputValid || isSubmitLoading || emailInput.length === 0) return;
+              if (
+                !emailInputValid ||
+                isSubmitLoading ||
+                emailInput.length === 0
+              )
+                return;
               handleSubmitEmail();
             }}
           >
-            <motion.div
-              variants={item}
-            >
+            <motion.div variants={item}>
               <SignInTextInput
-                name="email"
-                type="email"
-                autoComplete="true"
+                name='email'
+                type='email'
+                autoComplete='true'
                 value={emailInput}
                 isValid={emailInputValid}
                 disabled={isSubmitLoading}
@@ -236,33 +264,26 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason, redirectURL 
                 errorCaption={t('errors.email_invalid')}
               />
             </motion.div>
-            {
-              submitError ? (
-                <AnimatedPresence
-                  animateWhenInView={false}
-                  animation="t-09"
-                >
-                  <SErrorDiv>
-                    <InlineSvg
-                      svg={AlertIcon}
-                      width="16px"
-                      height="16px"
-                    />
-                    { t(`errors.${submitError}`) }
-                  </SErrorDiv>
-                </AnimatedPresence>
-              ) : null
-            }
-            <motion.div
-              variants={item}
-            >
+            {submitError ? (
+              <AnimatedPresence animateWhenInView={false} animation='t-09'>
+                <SErrorDiv>
+                  <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+                  {t(`errors.${submitError}`)}
+                </SErrorDiv>
+              </AnimatedPresence>
+            ) : null}
+            <motion.div variants={item}>
               <EmailSignInButton
-                type="submit"
-                disabled={!emailInputValid || isSubmitLoading || emailInput.length === 0}
+                type='submit'
+                disabled={
+                  !emailInputValid || isSubmitLoading || emailInput.length === 0
+                }
                 onClick={() => {}}
               >
                 <span>
-                  {t('signupOptions.signInBtn')}
+                  {goal !== 'log-in'
+                    ? t('signupOptions.signInBtn')
+                    : t('signupOptions.logInBtn')}
                 </span>
               </EmailSignInButton>
             </motion.div>
@@ -270,24 +291,28 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason, redirectURL 
         </MSContentWrapper>
         <AnimatedPresence
           animateWhenInView={false}
-          animation="t-01"
+          animation='t-01'
           delay={1.1}
         >
           <SLegalText>
             {t('legalDisclaimer.main_text')}
             <br />
-            <Link href="/privacy-policy">
-              <a href="/privacy-policy" target="_blank">{t('legalDisclaimer.privacy_policy')}</a>
+            <Link href='https://privacy.newnew.co'>
+              <a href='https://privacy.newnew.co' target='_blank'>
+                {t('legalDisclaimer.privacy_policy')}
+              </a>
             </Link>
             {', '}
-            <Link href="/terms-and-conditions">
-              <a href="/terms-and-conditions" target="_blank">{t('legalDisclaimer.terms')}</a>
-            </Link>
-            {' '}
-            {t('legalDisclaimer.and')}
-            {' '}
-            <Link href="/community-guidelines">
-              <a href="/community-guidelines" target="_blank">{t('legalDisclaimer.community_guidelines')}</a>
+            <Link href='https://terms.newnew.co'>
+              <a href='https://terms.newnew.co' target='_blank'>
+                {t('legalDisclaimer.terms')}
+              </a>
+            </Link>{' '}
+            {t('legalDisclaimer.and')}{' '}
+            <Link href='https://communityguidelines.newnew.co'>
+              <a href='https://communityguidelines.newnew.co' target='_blank'>
+                {t('legalDisclaimer.community_guidelines')}
+              </a>
             </Link>
           </SLegalText>
         </AnimatedPresence>
@@ -335,7 +360,7 @@ const SSignupMenu = styled.div<{ isLoading?: boolean }>`
   cursor: ${({ isLoading }) => (isLoading ? 'wait' : 'default')};
 
   ${({ theme }) => theme.media.tablet} {
-    width: 50%
+    width: 50%;
   }
 
   ${({ theme }) => theme.media.laptopL} {
@@ -421,7 +446,7 @@ const SSignInBackButton = styled(GoBackButton)`
     & div > svg {
       transform: scale(0.8);
 
-      transition: .2s ease-in-out;
+      transition: 0.2s ease-in-out;
     }
   }
 
@@ -471,7 +496,7 @@ const SHeadline = styled(Headline)`
   }
 
   ${({ theme }) => theme.media.laptopL} {
-    margin-top: 140px;
+    margin-top: 80px;
 
     font-size: 32px;
     line-height: 40px;
@@ -541,7 +566,6 @@ const SLegalText = styled(Text)`
   font-size: 12px;
   line-height: 16px;
 
-
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   a {
@@ -549,11 +573,12 @@ const SLegalText = styled(Text)`
 
     color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       outline: none;
       color: ${({ theme }) => theme.colorsThemed.text.primary};
 
-      transition: .2s ease;
+      transition: 0.2s ease;
     }
   }
 

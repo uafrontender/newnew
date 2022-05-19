@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
-const EmptyInbox: React.FC = () => {
+const EmptyInbox: React.FC = React.memo(() => {
   const { t } = useTranslation('chat');
 
   return (
@@ -12,7 +12,7 @@ const EmptyInbox: React.FC = () => {
       <SEmptyInboxText>{t('empty-inbox.text')}</SEmptyInboxText>
     </SEmptyInbox>
   );
-};
+});
 
 export default EmptyInbox;
 
@@ -37,7 +37,9 @@ const SEmptyInboxTitle = styled.strong`
   margin-bottom: 4px;
   font-weight: 600;
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
 `;
 
 const SEmptyInboxText = styled.div`

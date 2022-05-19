@@ -13,10 +13,10 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../../redux-store/store';
-import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
+// import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
 import {
   createPaymentSession,
-  getTopUpWalletWithPaymentPurposeUrl,
+  // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 
 import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
@@ -24,7 +24,7 @@ import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewM
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../../checkout/PaymentModal';
+import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
 
@@ -103,14 +103,14 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
       setPaymentModalOpen(true);
     };
 
-    const handleDoubleVoteWithWallet = useCallback(() => {}, []);
+    // const handleDoubleVoteWithWallet = useCallback(() => {}, []);
 
     const handleDoubleVoteWithCardStripeRedirect = useCallback(() => {}, []);
 
     return (
       <motion.div
         key={index}
-        layout="position"
+        layout='position'
         transition={{
           type: 'spring',
           damping: 20,
@@ -124,7 +124,7 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
         }}
       >
         <SContainerDoubleVote
-          layout="position"
+          layout='position'
           transition={{
             type: 'spring',
             damping: 20,
@@ -244,14 +244,14 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
             isOpen={paymentModalOpen}
             amount={`$${parseInt(doubleVoteAmount) * 5}`}
             onClose={() => setPaymentModalOpen(false)}
-            handlePayWithWallet={handleDoubleVoteWithWallet}
+            // handlePayWithWallet={handleDoubleVoteWithWallet}
             handlePayWithCardStripeRedirect={
               handleDoubleVoteWithCardStripeRedirect
             }
           >
             <SPaymentModalHeader>
               <SPaymentModalTitle variant={3}>
-                {t('McPost.paymenModalHeader.subtitle')}
+                {t('McPost.paymentModalHeader.subtitle')}
               </SPaymentModalTitle>
               <SPaymentModalOptionText>{option.text}</SPaymentModalOptionText>
             </SPaymentModalHeader>

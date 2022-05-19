@@ -3,291 +3,309 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-import {
-  fetchAcOptionById,
-} from '../../../api/endpoints/auction';
-
-// test post
-// http://localhost:4000/post/421e53e4-8297-4ac6-ac74-47366bc1c43b
-// http://localhost:4000/post/24d54ea4-a110-43da-99a2-3712c394e2ef
+import { fetchAcOptionById } from '../../../api/endpoints/auction';
 
 // Utils
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
 import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
 
-import BoxIcon from '../../../public/images/creation/AC.webp';
-import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
-import AcSuccessOptionsTab from '../../molecules/decision/auction/success/AcSuccessOptionsTab';
+import assets from '../../../constants/assets';
+import { fetchPostByUUID } from '../../../api/endpoints/post';
+
+const AcSuccessOptionsTab = dynamic(
+  () => import('../../molecules/decision/auction/success/AcSuccessOptionsTab')
+);
+const CommentsSuccess = dynamic(
+  () => import('../../molecules/decision/success/CommentsSuccess')
+);
 
 interface IPostSuccessAC {
   post: newnewapi.Auction;
 }
 
-const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
-  post,
-}) => {
-  const { t } = useTranslation('decision');
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state);
-  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
+  ({ post }) => {
+    const { t } = useTranslation('decision');
+    const dispatch = useAppDispatch();
+    const { user } = useAppSelector((state) => state);
+    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
     // Winninfg option
-  const [winningOption, setWinningOption] =
-    useState<newnewapi.Auction.Option | undefined>();
+    const [winningOption, setWinningOption] =
+      useState<newnewapi.Auction.Option | undefined>();
 
     // Video
-  // Open video tab
-  const [videoTab, setVideoTab] = useState<'announcement' | 'response'>('announcement');
-  // Response viewed
-  const [responseViewed, setResponseViewed] = useState(
-    post.isResponseViewedByMe ?? false
-  );
-  // Muted mode
-  const handleToggleMutedMode = useCallback(() => {
-    dispatch(toggleMutedMode(''));
-  }, [dispatch]);
-
-    // Main screen vs all bids
-  const [openedMainSection, setOpenedMainSection] = useState<'main' | 'bids'>('main');
-
-    // Comments
-  const {
-    ref: commentsSectionRef,
-    inView
-  } = useInView({
-    threshold: 0.8
-  });
-
-  // Scroll to comments if hash is present
-  useEffect(() => {
-    const handleCommentsInitialHash = () => {
-      const { hash } = window.location;
-      if (!hash) {
-        return;
-      }
-      const parsedHash = hash.substring(1);
-
-      if (parsedHash === 'comments') {
-        document.getElementById('comments')?.scrollIntoView();
-      }
-    };
-
-    handleCommentsInitialHash();
-  }, []);
-
-  // Replace hash once scrolled to comments
-  useEffect(() => {
-    if (inView) {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}#comments`
-      );
-    } else {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}`
-      );
-    }
-  }, [inView, post.postUuid]);
-
-  // Load winning option
-  useEffect(() => {
-    async function fetchAndSetWinningOption(id: number) {
+    // Open video tab
+    const [videoTab, setVideoTab] =
+      useState<'announcement' | 'response'>('announcement');
+    // Response viewed
+    const [responseViewed, setResponseViewed] = useState(
+      post.isResponseViewedByMe ?? false
+    );
+    const fetchPostLatestData = useCallback(async () => {
       try {
-        const payload = new newnewapi.GetAcOptionRequest({
-          optionId: id,
+        const fetchPostPayload = new newnewapi.GetPostRequest({
+          postUuid: post.postUuid,
         });
 
-        const res = await fetchAcOptionById(payload);
+        const res = await fetchPostByUUID(fetchPostPayload);
 
-        if (res.data?.option) {
-          setWinningOption(res.data.option as newnewapi.Auction.Option);
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+
+        if (res.data.auction?.isResponseViewedByMe) {
+          setResponseViewed(true);
         }
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
-    }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    if (post.winningOptionId) {
-      fetchAndSetWinningOption(post.winningOptionId as number);
-    }
-  }, [post.winningOptionId]);
+    // Muted mode
+    const handleToggleMutedMode = useCallback(() => {
+      dispatch(toggleMutedMode(''));
+    }, [dispatch]);
 
-  return (
-    <>
-      <SWrapper>
-        <PostVideoSuccess
-          postId={post.postUuid}
-          announcement={post.announcement!!}
-          response={post.response ?? undefined}
-          responseViewed={responseViewed}
-          openedTab={videoTab}
-          setOpenedTab={(tab) => setVideoTab(tab)}
-          isMuted={mutedMode}
-          handleToggleMuted={() => handleToggleMutedMode()}
-          handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
-        />
-        <SActivitesContainer>
-          {openedMainSection === 'main' ? (
-            <>
-              <DecisionEndedBox
-                imgSrc={BoxIcon.src}
-              >
-                {t('AcPostSuccess.hero_text')}
-              </DecisionEndedBox>
-              <SMainSectionWrapper>
-                <SCreatorInfoDiv>
-                  <SCreator>
-                    <SCreatorImage
-                      src={post.creator?.avatarUrl!!}
-                    />
-                    <SWantsToKnow>
-                      {t('AcPostSuccess.wants_to_know', { creator: post.creator?.nickname })}
-                    </SWantsToKnow>
-                  </SCreator>
-                  <STotal>
-                    {`$${formatNumber(post.totalAmount?.usdCents!! / 100 ?? 0, true)}`}
-                    {' '}
-                    <span>
-                      {t('AcPostSuccess.in_total_bids')}
-                    </span>
-                  </STotal>
-                </SCreatorInfoDiv>
-                <SPostTitle
-                  variant={4}
-                >
-                  {post.title}
-                </SPostTitle>
-                <SSeparator />
-                {winningOption && (
-                <>
-                  <SWinningBidCreator>
-                    <SCreator>
-                      <SCreatorImage
-                        src={winningOption.creator?.avatarUrl!!}
-                      />
-                      <SWinningBidCreatorText>
-                        { winningOption.creator?.uuid === user.userData?.userUuid ? (
-                            winningOption.supporterCount > 1 ? (
-                              t('me')
-                            ) : t('my')
-                          ) : (
-                            getDisplayname(winningOption.creator!!)
-                        ) }
-                        {winningOption.supporterCount > 1 ? (
-                          <>
-                            {formatNumber(winningOption.supporterCount, true)}
-                            {' & '}
-                            {t('AcPostSuccess.others')}
-                          </>
-                        ) : null}
-                        {' '}
-                        {t('AcPostSuccess.bid')}
-                      </SWinningBidCreatorText>
-                    </SCreator>
-                  </SWinningBidCreator>
-                  <SWinningOptionAmount
-                    variant={4}
-                  >
-                    {`$${formatNumber(winningOption.totalAmount?.usdCents!! / 100 ?? 0, true)}`}
-                  </SWinningOptionAmount>
-                  <SSeparator />
-                  <SWinningOptionDetails>
-                    <SWinningOptionDetailsBidChosen>
-                      {t('AcPostSuccess.bid_chosen')}
-                    </SWinningOptionDetailsBidChosen>
-                    <SWinningOptionDetailsSeeAll
-                      onClick={() => setOpenedMainSection('bids')}
-                    >
-                      {t('AcPostSuccess.see_all')}
-                    </SWinningOptionDetailsSeeAll>
-                    <SWinningOptionDetailsTitle
-                      variant={4}
-                    >
-                      {winningOption.title}
-                    </SWinningOptionDetailsTitle>
-                  </SWinningOptionDetails>
-                </>
-                )}
-              </SMainSectionWrapper>
-              {!isMobile ? (
-                <>
-                  {!responseViewed && videoTab === 'announcement' ? (
-                    <SWatchResponseWrapper>
-                      <SWatchResponseBtn
-                        shouldView={!responseViewed}
-                        onClick={() => setVideoTab('response')}
-                      >
-                        { t('PostVideoSuccess.tabs.watch_reponse_first_time') }
-                      </SWatchResponseBtn>
-                    </SWatchResponseWrapper>
-                  ) : null}
-                  {responseViewed ? (
-                    <SToggleVideoWidget>
-                      <SChangeTabBtn
-                        shouldView={videoTab === 'announcement'}
-                        onClick={() => setVideoTab('announcement')}
-                      >
-                        { t('PostVideoSuccess.tabs.watch_original') }
-                      </SChangeTabBtn>
-                      <SChangeTabBtn
-                        shouldView={videoTab === 'response'}
-                        onClick={() => setVideoTab('response')}
-                      >
-                        { t('PostVideoSuccess.tabs.watch_response')}
-                      </SChangeTabBtn>
-                    </SToggleVideoWidget>
-                  ) : null}
-                </>
-              ) : null}
-            </>
-          ) : (
-            <AcSuccessOptionsTab
-              post={post}
-              handleGoBack={() => setOpenedMainSection('main')}
-            />
-          )}
-        </SActivitesContainer>
-      </SWrapper>
-      {post.isCommentsAllowed && (
-        <SCommentsSection
-          id="comments"
-          ref={commentsSectionRef}
-        >
-          <SCommentsHeadline variant={4}>
-            {t('SuccessCommon.Comments.heading')}
-          </SCommentsHeadline>
-          <CommentsSuccess
-            commentsRoomId={post.commentsRoomId as number}
-            handleGoBack={() => {}}
+    // Main screen vs all bids
+    const [openedMainSection, setOpenedMainSection] =
+      useState<'main' | 'bids'>('main');
+
+    // Comments
+    const { ref: commentsSectionRef, inView } = useInView({
+      threshold: 0.8,
+    });
+
+    // Check if the response has been viewed
+    useEffect(() => {
+      fetchPostLatestData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Scroll to comments if hash is present
+    useEffect(() => {
+      const handleCommentsInitialHash = () => {
+        const { hash } = window.location;
+        if (!hash) {
+          return;
+        }
+
+        const parsedHash = hash.substring(1);
+
+        if (parsedHash === 'comments') {
+          document.getElementById('comments')?.scrollIntoView();
+        }
+      };
+
+      handleCommentsInitialHash();
+    }, []);
+
+    // Replace hash once scrolled to comments
+    useEffect(() => {
+      if (inView) {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}#comments`
+        );
+      } else {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}`
+        );
+      }
+    }, [inView, post.postUuid]);
+
+    // Load winning option
+    useEffect(() => {
+      async function fetchAndSetWinningOption(id: number) {
+        try {
+          const payload = new newnewapi.GetAcOptionRequest({
+            optionId: id,
+          });
+
+          const res = await fetchAcOptionById(payload);
+
+          if (res.data?.option) {
+            setWinningOption(res.data.option as newnewapi.Auction.Option);
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      if (post.winningOptionId) {
+        fetchAndSetWinningOption(post.winningOptionId as number);
+      }
+    }, [post.winningOptionId]);
+
+    return (
+      <>
+        <SWrapper>
+          <PostVideoSuccess
+            postId={post.postUuid}
+            announcement={post.announcement!!}
+            response={post.response ?? undefined}
+            responseViewed={responseViewed}
+            openedTab={videoTab}
+            setOpenedTab={(tab) => setVideoTab(tab)}
+            isMuted={mutedMode}
+            handleToggleMuted={() => handleToggleMutedMode()}
+            handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
-        </SCommentsSection>
-      )}
-    </>
-  );
-};
+          <SActivitesContainer>
+            {openedMainSection === 'main' ? (
+              <>
+                <DecisionEndedBox imgSrc={assets.creation.AcAnimated}>
+                  {t('AcPostSuccess.hero_text')}
+                </DecisionEndedBox>
+                <SMainSectionWrapper>
+                  <SCreatorInfoDiv>
+                    <SCreator>
+                      <SCreatorImage src={post.creator?.avatarUrl!!} />
+                      <SWantsToKnow>
+                        {t('AcPostSuccess.wants_to_know', {
+                          creator: post.creator?.nickname,
+                        })}
+                      </SWantsToKnow>
+                    </SCreator>
+                    <STotal>
+                      {`$${formatNumber(
+                        post.totalAmount?.usdCents!! / 100 ?? 0,
+                        true
+                      )}`}{' '}
+                      <span>{t('AcPostSuccess.in_total_bids')}</span>
+                    </STotal>
+                  </SCreatorInfoDiv>
+                  <SPostTitle variant={4}>{post.title}</SPostTitle>
+                  <SSeparator />
+                  {winningOption && (
+                    <>
+                      <SWinningBidCreator>
+                        <SCreator>
+                          <SCreatorImage
+                            src={winningOption.creator?.avatarUrl!!}
+                          />
+                          <SWinningBidCreatorText>
+                            {winningOption.creator?.uuid ===
+                              user.userData?.userUuid ||
+                            winningOption.isSupportedByMe
+                              ? winningOption.supporterCount > 1
+                                ? t('me')
+                                : t('my')
+                              : getDisplayname(winningOption.creator!!)}
+                            {winningOption.supporterCount > 1 ? (
+                              <>
+                                {' & '}
+                                {formatNumber(
+                                  winningOption.supporterCount,
+                                  true
+                                )}{' '}
+                                {t('AcPostSuccess.others')}
+                              </>
+                            ) : null}{' '}
+                            {t('AcPostSuccess.bid')}
+                          </SWinningBidCreatorText>
+                        </SCreator>
+                      </SWinningBidCreator>
+                      <SWinningOptionAmount variant={4}>
+                        {`$${formatNumber(
+                          winningOption.totalAmount?.usdCents!! / 100 ?? 0,
+                          true
+                        )}`}
+                      </SWinningOptionAmount>
+                      <SSeparator />
+                      <SWinningOptionDetails>
+                        <SWinningOptionDetailsBidChosen>
+                          {t('AcPostSuccess.bid_chosen')}
+                        </SWinningOptionDetailsBidChosen>
+                        <SWinningOptionDetailsSeeAll
+                          onClick={() => setOpenedMainSection('bids')}
+                        >
+                          {t('AcPostSuccess.see_all')}
+                        </SWinningOptionDetailsSeeAll>
+                        <SWinningOptionDetailsTitle variant={4}>
+                          {winningOption.title}
+                        </SWinningOptionDetailsTitle>
+                      </SWinningOptionDetails>
+                    </>
+                  )}
+                </SMainSectionWrapper>
+                {!isMobile ? (
+                  <>
+                    {!responseViewed && videoTab === 'announcement' ? (
+                      <SWatchResponseWrapper>
+                        <SWatchResponseBtn
+                          shouldView={!responseViewed}
+                          onClick={() => setVideoTab('response')}
+                        >
+                          {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
+                        </SWatchResponseBtn>
+                      </SWatchResponseWrapper>
+                    ) : null}
+                    {responseViewed ? (
+                      <SToggleVideoWidget>
+                        <SChangeTabBtn
+                          shouldView={videoTab === 'announcement'}
+                          onClick={() => setVideoTab('announcement')}
+                        >
+                          {t('PostVideoSuccess.tabs.watch_original')}
+                        </SChangeTabBtn>
+                        <SChangeTabBtn
+                          shouldView={videoTab === 'response'}
+                          onClick={() => setVideoTab('response')}
+                        >
+                          {t('PostVideoSuccess.tabs.watch_response')}
+                        </SChangeTabBtn>
+                      </SToggleVideoWidget>
+                    ) : null}
+                  </>
+                ) : null}
+              </>
+            ) : (
+              <AcSuccessOptionsTab
+                post={post}
+                handleGoBack={() => setOpenedMainSection('main')}
+              />
+            )}
+          </SActivitesContainer>
+        </SWrapper>
+        {post.isCommentsAllowed && (
+          <SCommentsSection id='comments' ref={commentsSectionRef}>
+            <SCommentsHeadline variant={4}>
+              {t('SuccessCommon.Comments.heading')}
+            </SCommentsHeadline>
+            <CommentsSuccess
+              postUuid={post.postUuid}
+              commentsRoomId={post.commentsRoomId as number}
+              handleGoBack={() => {}}
+            />
+          </SCommentsSection>
+        )}
+      </>
+    );
+  }
+);
 
 export default PostSuccessAC;
 
@@ -300,8 +318,7 @@ const SWrapper = styled.div`
     min-height: 0;
 
     display: inline-grid;
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 284px 1fr;
     grid-template-rows: minmax(0, 1fr);
 
@@ -313,12 +330,10 @@ const SWrapper = styled.div`
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 410px 1fr;
   }
 `;
-
 
 const SActivitesContainer = styled.div`
   grid-area: activities;
@@ -332,6 +347,11 @@ const SActivitesContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
     margin-top: 0px;
     min-height: 506px;
+
+    background-color: ${({ theme }) =>
+      theme.name === 'dark'
+        ? theme.colorsThemed.background.secondary
+        : 'transparent'};
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -355,7 +375,7 @@ const SMainSectionWrapper = styled.div`
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start\;
+    justify-content: flex-start\;;
   }
 `;
 
@@ -365,7 +385,8 @@ const SSeparator = styled.div`
   height: 1.5px;
   width: 64px;
 
-  border-bottom: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1.5px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
 
 // Creator info
@@ -434,7 +455,6 @@ const STotal = styled.div`
     font-weight: 700;
     font-size: 12px;
     line-height: 16px;
-
   }
   ${({ theme }) => theme.media.laptop} {
     position: relative;
@@ -496,7 +516,6 @@ const SWinningBidCreatorText = styled.span`
   }
 `;
 
-
 // Winning option
 const SWinningOptionAmount = styled(Headline)`
   text-align: center;
@@ -513,16 +532,14 @@ const SWinningOptionDetails = styled.div`
   grid-template-areas:
     'bidchosen'
     'title'
-    'see_all'
-  ;
+    'see_all';
 
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
       'bidchosen see_all'
-      'title title'
-    ;
+      'title title';
     grid-template-columns: 1fr 1fr;
 
     margin-bottom: initial;
@@ -537,7 +554,6 @@ const SWinningOptionDetailsBidChosen = styled.div`
   font-size: 12px;
   line-height: 16px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
 
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
@@ -566,7 +582,9 @@ const SWinningOptionDetailsSeeAll = styled.button`
 
   cursor: pointer;
 
-  &:focus, &:hover, &:active {
+  &:focus,
+  &:hover,
+  &:active {
     outline: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
@@ -588,13 +606,11 @@ const SWinningOptionDetailsSeeAll = styled.button`
 const SWinningOptionDetailsTitle = styled(Headline)`
   grid-area: title;
 
-
   text-align: center;
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
   }
 `;
-
 
 // Watch response for the first time
 const SWatchResponseWrapper = styled.div`
@@ -608,7 +624,8 @@ const SWatchResponseWrapper = styled.div`
 const SWatchResponseBtn = styled.button<{
   shouldView?: boolean;
 }>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)')};
+  background: ${({ shouldView, theme }) =>
+    shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)'};
   border: transparent;
   border-radius: 16px;
 
@@ -617,14 +634,15 @@ const SWatchResponseBtn = styled.button<{
   width: 100%;
   height: 100%;
 
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
 
   cursor: pointer;
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
   }
 `;
@@ -642,7 +660,10 @@ const SToggleVideoWidget = styled.div`
 const SChangeTabBtn = styled.button<{
   shouldView?: boolean;
 }>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary)};
+  background: ${({ shouldView, theme }) =>
+    shouldView
+      ? theme.colorsThemed.accent.blue
+      : theme.colorsThemed.background.tertiary};
   border: transparent;
 
   padding: 17px 24px;
@@ -651,18 +672,23 @@ const SChangeTabBtn = styled.button<{
   height: 100%;
 
   text-align: center;
-  color: #FFFFFF;
+  color: ${({ shouldView, theme }) =>
+    shouldView
+      ? '#ffffff'
+      : theme.name === 'dark'
+      ? '#ffffff'
+      : theme.colorsThemed.text.tertiary};
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
 
   cursor: pointer;
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
   }
 `;
-
 
 // Comments
 const SCommentsHeadline = styled(Headline)`
@@ -673,6 +699,4 @@ const SCommentsHeadline = styled(Headline)`
   }
 `;
 
-const SCommentsSection = styled.div`
-
-`;
+const SCommentsSection = styled.div``;

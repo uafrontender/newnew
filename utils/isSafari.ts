@@ -1,12 +1,11 @@
-import isBrowser from "./isBrowser";
+import isBrowser from './isBrowser';
 
-const isSafari = () => (
-  isBrowser()
-    && navigator.vendor
-    && navigator.vendor.indexOf('Apple') > -1
-    && navigator.userAgent
-    && navigator.userAgent.indexOf('CriOS') === -1
-    && navigator.userAgent.indexOf('FxiOS') === -1
-);
+const isSafari = () =>
+  isBrowser() &&
+  navigator.vendor &&
+  navigator.vendor.indexOf('Apple') > -1 &&
+  navigator.userAgent &&
+  navigator.userAgent.indexOf('CriOS') === -1 &&
+  navigator.userAgent.indexOf('FxiOS') === -1;
 
 export default isSafari;

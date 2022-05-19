@@ -17,25 +17,17 @@ interface IScrollArrow {
   handleClick: () => void;
 }
 
-export const ScrollArrow: React.FC<IScrollArrow> = (props) => {
-  const {
-    active,
-    position,
-    handleClick,
-  } = props;
+const ScrollArrow: React.FC<IScrollArrow> = (props) => {
+  const { active, position, handleClick } = props;
   const theme = useTheme();
 
   return (
-    <SArrowHolder
-      active={active}
-      onClick={handleClick}
-      position={position}
-    >
+    <SArrowHolder active={active} onClick={handleClick} position={position}>
       <InlineSVG
         svg={ICONS[position]}
         fill={theme.colorsThemed.text.primary}
-        width="48px"
-        height="48px"
+        width='48px'
+        height='48px'
       />
     </SArrowHolder>
   );
@@ -66,20 +58,23 @@ const SArrowHolder = styled.div<ISArrowHolder>`
     z-index: 3;
   }
 
-  ${(props) => (props.position === 'left' ? css`
-    left: -32px;
-    background: ${props.theme.gradients.arrowLeft};
+  ${(props) =>
+    props.position === 'left'
+      ? css`
+          left: -32px;
+          background: ${props.theme.gradients.arrowLeft};
 
-    ${props.theme.media.laptop} {
-      left: -16px;
-    }
-  ` : css`
-    right: -32px;
-    background: ${props.theme.gradients.arrowRight};
-    justify-content: flex-end;
+          ${props.theme.media.laptop} {
+            left: -16px;
+          }
+        `
+      : css`
+          right: -32px;
+          background: ${props.theme.gradients.arrowRight};
+          justify-content: flex-end;
 
-    ${props.theme.media.laptop} {
-      right: -16px;
-    }
-  `)}
+          ${props.theme.media.laptop} {
+            right: -16px;
+          }
+        `}
 `;

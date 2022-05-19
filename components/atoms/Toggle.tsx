@@ -7,7 +7,7 @@ type TToggle = {
   disabled?: boolean;
   wrapperStyle?: React.CSSProperties;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
+};
 
 const Toggle: React.FunctionComponent<TToggle> = ({
   title,
@@ -23,7 +23,7 @@ const Toggle: React.FunctionComponent<TToggle> = ({
     style={wrapperStyle ?? {}}
   >
     <input
-      type="checkbox"
+      type='checkbox'
       disabled={disabled}
       title={title ?? ''}
       onChange={(e) => onChange(e)}
@@ -58,7 +58,7 @@ const SToggleLabel = styled.label<{
   }};
 
   cursor: pointer;
-  transition: .2s linear;
+  transition: 0.2s linear;
 
   input {
     opacity: 0;
@@ -77,17 +77,18 @@ const SToggleLabel = styled.label<{
 
     border-radius: 50%;
 
-    background-color: #FFFFFF;
+    background-color: #ffffff;
 
     transform: ${({ checked }) => (checked ? 'translateX(12px)' : 'unset')};
 
-    transition: transform .2s linear;
+    transition: transform 0.2s linear;
   }
 
-  ${({ disabled }) => (
-    disabled ? css`
-      opacity: 0.5;
-      cursor: default;
-    ` : null
-  )};
+  ${({ disabled }) =>
+    disabled
+      ? css`
+          opacity: 0.5;
+          cursor: default;
+        `
+      : null};
 `;

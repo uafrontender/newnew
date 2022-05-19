@@ -13,6 +13,12 @@
       "message-second-part": "?",
       "button-cancel": "Cancel",
       "button-confirm": "Block user"
+    },
+    "delete-my-account": {
+      "title": "Delete my account",
+      "body": "Are you sure you want to delete your account?\nYou won’t be able to access your account in the future\nand all of your history will be erased.",
+      "button-confirm": "Delete my account",
+      "button-cancel": "Cancel"
     }
   },
   "tabs": {
@@ -84,7 +90,7 @@
           "linksForbidden": "Links not allowed"
         },
         "points": {
-          "1": "8-15 characters length",
+          "1": "2-25 characters length",
           "2": "Lower case only",
           "3": "No space and special characters"
         }
@@ -102,8 +108,8 @@
     }
   },
   "Settings": {
-    "heading": "General settings",
-    "goBackBtn": "Go back",
+    "heading": "Settings",
+    "goBackBtn": "Back",
     "colorModeSwitch": {
       "options": {
         "light": "Light",
@@ -114,18 +120,18 @@
     "sections": {
       "Wallet": {
         "empty": {
-          "balance": "Balance",
-          "caption": "Use your NewNew wallet and make your bets with no fees.",
-          "topUpBtn": "Top up my wallet"
+          "balance": "My balance",
+          "caption": "Add funds to vote and bid without any fees",
+          "topUpBtn": "Add funds"
         },
         "non-empty": {
-          "balance": "Balance",
-          "topUpBtn": "Top up"
+          "balance": "My balance",
+          "topUpBtn": "Add funds"
         },
         "TopUpWalletModal": {
-          "heading": "Top up amount",
-          "checkoutButtonMobile": "Check out",
-          "checkoutButtonDesktop": "Check out",
+          "heading": "Add funds",
+          "checkoutButtonMobile": "Checkout",
+          "checkoutButtonDesktop": "Checkout",
           "cancelButtonDesktop": "Cancel"
         }
       },
@@ -135,7 +141,7 @@
           "label": "Email Address",
           "placeholder": "email@email.com",
           "errors": {
-            "invalidEmail": "Please enter a valid email",
+            "invalidEmail": "Please enter a valid email address",
             "emailTaken": "Email taken"
           }
         },
@@ -145,7 +151,7 @@
             "tooYoung": "You must be 18 years or older."
           },
           "captions": {
-            "twoTimesOnly": "Birthdate can be changed 2 times only.",
+            "twoTimesOnly": "Birthday can be changed 2 times only",
             "cannotChange": "You can only change this once"
           },
           "saveBtn": "Save",
@@ -155,7 +161,9 @@
         "cancelBtn": "Cancel"
       },
       "Notifications": {
-        "title": "Notifications"
+        "title": "Notifications",
+        "email": "Email Notifications",
+        "push": "Push Notifications"
       },
       "Transactions": {
         "title": "Transactions",
@@ -172,21 +180,21 @@
         "title": "Privacy",
         "privacySubsections": {
           "spendings": {
-            "title": "Hide spending from other users.",
-            "caption": "People will not be able to see how much you spent on votes and bids."
+            "title": "Hide my spending from others",
+            "caption": "People will not be able to see how much you spent on events, superpolls and goals"
           },
           "private": {
-            "title": "Make private account.",
-            "caption": "People will not be able to see your bids."
+            "title": "Make my activity private",
+            "caption": "People will not be able to see any of your activity on events, superpolls and goals"
           }
         },
         "blockedusers": {
-          "title": "Blocked uses",
+          "title": "Blocked users",
           "unblockBtn": "Unblock",
           "no_blocked_users": "No blocked users"
         },
         "closeAccount": {
-          "title": "Close account",
+          "title": "Delete my account",
           "caption": "Delete your account and account data.",
           "closeBtn": "Delete"
         }
@@ -196,6 +204,46 @@
       "languageTitle": "Choose language",
       "help": "Help",
       "logout": "Log out"
+    }
+  },
+  "MyPosts": {
+    "no-content": {
+      "description": "Posts you created will be shown here"
+    }
+  },
+  "Active": {
+    "no-content": {
+      "description": "Posts you’re actively bidding on, voting\non, or backing will be shown here"
+    }
+  },
+  "Purchases": {
+    "no-content": {
+      "description": "Any purchases you make\nwill be shown here"
+    }
+  },
+  "Viewing-history": {
+    "no-content": {
+      "description": "All posts you previewed\nwill be kept here in your history"
+    }
+  },
+  "Subscriptions": {
+    "no-content": {
+      "description": "You’re not subscribed\nto any creators yet"
+    }
+  },
+  "Favorites": {
+    "no-content": {
+      "description": "Any creators you favorite\nwill be shown here"
+    }
+  },
+  "CreatorsDecisions": {
+    "no-content": {
+      "description": "Posts from the creator will be shown here"
+    }
+  },
+  "Activity": {
+    "no-content": {
+      "description": "Any creators activity will be shown here"
     }
   }
 }

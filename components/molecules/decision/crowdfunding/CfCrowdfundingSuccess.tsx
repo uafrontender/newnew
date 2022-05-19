@@ -10,80 +10,58 @@ import Text from '../../../atoms/Text';
 import Headline from '../../../atoms/Headline';
 
 import { formatNumber } from '../../../../utils/format';
-
-import WinnerIcon from '../../../../public/images/decision/ac-select-winner-trophy-mock.png';
+import assets from '../../../../constants/assets';
 
 interface ICfCrowdfundingSuccess {
   post: newnewapi.Crowdfunding;
   currentNumBackers: number;
 }
 
-const CfCrowdfundingSuccess: React.FunctionComponent<ICfCrowdfundingSuccess> = ({
-  post,
-  currentNumBackers,
-}) => {
-  const { t } = useTranslation('decision');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+const CfCrowdfundingSuccess: React.FunctionComponent<ICfCrowdfundingSuccess> =
+  ({ post, currentNumBackers }) => {
+    const { t } = useTranslation('decision');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  return (
-    <SSectionContainer>
-      {!isMobile ? (
-        <>
-          <SProgressRingContainer>
-            <STrophyImg
-              src={WinnerIcon.src}
-            />
-            <STrophyGlow />
-          </SProgressRingContainer>
-        </>
-      ) : null}
-      <SCaptionSection>
-        <SHeadlineNumBackers
-          variant={3}
-        >
-          {currentNumBackers}
-        </SHeadlineNumBackers>
-        <STarget>
-          {t('CfPost.BackersStatsSection.of_backers', {
-            targetBackers: formatNumber(post.targetBackerCount, true),
-          })}
-        </STarget>
-      </SCaptionSection>
-      <SWinnerCard>
-        <SOptionDetails>
-          <SNumBidders
-            variant={3}
-          >
-            <SSpanBold>
-              {formatNumber(
-                currentNumBackers,
-                true,
-              )}
-            </SSpanBold>
-            {' '}
-            <SSpanThin>
-              {currentNumBackers > 1
-                ? t('CfPost.WinnerTab.WinnerOptionCard.backers_founded')
-                : t('CfPost.WinnerTab.WinnerOptionCard.backer_founded')
-              }
-            </SSpanThin>
-          </SNumBidders>
-          <SHeadline
-            variant={4}
-          >
-            { post.title }
-          </SHeadline>
-        </SOptionDetails>
-        {isMobile && (
-          <STrophyImgCard
-            src={WinnerIcon.src}
-          />
-        )}
-      </SWinnerCard>
-    </SSectionContainer>
-  );
-};
+    return (
+      <SSectionContainer>
+        {!isMobile ? (
+          <>
+            <SProgressRingContainer>
+              <STrophyImg src={assets.decision.trophy} />
+              <STrophyGlow />
+            </SProgressRingContainer>
+          </>
+        ) : null}
+        <SCaptionSection>
+          <SHeadlineNumBackers variant={3}>
+            {currentNumBackers}
+          </SHeadlineNumBackers>
+          <STarget>
+            {t('CfPost.BackersStatsSection.of_backers', {
+              targetBackers: formatNumber(post.targetBackerCount, true),
+            })}
+          </STarget>
+        </SCaptionSection>
+        <SWinnerCard>
+          <SOptionDetails>
+            <SNumBidders variant={3}>
+              <SSpanBold>{formatNumber(currentNumBackers, true)}</SSpanBold>{' '}
+              <SSpanThin>
+                {currentNumBackers > 1
+                  ? t('CfPost.WinnerTab.WinnerOptionCard.backers_founded')
+                  : t('CfPost.WinnerTab.WinnerOptionCard.backer_founded')}
+              </SSpanThin>
+            </SNumBidders>
+            <SHeadline variant={4}>{post.title}</SHeadline>
+          </SOptionDetails>
+          {isMobile && <STrophyImgCard src={assets.decision.trophy} />}
+        </SWinnerCard>
+      </SSectionContainer>
+    );
+  };
 
 export default CfCrowdfundingSuccess;
 
@@ -101,7 +79,6 @@ const SProgressRingContainer = styled.div`
   position: absolute;
   left: 24px;
   top: 24px;
-
 
   width: 180px;
   height: 180px;
@@ -170,7 +147,7 @@ const SCaptionSection = styled.div`
 `;
 
 const SHeadline = styled(Headline)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SHeadlineNumBackers = styled(Headline)`
@@ -194,7 +171,12 @@ const SWinnerCard = styled.div`
   padding: 16px;
   padding-right: 114px;
 
-  background: linear-gradient(76.09deg, #00C291 2.49%, #07DF74 50.67%, #0FF34F 102.41%);
+  background: linear-gradient(
+    76.09deg,
+    #00c291 2.49%,
+    #07df74 50.67%,
+    #0ff34f 102.41%
+  );
   border-radius: 24px;
 
   display: flex;
@@ -210,10 +192,9 @@ const SWinnerCard = styled.div`
   }
 `;
 
-
 // Option details
 const SOptionDetails = styled.div`
-  color: #FFFFFF;
+  color: #ffffff;
 
   display: flex;
   flex-direction: column;
@@ -221,21 +202,18 @@ const SOptionDetails = styled.div`
 `;
 
 const SNumBidders = styled(Text)`
-  color: #FFFFFF;
-
+  color: #ffffff;
 `;
 
 const SSpanBold = styled.span`
-  color: #FFFFFF;
-
+  color: #ffffff;
 `;
 
 const SSpanThin = styled.span`
-  color: #FFFFFF;
+  color: #ffffff;
 
   opacity: 0.8;
 `;
-
 
 const STrophyImgCard = styled.img`
   position: absolute;

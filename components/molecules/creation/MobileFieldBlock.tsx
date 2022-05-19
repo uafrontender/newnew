@@ -1,9 +1,4 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -13,7 +8,7 @@ import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
-import Calendar from '../../atoms/creation/calendar/ScrollableVertically';
+import CalendarScrollableVertically from '../../atoms/creation/calendar/CalendarScrollableVertically';
 import InlineSVG from '../../atoms/InlineSVG';
 import CustomToggle from '../CustomToggle';
 import TimePicker from './TimePicker';
@@ -37,7 +32,7 @@ interface IMobileFieldBlock {
   formattedDescription?: any;
 }
 
-export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
+const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const {
     id,
     type,
@@ -53,9 +48,12 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const { t } = useTranslation('creation');
   const [focused, setFocused] = useState(false);
 
-  const handleChange = useCallback((e) => {
-    onChange(id, e.target.value);
-  }, [id, onChange]);
+  const handleChange = useCallback(
+    (e) => {
+      onChange(id, e.target.value);
+    },
+    [id, onChange]
+  );
   const handleFocus = useCallback(() => {
     setFocused(true);
   }, []);
@@ -65,7 +63,7 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const handleBlur = useCallback(() => {
     setFocused(false);
 
-    if (inputProps?.type === 'number' && inputProps?.min as number > value) {
+    if (inputProps?.type === 'number' && (inputProps?.min as number) > value) {
       onChange(id, inputProps?.min as number);
     }
   }, [inputProps, id, onChange, value]);
@@ -73,37 +71,36 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
     e.preventDefault();
     e.stopPropagation();
   };
-  const renderItem = useCallback((item: any) => {
-    const handleItemClick = () => {
-      onChange(id, item.id);
-    };
-    const selected = item.id === value;
+  const renderItem = useCallback(
+    (item: any) => {
+      const handleItemClick = () => {
+        onChange(id, item.id);
+        handleBlur();
+      };
+      const selected = item.id === value;
 
-    return (
-      <SButton
-        key={`select-${id}-${item.id}`}
-        view={selected ? 'modalSecondarySelected' : 'modalSecondary'}
-        onClick={handleItemClick}
-        selected={selected}
-      >
-        <SItemTitle variant={3} weight={600}>
-          {item.title}
-        </SItemTitle>
-      </SButton>
-    );
-  }, [id, onChange, value]);
+      return (
+        <SButton
+          key={`select-${id}-${item.id}`}
+          view={selected ? 'modalSecondarySelected' : 'modalSecondary'}
+          onClick={handleItemClick}
+          selected={selected}
+        >
+          <SItemTitle variant={3} weight={600}>
+            {item.title}
+          </SItemTitle>
+        </SButton>
+      );
+    },
+    [id, onChange, handleBlur, value]
+  );
   const getModal = useCallback(() => {
     if (type === 'select') {
       return (
         <Modal show={focused} onClose={handleBlur}>
           <SMobileListContainer focused={focused}>
-            <SMobileList>
-              {options?.map(renderItem)}
-            </SMobileList>
-            <SCancelButton
-              view="modalSecondary"
-              onClick={handleBlur}
-            >
+            <SMobileList>{options?.map(renderItem)}</SMobileList>
+            <SCancelButton view='modalSecondary' onClick={handleBlur}>
               {t('secondStep.button.cancel')}
             </SCancelButton>
           </SMobileListContainer>
@@ -141,12 +138,10 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
         if (selectedId === 'right-away') {
           onChange(id, { date: new Date() });
           onChange(id, {
-            time: moment()
-              .format('hh:mm'),
+            time: moment().format('hh:mm'),
           });
           onChange(id, {
-            'hours-format': moment()
-              .format('a'),
+            'hours-format': moment().format('a'),
           });
         }
         onChange(id, { type: selectedId });
@@ -169,14 +164,12 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                 <SModalTitle variant={6}>
                   {t('secondStep.field.startsAt.modal.title')}
                 </SModalTitle>
-                <SInlineSVGWrapper
-                  onClick={handleBlur}
-                >
+                <SInlineSVGWrapper onClick={handleBlur}>
                   <SInlineSVG
                     svg={closeIcon}
                     fill={theme.colorsThemed.text.primary}
-                    width="20px"
-                    height="20px"
+                    width='20px'
+                    height='20px'
                   />
                 </SInlineSVGWrapper>
               </SModalTopLine>
@@ -187,20 +180,20 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                   onChange={handleScheduleChange}
                 />
               </SModalToggleWrapper>
-              <SCustomDays>
-                {DAYS.map(renderDay)}
-              </SCustomDays>
+              <SCustomDays>{DAYS.map(renderDay)}</SCustomDays>
               <SSeparator />
               <SCalendarWrapper>
                 <SCalendarTopGrad />
                 <SCalendarContent>
-                  <Calendar
+                  <CalendarScrollableVertically
                     minDate={moment()}
-                    maxDate={value?.type === 'right-away' ? moment() : moment()
-                      .add(1, 'M')}
+                    maxDate={
+                      value?.type === 'right-away'
+                        ? moment()
+                        : moment().add(1, 'M')
+                    }
                     onSelect={handleDateChange}
-                    selectedDate={moment(value?.date)
-                      .startOf('D')}
+                    selectedDate={moment(value?.date).startOf('D')}
                   />
                 </SCalendarContent>
                 <SCalendarBottomGrad />
@@ -209,20 +202,19 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
               <SModalToggleWrapper>
                 <STimePickerWrapper>
                   <TimePicker
+                    disabled={value?.type === 'right-away'}
                     value={value?.time}
                     onChange={handleTimeChange}
                   />
                 </STimePickerWrapper>
                 <CustomToggle
+                  disabled={value?.type === 'right-away'}
                   options={formatOptions}
                   selected={value?.['hours-format']}
                   onChange={handleFormatChange}
                 />
               </SModalToggleWrapper>
-              <SScheduleButton
-                view="primaryGrad"
-                onClick={handleBlur}
-              >
+              <SScheduleButton view='primaryGrad' onClick={handleBlur}>
                 {t('secondStep.button.schedule')}
               </SScheduleButton>
             </SMobileDateContent>
@@ -261,11 +253,7 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
         </STitle>
         {type === 'input' ? (
           <SInputWrapper>
-            {inputLabel && (
-              <SInputLabel htmlFor={id}>
-                {inputLabel}
-              </SInputLabel>
-            )}
+            {inputLabel && <SInputLabel htmlFor={id}>{inputLabel}</SInputLabel>}
             <SInput
               id={id}
               ref={inputRef}
@@ -280,11 +268,15 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
           </SInputWrapper>
         ) : (
           <SValue variant={6}>
-            {t(`secondStep.field.${id}.value`, { value: formattedValue || value })}
+            {t(`secondStep.field.${id}.value`, {
+              value: formattedValue || value,
+            })}
           </SValue>
         )}
         <SDescription variant={2} weight={700}>
-          {t(`secondStep.field.${id}.description`, { value: formattedDescription || value })}
+          {t(`secondStep.field.${id}.description`, {
+            value: formattedDescription || value,
+          })}
         </SDescription>
       </SContainer>
     </>
@@ -427,7 +419,8 @@ const SMobileDateContent = styled.div`
   padding: 16px;
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   flex-direction: column;
-  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
+  background-color: ${(props) =>
+    props.theme.colorsThemed.background.backgroundDD};
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
 `;
@@ -438,7 +431,8 @@ const SMobileList = styled.div`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   flex-direction: column;
-  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
+  background-color: ${(props) =>
+    props.theme.colorsThemed.background.backgroundDD};
 `;
 
 interface ISButton {
@@ -484,8 +478,7 @@ const SModalTopLine = styled.div`
   justify-content: space-between;
 `;
 
-const SModalTitle = styled(Headline)`
-`;
+const SModalTitle = styled(Headline)``;
 
 const SInlineSVGWrapper = styled.div`
   cursor: pointer;

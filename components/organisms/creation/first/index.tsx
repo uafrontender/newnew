@@ -3,7 +3,6 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
 import List from '../List';
-import Text from '../../../atoms/Text';
 import Headline from '../../../atoms/Headline';
 
 export const CreationFirstStepContent = () => {
@@ -27,9 +26,6 @@ export const CreationFirstStepContent = () => {
   return (
     <SContent>
       <STitle variant={4}>{t('first-step-title')}</STitle>
-      <SSubTitle variant={2} weight={600}>
-        {t('first-step-sub-title')}
-      </SSubTitle>
       <List collection={collection} />
     </SContent>
   );
@@ -59,15 +55,5 @@ const STitle = styled(Headline)`
 
   ${(props) => props.theme.media.tablet} {
     margin-top: unset;
-  }
-`;
-
-const SSubTitle = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  margin-top: 8px;
-  text-align: center;
-
-  ${(props) => props.theme.media.tablet} {
-    margin-top: 12px;
   }
 `;

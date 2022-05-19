@@ -11,26 +11,19 @@ interface IProfileImageZoomSlider {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const ProfileImageZoomSlider: React.FunctionComponent<IProfileImageZoomSlider> = ({
-  value,
-  min,
-  max,
-  step,
-  ariaLabel,
-  disabled,
-  onChange,
-}) => (
-  <SSlider
-    type="range"
-    value={value}
-    min={min}
-    max={max}
-    step={step}
-    disabled={disabled}
-    aria-labelledby={ariaLabel}
-    onChange={onChange}
-  />
-);
+const ProfileImageZoomSlider: React.FunctionComponent<IProfileImageZoomSlider> =
+  ({ value, min, max, step, ariaLabel, disabled, onChange }) => (
+    <SSlider
+      type='range'
+      value={value}
+      min={min}
+      max={max}
+      step={step}
+      disabled={disabled}
+      aria-labelledby={ariaLabel}
+      onChange={onChange}
+    />
+  );
 
 export default ProfileImageZoomSlider;
 
@@ -65,11 +58,10 @@ const SSlider = styled.input.attrs({ type: 'range' })`
 
     margin-top: -7px;
 
-    transition: .1s ease-in-out;
+    transition: 0.1s ease-in-out;
   }
 
   &:focus::-webkit-slider-runnable-track {
-
   }
 
   &:hover::-webkit-slider-thumb {
@@ -89,7 +81,7 @@ const SSlider = styled.input.attrs({ type: 'range' })`
     background: ${({ theme }) => theme.colorsThemed.text.primary};
     cursor: pointer;
 
-    transition: .1s ease-in-out;
+    transition: 0.1s ease-in-out;
   }
   &:hover::-moz-range-thumb {
     transform: scale(1.2);

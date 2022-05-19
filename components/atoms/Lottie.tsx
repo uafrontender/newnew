@@ -3,29 +3,29 @@ import lottie from 'lottie-web';
 
 interface ILottie {
   ref?: any;
-  eventListeners?: {}[],
+  eventListeners?: {}[];
   options: {
-    loop?: boolean,
-    autoplay?: boolean,
-    animationData?: any,
-    rendererSettings?: boolean,
-    segments?: [],
-  },
-  height: string | number,
-  width: string | number,
-  isStopped?: boolean,
-  isPaused?: boolean,
-  speed?: number,
-  segments?: number[] | undefined,
-  direction?: number,
-  ariaRole?: string,
-  ariaLabel?: string,
-  isClickToPauseDisabled?: boolean,
-  title?: string,
-  style?: object,
+    loop?: boolean;
+    autoplay?: boolean;
+    animationData?: any;
+    rendererSettings?: boolean;
+    segments?: [];
+  };
+  height: string | number;
+  width: string | number;
+  isStopped?: boolean;
+  isPaused?: boolean;
+  speed?: number;
+  segments?: number[] | undefined;
+  direction?: number;
+  ariaRole?: string;
+  ariaLabel?: string;
+  isClickToPauseDisabled?: boolean;
+  title?: string;
+  style?: object;
 }
 
-export class Lottie extends React.Component<ILottie> {
+class Lottie extends React.Component<ILottie> {
   static defaultProps = {
     eventListeners: [],
     isStopped: false,
@@ -44,18 +44,10 @@ export class Lottie extends React.Component<ILottie> {
   private options: {} | undefined;
 
   componentDidMount() {
-    const {
-      options,
-      eventListeners,
-    } = this.props;
+    const { options, eventListeners } = this.props;
 
-    const {
-      loop,
-      autoplay,
-      animationData,
-      rendererSettings,
-      segments,
-    } = options;
+    const { loop, autoplay, animationData, rendererSettings, segments } =
+      options;
 
     this.options = {
       loop,
@@ -71,10 +63,12 @@ export class Lottie extends React.Component<ILottie> {
 
     // @ts-ignore
     this.anim = lottie.loadAnimation(this.options);
-    this.registerEvents(eventListeners as {
-      callback: () => void;
-      eventName: string;
-    }[]);
+    this.registerEvents(
+      eventListeners as {
+        callback: () => void;
+        eventName: string;
+      }[]
+    );
   }
 
   // eslint-disable-next-line camelcase
@@ -82,11 +76,13 @@ export class Lottie extends React.Component<ILottie> {
     /* Recreate the animation handle if the data is changed */
     // @ts-ignore
     if (this.options.animationData !== nextProps.options.animationData) {
-      // eslint-disable-next-line react/destructuring-assignment
-      this.deRegisterEvents(this.props.eventListeners as {
-        callback: () => void;
-        eventName: string;
-      }[]);
+      this.deRegisterEvents(
+        // eslint-disable-next-line react/destructuring-assignment
+        this.props.eventListeners as {
+          callback: () => void;
+          eventName: string;
+        }[]
+      );
       this.destroy();
       this.options = { ...this.options, ...nextProps.options };
       // @ts-ignore
@@ -112,11 +108,13 @@ export class Lottie extends React.Component<ILottie> {
   }
 
   componentWillUnmount() {
-    // eslint-disable-next-line react/destructuring-assignment
-    this.deRegisterEvents(this.props.eventListeners as {
-      callback: () => void;
-      eventName: string;
-    }[]);
+    this.deRegisterEvents(
+      // eslint-disable-next-line react/destructuring-assignment
+      this.props.eventListeners as {
+        callback: () => void;
+        eventName: string;
+      }[]
+    );
     this.destroy();
     // @ts-ignore
     this.options.animationData = null;
@@ -170,21 +168,31 @@ export class Lottie extends React.Component<ILottie> {
     this.anim.destroy();
   }
 
-  registerEvents(eventListeners: {
-    callback: () => void;
-    eventName: string;
-  }[]) {
+  registerEvents(
+    eventListeners: {
+      callback: () => void;
+      eventName: string;
+    }[]
+  ) {
     eventListeners.forEach((eventListener) => {
-      this.anim.addEventListener(eventListener.eventName, eventListener.callback);
+      this.anim.addEventListener(
+        eventListener.eventName,
+        eventListener.callback
+      );
     });
   }
 
-  deRegisterEvents(eventListeners: {
-    callback: () => void;
-    eventName: string;
-  }[]) {
+  deRegisterEvents(
+    eventListeners: {
+      callback: () => void;
+      eventName: string;
+    }[]
+  ) {
     eventListeners.forEach((eventListener) => {
-      this.anim.removeEventListener(eventListener.eventName, eventListener.callback);
+      this.anim.removeEventListener(
+        eventListener.eventName,
+        eventListener.callback
+      );
     });
   }
 
@@ -220,12 +228,24 @@ export class Lottie extends React.Component<ILottie> {
       ...(this.props.style || {}),
     };
 
-    const onClickHandler = isClickToPauseDisabled ? () => null : this.handleClickToPause;
+    const onClickHandler = isClickToPauseDisabled
+      ? () => null
+      : this.handleClickToPause;
 
     return (
-      // eslint-disable-next-line max-len
-      // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions,jsx-a11y/no-noninteractive-tabindex,max-len
-      <div ref={(c) => { this.el = c; }} role={ariaRole} title={title} style={lottieStyles} onClick={onClickHandler} tabIndex={0} aria-label={ariaLabel} />
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
+      <div
+        ref={(c) => {
+          this.el = c;
+        }}
+        role={ariaRole}
+        title={title}
+        style={lottieStyles}
+        onClick={onClickHandler}
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions,jsx-a11y/no-noninteractive-tabindex,max-len
+        tabIndex={0}
+        aria-label={ariaLabel}
+      />
     );
   }
 }

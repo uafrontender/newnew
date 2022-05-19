@@ -1,194 +1,209 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 
 import isBrowser from '../../../../../utils/isBrowser';
 
-import WinnerIcon from '../../../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import { formatNumber } from '../../../../../utils/format';
 import Headline from '../../../../atoms/Headline';
 import Text from '../../../../atoms/Text';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
+import assets from '../../../../../constants/assets';
 
 interface IAcWinnerTabModeration {
+  postId: string;
   option: newnewapi.Auction.Option;
   postStatus: TPostStatusStringified;
 }
 
-const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> = ({
-  option,
-  postStatus,
-}) => {
-  const { t } = useTranslation('decision');
-  const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
+  ({ postId, option, postStatus }) => {
+    const { t } = useTranslation('decision');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const containerRef = useRef<HTMLDivElement>();
-  const [isScrolledDown, setIsScrolledDown] = useState(false);
+    const containerRef = useRef<HTMLDivElement>();
+    const [isScrolledDown, setIsScrolledDown] = useState(false);
 
-  const handleRedirectToUser = () => {
-    window?.history.replaceState({
-      fromPost: true,
-    }, '', '');
-    router.push(`/${option.creator?.username!!}`);
-  };
+    // Share
+    const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-  useEffect(() => {
-    if (isBrowser()) {
-      const currScroll = document.getElementById('post-modal-container')!!.scrollTop!!;
-      const targetScroll = (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
-
-      setIsScrolledDown(currScroll >= targetScroll!!);
-    }
-  }, []);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      // @ts-ignore
-      const currScroll = e?.currentTarget?.scrollTop!!;
-      const targetScroll = (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
-
-      if (currScroll >= targetScroll!!) {
-        setIsScrolledDown(true);
+    async function copyPostUrlToClipboard(url: string) {
+      if ('clipboard' in navigator) {
+        await navigator.clipboard.writeText(url);
       } else {
-        setIsScrolledDown(false);
+        document.execCommand('copy', true, url);
       }
     }
 
-    if (isBrowser()) {
-      document?.getElementById('post-modal-container')?.addEventListener('scroll', handler);
-    }
+    const handleCopyLink = useCallback(() => {
+      if (window) {
+        const url = `${window.location.origin}/post/${postId}`;
 
-    return () => {
+        copyPostUrlToClipboard(url)
+          .then(() => {
+            setIsCopiedUrl(true);
+            setTimeout(() => {
+              setIsCopiedUrl(false);
+            }, 1500);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    }, [postId]);
+
+    useEffect(() => {
       if (isBrowser()) {
-        document?.getElementById('post-modal-container')?.removeEventListener('scroll', handler);
-      }
-    }
-  }, [isMobile]);
+        const currScroll = document.getElementById('post-modal-container')!!
+          .scrollTop!!;
+        const targetScroll =
+          (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
 
-  return (
-    <>
-      <STabContainer
-        key="winner"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        ref={(el) => {
-          containerRef.current = el!!;
-        }}
-      >
-        <SWinnerOptionCard
-          style={{
-            ...(isMobile ? {
-              position: !isScrolledDown ? 'fixed' : 'relative',
-              bottom: !isScrolledDown ? '88px' : 'initial',
-              left: !isScrolledDown ? '16px' : 'initial',
-              width: !isScrolledDown ? 'calc(100% - 32px)' : '100%',
-            } : {}),
+        setIsScrolledDown(currScroll >= targetScroll!!);
+      }
+    }, []);
+
+    useEffect(() => {
+      const handler = (e: Event) => {
+        // @ts-ignore
+        const currScroll = e?.currentTarget?.scrollTop!!;
+        const targetScroll =
+          (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
+
+        if (currScroll >= targetScroll!!) {
+          setIsScrolledDown(true);
+        } else {
+          setIsScrolledDown(false);
+        }
+      };
+
+      if (isBrowser()) {
+        document
+          ?.getElementById('post-modal-container')
+          ?.addEventListener('scroll', handler);
+      }
+
+      return () => {
+        if (isBrowser()) {
+          document
+            ?.getElementById('post-modal-container')
+            ?.removeEventListener('scroll', handler);
+        }
+      };
+    }, [isMobile]);
+
+    return (
+      <>
+        <STabContainer
+          key='winner'
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          ref={(el) => {
+            containerRef.current = el!!;
           }}
         >
-          <SOptionDetails>
-            <SNumBidders
-              variant={3}
-            >
-              <SSpanBold>
-                {formatNumber(
-                  option.supporterCount,
-                  true,
-                )}
-              </SSpanBold>
-              {' '}
-              <SSpanThin>
-                {option.supporterCount > 1
-                  ? t('AcPostModeration.WinnerTab.WinnerOptionCard.bidders_told_you')
-                  : t('AcPostModeration.WinnerTab.WinnerOptionCard.bidder_told_you')
-                }
-              </SSpanThin>
-            </SNumBidders>
-            <SHeadline
-              variant={4}
-            >
-              { option.title }
-            </SHeadline>
-            <SYouMade
-              variant={3}
-            >
-              { t('AcPostModeration.WinnerTab.WinnerOptionCard.you_made') }
-            </SYouMade>
-            <SHeadline
-              variant={4}
-            >
-              $
-              {formatNumber(
-                option.totalAmount!!.usdCents!! / 100,
-                true,
-              )}
-            </SHeadline>
-            <SOptionCreator
-              variant={3}
-            >
-              <SSpanThin>
-                { t('AcPostModeration.WinnerTab.WinnerOptionCard.created_by') }
-              </SSpanThin>
-              {' '}
-              <SSpanBold
-                onClick={() => handleRedirectToUser()}
-                style={{
-                  cursor: 'pointer',
-                }}
-              >
-                {option.creator?.nickname ?? option.creator?.username}
-              </SSpanBold>
-            </SOptionCreator>
-          </SOptionDetails>
-          <STrophyImg
-            src={WinnerIcon.src}
-          />
-          {!isMobile && (
-            <>
-              <STrophyGlow />
-              <SMainScoop />
-              <STopScoop>
-                <mask id='mask-STopScoop'>
-                  <svg>
-                    <circle id='circle-STopScoop' r='50' fill='#0DEE59'/>
-                  </svg>
-                </mask>
-              </STopScoop>
-              <SBottomScoop>
-                <mask id='mask-SBottomScoop'>
-                  <svg>
-                    <circle id='circle-SBottomScoop' r='50' fill='#08e171'/>
-                  </svg>
-                </mask>
-              </SBottomScoop>
-            </>
-          )}
-        </SWinnerOptionCard>
-        {postStatus === 'succeeded' ? (
-          <PostSuccessBoxModeration
-            title={t('PostSuccessModeration.title')}
-            body={t('PostSuccessModeration.body')}
-            buttonCaption={t('PostSuccessModeration.ctaButton')}
+          <SWinnerOptionCard
             style={{
-              marginTop: '24px',
+              ...(isMobile
+                ? {
+                    position: !isScrolledDown ? 'fixed' : 'relative',
+                    bottom: !isScrolledDown ? '88px' : 'initial',
+                    left: !isScrolledDown ? '16px' : 'initial',
+                    width: !isScrolledDown ? 'calc(100% - 32px)' : '100%',
+                  }
+                : {}),
             }}
-            handleButtonClick={() => {
-              console.log('Share')
-            }}
-          />
-        ) : null}
-      </STabContainer>
-    </>
-  );
-};
+          >
+            <SOptionDetails>
+              <SNumBidders variant={3}>
+                <SSpanBold>
+                  {formatNumber(option.supporterCount, true)}
+                </SSpanBold>{' '}
+                <SSpanThin>
+                  {option.supporterCount > 1
+                    ? t(
+                        'AcPostModeration.WinnerTab.WinnerOptionCard.bidders_told_you'
+                      )
+                    : t(
+                        'AcPostModeration.WinnerTab.WinnerOptionCard.bidder_told_you'
+                      )}
+                </SSpanThin>
+              </SNumBidders>
+              <SHeadline variant={4}>{option.title}</SHeadline>
+              <SYouMade variant={3}>
+                {t('AcPostModeration.WinnerTab.WinnerOptionCard.you_made')}
+              </SYouMade>
+              <SHeadline variant={5}>
+                ${formatNumber(option.totalAmount!!.usdCents!! / 100, true)}
+              </SHeadline>
+              <SOptionCreator variant={3}>
+                <SSpanThin>
+                  {t('AcPostModeration.WinnerTab.WinnerOptionCard.created_by')}
+                </SSpanThin>{' '}
+                <Link href={`/${option.creator?.username!!}`}>
+                  <SSpanBold
+                    style={{
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {option.creator?.nickname ?? option.creator?.username}
+                  </SSpanBold>
+                </Link>
+              </SOptionCreator>
+            </SOptionDetails>
+            <STrophyImg src={assets.decision.trophy} />
+            {!isMobile && (
+              <>
+                <STrophyGlow />
+                <SMainScoop />
+                <STopScoop>
+                  <mask id='mask-STopScoop'>
+                    <svg>
+                      <circle id='circle-STopScoop' r='50' fill='#0DEE59' />
+                    </svg>
+                  </mask>
+                </STopScoop>
+                <SBottomScoop>
+                  <mask id='mask-SBottomScoop'>
+                    <svg>
+                      <circle id='circle-SBottomScoop' r='50' fill='#08e171' />
+                    </svg>
+                  </mask>
+                </SBottomScoop>
+              </>
+            )}
+          </SWinnerOptionCard>
+          {postStatus === 'succeeded' ? (
+            <PostSuccessBoxModeration
+              title={t('PostSuccessModeration.title')}
+              body={t('PostSuccessModeration.body')}
+              buttonCaption={
+                isCopiedUrl
+                  ? t('PostSuccessModeration.ctaButton-copied')
+                  : t('PostSuccessModeration.ctaButton')
+              }
+              style={{
+                marginTop: '24px',
+              }}
+              handleButtonClick={() => {
+                handleCopyLink();
+              }}
+            />
+          ) : null}
+        </STabContainer>
+      </>
+    );
+  };
 
 AcWinnerTabModeration.defaultProps = {};
 
@@ -199,6 +214,8 @@ const STabContainer = styled(motion.div)`
   height: calc(100% - 112px);
 
   min-height: 300px;
+
+  position: relative;
 `;
 
 const SWinnerOptionCard = styled.div`
@@ -211,7 +228,12 @@ const SWinnerOptionCard = styled.div`
   padding: 16px;
   padding-right: 114px;
 
-  background: linear-gradient(76.09deg, #00C291 2.49%, #07DF74 50.67%, #0FF34F 102.41%);
+  background: linear-gradient(
+    76.09deg,
+    #00c291 2.49%,
+    #07df74 50.67%,
+    #0ff34f 102.41%
+  );
   border-radius: 24px;
 
   display: flex;
@@ -269,7 +291,10 @@ const SMainScoop = styled.div`
   height: 150px;
   border-radius: 50%;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : '#ffffff'};
 `;
 
 const STopScoop = styled.div`
@@ -277,13 +302,17 @@ const STopScoop = styled.div`
   right: 0px;
   bottom: 70px;
 
-	width: 50px;
-	height: 80px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  width: 50px;
+  height: 80px;
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : '#ffffff'};
 
   svg {
     position: absolute;
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
   }
 `;
 
@@ -292,19 +321,23 @@ const SBottomScoop = styled.div`
   right: 26px;
   bottom: 0px;
 
-	width: 150px;
-	height: 50px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  width: 150px;
+  height: 50px;
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : '#ffffff'};
 
   svg {
     position: absolute;
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
   }
 `;
 
 // Option details
 const SOptionDetails = styled.div`
-  color: #FFFFFF;
+  color: #ffffff;
 
   display: flex;
   flex-direction: column;
@@ -312,11 +345,11 @@ const SOptionDetails = styled.div`
 `;
 
 const SNumBidders = styled(Text)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SHeadline = styled(Headline)`
-  color: #FFFFFF;
+  color: #ffffff;
   margin-bottom: 8px;
 
   ${({ theme }) => theme.media.tablet} {
@@ -325,18 +358,18 @@ const SHeadline = styled(Headline)`
 `;
 
 const SYouMade = styled(Text)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SOptionCreator = styled(Text)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SSpanBold = styled.span`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SSpanThin = styled.span`
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 0.8;
 `;

@@ -14,7 +14,10 @@ import trashIcon from '../../../public/images/svg/icons/filled/Trash.svg';
 import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import changeOrderIcon from '../../../public/images/svg/icons/outlined/ChangeOrder.svg';
 
-import { CREATION_OPTION_MAX, CREATION_OPTION_MIN } from '../../../constants/general';
+import {
+  CREATION_OPTION_MAX,
+  CREATION_OPTION_MIN,
+} from '../../../constants/general';
 
 interface IOptionItem {
   item: {
@@ -23,11 +26,16 @@ interface IOptionItem {
   };
   index: number;
   withDelete: boolean;
-  validation: (value: string, min: number, max: number, kind: newnewapi.ValidateTextRequest.Kind) => Promise<string>;
+  validation: (
+    value: string,
+    min: number,
+    max: number,
+    kind: newnewapi.ValidateTextRequest.Kind
+  ) => Promise<string>;
   handleChange: (index: number, item: object | null) => void;
 }
 
-export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
+const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   const { item, index, withDelete, validation, handleChange } = props;
   const [value, setValue] = useState(item.text);
   const [error, setError] = useState('');
@@ -93,7 +101,13 @@ export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   }, [validation, validateTitleDebounced]);
 
   return (
-    <SWrapper error={!!error} style={{ y }} value={item} dragListener={false} dragControls={dragControls}>
+    <SWrapper
+      error={!!error}
+      style={{ y }}
+      value={item}
+      dragListener={false}
+      dragControls={dragControls}
+    >
       <STextAreaWrapper>
         <SLeftPart error={!!error} isDragging={isDragging}>
           <STextArea
@@ -101,30 +115,40 @@ export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
             onBlur={handleInputBlur}
             onFocus={handleInputFocus}
             onChange={handleInputChange}
-            placeholder={t('secondStep.field.choices.option.label', { value: index + 1 })}
+            placeholder={t('secondStep.field.choices.option.label', {
+              value: index + 1,
+            })}
           />
           {withDelete && (
             <SDeleteIcon
               clickable
               svg={trashIcon}
               fill={theme.colorsThemed.text.secondary}
-              width="23px"
-              height="23px"
+              width='23px'
+              height='23px'
               onClick={handleDelete}
             />
           )}
         </SLeftPart>
         {error ? (
-          <AnimatedPresence animation="t-09">
+          <AnimatedPresence animation='t-09'>
             <SErrorDiv>
-              <InlineSVG svg={alertIcon} width="16px" height="16px" />
+              <InlineSVG svg={alertIcon} width='16px' height='16px' />
               {error}
             </SErrorDiv>
           </AnimatedPresence>
         ) : null}
       </STextAreaWrapper>
-      <SRightPart onPointerUp={handlePointerUp} onPointerDown={handlePointerDown}>
-        <InlineSVG svg={changeOrderIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
+      <SRightPart
+        onPointerUp={handlePointerUp}
+        onPointerDown={handlePointerDown}
+      >
+        <InlineSVG
+          svg={changeOrderIcon}
+          fill={theme.colorsThemed.text.primary}
+          width='24px'
+          height='24px'
+        />
       </SRightPart>
     </SWrapper>
   );
@@ -211,7 +235,10 @@ const SLeftPart = styled.div<ISLeftPart>`
   padding: 10.5px 20px;
   overflow: hidden;
   position: relative;
-  background: ${(props) => props.theme.colorsThemed.background[props.isDragging ? 'quinary' : 'tertiary']};
+  background: ${(props) =>
+    props.theme.colorsThemed.background[
+      props.isDragging ? 'quinary' : 'tertiary'
+    ]};
   align-items: center;
   border-radius: 16px;
   flex-direction: row;

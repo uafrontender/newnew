@@ -14,6 +14,7 @@ interface ITutorialCard {
   imageStyle?: React.CSSProperties;
 }
 
+// TODO: optimize, memorize imageStyle object
 export const TutorialCard: React.FC<ITutorialCard> = ({
   image,
   title,
@@ -21,36 +22,25 @@ export const TutorialCard: React.FC<ITutorialCard> = ({
   height,
   imageStyle,
 }) => {
-  const {
-    resizeMode,
-  } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   return (
     <SWrapper>
-      <SImageBG
-        id="backgroundPart"
-        height={height}
-      >
+      <SImageBG id='backgroundPart' height={height}>
         <SImageHolder>
           <img
-            src={image.src}
+            src={image}
             alt={title}
             style={imageStyle ?? {}}
             draggable={false}
           />
         </SImageHolder>
       </SImageBG>
-      <SHeadline
-        variant={4}
-      >
-        {title}
-      </SHeadline>
-      <SBottomContent
-        variant={isMobile ? 1 : 3}
-      >
-        {caption}
-      </SBottomContent>
+      <SHeadline variant={4}>{title}</SHeadline>
+      <SBottomContent variant={isMobile ? 1 : 3}>{caption}</SBottomContent>
     </SWrapper>
   );
 };
@@ -71,7 +61,6 @@ const SWrapper = styled.div`
 
   padding: 10px;
 
-
   border: 1.5px solid;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   border-color: ${({ theme }) => theme.colorsThemed.background.outlines1};
@@ -83,6 +72,8 @@ const SWrapper = styled.div`
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+
+  cursor: default;
 
   ${({ theme }) => theme.media.tablet} {
     height: 100%;
@@ -107,18 +98,18 @@ const SImageBG = styled.div<ISImageBG>`
   height: 60%;
   position: relative;
 
-  padding: 16px;
-  padding-bottom: 0px;
+  padding: 48px;
 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
-  border-radius: 10px;
+  border-radius: 8px;
+  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   ${({ theme }) => theme.media.tablet} {
-    justify-content: flex-end;
+    padding: 16px;
   }
 `;
 
@@ -139,7 +130,7 @@ const SImageHolder = styled.div`
 
   ${({ theme }) => theme.media.laptop} {
     img {
-      height: 182px;
+      height: 172px;
     }
   }
 `;
@@ -147,13 +138,20 @@ const SImageHolder = styled.div`
 const SHeadline = styled(Headline)`
   margin-top: 36px;
   text-align: center;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 10px;
+  }
 `;
 
 const SBottomContent = styled(Text)`
   text-align: center;
-  padding: 8px 10px;
+  padding-top: 8px;
 
   font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
   ${(props) => props.theme.media.tablet} {
     width: 180px;

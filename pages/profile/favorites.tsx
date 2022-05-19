@@ -1,22 +1,29 @@
 /* eslint-disable no-unused-vars */
-import React, {
-  ReactElement, useCallback, useEffect, useState,
-} from 'react';
+import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSidePropsContext, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
+import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
 
 import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
 // import { TTokenCookie } from '../../api/apiConfigs';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
-import PostModal from '../../components/organisms/decision/PostModal';
-import List from '../../components/organisms/see-more/List';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
-import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
+import NoContentCard from '../../components/atoms/profile/NoContentCard';
+import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
+import switchPostType from '../../utils/switchPostType';
+
+const PostModal = dynamic(
+  () => import('../../components/organisms/decision/PostModal')
+);
+const PostList = dynamic(
+  () => import('../../components/organisms/see-more/PostList')
+);
 
 interface IMyProfileFavorites {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -47,14 +54,13 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
 }) => {
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] =
+    useState<newnewapi.IPost | undefined>();
 
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    ref: loadingRef,
-    inView,
-  } = useInView();
+  const { ref: loadingRef, inView } = useInView();
+  const { t } = useTranslation('profile');
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
@@ -62,60 +68,91 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
     setPostModalOpen(true);
   };
 
-  const handleSetDisplayedPost = (post: newnewapi.IPost) => {
+  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
     setDisplayedPost(post);
-  };
+  }, []);
 
   const handleClosePostModal = () => {
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };
 
-  // TODO: filters and other parameters
-  const loadPosts = useCallback(async (
-    token?: string,
-    needCount?: boolean,
-  ) => {
-    if (isLoading) return;
-    try {
-      setIsLoading(true);
-      setTriedLoading(true);
-      const payload = new newnewapi.GetRelatedToMePostsRequest({
-        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_FAVORITES,
-        filter: postsFilter,
-        paging: {
-          ...(token ? { pageToken: token } : {}),
-        },
-        ...(needCount ? {
-          needTotalCount: true,
-        } : {}),
-      });
-      const postsResponse = await getMyPosts(
-        payload,
+  const handleRemovePostFromState = (postUuid: string) => {
+    handleSetPosts((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+  };
+
+  const handleAddPostToState = (postToAdd: newnewapi.Post) => {
+    handleSetPosts((curr) => {
+      const newArr = [...curr];
+
+      const alreadyAdded = curr.findIndex(
+        (p) =>
+          switchPostType(p)[0].postUuid ===
+          switchPostType(postToAdd)[0].postUuid
       );
 
-      if (postsResponse.data && postsResponse.data.posts) {
-        handleSetPosts((curr) => [...curr, ...postsResponse.data?.posts as newnewapi.Post[]]);
-        handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
-
-        if (postsResponse.data.totalCount) {
-          handleUpdateCount(postsResponse.data.totalCount);
-        } else if (needCount) {
-          handleUpdateCount(0);
-        }
+      if (alreadyAdded !== -1) {
+        return newArr;
       }
-      setIsLoading(false);
-    } catch (err) {
-      setIsLoading(false);
-      console.error(err);
-    }
-  }, [
-    handleSetPosts,
-    handleUpdatePageToken,
-    handleUpdateCount,
-    postsFilter,
-    isLoading,
-  ]);
+
+      const updated = [postToAdd, ...newArr];
+      return updated;
+    });
+  };
+
+  // TODO: filters and other parameters
+  const loadPosts = useCallback(
+    async (token?: string, needCount?: boolean) => {
+      if (isLoading) return;
+      try {
+        setIsLoading(true);
+        setTriedLoading(true);
+        const payload = new newnewapi.GetRelatedToMePostsRequest({
+          relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_FAVORITES,
+          filter: postsFilter,
+          paging: {
+            ...(token ? { pageToken: token } : {}),
+          },
+          ...(needCount
+            ? {
+                needTotalCount: true,
+              }
+            : {}),
+        });
+        const postsResponse = await getMyPosts(payload);
+
+        if (postsResponse.data && postsResponse.data.posts) {
+          handleSetPosts((curr) => [
+            ...curr,
+            ...(postsResponse.data?.posts as newnewapi.Post[]),
+          ]);
+          handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
+
+          if (postsResponse.data.totalCount) {
+            handleUpdateCount(postsResponse.data.totalCount);
+          } else if (needCount) {
+            handleUpdateCount(0);
+          }
+        }
+        setIsLoading(false);
+      } catch (err) {
+        setIsLoading(false);
+        console.error(err);
+      }
+    },
+    [
+      handleSetPosts,
+      handleUpdatePageToken,
+      handleUpdateCount,
+      postsFilter,
+      isLoading,
+    ]
+  );
 
   useEffect(() => {
     if (inView && !isLoading) {
@@ -127,28 +164,16 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
     } else if (!triedLoading && posts?.length === 0) {
       loadPosts(undefined, true);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
-
-  // useUpdateEffect(() => {
-  //   handleUpdatePageToken('');
-  //   handleSetPosts([]);
-  //   loadPosts(undefined, true);
-  // }, [postsFilter]);
 
   return (
     <div>
       <SMain>
-        <PostsFilterSection
-          numDecisions={totalCount}
-          isLoading={isLoading}
-          postsFilter={postsFilter}
-          handleUpdateFilter={handleUpdateFilter}
-        />
         <SCardsSection>
           {posts && (
-            <List
-              category=""
+            <PostList
+              category=''
               loading={isLoading}
               collection={posts}
               wrapperStyle={{
@@ -157,33 +182,46 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
               handlePostClicked={handleOpenPostModal}
             />
           )}
+          {posts && posts.length === 0 && !isLoading && (
+            <NoContentCard>
+              <NoContentDescription>
+                {t('Favorites.no-content.description')}
+              </NoContentDescription>
+            </NoContentCard>
+          )}
         </SCardsSection>
-        <div
-          ref={loadingRef}
-        />
+        <div ref={loadingRef} />
       </SMain>
-      {displayedPost && (
+      {displayedPost && postModalOpen && (
         <PostModal
           isOpen={postModalOpen}
           post={displayedPost}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
+          handleRemovePostFromState={() =>
+            handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
+          }
+          handleAddPostToState={() =>
+            handleAddPostToState(displayedPost as newnewapi.Post)
+          }
         />
       )}
     </div>
   );
 };
 
-(MyProfileFavorites as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
+(MyProfileFavorites as NextPageWithLayout).getLayout = function getLayout(
+  page: ReactElement
+) {
   return (
     <MyProfileLayout
-      renderedPage="favorites"
+      renderedPage='favorites'
       postsCachedFavorites={page.props.pagedPosts.posts}
       postsCachedFavoritesFilter={newnewapi.Post.Filter.ALL}
       postsCachedFavoritesPageToken={page.props.nextPageTokenFromServer}
       postsCachedFavoritesCount={page.props.pagedPosts.totalCount}
     >
-      { page }
+      {page}
     </MyProfileLayout>
   );
 };
@@ -191,13 +229,16 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
 export default MyProfileFavorites;
 
 export async function getServerSideProps(
-  context: GetServerSidePropsContext,
+  context: GetServerSidePropsContext
 ): Promise<any> {
   try {
-    const translationContext = await serverSideTranslations(
-      context.locale!!,
-      ['common', 'profile', 'home', 'decision', 'payment-modal'],
-    );
+    const translationContext = await serverSideTranslations(context.locale!!, [
+      'common',
+      'profile',
+      'home',
+      'decision',
+      'payment-modal',
+    ]);
 
     // const { req } = context;
     // // Try to fetch only if actual SSR needed
