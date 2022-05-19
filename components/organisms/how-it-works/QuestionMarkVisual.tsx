@@ -1,29 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import assets from '../../../constants/assets';
-import useImageLoaded from '../../../utils/hooks/useImageLoaded';
 
 interface QuestionMarkVisualI {
   alt: string;
 }
 
+const QUESTION_MARK_INTRO_DURATION = 2800;
 const QuestionMarkVisual: React.FC<QuestionMarkVisualI> = ({ alt }) => {
   const theme = useTheme();
   const [currentState, setCurrentState] = useState<'intro' | 'hold'>('intro');
+  const timer = useRef<NodeJS.Timeout | undefined>();
 
-  const {
-    ref: introRef,
-    loaded: introLoaded,
-    onLoad: onIntroLoaded,
-  } = useImageLoaded();
-
-  useEffect(() => {
-    if (introLoaded) {
-      setTimeout(() => {
-        setCurrentState('hold');
-      }, 1750);
+  function scheduleHold() {
+    if (currentState === 'hold') {
+      return;
     }
-  }, [introLoaded]);
+
+    if (timer.current) {
+      clearTimeout(timer.current);
+    }
+
+    const newTimer = setTimeout(() => {
+      setCurrentState('hold');
+    }, QUESTION_MARK_INTRO_DURATION);
+
+    timer.current = newTimer;
+  }
 
   return (
     <Container>
@@ -34,21 +37,33 @@ const QuestionMarkVisual: React.FC<QuestionMarkVisualI> = ({ alt }) => {
             : assets.info.darkQuestionMarkStatic
         }
         alt={alt}
-        style={{ opacity: introLoaded && currentState === 'hold' ? 1 : 0 }}
+        style={{ opacity: currentState === 'hold' ? 1 : 0 }}
       />
       <Animation
-        ref={(el) => {
-          introRef.current = el!!;
-        }}
-        src={
+        key='video-desktop'
+        loop
+        muted
+        autoPlay
+        playsInline
+        poster={
           theme.name === 'light'
-            ? assets.info.lightQuestionMarkAnimated
-            : assets.info.darkQuestionMarkAnimated
+            ? assets.info.lightQuestionMarkStatic
+            : assets.info.darkQuestionMarkStatic
         }
-        alt={alt}
-        style={{ opacity: introLoaded && currentState === 'intro' ? 1 : 0 }}
-        onLoad={onIntroLoaded}
-      />
+        style={{ opacity: currentState === 'intro' ? 1 : 0 }}
+        onLoadedData={() => {
+          scheduleHold();
+        }}
+      >
+        <source
+          src={
+            theme.name === 'light'
+              ? assets.info.lightQuestionMarkAnimated
+              : assets.info.darkQuestionMarkAnimated
+          }
+          type='video/mp4'
+        />
+      </Animation>
     </Container>
   );
 };
@@ -65,7 +80,7 @@ const Image = styled('img')`
   object-fit: contain;
 `;
 
-const Animation = styled('img')`
+const Animation = styled('video')`
   display: flex;
   position: absolute;
   object-fit: contain;
