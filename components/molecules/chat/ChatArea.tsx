@@ -245,7 +245,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       const res = await markUser(payload);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
-      unblockUser(chatRoom?.visavis?.uuid!!);
+      if (chatRoom?.visavis?.uuid) unblockUser(chatRoom.visavis.uuid);
     } catch (err) {
       console.error(err);
     }
@@ -456,7 +456,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                       ? chatRoom.memberCount
                       : 0
                   } ${
-                    chatRoom.memberCount!! > 1
+                    chatRoom.memberCount && chatRoom.memberCount > 1
                       ? t('new-announcement.members')
                       : t('new-announcement.member')
                   }`}

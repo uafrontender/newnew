@@ -66,7 +66,7 @@ export const NotificationsList: React.FC<IFunction> = ({
         if (res.data.notifications.length > 0) {
           if (limit === defaultLimit) {
             setNotifications((curr) => {
-              const arr = [...curr!!];
+              const arr = curr ? [...curr] : [];
               res.data?.notifications.forEach((item) => {
                 arr.push(item);
               });
@@ -84,13 +84,13 @@ export const NotificationsList: React.FC<IFunction> = ({
             setNotificationsNextPageToken(res.data.paging?.nextPageToken);
           } else {
             setNotifications((curr) => {
-              const arr = [...curr!!];
-              arr.unshift(res.data!!.notifications[0]);
+              const arr = curr ? [...curr] : [];
+              if (res.data) arr.unshift(res.data.notifications[0]);
               return arr;
             });
             setUnreadNotifications((curr) => {
               const arr = curr ? [...curr] : [];
-              arr.push(res.data!!.notifications[0].id as number);
+              if (res.data) arr.push(res.data.notifications[0].id as number);
               return arr;
             });
           }
@@ -198,9 +198,11 @@ export const NotificationsList: React.FC<IFunction> = ({
               }
             />
             <SNotificationItemCenter>
-              <SNotificationItemText variant={3} weight={600}>
-                {item.content!!.message}
-              </SNotificationItemText>
+              {item.content && (
+                <SNotificationItemText variant={3} weight={600}>
+                  {item.content.message}
+                </SNotificationItemText>
+              )}
               <SNotificationItemTime variant={2} weight={600}>
                 {moment((item.createdAt?.seconds as number) * 1000).fromNow()}
               </SNotificationItemTime>
@@ -237,10 +239,10 @@ export const NotificationsList: React.FC<IFunction> = ({
               animationData: loadingAnimation,
             }}
           />
-        ) : notifications!!.length < 1 ? (
+        ) : notifications && notifications.length < 1 ? (
           <NoResults />
         ) : (
-          notifications!!.map(renderNotificationItem)
+          notifications && notifications.map(renderNotificationItem)
         )}
         {notificationsNextPageToken && !loading && (
           <SRef ref={scrollRefNotifications}>

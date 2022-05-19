@@ -115,46 +115,52 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
     let payload;
     switch (postType) {
       case 'ac':
-        if (user.loggedIn) {
-          payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![0],
-          });
+        if (user.userTutorialsProgress.remainingAcSteps) {
+          if (user.loggedIn) {
+            payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+              acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
+            });
+          }
+          dispatch(
+            setUserTutorialsProgress({
+              remainingAcSteps: [
+                ...user.userTutorialsProgress.remainingAcSteps,
+              ].slice(1),
+            })
+          );
         }
-        dispatch(
-          setUserTutorialsProgress({
-            remainingAcSteps: [
-              ...user.userTutorialsProgress.remainingAcSteps!!,
-            ].slice(1),
-          })
-        );
         break;
       case 'cf':
-        if (user.loggedIn) {
-          payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![0],
-          });
+        if (user.userTutorialsProgress.remainingCfSteps) {
+          if (user.loggedIn) {
+            payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+              cfCurrentStep: user.userTutorialsProgress.remainingCfSteps[0],
+            });
+          }
+          dispatch(
+            setUserTutorialsProgress({
+              remainingCfSteps: [
+                ...user.userTutorialsProgress.remainingCfSteps,
+              ].slice(1),
+            })
+          );
         }
-        dispatch(
-          setUserTutorialsProgress({
-            remainingCfSteps: [
-              ...user.userTutorialsProgress.remainingCfSteps!!,
-            ].slice(1),
-          })
-        );
         break;
       default:
-        if (user.loggedIn) {
-          payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![0],
-          });
+        if (user.userTutorialsProgress.remainingMcSteps) {
+          if (user.loggedIn) {
+            payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+              mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
+            });
+          }
+          dispatch(
+            setUserTutorialsProgress({
+              remainingMcSteps: [
+                ...user.userTutorialsProgress.remainingMcSteps,
+              ].slice(1),
+            })
+          );
         }
-        dispatch(
-          setUserTutorialsProgress({
-            remainingMcSteps: [
-              ...user.userTutorialsProgress.remainingMcSteps!!,
-            ].slice(1),
-          })
-        );
     }
     if (user.loggedIn && payload) markTutorialStepAsCompleted(payload);
   };

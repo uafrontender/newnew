@@ -353,9 +353,12 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
 
-        setTotalVotes(res.data.multipleChoice!!.totalVotes as number);
-        setNumberOfOptions(res.data.multipleChoice!!.optionCount as number);
-        handleUpdatePostStatus(res.data.multipleChoice!!.status!!);
+        if (res.data.multipleChoice) {
+          setTotalVotes(res.data.multipleChoice.totalVotes as number);
+          setNumberOfOptions(res.data.multipleChoice.optionCount as number);
+          if (res.data.multipleChoice.status)
+            handleUpdatePostStatus(res.data.multipleChoice.status);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -454,8 +457,10 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         if (!decoded) return;
         const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
         if (decodedParsed.postUuid === post.postUuid) {
-          setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
-          setNumberOfOptions(decoded.post?.multipleChoice?.optionCount!!);
+          if (decoded.post?.multipleChoice?.totalVotes)
+            setTotalVotes(decoded.post?.multipleChoice?.totalVotes);
+          if (decoded.post?.multipleChoice?.optionCount)
+            setNumberOfOptions(decoded.post?.multipleChoice?.optionCount);
 
           if (
             !responseFreshlyUploaded &&
@@ -471,13 +476,13 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
         if (!decoded) return;
-        if (decoded.postUuid === post.postUuid) {
-          handleUpdatePostStatus(decoded.multipleChoice!!);
+        if (decoded.postUuid === post.postUuid && decoded.multipleChoice) {
+          handleUpdatePostStatus(decoded.multipleChoice);
 
           if (
             !responseFreshlyUploaded &&
             postStatus === 'processing_response' &&
-            switchPostStatus('mc', decoded.multipleChoice!!) === 'succeeded'
+            switchPostStatus('mc', decoded.multipleChoice) === 'succeeded'
           ) {
             const fetchPostPayload = new newnewapi.GetPostRequest({
               postUuid: post.postUuid,
@@ -524,26 +529,29 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     ]);
 
     const goToNextStep = () => {
-      if (user.loggedIn) {
-        const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-          mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![0],
-        });
-        markTutorialStepAsCompleted(payload);
+      if (user.userTutorialsProgress.remainingMcSteps) {
+        if (user.loggedIn) {
+          const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+            mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
+          });
+          markTutorialStepAsCompleted(payload);
+        }
+        dispatch(
+          setUserTutorialsProgress({
+            remainingMcSteps: [
+              ...user.userTutorialsProgress.remainingMcSteps,
+            ].slice(1),
+          })
+        );
       }
-      dispatch(
-        setUserTutorialsProgress({
-          remainingMcSteps: [
-            ...user.userTutorialsProgress.remainingMcSteps!!,
-          ].slice(1),
-        })
-      );
     };
 
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     useEffect(() => {
       if (
-        user!!.userTutorialsProgressSynced &&
-        user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+        user.userTutorialsProgressSynced &&
+        user.userTutorialsProgress.remainingMcSteps &&
+        user.userTutorialsProgress.remainingMcSteps[0] ===
           newnewapi.McTutorialStep.MC_HERO
       ) {
         setIsPopupVisible(true);

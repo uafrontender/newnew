@@ -206,13 +206,15 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const handleUpdatePostStatus = useCallback(
     (newStatus: number | string) => {
-      let status;
-      if (typeof newStatus === 'number') {
-        status = switchPostStatus(typeOfPost!!, newStatus);
-      } else {
-        status = switchPostStatusString(typeOfPost!!, newStatus);
+      if (typeOfPost) {
+        let status;
+        if (typeof newStatus === 'number') {
+          status = switchPostStatus(typeOfPost, newStatus);
+        } else {
+          status = switchPostStatusString(typeOfPost, newStatus);
+        }
+        setPostStatus(status);
       }
-      setPostStatus(status);
     },
     [typeOfPost]
   );
@@ -413,12 +415,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   );
 
   const renderPostView = (postToRender: TPostType) => {
-    if (postStatus === 'scheduled') {
+    if (postStatus === 'scheduled' && postParsed) {
       return (
         <PostViewScheduled
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           postType={typeOfPost as string}
-          post={postParsed!!}
+          post={postParsed}
           postStatus={postStatus}
           variant='decision'
           handleGoBack={handleGoBackInsidePost}
@@ -430,11 +432,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       );
     }
 
-    if (postStatus === 'processing_announcement') {
+    if (postStatus === 'processing_announcement' && postParsed) {
       return (
         <PostViewProcessingAnnouncement
-          key={postParsed?.postUuid}
-          post={postParsed!!}
+          key={postParsed.postUuid}
+          post={postParsed}
           postStatus={postStatus}
           postType={typeOfPost as string}
           variant='decision'
@@ -447,10 +449,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       );
     }
 
-    if (postToRender === 'mc') {
+    if (postToRender === 'mc' && postParsed) {
       return (
         <PostViewMC
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           post={postParsed as newnewapi.MultipleChoice}
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
@@ -463,10 +465,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         />
       );
     }
-    if (postToRender === 'ac') {
+    if (postToRender === 'ac' && postParsed) {
       return (
         <PostViewAC
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           post={postParsed as newnewapi.Auction}
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
@@ -479,10 +481,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         />
       );
     }
-    if (postToRender === 'cf') {
+    if (postToRender === 'cf' && postParsed) {
       return (
         <PostViewCF
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           post={postParsed as newnewapi.Crowdfunding}
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
@@ -499,26 +501,26 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   };
 
   const renderPostWaitingForResponse = (postToRender: TPostType) => {
-    if (postToRender === 'ac') {
+    if (postToRender === 'ac' && postParsed) {
       return (
         <PostAwaitingResponseAC
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           post={postParsed as newnewapi.Auction}
         />
       );
     }
-    if (postToRender === 'mc') {
+    if (postToRender === 'mc' && postParsed) {
       return (
         <PostAwaitingResponseMC
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           post={postParsed as newnewapi.MultipleChoice}
         />
       );
     }
-    if (postToRender === 'cf') {
+    if (postToRender === 'cf' && postParsed) {
       return (
         <PostAwaitingResponseCF
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           post={postParsed as newnewapi.Crowdfunding}
         />
       );
@@ -527,26 +529,26 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   };
 
   const renderPostSuccess = (postToRender: TPostType) => {
-    if (postToRender === 'mc') {
+    if (postToRender === 'mc' && postParsed) {
       return (
         <PostSuccessMC
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           post={postParsed as newnewapi.MultipleChoice}
         />
       );
     }
-    if (postToRender === 'ac') {
+    if (postToRender === 'ac' && postParsed) {
       return (
         <PostSuccessAC
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           post={postParsed as newnewapi.Auction}
         />
       );
     }
-    if (postToRender === 'cf') {
+    if (postToRender === 'cf' && postParsed) {
       return (
         <PostSuccessCF
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           post={postParsed as newnewapi.Crowdfunding}
         />
       );
@@ -555,11 +557,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   };
 
   const renderPostModeration = (postToRender: TPostType) => {
-    if (postStatus === 'processing_announcement') {
+    if (postStatus === 'processing_announcement' && postParsed) {
       return (
         <PostViewProcessingAnnouncement
-          key={postParsed?.postUuid}
-          post={postParsed!!}
+          key={postParsed.postUuid}
+          post={postParsed}
           postStatus={postStatus}
           variant='moderation'
           postType={typeOfPost as string}
@@ -572,12 +574,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       );
     }
 
-    if (postStatus === 'scheduled') {
+    if (postStatus === 'scheduled' && postParsed) {
       return (
         <PostViewScheduled
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           postType={typeOfPost as string}
-          post={postParsed!!}
+          post={postParsed}
           postStatus={postStatus}
           variant='moderation'
           handleGoBack={handleGoBackInsidePost}
@@ -589,10 +591,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       );
     }
 
-    if (postToRender === 'mc') {
+    if (postToRender === 'mc' && postParsed) {
       return (
         <PostModerationMC
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           postStatus={postStatus}
           post={postParsed as newnewapi.MultipleChoice}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -601,10 +603,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         />
       );
     }
-    if (postToRender === 'ac') {
+    if (postToRender === 'ac' && postParsed) {
       return (
         <PostModerationAC
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           post={postParsed as newnewapi.Auction}
           postStatus={postStatus}
           handleGoBack={handleGoBackInsidePost}
@@ -613,10 +615,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         />
       );
     }
-    if (postToRender === 'cf') {
+    if (postToRender === 'cf' && postParsed) {
       return (
         <PostModerationCF
-          key={postParsed?.postUuid}
+          key={postParsed.postUuid}
           postStatus={postStatus}
           post={postParsed as newnewapi.Crowdfunding}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -861,21 +863,21 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               />
             </SWaitingSuccessControlsBtn>
             {/* Share menu */}
-            {!isMobile && (
+            {!isMobile && postParsed?.postUuid && (
               <PostShareMenu
-                postId={postParsed?.postUuid!!}
+                postId={postParsed.postUuid}
                 isVisible={shareMenuOpen}
                 onClose={handleShareClose}
               />
             )}
-            {isMobile && shareMenuOpen ? (
+            {isMobile && shareMenuOpen && postParsed?.postUuid && (
               <PostShareModal
                 isOpen={shareMenuOpen}
                 zIndex={11}
-                postId={postParsed?.postUuid!!}
+                postId={postParsed.postUuid}
                 onClose={handleShareClose}
               />
-            ) : null}
+            )}
             {/* Ellipse menu */}
             {!isMobile && (
               <PostEllipseMenu

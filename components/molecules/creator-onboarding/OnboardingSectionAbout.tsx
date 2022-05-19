@@ -86,7 +86,7 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
           if (!res.data?.status) throw new Error('An error occured');
 
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-            setBioError(errorSwitch(res.data?.status!!));
+            setBioError(errorSwitch(res.data?.status));
           } else {
             setBioError('');
           }

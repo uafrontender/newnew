@@ -223,7 +223,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
             : {}),
           cfPledgeRequest: {
             amount: new newnewapi.MoneyAmount({
-              usdCents: parseInt(pledgeAmount?.toString()!!),
+              usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
             }),
             postUuid: post.postUuid,
           },
@@ -255,24 +255,28 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
               e.stopPropagation();
             }}
           >
-            {pledgeLevels.map((p, i) => (
-              <React.Fragment key={p.usdCents}>
-                <SItem
-                  key={i}
-                  onClick={() => {
-                    handleSetPledgeAmountAndOpenPaymentModal(p.usdCents!!);
-                  }}
-                >
-                  <SText>{`$${(p.usdCents!! / 100).toFixed(0)}`}</SText>
-                  {/* {i === arr.length - 1 ? (
+            {pledgeLevels.map((p, i) =>
+              p.usdCents ? (
+                <React.Fragment key={p.usdCents}>
+                  <SItem
+                    key={i}
+                    onClick={() => {
+                      handleSetPledgeAmountAndOpenPaymentModal(
+                        p.usdCents ? p.usdCents : 0
+                      );
+                    }}
+                  >
+                    <SText>{`$${(p.usdCents / 100).toFixed(0)}`}</SText>
+                    {/* {i === arr.length - 1 ? (
                     <SAdditionalLabel>
                       {t('CfPost.BackersTab.free_sub')}
                     </SAdditionalLabel>
                   ) : null} */}
-                </SItem>
-                <SSeparator />
-              </React.Fragment>
-            ))}
+                  </SItem>
+                  <SSeparator />
+                </React.Fragment>
+              ) : null
+            )}
             <SItem
               onClick={() => {
                 handleOpenCustomPledgeForm();
@@ -342,7 +346,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={14}
-          amount={`$${(pledgeAmount!! / 100)?.toFixed(0)}`}
+          amount={pledgeAmount ? `$${(pledgeAmount / 100)?.toFixed(0)}` : '0'}
           // {...(walletBalance?.usdCents &&
           // pledgeAmount &&
           // walletBalance.usdCents >= pledgeAmount
@@ -357,9 +361,11 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
           // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
             <SPaymentFooter variant={3}>
-              {t('CfPost.paymentModalFooter.body', {
-                creator: getDisplayname(post.creator!!),
-              })}
+              {post.creator
+                ? t('CfPost.paymentModalFooter.body', {
+                    creator: getDisplayname(post.creator),
+                  })
+                : ''}
             </SPaymentFooter>
           }
           // payButtonCaptionKey={t('CfPost.paymentModalPayButton')}
@@ -372,9 +378,11 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
                 />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
-                {t('CfPost.paymentModalHeader.title', {
-                  creator: getDisplayname(post.creator!!),
-                })}
+                {post.creator
+                  ? t('CfPost.paymentModalHeader.title', {
+                      creator: getDisplayname(post.creator),
+                    })
+                  : ''}
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalOptionText variant={5}>
