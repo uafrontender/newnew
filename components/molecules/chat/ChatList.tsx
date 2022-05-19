@@ -121,7 +121,7 @@ const ChatList: React.FC<IFunctionProps> = ({
 
         if (res.data && res.data.rooms.length > 0) {
           setChatRooms((curr) => {
-            const arr = [...curr!!];
+            const arr = curr ? [...curr] : [];
             res.data?.rooms.forEach((chat) => {
               if (arr.findIndex((item) => item.id === chat.id) < 0) {
                 const emptyMassUpdateFromCreator =
@@ -134,7 +134,7 @@ const ChatList: React.FC<IFunctionProps> = ({
           });
 
           setChatRoomsCreators((curr) => {
-            const arr = [...curr!!];
+            const arr = curr ? [...curr] : [];
             res.data?.rooms.forEach((chat) => {
               if (curr.findIndex((item) => item.id === chat.id) < 0) {
                 const emptyMassUpdateFromCreator =
@@ -147,7 +147,7 @@ const ChatList: React.FC<IFunctionProps> = ({
           });
 
           setChatRoomsSubs((curr) => {
-            const arr = [...curr!!];
+            const arr = curr ? [...curr] : [];
             res.data?.rooms.forEach((chat) => {
               if (
                 chat.myRole === 2 &&
@@ -175,10 +175,11 @@ const ChatList: React.FC<IFunctionProps> = ({
 
   const openRoom = useCallback(
     (room: newnewapi.IChatRoom) => {
-      if (activeChatIndex !== room.id!!.toString()) {
-        setActiveChatIndex(room.id!!.toString());
-        openChat({ chatRoom: room, showChatList: null });
-      }
+      if (room.id)
+        if (activeChatIndex !== room.id.toString()) {
+          setActiveChatIndex(room.id.toString());
+          openChat({ chatRoom: room, showChatList: null });
+        }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -282,18 +283,20 @@ const ChatList: React.FC<IFunctionProps> = ({
           ? chatRoomsSubs
           : chatRoomsCreators;
         arr?.splice(isAlreadyAdded, 1);
-        // console.log(updatedChat.id!!.toString() === activeChatIndex);
-        if (updatedChat.id!!.toString() === activeChatIndex) {
+
+        if (updatedChat.id && updatedChat.id.toString() === activeChatIndex) {
           arr?.splice(0, 0, updatedChat);
           markChatAsRead(updatedChat.id as number);
         } else {
           arr?.splice(1, 0, updatedChat);
         }
-        displayAllRooms
-          ? setChatRooms(arr)
-          : isChatWithSub
-          ? setChatRoomsSubs(arr!!)
-          : setChatRoomsCreators(arr!!);
+        if (displayAllRooms) {
+          setChatRooms(arr);
+        } else {
+          isChatWithSub
+            ? setChatRoomsSubs(arr ?? [])
+            : setChatRoomsCreators(arr ?? []);
+        }
       } else {
         const arr = displayAllRooms
           ? chatRooms
@@ -301,11 +304,14 @@ const ChatList: React.FC<IFunctionProps> = ({
           ? chatRoomsSubs
           : chatRoomsCreators;
         arr?.splice(1, 0, updatedChat);
-        displayAllRooms
-          ? setChatRooms(arr)
-          : isChatWithSub
-          ? setChatRoomsSubs(arr!!)
-          : setChatRoomsCreators(arr!!);
+
+        if (displayAllRooms) {
+          setChatRooms(arr);
+        } else {
+          isChatWithSub
+            ? setChatRoomsSubs(arr ?? [])
+            : setChatRoomsCreators(arr ?? []);
+        }
       }
 
       setUpdatedChat(null);
@@ -359,7 +365,8 @@ const ChatList: React.FC<IFunctionProps> = ({
   }, [chatRoomsCreators, chatRoomsSubs, chatRooms, loadingRooms]);
 
   const isActiveChat = useCallback(
-    (chat: newnewapi.IChatRoom) => activeChatIndex === chat.id!!.toString(),
+    (chat: newnewapi.IChatRoom) =>
+      chat.id ? activeChatIndex === chat.id.toString() : false,
     [activeChatIndex]
   );
 
@@ -368,11 +375,15 @@ const ChatList: React.FC<IFunctionProps> = ({
       if (activeTab === tabName) return;
       if (tabName === 'chatRoomsSubs') {
         openChat({ chatRoom: chatRoomsSubs[0], showChatList: null });
-        setActiveChatIndex(chatRoomsSubs[0].id!!.toString());
+        setActiveChatIndex(
+          chatRoomsSubs[0].id ? chatRoomsSubs[0].id.toString() : null
+        );
       } else {
         tabName === 'chatRoomsCreators' &&
           openChat({ chatRoom: chatRoomsCreators[0], showChatList: null });
-        setActiveChatIndex(chatRoomsCreators[0].id!!.toString());
+        setActiveChatIndex(
+          chatRoomsCreators[0].id ? chatRoomsCreators[0].id.toString() : null
+        );
       }
       setActiveTab(tabName);
     },
@@ -384,7 +395,7 @@ const ChatList: React.FC<IFunctionProps> = ({
       const localChat = chat;
       const handleItemClick = async () => {
         if (searchedRooms) setSearchedRooms(null);
-        setActiveChatIndex(chat.id!!.toString());
+        setActiveChatIndex(chat.id ? chat.id.toString() : null);
         openChat({ chatRoom: chat, showChatList: null });
         localChat.unreadMessageCount = 0;
         await markChatAsRead(chat.id as number);
@@ -393,9 +404,7 @@ const ChatList: React.FC<IFunctionProps> = ({
 
       let avatar = (
         <SUserAvatar>
-          <UserAvatar
-            avatarUrl={chat.visavis?.avatarUrl ? chat.visavis?.avatarUrl : ''}
-          />
+          <UserAvatar avatarUrl={chat.visavis?.avatarUrl ?? ''} />
         </SUserAvatar>
       );
       let chatName = chat.visavis?.nickname
@@ -406,7 +415,7 @@ const ChatList: React.FC<IFunctionProps> = ({
         avatar = (
           <SMyAvatar>
             <SUserAvatar>
-              <UserAvatar avatarUrl={user.userData?.avatarUrl!!} />
+              <UserAvatar avatarUrl={user.userData?.avatarUrl ?? ''} />
             </SUserAvatar>
             <SInlineSVG
               svg={megaphone}
@@ -428,11 +437,7 @@ const ChatList: React.FC<IFunctionProps> = ({
         avatar = (
           <SMyAvatar>
             <SUserAvatar>
-              <UserAvatar
-                avatarUrl={
-                  chat.visavis?.avatarUrl ? chat.visavis?.avatarUrl : ''
-                }
-              />
+              <UserAvatar avatarUrl={chat.visavis?.avatarUrl ?? ''} />
             </SUserAvatar>
             <SInlineSVG
               svg={megaphone}

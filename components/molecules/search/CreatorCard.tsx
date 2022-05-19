@@ -24,7 +24,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
     <SCard showSubscriptionPrice={subscriptionPrice !== undefined}>
       <SUserAvatarContainer>
         <SUserAvatar>
-          <UserAvatar avatarUrl={creator.avatarUrl!!} />
+          <UserAvatar avatarUrl={creator.avatarUrl ?? ''} />
         </SUserAvatar>
         {sign && <AvatarSign>{sign}</AvatarSign>}
       </SUserAvatarContainer>
@@ -38,7 +38,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         </SSubscriptionPrice>
       )}
       <SBackground>
-        <Image src={creator.coverUrl!!} layout='fill' />
+        <Image src={creator.coverUrl ?? ''} layout='fill' />
       </SBackground>
     </SCard>
   );

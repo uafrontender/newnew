@@ -202,7 +202,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           if (
             res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK
           ) {
-            setUsernameError(errorSwitchUsername(res.data?.status!!));
+            setUsernameError(errorSwitchUsername(res.data?.status));
           } else {
             setUsernameError('');
           }
@@ -250,7 +250,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           if (!res.data?.status) throw new Error('An error occured');
 
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-            setNicknameError(errorSwitch(res.data?.status!!));
+            setNicknameError(errorSwitch(res.data?.status));
           } else {
             setNicknameError('');
           }

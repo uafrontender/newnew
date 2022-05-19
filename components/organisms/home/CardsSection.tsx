@@ -279,7 +279,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
                         <SUserAvatar
                           key={creator?.uuid}
                           index={i}
-                          avatarUrl={creator?.avatarUrl!!}
+                          avatarUrl={creator?.avatarUrl ?? ''}
                           onClick={() =>
                             handleUserClick(creator?.username as string)
                           }

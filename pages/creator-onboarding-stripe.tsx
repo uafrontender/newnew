@@ -3,7 +3,6 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
-import type { NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
@@ -22,9 +21,7 @@ const OnboardingSectionStripe = dynamic(
     import('../components/molecules/creator-onboarding/OnboardingSectionStripe')
 );
 
-interface ICreatorOnboardingStripe {}
-
-const CreatorOnboardingStripe: NextPage<ICreatorOnboardingStripe> = () => {
+const CreatorOnboardingStripe = () => {
   const { t } = useTranslation('creator-onboarding');
 
   const [onboardingState, setOnboardingState] =

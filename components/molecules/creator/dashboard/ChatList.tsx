@@ -55,9 +55,10 @@ export const ChatList = () => {
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data && res.data.rooms.length > 0) {
+        if (res.data?.rooms.length > 0) {
           setChatRooms((curr) => {
-            const arr = [...curr!!, ...res.data?.rooms!!];
+            const arr =
+              curr && res?.data?.rooms ? [...curr, ...res.data.rooms] : [];
             return arr;
           });
           setChatRoomsNextPageToken(res.data.paging?.nextPageToken);
@@ -152,7 +153,6 @@ export const ChatList = () => {
     (chat: newnewapi.IChatRoom) => {
       const handleItemClick = async () => {
         if (searchedRooms) setSearchedRooms(null);
-        // console.log(chat);
 
         router.push(`/creator/dashboard?tab=direct-messages&roomID=${chat.id}`);
         return null;
@@ -160,9 +160,7 @@ export const ChatList = () => {
 
       let avatar = (
         <SUserAvatar>
-          <UserAvatar
-            avatarUrl={chat.visavis?.avatarUrl ? chat.visavis?.avatarUrl : ''}
-          />
+          <UserAvatar avatarUrl={chat.visavis?.avatarUrl ?? ''} />
         </SUserAvatar>
       );
       let chatName = chat.visavis?.nickname
@@ -173,7 +171,7 @@ export const ChatList = () => {
         avatar = (
           <SMyAvatar>
             <SUserAvatar>
-              <UserAvatar avatarUrl={user.userData?.avatarUrl!!} />
+              <UserAvatar avatarUrl={user.userData?.avatarUrl ?? ''} />
             </SUserAvatar>
             <SInlineSVG
               svg={megaphone}

@@ -140,11 +140,12 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
             },
           } as newnewapi.IChannel);
         } else {
-          shouldUnsubArray.push({
-            postUpdates: {
-              postUuid: Object.keys(channelsWithSubs)[i]!!,
-            },
-          } as newnewapi.IChannel);
+          if (Object.keys(channelsWithSubs)[i])
+            shouldUnsubArray.push({
+              postUpdates: {
+                postUuid: Object.keys(channelsWithSubs)[i],
+              },
+            } as newnewapi.IChannel);
         }
       }
     }
