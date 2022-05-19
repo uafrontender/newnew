@@ -168,12 +168,18 @@
       "Transactions": {
         "title": "Transactions",
         "you": "You",
+        "type": {
+          "1": "event",
+          "2": "superpoll",
+          "3": "goal"
+        },
         "actions": {
           "topup": "top-up your wallet.",
           "decision": "decision.",
-          "bid": "bid on",
-          "vote": "voted for",
-          "support": "supported"
+          "1": "bid on",
+          "2": "voted on",
+          "3": "backed on",
+          "5": "subscribed to"
         }
       },
       "Privacy": {
