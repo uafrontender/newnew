@@ -271,11 +271,21 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         },
         {
           key: 'startsAt',
-          value: formatStartsAt().format('DD MMM [at] hh:mm A'),
+          value: `${formatStartsAt().format(
+            'MMM DD YYYY [at] hh:mm A'
+          )} ${new Date()
+            .toLocaleString('en', { timeZoneName: 'short' })
+            .split(' ')
+            .pop()}`,
         },
         {
           key: 'expiresAt',
-          value: formatExpiresAt(false).format('DD MMM [at] hh:mm A'),
+          value: `${formatExpiresAt(false).format(
+            'MMM DD YYYY [at] hh:mm A'
+          )} ${new Date()
+            .toLocaleString('en', { timeZoneName: 'short' })
+            .split(' ')
+            .pop()}`,
         },
         {
           key: 'comments',
