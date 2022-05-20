@@ -100,10 +100,12 @@ export default `
       <strong>1.1. </strong>By signing up for, installing, accessing and/or using the Site in any manner
       and/or participating in any Creator Event (as defined below) made available through the Site, you
       indicate that you have read and understand this Terms of Use Agreement (the "Terms"), which incorporates
-      by reference our Privacy Policy located at {Privacy Policy URL or LINK}, that you meet the Eligibility
-      requirements provided in the Eligibility section (see below), and that you agree to be bound by these
-      Terms in their entirety. Your continued use of the Site constitutes your agreement to the most current
-      version of the Terms. If at any time you do not agree to the Terms, you must cease your use of the Site.
+      by reference our Privacy Policy located at
+      <a href="https://privacy.newnew.co/" target="_blank" rel="noopener noreferrer">Privacy Policy</a>, that
+      you meet the Eligibility requirements provided in the Eligibility section (see below), and that you
+      agree to be bound by these Terms in their entirety. Your continued use of the Site constitutes your
+      agreement to the most current version of the Terms. If at any time you do not agree to the Terms, you
+      must cease your use of the Site.
     </p>
   </div>
   <div>
@@ -114,15 +116,16 @@ export default `
   </div>
   <div>
     <p>
-      <strong>1.3. </strong>To provide the Site, we need information about you. Please refer to
-      our&nbsp;Privacy Policy [Make Hyperlink]&nbsp;to help you understand what information we collect, how we
-      use that information and what choices you have regarding your information when you use our Site.
+      <strong>1.3. </strong>To provide the Site, we need information about you. Please refer to our
+      <a href="https://privacy.newnew.co/" target="_blank" rel="noopener noreferrer">Privacy Policy</a> to
+      help you understand what information we collect, how we use that information and what choices you have
+      regarding your information when you use our Site.
     </p>
   </div>
   <h1>2. <strong>Eligibility and User Accounts</strong></h1>
   <div>
     <p>
-      <strong>2.1.</strong> <u><strong>Eligibility</strong></u> You represent and warrant that you are an
+      <strong>2.1.</strong> <u><strong>Eligibility.</strong></u> You represent and warrant that you are an
       individual person at least 13 years of age. If you are under age 13, you may not, under any
       circumstances or for any reason, use the Site. Persons under the age of eighteen (18) or the applicable
       age of majority in their legal state of residence (collectively, "Minors") must obtain the consent of
@@ -149,13 +152,13 @@ export default `
   </div>
   <div>
     <p>
-      <strong>2.2.</strong> <u><strong>Registration</strong></u> We may require you to register for an Account
-      on the Site (an "Account"). You must provide accurate and complete information and keep your Account
-      information updated. If you provide any information that is inaccurate, not current or incomplete, or we
-      have reasonable grounds to suspect that such information is inaccurate, not current or incomplete, or
-      otherwise violates our Terms, we may deny you access to Creator Events and/or areas requiring
-      registration, terminate your Account, and/or take such other action as we deem appropriate, at our sole
-      discretion.
+      <strong>2.2.</strong> <u><strong>Registration.</strong></u> We may require you to register for an
+      Account on the Site (an "Account"). You must provide accurate and complete information and keep your
+      Account information updated. If you provide any information that is inaccurate, not current or
+      incomplete, or we have reasonable grounds to suspect that such information is inaccurate, not current or
+      incomplete, or otherwise violates our Terms, we may deny you access to Creator Events and/or areas
+      requiring registration, terminate your Account, and/or take such other action as we deem appropriate, at
+      our sole discretion.
     </p>
   </div>
   <div>
@@ -253,19 +256,19 @@ export default `
         </li>
         <ol type="1">
           <li>
-            they post an update that explains what has been done, how funds were used, and what prevents them
+            They post an update that explains what has been done, how funds were used, and what prevents them
             from finishing the task as planned;
           </li>
           <li>
-            they&rsquo;re able to demonstrate that they&rsquo;ve used funds appropriately and made every
+            They&rsquo;re able to demonstrate that they&rsquo;ve used funds appropriately and made every
             reasonable effort to complete the task as promised;
           </li>
           <li>
-            they&rsquo;ve been honest, and have made no material misrepresentations in their communication to
+            They&rsquo;ve been honest, and have made no material misrepresentations in their communication to
             Supporters; and
           </li>
           <li>
-            they offer to return any remaining funds to Supporters who participated in the applicable Creator
+            They offer to return any remaining funds to Supporters who participated in the applicable Creator
             Event (in proportion to the amounts provided).
           </li>
         </ol>
@@ -344,7 +347,7 @@ export default `
   </div>
   <div>
     <p>
-      <strong>5.2. </strong><u><strong>Binding Agreement</strong></u> You acknowledge and agree that your
+      <strong>5.2. </strong><u><strong>Binding Agreement.</strong></u> You acknowledge and agree that your
       acceptance of any amount as part of a Creator Event, creates a direct agreement between you and your
       Supporters where you agree to fulfill your obligations set forth in that Creator Event, in accordance
       with these Terms and specifically as outlined in Section 4 above.
@@ -352,22 +355,23 @@ export default `
   </div>
   <div>
     <p>
-      5.3. <u><strong>Term of Creator Events and Payments</strong></u> Each Creator Event shall run for a time
-      period of seven days from the date the event is posted (the &ldquo;Event Term&rdquo;). During this time,
-      Creators can solicit feedback and support from their Supporters. All funds related to the applicable
-      Creator Event shall be held by NewNew&rsquo;s payment processor until the conclusion of the Event Term.
-      NewNew shall try to provide timely access to your funds, but you may occasionally experience delays in
-      accessing your funds. NewNew may also block or hold payments for violations of our policies or for
-      compliance reasons, including collecting tax reporting information. When payments are delayed or blocked
-      we try to communicate the reason to you promptly. If you have questions about a block, please reach out
-      to us. In order to protect Creators, we may block Supporters&rsquo; payments if we believe them to be
-      fraudulent. Sometimes activities like refunds can put your account balance into the negative. If your
-      balance becomes negative then we reserve the right to recover those funds from future payments.
+      <strong>5.3.</strong> <u><strong>Term of Creator Events and Payments.</strong></u> Each Creator Event
+      shall run for a time period of seven days from the date the event is posted (the &ldquo;Event
+      Term&rdquo;). During this time, Creators can solicit feedback and support from their Supporters. All
+      funds related to the applicable Creator Event shall be held by NewNew&rsquo;s payment processor until
+      the conclusion of the Event Term. NewNew shall try to provide timely access to your funds, but you may
+      occasionally experience delays in accessing your funds. NewNew may also block or hold payments for
+      violations of our policies or for compliance reasons, including collecting tax reporting information.
+      When payments are delayed or blocked we try to communicate the reason to you promptly. If you have
+      questions about a block, please reach out to us. In order to protect Creators, we may block
+      Supporters&rsquo; payments if we believe them to be fraudulent. Sometimes activities like refunds can
+      put your account balance into the negative. If your balance becomes negative then we reserve the right
+      to recover those funds from future payments.
     </p>
   </div>
   <div>
     <p>
-      <strong>5.4. </strong><u><strong>Taxes</strong></u> We may deduct or withhold any taxes that we may be
+      <strong>5.4. </strong><u><strong>Taxes.</strong></u> We may deduct or withhold any taxes that we may be
       legally obligated to deduct or withhold from any payment made to you under this Agreement, and payment
       to you as reduced by such deductions or withholdings will constitute full payment and settlement to you
       of such payment under this Agreement.
@@ -376,7 +380,7 @@ export default `
   <div>
     <p>
       <strong>5.5. </strong
-      ><u><strong>Creators can refund individual pledges at their sole discretion</strong></u> After your
+      ><u><strong>Creators can refund individual pledges at their sole discretion.</strong></u> After your
       Creator Event has been completed, Creators may cancel and refund a Supporter&rsquo;s pledge at any time.
       If a Creator does so, the Creator shall have no further obligation to that specific Supporter, and no
       agreement shall exist between them.
@@ -384,17 +388,14 @@ export default `
   </div>
   <div>
     <p>
-      <strong>5.6. </strong
-      ><u
-        ><strong>Some pledges can&rsquo;t be collected, which might reduce the amount you get</strong> Because
-        some payments can&rsquo;t be collected, we can&rsquo;t guarantee that the amounts you receive from a
-        Creator Event will be exactly equal to the full amount pledged minus our fees.
-      </u>
+      <strong>5.6. </strong><u><strong>Some pledges can&rsquo;t be collected, which might reduce the amount you get.</strong></u>
+      Because some payments can&rsquo;t be collected, we can&rsquo;t guarantee that the amounts you receive
+      from a Creator Event will be exactly equal to the full amount pledged minus our fees.
     </p>
   </div>
   <div>
     <p>
-      <strong>5.7. </strong><strong><u>Eligibility</u></strong> Persons under the age of eighteen (18) or the
+      <strong>5.7. </strong><strong><u>Eligibility.</u></strong> Persons under the age of eighteen (18) or the
       applicable age of majority in their legal state of residence (collectively, "Minors") are not eligible
       to become Creators on the Site. We may, in our sole discretion, refuse to offer the Creator
       functionality to any person or entity and change its eligibility criteria at any time.
@@ -402,7 +403,7 @@ export default `
   </div>
   <div>
     <p>
-      <strong>5.8. </strong><strong><u>Know Your Legal Obligations</u></strong> As a Creator, you are
+      <strong>5.8. </strong><strong><u>Know Your Legal Obligations.</u></strong> As a Creator, you are
       responsible for understanding and complying with these Terms and our Community Guidelines along with any
       laws, rules, regulations and contracts with third parties that apply to your Creator Events. The
       information we provide regarding legal requirements is for informational purposes only and you should
@@ -414,7 +415,7 @@ export default `
   <h1>6. Supports on the Site</h1>
   <div>
     <p>
-      <strong>6.1. </strong><strong><u>Supporters on the Site</u></strong> NewNew allows for certain users of
+      <strong>6.1. </strong><strong><u>Supporters on the Site.</u></strong> NewNew allows for certain users of
       the Site to provide feedback on how to respond to life choices that will be made by Creators (each a
       &ldquo;Supporter&rdquo;, and collectively the &ldquo;Supporters&rdquo;). Supporters can participate in
       helping make these decisions by taking part in various kinds of Creator Events, where the Creator will
@@ -425,7 +426,7 @@ export default `
   </div>
   <div>
     <p>
-      <strong>6.2. </strong><strong><u>Account Holds</u></strong> When you participate in a Creator Event
+      <strong>6.2. </strong><strong><u>Account Holds.</u></strong> When you participate in a Creator Event
       through our Site, you agree that NewNew and its payment partners may authorize or reserve a charge on
       your credit card (or whatever payment method you use) for any amount up to the full amount you pledged,
       and that such funds shall be held for the entire Event Term for the applicable Creator Event. Your
@@ -439,7 +440,7 @@ export default `
   </div>
   <div>
     <p>
-      <strong>6.3. </strong><strong><u>Know Your Legal Obligations</u></strong> As a Supporter, you may
+      <strong>6.3. </strong><strong><u>Know Your Legal Obligations.</u></strong> As a Supporter, you may
       participate in Creator Events and, in certain circumstances, provide your own suggestions for how a
       Creator should respond to a particular situation. As part of your participation in Creator Events, you
       agree that you are responsible for understanding and complying with these Terms and our Community
@@ -452,16 +453,14 @@ export default `
   </div>
   <div>
     <p>
-      <strong>6.4. </strong
-      ><strong><u>The estimated performance timeframe is the Creator&rsquo;s estimate</u></strong> The Creator
-      is given the choice of when to perform the results of a Creator Event. The timeframe specified by the
-      Creator is an estimate and circumstances may change that prevent the Creator from fulfilling the task
-      within that timeframe.
+      <strong>6.4. </strong><strong><u>The estimated performance timeframe is the Creator&rsquo;s estimate.</u></strong> The Creator is given the choice of when to perform the results of a Creator Event. The timeframe specified
+      by the Creator is an estimate and circumstances may change that prevent the Creator from fulfilling the
+      task within that timeframe.
     </p>
   </div>
   <div>
     <p>
-      <strong>6.5. </strong><strong><u>No refunds</u></strong> NewNew doesn&rsquo;t hold funds on
+      <strong>6.5. </strong><strong><u>No refunds.</u></strong> NewNew doesn&rsquo;t hold funds on
       Creators&rsquo; behalf, cannot guarantee Creators&rsquo; performance, and does not offer refunds.
     </p>
   </div>
@@ -488,7 +487,7 @@ export default `
   <h1>8. Content and Submissions</h1>
   <div>
     <p>
-      <strong>8.1. </strong><u><strong>Rights Granted to You</strong></u> Subject to your compliance with
+      <strong>8.1. </strong><u><strong>Rights Granted to You.</strong></u> Subject to your compliance with
       these Terms, NewNew grants you a personal, non-exclusive, non-transferable, non-sublicensable,
       revocable, limited license to download, view, display, and use the Content solely for your permitted use
       within the Site. "<strong>Content</strong>" means the text, software, scripts, graphics, photos, sounds,
@@ -500,7 +499,7 @@ export default `
   </div>
   <div>
     <p>
-      <strong>8.2. </strong><u><strong>Content Ownership</strong></u> NewNew does not claim ownership rights
+      <strong>8.2. </strong><u><strong>Content Ownership.</strong></u> NewNew does not claim ownership rights
       in User Content and nothing in these Terms restricts any rights that you may have to use and exploit
       your User Content. Subject to the foregoing, NewNew and its licensors exclusively own all right, title,
       and interest in and to the Site and Content, including all associated intellectual property rights. You
@@ -524,19 +523,19 @@ export default `
   </div>
   <div>
     <p>
-      <strong>8.3. </strong><u><strong>Rights Granted by You</strong></u> By making any User Content available
-      to NewNew and/or through the Site you grant to NewNew a non-exclusive, transferable, sublicenseable,
-      worldwide, royalty-free, perpetual license (or, if not permitted under applicable law, a license for the
-      whole duration, including for any extension thereof, of all relevant rights under any applicable law),
-      to use, copy, modify, create derivative works based upon, publicly display, publish, publicly perform,
-      market, promote, distribute or otherwise make available your User Content, in whole or in part, for any
-      purposes, in any form, media or technology, whether known or hereafter developed, alone or as part of
-      other works, with no payment or other compensation to you. The purposes shall include but are not
-      limited to: in connection with operating and providing the Site and Content to you and to others; for
-      demonstration, promotion and advertising; for all NewNew products and services, including the Site; to
-      satisfy any law, regulation, or government request; and to use the information in accordance with our
-      Privacy Policy [make a hyperlink]. By accepting these Terms, you allow NewNew to benefit freely from the
-      above rights, including but not limited to:
+      <strong>8.3. </strong><u><strong>Rights Granted by You.</strong></u> By making any User Content
+      available to NewNew and/or through the Site you grant to NewNew a non-exclusive, transferable,
+      sublicenseable, worldwide, royalty-free, perpetual license (or, if not permitted under applicable law, a
+      license for the whole duration, including for any extension thereof, of all relevant rights under any
+      applicable law), to use, copy, modify, create derivative works based upon, publicly display, publish,
+      publicly perform, market, promote, distribute or otherwise make available your User Content, in whole or
+      in part, for any purposes, in any form, media or technology, whether known or hereafter developed, alone
+      or as part of other works, with no payment or other compensation to you. The purposes shall include but
+      are not limited to: in connection with operating and providing the Site and Content to you and to
+      others; for demonstration, promotion and advertising; for all NewNew products and services, including
+      the Site; to satisfy any law, regulation, or government request; and to use the information in
+      accordance with our <a href="https://privacy.newnew.co/" target="_blank" rel="noopener noreferrer">Privacy Policy</a>. By accepting these Terms, you allow NewNew to benefit freely from the above rights, including but not
+      limited to:
     </p>
   </div>
   <div>
@@ -577,7 +576,7 @@ export default `
   </div>
   <div>
     <p>
-      <strong>8.4. </strong><strong><u>Your Representations and Warranties</u></strong> You are solely
+      <strong>8.4. </strong><strong><u>Your Representations and Warranties.</u></strong> You are solely
       responsible for all your User Content. By submitting User Content, you represent and warrant that you
       own all parts of your User Content or you have all rights, releases and permissions that are necessary
       to grant us the license rights in your User Content under these Terms. By including or otherwise
@@ -596,7 +595,7 @@ export default `
   </div>
   <div>
     <p>
-      <strong>8.5. </strong><strong><u>Availability of Content</u></strong> We do not guarantee that any
+      <strong>8.5. </strong><strong><u>Availability of Content.</u></strong> We do not guarantee that any
       Content will be made available on and/or through the Site, and the ranking of search results on the Site
       depends on a variety of factors. Search results may appear different on our mobile application than they
       appear on our website. We do not practice editorial control over the content posted by third parties
@@ -626,7 +625,7 @@ export default `
   </div>
   <div>
     <p>
-      <strong>9.2. </strong><u><strong>Safe and Appropriate Use</strong></u> While you are using our Site,
+      <strong>9.2. </strong><u><strong>Safe and Appropriate Use.</strong></u> While you are using our Site,
       please be aware of your surroundings, and participate and communicate safely. You may not use the Site
       in a way that would distract you from obeying traffic or safety laws. For example, you may not use the
       Site while driving and may not put yourself or others in harm's way. You agree that your use of the Site
@@ -637,7 +636,7 @@ export default `
   </div>
   <div>
     <p>
-      <strong>9.3. </strong><u><strong>Your Interactions with Other People</strong></u> You agree that in
+      <strong>9.3. </strong><u><strong>Your Interactions with Other People.</strong></u> You agree that in
       conjunction with your use of the Site, any contact with other people will be safe and appropriate. You
       will not harass, threaten or otherwise violate the legal rights of others. You will not trespass, or in
       any manner attempt to gain or gain access to any property or location where you do not have a right or
@@ -651,123 +650,115 @@ export default `
   </div>
   <div>
     <p>
-      <strong>9.4. </strong><strong><u>Objectionable Actions/Content</u></strong> You agree that you shall
+      <strong>9.4. </strong><strong><u>Objectionable Actions/Content.</u></strong> You agree that you shall
       not, and shall not permit any third party to, (unless applicable law mandates that you be given the
       right to do so) either (a) take any action or (b) upload, download, post, submit or otherwise distribute
       or facilitate distribution of any Content on or through the Site, including without limitation any User
-      Content, that violates our Community Guidelines [Make a hyperlink to Community Guidelines] and/or :
+      Content, that violates our <a href="https://communityguidelines.newnew.co/" target="_blank" rel="noopener noreferrer">Community Guidelines</a>
+      and/or :
     </p>
   </div>
+  <ul class="list">
+    <li>
+      collects, solicits, stores or shares any personally identifiable information (such as passwords and
+      phone numbers) of other users without their express permission;
+    </li>
+    <li>
+      extracts, scrapes, indexes, intercepts, mines or other collects information about the Site or Content
+      (including information about users);
+    </li>
+    <li>
+      uses automation software, bots, hacks, mods or any other unauthorized software designed to modify or
+      interfere with the Site;
+    </li>
+    <li>
+      uses the Site or Content, or any portion thereof, in a manner not permitted by these Terms, including
+      but not limited to selling, reselling, or renting the Site or your Account;
+    </li>
+    <li>
+      attempts to access or search the Site or Content or download Content from the Site through the use of
+      any technology or means other than those provided by NewNew or other generally available third party web
+      browsers (including without limitation automation software, bots, spiders, crawlers, data mining tools,
+      or hacks, tools, agents, engines, or devices of any kind);
+    </li>
+    <li>
+      attempts to decipher, decompile, disassemble, or reverse engineer any of the software used to provide
+      the Site or Content;
+    </li>
+    <li>
+      bypasses, removes, deactivates, descrambles, or otherwise attempts to circumvent any technological
+      measure implemented by NewNew or any of NewNew&rsquo;s providers or any other third party (including
+      another user) to protect and/or filter the Site or Content;
+    </li>
+    <li>
+      posts, publishes, submits or transmits any Content that infringes, misappropriates, or violates a third
+      party&rsquo;s patent, copyright, trademark, trade secret, moral rights, or other intellectual property
+      rights, or rights of publicity or privacy;
+    </li>
+    <li>
+      uses any meta tags or other hidden text or metadata utilizing a NewNew trademark, logo, URL, or product
+      name without NewNew&rsquo;s express written consent;
+    </li>
+    <li>
+      accesses, tampers with, or uses nonpublic areas of the Site, NewNew&rsquo;s computer systems, or the
+      technical delivery systems of NewNew&rsquo;s providers;
+    </li>
+    <li>
+      attempts to probe, scan, or test the vulnerability of any NewNew system or network or the Site, or
+      breach any security or authentication measures;
+    </li>
+    <li>
+      forges any TCP/IP packet header or any part of the header information in any email or newsgroup posting,
+      or in any way use the Site or Content to send altered, deceptive, or false source identifying
+      information;
+    </li>
+    <li>
+      interferes with, or attempts to interfere with, the access of any user, host, or network, including,
+      without limitation, sending a virus, overloading, flooding, spamming, or mailbombing the Site;
+    </li>
+    <li>
+      deletes, obscures, or in any manner alters any attribution, warning, or link that appears in the Site or
+      the Content;
+    </li>
+    <li>
+      sublicenses, rents, leases, sells, trades, gifts, bequeaths or otherwise transfers your Account to
+      anyone;
+    </li>
+    <li>
+      is unlawful, threatening, abusive, harassing, defamatory, libelous, deceptive, fraudulent, invasive of
+      another's privacy, tortious, obscene, vulgar, pornographic, offensive, profane, contains or depicts
+      nudity, contains or depicts sexual activity, otherwise violates any law or right of any third party, or
+      is otherwise inappropriate as determined by us in our sole discretion;
+    </li>
+    <li>
+      promotes or contains illegal or tortious activities, promotes alcohol, tobacco, pseudo-pharmaceutical or
+      prescription drugs, or conduct that is abusive, violent, threatening, obscene, sexually explicit,
+      discriminatory on the basis of race, sex, religion, nationality, disability, sexual orientation, or age,
+      or is defamatory or libelous;
+    </li>
+    <li>
+      promotes or contains criminal or tortious activity, including child pornography, fraud, trafficking in
+      obscene material, drug dealing, gambling, harassment, stalking, spamming, spimming, sending of viruses
+      or other harmful files, copyright infringement, patent infringement, or theft of trade secrets;
+    </li>
+    <li>constitutes unauthorized or unsolicited advertising, junk or bulk email ("spamming");</li>
+    <li>
+      contains software viruses or any other computer codes, files, content, or programs that are designed or
+      intended to disrupt, damage, limit or interfere with the proper function of any software, hardware, or
+      telecommunications equipment or to damage or obtain unauthorized access to any system, data, password or
+      other information of ours or of any third party;
+    </li>
+    <li>is designed or intended to obtain password, Account, or private information from any Site user;</li>
+    <li>impersonates any person or entity, including any of our employees, representatives, or users;</li>
+    <li>
+      promotes or links to affiliate programs, multi-level marketing schemes, sites repurposing existing
+      stories or off-topic content;
+    </li>
+    <li>includes anyone&rsquo;s identification documents or sensitive financial information;</li>
+    <li>violates any applicable law or regulation, including U.S. export and re-export control laws; or</li>
+    <li>encourages or enables any other individual to do any of the foregoing.</li>
+  </ul>
   <div>
-    <p>{title}</p>
-    <div>
-      <ul class="list">
-        <li>
-          collects, solicits, stores or shares any personally identifiable information (such as passwords and
-          phone numbers) of other users without their express permission;
-        </li>
-        <li>
-          extracts, scrapes, indexes, intercepts, mines or other collects information about the Site or
-          Content (including information about users);
-        </li>
-        <li>
-          uses automation software, bots, hacks, mods or any other unauthorized software designed to modify or
-          interfere with the Site;
-        </li>
-        <li>
-          uses the Site or Content, or any portion thereof, in a manner not permitted by these Terms,
-          including but not limited to selling, reselling, or renting the Site or your Account;
-        </li>
-        <li>
-          attempts to access or search the Site or Content or download Content from the Site through the use
-          of any technology or means other than those provided by NewNew or other generally available third
-          party web browsers (including without limitation automation software, bots, spiders, crawlers, data
-          mining tools, or hacks, tools, agents, engines, or devices of any kind);
-        </li>
-        <li>
-          attempts to decipher, decompile, disassemble, or reverse engineer any of the software used to
-          provide the Site or Content;
-        </li>
-        <li>
-          bypasses, removes, deactivates, descrambles, or otherwise attempts to circumvent any technological
-          measure implemented by NewNew or any of NewNew&rsquo;s providers or any other third party (including
-          another user) to protect and/or filter the Site or Content;
-        </li>
-        <li>
-          posts, publishes, submits or transmits any Content that infringes, misappropriates, or violates a
-          third party&rsquo;s patent, copyright, trademark, trade secret, moral rights, or other intellectual
-          property rights, or rights of publicity or privacy;
-        </li>
-        <li>
-          uses any meta tags or other hidden text or metadata utilizing a NewNew trademark, logo, URL, or
-          product name without NewNew&rsquo;s express written consent;
-        </li>
-        <li>
-          accesses, tampers with, or uses nonpublic areas of the Site, NewNew&rsquo;s computer systems, or the
-          technical delivery systems of NewNew&rsquo;s providers;
-        </li>
-        <li>
-          attempts to probe, scan, or test the vulnerability of any NewNew system or network or the Site, or
-          breach any security or authentication measures;
-        </li>
-        <li>
-          forges any TCP/IP packet header or any part of the header information in any email or newsgroup
-          posting, or in any way use the Site or Content to send altered, deceptive, or false source
-          identifying information;
-        </li>
-        <li>
-          interferes with, or attempts to interfere with, the access of any user, host, or network, including,
-          without limitation, sending a virus, overloading, flooding, spamming, or mailbombing the Site;
-        </li>
-        <li>
-          deletes, obscures, or in any manner alters any attribution, warning, or link that appears in the
-          Site or the Content;
-        </li>
-        <li>
-          sublicenses, rents, leases, sells, trades, gifts, bequeaths or otherwise transfers your Account to
-          anyone;
-        </li>
-        <li>
-          is unlawful, threatening, abusive, harassing, defamatory, libelous, deceptive, fraudulent, invasive
-          of another's privacy, tortious, obscene, vulgar, pornographic, offensive, profane, contains or
-          depicts nudity, contains or depicts sexual activity, otherwise violates any law or right of any
-          third party, or is otherwise inappropriate as determined by us in our sole discretion;
-        </li>
-        <li>
-          promotes or contains illegal or tortious activities, promotes alcohol, tobacco,
-          pseudo-pharmaceutical or prescription drugs, or conduct that is abusive, violent, threatening,
-          obscene, sexually explicit, discriminatory on the basis of race, sex, religion, nationality,
-          disability, sexual orientation, or age, or is defamatory or libelous;
-        </li>
-        <li>
-          promotes or contains criminal or tortious activity, including child pornography, fraud, trafficking
-          in obscene material, drug dealing, gambling, harassment, stalking, spamming, spimming, sending of
-          viruses or other harmful files, copyright infringement, patent infringement, or theft of trade
-          secrets;
-        </li>
-        <li>constitutes unauthorized or unsolicited advertising, junk or bulk email ("spamming");</li>
-        <li>
-          contains software viruses or any other computer codes, files, content, or programs that are designed
-          or intended to disrupt, damage, limit or interfere with the proper function of any software,
-          hardware, or telecommunications equipment or to damage or obtain unauthorized access to any system,
-          data, password or other information of ours or of any third party;
-        </li>
-        <li>
-          is designed or intended to obtain password, Account, or private information from any Site user;
-        </li>
-        <li>impersonates any person or entity, including any of our employees, representatives, or users;</li>
-        <li>
-          promotes or links to affiliate programs, multi-level marketing schemes, sites repurposing existing
-          stories or off-topic content;
-        </li>
-        <li>includes anyone&rsquo;s identification documents or sensitive financial information;</li>
-        <li>
-          violates any applicable law or regulation, including U.S. export and re-export control laws; or
-        </li>
-        <li>encourages or enables any other individual to do any of the foregoing.</li>
-      </ul>
-    </div>
-  </div>
   <div>
     <p>
       <strong>9.5.</strong> Although NewNew is not obligated to monitor access to or use of the Site or
@@ -870,46 +861,36 @@ export default `
       the following:
     </p>
     <div>
-      <div>
-        <p>
+      <ol type="a">
+        <li>
           A physical or electronic signature of person authorized to act on behalf of the owner of an
           exclusive right that is allegedly infringed;
-        </p>
-      </div>
-      <div>
-        <p>
+        </li>
+        <li>
           Identification of the copyrighted work claimed to have been infringed, or if multiple copyrighted
           works at a single online site are covered by a single notification, a representative list of such
           works at that site;
-        </p>
-      </div>
-      <div>
-        <p>
+        </li>
+        <li>
           Identification of the material that is claimed to be infringing or to be the subject of infringing
           activity and that is to be removed or access to which is to be disabled, and information reasonably
           sufficient to permit us to locate the material;
-        </p>
-      </div>
-      <div>
-        <p>
+        </li>
+        <li>
           Information reasonably sufficient to permit us to contact the complaining party, such as an address,
           telephone number, and if available, an electronic mail address at which the complaining party may be
           contacted;
-        </p>
-      </div>
-      <div>
-        <p>
+        </li>
+        <li>
           A statement that the complaining party has a good faith belief that use of the material in the
           manner complained of is not authorized by the copyright owner, its agent, or the law;
-        </p>
-      </div>
-      <div>
-        <p>
+        </li>
+        <li>
           A statement that the information in the notification is accurate, and under penalty of perjury, that
           the complaining party is authorized to act on behalf of the owner of an exclusive right that is
           allegedly infringed.
-        </p>
-      </div>
+        </li>
+      </ol>
     </div>
   </div>
   <div>
@@ -975,64 +956,43 @@ export default `
       </ol>
     </div>
   </div>
-  <h1>13. T<strong>hird Party Services and Resources</strong></h1>
+  <h1>13. <strong>Third Party Services and Resources</strong></h1>
   <div>
     <p>
-      <strong>13.1. </strong>Third Party Links. The Site may contain links to third party websites or
-      resources. NewNew provides these links only as a convenience and is not responsible for the content,
-      products, or services on or available from those websites or resources, or links displayed on such
-      websites. We do not monitor or control the linked sites and make no representations regarding, and are
-      not liable or responsible for the accuracy, completeness, timeliness, reliability or availability of,
-      any of the content uploaded, displayed, or distributed, or products, or services available at these
-      sites. The presence of a link to a third party site does not constitute or imply our endorsement,
-      sponsorship, or recommendation of the third party or of the content, products, or services contained on,
-      or available through, the third party site. We reserve the right to disable links from or to third party
-      sites. To the extent permitted under applicable law, you acknowledge sole responsibility for and assume
-      all risk arising from, your use of any third party websites or resources.
+      <strong>13.1. </strong><u><strong>Third Party Links.</strong></u> The Site may contain links to third
+      party websites or resources. NewNew provides these links only as a convenience and is not responsible
+      for the content, products, or services on or available from those websites or resources, or links
+      displayed on such websites. We do not monitor or control the linked sites and make no representations
+      regarding, and are not liable or responsible for the accuracy, completeness, timeliness, reliability or
+      availability of, any of the content uploaded, displayed, or distributed, or products, or services
+      available at these sites. The presence of a link to a third party site does not constitute or imply our
+      endorsement, sponsorship, or recommendation of the third party or of the content, products, or services
+      contained on, or available through, the third party site. We reserve the right to disable links from or
+      to third party sites. To the extent permitted under applicable law, you acknowledge sole responsibility
+      for and assume all risk arising from, your use of any third party websites or resources.
     </p>
   </div>
   <div>
     <p>
-      <strong>13.2. </strong>Third Party Resources. NewNew is not responsible for the availability or quality
-      of your devices or any third party services ("Third Party Resources"), including cell phone networks,
-      hotspots, wireless internet and other services. SUCH THIRD PARTY RESOURCES MAY AFFECT YOUR ABILITY TO
-      UTILIZE THE SITE OR PARTICIPATE IN ANY CREATOR EVENTS AND YOU HEREBY WAIVE AND RELEASE NEWNEW AND ANY
-      OTHER PARTY INVOLVED IN CREATING OR DELIVERING THE SITE FROM ALL CLAIMS, DEMANDS, CAUSES OF ACTION,
-      DAMAGES, LOSSES, EXPENSES OR LIABILITY WHICH MAY ARISE OUT OF, RESULT FROM, OR RELATE IN ANY WAY TO SUCH
-      THIRD PARTY SERVICES.
+      <strong>13.2. </strong><u><strong>Third Party Resources.</strong></u> NewNew is not responsible for the
+      availability or quality of your devices or any third party services ("Third Party Resources"), including
+      cell phone networks, hotspots, wireless internet and other services. SUCH THIRD PARTY RESOURCES MAY
+      AFFECT YOUR ABILITY TO UTILIZE THE SITE OR PARTICIPATE IN ANY CREATOR EVENTS AND YOU HEREBY WAIVE AND
+      RELEASE NEWNEW AND ANY OTHER PARTY INVOLVED IN CREATING OR DELIVERING THE SITE FROM ALL CLAIMS, DEMANDS,
+      CAUSES OF ACTION, DAMAGES, LOSSES, EXPENSES OR LIABILITY WHICH MAY ARISE OUT OF, RESULT FROM, OR RELATE
+      IN ANY WAY TO SUCH THIRD PARTY SERVICES.
     </p>
   </div>
   <div>
     <p>
-      <strong>13.3. </strong>Stripe. Payment processing services for users on the Site are provided by Stripe
-      and are subject to the&nbsp;<a
-        href="https://stripe.com/connect-account/legal/full"
-        target="_blank"
-        rel="noopener noreferrer"
-        >Stripe Connected Account Agreement</a>, which includes the&nbsp;<a href="https://stripe.com/legal" target="_blank" rel="noopener noreferrer"
-        >Stripe Terms of Service</a>&nbsp;(collectively, the &ldquo;Stripe Services Agreement&rdquo;). By agreeing
-        to these Terms or continuing to use the Site, you agree to be bound by the Stripe Services Agreement,
-        as the same may be modified by Stripe from time to time. As a condition of NewNew enabling payment
-        processing services through Stripe, you agree to provide NewNew with accurate and complete information
-        about you and your business, and you authorize NewNew to share it and transaction information related
-        to your use of the payment processing services provided by Stripe.
-      </a>
+      <strong>13.3. </strong><u><strong>Stripe.</strong></u> Payment processing services for users on the Site
+      are provided by Stripe and are subject to the&nbsp;<a href="https://stripe.com/connect-account/legal/full" target="_blank" rel="noopener noreferrer">Stripe Connected Account Agreement</a>, which includes the&nbsp;<a href="https://stripe.com/legal" target="_blank" rel="noopener noreferrer">Stripe Terms of Service</a>&nbsp;(collectively, the &ldquo;Stripe Services Agreement&rdquo;). By agreeing to these Terms or continuing to use the Site, you agree to be bound by the Stripe Services Agreement, as the same may be modified by Stripe from time to time. As a condition of NewNew enabling payment processing services through Stripe, you agree to provide NewNew with accurate and complete information about you and your business, and you authorize NewNew to share it and transaction information related to your use of the payment processing services provided by Stripe.
     </p>
   </div>
   <div>
     <p>
-      Further, the NewNew uses Stripe to make payouts to our users. The&nbsp;<a
-        href="https://stripe.com/connect-account/legal/recipient"
-        target="_blank"
-        rel="noopener noreferrer"
-        >Stripe Recipient Agreement</a>&nbsp;applies to your receipt of such payouts. To receive payouts from
-        NewNew, you must provide NewNew accurate and complete information about you and your business, and you
-        authorize NewNew to share it and transaction information related to your payout with Stripe.
-      </a>
+      Further, the NewNew uses Stripe to make payouts to our users. The&nbsp;<a href="https://stripe.com/connect-account/legal/recipient" target="_blank" rel="noopener noreferrer">Stripe Recipient Agreement</a>&nbsp;applies to your receipt of such payouts. To receive payouts from NewNew, you must provide NewNew accurate and complete information about you and your business, and you authorize NewNew to share it and transaction information related to your payout with Stripe.
     </p>
-  </div>
-  <div>
-    <p>[MAKE SURE THE ABOVE HYPERLINKS ARE MAINTAINED AS PART OF PUBLISHING THESE TERMS]</p>
   </div>
   <h1>14. Termination</h1>
   <div>
@@ -1048,17 +1008,15 @@ export default `
   <div>
     <p>
       <strong>14.2. </strong>You may terminate your Account at any time directly by emailing us at
-      <a href="mailto:legal@newnew.co" target="_blank" rel="noopener noreferrer"
-        >legal@newnew.co</a> and/or by accessing the Delete my Account option within User Profile &rarr; Settings
-        &rarr; Privacy &rarr; Delete my Account. Upon termination of the Site, your Account, or these Terms,
-        for any reason, the following provisions of these Terms will survive: "Content and Submissions"
-        excluding "Rights Granted to You", "Conduct, General Prohibitions and Enforcement Rights", "Assumption
-        of Risks", "Apple Device and Application Terms", "Third Party Services and Resources", "Waiver of
-        Unknown Claims under California Civil Code &sect; 1542","Disclaimer of Warranties", "Limitations of
-        Liability", "Indemnification", "Governing Law, Arbitration and No Class Actions", "Miscellaneous" and
-        any other provision that provides for itself for survival or which by its nature should survive
-        termination of these Terms.
-      </a>
+      <a href="mailto:legal@newnew.co" target="_blank" rel="noopener noreferrer">legal@newnew.co</a> and/or by
+      accessing the Delete my Account option within User Profile &rarr; Settings &rarr; Privacy &rarr; Delete
+      my Account. Upon termination of the Site, your Account, or these Terms, for any reason, the following
+      provisions of these Terms will survive: "Content and Submissions" excluding "Rights Granted to You",
+      "Conduct, General Prohibitions and Enforcement Rights", "Assumption of Risks", "Apple Device and
+      Application Terms", "Third Party Services and Resources", "Waiver of Unknown Claims under California
+      Civil Code &sect; 1542","Disclaimer of Warranties", "Limitations of Liability", "Indemnification",
+      "Governing Law, Arbitration and No Class Actions", "Miscellaneous" and any other provision that provides
+      for itself for survival or which by its nature should survive termination of these Terms.
     </p>
   </div>
   <h1>15. <strong>Waiver of Unknown Claims under California Civil Code &sect; 1542</strong></h1>
@@ -1131,7 +1089,7 @@ export default `
       SUBSTITUTE SERVICES, ARISING OUT OF OR IN CONNECTION WITH THESE TERMS, OR FROM THE USE OF OR INABILITY
       TO USE THE SITE OR CONTENT, OR FROM ANY COMMUNICATIONS, INTERACTIONS, OR MEETINGS WITH OTHER USERS OF
       THE SITE OR PERSONS WITH WHOM YOU COMMUNICATE OR INTERACT AS A RESULT OF YOUR USE OF THE SITE, WHETHER
-      BASED ON WARRANTY, CONTRACT, TORT (INCLUDING NEGLIGENCE), PRODUCT LIABIL=ITY, OR ANY OTHER LEGAL THEORY,
+      BASED ON WARRANTY, CONTRACT, TORT (INCLUDING NEGLIGENCE), PRODUCT LIABILITY, OR ANY OTHER LEGAL THEORY,
       AND WHETHER OR NOT NEWNEW HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, EVEN IF A LIMITED REMEDY
       SET FORTH HEREIN IS FOUND TO HAVE FAILED OF ITS ESSENTIAL PURPOSE. SOME JURISDICTIONS DO NOT ALLOW THE
       EXCLUSION OR LIMITATION OF LIABILITY FOR CONSEQUENTIAL OR INCIDENTAL DAMAGES, SO THE FOREGOING
@@ -1189,7 +1147,7 @@ export default `
   <h1>19. <strong>Governing Law, Arbitration and No Class Actions</strong></h1>
   <div>
     <p>
-      <strong>19.1. </strong><strong><u>GOVERNING LAW</u></strong> YOUR USE OF THE SITE AND ANY DISPUTE
+      <strong>19.1. </strong><strong><u>GOVERNING LAW.</u></strong> YOUR USE OF THE SITE AND ANY DISPUTE
       ARISING OUT OF OR IN CONNECTION WITH THE SITE INCLUDING THE TERMS AND PRIVACY POLICY SHALL BE GOVERNED
       BY AND CONSTRUED IN ACCORDANCE WITH THE LAWS OF THE STATE OF CALIFORNIA WITHOUT GIVING EFFECT TO ANY
       CONFLICT OF LAWS PROVISIONS.
@@ -1197,7 +1155,7 @@ export default `
   </div>
   <div>
     <p>
-      <strong>19.2. </strong><strong><u>ARBITRATION</u></strong> YOU UNDERSTAND AND AGREE THAT ALL CLAIMS,
+      <strong>19.2. </strong><strong><u>ARBITRATION.</u></strong> YOU UNDERSTAND AND AGREE THAT ALL CLAIMS,
       DISAGREEMENTS, DISPUTES OR CONTROVERSIES BETWEEN YOU AND NEWNEW, AND ITS OFFICERS, DIRECTORS, EMPLOYEES,
       REPRESENTATIVES, AGENTS, PARTNERS, AFFILIATES, SUBSIDIARIES AND/OR RELATED COMPANIES ARISING OUT OF OR
       RELATING TO THE SITE, TO THE USE OR ACCESS THEREOF, TO PARTICIPATION IN A CREATOR EVENT OR OTHER SITE
@@ -1222,7 +1180,7 @@ export default `
   </div>
   <div>
     <p>
-      <strong>19.3. </strong><strong><u>NO CLASS ACTIONS</u></strong> TO THE FULLEST EXTENT PERMITTED BY
+      <strong>19.3. </strong><strong><u>NO CLASS ACTIONS.</u></strong> TO THE FULLEST EXTENT PERMITTED BY
       APPLICABLE LAW, YOU AGREE THAT ANY AND ALL DISPUTES, CLAIMS AND CAUSES OF ACTION YOU MAY HAVE IN
       CONNECTION WITH OR RELATED TO THE SITE, TO THE USE THEREOF OR ACCESS THERETO, TO THE ADVERTISING AND
       CONTENT ON THE SITE, TO THE PRODUCTS, SERVICES, MATERIALS, PROGRAMS OR OTHER FEATURES OFFERED,
@@ -1239,7 +1197,7 @@ export default `
   <h1>20. <strong>Miscellaneous</strong></h1>
   <div>
     <p>
-      <strong>20.1. </strong><strong><u>Entire Agreement</u></strong> The Terms and Privacy Policy, and any
+      <strong>20.1. </strong><strong><u>Entire Agreement.</u></strong> The Terms and Privacy Policy, and any
       other documents incorporated therein, constitute the entire agreement between you and NewNew governing
       your use of the Site, superseding any prior agreements between you and NewNew with respect to the Site.
     </p>
@@ -1260,17 +1218,16 @@ export default `
   </div>
   <div>
     <p>
-      <strong>20.3. </strong><strong><u>Force Majeure</u></strong
-      ><u> </u>Neither NewNew, any user, nor any other party involved in creating, producing, or delivering
-      the Site or Content shall be liable with respect to any damages, injuries, nonperformance or delay in
-      performance by reason of any act of God, weather, fire, flood, acts of terror or foreign enemy,
-      satellite or network failure, governmental order or regulation, trade dispute,or any other cause beyond
-      its respective control.
+      <strong>20.3. </strong><strong><u>Force Majeure.</u></strong> Neither NewNew, any user, nor any other
+      party involved in creating, producing, or delivering the Site or Content shall be liable with respect to
+      any damages, injuries, nonperformance or delay in performance by reason of any act of God, weather,
+      fire, flood, acts of terror or foreign enemy, satellite or network failure, governmental order or
+      regulation, trade dispute,or any other cause beyond its respective control.
     </p>
   </div>
   <div>
     <p>
-      <strong>20.4. </strong><strong><u>Notice</u></strong> Any notices or other communications provided by
+      <strong>20.4. </strong><strong><u>Notice.</u></strong> Any notices or other communications provided by
       NewNew under these Terms will be given: (a) via email; or (b) by posting to the Site. For notices made
       by email, the date of receipt will be deemed the date on which such notice is transmitted to any email
       address you provided.
@@ -1278,7 +1235,7 @@ export default `
   </div>
   <div>
     <p>
-      <strong>20.5. </strong><strong><u>Waiver</u></strong> NewNew&rsquo;s failure to enforce any right or
+      <strong>20.5. </strong><strong><u>Waiver.</u></strong> NewNew&rsquo;s failure to enforce any right or
       provision of these Terms will not be considered a waiver of such right or provision. The waiver of any
       such right or provision will be effective only if in writing and signed by a duly authorized
       representative of NewNew. Except as expressly set forth in these Terms, the exercise by either party of
@@ -1288,7 +1245,7 @@ export default `
   </div>
   <div>
     <p>
-      <strong>20.6. </strong><strong><u>Assignment</u></strong> These Terms are not assignable, transferable
+      <strong>20.6. </strong><strong><u>Assignment.</u></strong> These Terms are not assignable, transferable
       or sublicensable by you except with our prior written consent. You may not assign or transfer these
       Terms, by operation of law or otherwise, without NewNew&rsquo;s prior written consent. Any attempt by
       you to assign or transfer these Terms, without such consent, is void. NewNew may freely assign or
@@ -1299,27 +1256,27 @@ export default `
   </div>
   <div>
     <p>
-      <strong>20.7. </strong><strong><u>Headings</u></strong> The section and paragraph headings in these
+      <strong>20.7. </strong><strong><u>Headings.</u></strong> The section and paragraph headings in these
       Terms are for convenience only and shall not affect their interpretation.
     </p>
   </div>
   <div>
     <p>
-      <strong>20.8. </strong><strong><u>Relationships</u></strong> The Site and any Creator Event on the
+      <strong>20.8. </strong><strong><u>Relationships.</u></strong> The Site and any Creator Event on the
       NewNew application is not in any way endorsed, sponsored, administered by, or associated with Apple
       Inc., Google LLC, Alphabet Inc., or their respective parents, subsidiaries or affiliates.
     </p>
   </div>
   <div>
     <p>
-      <strong>20.9. </strong><strong><u>Agency</u></strong> No agency, partnership, joint venture, or
+      <strong>20.9. </strong><strong><u>Agency.</u></strong> No agency, partnership, joint venture, or
       employment relationship is created as a result of these Terms and neither party has any authority of any
       kind to bind the other in any respect.
     </p>
   </div>
   <div>
     <p>
-      <strong>20.10. </strong><strong><u>Electronic Communications</u></strong> When you use the Site or send
+      <strong>20.10. </strong><strong><u>Electronic Communications.</u></strong> When you use the Site or send
       emails to us, you are communicating with us electronically. You consent to receive communications from
       us electronically. We will communicate with you by email or by posting notices on this Site. You agree
       that all agreements, notices, disclosures and other communications that we provide you electronically
@@ -1328,12 +1285,11 @@ export default `
   </div>
   <div>
     <p>
-      <strong>20.11. </strong><strong><u>Contact Information</u></strong> If you have any questions about
+      <strong>20.11. </strong><strong><u>Contact Information.</u></strong> If you have any questions about
       these Terms or the Site, please contact NewNew at legal@newnew.co or 2355 Westwood Blvd #409, Los
       Angeles, California 90064 USA.
     </p>
   </div>
   <blockquote><strong>Last Modified: </strong>April 5, 2022</blockquote>
 </article>
-
 `;
