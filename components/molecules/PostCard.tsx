@@ -200,16 +200,20 @@ export const PostCard: React.FC<ICard> = React.memo(
         if (!decoded) return;
         const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
         if (decodedParsed.postUuid === postParsed.postUuid) {
-          if (typeOfPost === 'ac') {
-            setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
+          if (
+            typeOfPost === 'ac' &&
+            decoded.post?.auction?.totalAmount?.usdCents
+          ) {
+            setTotalAmount(decoded.post.auction.totalAmount?.usdCents);
           }
-          if (typeOfPost === 'cf') {
-            setCurrentBackerCount(
-              decoded.post?.crowdfunding?.currentBackerCount!!
-            );
+          if (
+            typeOfPost === 'cf' &&
+            decoded.post?.crowdfunding?.currentBackerCount
+          ) {
+            setCurrentBackerCount(decoded.post.crowdfunding.currentBackerCount);
           }
-          if (typeOfPost === 'mc') {
-            setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
+          if (typeOfPost === 'mc' && decoded.post?.multipleChoice?.totalVotes) {
+            setTotalVotes(decoded.post.multipleChoice.totalVotes);
           }
         }
       };
@@ -281,7 +285,11 @@ export const PostCard: React.FC<ICard> = React.memo(
               <SBottomContent>
                 <SUserAvatar
                   withClick
-                  avatarUrl={postParsed.creator?.avatarUrl!!}
+                  avatarUrl={
+                    postParsed.creator?.avatarUrl
+                      ? postParsed.creator.avatarUrl
+                      : ''
+                  }
                   onClick={(e) => {
                     e.stopPropagation();
                     handleUserClick(postParsed.creator?.username!!);
@@ -343,7 +351,11 @@ export const PostCard: React.FC<ICard> = React.memo(
         <SBottomContentOutside>
           <SBottomStart hasEnded={Date.now() > timestampSeconds}>
             <SUserAvatarOutside
-              avatarUrl={postParsed?.creator?.avatarUrl!!}
+              avatarUrl={
+                postParsed?.creator?.avatarUrl
+                  ? postParsed.creator.avatarUrl
+                  : ''
+              }
               withClick
               onClick={(e) => {
                 e.stopPropagation();

@@ -553,9 +553,16 @@ const SItem = styled.div`
 
 const SItemTitle = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-right: 8px;
 `;
 
-const SItemValue = styled(Text)``;
+const SItemValue = styled(Text)`
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+`;
 
 const SChoiceItem = styled.div`
   margin: 6px 0;

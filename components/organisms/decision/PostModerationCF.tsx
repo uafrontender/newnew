@@ -280,8 +280,11 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
 
-        setCurrentBackers(res.data.crowdfunding!!.currentBackerCount as number);
-        handleUpdatePostStatus(res.data.crowdfunding!!.status!!);
+        if (res.data.crowdfunding) {
+          setCurrentBackers(res.data.crowdfunding.currentBackerCount as number);
+          if (res.data.crowdfunding.status)
+            handleUpdatePostStatus(res.data.crowdfunding.status);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -346,7 +349,8 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         if (!decoded) return;
         const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
         if (decodedParsed.postUuid === post.postUuid) {
-          setCurrentBackers(decoded.post?.crowdfunding?.currentBackerCount!!);
+          if (decoded.post?.crowdfunding?.currentBackerCount)
+            setCurrentBackers(decoded.post?.crowdfunding?.currentBackerCount);
 
           if (
             !responseFreshlyUploaded &&
@@ -362,13 +366,13 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
         if (!decoded) return;
-        if (decoded.postUuid === post.postUuid) {
-          handleUpdatePostStatus(decoded.crowdfunding!!);
+        if (decoded.postUuid === post.postUuid && decoded.crowdfunding) {
+          handleUpdatePostStatus(decoded.crowdfunding);
 
           if (
             !responseFreshlyUploaded &&
             postStatus === 'processing_response' &&
-            switchPostStatus('cf', decoded.crowdfunding!!) === 'succeeded'
+            switchPostStatus('cf', decoded.crowdfunding) === 'succeeded'
           ) {
             const fetchPostPayload = new newnewapi.GetPostRequest({
               postUuid: post.postUuid,
@@ -400,26 +404,29 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
     }, [socketConnection, post, postStatus, setPledges, sortPleges]);
 
     const goToNextStep = () => {
-      if (user.loggedIn) {
-        const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-          cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![0],
-        });
-        markTutorialStepAsCompleted(payload);
+      if (user.userTutorialsProgress.remainingCfSteps) {
+        if (user.loggedIn) {
+          const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+            cfCurrentStep: user.userTutorialsProgress.remainingCfSteps[0],
+          });
+          markTutorialStepAsCompleted(payload);
+        }
+        dispatch(
+          setUserTutorialsProgress({
+            remainingCfSteps: [
+              ...user.userTutorialsProgress.remainingCfSteps,
+            ].slice(1),
+          })
+        );
       }
-      dispatch(
-        setUserTutorialsProgress({
-          remainingCfSteps: [
-            ...user.userTutorialsProgress.remainingCfSteps!!,
-          ].slice(1),
-        })
-      );
     };
 
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     useEffect(() => {
       if (
-        user!!.userTutorialsProgressSynced &&
-        user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+        user.userTutorialsProgressSynced &&
+        user.userTutorialsProgress.remainingCfSteps &&
+        user.userTutorialsProgress.remainingCfSteps[0] ===
           newnewapi.CfTutorialStep.CF_HERO
       ) {
         setIsPopupVisible(true);

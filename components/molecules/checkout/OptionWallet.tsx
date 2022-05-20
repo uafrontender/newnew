@@ -63,11 +63,13 @@ const OptionWallet: React.FunctionComponent<IOptionWallet> = ({
           }}
         >
           <SSubtitle variant={3}>{t('options.wallet.subtitle')}</SSubtitle>
-          <Text variant={2}>
-            {t('options.wallet.name')}
-            {walletBalance &&
-              ` ($${formatNumber(walletBalance.usdCents!! / 100 ?? 0, true)})`}
-          </Text>
+          {walletBalance?.usdCents && (
+            <Text variant={2}>
+              {t('options.wallet.name')}
+              {walletBalance &&
+                ` ($${formatNumber(walletBalance.usdCents / 100 ?? 0, true)})`}
+            </Text>
+          )}
         </div>
         <InlineSvg svg={NewnewLogoBlue} width='48px' />
         {/* <SFeesText

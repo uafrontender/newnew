@@ -115,46 +115,52 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
     let payload;
     switch (postType) {
       case 'ac':
-        if (user.loggedIn) {
-          payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![0],
-          });
+        if (user.userTutorialsProgress.remainingAcSteps) {
+          if (user.loggedIn) {
+            payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+              acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
+            });
+          }
+          dispatch(
+            setUserTutorialsProgress({
+              remainingAcSteps: [
+                ...user.userTutorialsProgress.remainingAcSteps,
+              ].slice(1),
+            })
+          );
         }
-        dispatch(
-          setUserTutorialsProgress({
-            remainingAcSteps: [
-              ...user.userTutorialsProgress.remainingAcSteps!!,
-            ].slice(1),
-          })
-        );
         break;
       case 'cf':
-        if (user.loggedIn) {
-          payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![0],
-          });
+        if (user.userTutorialsProgress.remainingCfSteps) {
+          if (user.loggedIn) {
+            payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+              cfCurrentStep: user.userTutorialsProgress.remainingCfSteps[0],
+            });
+          }
+          dispatch(
+            setUserTutorialsProgress({
+              remainingCfSteps: [
+                ...user.userTutorialsProgress.remainingCfSteps,
+              ].slice(1),
+            })
+          );
         }
-        dispatch(
-          setUserTutorialsProgress({
-            remainingCfSteps: [
-              ...user.userTutorialsProgress.remainingCfSteps!!,
-            ].slice(1),
-          })
-        );
         break;
       default:
-        if (user.loggedIn) {
-          payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![0],
-          });
+        if (user.userTutorialsProgress.remainingMcSteps) {
+          if (user.loggedIn) {
+            payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+              mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
+            });
+          }
+          dispatch(
+            setUserTutorialsProgress({
+              remainingMcSteps: [
+                ...user.userTutorialsProgress.remainingMcSteps,
+              ].slice(1),
+            })
+          );
         }
-        dispatch(
-          setUserTutorialsProgress({
-            remainingMcSteps: [
-              ...user.userTutorialsProgress.remainingMcSteps!!,
-            ].slice(1),
-          })
-        );
     }
     if (user.loggedIn && payload) markTutorialStepAsCompleted(payload);
   };
@@ -294,9 +300,9 @@ const SWrapper = styled.div<{
 
 const STimerItem = styled.div`
   display: grid;
-  grid-template-columns: 5fr 1fr;
+  grid-template-columns: 4fr 3fr;
 
-  padding: 10px 14px;
+  padding: 10px 12px;
   width: 60px;
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -305,10 +311,11 @@ const STimerItem = styled.div`
   position: relative;
 
   div:nth-child(1) {
-    text-align: center;
+    text-align: right;
   }
   div:nth-child(2) {
-    text-align: right;
+    text-align: left;
+    margin-left: 2px;
   }
 `;
 

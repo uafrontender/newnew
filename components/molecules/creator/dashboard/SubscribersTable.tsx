@@ -61,7 +61,7 @@ export const SubscribersTable = () => {
 
   useEffect(() => {
     if (mySubscribersTotal > 10)
-      setLastPage(Math.floor(mySubscribersTotal / 10));
+      setLastPage(Math.ceil(mySubscribersTotal / 10));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mySubscribersTotal]);

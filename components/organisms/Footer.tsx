@@ -39,10 +39,11 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const topItems: TItem[] = [
-    {
+    // TODO: return about link later when we have a page for it
+    /* {
       key: 'about',
       url: 'https://about.newnew.co',
-    },
+    }, */
     {
       key: 'how-it-works',
       url: '/how-it-works',
@@ -134,7 +135,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
                 <InlineSvg
                   clickable
                   svg={mobileLogo}
-                  fill={theme.colorsThemed.text.primary}
+                  fill='#1D6AFF'
                   width='48px'
                   height='48px'
                   onClick={handleLogoClick}

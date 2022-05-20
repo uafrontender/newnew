@@ -10,6 +10,7 @@ import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
@@ -237,7 +238,9 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
               : {}),
             cfPledgeRequest: {
               amount: new newnewapi.MoneyAmount({
-                usdCents: parseInt(pledgeAmount?.toString()!!),
+                usdCents: parseInt(
+                  pledgeAmount ? pledgeAmount?.toString() : '0'
+                ),
               }),
               postUuid: post.postUuid,
             },
@@ -261,19 +264,21 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
     }, [paymentModalOpen]);
 
     const goToNextStep = () => {
-      if (user.loggedIn) {
-        const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-          cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![0],
-        });
-        markTutorialStepAsCompleted(payload);
+      if (user.userTutorialsProgress.remainingCfSteps) {
+        if (user.loggedIn) {
+          const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+            cfCurrentStep: user.userTutorialsProgress.remainingCfSteps[0],
+          });
+          markTutorialStepAsCompleted(payload);
+        }
+        dispatch(
+          setUserTutorialsProgress({
+            remainingCfSteps: [
+              ...user.userTutorialsProgress.remainingCfSteps,
+            ].slice(1),
+          })
+        );
       }
-      dispatch(
-        setUserTutorialsProgress({
-          remainingCfSteps: [
-            ...user.userTutorialsProgress.remainingCfSteps!!,
-          ].slice(1),
-        })
-      );
     };
 
     return (
@@ -342,7 +347,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                   grandsVipStatus={i === arr.length - 1}
                   handleOpenMakePledgeForm={() => {
                     handleSetPledgeAmountAndOpenPaymentModal(
-                      pledgeLevel.usdCents!!
+                      pledgeLevel?.usdCents ? pledgeLevel.usdCents : 0
                     );
                   }}
                 />
@@ -368,18 +373,20 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                 positionRight='0px'
                 active={showRightGradient}
               />
-              <STutorialTooltipHolder>
-                <TutorialTooltip
-                  isTooltipVisible={
-                    user!!.userTutorialsProgress.remainingCfSteps!![0] ===
-                    newnewapi.CfTutorialStep.CF_BACK_GOAL
-                  }
-                  closeTooltip={goToNextStep}
-                  title={t('tutorials.cf.createYourBid.title')}
-                  text={t('tutorials.cf.createYourBid.text')}
-                  dotPosition={DotPositionEnum.BottomRight}
-                />
-              </STutorialTooltipHolder>
+              {user?.userTutorialsProgress.remainingCfSteps && (
+                <STutorialTooltipHolder>
+                  <TutorialTooltip
+                    isTooltipVisible={
+                      user.userTutorialsProgress.remainingCfSteps[0] ===
+                      newnewapi.CfTutorialStep.CF_BACK_GOAL
+                    }
+                    closeTooltip={goToNextStep}
+                    title={t('tutorials.cf.createYourBid.title')}
+                    text={t('tutorials.cf.createYourBid.text')}
+                    dotPosition={DotPositionEnum.BottomRight}
+                  />
+                </STutorialTooltipHolder>
+              )}
             </SButtonsContainer>
           )}
         </SSectionContainer>
@@ -388,7 +395,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
           <PaymentModal
             isOpen={paymentModalOpen}
             zIndex={12}
-            amount={`$${(pledgeAmount!! / 100)?.toFixed(0)}`}
+            amount={pledgeAmount ? `$${(pledgeAmount / 100)?.toFixed(0)}` : '0'}
             // {...(walletBalance?.usdCents &&
             // pledgeAmount &&
             // walletBalance.usdCents >= pledgeAmount
@@ -402,11 +409,27 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
             handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
             // handlePayWithWallet={handlePayWithWallet}
             bottomCaption={
-              <SPaymentFooter variant={3}>
-                {t('CfPost.paymentModalFooter.body', {
-                  creator: getDisplayname(post.creator!!),
-                })}
-              </SPaymentFooter>
+              <>
+                {post.creator && (
+                  <SPaymentSign variant={3}>
+                    {t('CfPost.paymentModalFooter.body', {
+                      creator: getDisplayname(post.creator),
+                    })}
+                  </SPaymentSign>
+                )}
+                <SPaymentTerms variant={3}>
+                  *{' '}
+                  <Link href='https://terms.newnew.co'>
+                    <SPaymentTermsLink
+                      href='https://terms.newnew.co'
+                      target='_blank'
+                    >
+                      {t('CfPost.paymentModalFooter.terms')}
+                    </SPaymentTermsLink>
+                  </Link>{' '}
+                  {t('CfPost.paymentModalFooter.apply')}
+                </SPaymentTerms>
+              </>
             }
             // payButtonCaptionKey={t('CfPost.paymentModalPayButton')}
           >
@@ -418,9 +441,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                   />
                 </SPaymentModalHeadingPostSymbol>
                 <SPaymentModalHeadingPostCreator variant={3}>
-                  {t('CfPost.paymentModalHeader.title', {
-                    creator: getDisplayname(post.creator!!),
-                  })}
+                  {post.creator
+                    ? t('CfPost.paymentModalHeader.title', {
+                        creator: getDisplayname(post.creator),
+                      })
+                    : ''}
                 </SPaymentModalHeadingPostCreator>
               </SPaymentModalHeading>
               <SPaymentModalOptionText variant={5}>
@@ -592,10 +617,22 @@ const STutorialTooltipHolder = styled.div`
   }
 `;
 
-const SPaymentFooter = styled(Text)`
+const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
+`;
+
+const SPaymentTermsLink = styled.a`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SPaymentTerms = styled(Text)`
+  margin-top: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
   white-space: pre;
 `;

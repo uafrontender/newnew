@@ -36,10 +36,8 @@ export const CreatorCardWithSubscriptionPrice: React.FC<ICreatorListItem> = ({
 
         const res = await getSubscriptionStatus(getStatusPayload);
 
-        if (res.data?.status?.product) {
-          setSubscriptionPrice(
-            res.data?.status?.product.monthlyRate?.usdCents!!
-          );
+        if (res.data?.status?.product?.monthlyRate?.usdCents) {
+          setSubscriptionPrice(res.data?.status?.product.monthlyRate?.usdCents);
         }
       } catch (err) {
         console.log(err);

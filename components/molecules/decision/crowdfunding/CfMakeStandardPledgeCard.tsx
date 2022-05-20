@@ -26,9 +26,11 @@ const CfMakeStandardPledgeCard: React.FunctionComponent<ICfMakeStandardPledgeCar
         />
       )} */}
         <SCardInfo>
-          <SCardAmount variant={6}>
-            {`$${(amount!!.usdCents!! / 100).toFixed(0)}`}
-          </SCardAmount>
+          {amount?.usdCents && (
+            <SCardAmount variant={6}>
+              {`$${(amount.usdCents / 100).toFixed(0)}`}
+            </SCardAmount>
+          )}
         </SCardInfo>
       </SStandardPledgeCard>
     );

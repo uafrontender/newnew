@@ -9,11 +9,9 @@ import moment from 'moment';
 import { SUserAvatar } from '../../../atoms/chat/styles';
 
 import Text from '../../../atoms/Text';
-// import GradientMask from '../../../atoms/GradientMask';
 import UserAvatar from '../../UserAvatar';
 
 import { useAppSelector } from '../../../../redux-store/store';
-// import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 import { getMyRooms } from '../../../../api/endpoints/chat';
 import { useGetChats } from '../../../../contexts/chatContext';
 import textTrim from '../../../../utils/textTrim';
@@ -55,9 +53,10 @@ export const ChatList = () => {
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data && res.data.rooms.length > 0) {
+        if (res.data?.rooms.length > 0) {
           setChatRooms((curr) => {
-            const arr = [...curr!!, ...res.data?.rooms!!];
+            const arr =
+              curr && res?.data?.rooms ? [...curr, ...res.data.rooms] : [];
             return arr;
           });
           setChatRoomsNextPageToken(res.data.paging?.nextPageToken);
@@ -152,7 +151,6 @@ export const ChatList = () => {
     (chat: newnewapi.IChatRoom) => {
       const handleItemClick = async () => {
         if (searchedRooms) setSearchedRooms(null);
-        // console.log(chat);
 
         router.push(`/creator/dashboard?tab=direct-messages&roomID=${chat.id}`);
         return null;
@@ -160,9 +158,7 @@ export const ChatList = () => {
 
       let avatar = (
         <SUserAvatar>
-          <UserAvatar
-            avatarUrl={chat.visavis?.avatarUrl ? chat.visavis?.avatarUrl : ''}
-          />
+          <UserAvatar avatarUrl={chat.visavis?.avatarUrl ?? ''} />
         </SUserAvatar>
       );
       let chatName = chat.visavis?.nickname
@@ -171,19 +167,18 @@ export const ChatList = () => {
 
       if (chat.kind === 4 && chat.myRole === 2) {
         avatar = (
-          <SMyAvatar>
-            <SUserAvatar>
-              <UserAvatar avatarUrl={user.userData?.avatarUrl!!} />
-            </SUserAvatar>
+          <SMyAvatarMassupdate>
             <SInlineSVG
               svg={megaphone}
               fill={
-                theme.name === 'light' ? theme.colors.black : theme.colors.white
+                theme.name === 'light'
+                  ? theme.colorsThemed.text.secondary
+                  : theme.colors.white
               }
               width='26px'
               height='26px'
             />
-          </SMyAvatar>
+          </SMyAvatarMassupdate>
         );
         chatName = `${
           user.userData?.nickname
@@ -364,16 +359,17 @@ const SInlineSVG = styled(InlineSVG)`
   margin-right: 14px;
 `;
 
-const SMyAvatar = styled.div`
-  position: relative;
+const SMyAvatarMassupdate = styled.div`
+  width: 48px;
   height: 48px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: ${({ theme }) => theme.colorsThemed.background.quinary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
   ${SInlineSVG} {
     margin-right: 0;
-    position: absolute;
-    left: calc(50% - 13px);
-    top: calc(50% - 13px);
-  }
-  ${SUserAvatar} {
-    opacity: ${(props) => (props.theme.name === 'light' ? '1' : '0.5')};
   }
 `;

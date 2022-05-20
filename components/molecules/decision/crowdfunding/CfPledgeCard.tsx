@@ -67,8 +67,8 @@ const CfPledgeCard: React.FunctionComponent<ICfPledgeCard> = ({
                 e.stopPropagation();
                 handleRedirectToUser();
               }}
-              src={creator?.avatarUrl!! as string}
-              alt={pledge?.creator?.username!!}
+              src={creator?.avatarUrl ?? ''}
+              alt={pledge?.creator?.username ?? ''}
               draggable={false}
             />
             <SUsername

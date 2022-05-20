@@ -216,17 +216,18 @@ export async function fetchProtobufProtectedIntercepted<
         // Refreshed succeded, re-set access and refresh tokens
         // Client side
         if (!serverSideTokens) {
-          cookiesInstance.set(
-            'accessToken',
-            resRefresh.data.credential?.accessToken,
-            {
-              expires: new Date(
-                (resRefresh.data.credential?.expiresAt?.seconds as number)!! *
-                  1000
-              ),
-              path: '/',
-            }
-          );
+          if (resRefresh.data.credential?.expiresAt?.seconds)
+            cookiesInstance.set(
+              'accessToken',
+              resRefresh.data.credential?.accessToken,
+              {
+                expires: new Date(
+                  (resRefresh.data.credential.expiresAt.seconds as number) *
+                    1000
+                ),
+                path: '/',
+              }
+            );
           cookiesInstance.set(
             'refreshToken',
             resRefresh.data.credential?.refreshToken,
@@ -238,21 +239,22 @@ export async function fetchProtobufProtectedIntercepted<
           );
         } else {
           // Server-side
-          updateCookieServerSideCallback?.([
-            {
-              name: 'accessToken',
-              value: resRefresh.data.credential?.accessToken!!,
-              expires: new Date(
-                (resRefresh.data.credential?.expiresAt?.seconds as number)!! *
-                  1000
-              ).toUTCString(),
-            },
-            {
-              name: 'refreshToken',
-              value: resRefresh.data.credential?.refreshToken!!,
-              maxAge: (10 * 365 * 24 * 60 * 60).toString(),
-            },
-          ]);
+          if (resRefresh.data.credential?.expiresAt?.seconds)
+            updateCookieServerSideCallback?.([
+              {
+                name: 'accessToken',
+                value: resRefresh.data.credential?.accessToken!!,
+                expires: new Date(
+                  (resRefresh.data.credential.expiresAt.seconds as number) *
+                    1000
+                ).toUTCString(),
+              },
+              {
+                name: 'refreshToken',
+                value: resRefresh.data.credential?.refreshToken!!,
+                maxAge: (10 * 365 * 24 * 60 * 60).toString(),
+              },
+            ]);
         }
         // Try request again with new credentials
         res = await fetchProtobuf<RequestType, ResponseType>(

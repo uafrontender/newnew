@@ -25,6 +25,7 @@ import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessag
 import notificationsIcon from '../../../../public/images/svg/icons/filled/Notifications.svg';
 import { useGetChats } from '../../../../contexts/chatContext';
 import { useNotifications } from '../../../../contexts/notificationsContext';
+import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
 
 const NewMessageModal = dynamic(() => import('./NewMessageModal'));
 const NotificationsList = dynamic(() => import('./NotificationsList'));
@@ -47,6 +48,7 @@ export const DynamicSection = () => {
   const { unreadCountForCreator } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const [markReadNotifications, setMarkReadNotifications] = useState(false);
+  const { mySubscribersTotal } = useGetSubscriptions();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -200,7 +202,8 @@ export const DynamicSection = () => {
             <>
               <SSectionTopLine tab={tab as string}>
                 <STabsWrapper>
-                  {user.userData?.options?.isOfferingSubscription ? (
+                  {user.userData?.options?.isOfferingSubscription &&
+                  mySubscribersTotal > 0 ? (
                     <Tabs
                       t={t}
                       tabs={tabs}

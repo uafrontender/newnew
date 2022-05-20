@@ -4,11 +4,12 @@ import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
 import UserAvatar from '../UserAvatar';
-import InlineSVG from '../../atoms/InlineSVG';
+import { InlineSvg } from '../../atoms/InlineSVG';
 
 import MessageIcon from '../../../public/images/svg/icons/filled/MessageIcon.svg';
 import MessageCircle from '../../../public/images/svg/icons/filled/MessageCircle.svg';
 import { useAppSelector } from '../../../redux-store/store';
+import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
 
 const Notification: React.FC<newnewapi.INotification> = ({
   content,
@@ -20,7 +21,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-
+  const user = useAppSelector((state) => state.user);
   const [url, setUrl] = useState('');
 
   useEffect(() => {
@@ -46,44 +47,56 @@ const Notification: React.FC<newnewapi.INotification> = ({
     <Link href={url}>
       <a>
         <SWrapper>
-          <SAvatarHolder>
-            <SUserAvatar
-              avatarUrl={
-                content?.relatedUser?.thumbnailAvatarUrl
-                  ? content?.relatedUser?.thumbnailAvatarUrl
-                  : ''
-              }
-            />
-            {target && (
-              <SIcon>
-                <SInlineSVG
-                  svg={
-                    target === newnewapi.RoutingTarget.ChatRoomTarget
-                      ? MessageIcon
-                      : MessageCircle
-                  }
-                  fill={theme.colors.white}
-                  width='14px'
-                  height='14px'
+          {content?.relatedUser?.uuid !== user.userData?.userUuid ? (
+            <SAvatarHolder>
+              <SUserAvatar
+                avatarUrl={
+                  content?.relatedUser?.thumbnailAvatarUrl
+                    ? content?.relatedUser?.thumbnailAvatarUrl
+                    : ''
+                }
+              />
+              {target && (
+                <SIcon>
+                  <SInlineSVG
+                    svg={
+                      target === newnewapi.RoutingTarget.ChatRoomTarget
+                        ? MessageIcon
+                        : MessageCircle
+                    }
+                    fill={theme.colors.white}
+                    width='14px'
+                    height='14px'
+                  />
+                </SIcon>
+              )}
+            </SAvatarHolder>
+          ) : (
+            <SAvatarHolder>
+              <SIconHolder>
+                <InlineSvg
+                  clickable
+                  svg={mobileLogo}
+                  fill='#fff'
+                  width='48px'
+                  height='48px'
                 />
-              </SIcon>
-            )}
-          </SAvatarHolder>
+              </SIconHolder>
+            </SAvatarHolder>
+          )}
           <SText>
-            <STitle>{content!!.relatedUser?.nicknameOrUsername}</STitle>
-            <p>{content!!.message}</p>
+            <STitle>{content?.relatedUser?.nicknameOrUsername}</STitle>
+            <p>{content?.message}</p>
             <SDate>
               {moment((createdAt?.seconds as number) * 1000).fromNow()}
             </SDate>
           </SText>
-          {content!!.relatedPost &&
-            content!!.relatedPost.thumbnailImageUrl &&
+          {content?.relatedPost &&
+            content?.relatedPost.thumbnailImageUrl &&
             !isMobile && (
-              // <Link href={`/post/${content?.relatedPost.uuid}`}>
               <SPostThumbnail
-                avatarUrl={content!!.relatedPost.thumbnailImageUrl}
+                avatarUrl={content?.relatedPost.thumbnailImageUrl}
               />
-              // </Link>
             )}
         </SWrapper>
       </a>
@@ -192,7 +205,17 @@ const SIcon = styled.span`
   }
 `;
 
-const SInlineSVG = styled(InlineSVG)`
+const SInlineSVG = styled(InlineSvg)`
   min-width: 16px;
   min-height: 16px;
+`;
+
+const SIconHolder = styled.div`
+  background: ${(props) => props.theme.colorsThemed.accent.blue};
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;

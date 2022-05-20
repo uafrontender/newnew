@@ -17,7 +17,7 @@ export const Dashboard = () => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   if (!user.loggedIn) {
-    router.push('/sign-up');
+    router.push('/sign-up?to=log-in');
     return null;
   }
   return (

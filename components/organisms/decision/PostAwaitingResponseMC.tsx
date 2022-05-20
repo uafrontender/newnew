@@ -193,7 +193,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>
                     <SCreator>
-                      <SCreatorImage src={post.creator?.avatarUrl!!} />
+                      <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
                       <SWantsToKnow>
                         {t('McPostSuccess.wants_to_know', {
                           creator: post.creator?.nickname,
@@ -214,7 +214,8 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                           <SCreatorImage
                             src={
                               winningOption.creator?.avatarUrl ??
-                              winningOption.firstVoter?.avatarUrl!!
+                              winningOption.firstVoter?.avatarUrl ??
+                              ''
                             }
                           />
                           <SWinningBidCreatorText>

@@ -47,11 +47,7 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
           <SPost>
             <SLeftSide>
               <SUserAvatar>
-                <UserAvatar
-                  avatarUrl={
-                    data.creator?.avatarUrl ? data.creator?.avatarUrl : ''
-                  }
-                />
+                <UserAvatar avatarUrl={data.creator?.avatarUrl ?? ''} />
               </SUserAvatar>
               <SPostData>
                 {data.title && (

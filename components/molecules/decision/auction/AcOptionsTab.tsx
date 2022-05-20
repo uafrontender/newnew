@@ -16,6 +16,7 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { debounce } from 'lodash';
+import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
@@ -130,19 +131,21 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
 
   const goToNextStep = () => {
-    if (user.loggedIn) {
-      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-        acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![0],
-      });
-      markTutorialStepAsCompleted(payload);
+    if (user.userTutorialsProgress.remainingAcSteps) {
+      if (user.loggedIn) {
+        const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+          acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
+        });
+        markTutorialStepAsCompleted(payload);
+      }
+      dispatch(
+        setUserTutorialsProgress({
+          remainingAcSteps: [
+            ...user.userTutorialsProgress.remainingAcSteps,
+          ].slice(1),
+        })
+      );
     }
-    dispatch(
-      setUserTutorialsProgress({
-        remainingAcSteps: [
-          ...user.userTutorialsProgress.remainingAcSteps!!,
-        ].slice(1),
-      })
-    );
   };
 
   // Handlers
@@ -522,34 +525,38 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             >
               {t('AcPost.OptionsTab.ActionSection.placeABidBtn')}
             </Button>
-            <STutorialTooltipTextAreaHolder>
-              <TutorialTooltip
-                isTooltipVisible={
-                  options.length > 0 &&
-                  user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-                    newnewapi.AcTutorialStep.AC_TEXT_FIELD
-                }
-                closeTooltip={goToNextStep}
-                title={t('tutorials.ac.createYourBid.title')}
-                text={t('tutorials.ac.createYourBid.text')}
-                dotPosition={DotPositionEnum.BottomRight}
-              />
-            </STutorialTooltipTextAreaHolder>
+            {user?.userTutorialsProgress.remainingAcSteps && (
+              <STutorialTooltipTextAreaHolder>
+                <TutorialTooltip
+                  isTooltipVisible={
+                    options.length > 0 &&
+                    user.userTutorialsProgress.remainingAcSteps[0] ===
+                      newnewapi.AcTutorialStep.AC_TEXT_FIELD
+                  }
+                  closeTooltip={goToNextStep}
+                  title={t('tutorials.ac.createYourBid.title')}
+                  text={t('tutorials.ac.createYourBid.text')}
+                  dotPosition={DotPositionEnum.BottomRight}
+                />
+              </STutorialTooltipTextAreaHolder>
+            )}
           </SActionSection>
         )}
-        <STutorialTooltipHolder>
-          <TutorialTooltip
-            isTooltipVisible={
-              options.length > 0 &&
-              user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-                newnewapi.AcTutorialStep.AC_ALL_BIDS
-            }
-            closeTooltip={goToNextStep}
-            title={t('tutorials.ac.peopleBids.title')}
-            text={t('tutorials.ac.peopleBids.text')}
-            dotPosition={DotPositionEnum.BottomLeft}
-          />
-        </STutorialTooltipHolder>
+        {user?.userTutorialsProgress.remainingAcSteps && (
+          <STutorialTooltipHolder>
+            <TutorialTooltip
+              isTooltipVisible={
+                options.length > 0 &&
+                user.userTutorialsProgress.remainingAcSteps[0] ===
+                  newnewapi.AcTutorialStep.AC_ALL_BIDS
+              }
+              closeTooltip={goToNextStep}
+              title={t('tutorials.ac.peopleBids.title')}
+              text={t('tutorials.ac.peopleBids.text')}
+              dotPosition={DotPositionEnum.BottomLeft}
+            />
+          </STutorialTooltipHolder>
+        )}
       </STabContainer>
       {/* Suggest new Modal */}
       {isMobile && postStatus === 'voting' ? (
@@ -617,9 +624,23 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           // handlePayWithWallet={handleSubmitNewOptionWallet}
           bottomCaption={
-            <SPaymentFooter variant={3}>
-              {t('AcPost.paymentModalFooter.body', { creator: postCreator })}
-            </SPaymentFooter>
+            <>
+              <SPaymentSign variant={3}>
+                {t('AcPost.paymentModalFooter.body', { creator: postCreator })}
+              </SPaymentSign>
+              <SPaymentTerms variant={3}>
+                *{' '}
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('AcPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
+                {t('AcPost.paymentModalFooter.apply')}
+              </SPaymentTerms>
+            </>
           }
           // payButtonCaptionKey={t('AcPost.paymentModalPayButton')}
         >
@@ -668,19 +689,21 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           >
             {t('AcPost.FloatingActionButton.suggestNewBtn')}
           </SActionButton>
-          <STutorialTooltipHolderMobile>
-            <TutorialTooltip
-              isTooltipVisible={
-                options.length > 0 &&
-                user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-                  newnewapi.AcTutorialStep.AC_TEXT_FIELD
-              }
-              closeTooltip={goToNextStep}
-              title={t('tutorials.ac.createYourBid.title')}
-              text={t('tutorials.ac.createYourBid.text')}
-              dotPosition={DotPositionEnum.BottomRight}
-            />
-          </STutorialTooltipHolderMobile>
+          {user?.userTutorialsProgress.remainingAcSteps && (
+            <STutorialTooltipHolderMobile>
+              <TutorialTooltip
+                isTooltipVisible={
+                  options.length > 0 &&
+                  user.userTutorialsProgress.remainingAcSteps[0] ===
+                    newnewapi.AcTutorialStep.AC_TEXT_FIELD
+                }
+                closeTooltip={goToNextStep}
+                title={t('tutorials.ac.createYourBid.title')}
+                text={t('tutorials.ac.createYourBid.text')}
+                dotPosition={DotPositionEnum.BottomRight}
+              />
+            </STutorialTooltipHolderMobile>
+          )}
         </>
       ) : null}
     </>
@@ -965,10 +988,22 @@ const STutorialTooltipTextAreaHolder = styled.div`
   }
 `;
 
-const SPaymentFooter = styled(Text)`
+const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
+`;
+
+const SPaymentTermsLink = styled.a`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SPaymentTerms = styled(Text)`
+  margin-top: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
   white-space: pre;
 `;

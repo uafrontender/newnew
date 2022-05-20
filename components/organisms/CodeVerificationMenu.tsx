@@ -118,12 +118,13 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           })
         );
         // Set credential cookies
-        setCookie('accessToken', data.credential?.accessToken, {
-          expires: new Date(
-            (data.credential?.expiresAt?.seconds as number)!! * 1000
-          ),
-          path: '/',
-        });
+        if (data.credential?.expiresAt?.seconds)
+          setCookie('accessToken', data.credential?.accessToken, {
+            expires: new Date(
+              (data.credential.expiresAt.seconds as number) * 1000
+            ),
+            path: '/',
+          });
         setCookie('refreshToken', data.credential?.refreshToken, {
           // Expire in 10 years
           maxAge: 10 * 365 * 24 * 60 * 60,

@@ -40,14 +40,14 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVo
     useOnClickOutside(containerRef, handleClose);
 
     useEffect(() => {
-      if (isBrowser() && !!document.getElementById('post-modal-container')) {
-        if (isVisible) {
-          document.getElementById('post-modal-container')!!.style.overflowY =
-            'hidden';
-        } else {
-          document.getElementById('post-modal-container')!!.style.overflowY =
-            '';
-        }
+      if (isBrowser()) {
+        const container = document.getElementById('post-modal-container');
+        if (container)
+          if (isVisible) {
+            container.style.overflowY = 'hidden';
+          } else {
+            container.style.overflowY = '';
+          }
       }
     }, [isVisible]);
 

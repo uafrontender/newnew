@@ -71,12 +71,18 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
       try {
         setIsLoading(true);
 
-        if (wasDateModified) {
+        if (
+          wasDateModified &&
+          dateInEdit &&
+          dateInEdit.getMonth() &&
+          dateInEdit.getFullYear() &&
+          dateInEdit.getDate()
+        ) {
           const updateDatePayload = new newnewapi.UpdateMeRequest({
             dateOfBirth: {
-              year: dateInEdit?.getFullYear(),
-              month: dateInEdit?.getMonth()!! + 1,
-              day: dateInEdit?.getDate(),
+              year: dateInEdit.getFullYear(),
+              month: dateInEdit.getMonth() + 1,
+              day: dateInEdit.getDate(),
             },
           });
 
@@ -208,8 +214,8 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
             maxDate={maxDate}
             locale={router.locale}
             disabled={
-              user.userData?.options?.birthDateUpdatesLeft!! <= 0 ||
-              !user.userData?.options?.birthDateUpdatesLeft
+              !user.userData?.options?.birthDateUpdatesLeft ||
+              user.userData.options.birthDateUpdatesLeft <= 0
             }
             submitError={
               dateError

@@ -344,20 +344,22 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
   // eslint-disable-next-line consistent-return
   const goToNextStep = () => {
-    if (user.loggedIn) {
-      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-        acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![0],
-      });
-      markTutorialStepAsCompleted(payload);
-    }
+    if (user.userTutorialsProgress.remainingAcSteps) {
+      if (user.loggedIn) {
+        const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+          acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
+        });
+        markTutorialStepAsCompleted(payload);
+      }
 
-    dispatch(
-      setUserTutorialsProgress({
-        remainingAcSteps: [
-          ...user.userTutorialsProgress.remainingAcSteps!!,
-        ].slice(1),
-      })
-    );
+      dispatch(
+        setUserTutorialsProgress({
+          remainingAcSteps: [
+            ...user.userTutorialsProgress.remainingAcSteps,
+          ].slice(1),
+        })
+      );
+    }
   };
 
   useEffect(() => {
@@ -519,20 +521,22 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               : t('AcPost.OptionsTab.OptionCard.supportAgainBtn')}
           </SSupportButtonDesktop>
         )}
-        {index === 0 && !isMyBid && (
-          <STutorialTooltipHolder>
-            <TutorialTooltip
-              isTooltipVisible={
-                user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-                newnewapi.AcTutorialStep.AC_BOOST_BID
-              }
-              closeTooltip={goToNextStep}
-              title={t('tutorials.ac.supportPeopleBids.title')}
-              text={t('tutorials.ac.supportPeopleBids.text')}
-              dotPosition={DotPositionEnum.TopRight}
-            />
-          </STutorialTooltipHolder>
-        )}
+        {index === 0 &&
+          !isMyBid &&
+          user?.userTutorialsProgress.remainingAcSteps && (
+            <STutorialTooltipHolder>
+              <TutorialTooltip
+                isTooltipVisible={
+                  user.userTutorialsProgress.remainingAcSteps[0] ===
+                  newnewapi.AcTutorialStep.AC_BOOST_BID
+                }
+                closeTooltip={goToNextStep}
+                title={t('tutorials.ac.supportPeopleBids.title')}
+                text={t('tutorials.ac.supportPeopleBids.text')}
+                dotPosition={DotPositionEnum.TopRight}
+              />
+            </STutorialTooltipHolder>
+          )}
       </SContainer>
       <SSupportBidForm
         // layout
@@ -632,9 +636,23 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
-            <SPaymentFooter variant={3}>
-              {t('AcPost.paymentModalFooter.body', { creator: postCreator })}
-            </SPaymentFooter>
+            <>
+              <SPaymentSign variant={3}>
+                {t('AcPost.paymentModalFooter.body', { creator: postCreator })}
+              </SPaymentSign>
+              <SPaymentTerms variant={3}>
+                *{' '}
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('AcPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
+                {t('AcPost.paymentModalFooter.apply')}
+              </SPaymentTerms>
+            </>
           }
           // payButtonCaptionKey={t('AcPost.paymentModalPayButton')}
         >
@@ -1065,10 +1083,22 @@ const STutorialTooltipHolder = styled.div`
   text-align: left;
 `;
 
-const SPaymentFooter = styled(Text)`
+const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
+`;
+
+const SPaymentTermsLink = styled.a`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SPaymentTerms = styled(Text)`
+  margin-top: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
   white-space: pre;
 `;

@@ -15,6 +15,7 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
+import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { validateText } from '../../../../api/endpoints/infrastructure';
@@ -424,19 +425,21 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   ]);
 
   const goToNextStep = () => {
-    if (user.loggedIn) {
-      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![0],
-      });
-      markTutorialStepAsCompleted(payload);
+    if (user.userTutorialsProgress.remainingMcSteps) {
+      if (user.loggedIn) {
+        const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+          mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
+        });
+        markTutorialStepAsCompleted(payload);
+      }
+      dispatch(
+        setUserTutorialsProgress({
+          remainingMcSteps: [
+            ...user.userTutorialsProgress.remainingMcSteps,
+          ].slice(1),
+        })
+      );
     }
-    dispatch(
-      setUserTutorialsProgress({
-        remainingMcSteps: [
-          ...user.userTutorialsProgress.remainingMcSteps!!,
-        ].slice(1),
-      })
-    );
   };
 
   return (
@@ -543,18 +546,20 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             >
               {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
             </SAddFreeVoteButton>
-            <STutorialTooltipTextAreaHolder>
-              <TutorialTooltip
-                isTooltipVisible={
-                  user!!.userTutorialsProgress.remainingMcSteps!![0] ===
-                  newnewapi.McTutorialStep.MC_TEXT_FIELD
-                }
-                closeTooltip={goToNextStep}
-                title={t('tutorials.mc.createYourBid.title')}
-                text={t('tutorials.mc.createYourBid.text')}
-                dotPosition={DotPositionEnum.BottomRight}
-              />
-            </STutorialTooltipTextAreaHolder>
+            {user.userTutorialsProgress.remainingMcSteps && (
+              <STutorialTooltipTextAreaHolder>
+                <TutorialTooltip
+                  isTooltipVisible={
+                    user.userTutorialsProgress.remainingMcSteps[0] ===
+                    newnewapi.McTutorialStep.MC_TEXT_FIELD
+                  }
+                  closeTooltip={goToNextStep}
+                  title={t('tutorials.mc.createYourBid.title')}
+                  text={t('tutorials.mc.createYourBid.text')}
+                  dotPosition={DotPositionEnum.BottomRight}
+                />
+              </STutorialTooltipTextAreaHolder>
+            )}
           </SActionSection>
         ) : post.isSuggestionsAllowed &&
           !hasVotedOptionId &&
@@ -590,18 +595,20 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             }}
           />
         )}
-        <STutorialTooltipHolder>
-          <TutorialTooltip
-            isTooltipVisible={
-              user!!.userTutorialsProgress.remainingMcSteps!![0] ===
-              newnewapi.McTutorialStep.MC_ALL_OPTIONS
-            }
-            closeTooltip={goToNextStep}
-            title={t('tutorials.mc.peopleBids.title')}
-            text={t('tutorials.mc.peopleBids.text')}
-            dotPosition={DotPositionEnum.BottomLeft}
-          />
-        </STutorialTooltipHolder>
+        {user.userTutorialsProgress.remainingMcSteps && (
+          <STutorialTooltipHolder>
+            <TutorialTooltip
+              isTooltipVisible={
+                user.userTutorialsProgress.remainingMcSteps[0] ===
+                newnewapi.McTutorialStep.MC_ALL_OPTIONS
+              }
+              closeTooltip={goToNextStep}
+              title={t('tutorials.mc.peopleBids.title')}
+              text={t('tutorials.mc.peopleBids.text')}
+              dotPosition={DotPositionEnum.BottomLeft}
+            />
+          </STutorialTooltipHolder>
+        )}
       </STabContainer>
       {/* Suggest new Modal */}
       {isMobile && !hasVotedOptionId ? (
@@ -667,9 +674,23 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
-            <SPaymentFooter variant={3}>
-              {t('McPost.paymentModalFooter.body')}
-            </SPaymentFooter>
+            <>
+              <SPaymentSign variant={3}>
+                {t('McPost.paymentModalFooter.body', { creator: postCreator })}
+              </SPaymentSign>
+              <SPaymentTerms variant={3}>
+                *{' '}
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('McPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
+                {t('McPost.paymentModalFooter.apply')}
+              </SPaymentTerms>
+            </>
           }
           // payButtonCaptionKey={t('McPost.paymentModalPayButton')}
         >
@@ -724,18 +745,20 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           >
             {t('McPost.FloatingActionButton.suggestNewBtn')}
           </SActionButton>
-          <STutorialTooltipHolderMobile>
-            <TutorialTooltip
-              isTooltipVisible={
-                user!!.userTutorialsProgress.remainingMcSteps!![0] ===
-                newnewapi.McTutorialStep.MC_TEXT_FIELD
-              }
-              closeTooltip={goToNextStep}
-              title={t('tutorials.mc.createYourBid.title')}
-              text={t('tutorials.mc.createYourBid.text')}
-              dotPosition={DotPositionEnum.BottomRight}
-            />
-          </STutorialTooltipHolderMobile>
+          {user.userTutorialsProgress.remainingMcSteps && (
+            <STutorialTooltipHolderMobile>
+              <TutorialTooltip
+                isTooltipVisible={
+                  user.userTutorialsProgress.remainingMcSteps[0] ===
+                  newnewapi.McTutorialStep.MC_TEXT_FIELD
+                }
+                closeTooltip={goToNextStep}
+                title={t('tutorials.mc.createYourBid.title')}
+                text={t('tutorials.mc.createYourBid.text')}
+                dotPosition={DotPositionEnum.BottomRight}
+              />
+            </STutorialTooltipHolderMobile>
+          )}
         </>
       ) : null}
     </>
@@ -1062,10 +1085,22 @@ const STutorialTooltipTextAreaHolder = styled.div`
   }
 `;
 
-const SPaymentFooter = styled(Text)`
+const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
+`;
+
+const SPaymentTermsLink = styled.a`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SPaymentTerms = styled(Text)`
+  margin-top: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
   white-space: pre;
 `;

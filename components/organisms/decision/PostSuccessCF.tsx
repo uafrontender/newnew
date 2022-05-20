@@ -233,7 +233,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
               <SMainSectionWrapper>
                 <SCreatorInfoDiv>
                   <SCreator>
-                    <SCreatorImage src={post.creator?.avatarUrl!!} />
+                    <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
                     <SWantsToKnow>
                       {t('CfPostSuccess.wants_to_know', {
                         creator: post.creator?.nickname,

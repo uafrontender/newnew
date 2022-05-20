@@ -35,7 +35,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
 
   const handleShareMenuClick = () => setShareMenuOpen(!shareMenuOpen);
-  const { creatorsImSubscribedTo } = useGetSubscriptions();
+  const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
   const { unreadCount } = useGetChats();
 
   useOnClickEsc(containerRef, handleClose);
@@ -58,7 +58,8 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
         >
           {!shareMenuOpen ? (
             <>
-              {(user.userData?.options?.isOfferingSubscription ||
+              {((user.userData?.options?.isOfferingSubscription &&
+                mySubscribersTotal > 0) ||
                 creatorsImSubscribedTo.length > 0) && (
                 <SButton
                   onClick={() =>

@@ -377,9 +377,12 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           setWinningOptionId(res.data.auction?.winningOptionId);
           handleChangeTab('winner');
         }
-        setTotalAmount(res.data.auction!!.totalAmount?.usdCents as number);
-        setNumberOfOptions(res.data.auction!!.optionCount as number);
-        handleUpdatePostStatus(res.data.auction!!.status!!);
+        if (res.data.auction) {
+          setTotalAmount(res.data.auction.totalAmount?.usdCents as number);
+          setNumberOfOptions(res.data.auction.optionCount as number);
+          if (res.data.auction.status)
+            handleUpdatePostStatus(res.data.auction.status);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -491,8 +494,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         if (!decoded) return;
         const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
         if (decodedParsed.postUuid === post.postUuid) {
-          setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
-          setNumberOfOptions(decoded.post?.auction?.optionCount!!);
+          setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents ?? 0);
+          setNumberOfOptions(decoded.post?.auction?.optionCount ?? 0);
 
           if (!responseFreshlyUploaded && decoded.post?.auction?.response) {
             setResponseFreshlyUploaded(decoded.post.auction.response);
@@ -505,13 +508,13 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
         if (!decoded) return;
-        if (decoded.postUuid === post.postUuid) {
-          handleUpdatePostStatus(decoded.auction!!);
+        if (decoded.postUuid === post.postUuid && decoded.auction) {
+          handleUpdatePostStatus(decoded.auction);
 
           if (
             !responseFreshlyUploaded &&
             postStatus === 'processing_response' &&
-            switchPostStatus('ac', decoded.auction!!) === 'succeeded'
+            switchPostStatus('ac', decoded.auction) === 'succeeded'
           ) {
             const fetchPostPayload = new newnewapi.GetPostRequest({
               postUuid: post.postUuid,
@@ -564,27 +567,30 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     }, [loadingOptionsError]);
 
     const goToNextStep = () => {
-      if (user.loggedIn) {
-        const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-          acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![0],
-        });
-        markTutorialStepAsCompleted(payload);
+      if (user.userTutorialsProgress.remainingAcSteps) {
+        if (user.loggedIn) {
+          const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+            acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
+          });
+          markTutorialStepAsCompleted(payload);
+        }
+        dispatch(
+          setUserTutorialsProgress({
+            remainingAcSteps: [
+              ...user.userTutorialsProgress.remainingAcSteps,
+            ].slice(1),
+          })
+        );
       }
-      dispatch(
-        setUserTutorialsProgress({
-          remainingAcSteps: [
-            ...user.userTutorialsProgress.remainingAcSteps!!,
-          ].slice(1),
-        })
-      );
     };
 
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     useEffect(() => {
       if (
         options.length > 0 &&
-        user!!.userTutorialsProgressSynced &&
-        user!!.userTutorialsProgress.remainingAcSteps!![0] ===
+        user.userTutorialsProgressSynced &&
+        user.userTutorialsProgress.remainingAcSteps &&
+        user.userTutorialsProgress.remainingAcSteps[0] ===
           newnewapi.AcTutorialStep.AC_HERO
       ) {
         setIsPopupVisible(true);
