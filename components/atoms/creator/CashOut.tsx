@@ -1,4 +1,5 @@
 /* eslint-disable no-unsafe-optional-chaining */
+/* eslint-disable react/jsx-no-target-blank */
 import React from 'react';
 import { useTranslation } from 'next-i18next';
 import { google, newnewapi } from 'newnew-api';
@@ -54,11 +55,7 @@ const CashOut: React.FC<ICashOut> = ({
           )}
         </SDescriptionWrapper>
       </SCashOutTopBlock>
-      <a
-        href='https://creatorpayouts.newnew.co/'
-        target='_blank'
-        rel='noreferrer'
-      >
+      <a href='https://creatorpayouts.newnew.co/' target='_blank'>
         <SButton view='primaryGrad'>
           {t('dashboard.earnings.cashOut.submit')}
         </SButton>
