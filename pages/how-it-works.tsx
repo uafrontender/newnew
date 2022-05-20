@@ -62,7 +62,11 @@ export const HowItWorks = () => {
         <Content>
           <Section>
             <SectionImage
-              src={assets.creation.AcAnimated}
+              src={
+                theme.name === 'light'
+                  ? assets.creation.lightAcAnimated
+                  : assets.creation.darkAcAnimated
+              }
               alt='events'
               // Quick fix for animated image alignment
               style={
@@ -82,7 +86,11 @@ export const HowItWorks = () => {
 
           <Section>
             <SectionImage
-              src={assets.creation.McAnimated}
+              src={
+                theme.name === 'light'
+                  ? assets.creation.lightMcAnimated
+                  : assets.creation.darkMcAnimated
+              }
               alt='superpolls'
               // Quick fix for animated image alignment
               style={
@@ -102,7 +110,11 @@ export const HowItWorks = () => {
 
           <Section>
             <SectionImage
-              src={assets.creation.CfAnimated}
+              src={
+                theme.name === 'light'
+                  ? assets.creation.lightCfAnimated
+                  : assets.creation.darkCfAnimated
+              }
               alt='goals'
               // Quick fix for animated image alignment
               style={

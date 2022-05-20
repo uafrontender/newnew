@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
@@ -10,10 +10,16 @@ import preventParentClick from '../../../utils/preventParentClick';
 import Button from '../../atoms/Button';
 import assets from '../../../constants/assets';
 
-const IMAGES: any = {
-  AC: assets.creation.AcAnimated,
-  CF: assets.creation.CfAnimated,
-  MC: assets.creation.McAnimated,
+const DARK_IMAGES: any = {
+  AC: assets.creation.darkAcAnimated,
+  CF: assets.creation.darkCfAnimated,
+  MC: assets.creation.darkMcAnimated,
+};
+
+const LIGHT_IMAGES: any = {
+  AC: assets.creation.lightAcAnimated,
+  CF: assets.creation.lightCfAnimated,
+  MC: assets.creation.lightMcAnimated,
 };
 
 interface IHeroPopup {
@@ -28,6 +34,7 @@ const HeroPopup: React.FC<IHeroPopup> = ({
   closeModal,
 }) => {
   const { t } = useTranslation('creation');
+  const theme = useTheme();
 
   return (
     <Modal show={isPopupVisible} onClose={closeModal} additionalZ={99999}>
@@ -35,7 +42,11 @@ const HeroPopup: React.FC<IHeroPopup> = ({
         <SModal onClick={preventParentClick()}>
           <SImageWrapper>
             <img
-              src={IMAGES[postType]}
+              src={
+                theme.name === 'light'
+                  ? LIGHT_IMAGES[postType]
+                  : DARK_IMAGES[postType]
+              }
               alt='Post type'
               width={150}
               height={130}

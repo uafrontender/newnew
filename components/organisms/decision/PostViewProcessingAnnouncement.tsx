@@ -1,7 +1,7 @@
 /* eslint-disable no-lonely-if */
 import React, { useContext, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
@@ -20,10 +20,18 @@ import Text from '../../atoms/Text';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 
-const IMAGES = {
-  ac: assets.creation.McAnimated,
+const DARK_IMAGES = {
+  ac: assets.creation.darkMcAnimated,
+  // TODO: light votes version? why not animated?
   mc: assets.decision.votes,
-  cf: assets.creation.CfAnimated,
+  cf: assets.creation.darkCfAnimated,
+};
+
+const LIGHT_IMAGES = {
+  ac: assets.creation.lightMcAnimated,
+  // TODO: light votes version? why not animated?
+  mc: assets.decision.votes,
+  cf: assets.creation.lightCfAnimated,
 };
 
 interface IPostViewProcessingAnnouncement {
@@ -52,6 +60,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
     handleReportOpen,
   }) => {
     const { t } = useTranslation('decision');
+    const theme = useTheme();
     const { user } = useAppSelector((state) => state);
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -152,8 +161,15 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
           />
         )}
         <SActivitesContainer>
-          {/* @ts-ignore */}
-          <SDecisionImage src={IMAGES[postType]} />
+          <SDecisionImage
+            src={
+              theme.name === 'light'
+                ? /* @ts-ignore */
+                  LIGHT_IMAGES[postType]
+                : /* @ts-ignore */
+                  DARK_IMAGES[postType]
+            }
+          />
           <SText variant={2} weight={600}>
             {t(`PostViewProcessingAnnouncement.stayTuned.${postType}`)}
           </SText>
