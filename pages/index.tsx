@@ -7,6 +7,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useTheme } from 'styled-components';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
@@ -50,6 +51,7 @@ interface IHome {
 // No sense to memorize
 const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   const { t } = useTranslation('home');
+  const theme = useTheme();
   const user = useAppSelector((state) => state.user);
 
   // Posts
@@ -366,7 +368,11 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           tutorialCard={
             !user.loggedIn ? (
               <TutorialCard
-                image={assets.creation.AcAnimated}
+                image={
+                  theme.name === 'light'
+                    ? assets.creation.lightAcAnimated
+                    : assets.creation.darkAcAnimated
+                }
                 title={t('ac-block-tutorial-card.title')}
                 caption={t('ac-block-tutorial-card.caption')}
                 imageStyle={{
@@ -389,7 +395,11 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           tutorialCard={
             !user.loggedIn ? (
               <TutorialCard
-                image={assets.creation.McAnimated}
+                image={
+                  theme.name === 'light'
+                    ? assets.creation.lightMcAnimated
+                    : assets.creation.darkMcAnimated
+                }
                 title={t('mc-block-tutorial-card.title')}
                 caption={t('mc-block-tutorial-card.caption')}
               />
@@ -407,7 +417,11 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           tutorialCard={
             !user.loggedIn ? (
               <TutorialCard
-                image={assets.creation.CfAnimated}
+                image={
+                  theme.name === 'light'
+                    ? assets.creation.lightCfAnimated
+                    : assets.creation.darkCfAnimated
+                }
                 title={t('cf-block-tutorial-card.title')}
                 caption={t('cf-block-tutorial-card.caption')}
                 imageStyle={{

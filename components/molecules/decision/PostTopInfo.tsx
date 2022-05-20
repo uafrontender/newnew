@@ -33,10 +33,16 @@ import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
 
-const IMAGES = {
-  ac: assets.creation.AcAnimated,
-  cf: assets.creation.CfAnimated,
-  mc: assets.creation.McAnimated,
+const DARK_IMAGES = {
+  ac: assets.creation.darkAcAnimated,
+  cf: assets.creation.darkCfAnimated,
+  mc: assets.creation.darkMcAnimated,
+};
+
+const LIGHT_IMAGES = {
+  ac: assets.creation.lightAcAnimated,
+  cf: assets.creation.lightCfAnimated,
+  mc: assets.creation.lightMcAnimated,
 };
 
 interface IPostTopInfo {
@@ -301,7 +307,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           buttonCaption={t('PostFailedBox.ctaButton', {
             postTypeMultiple: t(`postType.multiple.${postType}`),
           })}
-          imageSrc={postType ? IMAGES[postType] : undefined}
+          imageSrc={
+            postType
+              ? theme.name === 'light'
+                ? LIGHT_IMAGES[postType]
+                : DARK_IMAGES[postType]
+              : undefined
+          }
           handleButtonClick={() => {
             document.getElementById('post-modal-container')?.scrollTo({
               top: document.getElementById('recommendations-section-heading')
