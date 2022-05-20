@@ -372,7 +372,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                     )}...`
                   : postParsed.creator?.nickname
                 : postParsed.creator?.nickname &&
-                  postParsed.creator?.nickname?.length > (isMobile ? 18 : 11)
+                  postParsed.creator?.nickname?.length > (isMobile ? 18 : 9)
                 ? `${postParsed.creator?.nickname?.substring(
                     0,
                     isMobile ? 15 : 9
@@ -846,6 +846,8 @@ const SUsername = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
   margin-left: 6px;
+
+  white-space: nowrap;
 `;
 
 interface ISBottomEnd {

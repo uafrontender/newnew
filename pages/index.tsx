@@ -345,15 +345,17 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           handlePostClicked={handleOpenPostModal}
         />
       )}
-      {user.loggedIn && !collectionFYError && (
-        <CardsSection
-          title={t('for-you-block-title')}
-          category='for-you'
-          collection={collectionFY}
-          loading={collectionFYInitialLoading}
-          handlePostClicked={handleOpenPostModal}
-        />
-      )}
+      {user.loggedIn &&
+        !collectionFYError &&
+        (collectionFYInitialLoading || collectionFY.length > 0) && (
+          <CardsSection
+            title={t('for-you-block-title')}
+            category='for-you'
+            collection={collectionFY}
+            loading={collectionFYInitialLoading}
+            handlePostClicked={handleOpenPostModal}
+          />
+        )}
       {!collectionACError && (
         <CardsSection
           title={t('ac-block-title')}
