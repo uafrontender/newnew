@@ -3,6 +3,7 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  useRef,
 } from 'react';
 // import Image from 'next/image';
 import styled, { useTheme } from 'styled-components';
@@ -22,6 +23,9 @@ import { SCROLL_EXPLORE } from '../../../constants/timings';
 
 import assets from '../../../constants/assets';
 
+const GRAPHICS_VERSION_STORAGE_KEY = 'graphics-version';
+type GraphicsVersion = 1 | 2 | 3 | 4 | 5;
+
 export const HeroSection = React.memo(() => {
   const router = useRouter();
   const theme = useTheme();
@@ -31,6 +35,17 @@ export const HeroSection = React.memo(() => {
   const [animateTitle, setAnimateTitle] = useState(false);
   const [animateSubTitle, setAnimateSubTitle] = useState(false);
   const [animateButton, setAnimateButton] = useState(false);
+
+  const graphicsVersion = useRef<GraphicsVersion>(
+    parseInt(
+      localStorage.getItem(GRAPHICS_VERSION_STORAGE_KEY) || '1'
+    ) as GraphicsVersion
+  );
+  useEffect(() => {
+    const nextVersion =
+      graphicsVersion.current >= 5 ? 1 : graphicsVersion.current + 1;
+    localStorage.setItem(GRAPHICS_VERSION_STORAGE_KEY, nextVersion.toString());
+  }, []);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -148,15 +163,19 @@ export const HeroSection = React.memo(() => {
             playsInline
             poster={
               theme.name === 'light'
-                ? assets.home.lightMobileLandingStatic
-                : assets.home.darkMobileLandingStatic
+                ? assets.landing[graphicsVersion.current]
+                    .lightMobileLandingStatic
+                : assets.landing[graphicsVersion.current]
+                    .darkMobileLandingStatic
             }
           >
             <source
               src={
                 theme.name === 'light'
-                  ? assets.home.lightMobileLandingAnimated
-                  : assets.home.darkMobileLandingAnimated
+                  ? assets.landing[graphicsVersion.current]
+                      .lightMobileLandingAnimated
+                  : assets.landing[graphicsVersion.current]
+                      .darkMobileLandingAnimated
               }
               type='video/mp4'
             />
@@ -170,15 +189,19 @@ export const HeroSection = React.memo(() => {
             playsInline
             poster={
               theme.name === 'light'
-                ? assets.home.lightLandingStatic
-                : assets.home.darkLandingStatic
+                ? assets.landing[graphicsVersion.current]
+                    .lightDesktopLandingStatic
+                : assets.landing[graphicsVersion.current]
+                    .darkDesktopLandingStatic
             }
           >
             <source
               src={
                 theme.name === 'light'
-                  ? assets.home.lightLandingAnimated
-                  : assets.home.darkLandingAnimated
+                  ? assets.landing[graphicsVersion.current]
+                      .lightDesktopLandingAnimated
+                  : assets.landing[graphicsVersion.current]
+                      .darkDesktopLandingAnimated
               }
               type='video/mp4'
             />
