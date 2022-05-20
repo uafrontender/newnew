@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState } from 'react';
 import Link from 'next/link';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
@@ -10,16 +10,28 @@ import Caption from '../../atoms/Caption';
 import { useAppSelector } from '../../../redux-store/store';
 import assets from '../../../constants/assets';
 
-const IMAGES: any = {
-  auction: assets.creation.AcAnimated,
-  crowdfunding: assets.creation.CfAnimated,
-  'multiple-choice': assets.creation.McAnimated,
+const DARK_IMAGES_ANIMATED: any = {
+  auction: assets.creation.darkAcAnimated,
+  crowdfunding: assets.creation.darkCfAnimated,
+  'multiple-choice': assets.creation.darkMcAnimated,
 };
 
-const IMAGES_STATIC: any = {
-  auction: assets.creation.AcStatic,
-  crowdfunding: assets.creation.CfStatic,
-  'multiple-choice': assets.creation.McStatic,
+const DARK_IMAGES_STATIC: any = {
+  auction: assets.creation.darkAcStatic,
+  crowdfunding: assets.creation.darkCfStatic,
+  'multiple-choice': assets.creation.darkMcStatic,
+};
+
+const LIGHT_IMAGES_ANIMATED: any = {
+  auction: assets.creation.lightAcAnimated,
+  crowdfunding: assets.creation.lightCfAnimated,
+  'multiple-choice': assets.creation.lightMcAnimated,
+};
+
+const LIGHT_IMAGES_STATIC: any = {
+  auction: assets.creation.lightAcStatic,
+  crowdfunding: assets.creation.lightCfStatic,
+  'multiple-choice': assets.creation.lightMcStatic,
 };
 
 interface IListItem {
@@ -28,6 +40,7 @@ interface IListItem {
 
 const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
   const { t } = useTranslation('creation');
+  const theme = useTheme();
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -65,11 +78,13 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
           <SImageWrapper>
             <img
               src={
-                isMobile || isTablet
-                  ? IMAGES[itemKey]
-                  : mouseEntered
-                  ? IMAGES[itemKey]
-                  : IMAGES_STATIC[itemKey]
+                isMobile || isTablet || mouseEntered
+                  ? theme.name === 'light'
+                    ? LIGHT_IMAGES_ANIMATED[itemKey]
+                    : DARK_IMAGES_ANIMATED[itemKey]
+                  : theme.name === 'light'
+                  ? LIGHT_IMAGES_STATIC[itemKey]
+                  : DARK_IMAGES_STATIC[itemKey]
               }
               alt='Post type'
               width={isMobile ? 80 : 120}
