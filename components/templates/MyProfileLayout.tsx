@@ -574,7 +574,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               user?.userData?.coverUrl ?? '../public/images/mock/profile-bg.png'
             }
           >
-            <Button
+            <SButton
               view='transparent'
               withShrink
               withDim
@@ -587,8 +587,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                 height={isMobileOrTablet ? '16px' : '24px'}
               />
               {isMobileOrTablet ? null : t('ProfileLayout.headerButtons.edit')}
-            </Button>
-            <Button
+            </SButton>
+            <SButton
               view='transparent'
               withDim
               withShrink
@@ -603,7 +603,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               {isMobileOrTablet
                 ? null
                 : t('ProfileLayout.headerButtons.settings')}
-            </Button>
+            </SButton>
           </ProfileBackground>
           <SBackButton
             onClick={() => {
@@ -760,6 +760,14 @@ const SGeneral = styled(General)`
       }
     }
   }
+`;
+
+// TODO: standardize.
+const SButton = styled(Button)`
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? 'rgba(255, 255, 255, 0.06)'
+      : 'rgba(11, 10, 19, 0.2)'};
 `;
 
 const SBackButton = styled(BackButton)`
