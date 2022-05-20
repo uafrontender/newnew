@@ -282,7 +282,9 @@
       "subtitle": "Your bid"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} chooses your bid."
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} chooses your bid.",
+      "terms": "Terms",
+      "apply": "apply"
     },
     "paymentModalPayButton": "Bid",
     "PostTopInfo": {
@@ -351,7 +353,9 @@
       "subtitle": "Option you chose"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if the option you chose gets the most votes."
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if the option you chose gets the most votes.",
+      "terms": "Terms",
+      "apply": "apply"
     },
     "paymentModalPayButton": "Vote for",
     "OptionsTab": {
@@ -461,7 +465,9 @@
       "title": "{{ creator }}'s Goal"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} reaches their goal."
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} reaches their goal.",
+      "terms": "Terms",
+      "apply": "apply"
     },
     "paymentModalPayButton": "Back it for",
     "FloatingActionButton": {

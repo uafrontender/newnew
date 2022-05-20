@@ -21,10 +21,10 @@ export const Subscriptions = () => {
   useEffect(() => {
     if (user.creatorData?.isLoaded) {
       if (!user.creatorData?.options.isCreatorConnectedToStripe) {
-        router.push('/creator/get-paid');
+        router.replace('/creator/get-paid');
       } else {
         if (!user.userData?.options?.isOfferingSubscription)
-          router.push('/creator/subscribers/edit-subscription-rate');
+          router.replace('/creator/subscribers/edit-subscription-rate');
       }
     }
   }, [

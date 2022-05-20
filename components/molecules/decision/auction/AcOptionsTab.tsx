@@ -16,6 +16,7 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { debounce } from 'lodash';
+import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
@@ -623,9 +624,23 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           // handlePayWithWallet={handleSubmitNewOptionWallet}
           bottomCaption={
-            <SPaymentFooter variant={3}>
-              {t('AcPost.paymentModalFooter.body', { creator: postCreator })}
-            </SPaymentFooter>
+            <>
+              <SPaymentSign variant={3}>
+                {t('AcPost.paymentModalFooter.body', { creator: postCreator })}
+              </SPaymentSign>
+              <SPaymentTerms variant={3}>
+                *{' '}
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('AcPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
+                {t('AcPost.paymentModalFooter.apply')}
+              </SPaymentTerms>
+            </>
           }
           // payButtonCaptionKey={t('AcPost.paymentModalPayButton')}
         >
@@ -973,10 +988,22 @@ const STutorialTooltipTextAreaHolder = styled.div`
   }
 `;
 
-const SPaymentFooter = styled(Text)`
+const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
+`;
+
+const SPaymentTermsLink = styled.a`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SPaymentTerms = styled(Text)`
+  margin-top: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
   white-space: pre;
 `;
