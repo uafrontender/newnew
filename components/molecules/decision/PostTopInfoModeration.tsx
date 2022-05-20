@@ -29,10 +29,16 @@ import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import assets from '../../../constants/assets';
 
-const IMAGES = {
-  ac: assets.creation.AcAnimated,
-  cf: assets.creation.CfAnimated,
-  mc: assets.creation.McAnimated,
+const DARK_IMAGES = {
+  ac: assets.creation.darkAcAnimated,
+  cf: assets.creation.darkCfAnimated,
+  mc: assets.creation.darkMcAnimated,
+};
+
+const LIGHT_IMAGES = {
+  ac: assets.creation.lightAcAnimated,
+  cf: assets.creation.lightCfAnimated,
+  mc: assets.creation.lightMcAnimated,
 };
 
 interface IPostTopInfoModeration {
@@ -258,7 +264,13 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
               postType: t(`postType.${postType}`),
             })}
             body={t(`PostFailedBoxModeration.reason.${failureReason}`)}
-            imageSrc={postType ? IMAGES[postType] : undefined}
+            imageSrc={
+              postType
+                ? theme.name === 'light'
+                  ? LIGHT_IMAGES[postType]
+                  : DARK_IMAGES[postType]
+                : undefined
+            }
             buttonCaption={t('PostFailedBoxModeration.ctaButton', {
               postType: t(`postType.${postType}`),
             })}

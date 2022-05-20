@@ -263,13 +263,6 @@ const PRE_FETCH_LINKS_COMMON = (
       as='image'
       media='(min-width: 760px)'
     />
-    {/* Creation screen */}
-    <link rel='prefetch' href={assets.creation.AcAnimated} as='image' />
-    <link rel='prefetch' href={assets.creation.McAnimated} as='image' />
-    <link rel='prefetch' href={assets.creation.CfAnimated} as='image' />
-    <link rel='prefetch' href={assets.creation.AcStatic} as='image' />
-    <link rel='prefetch' href={assets.creation.McStatic} as='image' />
-    <link rel='prefetch' href={assets.creation.CfStatic} as='image' />
   </>
 );
 
@@ -320,6 +313,13 @@ const PRE_FETCH_LINKS_DARK = (
       as='image'
     />
     <link rel='prefetch' href={assets.info.darkQuestionMarkStatic} as='image' />
+    {/* Creation screen */}
+    <link rel='prefetch' href={assets.creation.darkAcAnimated} as='image' />
+    <link rel='prefetch' href={assets.creation.darkMcAnimated} as='image' />
+    <link rel='prefetch' href={assets.creation.darkCfAnimated} as='image' />
+    <link rel='prefetch' href={assets.creation.darkAcStatic} as='image' />
+    <link rel='prefetch' href={assets.creation.darkMcStatic} as='image' />
+    <link rel='prefetch' href={assets.creation.darkCfStatic} as='image' />
   </>
 );
 
@@ -374,5 +374,12 @@ const PRE_FETCH_LINKS_LIGHT = (
       href={assets.info.lightQuestionMarkStatic}
       as='image'
     />
+    {/* Creation screen */}
+    <link rel='prefetch' href={assets.creation.lightAcAnimated} as='image' />
+    <link rel='prefetch' href={assets.creation.lightMcAnimated} as='image' />
+    <link rel='prefetch' href={assets.creation.lightCfAnimated} as='image' />
+    <link rel='prefetch' href={assets.creation.lightAcStatic} as='image' />
+    <link rel='prefetch' href={assets.creation.lightMcStatic} as='image' />
+    <link rel='prefetch' href={assets.creation.lightCfStatic} as='image' />
   </>
 );

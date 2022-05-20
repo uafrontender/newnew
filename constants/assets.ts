@@ -3,12 +3,18 @@ const APP_ASSETS_ORIGIN = `https://${APP_ASSETS_DOMAIN}`;
 
 const assets = {
   creation: {
-    AcStatic: `${APP_ASSETS_ORIGIN}/creation/AC-static.png`,
-    AcAnimated: `${APP_ASSETS_ORIGIN}/creation/AC.webp`,
-    CfStatic: `${APP_ASSETS_ORIGIN}/creation/CF-static.png`,
-    CfAnimated: `${APP_ASSETS_ORIGIN}/creation/CF.webp`,
-    McStatic: `${APP_ASSETS_ORIGIN}/creation/MC-static.png`,
-    McAnimated: `${APP_ASSETS_ORIGIN}/creation/MC.webp`,
+    darkAcStatic: `${APP_ASSETS_ORIGIN}/creation/AC-static.png`,
+    darkAcAnimated: `${APP_ASSETS_ORIGIN}/creation/AC.webp`,
+    lightAcStatic: `${APP_ASSETS_ORIGIN}/creation/AC-static-light.png`,
+    lightAcAnimated: `${APP_ASSETS_ORIGIN}/creation/AC-light.webp`,
+    darkCfStatic: `${APP_ASSETS_ORIGIN}/creation/CF-static.png`,
+    darkCfAnimated: `${APP_ASSETS_ORIGIN}/creation/CF.webp`,
+    lightCfStatic: `${APP_ASSETS_ORIGIN}/creation/CF-static-light.png`,
+    lightCfAnimated: `${APP_ASSETS_ORIGIN}/creation/CF-light.webp`,
+    darkMcStatic: `${APP_ASSETS_ORIGIN}/creation/MC-static.png`,
+    darkMcAnimated: `${APP_ASSETS_ORIGIN}/creation/MC.webp`,
+    lightMcStatic: `${APP_ASSETS_ORIGIN}/creation/MC-static-light.png`,
+    lightMcAnimated: `${APP_ASSETS_ORIGIN}/creation/MC-light.webp`,
   },
   decision: {
     gold: `${APP_ASSETS_ORIGIN}/decision/gold.png`,

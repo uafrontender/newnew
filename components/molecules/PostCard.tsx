@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
 import styled, { css, useTheme } from 'styled-components';
+import { uuid } from 'uuidv4';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
@@ -131,6 +132,11 @@ export const PostCard: React.FC<ICard> = React.memo(
       return 0;
     }, [postParsed.expiresAt?.seconds]);
 
+    const [thumbnailUrl, setThumbnailUrl] = useState(
+      postParsed.announcement?.thumbnailUrl
+    );
+    const [thumbnailKey, setThumbnailKey] = useState(uuid());
+
     const handleUserClick = (username: string) => {
       router.push(`/${username}`);
     };
@@ -218,13 +224,30 @@ export const PostCard: React.FC<ICard> = React.memo(
         }
       };
 
+      const handlerSocketThumbnailUpdated = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostThumbnailUpdated.decode(arr);
+
+        if (!decoded || !decoded.thumbnailUrl) return;
+        setThumbnailUrl(decoded.thumbnailUrl);
+        setThumbnailKey(uuid());
+      };
+
       if (socketConnection) {
         socketConnection.on('PostUpdated', handlerSocketPostUpdated);
+        socketConnection.on(
+          'PostThumbnailUpdated',
+          handlerSocketThumbnailUpdated
+        );
       }
 
       return () => {
         if (socketConnection && socketConnection.connected) {
           socketConnection.off('PostUpdated', handlerSocketPostUpdated);
+          socketConnection.off(
+            'PostThumbnailUpdated',
+            handlerSocketThumbnailUpdated
+          );
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -246,6 +269,7 @@ export const PostCard: React.FC<ICard> = React.memo(
             <SImageHolder index={index}>
               {ioEntry?.isIntersecting ? (
                 <video
+                  key={thumbnailKey}
                   ref={(el) => {
                     videoRef.current = el!!;
                   }}
@@ -254,10 +278,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   playsInline
                   poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
                 >
-                  <source
-                    src={postParsed.announcement?.thumbnailUrl ?? ''}
-                    type='video/mp4'
-                  />
+                  <source src={thumbnailUrl ?? ''} type='video/mp4' />
                 </video>
               ) : (
                 <img
@@ -311,6 +332,7 @@ export const PostCard: React.FC<ICard> = React.memo(
           <SImageHolderOutside id='animatedPart'>
             {ioEntry?.isIntersecting ? (
               <video
+                key={thumbnailKey}
                 ref={(el) => {
                   videoRef.current = el!!;
                 }}
@@ -319,10 +341,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 playsInline
                 poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
               >
-                <source
-                  src={postParsed.announcement?.thumbnailUrl ?? ''}
-                  type='video/mp4'
-                />
+                <source src={thumbnailUrl ?? ''} type='video/mp4' />
               </video>
             ) : (
               <img

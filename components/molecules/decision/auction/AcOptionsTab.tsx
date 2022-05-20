@@ -648,7 +648,11 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             <SPaymentModalHeading>
               <SPaymentModalHeadingPostSymbol>
                 <SPaymentModalHeadingPostSymbolImg
-                  src={assets.creation.AcStatic}
+                  src={
+                    theme.name === 'light'
+                      ? assets.creation.lightAcStatic
+                      : assets.creation.darkAcStatic
+                  }
                 />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>

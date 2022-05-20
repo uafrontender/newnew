@@ -97,10 +97,16 @@ const PostSuccessAnimationBackground = dynamic(
 );
 const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 
-const IMAGES = {
-  ac: assets.creation.AcAnimated,
-  cf: assets.creation.CfAnimated,
-  mc: assets.creation.McAnimated,
+const DARK_IMAGES = {
+  ac: assets.creation.darkAcAnimated,
+  cf: assets.creation.darkCfAnimated,
+  mc: assets.creation.darkMcAnimated,
+};
+
+const LIGHT_IMAGES = {
+  ac: assets.creation.lightAcAnimated,
+  cf: assets.creation.lightCfAnimated,
+  mc: assets.creation.lightMcAnimated,
 };
 
 interface IPostModal {
@@ -989,7 +995,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                         postType: t(`postType.${typeOfPost}`),
                       })
                 }
-                imageSrc={IMAGES[typeOfPost]}
+                imageSrc={
+                  theme.name === 'light'
+                    ? LIGHT_IMAGES[typeOfPost]
+                    : DARK_IMAGES[typeOfPost]
+                }
                 buttonCaption={t('PostDeletedByMe.ctaButton')}
                 handleButtonClick={() => {
                   router.push('/creation');
@@ -1014,7 +1024,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 buttonCaption={t('PostDeleted.ctaButton', {
                   postTypeMultiple: t(`postType.multiple.${typeOfPost}`),
                 })}
-                imageSrc={IMAGES[typeOfPost]}
+                imageSrc={
+                  theme.name === 'light'
+                    ? LIGHT_IMAGES[typeOfPost]
+                    : DARK_IMAGES[typeOfPost]
+                }
                 style={{
                   marginBottom: '24px',
                 }}
