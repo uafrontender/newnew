@@ -922,15 +922,19 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     // However, it re renders after every letter typed anyway
     // TODO: optimize this view
     useEffect(() => {
-      const updateStartDate = setInterval(() => {
-        const newStartAt = {
-          type: post.startsAt.type,
-          date: moment().format(),
-          time: moment().format('hh:mm'),
-          'hours-format': post.startsAt['hours-format'],
-        };
-        dispatch(setCreationStartDate(newStartAt));
-      }, 1000);
+      let updateStartDate: any;
+
+      if (post.startsAt.type === 'right-away') {
+        updateStartDate = setInterval(() => {
+          const newStartAt = {
+            type: post.startsAt.type,
+            date: moment().format(),
+            time: moment().format('hh:mm'),
+            'hours-format': post.startsAt['hours-format'],
+          };
+          dispatch(setCreationStartDate(newStartAt));
+        }, 1000);
+      }
 
       return () => {
         clearInterval(updateStartDate);
