@@ -36,12 +36,14 @@ const EnableSubModal: React.FC<IEnableSubModal> = ({
             <CloseModalButton handleClick={closeModal} />
           </SModalHeader>
           <SModalContent>
-            <SProductInfo>{`${t('enableSubModal.confirmationTextFirstPart')}
+            {selectedProduct?.monthlyRate?.usdCents && (
+              <SProductInfo>{`${t('enableSubModal.confirmationTextFirstPart')}
             $${formatNumber(
-              selectedProduct?.monthlyRate?.usdCents!! / 100 ?? 0,
+              selectedProduct.monthlyRate.usdCents / 100 ?? 0,
               true
             )}
             ${t('enableSubModal.confirmationTextSecondPart')}`}</SProductInfo>
+            )}
             <SNote>{t('enableSubModal.note')}</SNote>
           </SModalContent>
           <SConfirmButton view='primaryGrad' onClick={handleSubmit}>

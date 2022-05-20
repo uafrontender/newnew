@@ -240,7 +240,7 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
               <SMainSectionWrapper>
                 <SCreatorInfoDiv>
                   <SCreator>
-                    <SCreatorImage src={post.creator?.avatarUrl!!} />
+                    <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
                     <SWantsToKnow>
                       {t('CfPostAwaiting.wants_to_know', {
                         creator: post.creator?.nickname,

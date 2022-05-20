@@ -20,7 +20,6 @@ export const Chat = () => {
   const { t } = useTranslation('chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
     'mobile',
@@ -53,16 +52,16 @@ export const Chat = () => {
         setIsLoaded(true);
         throw new Error(res.error?.message ?? 'Request failed');
       }
-      if (res.data && res.data.rooms.length > 0) {
+      if (res.data.rooms.length > 0) {
         const chatRoom = res.data.rooms[0];
         let route = '';
 
         if (chatRoom?.visavis?.username) {
           chatRoom.kind === 1
-            ? (route = chatRoom?.visavis?.username)
-            : (route = `${chatRoom?.visavis?.username}-announcement`);
+            ? (route = chatRoom.visavis.username)
+            : (route = `${chatRoom.visavis.username}-announcement`);
         } else {
-          chatRoom!!.kind === 4 && chatRoom!!.myRole === 2
+          chatRoom.kind === 4 && chatRoom.myRole === 2
             ? (route = `${user.userData?.username}-announcement`)
             : '';
         }
@@ -77,7 +76,7 @@ export const Chat = () => {
   };
 
   if (!user.loggedIn) {
-    router.push('/sign-up');
+    router.push('/sign-up?to=log-in');
     return null;
   }
 

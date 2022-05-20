@@ -387,8 +387,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         throw new Error(res.error?.message ?? 'Request failed');
       }
 
-      const optionFromResponse = (res.data
-        .option as newnewapi.MultipleChoice.Option)!!;
+      const optionFromResponse = res.data
+        .option as newnewapi.MultipleChoice.Option;
       optionFromResponse.isSupportedByMe = true;
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
       setLoadingModalOpen(false);
@@ -407,19 +407,21 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     handleResetFreeVote,
   ]);
   const goToNextStep = () => {
-    if (user.loggedIn) {
-      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![0],
-      });
-      markTutorialStepAsCompleted(payload);
+    if (user.userTutorialsProgress.remainingMcSteps) {
+      if (user.loggedIn) {
+        const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+          mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
+        });
+        markTutorialStepAsCompleted(payload);
+      }
+      dispatch(
+        setUserTutorialsProgress({
+          remainingMcSteps: [
+            ...user.userTutorialsProgress.remainingMcSteps,
+          ].slice(1),
+        })
+      );
     }
-    dispatch(
-      setUserTutorialsProgress({
-        remainingMcSteps: [
-          ...user.userTutorialsProgress.remainingMcSteps!!,
-        ].slice(1),
-      })
-    );
   };
 
   return (
@@ -542,11 +544,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                     : t('McPost.OptionsTab.OptionCard.raiseBidBtn')}
                 </div>
               </SSupportButton>
-              {index === 0 && (
+              {index === 0 && user?.userTutorialsProgress.remainingMcSteps && (
                 <STutorialTooltipHolder>
                   <TutorialTooltip
                     isTooltipVisible={
-                      user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+                      user.userTutorialsProgress.remainingMcSteps[0] ===
                       newnewapi.McTutorialStep.MC_VOTE
                     }
                     closeTooltip={goToNextStep}
@@ -584,11 +586,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   ? t('McPost.OptionsTab.OptionCard.supportBtn')
                   : t('McPost.OptionsTab.OptionCard.supportAgainBtn')}
               </SSupportButtonDesktop>
-              {index === 0 && (
+              {index === 0 && user.userTutorialsProgress.remainingMcSteps && (
                 <STutorialTooltipHolder>
                   <TutorialTooltip
                     isTooltipVisible={
-                      user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+                      user.userTutorialsProgress.remainingMcSteps[0] ===
                       newnewapi.McTutorialStep.MC_VOTE
                     }
                     closeTooltip={goToNextStep}
@@ -608,7 +610,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             isOpen={isConfirmVoteModalOpen}
             predefinedAmount={isAmountPredefined}
             supportVotesAmount={supportBidAmount}
-            postCreator={creator.nickname!!}
+            postCreator={
+              creator.nickname ? creator.nickname : creator.username ?? ''
+            }
             optionText={option.text}
             minAmount={minAmount}
             votePrice={votePrice}
@@ -644,9 +648,25 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
             // handlePayWithWallet={handlePayWithWallet}
             bottomCaption={
-              <SPaymentFooter variant={3}>
-                {t('McPost.paymentModalFooter.body')}
-              </SPaymentFooter>
+              <>
+                <SPaymentSign variant={3}>
+                  {t('McPost.paymentModalFooter.body', {
+                    creator: postCreator,
+                  })}
+                </SPaymentSign>
+                <SPaymentTerms variant={3}>
+                  *{' '}
+                  <Link href='https://terms.newnew.co'>
+                    <SPaymentTermsLink
+                      href='https://terms.newnew.co'
+                      target='_blank'
+                    >
+                      {t('McPost.paymentModalFooter.terms')}
+                    </SPaymentTermsLink>
+                  </Link>{' '}
+                  {t('McPost.paymentModalFooter.apply')}
+                </SPaymentTerms>
+              </>
             }
             // payButtonCaptionKey={t('McPost.paymentModalPayButton')}
           >
@@ -1333,10 +1353,22 @@ const STutorialTooltipHolder = styled.div`
   }
 `;
 
-const SPaymentFooter = styled(Text)`
+const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
+`;
+
+const SPaymentTermsLink = styled.a`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SPaymentTerms = styled(Text)`
+  margin-top: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
   white-space: pre;
 `;

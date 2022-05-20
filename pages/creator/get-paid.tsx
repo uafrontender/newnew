@@ -3,7 +3,6 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
-import type { NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
@@ -20,9 +19,7 @@ const DashboardSectionStripe = dynamic(
   () => import('../../components/organisms/creator/DashboardSectionStripe')
 );
 
-interface ICreatorOnboardingStripe {}
-
-const GetPaid: NextPage<ICreatorOnboardingStripe> = () => {
+const GetPaid = () => {
   const { t } = useTranslation('creator');
 
   const [onboardingState, setOnboardingState] =
@@ -38,8 +35,6 @@ const GetPaid: NextPage<ICreatorOnboardingStripe> = () => {
         const res = await getMyOnboardingState(payload);
 
         if (res.data) {
-          console.log(res.data);
-
           setOnboardingState(res.data);
           dispatch(
             setCreatorData({

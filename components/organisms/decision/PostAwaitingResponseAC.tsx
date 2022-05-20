@@ -146,20 +146,22 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
             <SMainSectionWrapper>
               <SCreatorInfoDiv>
                 <SCreator>
-                  <SCreatorImage src={post.creator?.avatarUrl!!} />
+                  <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
                   <SWantsToKnow>
                     {t('AcPostAwaiting.wants_to_know', {
                       creator: post.creator?.nickname,
                     })}
                   </SWantsToKnow>
                 </SCreator>
-                <STotal>
-                  {`$${formatNumber(
-                    post.totalAmount?.usdCents!! / 100 ?? 0,
-                    true
-                  )}`}{' '}
-                  <span>{t('AcPostAwaiting.in_total_bids')}</span>
-                </STotal>
+                {post.totalAmount?.usdCents && (
+                  <STotal>
+                    {`$${formatNumber(
+                      post.totalAmount.usdCents / 100 ?? 0,
+                      true
+                    )}`}{' '}
+                    <span>{t('AcPostAwaiting.in_total_bids')}</span>
+                  </STotal>
+                )}
               </SCreatorInfoDiv>
               <SPostTitle variant={4}>{post.title}</SPostTitle>
               <SSeparator />

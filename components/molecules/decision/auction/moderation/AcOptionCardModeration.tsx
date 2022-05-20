@@ -301,20 +301,22 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
             handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
           />
         )}
-        {/* Confirm block user modal */}
-        <BlockUserModalPost
-          confirmBlockUser={isBlockModalOpen}
-          user={option.creator!!}
-          closeModal={() => setIsBlockModalOpen(false)}
-        />
-        {/* Report modal */}
         {option.creator && (
-          <ReportModal
-            show={isReportModalOpen}
-            reportedDisplayname={getDisplayname(option.creator)}
-            onSubmit={handleReportSubmit}
-            onClose={handleReportClose}
-          />
+          <>
+            {/* Confirm block user modal */}
+            <BlockUserModalPost
+              confirmBlockUser={isBlockModalOpen}
+              user={option.creator}
+              closeModal={() => setIsBlockModalOpen(false)}
+            />
+            {/* Report modal */}
+            <ReportModal
+              show={isReportModalOpen}
+              reportedDisplayname={getDisplayname(option.creator)}
+              onSubmit={handleReportSubmit}
+              onClose={handleReportClose}
+            />
+          </>
         )}
       </>
     );

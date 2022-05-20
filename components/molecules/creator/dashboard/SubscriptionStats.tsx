@@ -49,7 +49,6 @@ export const SubscriptionStats = () => {
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
       setNewSubs(res.data.subscribers as newnewapi.ISubscriber[]);
-      console.log(res.data.subscribers);
       setMySubscribersIsLoading(false);
     } catch (err) {
       console.error(err);
@@ -171,7 +170,7 @@ export const SubscriptionStats = () => {
         <SSubscribersItem
           key={`list-item-subscriptionStats-subscriber-${item.user?.uuid}`}
         >
-          <Link href={`/${item.user!!.username}`}>
+          <Link href={`/${item.user?.username}`}>
             <a>
               {item.user?.avatarUrl && (
                 <SSubscribersItemAvatar avatarUrl={item.user?.avatarUrl} />

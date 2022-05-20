@@ -103,11 +103,7 @@ const Comment: React.FC<IComment> = ({
       <SComment key={comment.id.toString()} id={`comment_id_${comment.id}`}>
         {!comment.isDeleted ? (
           <Link href={`/${comment.sender?.username}`}>
-            <SUserAvatar
-              avatarUrl={
-                comment.sender?.avatarUrl ? comment.sender?.avatarUrl : ''
-              }
-            />
+            <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
           </Link>
         ) : (
           <SUserAvatar avatarUrl='' onClick={() => {}} />

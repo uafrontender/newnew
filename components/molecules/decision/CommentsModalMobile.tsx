@@ -70,9 +70,9 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
         if (
           comments[i].replies &&
           Array.isArray(comments[i].replies) &&
-          comments[i].replies!!.length > 0
+          comments[i].replies.length > 0
         ) {
-          flat.push(...[comments[i], ...comments[i].replies!!]);
+          flat.push(...[comments[i], ...comments[i].replies]);
         }
         flat.push(comments[i]);
       }

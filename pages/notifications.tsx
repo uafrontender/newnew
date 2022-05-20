@@ -81,13 +81,15 @@ export const Notifications = () => {
             setNotificationsNextPageToken(res.data.paging?.nextPageToken);
           } else {
             setNotifications((curr) => {
-              const arr = [...curr!!];
-              arr.unshift(res.data!!.notifications[0]);
+              const arr = curr ? [...curr] : [];
+              if (res.data?.notifications[0])
+                arr.unshift(res.data.notifications[0]);
               return arr;
             });
             setUnreadNotifications((curr) => {
               const arr = curr ? [...curr] : [];
-              arr.push(res.data!!.notifications[0].id as number);
+              if (res.data?.notifications[0].id)
+                arr.push(res.data.notifications[0].id as number);
               return arr;
             });
           }
@@ -187,10 +189,10 @@ export const Notifications = () => {
               animationData: loadingAnimation,
             }}
           />
-        ) : notifications!!.length < 1 && !loading ? (
+        ) : notifications && notifications.length < 1 && !loading ? (
           <NoResults />
         ) : (
-          notifications!!.map(renderNotification)
+          notifications?.map(renderNotification)
         )}
         {notificationsNextPageToken && !loading && (
           <SRef ref={scrollRef}>

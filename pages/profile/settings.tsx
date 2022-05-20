@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-target-blank */
 import React, {
   ReactElement,
   useCallback,
@@ -7,8 +8,6 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import type { NextPage } from 'next';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCookies } from 'react-cookie';
 import { useTranslation } from 'next-i18next';
@@ -50,22 +49,9 @@ import TransactionsSection from '../../components/organisms/settings/Transaction
 import PrivacySection from '../../components/organisms/settings/PrivacySection';
 import { SocketContext } from '../../contexts/socketContext';
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
+import { getMyTransactions } from '../../api/endpoints/payments';
 
-// Mock
-const unicornbabe = {
-  uuid: '1',
-  username: 'unicornbabe',
-  nickname: 'UnicornBabe',
-  avatarUrl: 'https://randomuser.me/api/portraits/women/34.jpg',
-  bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-  coverUrl: '/images/mock/profile-bg.png',
-  options: {
-    isCreator: true,
-    isVerified: true,
-  },
-};
-
-const MyProfileSettingsIndex: NextPage = () => {
+const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
   // Translations
@@ -78,8 +64,8 @@ const MyProfileSettingsIndex: NextPage = () => {
   const socketConnection = useContext(SocketContext);
   // Redux
   const dispatch = useAppDispatch();
-  const { userData, loggedIn } = useAppSelector((state) => state.user);
-  const { resizeMode, colorMode } = useAppSelector((state) => state.ui);
+  const { userData, loggedIn } = useAppSelector((state: any) => state.user);
+  const { resizeMode, colorMode } = useAppSelector((state: any) => state.ui);
   // Measurements
   const isMobileOrTablet = [
     'mobile',
@@ -190,6 +176,30 @@ const MyProfileSettingsIndex: NextPage = () => {
     }
   };
 
+  const [myTransactions, setMyTransactions] = useState<
+    newnewapi.ITransaction[]
+  >([]);
+
+  const [myTransactionsTotal, setMyTransactionsTotal] = useState(0);
+
+  const fetchMyTransactions = useCallback(async () => {
+    try {
+      const payload = new newnewapi.GetMyTransactionsRequest({
+        paging: { limit: 5 },
+      });
+      const res = await getMyTransactions(payload);
+      const { data, error } = res;
+
+      console.log(data);
+
+      if (!data || error) throw new Error(error?.message ?? 'Request failed');
+      if (data.paging?.total) setMyTransactionsTotal(data.paging?.total);
+      if (data.transactions) setMyTransactions(data.transactions);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
   const accordionSections: AccordionSection[] = [
     {
       title: t('Settings.sections.PersonalInformation.title'),
@@ -228,27 +238,13 @@ const MyProfileSettingsIndex: NextPage = () => {
       title: t('Settings.sections.Transactions.title'),
       content: (
         <TransactionsSection
-          transactions={[
-            {
-              actor: userData!!,
-              recipient: unicornbabe,
-              date: new Date('05.23.2021'),
-              amount: 2.99,
-              direction: 'from',
-              action: 'bid',
-            },
-            {
-              actor: userData!!,
-              recipient: userData!!,
-              date: new Date('04.23.2021'),
-              amount: 400,
-              direction: 'to',
-              action: 'topup',
-            },
-          ]}
+          transactions={myTransactions}
+          transactionsTotal={myTransactionsTotal}
+          transactionsLimit={5}
           handleSetActive={() => {}}
         />
       ),
+      hidden: myTransactionsTotal === 0,
     },
     {
       title: t('Settings.sections.Privacy.title'),
@@ -268,7 +264,13 @@ const MyProfileSettingsIndex: NextPage = () => {
 
   useEffect(() => {
     if (!loggedIn) router.push('/');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loggedIn, router]);
+
+  useEffect(() => {
+    fetchMyTransactions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Listen to Me update event
   useEffect(() => {
@@ -374,9 +376,9 @@ const MyProfileSettingsIndex: NextPage = () => {
           {/* <SBlockOptionButton>
             {commonT(`selected-language-title-${router.locale}`)}
           </SBlockOptionButton> */}
-          <Link href='/help'>
+          <a href='https://faqs.newnew.co' target='_blank'>
             <SBlockOption>{t('Settings.bottomDiv.help')}</SBlockOption>
-          </Link>
+          </a>
           <SBlockOptionButton
             disabled={isLogoutLoading}
             onClick={() => handleLogout()}

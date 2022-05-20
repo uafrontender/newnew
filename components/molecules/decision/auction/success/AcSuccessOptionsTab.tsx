@@ -220,7 +220,11 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
             key={option.id.toString()}
             option={option as TAcOptionWithHighestField}
             postId={post.postUuid}
-            postCreator={post.creator?.nickname!!}
+            postCreator={
+              post.creator?.nickname
+                ? post.creator?.nickname
+                : post.creator?.username ?? ''
+            }
             postText=''
             postDeadline=''
             index={i}

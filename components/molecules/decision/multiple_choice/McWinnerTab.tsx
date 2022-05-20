@@ -83,12 +83,14 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
 
   useEffect(() => {
     if (isBrowser()) {
-      const currScroll = document.getElementById('post-modal-container')!!
-        .scrollTop!!;
-      const targetScroll =
-        (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
+      const container = document.getElementById('post-modal-container');
+      if (container) {
+        const currScroll = container.scrollTop;
+        const targetScroll =
+          (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
 
-      setIsScrolledDown(currScroll >= targetScroll!!);
+        setIsScrolledDown(currScroll >= targetScroll!!);
+      }
     }
   }, []);
 

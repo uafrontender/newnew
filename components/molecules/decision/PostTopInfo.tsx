@@ -100,7 +100,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     }
 
     if (postType === 'cf') {
-      if (!totalPledges || totalPledges!! < targetPledges!!) {
+      if (!totalPledges || (targetPledges && totalPledges < targetPledges)) {
         return 'cf';
       }
     }
@@ -199,10 +199,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         <CreatorCard>
           <Link href={`/${creator.username}`}>
             <SAvatarArea>
-              <img
-                src={creator.avatarUrl!! as string}
-                alt={creator.username!!}
-              />
+              <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
             </SAvatarArea>
           </Link>
           <Link href={`/${creator.username}`}>
@@ -304,7 +301,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           buttonCaption={t('PostFailedBox.ctaButton', {
             postTypeMultiple: t(`postType.multiple.${postType}`),
           })}
-          imageSrc={IMAGES[postType!!]}
+          imageSrc={postType ? IMAGES[postType] : undefined}
           handleButtonClick={() => {
             document.getElementById('post-modal-container')?.scrollTo({
               top: document.getElementById('recommendations-section-heading')
@@ -454,7 +451,7 @@ const SShareButton = styled(Button)`
   padding: 0px;
   &:focus:enabled {
     background: ${({ theme, view }) =>
-      theme.colorsThemed.button.background[view!!]};
+      view ? theme.colorsThemed.button.background[view] : ''};
   }
 `;
 

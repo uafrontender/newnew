@@ -308,7 +308,7 @@ const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
     const socketHandlerMessageCreated = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
-      if (decoded.newMessage!!.sender?.uuid!! !== user.userData?.userUuid) {
+      if (decoded.newMessage!!.sender?.uuid !== user.userData?.userUuid) {
         setComments((curr) => {
           const workingArr = [...curr];
 

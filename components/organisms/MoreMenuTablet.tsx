@@ -57,8 +57,8 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
               <SButton>
                 <SAvatar>
                   <img
-                    src={user?.userData?.avatarUrl!! as string}
-                    alt={user?.userData?.username!!}
+                    src={user?.userData?.avatarUrl ?? ''}
+                    alt={user?.userData?.username ?? ''}
                     draggable={false}
                   />
                 </SAvatar>
