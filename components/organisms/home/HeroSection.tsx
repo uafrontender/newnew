@@ -254,6 +254,13 @@ const SHeadline = styled(Headline)`
 
   ${(props) => props.theme.media.laptop} {
     max-width: 480px;
+    font-size: 40px;
+    line-height: 48px;
+  }
+
+  ${({ theme }) => theme.media.laptopM} {
+    font-size: 56px;
+    line-height: 64px;
   }
 `;
 
@@ -268,6 +275,13 @@ const SSubTitle = styled(Text)`
   }
 
   ${(props) => props.theme.media.laptop} {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  ${({ theme }) => theme.media.laptopM} {
+    font-size: 24px;
+    line-height: 32px;
   }
 `;
 
