@@ -21,6 +21,9 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
 }) => {
   const { t } = useTranslation('profile');
   const user = useAppSelector((state) => state.user);
+
+  console.log(transaction.relatedCreator?.nicknameOrUsername);
+
   return (
     <STransactionCard>
       <SAvatar>
@@ -35,7 +38,7 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
             `Settings.sections.Transactions.actions.${transaction.transactionType}`
           )} `}
           <Link href={`/${transaction.relatedCreator?.nicknameOrUsername}`}>
-            <a>@{transaction.relatedCreator?.nicknameOrUsername}</a>
+            {`@${transaction.relatedCreator?.nicknameOrUsername}`}
           </Link>
         </SAction>
       ) : (
@@ -44,7 +47,7 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
             `Settings.sections.Transactions.actions.${transaction.transactionType}`
           )} `}
           <Link href={`/${transaction.relatedCreator?.nicknameOrUsername}`}>
-            @{transaction.relatedCreator?.nicknameOrUsername}
+            {`@${transaction.relatedCreator?.nicknameOrUsername}`}
           </Link>
           {`'s ${t(
             `Settings.sections.Transactions.type.${transaction.transactionType}`

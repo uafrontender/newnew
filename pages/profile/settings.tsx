@@ -190,6 +190,8 @@ const MyProfileSettingsIndex = () => {
       const res = await getMyTransactions(payload);
       const { data, error } = res;
 
+      console.log(data);
+
       if (!data || error) throw new Error(error?.message ?? 'Request failed');
       if (data.paging?.total) setMyTransactionsTotal(data.paging?.total);
       if (data.transactions) setMyTransactions(data.transactions);
@@ -266,8 +268,9 @@ const MyProfileSettingsIndex = () => {
   }, [loggedIn, router]);
 
   useEffect(() => {
-    if (!myTransactions || myTransactions.length < 1) fetchMyTransactions();
-  }, [myTransactions, fetchMyTransactions]);
+    fetchMyTransactions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Listen to Me update event
   useEffect(() => {
