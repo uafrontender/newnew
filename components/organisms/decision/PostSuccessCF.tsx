@@ -5,7 +5,7 @@
 /* eslint-disable arrow-body-style */
 import React, { useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
@@ -34,6 +34,7 @@ interface IPostSuccessCF {
 const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
   ({ post }) => {
     const { t } = useTranslation('decision');
+    const theme = useTheme();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -227,7 +228,14 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
           />
           <SActivitesContainer>
             <>
-              <DecisionEndedBox type='mc' imgSrc={assets.creation.CfAnimated}>
+              <DecisionEndedBox
+                type='mc'
+                imgSrc={
+                  theme.name === 'light'
+                    ? assets.creation.lightCfAnimated
+                    : assets.creation.darkCfAnimated
+                }
+              >
                 {t('CfPostSuccess.hero_text')}
               </DecisionEndedBox>
               <SMainSectionWrapper>
