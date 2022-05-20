@@ -22,8 +22,6 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
   const { t } = useTranslation('profile');
   const user = useAppSelector((state) => state.user);
 
-  console.log(transaction.relatedCreator?.nicknameOrUsername);
-
   return (
     <STransactionCard>
       <SAvatar>
