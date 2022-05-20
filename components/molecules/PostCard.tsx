@@ -386,34 +386,55 @@ export const PostCard: React.FC<ICard> = React.memo(
           </STextOutside>
           <SBottomEnd type={typeOfPost}>
             {totalVotes > 0 || totalAmount > 0 || currentBackerCount > 0 ? (
-              <SButton
-                withDim
-                withShrink
-                view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
-                onClick={handleBidClick}
-                cardType={typeOfPost}
-                progress={
-                  typeOfPost === 'cf'
-                    ? Math.floor(
-                        (currentBackerCount * 100) /
-                          (postParsed as newnewapi.Crowdfunding)
-                            .targetBackerCount
-                      )
-                    : 0
-                }
-                withProgress={typeOfPost === 'cf'}
-              >
-                {t(`button-card-${typeOfPost}`, {
-                  votes: totalVotes,
-                  total: formatNumber(
-                    (postParsed as newnewapi.Crowdfunding).targetBackerCount ??
-                      0,
-                    true
-                  ),
-                  backed: formatNumber(currentBackerCount ?? 0, true),
-                  amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
-                })}
-              </SButton>
+              totalVotes === 1 && typeOfPost === 'mc' ? (
+                <SButton
+                  withDim
+                  withShrink
+                  view='primary'
+                  onClick={handleBidClick}
+                  cardType={typeOfPost}
+                >
+                  {t(`button-card-singular-${typeOfPost}`, {
+                    votes: totalVotes,
+                    total: formatNumber(
+                      (postParsed as newnewapi.Crowdfunding)
+                        .targetBackerCount ?? 0,
+                      true
+                    ),
+                    backed: formatNumber(currentBackerCount ?? 0, true),
+                    amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
+                  })}
+                </SButton>
+              ) : (
+                <SButton
+                  withDim
+                  withShrink
+                  view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
+                  onClick={handleBidClick}
+                  cardType={typeOfPost}
+                  progress={
+                    typeOfPost === 'cf'
+                      ? Math.floor(
+                          (currentBackerCount * 100) /
+                            (postParsed as newnewapi.Crowdfunding)
+                              .targetBackerCount
+                        )
+                      : 0
+                  }
+                  withProgress={typeOfPost === 'cf'}
+                >
+                  {t(`button-card-${typeOfPost}`, {
+                    votes: totalVotes,
+                    total: formatNumber(
+                      (postParsed as newnewapi.Crowdfunding)
+                        .targetBackerCount ?? 0,
+                      true
+                    ),
+                    backed: formatNumber(currentBackerCount ?? 0, true),
+                    amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
+                  })}
+                </SButton>
+              )
             ) : (
               <SButtonFirst withShrink onClick={handleBidClick}>
                 {switchPostStatus(typeOfPost, postParsed.status) === 'voting'
