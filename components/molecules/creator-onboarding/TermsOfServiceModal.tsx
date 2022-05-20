@@ -183,8 +183,27 @@ const SShadowBottom = styled.div`
 `;
 
 const STosText = styled.div`
+  h1,
+  ul,
+  blockquote,
+  li,
   p {
     margin-bottom: 16px;
+  }
+
+  ol[type='a'] {
+    padding-left: 20px;
+  }
+  ol {
+    ol {
+      padding-left: 30px;
+    }
+  }
+  ul.list {
+    padding-left: 16px;
+  }
+  a {
+    text-decoration: underline;
   }
 
   display: flex;
