@@ -369,6 +369,7 @@
       "OptionCard": {
         "noVotes": "no votes",
         "votes": "votes",
+        "vote": "vote",
         "my_suggestion": "My suggestion",
         "subscriber_suggestion": "{{ nickname }}'s suggestion",
         "others": "others",
