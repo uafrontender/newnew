@@ -31,7 +31,7 @@
       "placeholder": "ex. Where should I get my first tattoo \uD83D\uDE4A"
     },
     "fileUpload": {
-      "description": "Video can be up to 100 MB",
+      "description": "Video can be up to 10 GB",
       "button": "Select file"
     },
     "block": {
@@ -149,7 +149,7 @@
       "error": {
         "minLength": "Video duration too small, choose from 10 seconds",
         "maxLength": "Video duration too long, choose up to 10 minutes",
-        "maxSize": "Video size too big, choose up to 100mb",
+        "maxSize": "Video size too big, choose up to 10gb",
         "title": "Ooops...",
         "description": "There was an error and your file could not be uploaded. Would you like to try again."
       },
