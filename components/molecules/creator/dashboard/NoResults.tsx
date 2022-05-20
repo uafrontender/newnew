@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 
 import copyIcon from '../../../../public/images/svg/icons/outlined/Link.svg';
-import emptyFolder from '../../../../public/images/dashboard/no-subs.png';
 import Button from '../../../atoms/Button';
 import { useAppSelector } from '../../../../redux-store/store';
 import InlineSvg from '../../../atoms/InlineSVG';
+import assets from '../../../../constants/assets';
 
 export const NoResults = () => {
   const { t } = useTranslation('creator');
@@ -52,7 +52,7 @@ export const NoResults = () => {
     <SContainer>
       <SWrapper>
         <Image
-          src={emptyFolder}
+          src={assets.subscription.subDm}
           alt={t('noResults.title')}
           width={108}
           height={96}
