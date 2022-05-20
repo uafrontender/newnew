@@ -104,7 +104,7 @@ export const Subscriptions: React.FC = React.memo(() => {
             {t('subscriptions.title')}{' '}
             {mySubscribersTotal > 0 && `(${mySubscribersTotal})`}
           </STitle>
-          {myAnnouncementRoomId && (
+          {myAnnouncementRoomId && mySubscribersTotal > 0 && (
             <Link
               href={`/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoomId}`}
             >
