@@ -80,6 +80,8 @@ const SCaption = styled(Caption)`
   justify-self: flex-end;
 
   color: ${(props) => props.theme.colorsThemed.text.secondary};
+
+  white-space: nowrap;
 `;
 
 const SCaptionEnded = styled(Caption)`
@@ -89,4 +91,6 @@ const SCaptionEnded = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
 
   letter-spacing: -0.5px;
+
+  white-space: nowrap;
 `;

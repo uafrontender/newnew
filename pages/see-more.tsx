@@ -433,10 +433,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const resTop10 = await fetchCuratedPosts(top10payload);
 
-  if (resTop10.error) {
-    throw new Error('Request failed');
-  }
-
   return {
     props: {
       ...(resTop10.data
