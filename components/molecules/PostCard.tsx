@@ -132,9 +132,6 @@ export const PostCard: React.FC<ICard> = React.memo(
       return 0;
     }, [postParsed.expiresAt?.seconds]);
 
-    const [thumbnailUrl, setThumbnailUrl] = useState(
-      postParsed.announcement?.thumbnailUrl
-    );
     const [thumbnailKey, setThumbnailKey] = useState(uuid());
 
     const handleUserClick = (username: string) => {
@@ -229,7 +226,6 @@ export const PostCard: React.FC<ICard> = React.memo(
         const decoded = newnewapi.PostThumbnailUpdated.decode(arr);
 
         if (!decoded || !decoded.thumbnailUrl) return;
-        setThumbnailUrl(decoded.thumbnailUrl);
         setThumbnailKey(uuid());
       };
 
@@ -278,7 +274,10 @@ export const PostCard: React.FC<ICard> = React.memo(
                   playsInline
                   poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
                 >
-                  <source src={thumbnailUrl ?? ''} type='video/mp4' />
+                  <source
+                    src={postParsed.announcement?.thumbnailUrl ?? ''}
+                    type='video/mp4'
+                  />
                 </video>
               ) : (
                 <img
@@ -341,7 +340,10 @@ export const PostCard: React.FC<ICard> = React.memo(
                 playsInline
                 poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
               >
-                <source src={thumbnailUrl ?? ''} type='video/mp4' />
+                <source
+                  src={postParsed.announcement?.thumbnailUrl ?? ''}
+                  type='video/mp4'
+                />
               </video>
             ) : (
               <img
