@@ -130,9 +130,11 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                 />
                 <div>
                   {option.voteCount && option.voteCount > 0
-                    ? `${formatNumber(option?.voteCount, true)} ${t(
-                        'McPost.OptionsTab.OptionCard.votes'
-                      )}`
+                    ? `${formatNumber(option?.voteCount, true)} ${
+                        option.voteCount === 1
+                          ? t('McPost.OptionsTab.OptionCard.vote')
+                          : t('McPost.OptionsTab.OptionCard.votes')
+                      }`
                     : t('McPost.OptionsTab.OptionCard.noVotes')}
                 </div>
               </SBidAmount>

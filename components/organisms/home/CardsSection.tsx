@@ -315,7 +315,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             ) : (
               <CardSkeletonSection count={5} />
             )}
-            {!loading && collection.length === 0 ? (
+            {(!loading && collection?.length === 0) || !collection ? (
               <SItemWrapper
                 key='tutorial-card'
                 name={`cards-section-${category}-${0}`}

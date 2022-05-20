@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
 import styled, { css, useTheme } from 'styled-components';
+import { uuid } from 'uuidv4';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
@@ -131,6 +132,8 @@ export const PostCard: React.FC<ICard> = React.memo(
       return 0;
     }, [postParsed.expiresAt?.seconds]);
 
+    const [thumbnailKey, setThumbnailKey] = useState(uuid());
+
     const handleUserClick = (username: string) => {
       router.push(`/${username}`);
     };
@@ -218,13 +221,29 @@ export const PostCard: React.FC<ICard> = React.memo(
         }
       };
 
+      const handlerSocketThumbnailUpdated = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostThumbnailUpdated.decode(arr);
+
+        if (!decoded || !decoded.thumbnailUrl) return;
+        setThumbnailKey(uuid());
+      };
+
       if (socketConnection) {
         socketConnection.on('PostUpdated', handlerSocketPostUpdated);
+        socketConnection.on(
+          'PostThumbnailUpdated',
+          handlerSocketThumbnailUpdated
+        );
       }
 
       return () => {
         if (socketConnection && socketConnection.connected) {
           socketConnection.off('PostUpdated', handlerSocketPostUpdated);
+          socketConnection.off(
+            'PostThumbnailUpdated',
+            handlerSocketThumbnailUpdated
+          );
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -246,6 +265,7 @@ export const PostCard: React.FC<ICard> = React.memo(
             <SImageHolder index={index}>
               {ioEntry?.isIntersecting ? (
                 <video
+                  key={thumbnailKey}
                   ref={(el) => {
                     videoRef.current = el!!;
                   }}
@@ -311,6 +331,7 @@ export const PostCard: React.FC<ICard> = React.memo(
           <SImageHolderOutside id='animatedPart'>
             {ioEntry?.isIntersecting ? (
               <video
+                key={thumbnailKey}
                 ref={(el) => {
                   videoRef.current = el!!;
                 }}
@@ -386,34 +407,55 @@ export const PostCard: React.FC<ICard> = React.memo(
           </STextOutside>
           <SBottomEnd type={typeOfPost}>
             {totalVotes > 0 || totalAmount > 0 || currentBackerCount > 0 ? (
-              <SButton
-                withDim
-                withShrink
-                view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
-                onClick={handleBidClick}
-                cardType={typeOfPost}
-                progress={
-                  typeOfPost === 'cf'
-                    ? Math.floor(
-                        (currentBackerCount * 100) /
-                          (postParsed as newnewapi.Crowdfunding)
-                            .targetBackerCount
-                      )
-                    : 0
-                }
-                withProgress={typeOfPost === 'cf'}
-              >
-                {t(`button-card-${typeOfPost}`, {
-                  votes: totalVotes,
-                  total: formatNumber(
-                    (postParsed as newnewapi.Crowdfunding).targetBackerCount ??
-                      0,
-                    true
-                  ),
-                  backed: formatNumber(currentBackerCount ?? 0, true),
-                  amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
-                })}
-              </SButton>
+              totalVotes === 1 && typeOfPost === 'mc' ? (
+                <SButton
+                  withDim
+                  withShrink
+                  view='primary'
+                  onClick={handleBidClick}
+                  cardType={typeOfPost}
+                >
+                  {t(`button-card-singular-${typeOfPost}`, {
+                    votes: totalVotes,
+                    total: formatNumber(
+                      (postParsed as newnewapi.Crowdfunding)
+                        .targetBackerCount ?? 0,
+                      true
+                    ),
+                    backed: formatNumber(currentBackerCount ?? 0, true),
+                    amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
+                  })}
+                </SButton>
+              ) : (
+                <SButton
+                  withDim
+                  withShrink
+                  view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
+                  onClick={handleBidClick}
+                  cardType={typeOfPost}
+                  progress={
+                    typeOfPost === 'cf'
+                      ? Math.floor(
+                          (currentBackerCount * 100) /
+                            (postParsed as newnewapi.Crowdfunding)
+                              .targetBackerCount
+                        )
+                      : 0
+                  }
+                  withProgress={typeOfPost === 'cf'}
+                >
+                  {t(`button-card-${typeOfPost}`, {
+                    votes: totalVotes,
+                    total: formatNumber(
+                      (postParsed as newnewapi.Crowdfunding)
+                        .targetBackerCount ?? 0,
+                      true
+                    ),
+                    backed: formatNumber(currentBackerCount ?? 0, true),
+                    amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
+                  })}
+                </SButton>
+              )
             ) : (
               <SButtonFirst withShrink onClick={handleBidClick}>
                 {switchPostStatus(typeOfPost, postParsed.status) === 'voting'
