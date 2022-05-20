@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useCookies } from 'react-cookie';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import Link from 'next/link';
 
 import InlineSVG from '../atoms/InlineSVG';
 import AnimatedPresence, { TAnimation } from '../atoms/AnimatedPresence';
@@ -63,8 +63,12 @@ const Cookie = React.memo(() => {
         >
           <SText>{t('cookie-text')}</SText>
           <SInlineSVG svg={cookieIcon} width='20px' height='20px' />
-          <Link href='/cookies'>
-            <a target='_blank'>
+          <Link href='https://privacy.newnew.co'>
+            <a
+              href='https://privacy.newnew.co'
+              target='_blank'
+              rel='noreferrer'
+            >
               <STextLink>{t('cookie-link')}</STextLink>
             </a>
           </Link>

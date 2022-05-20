@@ -19,13 +19,16 @@ export const Subscriptions = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!user.creatorData?.options.isCreatorConnectedToStripe) {
-      router.push('/creator/get-paid');
-    } else {
-      if (!user.userData?.options?.isOfferingSubscription)
-        router.push('/creator/subscribers/edit-subscription-rate');
+    if (user.creatorData?.isLoaded) {
+      if (!user.creatorData?.options.isCreatorConnectedToStripe) {
+        router.replace('/creator/get-paid');
+      } else {
+        if (!user.userData?.options?.isOfferingSubscription)
+          router.replace('/creator/subscribers/edit-subscription-rate');
+      }
     }
   }, [
+    user.creatorData?.isLoaded,
     user.userData?.options?.isOfferingSubscription,
     router,
     user.creatorData?.options.isCreatorConnectedToStripe,

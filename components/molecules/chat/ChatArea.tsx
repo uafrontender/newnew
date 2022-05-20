@@ -193,7 +193,6 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       const isBlocked = usersIBlocked.find(
         (i) => i === chatRoom?.visavis?.uuid
       );
-      console.log(isBlocked);
 
       if (isBlocked) {
         setIsVisavisBlocked(true);
@@ -416,7 +415,9 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     if (
       isVisavisBlocked ||
       localUserData.subscriptionExpired ||
-      !chatRoom?.visavis?.options?.isOfferingSubscription ||
+      (chatRoom &&
+        chatRoom.myRole === 1 &&
+        !chatRoom?.visavis?.options?.isOfferingSubscription) ||
       localUserData.accountDeleted ||
       !chatRoom
     ) {
@@ -550,6 +551,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         {localUserData.accountDeleted && <AccountDeleted />}
         {chatRoom &&
           chatRoom.visavis &&
+          chatRoom.myRole === 1 &&
           !chatRoom.visavis.options?.isOfferingSubscription && (
             <MessagingDisabled user={chatRoom.visavis} />
           )}

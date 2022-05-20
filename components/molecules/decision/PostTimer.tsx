@@ -300,9 +300,9 @@ const SWrapper = styled.div<{
 
 const STimerItem = styled.div`
   display: grid;
-  grid-template-columns: 5fr 1fr;
+  grid-template-columns: 4fr 3fr;
 
-  padding: 10px 14px;
+  padding: 10px 12px;
   width: 60px;
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -311,10 +311,11 @@ const STimerItem = styled.div`
   position: relative;
 
   div:nth-child(1) {
-    text-align: center;
+    text-align: right;
   }
   div:nth-child(2) {
-    text-align: right;
+    text-align: left;
+    margin-left: 2px;
   }
 `;
 

@@ -20,7 +20,6 @@ export const Chat = () => {
   const { t } = useTranslation('chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
     'mobile',
@@ -77,7 +76,7 @@ export const Chat = () => {
   };
 
   if (!user.loggedIn) {
-    router.push('/sign-up');
+    router.push('/sign-up?to=log-in');
     return null;
   }
 

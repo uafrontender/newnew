@@ -29,7 +29,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
-  const { creatorsImSubscribedTo } = useGetSubscriptions();
+  const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
@@ -78,7 +78,8 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 </SNavText>
               </SItemWithMargin>
             )}
-            {(user.userData?.options?.isCreator ||
+            {((user.userData?.options?.isOfferingSubscription &&
+              mySubscribersTotal > 0) ||
               creatorsImSubscribedTo.length > 0) && (
               <SItemWithMargin>
                 <NavigationItem

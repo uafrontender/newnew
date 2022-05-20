@@ -303,6 +303,7 @@ const SContainer = styled.div`
     left: unset;
     padding: 24px;
     border-radius: 24px;
+    width: 100%;
   }
 
   ${(props) => props.theme.media.laptop} {
