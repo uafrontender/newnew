@@ -389,7 +389,11 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
             <SPaymentModalHeading>
               <SPaymentModalHeadingPostSymbol>
                 <SPaymentModalHeadingPostSymbolImg
-                  src={assets.creation.CfStatic}
+                  src={
+                    theme.name === 'light'
+                      ? assets.creation.lightCfStatic
+                      : assets.creation.darkCfStatic
+                  }
                 />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
