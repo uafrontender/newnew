@@ -5,6 +5,7 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../../redux-store/store';
 // import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
@@ -360,13 +361,27 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
-            <SPaymentFooter variant={3}>
-              {post.creator
-                ? t('CfPost.paymentModalFooter.body', {
-                    creator: getDisplayname(post.creator),
-                  })
-                : ''}
-            </SPaymentFooter>
+            <>
+              {post.creator && (
+                <SPaymentSign variant={3}>
+                  {t('CfPost.paymentModalFooter.body', {
+                    creator: post.creator,
+                  })}
+                </SPaymentSign>
+              )}
+              <SPaymentTerms variant={3}>
+                *{' '}
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('CfPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
+                {t('CfPost.paymentModalFooter.apply')}
+              </SPaymentTerms>
+            </>
           }
           // payButtonCaptionKey={t('CfPost.paymentModalPayButton')}
         >
@@ -565,10 +580,22 @@ const SCloseButton = styled.button`
   cursor: pointer;
 `;
 
-const SPaymentFooter = styled(Text)`
+const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
+`;
+
+const SPaymentTermsLink = styled.a`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SPaymentTerms = styled(Text)`
+  margin-top: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
   white-space: pre;
 `;
