@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-target-blank */
 import React, {
   ReactElement,
   useCallback,
@@ -7,7 +8,6 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCookies } from 'react-cookie';
 import { useTranslation } from 'next-i18next';
@@ -242,6 +242,7 @@ const MyProfileSettingsIndex = () => {
           handleSetActive={() => {}}
         />
       ),
+      hidden: myTransactionsTotal === 0,
     },
     {
       title: t('Settings.sections.Privacy.title'),
@@ -372,9 +373,9 @@ const MyProfileSettingsIndex = () => {
           {/* <SBlockOptionButton>
             {commonT(`selected-language-title-${router.locale}`)}
           </SBlockOptionButton> */}
-          <Link href='/help'>
+          <a href='https://faqs.newnew.co' target='_blank'>
             <SBlockOption>{t('Settings.bottomDiv.help')}</SBlockOption>
-          </Link>
+          </a>
           <SBlockOptionButton
             disabled={isLogoutLoading}
             onClick={() => handleLogout()}
