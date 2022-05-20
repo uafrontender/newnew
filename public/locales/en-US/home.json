@@ -26,6 +26,7 @@
   "button-creator-on-the-rise": "On the Rise",
   "button-card-ac": "{{amount}} in bids",
   "button-card-mc": "{{votes}} votes",
+  "button-card-singular-mc": "{{votes}} vote",
   "button-card-cf": "{{backed}} of {{total}} backers",
   "card-time-left": "{{time}} left",
   "button-card-first-ac": "Bid now",
