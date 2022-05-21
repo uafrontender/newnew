@@ -570,11 +570,16 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           );
         }
       }
+      // We dont need router here?
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
       fieldsToBeUpdated,
       dateInEdit,
       selectedCountry,
+      firstNameInEdit,
+      lastNameInEdit,
+      nicknameInEdit,
+      usernameInEdit,
       emailInEdit,
       user.userData,
       imageToSave,

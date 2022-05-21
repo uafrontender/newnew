@@ -38,6 +38,7 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
   >([]);
   const [selectedProduct, setSelectedProduct] =
     useState<newnewapi.ISubscriptionProduct>();
+  const [productWasSelected, setProductWasSelected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [confirmSubEnable, setConfirmSubEnable] = useState<boolean>(false);
   const router = useRouter();
@@ -76,6 +77,7 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
   const handleSetSelectedProduct = (
     product: newnewapi.ISubscriptionProduct
   ) => {
+    setProductWasSelected(true);
     setSelectedProduct(product);
   };
 
@@ -122,9 +124,9 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
               <ProductOption
                 key={p.id}
                 product={p}
-                isMyProduct={
+                hasRemoveOption={
                   mySubscriptionProduct
-                    ? mySubscriptionProduct.id === p.id
+                    ? mySubscriptionProduct.id === p.id && productWasSelected
                     : false
                 }
                 selected={selectedProduct ? selectedProduct.id === p.id : false}
@@ -224,7 +226,7 @@ const SNote = styled.p`
 
 interface IProductOption {
   selected: boolean;
-  isMyProduct: boolean;
+  hasRemoveOption: boolean;
   product: newnewapi.ISubscriptionProduct;
   handleClick: () => void;
   removedMyProduct: () => void;
@@ -234,7 +236,7 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
   selected,
   product,
   handleClick,
-  isMyProduct,
+  hasRemoveOption,
   removedMyProduct,
 }) => {
   const { t } = useTranslation('creator');
@@ -308,7 +310,7 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
           <Text variant={2}>{t('SubrateSection.selectInput.noProduct')}</Text>
         )}
       </SLabelContent>
-      {isMyProduct && (
+      {selected && hasRemoveOption && (
         <>
           <SButton
             view='danger'
