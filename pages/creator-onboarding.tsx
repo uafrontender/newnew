@@ -60,6 +60,14 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
   const [onboardingState, setOnboardingState] =
     useState<newnewapi.GetMyOnboardingStateResponse>();
 
+  // Redirect if onboarded
+  useEffect(() => {
+    if (user.userData?.options?.isCreator) {
+      router.push('/creator/dashboard');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Try to pre-fetch the content
   useEffect(() => {
     router.prefetch('/creator/dashboard');
