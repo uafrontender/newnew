@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -44,6 +43,7 @@ import { getImageUploadUrl } from '../../api/endpoints/upload';
 import { CropperObjectFit } from '../molecules/profile/ProfileBackgroundCropper';
 import isBrowser from '../../utils/isBrowser';
 import isAnimatedImage from '../../utils/isAnimatedImage';
+import resizeImage from '../../utils/resizeImage';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -142,7 +142,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('profile');
-  const router = useRouter();
 
   const dispatch = useAppDispatch();
   const { user, ui } = useAppSelector((state) => state);
@@ -516,20 +515,19 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       // Read uploaded file as data URL
       const reader = new FileReader();
-      const img = new Image();
+
       reader.readAsDataURL(file);
-      reader.addEventListener('load', () => {
+
+      reader.addEventListener('load', async () => {
         if (reader.result) {
-          setAvatarUrlInEdit(reader.result as string);
-          handleSetStageToEditingProfilePicture();
-
-          img.src = reader.result as string;
-
+          const result = reader.result as string;
+          const properlySizedImage = await resizeImage(result, 1000);
           // eslint-disable-next-line func-names
-          img.addEventListener('load', function () {
-            // eslint-disable-next-line react/no-this-in-sfc
-            setOriginalProfileImageWidth(this.width);
-          });
+
+          // eslint-disable-next-line react/no-this-in-sfc
+          setOriginalProfileImageWidth(properlySizedImage.width);
+          setAvatarUrlInEdit(properlySizedImage.url);
+          handleSetStageToEditingProfilePicture();
         }
       });
     }
