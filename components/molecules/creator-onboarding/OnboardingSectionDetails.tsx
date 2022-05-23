@@ -474,7 +474,6 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
         });
 
         const updateMeRes = await updateMe(updateMePayload);
-
         if (!updateMeRes.data || updateMeRes.error)
           throw new Error(updateMeRes.error?.message ?? 'Request failed');
 
@@ -555,6 +554,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
         if ((err as Error).message === 'Email taken') {
           setEmailError('emailTaken');
           // } else if ((err as Error).message === 'Too young') {
+          // TODO: fix error handling, not all other errors are DoB related
         } else if ((err as Error).message) {
           setDateError('tooYoung');
         }
