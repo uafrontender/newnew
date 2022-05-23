@@ -40,6 +40,7 @@ import OnboardingCountrySelect from './OnboardingCountrySelect';
 import OnboardingSectionUsernameInput from './OnboardingUsernameInput';
 import OnboardingSectionNicknameInput from './OnboardingNicknameInput';
 import { validateText } from '../../../api/endpoints/infrastructure';
+import resizeImage from '../../../utils/resizeImage';
 
 const OnboardingEditProfileImageModal = dynamic(
   () => import('./OnboardingEditProfileImageModal')
@@ -383,28 +384,25 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
 
         // Read uploaded file as data URL
         const reader = new FileReader();
-        const img = new Image();
         reader.readAsDataURL(file);
-        reader.addEventListener('load', () => {
+        reader.addEventListener('load', async () => {
           if (reader.result) {
-            setAvatarUrlInEdit(reader.result as string);
+            const imageUrl = reader.result as string;
+            setAvatarUrlInEdit(imageUrl as string);
 
-            img.src = reader.result as string;
+            const properlySizedImage = await resizeImage(imageUrl, 1000);
 
-            // eslint-disable-next-line func-names
-            img.addEventListener('load', function () {
-              // eslint-disable-next-line react/no-this-in-sfc
-              setOriginalProfileImageWidth(this.width);
-              setCropMenuOpen(true);
-              if (isBrowser()) {
-                window.history.pushState(
-                  {
-                    stage: 'edit-profile-picture',
-                  },
-                  ''
-                );
-              }
-            });
+            // eslint-disable-next-line react/no-this-in-sfc
+            setOriginalProfileImageWidth(properlySizedImage.width);
+            setCropMenuOpen(true);
+            if (isBrowser()) {
+              window.history.pushState(
+                {
+                  stage: 'edit-profile-picture',
+                },
+                ''
+              );
+            }
           }
         });
       }
@@ -474,7 +472,6 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
         });
 
         const updateMeRes = await updateMe(updateMePayload);
-
         if (!updateMeRes.data || updateMeRes.error)
           throw new Error(updateMeRes.error?.message ?? 'Request failed');
 
@@ -555,6 +552,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
         if ((err as Error).message === 'Email taken') {
           setEmailError('emailTaken');
           // } else if ((err as Error).message === 'Too young') {
+          // TODO: fix error handling, not all other errors are DoB related
         } else if ((err as Error).message) {
           setDateError('tooYoung');
         }
