@@ -520,8 +520,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       reader.addEventListener('load', async () => {
         if (reader.result) {
-          const result = reader.result as string;
-          const properlySizedImage = await resizeImage(result, 1000);
+          const imageUrl = reader.result as string;
+          const properlySizedImage = await resizeImage(imageUrl, 1000);
           // eslint-disable-next-line func-names
 
           // eslint-disable-next-line react/no-this-in-sfc
