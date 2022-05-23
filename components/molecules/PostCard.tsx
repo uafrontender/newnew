@@ -132,7 +132,7 @@ export const PostCard: React.FC<ICard> = React.memo(
       return 0;
     }, [postParsed.expiresAt?.seconds]);
 
-    const [thumbnailKey, setThumbnailKey] = useState(uuid());
+    const [thumbnailKey, setThumbnailKey] = useState('');
 
     const handleUserClick = (username: string) => {
       router.push(`/${username}`);
@@ -225,7 +225,8 @@ export const PostCard: React.FC<ICard> = React.memo(
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostThumbnailUpdated.decode(arr);
 
-        if (!decoded || !decoded.thumbnailUrl) return;
+        if (!decoded || !decoded.thumbnailUrl || (decoded.postUuid !== postParsed.postUuid)) return;
+
         setThumbnailKey(uuid());
       };
 
@@ -249,6 +250,22 @@ export const PostCard: React.FC<ICard> = React.memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socketConnection]);
 
+    let thumbnailUrl = postParsed.announcement?.thumbnailUrl ?? '';
+
+    if (thumbnailUrl && thumbnailKey) {
+      thumbnailUrl += `?key=${thumbnailKey}`
+    }
+
+    useEffect(() => {
+      if (thumbnailUrl) {
+        setTimeout(() => {
+          videoRef.current?.pause();
+          videoRef.current?.load();
+          videoRef.current?.play();
+        }, 200);
+      }
+    }, [thumbnailUrl])
+
     if (type === 'inside') {
       return (
         <SWrapper ref={cardRef} index={index} width={width}>
@@ -269,15 +286,13 @@ export const PostCard: React.FC<ICard> = React.memo(
                   ref={(el) => {
                     videoRef.current = el!!;
                   }}
+                  src={thumbnailUrl}
+                  itemType='video/mp4'
                   loop
                   muted
                   playsInline
                   poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
                 >
-                  <source
-                    src={postParsed.announcement?.thumbnailUrl ?? ''}
-                    type='video/mp4'
-                  />
                 </video>
               ) : (
                 <img
@@ -339,11 +354,9 @@ export const PostCard: React.FC<ICard> = React.memo(
                 muted
                 playsInline
                 poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
+                src={thumbnailUrl}
+                itemType='video/mp4'
               >
-                <source
-                  src={postParsed.announcement?.thumbnailUrl ?? ''}
-                  type='video/mp4'
-                />
               </video>
             ) : (
               <img
