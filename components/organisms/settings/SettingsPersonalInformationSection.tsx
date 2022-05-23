@@ -139,6 +139,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
       } catch (err) {
         console.error(err);
         setIsLoading(false);
+        // TODO: fix error handling, there are other errors!
         if ((err as Error).message === 'Date update error') {
           setDateError('tooYoung');
         }

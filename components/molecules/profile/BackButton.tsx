@@ -24,7 +24,7 @@ const Container = styled.div`
   padding: 8px;
   border-radius: 16px;
   cursor: pointer;
-  color: ${(props) => props.theme.colorsThemed.tag.color.primary};
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   background: ${(props) =>
     props.theme.name === 'light'
       ? 'rgba(255, 255, 255, 0.06)'
