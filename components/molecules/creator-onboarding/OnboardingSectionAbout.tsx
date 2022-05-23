@@ -161,7 +161,7 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
 
         dispatch(
           setUserData({
-            bio: updateMeRes.data.me?.bio,
+            bio: bioInEdit,
           })
         );
 
