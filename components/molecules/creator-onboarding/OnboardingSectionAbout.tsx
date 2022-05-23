@@ -19,6 +19,7 @@ import { setMyCreatorTags, updateMe } from '../../../api/endpoints/user';
 import {
   logoutUserClearCookiesAndRedirect,
   setUserData,
+  setCreatorData,
 } from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
 
@@ -161,7 +162,7 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
 
         dispatch(
           setUserData({
-            bio: bioInEdit,
+            bio: updateMeRes.data.me?.bio,
           })
         );
 
@@ -173,6 +174,12 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
 
         if (!updateTagsRes.data || updateTagsRes.error)
           throw new Error(updateTagsRes.error?.message ?? 'Request failed');
+
+        dispatch(
+          setCreatorData({
+            hasCreatorTags: true,
+          })
+        );
 
         router.push('/creator-onboarding-stripe');
 
