@@ -854,7 +854,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             </SControlsWrapper>
           </motion.div>
         ) : (
-          <motion.div
+          <SEditProfilePicture
             key='edit-picture'
             initial={{ x: 300, opacity: 0 }}
             animate={{ x: 0, opacity: 1, transition: { delay: 0.5 } }}
@@ -944,7 +944,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 {t('EditProfileMenu.saveButton')}
               </Button>
             </SControlsWrapperPicture>
-          </motion.div>
+          </SEditProfilePicture>
         )}
       </AnimatePresence>
     </SEditProfileMenu>
@@ -1103,6 +1103,12 @@ const SControlsWrapper = styled.div`
 
     margin-bottom: 8px;
   }
+`;
+
+const SEditProfilePicture = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 `;
 
 const SControlsWrapperPicture = styled.div`
