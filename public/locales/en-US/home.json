@@ -68,12 +68,18 @@
   "sort-title-option-numbers-of-bids-most-first": "Most first",
   "home": {
     "meta": {
-      "title": "NewNew - Bid, Vote & Crowdfund Decisions"
+      "title": "NewNew - Bid, Vote & Crowdfund Decisions",
+      "description": "Decide what people do next. Vote, bid and crowdfund with the community to watch people do things IRL on NewNew"
     }
   },
   "search": {
     "meta": {
-      "title": "See more"
+      "title-ac": "See more Events on NewNew",
+      "description-ac": "See more Events creators posted on creator economy startup company NewNew",
+      "title-mc": "See more Superpolls on NewNew",
+      "description-mc": "See more Superpolls creators posted on creator economy startup company NewNew",
+      "title-cf": "See more Goals on NewNew",
+      "description-cf": "See more Goals creators posted on creator economy startup company NewNew"
     }
   }
 }

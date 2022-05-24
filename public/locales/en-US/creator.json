@@ -1,7 +1,8 @@
 {
   "dashboard": {
     "meta": {
-      "title": "Creator Dashboard"
+      "title": "NewNew Creator Dashboard",
+      "description": "View your NewNew earnings, posts, manage your subscribers and more"
     },
     "title": "My Dashboard",
     "button": {
@@ -145,7 +146,8 @@
   },
   "getPaid": {
     "meta": {
-      "title": "Creator Get Paid"
+      "title": "Get Paid on NewNew",
+      "description": "Earn income through cash auctions, polls, crowdfunding and subscription memberships"
     },
     "title": "Get Paid",
     "title-set-up-stripe": "Set payment system",
