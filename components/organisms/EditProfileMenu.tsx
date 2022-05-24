@@ -327,7 +327,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   // Cover image
   const [coverUrlInEdit, setCoverUrlInEdit] = useState(user.userData?.coverUrl);
-  const [coverUrlInEditAnimated, setCoverUrlInEditAinmated] = useState(false);
+  const [coverUrlInEditAnimated, setCoverUrlInEditAnimated] = useState(false);
   const [coverImageInitialObjectFit, setCoverImageInitialObjectFit] =
     useState<CropperObjectFit>('horizontal-cover');
   const [cropCoverImage, setCropCoverImage] = useState<Point>({ x: 0, y: 0 });
@@ -347,22 +347,30 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       const reader = new FileReader();
       const img = new Image();
       reader.readAsDataURL(file);
-      reader.addEventListener('load', () => {
+      reader.addEventListener('load', async () => {
         if (reader.result) {
-          img.src = reader.result as string;
+          const imageUrl = reader.result as string;
+          const properlySizedImage = await resizeImage(imageUrl, 2000);
+          img.src = properlySizedImage.url;
 
           // eslint-disable-next-line func-names
           img.addEventListener('load', function () {
             // eslint-disable-next-line react/no-this-in-sfc
-            if (this.width > this.height) {
-              setCoverImageInitialObjectFit('vertical-cover');
-            } else {
+            if (this.width < this.height * 2.5) {
               setCoverImageInitialObjectFit('horizontal-cover');
+              setZoomCoverImage(1);
+              // eslint-disable-next-line react/no-this-in-sfc
+            } else if (this.width < this.height * 5) {
+              setCoverImageInitialObjectFit('horizontal-cover');
+              setZoomCoverImage(2);
+            } else {
+              setCoverImageInitialObjectFit('vertical-cover');
+              setZoomCoverImage(1);
             }
+
             setCropCoverImage({ x: 0, y: 0 });
-            setZoomCoverImage(1);
             setCoverUrlInEdit(reader.result as string);
-            setCoverUrlInEditAinmated(isAnimatedImage(file.name));
+            setCoverUrlInEditAnimated(isAnimatedImage(file.name));
           });
         }
       });
@@ -854,7 +862,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             </SControlsWrapper>
           </motion.div>
         ) : (
-          <motion.div
+          <SEditProfilePicture
             key='edit-picture'
             initial={{ x: 300, opacity: 0 }}
             animate={{ x: 0, opacity: 1, transition: { delay: 0.5 } }}
@@ -944,7 +952,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 {t('EditProfileMenu.saveButton')}
               </Button>
             </SControlsWrapperPicture>
-          </motion.div>
+          </SEditProfilePicture>
         )}
       </AnimatePresence>
     </SEditProfileMenu>
@@ -1000,7 +1008,7 @@ const SEditProfileMenu = styled(motion.div)`
     left: calc(50% - 232px);
 
     width: 464px;
-    height: 72vh;
+    height: 75vh;
     max-height: 684px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -1103,6 +1111,12 @@ const SControlsWrapper = styled.div`
 
     margin-bottom: 8px;
   }
+`;
+
+const SEditProfilePicture = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 `;
 
 const SControlsWrapperPicture = styled.div`
