@@ -239,7 +239,7 @@ const SEditPictureMenu = styled(motion.div)`
     left: calc(50% - 232px);
 
     width: 464px;
-    height: 72vh;
+    height: 75vh;
     max-height: 684px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
