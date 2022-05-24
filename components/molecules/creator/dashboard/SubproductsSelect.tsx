@@ -243,7 +243,6 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
       ref.current.anim.setSegment(1, 1);
     }
     ref.current.anim.play();
-    console.log(ref);
   }, [ref, selected]);
 
   return (
