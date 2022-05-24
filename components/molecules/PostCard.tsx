@@ -253,8 +253,6 @@ export const PostCard: React.FC<ICard> = React.memo(
                 const blob = new Blob([byteArray], { type: 'video/mp4' });
                 const url = URL.createObjectURL(blob);
 
-                console.log('Setting new thumnail');
-
                 setThumbnailUrl(url);
               };
 
