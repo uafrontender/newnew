@@ -30,6 +30,7 @@ export const HowItWorks = () => {
     <>
       <Head>
         <title>{t('meta.title')}</title>
+        <meta name='description' content={t('meta.description')} />
       </Head>
       <Container>
         <IntroSection>
