@@ -10,17 +10,17 @@ import CloseModalButton from './CloseModalButton';
 interface IRemoveSubModal {
   confirmEnableSub: boolean;
   closeModal: () => void;
-  subEnabled: () => void;
+  subDisabled: () => void;
 }
 
 const RemoveSubModal: React.FC<IRemoveSubModal> = ({
   confirmEnableSub,
   closeModal,
-  subEnabled,
+  subDisabled,
 }) => {
   const { t } = useTranslation('creator');
   const handleSubmit = () => {
-    subEnabled();
+    subDisabled();
   };
 
   return (
