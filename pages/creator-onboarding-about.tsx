@@ -56,8 +56,8 @@ const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = ({
   return (
     <>
       <Head>
-        <title>{t('meta.title')}</title>
-        <meta name='description' content={t('meta.description')} />
+        <title>{t('AboutSection.meta.title')}</title>
+        <meta name='description' content={t('AboutSection.meta.description')} />
       </Head>
       {!isLoading ? (
         <OnboardingSectionAbout
