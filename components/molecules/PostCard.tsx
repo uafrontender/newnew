@@ -300,6 +300,11 @@ export const PostCard: React.FC<ICard> = React.memo(
               </SNumberImageHolder>
             )}
             <SImageHolder index={index}>
+              <img
+                className='thumnailHolder'
+                src={postParsed.announcement?.thumbnailImageUrl ?? ''}
+                alt='Post'
+              />
               <video
                 ref={(el) => {
                   videoRef.current = el!!;
@@ -315,6 +320,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   type='video/mp4'
                 />
               </video>
+
               <SImageMask />
               <STopContent>
                 <SButtonIcon
@@ -358,6 +364,11 @@ export const PostCard: React.FC<ICard> = React.memo(
       <SWrapperOutside ref={cardRef} width={width}>
         <SImageBG id='backgroundPart' height={height}>
           <SImageHolderOutside id='animatedPart'>
+            <img
+              className='thumnailHolder'
+              src={postParsed.announcement?.thumbnailImageUrl ?? ''}
+              alt='Post'
+            />
             <video
               ref={(el) => {
                 videoRef.current = el!!;
