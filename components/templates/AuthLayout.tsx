@@ -67,12 +67,14 @@ const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {
             <Container>
               <BackgroundVisual
                 view={
-                  router.pathname.includes('verify-email')
+                  router.pathname.includes('verify-email') ||
+                  router.pathname.includes('verify-new-email')
                     ? 'verify-email'
                     : 'sign-up'
                 }
               />
-              {!router.pathname.includes('verify-email') ? (
+              { !router.pathname.includes('verify-email') &&
+                  !router.pathname.includes('verify-new-email') ? (
                 <HomeLogoButton />
               ) : null}
               <AnimatePresence>{children}</AnimatePresence>
