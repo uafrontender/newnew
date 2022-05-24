@@ -72,7 +72,7 @@ const ProfileBackgroundCropper: React.FunctionComponent<TProfileBackgroundCroppe
             crop={crop}
             cropSize={{
               height: 160,
-              width: isMobile ? mobileCropWidth : 432,
+              width: isMobile ? mobileCropWidth : 416,
             }}
             cropShape='rect'
             showGrid={false}
