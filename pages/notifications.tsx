@@ -166,6 +166,7 @@ export const Notifications = () => {
     <>
       <Head>
         <title>{t('meta.title')}</title>
+        <meta name='description' content={t('meta.description')} />
       </Head>
       <SContent>
         <SHeading>{t('meta.title')}</SHeading>

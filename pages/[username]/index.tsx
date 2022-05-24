@@ -173,13 +173,16 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
                 handlePostClicked={handleOpenPostModal}
               />
             )}
-            {posts && posts.length === 0 && !isLoading && (
-              <NoContentCard>
-                <NoContentDescription>
-                  {t('CreatorsDecisions.no-content.description')}
-                </NoContentDescription>
-              </NoContentCard>
-            )}
+            {user.options?.isCreator &&
+              posts &&
+              posts.length === 0 &&
+              !isLoading && (
+                <NoContentCard>
+                  <NoContentDescription>
+                    {t('CreatorsDecisions.no-content.description')}
+                  </NoContentDescription>
+                </NoContentCard>
+              )}
           </SCardsSection>
           <div ref={loadingRef} />
         </SMain>

@@ -18,14 +18,18 @@
   },
   "firstStep": {
     "meta": {
-      "title": "Creation"
+      "title": "Create a post on NewNew",
+      "description": "Create an Event, a Superpoll or a Goal on NewNew in a few simple clicks and earn money"
     }
   },
   "secondStep": {
     "meta": {
-      "title-auction": "Creation | Event",
-      "title-multiple-choice": "Creation | Superpoll",
-      "title-crowdfunding": "Creation | Goal"
+      "title-auction": "Post an Event on NewNew",
+      "title-multiple-choice": "Post a Superpoll on NewNew",
+      "title-crowdfunding": "Post a Goal on NewNew",
+      "description-auction": "Fans bid on your auctions and you earn cash",
+      "description-multiple-choice": "Make a paid poll, earn money and cash out on NewNew",
+      "description-crowdfunding": "Use crowdfunding campaigns to fund your life goals and earn money"
     },
     "input": {
       "placeholder": "ex. Where should I get my first tattoo \uD83D\uDE4A"
