@@ -52,7 +52,8 @@ export const Dashboard: React.FC = React.memo(() => {
   const { mySubscribers } = useGetSubscriptions();
   const [mySubscriptionProduct, setMySubscriptionProduct] =
     useState<newnewapi.ISubscriptionProduct | null>(null);
-  const [isTodosCompleted, setIsTodosCompleted] = useState<boolean>(false);
+  const [isTodosCompleted, setIsTodosCompleted] =
+    useState<boolean | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [isEarningsLoading, setIsEarningsLoading] = useState(true);
   const [isMySubscriptionProductLoading, setIsMySubscriptionProductLoading] =
@@ -66,14 +67,15 @@ export const Dashboard: React.FC = React.memo(() => {
   const [hasMyPosts, setHasMyPosts] = useState(false);
 
   useEffect(() => {
-    user.creatorData?.isLoaded &&
-    user.creatorData?.hasCreatorTags &&
-    user.userData?.bio &&
-    user.userData?.bio.length > 0 &&
-    user.creatorData?.options?.isCreatorConnectedToStripe
-      ? setIsTodosCompleted(true)
-      : setIsTodosCompleted(false);
-  }, [user.creatorData, user.userData]);
+    if (user.creatorData?.isLoaded) {
+      user.creatorData?.hasCreatorTags &&
+      user.userData?.bio &&
+      user.userData?.bio.length > 0 &&
+      user.creatorData?.options?.isCreatorConnectedToStripe
+        ? setIsTodosCompleted(true)
+        : setIsTodosCompleted(false);
+    }
+  }, [user.creatorData, user.userData?.bio]);
 
   const fetchMySubscriptionProduct = async () => {
     try {
@@ -220,10 +222,22 @@ export const Dashboard: React.FC = React.memo(() => {
         )}
         <SBlock>
           {!isEarningsLoading ? (
-            isTodosCompleted ? (
-              <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
+            isTodosCompleted !== undefined ? (
+              isTodosCompleted ? (
+                <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
+              ) : (
+                <FinishProfileSetup />
+              )
             ) : (
-              <FinishProfileSetup />
+              <Lottie
+                width={64}
+                height={64}
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: loadingAnimation,
+                }}
+              />
             )
           ) : (
             <Lottie
