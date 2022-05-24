@@ -212,67 +212,74 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<ICodeVerificationMen
     }, [timerActive, timerSeconds]);
 
     return (
-      <SCodeVerificationMenuNewEmail
-        onClick={() => {
-          if (submitError) {
-            handleTryAgain();
-          }
-        }}
-      >
-        <SBackButton
-          defer={isMobileOrTablet ? 250 : undefined}
-          onClick={() => router.back()}
-        />
-        <AnimatedLogoEmailVerification
-          isLoading={isSigninWithEmailLoading || isResendCodeLoading}
-        />
-        <SHeadline variant={3}>{t('heading.heading')}</SHeadline>
-        <SSubheading variant={2} weight={600}>
-          {t('heading.subheading')}
-          <br />
-          {/* NB! Temp */}
-          {newEmail}
-        </SSubheading>
-        <VerficationCodeInput
-          initialValue={codeInitial}
-          length={6}
-          disabled={
-            isSigninWithEmailLoading || isResendCodeLoading || timerSeconds < 1
-          }
-          error={submitError ? true : undefined}
-          onComplete={onCodeComplete}
-        />
-        {timerActive && !timerHidden && !submitError && !isSucces ? (
-          <STimeoutDiv isAlertColor={timerSeconds < 11}>
-            {secondsToString(timerSeconds, 'm:s')}
-          </STimeoutDiv>
-        ) : (
-          !submitError &&
-          !isSigninWithEmailLoading &&
-          !isResendCodeLoading && (
-            <AnimatedPresence
-              animateWhenInView={false}
-              animation='t-01'
-              delay={0.3}
-            >
-              <STimeExpired>
-                {t('timeExpired.not_receieved')}{' '}
-                <button type='button' onClick={() => handleResendCode()}>
-                  {t('timeExpired.resendBtn')}
-                </button>
-              </STimeExpired>
-            </AnimatedPresence>
-          )
+      <>
+        {!isMobileOrTablet && (
+          <SBackButtonDesktop onClick={() => router.back()} />
         )}
-        {!isSigninWithEmailLoading &&
-        !isResendCodeLoading &&
-        submitError &&
-        !isSucces ? (
-          <AnimatedPresence animateWhenInView={false} animation='t-09'>
-            <SErrorDiv>{t('errors.invalidCode')}</SErrorDiv>
-          </AnimatedPresence>
-        ) : null}
-      </SCodeVerificationMenuNewEmail>
+        <SCodeVerificationMenuNewEmail
+          onClick={() => {
+            if (submitError) {
+              handleTryAgain();
+            }
+          }}
+        >
+          <SBackButton
+            defer={isMobileOrTablet ? 250 : undefined}
+            onClick={() => router.back()}
+          />
+          <AnimatedLogoEmailVerification
+            isLoading={isSigninWithEmailLoading || isResendCodeLoading}
+          />
+          <SHeadline variant={3}>{t('heading.heading')}</SHeadline>
+          <SSubheading variant={2} weight={600}>
+            {t('heading.subheading')}
+            <br />
+            {/* NB! Temp */}
+            {newEmail}
+          </SSubheading>
+          <VerficationCodeInput
+            initialValue={codeInitial}
+            length={6}
+            disabled={
+              isSigninWithEmailLoading ||
+              isResendCodeLoading ||
+              timerSeconds < 1
+            }
+            error={submitError ? true : undefined}
+            onComplete={onCodeComplete}
+          />
+          {timerActive && !timerHidden && !submitError && !isSucces ? (
+            <STimeoutDiv isAlertColor={timerSeconds < 11}>
+              {secondsToString(timerSeconds, 'm:s')}
+            </STimeoutDiv>
+          ) : (
+            !submitError &&
+            !isSigninWithEmailLoading &&
+            !isResendCodeLoading && (
+              <AnimatedPresence
+                animateWhenInView={false}
+                animation='t-01'
+                delay={0.3}
+              >
+                <STimeExpired>
+                  {t('timeExpired.not_receieved')}{' '}
+                  <button type='button' onClick={() => handleResendCode()}>
+                    {t('timeExpired.resendBtn')}
+                  </button>
+                </STimeExpired>
+              </AnimatedPresence>
+            )
+          )}
+          {!isSigninWithEmailLoading &&
+          !isResendCodeLoading &&
+          submitError &&
+          !isSucces ? (
+            <AnimatedPresence animateWhenInView={false} animation='t-09'>
+              <SErrorDiv>{t('errors.invalidCode')}</SErrorDiv>
+            </AnimatedPresence>
+          ) : null}
+        </SCodeVerificationMenuNewEmail>
+      </>
     );
   };
 
@@ -344,6 +351,47 @@ const SBackButton = styled(GoBackButton)`
 
   ${({ theme }) => theme.media.laptopL} {
     display: none;
+  }
+`;
+
+const SBackButtonDesktop = styled(GoBackButton)`
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: fit-content;
+
+  padding: 8px;
+
+  &:active {
+    & div > svg {
+      transform: scale(0.8);
+
+      transition: 0.2s ease-in-out;
+    }
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    display: flex;
+
+    top: 90px;
+    left: 104px;
+
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+    padding: 0;
+
+    border-radius: 12px;
+
+    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+
+    div {
+      margin-right: 0;
+    }
   }
 `;
 

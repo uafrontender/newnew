@@ -23,7 +23,7 @@ import {
 import Text from '../atoms/Text';
 import Headline from '../atoms/Headline';
 import GoBackButton from '../molecules/GoBackButton';
-import VerficationCodeInput from '../atoms/VerificationCodeInput';
+import VerificationCodeInput from '../atoms/VerificationCodeInput';
 import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmailVerification';
 
 // Utils
@@ -57,10 +57,10 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const [, setCookie] = useCookies();
 
   // isSuccess - no bottom sections
-  const [isSucces, setIsSuccess] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // Code input
-  const [isSigninWithEmailLoading, setIsSigninWithEmailLoading] =
+  const [isSignInWithEmailLoading, setIsSignInWithEmailLoading] =
     useState(false);
   const [submitError, setSubmitError] = useState<string>('');
 
@@ -82,7 +82,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       try {
         setSubmitError('');
         setTimerHidden(true);
-        setIsSigninWithEmailLoading(true);
+        setIsSignInWithEmailLoading(true);
 
         const signInRequest = new newnewapi.EmailSignInRequest({
           emailAddress: signupEmailInput,
@@ -138,7 +138,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         // Clean up email state, sign in the user with the response & redirect home
         setTimerActive(false);
 
-        setIsSigninWithEmailLoading(false);
+        setIsSignInWithEmailLoading(false);
         setIsSuccess(true);
 
         if (data.redirectUrl) {
@@ -149,14 +149,14 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           router.push('/');
         }
       } catch (err: any) {
-        setIsSigninWithEmailLoading(false);
+        setIsSignInWithEmailLoading(false);
         setSubmitError(err?.message ?? 'generic_error');
         setTimerActive(true);
         setTimerHidden(false);
       }
     },
     [
-      setIsSigninWithEmailLoading,
+      setIsSignInWithEmailLoading,
       setSubmitError,
       setTimerActive,
       setCookie,
@@ -224,10 +224,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   return (
     <>
       {!isMobileOrTablet && (
-        <SBackButtonDesktop
-          defer={isMobileOrTablet ? 250 : undefined}
-          onClick={() => router.back()}
-        />
+        <SBackButtonDesktop onClick={() => router.back()} />
       )}
       <SCodeVerificationMenu
         onClick={() => {
@@ -241,7 +238,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           onClick={() => router.back()}
         />
         <AnimatedLogoEmailVerification
-          isLoading={isSigninWithEmailLoading || isResendCodeLoading}
+          isLoading={isSignInWithEmailLoading || isResendCodeLoading}
         />
         <SHeadline variant={3}>{t('heading.heading')}</SHeadline>
         <SSubheading variant={2} weight={600}>
@@ -253,22 +250,22 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
             </>
           ) : null}
         </SSubheading>
-        <VerficationCodeInput
+        <VerificationCodeInput
           initialValue={codeInitial}
           length={6}
           disabled={
-            isSigninWithEmailLoading || isResendCodeLoading || timerSeconds < 1
+            isSignInWithEmailLoading || isResendCodeLoading || timerSeconds < 1
           }
           error={submitError ? true : undefined}
           onComplete={onCodeComplete}
         />
-        {timerActive && !timerHidden && !submitError && !isSucces ? (
+        {timerActive && !timerHidden && !submitError && !isSuccess ? (
           <STimeoutDiv isAlertColor={timerSeconds < 11}>
             {secondsToString(timerSeconds, 'm:s')}
           </STimeoutDiv>
         ) : (
           !submitError &&
-          !isSigninWithEmailLoading &&
+          !isSignInWithEmailLoading &&
           !isResendCodeLoading && (
             <AnimatedPresence
               animateWhenInView={false}
@@ -284,10 +281,10 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
             </AnimatedPresence>
           )
         )}
-        {!isSigninWithEmailLoading &&
+        {!isSignInWithEmailLoading &&
         !isResendCodeLoading &&
         submitError &&
-        !isSucces ? (
+        !isSuccess ? (
           <AnimatedPresence animateWhenInView={false} animation='t-09'>
             <SErrorDiv>{t('errors.invalidCode')}</SErrorDiv>
           </AnimatedPresence>
