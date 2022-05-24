@@ -17,6 +17,7 @@ export const CreationFirstStep = () => {
       <SWrapper>
         <Head>
           <title>{t('firstStep.meta.title')}</title>
+          <meta name='description' content={t('firstStep.meta.description')} />
         </Head>
         <CreationFirstStepContent />
       </SWrapper>

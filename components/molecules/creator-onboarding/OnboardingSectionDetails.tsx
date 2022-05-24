@@ -504,8 +504,9 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
               newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
             !res.error
           ) {
+            const newEmailValue = encodeURIComponent(emailInEdit);
             router.push(
-              `/verify-new-email?email=${emailInEdit}&redirect=dashboard`
+              `/verify-new-email?email=${newEmailValue}&redirect=dashboard`
             );
             return;
             // eslint-disable-next-line no-else-return
