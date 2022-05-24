@@ -321,9 +321,6 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
       }
     }
 
-    // console.log(`Sorting is ${sorting}`);
-    // console.log(`Sorting ref is ${sortingRef.current}`);
-
     if (inView && category && !isCollectionLoading) {
       if (nextPageToken) {
         loadPosts({
@@ -347,11 +344,8 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
         categoryRef.current = category;
         sortingRef.current = sorting?.toString();
       } else if (sorting?.toString() !== sortingRef.current) {
-        // console.log('Sorting changed')
-
         setCollectionLoaded([]);
         setNextPageToken(undefined);
-
         loadPosts({
           categoryToFetch: category as TCollectionType,
           ...(sorting
@@ -372,7 +366,6 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     router.query.category,
     router.query.sort,
   ]);
-  console.log(router?.query?.category);
   return (
     <>
       <Head>
