@@ -125,8 +125,9 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
               newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
             !res.error
           ) {
+            const newEmailValue = encodeURIComponent(emailInEdit);
             router.push(
-              `/verify-new-email?email=${emailInEdit}&redirect=settings`
+              `/verify-new-email?email=${newEmailValue}&redirect=settings`
             );
             return;
             // eslint-disable-next-line no-else-return
