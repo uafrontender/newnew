@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
 import styled, { css, useTheme } from 'styled-components';
-import { uuid } from 'uuidv4';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
@@ -97,12 +96,8 @@ export const PostCard: React.FC<ICard> = React.memo(
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-    const {
-      ref: cardRef,
-      inView,
-      entry: ioEntry,
-    } = useInView({
-      threshold: [0, 0.55],
+    const { ref: cardRef, inView } = useInView({
+      threshold: 0.55,
     });
     const videoRef = useRef<HTMLVideoElement>();
 
@@ -132,12 +127,15 @@ export const PostCard: React.FC<ICard> = React.memo(
       return 0;
     }, [postParsed.expiresAt?.seconds]);
 
-    const [thumbnailKey, setThumbnailKey] = useState(uuid());
+    const [thumbnailUrl, setThumbnailUrl] = useState(
+      postParsed.announcement?.thumbnailUrl ?? ''
+    );
 
     const handleUserClick = (username: string) => {
       router.push(`/${username}`);
     };
 
+    // TODO: make it open a context menu with an option to report
     const handleMoreClick = (
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
@@ -159,16 +157,12 @@ export const PostCard: React.FC<ICard> = React.memo(
         videoRef.current?.removeEventListener('canplay', handleCanplay);
         videoRef.current?.removeEventListener('loadedmetadata', handleCanplay);
       };
-    }, [inView]);
+    }, [inView, thumbnailUrl]);
 
     useEffect(() => {
       try {
         if (videoReady) {
-          if (
-            ioEntry?.intersectionRatio &&
-            ioEntry?.intersectionRatio > 0.55 &&
-            !shouldStop
-          ) {
+          if (inView && !shouldStop) {
             videoRef.current?.play();
           } else {
             videoRef.current?.pause();
@@ -177,7 +171,7 @@ export const PostCard: React.FC<ICard> = React.memo(
       } catch (err) {
         console.error(err);
       }
-    }, [ioEntry?.intersectionRatio, videoReady, shouldStop]);
+    }, [inView, videoReady, shouldStop, thumbnailUrl]);
 
     // Increment channel subs after mounting
     // Decrement when unmounting
@@ -225,8 +219,49 @@ export const PostCard: React.FC<ICard> = React.memo(
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostThumbnailUpdated.decode(arr);
 
-        if (!decoded || !decoded.thumbnailUrl) return;
-        setThumbnailKey(uuid());
+        if (
+          !decoded ||
+          !decoded.thumbnailUrl ||
+          decoded.postUuid !== postParsed.postUuid
+        )
+          return;
+
+        // Wait to make sure that cloudfare cache has been invalidated
+        setTimeout(() => {
+          fetch(decoded.thumbnailUrl)
+            .then((res) => res.blob())
+            .then((blobFromFetch) => {
+              const reader = new FileReader();
+
+              reader.onloadend = () => {
+                if (!reader.result) return;
+
+                const byteCharacters = atob(
+                  reader.result.slice(
+                    (reader.result as string).indexOf(',') + 1
+                  ) as string
+                );
+
+                const byteNumbers = new Array(byteCharacters.length);
+
+                // eslint-disable-next-line no-plusplus
+                for (let i = 0; i < byteCharacters.length; i++) {
+                  byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'video/mp4' });
+                const url = URL.createObjectURL(blob);
+
+                setThumbnailUrl(url);
+              };
+
+              reader.readAsDataURL(blobFromFetch);
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        }, 5000);
       };
 
       if (socketConnection) {
@@ -263,29 +298,27 @@ export const PostCard: React.FC<ICard> = React.memo(
               </SNumberImageHolder>
             )}
             <SImageHolder index={index}>
-              {ioEntry?.isIntersecting ? (
-                <video
-                  key={thumbnailKey}
-                  ref={(el) => {
-                    videoRef.current = el!!;
-                  }}
-                  loop
-                  muted
-                  playsInline
-                  poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
-                >
-                  <source
-                    src={postParsed.announcement?.thumbnailUrl ?? ''}
-                    type='video/mp4'
-                  />
-                </video>
-              ) : (
-                <img
-                  className='thumnailHolder'
-                  src={postParsed.announcement?.thumbnailImageUrl ?? ''}
-                  alt='Post'
+              <img
+                className='thumnailHolder'
+                src={postParsed.announcement?.thumbnailImageUrl ?? ''}
+                alt='Post'
+              />
+              <video
+                ref={(el) => {
+                  videoRef.current = el!!;
+                }}
+                key={thumbnailUrl}
+                loop
+                muted
+                playsInline
+              >
+                <source
+                  key={thumbnailUrl}
+                  src={thumbnailUrl}
+                  type='video/mp4'
                 />
-              )}
+              </video>
+
               <SImageMask />
               <STopContent>
                 <SButtonIcon
@@ -329,29 +362,22 @@ export const PostCard: React.FC<ICard> = React.memo(
       <SWrapperOutside ref={cardRef} width={width}>
         <SImageBG id='backgroundPart' height={height}>
           <SImageHolderOutside id='animatedPart'>
-            {ioEntry?.isIntersecting ? (
-              <video
-                key={thumbnailKey}
-                ref={(el) => {
-                  videoRef.current = el!!;
-                }}
-                loop
-                muted
-                playsInline
-                poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
-              >
-                <source
-                  src={postParsed.announcement?.thumbnailUrl ?? ''}
-                  type='video/mp4'
-                />
-              </video>
-            ) : (
-              <img
-                className='thumnailHolder'
-                src={postParsed.announcement?.thumbnailImageUrl ?? ''}
-                alt='Post'
-              />
-            )}
+            <img
+              className='thumnailHolder'
+              src={postParsed.announcement?.thumbnailImageUrl ?? ''}
+              alt='Post'
+            />
+            <video
+              ref={(el) => {
+                videoRef.current = el!!;
+              }}
+              key={thumbnailUrl}
+              loop
+              muted
+              playsInline
+            >
+              <source key={thumbnailUrl} src={thumbnailUrl} type='video/mp4' />
+            </video>
             <STopContent>
               <SButtonIcon
                 iconOnly

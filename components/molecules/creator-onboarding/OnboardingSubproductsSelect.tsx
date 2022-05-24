@@ -32,7 +32,7 @@ const OnboardingSubproductSelect: React.FunctionComponent<IOnboardingSubproductS
             id: '',
           })
         }
-        selected={currentProduct.id === ''}
+        selected={currentProduct && currentProduct.id === ''}
         featured={false}
         handleClick={() =>
           handleSelectProduct(
@@ -46,7 +46,7 @@ const OnboardingSubproductSelect: React.FunctionComponent<IOnboardingSubproductS
         <ProductOption
           key={p.id}
           product={p}
-          selected={currentProduct.id === p.id}
+          selected={currentProduct && currentProduct.id === p.id}
           featured={featuredProductsIds.includes(p.id as string)}
           handleClick={() => handleSelectProduct(p)}
         />

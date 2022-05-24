@@ -1,7 +1,13 @@
 {
   "meta": {
-    "title": "Sign in",
-    "description": "Sign up to Newnew!"
+    "title": "Sign up to NewNew",
+    "description": "Signing up to NewNew is fast and easy. Join now to be a Creator or watch people"
+  },
+  "toLogIn": {
+    "meta": {
+      "title": "Log in to NewNew",
+      "description": "Logging in to NewNew is fast and easy"
+    }
   },
   "goBackBtn": "Go back",
   "heading": {
