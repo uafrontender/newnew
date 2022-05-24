@@ -138,6 +138,7 @@ export const PostCard: React.FC<ICard> = React.memo(
       router.push(`/${username}`);
     };
 
+    // TODO: make it open a context menu with an option to report
     const handleMoreClick = (
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {

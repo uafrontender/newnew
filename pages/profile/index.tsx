@@ -3,6 +3,7 @@ import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSidePropsContext, NextPage } from 'next';
+import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -140,39 +141,45 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
 
   return (
-    <div>
-      <SMain>
-        <SCardsSection>
-          {posts && posts.length > 0 && (
-            <PostList
-              category=''
-              loading={isLoading}
-              collection={posts}
-              wrapperStyle={{
-                left: 0,
-              }}
-              handlePostClicked={handleOpenPostModal}
-            />
-          )}
-          {posts && posts.length === 0 && !isLoading && (
-            <NoContentCard>
-              <NoContentDescription>
-                {t('Active.no-content.description')}
-              </NoContentDescription>
-            </NoContentCard>
-          )}
-        </SCardsSection>
-        <div ref={loadingRef} />
-      </SMain>
-      {displayedPost && postModalOpen && (
-        <PostModal
-          isOpen={postModalOpen}
-          post={displayedPost}
-          handleClose={() => handleClosePostModal()}
-          handleOpenAnotherPost={handleSetDisplayedPost}
-        />
-      )}
-    </div>
+    <>
+      <Head>
+        <title>{t('meta.title')}</title>
+        <meta name='description' content={t('meta.description')} />
+      </Head>
+      <div>
+        <SMain>
+          <SCardsSection>
+            {posts && posts.length > 0 && (
+              <PostList
+                category=''
+                loading={isLoading}
+                collection={posts}
+                wrapperStyle={{
+                  left: 0,
+                }}
+                handlePostClicked={handleOpenPostModal}
+              />
+            )}
+            {posts && posts.length === 0 && !isLoading && (
+              <NoContentCard>
+                <NoContentDescription>
+                  {t('Active.no-content.description')}
+                </NoContentDescription>
+              </NoContentCard>
+            )}
+          </SCardsSection>
+          <div ref={loadingRef} />
+        </SMain>
+        {displayedPost && postModalOpen && (
+          <PostModal
+            isOpen={postModalOpen}
+            post={displayedPost}
+            handleClose={() => handleClosePostModal()}
+            handleOpenAnotherPost={handleSetDisplayedPost}
+          />
+        )}
+      </div>
+    </>
   );
 };
 

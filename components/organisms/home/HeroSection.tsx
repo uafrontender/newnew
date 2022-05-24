@@ -168,6 +168,8 @@ export const HeroSection = React.memo(() => {
                 : assets.landing[graphicsVersion.current]
                     .darkMobileLandingStatic
             }
+            // For unknown reason animation has empty space on the left
+            style={{ marginRight: 18 }}
           >
             <source
               src={
