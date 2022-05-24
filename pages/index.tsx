@@ -339,6 +339,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     <>
       <Head>
         <title>{t('home.meta.title')}</title>
+        <meta name='description' content={t('home.meta.description')} />
       </Head>
       {!user.loggedIn && <HeroSection />}
       {topSectionCollection.length > 0 && (
