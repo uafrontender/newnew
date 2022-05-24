@@ -89,16 +89,14 @@ const STitle = styled(Headline)`
 const SButton = styled(Button)`
   width: 100%;
   padding: 16px 20px;
-  margin-top: 16px;
-
   background: ${(props) => props.theme.colorsThemed.accent.yellow};
   color: #2c2c33;
 
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
-    margin-top: 24px;
   }
+  &:enabled,
   &:hover {
     background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
   }
@@ -106,13 +104,14 @@ const SButton = styled(Button)`
 
 const SDescriptionWrapper = styled.div`
   margin-top: 8px;
-
+  padding-bottom: 16px;
   p {
     display: inline;
   }
 
   ${(props) => props.theme.media.tablet} {
     margin-top: 12px;
+    padding-bottom: 24px;
   }
 
   ${(props) => props.theme.media.laptop} {
