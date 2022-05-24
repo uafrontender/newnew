@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "NewNew Profile Page",
+    "description": "Customize your NewNew profile with username, display name, bio and more"
+  },
   "subscribed-tag": "SUBSCRIBED",
   "ellipse": {
     "unsub": "Unsubscribe",
