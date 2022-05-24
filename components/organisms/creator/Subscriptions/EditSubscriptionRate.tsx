@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
@@ -9,15 +9,23 @@ import Navigation from '../../../molecules/creator/Navigation';
 import { useAppSelector } from '../../../../redux-store/store';
 import { getMySubscriptionProduct } from '../../../../api/endpoints/subscription';
 import SubproductsSelect from '../../../molecules/creator/dashboard/SubproductsSelect';
+import RemoveSubscriptionEllipseMenu from '../../../atoms/dashboard/RemoveSubscriptionEllipseMenu';
+import MoreIconFilled from '../../../../public/images/svg/icons/filled/More.svg';
+import InlineSVG from '../../../atoms/InlineSVG';
+import Button from '../../../atoms/Button';
 
 export const EditSubscriptionRate: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
+  const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const [mySubscriptionProduct, setMySubscriptionProduct] =
     useState<newnewapi.ISubscriptionProduct | null>(null);
+
+  const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
+  const user = useAppSelector((state) => state.user);
 
   const fetchMySubscriptionProduct = async () => {
     try {
@@ -35,10 +43,22 @@ export const EditSubscriptionRate: React.FC = React.memo(() => {
   };
 
   useEffect(() => {
+    if (
+      mySubscriptionProduct &&
+      !user.userData?.options?.isOfferingSubscription
+    ) {
+      setMySubscriptionProduct(null);
+    }
+  }, [user.userData?.options?.isOfferingSubscription, mySubscriptionProduct]);
+
+  useEffect(() => {
     if (!mySubscriptionProduct) {
       fetchMySubscriptionProduct();
     }
   }, [mySubscriptionProduct]);
+
+  const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
+  const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
   return (
     <SContainer>
@@ -46,6 +66,27 @@ export const EditSubscriptionRate: React.FC = React.memo(() => {
       <SContent>
         <STitleBlock>
           <STitle variant={4}>{t('SubrateSection.heading')}</STitle>
+          {user.userData?.options?.isOfferingSubscription && (
+            <>
+              <SMoreButton
+                view='transparent'
+                iconOnly
+                onClick={() => handleOpenEllipseMenu()}
+              >
+                <InlineSVG
+                  svg={MoreIconFilled}
+                  fill={theme.colorsThemed.text.secondary}
+                  width='20px'
+                  height='20px'
+                />
+              </SMoreButton>
+
+              <RemoveSubscriptionEllipseMenu
+                isVisible={ellipseMenuOpen}
+                handleClose={handleCloseEllipseMenu}
+              />
+            </>
+          )}
         </STitleBlock>
         <SubproductsSelect
           mySubscriptionProduct={mySubscriptionProduct}
@@ -100,4 +141,19 @@ const STitleBlock = styled.section`
   margin-bottom: 24px;
   flex-direction: row;
   justify-content: space-between;
+  max-width: 608px;
+  position: relative;
+`;
+
+const SMoreButton = styled(Button)`
+  background: none;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  padding: 8px;
+  margin-right: 18px;
+  span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 `;
