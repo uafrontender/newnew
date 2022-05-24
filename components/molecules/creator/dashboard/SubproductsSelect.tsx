@@ -16,7 +16,7 @@ import Lottie from '../../../atoms/Lottie';
 import Button from '../../../atoms/Button';
 import { formatNumber } from '../../../../utils/format';
 import SubsFeatures from '../../../atoms/dashboard/SubsFeatures';
-import checkBoxAnim from '../../../../public/animations/checkbox.json';
+import checkBoxAnim from '../../../../public/animations/checkbox-subrate.json';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import EnableSubModal from '../../../atoms/dashboard/EnableSubModal';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
@@ -24,12 +24,10 @@ import { setUserData } from '../../../../redux-store/slices/userStateSlice';
 
 interface ISubproductsSelect {
   mySubscriptionProduct: newnewapi.ISubscriptionProduct | null;
-  removedMyProduct: () => void;
 }
 
 const SubproductsSelect: React.FC<ISubproductsSelect> = ({
   mySubscriptionProduct,
-  removedMyProduct,
 }) => {
   const { t } = useTranslation('creator');
   const [standardProducts, setStandardProducts] = useState<
@@ -123,6 +121,11 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
                 product={p}
                 selected={selectedProduct ? selectedProduct.id === p.id : false}
                 handleClick={() => handleSetSelectedProduct(p)}
+                currentProduct={
+                  mySubscriptionProduct
+                    ? mySubscriptionProduct.id === p.id
+                    : false
+                }
               />
             ))}
           </SProductOptions>
@@ -217,6 +220,7 @@ const SNote = styled.p`
 
 interface IProductOption {
   selected: boolean;
+  currentProduct: boolean;
   product: newnewapi.ISubscriptionProduct;
   handleClick: () => void;
 }
@@ -225,6 +229,7 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
   selected,
   product,
   handleClick,
+  currentProduct,
 }) => {
   const { t } = useTranslation('creator');
   const ref: any = useRef();
@@ -238,6 +243,7 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
       ref.current.anim.setSegment(1, 1);
     }
     ref.current.anim.play();
+    console.log(ref);
   }, [ref, selected]);
 
   return (
@@ -258,13 +264,18 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
         {product.id !== '' ? (
           <>
             {product?.monthlyRate?.usdCents && (
-              <Text variant={1} weight={600}>
+              <SPrice variant={1} weight={600} selected={selected ?? false}>
                 ${formatNumber(product.monthlyRate.usdCents / 100 ?? 0, true)}
-              </Text>
+              </SPrice>
             )}
-            <SPerMonth variant={2}>
+            <SPerMonth variant={2} selected={selected ?? false}>
               {t('SubrateSection.selectInput.perMonth')}
             </SPerMonth>
+            {currentProduct && (
+              <SLabelCurrent selected={selected ?? false}>
+                Current
+              </SLabelCurrent>
+            )}
           </>
         ) : (
           <Text variant={2}>{t('SubrateSection.selectInput.noProduct')}</Text>
@@ -280,19 +291,13 @@ const SProductOption = styled.button<{
   display: flex;
   align-items: center;
   position: relative;
-
-  border-style: solid;
-  border-width: 2px;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  border-color: ${({ theme, selected }) =>
-    selected ? theme.colorsThemed.accent.blue : 'transparent'};
-
+  border: none;
+  border-radius: 16px;
   width: 100%;
 
   background: ${({ selected, theme }) =>
     selected
-      ? 'linear-gradient(0deg, rgba(29, 106, 255, 0.2), rgba(29, 106, 255, 0.2))'
+      ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF'
       : theme.name === 'light'
       ? theme.colors.white
       : theme.colorsThemed.background.secondary};
@@ -325,7 +330,40 @@ const SLabelContent = styled.div`
   padding-left: 3px;
 `;
 
-const SPerMonth = styled(Text)`
-  color: ${({ theme }) =>
-    theme.name === 'light' ? '#586070' : theme.colorsThemed.text.tertiary};
+const SPrice = styled(Text)<{
+  selected: boolean;
+}>`
+  color: ${({ selected }) => (selected ? '#fff' : '')};
+`;
+
+const SPerMonth = styled(Text)<{
+  selected: boolean;
+}>`
+  color: ${({ theme, selected }) =>
+    selected
+      ? 'rgba(255,255,255,.4)'
+      : theme.name === 'light'
+      ? '#586070'
+      : theme.colorsThemed.text.tertiary};
+`;
+
+const SLabelCurrent = styled.div<{
+  selected: boolean;
+}>`
+  border-radius: 20px;
+  background: ${({ selected, theme }) =>
+    selected
+      ? '#fff'
+      : theme.name !== 'light'
+      ? theme.colors.white
+      : 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF'};
+  margin: auto 0 auto auto;
+  padding: 6px;
+  font-weight: bold;
+  color: ${({ theme, selected }) =>
+    selected
+      ? '#2C2C33'
+      : theme.name === 'light'
+      ? theme.colors.white
+      : '#2C2C33'};
 `;

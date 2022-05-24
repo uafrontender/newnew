@@ -88,10 +88,7 @@ export const EditSubscriptionRate: React.FC = React.memo(() => {
             </>
           )}
         </STitleBlock>
-        <SubproductsSelect
-          mySubscriptionProduct={mySubscriptionProduct}
-          removedMyProduct={fetchMySubscriptionProduct}
-        />
+        <SubproductsSelect mySubscriptionProduct={mySubscriptionProduct} />
       </SContent>
     </SContainer>
   );
@@ -149,7 +146,7 @@ const SMoreButton = styled(Button)`
   background: none;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   padding: 8px;
-  margin-right: 18px;
+  /* margin-right: 18px; */
   span {
     display: flex;
     flex-direction: column;

@@ -86,7 +86,7 @@ const SContainer = styled(motion.div)`
   position: absolute;
   top: 60px;
   z-index: 10;
-  right: 27px;
+  right: 0;
 `;
 
 const SButton = styled(Button)`
