@@ -37,7 +37,7 @@ const TopSection = dynamic(
 );
 
 export type TCollectionType = 'ac' | 'mc' | 'cf' | 'biggest' | 'for-you';
-export type TSortingType = 'all' | 'num_bids' | 'most_funded' | 'newest';
+export type TSortingType = 'all' | 'num_bids' | 'newest';
 
 interface ISearch {
   top10posts: newnewapi.NonPagedPostsResponse;
@@ -312,9 +312,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     // eslint-disable-next-line no-undef-init
     let sorting: newnewapi.PostSorting | undefined = undefined;
     if (sort.sortingtype) {
-      if ((sort.sortingtype as TSortingType) === 'most_funded') {
-        sorting = newnewapi.PostSorting.MOST_FUNDED_FIRST;
-      } else if ((sort.sortingtype as TSortingType) === 'num_bids') {
+      if ((sort.sortingtype as TSortingType) === 'num_bids') {
         sorting = newnewapi.PostSorting.MOST_VOTED_FIRST;
       } else if ((sort.sortingType as TSortingType) === 'newest') {
         sorting = newnewapi.PostSorting.NEWEST_FIRST;
