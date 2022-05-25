@@ -1150,8 +1150,7 @@ const SPostModalContainer = styled.div<{
         : theme.colorsThemed.background.primary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     width: 100%;
-    height: ${({ loaded }) =>
-      loaded ? 'calc(100% - 64px)' : 'calc(100% - 64px)'};
+    height: calc(100% - 64px);
 
     ${({ isMyPost }) =>
       isMyPost
@@ -1166,7 +1165,8 @@ const SPostModalContainer = styled.div<{
     top: 32px;
     left: calc(50% - 496px);
     width: 992px;
-    height: ${({ loaded }) => (loaded ? 'calc(100% - 32px)' : 'auto')};
+    height: calc(100% - 32px);
+    max-height: ${({ loaded }) => (loaded ? 'unset' : '776px')};
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
