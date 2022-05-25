@@ -660,7 +660,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           //   : {
           //       predefinedOption: 'card',
           //     })}
-          showTocApply={!user?.loggedIn}
+
           // {...{
           //   ...(walletBalance &&
           //   walletBalance?.usdCents < parseInt(newBidAmount) * votePrice

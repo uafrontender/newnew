@@ -619,7 +619,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           //       predefinedOption: 'card',
           //     })}
           // predefinedOption='card'
-          showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           // handlePayWithWallet={handleSubmitNewOptionWallet}
