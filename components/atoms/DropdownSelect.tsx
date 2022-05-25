@@ -42,6 +42,8 @@ const DropdownSelect = <T,>({
   const optionsContainerRef = useRef<HTMLDivElement>();
   const optionsRefs = useRef<HTMLButtonElement[]>([]);
 
+  const selectedRef = useRef<T | undefined>(selected);
+
   const handleToggle = () => setIsOpen((curr) => !curr);
   const handleClose = () => setIsOpen(false);
 
@@ -51,7 +53,7 @@ const DropdownSelect = <T,>({
   });
 
   useEffect(() => {
-    if (isOpen && selected) {
+    if (isOpen && selected && selected !== selectedRef.current) {
       const itemTopPos =
         optionsRefs.current[options.findIndex((o) => o.value === selected)]
           .offsetTop;
@@ -59,6 +61,8 @@ const DropdownSelect = <T,>({
       if (optionsContainerRef.current) {
         optionsContainerRef.current.scrollTop = itemTopPos;
       }
+
+      selectedRef.current = selected;
     }
   }, [selected, options, isOpen]);
 

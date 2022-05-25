@@ -430,6 +430,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
               ];
             } else {
               workingArr[idx].voteCount = decoded.option?.voteCount as number;
+              workingArr[idx].supporterCount = decoded.option
+                ?.supporterCount as number;
+              workingArr[idx].firstVoter = decoded.option?.firstVoter;
               workingArrUnsorted = workingArr;
             }
 
