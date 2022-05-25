@@ -530,7 +530,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
                 decoded.option as TMcOptionWithHighestField,
               ];
             } else {
+              // workingArr[idx] = decoded.option as TMcOptionWithHighestField;
               workingArr[idx].voteCount = decoded.option?.voteCount as number;
+              workingArr[idx].supporterCount = decoded.option
+                ?.supporterCount as number;
+              workingArr[idx].firstVoter = decoded.option?.firstVoter;
               workingArrUnsorted = workingArr;
             }
 
