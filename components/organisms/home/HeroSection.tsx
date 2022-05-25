@@ -1,11 +1,4 @@
-import React, {
-  // useMemo,
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-} from 'react';
-// import Image from 'next/image';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
@@ -22,6 +15,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { SCROLL_EXPLORE } from '../../../constants/timings';
 
 import assets from '../../../constants/assets';
+import LargeAnimation from '../../atoms/LargeAnimation';
 
 const GRAPHICS_VERSION_STORAGE_KEY = 'graphics-version';
 type GraphicsVersion = 1 | 2 | 3 | 4 | 5;
@@ -153,63 +147,38 @@ export const HeroSection = React.memo(() => {
           </SButtonsHolder>
         </AnimatedPresence>
       </STopWrapper>
-      <SHeroImage>
-        {isMobile ? (
-          <video
-            key='video-mobile'
-            loop
-            muted
-            autoPlay
-            playsInline
-            poster={
-              theme.name === 'light'
-                ? assets.landing[graphicsVersion.current]
-                    .lightMobileLandingStatic
-                : assets.landing[graphicsVersion.current]
-                    .darkMobileLandingStatic
-            }
-            // For unknown reason animation has empty space on the left
-            style={{ marginRight: 36 }}
-          >
-            <source
-              src={
-                theme.name === 'light'
-                  ? assets.landing[graphicsVersion.current]
-                      .lightMobileLandingAnimated
-                  : assets.landing[graphicsVersion.current]
-                      .darkMobileLandingAnimated
-              }
-              type='video/mp4'
-            />
-          </video>
-        ) : (
-          <video
-            key='video-desktop'
-            loop
-            muted
-            autoPlay
-            playsInline
-            poster={
-              theme.name === 'light'
-                ? assets.landing[graphicsVersion.current]
-                    .lightDesktopLandingStatic
-                : assets.landing[graphicsVersion.current]
-                    .darkDesktopLandingStatic
-            }
-          >
-            <source
-              src={
-                theme.name === 'light'
-                  ? assets.landing[graphicsVersion.current]
-                      .lightDesktopLandingAnimated
-                  : assets.landing[graphicsVersion.current]
-                      .darkDesktopLandingAnimated
-              }
-              type='video/mp4'
-            />
-          </video>
-        )}
-      </SHeroImage>
+      {isMobile ? (
+        <SLargeAnimation
+          placeholderSrc={
+            theme.name === 'light'
+              ? assets.landing[graphicsVersion.current].lightMobileLandingStatic
+              : assets.landing[graphicsVersion.current].darkMobileLandingStatic
+          }
+          videoSrc={
+            theme.name === 'light'
+              ? assets.landing[graphicsVersion.current]
+                  .lightMobileLandingAnimated
+              : assets.landing[graphicsVersion.current]
+                  .darkMobileLandingAnimated
+          }
+        />
+      ) : (
+        <SLargeAnimation
+          placeholderSrc={
+            theme.name === 'light'
+              ? assets.landing[graphicsVersion.current]
+                  .lightDesktopLandingStatic
+              : assets.landing[graphicsVersion.current].darkDesktopLandingStatic
+          }
+          videoSrc={
+            theme.name === 'light'
+              ? assets.landing[graphicsVersion.current]
+                  .lightDesktopLandingAnimated
+              : assets.landing[graphicsVersion.current]
+                  .darkDesktopLandingAnimated
+          }
+        />
+      )}
     </SWrapper>
   );
 });
@@ -303,16 +272,7 @@ const SButtonsHolder = styled.div`
   }
 `;
 
-// const SNotificationsList = styled.div`
-//   flex: 1;
-//   display: flex;
-//   position: relative;
-//   margin-top: 44px;
-//   align-items: flex-end;
-//   flex-direction: column;
-// `;
-
-const SHeroImage = styled.div`
+const SLargeAnimation = styled(LargeAnimation)`
   order: -1;
 
   flex: 1;
@@ -326,14 +286,13 @@ const SHeroImage = styled.div`
 
   z-index: 1;
 
-  video {
+  * {
+    position: relative;
+    top: -32px;
     width: 100%;
     max-width: 360px;
     object-fit: contain;
-
-    position: relative;
-
-    top: -32px;
+    margin-right: 36px;
   }
 
   ${({ theme }) => theme.media.tablet} {
@@ -341,10 +300,10 @@ const SHeroImage = styled.div`
     height: 642px;
     margin-top: 24px;
 
-    video {
+    * {
       top: -10%;
-
       max-width: unset;
+      margin-right: unset;
     }
   }
 `;
@@ -356,31 +315,3 @@ const SButton = styled(Button)`
     font-size: 16px;
   }
 `;
-
-// const GradientMask = styled.div`
-//   top: 0;
-//   left: 0;
-//   right: 0;
-//   bottom: 0;
-//   z-index: 1;
-//   position: absolute;
-//   background: ${(props) => props.theme.gradients.heroNotifications};
-//   pointer-events: none;
-
-//   ${(props) => props.theme.media.tablet} {
-//     background: ${(props) => props.theme.gradients.heroNotificationsTablet};
-//   }
-// `;
-
-// const SNotificationItemHolder = styled.div`
-//   width: 100%;
-//   margin-top: 16px;
-
-//   ${(props) => props.theme.media.tablet} {
-//     max-width: 344px;
-//   }
-
-//   ${(props) => props.theme.media.laptop} {
-//     max-width: 608px;
-//   }
-// `;
