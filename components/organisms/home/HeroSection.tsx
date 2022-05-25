@@ -273,6 +273,7 @@ const SButtonsHolder = styled.div`
 `;
 
 const SLargeAnimation = styled(LargeAnimation)`
+  right: 18px;
   order: -1;
 
   flex: 1;
@@ -287,23 +288,23 @@ const SLargeAnimation = styled(LargeAnimation)`
   z-index: 1;
 
   * {
-    position: relative;
-    top: -32px;
+    margin-top: -32px;
+    margin-bottom: 32px;
     width: 100%;
     max-width: 360px;
     object-fit: contain;
-    margin-right: 36px;
   }
 
   ${({ theme }) => theme.media.tablet} {
     order: unset;
+    right: unset;
     height: 642px;
     margin-top: 24px;
 
     * {
-      top: -10%;
       max-width: unset;
-      margin-right: unset;
+      margin-top: -10%;
+      margin-bottom: 10%;
     }
   }
 `;
