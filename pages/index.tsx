@@ -367,7 +367,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionACInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn ? (
+            !user.loggedIn || collectionAC.length === 0 ? (
               <TutorialCard
                 image={
                   theme.name === 'light'
@@ -394,7 +394,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionMCInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn ? (
+            !user.loggedIn || collectionMC.length === 0 ? (
               <TutorialCard
                 image={
                   theme.name === 'light'
@@ -416,7 +416,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionCFInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn ? (
+            !user.loggedIn || collectionCF.length === 0 ? (
               <TutorialCard
                 image={
                   theme.name === 'light'

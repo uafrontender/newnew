@@ -635,7 +635,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         {paymentModalOpen ? (
           <PaymentModal
             zIndex={12}
-            showTocApply={!user?.loggedIn}
             isOpen={paymentModalOpen}
             amount={`$${parseInt(supportBidAmount) * votePrice}`}
             // {...(walletBalance?.usdCents &&

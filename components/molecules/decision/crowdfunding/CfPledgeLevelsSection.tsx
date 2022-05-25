@@ -404,7 +404,6 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
             //       predefinedOption: 'card',
             //     })}
             // predefinedOption='card'
-            showTocApply={!user?.loggedIn}
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
             // handlePayWithWallet={handlePayWithWallet}
