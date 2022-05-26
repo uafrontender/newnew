@@ -19,7 +19,6 @@ interface IPostCardEllipseMenu {
   postType: string;
   isVisible: boolean;
   user: IUserStateInterface;
-  handleFollowDecision: () => void;
   handleReportOpen: () => void;
   onClose: () => void;
   handleRemovePostFromState?: () => void;
@@ -84,7 +83,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           if (!user.loggedIn) {
             router.push(
               `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
-                window.location.href
+                `${process.env.NEXT_PUBLIC_APP_URL}/post/${postUuid}`
               )}`
             );
           }
