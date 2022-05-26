@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { newnewapi } from 'newnew-api';
@@ -42,6 +43,7 @@ import { SocketContext } from '../../contexts/socketContext';
 import { ChannelsContext } from '../../contexts/channelsContext';
 import CardTimer from '../atoms/CardTimer';
 import switchPostStatus from '../../utils/switchPostStatus';
+import PostCardEllipseMenu from './PostCardEllipseMenu';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -77,13 +79,23 @@ interface ICard {
   width?: string;
   height?: string;
   shouldStop?: boolean;
+  hanldeRemoveCardFromState?: () => void;
 }
 
 export const PostCard: React.FC<ICard> = React.memo(
-  ({ item, type, index, width, height, shouldStop }) => {
+  ({
+    item,
+    type,
+    index,
+    width,
+    height,
+    shouldStop,
+    hanldeRemoveCardFromState,
+  }) => {
     const { t } = useTranslation('home');
     const theme = useTheme();
     const router = useRouter();
+    const user = useAppSelector((state) => state.user);
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -135,13 +147,27 @@ export const PostCard: React.FC<ICard> = React.memo(
       router.push(`/${username}`);
     };
 
-    // TODO: make it open a context menu with an option to report
+    // Ellipse menu
+    const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
+    const [isFollowingDecision, setIsFollowingDecision] = useState(
+      postParsed.isFavoritedByMe
+    );
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
     const handleMoreClick = (
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
       e.preventDefault();
       e.stopPropagation();
+
+      setIsEllipseMenuOpen(true);
     };
+
+    const handleFollowDecision = () => {};
+    const handleReportOpen = () => {};
+    const handleDeleteModalOpen = () => {};
+    const handleEllipseMenuClose = () => setIsEllipseMenuOpen(false);
 
     const handleBidClick = () => {};
 
@@ -318,7 +344,6 @@ export const PostCard: React.FC<ICard> = React.memo(
                   type='video/mp4'
                 />
               </video>
-
               <SImageMask />
               <STopContent>
                 <SButtonIcon
@@ -334,6 +359,20 @@ export const PostCard: React.FC<ICard> = React.memo(
                     height='20px'
                   />
                 </SButtonIcon>
+                {!isMobile && (
+                  <PostCardEllipseMenu
+                    postType={typeOfPost as string}
+                    isFollowingDecision={!!isFollowingDecision}
+                    isVisible={isEllipseMenuOpen}
+                    isMyPost={
+                      postParsed.creator?.uuid === user.userData?.userUuid
+                    }
+                    handleFollowDecision={handleFollowDecision}
+                    handleReportOpen={handleReportOpen}
+                    handleDeleteModalOpen={handleDeleteModalOpen}
+                    onClose={handleEllipseMenuClose}
+                  />
+                )}
               </STopContent>
               <SBottomContent>
                 <SUserAvatar
@@ -392,6 +431,20 @@ export const PostCard: React.FC<ICard> = React.memo(
                   height='20px'
                 />
               </SButtonIcon>
+              {!isMobile && (
+                <PostCardEllipseMenu
+                  postType={typeOfPost as string}
+                  isFollowingDecision={!!isFollowingDecision}
+                  isMyPost={
+                    postParsed.creator?.uuid === user.userData?.userUuid
+                  }
+                  isVisible={isEllipseMenuOpen}
+                  handleFollowDecision={handleFollowDecision}
+                  handleReportOpen={handleReportOpen}
+                  handleDeleteModalOpen={handleDeleteModalOpen}
+                  onClose={handleEllipseMenuClose}
+                />
+              )}
             </STopContent>
           </SImageHolderOutside>
         </SImageBG>
