@@ -361,15 +361,12 @@ export const PostCard: React.FC<ICard> = React.memo(
                 </SButtonIcon>
                 {!isMobile && (
                   <PostCardEllipseMenu
+                    postUuid={postParsed.postUuid}
                     postType={typeOfPost as string}
-                    isFollowingDecision={!!isFollowingDecision}
                     isVisible={isEllipseMenuOpen}
-                    isMyPost={
-                      postParsed.creator?.uuid === user.userData?.userUuid
-                    }
+                    user={user}
                     handleFollowDecision={handleFollowDecision}
                     handleReportOpen={handleReportOpen}
-                    handleDeleteModalOpen={handleDeleteModalOpen}
                     onClose={handleEllipseMenuClose}
                   />
                 )}
@@ -433,15 +430,12 @@ export const PostCard: React.FC<ICard> = React.memo(
               </SButtonIcon>
               {!isMobile && (
                 <PostCardEllipseMenu
+                  postUuid={postParsed.postUuid}
                   postType={typeOfPost as string}
-                  isFollowingDecision={!!isFollowingDecision}
-                  isMyPost={
-                    postParsed.creator?.uuid === user.userData?.userUuid
-                  }
                   isVisible={isEllipseMenuOpen}
+                  user={user}
                   handleFollowDecision={handleFollowDecision}
                   handleReportOpen={handleReportOpen}
-                  handleDeleteModalOpen={handleDeleteModalOpen}
                   onClose={handleEllipseMenuClose}
                 />
               )}

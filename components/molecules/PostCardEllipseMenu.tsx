@@ -1,21 +1,29 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import { newnewapi } from 'newnew-api';
+import styled, { useTheme } from 'styled-components';
+import { useRouter } from 'next/router';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 import Text from '../atoms/Text';
+import { IUserStateInterface } from '../../redux-store/slices/userStateSlice';
+import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
+import switchPostType from '../../utils/switchPostType';
 
 interface IPostCardEllipseMenu {
+  postUuid: string;
   postType: string;
   isVisible: boolean;
-  isFollowingDecision: boolean;
-  isMyPost: boolean;
+  user: IUserStateInterface;
   handleFollowDecision: () => void;
   handleReportOpen: () => void;
-  handleDeleteModalOpen: () => void;
   onClose: () => void;
+  handleRemovePostFromState?: () => void;
+  handleAddPostToState?: () => void;
 }
 
 const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
@@ -23,47 +31,119 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
     ({
       postType,
       isVisible,
-      isFollowingDecision,
-      isMyPost,
-      handleFollowDecision,
+      user,
+      postUuid,
       handleReportOpen,
-      handleDeleteModalOpen,
       onClose,
+      handleRemovePostFromState,
+      handleAddPostToState,
     }) => {
+      const theme = useTheme();
+      const router = useRouter();
       const { t } = useTranslation('home');
       const containerRef = useRef<HTMLDivElement>();
 
       useOnClickEsc(containerRef, onClose);
       useOnClickOutside(containerRef, onClose);
 
-      if (isMyPost) {
-        return (
-          <AnimatePresence>
-            {isVisible && (
-              <SContainer
-                ref={(el) => {
-                  containerRef.current = el!!;
-                }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <SButton
-                  onClick={() => {
-                    handleDeleteModalOpen();
-                    onClose();
-                  }}
-                >
-                  <Text variant={3} tone='error'>
-                    {t('ellipse.report')}
-                  </Text>
-                </SButton>
-              </SContainer>
-            )}
-          </AnimatePresence>
-        );
+      // Share
+      const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+
+      async function copyPostUrlToClipboard(url: string) {
+        if ('clipboard' in navigator) {
+          await navigator.clipboard.writeText(url);
+        } else {
+          document.execCommand('copy', true, url);
+        }
       }
+
+      const handleCopyLink = useCallback(() => {
+        if (window) {
+          const url = `${window.location.origin}/post/${postUuid}`;
+
+          copyPostUrlToClipboard(url)
+            .then(() => {
+              setIsCopiedUrl(true);
+              setTimeout(() => {
+                onClose();
+                setIsCopiedUrl(false);
+              }, 1000);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      }, [postUuid, onClose]);
+
+      // Following
+      const [isFollowingDecision, setIsFollowingDecision] = useState(false);
+      const [isFollowingLoading, setIsFollowingLoading] = useState(false);
+
+      const handleFollowDecision = useCallback(async () => {
+        try {
+          if (!user.loggedIn) {
+            router.push(
+              `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
+                window.location.href
+              )}`
+            );
+          }
+          const markAsFavoritePayload = new newnewapi.MarkPostRequest({
+            markAs: !isFollowingDecision
+              ? newnewapi.MarkPostRequest.Kind.FAVORITE
+              : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
+            postUuid,
+          });
+
+          const res = await markPost(markAsFavoritePayload);
+
+          if (!res.error) {
+            setIsFollowingDecision(!isFollowingDecision);
+
+            if (isFollowingDecision) {
+              handleRemovePostFromState?.();
+            } else {
+              handleAddPostToState?.();
+            }
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }, [
+        handleAddPostToState,
+        handleRemovePostFromState,
+        isFollowingDecision,
+        postUuid,
+        router,
+        user.loggedIn,
+      ]);
+
+      useEffect(() => {
+        async function fetchIsFollowing() {
+          setIsFollowingLoading(true);
+          try {
+            const payload = new newnewapi.GetPostRequest({
+              postUuid,
+            });
+
+            const res = await fetchPostByUUID(payload);
+
+            if (!res.data || res.error) throw new Error('Request failed');
+
+            setIsFollowingDecision(
+              !!switchPostType(res.data)[0].isFavoritedByMe
+            );
+          } catch (err) {
+            console.error(err);
+          } finally {
+            setIsFollowingLoading(false);
+          }
+        }
+
+        if (user.loggedIn) {
+          fetchIsFollowing();
+        }
+      }, [user.loggedIn, postUuid]);
 
       return (
         <AnimatePresence>
@@ -77,28 +157,47 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
               exit={{ opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <SButton onClick={() => handleFollowDecision()}>
+              <SButton onClick={() => handleCopyLink()}>
                 <Text variant={3}>
-                  {!isFollowingDecision
-                    ? t('ellipse.follow-decision', {
-                        postType: t(`postType.${postType}`),
-                      })
-                    : t('ellipse.unfollow-decision', {
-                        postType: t(`postType.${postType}`),
-                      })}
+                  {isCopiedUrl
+                    ? t('ellipse.link-copied')
+                    : t('ellipse.copy-link')}
                 </Text>
               </SButton>
-              <SSeparator />
-              <SButton
-                onClick={() => {
-                  handleReportOpen();
-                  onClose();
-                }}
-              >
-                <Text variant={3} tone='error'>
-                  {t('ellipse.report')}
-                </Text>
-              </SButton>
+              {postUuid !== user.userData?.userUuid && (
+                <>
+                  {!isFollowingLoading ? (
+                    <SButton onClick={() => handleFollowDecision()}>
+                      <Text variant={3}>
+                        {!isFollowingDecision
+                          ? t('ellipse.follow-decision', {
+                              postType: t(`postType.${postType}`),
+                            })
+                          : t('ellipse.unfollow-decision', {
+                              postType: t(`postType.${postType}`),
+                            })}
+                      </Text>
+                    </SButton>
+                  ) : (
+                    <Skeleton
+                      count={1}
+                      height='100%'
+                      width='100px'
+                      highlightColor={theme.colorsThemed.background.primary}
+                    />
+                  )}
+                  <SButton
+                    onClick={() => {
+                      handleReportOpen();
+                      onClose();
+                    }}
+                  >
+                    <Text variant={3} tone='error'>
+                      {t('ellipse.report')}
+                    </Text>
+                  </SButton>
+                </>
+              )}
             </SContainer>
           )}
         </AnimatePresence>
@@ -117,7 +216,8 @@ const SContainer = styled(motion.div)`
 
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: flex-end;
+  gap: 16px;
 
   padding: 12px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -140,12 +240,4 @@ const SButton = styled.button`
   &:focus {
     outline: none;
   }
-`;
-
-const SSeparator = styled.div`
-  margin-top: 8px;
-  margin-bottom: 8px;
-  width: 100%;
-  border-bottom: 1px solid
-    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
