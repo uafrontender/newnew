@@ -53,6 +53,7 @@ import PostCardEllipseMenu from './PostCardEllipseMenu';
 import getDisplayname from '../../utils/getDisplayname';
 import ReportModal, { ReportData } from './chat/ReportModal';
 import { reportPost } from '../../api/endpoints/report';
+import PostCardEllipseModal from './PostCardEllipseModal';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -427,6 +428,17 @@ export const PostCard: React.FC<ICard> = React.memo(
               onClose={handleReportClose}
             />
           )}
+          {isMobile && (
+            <PostCardEllipseModal
+              isOpen={isEllipseMenuOpen}
+              zIndex={11}
+              postUuid={postParsed.postUuid}
+              postType={typeOfPost as string}
+              user={user}
+              handleReportOpen={handleReportOpen}
+              onClose={handleEllipseMenuClose}
+            />
+          )}
         </SWrapper>
       );
     }
@@ -583,6 +595,17 @@ export const PostCard: React.FC<ICard> = React.memo(
             reportedDisplayname={getDisplayname(postParsed?.creator)}
             onSubmit={handleReportSubmit}
             onClose={handleReportClose}
+          />
+        )}
+        {isMobile && (
+          <PostCardEllipseModal
+            isOpen={isEllipseMenuOpen}
+            zIndex={11}
+            postUuid={postParsed.postUuid}
+            postType={typeOfPost as string}
+            user={user}
+            handleReportOpen={handleReportOpen}
+            onClose={handleEllipseMenuClose}
           />
         )}
       </SWrapperOutside>
