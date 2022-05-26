@@ -1166,7 +1166,7 @@ const SPostModalContainer = styled.div<{
     left: calc(50% - 496px);
     width: 992px;
     height: calc(100% - 32px);
-    max-height: ${({ loaded }) => (loaded ? 'unset' : '776px')};
+    max-height: ${({ loaded }) => (loaded ? 'unset' : '840px')};
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
