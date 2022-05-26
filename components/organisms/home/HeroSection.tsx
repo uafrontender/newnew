@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
@@ -17,9 +17,6 @@ import { SCROLL_EXPLORE } from '../../../constants/timings';
 import assets from '../../../constants/assets';
 import AnimationChain from '../../atoms/AnimationChain';
 
-const GRAPHICS_VERSION_STORAGE_KEY = 'graphics-version';
-type GraphicsVersion = 1 | 2 | 3 | 4 | 5;
-
 export const HeroSection = React.memo(() => {
   const router = useRouter();
   const theme = useTheme();
@@ -29,17 +26,6 @@ export const HeroSection = React.memo(() => {
   const [animateTitle, setAnimateTitle] = useState(false);
   const [animateSubTitle, setAnimateSubTitle] = useState(false);
   const [animateButton, setAnimateButton] = useState(false);
-
-  const graphicsVersion = useRef<GraphicsVersion>(
-    parseInt(
-      localStorage.getItem(GRAPHICS_VERSION_STORAGE_KEY) || '1'
-    ) as GraphicsVersion
-  );
-  useEffect(() => {
-    const nextVersion =
-      graphicsVersion.current >= 5 ? 1 : graphicsVersion.current + 1;
-    localStorage.setItem(GRAPHICS_VERSION_STORAGE_KEY, nextVersion.toString());
-  }, []);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
