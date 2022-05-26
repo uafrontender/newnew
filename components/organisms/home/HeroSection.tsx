@@ -15,7 +15,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { SCROLL_EXPLORE } from '../../../constants/timings';
 
 import assets from '../../../constants/assets';
-import LargeAnimation from '../../atoms/LargeAnimation';
+import AnimationChain from '../../atoms/AnimationChain';
 
 const GRAPHICS_VERSION_STORAGE_KEY = 'graphics-version';
 type GraphicsVersion = 1 | 2 | 3 | 4 | 5;
@@ -151,31 +151,26 @@ export const HeroSection = React.memo(() => {
         <SLargeAnimation
           placeholderSrc={
             theme.name === 'light'
-              ? assets.landing[graphicsVersion.current].lightMobileLandingStatic
-              : assets.landing[graphicsVersion.current].darkMobileLandingStatic
+              ? assets.landing.lightMobileLandingStatic
+              : assets.landing.darkMobileLandingStatic
           }
-          videoSrc={
+          videoSrcList={
             theme.name === 'light'
-              ? assets.landing[graphicsVersion.current]
-                  .lightMobileLandingAnimated
-              : assets.landing[graphicsVersion.current]
-                  .darkMobileLandingAnimated
+              ? assets.landing.lightMobileLandingAnimated
+              : assets.landing.darkMobileLandingAnimated
           }
         />
       ) : (
         <SLargeAnimation
           placeholderSrc={
             theme.name === 'light'
-              ? assets.landing[graphicsVersion.current]
-                  .lightDesktopLandingStatic
-              : assets.landing[graphicsVersion.current].darkDesktopLandingStatic
+              ? assets.landing.lightDesktopLandingStatic
+              : assets.landing.darkDesktopLandingStatic
           }
-          videoSrc={
+          videoSrcList={
             theme.name === 'light'
-              ? assets.landing[graphicsVersion.current]
-                  .lightDesktopLandingAnimated
-              : assets.landing[graphicsVersion.current]
-                  .darkDesktopLandingAnimated
+              ? assets.landing.lightDesktopLandingAnimated
+              : assets.landing.darkDesktopLandingAnimated
           }
         />
       )}
@@ -272,7 +267,7 @@ const SButtonsHolder = styled.div`
   }
 `;
 
-const SLargeAnimation = styled(LargeAnimation)`
+const SLargeAnimation = styled(AnimationChain)`
   right: 18px;
   order: -1;
 
