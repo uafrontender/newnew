@@ -52,9 +52,6 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
           {
             key: 'num_bids',
           },
-          {
-            key: 'most_funded',
-          },
         ],
       },
     ],

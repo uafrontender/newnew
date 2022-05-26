@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/interactive-supports-focus */
 /* eslint-disable no-nested-ternary */
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -7,8 +8,9 @@ import { useTranslation } from 'next-i18next';
 
 import Caption from '../../atoms/Caption';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import assets from '../../../constants/assets';
+import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
 
 const DARK_IMAGES_ANIMATED: any = {
   auction: assets.creation.darkAcAnimated,
@@ -42,6 +44,7 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
   const { t } = useTranslation('creation');
   const theme = useTheme();
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -59,11 +62,22 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
   return (
     <Link href={link}>
       <a
+        role='button'
         onMouseEnter={() => {
           setMouseEntered(true);
         }}
         onMouseLeave={() => {
           setMouseEntered(false);
+        }}
+        onClick={() => {
+          dispatch(clearCreation({}));
+          dispatch(clearPostData({}));
+        }}
+        onKeyUp={(e) => {
+          if (e.key === 'Enter') {
+            dispatch(clearCreation({}));
+            dispatch(clearPostData({}));
+          }
         }}
       >
         <SWrapper>
@@ -175,3 +189,6 @@ const SImageWrapper = styled.div`
     min-height: 120px;
   }
 `;
+function clearPostData(arg0: {}): any {
+  throw new Error('Function not implemented.');
+}

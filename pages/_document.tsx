@@ -66,6 +66,21 @@ export default class MyDocument extends Document {
             type='font/otf'
             crossOrigin='anonymous'
           />
+          <script
+            async
+            src={`https://widget.usersnap.com/global/load/${process.env.NEXT_PUBLIC_USERSNAP_GLOBAL_API_KEY}?onload=onUsersnapCXLoad`}
+          />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.onUsersnapCXLoad = function(api) {
+                  // store the Usersnap global api on the window, if case you want to use it in other contexts
+                  window.Usersnap = api; 
+                  api.init();
+              }         
+              `,
+            }}
+          />
         </Head>
         <body>
           <Main />

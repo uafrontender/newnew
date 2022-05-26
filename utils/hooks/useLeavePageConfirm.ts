@@ -5,7 +5,8 @@ import { useBeforeUnload } from 'react-use';
 export const useLeavePageConfirm = (
   isConfirm: boolean,
   message: string,
-  allowedRoutes: string[]
+  allowedRoutes: string[],
+  callback?: () => void,
 ) => {
   useBeforeUnload(isConfirm, message);
 
@@ -18,11 +19,14 @@ export const useLeavePageConfirm = (
 
       if (
         !allowedRoutes.includes(routeTrimmed) &&
-        isConfirm &&
-        !window.confirm(message)
+        isConfirm
       ) {
-        // eslint-disable-next-line no-throw-literal
-        throw 'Route Canceled';
+        if (!window.confirm(message)) {
+          // eslint-disable-next-line no-throw-literal
+          throw 'Route Canceled';
+        } else {
+          callback?.();
+        }
       }
     };
 
@@ -31,7 +35,7 @@ export const useLeavePageConfirm = (
     return () => {
       Router.events.off('beforeHistoryChange', handler);
     };
-  }, [isConfirm, message, allowedRoutes]);
+  }, [isConfirm, message, allowedRoutes, callback]);
 };
 
 export default useLeavePageConfirm;

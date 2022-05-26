@@ -12,25 +12,35 @@ import SecondStepContent from '../../../components/organisms/creation/second';
 import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
 
 import { NextPageWithLayout } from '../../_app';
+import { useAppDispatch } from '../../../redux-store/store';
+import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
 
 interface ICreationSecondStep {}
 
 export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
-  const { t } = useTranslation('creation');
   const router = useRouter();
+  const { t } = useTranslation('creation');
+  const dispatch = useAppDispatch();
 
-  useLeavePageConfirm(true, t('secondStep.modal.leave.message'), [
-    '/creation',
-    '/creation/auction',
-    '/creation/multiple-choice',
-    '/creation/crowdfunding',
-    '/creation/auction/preview',
-    '/creation/multiple-choice/preview',
-    '/creation/crowdfunding/preview',
-    '/creation/auction/published',
-    '/creation/multiple-choice/published',
-    '/creation/crowdfunding/published',
-  ]);
+  useLeavePageConfirm(
+    true,
+    t('secondStep.modal.leave.message'),
+    [
+      '/creation',
+      '/creation/auction',
+      '/creation/multiple-choice',
+      '/creation/crowdfunding',
+      '/creation/auction/preview',
+      '/creation/multiple-choice/preview',
+      '/creation/crowdfunding/preview',
+      '/creation/auction/published',
+      '/creation/multiple-choice/published',
+      '/creation/crowdfunding/published',
+    ],
+    () => {
+      dispatch(clearCreation({}));
+    }
+  );
 
   return (
     <SWrapper>
