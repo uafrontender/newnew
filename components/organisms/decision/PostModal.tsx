@@ -911,6 +911,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             <SPostModalContainer
               id='post-modal-container'
               isMyPost={isMyPost}
+              loaded={recommendedPosts && recommendedPosts.length > 0}
               style={{
                 ...(isMobile
                   ? {
@@ -967,6 +968,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         )}
         {postParsed && typeOfPost ? (
           <SPostModalContainer
+            loaded={recommendedPosts && recommendedPosts.length > 0}
             id='post-modal-container'
             isMyPost={isMyPost}
             onClick={(e) => e.stopPropagation()}
@@ -1043,7 +1045,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               />
             )}
             {!isMyPost && (
-              <SRecommendationsSection id='recommendations-section-heading'>
+              <SRecommendationsSection
+                id='recommendations-section-heading'
+                loaded={recommendedPosts && recommendedPosts.length > 0}
+              >
                 <Headline variant={4}>
                   {recommendedPosts.length > 0
                     ? t('RecommendationsSection.heading')
@@ -1105,6 +1110,7 @@ export default (props: any) => (
 
 const SPostModalContainer = styled.div<{
   isMyPost: boolean;
+  loaded: boolean;
 }>`
   position: absolute;
   top: 0;
@@ -1135,6 +1141,9 @@ const SPostModalContainer = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     top: 64px;
+    /*transform: none; */
+    /* top: 50%; */
+    /* transform: translateY(-50%); */
     background-color: ${({ theme }) =>
       theme.name === 'dark'
         ? theme.colorsThemed.background.secondary
@@ -1157,6 +1166,7 @@ const SPostModalContainer = styled.div<{
     left: calc(50% - 496px);
     width: 992px;
     height: calc(100% - 32px);
+    max-height: ${({ loaded }) => (loaded ? 'unset' : '840px')};
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
@@ -1172,8 +1182,10 @@ const SPostModalContainer = styled.div<{
   }
 `;
 
-const SRecommendationsSection = styled.div`
-  min-height: 600px;
+const SRecommendationsSection = styled.div<{
+  loaded: boolean;
+}>`
+  min-height: ${({ loaded }) => (loaded ? '600px' : '0')};
 `;
 
 const SGoBackButtonDesktop = styled(Button)`
