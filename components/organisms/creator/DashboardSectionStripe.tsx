@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -17,6 +17,7 @@ import StripeLogo from '../../../public/images/svg/StripeLogo.svg';
 import StripeLogoS from '../../../public/images/svg/icons/filled/StripeLogoS.svg';
 import VerificationPassedInverted from '../../../public/images/svg/icons/filled/VerificationPassedInverted.svg';
 import GoBackButton from '../../molecules/GoBackButton';
+import { updateMe } from '../../../api/endpoints/user';
 
 interface IDashboardSectionStripe {
   isConnectedToStripe: boolean;
@@ -32,11 +33,60 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
       resizeMode
     );
 
+    const [stripeProcessing, setStripeProcessing] = useState(false);
+    const [loadingStripeProcessing, setLoadingStripeProcessing] =
+      useState(false);
+
+    const handleStripeProcessing = useCallback(async () => {
+      if (loadingStripeProcessing) return;
+      try {
+        setLoadingStripeProcessing(true);
+
+        const payload = new newnewapi.UpdateMeRequest({
+          isStripeAccountProcessing: stripeProcessing,
+        });
+
+        const updateMeRes = await updateMe(payload);
+
+        if (!updateMeRes.data || updateMeRes.error)
+          throw new Error(updateMeRes.error?.message ?? 'Request failed');
+
+        console.log(payload, updateMeRes);
+
+        // dispatch(
+        //   setUserData({
+        //     bio: updateMeRes.data.me?.bio,
+        //   })
+        // );
+
+        // setLoadingStripeProcessing(false);
+      } catch (err) {
+        console.log(err);
+        // setLoadingStripeProcessing(false);
+      }
+    }, [loadingStripeProcessing, stripeProcessing]);
+
+    useEffect(() => {
+      if (router && router.query && !isConnectedToStripe) {
+        if (router.query.query && router.query.query === 'stripe_processing') {
+          setStripeProcessing(true);
+        }
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [router.query, isConnectedToStripe]);
+
+    useEffect(() => {
+      if (stripeProcessing && !loadingStripeProcessing) {
+        handleStripeProcessing();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [stripeProcessing, loadingStripeProcessing]);
+
     const handleRedirectToStripesetup = async () => {
       try {
         const payload = new newnewapi.SetupStripeCreatorAccountRequest({
           refreshUrl: window.location.href,
-          returnUrl: window.location.href,
+          returnUrl: `${window.location.href}?query=stripe_processing`,
         });
 
         const res = await fetchSetStripeLinkCreator(payload);

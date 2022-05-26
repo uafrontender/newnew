@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -17,6 +17,8 @@ import GoBackButton from '../GoBackButton';
 import StripeLogo from '../../../public/images/svg/StripeLogo.svg';
 import StripeLogoS from '../../../public/images/svg/icons/filled/StripeLogoS.svg';
 import VerificationPassedInverted from '../../../public/images/svg/icons/filled/VerificationPassedInverted.svg';
+import { updateMe } from '../../../api/endpoints/user';
+// import { setUserData } from '../../../redux-store/slices/userStateSlice';
 
 interface IOnboardingSectionStripe {
   isConnectedToStripe: boolean;
@@ -27,16 +29,61 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
     const router = useRouter();
     const theme = useTheme();
     const { t } = useTranslation('creator-onboarding');
+    // const dispatch = useAppDispatch();
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
 
+    const [stripeProcessing, setStripeProcessing] = useState(false);
+    const [loadingStripeProcessing, setLoadingStripeProcessing] =
+      useState(false);
+
+    const handleStripeProcessing = useCallback(async () => {
+      if (loadingStripeProcessing) return;
+      try {
+        setLoadingStripeProcessing(true);
+
+        const payload = new newnewapi.UpdateMeRequest({
+          isStripeAccountProcessing: stripeProcessing,
+        });
+
+        const updateMeRes = await updateMe(payload);
+
+        if (!updateMeRes.data || updateMeRes.error)
+          throw new Error(updateMeRes.error?.message ?? 'Request failed');
+
+        console.log(payload, updateMeRes);
+
+        // dispatch(
+        //   setUserData({
+        //     bio: updateMeRes.data.me?.bio,
+        //   })
+        // );
+
+        setLoadingStripeProcessing(false);
+      } catch (err) {
+        console.log(err);
+        setLoadingStripeProcessing(false);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loadingStripeProcessing, stripeProcessing]);
+
+    useEffect(() => {
+      if (router && router.query && !isConnectedToStripe) {
+        if (router.query.query && router.query.query === 'stripe_processing') {
+          setStripeProcessing(true);
+          handleStripeProcessing();
+        }
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [router, isConnectedToStripe]);
+
     const handleRedirectToStripesetup = async () => {
       try {
         const payload = new newnewapi.SetupStripeCreatorAccountRequest({
           refreshUrl: window.location.href,
-          returnUrl: window.location.href,
+          returnUrl: `${window.location.href}?query=stripe_processing`,
         });
 
         const res = await fetchSetStripeLinkCreator(payload);
