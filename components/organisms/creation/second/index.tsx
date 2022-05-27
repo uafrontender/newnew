@@ -393,7 +393,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
               reject(new Error('Upload failed'));
             });
             xhr.addEventListener('abort', () => {
-              console.log('Aborted');
+              // console.log('Aborted');
               dispatch(setCreationFileUploadProgress(0));
               reject(new Error('Upload aborted'));
             });

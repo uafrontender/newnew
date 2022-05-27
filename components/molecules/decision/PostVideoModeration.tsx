@@ -232,7 +232,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           reject(new Error('Upload failed'));
         });
         xhr.addEventListener('abort', () => {
-          console.log('Aborted');
+          // console.log('Aborted');
           setResponseFileUploadProgress(0);
           reject(new Error('Upload aborted'));
         });
