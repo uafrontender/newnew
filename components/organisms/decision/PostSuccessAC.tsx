@@ -9,6 +9,7 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -212,17 +213,25 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                     <>
                       <SWinningBidCreator>
                         <SCreator>
-                          <SCreatorImage
-                            src={winningOption.creator?.avatarUrl ?? ''}
-                          />
+                          <Link href={`/${winningOption.creator?.username}`}>
+                            <SCreatorImage
+                              src={winningOption.creator?.avatarUrl ?? ''}
+                            />
+                          </Link>
                           <SWinningBidCreatorText>
-                            {winningOption.creator?.uuid ===
-                              user.userData?.userUuid ||
-                            winningOption.isSupportedByMe
-                              ? winningOption.supporterCount > 1
-                                ? t('me')
-                                : t('my')
-                              : getDisplayname(winningOption.creator!!)}
+                            <SSpan>
+                              <Link
+                                href={`/${winningOption.creator?.username}`}
+                              >
+                                {winningOption.creator?.uuid ===
+                                  user.userData?.userUuid ||
+                                winningOption.isSupportedByMe
+                                  ? winningOption.supporterCount > 1
+                                    ? t('me')
+                                    : t('my')
+                                  : getDisplayname(winningOption.creator!!)}
+                              </Link>
+                            </SSpan>
                             {winningOption.supporterCount > 1 ? (
                               <>
                                 {' & '}
@@ -711,3 +720,16 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
+
+const SSpan = styled.span`
+  a {
+    cursor: pointer;
+
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+    &:hover {
+      outline: none;
+      color: ${({ theme }) => theme.colorsThemed.text.primary};
+    }
+  }
+`;
