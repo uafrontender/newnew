@@ -75,6 +75,8 @@ interface IPostViewCF {
   post: newnewapi.Crowdfunding;
   postStatus: TPostStatusStringified;
   sessionId?: string;
+  isFollowingDecision: boolean;
+  handleSetIsFollowingDecision: (newValue: boolean) => void;
   resetSessionId: () => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
@@ -88,6 +90,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
     post,
     postStatus,
     sessionId,
+    isFollowingDecision,
+    handleSetIsFollowingDecision,
     resetSessionId,
     handleGoBack,
     handleUpdatePostStatus,
@@ -719,7 +723,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           hasWinner={false}
           totalPledges={currentBackers}
           targetPledges={post.targetBackerCount}
-          isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleReportOpen={handleReportOpen}
           handleRemovePostFromState={handleRemovePostFromState}
           handleAddPostToState={handleAddPostToState}
