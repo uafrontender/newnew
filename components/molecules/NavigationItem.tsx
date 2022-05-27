@@ -1,8 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
-// import { useCookies } from 'react-cookie';
-
 import Indicator from '../atoms/Indicator';
 import InlineSVG from '../atoms/InlineSVG';
 import Button from '../atoms/Button';
@@ -29,21 +27,7 @@ export interface INavigationItem {
 export const NavigationItem: React.FC<INavigationItem> = (props) => {
   const { item } = props;
   const theme = useTheme();
-  // const [cookies, setCookie] = useCookies();
-
-  // const cookieKey = `${item.key}-${item.counter}`;
-
-  // const handleAnimationEnd = () => {
-  //   setCookie(cookieKey, true);
-  // };
-
-  // useEffect(() => {
-  //   _map(cookies, (value, key) => {
-  //     if (key.includes(item.key) && key !== cookieKey) {
-  //       setCookie(key, '');
-  //     }
-  //   });
-  // }, [cookieKey, cookies, item.counter, item.key, setCookie]);
+  console.log(item);
 
   return (
     <Link href={item.url}>
@@ -55,7 +39,7 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
             width='24px'
             height='24px'
           />
-          {!!item.counter && (
+          {item.counter !== undefined && item.counter > 0 && (
             <SIndicatorContainer>
               <Indicator counter={item.counter} animate={false} />
             </SIndicatorContainer>
