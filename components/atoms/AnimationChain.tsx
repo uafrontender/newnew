@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 interface ReactChainI {
@@ -13,13 +13,15 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
     const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
     const [maxLoadedSrcIndex, setMaxLoadedSrcIndex] = useState(0);
 
-    function getPreviousIndex(index: number) {
-      return index > 0 ? index - 1 : videoSrcList.length - 1;
-    }
+    const getPreviousIndex = useCallback(
+      (index: number) => (index > 0 ? index - 1 : videoSrcList.length - 1),
+      [videoSrcList]
+    );
 
-    function getNextIndex(index: number) {
-      return index < videoSrcList.length - 1 ? index + 1 : 0;
-    }
+    const getNextIndex = useCallback(
+      (index: number) => (index < videoSrcList.length - 1 ? index + 1 : 0),
+      [videoSrcList]
+    );
 
     function getVideoZIndex(index: number) {
       const previousIndex = getPreviousIndex(currentVideoIndex);
@@ -56,7 +58,7 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
       if (currentVideo) {
         currentVideo.play();
       }
-    }, [videoSrcList, currentVideoIndex]);
+    }, [videoSrcList, currentVideoIndex, getPreviousIndex]);
 
     return (
       <Container className={className}>
