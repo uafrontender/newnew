@@ -7,6 +7,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
+import Head from 'next/head';
 
 import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
@@ -169,6 +170,10 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
 
   return (
     <div>
+      <Head>
+        <title>{t('Favorites.meta.title')}</title>
+        <meta name='description' content={t('Favorites.meta.description')} />
+      </Head>
       <SMain>
         <SCardsSection>
           {posts && (

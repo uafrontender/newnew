@@ -6,6 +6,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
+import Head from 'next/head';
 import { NextPageWithLayout } from '../_app';
 // import { TTokenCookie } from '../../api/apiConfigs';
 
@@ -54,6 +55,13 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
 
   return (
     <div>
+      <Head>
+        <title>{t('Subscriptions.meta.title')}</title>
+        <meta
+          name='description'
+          content={t('Subscriptions.meta.description')}
+        />
+      </Head>
       <SMain>
         <SCardsSection>
           {creatorsImSubscribedTo.length > 0 ? (

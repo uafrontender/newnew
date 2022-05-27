@@ -6,6 +6,7 @@ import type { GetServerSidePropsContext, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
+import Head from 'next/head';
 
 import dynamic from 'next/dynamic';
 import { NextPageWithLayout } from '../_app';
@@ -152,6 +153,10 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
 
   return (
     <div>
+      <Head>
+        <title>{t('MyPosts.meta.title')}</title>
+        <meta name='description' content={t('MyPosts.meta.description')} />
+      </Head>
       <SMain>
         <SCardsSection>
           {posts && (

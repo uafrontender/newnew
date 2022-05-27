@@ -15,7 +15,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { useTranslation } from 'next-i18next';
 
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import { fetchCuratedPosts, fetchPostByUUID } from '../../api/endpoints/post';
@@ -53,7 +52,7 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
     resizeMode
   );
 
-  const [postParsed] = useMemo(
+  const [postParsed, typeOfPost] = useMemo(
     () => (post ? switchPostType(post) : [undefined, undefined]),
     [post]
   );
