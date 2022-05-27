@@ -1,5 +1,12 @@
 /* eslint-disable no-nested-ternary */
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -42,6 +49,11 @@ import { SocketContext } from '../../contexts/socketContext';
 import { ChannelsContext } from '../../contexts/channelsContext';
 import CardTimer from '../atoms/CardTimer';
 import switchPostStatus from '../../utils/switchPostStatus';
+import PostCardEllipseMenu from './PostCardEllipseMenu';
+import getDisplayname from '../../utils/getDisplayname';
+import ReportModal, { ReportData } from './chat/ReportModal';
+import { reportPost } from '../../api/endpoints/report';
+import PostCardEllipseModal from './PostCardEllipseModal';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -77,13 +89,23 @@ interface ICard {
   width?: string;
   height?: string;
   shouldStop?: boolean;
+  handleRemovePostFromState?: () => void;
 }
 
 export const PostCard: React.FC<ICard> = React.memo(
-  ({ item, type, index, width, height, shouldStop }) => {
+  ({
+    item,
+    type,
+    index,
+    width,
+    height,
+    shouldStop,
+    handleRemovePostFromState,
+  }) => {
     const { t } = useTranslation('home');
     const theme = useTheme();
     const router = useRouter();
+    const user = useAppSelector((state) => state.user);
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -135,13 +157,48 @@ export const PostCard: React.FC<ICard> = React.memo(
       router.push(`/${username}`);
     };
 
-    // TODO: make it open a context menu with an option to report
+    // Ellipse menu
+    const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
+
     const handleMoreClick = (
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
       e.preventDefault();
       e.stopPropagation();
+
+      setIsEllipseMenuOpen(true);
     };
+
+    const handleEllipseMenuClose = () => setIsEllipseMenuOpen(false);
+
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
+    const handleReportOpen = useCallback(() => {
+      if (!user.loggedIn) {
+        router.push(
+          `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
+            `${process.env.NEXT_PUBLIC_APP_URL}/post/${postParsed.postUuid}`
+          )}`
+        );
+        return;
+      }
+      setIsReportModalOpen(true);
+    }, [user.loggedIn, router, postParsed.postUuid]);
+
+    const handleReportClose = useCallback(() => {
+      setIsReportModalOpen(false);
+    }, []);
+
+    const handleReportSubmit = useCallback(
+      async ({ reasons, message }: ReportData) => {
+        if (postParsed) {
+          await reportPost(postParsed.postUuid, reasons, message).catch((e) =>
+            console.error(e)
+          );
+        }
+      },
+      [postParsed]
+    );
 
     const handleBidClick = () => {};
 
@@ -318,7 +375,6 @@ export const PostCard: React.FC<ICard> = React.memo(
                   type='video/mp4'
                 />
               </video>
-
               <SImageMask />
               <STopContent>
                 <SButtonIcon
@@ -334,6 +390,16 @@ export const PostCard: React.FC<ICard> = React.memo(
                     height='20px'
                   />
                 </SButtonIcon>
+                {!isMobile && (
+                  <PostCardEllipseMenu
+                    postUuid={postParsed.postUuid}
+                    postType={typeOfPost as string}
+                    isVisible={isEllipseMenuOpen}
+                    postCreator={postParsed.creator as newnewapi.User}
+                    handleReportOpen={handleReportOpen}
+                    onClose={handleEllipseMenuClose}
+                  />
+                )}
               </STopContent>
               <SBottomContent>
                 <SUserAvatar
@@ -354,6 +420,25 @@ export const PostCard: React.FC<ICard> = React.memo(
               </SBottomContent>
             </SImageHolder>
           </SContent>
+          {postParsed?.creator && isReportModalOpen && (
+            <ReportModal
+              show={isReportModalOpen}
+              reportedDisplayname={getDisplayname(postParsed?.creator)}
+              onSubmit={handleReportSubmit}
+              onClose={handleReportClose}
+            />
+          )}
+          {isMobile && (
+            <PostCardEllipseModal
+              isOpen={isEllipseMenuOpen}
+              zIndex={11}
+              postUuid={postParsed.postUuid}
+              postType={typeOfPost as string}
+              postCreator={postParsed.creator as newnewapi.User}
+              handleReportOpen={handleReportOpen}
+              onClose={handleEllipseMenuClose}
+            />
+          )}
         </SWrapper>
       );
     }
@@ -392,6 +477,19 @@ export const PostCard: React.FC<ICard> = React.memo(
                   height='20px'
                 />
               </SButtonIcon>
+              {!isMobile && (
+                <PostCardEllipseMenu
+                  postUuid={postParsed.postUuid}
+                  postType={typeOfPost as string}
+                  isVisible={isEllipseMenuOpen}
+                  postCreator={postParsed.creator as newnewapi.User}
+                  handleReportOpen={handleReportOpen}
+                  handleRemovePostFromState={
+                    handleRemovePostFromState ?? undefined
+                  }
+                  onClose={handleEllipseMenuClose}
+                />
+              )}
             </STopContent>
           </SImageHolderOutside>
         </SImageBG>
@@ -491,6 +589,25 @@ export const PostCard: React.FC<ICard> = React.memo(
             )}
           </SBottomEnd>
         </SBottomContentOutside>
+        {postParsed?.creator && isReportModalOpen && (
+          <ReportModal
+            show={isReportModalOpen}
+            reportedDisplayname={getDisplayname(postParsed?.creator)}
+            onSubmit={handleReportSubmit}
+            onClose={handleReportClose}
+          />
+        )}
+        {isMobile && (
+          <PostCardEllipseModal
+            isOpen={isEllipseMenuOpen}
+            zIndex={11}
+            postUuid={postParsed.postUuid}
+            postType={typeOfPost as string}
+            postCreator={postParsed.creator as newnewapi.User}
+            handleReportOpen={handleReportOpen}
+            onClose={handleEllipseMenuClose}
+          />
+        )}
       </SWrapperOutside>
     );
   }
