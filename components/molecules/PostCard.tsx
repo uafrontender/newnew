@@ -395,7 +395,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                     postUuid={postParsed.postUuid}
                     postType={typeOfPost as string}
                     isVisible={isEllipseMenuOpen}
-                    user={user}
+                    postCreator={postParsed.creator as newnewapi.User}
                     handleReportOpen={handleReportOpen}
                     onClose={handleEllipseMenuClose}
                   />
@@ -434,7 +434,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               zIndex={11}
               postUuid={postParsed.postUuid}
               postType={typeOfPost as string}
-              user={user}
+              postCreator={postParsed.creator as newnewapi.User}
               handleReportOpen={handleReportOpen}
               onClose={handleEllipseMenuClose}
             />
@@ -482,7 +482,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   postUuid={postParsed.postUuid}
                   postType={typeOfPost as string}
                   isVisible={isEllipseMenuOpen}
-                  user={user}
+                  postCreator={postParsed.creator as newnewapi.User}
                   handleReportOpen={handleReportOpen}
                   handleRemovePostFromState={
                     handleRemovePostFromState ?? undefined
@@ -603,7 +603,7 @@ export const PostCard: React.FC<ICard> = React.memo(
             zIndex={11}
             postUuid={postParsed.postUuid}
             postType={typeOfPost as string}
-            user={user}
+            postCreator={postParsed.creator as newnewapi.User}
             handleReportOpen={handleReportOpen}
             onClose={handleEllipseMenuClose}
           />

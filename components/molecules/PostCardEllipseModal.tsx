@@ -7,16 +7,16 @@ import { newnewapi } from 'newnew-api';
 import Modal from '../organisms/Modal';
 import Button from '../atoms/Button';
 import Text from '../atoms/Text';
-import { IUserStateInterface } from '../../redux-store/slices/userStateSlice';
 import switchPostType from '../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
+import { useAppSelector } from '../../redux-store/store';
 
 interface IPostCardEllipseModal {
   isOpen: boolean;
   zIndex: number;
   postUuid: string;
   postType: string;
-  user: IUserStateInterface;
+  postCreator: newnewapi.User;
   handleReportOpen: () => void;
   onClose: () => void;
   handleRemovePostFromState?: () => void;
@@ -26,7 +26,7 @@ interface IPostCardEllipseModal {
 const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   isOpen,
   zIndex,
-  user,
+  postCreator,
   postUuid,
   postType,
   handleReportOpen,
@@ -36,6 +36,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
 }) => {
   const router = useRouter();
   const { t } = useTranslation('home');
+  const user = useAppSelector((state) => state.user);
 
   // Share
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -148,7 +149,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
             </Text>
           </SButton>
           <SSeparator />
-          {postUuid !== user.userData?.userUuid && (
+          {postCreator.uuid !== user.userData?.userUuid && (
             <>
               <SButton onClick={() => handleFollowDecision()}>
                 {!isFollowingLoading && (

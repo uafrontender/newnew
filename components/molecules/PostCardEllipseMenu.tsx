@@ -10,15 +10,15 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 import Text from '../atoms/Text';
-import { IUserStateInterface } from '../../redux-store/slices/userStateSlice';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
 import switchPostType from '../../utils/switchPostType';
+import { useAppSelector } from '../../redux-store/store';
 
 interface IPostCardEllipseMenu {
   postUuid: string;
   postType: string;
   isVisible: boolean;
-  user: IUserStateInterface;
+  postCreator: newnewapi.User;
   handleReportOpen: () => void;
   onClose: () => void;
   handleRemovePostFromState?: () => void;
@@ -30,7 +30,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
     ({
       postType,
       isVisible,
-      user,
+      postCreator,
       postUuid,
       handleReportOpen,
       onClose,
@@ -41,6 +41,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       const router = useRouter();
       const { t } = useTranslation('home');
       const containerRef = useRef<HTMLDivElement>();
+      const user = useAppSelector((state) => state.user);
 
       useOnClickEsc(containerRef, onClose);
       useOnClickOutside(containerRef, onClose);
@@ -163,7 +164,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
                     : t('ellipse.copy-link')}
                 </Text>
               </SButton>
-              {postUuid !== user.userData?.userUuid && (
+              {postCreator.uuid !== user.userData?.userUuid && (
                 <>
                   {!isFollowingLoading ? (
                     <SButton onClick={() => handleFollowDecision()}>
