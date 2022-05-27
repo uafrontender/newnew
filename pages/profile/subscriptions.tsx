@@ -13,7 +13,7 @@ import { NextPageWithLayout } from '../_app';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
-import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
+import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
 
 const NoContentCard = dynamic(
   () => import('../../components/atoms/profile/NoContentCard')
