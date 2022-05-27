@@ -9,10 +9,10 @@ import { useAppDispatch } from '../../redux-store/store';
 
 interface IModal {
   show: boolean;
-  transitionSpeed?: number;
-  overlayDim?: boolean;
-  additionalZ?: number;
-  customBackdropFilterValue?: number;
+  transitionspeed?: number;
+  overlaydim?: boolean;
+  additionalz?: number;
+  custombackdropfiltervalue?: number;
   onClose?: () => void;
   children: ReactNode;
 }
@@ -20,10 +20,10 @@ interface IModal {
 const Modal: React.FC<IModal> = React.memo((props) => {
   const {
     show,
-    transitionSpeed,
-    overlayDim,
-    additionalZ,
-    customBackdropFilterValue,
+    transitionspeed,
+    overlaydim,
+    additionalz,
+    custombackdropfiltervalue,
     onClose,
     children,
   } = props;
@@ -52,15 +52,15 @@ const Modal: React.FC<IModal> = React.memo((props) => {
           exit={{ opacity: 0 }}
           transition={{
             type: 'tween',
-            duration: transitionSpeed ?? 0.15,
+            duration: transitionspeed ?? 0.15,
             delay: 0,
           }}
-          show={show}
+          // show={show}
           // onClick={onClose}
-          overlayDim={overlayDim ?? false}
-          additionalZ={additionalZ ?? undefined}
-          customBackdropFilterValue={customBackdropFilterValue ?? undefined}
-          transitionSpeed={transitionSpeed ?? 0.15}
+          overlaydim={!overlaydim ? 'false' : overlaydim.toString()}
+          additionalz={additionalz ?? undefined}
+          custombackdropfiltervalue={custombackdropfiltervalue ?? undefined}
+          transitionspeed={transitionspeed ?? 0.15}
         >
           <SClickableDiv
             onClick={() => {
@@ -78,11 +78,10 @@ const Modal: React.FC<IModal> = React.memo((props) => {
 });
 
 interface IStyledModalOverlay {
-  show: boolean;
-  transitionSpeed?: number;
-  overlayDim?: boolean;
-  additionalZ?: number;
-  customBackdropFilterValue?: number;
+  transitionspeed?: number;
+  overlaydim?: string;
+  additionalz?: number;
+  custombackdropfiltervalue?: number;
 }
 
 const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
@@ -90,21 +89,23 @@ const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
   width: 100vw;
   height: 100%;
   bottom: 0;
-  z-index: ${({ additionalZ }) => additionalZ ?? 10};
+  z-index: ${({ additionalz }) => additionalz ?? 10};
   overflow: hidden;
   position: fixed;
-  backdrop-filter: ${({ customBackdropFilterValue }) =>
-    customBackdropFilterValue
-      ? `blur(${customBackdropFilterValue}px)`
+  backdrop-filter: ${({ custombackdropfiltervalue }) =>
+    custombackdropfiltervalue
+      ? `blur(${custombackdropfiltervalue}px)`
       : 'blur(16px)'};
-  -webkit-backdrop-filter: ${({ customBackdropFilterValue }) =>
-    customBackdropFilterValue
-      ? `blur(${customBackdropFilterValue}px)`
+  -webkit-backdrop-filter: ${({ custombackdropfiltervalue }) =>
+    custombackdropfiltervalue
+      ? `blur(${custombackdropfiltervalue}px)`
       : 'blur(16px)'};
 
   // To avoid overlapping dim color with this bg color
-  background-color: ${({ theme, overlayDim }) =>
-    overlayDim ? 'transparent' : theme.colorsThemed.background.backgroundT};
+  background-color: ${({ theme, overlaydim }) =>
+    overlaydim === 'true'
+      ? 'transparent'
+      : theme.colorsThemed.background.backgroundT};
 
   ::before {
     top: 0;
@@ -120,8 +121,8 @@ const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
     -webkit-backdrop-filter: blur(16px);
 
     /* Some screens have dimmed overlay */
-    background-color: ${({ overlayDim, theme }) =>
-      overlayDim ? theme.colorsThemed.background.overlayDim : null};
+    background-color: ${({ overlaydim, theme }) =>
+      overlaydim ? theme.colorsThemed.background.overlaydim : null};
   }
 `;
 

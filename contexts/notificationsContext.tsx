@@ -44,11 +44,11 @@ export const NotificationsProvider: React.FC = ({ children }) => {
           res.data.unreadNotificationCount !== undefined &&
           res.data.unreadNotificationCount > 0
         ) {
-          console.log(`Unread ${res.data.unreadNotificationCount}`);
           setUnreadNotificationCount(res.data.unreadNotificationCount);
         } else {
           setUnreadNotificationCount(0);
         }
+        console.log(`Unread ${res.data.unreadNotificationCount}`);
       } catch (err) {
         console.error(err);
         setNotificationsLoading(false);
@@ -60,8 +60,10 @@ export const NotificationsProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     const socketHandlerNotificationUnreadCountsChanged = async (data: any) => {
+      console.log(`1`);
       const arr = new Uint8Array(data);
       const decoded = newnewapi.NotificationUnreadCountsChanged.decode(arr);
+      console.log(`Decoded ${decoded.unreadCount}`);
       if (!decoded) return;
       if (decoded.unreadCount !== undefined && decoded.unreadCount > 0) {
         setUnreadNotificationCount(decoded.unreadCount);
@@ -69,7 +71,6 @@ export const NotificationsProvider: React.FC = ({ children }) => {
         setUnreadNotificationCount(0);
       }
     };
-
     if (socketConnection) {
       socketConnection.on(
         'NotificationUnreadCountsChanged',

@@ -824,7 +824,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   if (shouldRenderVotingFinishedModal && !isMyPost) {
     return (
       <>
-        <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
+        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
           {postStatus === 'succeeded' && !isMobile && (
             <PostSuccessAnimationBackground />
           )}
@@ -948,7 +948,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   return (
     <>
-      <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
+      <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
         <Head>
           <title>{postParsed?.title}</title>
         </Head>
