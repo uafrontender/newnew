@@ -829,7 +829,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             <PostSuccessAnimationBackground />
           )}
           <Head>
-            <title>{postParsed?.title}</title>
+            <title>{t(`meta.${typeOfPost}.title`)}</title>
+            <meta
+              name='description'
+              content={t(`meta.${typeOfPost}.description`)}
+            />
           </Head>
           <SPostSuccessWaitingControlsDiv onClick={(e) => e.stopPropagation()}>
             <SWaitingSuccessControlsBtn
@@ -950,7 +954,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     <>
       <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
         <Head>
-          <title>{postParsed?.title}</title>
+          <title>{t(`meta.${typeOfPost}.title`)}</title>
+          <meta
+            name='description'
+            content={t(`meta.${typeOfPost}.description`)}
+          />
         </Head>
         {!isMobile && (
           <SGoBackButtonDesktop
