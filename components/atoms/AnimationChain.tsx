@@ -11,7 +11,7 @@ interface ReactChainI {
 const AnimationChain: React.FC<ReactChainI> = React.memo(
   ({ className, placeholderSrc, videoSrcList }) => {
     const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
-    const [maxLoadedSrc, setMaxLoadedSrc] = useState(1);
+    const [maxLoadedSrcIndex, setMaxLoadedSrcIndex] = useState(0);
 
     function getPreviousIndex(index: number) {
       return index > 0 ? index - 1 : videoSrcList.length - 1;
@@ -35,20 +35,33 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
     }
 
     useEffect(() => {
-      const currentElement = document.getElementById(
+      const previousVideoIndex = getPreviousIndex(currentVideoIndex);
+
+      const previousVideo = document.getElementById(
+        videoSrcList[previousVideoIndex]
+      ) as HTMLVideoElement;
+
+      if (previousVideo) {
+        // A timeout can help to prevent blinking
+        setTimeout(() => {
+          previousVideo.autoplay = false;
+          previousVideo.currentTime = 0;
+        }, 3000);
+      }
+
+      const currentVideo = document.getElementById(
         videoSrcList[currentVideoIndex]
       ) as HTMLVideoElement;
 
-      if (currentElement) {
-        currentElement.currentTime = 0;
-        currentElement.play();
+      if (currentVideo) {
+        currentVideo.play();
       }
     }, [videoSrcList, currentVideoIndex]);
 
     return (
       <Container className={className}>
         <Placeholder src={placeholderSrc} />
-        {videoSrcList.slice(0, maxLoadedSrc).map((videoSrc, index) => (
+        {videoSrcList.slice(0, maxLoadedSrcIndex + 1).map((videoSrc, index) => (
           <Video
             id={videoSrc}
             key={videoSrc}
@@ -60,12 +73,12 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
             }}
             playsInline
             onPlay={() => {
-              setMaxLoadedSrc((curr) => (curr === 1 ? 2 : curr));
+              setMaxLoadedSrcIndex((curr) => (curr === 0 ? 1 : curr));
             }}
             onEnded={() => {
               const nextIndex = getNextIndex(index);
               setCurrentVideoIndex(nextIndex);
-              setMaxLoadedSrc((curr) =>
+              setMaxLoadedSrcIndex((curr) =>
                 nextIndex + 1 > curr ? nextIndex + 1 : curr
               );
             }}
