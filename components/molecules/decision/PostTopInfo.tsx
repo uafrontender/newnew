@@ -50,7 +50,8 @@ interface IPostTopInfo {
   postStatus: TPostStatusStringified;
   title: string;
   creator: newnewapi.IUser;
-  isFollowingDecisionInitial: boolean;
+  isFollowingDecision: boolean;
+  handleSetIsFollowingDecision: (newValue: boolean) => void;
   postType?: TPostType;
   totalVotes?: number;
   totalPledges?: number;
@@ -67,7 +68,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   postStatus,
   title,
   creator,
-  isFollowingDecisionInitial,
+  isFollowingDecision,
+  handleSetIsFollowingDecision,
   postType,
   totalVotes,
   totalPledges,
@@ -129,10 +131,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
   const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
-  const [isFollowingDecision, setIsFollowingDecision] = useState(
-    isFollowingDecisionInitial
-  );
-
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
@@ -165,7 +163,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       const res = await markPost(markAsFavoritePayload);
 
       if (!res.error) {
-        setIsFollowingDecision(!isFollowingDecision);
+        handleSetIsFollowingDecision(!isFollowingDecision);
 
         if (isFollowingDecision) {
           handleRemovePostFromState?.();
@@ -179,6 +177,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   }, [
     handleAddPostToState,
     handleRemovePostFromState,
+    handleSetIsFollowingDecision,
     isFollowingDecision,
     postId,
     router,
