@@ -19,13 +19,13 @@ export const NotificationsProvider: React.FC = ({ children }) => {
   const user = useAppSelector((state) => state.user);
   const [unreadNotificationCount, setUnreadNotificationCount] =
     useState<number>(0);
-  const [notificationsLodaing, setNotificationsLodaing] = useState(false);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
   const socketConnection = useContext(SocketContext);
 
   const contextValue = useMemo(
     () => ({
       unreadNotificationCount,
-      notificationsLodaing,
+      notificationsLoading,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [unreadNotificationCount]
@@ -35,19 +35,24 @@ export const NotificationsProvider: React.FC = ({ children }) => {
     async function fetchNotificationCount() {
       if (!user.loggedIn) return;
       try {
-        setNotificationsLodaing(true);
+        setNotificationsLoading(true);
         const payload = new newnewapi.EmptyRequest();
         const res = await getUnreadNotificationCount(payload);
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data.unreadNotificationCount) {
+        if (
+          res.data.unreadNotificationCount !== undefined &&
+          res.data.unreadNotificationCount > 0
+        ) {
+          console.log(`Unread ${res.data.unreadNotificationCount}`);
           setUnreadNotificationCount(res.data.unreadNotificationCount);
         } else {
           setUnreadNotificationCount(0);
         }
       } catch (err) {
         console.error(err);
-        setNotificationsLodaing(false);
+        setNotificationsLoading(false);
+        setUnreadNotificationCount(0);
       }
     }
     fetchNotificationCount();
@@ -58,7 +63,11 @@ export const NotificationsProvider: React.FC = ({ children }) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.NotificationUnreadCountsChanged.decode(arr);
       if (!decoded) return;
-      setUnreadNotificationCount(decoded.unreadCount);
+      if (decoded.unreadCount !== undefined && decoded.unreadCount > 0) {
+        setUnreadNotificationCount(decoded.unreadCount);
+      } else {
+        setUnreadNotificationCount(0);
+      }
     };
 
     if (socketConnection) {

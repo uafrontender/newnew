@@ -114,6 +114,7 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       const res = await getCreatorsImSubscribedTo(payload);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
+
       setCreatorsImSubscribedTo(res.data.creators as []);
     } catch (err) {
       console.error(err);

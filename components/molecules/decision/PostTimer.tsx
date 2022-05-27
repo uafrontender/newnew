@@ -115,7 +115,10 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
     let payload;
     switch (postType) {
       case 'ac':
-        if (user.userTutorialsProgress.remainingAcSteps) {
+        if (
+          user.userTutorialsProgress.remainingAcSteps &&
+          user.userTutorialsProgress.remainingAcSteps[0]
+        ) {
           if (user.loggedIn) {
             payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
               acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
@@ -131,7 +134,10 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
         }
         break;
       case 'cf':
-        if (user.userTutorialsProgress.remainingCfSteps) {
+        if (
+          user.userTutorialsProgress.remainingCfSteps &&
+          user.userTutorialsProgress.remainingCfSteps[0]
+        ) {
           if (user.loggedIn) {
             payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
               cfCurrentStep: user.userTutorialsProgress.remainingCfSteps[0],
@@ -147,7 +153,10 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
         }
         break;
       default:
-        if (user.userTutorialsProgress.remainingMcSteps) {
+        if (
+          user.userTutorialsProgress.remainingMcSteps &&
+          user.userTutorialsProgress.remainingMcSteps[0]
+        ) {
           if (user.loggedIn) {
             payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
               mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],

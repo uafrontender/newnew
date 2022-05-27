@@ -610,7 +610,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     ]);
 
     const goToNextStep = () => {
-      if (user.userTutorialsProgress.remainingMcSteps) {
+      if (
+        user.userTutorialsProgress.remainingMcSteps &&
+        user.userTutorialsProgress.remainingMcSteps[0]
+      ) {
         if (user.loggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
             mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
