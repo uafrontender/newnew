@@ -9,14 +9,10 @@ import dashboardFilledIcon from '../../../public/images/svg/icons/filled/Dashboa
 import dashboardOutlinedIcon from '../../../public/images/svg/icons/outlined/Dashboard.svg';
 import subscriptionsFilledIcon from '../../../public/images/svg/icons/filled/Subscriptions.svg';
 import subscriptionsOutlinedIcon from '../../../public/images/svg/icons/outlined/Subscriptions.svg';
-// import earningsFilledIcon from '../../../public/images/svg/icons/filled/Earnings.svg';
-// import earningsOutlinedIcon from '../../../public/images/svg/icons/outlined/Earnings.svg';
 import walletFilledIcon from '../../../public/images/svg/icons/filled/Wallet.svg';
 import walletOutlinedIcon from '../../../public/images/svg/icons/outlined/Wallet.svg';
 import Button from '../../atoms/Button';
 import { useAppSelector } from '../../../redux-store/store';
-// import transactionsFilledIcon from '../../../public/images/svg/icons/filled/Transactions.svg';
-// import transactionsOutlinedIcon from '../../../public/images/svg/icons/outlined/Transactions.svg';
 
 export const Navigation = () => {
   const theme = useTheme();
@@ -38,26 +34,15 @@ export const Navigation = () => {
         iconFilled: subscriptionsFilledIcon,
         iconOutlined: subscriptionsOutlinedIcon,
       },
-      // {
-      //   url: '/creator/earnings',
-      //   label: t('navigation.earnings'),
-      //   iconFilled: earningsFilledIcon,
-      //   iconOutlined: earningsOutlinedIcon,
-      // },
       {
         url: '/creator/get-paid',
-        label: user.creatorData?.options?.isCreatorConnectedToStripe
-          ? t('navigation.getPaidEdit')
-          : t('navigation.getPaid'),
+        label:
+          user.creatorData?.options?.isCreatorConnectedToStripe === true
+            ? t('navigation.getPaidEdit')
+            : t('navigation.getPaid'),
         iconFilled: walletFilledIcon,
         iconOutlined: walletOutlinedIcon,
       },
-      // {
-      //   url: '/creator/transactions',
-      //   label: t('navigation.transactions'),
-      //   iconFilled: transactionsFilledIcon,
-      //   iconOutlined: transactionsOutlinedIcon,
-      // },
     ],
     [t, user.creatorData]
   );
@@ -65,8 +50,6 @@ export const Navigation = () => {
   const renderItem = useCallback(
     (item) => {
       const active = router.route.includes(item.url);
-      if (!user.creatorData?.isLoaded && item.url === '/creator/get-paid')
-        return null;
       return (
         <Link href={item.url} key={item.url}>
           <a>
@@ -91,7 +74,6 @@ export const Navigation = () => {
       router.route,
       theme.colorsThemed.accent.blue,
       theme.colorsThemed.text.tertiary,
-      user,
     ]
   );
 

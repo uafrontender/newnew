@@ -190,8 +190,6 @@ const MyProfileSettingsIndex = () => {
       const res = await getMyTransactions(payload);
       const { data, error } = res;
 
-      console.log(data);
-
       if (!data || error) throw new Error(error?.message ?? 'Request failed');
       if (data.paging?.total) setMyTransactionsTotal(data.paging?.total);
       if (data.transactions) setMyTransactions(data.transactions);
