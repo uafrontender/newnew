@@ -404,7 +404,10 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
     }, [socketConnection, post, postStatus, setPledges, sortPleges]);
 
     const goToNextStep = () => {
-      if (user.userTutorialsProgress.remainingCfSteps) {
+      if (
+        user.userTutorialsProgress.remainingCfSteps &&
+        user.userTutorialsProgress.remainingCfSteps[0]
+      ) {
         if (user.loggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
             cfCurrentStep: user.userTutorialsProgress.remainingCfSteps[0],
