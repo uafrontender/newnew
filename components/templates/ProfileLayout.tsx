@@ -394,7 +394,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       });
 
       const res = await unsubscribeFromCreator(payload);
-      console.log(res, user);
+      // console.log(res, user);
 
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
     } catch (err) {

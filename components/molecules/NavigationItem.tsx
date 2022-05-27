@@ -27,7 +27,6 @@ export interface INavigationItem {
 export const NavigationItem: React.FC<INavigationItem> = (props) => {
   const { item } = props;
   const theme = useTheme();
-  console.log(item);
 
   return (
     <Link href={item.url}>

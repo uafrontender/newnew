@@ -44,7 +44,7 @@ export const NotificationsProvider: React.FC = ({ children }) => {
           res.data.unreadNotificationCount !== undefined &&
           res.data.unreadNotificationCount > 0
         ) {
-          console.log(`Unread ${res.data.unreadNotificationCount}`);
+          // console.log(`Unread ${res.data.unreadNotificationCount}`);
           setUnreadNotificationCount(res.data.unreadNotificationCount);
         } else {
           setUnreadNotificationCount(0);
