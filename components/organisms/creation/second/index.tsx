@@ -863,7 +863,10 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       let payload = null;
       switch (tutorialType) {
         case 'MC':
-          if (user.userTutorialsProgress.remainingMcCrCurrentStep) {
+          if (
+            user.userTutorialsProgress.remainingMcCrCurrentStep &&
+            user.userTutorialsProgress.remainingMcCrCurrentStep[0]
+          ) {
             payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
               mcCrCurrentStep:
                 user.userTutorialsProgress.remainingMcCrCurrentStep[0],
@@ -878,7 +881,10 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
           }
           break;
         case 'CF':
-          if (user.userTutorialsProgress.remainingCfCrCurrentStep) {
+          if (
+            user.userTutorialsProgress.remainingCfCrCurrentStep &&
+            user.userTutorialsProgress.remainingCfCrCurrentStep[0]
+          ) {
             payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
               cfCrCurrentStep:
                 user.userTutorialsProgress.remainingCfCrCurrentStep[0],
@@ -893,7 +899,10 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
           }
           break;
         default:
-          if (user.userTutorialsProgress.remainingAcCrCurrentStep) {
+          if (
+            user.userTutorialsProgress.remainingAcCrCurrentStep &&
+            user.userTutorialsProgress.remainingAcCrCurrentStep[0]
+          ) {
             payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
               acCrCurrentStep:
                 user.userTutorialsProgress.remainingAcCrCurrentStep[0],
