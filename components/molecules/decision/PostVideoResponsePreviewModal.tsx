@@ -37,7 +37,7 @@ export const PostVideoResponsePreviewModal: React.FC<IPostVideoResponsePreviewMo
     };
 
     return (
-      <Modal show={open} additionalZ={15} onClose={handleClose}>
+      <Modal show={open} additionalz={15} onClose={handleClose}>
         <SMobileContainer onClick={preventCLick}>
           {!isMobile && (
             <SModalTopLine>

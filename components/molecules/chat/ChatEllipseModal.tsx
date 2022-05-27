@@ -40,7 +40,7 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
   };
 
   return (
-    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+    <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
           onClick={(e) => {

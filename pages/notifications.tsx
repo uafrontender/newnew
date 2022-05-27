@@ -113,6 +113,8 @@ export const Notifications = () => {
           notificationIds: unreadNotifications,
         });
         const res = await markAsRead(payload);
+        console.log(payload, res);
+
         if (res.error) throw new Error(res.error?.message ?? 'Request failed');
         setUnreadNotifications(null);
       } catch (err) {

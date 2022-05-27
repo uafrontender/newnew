@@ -23,7 +23,7 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
   const { t } = useTranslation('decision');
 
   return (
-    <Modal show={isVisible} additionalZ={14} onClose={closeModal}>
+    <Modal show={isVisible} additionalz={14} onClose={closeModal}>
       <SContainer onClick={(e) => e.stopPropagation()}>
         <SModal>
           <SModalTitle variant={6}>
