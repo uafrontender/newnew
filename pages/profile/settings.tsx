@@ -374,9 +374,9 @@ const MyProfileSettingsIndex = () => {
           {/* <SBlockOptionButton>
             {commonT(`selected-language-title-${router.locale}`)}
           </SBlockOptionButton> */}
-          <a href='https://faqs.newnew.co' target='_blank'>
-            <SBlockOption>{t('Settings.bottomDiv.help')}</SBlockOption>
-          </a>
+          <SBlockOption href='https://faqs.newnew.co' target='_blank'>
+            {t('Settings.bottomDiv.help')}
+          </SBlockOption>
           <SBlockOptionButton
             disabled={isLogoutLoading}
             onClick={() => handleLogout()}

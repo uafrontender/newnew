@@ -37,7 +37,8 @@ export const Notifications = () => {
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [defaultLimit, setDefaultLimit] = useState<number>(6);
-  const { unreadNotificationCount } = useNotifications();
+  const { unreadNotificationCount, fetchNotificationCount } =
+    useNotifications();
   const [localUnreadNotificationCount, setLocalUnreadNotificationCount] =
     useState<number>(0);
 
@@ -113,9 +114,8 @@ export const Notifications = () => {
           notificationIds: unreadNotifications,
         });
         const res = await markAsRead(payload);
-        console.log(payload, res);
-
         if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+        fetchNotificationCount();
         setUnreadNotifications(null);
       } catch (err) {
         console.error(err);
