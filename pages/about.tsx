@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 import React from 'react';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
@@ -49,8 +50,41 @@ import LSVPLogo from '../public/images/png/lsvp-logo.png';
 import A16ZLogo from '../public/images/png/a16z-logo.png';
 import SHRUGLogo from '../public/images/png/shrug-logo.png';
 
-import Media1 from '../public/images/png/media-7.png';
-// import assets from '../constants/assets';
+import BBCLogo from '../public/images/png/bbc-logo.png';
+import BloombergLogo from '../public/images/png/bloomberg-logo.png';
+import ForbesLogo from '../public/images/png/forbes-logo.png';
+import BNNLogo from '../public/images/png/bnn-logo.png';
+import BILogo from '../public/images/png/business-insider-logo.png';
+import FCLogo from '../public/images/png/fast-company-logo.png';
+import CNBCLogo from '../public/images/png/cnbc-logo.png';
+import ForbesCLogo from '../public/images/png/forbes-culture-logo.png';
+import NytLogo from '../public/images/png/the-nyt-logo.png';
+
+import assets from '../constants/assets';
+
+enum MediaNames {
+  bbc = 'bbc',
+  bloomberg = 'bloomberg',
+  cnbc = 'cnbc',
+  nyt = 'nyt',
+  bi = 'bi',
+  forbes = 'forbes',
+  fc = 'fc',
+  bnn = 'bnn',
+  'forbes-c' = 'forbes-c',
+}
+
+const MEDIA_ICONS = {
+  bbc: BBCLogo,
+  bloomberg: BloombergLogo,
+  cnbc: CNBCLogo,
+  nyt: NytLogo,
+  bi: BILogo,
+  forbes: ForbesLogo,
+  fc: FCLogo,
+  bnn: BNNLogo,
+  'forbes-c': ForbesCLogo,
+};
 
 const ICONS: Record<TColorMode, { [key: string]: StaticImageData }> = {
   light: {
@@ -77,39 +111,84 @@ const ICONS: Record<TColorMode, { [key: string]: StaticImageData }> = {
 const MEDIAS = [
   {
     id: 1,
-    pressName: 'cnbc',
-    link: 'https://google.com',
-    previewSrc: Media1,
+    pressName: 'bbc',
+    link: 'https://www.bbc.com/news/business-57085557',
+    previewSrc: {
+      dark: assets.about.darkMedia1,
+      light: assets.about.lightMedia1,
+    },
   },
   {
     id: 2,
-    pressName: 'cnbc',
-    link: 'https://google.com',
-    previewSrc: Media1,
+    pressName: 'nyt',
+    link: 'https://www.nytimes.com/2021/03/10/style/creators-selling-selves.html',
+    previewSrc: {
+      dark: assets.about.darkMedia2,
+      light: assets.about.lightMedia2,
+    },
   },
   {
     id: 3,
     pressName: 'cnbc',
-    link: 'https://google.com',
-    previewSrc: Media1,
+    link: 'https://www.cnbc.com/video/2021/04/01/monetizing-the-creator-economy-with-the-control-my-life-app.html?__source=sharebar%7Ctwitter&par=sharebar',
+    previewSrc: {
+      dark: assets.about.darkMedia3,
+      light: assets.about.lightMedia3,
+    },
   },
   {
     id: 4,
-    pressName: 'cnbc',
-    link: 'https://google.com',
-    previewSrc: Media1,
+    pressName: 'bi',
+    link: 'https://www.businessinsider.com/top-creator-economy-startups-to-watch-in-2021-vc-investors-2021-8?IR=T',
+    previewSrc: {
+      dark: assets.about.darkMedia4,
+      light: assets.about.lightMedia4,
+    },
   },
   {
     id: 5,
-    pressName: 'cnbc',
-    link: 'https://google.com',
-    previewSrc: Media1,
+    pressName: 'forbes',
+    link: 'https://www.forbes.com/sites/geristengel/2021/12/30/smart-vcs-recognize-that-black-female-founders-may-be-the-next-unicorns/?sh=4f00b6bc55ac',
+    previewSrc: {
+      dark: assets.about.darkMedia5,
+      light: assets.about.lightMedia5,
+    },
   },
   {
     id: 6,
-    pressName: 'cnbc',
-    link: 'https://google.com',
-    previewSrc: Media1,
+    pressName: 'bloomberg',
+    link: 'https://www.bloomberg.com/news/videos/2021-03-26/quicktake-take-the-lead-03-25-2021-video',
+    previewSrc: {
+      dark: assets.about.darkMedia6,
+      light: assets.about.lightMedia6,
+    },
+  },
+  {
+    id: 7,
+    pressName: 'fc',
+    link: 'https://www.fastcompany.com/90586403/how-polling-app-newnew-represents-the-new-class-of-social-media',
+    previewSrc: {
+      dark: assets.about.darkMedia7,
+      light: assets.about.lightMedia7,
+    },
+  },
+  {
+    id: 8,
+    pressName: 'bnn',
+    link: 'https://www.bnnbloomberg.ca/this-tech-outsider-ceo-from-toronto-went-from-managing-drake-to-taking-on-silicon-valley-1.1557924',
+    previewSrc: {
+      dark: assets.about.darkMedia8,
+      light: assets.about.lightMedia8,
+    },
+  },
+  {
+    id: 9,
+    pressName: 'forbes-c',
+    link: 'https://www.forbes.com/sites/forbestheculture/2020/12/03/former-drake-executive-discusses-her-transition-to-tech-and-entrepreneurship/?sh=700c35046cb8',
+    previewSrc: {
+      dark: assets.about.darkMedia9,
+      light: assets.about.lightMedia9,
+    },
   },
 ];
 
@@ -166,8 +245,6 @@ export const HowItWorks = () => {
   );
 
   const isTablet = ['tablet'].includes(resizeMode);
-
-  console.log(sizes.tablet);
 
   const settings = {
     slidesToShow: 3,
@@ -237,17 +314,21 @@ export const HowItWorks = () => {
                     key={media.id}
                   >
                     <SMediaPreview>
-                      <SMediaPreviewPic src={media.previewSrc.src} />
+                      <SMediaPreviewPic
+                        src={media.previewSrc[theme.name as 'dark' | 'light']}
+                      />
+                      <SMediaLogo
+                        src={MEDIA_ICONS[media.pressName as MediaNames].src}
+                        name={media.pressName}
+                      />
                     </SMediaPreview>
                     <SMediaInfo>
                       <SMediaTitle variant={1}>
-                        {
-                          (
-                            t(`press.items`, { returnObjects: true }) as {
-                              title: string;
-                            }[]
-                          )[i].title
-                        }
+                        {(
+                          t(`press.items`, { returnObjects: true }) as {
+                            title: string;
+                          }[]
+                        )[i]?.title ?? ''}
                       </SMediaTitle>
                       <SMediaPreviewIcon
                         svg={ArrowRightIcon}
@@ -678,6 +759,7 @@ const SMedia = styled.div`
 `;
 
 const SMediaPreview = styled.div`
+  position: relative;
   padding: 8px;
   border: 1.6px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
   border-radius: ${({ theme }) => theme.borderRadius.smallLg};
@@ -694,6 +776,71 @@ const SMediaPreview = styled.div`
 
 const SMediaInfo = styled.div`
   display: flex;
+`;
+
+interface ISMediaLogo {
+  name: string;
+}
+
+const SMediaLogo = styled.img<ISMediaLogo>`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  ${(props) => {
+    switch (props.name) {
+      case 'bbc':
+        return css`
+          width: 103px;
+          height: 30px;
+        `;
+      case 'nyt':
+        return css`
+          width: 207px;
+          height: 27px;
+        `;
+      case 'cnbc':
+        return css`
+          width: 62px;
+          height: 49px;
+        `;
+      case 'bi':
+        return css`
+          width: 158px;
+          height: 50px;
+        `;
+      case 'forbes':
+        return css`
+          width: 90px;
+          height: 22px;
+        `;
+      case 'bloomberg':
+        return css`
+          width: 157px;
+          height: 32px;
+        `;
+      case 'fc':
+        return css`
+          width: 148px;
+          height: 22px;
+        `;
+      case 'bnn':
+        return css`
+          width: 150px;
+          height: 56px;
+        `;
+      case 'forbes-c':
+        return css`
+          width: 176px;
+          height: 49px;
+        `;
+      default:
+        return css`
+          width: 48px;
+          height: 48px;
+        `;
+    }
+  }}
 `;
 
 interface ISMediaPreviewPic {
