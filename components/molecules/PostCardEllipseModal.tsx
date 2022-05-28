@@ -136,7 +136,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   }, [user.loggedIn, postUuid]);
 
   return (
-    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+    <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
           onClick={(e) => {

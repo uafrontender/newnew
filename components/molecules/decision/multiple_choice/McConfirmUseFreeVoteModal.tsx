@@ -20,7 +20,7 @@ const McConfirmUseFreeVoteModal: React.FC<IMcConfirmUseFreeVoteModal> = ({
   const { t } = useTranslation('decision');
 
   return (
-    <Modal show={isVisible} additionalZ={12} onClose={closeModal}>
+    <Modal show={isVisible} additionalz={12} onClose={closeModal}>
       <SContainer
       // onClick={(e) => e.stopPropagation()}
       >

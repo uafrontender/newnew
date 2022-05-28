@@ -39,7 +39,7 @@ declare module 'styled-components' {
         backgroundHeader: string;
         backgroundErrorPopup: string;
         // Used for overlaydim
-        overlayDim: string;
+        overlaydim: string;
         thumbLineHidden: string;
         thumbLineVisible: string;
       };

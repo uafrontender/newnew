@@ -84,7 +84,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
       />
       <Modal
         show={modalOpen}
-        customBackdropFilterValue={1}
+        custombackdropfiltervalue={1}
         onClose={() => setModalOpen(false)}
       >
         {modalOpen && (

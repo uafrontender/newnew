@@ -22,7 +22,7 @@ const OptionModal: React.FunctionComponent<IOptionModal> = ({
   const { t } = useTranslation('decision');
 
   return (
-    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+    <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
           onClick={(e) => {

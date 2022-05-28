@@ -11,7 +11,7 @@ interface IOptionActionMobileModal {
 
 const OptionActionMobileModal: React.FunctionComponent<IOptionActionMobileModal> =
   ({ isOpen, zIndex, onClose, children }) => (
-    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+    <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
           onClick={(e) => {
