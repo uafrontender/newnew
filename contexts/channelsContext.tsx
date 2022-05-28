@@ -9,7 +9,6 @@ import React, {
   useMemo,
   useEffect,
   useContext,
-  useCallback,
 } from 'react';
 import { SocketContext } from './socketContext';
 

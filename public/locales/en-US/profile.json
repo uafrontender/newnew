@@ -18,6 +18,12 @@
       "button-cancel": "Cancel",
       "button-confirm": "Block user"
     },
+    "unsubscribe-user": {
+      "title": "Unsubscribe from creator",
+      "message": "Do you really want to unsubscribe from {{username}}?",
+      "button-cancel": "Cancel",
+      "button-confirm": "Unsubscribe"
+    },
     "delete-my-account": {
       "title": "Delete my account",
       "body": "Are you sure you want to delete your account?\nYou won’t be able to access your account in the future\nand all of your history will be erased.",

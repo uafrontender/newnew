@@ -13,6 +13,7 @@ import { SocketContext } from './socketContext';
 
 const NotificationsContext = createContext({
   unreadNotificationCount: 0,
+  fetchNotificationCount: () => {},
 });
 
 export const NotificationsProvider: React.FC = ({ children }) => {
@@ -26,44 +27,43 @@ export const NotificationsProvider: React.FC = ({ children }) => {
     () => ({
       unreadNotificationCount,
       notificationsLoading,
+      fetchNotificationCount,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [unreadNotificationCount]
+    [unreadNotificationCount, fetchNotificationCount, notificationsLoading]
   );
 
-  useEffect(() => {
-    async function fetchNotificationCount() {
-      if (!user.loggedIn) return;
-      try {
-        setNotificationsLoading(true);
-        const payload = new newnewapi.EmptyRequest();
-        const res = await getUnreadNotificationCount(payload);
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-        if (
-          res.data.unreadNotificationCount !== undefined &&
-          res.data.unreadNotificationCount > 0
-        ) {
-          setUnreadNotificationCount(res.data.unreadNotificationCount);
-        } else {
-          setUnreadNotificationCount(0);
-        }
-        console.log(`Unread ${res.data.unreadNotificationCount}`);
-      } catch (err) {
-        console.error(err);
-        setNotificationsLoading(false);
+  async function fetchNotificationCount() {
+    if (!user.loggedIn) return;
+    try {
+      setNotificationsLoading(true);
+      const payload = new newnewapi.EmptyRequest();
+      const res = await getUnreadNotificationCount(payload);
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      if (
+        res.data.unreadNotificationCount !== undefined &&
+        res.data.unreadNotificationCount > 0
+      ) {
+        setUnreadNotificationCount(res.data.unreadNotificationCount);
+      } else {
         setUnreadNotificationCount(0);
       }
+    } catch (err) {
+      console.error(err);
+      setNotificationsLoading(false);
+      setUnreadNotificationCount(0);
     }
+  }
+
+  useEffect(() => {
     fetchNotificationCount();
   }, [user.loggedIn]);
 
   useEffect(() => {
     const socketHandlerNotificationUnreadCountsChanged = async (data: any) => {
-      console.log(`1`);
       const arr = new Uint8Array(data);
       const decoded = newnewapi.NotificationUnreadCountsChanged.decode(arr);
-      console.log(`Decoded ${decoded.unreadCount}`);
       if (!decoded) return;
       if (decoded.unreadCount !== undefined && decoded.unreadCount > 0) {
         setUnreadNotificationCount(decoded.unreadCount);
