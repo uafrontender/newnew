@@ -303,7 +303,6 @@ export const HowItWorks = () => {
           {/* PRESS SECTION */}
           <SMediaSection>
             <SSectionTitle variant={4}>{t('press.title')}</SSectionTitle>
-            {/* <SMediaList> */}
             <Slider {...settings}>
               {MEDIAS.map((media, i) => (
                 <SMedia key={media.id}>
@@ -341,7 +340,6 @@ export const HowItWorks = () => {
                 </SMedia>
               ))}
             </Slider>
-            {/* </SMediaList> */}
           </SMediaSection>
 
           {/* BACKERS SECTION */}
@@ -680,23 +678,18 @@ const SBubble2Icon = styled.img`
 
 // MEDIA
 const SMediaSection = styled(SSection)`
-  /* margin-left: -16px; */
-  /* margin-right: -16px; */
   z-index: 1;
   max-width: 100%;
-  opacity: hidden;
+
+  & .slick-slider {
+    margin-right: -16px;
+  }
 
   & .slick-slide {
-    margin-right: -16px;
-
     & > div {
       margin-right: 16px;
     }
   }
-
-  /* & h4 {
-    margin-left: 16px;
-  } */
 
   ${({ theme }) => theme.media.tablet} {
     margin-left: 0;
@@ -747,11 +740,6 @@ const SScrollArrow = styled(ScrollArrowPermanent)`
 const SMedia = styled.div`
   max-width: 252px;
   margin-right: 16px;
-
-  /* 
-  &:first-child {
-    margin-left: 16px;
-  } */
 
   ${({ theme }) => theme.media.tablet} {
     max-width: unset;
@@ -859,8 +847,6 @@ const SMediaPreviewPic = styled.div<ISMediaPreviewPic>`
     background-position: center;
     border-radius: ${({ theme }) => theme.borderRadius.smallLg};
     overflow: hidden;
-    /* filter: ${({ theme }) =>
-      theme.name === 'dark' ? `brightness(0.7)` : `none`}; */
   }
 
   &:after {
@@ -1136,12 +1122,6 @@ const SInvestor = styled.li`
         : theme.colorsThemed.background.outlines2};
 
   ${({ theme }) => theme.media.laptop} {
-    &:hover > h5 {
-      /* transform: scale3d(1.2, 1, 1); */
-    }
-  }
-
-  ${({ theme }) => theme.media.laptopL} {
     &:hover > h5 {
       transform: scale(1.3);
     }
