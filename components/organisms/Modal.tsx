@@ -63,7 +63,8 @@ const Modal: React.FC<IModal> = React.memo((props) => {
           transitionspeed={transitionspeed ?? 0.15}
         >
           <SClickableDiv
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               onClose?.();
             }}
           />

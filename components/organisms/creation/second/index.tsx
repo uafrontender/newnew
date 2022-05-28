@@ -68,6 +68,7 @@ import {
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
+import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -392,7 +393,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
               reject(new Error('Upload failed'));
             });
             xhr.addEventListener('abort', () => {
-              console.log('Aborted');
+              // console.log('Aborted');
               dispatch(setCreationFileUploadProgress(0));
               reject(new Error('Upload aborted'));
             });
@@ -755,8 +756,9 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
         multiplechoice.options.allowSuggestions,
       ]
     );
+
     const handlerSocketUpdated = useCallback(
-      (data: any) => {
+      async (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.VideoProcessingProgress.decode(arr);
 
@@ -773,8 +775,31 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
             );
           }
 
-          if (decoded.fractionCompleted === 100) {
-            dispatch(setCreationFileProcessingLoading(false));
+          if (
+            decoded.fractionCompleted === 100 &&
+            decoded.status ===
+              newnewapi.VideoProcessingProgress.Status.SUCCEEDED &&
+            videoProcessing.targetUrls?.hlsStreamUrl
+          ) {
+            const available = await waitResourceIsAvailable(
+              videoProcessing.targetUrls?.hlsStreamUrl,
+              {
+                maxAttempts: 60,
+                retryTimeMs: 1000,
+              }
+            );
+
+            if (available) {
+              dispatch(setCreationFileProcessingLoading(false));
+            } else {
+              dispatch(setCreationFileUploadError(true));
+              toast.error('An error occured');
+            }
+          } else if (
+            decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
+          ) {
+            dispatch(setCreationFileUploadError(true));
+            toast.error('An error occured');
           }
         }
       },
@@ -1073,7 +1098,8 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                     </STabletBlockPreviewTitle>
                   </SItemWrapper>
                   {fileUpload?.progress === 100 ? (
-                    fileProcessing?.progress === 100 ? (
+                    fileProcessing?.progress === 100 &&
+                    !fileProcessing.loading ? (
                       <SFloatingSubSectionWithPlayer>
                         <SFloatingSubSectionPlayer>
                           <BitmovinPlayer

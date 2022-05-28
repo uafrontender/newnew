@@ -336,6 +336,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         amount={`$${subPriceFormatted}`}
         onClose={() => setIsPaymentModalOpen(false)}
         handlePayWithCardStripeRedirect={handlePayRegistered}
+        showTocApply
         // handlePayWithWallet={handlePayRegistered}
         // payButtonCaptionKey={t('paymentModalPayButton')}
       >

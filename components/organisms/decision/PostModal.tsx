@@ -183,6 +183,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [isFollowingDecision, setIsFollowingDecision] = useState(
     !!postParsed?.isFavoritedByMe
   );
+  const handleSetIsFollowingDecision = (v: boolean) =>
+    setIsFollowingDecision(v);
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
@@ -429,6 +431,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed}
           postStatus={postStatus}
           variant='decision'
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleRemovePostFromState={handleRemovePostFromState!!}
@@ -446,6 +450,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           postType={typeOfPost as string}
           variant='decision'
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleRemovePostFromState={handleRemovePostFromState!!}
@@ -462,6 +468,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.MultipleChoice}
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -478,6 +486,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.Auction}
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -494,6 +504,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.Crowdfunding}
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -571,6 +583,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           variant='moderation'
           postType={typeOfPost as string}
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleRemovePostFromState={handleRemovePostFromState!!}
@@ -588,6 +602,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed}
           postStatus={postStatus}
           variant='moderation'
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleRemovePostFromState={handleRemovePostFromState!!}
@@ -680,6 +696,28 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    async function fetchIsFavorited() {
+      try {
+        const fetchPostPayload = new newnewapi.GetPostRequest({
+          postUuid: postParsed?.postUuid,
+        });
+
+        const res = await fetchPostByUUID(fetchPostPayload);
+
+        if (res.data) {
+          setIsFollowingDecision(!!switchPostType(res.data)[0].isFavoritedByMe);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (postParsed?.postUuid) {
+      fetchIsFavorited();
+    }
+  }, [postParsed?.postUuid]);
 
   // Override next/router default onPopState
   // More: https://nextjs.org/docs/api-reference/next/router#routerbeforepopstate
