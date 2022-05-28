@@ -18,11 +18,16 @@ interface IScrollArrow {
 }
 
 const ScrollArrow: React.FC<IScrollArrow> = (props) => {
-  const { active, position, handleClick } = props;
+  const { active, position, handleClick, ...rest } = props;
   const theme = useTheme();
 
   return (
-    <SArrowHolder active={active} onClick={handleClick} position={position}>
+    <SArrowHolder
+      active={active}
+      onClick={handleClick}
+      position={position}
+      {...rest}
+    >
       <InlineSVG
         svg={ICONS[position]}
         fill={theme.colorsThemed.background.outlines2}

@@ -1,0 +1,60 @@
+{
+  "meta": {
+    "title": "About NewNew",
+    "description": "We empower people to take control and have more interactive experiences."
+  },
+  "intro": {
+    "title": "NewNew is where people come together to bid and vote on the world’s biggest decisions.",
+    "text": "We empower people to take control and have more interactive experiences."
+  },
+  "press": {
+    "title": "Press",
+    "items": [
+      {
+        "title": "Top Creator Economy Startups to Watch in 2021."
+      },
+      {
+        "title": "Top Creator Economy Startups to Watch in 2021."
+      },
+      {
+        "title": "Top Creator Economy Startups to Watch in 2021."
+      },
+      {
+        "title": "Top Creator Economy Startups to Watch in 2021."
+      },
+      {
+        "title": "Top Creator Economy Startups to Watch in 2021."
+      },
+      {
+        "title": "Top Creator Economy Startups to Watch in 2021."
+      },
+      {
+        "title": "Top Creator Economy Startups to Watch in 2021."
+      }
+    ]
+  },
+  "backers": {
+    "title": "Backers"
+  },
+  "investors": {
+    "title": "Our Investors",
+    "participants": [
+      {
+        "name": "Michael Ovitz",
+        "description": "Founder, Creative Artists Agency (CAA)"
+      },
+      {
+        "name": "Stephen Pagliuca",
+        "description": "Co-Chairman, Bain Capital"
+      },
+      {
+        "name": "Kevin Mayer",
+        "description": "Chairman, DAZN Group (Former TikTok CEO  & Disney Chairman)"
+      },
+      {
+        "name": "Steven Galanis",
+        "description": "Founder, Cameo)"
+      }
+    ]
+  }
+}
