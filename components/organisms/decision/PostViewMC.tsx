@@ -69,6 +69,8 @@ interface IPostViewMC {
   sessionId?: string;
   resetSessionId: () => void;
   postStatus: TPostStatusStringified;
+  isFollowingDecision: boolean;
+  handleSetIsFollowingDecision: (newValue: boolean) => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
@@ -81,6 +83,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     post,
     postStatus,
     sessionId,
+    isFollowingDecision,
+    handleSetIsFollowingDecision,
     resetSessionId,
     handleGoBack,
     handleUpdatePostStatus,
@@ -685,7 +689,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           totalVotes={totalVotes}
           hasWinner={false}
           creator={post.creator!!}
-          isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleReportOpen={handleReportOpen}
           handleRemovePostFromState={handleRemovePostFromState}
           handleAddPostToState={handleAddPostToState}

@@ -135,7 +135,7 @@ const SContentContainer = styled.div<{
     width: 480px;
     height: fit-content;
     /* min-height: 360px; */
-    max-height: ${({ showTocApply }) => (showTocApply ? '480px' : '412px')};
+    /* max-height: 480px; */
     margin: auto;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};

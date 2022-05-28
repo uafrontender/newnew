@@ -44,6 +44,7 @@ import {
 } from '../../../api/endpoints/post';
 import isSafari from '../../../utils/isSafari';
 import { usePostModalState } from '../../../contexts/postModalContext';
+import waitResourceIsAvailable from '../../../utils/checkResourceAvailable';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
@@ -231,7 +232,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           reject(new Error('Upload failed'));
         });
         xhr.addEventListener('abort', () => {
-          console.log('Aborted');
+          // console.log('Aborted');
           setResponseFileUploadProgress(0);
           reject(new Error('Upload aborted'));
         });
@@ -382,7 +383,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   }, [postId, uploadedResponseVideoUrl, t, handleUpdatePostStatus]);
 
   const handlerSocketUpdated = useCallback(
-    (data: any) => {
+    async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.VideoProcessingProgress.decode(arr);
 
@@ -400,12 +401,40 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           setResponseFileProcessingProgress(decoded.fractionCompleted);
         }
 
-        if (decoded.fractionCompleted === 100) {
-          setResponseFileProcessingLoading(false);
+        if (
+          decoded.fractionCompleted === 100 &&
+          decoded.status ===
+            newnewapi.VideoProcessingProgress.Status.SUCCEEDED &&
+          videoProcessing.targetUrls?.hlsStreamUrl
+        ) {
+          const available = await waitResourceIsAvailable(
+            videoProcessing.targetUrls?.hlsStreamUrl,
+            {
+              maxAttempts: 60,
+              retryTimeMs: 1000,
+            }
+          );
+
+          if (available) {
+            setResponseFileProcessingLoading(false);
+          } else {
+            setResponseFileUploadError(true);
+            toast.error('An error occured');
+          }
+        } else if (
+          decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
+        ) {
+          setResponseFileUploadError(true);
+          toast.error('An error occured');
         }
       }
     },
-    [videoProcessing.taskUuid, postId, responseFileProcessingProgress]
+    [
+      postId,
+      videoProcessing?.taskUuid,
+      videoProcessing.targetUrls?.hlsStreamUrl,
+      responseFileProcessingProgress,
+    ]
   );
 
   useEffect(() => {

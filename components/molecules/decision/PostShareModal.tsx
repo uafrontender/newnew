@@ -109,7 +109,13 @@ const PostShareModal: React.FunctionComponent<IPostShareModal> = React.memo(
               {socialButtons.map(renderItem)}
             </SSocials> */}
               <SItem>
-                <SItemButtonWide type='copy' onClick={() => handlerCopy()}>
+                <SItemButtonWide
+                  type='copy'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlerCopy();
+                  }}
+                >
                   <InlineSvg
                     svg={SOCIAL_ICONS.copy as string}
                     width='24px'
@@ -154,6 +160,8 @@ const SWrapper = styled.div`
 const SContentContainer = styled.div`
   width: calc(100% - 32px);
   height: fit-content;
+
+  z-index: 15;
 
   padding: 16px;
 
