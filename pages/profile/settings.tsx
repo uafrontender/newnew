@@ -190,8 +190,6 @@ const MyProfileSettingsIndex = () => {
       const res = await getMyTransactions(payload);
       const { data, error } = res;
 
-      console.log(data);
-
       if (!data || error) throw new Error(error?.message ?? 'Request failed');
       if (data.paging?.total) setMyTransactionsTotal(data.paging?.total);
       if (data.transactions) setMyTransactions(data.transactions);
@@ -376,9 +374,9 @@ const MyProfileSettingsIndex = () => {
           {/* <SBlockOptionButton>
             {commonT(`selected-language-title-${router.locale}`)}
           </SBlockOptionButton> */}
-          <a href='https://faqs.newnew.co' target='_blank'>
-            <SBlockOption>{t('Settings.bottomDiv.help')}</SBlockOption>
-          </a>
+          <SBlockOption href='https://faqs.newnew.co' target='_blank'>
+            {t('Settings.bottomDiv.help')}
+          </SBlockOption>
           <SBlockOptionButton
             disabled={isLogoutLoading}
             onClick={() => handleLogout()}

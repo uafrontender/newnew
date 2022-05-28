@@ -56,7 +56,6 @@ export const HeroSection = React.memo(() => {
         containerId: 'generalScrollContainer',
       });
     } else {
-      console.log('hey');
       scroller.scrollTo('ac', {
         offset: isMobile ? -20 : -100,
         smooth: 'ease',

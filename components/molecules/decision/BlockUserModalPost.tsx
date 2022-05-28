@@ -42,7 +42,7 @@ const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
     blockUserRequest();
   };
   return (
-    <Modal additionalZ={15} show={confirmBlockUser} onClose={closeModal}>
+    <Modal additionalz={15} show={confirmBlockUser} onClose={closeModal}>
       <SContainer>
         <SModal>
           <SModalTitle>{t('BlockUserModal.title')}</SModalTitle>

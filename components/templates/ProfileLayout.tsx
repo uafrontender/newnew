@@ -1,4 +1,6 @@
 /* eslint-disable no-unsafe-optional-chaining */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   ReactElement,
   useCallback,
@@ -31,7 +33,10 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
 // import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 // import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
-import { getSubscriptionStatus } from '../../api/endpoints/subscription';
+import {
+  getSubscriptionStatus,
+  unsubscribeFromCreator,
+} from '../../api/endpoints/subscription';
 // import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
 
@@ -42,6 +47,8 @@ import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
 import BackButton from '../molecules/profile/BackButton';
+import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+import UnsubscribeModal from '../molecules/profile/UnsubscribeModal';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -91,6 +98,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [wasSubscribed, setWasSubscribed] = useState(false);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
   // Share
@@ -124,6 +132,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+  const [unsubscribeModalOpen, setUnsubscribeModalOpen] = useState(false);
   const { usersIBlocked, unblockUser } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(user.uuid),
@@ -188,6 +197,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const [activityDecisionsCount, setActivityDecisionsCount] = useState(
     postsCachedActivityCount
   );
+
+  const { creatorsImSubscribedTo } = useGetSubscriptions();
 
   const handleSetPostsCreatorsDecisions: React.Dispatch<
     React.SetStateAction<newnewapi.Post[]>
@@ -411,6 +422,13 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
         if (res.data?.status?.activeRenewsAt) {
           setIsSubscribed(true);
+        } else {
+          setIsSubscribed(false);
+        }
+        if (res.data?.status?.activeCancelsAt) {
+          setWasSubscribed(true);
+        } else {
+          setWasSubscribed(false);
         }
       } catch (err) {
         console.error(err);
@@ -418,7 +436,14 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     }
 
     fetchIsSubscribed();
-  }, [user.uuid]);
+
+    // TODO: After update GetCreatorsImSubscribedToResponse on backend remaster this section
+    // let isSub = undefined;
+    // if (creatorsImSubscribedTo && creatorsImSubscribedTo.length > 0) {
+    //   isSub = creatorsImSubscribedTo.find((cr) => cr.uuid === user.uuid);
+    // }
+    // isSub ? setIsSubscribed(true) : setIsSubscribed(false);
+  }, [creatorsImSubscribedTo, user.uuid]);
 
   return (
     <ErrorBoundary>
@@ -486,7 +511,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 }
               }}
               handleClickReport={handleClickReport}
-              handleClickUnsubscribe={() => {}}
+              handleClickUnsubscribe={() => {
+                setUnsubscribeModalOpen(true);
+              }}
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
@@ -547,7 +574,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             {user.options?.isOfferingSubscription ? (
               <Link
                 href={
-                  !isSubscribed
+                  !isSubscribed && !wasSubscribed
                     ? `/${user.username}/subscribe`
                     : `/direct-messages/${user.username}`
                 }
@@ -586,9 +613,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           handleClickReport={() => {
             setConfirmReportUser(true);
           }}
-          handleClickUnsubscribe={() => {}}
+          handleClickUnsubscribe={() => {
+            setUnsubscribeModalOpen(true);
+          }}
         />
       )}
+      <UnsubscribeModal
+        confirmUnsubscribe={unsubscribeModalOpen}
+        user={user}
+        closeModal={() => setUnsubscribeModalOpen(false)}
+      />
       <BlockUserModal
         confirmBlockUser={blockUserModalOpen}
         user={user}

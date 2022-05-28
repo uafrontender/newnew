@@ -1,4 +1,14 @@
 {
+  "postType": {
+    "ac": "Event",
+    "mc": "Superpoll",
+    "cf": "Goal",
+    "multiple": {
+      "ac": "Events",
+      "mc": "Superpolls",
+      "cf": "Goals"
+    }
+  },
   "hero-block-title": "Come together \nto shape reality",
   "hero-block-subTitle": "Bid and vote on what the world does next",
   "hero-block-sign-in": "Sign in now",
@@ -80,5 +90,16 @@
       "title-cf": "See more Goals on NewNew",
       "description-cf": "See more Goals creators posted on creator economy startup company NewNew"
     }
+  },
+  "ellipse": {
+    "copy-link": "Copy link",
+    "link-copied": "Link copied!",
+    "follow-creator": "Favorite creator",
+    "unfollow-creator": "Unfavorite creator",
+    "follow-decision": "Favorite {{ postType }}",
+    "unfollow-decision": "Unfavorite {{ postType }}",
+    "report": "Report",
+    "deleteDecision": "Delete {{ postType }}",
+    "cancel": "Cancel"
   }
 }

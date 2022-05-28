@@ -38,7 +38,7 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<IMcOptionCardSelectV
     const { appConstants } = useGetAppConstants();
 
     return (
-      <Modal show={isVisible} overlayDim additionalZ={10} onClose={handleClose}>
+      <Modal show={isVisible} overlaydim additionalz={10} onClose={handleClose}>
         <SContainer>
           <STitleContainer>
             <STitleText variant={6}>

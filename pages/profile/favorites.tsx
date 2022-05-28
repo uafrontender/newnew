@@ -180,6 +180,9 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
                 left: 0,
               }}
               handlePostClicked={handleOpenPostModal}
+              handleRemovePostFromState={(uuid: string) =>
+                handleRemovePostFromState(uuid)
+              }
             />
           )}
           {posts && posts.length === 0 && !isLoading && (
