@@ -48,6 +48,7 @@ import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
 import BackButton from '../molecules/profile/BackButton';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+import UnsubscribeModal from '../molecules/profile/UnsubscribeModal';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -97,6 +98,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [wasSubscribed, setWasSubscribed] = useState(false);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
   // Share
@@ -130,6 +132,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+  const [unsubscribeModalOpen, setUnsubscribeModalOpen] = useState(false);
   const { usersIBlocked, unblockUser } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(user.uuid),
@@ -379,29 +382,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   //   }
   // };
 
-  const handleUnsubscribeCreator = async () => {
-    try {
-      if (!currentUser.loggedIn) {
-        router.push(
-          `/sign-up?reason=follow-creator&redirect=${encodeURIComponent(
-            window.location.href
-          )}`
-        );
-      }
-
-      const payload = new newnewapi.UnsubscribeFromCreatorRequest({
-        creatorUuid: user.uuid,
-      });
-
-      const res = await unsubscribeFromCreator(payload);
-      // console.log(res, user);
-
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   // Try to pre-fetch the content
   useEffect(() => {
     router.prefetch('/sign-up?reason=follow-creator');
@@ -439,10 +419,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         });
 
         const res = await getSubscriptionStatus(getStatusPayload);
+
         if (res.data?.status?.activeRenewsAt) {
           setIsSubscribed(true);
         } else {
           setIsSubscribed(false);
+        }
+        if (res.data?.status?.activeCancelsAt) {
+          setWasSubscribed(true);
+        } else {
+          setWasSubscribed(false);
         }
       } catch (err) {
         console.error(err);
@@ -525,8 +511,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 }
               }}
               handleClickReport={handleClickReport}
-              // handleClickUnsubscribe={handleUnsubscribeCreator}
-              handleClickUnsubscribe={() => {}}
+              handleClickUnsubscribe={() => {
+                setUnsubscribeModalOpen(true);
+              }}
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
@@ -587,7 +574,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             {user.options?.isOfferingSubscription ? (
               <Link
                 href={
-                  !isSubscribed
+                  !isSubscribed && !wasSubscribed
                     ? `/${user.username}/subscribe`
                     : `/direct-messages/${user.username}`
                 }
@@ -626,10 +613,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           handleClickReport={() => {
             setConfirmReportUser(true);
           }}
-          handleClickUnsubscribe={() => {}}
-          // handleClickUnsubscribe={handleUnsubscribeCreator}
+          handleClickUnsubscribe={() => {
+            setUnsubscribeModalOpen(true);
+          }}
         />
       )}
+      <UnsubscribeModal
+        confirmUnsubscribe={unsubscribeModalOpen}
+        user={user}
+        closeModal={() => setUnsubscribeModalOpen(false)}
+      />
       <BlockUserModal
         confirmBlockUser={blockUserModalOpen}
         user={user}
