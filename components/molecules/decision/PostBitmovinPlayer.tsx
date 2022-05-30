@@ -209,8 +209,8 @@ const SVideoWrapper = styled.div`
   min-height: 100%;
   background: transparent;
 
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
 
   ${({ theme }) => theme.media.tablet} {
     border-radius: 16px;
