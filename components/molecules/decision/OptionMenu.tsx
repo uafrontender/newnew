@@ -21,6 +21,7 @@ interface IOptionMenu {
   isVisible: boolean;
   optionId?: number;
   postUuid?: string;
+  optionCreatorUuid?: string;
   optionType?: 'ac' | 'mc';
   isMyOption?: boolean;
   handleClose: () => void;
@@ -35,6 +36,7 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
   optionType,
   optionId,
   postUuid,
+  optionCreatorUuid,
   handleClose,
   handleOpenReportOptionModal,
   handleOpenRemoveOptionModal,
@@ -64,19 +66,35 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
   useEffect(() => {
     async function fetchCanDelete() {
       try {
+        let hasOthersVoted = false;
         if (optionType === 'ac') {
           const payload = new newnewapi.GetAcBidsRequest({
             optionId,
             postUuid,
+            paging: {
+              limit: 50,
+            },
           });
 
           const res = await fetchBidsForOption(payload);
+
+          if (res.data?.bids) {
+            hasOthersVoted = !!(
+              res.data?.bids.filter((b) => b.bidder?.uuid !== optionCreatorUuid)
+                ?.length > 0
+            );
+          }
         } else {
           const payload = new newnewapi.GetMcVotesRequest({
             optionId,
             postUuid,
+            paging: {
+              limit: 50,
+            },
           });
         }
+
+        setCanDeleteOption(!hasOthersVoted);
       } catch (err) {
         console.error(err);
       }
@@ -85,7 +103,14 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
     if (isVisible && isMyOption) {
       fetchCanDelete();
     }
-  }, [isVisible, isMyOption, optionType, optionId, postUuid]);
+  }, [
+    isVisible,
+    isMyOption,
+    optionType,
+    optionId,
+    postUuid,
+    optionCreatorUuid,
+  ]);
 
   if (!isVisible) return null;
 

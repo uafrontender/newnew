@@ -715,6 +715,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           optionType='ac'
           optionId={option.id as number}
           postUuid=''
+          optionCreatorUuid={option.creator?.uuid ?? ''}
           handleClose={() => setIsEllipseMenuOpen(false)}
           handleOpenReportOptionModal={() => handleOpenReportForm()}
         />
