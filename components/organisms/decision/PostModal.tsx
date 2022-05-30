@@ -183,6 +183,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [isFollowingDecision, setIsFollowingDecision] = useState(
     !!postParsed?.isFavoritedByMe
   );
+  const handleSetIsFollowingDecision = (v: boolean) =>
+    setIsFollowingDecision(v);
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
@@ -429,6 +431,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed}
           postStatus={postStatus}
           variant='decision'
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleRemovePostFromState={handleRemovePostFromState!!}
@@ -446,6 +450,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           postType={typeOfPost as string}
           variant='decision'
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleRemovePostFromState={handleRemovePostFromState!!}
@@ -462,6 +468,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.MultipleChoice}
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -478,6 +486,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.Auction}
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -494,6 +504,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.Crowdfunding}
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -571,6 +583,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           variant='moderation'
           postType={typeOfPost as string}
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleRemovePostFromState={handleRemovePostFromState!!}
@@ -588,6 +602,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed}
           postStatus={postStatus}
           variant='moderation'
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleRemovePostFromState={handleRemovePostFromState!!}
@@ -680,6 +696,28 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    async function fetchIsFavorited() {
+      try {
+        const fetchPostPayload = new newnewapi.GetPostRequest({
+          postUuid: postParsed?.postUuid,
+        });
+
+        const res = await fetchPostByUUID(fetchPostPayload);
+
+        if (res.data) {
+          setIsFollowingDecision(!!switchPostType(res.data)[0].isFavoritedByMe);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (postParsed?.postUuid) {
+      fetchIsFavorited();
+    }
+  }, [postParsed?.postUuid]);
 
   // Override next/router default onPopState
   // More: https://nextjs.org/docs/api-reference/next/router#routerbeforepopstate
@@ -824,12 +862,16 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   if (shouldRenderVotingFinishedModal && !isMyPost) {
     return (
       <>
-        <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
+        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
           {postStatus === 'succeeded' && !isMobile && (
             <PostSuccessAnimationBackground />
           )}
           <Head>
-            <title>{postParsed?.title}</title>
+            <title>{t(`meta.${typeOfPost}.title`)}</title>
+            <meta
+              name='description'
+              content={t(`meta.${typeOfPost}.description`)}
+            />
           </Head>
           <SPostSuccessWaitingControlsDiv onClick={(e) => e.stopPropagation()}>
             <SWaitingSuccessControlsBtn
@@ -911,6 +953,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             <SPostModalContainer
               id='post-modal-container'
               isMyPost={isMyPost}
+              loaded={recommendedPosts && recommendedPosts.length > 0}
               style={{
                 ...(isMobile
                   ? {
@@ -947,9 +990,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   return (
     <>
-      <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
+      <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
         <Head>
-          <title>{postParsed?.title}</title>
+          <title>{t(`meta.${typeOfPost}.title`)}</title>
+          <meta
+            name='description'
+            content={t(`meta.${typeOfPost}.description`)}
+          />
         </Head>
         {!isMobile && (
           <SGoBackButtonDesktop
@@ -967,6 +1014,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         )}
         {postParsed && typeOfPost ? (
           <SPostModalContainer
+            loaded={recommendedPosts && recommendedPosts.length > 0}
             id='post-modal-container'
             isMyPost={isMyPost}
             onClick={(e) => e.stopPropagation()}
@@ -1043,7 +1091,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               />
             )}
             {!isMyPost && (
-              <SRecommendationsSection id='recommendations-section-heading'>
+              <SRecommendationsSection
+                id='recommendations-section-heading'
+                loaded={recommendedPosts && recommendedPosts.length > 0}
+              >
                 <Headline variant={4}>
                   {recommendedPosts.length > 0
                     ? t('RecommendationsSection.heading')
@@ -1105,6 +1156,7 @@ export default (props: any) => (
 
 const SPostModalContainer = styled.div<{
   isMyPost: boolean;
+  loaded: boolean;
 }>`
   position: absolute;
   top: 0;
@@ -1135,6 +1187,9 @@ const SPostModalContainer = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     top: 64px;
+    /*transform: none; */
+    /* top: 50%; */
+    /* transform: translateY(-50%); */
     background-color: ${({ theme }) =>
       theme.name === 'dark'
         ? theme.colorsThemed.background.secondary
@@ -1157,6 +1212,7 @@ const SPostModalContainer = styled.div<{
     left: calc(50% - 496px);
     width: 992px;
     height: calc(100% - 32px);
+    max-height: ${({ loaded }) => (loaded ? 'unset' : '840px')};
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
@@ -1172,8 +1228,10 @@ const SPostModalContainer = styled.div<{
   }
 `;
 
-const SRecommendationsSection = styled.div`
-  min-height: 600px;
+const SRecommendationsSection = styled.div<{
+  loaded: boolean;
+}>`
+  min-height: ${({ loaded }) => (loaded ? '600px' : '0')};
 `;
 
 const SGoBackButtonDesktop = styled(Button)`

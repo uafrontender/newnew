@@ -66,7 +66,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   }, [predefinedOption]);
 
   return (
-    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+    <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
           showTocApply={showTocApply ?? false}
@@ -206,7 +206,7 @@ const SContentContainer = styled.div<{
     width: 480px;
     height: fit-content;
     /* min-height: 360px; */
-    max-height: ${({ showTocApply }) => (showTocApply ? '480px' : '412px')};
+    /* max-height: 480px; */
     margin: auto;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};

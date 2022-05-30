@@ -69,6 +69,8 @@ interface IPostViewAC {
   post: newnewapi.Auction;
   postStatus: TPostStatusStringified;
   sessionId?: string;
+  isFollowingDecision: boolean;
+  handleSetIsFollowingDecision: (newValue: boolean) => void;
   resetSessionId: () => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
@@ -83,6 +85,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     sessionId,
     resetSessionId,
     postStatus,
+    isFollowingDecision,
+    handleSetIsFollowingDecision,
     handleGoBack,
     handleUpdatePostStatus,
     handleReportOpen,
@@ -623,7 +627,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     ]);
 
     const goToNextStep = () => {
-      if (user.userTutorialsProgress.remainingAcSteps) {
+      if (
+        user.userTutorialsProgress.remainingAcSteps &&
+        user.userTutorialsProgress.remainingAcSteps[0]
+      ) {
         if (user.loggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
             acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
@@ -697,7 +704,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
           amountInBids={totalAmount}
           hasWinner={!!post.winningOptionId}
           creator={post.creator!!}
-          isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleReportOpen={handleReportOpen}
           handleRemovePostFromState={handleRemovePostFromState}
           handleAddPostToState={handleAddPostToState}

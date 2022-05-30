@@ -29,6 +29,8 @@ interface IPostViewScheduled {
   postType: string;
   postStatus: TPostStatusStringified;
   variant: 'decision' | 'moderation';
+  isFollowingDecision: boolean;
+  handleSetIsFollowingDecision: (newValue: boolean) => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleRemovePostFromState: () => void;
@@ -43,6 +45,8 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
       postType,
       postStatus,
       variant,
+      isFollowingDecision,
+      handleSetIsFollowingDecision,
       handleGoBack,
       handleUpdatePostStatus,
       handleReportOpen,
@@ -167,7 +171,8 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
               postType={postType as TPostType}
               creator={post.creator!!}
               hasWinner={false}
-              isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+              isFollowingDecision={isFollowingDecision}
+              handleSetIsFollowingDecision={handleSetIsFollowingDecision}
               handleReportOpen={handleReportOpen}
               handleRemovePostFromState={handleRemovePostFromState}
               handleAddPostToState={handleAddPostToState}

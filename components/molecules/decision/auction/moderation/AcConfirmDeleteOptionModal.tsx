@@ -18,7 +18,7 @@ const AcConfirmDeleteOptionModal: React.FC<IAcConfirmDeleteOptionModal> = ({
   const { t } = useTranslation('decision');
 
   return (
-    <Modal show={isVisible} additionalZ={12} onClose={closeModal}>
+    <Modal show={isVisible} additionalz={12} onClose={closeModal}>
       <SContainer>
         <SModal>
           <SModalTitle>

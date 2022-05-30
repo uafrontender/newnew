@@ -145,7 +145,6 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
       setPrevSearchText(searchText);
       if (!searchedRoomsLoading) {
         setSearchedRoomsLoading(true);
-        console.log(searchText);
         const arr = [] as newnewapi.IChatRoom[];
         chatRooms.forEach((chat) => {
           if (

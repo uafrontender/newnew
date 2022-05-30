@@ -47,7 +47,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
     {
       key: 'how-it-works',
       url: '/how-it-works',
-      external: true,
+      // external: true,
     },
     {
       key: 'faq',
@@ -73,7 +73,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
     {
       key: 'email',
       url: 'hi@newnew.co',
-      external: true,
+      // external: true,
       email: true,
     },
   ];
@@ -119,8 +119,14 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
     }
 
     return (
-      <Link key={item.key} href={item.url} passHref>
-        <SBlockOption target='_blank'>{t(`footer-${item.key}`)}</SBlockOption>
+      <Link
+        key={item.key}
+        href={item.email ? `mailto: ${item.url}` : item.url}
+        passHref
+      >
+        <SBlockOption target='_blank'>
+          {!item.email ? t(`footer-${item.key}`) : item.url}
+        </SBlockOption>
       </Link>
     );
   };
@@ -203,14 +209,18 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
                   <SBottomBlockOptionInc>
                     {t('footer-inc')}
                   </SBottomBlockOptionInc>
-                  <a href='https://terms.newnew.co' target='_blank'>
-                    <SBottomBlockOption>{t('footer-terms')}</SBottomBlockOption>
-                  </a>
-                  <a href='https://privacy.newnew.co' target='_blank'>
-                    <SBottomBlockOption>
-                      {t('footer-privacy')}
-                    </SBottomBlockOption>
-                  </a>
+                  <SBottomBlockOption
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('footer-terms')}
+                  </SBottomBlockOption>
+                  <SBottomBlockOption
+                    href='https://privacy.newnew.co'
+                    target='_blank'
+                  >
+                    {t('footer-privacy')}
+                  </SBottomBlockOption>
                 </SLeftBlock>
                 <SRightBlock>
                   <SRightBlockItemHolder>

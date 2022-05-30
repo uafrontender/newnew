@@ -249,7 +249,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 
   return (
     <>
-      <Modal additionalZ={zIndex} show={isOpen} onClose={() => onClose()}>
+      <Modal additionalz={zIndex} show={isOpen} onClose={() => onClose()}>
         <SWrapper>
           <SContentContainer
             onClick={(e) => {
@@ -356,7 +356,6 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
           //       predefinedOption: 'card',
           //     })}
           // predefinedOption='card'
-          showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           // handlePayWithWallet={handlePayWithWallet}

@@ -1,8 +1,18 @@
 {
+  "postType": {
+    "ac": "Event",
+    "mc": "Superpoll",
+    "cf": "Goal",
+    "multiple": {
+      "ac": "Events",
+      "mc": "Superpolls",
+      "cf": "Goals"
+    }
+  },
   "hero-block-title": "Come together \nto shape reality",
   "hero-block-subTitle": "Bid and vote on what the world does next",
-  "hero-block-sign-in": "Sign in now",
-  "hero-block-explore": "Explore",
+  "hero-block-sign-in": "Sign in",
+  "hero-block-explore": "Explore Now",
   "hero-block-explore-now": "Explore now",
   "top-block-title": "Top 10 in {{country}}",
   "ac-block-title": "Biggest Events",
@@ -53,8 +63,7 @@
   "sort-title-option-sortingtype-num_bids": "Participants",
   "sort-title-option-sortingtype-num_bids-ac": "Number of bids",
   "sort-title-option-sortingtype-num_bids-mc": "Number of votes",
-  "sort-title-option-sortingtype-num_bids-cf": "Number of pledges",
-  "sort-title-option-sortingtype-most_funded": "Most funded",
+  "sort-title-option-sortingtype-num_bids-cf": "Number of backers",
   "sort-title-option-sortingtype-newest": "Newest",
   "sort-title-option-bid": "Bid",
   "sort-title-option-bid-lowest": "Lowest",
@@ -81,5 +90,16 @@
       "title-cf": "See more Goals on NewNew",
       "description-cf": "See more Goals creators posted on creator economy startup company NewNew"
     }
+  },
+  "ellipse": {
+    "copy-link": "Copy link",
+    "link-copied": "Link copied!",
+    "follow-creator": "Favorite creator",
+    "unfollow-creator": "Unfavorite creator",
+    "follow-decision": "Favorite {{ postType }}",
+    "unfollow-decision": "Unfavorite {{ postType }}",
+    "report": "Report",
+    "deleteDecision": "Delete {{ postType }}",
+    "cancel": "Cancel"
   }
 }

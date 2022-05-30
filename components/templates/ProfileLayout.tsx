@@ -1,8 +1,10 @@
 /* eslint-disable no-unsafe-optional-chaining */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   ReactElement,
   useCallback,
-  useContext,
+  // useContext,
   useEffect,
   useMemo,
   useState,
@@ -29,10 +31,13 @@ import ProfileBackground from '../molecules/profile/ProfileBackground';
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
-import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
-import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
-import { getSubscriptionStatus } from '../../api/endpoints/subscription';
-import { FollowingsContext } from '../../contexts/followingContext';
+// import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
+// import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
+import {
+  getSubscriptionStatus,
+  unsubscribeFromCreator,
+} from '../../api/endpoints/subscription';
+// import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
 
 import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
@@ -42,6 +47,8 @@ import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
 import BackButton from '../molecules/profile/BackButton';
+import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+import UnsubscribeModal from '../molecules/profile/UnsubscribeModal';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -88,9 +95,10 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     'tablet',
   ].includes(resizeMode);
 
-  const { followingsIds, addId, removeId } = useContext(FollowingsContext);
+  // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [wasSubscribed, setWasSubscribed] = useState(false);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
   // Share
@@ -124,6 +132,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+  const [unsubscribeModalOpen, setUnsubscribeModalOpen] = useState(false);
   const { usersIBlocked, unblockUser } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(user.uuid),
@@ -188,6 +197,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const [activityDecisionsCount, setActivityDecisionsCount] = useState(
     postsCachedActivityCount
   );
+
+  const { creatorsImSubscribedTo } = useGetSubscriptions();
 
   const handleSetPostsCreatorsDecisions: React.Dispatch<
     React.SetStateAction<newnewapi.Post[]>
@@ -338,38 +349,38 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     });
   };
 
-  const handleToggleFollowingCreator = async () => {
-    try {
-      if (!currentUser.loggedIn) {
-        router.push(
-          `/sign-up?reason=follow-creator&redirect=${encodeURIComponent(
-            window.location.href
-          )}`
-        );
-      }
+  // const handleToggleFollowingCreator = async () => {
+  //   try {
+  //     if (!currentUser.loggedIn) {
+  //       router.push(
+  //         `/sign-up?reason=follow-creator&redirect=${encodeURIComponent(
+  //           window.location.href
+  //         )}`
+  //       );
+  //     }
 
-      const payload = new newnewapi.MarkUserRequest({
-        userUuid: user.uuid,
-        markAs: followingsIds.includes(user.uuid as string)
-          ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED
-          : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
-      });
+  //     const payload = new newnewapi.MarkUserRequest({
+  //       userUuid: user.uuid,
+  //       markAs: followingsIds.includes(user.uuid as string)
+  //         ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED
+  //         : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
+  //     });
 
-      console.log(payload);
+  //     console.log(payload);
 
-      const res = await markUser(payload);
+  //     const res = await markUser(payload);
 
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+  //     if (res.error) throw new Error(res.error?.message ?? 'Request failed');
 
-      if (followingsIds.includes(user.uuid as string)) {
-        removeId(user.uuid as string);
-      } else {
-        addId(user.uuid as string);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  //     if (followingsIds.includes(user.uuid as string)) {
+  //       removeId(user.uuid as string);
+  //     } else {
+  //       addId(user.uuid as string);
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
 
   // Try to pre-fetch the content
   useEffect(() => {
@@ -411,6 +422,13 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
         if (res.data?.status?.activeRenewsAt) {
           setIsSubscribed(true);
+        } else {
+          setIsSubscribed(false);
+        }
+        if (res.data?.status?.activeCancelsAt) {
+          setWasSubscribed(true);
+        } else {
+          setWasSubscribed(false);
         }
       } catch (err) {
         console.error(err);
@@ -418,7 +436,14 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     }
 
     fetchIsSubscribed();
-  }, [user.uuid]);
+
+    // TODO: After update GetCreatorsImSubscribedToResponse on backend remaster this section
+    // let isSub = undefined;
+    // if (creatorsImSubscribedTo && creatorsImSubscribedTo.length > 0) {
+    //   isSub = creatorsImSubscribedTo.find((cr) => cr.uuid === user.uuid);
+    // }
+    // isSub ? setIsSubscribed(true) : setIsSubscribed(false);
+  }, [creatorsImSubscribedTo, user.uuid]);
 
   return (
     <ErrorBoundary>
@@ -433,7 +458,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               router.back();
             }}
           />
-          <SFavoritesButton
+          {/* <SFavoritesButton
             view='transparent'
             iconOnly
             onClick={() => handleToggleFollowingCreator()}
@@ -455,7 +480,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               />
             </SSVGContainer>
             {t('ProfileLayout.buttons.favorites')}
-          </SFavoritesButton>
+          </SFavoritesButton> */}
           <SMoreButton
             view='transparent'
             iconOnly
@@ -486,7 +511,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 }
               }}
               handleClickReport={handleClickReport}
-              handleClickUnsubscribe={() => {}}
+              handleClickUnsubscribe={() => {
+                setUnsubscribeModalOpen(true);
+              }}
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
@@ -547,7 +574,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             {user.options?.isOfferingSubscription ? (
               <Link
                 href={
-                  !isSubscribed
+                  !isSubscribed && !wasSubscribed
                     ? `/${user.username}/subscribe`
                     : `/direct-messages/${user.username}`
                 }
@@ -586,9 +613,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           handleClickReport={() => {
             setConfirmReportUser(true);
           }}
-          handleClickUnsubscribe={() => {}}
+          handleClickUnsubscribe={() => {
+            setUnsubscribeModalOpen(true);
+          }}
         />
       )}
+      <UnsubscribeModal
+        confirmUnsubscribe={unsubscribeModalOpen}
+        user={user}
+        closeModal={() => setUnsubscribeModalOpen(false)}
+      />
       <BlockUserModal
         confirmBlockUser={blockUserModalOpen}
         user={user}
@@ -747,40 +781,40 @@ const SBackButton = styled(BackButton)`
   }
 `;
 
-const SFavoritesButton = styled(Button)`
-  position: absolute;
-  top: 164px;
-  right: 4px;
+// const SFavoritesButton = styled(Button)`
+//   position: absolute;
+//   top: 164px;
+//   right: 4px;
 
-  background: none;
-  &:active:enabled,
-  &:hover:enabled,
-  &:focus:enabled {
-    background: none;
-  }
+//   background: none;
+//   &:active:enabled,
+//   &:hover:enabled,
+//   &:focus:enabled {
+//     background: none;
+//   }
 
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
+//   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 10px;
-    line-height: 12px;
-  }
+//   span {
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     justify-content: center;
+//     font-weight: 600;
+//     font-size: 10px;
+//     line-height: 12px;
+//   }
 
-  ${(props) => props.theme.media.tablet} {
-    top: 204px;
-    right: calc(4px + 56px);
-  }
+//   ${(props) => props.theme.media.tablet} {
+//     top: 204px;
+//     right: calc(4px + 56px);
+//   }
 
-  ${(props) => props.theme.media.laptop} {
-    top: 244px;
-    right: calc(4px + 68px);
-  }
-`;
+//   ${(props) => props.theme.media.laptop} {
+//     top: 244px;
+//     right: calc(4px + 68px);
+//   }
+// `;
 
 const SMoreButton = styled(Button)`
   position: absolute;

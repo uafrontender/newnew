@@ -1,38 +1,56 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
-import Modal from '../../../../organisms/Modal';
-import Button from '../../../../atoms/Button';
+import Modal from '../../organisms/Modal';
+import Button from '../../atoms/Button';
+import { unsubscribeFromCreator } from '../../../api/endpoints/subscription';
+import getDisplayname from '../../../utils/getDisplayname';
 
-interface IMcConfirmDeleteOptionModal {
-  isVisible: boolean;
+interface IUnsubscribeModal {
+  user: newnewapi.IUser;
+  confirmUnsubscribe: boolean;
   closeModal: () => void;
-  handleConfirmDelete: () => void;
 }
 
-const McConfirmDeleteOptionModal: React.FC<IMcConfirmDeleteOptionModal> = ({
-  isVisible,
+const UnsubscribeModal: React.FC<IUnsubscribeModal> = ({
+  confirmUnsubscribe,
+  user,
   closeModal,
-  handleConfirmDelete,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('profile');
 
+  const handleUnsubscribeCreator = async () => {
+    try {
+      const payload = new newnewapi.UnsubscribeFromCreatorRequest({
+        creatorUuid: user.uuid,
+      });
+      const res = await unsubscribeFromCreator(payload);
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+      closeModal();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleConfirmClick = () => {
+    handleUnsubscribeCreator();
+  };
   return (
-    <Modal show={isVisible} additionalz={12} onClose={closeModal}>
+    <Modal show={confirmUnsubscribe} onClose={closeModal}>
       <SContainer>
         <SModal>
-          <SModalTitle>
-            {t('McPostModeration.DeleteOptionModal.title')}
-          </SModalTitle>
+          <SModalTitle>{t('modal.block-user.title')}</SModalTitle>
           <SModalMessage>
-            {t('McPostModeration.DeleteOptionModal.body')}
+            {t(`modal.unsubscribe-user.message`, {
+              username: getDisplayname(user),
+            })}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>
-              {t('McPostModeration.DeleteOptionModal.cancelBtn')}
+              {t('modal.unsubscribe-user.button-cancel')}
             </SCancelButton>
-            <SConfirmButton onClick={handleConfirmDelete}>
-              {t('McPostModeration.DeleteOptionModal.confirmBtn')}
+            <SConfirmButton onClick={handleConfirmClick}>
+              {t('modal.unsubscribe-user.button-confirm')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>
@@ -41,11 +59,13 @@ const McConfirmDeleteOptionModal: React.FC<IMcConfirmDeleteOptionModal> = ({
   );
 };
 
-export default McConfirmDeleteOptionModal;
+export default UnsubscribeModal;
 
 const SContainer = styled.div`
   display: flex;
   height: 100%;
+  width: 100%;
+  position: absolute;
   justify-content: center;
   align-items: center;
 `;
