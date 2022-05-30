@@ -153,7 +153,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                                         getLayout(<Component {...pageProps} />)
                                       ) : (
                                         <Error
-                                          errorMsg={pageProps.error?.message}
+                                          title={pageProps.error?.message}
                                           statusCode={
                                             pageProps.error?.statusCode ?? 500
                                           }
