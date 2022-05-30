@@ -11,6 +11,7 @@ import Text from '../../atoms/Text';
 import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import isBrowser from '../../../utils/isBrowser';
+import { fetchBidsForOption } from '../../../api/endpoints/auction';
 
 interface IOptionMenu {
   xy: {
@@ -68,6 +69,8 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
             optionId,
             postUuid,
           });
+
+          const res = await fetchBidsForOption(payload);
         } else {
           const payload = new newnewapi.GetMcVotesRequest({
             optionId,
