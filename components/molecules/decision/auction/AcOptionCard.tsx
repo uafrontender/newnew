@@ -711,6 +711,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         <OptionMenu
           xy={optionMenuX}
           isVisible={isEllipseMenuOpen}
+          isMyOption={isMyBid}
+          optionType='ac'
+          optionId={option.id as number}
+          postUuid=''
           handleClose={() => setIsEllipseMenuOpen(false)}
           handleOpenReportOptionModal={() => handleOpenReportForm()}
         />

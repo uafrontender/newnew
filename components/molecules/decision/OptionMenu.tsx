@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import { newnewapi } from 'newnew-api';
 
 import Text from '../../atoms/Text';
 
@@ -16,21 +18,35 @@ interface IOptionMenu {
     y: number;
   };
   isVisible: boolean;
+  optionId?: number;
+  postUuid?: string;
+  optionType?: 'ac' | 'mc';
+  isMyOption?: boolean;
   handleClose: () => void;
   handleOpenReportOptionModal: () => void;
+  handleOpenRemoveOptionModal?: () => void;
 }
 
 const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
   xy,
   isVisible,
+  isMyOption,
+  optionType,
+  optionId,
+  postUuid,
   handleClose,
   handleOpenReportOptionModal,
+  handleOpenRemoveOptionModal,
 }) => {
   const { t } = useTranslation('decision');
   const containerRef = useRef<HTMLDivElement>();
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
+
+  const [canDeleteOption, setCanDeleteOption] = useState(false);
+  const [isCanDeleteOptionLoading, setIsCanDeleteOptionLoading] =
+    useState(false);
 
   useEffect(() => {
     if (isBrowser()) {
@@ -43,6 +59,30 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
         }
     }
   }, [isVisible]);
+
+  useEffect(() => {
+    async function fetchCanDelete() {
+      try {
+        if (optionType === 'ac') {
+          const payload = new newnewapi.GetAcBidsRequest({
+            optionId,
+            postUuid,
+          });
+        } else {
+          const payload = new newnewapi.GetMcVotesRequest({
+            optionId,
+            postUuid,
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (isVisible && isMyOption) {
+      fetchCanDelete();
+    }
+  }, [isVisible, isMyOption, optionType, optionId, postUuid]);
 
   if (!isVisible) return null;
 
