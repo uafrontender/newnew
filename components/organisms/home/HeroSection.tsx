@@ -119,7 +119,7 @@ export const HeroSection = React.memo(() => {
                 <SButton
                   withDim
                   withShrink
-                  view='primaryGrad'
+                  view='secondary'
                   onClick={handleSignInClick}
                 >
                   {t('hero-block-sign-in')}
@@ -127,7 +127,7 @@ export const HeroSection = React.memo(() => {
                 <SButton
                   withDim
                   withShrink
-                  view='secondary'
+                  view='primaryGrad'
                   onClick={handleExploreClick}
                 >
                   {t('hero-block-explore')}
