@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { newnewapi } from 'newnew-api';
+import { withSentry } from '@sentry/nextjs';
 
 type User = Omit<newnewapi.User, 'toJSON'>;
 
@@ -41,10 +42,10 @@ const users: User[] = [
   },
 ];
 
-export default function handler(
+const handler = (
   req: NextApiRequest,
   res: NextApiResponse<Uint8Array | any>
-): any {
+): any => {
   if (req.method === 'GET') {
     const { username } = req.query;
     if (!username) {
@@ -66,4 +67,6 @@ export default function handler(
   }
 
   res.status(400).send('');
-}
+};
+
+export default withSentry(handler);
