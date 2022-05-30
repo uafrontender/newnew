@@ -204,11 +204,15 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
       // @ts-ignore
       state.videoProcessing = { ...defaultUIState.videoProcessing };
     },
+    clearPostData(state) {
+      state.postData = {};
+    },
   },
 });
 
 export const {
   setPostData,
+  clearPostData,
   clearCreation,
   setCreationVideo,
   setCreationTitle,

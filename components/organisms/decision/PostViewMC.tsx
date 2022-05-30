@@ -69,6 +69,8 @@ interface IPostViewMC {
   sessionId?: string;
   resetSessionId: () => void;
   postStatus: TPostStatusStringified;
+  isFollowingDecision: boolean;
+  handleSetIsFollowingDecision: (newValue: boolean) => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
@@ -81,6 +83,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     post,
     postStatus,
     sessionId,
+    isFollowingDecision,
+    handleSetIsFollowingDecision,
     resetSessionId,
     handleGoBack,
     handleUpdatePostStatus,
@@ -530,7 +534,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
                 decoded.option as TMcOptionWithHighestField,
               ];
             } else {
+              // workingArr[idx] = decoded.option as TMcOptionWithHighestField;
               workingArr[idx].voteCount = decoded.option?.voteCount as number;
+              workingArr[idx].supporterCount = decoded.option
+                ?.supporterCount as number;
+              workingArr[idx].firstVoter = decoded.option?.firstVoter;
               workingArrUnsorted = workingArr;
             }
 
@@ -606,7 +614,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     ]);
 
     const goToNextStep = () => {
-      if (user.userTutorialsProgress.remainingMcSteps) {
+      if (
+        user.userTutorialsProgress.remainingMcSteps &&
+        user.userTutorialsProgress.remainingMcSteps[0]
+      ) {
         if (user.loggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
             mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
@@ -678,7 +689,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           totalVotes={totalVotes}
           hasWinner={false}
           creator={post.creator!!}
-          isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+          isFollowingDecision={isFollowingDecision}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleReportOpen={handleReportOpen}
           handleRemovePostFromState={handleRemovePostFromState}
           handleAddPostToState={handleAddPostToState}

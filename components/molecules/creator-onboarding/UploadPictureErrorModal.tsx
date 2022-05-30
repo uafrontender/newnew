@@ -11,7 +11,7 @@ interface IUploadPictureErrorModal {
 
 const UploadPictureErrorModal: React.FunctionComponent<IUploadPictureErrorModal> =
   ({ isOpen, zIndex, onClose, children }) => (
-    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+    <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
           onClick={(e) => {

@@ -114,7 +114,13 @@ const PostShareMenu: React.FunctionComponent<IPostShareMenu> = React.memo(
           </SSocials> */}
             {/* <SSeparator /> */}
             <SItem>
-              <SItemButtonWide type='copy' onClick={() => handlerCopy()}>
+              <SItemButtonWide
+                type='copy'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlerCopy();
+                }}
+              >
                 <InlineSvg
                   svg={SOCIAL_ICONS.copy as string}
                   width='24px'

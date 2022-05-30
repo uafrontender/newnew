@@ -13,43 +13,50 @@ import { SocketContext } from './socketContext';
 
 const NotificationsContext = createContext({
   unreadNotificationCount: 0,
+  fetchNotificationCount: () => {},
 });
 
 export const NotificationsProvider: React.FC = ({ children }) => {
   const user = useAppSelector((state) => state.user);
   const [unreadNotificationCount, setUnreadNotificationCount] =
     useState<number>(0);
-  const [notificationsLodaing, setNotificationsLodaing] = useState(false);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
   const socketConnection = useContext(SocketContext);
 
   const contextValue = useMemo(
     () => ({
       unreadNotificationCount,
-      notificationsLodaing,
+      notificationsLoading,
+      fetchNotificationCount,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [unreadNotificationCount]
+    [unreadNotificationCount, fetchNotificationCount, notificationsLoading]
   );
 
-  useEffect(() => {
-    async function fetchNotificationCount() {
-      if (!user.loggedIn) return;
-      try {
-        setNotificationsLodaing(true);
-        const payload = new newnewapi.EmptyRequest();
-        const res = await getUnreadNotificationCount(payload);
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data.unreadNotificationCount) {
-          setUnreadNotificationCount(res.data.unreadNotificationCount);
-        } else {
-          setUnreadNotificationCount(0);
-        }
-      } catch (err) {
-        console.error(err);
-        setNotificationsLodaing(false);
+  async function fetchNotificationCount() {
+    if (!user.loggedIn) return;
+    try {
+      setNotificationsLoading(true);
+      const payload = new newnewapi.EmptyRequest();
+      const res = await getUnreadNotificationCount(payload);
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      if (
+        res.data.unreadNotificationCount !== undefined &&
+        res.data.unreadNotificationCount > 0
+      ) {
+        setUnreadNotificationCount(res.data.unreadNotificationCount);
+      } else {
+        setUnreadNotificationCount(0);
       }
+    } catch (err) {
+      console.error(err);
+      setNotificationsLoading(false);
+      setUnreadNotificationCount(0);
     }
+  }
+
+  useEffect(() => {
     fetchNotificationCount();
   }, [user.loggedIn]);
 
@@ -58,9 +65,12 @@ export const NotificationsProvider: React.FC = ({ children }) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.NotificationUnreadCountsChanged.decode(arr);
       if (!decoded) return;
-      setUnreadNotificationCount(decoded.unreadCount);
+      if (decoded.unreadCount !== undefined && decoded.unreadCount > 0) {
+        setUnreadNotificationCount(decoded.unreadCount);
+      } else {
+        setUnreadNotificationCount(0);
+      }
     };
-
     if (socketConnection) {
       socketConnection.on(
         'NotificationUnreadCountsChanged',
