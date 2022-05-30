@@ -112,7 +112,6 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
   return (
     <>
       <Head>
-        <title>{postParsed?.title}</title>
         <meta property='og:title' content={postParsed?.title} />
         <meta property='og:type' content='website' />
         <meta

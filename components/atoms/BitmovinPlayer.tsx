@@ -241,8 +241,8 @@ const SVideoWrapper = styled.div<ISVideoWrapper>`
   min-height: 100%;
   background: transparent;
   border-radius: ${(props) => props.borderRadius};
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
 `;
 
 const SWrapper = styled.div`
