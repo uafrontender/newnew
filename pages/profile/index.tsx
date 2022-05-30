@@ -14,7 +14,7 @@ import { getMyPosts } from '../../api/endpoints/user';
 // import { TTokenCookie } from '../../api/apiConfigs';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
-import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
+import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
 
 const PostModal = dynamic(
   () => import('../../components/organisms/decision/PostModal')
