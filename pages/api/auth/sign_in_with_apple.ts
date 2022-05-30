@@ -1,11 +1,12 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { newnewapi } from 'newnew-api';
+import { withSentry } from '@sentry/nextjs';
 
-export default function handler(
+const handler = (
   req: NextApiRequest,
   res: NextApiResponse<Uint8Array | any>
-): any {
+): any => {
   if (req.method === 'POST') {
     const resBytes = newnewapi.SignInResponse.encode({
       status: newnewapi.SignInResponse.Status.SUCCESS,
@@ -15,4 +16,6 @@ export default function handler(
   }
 
   res.status(400).send('');
-}
+};
+
+export default withSentry(handler);
