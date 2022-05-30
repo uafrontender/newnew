@@ -11,7 +11,7 @@ import { CookiesProvider } from 'react-cookie';
 import { parse } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
-import Sentry from '@sentry/browser';
+import * as Sentry from '@sentry/browser';
 
 // Custom error page
 import Error from './_error';
