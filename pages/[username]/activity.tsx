@@ -128,6 +128,14 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
   );
 
   useEffect(() => {
+    if (!user.options) {
+      return;
+    }
+
+    if (user.options.isActivityPrivate) {
+      return;
+    }
+
     if (inView && !isLoading) {
       if (pageToken) {
         loadPosts(pageToken);

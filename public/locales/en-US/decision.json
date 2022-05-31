@@ -354,7 +354,7 @@
       }
     },
     "FloatingActionButton": {
-      "suggestNewBtn": "Suggest new"
+      "suggestNewBtn": "Place bid"
     }
   },
   "McPost": {
@@ -436,7 +436,7 @@
         "subscribeToCreatorCaption": "Subscribe to {{ creator }} to add your own options to this Superpoll!",
         "subscribeBtn": "Subscribe",
         "suggestionPlaceholder": "Add your own option...",
-        "placeABidBtn": "Post my option"
+        "placeABidBtn": "Add my option"
       }
     },
     "WinnerTab": {
@@ -447,7 +447,7 @@
       }
     },
     "FloatingActionButton": {
-      "suggestNewBtn": "Suggest new"
+      "suggestNewBtn": "Add my option"
     }
   },
   "CfPost": {
@@ -486,7 +486,7 @@
     },
     "paymentModalPayButton": "Back it for",
     "FloatingActionButton": {
-      "choosePledgeBtn": "Make pledge"
+      "choosePledgeBtn": "Back this goal"
     }
   },
   "PostVideoThumbnailEdit": {
