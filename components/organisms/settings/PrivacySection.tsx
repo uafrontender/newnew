@@ -38,7 +38,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
   return (
     <SWrapper onMouseEnter={() => handleSetActive()}>
       <SHidingSubsectionsContainer>
-        <SHidingSubsection>
+        {/* <SHidingSubsection>
           <SHidingSubsectionTitle variant={2}>
             {t('Settings.sections.Privacy.privacySubsections.spendings.title')}
           </SHidingSubsectionTitle>
@@ -55,7 +55,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
               justifySelf: 'right',
             }}
           />
-        </SHidingSubsection>
+        </SHidingSubsection> */}
         <SHidingSubsection>
           <SHidingSubsectionTitle variant={2}>
             {t('Settings.sections.Privacy.privacySubsections.private.title')}
