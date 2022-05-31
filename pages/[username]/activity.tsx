@@ -132,7 +132,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
       return;
     }
 
-    if (!user.options.isActivityPrivate) {
+    if (user.options.isActivityPrivate) {
       return;
     }
 
