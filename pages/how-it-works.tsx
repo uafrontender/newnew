@@ -40,16 +40,7 @@ export const HowItWorks = () => {
               {t('intro.text')}
             </IntroText>
           </IntroContent>
-          <QuestionMarkVisual
-            muted
-            autoPlay
-            playsInline
-            poster={
-              theme.name === 'light'
-                ? assets.info.lightQuestionMarkStatic
-                : assets.info.darkQuestionMarkStatic
-            }
-          >
+          <QuestionMarkVisual muted autoPlay playsInline>
             <source
               src={
                 theme.name === 'light'
