@@ -740,6 +740,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       !suggestNewMobileOpen &&
       !hasVotedOptionId &&
       postStatus === 'voting' &&
+      post.isSuggestionsAllowed &&
       canVoteForFree ? (
         <>
           <SActionButton
