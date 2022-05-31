@@ -2,9 +2,9 @@ User-agent: *
 Disallow: /api/
 Disallow: /creation/
 Disallow: /creator/
-Disallow: /direct-messages
+Disallow: /direct-messages/
 Disallow: /*/forced_redirect_to_home
-Disallow: /profile
+Disallow: /profile/
 Disallow: /change-email
 Disallow: /creator-onboarding-about
 Disallow: /creator-onboarding-stripe
