@@ -543,6 +543,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           optionFromResponse.isSupportedByMe = true;
           handleAddOrUpdateOptionFromResponse(optionFromResponse);
           setLoadingModalOpen(false);
+          handleResetFreeVote();
           setPaymentSuccesModalOpen(true);
         } catch (err) {
           console.error(err);
