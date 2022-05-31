@@ -3,12 +3,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import { newnewapi } from 'newnew-api';
 
 import Text from '../../atoms/Text';
 
 import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import isBrowser from '../../../utils/isBrowser';
+import { checkCanDeleteMcOption } from '../../../api/endpoints/multiple_choice';
+import { checkCanDeleteAcOption } from '../../../api/endpoints/auction';
 
 interface IOptionMenu {
   xy: {
@@ -17,7 +20,6 @@ interface IOptionMenu {
   };
   isVisible: boolean;
   optionId?: number;
-  postUuid?: string;
   optionCreatorUuid?: string;
   optionType?: 'ac' | 'mc';
   isMyOption?: boolean;
@@ -32,7 +34,6 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
   isMyOption,
   optionType,
   optionId,
-  postUuid,
   optionCreatorUuid,
   handleClose,
   handleOpenReportOptionModal,
@@ -64,13 +65,30 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
     async function fetchCanDelete() {
       setIsCanDeleteOptionLoading(true);
       try {
-        // eslint-disable-next-line prefer-const
         let canDelete = false;
         if (optionType === 'ac') {
-          console.log('Checking can delete ac');
+          const payload = new newnewapi.CanDeleteAcOptionRequest({
+            optionId,
+          });
+
+          const res = await checkCanDeleteAcOption(payload);
+
+          if (res.data) {
+            canDelete = res.data.canDelete;
+          }
         } else {
-          console.log('Checking can delete mc');
+          const payload = new newnewapi.CanDeleteMcOptionRequest({
+            optionId,
+          });
+
+          const res = await checkCanDeleteMcOption(payload);
+
+          if (res.data) {
+            canDelete = res.data.canDelete;
+          }
         }
+
+        canDelete = true;
 
         setCanDeleteOption(canDelete);
       } catch (err) {
@@ -82,14 +100,7 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
     if (isVisible && isMyOption) {
       fetchCanDelete();
     }
-  }, [
-    isVisible,
-    isMyOption,
-    optionType,
-    optionId,
-    postUuid,
-    optionCreatorUuid,
-  ]);
+  }, [isVisible, isMyOption, optionType, optionId, optionCreatorUuid]);
 
   if (!isVisible) return null;
 

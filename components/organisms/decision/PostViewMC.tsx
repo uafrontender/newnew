@@ -389,6 +389,19 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       [setOptions, sortOptions]
     );
 
+    const handleRemoveOption = useCallback(
+      (optionToRemove: newnewapi.MultipleChoice.Option) => {
+        setOptions((curr) => {
+          const workingArr = [...curr];
+          const workingArrUnsorted = [
+            ...workingArr.filter((o) => o.id !== optionToRemove.id),
+          ];
+          return sortOptions(workingArrUnsorted);
+        });
+      },
+      [setOptions, sortOptions]
+    );
+
     const fetchPostLatestData = useCallback(async () => {
       setPostLoading(true);
       try {
@@ -735,6 +748,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
               }
+              handleRemoveOption={handleRemoveOption}
             />
           ) : currentTab === 'comments' && post.isCommentsAllowed ? (
             <CommentsTab
