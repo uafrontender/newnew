@@ -88,8 +88,6 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
           }
         }
 
-        canDelete = true;
-
         setCanDeleteOption(canDelete);
       } catch (err) {
         console.error(err);

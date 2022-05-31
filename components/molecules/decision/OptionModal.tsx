@@ -65,8 +65,6 @@ const OptionModal: React.FunctionComponent<IOptionModal> = ({
           }
         }
 
-        canDelete = true;
-
         setCanDeleteOption(canDelete);
       } catch (err) {
         console.error(err);

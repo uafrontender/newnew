@@ -430,6 +430,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
               newOption?.supporterCount as number;
             workingArr[idx].totalAmount =
               newOption?.totalAmount as newnewapi.IMoneyAmount;
+            workingArr[idx].isSupportedByMe = newOption?.isSupportedByMe;
             workingArrUnsorted = workingArr;
           }
 
