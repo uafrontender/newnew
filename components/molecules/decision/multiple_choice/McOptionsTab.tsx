@@ -72,6 +72,7 @@ interface IMcOptionsTab {
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
   ) => void;
+  handleRemoveOption: (optionToRemove: newnewapi.MultipleChoice.Option) => void;
 }
 
 const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
@@ -89,6 +90,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   canSubscribe,
   handleLoadOptions,
   handleResetFreeVote,
+  handleRemoveOption,
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
@@ -508,6 +510,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
               }
+              handleRemoveOption={() => handleRemoveOption(option)}
             />
           ))}
           {!isMobile ? (
