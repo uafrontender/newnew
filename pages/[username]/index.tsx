@@ -84,7 +84,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   const loadPosts = useCallback(
     async (isCreator: boolean, token?: string, needCount?: boolean) => {
       if (isLoading) return;
-      console.log('LOAD');
+
       try {
         setIsLoading(true);
         setTriedLoading(true);
