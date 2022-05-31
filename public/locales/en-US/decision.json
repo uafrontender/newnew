@@ -447,7 +447,7 @@
       }
     },
     "FloatingActionButton": {
-      "suggestNewBtn": "Place bid"
+      "suggestNewBtn": "Add my option"
     }
   },
   "CfPost": {
@@ -486,7 +486,7 @@
     },
     "paymentModalPayButton": "Back it for",
     "FloatingActionButton": {
-      "choosePledgeBtn": "Make pledge"
+      "choosePledgeBtn": "Back this goal"
     }
   },
   "PostVideoThumbnailEdit": {
