@@ -130,7 +130,8 @@
     "cancel": "Cancel"
   },
   "ellipse-option": {
-    "report-option": "Report"
+    "report-option": "Report",
+    "delete-option": "Delete"
   },
   "PostVideo": {
     "tabs": {

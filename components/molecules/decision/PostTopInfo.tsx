@@ -58,6 +58,7 @@ interface IPostTopInfo {
   targetPledges?: number;
   amountInBids?: number;
   hasWinner: boolean;
+  hasRecommendations: boolean;
   handleReportOpen: () => void;
   handleRemovePostFromState?: () => void;
   handleAddPostToState?: () => void;
@@ -76,6 +77,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   targetPledges,
   amountInBids,
   hasWinner,
+  hasRecommendations,
   handleReportOpen,
   handleRemovePostFromState,
   handleAddPostToState,
@@ -183,6 +185,18 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     router,
     user.loggedIn,
   ]);
+
+  const handleSeeNewFailedBox = useCallback(() => {
+    if (hasRecommendations) {
+      document.getElementById('post-modal-container')?.scrollTo({
+        top: document.getElementById('recommendations-section-heading')
+          ?.offsetTop,
+        behavior: 'smooth',
+      });
+    } else {
+      router.push(`/see-more?category=${postType}`);
+    }
+  }, [hasRecommendations, postType, router]);
 
   return (
     <SContainer>
@@ -313,13 +327,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
                 : DARK_IMAGES[postType]
               : undefined
           }
-          handleButtonClick={() => {
-            document.getElementById('post-modal-container')?.scrollTo({
-              top: document.getElementById('recommendations-section-heading')
-                ?.offsetTop,
-              behavior: 'smooth',
-            });
-          }}
+          handleButtonClick={handleSeeNewFailedBox}
         />
       )}
     </SContainer>

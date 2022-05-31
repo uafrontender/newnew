@@ -67,6 +67,7 @@ interface IAcOptionsTab {
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.Auction.Option
   ) => void;
+  handleRemoveOption: (optionToRemove: newnewapi.Auction.Option) => void;
 }
 
 const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
@@ -82,6 +83,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   minAmount,
   handleLoadBids,
   handleAddOrUpdateOptionFromResponse,
+  handleRemoveOption,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -469,6 +471,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
               }
+              handleRemoveOption={() => handleRemoveOption(option)}
             />
           ))}
           {!isMobile ? (
