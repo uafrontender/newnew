@@ -82,20 +82,15 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   };
 
   const loadPosts = useCallback(
-    async (isCreator: boolean, token?: string, needCount?: boolean) => {
+    async (token?: string, needCount?: boolean) => {
       if (isLoading) return;
-
       try {
         setIsLoading(true);
         setTriedLoading(true);
-
         const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
           userUuid: user.uuid,
           filter: postsFilter,
-          relation: isCreator
-            ? newnewapi.GetUserPostsRequest.Relation.THEY_CREATED
-            : newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
-          // relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
+          relation: newnewapi.GetUserPostsRequest.Relation.THEY_CREATED,
           paging: {
             ...(token ? { pageToken: token } : {}),
           },
@@ -138,28 +133,17 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   );
 
   useEffect(() => {
-    if (!user.options) {
-      return;
-    }
-
-    const isCreator = !!user.options.isCreator;
-    const isActivityPrivate = !!user.options.isActivityPrivate;
-
-    if (!isCreator && isActivityPrivate) {
-      return;
-    }
-
     if (inView && !isLoading) {
       if (pageToken) {
-        loadPosts(isCreator, pageToken);
+        loadPosts(pageToken);
       } else if (!triedLoading && !pageToken && posts?.length === 0) {
-        loadPosts(isCreator, undefined, true);
+        loadPosts(undefined, true);
       }
     } else if (!triedLoading && posts?.length === 0) {
-      loadPosts(isCreator, undefined, true);
+      loadPosts(undefined, true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pageToken, isLoading, triedLoading, posts?.length, user.options]);
+  }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
 
   return (
     <div>
@@ -301,7 +285,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!username || Array.isArray(username)) {
     return {
       redirect: {
-        destination: '/',
+        destination: '/404',
         permanent: false,
       },
     };
@@ -316,7 +300,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!res.data || res.error) {
     return {
       redirect: {
-        destination: '/',
+        destination: '/404',
         permanent: false,
       },
     };
