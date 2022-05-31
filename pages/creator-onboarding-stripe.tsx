@@ -32,12 +32,15 @@ const CreatorOnboardingStripe = () => {
 
   useEffect(() => {
     async function fetchOnboardingState() {
+      if (isLoading) return;
       try {
+        setIsLoading(true);
         const payload = new newnewapi.EmptyRequest({});
         const res = await getMyOnboardingState(payload);
-
         if (res.data) {
           setOnboardingState(res.data);
+          console.log(res.data);
+
           dispatch(
             setCreatorData({
               options: {
@@ -51,6 +54,7 @@ const CreatorOnboardingStripe = () => {
         setIsLoading(false);
       } catch (err) {
         console.error(err);
+        setIsLoading(false);
       }
     }
     fetchOnboardingState();

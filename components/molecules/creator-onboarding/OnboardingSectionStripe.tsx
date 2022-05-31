@@ -30,6 +30,7 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
     const theme = useTheme();
     const { t } = useTranslation('creator-onboarding');
     // const dispatch = useAppDispatch();
+    const user = useAppSelector((state) => state.user);
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -81,9 +82,15 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
 
     const handleRedirectToStripesetup = async () => {
       try {
+        console.log(user.creatorData?.options);
+
+        let returnUrl = window.location.href;
+        if (!window.location.href.includes('stripe_processing')) {
+          returnUrl = `${window.location.href}?query=stripe_processing`;
+        }
         const payload = new newnewapi.SetupStripeCreatorAccountRequest({
           refreshUrl: window.location.href,
-          returnUrl: `${window.location.href}?query=stripe_processing`,
+          returnUrl,
         });
 
         const res = await fetchSetStripeLinkCreator(payload);

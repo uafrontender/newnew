@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { newnewapi } from 'newnew-api';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   getMe,
   getMyCreatorTags,
@@ -19,11 +19,12 @@ import {
 
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { loadStateLS, saveStateLS } from '../utils/localStorage';
+import { SocketContext } from './socketContext';
 
 const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-
+  const socketConnection = useContext(SocketContext);
   const [creatorDataSteps, setCreatorDataSteps] = useState(0);
 
   const updateCreatorDataSteps = useCallback(
@@ -43,6 +44,56 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
       );
     }
   }, [creatorDataSteps]);
+
+  useEffect(() => {
+    if (
+      !user.creatorData?.options.isCreatorConnectedToStripe &&
+      user.creatorData?.options.stripeConnectStatus ===
+        newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus.PROCESSING &&
+      socketConnection
+    ) {
+      const handlerStripeAccountChanged = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.StripeAccountChanged.decode(arr);
+        if (!decoded) return;
+        if (decoded._isActive) {
+          const payload = new newnewapi.EmptyRequest({});
+          const res = await getMyOnboardingState(payload);
+
+          if (res.data) {
+            dispatch(
+              setCreatorData({
+                options: {
+                  ...user.creatorData?.options,
+                  ...res.data,
+                },
+              })
+            );
+          }
+        }
+      };
+
+      if (socketConnection) {
+        socketConnection.on(
+          'StripeAccountChanged',
+          handlerStripeAccountChanged
+        );
+      }
+
+      return () => {
+        if (socketConnection && socketConnection.connected) {
+          socketConnection.off(
+            'StripeAccountChanged',
+            handlerStripeAccountChanged
+          );
+        }
+      };
+    }
+  }, [
+    user.creatorData?.options.isCreatorConnectedToStripe,
+    user.creatorData?.options.stripeConnectStatus,
+    socketConnection,
+  ]);
 
   useEffect(() => {
     async function syncUserData() {

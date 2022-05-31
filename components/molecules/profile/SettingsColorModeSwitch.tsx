@@ -130,7 +130,6 @@ const SettingsColorModeSwitch: React.FunctionComponent<ISettingsColorModeSwitch>
                   ? { cursor: 'default' }
                   : {}),
               }}
-              key={`color-mode-${option}`}
             >
               <div
                 style={{

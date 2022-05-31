@@ -21,10 +21,11 @@ import { updateMe } from '../../../api/endpoints/user';
 
 interface IDashboardSectionStripe {
   isConnectedToStripe: boolean;
+  isStripeAccountProcessing: boolean;
 }
 
 const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
-  ({ isConnectedToStripe }) => {
+  ({ isConnectedToStripe, isStripeAccountProcessing }) => {
     const router = useRouter();
     const theme = useTheme();
     const { t } = useTranslation('creator');
@@ -32,7 +33,6 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
-
     const [stripeProcessing, setStripeProcessing] = useState(false);
     const [loadingStripeProcessing, setLoadingStripeProcessing] =
       useState(false);
@@ -50,30 +50,26 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
 
         if (!updateMeRes.data || updateMeRes.error)
           throw new Error(updateMeRes.error?.message ?? 'Request failed');
-
-        console.log(payload, updateMeRes);
-
-        // dispatch(
-        //   setUserData({
-        //     bio: updateMeRes.data.me?.bio,
-        //   })
-        // );
-
-        // setLoadingStripeProcessing(false);
+        setLoadingStripeProcessing(false);
       } catch (err) {
         console.log(err);
-        // setLoadingStripeProcessing(false);
+        setLoadingStripeProcessing(false);
       }
     }, [loadingStripeProcessing, stripeProcessing]);
 
     useEffect(() => {
-      if (router && router.query && !isConnectedToStripe) {
+      if (
+        router &&
+        router.query &&
+        !isConnectedToStripe &&
+        !isStripeAccountProcessing
+      ) {
         if (router.query.query && router.query.query === 'stripe_processing') {
           setStripeProcessing(true);
         }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [router.query, isConnectedToStripe]);
+    }, [router.query, isConnectedToStripe, isStripeAccountProcessing]);
 
     useEffect(() => {
       if (stripeProcessing && !loadingStripeProcessing) {
@@ -84,9 +80,13 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
 
     const handleRedirectToStripesetup = async () => {
       try {
+        let returnUrl = window.location.href;
+        if (!window.location.href.includes('stripe_processing')) {
+          returnUrl = `${window.location.href}?query=stripe_processing`;
+        }
         const payload = new newnewapi.SetupStripeCreatorAccountRequest({
           refreshUrl: window.location.href,
-          returnUrl: `${window.location.href}?query=stripe_processing`,
+          returnUrl,
         });
 
         const res = await fetchSetStripeLinkCreator(payload);
