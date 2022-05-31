@@ -132,7 +132,6 @@ const MyApp = (props: IMyApp): ReactElement => {
     <>
       <Head>
         <meta charSet='utf-8' />
-        <meta name='robots' content='noindex' />
         <meta
           name='viewport'
           content='width=device-width, initial-scale=1, user-scalable=no'
