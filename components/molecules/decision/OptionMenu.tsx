@@ -1,17 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
-import { newnewapi } from 'newnew-api';
 
 import Text from '../../atoms/Text';
 
 import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import isBrowser from '../../../utils/isBrowser';
-import { fetchBidsForOption } from '../../../api/endpoints/auction';
 
 interface IOptionMenu {
   xy: {
@@ -65,39 +62,21 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
 
   useEffect(() => {
     async function fetchCanDelete() {
+      setIsCanDeleteOptionLoading(true);
       try {
-        let hasOthersVoted = false;
+        // eslint-disable-next-line prefer-const
+        let canDelete = false;
         if (optionType === 'ac') {
-          const payload = new newnewapi.GetAcBidsRequest({
-            optionId,
-            postUuid,
-            paging: {
-              limit: 50,
-            },
-          });
-
-          const res = await fetchBidsForOption(payload);
-
-          if (res.data?.bids) {
-            hasOthersVoted = !!(
-              res.data?.bids.filter((b) => b.bidder?.uuid !== optionCreatorUuid)
-                ?.length > 0
-            );
-          }
+          console.log('Checking can delete ac');
         } else {
-          const payload = new newnewapi.GetMcVotesRequest({
-            optionId,
-            postUuid,
-            paging: {
-              limit: 50,
-            },
-          });
+          console.log('Checking can delete mc');
         }
 
-        setCanDeleteOption(!hasOthersVoted);
+        setCanDeleteOption(canDelete);
       } catch (err) {
         console.error(err);
       }
+      setIsCanDeleteOptionLoading(false);
     }
 
     if (isVisible && isMyOption) {
@@ -131,16 +110,31 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
                 top: `${xy.y}px`,
               }}
             >
-              <SButton
-                onClick={() => {
-                  handleOpenReportOptionModal();
-                  handleClose();
-                }}
-              >
-                <Text variant={3} tone='error'>
-                  {t('ellipse-option.report-option')}
-                </Text>
-              </SButton>
+              {isMyOption && (
+                <SButton
+                  onClick={() => {
+                    handleOpenRemoveOptionModal?.();
+                    handleClose();
+                  }}
+                  disabled={!canDeleteOption || isCanDeleteOptionLoading}
+                >
+                  <Text variant={3} tone='error'>
+                    {t('ellipse-option.delete-option')}
+                  </Text>
+                </SButton>
+              )}
+              {!isMyOption && (
+                <SButton
+                  onClick={() => {
+                    handleOpenReportOptionModal();
+                    handleClose();
+                  }}
+                >
+                  <Text variant={3} tone='error'>
+                    {t('ellipse-option.report-option')}
+                  </Text>
+                </SButton>
+              )}
             </SContainer>
           )}
         </AnimatePresence>
