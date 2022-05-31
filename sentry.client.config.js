@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/nextjs';
 import { CaptureConsole } from '@sentry/integrations';
 
 const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
+const NEXT_PUBLIC_ENVIRONMENT = process.env.NEXT_PUBLIC_ENVIRONMENT;
 
 Sentry.init({
   dsn:
@@ -18,7 +19,7 @@ Sentry.init({
     }),
   ],
   tracesSampleRate: 1.0,
-  environment: 'prod',
+  environment: NEXT_PUBLIC_ENVIRONMENT,
   maxBreadcrumbs: 50,
   // ...
   // Note: if you want to override the automatic release value, do not set a
