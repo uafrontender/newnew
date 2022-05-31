@@ -143,6 +143,11 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
     }
 
     const isCreator = !!user.options.isCreator;
+    const isActivityPrivate = !!user.options.isCreator;
+
+    if (!isCreator && isActivityPrivate) {
+      return;
+    }
 
     if (inView && !isLoading) {
       if (pageToken) {
