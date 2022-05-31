@@ -190,12 +190,16 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>
                     <SCreator>
-                      <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                      <SWantsToKnow>
-                        {t('AcPostSuccess.wants_to_know', {
-                          creator: post.creator?.nickname,
-                        })}
-                      </SWantsToKnow>
+                      <a href={`/${post.creator?.username}`}>
+                        <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
+                      </a>
+                      <a href={`/${post.creator?.username}`}>
+                        <SWantsToKnow>
+                          {t('AcPostSuccess.wants_to_know', {
+                            creator: post.creator?.nickname,
+                          })}
+                        </SWantsToKnow>
+                      </a>
                     </SCreator>
                     {post.totalAmount?.usdCents && (
                       <STotal>
