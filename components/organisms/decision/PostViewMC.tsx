@@ -43,6 +43,7 @@ import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
+import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
@@ -227,6 +228,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       post.canVoteForFree ?? false
     );
     const handleResetFreeVote = () => setHasFreeVote(false);
+
+    const [canSubscribe, setCanSubscribe] = useState(
+      post.creator?.options?.isOfferingSubscription
+    );
 
     // Options
     const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
@@ -420,6 +425,24 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
         setNumberOfOptions(res.data.multipleChoice?.optionCount as number);
         if (res.data.multipleChoice?.status)
           handleUpdatePostStatus(res.data.multipleChoice?.status);
+
+        if (user.loggedIn && post.creator?.options?.isOfferingSubscription) {
+          const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
+            creatorUuid: post.creator?.uuid,
+          });
+
+          const responseSubStatus = await getSubscriptionStatus(
+            getStatusPayload
+          );
+
+          if (
+            responseSubStatus.data?.status?.activeRenewsAt ||
+            responseSubStatus.data?.status?.activeCancelsAt
+          ) {
+            setCanSubscribe(false);
+          }
+        }
+
         setPostLoading(false);
       } catch (err) {
         console.error(err);
@@ -739,9 +762,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
                   ? Math.floor(appConstants?.mcVotePrice / 100)
                   : 1
               }
-              canSubscribe={
-                post.creator?.options?.isOfferingSubscription ?? false
-              }
+              canSubscribe={!!canSubscribe}
               canVoteForFree={hasFreeVote}
               handleLoadOptions={fetchOptions}
               handleResetFreeVote={handleResetFreeVote}
