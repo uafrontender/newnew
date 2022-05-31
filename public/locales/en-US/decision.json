@@ -354,7 +354,7 @@
       }
     },
     "FloatingActionButton": {
-      "suggestNewBtn": "Suggest new"
+      "suggestNewBtn": "Place bid"
     }
   },
   "McPost": {
@@ -447,7 +447,7 @@
       }
     },
     "FloatingActionButton": {
-      "suggestNewBtn": "Suggest new"
+      "suggestNewBtn": "Place bid"
     }
   },
   "CfPost": {
