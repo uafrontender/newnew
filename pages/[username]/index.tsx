@@ -84,7 +84,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   const loadPosts = useCallback(
     async (isCreator: boolean, token?: string, needCount?: boolean) => {
       if (isLoading) return;
-
+      console.log('LOAD');
       try {
         setIsLoading(true);
         setTriedLoading(true);
@@ -143,7 +143,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
     }
 
     const isCreator = !!user.options.isCreator;
-    const isActivityPrivate = !!user.options.isCreator;
+    const isActivityPrivate = !!user.options.isActivityPrivate;
 
     if (!isCreator && isActivityPrivate) {
       return;
