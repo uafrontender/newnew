@@ -146,12 +146,16 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
             <SMainSectionWrapper>
               <SCreatorInfoDiv>
                 <SCreator>
-                  <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                  <SWantsToKnow>
-                    {t('AcPostAwaiting.wants_to_know', {
-                      creator: post.creator?.nickname,
-                    })}
-                  </SWantsToKnow>
+                  <a href={`/${post.creator?.username}`}>
+                    <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
+                  </a>
+                  <a href={`/${post.creator?.username}`}>
+                    <SWantsToKnow>
+                      {t('AcPostAwaiting.wants_to_know', {
+                        creator: post.creator?.nickname,
+                      })}
+                    </SWantsToKnow>
+                  </a>
                 </SCreator>
                 {post.totalAmount?.usdCents && (
                   <STotal>
