@@ -1,7 +1,6 @@
 User-agent: * 
 Disallow: /api/
-Disallow: /creation/preview
-Disallow: /creation/published
+Disallow: /creation/
 Disallow: /creator/
 Disallow: /direct-messages
 Disallow: /*/forced_redirect_to_home
