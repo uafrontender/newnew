@@ -89,7 +89,7 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
           width='24px'
           height='24px'
         />
-        {!!item.counter && (
+        {item.counter !== undefined && item.counter > 0 && (
           <SIndicatorContainer>
             <Indicator minified counter={item.counter} />
           </SIndicatorContainer>
@@ -115,7 +115,7 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
               width='24px'
               height='24px'
             />
-            {!!item.counter && (
+            {item.counter !== undefined && item.counter > 0 && (
               <SIndicatorContainer>
                 <Indicator minified counter={item.counter} />
               </SIndicatorContainer>

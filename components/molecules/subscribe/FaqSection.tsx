@@ -1,7 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
-import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
 
 import Text from '../../atoms/Text';
@@ -27,11 +26,9 @@ const FaqSection: React.FunctionComponent = () => {
       ))}
       <SBottomFooter>
         {t('FAQ.helpCenterFooter.text')}{' '}
-        <Link href='/how-it-works'>
-          <a href='/how-it-works' target='_blank'>
-            {t('FAQ.helpCenterFooter.link')}
-          </a>
-        </Link>
+        <a target='_blank' href='/how-it-works'>
+          {t('FAQ.helpCenterFooter.link')}
+        </a>
       </SBottomFooter>
     </SContainer>
   );

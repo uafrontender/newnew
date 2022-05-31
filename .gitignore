@@ -44,3 +44,7 @@ yarn-error.log*
 
 #editor
 .vscode
+.env
+
+# Sentry
+.sentryclirc

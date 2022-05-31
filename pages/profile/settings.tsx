@@ -12,6 +12,7 @@ import { useRouter } from 'next/router';
 import { useCookies } from 'react-cookie';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Head from 'next/head';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
@@ -325,6 +326,10 @@ const MyProfileSettingsIndex = () => {
 
   return (
     <div>
+      <Head>
+        <title>{t('Settings.meta.title')}</title>
+        <meta name='description' content={t('Settings.meta.description')} />
+      </Head>
       <SMain>
         <SGoBackButton onClick={() => router.back()}>
           {isMobile ? t('Settings.heading') : t('Settings.goBackBtn')}
@@ -374,9 +379,9 @@ const MyProfileSettingsIndex = () => {
           {/* <SBlockOptionButton>
             {commonT(`selected-language-title-${router.locale}`)}
           </SBlockOptionButton> */}
-          <a href='https://faqs.newnew.co' target='_blank'>
-            <SBlockOption>{t('Settings.bottomDiv.help')}</SBlockOption>
-          </a>
+          <SBlockOption href='https://faqs.newnew.co' target='_blank'>
+            {t('Settings.bottomDiv.help')}
+          </SBlockOption>
           <SBlockOptionButton
             disabled={isLogoutLoading}
             onClick={() => handleLogout()}

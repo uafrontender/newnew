@@ -2,6 +2,20 @@
   "my": "my",
   "me": "me",
   "I": "I",
+  "meta": {
+    "ac": {
+      "title": "NewNew Event",
+      "description": "Make money, bid in auctions with friends and support creators on NewNew"
+    },
+    "mc": {
+      "title": "NewNew Superpoll",
+      "description": "Make money, vote with friends and support creators on NewNew"
+    },
+    "cf": {
+      "title": "NewNew Goal",
+      "description": "Make money, pledge in crowdfunding campaigns with friends and support creators on NewNew"
+    }
+  },
   "postType": {
     "ac": "Event",
     "mc": "Superpoll",
@@ -340,7 +354,7 @@
       }
     },
     "FloatingActionButton": {
-      "suggestNewBtn": "Suggest new"
+      "suggestNewBtn": "Place bid"
     }
   },
   "McPost": {
@@ -422,7 +436,7 @@
         "subscribeToCreatorCaption": "Subscribe to {{ creator }} to add your own options to this Superpoll!",
         "subscribeBtn": "Subscribe",
         "suggestionPlaceholder": "Add your own option...",
-        "placeABidBtn": "Post my option"
+        "placeABidBtn": "Add my option"
       }
     },
     "WinnerTab": {
@@ -433,7 +447,7 @@
       }
     },
     "FloatingActionButton": {
-      "suggestNewBtn": "Suggest new"
+      "suggestNewBtn": "Add my option"
     }
   },
   "CfPost": {
@@ -472,7 +486,7 @@
     },
     "paymentModalPayButton": "Back it for",
     "FloatingActionButton": {
-      "choosePledgeBtn": "Make pledge"
+      "choosePledgeBtn": "Back this goal"
     }
   },
   "PostVideoThumbnailEdit": {

@@ -230,7 +230,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
         </SContainer>
         <Modal
           show={isModalOpen}
-          customBackdropFilterValue={1}
+          custombackdropfiltervalue={1}
           onClose={() => setIsModalOpen(false)}
         >
           {isModalOpen && value && (

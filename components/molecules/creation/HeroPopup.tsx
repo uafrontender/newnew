@@ -37,7 +37,7 @@ const HeroPopup: React.FC<IHeroPopup> = ({
   const theme = useTheme();
 
   return (
-    <Modal show={isPopupVisible} onClose={closeModal} additionalZ={99999}>
+    <Modal show={isPopupVisible} onClose={closeModal} additionalz={99999}>
       <SContainer>
         <SModal onClick={preventParentClick()}>
           <SImageWrapper>

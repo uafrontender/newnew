@@ -425,7 +425,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   ]);
 
   const goToNextStep = () => {
-    if (user.userTutorialsProgress.remainingMcSteps) {
+    if (
+      user.userTutorialsProgress.remainingMcSteps &&
+      user.userTutorialsProgress.remainingMcSteps[0]
+    ) {
       if (user.loggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
           mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
@@ -660,7 +663,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           //   : {
           //       predefinedOption: 'card',
           //     })}
-          showTocApply={!user?.loggedIn}
+
           // {...{
           //   ...(walletBalance &&
           //   walletBalance?.usdCents < parseInt(newBidAmount) * votePrice
@@ -737,6 +740,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       !suggestNewMobileOpen &&
       !hasVotedOptionId &&
       postStatus === 'voting' &&
+      post.isSuggestionsAllowed &&
       canVoteForFree ? (
         <>
           <SActionButton

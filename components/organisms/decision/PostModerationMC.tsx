@@ -430,6 +430,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
               ];
             } else {
               workingArr[idx].voteCount = decoded.option?.voteCount as number;
+              workingArr[idx].supporterCount = decoded.option
+                ?.supporterCount as number;
+              workingArr[idx].firstVoter = decoded.option?.firstVoter;
               workingArrUnsorted = workingArr;
             }
 
@@ -529,7 +532,10 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     ]);
 
     const goToNextStep = () => {
-      if (user.userTutorialsProgress.remainingMcSteps) {
+      if (
+        user.userTutorialsProgress.remainingMcSteps &&
+        user.userTutorialsProgress.remainingMcSteps[0]
+      ) {
         if (user.loggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
             mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
