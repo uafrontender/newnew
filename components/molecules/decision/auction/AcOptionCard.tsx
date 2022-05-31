@@ -499,7 +499,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                     : {}),
                 }}
               >
-                {isMyBid ? t('my') : getDisplayname(option.creator!!)}
+                {isMyBid
+                  ? option.supporterCount > 2
+                    ? t('me')
+                    : t('my')
+                  : getDisplayname(option.creator!!)}
               </SSpanBiddersHighlighted>
             </Link>
             {isSupportedByMe && !isMyBid ? (
