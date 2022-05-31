@@ -241,12 +241,16 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
               <SMainSectionWrapper>
                 <SCreatorInfoDiv>
                   <SCreator>
-                    <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                    <SWantsToKnow>
-                      {t('CfPostSuccess.wants_to_know', {
-                        creator: post.creator?.nickname,
-                      })}
-                    </SWantsToKnow>
+                    <a href={`/${post.creator?.username}`}>
+                      <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
+                    </a>
+                    <a href={`/${post.creator?.username}`}>
+                      <SWantsToKnow>
+                        {t('CfPostSuccess.wants_to_know', {
+                          creator: post.creator?.nickname,
+                        })}
+                      </SWantsToKnow>
+                    </a>
                   </SCreator>
                   {/* <STotal>
                     {`$${formatNumber(post.totalAmount?.usdCents ?? 0, true)}`}

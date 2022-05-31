@@ -201,12 +201,16 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>
                     <SCreator>
-                      <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                      <SWantsToKnow>
-                        {t('McPostSuccess.wants_to_know', {
-                          creator: post.creator?.nickname,
-                        })}
-                      </SWantsToKnow>
+                      <a href={`/${post.creator?.username}`}>
+                        <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
+                      </a>
+                      <a href={`/${post.creator?.username}`}>
+                        <SWantsToKnow>
+                          {t('McPostSuccess.wants_to_know', {
+                            creator: post.creator?.nickname,
+                          })}
+                        </SWantsToKnow>
+                      </a>
                     </SCreator>
                     <STotal>
                       {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}

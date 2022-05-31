@@ -76,6 +76,7 @@ interface IPostViewCF {
   postStatus: TPostStatusStringified;
   sessionId?: string;
   isFollowingDecision: boolean;
+  hasRecommendations: boolean;
   handleSetIsFollowingDecision: (newValue: boolean) => void;
   resetSessionId: () => void;
   handleGoBack: () => void;
@@ -91,6 +92,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
     postStatus,
     sessionId,
     isFollowingDecision,
+    hasRecommendations,
     handleSetIsFollowingDecision,
     resetSessionId,
     handleGoBack,
@@ -724,6 +726,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           totalPledges={currentBackers}
           targetPledges={post.targetBackerCount}
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={hasRecommendations}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleReportOpen={handleReportOpen}
           handleRemovePostFromState={handleRemovePostFromState}

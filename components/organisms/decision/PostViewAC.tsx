@@ -70,6 +70,7 @@ interface IPostViewAC {
   postStatus: TPostStatusStringified;
   sessionId?: string;
   isFollowingDecision: boolean;
+  hasRecommendations: boolean;
   handleSetIsFollowingDecision: (newValue: boolean) => void;
   resetSessionId: () => void;
   handleGoBack: () => void;
@@ -86,6 +87,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     resetSessionId,
     postStatus,
     isFollowingDecision,
+    hasRecommendations,
     handleSetIsFollowingDecision,
     handleGoBack,
     handleUpdatePostStatus,
@@ -377,6 +379,19 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       [post, setOptions, sortOptions, optionsLoading]
     );
 
+    const handleRemoveOption = useCallback(
+      (optionToRemove: newnewapi.Auction.Option) => {
+        setOptions((curr) => {
+          const workingArr = [...curr];
+          const workingArrUnsorted = [
+            ...workingArr.filter((o) => o.id !== optionToRemove.id),
+          ];
+          return sortOptions(workingArrUnsorted);
+        });
+      },
+      [setOptions, sortOptions]
+    );
+
     const fetchPostLatestData = useCallback(async () => {
       try {
         const fetchPostPayload = new newnewapi.GetPostRequest({
@@ -415,6 +430,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
               newOption?.supporterCount as number;
             workingArr[idx].totalAmount =
               newOption?.totalAmount as newnewapi.IMoneyAmount;
+            workingArr[idx].isSupportedByMe = newOption?.isSupportedByMe;
             workingArrUnsorted = workingArr;
           }
 
@@ -705,6 +721,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
           hasWinner={!!post.winningOptionId}
           creator={post.creator!!}
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={hasRecommendations}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleReportOpen={handleReportOpen}
           handleRemovePostFromState={handleRemovePostFromState}
@@ -745,6 +762,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
               }
+              handleRemoveOption={handleRemoveOption}
             />
           ) : currentTab === 'comments' && post.isCommentsAllowed ? (
             <CommentsTab
