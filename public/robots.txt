@@ -18,3 +18,5 @@ Disallow: /subscription-success
 Disallow: /test
 Disallow: /verify-email
 Disallow: /verify-new-email
+Disallow: /es-MX/
+Disallow: /fr/
