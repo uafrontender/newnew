@@ -586,7 +586,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                     closeTooltip={goToNextStep}
                     title={t('tutorials.mc.supportPeopleBids.title')}
                     text={t('tutorials.mc.supportPeopleBids.text')}
-                    dotPosition={DotPositionEnum.TopRight}
+                    dotPosition={
+                      theme.media.mobile
+                        ? DotPositionEnum.BottomLeft
+                        : DotPositionEnum.TopRight
+                    }
                   />
                 </STutorialTooltipHolder>
               )}
@@ -628,7 +632,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                     closeTooltip={goToNextStep}
                     title={t('tutorials.mc.supportPeopleBids.title')}
                     text={t('tutorials.mc.supportPeopleBids.text')}
-                    dotPosition={DotPositionEnum.TopRight}
+                    dotPosition={
+                      theme.media.mobile
+                        ? DotPositionEnum.BottomLeft
+                        : DotPositionEnum.TopRight
+                    }
                   />
                 </STutorialTooltipHolder>
               )}
@@ -1393,11 +1401,16 @@ const SPaymentModalOptionText = styled(Headline)`
 
 const STutorialTooltipHolder = styled.div`
   position: absolute;
-  right: 30px;
-  top: 65px;
+
   text-align: left;
   div {
     width: 190px;
+  }
+  right: 35px;
+  top: -20px;
+  ${({ theme }) => theme.media.tablet} {
+    right: 30px;
+    top: 65px;
   }
 `;
 
