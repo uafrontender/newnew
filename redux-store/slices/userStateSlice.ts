@@ -114,6 +114,9 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
           stripeConnectStatus: null,
         },
       };
+      state.userTutorialsProgress = defaultUIState.userTutorialsProgress;
+      state.userTutorialsProgressSynced =
+        defaultUIState.userTutorialsProgressSynced;
     },
   },
 });
