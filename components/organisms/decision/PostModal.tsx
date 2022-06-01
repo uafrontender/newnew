@@ -350,6 +350,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     t,
   ]);
 
+  const handleSeeNewDeletedBox = useCallback(() => {
+    if (recommendedPosts.length > 0) {
+      document.getElementById('post-modal-container')?.scrollTo({
+        top: document.getElementById('recommendations-section-heading')
+          ?.offsetTop,
+        behavior: 'smooth',
+      });
+    } else {
+      router.push(`/see-more?category=${typeOfPost}`);
+    }
+  }, [recommendedPosts, router, typeOfPost]);
+
   const handleOpenRecommendedPost = useCallback(
     (newPost: newnewapi.Post) => {
       const newPostParsed = switchPostType(newPost)[0];
@@ -432,6 +444,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           variant='decision'
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -451,6 +464,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postType={typeOfPost as string}
           variant='decision'
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -469,6 +483,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
@@ -487,6 +502,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
@@ -505,6 +521,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
@@ -584,6 +601,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           variant='moderation'
           postType={typeOfPost as string}
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -603,6 +621,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           variant='moderation'
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -1080,14 +1099,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 style={{
                   marginBottom: '24px',
                 }}
-                handleButtonClick={() => {
-                  document.getElementById('post-modal-container')?.scrollTo({
-                    top: document.getElementById(
-                      'recommendations-section-heading'
-                    )?.offsetTop,
-                    behavior: 'smooth',
-                  });
-                }}
+                handleButtonClick={handleSeeNewDeletedBox}
               />
             )}
             {!isMyPost && (
