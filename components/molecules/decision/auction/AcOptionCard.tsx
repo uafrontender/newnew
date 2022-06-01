@@ -573,7 +573,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 closeTooltip={goToNextStep}
                 title={t('tutorials.ac.supportPeopleBids.title')}
                 text={t('tutorials.ac.supportPeopleBids.text')}
-                dotPosition={DotPositionEnum.TopRight}
+                dotPosition={
+                  theme.media.mobile
+                    ? DotPositionEnum.BottomLeft
+                    : DotPositionEnum.TopRight
+                }
               />
             </STutorialTooltipHolder>
           )}
@@ -1139,8 +1143,12 @@ const SPaymentModalOptionText = styled(Headline)`
 const STutorialTooltipHolder = styled.div`
   position: absolute;
   right: 35px;
-  top: 25px;
+  top: 0;
   text-align: left;
+  ${({ theme }) => theme.media.tablet} {
+    right: 35px;
+    top: 25px;
+  }
 `;
 
 const SPaymentSign = styled(Text)`
