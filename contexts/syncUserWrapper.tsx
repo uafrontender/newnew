@@ -18,7 +18,7 @@ import {
 } from '../redux-store/slices/userStateSlice';
 
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import { loadStateLS, saveStateLS } from '../utils/localStorage';
+import { loadStateLS, removeStateLS, saveStateLS } from '../utils/localStorage';
 
 const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
   const dispatch = useAppDispatch();
@@ -36,6 +36,7 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
   useEffect(() => {
     if (userWasLoggedIn.current && !user.loggedIn) {
       setCreatorDataSteps(0);
+      removeStateLS('userTutorialsProgress');
       userWasLoggedIn.current = false;
     }
 
