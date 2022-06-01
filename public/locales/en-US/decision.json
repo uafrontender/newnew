@@ -266,9 +266,9 @@
   "PostScheduled": {
     "PostScheduledSection": {
       "decision": {
-        "title": "Coming soon",
-        "subtitle_1": "{{ postType }} is not active yet.",
-        "subtitle_2": "Favorite to not miss the update.",
+        "title": "Coming soon...",
+        "subtitle_1": "{{ postType }} will be live shortly.",
+        "subtitle_2": "Get notified once it's up!",
         "timer": {
           "days": "Days",
           "hours": "Hours",
