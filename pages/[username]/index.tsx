@@ -301,7 +301,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!username || Array.isArray(username)) {
     return {
       redirect: {
-        destination: '/',
+        destination: '/404',
         permanent: false,
       },
     };
@@ -316,7 +316,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!res.data || res.error) {
     return {
       redirect: {
-        destination: '/',
+        destination: '/404',
         permanent: false,
       },
     };

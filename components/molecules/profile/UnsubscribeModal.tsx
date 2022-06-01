@@ -39,7 +39,7 @@ const UnsubscribeModal: React.FC<IUnsubscribeModal> = ({
     <Modal show={confirmUnsubscribe} onClose={closeModal}>
       <SContainer>
         <SModal>
-          <SModalTitle>{t('modal.block-user.title')}</SModalTitle>
+          <SModalTitle>{t('modal.unsubscribe-user.title')}</SModalTitle>
           <SModalMessage>
             {t(`modal.unsubscribe-user.message`, {
               username: getDisplayname(user),

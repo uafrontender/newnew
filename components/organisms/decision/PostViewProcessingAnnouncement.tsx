@@ -40,6 +40,7 @@ interface IPostViewProcessingAnnouncement {
   postType: string;
   variant: 'decision' | 'moderation';
   isFollowingDecision: boolean;
+  hasRecommendations: boolean;
   handleSetIsFollowingDecision: (newValue: boolean) => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
@@ -56,6 +57,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
     postType,
     variant,
     isFollowingDecision,
+    hasRecommendations,
     handleSetIsFollowingDecision,
     handleGoBack,
     handleUpdatePostStatus,
@@ -148,6 +150,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
             creator={post.creator!!}
             hasWinner={false}
             isFollowingDecision={isFollowingDecision}
+            hasRecommendations={hasRecommendations}
             handleSetIsFollowingDecision={handleSetIsFollowingDecision}
             handleReportOpen={handleReportOpen}
             handleRemovePostFromState={handleRemovePostFromState}
