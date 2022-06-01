@@ -969,10 +969,13 @@ const SNoOptionsCaption = styled(Text)`
 const STutorialTooltipHolder = styled.div`
   position: absolute;
   left: 60px;
-  bottom: 97%;
+  bottom: 90%;
   text-align: left;
   div {
     width: 190px;
+  }
+  ${({ theme }) => theme.media.tablet} {
+    bottom: 97%;
   }
 `;
 
