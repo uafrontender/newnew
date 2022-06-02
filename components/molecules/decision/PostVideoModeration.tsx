@@ -450,6 +450,31 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, handlerSocketUpdated]);
 
+  // Video processing fallback
+  useEffect(() => {
+    async function videoProcessingFallback(hlsUrl: string) {
+      const available = await waitResourceIsAvailable(hlsUrl, {
+        maxAttempts: 120,
+        retryTimeMs: 1000,
+      });
+
+      if (available) {
+        setResponseFileProcessingLoading(false);
+      }
+    }
+
+    if (
+      responseFileProcessingLoading &&
+      videoProcessing?.targetUrls?.hlsStreamUrl
+    ) {
+      videoProcessingFallback(videoProcessing?.targetUrls?.hlsStreamUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    responseFileProcessingLoading,
+    videoProcessing?.targetUrls?.hlsStreamUrl,
+  ]);
+
   useEffect(() => {
     handleSetIsConfirmToClosePost(cannotLeavePage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
