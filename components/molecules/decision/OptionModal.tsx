@@ -1,45 +1,117 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import { newnewapi } from 'newnew-api';
 
 import Button from '../../atoms/Button';
 import Modal from '../../organisms/Modal';
 import Text from '../../atoms/Text';
+import { checkCanDeleteAcOption } from '../../../api/endpoints/auction';
+import { checkCanDeleteMcOption } from '../../../api/endpoints/multiple_choice';
 
 interface IOptionModal {
   isOpen: boolean;
   zIndex: number;
+  optionId?: number;
+  optionCreatorUuid?: string;
+  optionType?: 'ac' | 'mc';
+  isMyOption?: boolean;
   onClose: () => void;
   handleOpenReportOptionModal: () => void;
+  handleOpenRemoveOptionModal?: () => void;
 }
 
 const OptionModal: React.FunctionComponent<IOptionModal> = ({
   isOpen,
   zIndex,
+  optionId,
+  optionCreatorUuid,
+  optionType,
+  isMyOption,
   onClose,
   handleOpenReportOptionModal,
+  handleOpenRemoveOptionModal,
 }) => {
   const { t } = useTranslation('decision');
 
+  const [canDeleteOption, setCanDeleteOption] = useState(false);
+  const [isCanDeleteOptionLoading, setIsCanDeleteOptionLoading] =
+    useState(false);
+
+  useEffect(() => {
+    async function fetchCanDelete() {
+      setIsCanDeleteOptionLoading(true);
+      try {
+        let canDelete = false;
+        if (optionType === 'ac') {
+          const payload = new newnewapi.CanDeleteAcOptionRequest({
+            optionId,
+          });
+
+          const res = await checkCanDeleteAcOption(payload);
+
+          if (res.data) {
+            canDelete = res.data.canDelete;
+          }
+        } else {
+          const payload = new newnewapi.CanDeleteMcOptionRequest({
+            optionId,
+          });
+
+          const res = await checkCanDeleteMcOption(payload);
+
+          if (res.data) {
+            canDelete = res.data.canDelete;
+          }
+        }
+
+        setCanDeleteOption(canDelete);
+      } catch (err) {
+        console.error(err);
+      }
+      setIsCanDeleteOptionLoading(false);
+    }
+
+    if (isOpen && isMyOption) {
+      fetchCanDelete();
+    }
+  }, [isOpen, isMyOption, optionType, optionId, optionCreatorUuid]);
+
   return (
-    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+    <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
           onClick={(e) => {
             e.stopPropagation();
           }}
         >
-          <SButton
-            view='secondary'
-            onClick={() => {
-              handleOpenReportOptionModal();
-              onClose();
-            }}
-          >
-            <Text variant={2} tone='error'>
-              {t('ellipse-option.report-option')}
-            </Text>
-          </SButton>
+          {isMyOption && (
+            <SButton
+              view='secondary'
+              disabled={!canDeleteOption || isCanDeleteOptionLoading}
+              onClick={() => {
+                handleOpenRemoveOptionModal?.();
+                onClose();
+              }}
+            >
+              <Text variant={2} tone='error'>
+                {t('ellipse-option.delete-option')}
+              </Text>
+            </SButton>
+          )}
+          {!isMyOption && (
+            <SButton
+              view='secondary'
+              onClick={() => {
+                handleOpenReportOptionModal();
+                onClose();
+              }}
+            >
+              <Text variant={2} tone='error'>
+                {t('ellipse-option.report-option')}
+              </Text>
+            </SButton>
+          )}
         </SContentContainer>
         <Button
           view='secondary'
@@ -54,6 +126,14 @@ const OptionModal: React.FunctionComponent<IOptionModal> = ({
       </SWrapper>
     </Modal>
   );
+};
+
+OptionModal.defaultProps = {
+  optionId: undefined,
+  optionCreatorUuid: undefined,
+  optionType: undefined,
+  isMyOption: undefined,
+  handleOpenRemoveOptionModal: undefined,
 };
 
 export default OptionModal;

@@ -19,7 +19,7 @@ import Text from '../../components/atoms/Text';
 import InlineSvg from '../../components/atoms/InlineSVG';
 import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
-import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
+import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
 
 interface IUserPageActivity {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -128,6 +128,14 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
   );
 
   useEffect(() => {
+    if (!user.options) {
+      return;
+    }
+
+    if (user.options.isActivityPrivate) {
+      return;
+    }
+
     if (inView && !isLoading) {
       if (pageToken) {
         loadPosts(pageToken);

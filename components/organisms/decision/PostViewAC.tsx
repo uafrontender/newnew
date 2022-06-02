@@ -69,6 +69,9 @@ interface IPostViewAC {
   post: newnewapi.Auction;
   postStatus: TPostStatusStringified;
   sessionId?: string;
+  isFollowingDecision: boolean;
+  hasRecommendations: boolean;
+  handleSetIsFollowingDecision: (newValue: boolean) => void;
   resetSessionId: () => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
@@ -83,6 +86,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     sessionId,
     resetSessionId,
     postStatus,
+    isFollowingDecision,
+    hasRecommendations,
+    handleSetIsFollowingDecision,
     handleGoBack,
     handleUpdatePostStatus,
     handleReportOpen,
@@ -373,6 +379,19 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       [post, setOptions, sortOptions, optionsLoading]
     );
 
+    const handleRemoveOption = useCallback(
+      (optionToRemove: newnewapi.Auction.Option) => {
+        setOptions((curr) => {
+          const workingArr = [...curr];
+          const workingArrUnsorted = [
+            ...workingArr.filter((o) => o.id !== optionToRemove.id),
+          ];
+          return sortOptions(workingArrUnsorted);
+        });
+      },
+      [setOptions, sortOptions]
+    );
+
     const fetchPostLatestData = useCallback(async () => {
       try {
         const fetchPostPayload = new newnewapi.GetPostRequest({
@@ -411,6 +430,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
               newOption?.supporterCount as number;
             workingArr[idx].totalAmount =
               newOption?.totalAmount as newnewapi.IMoneyAmount;
+            workingArr[idx].isSupportedByMe = newOption?.isSupportedByMe;
             workingArrUnsorted = workingArr;
           }
 
@@ -490,42 +510,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
         fetchAndSetWinningOption(post.winningOptionId as number);
       }
     }, [post.winningOptionId]);
-
-    useEffect(() => {
-      const makeBidFromSessionId = async () => {
-        if (!sessionId) return;
-        try {
-          setLoadingModalOpen(true);
-          const payload = new newnewapi.FulfillPaymentPurposeRequest({
-            paymentSuccessUrl: `session_id=${sessionId}`,
-          });
-
-          const res = await placeBidOnAuction(payload);
-
-          if (
-            !res.data ||
-            res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS ||
-            res.error
-          )
-            throw new Error(res.error?.message ?? 'Request failed');
-
-          const optionFromResponse = res.data
-            .option as newnewapi.Auction.Option;
-          optionFromResponse.isSupportedByMe = true;
-          handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
-          setLoadingModalOpen(false);
-          setPaymentSuccesModalOpen(true);
-        } catch (err) {
-          console.error(err);
-          setLoadingModalOpen(false);
-        }
-        resetSessionId();
-      };
-
-      makeBidFromSessionId();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     useEffect(() => {
       const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -622,6 +606,44 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       sortOptions,
     ]);
 
+    useEffect(() => {
+      const makeBidFromSessionId = async () => {
+        if (!sessionId) return;
+        try {
+          setLoadingModalOpen(true);
+          const payload = new newnewapi.FulfillPaymentPurposeRequest({
+            paymentSuccessUrl: `session_id=${sessionId}`,
+          });
+
+          const res = await placeBidOnAuction(payload);
+
+          if (
+            !res.data ||
+            res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS ||
+            res.error
+          )
+            throw new Error(res.error?.message ?? 'Request failed');
+
+          const optionFromResponse = res.data
+            .option as newnewapi.Auction.Option;
+          optionFromResponse.isSupportedByMe = true;
+          handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+          setLoadingModalOpen(false);
+          setPaymentSuccesModalOpen(true);
+        } catch (err) {
+          console.error(err);
+          setLoadingModalOpen(false);
+        }
+        resetSessionId();
+      };
+
+      if (socketConnection.active) {
+        makeBidFromSessionId();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socketConnection.active, sessionId]);
+
     const goToNextStep = () => {
       if (
         user.userTutorialsProgress.remainingAcSteps &&
@@ -700,7 +722,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
           amountInBids={totalAmount}
           hasWinner={!!post.winningOptionId}
           creator={post.creator!!}
-          isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+          isFollowingDecision={isFollowingDecision}
+          hasRecommendations={hasRecommendations}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleReportOpen={handleReportOpen}
           handleRemovePostFromState={handleRemovePostFromState}
           handleAddPostToState={handleAddPostToState}
@@ -740,6 +764,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
               }
+              handleRemoveOption={handleRemoveOption}
             />
           ) : currentTab === 'comments' && post.isCommentsAllowed ? (
             <CommentsTab

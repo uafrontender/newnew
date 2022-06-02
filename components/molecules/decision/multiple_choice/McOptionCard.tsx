@@ -14,6 +14,7 @@ import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import {
+  deleteMcOption,
   doFreeVote,
   // voteOnPostWithWallet,
 } from '../../../../api/endpoints/multiple_choice';
@@ -53,6 +54,7 @@ import { reportEventOption } from '../../../../api/endpoints/report';
 import InlineSvg from '../../../atoms/InlineSVG';
 import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
 import OptionModal from '../OptionModal';
+import McConfirmDeleteOptionModal from './moderation/McConfirmDeleteOptionModal';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface IMcOptionCard {
@@ -75,6 +77,7 @@ interface IMcOptionCard {
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
   ) => void;
+  handleRemoveOption?: () => void;
 }
 
 const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
@@ -93,6 +96,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   optionBeingSupported,
   handleResetFreeVote,
   handleSetSupportedBid,
+  handleRemoveOption,
   handleSetPaymentSuccesModalOpen,
   handleAddOrUpdateOptionFromResponse,
 }) => {
@@ -160,6 +164,34 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   const handleReportClose = useCallback(() => {
     setIsReportModalOpen(false);
+  }, []);
+
+  // Remove modal
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+
+  const handleRemoveSubmit = useCallback(async () => {
+    try {
+      const payload = new newnewapi.DeleteMcOptionRequest({
+        optionId: option.id,
+      });
+
+      const res = await deleteMcOption(payload);
+
+      if (!res.error) {
+        setIsRemoveModalOpen(false);
+        handleRemoveOption?.();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [handleRemoveOption, option.id]);
+
+  const handleOpenRemoveForm = useCallback(() => {
+    setIsRemoveModalOpen(true);
+  }, []);
+
+  const handleRemoveClose = useCallback(() => {
+    setIsRemoveModalOpen(false);
   }, []);
 
   const [isSupportMenuOpen, setIsSupportMenuOpen] = useState(false);
@@ -454,12 +486,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           $isDisabled={disabled && votingAllowed}
           $isBlue={isBlue}
           onClick={(e) => {
-            if (
-              !isMobile &&
-              !isSuggestedByMe &&
-              !disabled &&
-              !isEllipseMenuOpen
-            ) {
+            if (!isMobile && !disabled && !isEllipseMenuOpen) {
               setIsEllipseMenuOpen(true);
 
               setOptionMenuXY({
@@ -469,7 +496,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             }
           }}
         >
-          {isMobile && !isSuggestedByMe && (
+          {isMobile && (
             <SEllipseButtonMobile onClick={() => setIsEllipseMenuOpen(true)}>
               <InlineSvg
                 svg={MoreIcon}
@@ -559,7 +586,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                     closeTooltip={goToNextStep}
                     title={t('tutorials.mc.supportPeopleBids.title')}
                     text={t('tutorials.mc.supportPeopleBids.text')}
-                    dotPosition={DotPositionEnum.TopRight}
+                    dotPosition={
+                      isMobile
+                        ? DotPositionEnum.BottomLeft
+                        : DotPositionEnum.TopRight
+                    }
                   />
                 </STutorialTooltipHolder>
               )}
@@ -601,7 +632,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                     closeTooltip={goToNextStep}
                     title={t('tutorials.mc.supportPeopleBids.title')}
                     text={t('tutorials.mc.supportPeopleBids.text')}
-                    dotPosition={DotPositionEnum.TopRight}
+                    dotPosition={
+                      isMobile
+                        ? DotPositionEnum.BottomLeft
+                        : DotPositionEnum.TopRight
+                    }
                   />
                 </STutorialTooltipHolder>
               )}
@@ -783,16 +818,26 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         <OptionModal
           zIndex={12}
           isOpen={isEllipseMenuOpen}
-          handleOpenReportOptionModal={() => handleOpenReportForm()}
+          isMyOption={isSuggestedByMe}
+          optionType='mc'
+          optionId={option.id as number}
+          optionCreatorUuid={option.creator?.uuid ?? ''}
           onClose={() => setIsEllipseMenuOpen(false)}
+          handleOpenReportOptionModal={() => handleOpenReportForm()}
+          handleOpenRemoveOptionModal={() => handleOpenRemoveForm()}
         />
       )}
-      {!isMobile && !isSuggestedByMe && (
+      {!isMobile && (
         <OptionMenu
           xy={optionMenuX}
           isVisible={isEllipseMenuOpen}
+          isMyOption={isSuggestedByMe}
+          optionType='mc'
+          optionId={option.id as number}
+          optionCreatorUuid={option.creator?.uuid ?? ''}
           handleClose={() => setIsEllipseMenuOpen(false)}
           handleOpenReportOptionModal={() => handleOpenReportForm()}
+          handleOpenRemoveOptionModal={() => handleOpenRemoveForm()}
         />
       )}
       {/* Report modal */}
@@ -804,12 +849,19 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           onClose={handleReportClose}
         />
       )}
+      {/* Remove modal */}
+      <McConfirmDeleteOptionModal
+        isVisible={isRemoveModalOpen}
+        closeModal={handleRemoveClose}
+        handleConfirmDelete={handleRemoveSubmit}
+      />
     </>
   );
 };
 
 McOptionCard.defaultProps = {
   optionBeingSupported: undefined,
+  handleRemoveOption: undefined,
 };
 
 export default McOptionCard;
@@ -1240,7 +1292,7 @@ const SSupportButtonDesktop = styled(Button)<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          border-left: ${({ theme }) => theme.colors.dark} 1.5px solid;
+          border-left: #ffffff 1px solid;
         `
       : null}
 
@@ -1349,11 +1401,16 @@ const SPaymentModalOptionText = styled(Headline)`
 
 const STutorialTooltipHolder = styled.div`
   position: absolute;
-  right: 30px;
-  top: 65px;
+
   text-align: left;
   div {
     width: 190px;
+  }
+  right: 35px;
+  top: -20px;
+  ${({ theme }) => theme.media.tablet} {
+    right: 30px;
+    top: 65px;
   }
 `;
 

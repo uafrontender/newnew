@@ -241,8 +241,8 @@ const SVideoWrapper = styled.div<ISVideoWrapper>`
   min-height: 100%;
   background: transparent;
   border-radius: ${(props) => props.borderRadius};
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
 `;
 
 const SWrapper = styled.div`
@@ -270,9 +270,10 @@ const SImageBG = styled.img<ISVideoWrapper>`
   height: 100%;
   object-fit: cover;
   border-radius: ${(props) => props.borderRadius};
+  transform: scale(1.1);
 
   @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
-    filter: blur(16px);
+    filter: blur(32px);
   }
 `;
 

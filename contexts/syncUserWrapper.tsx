@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { newnewapi } from 'newnew-api';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   getMe,
   getMyCreatorTags,
@@ -18,21 +18,32 @@ import {
 } from '../redux-store/slices/userStateSlice';
 
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import { loadStateLS, saveStateLS } from '../utils/localStorage';
+import { loadStateLS, removeStateLS, saveStateLS } from '../utils/localStorage';
 
 const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
 
   const [creatorDataSteps, setCreatorDataSteps] = useState(0);
+  const userWasLoggedIn = useRef(false);
 
   const updateCreatorDataSteps = useCallback(
-    () =>
-      setCreatorDataSteps((curr) => {
-        return curr + 1;
-      }),
+    () => setCreatorDataSteps((curr) => curr + 1),
     []
   );
+
+  // When user logs out, clear the state
+  useEffect(() => {
+    if (userWasLoggedIn.current && !user.loggedIn) {
+      setCreatorDataSteps(0);
+      removeStateLS('userTutorialsProgress');
+      userWasLoggedIn.current = false;
+    }
+
+    if (user.loggedIn) {
+      userWasLoggedIn.current = true;
+    }
+  }, [user.loggedIn]);
 
   useEffect(() => {
     if (creatorDataSteps === 2) {

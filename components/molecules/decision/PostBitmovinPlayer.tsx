@@ -209,8 +209,8 @@ const SVideoWrapper = styled.div`
   min-height: 100%;
   background: transparent;
 
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
 
   ${({ theme }) => theme.media.tablet} {
     border-radius: 16px;
@@ -241,9 +241,10 @@ const SImageBG = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transform: scale(1.1);
 
   @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
-    filter: blur(16px);
+    filter: blur(32px);
   }
 
   ${({ theme }) => theme.media.tablet} {

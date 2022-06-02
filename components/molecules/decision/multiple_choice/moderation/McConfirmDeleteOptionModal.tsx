@@ -18,7 +18,7 @@ const McConfirmDeleteOptionModal: React.FC<IMcConfirmDeleteOptionModal> = ({
   const { t } = useTranslation('decision');
 
   return (
-    <Modal show={isVisible} additionalZ={12} onClose={closeModal}>
+    <Modal show={isVisible} additionalz={12} onClose={closeModal}>
       <SContainer>
         <SModal>
           <SModalTitle>
@@ -51,6 +51,7 @@ const SContainer = styled.div`
 `;
 
 const SModal = styled.div`
+  z-index: 10;
   max-width: 480px;
   width: 100%;
   background: ${(props) =>

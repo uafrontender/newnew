@@ -42,7 +42,6 @@ export const HeroSection = React.memo(() => {
         containerId: 'generalScrollContainer',
       });
     } else {
-      console.log('hey');
       scroller.scrollTo('ac', {
         offset: isMobile ? -20 : -100,
         smooth: 'ease',
@@ -106,7 +105,7 @@ export const HeroSection = React.memo(() => {
                 <SButton
                   withDim
                   withShrink
-                  view='primaryGrad'
+                  view='secondary'
                   onClick={handleSignInClick}
                 >
                   {t('hero-block-sign-in')}
@@ -114,7 +113,7 @@ export const HeroSection = React.memo(() => {
                 <SButton
                   withDim
                   withShrink
-                  view='secondary'
+                  view='primaryGrad'
                   onClick={handleExploreClick}
                 >
                   {t('hero-block-explore')}

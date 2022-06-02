@@ -54,6 +54,8 @@ import OptionModal from '../OptionModal';
 import OptionMenu from '../OptionMenu';
 import ReportModal, { ReportData } from '../../chat/ReportModal';
 import { reportEventOption } from '../../../../api/endpoints/report';
+import { deleteAcOption } from '../../../../api/endpoints/auction';
+import AcConfirmDeleteOptionModal from './moderation/AcConfirmDeleteOptionModal';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -70,6 +72,7 @@ interface IAcOptionCard {
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.Auction.Option
   ) => void;
+  handleRemoveOption?: () => void;
 }
 
 const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
@@ -85,6 +88,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   minAmount,
   handleSetSupportedBid,
   handleAddOrUpdateOptionFromResponse,
+  handleRemoveOption,
 }) => {
   const router = useRouter();
   const theme = useTheme();
@@ -148,6 +152,34 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
   const handleReportClose = useCallback(() => {
     setIsReportModalOpen(false);
+  }, []);
+
+  // Remove modal
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+
+  const handleRemoveSubmit = useCallback(async () => {
+    try {
+      const payload = new newnewapi.DeleteAcOptionRequest({
+        optionId: option.id,
+      });
+
+      const res = await deleteAcOption(payload);
+
+      if (!res.error) {
+        setIsRemoveModalOpen(false);
+        handleRemoveOption?.();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [handleRemoveOption, option.id]);
+
+  const handleOpenRemoveForm = useCallback(() => {
+    setIsRemoveModalOpen(true);
+  }, []);
+
+  const handleRemoveClose = useCallback(() => {
+    setIsRemoveModalOpen(false);
   }, []);
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
@@ -389,7 +421,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         $isDisabled={disabled && votingAllowed}
         $isBlue={isBlue}
         onClick={(e) => {
-          if (!isMobile && !isMyBid && !disabled && !isEllipseMenuOpen) {
+          if (!isMobile && !disabled && !isEllipseMenuOpen) {
+            console.log(isMyBid);
             setIsEllipseMenuOpen(true);
 
             setOptionMenuXY({
@@ -399,7 +432,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           }
         }}
       >
-        {isMobile && !isMyBid && (
+        {isMobile && (
           <SEllipseButtonMobile onClick={() => setIsEllipseMenuOpen(true)}>
             <InlineSvg
               svg={MoreIcon}
@@ -466,7 +499,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                     : {}),
                 }}
               >
-                {isMyBid ? t('my') : getDisplayname(option.creator!!)}
+                {isMyBid
+                  ? option.supporterCount > 2
+                    ? t('me')
+                    : t('my')
+                  : getDisplayname(option.creator!!)}
               </SSpanBiddersHighlighted>
             </Link>
             {isSupportedByMe && !isMyBid ? (
@@ -536,7 +573,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 closeTooltip={goToNextStep}
                 title={t('tutorials.ac.supportPeopleBids.title')}
                 text={t('tutorials.ac.supportPeopleBids.text')}
-                dotPosition={DotPositionEnum.TopRight}
+                dotPosition={
+                  isMobile
+                    ? DotPositionEnum.BottomLeft
+                    : DotPositionEnum.TopRight
+                }
               />
             </STutorialTooltipHolder>
           )}
@@ -703,16 +744,26 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         <OptionModal
           zIndex={12}
           isOpen={isEllipseMenuOpen}
-          handleOpenReportOptionModal={() => handleOpenReportForm()}
+          isMyOption={isMyBid}
+          optionType='ac'
+          optionId={option.id as number}
+          optionCreatorUuid={option.creator?.uuid ?? ''}
           onClose={() => setIsEllipseMenuOpen(false)}
+          handleOpenReportOptionModal={() => handleOpenReportForm()}
+          handleOpenRemoveOptionModal={() => handleOpenRemoveForm()}
         />
       )}
-      {!isMobile && !isMyBid && (
+      {!isMobile && (
         <OptionMenu
           xy={optionMenuX}
           isVisible={isEllipseMenuOpen}
+          isMyOption={isMyBid}
+          optionType='ac'
+          optionId={option.id as number}
+          optionCreatorUuid={option.creator?.uuid ?? ''}
           handleClose={() => setIsEllipseMenuOpen(false)}
           handleOpenReportOptionModal={() => handleOpenReportForm()}
+          handleOpenRemoveOptionModal={() => handleOpenRemoveForm()}
         />
       )}
       {/* Report modal */}
@@ -724,12 +775,19 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           onClose={handleReportClose}
         />
       )}
+      {/* Delete option modal */}
+      <AcConfirmDeleteOptionModal
+        isVisible={isRemoveModalOpen}
+        closeModal={handleRemoveClose}
+        handleConfirmDelete={handleRemoveSubmit}
+      />
     </div>
   );
 };
 
 AcOptionCard.defaultProps = {
   optionBeingSupported: undefined,
+  handleRemoveOption: undefined,
 };
 
 export default AcOptionCard;
@@ -1085,8 +1143,12 @@ const SPaymentModalOptionText = styled(Headline)`
 const STutorialTooltipHolder = styled.div`
   position: absolute;
   right: 35px;
-  top: 25px;
+  top: 0;
   text-align: left;
+  ${({ theme }) => theme.media.tablet} {
+    right: 35px;
+    top: 25px;
+  }
 `;
 
 const SPaymentSign = styled(Text)`

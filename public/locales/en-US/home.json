@@ -1,8 +1,18 @@
 {
+  "postType": {
+    "ac": "Event",
+    "mc": "Superpoll",
+    "cf": "Goal",
+    "multiple": {
+      "ac": "Events",
+      "mc": "Superpolls",
+      "cf": "Goals"
+    }
+  },
   "hero-block-title": "Come together \nto shape reality",
   "hero-block-subTitle": "Bid and vote on what the world does next",
-  "hero-block-sign-in": "Sign in now",
-  "hero-block-explore": "Explore",
+  "hero-block-sign-in": "Sign in",
+  "hero-block-explore": "Explore Now",
   "hero-block-explore-now": "Explore now",
   "top-block-title": "Top 10 in {{country}}",
   "ac-block-title": "Biggest Events",
@@ -78,7 +88,22 @@
       "title-mc": "See more Superpolls on NewNew",
       "description-mc": "See more Superpolls creators posted on creator economy startup company NewNew",
       "title-cf": "See more Goals on NewNew",
-      "description-cf": "See more Goals creators posted on creator economy startup company NewNew"
+      "description-cf": "See more Goals creators posted on creator economy startup company NewNew",
+      "title-biggest": "See More of the Biggest Posts For You",
+      "description-biggest": "Watch the biggest videos and decisions from creators that we think you will like",
+      "title-for-you": "See More Posts For You",
+      "description-for-you": "Watch videos and decisions from creators that we think you will like"
     }
+  },
+  "ellipse": {
+    "copy-link": "Copy link",
+    "link-copied": "Link copied!",
+    "follow-creator": "Favorite creator",
+    "unfollow-creator": "Unfavorite creator",
+    "follow-decision": "Favorite {{ postType }}",
+    "unfollow-decision": "Unfavorite {{ postType }}",
+    "report": "Report",
+    "deleteDecision": "Delete {{ postType }}",
+    "cancel": "Cancel"
   }
 }

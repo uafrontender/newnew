@@ -7,6 +7,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import Link from 'next/link';
 
 import ProfileLayout from '../../components/templates/ProfileLayout';
 import { NextPageWithLayout } from '../_app';
@@ -20,7 +21,12 @@ import InlineSvg from '../../components/atoms/InlineSVG';
 import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
 import Text from '../../components/atoms/Text';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
-import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
+import {
+  NoContentDescription,
+  NoContentSuggestion,
+} from '../../components/atoms/profile/NoContentCommon';
+import getDisplayname from '../../utils/getDisplayname';
+import Button from '../../components/atoms/Button';
 
 interface IUserPageIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -76,15 +82,20 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   };
 
   const loadPosts = useCallback(
-    async (token?: string, needCount?: boolean) => {
+    async (isCreator: boolean, token?: string, needCount?: boolean) => {
       if (isLoading) return;
+
       try {
         setIsLoading(true);
         setTriedLoading(true);
+
         const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
           userUuid: user.uuid,
           filter: postsFilter,
-          relation: newnewapi.GetUserPostsRequest.Relation.THEY_CREATED,
+          relation: isCreator
+            ? newnewapi.GetUserPostsRequest.Relation.THEY_CREATED
+            : newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
+          // relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
           paging: {
             ...(token ? { pageToken: token } : {}),
           },
@@ -127,17 +138,28 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   );
 
   useEffect(() => {
+    if (!user.options) {
+      return;
+    }
+
+    const isCreator = !!user.options.isCreator;
+    const isActivityPrivate = !!user.options.isActivityPrivate;
+
+    if (!isCreator && isActivityPrivate) {
+      return;
+    }
+
     if (inView && !isLoading) {
       if (pageToken) {
-        loadPosts(pageToken);
+        loadPosts(isCreator, pageToken);
       } else if (!triedLoading && !pageToken && posts?.length === 0) {
-        loadPosts(undefined, true);
+        loadPosts(isCreator, undefined, true);
       }
     } else if (!triedLoading && posts?.length === 0) {
-      loadPosts(undefined, true);
+      loadPosts(isCreator, undefined, true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
+  }, [inView, pageToken, isLoading, triedLoading, posts?.length, user.options]);
 
   return (
     <div>
@@ -181,6 +203,27 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
                   <NoContentDescription>
                     {t('CreatorsDecisions.no-content.description')}
                   </NoContentDescription>
+                </NoContentCard>
+              )}
+            {user.options &&
+              !user.options.isCreator &&
+              posts &&
+              posts.length === 0 &&
+              !isLoading && (
+                <NoContentCard>
+                  <NoContentDescription>
+                    {t('UserProfile.no-content.description', {
+                      username: getDisplayname(user),
+                    })}
+                  </NoContentDescription>
+                  <NoContentSuggestion>
+                    {t('UserProfile.no-content.suggestion')}
+                  </NoContentSuggestion>
+                  <Link href='/'>
+                    <SButton view='primaryGrad'>
+                      {t('UserProfile.no-content.button')}
+                    </SButton>
+                  </Link>
                 </NoContentCard>
               )}
           </SCardsSection>
@@ -258,7 +301,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!username || Array.isArray(username)) {
     return {
       redirect: {
-        destination: '/',
+        destination: '/404',
         permanent: false,
       },
     };
@@ -273,7 +316,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!res.data || res.error) {
     return {
       redirect: {
-        destination: '/',
+        destination: '/404',
         permanent: false,
       },
     };
@@ -386,4 +429,19 @@ const SPrivateLock = styled.div`
 const SAccountPrivateText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
+`;
+
+const SButton = styled(Button)`
+  margin: auto;
+  width: 100%;
+  margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 164px;
+    margin-bottom: 0px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    width: 224px;
+  }
 `;

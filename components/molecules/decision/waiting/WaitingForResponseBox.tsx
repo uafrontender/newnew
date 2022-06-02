@@ -1,6 +1,6 @@
 /* eslint-disable react/require-default-props */
 import React from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import assets from '../../../../constants/assets';
 
 import Headline from '../../../atoms/Headline';
@@ -11,17 +11,28 @@ interface IWaitingForResponseBox {
 }
 
 const WaitingForResponseBox: React.FunctionComponent<IWaitingForResponseBox> =
-  ({ title, body }) => (
-    <SBox>
-      <STextWrapper>
-        <SHeadline variant={2}>{title}</SHeadline>
-        <SText variant={6}>{body}</SText>
-      </STextWrapper>
-      <SImageContainer>
-        <img src={assets.decision.hourglass} alt='decision' />
-      </SImageContainer>
-    </SBox>
-  );
+  ({ title, body }) => {
+    const theme = useTheme();
+
+    return (
+      <SBox>
+        <STextWrapper>
+          <SHeadline variant={2}>{title}</SHeadline>
+          <SText variant={6}>{body}</SText>
+        </STextWrapper>
+        <SImageContainer>
+          <img
+            src={
+              theme.name === 'dark'
+                ? assets.decision.darkHourglassAnimated
+                : assets.decision.lightHourglassAnimated
+            }
+            alt='decision'
+          />
+        </SImageContainer>
+      </SBox>
+    );
+  };
 
 export default WaitingForResponseBox;
 
@@ -71,10 +82,10 @@ const SImageContainer = styled.div`
   }
 
   ${({ theme }) => theme.media.tablet} {
-    width: 120px;
+    width: 80px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    width: 120px;
+    width: 80px;
   }
 `;

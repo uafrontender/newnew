@@ -9,6 +9,7 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -200,12 +201,16 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>
                     <SCreator>
-                      <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                      <SWantsToKnow>
-                        {t('McPostSuccess.wants_to_know', {
-                          creator: post.creator?.nickname,
-                        })}
-                      </SWantsToKnow>
+                      <a href={`/${post.creator?.username}`}>
+                        <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
+                      </a>
+                      <a href={`/${post.creator?.username}`}>
+                        <SWantsToKnow>
+                          {t('McPostSuccess.wants_to_know', {
+                            creator: post.creator?.nickname,
+                          })}
+                        </SWantsToKnow>
+                      </a>
                     </SCreator>
                     <STotal>
                       {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
@@ -218,23 +223,46 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                     <>
                       <SWinningBidCreator>
                         <SCreator>
-                          <SCreatorImage
-                            src={
-                              winningOption.creator?.avatarUrl ??
-                              winningOption.firstVoter?.avatarUrl!!
-                            }
-                          />
+                          <Link
+                            href={`/${
+                              winningOption.creator?.uuid !== post.creator?.uuid
+                                ? winningOption.creator?.username!!
+                                : winningOption.firstVoter?.username!!
+                            }`}
+                          >
+                            <SCreatorImage
+                              src={
+                                winningOption.creator?.uuid !==
+                                post.creator?.uuid
+                                  ? winningOption.creator?.avatarUrl!!
+                                  : winningOption.firstVoter?.avatarUrl!!
+                              }
+                            />
+                          </Link>
                           <SWinningBidCreatorText>
-                            {winningOption.creator?.uuid ===
-                              user.userData?.userUuid ||
-                            winningOption.isSupportedByMe
-                              ? winningOption.supporterCount > 1
-                                ? t('me')
-                                : t('I')
-                              : getDisplayname(
-                                  winningOption.creator ??
-                                    winningOption.firstVoter!!
-                                )}
+                            <SSpan>
+                              <Link
+                                href={`/${
+                                  winningOption.creator?.uuid !==
+                                  post.creator?.uuid
+                                    ? winningOption.creator?.username!!
+                                    : winningOption.firstVoter?.username!!
+                                }`}
+                              >
+                                {winningOption.creator?.uuid ===
+                                  user.userData?.userUuid ||
+                                winningOption.isSupportedByMe
+                                  ? winningOption.supporterCount > 1
+                                    ? t('me')
+                                    : t('I')
+                                  : getDisplayname(
+                                      winningOption.creator?.uuid !==
+                                        post.creator?.uuid
+                                        ? winningOption.creator!!
+                                        : winningOption.firstVoter!!
+                                    )}
+                              </Link>
+                            </SSpan>
                             {winningOption.supporterCount > 1 ? (
                               <>
                                 {' & '}
@@ -721,3 +749,16 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
+
+const SSpan = styled.span`
+  a {
+    cursor: pointer;
+
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+    &:hover {
+      outline: none;
+      color: ${({ theme }) => theme.colorsThemed.text.primary};
+    }
+  }
+`;

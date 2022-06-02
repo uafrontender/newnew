@@ -101,3 +101,15 @@ export const deleteMcOption = (payload: newnewapi.DeleteMcOptionRequest) =>
     'post',
     payload
   );
+
+export const checkCanDeleteMcOption = (payload: newnewapi.CanDeleteMcOptionRequest) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.CanDeleteMcOptionRequest,
+    newnewapi.CanDeleteMcOptionResponse
+  >(
+    newnewapi.CanDeleteMcOptionRequest,
+    newnewapi.CanDeleteMcOptionResponse,
+    `${BASE_URL_MULTICHOICE}/can_delete_mc_option`,
+    'post',
+    payload
+  );

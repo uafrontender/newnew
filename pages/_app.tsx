@@ -11,6 +11,7 @@ import { CookiesProvider } from 'react-cookie';
 import { parse } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
+import * as Sentry from '@sentry/browser';
 
 // Custom error page
 import Error from './_error';
@@ -21,7 +22,11 @@ import GlobalTheme from '../styles/ThemeProvider';
 
 // Redux store and provider
 import { setResizeMode } from '../redux-store/slices/uiStateSlice';
-import { EnhancedStoreWithPersistor, wrapper } from '../redux-store/store';
+import {
+  EnhancedStoreWithPersistor,
+  useAppSelector,
+  wrapper,
+} from '../redux-store/store';
 
 import isBrowser from '../utils/isBrowser';
 
@@ -63,6 +68,7 @@ interface IMyApp extends AppProps {
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString } = props;
   const store = useStore();
+  const user = useAppSelector((state) => state.user);
 
   // Pre-fetch images after all loading for initial page is done
   const [preFetchImages, setPreFetchImages] = useState<string>('');
@@ -112,6 +118,13 @@ const MyApp = (props: IMyApp): ReactElement => {
     }
   }, [store, uaString]);
 
+  // TODO: move to the store logic
+  useEffect(() => {
+    if (user.userData?.username) {
+      Sentry.setUser({ username: user.userData.username });
+    }
+  }, [user.userData?.username]);
+
   // Shared layouts
   const getLayout = Component.getLayout ?? ((page) => page);
 
@@ -119,7 +132,6 @@ const MyApp = (props: IMyApp): ReactElement => {
     <>
       <Head>
         <meta charSet='utf-8' />
-        <meta name='robots' content='noindex' />
         <meta
           name='viewport'
           content='width=device-width, initial-scale=1, user-scalable=no'
@@ -153,7 +165,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                                         getLayout(<Component {...pageProps} />)
                                       ) : (
                                         <Error
-                                          errorMsg={pageProps.error?.message}
+                                          title={pageProps.error?.message}
                                           statusCode={
                                             pageProps.error?.statusCode ?? 500
                                           }

@@ -79,11 +79,12 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
       if (loadingPosts) return;
       try {
         setLoadingPosts(true);
+
         const payload = new newnewapi.SearchPostsRequest({
           query,
           paging: {
             limit: 20,
-            pageToken,
+            pageToken: pageToken ?? null,
           },
           sorting: postSorting,
           filters: activeTabs,
@@ -116,7 +117,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loadingPosts, postSorting, query]
+    [loadingPosts, postSorting, query, initialLoad, activeTabs]
   );
 
   const handleRemovePostFromState = (postUuid: string) => {
@@ -129,11 +130,8 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   };
 
   useEffect(() => {
-    if (!initialLoad) {
-      if (
-        router.query.sorting &&
-        postSorting !== newnewapi.PostSorting.MOST_FUNDED_FIRST
-      ) {
+    if (initialLoad) {
+      if (router.query.sorting) {
         switch (router.query.sorting) {
           case 'numberOfParticipants':
             setPostSorting(newnewapi.PostSorting.MOST_VOTED_FIRST);
@@ -148,33 +146,39 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
             setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
         }
       }
+    }
+  }, [initialLoad, router.query.sorting]);
+
+  useEffect(() => {
+    if (initialLoad) {
       if (router.query.filter) {
         const filters = (router.query.filter as string).split('-');
-        const arr: newnewapi.Post.Filter[] = [];
-        filters.forEach((filter) => {
-          switch (filter) {
-            case 'ac':
-              arr.push(newnewapi.Post.Filter.AUCTIONS);
-              break;
-            case 'mc':
-              arr.push(newnewapi.Post.Filter.MULTIPLE_CHOICES);
-              break;
-            case 'cf':
-              arr.push(newnewapi.Post.Filter.CROWDFUNDINGS);
-              break;
-            default:
-              arr.push(newnewapi.Post.Filter.ALL);
-          }
-          setActiveTabs(arr);
+
+        setActiveTabs(() => {
+          const arr: newnewapi.Post.Filter[] = [];
+
+          filters.forEach((filter) => {
+            switch (filter) {
+              case 'ac':
+                arr.push(newnewapi.Post.Filter.AUCTIONS);
+                break;
+              case 'mc':
+                arr.push(newnewapi.Post.Filter.MULTIPLE_CHOICES);
+                break;
+              case 'cf':
+                arr.push(newnewapi.Post.Filter.CROWDFUNDINGS);
+                break;
+              default:
+                arr.push(newnewapi.Post.Filter.ALL);
+            }
+          });
+          return arr;
         });
       } else {
         setActiveTabs([newnewapi.Post.Filter.ALL]);
       }
     }
-    if (!router.query.filter && activeTabs.length > 1)
-      setActiveTabs([newnewapi.Post.Filter.ALL]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialLoad, router]);
+  }, [initialLoad, router.query.filter]);
 
   useEffect(() => {
     if (query.length > 0) {
@@ -183,37 +187,6 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
-
-  useEffect(() => {
-    if (initialLoad) {
-      switch (activeFilter) {
-        case 'numberOfParticipants':
-          setPostSorting(newnewapi.PostSorting.MOST_VOTED_FIRST);
-          router.push({
-            pathname: '/search',
-            query: { ...router.query, sorting: 'numberOfParticipants' },
-          });
-          break;
-        case 'mostFunded':
-          setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
-          router.push({
-            pathname: '/search',
-            query: { ...router.query, sorting: 'mostFunded' },
-          });
-          break;
-        case 'newest':
-          setPostSorting(newnewapi.PostSorting.NEWEST_FIRST);
-          router.push({
-            pathname: '/search',
-            query: { ...router.query, sorting: 'newest' },
-          });
-          break;
-        default:
-          setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeFilter, initialLoad]);
 
   useEffect(() => {
     if (initialLoad) {
@@ -330,10 +303,34 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   const handleTypeChange = useCallback(
     (e: React.MouseEvent, id: string | undefined) => {
       /* eslint-disable no-unused-expressions */
-      id && setActiveFilter(id);
+      if (id && id !== activeFilter) {
+        setActiveFilter(id);
+        const routerArr: string[] = [];
+        activeTabs.forEach((filter) => {
+          switch (filter) {
+            case newnewapi.Post.Filter.AUCTIONS:
+              routerArr.push('ac');
+              break;
+            case newnewapi.Post.Filter.MULTIPLE_CHOICES:
+              routerArr.push('mc');
+              break;
+            case newnewapi.Post.Filter.CROWDFUNDINGS:
+              routerArr.push('cf');
+              break;
+          }
+        });
+        router.push({
+          pathname: '/search',
+          query: {
+            ...router.query,
+            sorting: id,
+            filter: routerArr.length > 0 ? routerArr.join('-') : '',
+          },
+        });
+      }
       setIsFilterOpened(false);
     },
-    []
+    [activeFilter, activeTabs, router]
   );
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {

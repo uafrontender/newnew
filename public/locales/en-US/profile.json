@@ -18,6 +18,12 @@
       "button-cancel": "Cancel",
       "button-confirm": "Block user"
     },
+    "unsubscribe-user": {
+      "title": "Unsubscribe from creator",
+      "message": "Do you really want to unsubscribe from {{username}}?",
+      "button-cancel": "Cancel",
+      "button-confirm": "Unsubscribe"
+    },
     "delete-my-account": {
       "title": "Delete my account",
       "body": "Are you sure you want to delete your account?\nYou won’t be able to access your account in the future\nand all of your history will be erased.",
@@ -32,7 +38,7 @@
     "subscriptions": "Subscriptions",
     "myposts": "My posts",
     "favorites": "Favorites",
-    "userInitial": "Creator's decisions",
+    "userInitial": "Posts",
     "activity": "Activity"
   },
   "posts-filter": {
@@ -112,6 +118,10 @@
     }
   },
   "Settings": {
+    "meta": {
+      "title": "NewNew Settings",
+      "description": "Customize your NewNew profile and settings"
+    },
     "heading": "Settings",
     "goBackBtn": "Back",
     "colorModeSwitch": {
@@ -217,6 +227,10 @@
     }
   },
   "MyPosts": {
+    "meta": {
+      "title": "My NewNew Posts",
+      "description": "Re-watch all of the posts you created on NewNew for the audience"
+    },
     "no-content": {
       "description": "Posts you created will be shown here"
     }
@@ -227,21 +241,37 @@
     }
   },
   "Purchases": {
+    "meta": {
+      "title": "My NewNew Purchases",
+      "description": "See what you buy on NewNew"
+    },
     "no-content": {
       "description": "Any purchases you make\nwill be shown here"
     }
   },
   "Viewing-history": {
+    "meta": {
+      "title": "NewNew History",
+      "description": "History of all posts you have ever visited on NewNew"
+    },
     "no-content": {
       "description": "All posts you previewed\nwill be kept here in your history"
     }
   },
   "Subscriptions": {
+    "meta": {
+      "title": "NewNew Subscriptions",
+      "description": "Edit name, username, bio, profile photo and more in NewNew settings"
+    },
     "no-content": {
       "description": "You’re not subscribed\nto any creators yet"
     }
   },
   "Favorites": {
+    "meta": {
+      "title": "NewNew Favorites",
+      "description": "Browse through all of your saved favorite posts, decisions and creators"
+    },
     "no-content": {
       "description": "Any creators you favorite\nwill be shown here"
     }
@@ -249,6 +279,13 @@
   "CreatorsDecisions": {
     "no-content": {
       "description": "Posts from the creator will be shown here"
+    }
+  },
+  "UserProfile": {
+    "no-content": {
+      "description": "{{username}} has no activity yet.",
+      "suggestion": "Explore what's new",
+      "button": "Explore"
     }
   },
   "Activity": {

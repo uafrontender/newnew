@@ -105,6 +105,26 @@ const assets = {
     subMC: `${APP_ASSETS_ORIGIN}/subscription/sub-MC.webp`,
     subVotes: `${APP_ASSETS_ORIGIN}/subscription/sub-votes.webp`,
   },
+  about: {
+    darkMedia1: `${APP_ASSETS_ORIGIN}/about/media-1-dark.png`,
+    darkMedia2: `${APP_ASSETS_ORIGIN}/about/media-2-dark.png`,
+    darkMedia3: `${APP_ASSETS_ORIGIN}/about/media-3-dark.png`,
+    darkMedia4: `${APP_ASSETS_ORIGIN}/about/media-4-dark.png`,
+    darkMedia5: `${APP_ASSETS_ORIGIN}/about/media-5-dark.png`,
+    darkMedia6: `${APP_ASSETS_ORIGIN}/about/media-6-dark.png`,
+    darkMedia7: `${APP_ASSETS_ORIGIN}/about/media-7-dark.png`,
+    darkMedia8: `${APP_ASSETS_ORIGIN}/about/media-8-dark.png`,
+    darkMedia9: `${APP_ASSETS_ORIGIN}/about/media-9-dark.png`,
+    lightMedia1: `${APP_ASSETS_ORIGIN}/about/media-1-light.png`,
+    lightMedia2: `${APP_ASSETS_ORIGIN}/about/media-2-light.png`,
+    lightMedia3: `${APP_ASSETS_ORIGIN}/about/media-3-light.png`,
+    lightMedia4: `${APP_ASSETS_ORIGIN}/about/media-4-light.png`,
+    lightMedia5: `${APP_ASSETS_ORIGIN}/about/media-5-light.png`,
+    lightMedia6: `${APP_ASSETS_ORIGIN}/about/media-6-light.png`,
+    lightMedia7: `${APP_ASSETS_ORIGIN}/about/media-7-light.png`,
+    lightMedia8: `${APP_ASSETS_ORIGIN}/about/media-8-light.png`,
+    lightMedia9: `${APP_ASSETS_ORIGIN}/about/media-9-light.png`,
+  },
 };
 
 export default assets;

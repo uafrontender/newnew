@@ -50,13 +50,15 @@ interface IPostTopInfo {
   postStatus: TPostStatusStringified;
   title: string;
   creator: newnewapi.IUser;
-  isFollowingDecisionInitial: boolean;
+  isFollowingDecision: boolean;
+  handleSetIsFollowingDecision: (newValue: boolean) => void;
   postType?: TPostType;
   totalVotes?: number;
   totalPledges?: number;
   targetPledges?: number;
   amountInBids?: number;
   hasWinner: boolean;
+  hasRecommendations: boolean;
   handleReportOpen: () => void;
   handleRemovePostFromState?: () => void;
   handleAddPostToState?: () => void;
@@ -67,13 +69,15 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   postStatus,
   title,
   creator,
-  isFollowingDecisionInitial,
+  isFollowingDecision,
+  handleSetIsFollowingDecision,
   postType,
   totalVotes,
   totalPledges,
   targetPledges,
   amountInBids,
   hasWinner,
+  hasRecommendations,
   handleReportOpen,
   handleRemovePostFromState,
   handleAddPostToState,
@@ -129,10 +133,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
   const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
-  const [isFollowingDecision, setIsFollowingDecision] = useState(
-    isFollowingDecisionInitial
-  );
-
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
@@ -165,7 +165,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       const res = await markPost(markAsFavoritePayload);
 
       if (!res.error) {
-        setIsFollowingDecision(!isFollowingDecision);
+        handleSetIsFollowingDecision(!isFollowingDecision);
 
         if (isFollowingDecision) {
           handleRemovePostFromState?.();
@@ -179,11 +179,24 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   }, [
     handleAddPostToState,
     handleRemovePostFromState,
+    handleSetIsFollowingDecision,
     isFollowingDecision,
     postId,
     router,
     user.loggedIn,
   ]);
+
+  const handleSeeNewFailedBox = useCallback(() => {
+    if (hasRecommendations) {
+      document.getElementById('post-modal-container')?.scrollTo({
+        top: document.getElementById('recommendations-section-heading')
+          ?.offsetTop,
+        behavior: 'smooth',
+      });
+    } else {
+      router.push(`/see-more?category=${postType}`);
+    }
+  }, [hasRecommendations, postType, router]);
 
   return (
     <SContainer>
@@ -314,13 +327,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
                 : DARK_IMAGES[postType]
               : undefined
           }
-          handleButtonClick={() => {
-            document.getElementById('post-modal-container')?.scrollTo({
-              top: document.getElementById('recommendations-section-heading')
-                ?.offsetTop,
-              behavior: 'smooth',
-            });
-          }}
+          handleButtonClick={handleSeeNewFailedBox}
         />
       )}
     </SContainer>

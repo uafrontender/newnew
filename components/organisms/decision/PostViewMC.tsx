@@ -43,6 +43,7 @@ import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
+import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
@@ -69,6 +70,9 @@ interface IPostViewMC {
   sessionId?: string;
   resetSessionId: () => void;
   postStatus: TPostStatusStringified;
+  isFollowingDecision: boolean;
+  hasRecommendations: boolean;
+  handleSetIsFollowingDecision: (newValue: boolean) => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
@@ -81,6 +85,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     post,
     postStatus,
     sessionId,
+    isFollowingDecision,
+    hasRecommendations,
+    handleSetIsFollowingDecision,
     resetSessionId,
     handleGoBack,
     handleUpdatePostStatus,
@@ -221,6 +228,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       post.canVoteForFree ?? false
     );
     const handleResetFreeVote = () => setHasFreeVote(false);
+
+    const [canSubscribe, setCanSubscribe] = useState(
+      post.creator?.options?.isOfferingSubscription
+    );
 
     // Options
     const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
@@ -383,6 +394,19 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       [setOptions, sortOptions]
     );
 
+    const handleRemoveOption = useCallback(
+      (optionToRemove: newnewapi.MultipleChoice.Option) => {
+        setOptions((curr) => {
+          const workingArr = [...curr];
+          const workingArrUnsorted = [
+            ...workingArr.filter((o) => o.id !== optionToRemove.id),
+          ];
+          return sortOptions(workingArrUnsorted);
+        });
+      },
+      [setOptions, sortOptions]
+    );
+
     const fetchPostLatestData = useCallback(async () => {
       setPostLoading(true);
       try {
@@ -401,6 +425,24 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
         setNumberOfOptions(res.data.multipleChoice?.optionCount as number);
         if (res.data.multipleChoice?.status)
           handleUpdatePostStatus(res.data.multipleChoice?.status);
+
+        if (user.loggedIn && post.creator?.options?.isOfferingSubscription) {
+          const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
+            creatorUuid: post.creator?.uuid,
+          });
+
+          const responseSubStatus = await getSubscriptionStatus(
+            getStatusPayload
+          );
+
+          if (
+            responseSubStatus.data?.status?.activeRenewsAt ||
+            responseSubStatus.data?.status?.activeCancelsAt
+          ) {
+            setCanSubscribe(false);
+          }
+        }
+
         setPostLoading(false);
       } catch (err) {
         console.error(err);
@@ -477,41 +519,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
         fetchAndSetWinningOption(post.winningOptionId as number);
       }
     }, [post.winningOptionId]);
-
-    useEffect(() => {
-      const makeVoteFromSessionId = async () => {
-        if (!sessionId) return;
-        try {
-          setLoadingModalOpen(true);
-          const payload = new newnewapi.FulfillPaymentPurposeRequest({
-            paymentSuccessUrl: `session_id=${sessionId}`,
-          });
-
-          const res = await voteOnPost(payload);
-
-          if (
-            !res.data ||
-            res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
-            res.error
-          )
-            throw new Error(res.error?.message ?? 'Request failed');
-
-          const optionFromResponse = res.data
-            .option as newnewapi.MultipleChoice.Option;
-          optionFromResponse.isSupportedByMe = true;
-          handleAddOrUpdateOptionFromResponse(optionFromResponse);
-          setLoadingModalOpen(false);
-          setPaymentSuccesModalOpen(true);
-        } catch (err) {
-          console.error(err);
-          setLoadingModalOpen(false);
-        }
-        resetSessionId();
-      };
-
-      makeVoteFromSessionId();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     useEffect(() => {
       const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -609,6 +616,44 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       sortOptions,
     ]);
 
+    useEffect(() => {
+      const makeVoteFromSessionId = async () => {
+        if (!sessionId) return;
+        try {
+          setLoadingModalOpen(true);
+          const payload = new newnewapi.FulfillPaymentPurposeRequest({
+            paymentSuccessUrl: `session_id=${sessionId}`,
+          });
+
+          const res = await voteOnPost(payload);
+
+          if (
+            !res.data ||
+            res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+            res.error
+          )
+            throw new Error(res.error?.message ?? 'Request failed');
+
+          const optionFromResponse = res.data
+            .option as newnewapi.MultipleChoice.Option;
+          optionFromResponse.isSupportedByMe = true;
+          handleAddOrUpdateOptionFromResponse(optionFromResponse);
+          setLoadingModalOpen(false);
+          handleResetFreeVote();
+          setPaymentSuccesModalOpen(true);
+        } catch (err) {
+          console.error(err);
+          setLoadingModalOpen(false);
+        }
+        resetSessionId();
+      };
+
+      if (socketConnection.active) {
+        makeVoteFromSessionId();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socketConnection.active, sessionId]);
+
     const goToNextStep = () => {
       if (
         user.userTutorialsProgress.remainingMcSteps &&
@@ -685,7 +730,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           totalVotes={totalVotes}
           hasWinner={false}
           creator={post.creator!!}
-          isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+          isFollowingDecision={isFollowingDecision}
+          hasRecommendations={hasRecommendations}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleReportOpen={handleReportOpen}
           handleRemovePostFromState={handleRemovePostFromState}
           handleAddPostToState={handleAddPostToState}
@@ -718,15 +765,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
                   ? Math.floor(appConstants?.mcVotePrice / 100)
                   : 1
               }
-              canSubscribe={
-                post.creator?.options?.isOfferingSubscription ?? false
-              }
+              canSubscribe={!!canSubscribe}
               canVoteForFree={hasFreeVote}
               handleLoadOptions={fetchOptions}
               handleResetFreeVote={handleResetFreeVote}
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
               }
+              handleRemoveOption={handleRemoveOption}
             />
           ) : currentTab === 'comments' && post.isCommentsAllowed ? (
             <CommentsTab
