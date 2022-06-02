@@ -21,7 +21,6 @@ const disallow = [
   '/forced_redirect_to_home',
   '/notifications',
   '/search',
-  '/see-more',
   '/sign-up-payment',
   '/subscription-success',
   '/test',
@@ -46,8 +45,8 @@ module.exports = {
       { userAgent: '*', allow: '/' },
     ],
   },
-  /*additionalSitemaps: [
+  additionalSitemaps: [
     `${process.env.NEXT_PUBLIC_APP_URL}/sitemap.xml`,
     `${process.env.NEXT_PUBLIC_APP_URL}/server-sitemap.xml`,
-  ],*/
+  ],
 };
