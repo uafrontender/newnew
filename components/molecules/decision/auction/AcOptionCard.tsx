@@ -438,7 +438,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               svg={MoreIcon}
               width='16px'
               height='16px'
-              fill={theme.colorsThemed.text.primary}
+              fill={isBlue ? '#FFFFFF' : theme.colorsThemed.text.primary}
             />
           </SEllipseButtonMobile>
         )}

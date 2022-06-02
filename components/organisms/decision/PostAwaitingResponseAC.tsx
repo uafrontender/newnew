@@ -359,11 +359,11 @@ const SPostTitle = styled(Headline)`
   margin-top: 8px;
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
-    height: 80px;
+    max-height: 96px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    height: 120px;
+    max-height: 120px;
   }
 `;
 

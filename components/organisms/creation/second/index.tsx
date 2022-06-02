@@ -806,6 +806,25 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       [videoProcessing, fileProcessing, dispatch]
     );
 
+    // Video processing fallback
+    useEffect(() => {
+      async function videoProcessingFallback(hlsUrl: string) {
+        const available = await waitResourceIsAvailable(hlsUrl, {
+          maxAttempts: 120,
+          retryTimeMs: 1000,
+        });
+
+        if (available) {
+          dispatch(setCreationFileProcessingLoading(false));
+        }
+      }
+
+      if (fileProcessing.loading && videoProcessing?.targetUrls?.hlsStreamUrl) {
+        videoProcessingFallback(videoProcessing?.targetUrls?.hlsStreamUrl);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [fileProcessing.loading, videoProcessing?.targetUrls?.hlsStreamUrl]);
+
     useEffect(() => {
       const func = async () => {
         if (validateTitleDebounced) {
