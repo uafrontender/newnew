@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
+import Head from 'next/head';
 
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
@@ -15,10 +16,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { SCROLL_EXPLORE } from '../../../constants/timings';
 
 import assets from '../../../constants/assets';
-import LargeAnimation from '../../atoms/LargeAnimation';
-
-const GRAPHICS_VERSION_STORAGE_KEY = 'graphics-version';
-type GraphicsVersion = 1 | 2 | 3 | 4 | 5;
+import AnimationChain from '../../atoms/AnimationChain';
 
 export const HeroSection = React.memo(() => {
   const router = useRouter();
@@ -29,17 +27,6 @@ export const HeroSection = React.memo(() => {
   const [animateTitle, setAnimateTitle] = useState(false);
   const [animateSubTitle, setAnimateSubTitle] = useState(false);
   const [animateButton, setAnimateButton] = useState(false);
-
-  const graphicsVersion = useRef<GraphicsVersion>(
-    parseInt(
-      localStorage.getItem(GRAPHICS_VERSION_STORAGE_KEY) || '1'
-    ) as GraphicsVersion
-  );
-  useEffect(() => {
-    const nextVersion =
-      graphicsVersion.current >= 5 ? 1 : graphicsVersion.current + 1;
-    localStorage.setItem(GRAPHICS_VERSION_STORAGE_KEY, nextVersion.toString());
-  }, []);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -85,100 +72,118 @@ export const HeroSection = React.memo(() => {
   }, []);
 
   return (
-    <SWrapper
-      layoutId='heroSection'
-      transition={{
-        ease: 'easeInOut',
-        duration: 1,
-      }}
-    >
-      <STopWrapper>
-        <SHeadline>
-          <AnimatedPresence
-            start={animateTitle}
-            animation='t-08'
-            delay={0.4}
-            onAnimationEnd={handleTitleAnimationEnd}
-          >
-            {t('hero-block-title')}
-          </AnimatedPresence>
-        </SHeadline>
-        <SSubTitle weight={600}>
-          <AnimatedPresence
-            start={animateSubTitle}
-            animation='t-02'
-            onAnimationEnd={handleSubTitleAnimationEnd}
-          >
-            {t('hero-block-subTitle')}
-          </AnimatedPresence>
-        </SSubTitle>
-        <AnimatedPresence start={animateButton} animation='t-01'>
-          <SButtonsHolder>
-            {isMobile ? (
-              <>
+    <>
+      <Head>
+        {/* We need to change page colors to fit landing page animation dark mode background */}
+        {theme.name === 'dark' && (
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+              body {
+                background-color: #090813 !important;
+              }
+      
+              #top-nav-header {
+                background-color: #090813 !important;
+              }
+
+              #top-nav-header-wrapper {
+                background-color: #090813 !important;
+              }`,
+            }}
+          />
+        )}
+      </Head>
+      <SWrapper
+        layoutId='heroSection'
+        transition={{
+          ease: 'easeInOut',
+          duration: 1,
+        }}
+      >
+        <STopWrapper>
+          <SHeadline>
+            <AnimatedPresence
+              start={animateTitle}
+              animation='t-08'
+              delay={0.4}
+              onAnimationEnd={handleTitleAnimationEnd}
+            >
+              {t('hero-block-title')}
+            </AnimatedPresence>
+          </SHeadline>
+          <SSubTitle weight={600}>
+            <AnimatedPresence
+              start={animateSubTitle}
+              animation='t-02'
+              onAnimationEnd={handleSubTitleAnimationEnd}
+            >
+              {t('hero-block-subTitle')}
+            </AnimatedPresence>
+          </SSubTitle>
+          <AnimatedPresence start={animateButton} animation='t-01'>
+            <SButtonsHolder>
+              {isMobile ? (
+                <>
+                  <SButton
+                    withDim
+                    withShrink
+                    view='secondary'
+                    onClick={handleSignInClick}
+                  >
+                    {t('hero-block-sign-in')}
+                  </SButton>
+                  <SButton
+                    withDim
+                    withShrink
+                    view='primaryGrad'
+                    onClick={handleExploreClick}
+                  >
+                    {t('hero-block-explore')}
+                  </SButton>
+                </>
+              ) : (
                 <SButton
-                  withDim
                   withShrink
-                  view='secondary'
-                  onClick={handleSignInClick}
-                >
-                  {t('hero-block-sign-in')}
-                </SButton>
-                <SButton
-                  withDim
-                  withShrink
+                  withShadow
                   view='primaryGrad'
                   onClick={handleExploreClick}
                 >
-                  {t('hero-block-explore')}
+                  {t('hero-block-explore-now')}
                 </SButton>
-              </>
-            ) : (
-              <SButton
-                withShrink
-                withShadow
-                view='primaryGrad'
-                onClick={handleExploreClick}
-              >
-                {t('hero-block-explore-now')}
-              </SButton>
-            )}
-          </SButtonsHolder>
-        </AnimatedPresence>
-      </STopWrapper>
-      {isMobile ? (
-        <SLargeAnimation
-          placeholderSrc={
-            theme.name === 'light'
-              ? assets.landing[graphicsVersion.current].lightMobileLandingStatic
-              : assets.landing[graphicsVersion.current].darkMobileLandingStatic
-          }
-          videoSrc={
-            theme.name === 'light'
-              ? assets.landing[graphicsVersion.current]
-                  .lightMobileLandingAnimated
-              : assets.landing[graphicsVersion.current]
-                  .darkMobileLandingAnimated
-          }
-        />
-      ) : (
-        <SLargeAnimation
-          placeholderSrc={
-            theme.name === 'light'
-              ? assets.landing[graphicsVersion.current]
-                  .lightDesktopLandingStatic
-              : assets.landing[graphicsVersion.current].darkDesktopLandingStatic
-          }
-          videoSrc={
-            theme.name === 'light'
-              ? assets.landing[graphicsVersion.current]
-                  .lightDesktopLandingAnimated
-              : assets.landing[graphicsVersion.current]
-                  .darkDesktopLandingAnimated
-          }
-        />
-      )}
-    </SWrapper>
+              )}
+            </SButtonsHolder>
+          </AnimatedPresence>
+        </STopWrapper>
+        {isMobile ? (
+          <SLargeAnimation
+            placeholderSrc={
+              theme.name === 'light'
+                ? assets.landing.lightMobileLandingStatic
+                : assets.landing.darkMobileLandingStatic
+            }
+            videoSrcList={
+              theme.name === 'light'
+                ? assets.landing.lightMobileLandingAnimated
+                : assets.landing.darkMobileLandingAnimated
+            }
+          />
+        ) : (
+          <SLargeAnimation
+            placeholderSrc={
+              theme.name === 'light'
+                ? assets.landing.lightDesktopLandingStatic
+                : assets.landing.darkDesktopLandingStatic
+            }
+            videoSrcList={
+              theme.name === 'light'
+                ? assets.landing.lightDesktopLandingAnimated
+                : assets.landing.darkDesktopLandingAnimated
+            }
+          />
+        )}
+      </SWrapper>
+    </>
   );
 });
 
@@ -271,7 +276,7 @@ const SButtonsHolder = styled.div`
   }
 `;
 
-const SLargeAnimation = styled(LargeAnimation)`
+const SLargeAnimation = styled(AnimationChain)`
   right: 18px;
   order: -1;
 
