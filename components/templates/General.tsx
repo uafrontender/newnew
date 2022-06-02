@@ -25,6 +25,8 @@ import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
 import { useNotifications } from '../../contexts/notificationsContext';
 import { useGetChats } from '../../contexts/chatContext';
+import ReportBugButton from '../molecules/ReportBugButton';
+import { usePostModalState } from '../../contexts/postModalContext';
 
 interface IGeneral {
   children: React.ReactNode;
@@ -41,6 +43,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const [cookies] = useCookies();
   const { unreadNotificationCount } = useNotifications();
   const { unreadCount } = useGetChats();
+  const { postOverlayOpen } = usePostModalState();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
 
@@ -139,6 +142,11 @@ export const General: React.FC<IGeneral> = (props) => {
     setIsOpenedChat(false);
   };
 
+  const chatButtonVisible =
+    withChat && user.userData?.options?.isOfferingSubscription;
+
+  const mobileNavigationVisible = isMobile && scrollDirection !== 'down';
+
   return (
     <ErrorBoundary>
       <SkeletonTheme
@@ -161,9 +169,7 @@ export const General: React.FC<IGeneral> = (props) => {
               }
             />
           </Head>
-          <Header
-            visible={!isMobile || (isMobile && scrollDirection !== 'down')}
-          />
+          <Header visible={!isMobile || mobileNavigationVisible} />
           <SContent>
             <Container
               {...(restrictMaxWidth
@@ -182,31 +188,33 @@ export const General: React.FC<IGeneral> = (props) => {
             collection={bottomNavigation}
             moreMenuMobileOpen={moreMenuMobileOpen}
             handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-            visible={isMobile && scrollDirection !== 'down'}
+            visible={mobileNavigationVisible}
           />
           <SortingContainer
             id='sorting-container'
             withCookie={cookies.accepted !== 'true'}
-            bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+            bottomNavigationVisible={mobileNavigationVisible}
           />
-          <CookieContainer
-            bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
-          >
+          <CookieContainer bottomNavigationVisible={mobileNavigationVisible}>
             <Cookie />
           </CookieContainer>
-          {withChat &&
-            isMobile &&
-            user.userData?.options?.isOfferingSubscription && (
-              <ChatContainer
-                bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
-              >
-                {!isOpenedChat ? (
-                  <FloatingMessages withCounter openChat={openChat} />
-                ) : (
-                  <MobileDashBoardChat closeChat={closeChat} />
-                )}
-              </ChatContainer>
-            )}
+          {chatButtonVisible && (
+            <ChatContainer bottomNavigationVisible={mobileNavigationVisible}>
+              {!isOpenedChat ? (
+                <FloatingMessages withCounter openChat={openChat} />
+              ) : (
+                <MobileDashBoardChat closeChat={closeChat} />
+              )}
+            </ChatContainer>
+          )}
+          <ReportBugButton
+            bottom={
+              (isMobile ? 24 : 16) +
+              (mobileNavigationVisible || postOverlayOpen ? 56 : 0) +
+              (chatButtonVisible ? 72 : 0)
+            }
+            right={4}
+          />
         </SWrapper>
       </SkeletonTheme>
     </ErrorBoundary>
