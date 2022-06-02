@@ -27,7 +27,7 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
       withBanner={!!banner.show}
     >
       <Banner />
-      <SContentWrapper>
+      <SContentWrapper id='top-nav-header-wrapper'>
         <Container noMaxContent>
           <Row>
             <Col>
@@ -76,5 +76,8 @@ const SContentWrapper = styled.div`
     content: '';
     z-index: -1;
     position: absolute;
+    background-color: ${(props) =>
+      props.theme.colorsThemed.background.backgroundHeader};
+    opacity: ${({ theme }) => (theme.name === 'dark' ? 0.7 : 1)};
   }
 `;

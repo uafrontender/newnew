@@ -86,6 +86,10 @@ export const HeroSection = React.memo(() => {
               #top-nav-header {
                 background-color: #090813 !important;
               }
+
+              #top-nav-header-wrapper {
+                background-color: #090813 !important;
+              }
       `,
             }}
           />
