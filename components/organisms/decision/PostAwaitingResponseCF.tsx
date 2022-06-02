@@ -357,7 +357,7 @@ const SActivitesContainer = styled.div`
     height: 728px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    /* justify-content: space-between; */
   }
 `;
 

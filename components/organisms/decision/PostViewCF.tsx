@@ -643,7 +643,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           handleAddPledgeFromResponse(
             res.data.pledge as newnewapi.Crowdfunding.Pledge
           );
+
           await fetchPostLatestData();
+
           setLoadingModalOpen(false);
           setPaymentSuccesModalOpen(true);
         } catch (err) {

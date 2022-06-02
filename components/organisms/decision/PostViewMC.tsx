@@ -638,6 +638,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             .option as newnewapi.MultipleChoice.Option;
           optionFromResponse.isSupportedByMe = true;
           handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+          await fetchPostLatestData();
+
           setLoadingModalOpen(false);
           handleResetFreeVote();
           setPaymentSuccesModalOpen(true);

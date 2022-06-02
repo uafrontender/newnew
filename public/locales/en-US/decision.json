@@ -307,7 +307,7 @@
         "title": "Time's up!",
         "body": "Auction ended. Now it's time for the creator to choose a winner. Stay tuned!"
       },
-      "in_bids": "in bids"
+      "in_bids": "in total bids"
     },
     "OptionsTab": {
       "me": "me",
@@ -361,7 +361,7 @@
   "McPost": {
     "PostTopInfo": {
       "vote": "vote",
-      "votes": "votes"
+      "votes": "total votes"
     },
     "paymentModalHeader": {
       "title": "{{ creator }}'s Superpoll",
