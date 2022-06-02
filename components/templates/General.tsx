@@ -210,7 +210,9 @@ export const General: React.FC<IGeneral> = (props) => {
           <ReportBugButton
             bottom={
               (isMobile ? 24 : 16) +
-              (mobileNavigationVisible || postOverlayOpen ? 56 : 0) +
+              (isMobile && (mobileNavigationVisible || postOverlayOpen)
+                ? 56
+                : 0) +
               (chatButtonVisible ? 72 : 0)
             }
             right={4}
