@@ -367,10 +367,14 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
   return (
     <>
       <Head>
-        <title>{t(`search.meta.title-${router?.query?.category}`)}</title>
+        <title>
+          {t(`search.meta.title-${router?.query?.category || 'ac'}`)}
+        </title>
         <meta
           name='description'
-          content={t(`search.meta.description-${router?.query?.category}`)}
+          content={t(
+            `search.meta.description-${router?.query?.category || 'ac'}`
+          )}
         />
       </Head>
       {topSectionCollection.length > 0 && (
