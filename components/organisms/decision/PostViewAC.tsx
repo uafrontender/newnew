@@ -502,7 +502,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             setWinningOption(res.data.option as newnewapi.Auction.Option);
           }
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       }
 
@@ -628,6 +628,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             .option as newnewapi.Auction.Option;
           optionFromResponse.isSupportedByMe = true;
           handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+          await fetchPostLatestData();
 
           setLoadingModalOpen(false);
           setPaymentSuccesModalOpen(true);

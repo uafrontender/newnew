@@ -358,8 +358,8 @@ const SWrapper = styled.div<{
   display: grid;
 
   grid-template-areas:
-    'title title title'
     'userCard userCard actions'
+    'title title title'
     'stats stats stats';
   height: fit-content;
 
@@ -382,7 +382,7 @@ const SWrapper = styled.div<{
               'title title title';
           `}
     grid-template-rows: 40px;
-    grid-template-columns: 1fr 1fr 100px;
+    grid-template-columns: min-content 1fr 100px;
     align-items: center;
 
     margin-bottom: 0px;
@@ -396,6 +396,14 @@ const SPostTitle = styled.div`
 
   display: flex;
   align-items: center;
+
+  margin-top: 8px;
+  margin-bottom: 12px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: initial;
+    margin-bottom: initial;
+  }
 
   ${({ theme }) => theme.media.laptop} {
     min-height: 64px;
@@ -414,6 +422,8 @@ const CreatorCard = styled.div`
   height: 36px;
 
   cursor: pointer;
+
+  padding-right: 8px;
 
   & > div:nth-child(2) {
     transition: 0.2s linear;
@@ -509,7 +519,7 @@ const SBidsAmount = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: initial;
-    justify-self: flex-end;
+    justify-self: flex-start;
   }
 `;
 
