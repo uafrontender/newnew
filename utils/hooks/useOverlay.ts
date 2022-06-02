@@ -18,6 +18,7 @@ export const useOverlay = (ref: any) => {
         overflow: hidden;
         position: fixed;
      `;
+
     } else {
       // eslint-disable-next-line no-param-reassign
       ref.current.style.cssText = `
