@@ -587,7 +587,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                     title={t('tutorials.mc.supportPeopleBids.title')}
                     text={t('tutorials.mc.supportPeopleBids.text')}
                     dotPosition={
-                      theme.media.mobile
+                      isMobile
                         ? DotPositionEnum.BottomLeft
                         : DotPositionEnum.TopRight
                     }
@@ -633,7 +633,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                     title={t('tutorials.mc.supportPeopleBids.title')}
                     text={t('tutorials.mc.supportPeopleBids.text')}
                     dotPosition={
-                      theme.media.mobile
+                      isMobile
                         ? DotPositionEnum.BottomLeft
                         : DotPositionEnum.TopRight
                     }
