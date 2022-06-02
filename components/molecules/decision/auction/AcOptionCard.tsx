@@ -574,7 +574,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 title={t('tutorials.ac.supportPeopleBids.title')}
                 text={t('tutorials.ac.supportPeopleBids.text')}
                 dotPosition={
-                  theme.media.mobile
+                  isMobile
                     ? DotPositionEnum.BottomLeft
                     : DotPositionEnum.TopRight
                 }
