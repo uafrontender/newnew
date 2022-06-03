@@ -7,6 +7,7 @@ interface IToggleVideoWidget {
   currentTab: 'announcement' | 'response';
   responseUploaded: boolean;
   disabled?: boolean;
+  wrapperCSS?: React.CSSProperties;
   handleChangeTab: (tab: 'announcement' | 'response') => void;
 }
 
@@ -14,12 +15,16 @@ const ToggleVideoWidget: React.FunctionComponent<IToggleVideoWidget> = ({
   currentTab,
   responseUploaded,
   disabled,
+  wrapperCSS,
   handleChangeTab,
 }) => {
   const { t } = useTranslation('decision');
 
   return (
-    <SToggleVideoWidget>
+    <SToggleVideoWidget
+      id='toggle-video-widget'
+      style={{ ...(wrapperCSS || {}) }}
+    >
       {!responseUploaded ? (
         <SWrapper>
           <STabBtn
@@ -52,6 +57,7 @@ const ToggleVideoWidget: React.FunctionComponent<IToggleVideoWidget> = ({
 
 ToggleVideoWidget.defaultProps = {
   disabled: false,
+  wrapperCSS: {},
 };
 
 export default ToggleVideoWidget;
