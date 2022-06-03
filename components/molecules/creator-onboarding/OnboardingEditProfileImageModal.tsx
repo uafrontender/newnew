@@ -235,7 +235,7 @@ const SEditPictureMenu = styled(motion.div)`
 
   ${({ theme }) => theme.media.tablet} {
     position: absolute;
-    top: 136px;
+    top: min(15vh, 136px);
     left: calc(50% - 232px);
 
     width: 464px;
