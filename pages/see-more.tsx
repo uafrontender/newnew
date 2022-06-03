@@ -376,6 +376,16 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
             `search.meta.description-${router?.query?.category || 'ac'}`
           )}
         />
+        <meta
+          property='og:title'
+          content={t(`search.meta.title-${router?.query?.category || 'ac'}`)}
+        />
+        <meta
+          property='og:description'
+          content={t(
+            `search.meta.description-${router?.query?.category || 'ac'}`
+          )}
+        />
       </Head>
       {topSectionCollection.length > 0 && (
         <TopSection

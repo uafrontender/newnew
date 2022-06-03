@@ -61,6 +61,11 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
           name='description'
           content={t('Subscriptions.meta.description')}
         />
+        <meta property='og:title' content={t('Subscriptions.meta.title')} />
+        <meta
+          property='og:description'
+          content={t('Subscriptions.meta.description')}
+        />
       </Head>
       <SMain>
         <SCardsSection>
