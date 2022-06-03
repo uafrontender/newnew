@@ -25,6 +25,11 @@ export const Dashboard = () => {
       <Head>
         <title>{t('dashboard.meta.title')}</title>
         <meta name='description' content={t('dashboard.meta.description')} />
+        <meta property='og:title' content={t('dashboard.meta.title')} />
+        <meta
+          property='og:description'
+          content={t('dashboard.meta.description')}
+        />
       </Head>
       <Content />
     </>
