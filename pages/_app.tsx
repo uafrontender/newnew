@@ -1,8 +1,15 @@
 /* eslint-disable no-underscore-dangle */
-import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
+import React, {
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import App from 'next/app';
 import Head from 'next/head';
-import { useStore } from 'react-redux';
+import { Provider, useStore } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
@@ -70,6 +77,51 @@ const MyApp = (props: IMyApp): ReactElement => {
   const store = useStore();
   const user = useAppSelector((state) => state.user);
 
+  // Shared layouts
+  const getLayout = useMemo(
+    () => Component.getLayout ?? ((page: any) => page),
+    [Component.getLayout]
+  );
+
+  const renderAppContent = useCallback(
+    () => (
+      <SyncUserWrapper>
+        <NotificationsProvider>
+          <BlockedUsersProvider>
+            <FollowingsContextProvider>
+              {/* <WalletContextProvider> */}
+              <SubscriptionsProvider>
+                <ChatsProvider>
+                  <ResizeMode>
+                    <PostModalContextProvider>
+                      <GlobalTheme>
+                        <div>
+                          <ToastContainer />
+                          <VideoProcessingWrapper>
+                            {!pageProps.error ? (
+                              getLayout(<Component {...pageProps} />)
+                            ) : (
+                              <Error
+                                title={pageProps.error?.message}
+                                statusCode={pageProps.error?.statusCode ?? 500}
+                              />
+                            )}
+                          </VideoProcessingWrapper>
+                        </div>
+                      </GlobalTheme>
+                    </PostModalContextProvider>
+                  </ResizeMode>
+                </ChatsProvider>
+              </SubscriptionsProvider>
+              {/* </WalletContextProvider> */}
+            </FollowingsContextProvider>
+          </BlockedUsersProvider>
+        </NotificationsProvider>
+      </SyncUserWrapper>
+    ),
+    [Component, getLayout, pageProps]
+  );
+
   // Pre-fetch images after all loading for initial page is done
   const [preFetchImages, setPreFetchImages] = useState<string>('');
   const PRE_FETCHING_DELAY = 2500;
@@ -125,8 +177,32 @@ const MyApp = (props: IMyApp): ReactElement => {
     }
   }, [user.userData?.username]);
 
-  // Shared layouts
-  const getLayout = Component.getLayout ?? ((page) => page);
+  if (typeof window === undefined) {
+    return (
+      <>
+        <Head>
+          <meta charSet='utf-8' />
+          <meta
+            name='viewport'
+            content='width=device-width, initial-scale=1, user-scalable=no'
+          />
+          <meta property='og:image' content={assets.openGraphImage.common} />
+          {preFetchImages !== '' && PRE_FETCH_LINKS_COMMON}
+          {preFetchImages === 'dark' && PRE_FETCH_LINKS_DARK}
+          {preFetchImages === 'light' && PRE_FETCH_LINKS_LIGHT}
+        </Head>
+        <CookiesProvider cookies={cookiesInstance}>
+          <AppConstantsContextProvider>
+            <SocketContextProvider>
+              <ChannelsContextProvider>
+                <Provider store={store}>{renderAppContent()}</Provider>
+              </ChannelsContextProvider>
+            </SocketContextProvider>
+          </AppConstantsContextProvider>
+        </CookiesProvider>
+      </>
+    );
+  }
 
   return (
     <>
@@ -150,41 +226,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                 loading={null}
                 persistor={(store as EnhancedStoreWithPersistor).__persistor}
               >
-                <SyncUserWrapper>
-                  <NotificationsProvider>
-                    <BlockedUsersProvider>
-                      <FollowingsContextProvider>
-                        {/* <WalletContextProvider> */}
-                        <SubscriptionsProvider>
-                          <ChatsProvider>
-                            <ResizeMode>
-                              <PostModalContextProvider>
-                                <GlobalTheme>
-                                  <div>
-                                    <ToastContainer />
-                                    <VideoProcessingWrapper>
-                                      {!pageProps.error ? (
-                                        getLayout(<Component {...pageProps} />)
-                                      ) : (
-                                        <Error
-                                          title={pageProps.error?.message}
-                                          statusCode={
-                                            pageProps.error?.statusCode ?? 500
-                                          }
-                                        />
-                                      )}
-                                    </VideoProcessingWrapper>
-                                  </div>
-                                </GlobalTheme>
-                              </PostModalContextProvider>
-                            </ResizeMode>
-                          </ChatsProvider>
-                        </SubscriptionsProvider>
-                        {/* </WalletContextProvider> */}
-                      </FollowingsContextProvider>
-                    </BlockedUsersProvider>
-                  </NotificationsProvider>
-                </SyncUserWrapper>
+                {renderAppContent()}
               </PersistGate>
             </ChannelsContextProvider>
           </SocketContextProvider>
