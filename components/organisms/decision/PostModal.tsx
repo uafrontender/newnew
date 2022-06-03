@@ -891,6 +891,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               name='description'
               content={t(`meta.${typeOfPost}.description`)}
             />
+            <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
+            <meta
+              property='og:description'
+              content={t(`meta.${typeOfPost}.description`)}
+            />
           </Head>
           <SPostSuccessWaitingControlsDiv onClick={(e) => e.stopPropagation()}>
             <SWaitingSuccessControlsBtn
