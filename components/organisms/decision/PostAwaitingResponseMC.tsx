@@ -367,7 +367,7 @@ const SActivitesContainer = styled.div`
     height: 728px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    /* justify-content: space-between; */
   }
 `;
 
@@ -383,7 +383,7 @@ const SMainSectionWrapper = styled.div`
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start\;;
+    justify-content: flex-start;
   }
 `;
 

@@ -32,6 +32,8 @@ const VerifyEmail = () => {
       <Head>
         <title>{t('meta.title')}</title>
         <meta name='description' content={t('meta.description')} />
+        <meta property='og:title' content={t('meta.title')} />
+        <meta property='og:description' content={t('meta.description')} />
       </Head>
       <motion.div
         initial={{

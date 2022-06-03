@@ -62,7 +62,6 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVo
             rect.bottom <=
             (window.innerHeight || document.documentElement?.clientHeight);
 
-          console.log(isInViewPort);
           if (!isInViewPort) {
             setBottom(24);
           }

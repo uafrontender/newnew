@@ -108,7 +108,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     [option.isSupportedByMe]
   );
   const isMyBid = useMemo(
-    () => option.creator?.uuid === user.userData?.userUuid,
+    () =>
+      !!option.creator?.uuid &&
+      option.creator?.uuid === user.userData?.userUuid,
     [option.creator?.uuid, user.userData?.userUuid]
   );
   const isBlue = useMemo(
@@ -438,7 +440,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               svg={MoreIcon}
               width='16px'
               height='16px'
-              fill={theme.colorsThemed.text.primary}
+              fill={isBlue ? '#FFFFFF' : theme.colorsThemed.text.primary}
             />
           </SEllipseButtonMobile>
         )}
@@ -477,7 +479,37 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             {option.title}
           </SOptionInfo>
           <SBiddersInfo onClick={(e) => e.preventDefault()} variant={3}>
-            <Link href={`/${option.creator?.username}`}>
+            {option.creator?.username ? (
+              <Link href={`/${option.creator?.username}`}>
+                <SSpanBiddersHighlighted
+                  className='spanHighlighted'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  style={{
+                    ...(!isMyBid && option.isCreatedBySubscriber
+                      ? {
+                          color:
+                            theme.name === 'dark'
+                              ? theme.colorsThemed.accent.yellow
+                              : theme.colors.dark,
+                        }
+                      : {}),
+                    ...(!isMyBid
+                      ? {
+                          cursor: 'pointer',
+                        }
+                      : {}),
+                  }}
+                >
+                  {isMyBid
+                    ? option.supporterCount > 2
+                      ? t('me')
+                      : t('my')
+                    : getDisplayname(option.creator!!)}
+                </SSpanBiddersHighlighted>
+              </Link>
+            ) : (
               <SSpanBiddersHighlighted
                 className='spanHighlighted'
                 onClick={(e) => {
@@ -492,11 +524,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                             : theme.colors.dark,
                       }
                     : {}),
-                  ...(!isMyBid
-                    ? {
-                        cursor: 'pointer',
-                      }
-                    : {}),
                 }}
               >
                 {isMyBid
@@ -505,7 +532,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                     : t('my')
                   : getDisplayname(option.creator!!)}
               </SSpanBiddersHighlighted>
-            </Link>
+            )}
             {isSupportedByMe && !isMyBid ? (
               <SSpanBiddersHighlighted className='spanHighlighted'>{`, ${t(
                 'me'

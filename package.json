@@ -25,6 +25,7 @@
     "@sentry/browser": "^6.19.7",
     "@sentry/integrations": "^6.19.7",
     "@sentry/nextjs": "^6.19.7",
+    "@sentry/react": "^7.0.0",
     "bitmovin-player": "8.76.0",
     "date-fns": "2.27.0",
     "framer-motion": "5.5.5",

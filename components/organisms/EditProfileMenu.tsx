@@ -734,7 +734,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     >
       <AnimatePresence>
         {stage === 'edit-general' ? (
-          <motion.div
+          <SEditProfileGeneral
             key='edit-general'
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -755,91 +755,95 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 />
               </SGoBackButtonDesktop>
             )}
-            <SImageInputsWrapper>
-              <ProfileBackgroundInput
-                originalPictureUrl={user?.userData?.coverUrl ?? ''}
-                pictureInEditUrl={coverUrlInEdit ?? ''}
-                coverUrlInEditAnimated={coverUrlInEditAnimated}
-                crop={cropCoverImage}
-                zoom={zoomCoverImage}
-                initialObjectFit={coverImageInitialObjectFit}
-                disabled={isLoading}
-                handleSetPictureInEdit={handleSetBackgroundPictureInEdit}
-                handleUnsetPictureInEdit={handleUnsetPictureInEdit}
-                onCropChange={handleCoverImageCropChange}
-                onCropComplete={onCropCompleteCoverImage}
-                onZoomChange={setZoomCoverImage}
-              />
-              <ProfileImageInput
-                publicUrl={avatarUrlInEdit || user.userData?.avatarUrl!!}
-                disabled={isLoading}
-                handleImageInputChange={handleSetProfilePictureInEdit}
-              />
-            </SImageInputsWrapper>
-            <STextInputsWrapper>
-              <NicknameInput
-                type='text'
-                value={dataInEdit.nickname as string}
-                disabled={isLoading}
-                placeholder={t('EditProfileMenu.inputs.nickname.placeholder')}
-                errorCaption={t(
-                  `EditProfileMenu.inputs.nickname.errors.${formErrors.nicknameError}`
-                )}
-                isValid={!formErrors.nicknameError}
-                onChange={(e) =>
-                  handleUpdateDataInEdit('nickname', e.target.value)
-                }
-              />
-              <UsernameInput
-                type='text'
-                value={dataInEdit.username}
-                disabled={isLoading}
-                popupCaption={
-                  <UsernamePopupList
-                    points={[
-                      {
-                        text: t('EditProfileMenu.inputs.username.points.1'),
-                        isValid: dataInEdit.username
-                          ? dataInEdit.username.length >= 2 &&
-                            dataInEdit.username.length <= 25
-                          : false,
-                      },
-                      {
-                        text: t('EditProfileMenu.inputs.username.points.2'),
-                        isValid: dataInEdit.username
-                          ? validator.isLowercase(dataInEdit.username)
-                          : false,
-                      },
-                      {
-                        text: t('EditProfileMenu.inputs.username.points.3'),
-                        isValid: dataInEdit.username
-                          ? validator.isAlphanumeric(dataInEdit.username)
-                          : false,
-                      },
-                    ]}
-                  />
-                }
-                errorCaption={t(
-                  `EditProfileMenu.inputs.username.errors.${formErrors.usernameError}`
-                )}
-                placeholder={t('EditProfileMenu.inputs.username.placeholder')}
-                isValid={!formErrors.usernameError}
-                onChange={(value) => {
-                  handleUpdateDataInEdit('username', value);
-                }}
-              />
-              <BioTextarea
-                maxChars={150}
-                value={dataInEdit.bio}
-                disabled={isLoading}
-                placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
-                errorCaption={t(
-                  `EditProfileMenu.inputs.bio.errors.${formErrors.bioError}`
-                )}
-                isValid={!formErrors.bioError}
-                onChange={(e) => handleUpdateDataInEdit('bio', e.target.value)}
-              />
-            </STextInputsWrapper>
+            <ProfileGeneralContent>
+              <SImageInputsWrapper>
+                <ProfileBackgroundInput
+                  originalPictureUrl={user?.userData?.coverUrl ?? ''}
+                  pictureInEditUrl={coverUrlInEdit ?? ''}
+                  coverUrlInEditAnimated={coverUrlInEditAnimated}
+                  crop={cropCoverImage}
+                  zoom={zoomCoverImage}
+                  initialObjectFit={coverImageInitialObjectFit}
+                  disabled={isLoading}
+                  handleSetPictureInEdit={handleSetBackgroundPictureInEdit}
+                  handleUnsetPictureInEdit={handleUnsetPictureInEdit}
+                  onCropChange={handleCoverImageCropChange}
+                  onCropComplete={onCropCompleteCoverImage}
+                  onZoomChange={setZoomCoverImage}
+                />
+                <ProfileImageInput
+                  publicUrl={avatarUrlInEdit || user.userData?.avatarUrl!!}
+                  disabled={isLoading}
+                  handleImageInputChange={handleSetProfilePictureInEdit}
+                />
+              </SImageInputsWrapper>
+              <STextInputsWrapper>
+                <NicknameInput
+                  type='text'
+                  value={dataInEdit.nickname as string}
+                  disabled={isLoading}
+                  placeholder={t('EditProfileMenu.inputs.nickname.placeholder')}
+                  errorCaption={t(
+                    `EditProfileMenu.inputs.nickname.errors.${formErrors.nicknameError}`
+                  )}
+                  isValid={!formErrors.nicknameError}
+                  onChange={(e) =>
+                    handleUpdateDataInEdit('nickname', e.target.value)
+                  }
+                />
+                <UsernameInput
+                  type='text'
+                  value={dataInEdit.username}
+                  disabled={isLoading}
+                  popupCaption={
+                    <UsernamePopupList
+                      points={[
+                        {
+                          text: t('EditProfileMenu.inputs.username.points.1'),
+                          isValid: dataInEdit.username
+                            ? dataInEdit.username.length >= 2 &&
+                              dataInEdit.username.length <= 25
+                            : false,
+                        },
+                        {
+                          text: t('EditProfileMenu.inputs.username.points.2'),
+                          isValid: dataInEdit.username
+                            ? validator.isLowercase(dataInEdit.username)
+                            : false,
+                        },
+                        {
+                          text: t('EditProfileMenu.inputs.username.points.3'),
+                          isValid: dataInEdit.username
+                            ? validator.isAlphanumeric(dataInEdit.username)
+                            : false,
+                        },
+                      ]}
+                    />
+                  }
+                  errorCaption={t(
+                    `EditProfileMenu.inputs.username.errors.${formErrors.usernameError}`
+                  )}
+                  placeholder={t('EditProfileMenu.inputs.username.placeholder')}
+                  isValid={!formErrors.usernameError}
+                  onChange={(value) => {
+                    handleUpdateDataInEdit('username', value);
+                  }}
+                />
+                <BioTextarea
+                  maxChars={150}
+                  value={dataInEdit.bio}
+                  disabled={isLoading}
+                  placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
+                  errorCaption={t(
+                    `EditProfileMenu.inputs.bio.errors.${formErrors.bioError}`
+                  )}
+                  isValid={!formErrors.bioError}
+                  onChange={(e) =>
+                    handleUpdateDataInEdit('bio', e.target.value)
+                  }
+                />
+              </STextInputsWrapper>
+            </ProfileGeneralContent>
             <SControlsWrapper>
               {!isMobile ? (
                 <Button view='secondary' onClick={() => handleClose()}>
@@ -860,7 +864,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 {t('EditProfileMenu.saveButton')}
               </Button>
             </SControlsWrapper>
-          </motion.div>
+          </SEditProfileGeneral>
         ) : (
           <SEditProfilePicture
             key='edit-picture'
@@ -887,55 +891,57 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 />
               </SGoBackButtonDesktop>
             )}
-            <ProfileImageCropper
-              crop={cropProfileImage}
-              zoom={zoomProfileImage}
-              avatarUrlInEdit={avatarUrlInEdit}
-              originalImageWidth={originalProfileImageWidth}
-              disabled={updateProfileImageLoading}
-              onCropChange={setCropProfileImage}
-              onCropComplete={onCropCompleteProfileImage}
-              onZoomChange={setZoomProfileImage}
-            />
-            <SSliderWrapper>
-              <Button
-                iconOnly
-                size='sm'
-                view='transparent'
-                disabled={zoomProfileImage <= 1 || updateProfileImageLoading}
-                onClick={handleZoomOutProfileImage}
-              >
-                <InlineSvg
-                  svg={ZoomOutIcon}
-                  fill={theme.colorsThemed.text.primary}
-                  width='24px'
-                  height='24px'
-                />
-              </Button>
-              <ProfileImageZoomSlider
-                value={zoomProfileImage}
-                min={1}
-                max={3}
-                step={0.1}
-                ariaLabel='Zoom'
+            <ProfilePictureContent>
+              <ProfileImageCropper
+                crop={cropProfileImage}
+                zoom={zoomProfileImage}
+                avatarUrlInEdit={avatarUrlInEdit}
+                originalImageWidth={originalProfileImageWidth}
                 disabled={updateProfileImageLoading}
-                onChange={(e) => setZoomProfileImage(Number(e.target.value))}
+                onCropChange={setCropProfileImage}
+                onCropComplete={onCropCompleteProfileImage}
+                onZoomChange={setZoomProfileImage}
               />
-              <Button
-                iconOnly
-                size='sm'
-                view='transparent'
-                disabled={zoomProfileImage >= 3 || updateProfileImageLoading}
-                onClick={handleZoomInProfileImage}
-              >
-                <InlineSvg
-                  svg={ZoomInIcon}
-                  fill={theme.colorsThemed.text.primary}
-                  width='24px'
-                  height='24px'
+              <SSliderWrapper>
+                <Button
+                  iconOnly
+                  size='sm'
+                  view='transparent'
+                  disabled={zoomProfileImage <= 1 || updateProfileImageLoading}
+                  onClick={handleZoomOutProfileImage}
+                >
+                  <InlineSvg
+                    svg={ZoomOutIcon}
+                    fill={theme.colorsThemed.text.primary}
+                    width='24px'
+                    height='24px'
+                  />
+                </Button>
+                <ProfileImageZoomSlider
+                  value={zoomProfileImage}
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  ariaLabel='Zoom'
+                  disabled={updateProfileImageLoading}
+                  onChange={(e) => setZoomProfileImage(Number(e.target.value))}
                 />
-              </Button>
-            </SSliderWrapper>
+                <Button
+                  iconOnly
+                  size='sm'
+                  view='transparent'
+                  disabled={zoomProfileImage >= 3 || updateProfileImageLoading}
+                  onClick={handleZoomInProfileImage}
+                >
+                  <InlineSvg
+                    svg={ZoomInIcon}
+                    fill={theme.colorsThemed.text.primary}
+                    width='24px'
+                    height='24px'
+                  />
+                </Button>
+              </SSliderWrapper>
+            </ProfilePictureContent>
             <SControlsWrapperPicture>
               <Button
                 view='secondary'
@@ -1004,7 +1010,7 @@ const SEditProfileMenu = styled(motion.div)`
 
   ${({ theme }) => theme.media.tablet} {
     position: absolute;
-    top: 136px;
+    top: min(15vh, 136px);
     left: calc(50% - 232px);
 
     width: 464px;
@@ -1020,6 +1026,16 @@ const SEditProfileMenu = styled(motion.div)`
 
     width: 480px;
   }
+`;
+
+const SEditProfileGeneral = styled(motion.div)`
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ProfileGeneralContent = styled.div`
+  overflow-y: auto;
 `;
 
 const SGoBackButtonMobile = styled(GoBackButton)`
@@ -1068,6 +1084,11 @@ const STextInputsWrapper = styled.div`
     padding-left: 24px;
     padding-right: 24px;
   }
+`;
+
+const ProfilePictureContent = styled.div`
+  overflow-y: auto;
+  padding: 0 20px;
 `;
 
 const SSliderWrapper = styled.div`
