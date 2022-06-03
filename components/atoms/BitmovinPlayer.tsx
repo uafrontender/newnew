@@ -270,7 +270,7 @@ const SImageBG = styled.img<ISVideoWrapper>`
   height: 100%;
   object-fit: cover;
   border-radius: ${(props) => props.borderRadius};
-  transform: scale(1.1);
+  /* transform: scale(1.1); */
 
   @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
     filter: blur(32px);
