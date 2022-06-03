@@ -555,41 +555,6 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
     }, [standardPledgeAmounts]);
 
     useEffect(() => {
-      const makePledgeFromSessionId = async () => {
-        if (!sessionId) return;
-        try {
-          setLoadingModalOpen(true);
-          const payload = new newnewapi.FulfillPaymentPurposeRequest({
-            paymentSuccessUrl: `session_id=${sessionId}`,
-          });
-
-          const res = await doPledgeCrowdfunding(payload);
-
-          if (
-            !res.data ||
-            res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS ||
-            res.error
-          )
-            throw new Error(res.error?.message ?? 'Request failed');
-
-          handleAddPledgeFromResponse(
-            res.data.pledge as newnewapi.Crowdfunding.Pledge
-          );
-          await fetchPostLatestData();
-          setLoadingModalOpen(false);
-          setPaymentSuccesModalOpen(true);
-        } catch (err) {
-          console.error(err);
-          setLoadingModalOpen(false);
-        }
-        resetSessionId();
-      };
-
-      makePledgeFromSessionId();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
       const socketHandlerPledgeCreated = (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.CfPledgeCreated.decode(arr);
@@ -656,6 +621,45 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socketConnection, post, setPledges, sortPleges]);
+
+    useEffect(() => {
+      const makePledgeFromSessionId = async () => {
+        if (!sessionId) return;
+        try {
+          setLoadingModalOpen(true);
+          const payload = new newnewapi.FulfillPaymentPurposeRequest({
+            paymentSuccessUrl: `session_id=${sessionId}`,
+          });
+
+          const res = await doPledgeCrowdfunding(payload);
+
+          if (
+            !res.data ||
+            res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS ||
+            res.error
+          )
+            throw new Error(res.error?.message ?? 'Request failed');
+
+          handleAddPledgeFromResponse(
+            res.data.pledge as newnewapi.Crowdfunding.Pledge
+          );
+
+          await fetchPostLatestData();
+
+          setLoadingModalOpen(false);
+          setPaymentSuccesModalOpen(true);
+        } catch (err) {
+          console.error(err);
+          setLoadingModalOpen(false);
+        }
+        resetSessionId();
+      };
+
+      if (socketConnection.active) {
+        makePledgeFromSessionId();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socketConnection.active, sessionId]);
 
     useEffect(() => {
       const workingAmount = pledges

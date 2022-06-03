@@ -1016,6 +1016,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             name='description'
             content={t(`meta.${typeOfPost}.description`)}
           />
+          <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
+          <meta
+            property='og:description'
+            content={t(`meta.${typeOfPost}.description`)}
+          />
         </Head>
         {!isMobile && (
           <SGoBackButtonDesktop
@@ -1175,12 +1180,16 @@ const SPostModalContainer = styled.div<{
   left: 0;
 
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 1;
+  overscroll-behavior: none;
 
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
   padding: 16px;
+  padding-bottom: 86px;
 
   /* No select */
   -webkit-touch-callout: none;
@@ -1202,6 +1211,8 @@ const SPostModalContainer = styled.div<{
     /*transform: none; */
     /* top: 50%; */
     /* transform: translateY(-50%); */
+    padding-bottom: 16px;
+
     background-color: ${({ theme }) =>
       theme.name === 'dark'
         ? theme.colorsThemed.background.secondary
@@ -1229,6 +1240,7 @@ const SPostModalContainer = styled.div<{
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 24px;
+    padding-bottom: 24px;
 
     ${({ isMyPost }) =>
       isMyPost

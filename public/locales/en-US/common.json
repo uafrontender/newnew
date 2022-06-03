@@ -57,6 +57,7 @@
   "selected-currency-title-eur": "EUR",
   "cookie-text": "We use",
   "cookie-link": "Learn more",
+  "report-bug": "Report a bug",
   "error": {
     "text": {
       "min": "Text is too short, min {{value}} characters",

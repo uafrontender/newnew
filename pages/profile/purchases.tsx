@@ -143,6 +143,11 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({
       <Head>
         <title>{t('Purchases.meta.title')}</title>
         <meta name='description' content={t('Purchases.meta.description')} />
+        <meta property='og:title' content={t('Purchases.meta.title')} />
+        <meta
+          property='og:description'
+          content={t('Purchases.meta.description')}
+        />
       </Head>
       <SMain>
         <SCardsSection>

@@ -521,42 +521,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     }, [post.winningOptionId]);
 
     useEffect(() => {
-      const makeVoteFromSessionId = async () => {
-        if (!sessionId) return;
-        try {
-          setLoadingModalOpen(true);
-          const payload = new newnewapi.FulfillPaymentPurposeRequest({
-            paymentSuccessUrl: `session_id=${sessionId}`,
-          });
-
-          const res = await voteOnPost(payload);
-
-          if (
-            !res.data ||
-            res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
-            res.error
-          )
-            throw new Error(res.error?.message ?? 'Request failed');
-
-          const optionFromResponse = res.data
-            .option as newnewapi.MultipleChoice.Option;
-          optionFromResponse.isSupportedByMe = true;
-          handleAddOrUpdateOptionFromResponse(optionFromResponse);
-          setLoadingModalOpen(false);
-          handleResetFreeVote();
-          setPaymentSuccesModalOpen(true);
-        } catch (err) {
-          console.error(err);
-          setLoadingModalOpen(false);
-        }
-        resetSessionId();
-      };
-
-      makeVoteFromSessionId();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
       const socketHandlerOptionCreatedOrUpdated = (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.McOptionCreatedOrUpdated.decode(arr);
@@ -651,6 +615,47 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       setOptions,
       sortOptions,
     ]);
+
+    useEffect(() => {
+      const makeVoteFromSessionId = async () => {
+        if (!sessionId) return;
+        try {
+          setLoadingModalOpen(true);
+          const payload = new newnewapi.FulfillPaymentPurposeRequest({
+            paymentSuccessUrl: `session_id=${sessionId}`,
+          });
+
+          const res = await voteOnPost(payload);
+
+          if (
+            !res.data ||
+            res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+            res.error
+          )
+            throw new Error(res.error?.message ?? 'Request failed');
+
+          const optionFromResponse = res.data
+            .option as newnewapi.MultipleChoice.Option;
+          optionFromResponse.isSupportedByMe = true;
+          handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+          await fetchPostLatestData();
+
+          setLoadingModalOpen(false);
+          handleResetFreeVote();
+          setPaymentSuccesModalOpen(true);
+        } catch (err) {
+          console.error(err);
+          setLoadingModalOpen(false);
+        }
+        resetSessionId();
+      };
+
+      if (socketConnection.active) {
+        makeVoteFromSessionId();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socketConnection.active, sessionId]);
 
     const goToNextStep = () => {
       if (

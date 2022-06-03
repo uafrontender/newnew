@@ -329,6 +329,11 @@ const MyProfileSettingsIndex = () => {
       <Head>
         <title>{t('Settings.meta.title')}</title>
         <meta name='description' content={t('Settings.meta.description')} />
+        <meta property='og:title' content={t('Settings.meta.title')} />
+        <meta
+          property='og:description'
+          content={t('Settings.meta.description')}
+        />
       </Head>
       <SMain>
         <SGoBackButton onClick={() => router.back()}>

@@ -156,6 +156,11 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
       <Head>
         <title>{t('MyPosts.meta.title')}</title>
         <meta name='description' content={t('MyPosts.meta.description')} />
+        <meta property='og:title' content={t('MyPosts.meta.title')} />
+        <meta
+          property='og:description'
+          content={t('MyPosts.meta.description')}
+        />
       </Head>
       <SMain>
         <SCardsSection>

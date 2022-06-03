@@ -502,7 +502,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             setWinningOption(res.data.option as newnewapi.Auction.Option);
           }
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       }
 
@@ -510,42 +510,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
         fetchAndSetWinningOption(post.winningOptionId as number);
       }
     }, [post.winningOptionId]);
-
-    useEffect(() => {
-      const makeBidFromSessionId = async () => {
-        if (!sessionId) return;
-        try {
-          setLoadingModalOpen(true);
-          const payload = new newnewapi.FulfillPaymentPurposeRequest({
-            paymentSuccessUrl: `session_id=${sessionId}`,
-          });
-
-          const res = await placeBidOnAuction(payload);
-
-          if (
-            !res.data ||
-            res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS ||
-            res.error
-          )
-            throw new Error(res.error?.message ?? 'Request failed');
-
-          const optionFromResponse = res.data
-            .option as newnewapi.Auction.Option;
-          optionFromResponse.isSupportedByMe = true;
-          handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
-          setLoadingModalOpen(false);
-          setPaymentSuccesModalOpen(true);
-        } catch (err) {
-          console.error(err);
-          setLoadingModalOpen(false);
-        }
-        resetSessionId();
-      };
-
-      makeBidFromSessionId();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     useEffect(() => {
       const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -641,6 +605,46 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       setOptions,
       sortOptions,
     ]);
+
+    useEffect(() => {
+      const makeBidFromSessionId = async () => {
+        if (!sessionId) return;
+        try {
+          setLoadingModalOpen(true);
+          const payload = new newnewapi.FulfillPaymentPurposeRequest({
+            paymentSuccessUrl: `session_id=${sessionId}`,
+          });
+
+          const res = await placeBidOnAuction(payload);
+
+          if (
+            !res.data ||
+            res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS ||
+            res.error
+          )
+            throw new Error(res.error?.message ?? 'Request failed');
+
+          const optionFromResponse = res.data
+            .option as newnewapi.Auction.Option;
+          optionFromResponse.isSupportedByMe = true;
+          handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+          await fetchPostLatestData();
+
+          setLoadingModalOpen(false);
+          setPaymentSuccesModalOpen(true);
+        } catch (err) {
+          console.error(err);
+          setLoadingModalOpen(false);
+        }
+        resetSessionId();
+      };
+
+      if (socketConnection.active) {
+        makeBidFromSessionId();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socketConnection.active, sessionId]);
 
     const goToNextStep = () => {
       if (
