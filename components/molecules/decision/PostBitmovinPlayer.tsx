@@ -145,8 +145,10 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
         console.error(`Error while creating Bitmovin Player instance, ${err}`);
       }
     }
-
     load();
+    return () => {
+      player.current = null;
+    };
   }, [playerSource]);
 
   return (

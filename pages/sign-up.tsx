@@ -44,8 +44,6 @@ const Signup: NextPage<ISignup> = ({ reason, goal, redirectURL }) => {
 
   useEffect(() => {
     const handlerHistory = () => {
-      console.log('Popstate');
-
       const postId = window?.history?.state?.postId;
       if (postId && window?.history?.state?.fromPost) {
         router.push(`/post/${postId}`);

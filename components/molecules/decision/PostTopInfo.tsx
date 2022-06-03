@@ -154,6 +154,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             window.location.href
           )}`
         );
+        return;
       }
       const markAsFavoritePayload = new newnewapi.MarkPostRequest({
         markAs: !isFollowingDecision

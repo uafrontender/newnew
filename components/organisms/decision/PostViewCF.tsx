@@ -377,6 +377,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           router.push(
             `/sign-up?reason=follow-decision&redirect=${window.location.href}`
           );
+          return;
         }
         const markAsFavoritePayload = new newnewapi.MarkPostRequest({
           markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,

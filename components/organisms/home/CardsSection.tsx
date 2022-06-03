@@ -140,10 +140,15 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
         return;
       }
 
-      scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
-      setClientX(e.clientX);
-      setScrollX(scrollX - e.clientX + clientX);
-      setIsDragging(true);
+      if (
+        Math.abs(e.clientX) - Math.abs(clientX) > 15 ||
+        Math.abs(clientX) - Math.abs(e.clientX) > 15
+      ) {
+        scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
+        setClientX(e.clientX);
+        setScrollX(scrollX - e.clientX + clientX);
+        setIsDragging(true);
+      }
     };
 
     const mouseUpHandler = () => {
@@ -165,15 +170,11 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
 
       if (tutorialCard !== undefined && index === 0) {
         return (
-          <>
-            <SItemWrapper
-              key='tutorial-card'
-              name={`cards-section-${category}-${0}`}
-            >
+          <React.Fragment key={switchPostType(item)[0].postUuid}>
+            <SItemWrapper name={`cards-section-${category}-${0}`}>
               {tutorialCard}
             </SItemWrapper>
             <SItemWrapper
-              key={switchPostType(item)[0].postUuid}
               name={`cards-section-${category}-${
                 tutorialCard !== undefined ? index + 1 : index
               }`}
@@ -187,7 +188,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
                 height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
               />
             </SItemWrapper>
-          </>
+          </React.Fragment>
         );
       }
 

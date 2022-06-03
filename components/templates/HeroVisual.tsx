@@ -1,18 +1,16 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled, { keyframes, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 
 import useImageLoaded from '../../utils/hooks/useImageLoaded';
 import assets from '../../constants/assets';
 // Cyclic dependency
-import { AuthLayoutContext } from './AuthLayout';
 import isSafari from '../../utils/isSafari';
 
 interface IHeroVisual {}
 
 const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
   const theme = useTheme();
-  const authLayoutContext = useContext(AuthLayoutContext);
 
   const shouldUseCssFade = useMemo(() => isSafari(), []);
 
@@ -31,13 +29,10 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
         setCurrentState('hold');
       }, 2800);
     }
-  }, [introLoaded]);
-
-  useEffect(() => {
-    if (authLayoutContext.shouldHeroUnmount) {
+    return () => {
       setCurrentState('outro');
-    }
-  }, [authLayoutContext.shouldHeroUnmount]);
+    };
+  }, [introLoaded]);
 
   if (shouldUseCssFade) {
     return (
@@ -49,9 +44,6 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
           transition: {
             duration: 0.8,
           },
-        }}
-        onUnmount={() => {
-          setCurrentState('outro');
         }}
       >
         <SImageWrapperAnimated
@@ -93,9 +85,6 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
         transition: {
           duration: 0.8,
         },
-      }}
-      onUnmount={() => {
-        setCurrentState('outro');
       }}
     >
       <SImageWrapper

@@ -87,6 +87,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
                 `${process.env.NEXT_PUBLIC_APP_URL}/post/${postUuid}`
               )}`
             );
+            return;
           }
           const markAsFavoritePayload = new newnewapi.MarkPostRequest({
             markAs: !isFollowingDecision
