@@ -125,6 +125,9 @@ const assets = {
     lightMedia8: `${APP_ASSETS_ORIGIN}/about/media-8-light.png`,
     lightMedia9: `${APP_ASSETS_ORIGIN}/about/media-9-light.png`,
   },
+  openGraphImage: {
+    common: `${APP_ASSETS_ORIGIN}/open-graph-image/common.png`,
+  },
 };
 
 export default assets;
