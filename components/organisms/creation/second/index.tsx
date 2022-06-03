@@ -228,13 +228,18 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
           newnewapi.ValidateTextRequest.Kind.POST_OPTION
         )
       ) !== -1;
+
+    const targetBackersValid =
+      tab !== 'crowdfunding' ||
+      (crowdfunding.targetBackerCount && crowdfunding?.targetBackerCount >= 1);
     // const disabled =
     //   !!titleError || !post.title || !post.announcementVideoUrl || fileUpload.progress !== 100 || !optionsAreValid;
     const disabled =
       !!titleError ||
       !post.title ||
       !post.announcementVideoUrl ||
-      !optionsAreValid;
+      !optionsAreValid ||
+      !targetBackersValid;
 
     const validateTitleDebounced = useDebounce(post.title, 500);
     const formatStartsAt = useCallback(() => {
