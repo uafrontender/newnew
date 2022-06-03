@@ -45,6 +45,7 @@ import {
 import isSafari from '../../../utils/isSafari';
 import { usePostModalState } from '../../../contexts/postModalContext';
 import waitResourceIsAvailable from '../../../utils/checkResourceAvailable';
+import isBrowser from '../../../utils/isBrowser';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
@@ -94,6 +95,10 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   ].includes(resizeMode);
 
   const socketConnection = useContext(SocketContext);
+
+  // Show controls on shorter screens
+  const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] =
+    useState<number | undefined>(undefined);
 
   // Tabs
   const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
@@ -454,12 +459,15 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   useEffect(() => {
     async function videoProcessingFallback(hlsUrl: string) {
       const available = await waitResourceIsAvailable(hlsUrl, {
-        maxAttempts: 120,
-        retryTimeMs: 1000,
+        maxAttempts: 720,
+        retryTimeMs: 5000,
       });
 
       if (available) {
         setResponseFileProcessingLoading(false);
+      } else {
+        setResponseFileUploadError(true);
+        toast.error('An error occured');
       }
     }
 
@@ -480,6 +488,30 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cannotLeavePage]);
 
+  // Adjust sound button if needed
+  useEffect(() => {
+    if (isBrowser() && !isMobileOrTablet) {
+      const rect =
+        document.getElementById('sound-button')?.getBoundingClientRect() ||
+        document.getElementById('toggle-video-widget')?.getBoundingClientRect();
+
+      if (rect) {
+        const isInViewPort =
+          rect.bottom <=
+          (window.innerHeight || document.documentElement?.clientHeight);
+
+        if (!isInViewPort) {
+          const delta = window.innerHeight - rect.bottom;
+          setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+        }
+      }
+    }
+
+    return () => {
+      setSoundBtnBottomOverriden(undefined);
+    };
+  }, [isMobileOrTablet]);
+
   return (
     <>
       <SVideoWrapper>
@@ -495,6 +527,13 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
                 iconOnly
                 view='transparent'
                 onClick={() => setIsEditThumbnailModalOpen(true)}
+                style={{
+                  ...(soundBtnBottomOverriden
+                    ? {
+                        bottom: soundBtnBottomOverriden,
+                      }
+                    : {}),
+                }}
               >
                 <InlineSvg
                   svg={ThumbnailIcon}
@@ -507,11 +546,19 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               <SSetThumbnailButton
                 view='transparent'
                 onClick={() => setIsEditThumbnailModalOpen(true)}
+                style={{
+                  ...(soundBtnBottomOverriden
+                    ? {
+                        bottom: soundBtnBottomOverriden,
+                      }
+                    : {}),
+                }}
               >
                 {t('PostVideo.setThumbnail')}
               </SSetThumbnailButton>
             )}
             <SSoundButton
+              id='sound-button'
               iconOnly
               view='transparent'
               onClick={(e) => {
@@ -524,6 +571,13 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
                     ) as HTMLVideoElement
                   )?.play();
                 }
+              }}
+              style={{
+                ...(soundBtnBottomOverriden
+                  ? {
+                      bottom: soundBtnBottomOverriden,
+                    }
+                  : {}),
               }}
             >
               <InlineSvg
@@ -542,6 +596,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               muted={isMuted}
             />
             <SSoundButton
+              id='sound-button'
               iconOnly
               view='transparent'
               onClick={(e) => {
@@ -554,6 +609,13 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
                     ) as HTMLVideoElement
                   )?.play();
                 }
+              }}
+              style={{
+                ...(soundBtnBottomOverriden
+                  ? {
+                      bottom: soundBtnBottomOverriden,
+                    }
+                  : {}),
               }}
             >
               <InlineSvg
@@ -604,6 +666,13 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             currentTab={openedTab}
             responseUploaded={response !== undefined}
             disabled={responseFileUploadLoading || responseFileUploadLoading}
+            wrapperCSS={{
+              ...(soundBtnBottomOverriden
+                ? {
+                    bottom: soundBtnBottomOverriden + 8,
+                  }
+                : {}),
+            }}
             handleChangeTab={(newValue) => setOpenedTab(newValue)}
           />
         ) : null}
