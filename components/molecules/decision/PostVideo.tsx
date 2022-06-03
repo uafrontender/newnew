@@ -14,6 +14,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
 import isSafari from '../../../utils/isSafari';
+import isBrowser from '../../../utils/isBrowser';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
@@ -49,6 +50,10 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
     'tablet',
   ].includes(resizeMode);
 
+  // Show controls on shorter screens
+  const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] =
+    useState<number | undefined>(undefined);
+
   // Tabs
   const [openedTab, setOpenedTab] =
     useState<'announcement' | 'response'>('announcement');
@@ -79,6 +84,30 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openedTab, postId, user.loggedIn, responseViewed]);
 
+  // Adjust sound button if needed
+  useEffect(() => {
+    if (isBrowser() && !isMobileOrTablet) {
+      const rect = document
+        .getElementById('sound-button')
+        ?.getBoundingClientRect();
+
+      if (rect) {
+        const isInViewPort =
+          rect.bottom <=
+          (window.innerHeight || document.documentElement?.clientHeight);
+
+        if (!isInViewPort) {
+          const delta = window.innerHeight - rect.bottom;
+          setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+        }
+      }
+    }
+
+    return () => {
+      setSoundBtnBottomOverriden(undefined);
+    };
+  }, [isMobileOrTablet]);
+
   return (
     <SVideoWrapper>
       {openedTab === 'response' && response ? (
@@ -90,6 +119,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             muted={isMuted}
           />
           <SSoundButton
+            id='sound-button'
             iconOnly
             view='transparent'
             onClick={(e) => {
@@ -102,6 +132,13 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
                   ) as HTMLVideoElement
                 )?.play();
               }
+            }}
+            style={{
+              ...(soundBtnBottomOverriden
+                ? {
+                    bottom: soundBtnBottomOverriden,
+                  }
+                : {}),
             }}
           >
             <InlineSvg
@@ -120,6 +157,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             muted={isMuted}
           />
           <SSoundButton
+            id='sound-button'
             iconOnly
             view='transparent'
             onClick={(e) => {
@@ -132,6 +170,13 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
                   ) as HTMLVideoElement
                 )?.play();
               }
+            }}
+            style={{
+              ...(soundBtnBottomOverriden
+                ? {
+                    bottom: soundBtnBottomOverriden,
+                  }
+                : {}),
             }}
           >
             <InlineSvg
