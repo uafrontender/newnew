@@ -61,6 +61,11 @@ const GetPaid = () => {
       <Head>
         <title>{t('getPaid.meta.title')}</title>
         <meta name='description' content={t('getPaid.meta.description')} />
+        <meta property='og:title' content={t('getPaid.meta.title')} />
+        <meta
+          property='og:description'
+          content={t('getPaid.meta.description')}
+        />
       </Head>
       {!isLoading ? (
         <DashboardSectionStripe

@@ -9,6 +9,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -45,6 +46,7 @@ interface IPostPage {
 
 const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
   const router = useRouter();
+  const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { mutedMode, resizeMode } = useAppSelector((state) => state.ui);
@@ -112,8 +114,12 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
   return (
     <>
       <Head>
+        <title>{t(`meta.${typeOfPost}.title`)}</title>
+        <meta
+          name='description'
+          content={t(`meta.${typeOfPost}.description`)}
+        />
         <meta property='og:title' content={postParsed?.title} />
-        <meta property='og:type' content='website' />
         <meta
           property='og:url'
           content={`${process.env.NEXT_PUBLIC_APP_URL}/post/${postUuid}`}

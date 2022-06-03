@@ -140,10 +140,15 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
         return;
       }
 
-      scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
-      setClientX(e.clientX);
-      setScrollX(scrollX - e.clientX + clientX);
-      setIsDragging(true);
+      if (
+        Math.abs(e.clientX) - Math.abs(clientX) > 15 ||
+        Math.abs(clientX) - Math.abs(e.clientX) > 15
+      ) {
+        scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
+        setClientX(e.clientX);
+        setScrollX(scrollX - e.clientX + clientX);
+        setIsDragging(true);
+      }
     };
 
     const mouseUpHandler = () => {

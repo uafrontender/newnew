@@ -33,7 +33,7 @@ export interface ICreationStateInterface {
     minimalBid: number;
   };
   crowdfunding: {
-    targetBackerCount: number;
+    targetBackerCount?: number;
   };
   multiplechoice: {
     choices: {
@@ -83,7 +83,7 @@ const defaultUIState: ICreationStateInterface = {
     minimalBid: 5,
   },
   crowdfunding: {
-    targetBackerCount: 1,
+    targetBackerCount: undefined,
   },
   multiplechoice: {
     choices: [

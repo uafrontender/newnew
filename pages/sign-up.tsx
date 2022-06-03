@@ -73,6 +73,20 @@ const Signup: NextPage<ISignup> = ({ reason, goal, redirectURL }) => {
               : t('meta.description')
           }
         />
+        <meta
+          property='og:title'
+          content={
+            goal === 'log-in' ? t('toLogIn.meta.title') : t('meta.title')
+          }
+        />
+        <meta
+          property='og:description'
+          content={
+            goal === 'log-in'
+              ? t('toLogIn.meta.description')
+              : t('meta.description')
+          }
+        />
       </Head>
       <SignupMenu
         goal={goal ?? undefined}
