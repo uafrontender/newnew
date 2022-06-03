@@ -173,6 +173,11 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
       <Head>
         <title>{t('Favorites.meta.title')}</title>
         <meta name='description' content={t('Favorites.meta.description')} />
+        <meta property='og:title' content={t('Favorites.meta.title')} />
+        <meta
+          property='og:description'
+          content={t('Favorites.meta.description')}
+        />
       </Head>
       <SMain>
         <SCardsSection>
