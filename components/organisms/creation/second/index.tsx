@@ -815,12 +815,15 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     useEffect(() => {
       async function videoProcessingFallback(hlsUrl: string) {
         const available = await waitResourceIsAvailable(hlsUrl, {
-          maxAttempts: 120,
-          retryTimeMs: 1000,
+          maxAttempts: 720,
+          retryTimeMs: 5000,
         });
 
         if (available) {
           dispatch(setCreationFileProcessingLoading(false));
+        } else {
+          dispatch(setCreationFileUploadError(true));
+          toast.error('An error occured');
         }
       }
 

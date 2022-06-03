@@ -7,8 +7,6 @@ export async function isResourceAvailable(url: string) {
     method: 'HEAD'
   }).catch((err) => null);
 
-  console.log(response)
-
   return (response?.status || 500) < 400; // 200-399 http status range
 }
 
