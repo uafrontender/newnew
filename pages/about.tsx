@@ -46,8 +46,10 @@ import LogoDarkAnimated from '../public/images/png/logo-dark.webp';
 import LogoLightAnimated from '../public/images/png/logo-light.webp';
 import FFLogo from '../public/images/about/ff-logo.png';
 import LSVPLogo from '../public/images/about/lsvp-logo.png';
-import A16ZLogo from '../public/images/about/a16z-logo.png';
-import SHRUGLogo from '../public/images/about/shrug-logo.png';
+import A16ZLogoDark from '../public/images/about/a16z-logo-dark.png';
+import A16ZLogoLight from '../public/images/about/a16z-logo-light.png';
+import SHRUGLogoDark from '../public/images/about/shrug-logo-dark.png';
+import SHRUGLogoLight from '../public/images/about/shrug-logo-light.png';
 
 import BBCLogo from '../public/images/about/bbc-logo.png';
 import BloombergLogo from '../public/images/about/bloomberg-logo.png';
@@ -202,7 +204,8 @@ const BACKERS = [
   {
     id: 2,
     title: 'Andreessen Horowitz',
-    logo: A16ZLogo,
+    logo: A16ZLogoDark,
+    logoLight: A16ZLogoLight,
     name: 'a16z',
     link: 'https://a16z.com/',
   },
@@ -216,7 +219,8 @@ const BACKERS = [
   {
     id: 4,
     title: 'Shrug Capital',
-    logo: SHRUGLogo,
+    logo: SHRUGLogoDark,
+    logoLight: SHRUGLogoLight,
     name: 'shrug',
     link: 'https://www.shrug.vc/',
   },
@@ -227,18 +231,19 @@ const NextArrow = ({
   className,
 }: {
   onClick?: () => void;
-  className: 'string';
+  className?: string;
 }) => (
   <SScrollArrow
     active
     position='right'
     handleClick={onClick!!}
-    disabled={className.includes('slick-disabled')}
+    disabled={!!className && className.includes('slick-disabled')}
   />
 );
 
 NextArrow.defaultProps = {
   onClick: () => {},
+  className: '',
 };
 
 const PrevArrow = ({
@@ -246,18 +251,19 @@ const PrevArrow = ({
   className,
 }: {
   onClick?: () => void;
-  className: 'string';
+  className?: string;
 }) => (
   <SScrollArrow
     active
     position='left'
     handleClick={onClick!!}
-    disabled={className.includes('slick-disabled')}
+    disabled={!!className && className.includes('slick-disabled')}
   />
 );
 
 PrevArrow.defaultProps = {
   onClick: () => {},
+  className: '',
 };
 
 export const HowItWorks = () => {
@@ -381,7 +387,14 @@ export const HowItWorks = () => {
                     target='_blank'
                     rel='noreferrer'
                   >
-                    <SBackerLogo src={backer.logo.src} name={backer.name} />
+                    <SBackerLogo
+                      src={
+                        theme.name === 'light' && backer.logoLight
+                          ? backer.logoLight.src
+                          : backer.logo.src
+                      }
+                      name={backer.name}
+                    />
                     <SBackerTitle variant={4}>{backer.title}</SBackerTitle>
                   </SBackerLink>
                 </SBacker>
@@ -1013,7 +1026,7 @@ const SBacker = styled.li`
   margin-right: 15px;
   margin-bottom: 16px;
   z-index: 1;
-  transition: 0.1s background linear, 0.1s border-color linear;
+  transition: 0.12s all linear;
 
   &:nth-child(2n) {
     margin-right: 0;
@@ -1031,6 +1044,7 @@ const SBacker = styled.li`
 
     & img {
       filter: brightness(1) grayscale(0%);
+      opacity: 1;
     }
   }
 
@@ -1088,8 +1102,10 @@ interface ISBackerLogo {
 const SBackerLogo = styled.img<ISBackerLogo>`
   transform: translateY(-13px);
   opacity: ${({ theme }) => (theme.name === 'light' ? '30%' : '100%')};
-  filter: brightness(0.7) grayscale(100%);
-  transition: 0.1s filter linear, 0.1s -webkit-filter linear;
+  filter: ${({ theme }) =>
+    theme.name === 'light'
+      ? 'brightness(0.8) grayscale(100%);'
+      : 'brightness(0.7) grayscale(100%);'};
 
   ${(props) => {
     switch (props.name) {
@@ -1097,7 +1113,6 @@ const SBackerLogo = styled.img<ISBackerLogo>`
         return css`
           width: 48px;
           height: 48px;
-          filter: brightness(1) grayscale(100%);
 
           ${({ theme }) => theme.media.laptopL} {
             width: 72px;
@@ -1118,6 +1133,7 @@ const SBackerLogo = styled.img<ISBackerLogo>`
         return css`
           width: 48px;
           height: 48px;
+          filter: brightness(0.7) grayscale(100%);
 
           ${({ theme }) => theme.media.laptopL} {
             width: 80px;
@@ -1182,6 +1198,7 @@ const SGradient = styled.div<ISGradient>`
   background-size: contain;
   background-repeat: no-repeat;
   background-image: url(${(props) => props.url});
+  display: ${({ theme }) => (theme.name === 'light' ? 'none' : 'initial')};
 
   ${({ theme }) => theme.media.tablet} {
     height: 1700px;
