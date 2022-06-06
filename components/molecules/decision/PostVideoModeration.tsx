@@ -500,9 +500,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         document.getElementById('video-wrapper')?.getBoundingClientRect();
 
       if (rect && videoRect) {
-        const delta2 = window.innerHeight - videoRect.bottom;
-        if (delta2 < 0) {
-          setSoundBtnBottomOverriden(Math.abs(delta2) + 24);
+        const delta = window.innerHeight - videoRect.bottom;
+        if (delta < 0) {
+          setSoundBtnBottomOverriden(Math.abs(delta) + 24);
         }
       }
     };
