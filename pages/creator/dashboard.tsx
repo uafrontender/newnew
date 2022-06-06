@@ -11,6 +11,7 @@ import Content from '../../components/organisms/creator/Dashboard';
 
 import { NextPageWithLayout } from '../_app';
 import { useAppSelector } from '../../redux-store/store';
+import assets from '../../constants/assets';
 
 export const Dashboard = () => {
   const { t } = useTranslation('creator');
@@ -33,6 +34,7 @@ export const Dashboard = () => {
           property='og:description'
           content={t('dashboard.meta.description')}
         />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <Content />
     </>
