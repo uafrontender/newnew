@@ -16,6 +16,7 @@ import LD404 from '../public/images/404/404-Light-Desktop.webp';
 import LT404 from '../public/images/404/404-Light-Tablet.webp';
 import LM404 from '../public/images/404/404-Light-Mobile.webp';
 import Button from '../components/atoms/Button';
+import assets from '../constants/assets';
 
 // No sense to memorize
 const Custom404 = () => {
@@ -35,6 +36,7 @@ const Custom404 = () => {
         <meta name='description' content={t('meta.description')} />
         <meta property='og:title' content={t('meta.title')} />
         <meta property='og:description' content={t('meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <Container>
         {theme.name === 'light' ? (

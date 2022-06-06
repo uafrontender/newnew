@@ -14,6 +14,7 @@ import MyProfileLayout from '../../components/templates/MyProfileLayout';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
+import assets from '../../constants/assets';
 
 const NoContentCard = dynamic(
   () => import('../../components/atoms/profile/NoContentCard')
@@ -66,6 +67,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
           property='og:description'
           content={t('Subscriptions.meta.description')}
         />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <SMain>
         <SCardsSection>

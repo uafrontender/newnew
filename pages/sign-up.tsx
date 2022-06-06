@@ -12,6 +12,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { NextPageWithLayout } from './_app';
 import AuthLayout from '../components/templates/AuthLayout';
 import SignupMenu from '../components/organisms/SignupMenu';
+import assets from '../constants/assets';
 
 // Sign up reasons
 export const signupReasons = [
@@ -85,6 +86,7 @@ const Signup: NextPage<ISignup> = ({ reason, goal, redirectURL }) => {
               : t('meta.description')
           }
         />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <SignupMenu
         goal={goal ?? undefined}
