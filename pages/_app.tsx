@@ -177,7 +177,7 @@ const MyApp = (props: IMyApp): ReactElement => {
     }
   }, [user.userData?.username]);
 
-  if (typeof window === undefined) {
+  if (typeof window === 'undefined') {
     return (
       <>
         <Head>
