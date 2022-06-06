@@ -113,14 +113,17 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const { appConstants } = useGetAppConstants();
   // const { walletBalance } = useContext(WalletContext);
 
-  const isBlue = useMemo(
-    () => !!option.isSupportedByMe,
-    [option.isSupportedByMe]
+  const isSuggestedByMe = useMemo(
+    () =>
+      !isCreatorsBid &&
+      !!option.creator?.uuid &&
+      option.creator?.uuid === user.userData?.userUuid,
+    [option.creator?.uuid, user.userData?.userUuid, isCreatorsBid]
   );
 
-  const isSuggestedByMe = useMemo(
-    () => !isCreatorsBid && option.creator?.uuid === user.userData?.userUuid,
-    [option.creator?.uuid, user.userData?.userUuid, isCreatorsBid]
+  const isBlue = useMemo(
+    () => !!option.isSupportedByMe || isSuggestedByMe,
+    [option.isSupportedByMe, isSuggestedByMe]
   );
 
   const supporterCountSubstracted = useMemo(() => {
@@ -931,7 +934,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
         {supporterCount > 0 ? (
           <>
             <SSpanBiddersHighlighted className='spanHighlighted'>
-              {t('me')}
+              {supporterCount > 1 ? t('me') : t('I')}
             </SSpanBiddersHighlighted>
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubstracted > 0 ? ` & ` : ''}

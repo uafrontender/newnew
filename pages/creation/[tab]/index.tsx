@@ -50,6 +50,14 @@ export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
           name='description'
           content={t(`secondStep.meta.description-${router?.query?.tab}`)}
         />
+        <meta
+          property='og:title'
+          content={t(`secondStep.meta.title-${router?.query?.tab}`)}
+        />
+        <meta
+          property='og:description'
+          content={t(`secondStep.meta.description-${router?.query?.tab}`)}
+        />
       </Head>
       <SecondStepContent {...props} />
     </SWrapper>
