@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
@@ -16,10 +16,13 @@ export const Dashboard = () => {
   const { t } = useTranslation('creator');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  if (!user.loggedIn) {
-    router.push('/sign-up?to=log-in');
-    return null;
-  }
+
+  useEffect(() => {
+    if (!user.loggedIn) {
+      router?.push('/sign-up?to=log-in');
+    }
+  }, [router, user.loggedIn]);
+
   return (
     <>
       <Head>

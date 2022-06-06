@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -20,10 +20,13 @@ const Chat: NextPage<IChat> = ({ username }) => {
   const { t } = useTranslation('chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  if (!user.loggedIn) {
-    router.push('/sign-up');
-    return null;
-  }
+
+  useEffect(() => {
+    if (!user.loggedIn) {
+      router?.push('/sign-up');
+    }
+  }, [user.loggedIn, router]);
+
   return (
     <>
       <Head>

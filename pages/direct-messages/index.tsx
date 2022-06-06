@@ -65,7 +65,7 @@ export const Chat = () => {
             ? (route = `${user.userData?.username}-announcement`)
             : '';
         }
-        router.push(`/direct-messages/${route}`);
+        router?.push(`/direct-messages/${route}`);
       } else {
         setIsLoaded(true);
       }
@@ -75,12 +75,16 @@ export const Chat = () => {
     }
   };
 
-  if (!user.loggedIn) {
-    router.push('/sign-up?to=log-in');
-    return null;
-  }
+  useEffect(() => {
+    if (!user.loggedIn) {
+      router?.push('/sign-up?to=log-in');
+    }
+  }, [router, user.loggedIn]);
 
-  fetchLastActiveRoom();
+  useEffect(() => {
+    fetchLastActiveRoom();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

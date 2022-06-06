@@ -25,12 +25,12 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
   const router = useRouter();
 
   const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth ?? 0,
-    height: window.innerHeight ?? 0,
+    width: isBrowser() ? window?.innerWidth : 0,
+    height: isBrowser() ? window?.innerHeight : 0,
   });
 
   const [containerWidth, setContainerWidth] = useState<number>(
-    isBrowser() ? window.innerWidth : 768
+    isBrowser() ? window?.innerWidth : 768
   );
   const [tabsWidth, setTabsWidth] = useState<number>(tabs.length * 100);
 
@@ -58,7 +58,7 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
   // Route change
   const handleChangeRoute = useCallback(
     (path: string) => {
-      router.replace(path);
+      router?.replace(path);
     },
     [router]
   );
@@ -225,19 +225,21 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
     let timeout: any;
 
     const updateContainerWidth = () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        setContainerWidth(tabsRef.current?.getBoundingClientRect().width!!);
-        setWindowSize({
-          width: window.innerWidth ?? 0,
-          height: window.innerHeight ?? 0,
-        });
-      }, 1500);
+      if (isBrowser()) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          setContainerWidth(tabsRef.current?.getBoundingClientRect().width!!);
+          setWindowSize({
+            width: window?.innerWidth ?? 0,
+            height: window?.innerHeight ?? 0,
+          });
+        }, 1500);
+      }
     };
 
-    window.addEventListener('resize', updateContainerWidth);
+    window?.addEventListener('resize', updateContainerWidth);
 
-    return () => window.removeEventListener('resize', updateContainerWidth);
+    return () => window?.removeEventListener('resize', updateContainerWidth);
   }, []);
 
   useEffect(() => {

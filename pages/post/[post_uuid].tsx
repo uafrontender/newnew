@@ -87,7 +87,7 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
     if (isBrowser()) {
       const { idx } = window.history.state;
       if (idx < 2) {
-        router.replace('/');
+        router?.replace('/');
       }
     }
   };

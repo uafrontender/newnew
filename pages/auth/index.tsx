@@ -150,17 +150,17 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
 
         setIsLoading(false);
         if (data.redirectUrl) {
-          router.push(data.redirectUrl);
+          router?.push(data.redirectUrl);
         } else if (data.me?.options?.isCreator) {
-          router.push('/creator/dashboard');
+          router?.push('/creator/dashboard');
         } else {
-          router.push('/');
+          router?.push('/');
         }
       } catch (err) {
         // NB! Might need an error toast
         console.error(err);
         setIsLoading(false);
-        router.push('/');
+        router?.push('/');
       }
     }
 
