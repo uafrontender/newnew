@@ -114,82 +114,55 @@ const MEDIAS = [
     id: 1,
     pressName: 'bbc',
     link: 'https://www.bbc.com/news/business-57085557',
-    previewSrc: {
-      dark: assets.about.darkMedia1,
-      light: assets.about.lightMedia1,
-    },
+    previewSrc: assets.about.media1,
   },
   {
     id: 2,
     pressName: 'nyt',
     link: 'https://www.nytimes.com/2021/03/10/style/creators-selling-selves.html',
-    previewSrc: {
-      dark: assets.about.darkMedia2,
-      light: assets.about.lightMedia2,
-    },
+    previewSrc: assets.about.media2,
   },
   {
     id: 3,
     pressName: 'cnbc',
     link: 'https://www.cnbc.com/video/2021/04/01/monetizing-the-creator-economy-with-the-control-my-life-app.html?__source=sharebar%7Ctwitter&par=sharebar',
-    previewSrc: {
-      dark: assets.about.darkMedia3,
-      light: assets.about.lightMedia3,
-    },
+    previewSrc: assets.about.media3,
   },
   {
     id: 4,
     pressName: 'bi',
     link: 'https://www.businessinsider.com/top-creator-economy-startups-to-watch-in-2021-vc-investors-2021-8?IR=T',
-    previewSrc: {
-      dark: assets.about.darkMedia4,
-      light: assets.about.lightMedia4,
-    },
+    previewSrc: assets.about.media4,
   },
   {
     id: 5,
     pressName: 'forbes',
     link: 'https://www.forbes.com/sites/geristengel/2021/12/30/smart-vcs-recognize-that-black-female-founders-may-be-the-next-unicorns/?sh=4f00b6bc55ac',
-    previewSrc: {
-      dark: assets.about.darkMedia5,
-      light: assets.about.lightMedia5,
-    },
+    previewSrc: assets.about.media5,
   },
   {
     id: 6,
     pressName: 'bloomberg',
     link: 'https://www.bloomberg.com/news/videos/2021-03-26/quicktake-take-the-lead-03-25-2021-video',
-    previewSrc: {
-      dark: assets.about.darkMedia6,
-      light: assets.about.lightMedia6,
-    },
+    previewSrc: assets.about.media6,
   },
   {
     id: 7,
     pressName: 'fc',
     link: 'https://www.fastcompany.com/90586403/how-polling-app-newnew-represents-the-new-class-of-social-media',
-    previewSrc: {
-      dark: assets.about.darkMedia7,
-      light: assets.about.lightMedia7,
-    },
+    previewSrc: assets.about.media7,
   },
   {
     id: 8,
     pressName: 'bnn',
     link: 'https://www.bnnbloomberg.ca/this-tech-outsider-ceo-from-toronto-went-from-managing-drake-to-taking-on-silicon-valley-1.1557924',
-    previewSrc: {
-      dark: assets.about.darkMedia8,
-      light: assets.about.lightMedia8,
-    },
+    previewSrc: assets.about.media8,
   },
   {
     id: 9,
     pressName: 'forbes-c',
     link: 'https://www.forbes.com/sites/forbestheculture/2020/12/03/former-drake-executive-discusses-her-transition-to-tech-and-entrepreneurship/?sh=700c35046cb8',
-    previewSrc: {
-      dark: assets.about.darkMedia9,
-      light: assets.about.lightMedia9,
-    },
+    previewSrc: assets.about.media9,
   },
 ];
 
@@ -342,14 +315,16 @@ export const HowItWorks = () => {
                     target='_blank'
                     rel='noopener noreferrer'
                     key={media.id}
+                    draggable={false}
                   >
                     <SMediaPreview>
                       <SMediaPreviewPic
-                        src={media.previewSrc[theme.name as 'dark' | 'light']}
+                        src={media.previewSrc}
+                        name={media.pressName as MediaNames}
                       />
                       <SMediaLogo
                         src={MEDIA_ICONS[media.pressName as MediaNames].src}
-                        name={media.pressName}
+                        name={media.pressName as MediaNames}
                       />
                     </SMediaPreview>
                     <SMediaInfo>
@@ -386,6 +361,7 @@ export const HowItWorks = () => {
                     href={backer.link}
                     target='_blank'
                     rel='noreferrer'
+                    draggable={false}
                   >
                     <SBackerLogo
                       src={
@@ -841,7 +817,7 @@ const SMediaInfo = styled.div`
 `;
 
 interface ISMediaLogo {
-  name: string;
+  name: MediaNames;
 }
 
 const SMediaLogo = styled.img<ISMediaLogo>`
@@ -907,26 +883,26 @@ const SMediaLogo = styled.img<ISMediaLogo>`
 
 interface ISMediaPreviewPic {
   readonly src: string;
+  readonly name: MediaNames;
 }
 
 const SMediaPreviewPic = styled.div<ISMediaPreviewPic>`
-  & {
-    display: block;
-    position: relative;
-    width: 100%;
-    max-height: 175px;
-    min-height: 175px;
-    background: ${(props) => `url(${props.src})`};
-    background-size: cover;
-    background-position: center;
-    border-radius: ${({ theme }) => theme.borderRadius.smallLg};
-    overflow: hidden;
-  }
+  display: block;
+  position: relative;
+  width: 100%;
+  max-height: 175px;
+  min-height: 175px;
+  background: ${(props) => `url(${props.src})`};
+  background-size: cover;
+  background-position: center;
+  border-radius: ${({ theme }) => theme.borderRadius.smallLg};
+  overflow: hidden;
+  opacity: ${({ theme }) => (theme.name === 'light' ? 0.9 : 0.3)};
 
   &:after {
-    content: '';
-    background-image: url('../public/images/png/Mask.png');
-    opacity: 0.3;
+    content: ${({ theme }) => (theme.name === 'light' ? '""' : 'none')};
+
+    background-color: #000000;
     position: absolute;
     top: 0;
     bottom: 0;
@@ -934,6 +910,20 @@ const SMediaPreviewPic = styled.div<ISMediaPreviewPic>`
     right: 0;
     width: 100%;
     height: 100%;
+
+    ${(props) => {
+      switch (props.name) {
+        case 'nyt':
+        case 'fc':
+          return css`
+            opacity: 0.7;
+          `;
+        default:
+          return css`
+            opacity: 0.2;
+          `;
+      }
+    }};
   }
 
   ${({ theme }) => theme.media.tablet} {
@@ -1245,6 +1235,7 @@ const SInvestorsList = styled.ul`
 const SInvestor = styled.li`
   display: flex;
   flex-direction: column;
+  user-select: none;
 
   padding: 15px 0;
   border-bottom: 1px solid
