@@ -47,7 +47,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (user.loggedIn) router.push('/');
+    if (user.loggedIn) router?.push('/');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

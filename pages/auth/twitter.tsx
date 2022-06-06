@@ -33,7 +33,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (user.loggedIn) router.push('/');
+    if (user.loggedIn) router?.push('/');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -100,16 +100,16 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
         setIsLoading(false);
         if (data.redirectUrl) {
-          router.push(data.redirectUrl);
+          router?.push(data.redirectUrl);
         } else if (data.me?.options?.isCreator) {
-          router.push('/creator/dashboard');
+          router?.push('/creator/dashboard');
         } else {
-          router.push('/');
+          router?.push('/');
         }
       } catch (err) {
         // NB! Might need an error toast
         setIsLoading(false);
-        router.push('/');
+        router?.push('/');
       }
     }
 

@@ -73,7 +73,7 @@ const Comment: React.FC<IComment> = ({
 
   const onUserReport = useCallback(() => {
     if (!user.loggedIn) {
-      router?.push(
+      router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
         )}`

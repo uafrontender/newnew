@@ -58,7 +58,7 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
   // Route change
   const handleChangeRoute = useCallback(
     (path: string) => {
-      router?.replace(path);
+      router.replace(path);
     },
     [router]
   );

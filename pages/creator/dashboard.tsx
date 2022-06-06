@@ -53,6 +53,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'notifications',
   ]);
 
+  const { req } = context;
+
+  const accessToken = req.cookies?.accessToken;
+
+  if (!accessToken) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/',
+      },
+    };
+  }
+
   return {
     props: {
       ...translationContext,
