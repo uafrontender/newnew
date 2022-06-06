@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import React, { useEffect, useMemo, useState } from 'react';
 import styled, { keyframes, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
@@ -28,10 +29,10 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
       setTimeout(() => {
         setCurrentState('hold');
       }, 2800);
+      return () => {
+        setCurrentState('outro');
+      };
     }
-    return () => {
-      setCurrentState('outro');
-    };
   }, [introLoaded]);
 
   if (shouldUseCssFade) {
