@@ -26,9 +26,8 @@ import { sizes } from '../styles/media';
 import ArrowRightIcon from '../public/images/svg/icons/outlined/ArrowRight.svg';
 import AcIconDark from '../public/images/decision/ac-icon-dark.png';
 import AcIconLight from '../public/images/decision/ac-icon-light.png';
-import GradientMobile from '../public/images/svg/about/gradient-mobile.svg';
-import GradientTablet from '../public/images/svg/about/gradient-tablet.svg';
-import GradientDesktop from '../public/images/svg/about/gradient-desktop.svg';
+import GradientMobile from '../public/images/about/mobile-gradient.png';
+import GradientTablet from '../public/images/about/tablet-gradient.png';
 import VotesIconDark from '../public/images/decision/votes-icon-dark.png';
 import VotesIconLight from '../public/images/decision/votes-icon-light.png';
 import CfIconDark from '../public/images/decision/cf-icon-dark.png';
@@ -39,26 +38,26 @@ import McSubIconDark from '../public/images/decision/bulb-icon-dark.png';
 import McSubIconLight from '../public/images/decision/bulb-icon-light.png';
 import McIconDark from '../public/images/decision/mc-icon-dark.png';
 import McIconLight from '../public/images/decision/mc-icon-light.png';
-import Bubble1Icon from '../public/images/png/1-bubble-icon.png';
-import Bubble2Icon from '../public/images/png/2-bubble-icon.png';
-import Bubble3Icon from '../public/images/png/3-bubble-icon.png';
+import Bubble1Icon from '../public/images/about/1-bubble-icon.png';
+import Bubble2Icon from '../public/images/about/2-bubble-icon.png';
+import Bubble3Icon from '../public/images/about/3-bubble-icon.png';
 import LogoFlatIcon from '../public/images/svg/logo-flat-icon.svg';
 import LogoDarkAnimated from '../public/images/png/logo-dark.webp';
 import LogoLightAnimated from '../public/images/png/logo-light.webp';
-import FFLogo from '../public/images/png/ff-logo.png';
-import LSVPLogo from '../public/images/png/lsvp-logo.png';
-import A16ZLogo from '../public/images/png/a16z-logo.png';
-import SHRUGLogo from '../public/images/png/shrug-logo.png';
+import FFLogo from '../public/images/about/ff-logo.png';
+import LSVPLogo from '../public/images/about/lsvp-logo.png';
+import A16ZLogo from '../public/images/about/a16z-logo.png';
+import SHRUGLogo from '../public/images/about/shrug-logo.png';
 
-import BBCLogo from '../public/images/png/bbc-logo.png';
-import BloombergLogo from '../public/images/png/bloomberg-logo.png';
-import ForbesLogo from '../public/images/png/forbes-logo.png';
-import BNNLogo from '../public/images/png/bnn-logo.png';
-import BILogo from '../public/images/png/business-insider-logo.png';
-import FCLogo from '../public/images/png/fast-company-logo.png';
-import CNBCLogo from '../public/images/png/cnbc-logo.png';
-import ForbesCLogo from '../public/images/png/forbes-culture-logo.png';
-import NytLogo from '../public/images/png/the-nyt-logo.png';
+import BBCLogo from '../public/images/about/bbc-logo.png';
+import BloombergLogo from '../public/images/about/bloomberg-logo.png';
+import ForbesLogo from '../public/images/about/forbes-logo.png';
+import BNNLogo from '../public/images/about/bnn-logo.png';
+import BILogo from '../public/images/about/business-insider-logo.png';
+import FCLogo from '../public/images/about/fast-company-logo.png';
+import CNBCLogo from '../public/images/about/cnbc-logo.png';
+import ForbesCLogo from '../public/images/about/forbes-culture-logo.png';
+import NytLogo from '../public/images/about/the-nyt-logo.png';
 
 import assets from '../constants/assets';
 
@@ -198,37 +197,63 @@ const BACKERS = [
     title: 'Lightspeed Ventures',
     logo: LSVPLogo,
     name: 'lsvp',
+    link: 'https://lsvp.com/',
   },
   {
     id: 2,
     title: 'Andreessen Horowitz',
     logo: A16ZLogo,
     name: 'a16z',
+    link: 'https://a16z.com/',
   },
   {
     id: 3,
     title: 'Founders Fund',
     logo: FFLogo,
     name: 'ff',
+    link: 'https://foundersfund.com/',
   },
   {
     id: 4,
     title: 'Shrug Capital',
     logo: SHRUGLogo,
     name: 'shrug',
+    link: 'https://www.shrug.vc/',
   },
 ];
 
-const NextArrow = ({ onClick }: { onClick?: () => void }) => (
-  <SScrollArrow active position='right' handleClick={onClick!!} />
+const NextArrow = ({
+  onClick,
+  className,
+}: {
+  onClick?: () => void;
+  className: 'string';
+}) => (
+  <SScrollArrow
+    active
+    position='right'
+    handleClick={onClick!!}
+    disabled={className.includes('slick-disabled')}
+  />
 );
 
 NextArrow.defaultProps = {
   onClick: () => {},
 };
 
-const PrevArrow = ({ onClick }: { onClick?: () => void }) => (
-  <SScrollArrow active position='left' handleClick={onClick!!} />
+const PrevArrow = ({
+  onClick,
+  className,
+}: {
+  onClick?: () => void;
+  className: 'string';
+}) => (
+  <SScrollArrow
+    active
+    position='left'
+    handleClick={onClick!!}
+    disabled={className.includes('slick-disabled')}
+  />
 );
 
 PrevArrow.defaultProps = {
@@ -351,16 +376,19 @@ export const HowItWorks = () => {
             <SBackersList>
               {BACKERS.map((backer) => (
                 <SBacker key={backer.id}>
-                  <SBackerLogo src={backer.logo.src} name={backer.name} />
-                  <SBackerTitle variant={4}>{backer.title}</SBackerTitle>
+                  <SBackerLink
+                    href={backer.link}
+                    target='_blank'
+                    rel='noreferrer'
+                  >
+                    <SBackerLogo src={backer.logo.src} name={backer.name} />
+                    <SBackerTitle variant={4}>{backer.title}</SBackerTitle>
+                  </SBackerLink>
                 </SBacker>
               ))}
             </SBackersList>
-            <SHighlightBg>
-              {isMobile && <InlineSVG svg={GradientMobile} />}
-              {isTablet && <InlineSVG svg={GradientTablet} />}
-              {!isMobile && !isTablet && <InlineSVG svg={GradientDesktop} />}
-            </SHighlightBg>
+            {isMobile && <SGradient url={GradientMobile.src} />}
+            {isTablet && <SGradient url={GradientTablet.src} />}
           </SSection>
 
           {/* INVESTORS SECTION */}
@@ -428,12 +456,14 @@ const SContainerWrapper = styled.div`
 const SContainer = styled.div`
   width: 100%;
   ${({ theme }) => theme.media.tablet} {
-    padding-top: 22px;
+    padding-top: 36px;
   }
 
   ${(props) => props.theme.media.laptopL} {
     max-width: 1248px;
     align-self: center;
+    padding-top: 9px;
+    padding-bottom: 86px;
   }
 `;
 
@@ -455,13 +485,14 @@ const Logo = styled.img`
   object-fit: contain;
   height: 48px;
   width: 64px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+  margin-top: -8px;
 
   ${({ theme }) => theme.media.tablet} {
     height: 64px;
     width: 85px;
 
-    margin-bottom: 24px;
+    margin-bottom: 22px;
   }
 
   ${({ theme }) => theme.media.laptopL} {
@@ -477,6 +508,10 @@ const SHeadline = styled(Headline)`
   margin-bottom: 16px;
   max-width: 580px;
   width: 100%;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 24px;
+  }
 
   ${({ theme }) => theme.media.laptop} {
     max-width: 800px;
@@ -505,6 +540,10 @@ const SSubtitle = styled(Text)`
 const SSection = styled.section`
   position: relative;
   margin-bottom: 80px;
+
+  &:last-child {
+    margin-bottom: 40px;
+  }
 `;
 
 const SSectionTitle = styled(Headline)`
@@ -513,38 +552,42 @@ const SSectionTitle = styled(Headline)`
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 24px;
   }
+
+  ${({ theme }) => theme.media.laptopL} {
+    margin-bottom: 40px;
+  }
 `;
 
 const SVotesIcon = styled.img`
   position: absolute;
   right: 0;
   top: 100%;
-  transform: translate(3px, 16px);
+  transform: translate(3px, 18px);
   width: 45px;
   height: 40px;
 
   ${({ theme }) => theme.media.tablet} {
     width: 64px;
     height: 58px;
-    right: 12%;
-    transform: translate(0, -15px);
+    right: 9%;
+    transform: translate(-4px, -19px);
   }
 
   ${({ theme }) => theme.media.laptopL} {
     width: 94px;
     height: 85px;
-
-    transform: translate(-70%, 50px);
+    right: 18%;
+    transform: translate(0, 57%);
   }
 `;
 
 const SCfIcon = styled.img`
   position: absolute;
-  left: -16px;
+  left: -17px;
   bottom: 0;
-  transform: translate(-50%, -50px);
-  width: 71px;
-  height: 82px;
+  transform: translate(-50%, -53px);
+  width: 69px;
+  height: 78px;
 
   ${({ theme }) => theme.media.tablet} {
     width: 103px;
@@ -555,12 +598,11 @@ const SCfIcon = styled.img`
   }
 
   ${({ theme }) => theme.media.laptopL} {
-    width: 150px;
-    height: 196px;
-
-    left: -80px;
-
-    transform: translate(-40%, 60%);
+    width: 160px;
+    height: 166px;
+    left: -96px;
+    top: 82%;
+    transform: translate(-31%, -5px);
   }
 `;
 
@@ -569,9 +611,9 @@ const SAcIcon = styled.img`
   position: absolute;
   width: 151px;
   height: 154px;
-  top: 0;
-  right: -16px;
-  transform: translate(50%, -30%);
+  top: -1px;
+  right: -13px;
+  transform: translate(50%, -35%);
 
   ${({ theme }) => theme.media.tablet} {
     visibility: visible;
@@ -581,7 +623,7 @@ const SAcIcon = styled.img`
     width: 218px;
     height: 221px;
     right: -96px;
-    transform: translate(30%, -20%);
+    transform: translate(28%, -14%);
   }
 `;
 
@@ -589,18 +631,22 @@ const SHourGlassesIcon = styled.img`
   position: absolute;
   right: 18%;
   top: 0;
-  transform: translate(0, -40%);
+  transform: translate(2px, -72%);
   width: 30px;
   height: 35px;
 
   ${({ theme }) => theme.media.tablet} {
     width: 42px;
     height: 47px;
+    right: 22%;
+    transform: translate(0px, -60%);
   }
 
   ${({ theme }) => theme.media.laptopL} {
     width: 61px;
     height: 70px;
+    right: 24%;
+    transform: translate(-3px, -44px);
   }
 `;
 
@@ -608,7 +654,7 @@ const SMcSubIcon = styled.img`
   position: absolute;
   right: -16px;
   top: 0;
-  transform: translate(38%, -20px);
+  transform: translate(36%, -38%);
   width: ${({ theme }) => (theme.name === 'light' ? '43px' : '96px')};
   height: ${({ theme }) => (theme.name === 'light' ? '60px' : '96px')};
 
@@ -617,23 +663,22 @@ const SMcSubIcon = styled.img`
     height: ${({ theme }) => (theme.name === 'light' ? '81px' : '121px')};
     top: 100%;
     right: -32px;
-
-    transform: translate(45%, 15%);
+    transform: translate(60px, 17px);
   }
 
   ${({ theme }) => theme.media.laptopL} {
     width: ${({ theme }) => (theme.name === 'light' ? '88px' : '180px')};
     height: ${({ theme }) => (theme.name === 'light' ? '120px' : '180px')};
     left: 100%;
-    transform: translate(-10px, -10px);
+    transform: translate(-15%, 46%);
   }
 `;
 
 const SBubble1Icon = styled.img`
   position: absolute;
-  left: 0;
+  left: 10%;
   top: 0;
-  transform: translate(40px, 16px);
+  transform: translate(4px, 40%);
   width: 18px;
   height: 18px;
 
@@ -643,11 +688,14 @@ const SBubble1Icon = styled.img`
   ${({ theme }) => theme.media.tablet} {
     width: 25px;
     height: 25px;
+    left: 0;
+    transform: translate(41px, -15px);
   }
 
   ${({ theme }) => theme.media.laptopL} {
     width: 39px;
     height: 39px;
+    transform: translate(34px, 28px);
   }
 `;
 
@@ -657,7 +705,7 @@ const SBubble2Icon = styled.img`
   bottom: 0;
   transform: translate(-10px, -96px);
   width: 12px;
-  height: 13px;
+  height: 12px;
 
   filter: ${({ theme }) =>
     theme.name === 'dark' ? `brightness(0.6)` : `none`};
@@ -665,13 +713,13 @@ const SBubble2Icon = styled.img`
   ${({ theme }) => theme.media.tablet} {
     width: 18px;
     height: 18px;
+    transform: translate(-30px, -69px);
   }
 
   ${({ theme }) => theme.media.laptopL} {
     width: 27px;
     height: 27px;
-
-    transform: translate(0, -45px);
+    transform: translate(10px, -27px);
     right: 10%;
   }
 `;
@@ -705,7 +753,11 @@ const SMediaSection = styled(SSection)`
   }
 `;
 
-const SScrollArrow = styled(ScrollArrowPermanent)`
+interface ISScrollArrow {
+  disabled: boolean;
+}
+
+const SScrollArrow = styled(ScrollArrowPermanent)<ISScrollArrow>`
   & > div > svg {
     width: 25px;
     height: 27px;
@@ -735,11 +787,17 @@ const SScrollArrow = styled(ScrollArrowPermanent)`
             transform: translateX(50%);
           }
         `}
+
+  ${(props) =>
+    props.disabled
+      ? css`
+          display: none;
+        `
+      : ''}
 `;
 
 const SMedia = styled.div`
   max-width: 252px;
-  margin-right: 16px;
 
   ${({ theme }) => theme.media.tablet} {
     max-width: unset;
@@ -748,17 +806,20 @@ const SMedia = styled.div`
 
 const SMediaPreview = styled.div`
   position: relative;
-  padding: 8px;
-  border: 1.6px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
-  border-radius: ${({ theme }) => theme.borderRadius.smallLg};
-  margin-bottom: 24px;
+  padding: 9px;
+  border: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  margin-bottom: 15px;
 
   ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 16px;
+    margin-bottom: 13px;
+    padding: 6px;
+    border-radius: ${({ theme }) => theme.borderRadius.smallLg};
   }
 
-  ${({ theme }) => theme.media.laptopM} {
+  ${({ theme }) => theme.media.laptopL} {
     margin-bottom: 24px;
+    padding: 8px;
   }
 `;
 
@@ -863,8 +924,8 @@ const SMediaPreviewPic = styled.div<ISMediaPreviewPic>`
   }
 
   ${({ theme }) => theme.media.tablet} {
-    max-height: 171px;
-    min-height: 171px;
+    max-height: 160px;
+    min-height: 160px;
   }
 
   ${({ theme }) => theme.media.laptopL} {
@@ -874,11 +935,31 @@ const SMediaPreviewPic = styled.div<ISMediaPreviewPic>`
 `;
 
 const SMediaPreviewIcon = styled(InlineSVG)`
+  flex-shrink: 0;
+  width: 42px;
+  height: 25px;
+  margin-left: auto;
   transform: rotate(-45deg);
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 22px;
+    height: 23px;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    width: 28px;
+    height: 30px;
+  }
 `;
 
 const SMediaTitle = styled(Text)`
   margin-right: 10px;
+  max-height: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
@@ -917,14 +998,13 @@ const SBackersList = styled.ul`
 
 const SSectionTitleBackers = styled(SSectionTitle)`
   margin-bottom: 24px;
+
+  ${({ theme }) => theme.media.laptopL} {
+    margin-bottom: 40px;
+  }
 `;
 
 const SBacker = styled.li`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   width: calc((100% - 15px) / 2);
   height: calc(((100vw - 32px) - 15px) / 2);
   max-height: 288px;
@@ -947,8 +1027,9 @@ const SBacker = styled.li`
     background: ${({ theme }) =>
       theme.name === 'light' ? '#F1F3F9' : '#14151f'};
     border-color: ${({ theme }) =>
-        theme.name === 'light' ? '#F1F3F9' : '#14151f'}
-      & > img {
+      theme.name === 'light' ? '#F1F3F9' : '#14151f'};
+
+    & img {
       filter: brightness(1) grayscale(0%);
     }
   }
@@ -973,6 +1054,8 @@ const SBacker = styled.li`
     width: calc((100% - (32px * 3)) / 4);
     height: calc(((100vw - (96px * 2)) - (32px * 3)) / 4);
     margin-right: 32px;
+    border-width: 1.5px;
+    border-radius: ${({ theme }) => theme.borderRadius.smallLg};
 
     &:nth-child(2n) {
       margin-right: 32px;
@@ -984,6 +1067,16 @@ const SBacker = styled.li`
   }
 `;
 
+const SBackerLink = styled.a`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+`;
+
 const SBackerDescription = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
@@ -993,9 +1086,9 @@ interface ISBackerLogo {
 }
 
 const SBackerLogo = styled.img<ISBackerLogo>`
-  transform: translateY(-10px);
+  transform: translateY(-13px);
   opacity: ${({ theme }) => (theme.name === 'light' ? '30%' : '100%')};
-  filter: brightness(0.5) grayscale(100%);
+  filter: brightness(0.7) grayscale(100%);
   transition: 0.1s filter linear, 0.1s -webkit-filter linear;
 
   ${(props) => {
@@ -1004,6 +1097,7 @@ const SBackerLogo = styled.img<ISBackerLogo>`
         return css`
           width: 48px;
           height: 48px;
+          filter: brightness(1) grayscale(100%);
 
           ${({ theme }) => theme.media.laptopL} {
             width: 72px;
@@ -1061,32 +1155,38 @@ const SBackerLogo = styled.img<ISBackerLogo>`
 const SBackerTitle = styled(Text)`
   text-align: center;
   position: absolute;
-  bottom: 16px;
+  bottom: 14px;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 14px;
+  }
 
   ${({ theme }) => theme.media.laptop} {
     bottom: 40px;
-
     font-size: 16px;
     line-height: 20px;
   }
 `;
 
-const SHighlightBg = styled.div`
+interface ISGradient {
+  url: string;
+}
+
+const SGradient = styled.div<ISGradient>`
   position: absolute;
-  top: -42%;
-  height: 750px;
-  width: 985px;
-  left: -16px;
-  overflow-y: hidden;
+  height: 1300px;
+  width: 2000px;
+  right: 0;
+  transform: translate(50%, -66%);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-image: url(${(props) => props.url});
 
-  visibility: ${({ theme }) => (theme.name === 'light' ? 'hidden' : 'initial')};
-
-  & > div {
-    position: absolute;
-  }
-
-  & > div > svg {
-    height: 750px;
+  ${({ theme }) => theme.media.tablet} {
+    height: 1700px;
+    width: 2100px;
+    transform: translate(55%, -50%);
   }
 `;
 
@@ -1096,24 +1196,38 @@ const SSectionInvestors = styled(SSection)`
     display: flex;
     padding-top: 40px;
   }
+
+  ${({ theme }) => theme.media.laptopL} {
+    padding-top: 80px;
+  }
 `;
 
 const SInvestorsList = styled.ul`
   list-style: none;
   width: 100%;
   z-index: 1;
+  border-top: 1px solid
+    ${({ theme }) =>
+      theme.name === 'light'
+        ? theme.colorsThemed.background.outlines1
+        : theme.colorsThemed.background.outlines2};
 
   ${({ theme }) => theme.media.tablet} {
-    max-width: 55%;
+    max-width: 57%;
     margin-left: auto;
+    border-top: none;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    max-width: 60%;
+    max-width: 62%;
+    height: 460px;
   }
 `;
 
 const SInvestor = styled.li`
+  display: flex;
+  flex-direction: column;
+
   padding: 15px 0;
   border-bottom: 1px solid
     ${({ theme }) =>
@@ -1121,24 +1235,45 @@ const SInvestor = styled.li`
         ? theme.colorsThemed.background.outlines1
         : theme.colorsThemed.background.outlines2};
 
+  ${({ theme }) => theme.media.tablet} {
+    &:first-child {
+      padding-top: 0;
+    }
+
+    padding: 17px 0;
+  }
+
   ${({ theme }) => theme.media.laptop} {
     &:hover > h5 {
-      transform: scale(1.3);
+      /* transform: scale(2); */
+      font-size: 56px;
+      line-height: 64px;
+    }
+
+    padding: 24px 0;
+
+    &:first-child {
+      justify-content: flex-end;
+      height: 113px;
     }
   }
 `;
 
 const SInvestorTitle = styled(Headline)`
-  margin-bottom: 6px;
-  transition: 0.15s transform ease-in-out;
+  margin-bottom: 5px;
+  transition: 0.15s all ease-in-out;
   transform-origin: top left;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 0px;
+  }
 `;
 
 const SMcIcon = styled.img`
   position: absolute;
   left: -16px;
-  top: -20px;
-  transform: translate(-20px, -70%);
+  top: 0;
+  transform: translate(-20px, -100%);
   width: 62px;
   height: 75px;
   z-index: 1;
@@ -1147,10 +1282,10 @@ const SMcIcon = styled.img`
     width: 103px;
     height: 125px;
 
-    transform: translate(-45%, -40%);
+    transform: translate(-46%, -60%);
   }
 
-  ${({ theme }) => theme.media.laptopM} {
+  ${({ theme }) => theme.media.laptopL} {
     width: 155px;
     height: 188px;
     left: -96px;
@@ -1163,36 +1298,43 @@ const SLogoFlatIcon = styled(InlineSVG)`
   position: absolute;
   left: -16px;
   top: 0;
-  transform: translate(-15%, -35%);
+  transform: translate(-16%, -30%);
   width: 222px;
   height: 148px;
 
   ${({ theme }) => theme.media.tablet} {
     width: 343px;
     height: 230px;
-    transform: translate(-25%, -10%);
+    transform: translate(-25%, -3%);
   }
 
-  ${({ theme }) => theme.media.laptopM} {
+  ${({ theme }) => theme.media.laptopL} {
     width: 574px;
     height: 384px;
-    transform: translate(-35%, -15%);
+    transform: translate(-35%, -5%);
   }
 `;
 
 const SBubble3Icon = styled.img`
   position: absolute;
-  right: -16px;
-  bottom: -12px;
-  transform: translate(0, 100%);
-  width: 29px;
+  right: -17px;
+  bottom: 0;
+  transform: translate(50%, 90%);
+  width: 58px;
   height: 58px;
 
   ${({ theme }) => theme.media.tablet} {
     right: -32px;
-    width: 50px;
-    height: 100px;
+    width: 103px;
+    height: 103px;
 
-    transform: translate(20%, 100%);
+    transform: translate(61%, 113%);
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    right: -32px;
+    width: 133px;
+    height: 133px;
+    transform: translate(100%, 11px);
   }
 `;
