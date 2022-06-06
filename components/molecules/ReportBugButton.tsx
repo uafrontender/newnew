@@ -19,6 +19,9 @@ const ReportBugButton: React.FC<ReportBugButtonI> = React.memo(
     const handleClick = () => {
       const userSnapApi = (window as any).Usersnap;
       if (userSnapApi) {
+        userSnapApi.on('open', (event: any) => {
+          event.api.setValue('visitor', user.userData?.username);
+        });
         userSnapApi.logEvent('show_bug_report');
       }
     };
