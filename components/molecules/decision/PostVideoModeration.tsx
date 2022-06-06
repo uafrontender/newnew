@@ -490,6 +490,23 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
   // Adjust sound button if needed
   useEffect(() => {
+    const handleScroll = () => {
+      const rect =
+        document.getElementById('sound-button')?.getBoundingClientRect() ||
+        document.getElementById('toggle-video-widget')?.getBoundingClientRect();
+
+      const videoRect =
+        document.getElementById(`${postId}`)?.getBoundingClientRect() ||
+        document.getElementById('video-wrapper')?.getBoundingClientRect();
+
+      if (rect && videoRect) {
+        const delta = window.innerHeight - videoRect.bottom;
+        if (delta < 0) {
+          setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+        }
+      }
+    };
+
     if (isBrowser() && !isMobileOrTablet) {
       const rect =
         document.getElementById('sound-button')?.getBoundingClientRect() ||
@@ -505,16 +522,26 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           setSoundBtnBottomOverriden(Math.abs(delta) + 24);
         }
       }
+
+      document
+        ?.getElementById('post-modal-container')
+        ?.addEventListener('scroll', handleScroll);
     }
 
     return () => {
       setSoundBtnBottomOverriden(undefined);
+
+      if (isBrowser() && !isMobileOrTablet) {
+        document
+          ?.getElementById('post-modal-container')
+          ?.removeEventListener('scroll', handleScroll);
+      }
     };
-  }, [isMobileOrTablet]);
+  }, [isMobileOrTablet, postId]);
 
   return (
     <>
-      <SVideoWrapper>
+      <SVideoWrapper id='video-wrapper'>
         {openedTab === 'announcement' ? (
           <>
             <PostBitmovinPlayer

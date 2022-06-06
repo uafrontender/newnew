@@ -86,6 +86,23 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
 
   // Adjust sound button if needed
   useEffect(() => {
+    const handleScroll = () => {
+      const rect = document
+        .getElementById('sound-button')
+        ?.getBoundingClientRect();
+
+      const videoRect = document
+        .getElementById(`${postId}`)
+        ?.getBoundingClientRect();
+
+      if (rect && videoRect) {
+        const delta = window.innerHeight - videoRect.bottom;
+        if (delta < 0) {
+          setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+        }
+      }
+    };
+
     if (isBrowser() && !isMobileOrTablet) {
       const rect = document
         .getElementById('sound-button')
@@ -101,12 +118,22 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
           setSoundBtnBottomOverriden(Math.abs(delta) + 24);
         }
       }
+
+      document
+        ?.getElementById('post-modal-container')
+        ?.addEventListener('scroll', handleScroll);
     }
 
     return () => {
       setSoundBtnBottomOverriden(undefined);
+
+      if (isBrowser() && !isMobileOrTablet) {
+        document
+          ?.getElementById('post-modal-container')
+          ?.removeEventListener('scroll', handleScroll);
+      }
     };
-  }, [isMobileOrTablet]);
+  }, [isMobileOrTablet, postId]);
 
   return (
     <SVideoWrapper>
