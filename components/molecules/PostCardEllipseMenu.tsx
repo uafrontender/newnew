@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
@@ -142,7 +143,13 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
         }
 
         if (user.loggedIn) {
-          fetchIsFollowing();
+          // setTimeout used to fix the React memory leak warning
+          const timer = setTimeout(() => {
+            fetchIsFollowing();
+          });
+          return () => {
+            clearTimeout(timer);
+          };
         }
       }, [user.loggedIn, postUuid]);
 

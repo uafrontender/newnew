@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
+/* eslint-disable consistent-return */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -386,7 +387,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
 
         const res = await markPost(markAsFavoritePayload);
 
-        console.log(res);
+        if (res.error) throw new Error('Failed to mark post as favorited');
       } catch (err) {
         console.error(err);
       }
@@ -538,20 +539,37 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
         }
       }
 
-      markAsViewed();
+      // setTimeout used to fix the React memory leak warning
+      const timer = setTimeout(() => {
+        markAsViewed();
+      });
+      return () => {
+        clearTimeout(timer);
+      };
     }, [post, user.loggedIn, user.userData?.userUuid]);
 
     useEffect(() => {
-      setPledges([]);
-      setPledgesNextPageToken('');
-      fetchPledgesForPost();
-      fetchPostLatestData();
+      // setTimeout used to fix the React memory leak warning
+      const timer = setTimeout(() => {
+        setPledges([]);
+        setPledgesNextPageToken('');
+        fetchPledgesForPost();
+        fetchPostLatestData();
+      });
+      return () => {
+        clearTimeout(timer);
+      };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [post.postUuid]);
 
     useEffect(() => {
       if (standardPledgeAmounts) {
-        setPledgeLevels(standardPledgeAmounts);
+        const timer = setTimeout(() => {
+          setPledgeLevels(standardPledgeAmounts);
+        });
+        return () => {
+          clearTimeout(timer);
+        };
       }
     }, [standardPledgeAmounts]);
 
