@@ -196,6 +196,11 @@ const SContent = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
+  overflow: hidden;
+
+  ${({ theme }) => theme.media.tablet} {
+    border-radius: 16px;
+  }
 `;
 
 const SVideoWrapper = styled.div`
@@ -245,10 +250,6 @@ const SImageBG = styled.img`
 
   @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
     filter: blur(32px);
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    border-radius: 16px;
   }
 `;
 
