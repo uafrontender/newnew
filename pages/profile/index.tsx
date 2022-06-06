@@ -14,7 +14,8 @@ import { getMyPosts } from '../../api/endpoints/user';
 // import { TTokenCookie } from '../../api/apiConfigs';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
-import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
+import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
+import assets from '../../constants/assets';
 
 const PostModal = dynamic(
   () => import('../../components/organisms/decision/PostModal')
@@ -145,6 +146,9 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
       <Head>
         <title>{t('meta.title')}</title>
         <meta name='description' content={t('meta.description')} />
+        <meta property='og:title' content={t('meta.title')} />
+        <meta property='og:description' content={t('meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <div>
         <SMain>

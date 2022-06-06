@@ -25,12 +25,13 @@ const SettingsNotificationsSection = () => {
       const res = await getMyNotificationsState(payload);
       const { data, error } = res;
       if (!data || error) throw new Error(error?.message ?? 'Request failed');
-      if (data.notificationState)
+      if (data.notificationState) {
         setMyNotificationState(data.notificationState);
+      }
       setLoading(false);
     } catch (err) {
       console.error(err);
-      setLoading(null);
+      setLoading(false);
     }
   };
 

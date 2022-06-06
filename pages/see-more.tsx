@@ -28,6 +28,7 @@ import { fetchLiveAuctions } from '../api/endpoints/auction';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import switchPostType from '../utils/switchPostType';
+import assets from '../constants/assets';
 
 const PostModal = dynamic(
   () => import('../components/organisms/decision/PostModal')
@@ -367,11 +368,26 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
   return (
     <>
       <Head>
-        <title>{t(`search.meta.title-${router?.query?.category}`)}</title>
+        <title>
+          {t(`search.meta.title-${router?.query?.category || 'ac'}`)}
+        </title>
         <meta
           name='description'
-          content={t(`search.meta.description-${router?.query?.category}`)}
+          content={t(
+            `search.meta.description-${router?.query?.category || 'ac'}`
+          )}
         />
+        <meta
+          property='og:title'
+          content={t(`search.meta.title-${router?.query?.category || 'ac'}`)}
+        />
+        <meta
+          property='og:description'
+          content={t(
+            `search.meta.description-${router?.query?.category || 'ac'}`
+          )}
+        />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       {topSectionCollection.length > 0 && (
         <TopSection

@@ -6,13 +6,15 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
+import Head from 'next/head';
 import { NextPageWithLayout } from '../_app';
 // import { TTokenCookie } from '../../api/apiConfigs';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
-import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
+import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
+import assets from '../../constants/assets';
 
 const NoContentCard = dynamic(
   () => import('../../components/atoms/profile/NoContentCard')
@@ -54,6 +56,19 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
 
   return (
     <div>
+      <Head>
+        <title>{t('Subscriptions.meta.title')}</title>
+        <meta
+          name='description'
+          content={t('Subscriptions.meta.description')}
+        />
+        <meta property='og:title' content={t('Subscriptions.meta.title')} />
+        <meta
+          property='og:description'
+          content={t('Subscriptions.meta.description')}
+        />
+        <meta property='og:image' content={assets.openGraphImage.common} />
+      </Head>
       <SMain>
         <SCardsSection>
           {creatorsImSubscribedTo.length > 0 ? (

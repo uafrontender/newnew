@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -36,6 +36,8 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVo
 
     const { appConstants } = useGetAppConstants();
 
+    const [bottom, setBottom] = useState<number | undefined>(undefined);
+
     useOnClickEsc(containerRef, handleClose);
     useOnClickOutside(containerRef, handleClose);
 
@@ -48,6 +50,24 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVo
           } else {
             container.style.overflowY = '';
           }
+      }
+    }, [isVisible]);
+
+    useEffect(() => {
+      if (isVisible) {
+        const rect = containerRef?.current?.getBoundingClientRect();
+
+        if (rect) {
+          const isInViewPort =
+            rect.bottom <=
+            (window.innerHeight || document.documentElement?.clientHeight);
+
+          if (!isInViewPort) {
+            setBottom(24);
+          }
+        }
+      } else {
+        setBottom(undefined);
       }
     }, [isVisible]);
 
@@ -65,9 +85,14 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVo
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               style={{
-                ...(top
+                ...(top && !bottom
                   ? {
                       top: `${top}px`,
+                    }
+                  : {}),
+                ...(bottom
+                  ? {
+                      bottom: `${bottom}px`,
                     }
                   : {}),
               }}
@@ -120,7 +145,6 @@ export default McOptionCardSelectVotesMenu;
 
 const SContainer = styled(motion.div)`
   position: absolute;
-  top: 340px;
   z-index: 10;
   right: 86px;
   width: 174px;

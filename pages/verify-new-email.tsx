@@ -16,6 +16,7 @@ import CodeVerificationMenuNewEmail from '../components/organisms/CodeVerificati
 import { SocketContext } from '../contexts/socketContext';
 import { setUserData } from '../redux-store/slices/userStateSlice';
 import { becomeCreator } from '../api/endpoints/user';
+import assets from '../constants/assets';
 
 interface IVerifyNewEmail {}
 
@@ -102,6 +103,9 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
       <Head>
         <title>{t('meta.title')}</title>
         <meta name='description' content={t('meta.description')} />
+        <meta property='og:title' content={t('meta.title')} />
+        <meta property='og:description' content={t('meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <CodeVerificationMenuNewEmail
         newEmail={email as string}

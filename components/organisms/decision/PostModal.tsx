@@ -350,6 +350,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     t,
   ]);
 
+  const handleSeeNewDeletedBox = useCallback(() => {
+    if (recommendedPosts.length > 0) {
+      document.getElementById('post-modal-container')?.scrollTo({
+        top: document.getElementById('recommendations-section-heading')
+          ?.offsetTop,
+        behavior: 'smooth',
+      });
+    } else {
+      router.push(`/see-more?category=${typeOfPost}`);
+    }
+  }, [recommendedPosts, router, typeOfPost]);
+
   const handleOpenRecommendedPost = useCallback(
     (newPost: newnewapi.Post) => {
       const newPostParsed = switchPostType(newPost)[0];
@@ -432,6 +444,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           variant='decision'
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -451,6 +464,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postType={typeOfPost as string}
           variant='decision'
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -469,6 +483,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
@@ -487,6 +502,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
@@ -505,6 +521,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
@@ -584,6 +601,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           variant='moderation'
           postType={typeOfPost as string}
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -603,6 +621,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           variant='moderation'
           isFollowingDecision={isFollowingDecision}
+          hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -867,7 +886,16 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             <PostSuccessAnimationBackground />
           )}
           <Head>
-            <title>{postParsed?.title}</title>
+            <title>{t(`meta.${typeOfPost}.title`)}</title>
+            <meta
+              name='description'
+              content={t(`meta.${typeOfPost}.description`)}
+            />
+            <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
+            <meta
+              property='og:description'
+              content={t(`meta.${typeOfPost}.description`)}
+            />
           </Head>
           <SPostSuccessWaitingControlsDiv onClick={(e) => e.stopPropagation()}>
             <SWaitingSuccessControlsBtn
@@ -988,7 +1016,16 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     <>
       <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
         <Head>
-          <title>{postParsed?.title}</title>
+          <title>{t(`meta.${typeOfPost}.title`)}</title>
+          <meta
+            name='description'
+            content={t(`meta.${typeOfPost}.description`)}
+          />
+          <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
+          <meta
+            property='og:description'
+            content={t(`meta.${typeOfPost}.description`)}
+          />
         </Head>
         {!isMobile && (
           <SGoBackButtonDesktop
@@ -1072,14 +1109,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 style={{
                   marginBottom: '24px',
                 }}
-                handleButtonClick={() => {
-                  document.getElementById('post-modal-container')?.scrollTo({
-                    top: document.getElementById(
-                      'recommendations-section-heading'
-                    )?.offsetTop,
-                    behavior: 'smooth',
-                  });
-                }}
+                handleButtonClick={handleSeeNewDeletedBox}
               />
             )}
             {!isMyPost && (
@@ -1155,12 +1185,16 @@ const SPostModalContainer = styled.div<{
   left: 0;
 
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 1;
+  overscroll-behavior: none;
 
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
   padding: 16px;
+  padding-bottom: 86px;
 
   /* No select */
   -webkit-touch-callout: none;
@@ -1182,6 +1216,8 @@ const SPostModalContainer = styled.div<{
     /*transform: none; */
     /* top: 50%; */
     /* transform: translateY(-50%); */
+    padding-bottom: 16px;
+
     background-color: ${({ theme }) =>
       theme.name === 'dark'
         ? theme.colorsThemed.background.secondary
@@ -1209,6 +1245,7 @@ const SPostModalContainer = styled.div<{
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 24px;
+    padding-bottom: 24px;
 
     ${({ isMyPost }) =>
       isMyPost

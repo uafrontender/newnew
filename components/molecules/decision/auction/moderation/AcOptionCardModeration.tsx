@@ -121,7 +121,27 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
               </SBidAmount>
               <SOptionInfo variant={3}>{option.title}</SOptionInfo>
               <SBiddersInfo variant={3}>
-                <Link href={`/${option.creator?.username}`}>
+                {option.creator?.username ? (
+                  <Link href={`/${option.creator?.username}`}>
+                    <SSpanBiddersHighlighted
+                      className='spanHighlighted'
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        ...(option.isCreatedBySubscriber
+                          ? {
+                              color:
+                                theme.name === 'dark'
+                                  ? theme.colorsThemed.accent.yellow
+                                  : theme.colors.dark,
+                              cursor: 'pointer',
+                            }
+                          : {}),
+                      }}
+                    >
+                      {option.creator?.nickname ?? option.creator?.username}
+                    </SSpanBiddersHighlighted>
+                  </Link>
+                ) : (
                   <SSpanBiddersHighlighted
                     className='spanHighlighted'
                     onClick={(e) => e.stopPropagation()}
@@ -132,14 +152,13 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                               theme.name === 'dark'
                                 ? theme.colorsThemed.accent.yellow
                                 : theme.colors.dark,
-                            cursor: 'pointer',
                           }
                         : {}),
                     }}
                   >
                     {option.creator?.nickname ?? option.creator?.username}
                   </SSpanBiddersHighlighted>
-                </Link>
+                )}
                 {option.supporterCount > 1 ? (
                   <>
                     <SSpanBiddersRegular className='spanRegular'>
@@ -247,7 +266,27 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
             </SBidAmount>
             <SOptionInfo variant={3}>{option.title}</SOptionInfo>
             <SBiddersInfo variant={3}>
-              <Link href={`/${option.creator?.username}`}>
+              {option.creator?.username ? (
+                <Link href={`/${option.creator?.username}`}>
+                  <SSpanBiddersHighlighted
+                    className='spanHighlighted'
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      ...(option.isCreatedBySubscriber
+                        ? {
+                            color:
+                              theme.name === 'dark'
+                                ? theme.colorsThemed.accent.yellow
+                                : theme.colors.dark,
+                            cursor: 'pointer',
+                          }
+                        : {}),
+                    }}
+                  >
+                    {option.creator?.nickname ?? option.creator?.username}
+                  </SSpanBiddersHighlighted>
+                </Link>
+              ) : (
                 <SSpanBiddersHighlighted
                   className='spanHighlighted'
                   onClick={(e) => e.stopPropagation()}
@@ -258,14 +297,13 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                             theme.name === 'dark'
                               ? theme.colorsThemed.accent.yellow
                               : theme.colors.dark,
-                          cursor: 'pointer',
                         }
                       : {}),
                   }}
                 >
                   {option.creator?.nickname ?? option.creator?.username}
                 </SSpanBiddersHighlighted>
-              </Link>
+              )}
               {option.supporterCount > 1 ? (
                 <>
                   <SSpanBiddersRegular className='spanRegular'>

@@ -1,14 +1,17 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import { newnewapi } from 'newnew-api';
 
 import Text from '../../atoms/Text';
 
 import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import isBrowser from '../../../utils/isBrowser';
+import { checkCanDeleteMcOption } from '../../../api/endpoints/multiple_choice';
+import { checkCanDeleteAcOption } from '../../../api/endpoints/auction';
 
 interface IOptionMenu {
   xy: {
@@ -16,21 +19,35 @@ interface IOptionMenu {
     y: number;
   };
   isVisible: boolean;
+  optionId?: number;
+  optionCreatorUuid?: string;
+  optionType?: 'ac' | 'mc';
+  isMyOption?: boolean;
   handleClose: () => void;
   handleOpenReportOptionModal: () => void;
+  handleOpenRemoveOptionModal?: () => void;
 }
 
 const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
   xy,
   isVisible,
+  isMyOption,
+  optionType,
+  optionId,
+  optionCreatorUuid,
   handleClose,
   handleOpenReportOptionModal,
+  handleOpenRemoveOptionModal,
 }) => {
   const { t } = useTranslation('decision');
   const containerRef = useRef<HTMLDivElement>();
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
+
+  const [canDeleteOption, setCanDeleteOption] = useState(false);
+  const [isCanDeleteOptionLoading, setIsCanDeleteOptionLoading] =
+    useState(false);
 
   useEffect(() => {
     if (isBrowser()) {
@@ -43,6 +60,45 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
         }
     }
   }, [isVisible]);
+
+  useEffect(() => {
+    async function fetchCanDelete() {
+      setIsCanDeleteOptionLoading(true);
+      try {
+        let canDelete = false;
+        if (optionType === 'ac') {
+          const payload = new newnewapi.CanDeleteAcOptionRequest({
+            optionId,
+          });
+
+          const res = await checkCanDeleteAcOption(payload);
+
+          if (res.data) {
+            canDelete = res.data.canDelete;
+          }
+        } else {
+          const payload = new newnewapi.CanDeleteMcOptionRequest({
+            optionId,
+          });
+
+          const res = await checkCanDeleteMcOption(payload);
+
+          if (res.data) {
+            canDelete = res.data.canDelete;
+          }
+        }
+
+        setCanDeleteOption(canDelete);
+      } catch (err) {
+        console.error(err);
+      }
+      setIsCanDeleteOptionLoading(false);
+    }
+
+    if (isVisible && isMyOption) {
+      fetchCanDelete();
+    }
+  }, [isVisible, isMyOption, optionType, optionId, optionCreatorUuid]);
 
   if (!isVisible) return null;
 
@@ -63,16 +119,31 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
                 top: `${xy.y}px`,
               }}
             >
-              <SButton
-                onClick={() => {
-                  handleOpenReportOptionModal();
-                  handleClose();
-                }}
-              >
-                <Text variant={3} tone='error'>
-                  {t('ellipse-option.report-option')}
-                </Text>
-              </SButton>
+              {isMyOption && (
+                <SButton
+                  onClick={() => {
+                    handleOpenRemoveOptionModal?.();
+                    handleClose();
+                  }}
+                  disabled={!canDeleteOption || isCanDeleteOptionLoading}
+                >
+                  <Text variant={3} tone='error'>
+                    {t('ellipse-option.delete-option')}
+                  </Text>
+                </SButton>
+              )}
+              {!isMyOption && (
+                <SButton
+                  onClick={() => {
+                    handleOpenReportOptionModal();
+                    handleClose();
+                  }}
+                >
+                  <Text variant={3} tone='error'>
+                    {t('ellipse-option.report-option')}
+                  </Text>
+                </SButton>
+              )}
             </SContainer>
           )}
         </AnimatePresence>

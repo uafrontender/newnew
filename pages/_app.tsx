@@ -1,9 +1,14 @@
 /* eslint-disable no-underscore-dangle */
-import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
+import React, {
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import App from 'next/app';
 import Head from 'next/head';
 import { useStore } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import { ToastContainer } from 'react-toastify';
@@ -11,6 +16,7 @@ import { CookiesProvider } from 'react-cookie';
 import { parse } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
+import * as Sentry from '@sentry/browser';
 
 // Custom error page
 import Error from './_error';
@@ -21,7 +27,7 @@ import GlobalTheme from '../styles/ThemeProvider';
 
 // Redux store and provider
 import { setResizeMode } from '../redux-store/slices/uiStateSlice';
-import { EnhancedStoreWithPersistor, wrapper } from '../redux-store/store';
+import { useAppSelector, wrapper } from '../redux-store/store';
 
 import isBrowser from '../utils/isBrowser';
 
@@ -49,6 +55,7 @@ import assets from '../constants/assets';
 import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
+import PersistanceProvider from '../contexts/PersistenceProvider';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -63,6 +70,13 @@ interface IMyApp extends AppProps {
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString } = props;
   const store = useStore();
+  const user = useAppSelector((state) => state.user);
+
+  // Shared layouts
+  const getLayout = useMemo(
+    () => Component.getLayout ?? ((page: any) => page),
+    [Component.getLayout]
+  );
 
   // Pre-fetch images after all loading for initial page is done
   const [preFetchImages, setPreFetchImages] = useState<string>('');
@@ -112,18 +126,22 @@ const MyApp = (props: IMyApp): ReactElement => {
     }
   }, [store, uaString]);
 
-  // Shared layouts
-  const getLayout = Component.getLayout ?? ((page) => page);
+  // TODO: move to the store logic
+  useEffect(() => {
+    if (user.userData?.username) {
+      Sentry.setUser({ username: user.userData.username });
+    }
+  }, [user.userData?.username]);
 
   return (
     <>
       <Head>
         <meta charSet='utf-8' />
-        <meta name='robots' content='noindex' />
         <meta
           name='viewport'
           content='width=device-width, initial-scale=1, user-scalable=no'
         />
+        <meta property='og:type' content='website' />
         {preFetchImages !== '' && PRE_FETCH_LINKS_COMMON}
         {preFetchImages === 'dark' && PRE_FETCH_LINKS_DARK}
         {preFetchImages === 'light' && PRE_FETCH_LINKS_LIGHT}
@@ -132,10 +150,7 @@ const MyApp = (props: IMyApp): ReactElement => {
         <AppConstantsContextProvider>
           <SocketContextProvider>
             <ChannelsContextProvider>
-              <PersistGate
-                loading={null}
-                persistor={(store as EnhancedStoreWithPersistor).__persistor}
-              >
+              <PersistanceProvider store={store}>
                 <SyncUserWrapper>
                   <NotificationsProvider>
                     <BlockedUsersProvider>
@@ -153,7 +168,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                                         getLayout(<Component {...pageProps} />)
                                       ) : (
                                         <Error
-                                          errorMsg={pageProps.error?.message}
+                                          title={pageProps.error?.message}
                                           statusCode={
                                             pageProps.error?.statusCode ?? 500
                                           }
@@ -171,7 +186,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                     </BlockedUsersProvider>
                   </NotificationsProvider>
                 </SyncUserWrapper>
-              </PersistGate>
+              </PersistanceProvider>
             </ChannelsContextProvider>
           </SocketContextProvider>
         </AppConstantsContextProvider>

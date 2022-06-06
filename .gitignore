@@ -45,3 +45,10 @@ yarn-error.log*
 #editor
 .vscode
 .env
+
+# Sentry
+.sentryclirc
+
+# SEO
+/public/robots.txt
+/public/sitemap*.xml

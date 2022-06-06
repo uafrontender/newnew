@@ -31,6 +31,9 @@ export const HowItWorks = () => {
       <Head>
         <title>{t('meta.title')}</title>
         <meta name='description' content={t('meta.description')} />
+        <meta property='og:title' content={t('meta.title')} />
+        <meta property='og:description' content={t('meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <Container>
         <IntroSection>
@@ -40,16 +43,7 @@ export const HowItWorks = () => {
               {t('intro.text')}
             </IntroText>
           </IntroContent>
-          <QuestionMarkVisual
-            muted
-            autoPlay
-            playsInline
-            poster={
-              theme.name === 'light'
-                ? assets.info.lightQuestionMarkStatic
-                : assets.info.darkQuestionMarkStatic
-            }
-          >
+          <QuestionMarkVisual muted autoPlay playsInline>
             <source
               src={
                 theme.name === 'light'

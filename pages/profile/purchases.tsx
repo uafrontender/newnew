@@ -3,6 +3,7 @@ import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSidePropsContext, NextPage } from 'next';
+import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -13,7 +14,8 @@ import { getMyPosts } from '../../api/endpoints/user';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
-import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
+import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
+import assets from '../../constants/assets';
 
 const PostModal = dynamic(
   () => import('../../components/organisms/decision/PostModal')
@@ -139,6 +141,16 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({
 
   return (
     <div>
+      <Head>
+        <title>{t('Purchases.meta.title')}</title>
+        <meta name='description' content={t('Purchases.meta.description')} />
+        <meta property='og:title' content={t('Purchases.meta.title')} />
+        <meta
+          property='og:description'
+          content={t('Purchases.meta.description')}
+        />
+        <meta property='og:image' content={assets.openGraphImage.common} />
+      </Head>
       <SMain>
         <SCardsSection>
           {posts && posts.length > 0 && (

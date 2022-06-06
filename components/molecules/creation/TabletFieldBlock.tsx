@@ -205,6 +205,10 @@ const SInput = styled.input<ISInput>`
     -webkit-appearance: none;
   }
 
+  &::placeholder {
+    color: ${({ theme }) => theme.colorsThemed.text.quaternary};
+  }
+
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
     font-weight: 500;

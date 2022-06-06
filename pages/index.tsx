@@ -340,6 +340,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       <Head>
         <title>{t('home.meta.title')}</title>
         <meta name='description' content={t('home.meta.description')} />
+        <meta property='og:title' content={t('home.meta.title')} />
+        <meta property='og:description' content={t('home.meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       {!user.loggedIn && <HeroSection />}
       {topSectionCollection?.length > 0 && (

@@ -12,6 +12,7 @@ import { useRouter } from 'next/router';
 import { useCookies } from 'react-cookie';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Head from 'next/head';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
@@ -50,6 +51,7 @@ import PrivacySection from '../../components/organisms/settings/PrivacySection';
 import { SocketContext } from '../../contexts/socketContext';
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import { getMyTransactions } from '../../api/endpoints/payments';
+import assets from '../../constants/assets';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
@@ -325,6 +327,16 @@ const MyProfileSettingsIndex = () => {
 
   return (
     <div>
+      <Head>
+        <title>{t('Settings.meta.title')}</title>
+        <meta name='description' content={t('Settings.meta.description')} />
+        <meta property='og:title' content={t('Settings.meta.title')} />
+        <meta
+          property='og:description'
+          content={t('Settings.meta.description')}
+        />
+        <meta property='og:image' content={assets.openGraphImage.common} />
+      </Head>
       <SMain>
         <SGoBackButton onClick={() => router.back()}>
           {isMobile ? t('Settings.heading') : t('Settings.goBackBtn')}

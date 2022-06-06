@@ -112,3 +112,15 @@ export const deleteAcOption = (payload: newnewapi.DeleteAcOptionRequest) =>
     'post',
     payload
   );
+
+  export const checkCanDeleteAcOption = (payload: newnewapi.CanDeleteAcOptionRequest) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.CanDeleteAcOptionRequest,
+    newnewapi.CanDeleteAcOptionResponse
+  >(
+    newnewapi.CanDeleteAcOptionRequest,
+    newnewapi.CanDeleteAcOptionResponse,
+    `${BASE_URL_AUCTION}/can_delete_ac_option`,
+    'post',
+    payload
+  );

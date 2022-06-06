@@ -17,6 +17,7 @@ import General from '../components/templates/General';
 import { getMyNotifications, markAsRead } from '../api/endpoints/notification';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import { useNotifications } from '../contexts/notificationsContext';
+import assets from '../constants/assets';
 
 const NoResults = dynamic(
   () => import('../components/molecules/notifications/NoResults')
@@ -169,6 +170,9 @@ export const Notifications = () => {
       <Head>
         <title>{t('meta.title')}</title>
         <meta name='description' content={t('meta.description')} />
+        <meta property='og:title' content={t('meta.title')} />
+        <meta property='og:description' content={t('meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <SContent>
         <SHeading>{t('meta.title')}</SHeading>
