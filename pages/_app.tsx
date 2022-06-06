@@ -186,7 +186,7 @@ const MyApp = (props: IMyApp): ReactElement => {
             name='viewport'
             content='width=device-width, initial-scale=1, user-scalable=no'
           />
-          <meta property='og:image' content={assets.openGraphImage.common} />
+          <meta property='og:type' content='website' />
           {preFetchImages !== '' && PRE_FETCH_LINKS_COMMON}
           {preFetchImages === 'dark' && PRE_FETCH_LINKS_DARK}
           {preFetchImages === 'light' && PRE_FETCH_LINKS_LIGHT}
@@ -212,7 +212,6 @@ const MyApp = (props: IMyApp): ReactElement => {
           name='viewport'
           content='width=device-width, initial-scale=1, user-scalable=no'
         />
-        <meta property='og:image' content={assets.openGraphImage.common} />
         <meta property='og:type' content='website' />
         {preFetchImages !== '' && PRE_FETCH_LINKS_COMMON}
         {preFetchImages === 'dark' && PRE_FETCH_LINKS_DARK}
