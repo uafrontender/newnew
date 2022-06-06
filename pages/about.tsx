@@ -1238,6 +1238,7 @@ const SInvestorsList = styled.ul`
   ${({ theme }) => theme.media.laptop} {
     max-width: 62%;
     height: 460px;
+    margin-top: -25px;
   }
 `;
 
