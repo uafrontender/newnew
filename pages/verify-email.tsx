@@ -12,6 +12,7 @@ import AuthLayout, {
   AuthLayoutContext,
 } from '../components/templates/AuthLayout';
 import CodeVerificationMenu from '../components/organisms/CodeVerificationMenu';
+import assets from '../constants/assets';
 
 const VerifyEmail = () => {
   const { t } = useTranslation('verify-email');
@@ -34,6 +35,7 @@ const VerifyEmail = () => {
         <meta name='description' content={t('meta.description')} />
         <meta property='og:title' content={t('meta.title')} />
         <meta property='og:description' content={t('meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <motion.div
         initial={{
