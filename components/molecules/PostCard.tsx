@@ -367,6 +367,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 className='thumnailHolder'
                 src={postParsed.announcement?.thumbnailImageUrl ?? ''}
                 alt='Post'
+                draggable={false}
                 hovered={hovered}
               />
               {showVideo && (
@@ -462,6 +463,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               className='thumnailHolder'
               src={postParsed.announcement?.thumbnailImageUrl ?? ''}
               alt='Post'
+              draggable={false}
               hovered={hovered}
             />
             {showVideo && (
