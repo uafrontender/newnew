@@ -24,6 +24,7 @@ const disallow = [
   '/sign-up-payment',
   '/subscription-success',
   '/test',
+  '/unsubscribe',
   '/verify-email',
   '/verify-new-email',
   '/404',
