@@ -10,7 +10,6 @@ import React, {
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import { useInView } from 'react-intersection-observer';
 import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
@@ -54,6 +53,7 @@ import getDisplayname from '../../utils/getDisplayname';
 import ReportModal, { ReportData } from './chat/ReportModal';
 import { reportPost } from '../../api/endpoints/report';
 import PostCardEllipseModal from './PostCardEllipseModal';
+import useOnTouchStartOutside from '../../utils/hooks/useOnTouchStartOutside';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -111,17 +111,26 @@ export const PostCard: React.FC<ICard> = React.memo(
       resizeMode
     );
 
-    // Check if video is ready to avoid errors
-    const [videoReady, setVideoReady] = useState(false);
+    const wrapperRef = useRef<HTMLDivElement>();
+
+    // Hovered state
+    const [hovered, setHovered] = useState(false);
+    const [showVideo, setShowVideo] = useState(false);
+
+    const handleSetHovered = () => setHovered(true);
+    const handleSetUnhovered = () => setHovered(false);
+
+    const handleClickOutsideMobile = () => {
+      if (isMobile) {
+        handleSetUnhovered();
+      }
+    };
+
+    useOnTouchStartOutside(wrapperRef, handleClickOutsideMobile);
 
     // Socket
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
-
-    const { ref: cardRef, inView } = useInView({
-      threshold: 0.55,
-    });
-    const videoRef = useRef<HTMLVideoElement>();
 
     const [postParsed, typeOfPost] = switchPostType(item);
     // Live updates stored in local state
@@ -201,34 +210,6 @@ export const PostCard: React.FC<ICard> = React.memo(
     );
 
     const handleBidClick = () => {};
-
-    useEffect(() => {
-      const handleCanplay = () => {
-        setVideoReady(true);
-      };
-
-      videoRef.current?.addEventListener('canplay', handleCanplay);
-      videoRef.current?.addEventListener('loadedmetadata', handleCanplay);
-
-      return () => {
-        videoRef.current?.removeEventListener('canplay', handleCanplay);
-        videoRef.current?.removeEventListener('loadedmetadata', handleCanplay);
-      };
-    }, [inView, thumbnailUrl]);
-
-    useEffect(() => {
-      try {
-        if (videoReady) {
-          if (inView && !shouldStop) {
-            videoRef.current?.play();
-          } else {
-            videoRef.current?.pause();
-          }
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }, [inView, videoReady, shouldStop, thumbnailUrl]);
 
     // Increment channel subs after mounting
     // Decrement when unmounting
@@ -341,9 +322,36 @@ export const PostCard: React.FC<ICard> = React.memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socketConnection]);
 
+    useEffect(() => {
+      let timeout: any;
+
+      if (hovered) {
+        timeout = setTimeout(() => {
+          setShowVideo(true);
+        });
+      } else {
+        timeout = setTimeout(() => {
+          setShowVideo(false);
+        }, 300);
+      }
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }, [hovered]);
+
     if (type === 'inside') {
       return (
-        <SWrapper ref={cardRef} index={index} width={width}>
+        <SWrapper
+          ref={(el) => {
+            wrapperRef.current = el!!;
+          }}
+          onMouseEnter={() => handleSetHovered()}
+          onTouchStart={() => handleSetHovered()}
+          onMouseLeave={() => handleSetUnhovered()}
+          index={index}
+          width={width}
+        >
           <SContent>
             {!isMobile && (
               <SNumberImageHolder index={index}>
@@ -355,26 +363,21 @@ export const PostCard: React.FC<ICard> = React.memo(
               </SNumberImageHolder>
             )}
             <SImageHolder index={index}>
-              <img
+              <SThumnailHolder
                 className='thumnailHolder'
                 src={postParsed.announcement?.thumbnailImageUrl ?? ''}
                 alt='Post'
+                hovered={hovered}
               />
-              <video
-                ref={(el) => {
-                  videoRef.current = el!!;
-                }}
-                key={thumbnailUrl}
-                loop
-                muted
-                playsInline
-              >
-                <source
-                  key={thumbnailUrl}
-                  src={thumbnailUrl}
-                  type='video/mp4'
-                />
-              </video>
+              {showVideo && (
+                <video key={thumbnailUrl} loop muted playsInline autoPlay>
+                  <source
+                    key={thumbnailUrl}
+                    src={thumbnailUrl}
+                    type='video/mp4'
+                  />
+                </video>
+              )}
               <SImageMask />
               <STopContent>
                 <SButtonIcon
@@ -444,25 +447,32 @@ export const PostCard: React.FC<ICard> = React.memo(
     }
 
     return (
-      <SWrapperOutside ref={cardRef} width={width}>
+      <SWrapperOutside
+        ref={(el) => {
+          wrapperRef.current = el!!;
+        }}
+        onMouseEnter={() => handleSetHovered()}
+        onTouchStart={() => handleSetHovered()}
+        onMouseLeave={() => handleSetUnhovered()}
+        width={width}
+      >
         <SImageBG id='backgroundPart' height={height}>
           <SImageHolderOutside id='animatedPart'>
-            <img
+            <SThumnailHolder
               className='thumnailHolder'
               src={postParsed.announcement?.thumbnailImageUrl ?? ''}
               alt='Post'
+              hovered={hovered}
             />
-            <video
-              ref={(el) => {
-                videoRef.current = el!!;
-              }}
-              key={thumbnailUrl}
-              loop
-              muted
-              playsInline
-            >
-              <source key={thumbnailUrl} src={thumbnailUrl} type='video/mp4' />
-            </video>
+            {showVideo && (
+              <video key={thumbnailUrl} loop muted playsInline autoPlay>
+                <source
+                  key={thumbnailUrl}
+                  src={thumbnailUrl}
+                  type='video/mp4'
+                />
+              </video>
+            )}
             <STopContent>
               <SButtonIcon
                 iconOnly
@@ -763,7 +773,7 @@ const SImageHolder = styled.div<ISWrapper>`
     object-fit: cover;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    /* z-index: -1; */
   }
 
   ${(props) => props.theme.media.tablet} {
@@ -820,6 +830,13 @@ const SImageHolder = styled.div<ISWrapper>`
       return '65%';
     }};
   }
+`;
+
+const SThumnailHolder = styled.img<{
+  hovered: boolean;
+}>`
+  opacity: ${({ hovered }) => (hovered ? 0 : 1)};
+  transition: 0.3s opacity;
 `;
 
 const SImageMask = styled.div`
@@ -967,7 +984,7 @@ const SImageHolderOutside = styled.div`
     object-fit: cover;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    /* z-index: -1; */
   }
 `;
 
