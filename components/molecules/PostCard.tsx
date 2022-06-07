@@ -365,7 +365,11 @@ export const PostCard: React.FC<ICard> = React.memo(
             <SImageHolder index={index}>
               <SThumnailHolder
                 className='thumnailHolder'
-                src={postParsed.announcement?.thumbnailImageUrl ?? ''}
+                src={
+                  (postParsed.announcement?.coverImageUrl ||
+                    postParsed.announcement?.thumbnailImageUrl) ??
+                  ''
+                }
                 alt='Post'
                 draggable={false}
                 hovered={hovered}
@@ -461,7 +465,11 @@ export const PostCard: React.FC<ICard> = React.memo(
           <SImageHolderOutside id='animatedPart'>
             <SThumnailHolder
               className='thumnailHolder'
-              src={postParsed.announcement?.thumbnailImageUrl ?? ''}
+              src={
+                (postParsed.announcement?.coverImageUrl ||
+                  postParsed.announcement?.thumbnailImageUrl) ??
+                ''
+              }
               alt='Post'
               draggable={false}
               hovered={hovered}
