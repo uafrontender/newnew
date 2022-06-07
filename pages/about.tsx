@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import styled, { useTheme, css } from 'styled-components';
+import styled, { useTheme, css, keyframes } from 'styled-components';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -547,52 +547,78 @@ const SSectionTitle = styled(Headline)`
   }
 `;
 
+const votesIconAnimation = keyframes`
+ 0% { transform: translate3d(-4%, 0px, 0px); }
+  25% { transform: translate3d(0px, -4%, 0px); }
+  50% { transform: translate3d(4%, 0px, 0px); }
+  75% { transform: translate3d(0px, 4%, 0px); }
+  100% { transform: translate3d(-4%, 0px, 0px); }
+`;
+
 const SVotesIcon = styled.img`
   position: absolute;
-  right: 0;
-  top: 100%;
-  transform: translate(3px, 18px);
+  right: -3px;
+  bottom: -18%;
   width: 45px;
   height: 40px;
+  animation-name: ${votesIconAnimation};
+  animation-duration: 12s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 
   ${({ theme }) => theme.media.tablet} {
     width: 64px;
     height: 58px;
     right: 9%;
-    transform: translate(-4px, -19px);
+    bottom: -14%;
   }
 
   ${({ theme }) => theme.media.laptopL} {
     width: 94px;
     height: 85px;
     right: 18%;
-    transform: translate(0, 57%);
+    bottom: -34%;
   }
+`;
+
+const cfIconAnimation = keyframes`
+  0% { transform: translate3d(4%, 0px, 0px); }
+  25% { transform: translate3d(0px, 4%, 0px); }
+  50% { transform: translate3d(-4%, 0px, 0px); }
+  75% { transform: translate3d(0px, -4%, 0px); }
+  100% { transform: translate3d(4%, 0px, 0px); }
 `;
 
 const SCfIcon = styled.img`
   position: absolute;
-  left: -17px;
-  bottom: 0;
-  transform: translate(-50%, -53px);
+  left: -51px;
+  bottom: 17%;
   width: 69px;
   height: 78px;
+  animation-name: ${cfIconAnimation};
+  animation-duration: 10s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 
   ${({ theme }) => theme.media.tablet} {
     width: 103px;
     height: 110px;
-
-    left: -32px;
-    transform: translate(-10%, 0);
+    left: -39px;
+    bottom: 0%;
   }
 
   ${({ theme }) => theme.media.laptopL} {
     width: 160px;
     height: 166px;
-    left: -96px;
-    top: 82%;
-    transform: translate(-31%, -5px);
+    left: -144px;
+    top: 80%;
   }
+`;
+
+const acIconAnimation = keyframes`
+  0% { transform: translate3d(0px, 0px, 0px); }
+  50% { transform: translate3d(0px, 5%, 0px); }
+  100% { transform: translate3d(0px, 0px, 0px); }
 `;
 
 const SAcIcon = styled.img`
@@ -600,9 +626,12 @@ const SAcIcon = styled.img`
   position: absolute;
   width: 151px;
   height: 154px;
-  top: -1px;
-  right: -13px;
-  transform: translate(50%, -35%);
+  top: -19%;
+  right: -91px;
+  animation-name: ${acIconAnimation};
+  animation-duration: 8s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 
   ${({ theme }) => theme.media.tablet} {
     visibility: visible;
@@ -611,65 +640,96 @@ const SAcIcon = styled.img`
   ${({ theme }) => theme.media.laptopL} {
     width: 218px;
     height: 221px;
-    right: -96px;
-    transform: translate(28%, -14%);
+    right: -159px;
+    top: -9%;
   }
+`;
+
+const hourGlassesIconAnimation = keyframes`
+  0% { transform: translate3d(6%, 0px, 0px); }
+  25% { transform: translate3d(0px, 6%, 0px); }
+  50% { transform: translate3d(-6%, 0px, 0px); }
+  75% { transform: translate3d(0px, -6%, 0px); }
+  100% { transform: translate3d(6%, 0px, 0px); }
 `;
 
 const SHourGlassesIcon = styled.img`
   position: absolute;
   right: 18%;
-  top: 0;
-  transform: translate(2px, -72%);
+  top: -8%;
   width: 30px;
   height: 35px;
+  animation-name: ${hourGlassesIconAnimation};
+  animation-duration: 8s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 
   ${({ theme }) => theme.media.tablet} {
     width: 42px;
     height: 47px;
+    top: -10%;
     right: 22%;
-    transform: translate(0px, -60%);
   }
 
   ${({ theme }) => theme.media.laptopL} {
     width: 61px;
     height: 70px;
     right: 24%;
-    transform: translate(-3px, -44px);
+    top: -11%;
   }
+`;
+
+const mcSubIconAnimation = keyframes`
+  0% { transform: translate3d(-3%, 0px, 0px); }
+  25% { transform: translate3d(0px, -3%, 0px); }
+  50% { transform: translate3d(3%, 0px, 0px); }
+  75% { transform: translate3d(0px, 3%, 0px); }
+  100% { transform: translate3d(-3%, 0px, 0px); }
 `;
 
 const SMcSubIcon = styled.img`
   position: absolute;
-  right: -16px;
-  top: 0;
-  transform: translate(36%, -38%);
+  right: -51px;
+  top: -12%;
+
   width: ${({ theme }) => (theme.name === 'light' ? '43px' : '96px')};
   height: ${({ theme }) => (theme.name === 'light' ? '60px' : '96px')};
+  animation-name: ${mcSubIconAnimation};
+  animation-duration: 12s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 
   ${({ theme }) => theme.media.tablet} {
     width: ${({ theme }) => (theme.name === 'light' ? '60px' : '121px')};
     height: ${({ theme }) => (theme.name === 'light' ? '81px' : '121px')};
-    top: 100%;
-    right: -32px;
-    transform: translate(60px, 17px);
+    top: 107%;
+    right: -80px;
   }
 
   ${({ theme }) => theme.media.laptopL} {
     width: ${({ theme }) => (theme.name === 'light' ? '88px' : '180px')};
     height: ${({ theme }) => (theme.name === 'light' ? '120px' : '180px')};
-    left: 100%;
-    transform: translate(-15%, 46%);
+    top: 121%;
+    right: -150px;
   }
+`;
+
+const bubble1IconAnimation = keyframes`
+  0% { transform: translate3d(0px, 0px, 0px); }
+  50% { transform: translate3d(0px, -60%, 0px); }
+  100% { transform: translate3d(0px, 0px, 0px); }
 `;
 
 const SBubble1Icon = styled.img`
   position: absolute;
-  left: 10%;
-  top: 0;
-  transform: translate(4px, 40%);
+  left: 11%;
+  top: 2%;
   width: 18px;
   height: 18px;
+  animation-name: ${bubble1IconAnimation};
+  animation-duration: 12s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 
   filter: ${({ theme }) =>
     theme.name === 'dark' ? `brightness(0.6)` : `none`};
@@ -677,24 +737,36 @@ const SBubble1Icon = styled.img`
   ${({ theme }) => theme.media.tablet} {
     width: 25px;
     height: 25px;
-    left: 0;
-    transform: translate(41px, -15px);
+    left: 6%;
+    top: -6%;
   }
 
   ${({ theme }) => theme.media.laptopL} {
     width: 39px;
     height: 39px;
-    transform: translate(34px, 28px);
+    left: 3%;
+    top: 7%;
   }
+`;
+
+const bubble2IconAnimation = keyframes`
+  0% { transform: translate3d(20%, 0px, 0px); }
+  25% { transform: translate3d(0px, 20%, 0px); }
+  50% { transform: translate3d(-20%, 0px, 0px); }
+  75% { transform: translate3d(0px, -20%, 0px); }
+  100% { transform: translate3d(20%, 0px, 0px); }
 `;
 
 const SBubble2Icon = styled.img`
   position: absolute;
-  right: -16px;
-  bottom: 0;
-  transform: translate(-10px, -96px);
+  right: -6px;
+  bottom: 30%;
   width: 12px;
   height: 12px;
+  animation-name: ${bubble2IconAnimation};
+  animation-duration: 12s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 
   filter: ${({ theme }) =>
     theme.name === 'dark' ? `brightness(0.6)` : `none`};
@@ -702,14 +774,15 @@ const SBubble2Icon = styled.img`
   ${({ theme }) => theme.media.tablet} {
     width: 18px;
     height: 18px;
-    transform: translate(-30px, -69px);
+    right: 13px;
+    bottom: 25%;
   }
 
   ${({ theme }) => theme.media.laptopL} {
     width: 27px;
     height: 27px;
-    transform: translate(10px, -27px);
-    right: 10%;
+    right: 9%;
+    bottom: 7%;
   }
 `;
 
@@ -1278,28 +1351,38 @@ const SInvestorTitle = styled(Headline)`
   }
 `;
 
+const mcIconAnimation = keyframes`
+  0% { transform: translate3d(-5%, 0px, 0px); }
+  25% { transform: translate3d(0px, -5%, 0px); }
+  50% { transform: translate3d(5%, 0px, 0px); }
+  75% { transform: translate3d(0px, 5%, 0px); }
+  100% { transform: translate3d(-5%, 0px, 0px); }
+`;
+
 const SMcIcon = styled.img`
   position: absolute;
-  left: -16px;
-  top: 0;
-  transform: translate(-20px, -100%);
+  left: -35px;
+  top: -18%;
   width: 62px;
   height: 75px;
   z-index: 1;
 
+  animation-name: ${mcIconAnimation};
+  animation-duration: 16s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+
   ${({ theme }) => theme.media.tablet} {
     width: 103px;
     height: 125px;
-
-    transform: translate(-46%, -60%);
+    left: -65px;
   }
 
   ${({ theme }) => theme.media.laptopL} {
     width: 155px;
     height: 188px;
-    left: -96px;
-    top: -70%;
-    transform: translate(-35%, 0);
+    left: -147px;
+    top: -56%;
   }
 `;
 
@@ -1324,26 +1407,36 @@ const SLogoFlatIcon = styled(InlineSVG)`
   }
 `;
 
+const bubble3IconAnimation = keyframes`
+  0% { transform: translate3d(5%, 0px, 0px); }
+  25% { transform: translate3d(0px, 5%, 0px); }
+  50% { transform: translate3d(-5%, 0px, 0px); }
+  75% { transform: translate3d(0px, -5%, 0px); }
+  100% { transform: translate3d(5%, 0px, 0px); }
+`;
+
 const SBubble3Icon = styled.img`
   position: absolute;
-  right: -17px;
-  bottom: 0;
-  transform: translate(50%, 90%);
+  right: -45px;
+  bottom: -12%;
   width: 58px;
   height: 58px;
+  animation-name: ${bubble3IconAnimation};
+  animation-duration: 14s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 
   ${({ theme }) => theme.media.tablet} {
-    right: -32px;
     width: 103px;
     height: 103px;
-
-    transform: translate(61%, 113%);
+    right: -90px;
+    bottom: -28%;
   }
 
   ${({ theme }) => theme.media.laptopL} {
-    right: -32px;
     width: 133px;
     height: 133px;
-    transform: translate(100%, 11px);
+    right: -162px;
+    bottom: -3%;
   }
 `;
