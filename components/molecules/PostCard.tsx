@@ -113,6 +113,10 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     const wrapperRef = useRef<HTMLDivElement>();
 
+    // Check if video is ready to avoid errors
+    const videoRef = useRef<HTMLVideoElement>();
+    const [videoReady, setVideoReady] = useState(false);
+
     // Hovered state
     const [hovered, setHovered] = useState(false);
     const [showVideo, setShowVideo] = useState(false);
@@ -161,6 +165,10 @@ export const PostCard: React.FC<ICard> = React.memo(
     const [thumbnailUrl, setThumbnailUrl] = useState(
       postParsed.announcement?.thumbnailUrl ?? ''
     );
+
+    const [coverImageUrl, setCoverImageUrl] = useState<
+      string | undefined | null
+    >(postParsed.announcement?.coverImageUrl ?? undefined);
 
     const handleUserClick = (username: string) => {
       router.push(`/${username}`);
@@ -302,11 +310,65 @@ export const PostCard: React.FC<ICard> = React.memo(
         }, 5000);
       };
 
+      const handlerSocketPostCoverImageUpdated = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostCoverImageUpdated.decode(arr);
+
+        if (decoded.postUuid !== postParsed.postUuid) return;
+
+        if (decoded.action === newnewapi.PostCoverImageUpdated.Action.UPDATED) {
+          // Wait to make sure that cloudfare cache has been invalidated
+          setTimeout(() => {
+            fetch(decoded.coverImageUrl as string)
+              .then((res) => res.blob())
+              .then((blobFromFetch) => {
+                const reader = new FileReader();
+
+                reader.onloadend = () => {
+                  if (!reader.result) return;
+
+                  const byteCharacters = atob(
+                    reader.result.slice(
+                      (reader.result as string).indexOf(',') + 1
+                    ) as string
+                  );
+
+                  const byteNumbers = new Array(byteCharacters.length);
+
+                  // eslint-disable-next-line no-plusplus
+                  for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                  }
+
+                  const byteArray = new Uint8Array(byteNumbers);
+                  const blob = new Blob([byteArray], { type: 'video/mp4' });
+                  const url = URL.createObjectURL(blob);
+
+                  setCoverImageUrl(url);
+                };
+
+                reader.readAsDataURL(blobFromFetch);
+              })
+              .catch((err) => {
+                console.error(err);
+              });
+          }, 5000);
+        } else if (
+          decoded.action === newnewapi.PostCoverImageUpdated.Action.DELETED
+        ) {
+          setCoverImageUrl(undefined);
+        }
+      };
+
       if (socketConnection) {
         socketConnection.on('PostUpdated', handlerSocketPostUpdated);
         socketConnection.on(
           'PostThumbnailUpdated',
           handlerSocketThumbnailUpdated
+        );
+        socketConnection.on(
+          'PostCoverImageUpdated',
+          handlerSocketPostCoverImageUpdated
         );
       }
 
@@ -317,28 +379,46 @@ export const PostCard: React.FC<ICard> = React.memo(
             'PostThumbnailUpdated',
             handlerSocketThumbnailUpdated
           );
+          socketConnection.off(
+            'PostCoverImageUpdated',
+            handlerSocketPostCoverImageUpdated
+          );
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socketConnection]);
 
     useEffect(() => {
+      const handleCanplay = () => {
+        setVideoReady(true);
+      };
+
+      videoRef.current?.addEventListener('canplay', handleCanplay);
+      videoRef.current?.addEventListener('loadedmetadata', handleCanplay);
+
+      return () => {
+        videoRef.current?.removeEventListener('canplay', handleCanplay);
+        videoRef.current?.removeEventListener('loadedmetadata', handleCanplay);
+      };
+    }, [hovered]);
+
+    useEffect(() => {
       let timeout: any;
 
-      if (hovered) {
+      if (hovered && videoReady) {
         timeout = setTimeout(() => {
           setShowVideo(true);
         });
       } else {
         timeout = setTimeout(() => {
           setShowVideo(false);
-        }, 300);
+        }, 600);
       }
 
       return () => {
         clearTimeout(timeout);
       };
-    }, [hovered]);
+    }, [hovered, videoReady]);
 
     if (type === 'inside') {
       return (
@@ -366,16 +446,28 @@ export const PostCard: React.FC<ICard> = React.memo(
               <SThumnailHolder
                 className='thumnailHolder'
                 src={
-                  (postParsed.announcement?.coverImageUrl ||
+                  (coverImageUrl ||
                     postParsed.announcement?.thumbnailImageUrl) ??
                   ''
                 }
                 alt='Post'
                 draggable={false}
-                hovered={hovered}
+                hovered={hovered && showVideo}
               />
-              {showVideo && (
-                <video key={thumbnailUrl} loop muted playsInline autoPlay>
+              {hovered && (
+                <video
+                  ref={(el) => {
+                    videoRef.current = el!!;
+                  }}
+                  key={thumbnailUrl}
+                  loop
+                  muted
+                  playsInline
+                  autoPlay
+                  style={{
+                    opacity: videoReady ? 1 : 0,
+                  }}
+                >
                   <source
                     key={thumbnailUrl}
                     src={thumbnailUrl}
@@ -466,16 +558,27 @@ export const PostCard: React.FC<ICard> = React.memo(
             <SThumnailHolder
               className='thumnailHolder'
               src={
-                (postParsed.announcement?.coverImageUrl ||
-                  postParsed.announcement?.thumbnailImageUrl) ??
+                (coverImageUrl || postParsed.announcement?.thumbnailImageUrl) ??
                 ''
               }
               alt='Post'
               draggable={false}
-              hovered={hovered}
+              hovered={hovered && showVideo}
             />
-            {showVideo && (
-              <video key={thumbnailUrl} loop muted playsInline autoPlay>
+            {hovered && (
+              <video
+                ref={(el) => {
+                  videoRef.current = el!!;
+                }}
+                key={thumbnailUrl}
+                loop
+                muted
+                playsInline
+                autoPlay
+                style={{
+                  opacity: videoReady ? 1 : 0,
+                }}
+              >
                 <source
                   key={thumbnailUrl}
                   src={thumbnailUrl}
