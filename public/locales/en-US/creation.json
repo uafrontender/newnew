@@ -164,7 +164,12 @@
         "info": "Learn more",
         "title": "Set preview",
         "submit": "Save changes",
-        "description": "Select a 3 sec snippet as decision cover. A good preview draws viewer's attention."
+        "description": "Select a 3 sec snippet as decision cover. A good preview draws viewer's attention.",
+        "uploadCoverImage": {
+          "caption": "Select custom cover image",
+          "uploadBtn": "Select",
+          "deleteBtn": "Delete"
+        }
       },
       "full": {
         "title": "Video preview"

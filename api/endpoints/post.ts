@@ -32,6 +32,18 @@ export const setPostThumbnail = (payload: newnewapi.SetPostThumbnailRequest) =>
     payload
   );
 
+export const setPostCoverImage = (payload: newnewapi.SetPostCoverImageRequest) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.SetPostCoverImageRequest,
+    newnewapi.EmptyResponse
+  >(
+    newnewapi.SetPostCoverImageRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_POST}/set_post_cover_image`,
+    'post',
+    payload
+  );
+
 export const markPost = (payload: newnewapi.MarkPostRequest) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.MarkPostRequest,

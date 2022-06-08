@@ -498,6 +498,11 @@
     "toast": {
       "success": "Success! Thumbnail will be changed once processed",
       "error": "An error occurred"
+    },
+    "uploadCoverImage": {
+      "caption": "Select custom cover image",
+      "uploadBtn": "Select",
+      "deleteBtn": "Delete"
     }
   },
   "AcPostModeration": {

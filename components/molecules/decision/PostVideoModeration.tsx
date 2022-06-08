@@ -27,6 +27,7 @@ import ThumbnailIcon from '../../../public/images/svg/icons/filled/AddImage.svg'
 import PostVideoResponseUpload from './PostVideoResponseUpload';
 import ToggleVideoWidget from '../../atoms/moderation/ToggleVideoWidget';
 import {
+  getCoverImageUploadUrl,
   getVideoUploadUrl,
   removeUploadedFile,
   startVideoProcessing,
@@ -39,6 +40,7 @@ import {
 } from '../../../redux-store/slices/creationStateSlice';
 import PostVideoResponsePreviewModal from './PostVideoResponsePreviewModal';
 import {
+  setPostCoverImage,
   setPostThumbnail,
   uploadPostResponse,
 } from '../../../api/endpoints/post';
@@ -46,6 +48,7 @@ import isSafari from '../../../utils/isSafari';
 import { usePostModalState } from '../../../contexts/postModalContext';
 import waitResourceIsAvailable from '../../../utils/checkResourceAvailable';
 import isBrowser from '../../../utils/isBrowser';
+import urltoFile from '../../../utils/urlToFile';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
@@ -113,6 +116,15 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   const [isEditThumbnailModalOpen, setIsEditThumbnailModalOpen] =
     useState(false);
 
+  const [coverImageInEdit, setCoverImageInEdit] = useState(
+    announcement.coverImageUrl ?? undefined
+  );
+
+  const handleSetCustomCoverImageUrl = (objUrl: string) =>
+    setCoverImageInEdit(objUrl);
+
+  const handleUnsetCustomCoverImageUrl = () => setCoverImageInEdit(undefined);
+
   const isSetThumbnailButtonIconOnly = useMemo(
     () =>
       response ||
@@ -123,6 +135,75 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
   const handleSubmitNewThumbnail = async (params: TThumbnailParameters) => {
     try {
+      const shouldUpdateCoverImage =
+        !!coverImageInEdit && coverImageInEdit !== announcement.coverImageUrl;
+      const shouldDeleteCoverImage =
+        !coverImageInEdit && !!announcement.coverImageUrl;
+
+      console.log(shouldUpdateCoverImage);
+      console.log(shouldDeleteCoverImage);
+
+      if (shouldUpdateCoverImage) {
+        const coverImageFile = await urltoFile(
+          coverImageInEdit,
+          'coverImage',
+          'image/jpeg'
+        );
+
+        const imageUrlPayload = new newnewapi.GetCoverImageUploadUrlRequest({
+          postUuid: postId,
+        });
+
+        console.log(imageUrlPayload);
+
+        const res = await getCoverImageUploadUrl(imageUrlPayload);
+
+        console.log(res);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'An error occured');
+
+        const uploadResponse = await fetch(res.data.uploadUrl, {
+          method: 'PUT',
+          body: coverImageFile,
+          headers: {
+            'Content-Type': 'image/jpeg',
+          },
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const updateCoverImagePayload = new newnewapi.SetPostCoverImageRequest({
+          postUuid: postId,
+          action: newnewapi.SetPostCoverImageRequest.Action.COVER_UPLOADED,
+        });
+
+        const updateCoverImageRes = await setPostCoverImage(
+          updateCoverImagePayload
+        );
+
+        if (updateCoverImageRes.error) {
+          throw new Error('Could not update cover image');
+        }
+      } else if (shouldDeleteCoverImage) {
+        const updateCoverImagePayload = new newnewapi.SetPostCoverImageRequest({
+          postUuid: postId,
+          action: newnewapi.SetPostCoverImageRequest.Action.DELETE_COVER,
+        });
+
+        console.log(updateCoverImagePayload);
+
+        const updateCoverImageRes = await setPostCoverImage(
+          updateCoverImagePayload
+        );
+
+        if (updateCoverImageRes.error) {
+          throw new Error('Could not delete cover image');
+        }
+      }
+
       const payload = new newnewapi.SetPostThumbnailRequest({
         postUuid: postId,
         thumbnailParameters: {
@@ -734,6 +815,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         thumbnails={thumbnails}
         handleClose={() => setIsEditThumbnailModalOpen(false)}
         handleSubmit={handleSubmitNewThumbnail}
+        customCoverImageUrl={coverImageInEdit}
+        handleSetCustomCoverImageUrl={handleSetCustomCoverImageUrl}
+        handleUnsetCustomCoverImageUrl={handleUnsetCustomCoverImageUrl}
       />
     </>
   );

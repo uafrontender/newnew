@@ -1,20 +1,24 @@
 import { useTranslation } from 'next-i18next';
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-import {
-  setCustomCoverImageUrl,
-  unsetCustomCoverImageUrl,
-} from '../../../redux-store/slices/creationStateSlice';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+
 import isImage from '../../../utils/isImage';
 import resizeImage from '../../../utils/resizeImage';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 
-const CoverImageUpload: React.FunctionComponent = () => {
-  const { t } = useTranslation('creation');
-  const dispatch = useAppDispatch();
-  const { customCoverImageUrl } = useAppSelector((state) => state.creation);
+interface ICoverImageEdit {
+  customCoverImageUrl?: string;
+  handleSetCustomCoverImageUrl: (objectUrl: string) => void;
+  handleUnsetCustomCoverImageUrl: () => void;
+}
+
+const CoverImageEdit: React.FunctionComponent<ICoverImageEdit> = ({
+  customCoverImageUrl,
+  handleSetCustomCoverImageUrl,
+  handleUnsetCustomCoverImageUrl,
+}) => {
+  const { t } = useTranslation('decision');
 
   const imageInputRef = useRef<HTMLInputElement>();
 
@@ -37,7 +41,7 @@ const CoverImageUpload: React.FunctionComponent = () => {
           const imageUrl = reader.result as string;
           const properlySizedImage = await resizeImage(imageUrl, 1000);
 
-          dispatch(setCustomCoverImageUrl(properlySizedImage.url));
+          handleSetCustomCoverImageUrl(properlySizedImage.url);
         }
       });
     }
@@ -50,9 +54,9 @@ const CoverImageUpload: React.FunctionComponent = () => {
           <SCoverPreview alt='cover' src={customCoverImageUrl} />
           <SDeleteButton
             view='transparent'
-            onClick={() => dispatch(unsetCustomCoverImageUrl({}))}
+            onClick={() => handleUnsetCustomCoverImageUrl()}
           >
-            {t('secondStep.video.thumbnail.uploadCoverImage.deleteBtn')}
+            {t('PostVideoThumbnailEdit.uploadCoverImage.deleteBtn')}
           </SDeleteButton>
         </SSetCoverImageLabel>
       ) : (
@@ -73,13 +77,13 @@ const CoverImageUpload: React.FunctionComponent = () => {
             }}
           />
           <SCaption variant={2} weight={700}>
-            {t('secondStep.video.thumbnail.uploadCoverImage.caption')}
+            {t('PostVideoThumbnailEdit.uploadCoverImage.caption')}
           </SCaption>
           <SUploadButton
             view='secondary'
             onClick={() => imageInputRef.current?.click()}
           >
-            {t('secondStep.video.thumbnail.uploadCoverImage.uploadBtn')}
+            {t('PostVideoThumbnailEdit.uploadCoverImage.uploadBtn')}
           </SUploadButton>
         </SSetCoverImageLabel>
       )}
@@ -87,7 +91,11 @@ const CoverImageUpload: React.FunctionComponent = () => {
   );
 };
 
-export default CoverImageUpload;
+CoverImageEdit.defaultProps = {
+  customCoverImageUrl: undefined,
+};
+
+export default CoverImageEdit;
 
 const SWrapper = styled.div`
   min-height: 72px;

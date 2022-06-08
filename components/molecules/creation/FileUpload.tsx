@@ -115,17 +115,17 @@ const FileUpload: React.FC<IFileUpload> = ({
 
   const handleCloseThumbnailEditClick = useCallback(() => {
     setShowThumbnailEdit(false);
-    playerRef.current.play();
+    playerRef.current?.play();
   }, []);
 
   const handleDeleteVideoShow = useCallback(() => {
     setShowVideoDelete(true);
-    playerRef.current.pause();
+    playerRef.current?.pause();
   }, []);
 
   const handleCloseDeleteVideoClick = useCallback(() => {
     setShowVideoDelete(false);
-    playerRef.current.play();
+    playerRef.current?.play();
   }, []);
 
   const handleDeleteVideo = useCallback(() => {
@@ -411,8 +411,7 @@ const FileUpload: React.FC<IFileUpload> = ({
         handleClose={handleCloseFullPreviewClick}
       />
       <ThumbnailPreviewEdit
-        // open={showThumbnailEdit}
-        open
+        open={showThumbnailEdit}
         value={value}
         thumbnails={thumbnails}
         handleClose={handleCloseThumbnailEditClick}

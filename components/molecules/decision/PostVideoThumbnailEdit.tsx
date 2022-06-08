@@ -16,6 +16,7 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import CoverImageEdit from './CoverImageEdit';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -27,6 +28,9 @@ interface IPostVideoThumbnailEdit {
   thumbnails: any;
   handleClose: () => void;
   handleSubmit: (value: any) => void;
+  customCoverImageUrl?: string;
+  handleSetCustomCoverImageUrl: (objectUrl: string) => void;
+  handleUnsetCustomCoverImageUrl: () => void;
 }
 
 export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
@@ -35,6 +39,9 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
   thumbnails,
   handleClose,
   handleSubmit,
+  customCoverImageUrl,
+  handleSetCustomCoverImageUrl,
+  handleUnsetCustomCoverImageUrl,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('decision');
@@ -233,6 +240,11 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
               />
             )}
           </SModalTopLine>
+          <CoverImageEdit
+            customCoverImageUrl={customCoverImageUrl}
+            handleSetCustomCoverImageUrl={handleSetCustomCoverImageUrl}
+            handleUnsetCustomCoverImageUrl={handleUnsetCustomCoverImageUrl}
+          />
           <SPlayerWrapper>
             {open && (
               <BitmovinPlayer
@@ -309,6 +321,10 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
   );
 };
 
+PostVideoThumbnailEdit.defaultProps = {
+  customCoverImageUrl: undefined,
+};
+
 export default PostVideoThumbnailEdit;
 
 const SContainer = styled.div`
@@ -329,6 +345,15 @@ const SContainer = styled.div`
     min-height: unset;
     background: ${(props) => props.theme.colorsThemed.background.secondary};
     border-radius: 16px;
+
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
   ${({ theme }) => theme.media.tablet} {
