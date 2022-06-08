@@ -15,6 +15,7 @@ import Lottie from '../components/atoms/Lottie';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { setCreatorData } from '../redux-store/slices/userStateSlice';
+import assets from '../constants/assets';
 
 const OnboardingSectionStripe = dynamic(
   () =>
@@ -66,12 +67,16 @@ const CreatorOnboardingStripe = () => {
       <Head>
         <title>{t('meta.title')}</title>
         <meta name='description' content={t('meta.description')} />
+        <meta property='og:title' content={t('meta.title')} />
+        <meta property='og:description' content={t('meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       {!isLoading ? (
         <OnboardingSectionStripe
           isConnectedToStripe={
             onboardingState?.isCreatorConnectedToStripe ?? false
           }
+          stripeConnectStatus={onboardingState?.stripeConnectStatus}
         />
       ) : (
         <Lottie

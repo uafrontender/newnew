@@ -164,15 +164,13 @@ export const Dashboard: React.FC = React.memo(() => {
       setIsEarningsLoading(false);
       console.error(err);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEarningsLoading]);
+  }, []);
 
   useEffect(() => {
-    if (!myEarnings && isEarningsLoading) {
+    if (isEarningsLoading) {
       fetchMyEarnings();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isEarningsLoading, fetchMyEarnings]);
 
   return (
     <SContainer>

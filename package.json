@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev -p 4000",
     "build": "next build",
+    "postbuild": "next-sitemap --config next-sitemap-config.js",
     "start": "next start -p 4000",
     "lint": "next lint",
     "prettify": "prettier --write \"**/*.ts(x)?\"",
@@ -22,8 +23,9 @@
   "dependencies": {
     "@reduxjs/toolkit": "1.7.1",
     "@sentry/browser": "^6.19.7",
-    "@sentry/nextjs": "^6.19.7",
     "@sentry/integrations": "^6.19.7",
+    "@sentry/nextjs": "^6.19.7",
+    "@sentry/react": "^7.0.0",
     "bitmovin-player": "8.76.0",
     "date-fns": "2.27.0",
     "framer-motion": "5.5.5",
@@ -35,6 +37,7 @@
     "next": "12.0.10",
     "next-i18next": "10.0.1",
     "next-redux-wrapper": "7.0.5",
+    "next-sitemap": "^2.5.28",
     "next-useragent": "2.8.0",
     "protobufjs": "6.11.2",
     "raw-body": "2.4.2",

@@ -27,7 +27,7 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
       withBanner={!!banner.show}
     >
       <Banner />
-      <SContentWrapper>
+      <SContentWrapper id='top-nav-header-wrapper'>
         <Container noMaxContent>
           <Row>
             <Col>

@@ -312,7 +312,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           mine={isMine}
           prevSameUser={prevSameUser}
         >
-          {!nextSameUser && (
+          {!prevSameUser && (
             <SUserAvatar
               mine={isMine}
               avatarUrl={

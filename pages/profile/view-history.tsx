@@ -17,6 +17,7 @@ import MyProfileLayout from '../../components/templates/MyProfileLayout';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
+import assets from '../../constants/assets';
 
 const PostModal = dynamic(
   () => import('../../components/organisms/decision/PostModal')
@@ -148,6 +149,12 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
           name='description'
           content={t('Viewing-history.meta.description')}
         />
+        <meta property='og:title' content={t('Viewing-history.meta.title')} />
+        <meta
+          property='og:description'
+          content={t('Viewing-history.meta.description')}
+        />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <SMain>
         <SCardsSection>

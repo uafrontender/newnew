@@ -31,6 +31,9 @@ export const HowItWorks = () => {
       <Head>
         <title>{t('meta.title')}</title>
         <meta name='description' content={t('meta.description')} />
+        <meta property='og:title' content={t('meta.title')} />
+        <meta property='og:description' content={t('meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <Container>
         <IntroSection>

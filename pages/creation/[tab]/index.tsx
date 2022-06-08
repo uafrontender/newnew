@@ -14,6 +14,7 @@ import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
 import { NextPageWithLayout } from '../../_app';
 import { useAppDispatch } from '../../../redux-store/store';
 import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
+import assets from '../../../constants/assets';
 
 interface ICreationSecondStep {}
 
@@ -50,6 +51,15 @@ export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
           name='description'
           content={t(`secondStep.meta.description-${router?.query?.tab}`)}
         />
+        <meta
+          property='og:title'
+          content={t(`secondStep.meta.title-${router?.query?.tab}`)}
+        />
+        <meta
+          property='og:description'
+          content={t(`secondStep.meta.description-${router?.query?.tab}`)}
+        />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <SecondStepContent {...props} />
     </SWrapper>

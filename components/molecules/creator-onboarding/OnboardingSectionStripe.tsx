@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -22,10 +23,13 @@ import { updateMe } from '../../../api/endpoints/user';
 
 interface IOnboardingSectionStripe {
   isConnectedToStripe: boolean;
+  stripeConnectStatus:
+    | newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+    | undefined;
 }
 
 const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe> =
-  ({ isConnectedToStripe }) => {
+  ({ isConnectedToStripe, stripeConnectStatus }) => {
     const router = useRouter();
     const theme = useTheme();
     const { t } = useTranslation('creator-onboarding');
@@ -71,14 +75,25 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
     }, [loadingStripeProcessing, stripeProcessing]);
 
     useEffect(() => {
-      if (router && router.query && !isConnectedToStripe) {
+      if (
+        router &&
+        router.query &&
+        !isConnectedToStripe &&
+        stripeConnectStatus === 4
+      ) {
         if (router.query.query && router.query.query === 'stripe_processing') {
           setStripeProcessing(true);
-          handleStripeProcessing();
         }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [router, isConnectedToStripe]);
+    }, [router.query, isConnectedToStripe, stripeConnectStatus]);
+
+    useEffect(() => {
+      if (stripeProcessing && !loadingStripeProcessing) {
+        handleStripeProcessing();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [stripeProcessing, loadingStripeProcessing]);
 
     const handleRedirectToStripesetup = async () => {
       try {
@@ -119,30 +134,34 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
         </SUl>
         <SButton
           view='primaryGrad'
-          isConnectedToStripe={isConnectedToStripe}
+          isConnectedToStripe={isConnectedToStripe && stripeConnectStatus !== 4}
           style={{
-            ...(isConnectedToStripe
+            ...(isConnectedToStripe && stripeConnectStatus !== 4
               ? {
                   background: theme.colorsThemed.accent.success,
                 }
               : {}),
           }}
           onClick={() => {
-            if (!isConnectedToStripe) {
+            if (!isConnectedToStripe && stripeConnectStatus !== 4) {
               handleRedirectToStripesetup();
             }
           }}
         >
           <InlineSvg
             svg={
-              !isConnectedToStripe ? StripeLogoS : VerificationPassedInverted
+              !isConnectedToStripe && stripeConnectStatus !== 4
+                ? StripeLogoS
+                : VerificationPassedInverted
             }
             width='24px'
             height='24px'
           />
           <span>
             {isConnectedToStripe
-              ? t('StripeSection.stripeConnectedLinkBtn')
+              ? stripeConnectStatus === 4
+                ? t('StripeSection.stripeConnecting')
+                : t('StripeSection.stripeConnectedLinkBtn')
               : t('StripeSection.requestSetupLinkBtn')}
           </span>
         </SButton>

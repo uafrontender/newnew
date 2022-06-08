@@ -51,6 +51,7 @@ const SContainer = styled.div`
 `;
 
 const SModal = styled.div`
+  z-index: 10;
   max-width: 480px;
   width: 100%;
   background: ${(props) =>

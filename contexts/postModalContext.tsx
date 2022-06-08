@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
-import React, { createContext, useState, useContext, useMemo } from 'react';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useMemo,
+  useEffect,
+  useRef,
+} from 'react';
 
 export const PostModalContext = createContext<{
   postOverlayOpen: boolean;
@@ -17,6 +24,34 @@ export const PostModalContext = createContext<{
 const PostModalContextProvider: React.FC = ({ children }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [isConfirmToClosePost, setIsConfirmToClosePost] = useState(false);
+
+  const scrollPosition = useRef(0);
+
+  useEffect(() => {
+    if (modalOpen) {
+      scrollPosition.current = window ? window.scrollY : 0;
+
+      document.body.style.cssText = `
+      top: -${scrollPosition.current}px;
+      left: 0px;
+      right: 0px;
+      overflow: hidden;
+      position: fixed;
+   `;
+
+      document.documentElement.style.cssText = `
+      top: -${scrollPosition.current}px;
+      left: 0px;
+      right: 0px;
+      overflow: hidden;
+      position: fixed;
+   `;
+    } else {
+      document.body.style.cssText = '';
+      document.documentElement.style.cssText = '';
+      window?.scroll(0, scrollPosition.current);
+    }
+  }, [modalOpen]);
 
   const contextValue = useMemo(
     () => ({

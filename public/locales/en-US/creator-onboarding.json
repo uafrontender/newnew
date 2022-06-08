@@ -147,6 +147,7 @@
       "3": "Stripe keeps your information private and secure"
     },
     "requestSetupLinkBtn": "Connect with Stripe",
+    "stripeConnecting": "Connecting...",
     "stripeConnectedLinkBtn": "Stripe connected!",
     "submitMobile": "Submit",
     "submitDesktop": "Submit"

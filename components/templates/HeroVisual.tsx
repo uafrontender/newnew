@@ -50,9 +50,6 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
             duration: 0.8,
           },
         }}
-        onUnmount={() => {
-          setCurrentState('outro');
-        }}
       >
         <SImageWrapperAnimated
           style={{
@@ -93,9 +90,6 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
         transition: {
           duration: 0.8,
         },
-      }}
-      onUnmount={() => {
-        setCurrentState('outro');
       }}
     >
       <SImageWrapper

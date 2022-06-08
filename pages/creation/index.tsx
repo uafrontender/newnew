@@ -8,6 +8,7 @@ import CreationFirstStepContent from '../../components/organisms/creation/first/
 
 import { NextPageWithLayout } from '../_app';
 import General from '../../components/templates/General';
+import assets from '../../constants/assets';
 
 export const CreationFirstStep = () => {
   const { t } = useTranslation('creation');
@@ -18,6 +19,12 @@ export const CreationFirstStep = () => {
         <Head>
           <title>{t('firstStep.meta.title')}</title>
           <meta name='description' content={t('firstStep.meta.description')} />
+          <meta property='og:title' content={t('firstStep.meta.title')} />
+          <meta
+            property='og:description'
+            content={t('firstStep.meta.description')}
+          />
+          <meta property='og:image' content={assets.openGraphImage.common} />
         </Head>
         <CreationFirstStepContent />
       </SWrapper>

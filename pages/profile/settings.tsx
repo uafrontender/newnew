@@ -51,6 +51,7 @@ import PrivacySection from '../../components/organisms/settings/PrivacySection';
 import { SocketContext } from '../../contexts/socketContext';
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import { getMyTransactions } from '../../api/endpoints/payments';
+import assets from '../../constants/assets';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
@@ -329,6 +330,12 @@ const MyProfileSettingsIndex = () => {
       <Head>
         <title>{t('Settings.meta.title')}</title>
         <meta name='description' content={t('Settings.meta.description')} />
+        <meta property='og:title' content={t('Settings.meta.title')} />
+        <meta
+          property='og:description'
+          content={t('Settings.meta.description')}
+        />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <SMain>
         <SGoBackButton onClick={() => router.back()}>

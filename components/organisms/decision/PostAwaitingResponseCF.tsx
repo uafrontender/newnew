@@ -13,9 +13,6 @@ import dynamic from 'next/dynamic';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
-// test post
-// http://localhost:4000/post/0fc01edb-c88a-4c70-b597-b60aea9e072a
-
 // Utils
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
@@ -240,12 +237,16 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
               <SMainSectionWrapper>
                 <SCreatorInfoDiv>
                   <SCreator>
-                    <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                    <SWantsToKnow>
-                      {t('CfPostAwaiting.wants_to_know', {
-                        creator: post.creator?.nickname,
-                      })}
-                    </SWantsToKnow>
+                    <a href={`/${post.creator?.username}`}>
+                      <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
+                    </a>
+                    <a href={`/${post.creator?.username}`}>
+                      <SWantsToKnow>
+                        {t('CfPostAwaiting.wants_to_know', {
+                          creator: post.creator?.nickname,
+                        })}
+                      </SWantsToKnow>
+                    </a>
                   </SCreator>
                   {/* <STotal>
                   {`$${formatNumber(post.totalAmount?.usdCents ?? 0, true)}`}
@@ -356,7 +357,7 @@ const SActivitesContainer = styled.div`
     height: 728px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    /* justify-content: space-between; */
   }
 `;
 
