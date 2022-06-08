@@ -38,7 +38,9 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('subscribe-to-user');
-  const { loggedIn } = useAppSelector((state) => state.user);
+  const { loggedIn, userData: currentUserData } = useAppSelector(
+    (state) => state.user
+  );
   const { banner } = useAppSelector((state) => state.ui);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -115,6 +117,12 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    if (user.uuid === currentUserData?.userUuid) {
+      router?.push('/profile');
+    }
+  }, [user.uuid, currentUserData?.userUuid, router]);
 
   useEffect(() => {
     async function fetchSubscriptionPrice() {
