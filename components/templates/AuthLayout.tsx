@@ -68,13 +68,14 @@ const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {
               <BackgroundVisual
                 view={
                   router.pathname.includes('verify-email') ||
-                  router.pathname.includes('verify-new-email')
-                    ? 'verify-email'
-                    : 'sign-up'
+                  router.pathname.includes('verify-new-email') ||
+                  router.pathname.includes('unsubscribe')
+                    ? 'floating-items'
+                    : 'hero-visual'
                 }
               />
-              { !router.pathname.includes('verify-email') &&
-                  !router.pathname.includes('verify-new-email') ? (
+              {!router.pathname.includes('verify-email') &&
+              !router.pathname.includes('verify-new-email') ? (
                 <HomeLogoButton />
               ) : null}
               <AnimatePresence>{children}</AnimatePresence>
@@ -117,7 +118,7 @@ const SHomeLogoButton = styled.div`
 // 3D Visuals
 
 interface IBackgroundVisual {
-  view: 'verify-email' | 'sign-up';
+  view: 'floating-items' | 'hero-visual';
 }
 
 const BackgroundVisual: React.FunctionComponent<IBackgroundVisual> = ({
@@ -126,12 +127,12 @@ const BackgroundVisual: React.FunctionComponent<IBackgroundVisual> = ({
   return (
     <SBackgroundVisual>
       <AnimatePresence>
-        {view === 'sign-up' && (
+        {view === 'hero-visual' && (
           <HeroVisualContainer>
             <HeroVisual key='hero-visual' />
           </HeroVisualContainer>
         )}
-        {view === 'verify-email' && <VerifyEmailVisual />}
+        {view === 'floating-items' && <VerifyEmailVisual />}
       </AnimatePresence>
     </SBackgroundVisual>
   );
