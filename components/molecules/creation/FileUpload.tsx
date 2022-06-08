@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useRef, useState, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import dynamic from 'next/dynamic';
@@ -410,7 +411,8 @@ const FileUpload: React.FC<IFileUpload> = ({
         handleClose={handleCloseFullPreviewClick}
       />
       <ThumbnailPreviewEdit
-        open={showThumbnailEdit}
+        // open={showThumbnailEdit}
+        open
         value={value}
         thumbnails={thumbnails}
         handleClose={handleCloseThumbnailEditClick}

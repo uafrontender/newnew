@@ -22,7 +22,7 @@ export const getVideoUploadUrl = (
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.GetVideoUploadUrlRequest,
-    newnewapi.GetImageUploadUrlResponse
+    newnewapi.GetVideoUploadUrlResponse
   >(
     newnewapi.GetVideoUploadUrlRequest,
     newnewapi.GetVideoUploadUrlResponse,

@@ -16,6 +16,7 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import CoverImageUpload from './CoverImageUpload';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -229,6 +230,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
               />
             )}
           </SModalTopLine>
+          <CoverImageUpload />
           <SPlayerWrapper>
             {open && (
               <BitmovinPlayer
@@ -325,6 +327,15 @@ const SContainer = styled.div`
     min-height: unset;
     background: ${(props) => props.theme.colorsThemed.background.secondary};
     border-radius: 16px;
+
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
   ${({ theme }) => theme.media.tablet} {
