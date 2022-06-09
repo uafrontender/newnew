@@ -1,8 +1,8 @@
 /* eslint-disable consistent-return */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import styled, { keyframes, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
-
+import { AuthLayoutContext } from './AuthLayout';
 import useImageLoaded from '../../utils/hooks/useImageLoaded';
 import assets from '../../constants/assets';
 // Cyclic dependency
@@ -12,7 +12,7 @@ interface IHeroVisual {}
 
 const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
   const theme = useTheme();
-
+  const authLayoutContext = useContext(AuthLayoutContext);
   const shouldUseCssFade = useMemo(() => isSafari(), []);
 
   const [currentState, setCurrentState] = useState<'intro' | 'hold' | 'outro'>(
@@ -26,14 +26,20 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
 
   useEffect(() => {
     if (introLoaded) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setCurrentState('hold');
       }, 2800);
       return () => {
-        setCurrentState('outro');
+        clearTimeout(timer);
       };
     }
   }, [introLoaded]);
+
+  useEffect(() => {
+    if (authLayoutContext.shouldHeroUnmount) {
+      setCurrentState('outro');
+    }
+  }, [authLayoutContext.shouldHeroUnmount]);
 
   if (shouldUseCssFade) {
     return (
