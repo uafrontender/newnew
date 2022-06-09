@@ -60,6 +60,7 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
             window.location.href
           )}`
         );
+        return;
       }
       const markAsFavoritePayload = new newnewapi.MarkPostRequest({
         markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
