@@ -540,7 +540,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   cardType={typeOfPost}
                 >
                   {t(`button-card-singular-${typeOfPost}`, {
-                    votes: totalVotes,
+                    votes: formatNumber(totalVotes ?? 0, true),
                     total: formatNumber(
                       (postParsed as newnewapi.Crowdfunding)
                         .targetBackerCount ?? 0,
@@ -569,7 +569,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   withProgress={typeOfPost === 'cf'}
                 >
                   {t(`button-card-${typeOfPost}`, {
-                    votes: totalVotes,
+                    votes: formatNumber(totalVotes ?? 0, true),
                     total: formatNumber(
                       (postParsed as newnewapi.Crowdfunding)
                         .targetBackerCount ?? 0,
