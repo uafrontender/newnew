@@ -3,9 +3,9 @@
     "title": "Email verification",
     "description": "Verify email"
   },
-  "top": {
-    "heading": "Verify your email",
-    "subheading": "Please enter the code we sent to"
+  "heading": {
+    "mainHeading": "Verify your email",
+    "subHeading": "Please enter the code we sent to"
   },
   "expired": {
     "noCodeReceived": "I didn't get a code.",
