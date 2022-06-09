@@ -20,7 +20,7 @@ import assets from '../constants/assets';
 
 // No sense to memorize
 const Custom404 = () => {
-  const { t } = useTranslation('404');
+  const { t } = useTranslation('page-404');
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -50,9 +50,9 @@ const Custom404 = () => {
             alt='No content yet'
           />
         )}
-        <SText>{t('something-wrong')}</SText>
+        <SText>{t('errorText')}</SText>
         <Link href='/'>
-          <Button>{t('btn-text')}</Button>
+          <Button>{t('buttonText')}</Button>
         </Link>
       </Container>
     </>
