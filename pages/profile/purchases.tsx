@@ -15,6 +15,7 @@ import { getMyPosts } from '../../api/endpoints/user';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
+import assets from '../../constants/assets';
 
 const PostModal = dynamic(
   () => import('../../components/organisms/decision/PostModal')
@@ -148,6 +149,7 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({
           property='og:description'
           content={t('Purchases.meta.description')}
         />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <SMain>
         <SCardsSection>

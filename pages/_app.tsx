@@ -2,15 +2,13 @@
 import React, {
   ReactElement,
   ReactNode,
-  useCallback,
   useEffect,
   useMemo,
   useState,
 } from 'react';
 import App from 'next/app';
 import Head from 'next/head';
-import { Provider, useStore } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
+import { useStore } from 'react-redux';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import { ToastContainer } from 'react-toastify';
@@ -29,11 +27,7 @@ import GlobalTheme from '../styles/ThemeProvider';
 
 // Redux store and provider
 import { setResizeMode } from '../redux-store/slices/uiStateSlice';
-import {
-  EnhancedStoreWithPersistor,
-  useAppSelector,
-  wrapper,
-} from '../redux-store/store';
+import { useAppSelector, wrapper } from '../redux-store/store';
 
 import isBrowser from '../utils/isBrowser';
 
@@ -61,6 +55,7 @@ import assets from '../constants/assets';
 import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
+import PersistanceProvider from '../contexts/PersistenceProvider';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -83,45 +78,6 @@ const MyApp = (props: IMyApp): ReactElement => {
     [Component.getLayout]
   );
 
-  const renderAppContent = useCallback(
-    () => (
-      <SyncUserWrapper>
-        <NotificationsProvider>
-          <BlockedUsersProvider>
-            <FollowingsContextProvider>
-              {/* <WalletContextProvider> */}
-              <SubscriptionsProvider>
-                <ChatsProvider>
-                  <ResizeMode>
-                    <PostModalContextProvider>
-                      <GlobalTheme>
-                        <div>
-                          <ToastContainer />
-                          <VideoProcessingWrapper>
-                            {!pageProps.error ? (
-                              getLayout(<Component {...pageProps} />)
-                            ) : (
-                              <Error
-                                title={pageProps.error?.message}
-                                statusCode={pageProps.error?.statusCode ?? 500}
-                              />
-                            )}
-                          </VideoProcessingWrapper>
-                        </div>
-                      </GlobalTheme>
-                    </PostModalContextProvider>
-                  </ResizeMode>
-                </ChatsProvider>
-              </SubscriptionsProvider>
-              {/* </WalletContextProvider> */}
-            </FollowingsContextProvider>
-          </BlockedUsersProvider>
-        </NotificationsProvider>
-      </SyncUserWrapper>
-    ),
-    [Component, getLayout, pageProps]
-  );
-
   // Pre-fetch images after all loading for initial page is done
   const [preFetchImages, setPreFetchImages] = useState<string>('');
   const PRE_FETCHING_DELAY = 2500;
@@ -139,7 +95,13 @@ const MyApp = (props: IMyApp): ReactElement => {
     if (hotjarIdVariable && hotjarSvVariable) {
       const hotjarId = parseInt(hotjarIdVariable);
       const hotjarSv = parseInt(hotjarSvVariable);
-      hotjar.initialize(hotjarId, hotjarSv);
+      try {
+        hotjar.initialize(hotjarId, hotjarSv);
+      } catch (err) {
+        // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
+        // This is expected to happen from time to time, no need to react
+        console.log(err);
+      }
     }
   }, []);
 
@@ -177,33 +139,6 @@ const MyApp = (props: IMyApp): ReactElement => {
     }
   }, [user.userData?.username]);
 
-  if (typeof window === undefined) {
-    return (
-      <>
-        <Head>
-          <meta charSet='utf-8' />
-          <meta
-            name='viewport'
-            content='width=device-width, initial-scale=1, user-scalable=no'
-          />
-          <meta property='og:image' content={assets.openGraphImage.common} />
-          {preFetchImages !== '' && PRE_FETCH_LINKS_COMMON}
-          {preFetchImages === 'dark' && PRE_FETCH_LINKS_DARK}
-          {preFetchImages === 'light' && PRE_FETCH_LINKS_LIGHT}
-        </Head>
-        <CookiesProvider cookies={cookiesInstance}>
-          <AppConstantsContextProvider>
-            <SocketContextProvider>
-              <ChannelsContextProvider>
-                <Provider store={store}>{renderAppContent()}</Provider>
-              </ChannelsContextProvider>
-            </SocketContextProvider>
-          </AppConstantsContextProvider>
-        </CookiesProvider>
-      </>
-    );
-  }
-
   return (
     <>
       <Head>
@@ -212,7 +147,6 @@ const MyApp = (props: IMyApp): ReactElement => {
           name='viewport'
           content='width=device-width, initial-scale=1, user-scalable=no'
         />
-        <meta property='og:image' content={assets.openGraphImage.common} />
         <meta property='og:type' content='website' />
         {preFetchImages !== '' && PRE_FETCH_LINKS_COMMON}
         {preFetchImages === 'dark' && PRE_FETCH_LINKS_DARK}
@@ -222,12 +156,43 @@ const MyApp = (props: IMyApp): ReactElement => {
         <AppConstantsContextProvider>
           <SocketContextProvider>
             <ChannelsContextProvider>
-              <PersistGate
-                loading={null}
-                persistor={(store as EnhancedStoreWithPersistor).__persistor}
-              >
-                {renderAppContent()}
-              </PersistGate>
+              <PersistanceProvider store={store}>
+                <SyncUserWrapper>
+                  <NotificationsProvider>
+                    <BlockedUsersProvider>
+                      <FollowingsContextProvider>
+                        {/* <WalletContextProvider> */}
+                        <SubscriptionsProvider>
+                          <ChatsProvider>
+                            <ResizeMode>
+                              <PostModalContextProvider>
+                                <GlobalTheme>
+                                  <div>
+                                    <ToastContainer />
+                                    <VideoProcessingWrapper>
+                                      {!pageProps.error ? (
+                                        getLayout(<Component {...pageProps} />)
+                                      ) : (
+                                        <Error
+                                          title={pageProps.error?.message}
+                                          statusCode={
+                                            pageProps.error?.statusCode ?? 500
+                                          }
+                                        />
+                                      )}
+                                    </VideoProcessingWrapper>
+                                  </div>
+                                </GlobalTheme>
+                              </PostModalContextProvider>
+                            </ResizeMode>
+                          </ChatsProvider>
+                        </SubscriptionsProvider>
+                        {/* </WalletContextProvider> */}
+                      </FollowingsContextProvider>
+                    </BlockedUsersProvider>
+                  </NotificationsProvider>
+                </SyncUserWrapper>
+              </PersistanceProvider>
             </ChannelsContextProvider>
           </SocketContextProvider>
         </AppConstantsContextProvider>

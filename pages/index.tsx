@@ -193,6 +193,11 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     if (user.loggedIn) {
       fetchFYPosts();
     }
+
+    return () => {
+      setPostModalOpen(false);
+      setDisplayedPost(undefined);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -342,6 +347,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
         <meta name='description' content={t('home.meta.description')} />
         <meta property='og:title' content={t('home.meta.title')} />
         <meta property='og:description' content={t('home.meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       {!user.loggedIn && <HeroSection />}
       {topSectionCollection.length > 0 && (

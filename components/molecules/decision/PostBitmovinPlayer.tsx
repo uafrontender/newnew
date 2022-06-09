@@ -17,7 +17,6 @@ import {
 
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 import Lottie from '../../atoms/Lottie';
-import isSafari from '../../../utils/isSafari';
 
 interface IPostBitmovinPlayer {
   id: string;
@@ -82,12 +81,12 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
     player?.current?.play();
   }, []);
 
-  const destroyPlayer = useCallback(() => {
+  const destroyPlayer = useCallback(async () => {
     if (player.current != null) {
       // setInit(false);
-      player.current.destroy();
+      await player.current.destroy();
     }
-  }, []);
+  }, [player]);
 
   const setupPlayer = useCallback(() => {
     player.current = new Player(playerRef.current, playerConfig);
@@ -131,22 +130,33 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   }, [player, muted, loaded]);
 
   useEffect(() => {
+    let cancel = false;
     async function load() {
       setIsLoading(true);
       // console.log(player.current);
       try {
-        await player?.current?.load(playerSource);
-        player.current?.play();
-        setLoaded(true);
-        setIsLoading(false);
+        await player?.current
+          ?.load(playerSource)
+          .then(() => {
+            if (cancel) return;
+            player.current?.play();
+            setLoaded(true);
+            setIsLoading(false);
+          })
+          .catch(() => {
+            if (cancel) return;
+            console.error('Player load failed');
+          });
       } catch (err) {
         setLoaded(true);
         setIsLoading(false);
         console.error(`Error while creating Bitmovin Player instance, ${err}`);
       }
     }
-
     load();
+    return () => {
+      cancel = true;
+    };
   }, [playerSource]);
 
   return (
@@ -156,7 +166,7 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
         <SWrapper
           id={id}
           onClick={() => {
-            if (isSafari()) {
+            if (loaded) {
               if (player.current?.isPlaying()) {
                 player.current?.pause();
               } else {
@@ -196,6 +206,11 @@ const SContent = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
+  overflow: hidden;
+
+  ${({ theme }) => theme.media.tablet} {
+    border-radius: 16px;
+  }
 `;
 
 const SVideoWrapper = styled.div`
@@ -245,10 +260,6 @@ const SImageBG = styled.img`
 
   @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
     filter: blur(32px);
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    border-radius: 16px;
   }
 `;
 

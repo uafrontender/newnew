@@ -24,6 +24,7 @@ const disallow = [
   '/sign-up-payment',
   '/subscription-success',
   '/test',
+  '/unsubscribe',
   '/verify-email',
   '/verify-new-email',
   '/404',
@@ -44,9 +45,9 @@ module.exports = {
       },
       { userAgent: '*', allow: '/' },
     ],
+    additionalSitemaps: [
+      `${process.env.NEXT_PUBLIC_APP_URL}/sitemap.xml`,
+      `${process.env.NEXT_PUBLIC_APP_URL}/server-sitemap.xml`,
+    ],
   },
-  additionalSitemaps: [
-    `${process.env.NEXT_PUBLIC_APP_URL}/sitemap.xml`,
-    `${process.env.NEXT_PUBLIC_APP_URL}/server-sitemap.xml`,
-  ],
 };
