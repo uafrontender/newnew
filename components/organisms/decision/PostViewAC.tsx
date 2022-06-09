@@ -478,14 +478,26 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
         }
       }
 
-      markAsViewed();
+      // setTimeout used to fix the React memory leak warning
+      const timer = setTimeout(() => {
+        markAsViewed();
+      });
+      return () => {
+        clearTimeout(timer);
+      };
     }, [post, user.loggedIn, user.userData?.userUuid]);
 
     useEffect(() => {
-      setOptions([]);
-      setOptionsNextPageToken('');
-      fetchBids();
-      fetchPostLatestData();
+      // setTimeout used to fix the React memory leak warning
+      const timer = setTimeout(() => {
+        setOptions([]);
+        setOptionsNextPageToken('');
+        fetchBids();
+        fetchPostLatestData();
+      });
+      return () => {
+        clearTimeout(timer);
+      };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [post.postUuid]);
 

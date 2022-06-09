@@ -35,7 +35,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   const [signInError, setSignInError] = useState(false);
 
   useEffect(() => {
-    if (user.loggedIn) router.push('/');
+    if (user.loggedIn) router?.push('/');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -103,11 +103,11 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
         setIsLoading(false);
         if (data.redirectUrl) {
-          router.push(data.redirectUrl);
+          router?.push(data.redirectUrl);
         } else if (data.me?.options?.isCreator) {
-          router.push('/creator/dashboard');
+          router?.push('/creator/dashboard');
         } else {
-          router.push('/');
+          router?.push('/');
         }
       } catch (err) {
         // NB! Might need an error toast

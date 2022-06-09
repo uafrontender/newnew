@@ -52,21 +52,19 @@ export const Navigation = () => {
       const active = router.route.includes(item.url);
       return (
         <Link href={item.url} key={item.url}>
-          <a>
-            <SItem active={active}>
-              <SInlineSVG
-                svg={active ? item.iconFilled : item.iconOutlined}
-                fill={
-                  active
-                    ? theme.colorsThemed.accent.blue
-                    : theme.colorsThemed.text.tertiary
-                }
-                width='24px'
-                height='24px'
-              />
-              <SLabel>{item.label}</SLabel>
-            </SItem>
-          </a>
+          <SItem active={active}>
+            <SInlineSVG
+              svg={active ? item.iconFilled : item.iconOutlined}
+              fill={
+                active
+                  ? theme.colorsThemed.accent.blue
+                  : theme.colorsThemed.text.tertiary
+              }
+              width='24px'
+              height='24px'
+            />
+            <SLabel>{item.label}</SLabel>
+          </SItem>
         </Link>
       );
     },

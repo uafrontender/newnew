@@ -21,6 +21,7 @@ import {
 } from '../api/endpoints/user';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import { setCreatorData } from '../redux-store/slices/userStateSlice';
+import assets from '../constants/assets';
 
 const OnboardingSectionDetails = dynamic(
   () =>
@@ -107,6 +108,7 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
         <meta name='description' content={t('meta.description')} />
         <meta property='og:title' content={t('meta.title')} />
         <meta property='og:description' content={t('meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       {onboardingState ? (
         <OnboardingSectionDetails

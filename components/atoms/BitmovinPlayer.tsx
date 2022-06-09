@@ -113,6 +113,8 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
           setLoaded(true);
           setIsLoading(false);
 
+          // TODO: Handle the error as it can can fail due to...
+          // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
           player.current.play();
 
           if (setDuration) {
@@ -181,8 +183,8 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   }, [player, isMuted, loaded]);
 
   return (
-    <SContent>
-      <SImageBG src={resources.thumbnailImageUrl} borderRadius={borderRadius} />
+    <SContent borderRadius={borderRadius}>
+      <SImageBG src={resources.thumbnailImageUrl} />
       <SVideoWrapper borderRadius={borderRadius}>
         <SWrapper id={id} ref={playerRef} />
       </SVideoWrapper>
@@ -220,12 +222,16 @@ BitmovinPlayer.defaultProps = {
   setCurrentTime: () => {},
 };
 
-const SContent = styled.div`
+interface ISContent {
+  borderRadius?: string;
+}
+
+const SContent = styled.div<ISContent>`
   width: 100%;
   height: 100%;
   position: relative;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: ${(props) => props.borderRadius};
 `;
 
 interface ISVideoWrapper {
@@ -267,11 +273,10 @@ const SWrapper = styled.div`
   }
 `;
 
-const SImageBG = styled.img<ISVideoWrapper>`
+const SImageBG = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: ${(props) => props.borderRadius};
   transform: scale(1.1);
 
   @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
