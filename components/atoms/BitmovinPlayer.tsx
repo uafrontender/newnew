@@ -113,6 +113,8 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
           setLoaded(true);
           setIsLoading(false);
 
+          // TODO: Handle the error as it can can fail due to...
+          // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
           player.current.play();
 
           if (setDuration) {

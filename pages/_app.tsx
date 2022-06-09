@@ -95,7 +95,13 @@ const MyApp = (props: IMyApp): ReactElement => {
     if (hotjarIdVariable && hotjarSvVariable) {
       const hotjarId = parseInt(hotjarIdVariable);
       const hotjarSv = parseInt(hotjarSvVariable);
-      hotjar.initialize(hotjarId, hotjarSv);
+      try {
+        hotjar.initialize(hotjarId, hotjarSv);
+      } catch (err) {
+        // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
+        // This is expected to happen from time to time, no need to react
+        console.log(err);
+      }
     }
   }, []);
 

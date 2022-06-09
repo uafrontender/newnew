@@ -220,7 +220,13 @@ export const PostCard: React.FC<ICard> = React.memo(
       try {
         if (videoReady) {
           if (inView && !shouldStop) {
-            videoRef.current?.play();
+            try {
+              videoRef.current?.play();
+            } catch (err) {
+              // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
+              // Many browsers prevent autoplay
+              console.log(err);
+            }
           } else {
             videoRef.current?.pause();
           }
