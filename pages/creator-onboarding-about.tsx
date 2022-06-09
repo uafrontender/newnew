@@ -17,6 +17,7 @@ import {
 } from '../api/endpoints/user';
 import Lottie from '../components/atoms/Lottie';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
+import assets from '../constants/assets';
 
 const OnboardingSectionAbout = dynamic(
   () =>
@@ -63,6 +64,7 @@ const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = ({
           property='og:description'
           content={t('AboutSection.meta.description')}
         />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       {!isLoading ? (
         <OnboardingSectionAbout

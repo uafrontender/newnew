@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ReactElement, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
@@ -11,17 +9,11 @@ import { NextPageWithLayout } from './_app';
 import AuthLayout, {
   AuthLayoutContext,
 } from '../components/templates/AuthLayout';
-import CodeVerificationMenu from '../components/organisms/CodeVerificationMenu';
-import assets from '../constants/assets';
+import UnsubscribeMenu from '../components/organisms/UnsubscribeMenu';
 
-const VerifyEmail = () => {
-  const { t } = useTranslation('verify-email');
+const Unsubscribe = () => {
+  const { t } = useTranslation('unsubscribe');
   const authLayoutContext = useContext(AuthLayoutContext);
-
-  // Redirect if the user is logged in
-  // useEffect(() => {
-  //   if (loggedIn) router.push('/');
-  // }, [loggedIn, router]);
 
   useEffect(() => {
     authLayoutContext.setShouldHeroUnmount(false);
@@ -32,10 +24,6 @@ const VerifyEmail = () => {
     <>
       <Head>
         <title>{t('meta.title')}</title>
-        <meta name='description' content={t('meta.description')} />
-        <meta property='og:title' content={t('meta.title')} />
-        <meta property='og:description' content={t('meta.description')} />
-        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <motion.div
         initial={{
@@ -52,27 +40,30 @@ const VerifyEmail = () => {
           },
         }}
       >
-        <CodeVerificationMenu expirationTime={60} />
+        <UnsubscribeMenu />
       </motion.div>
     </>
   );
 };
 
-(VerifyEmail as NextPageWithLayout).getLayout = function getLayout(
+(Unsubscribe as NextPageWithLayout).getLayout = function getLayout(
   page: ReactElement
 ) {
   return <AuthLayout>{page}</AuthLayout>;
 };
 
-export default VerifyEmail;
+export default Unsubscribe;
 
 export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
-    'sign-up',
-    'verify-email',
+    'unsubscribe',
   ]);
+
+  // TODO: get token from a magic link query parameters
+  // TODO: send a request to BE API responsible for unsubscribing a user using a token
+  // TODO: get a response and only then render a UI showing a success message
 
   return {
     props: {

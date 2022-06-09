@@ -154,6 +154,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             window.location.href
           )}`
         );
+        return;
       }
       const markAsFavoritePayload = new newnewapi.MarkPostRequest({
         markAs: !isFollowingDecision
@@ -382,7 +383,7 @@ const SWrapper = styled.div<{
               'title title title';
           `}
     grid-template-rows: 40px;
-    grid-template-columns: min-content 1fr 100px;
+    grid-template-columns: max-content 1fr 100px;
     align-items: center;
 
     margin-bottom: 0px;

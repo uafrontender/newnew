@@ -18,6 +18,7 @@ import {
 } from '../api/endpoints/subscription';
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { setCreatorData } from '../redux-store/slices/userStateSlice';
+import assets from '../constants/assets';
 
 const OnboardingSectionSubrate = dynamic(
   () =>
@@ -92,6 +93,7 @@ const CreatorOnboardingSubrate = () => {
         <meta name='description' content={t('meta.description')} />
         <meta property='og:title' content={t('meta.title')} />
         <meta property='og:description' content={t('meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       {!isLoading ? (
         <OnboardingSectionSubrate
