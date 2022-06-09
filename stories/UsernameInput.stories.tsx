@@ -30,7 +30,7 @@ const Template: ComponentStory<typeof UsernameInput> = (args) => {
           <div style={{ width: '100px', height: '50px' }}>Caption</div>
         }
         frequencyCaption='Can be changed only two times'
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e: any) => setValue(e.target.value)}
         {...(args as any)}
       />
     </div>

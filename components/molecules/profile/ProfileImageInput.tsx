@@ -39,7 +39,7 @@ const ProfileImageInput: React.FunctionComponent<IProfileImageInput> = ({
         ref={(el) => {
           imageInputRef.current = el!!;
         }}
-        onChange={(e) => {
+        onChange={(e: any) => {
           handleImageInputChange(e);
           if (imageInputRef.current) {
             imageInputRef.current.value = '';

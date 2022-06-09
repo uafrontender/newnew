@@ -47,7 +47,7 @@ const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm>
           }
           selected={agreed}
           disabled={!hasScrolledDownDesktop}
-          handleChange={(e) => setAgreed(!agreed)}
+          handleChange={(e: any) => setAgreed(!agreed)}
         />
         <Button
           view='primaryGrad'

@@ -50,7 +50,7 @@ const TopUpWalletSlider: React.FunctionComponent<ITopUpWalletSlider> = ({
         min={min}
         max={max}
         step={step}
-        onChange={(e) => onChange(parseInt(e.target.value))}
+        onChange={(e: any) => onChange(parseInt(e.target.value))}
       />
       <Button
         iconOnly

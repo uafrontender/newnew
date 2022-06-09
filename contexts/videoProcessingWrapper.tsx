@@ -6,7 +6,11 @@ import { toast } from 'react-toastify';
 import { SocketContext } from './socketContext';
 import { usePostModalState } from './postModalContext';
 
-const VideoProcessingWrapper: React.FunctionComponent = ({ children }) => {
+interface IReactFunction {
+  children: React.ReactNode;
+}
+
+const VideoProcessingWrapper: React.FC<IReactFunction> = ({ children }) => {
   const router = useRouter();
   const socketConnection = useContext(SocketContext);
 

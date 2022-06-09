@@ -63,7 +63,7 @@ const CfPledgeCard: React.FunctionComponent<ICfPledgeCard> = ({
         <SPledgeDetails>
           <SPledgeInfo>
             <SAvatar
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.stopPropagation();
                 handleRedirectToUser();
               }}
@@ -72,7 +72,7 @@ const CfPledgeCard: React.FunctionComponent<ICfPledgeCard> = ({
               draggable={false}
             />
             <SUsername
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.stopPropagation();
                 handleRedirectToUser();
               }}

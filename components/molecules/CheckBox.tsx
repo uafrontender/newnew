@@ -18,7 +18,7 @@ const CheckBox: React.FC<ICheckBox> = (props) => {
   const ref: any = useRef();
 
   const onClick = useCallback(
-    (e) => {
+    (e: any) => {
       handleChange(e, id);
     },
     [id, handleChange]

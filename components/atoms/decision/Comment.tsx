@@ -129,7 +129,7 @@ const Comment: React.FC<IComment> = ({
               <SMoreButton
                 view='transparent'
                 iconOnly
-                onClick={(e) => {
+                onClick={(e: any) => {
                   e.stopPropagation();
                   handleOpenEllipseMenu();
                 }}

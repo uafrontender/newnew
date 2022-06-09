@@ -99,7 +99,7 @@ const PostShareModal: React.FunctionComponent<IPostShareModal> = React.memo(
       <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
         <SWrapper>
           <SContentContainer
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
             }}
           >
@@ -111,7 +111,7 @@ const PostShareModal: React.FunctionComponent<IPostShareModal> = React.memo(
               <SItem>
                 <SItemButtonWide
                   type='copy'
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     handlerCopy();
                   }}

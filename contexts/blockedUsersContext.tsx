@@ -19,7 +19,13 @@ const BlockedUsersContext = createContext({
   usersBlockedLoading: false,
 });
 
-export const BlockedUsersProvider: React.FC = ({ children }) => {
+interface IReactFunction {
+  children: React.ReactNode;
+}
+
+export const BlockedUsersProvider: React.FC<IReactFunction> = ({
+  children,
+}) => {
   const user = useAppSelector((state) => state.user);
   const [usersBlockedMe, setUsersBlockedMe] = useState<string[]>([]);
   const [usersIBlocked, setUsersIBlocked] = useState<string[]>([]);

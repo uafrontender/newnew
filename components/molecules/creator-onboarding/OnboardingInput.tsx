@@ -68,7 +68,7 @@ const OnboardingInput: React.FunctionComponent<TOnboardingInput> = ({
             setErrorBordersShown(false);
           }
         }}
-        onFocus={(e) => {
+        onFocus={(e: any) => {
           if (onFocus) onFocus(e);
           setErrorBordersShown(false);
         }}

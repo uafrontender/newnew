@@ -28,7 +28,13 @@ const SubscriptionsContext = createContext({
   fetchCreatorsImSubscribedTo: () => {},
 });
 
-export const SubscriptionsProvider: React.FC = ({ children }) => {
+interface IReactFunction {
+  children: React.ReactNode;
+}
+
+export const SubscriptionsProvider: React.FC<IReactFunction> = ({
+  children,
+}) => {
   const user = useAppSelector((state) => state.user);
   const [mySubscribers, setMySubscribers] = useState<newnewapi.ISubscriber[]>(
     []

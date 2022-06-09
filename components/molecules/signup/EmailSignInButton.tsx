@@ -23,7 +23,7 @@ const EmailSignInButton: React.FunctionComponent<TEmailSignInButton> = ({
       x={mousePosition.x}
       y={mousePosition.y}
       disabled={disabled}
-      onMouseEnter={(e) => {
+      onMouseEnter={(e: any) => {
         if (disabled) return;
         const rect = e.currentTarget.getBoundingClientRect();
         const x = Math.round((rect.width / e.clientX) * 100);
@@ -35,7 +35,7 @@ const EmailSignInButton: React.FunctionComponent<TEmailSignInButton> = ({
 
         setMousePosition(newMP);
       }}
-      onMouseMove={(e) => {
+      onMouseMove={(e: any) => {
         if (disabled) return;
         const rect = e.currentTarget.getBoundingClientRect();
         const x = Math.round((rect.width / e.clientX) * 100);

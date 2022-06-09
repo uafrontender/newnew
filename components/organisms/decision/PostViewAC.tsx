@@ -3,6 +3,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
+/* eslint-disable consistent-return */
 import React, {
   useCallback,
   useContext,
@@ -519,7 +520,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       }
 
       if (post.winningOptionId) {
-        fetchAndSetWinningOption(post.winningOptionId as number);
+        const timer = setTimeout(() => {
+          fetchAndSetWinningOption(post.winningOptionId as number);
+        });
+        return () => {
+          clearTimeout(timer);
+        };
       }
     }, [post.winningOptionId]);
 
@@ -653,7 +659,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       };
 
       if (socketConnection.active) {
-        makeBidFromSessionId();
+        const timer = setTimeout(() => {
+          makeBidFromSessionId();
+        });
+        return () => {
+          clearTimeout(timer);
+        };
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socketConnection.active, sessionId]);

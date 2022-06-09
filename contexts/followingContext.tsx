@@ -19,7 +19,11 @@ export const FollowingsContext = createContext({
   removeId: (id: string) => {},
 });
 
-const FollowingsContextProvider: React.FC = ({ children }) => {
+interface IReactFunction {
+  children: React.ReactNode;
+}
+
+const FollowingsContextProvider: React.FC<IReactFunction> = ({ children }) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
 

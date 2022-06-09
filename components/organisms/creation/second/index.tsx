@@ -912,7 +912,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     }, [tutorialType, user.userTutorialsProgressSynced]);
 
     const goToNextStep = () => {
-      let payload = null;
+      let payload: any = null;
       switch (tutorialType) {
         case 'MC':
           if (

@@ -20,7 +20,7 @@ const DeleteCommentModal: React.FC<IDeleteCommentModal> = ({
   return (
     <Modal show={isVisible} additionalz={12} onClose={closeModal}>
       <SContainer
-        onClick={(e) => {
+        onClick={(e: any) => {
           e.stopPropagation();
         }}
       >

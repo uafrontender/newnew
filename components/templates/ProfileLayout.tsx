@@ -63,6 +63,7 @@ interface IProfileLayout {
   postsCachedActivityFilter?: newnewapi.Post.Filter;
   postsCachedActivityPageToken?: string | null | undefined;
   postsCachedActivityCount?: number;
+  children: React.ReactNode;
 }
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
@@ -292,7 +293,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
-      await reportUser(user.uuid, reasons, message).catch((e) =>
+      await reportUser(user.uuid, reasons, message).catch((e: any) =>
         console.error(e)
       );
     },

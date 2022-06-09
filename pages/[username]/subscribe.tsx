@@ -370,7 +370,11 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
 export default SubscribeToUserPage;
 
-const BoldSpan: React.FC = ({ children }) => (
+interface IReactFunction {
+  children: React.ReactNode;
+}
+
+const BoldSpan: React.FC<IReactFunction> = ({ children }) => (
   <strong>
     <em>{children}</em>
   </strong>

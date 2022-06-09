@@ -422,7 +422,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       <SContainer
         $isDisabled={disabled && votingAllowed}
         $isBlue={isBlue}
-        onClick={(e) => {
+        onClick={(e: any) => {
           if (!isMobile && !disabled && !isEllipseMenuOpen) {
             console.log(isMyBid);
             setIsEllipseMenuOpen(true);
@@ -478,12 +478,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           <SOptionInfo isWhite={isSupportedByMe || isMyBid} variant={3}>
             {option.title}
           </SOptionInfo>
-          <SBiddersInfo onClick={(e) => e.preventDefault()} variant={3}>
+          <SBiddersInfo onClick={(e: any) => e.preventDefault()} variant={3}>
             {option.creator?.username ? (
               <Link href={`/${option.creator?.username}`}>
                 <SSpanBiddersHighlighted
                   className='spanHighlighted'
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                   }}
                   style={{
@@ -512,7 +512,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             ) : (
               <SSpanBiddersHighlighted
                 className='spanHighlighted'
-                onClick={(e) => {
+                onClick={(e: any) => {
                   e.stopPropagation();
                 }}
                 style={{
@@ -562,7 +562,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             view='quaternary'
             disabled={disabled}
             isBlue={isBlue}
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
               handleOpenSupportForm();
             }}
@@ -578,7 +578,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             view='secondary'
             disabled={disabled}
             isBlue={isBlue}
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
               handleOpenSupportForm();
             }}

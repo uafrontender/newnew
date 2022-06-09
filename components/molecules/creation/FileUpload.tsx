@@ -142,7 +142,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   );
 
   const handleFileChange = useCallback(
-    async (e) => {
+    async (e: any) => {
       const file = e.target?.files[0];
 
       if (file.size > MAX_VIDEO_SIZE) {
@@ -220,7 +220,7 @@ const FileUpload: React.FC<IFileUpload> = ({
           style={{ display: 'none' }}
           accept='video/*'
           multiple={false}
-          onChange={(e) => {
+          onChange={(e: any) => {
             handleFileChange(e);
             if (inputRef.current) {
               inputRef.current.value = '';
@@ -336,7 +336,7 @@ const FileUpload: React.FC<IFileUpload> = ({
             style={{ display: 'none' }}
             accept='video/*'
             multiple={false}
-            onChange={(e) => {
+            onChange={(e: any) => {
               handleFileChange(e);
               if (inputRef.current) {
                 inputRef.current.value = '';

@@ -68,6 +68,7 @@ interface IMyProfileLayout {
   postsCachedMyPostsFilter?: newnewapi.Post.Filter;
   postsCachedMyPostsCount?: number;
   postsCachedMyPostsPageToken?: string | null | undefined;
+  children: React.ReactNode;
 }
 
 const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({

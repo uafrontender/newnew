@@ -63,7 +63,7 @@ const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileIma
             ref={(el) => {
               imageInputRef.current = el!!;
             }}
-            onChange={(e) => {
+            onChange={(e: any) => {
               handleChangeImageInEdit(e);
               if (imageInputRef.current) {
                 imageInputRef.current.value = '';

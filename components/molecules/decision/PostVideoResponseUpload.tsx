@@ -96,7 +96,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   }, [handleCloseDeleteVideoClick, id, onChange]);
 
   const handleFileChange = useCallback(
-    async (e) => {
+    async (e: any) => {
       const file = e.target?.files[0];
 
       if (file.size > MAX_VIDEO_SIZE) {
@@ -160,7 +160,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           style={{ display: 'none' }}
           accept='video/*'
           multiple={false}
-          onChange={(e) => {
+          onChange={(e: any) => {
             handleFileChange(e);
             if (inputRef.current) {
               inputRef.current.value = '';
@@ -322,7 +322,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
             style={{ display: 'none' }}
             accept='video/*'
             multiple={false}
-            onChange={(e) => {
+            onChange={(e: any) => {
               handleFileChange(e);
               if (inputRef.current) {
                 inputRef.current.value = '';

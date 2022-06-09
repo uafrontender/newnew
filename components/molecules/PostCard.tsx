@@ -192,8 +192,8 @@ export const PostCard: React.FC<ICard> = React.memo(
     const handleReportSubmit = useCallback(
       async ({ reasons, message }: ReportData) => {
         if (postParsed) {
-          await reportPost(postParsed.postUuid, reasons, message).catch((e) =>
-            console.error(e)
+          await reportPost(postParsed.postUuid, reasons, message).catch(
+            (e: any) => console.error(e)
           );
         }
       },
@@ -409,7 +409,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                       ? postParsed.creator.avatarUrl
                       : ''
                   }
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     handleUserClick(postParsed.creator?.username!!);
                   }}
@@ -502,7 +502,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   : ''
               }
               withClick
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.stopPropagation();
                 handleUserClick(postParsed.creator?.username!!);
               }}

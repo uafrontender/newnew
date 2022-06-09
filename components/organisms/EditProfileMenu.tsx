@@ -730,7 +730,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     <SEditProfileMenu
       initial={MInitial}
       animate={MAnimation}
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e: any) => e.stopPropagation()}
     >
       <AnimatePresence>
         {stage === 'edit-general' ? (
@@ -787,7 +787,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     `EditProfileMenu.inputs.nickname.errors.${formErrors.nicknameError}`
                   )}
                   isValid={!formErrors.nicknameError}
-                  onChange={(e) =>
+                  onChange={(e: any) =>
                     handleUpdateDataInEdit('nickname', e.target.value)
                   }
                 />
@@ -838,7 +838,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     `EditProfileMenu.inputs.bio.errors.${formErrors.bioError}`
                   )}
                   isValid={!formErrors.bioError}
-                  onChange={(e) =>
+                  onChange={(e: any) =>
                     handleUpdateDataInEdit('bio', e.target.value)
                   }
                 />
@@ -924,7 +924,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   step={0.1}
                   ariaLabel='Zoom'
                   disabled={updateProfileImageLoading}
-                  onChange={(e) => setZoomProfileImage(Number(e.target.value))}
+                  onChange={(e: any) =>
+                    setZoomProfileImage(Number(e.target.value))
+                  }
                 />
                 <Button
                   iconOnly

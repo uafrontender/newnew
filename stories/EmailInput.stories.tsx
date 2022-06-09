@@ -28,7 +28,7 @@ const Template: ComponentStory<typeof SignInTextInput> = (args) => {
         placeholder='Email'
         isValid={validator.isEmail(value)}
         errorCaption='Input is incorrect'
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e: any) => setValue(e.target.value)}
       />
     </div>
   );

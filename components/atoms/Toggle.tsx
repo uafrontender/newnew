@@ -26,7 +26,7 @@ const Toggle: React.FunctionComponent<TToggle> = ({
       type='checkbox'
       disabled={disabled}
       title={title ?? ''}
-      onChange={(e) => onChange(e)}
+      onChange={(e: any) => onChange(e)}
     />
   </SToggleLabel>
 );

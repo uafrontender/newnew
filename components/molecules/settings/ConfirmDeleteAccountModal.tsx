@@ -41,7 +41,7 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
   return (
     <Modal show={isVisible} onClose={closeModal}>
       <SContainer>
-        <SModal onClick={(e) => e.stopPropagation()}>
+        <SModal onClick={(e: any) => e.stopPropagation()}>
           <SModalTitle>{t('modal.delete-my-account.title')}</SModalTitle>
           <SModalMessage>{t('modal.delete-my-account.body')}</SModalMessage>
           <SModalButtons>

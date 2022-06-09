@@ -116,7 +116,7 @@ const PostShareMenu: React.FunctionComponent<IPostShareMenu> = React.memo(
             <SItem>
               <SItemButtonWide
                 type='copy'
-                onClick={(e) => {
+                onClick={(e: any) => {
                   e.stopPropagation();
                   handlerCopy();
                 }}

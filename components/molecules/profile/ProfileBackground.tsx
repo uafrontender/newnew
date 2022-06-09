@@ -1,8 +1,10 @@
+/* eslint-disable react/require-default-props */
 import React from 'react';
 import styled from 'styled-components';
 
 interface IProfileBackground {
   pictureURL: string;
+  children?: React.ReactNode;
 }
 
 const ProfileBackground: React.FunctionComponent<IProfileBackground> = ({

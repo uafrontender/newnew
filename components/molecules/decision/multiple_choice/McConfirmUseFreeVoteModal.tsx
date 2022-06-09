@@ -22,7 +22,7 @@ const McConfirmUseFreeVoteModal: React.FC<IMcConfirmUseFreeVoteModal> = ({
   return (
     <Modal show={isVisible} additionalz={12} onClose={closeModal}>
       <SContainer
-      // onClick={(e) => e.stopPropagation()}
+      // onClick={(e: any) => e.stopPropagation()}
       >
         <SModal>
           <STag>{t('McPost.OptionsTab.ConfirmUseFreeVoteModal.tag')}</STag>

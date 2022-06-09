@@ -31,6 +31,7 @@ interface IPaymentModal {
   onClose: () => void;
   // handlePayWithWallet?: () => void;
   handlePayWithCardStripeRedirect?: () => void;
+  children: React.ReactNode;
 }
 
 const PaymentModal: React.FC<IPaymentModal> = ({
@@ -70,7 +71,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
       <SWrapper>
         <SContentContainer
           showTocApply={showTocApply ?? false}
-          onClick={(e) => {
+          onClick={(e: any) => {
             e.stopPropagation();
           }}
         >

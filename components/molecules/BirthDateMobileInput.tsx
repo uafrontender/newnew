@@ -190,7 +190,7 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
   }, [availableDays, innerDate.day]);
 
   return (
-    <SContainer onClick={(e) => e.stopPropagation()}>
+    <SContainer onClick={(e: any) => e.stopPropagation()}>
       <SDateInputContainer>
         <SScroller
           ref={(el) => {

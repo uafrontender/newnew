@@ -84,7 +84,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
     [t]
   );
   const renderMonth = useCallback(
-    (el, index) => {
+    (el: any, index: number) => {
       const opts: any = {
         date: el,
       };

@@ -7,7 +7,11 @@ import getColorMode from '../utils/getColorMode';
 import { useAppSelector } from '../redux-store/store';
 import { darkTheme, lightTheme } from './themes';
 
-const GlobalTheme: React.FunctionComponent = ({ children }) => {
+interface IReactFunction {
+  children: React.ReactNode;
+}
+
+const GlobalTheme: React.FC<IReactFunction> = ({ children }) => {
   const { colorMode } = useAppSelector((state) => state.ui);
 
   return (

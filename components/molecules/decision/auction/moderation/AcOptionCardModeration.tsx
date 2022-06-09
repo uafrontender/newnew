@@ -125,7 +125,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                   <Link href={`/${option.creator?.username}`}>
                     <SSpanBiddersHighlighted
                       className='spanHighlighted'
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={(e: any) => e.stopPropagation()}
                       style={{
                         ...(option.isCreatedBySubscriber
                           ? {
@@ -144,7 +144,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                 ) : (
                   <SSpanBiddersHighlighted
                     className='spanHighlighted'
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e: any) => e.stopPropagation()}
                     style={{
                       ...(option.isCreatedBySubscriber
                         ? {
@@ -270,7 +270,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                 <Link href={`/${option.creator?.username}`}>
                   <SSpanBiddersHighlighted
                     className='spanHighlighted'
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e: any) => e.stopPropagation()}
                     style={{
                       ...(option.isCreatedBySubscriber
                         ? {
@@ -289,7 +289,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
               ) : (
                 <SSpanBiddersHighlighted
                   className='spanHighlighted'
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e: any) => e.stopPropagation()}
                   style={{
                     ...(option.isCreatedBySubscriber
                       ? {

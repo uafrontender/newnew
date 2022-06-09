@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable no-nested-ternary */
+/* eslint-disable react/require-default-props */
 // Temp disabled until backend is in place
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -237,7 +238,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
             />
           </motion.div>
           <SEmailSignInForm
-            onSubmit={(e) => {
+            onSubmit={(e: any) => {
               e.preventDefault();
               if (
                 !emailInputValid ||
@@ -259,7 +260,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 onFocus={() => {
                   if (submitError) setSubmitError('');
                 }}
-                onChange={(e) => setEmailInput(e.target.value)}
+                onChange={(e: any) => setEmailInput(e.target.value)}
                 placeholder={t('signupOptions.email')}
                 errorCaption={t('errors.email_invalid')}
               />

@@ -1,3 +1,4 @@
+/* eslint-disable react/require-default-props */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';

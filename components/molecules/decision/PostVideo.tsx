@@ -149,7 +149,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             id='sound-button'
             iconOnly
             view='transparent'
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
               handleToggleMuted();
               if (isSafari()) {
@@ -187,7 +187,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             id='sound-button'
             iconOnly
             view='transparent'
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
               handleToggleMuted();
               if (isSafari()) {

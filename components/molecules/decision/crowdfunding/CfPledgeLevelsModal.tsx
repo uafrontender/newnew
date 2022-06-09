@@ -252,7 +252,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
       <Modal additionalz={zIndex} show={isOpen} onClose={() => onClose()}>
         <SWrapper>
           <SContentContainer
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
             }}
           >

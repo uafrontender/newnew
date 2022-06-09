@@ -7,6 +7,7 @@ interface IOptionActionMobileModal {
   isOpen: boolean;
   zIndex: number;
   onClose: () => void;
+  children: React.ReactNode;
 }
 
 const OptionActionMobileModal: React.FunctionComponent<IOptionActionMobileModal> =
@@ -14,7 +15,7 @@ const OptionActionMobileModal: React.FunctionComponent<IOptionActionMobileModal>
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
-          onClick={(e) => {
+          onClick={(e: any) => {
             e.stopPropagation();
           }}
         >

@@ -121,7 +121,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     );
 
     const handleSubmit = useCallback(
-      async (e) => {
+      async (e: any) => {
         e.preventDefault();
         if (isAPIValidateLoading) return;
 
@@ -178,7 +178,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         }}
         position={position}
         zIndex={zIndex}
-        onKeyDown={(e) => {
+        onKeyDown={(e: any) => {
           if (e.shiftKey && e.key === 'Enter') {
             handleSubmit(e);
           }

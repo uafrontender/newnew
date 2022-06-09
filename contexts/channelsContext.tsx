@@ -22,7 +22,11 @@ export const ChannelsContext = createContext({
   removeChannel: (id: string) => {},
 });
 
-const ChannelsContextProvider: React.FC = ({ children }) => {
+interface IReactFunction {
+  children: React.ReactNode;
+}
+
+const ChannelsContextProvider: React.FC<IReactFunction> = ({ children }) => {
   const socketConnection = useContext(SocketContext);
   const [channelsWithSubs, setChannelsWithSubs] = useState<IChannels>({});
   const [scheduledArr, setScheduledArr] = useState<string[]>([]);

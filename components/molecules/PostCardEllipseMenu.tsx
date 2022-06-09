@@ -163,7 +163,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e: any) => e.stopPropagation()}
             >
               <SButton onClick={() => handleCopyLink()}>
                 <Text variant={3}>

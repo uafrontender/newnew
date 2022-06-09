@@ -310,12 +310,12 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
                 tabRefs.current[i] = el!!;
               }}
               type='button'
-              onClick={(e) => handleButtonClick(e, tab)}
+              onClick={(e: any) => handleButtonClick(e, tab)}
               activeTab={i === activeTabIndex}
               extraMargin={i === 0 && shouldDrag}
               onMouseLeave={handleButtonMouseLeave}
               withTabIndicator={withTabIndicator}
-              onMouseDownCapture={(e) => handleButtonMouseDownCapture(e)}
+              onMouseDownCapture={(e: any) => handleButtonMouseDownCapture(e)}
             >
               {t(`tabs.${tab.nameToken}`)}
               {!!tab.counter && (

@@ -38,7 +38,7 @@ const AcBidCard: React.FunctionComponent<IAcBidCard> = ({ bid }) => {
     >
       <SCardWrapper>
         <SAvatar
-          onClick={(e) => {
+          onClick={(e: any) => {
             e.stopPropagation();
             handleRedirectToUser();
           }}

@@ -113,7 +113,7 @@ const TimePickerMobileModal: React.FunctionComponent<ITimePickerMobileModal> =
     }, [hours, innerTime.hours]);
 
     return (
-      <SContainer onClick={(e) => e.stopPropagation()}>
+      <SContainer onClick={(e: any) => e.stopPropagation()}>
         <SDateInputContainer>
           <SScroller
             ref={(el) => {

@@ -25,6 +25,7 @@ interface IPaymentModalRedirectOnly {
   bottomCaption?: React.ReactNode;
   onClose: () => void;
   handlePayWithCardStripeRedirect?: () => void;
+  children: React.ReactNode;
 }
 
 const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
@@ -49,7 +50,7 @@ const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
       <SWrapper>
         <SContentContainer
           showTocApply={showTocApply ?? false}
-          onClick={(e) => {
+          onClick={(e: any) => {
             e.stopPropagation();
           }}
         >

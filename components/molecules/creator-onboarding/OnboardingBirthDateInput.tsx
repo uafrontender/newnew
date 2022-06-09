@@ -73,7 +73,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
     );
 
     const years: TDropdownSelectItem<number>[] = useMemo(() => {
-      const workingArr = [];
+      const workingArr: any[] = [];
       for (let i = maxDate.getFullYear(); i >= minDate.getFullYear(); i--) {
         workingArr.push({
           name: i.toString(),

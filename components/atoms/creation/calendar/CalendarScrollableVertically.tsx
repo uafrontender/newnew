@@ -68,7 +68,7 @@ export default CalendarScrollableVertically;
 export const RenderCalendarYear = (props: any) => {
   const { minDate, maxDate } = props;
   const totalMonth = Math.round(maxDate.diff(minDate, 'months', true)) + 1;
-  const elements = [];
+  const elements: JSX.Element[] = [];
   let now = moment(minDate, 'DD/MMM/YYYY');
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < totalMonth; i++) {
@@ -227,7 +227,7 @@ export const RenderDays = (props: any) => {
   const balanceDayCount = startDate.day();
 
   const renderDay = () => {
-    const elements = [];
+    const elements: JSX.Element[] = [];
     let now = moment(date, 'DD/MMM/YYYY');
     // eslint-disable-next-line no-plusplus
     for (let i = 1; i <= daysInMonth; i++) {
@@ -246,7 +246,7 @@ export const RenderDays = (props: any) => {
     return elements;
   };
   const renderUnwantedDay = (count: number) => {
-    const elements = [];
+    const elements: JSX.Element[] = [];
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < count; i++) {
       elements.push(<SUnwantedDays key={i} />);

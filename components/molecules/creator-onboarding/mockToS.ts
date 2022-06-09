@@ -830,7 +830,7 @@ export default `
       activities related to the Endeavors, have inherent and unforeseen risks, including but not limited to
       (a) contact or collision with persons or objects, (b) obstacles (e.g., natural and man-made water, road
       and surface hazards), (c) equipment-related hazards (e.g., broken, defective or inadequate equipment,
-      unexpected equipment failure), (d) weather-related hazards, (e) inadequate first aid and/or emergency
+      unexpected equipment failure), (d) weather-related hazards, (e: any) inadequate first aid and/or emergency
       measures, (f) judgment and/or behavior-related problems (e.g., erratic or inappropriate participant,
       co-participant, or spectator behavior or errors in judgment by personnel at the Endeavors), and (g)
       natural hazards (e.g., uneven or difficult terrain, wildlife and insects, contact with plants). You

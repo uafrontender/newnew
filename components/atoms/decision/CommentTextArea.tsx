@@ -33,7 +33,7 @@ export const CommentTextArea: React.FC<ICommentTextArea> = (props) => {
   } = props;
 
   const handleChange = useCallback(
-    (e) => {
+    (e: any) => {
       onChange(id, e.target.value);
     },
     [id, onChange]
@@ -42,7 +42,7 @@ export const CommentTextArea: React.FC<ICommentTextArea> = (props) => {
     onFocus(id);
   }, [id, onFocus]);
   const handleBlur = useCallback(
-    (e) => {
+    (e: any) => {
       onBlur(id, e.target.value);
     },
     [id, onBlur]

@@ -109,7 +109,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
         };
       });
     const years: TDropdownSelectItem<number>[] = useMemo(() => {
-      const workingArr = [];
+      const workingArr: any[] = [];
       for (let i = minDate.getFullYear(); i <= maxDate.getFullYear(); i++) {
         workingArr.push({
           name: i.toString(),
@@ -153,6 +153,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       );
     };
 
+    // eslint-disable-next-line react/no-unstable-nested-components
     const CustomInputForwardRef = forwardRef<
       HTMLInputElement,
       React.DetailedHTMLProps<
@@ -256,7 +257,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
               inputMode='numeric'
               value={inputData}
               onChange={handleChange}
-              onPaste={(e) => e.preventDefault()}
+              onPaste={(e: any) => e.preventDefault()}
             />
             <SPseudoPlaceholder
               dangerouslySetInnerHTML={{

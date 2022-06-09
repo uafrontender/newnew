@@ -13,7 +13,7 @@ export const loadVideo = (file: any) =>
       };
 
       video.src = window.URL.createObjectURL(file);
-    } catch (e) {
+    } catch (e: any) {
       reject(e);
     }
   });

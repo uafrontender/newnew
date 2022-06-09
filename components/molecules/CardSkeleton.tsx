@@ -41,7 +41,7 @@ const CardSkeleton: React.FunctionComponent<ICardSkeleton> = ({
     }}
     wrapper={
       // eslint-disable-next-line react/no-unstable-nested-components
-      ({ children: skeletons }) => (
+      ({ children: skeletons }: any) => (
         <SSingleSkeletonWrapper
           width={cardWidth ?? undefined}
           height={cardHeight ?? undefined}

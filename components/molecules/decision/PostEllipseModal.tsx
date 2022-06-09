@@ -31,7 +31,7 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
-          onClick={(e) => {
+          onClick={(e: any) => {
             e.stopPropagation();
           }}
         >

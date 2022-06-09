@@ -73,7 +73,7 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
           dispatch(clearCreation({}));
           dispatch(clearPostData({}));
         }}
-        onKeyUp={(e) => {
+        onKeyUp={(e: any) => {
           if (e.key === 'Enter') {
             dispatch(clearCreation({}));
             dispatch(clearPostData({}));

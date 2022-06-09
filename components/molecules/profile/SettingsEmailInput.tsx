@@ -48,7 +48,7 @@ const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
             setErrorBordersShown(false);
           }
         }}
-        onFocus={(e) => {
+        onFocus={(e: any) => {
           if (onFocus) onFocus(e);
           setErrorBordersShown(false);
         }}

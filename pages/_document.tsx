@@ -27,6 +27,7 @@ export default class MyDocument extends Document {
       const initialProps = await Document.getInitialProps(ctx);
       return {
         ...initialProps,
+        // @ts-ignore:next-line
         styles: (
           <>
             {initialProps.styles}
@@ -75,9 +76,9 @@ export default class MyDocument extends Document {
               __html: `
                 window.onUsersnapCXLoad = function(api) {
                   // store the Usersnap global api on the window, if case you want to use it in other contexts
-                  window.Usersnap = api; 
+                  window.Usersnap = api;
                   api.init();
-              }         
+              }
               `,
             }}
           />

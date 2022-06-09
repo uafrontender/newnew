@@ -55,7 +55,7 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
             setErrorBordersShown(false);
           }
         }}
-        onFocus={(e) => {
+        onFocus={(e: any) => {
           if (onFocus) onFocus(e);
           setFocused(true);
           setIsPopupVisible(true);

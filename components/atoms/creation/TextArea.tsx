@@ -31,7 +31,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
   } = props;
 
   const handleChange = useCallback(
-    (e) => {
+    (e: any) => {
       onChange(id, e.target.value);
     },
     [id, onChange]
@@ -40,7 +40,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     onFocus(id);
   }, [id, onFocus]);
   const handleBlur = useCallback(
-    (e) => {
+    (e: any) => {
       onBlur(id, e.target.value);
     },
     [id, onBlur]

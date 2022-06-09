@@ -9,6 +9,7 @@ interface IAcPickWinningOptionModal {
   isVisible: boolean;
   closeModal: () => void;
   handleConfirm: () => void;
+  children: React.ReactNode;
 }
 
 const AcPickWinningOptionModal: React.FC<IAcPickWinningOptionModal> = ({
@@ -22,7 +23,7 @@ const AcPickWinningOptionModal: React.FC<IAcPickWinningOptionModal> = ({
   return (
     <Modal show={isVisible} additionalz={12} onClose={closeModal}>
       <SContainer>
-        <SModal onClick={(e) => e.stopPropagation()}>
+        <SModal onClick={(e: any) => e.stopPropagation()}>
           <SModalTitle>
             {t('AcPostModeration.OptionsTab.selectWinner.title')}
           </SModalTitle>

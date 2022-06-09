@@ -16,7 +16,13 @@ export const CommentFromUrlContext = createContext<{
   handleSetNewCommentContentFromUrl: () => {},
 });
 
-const CommentFromUrlContextProvider: React.FC = ({ children }) => {
+interface IReactFunction {
+  children: React.ReactNode;
+}
+
+const CommentFromUrlContextProvider: React.FC<IReactFunction> = ({
+  children,
+}) => {
   const [commentId, setCommentId] = useState('');
   const [newCommentContent, setNewCommentContent] = useState('');
 

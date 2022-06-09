@@ -140,7 +140,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
-          onClick={(e) => {
+          onClick={(e: any) => {
             e.stopPropagation();
           }}
         >

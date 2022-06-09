@@ -105,7 +105,7 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
         }}
         aria-roledescription='Confirmation code input'
         autoComplete='false'
-        onFocus={(e) => {
+        onFocus={(e: any) => {
           if (!disabled) wrapperRef?.current?.click();
           e.preventDefault();
         }}
@@ -116,7 +116,7 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
         ref={(el) => {
           wrapperRef.current = el!!;
         }}
-        onClick={(e) => {
+        onClick={(e: any) => {
           if (error) return;
 
           e.stopPropagation();
@@ -144,10 +144,10 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
             autoFocus={!code[0].length && i === 0}
             disabled={disabled}
             readOnly={code[i].length > 0}
-            onChange={(e) => handleSlotInput(e, i)}
-            onKeyUp={(e) => handleDeleteSymbol(e, i)}
-            onKeyDown={(e) => handlePreventTab(e)}
-            onPaste={(e) => {
+            onChange={(e: any) => handleSlotInput(e, i)}
+            onKeyUp={(e: any) => handleDeleteSymbol(e, i)}
+            onKeyDown={(e: any) => handlePreventTab(e)}
+            onPaste={(e: any) => {
               e.preventDefault();
               if (i !== 0) {
                 return;

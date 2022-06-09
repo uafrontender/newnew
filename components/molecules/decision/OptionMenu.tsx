@@ -1,3 +1,4 @@
+/* eslint-disable react/require-default-props */
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';

@@ -67,7 +67,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
 
   return (
     <SWrapper
-      onClick={(e) => {
+      onClick={(e: any) => {
         e.preventDefault();
 
         if (!disabled) {

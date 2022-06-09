@@ -488,7 +488,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           }}
           $isDisabled={disabled && votingAllowed}
           $isBlue={isBlue}
-          onClick={(e) => {
+          onClick={(e: any) => {
             if (!isMobile && !disabled && !isEllipseMenuOpen) {
               setIsEllipseMenuOpen(true);
 
@@ -562,7 +562,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 disabled={disabled}
                 isBlue={isBlue}
                 canVoteForFree={canVoteForFree}
-                onClick={(e) => {
+                onClick={(e: any) => {
                   e.stopPropagation();
                   if (canVoteForFree) {
                     setUseFreeVoteModalOpen(true);
@@ -606,7 +606,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 view='secondary'
                 disabled={disabled}
                 isBlue={isBlue}
-                onClick={(e) => {
+                onClick={(e: any) => {
                   e.stopPropagation();
                   if (!isSupportMenuOpen) {
                     if (canVoteForFree) {
@@ -901,7 +901,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
             {firstVoter && (
               <Link href={`/${firstVoterUsername}`}>
                 <SSpanBiddersHighlighted
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e: any) => e.stopPropagation()}
                   className='spanHighlighted'
                   style={{
                     cursor: 'pointer',
@@ -960,7 +960,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
         <Link href={`/${optionCreatorUsername}`}>
           <SSpanBiddersHighlighted
             className='spanHighlighted'
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
             }}
             style={{
@@ -998,7 +998,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
         <Link href={`/${optionCreatorUsername}`}>
           <SSpanBiddersHighlighted
             className='spanHighlighted'
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
             }}
             style={{
@@ -1037,7 +1037,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
         <Link href={`/${optionCreatorUsername}`}>
           <SSpanBiddersHighlighted
             className='spanHighlighted'
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
             }}
             style={{

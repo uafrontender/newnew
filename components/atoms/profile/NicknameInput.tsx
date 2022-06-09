@@ -40,7 +40,7 @@ const NicknameInput: React.FunctionComponent<TNicknameInput> = ({
             setErrorBordersShown(false);
           }
         }}
-        onFocus={(e) => {
+        onFocus={(e: any) => {
           if (onFocus) onFocus(e);
           setFocused(true);
           setErrorBordersShown(false);

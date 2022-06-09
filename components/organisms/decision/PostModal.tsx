@@ -2,6 +2,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable consistent-return */
 import React, {
   useCallback,
   useContext,
@@ -282,8 +283,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         new URL(window.location.href).searchParams.get('comment_content')
       : undefined;
 
-    handleSetCommentIdFromUrl?.(commentId ?? '');
-    handleSetNewCommentContentFromUrl?.(commentContent ?? '');
+    const timer = setTimeout(() => {
+      handleSetCommentIdFromUrl?.(commentId ?? '');
+      handleSetNewCommentContentFromUrl?.(commentContent ?? '');
+    });
+    return () => {
+      clearTimeout(timer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -426,8 +432,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
       if (postParsed) {
-        await reportPost(postParsed.postUuid, reasons, message).catch((e) =>
-          console.error(e)
+        await reportPost(postParsed.postUuid, reasons, message).catch(
+          (e: any) => console.error(e)
         );
       }
     },
@@ -700,9 +706,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         );
       }
 
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         handleSetPostOverlayOpen(true);
       }, 400);
+      return () => {
+        clearTimeout(timer);
+      };
     }
 
     return () => {
@@ -734,7 +743,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     }
 
     if (postParsed?.postUuid) {
-      fetchIsFavorited();
+      const timer = setTimeout(() => {
+        fetchIsFavorited();
+      });
+      return () => {
+        clearTimeout(timer);
+      };
     }
   }, [postParsed?.postUuid]);
 
@@ -841,13 +855,24 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   useEffect(() => {
     if (inView && !recommendedPostsLoading) {
       if (nextPageToken) {
-        loadRecommendedPosts(nextPageToken);
+        const timer = setTimeout(() => {
+          loadRecommendedPosts(nextPageToken);
+        });
+        return () => {
+          clearTimeout(timer);
+        };
+        // eslint-disable-next-line no-else-return
       } else if (
         !triedLoading &&
         !nextPageToken &&
         recommendedPosts?.length === 0
       ) {
-        loadRecommendedPosts();
+        const timer = setTimeout(() => {
+          loadRecommendedPosts();
+        });
+        return () => {
+          clearTimeout(timer);
+        };
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -860,15 +885,20 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   ]);
 
   useEffect(() => {
-    setPostStatus(() => {
-      if (typeOfPost && postParsed?.status) {
-        if (typeof postParsed.status === 'string') {
-          return switchPostStatusString(typeOfPost, postParsed?.status);
+    const timer = setTimeout(() => {
+      setPostStatus(() => {
+        if (typeOfPost && postParsed?.status) {
+          if (typeof postParsed.status === 'string') {
+            return switchPostStatusString(typeOfPost, postParsed?.status);
+          }
+          return switchPostStatus(typeOfPost, postParsed?.status);
         }
-        return switchPostStatus(typeOfPost, postParsed?.status);
-      }
-      return 'processing_announcement';
+        return 'processing_announcement';
+      });
     });
+    return () => {
+      clearTimeout(timer);
+    };
   }, [postParsed, typeOfPost]);
 
   // Try to pre-fetch the content
@@ -897,7 +927,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               content={t(`meta.${typeOfPost}.description`)}
             />
           </Head>
-          <SPostSuccessWaitingControlsDiv onClick={(e) => e.stopPropagation()}>
+          <SPostSuccessWaitingControlsDiv
+            onClick={(e: any) => e.stopPropagation()}
+          >
             <SWaitingSuccessControlsBtn
               view='secondary'
               iconOnly
@@ -985,7 +1017,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                     }
                   : {}),
               }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e: any) => e.stopPropagation()}
               ref={(el) => {
                 modalContainerRef.current = el!!;
               }}
@@ -1046,7 +1078,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             loaded={recommendedPosts && recommendedPosts.length > 0}
             id='post-modal-container'
             isMyPost={isMyPost}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e: any) => e.stopPropagation()}
             ref={(el) => {
               modalContainerRef.current = el!!;
             }}

@@ -15,6 +15,7 @@ import HeroVisual from './HeroVisual';
 
 export interface ICreatorStripeLayout {
   hideProgressBar?: boolean;
+  children: React.ReactNode;
 }
 
 const SCreatorStripeLayout = styled.div`
@@ -70,6 +71,10 @@ const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({
 };
 
 export default CreatorStripeLayout;
+
+CreatorStripeLayout.defaultProps = {
+  hideProgressBar: false,
+};
 
 const HomeLogoButton: React.FunctionComponent = () => (
   <SHomeLogoButton>

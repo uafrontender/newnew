@@ -43,7 +43,7 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
   const isTablet = ['tablet'].includes(resizeMode);
 
   const handleChange = useCallback(
-    (e) => {
+    (e: any) => {
       onChange(id, e?.target?.value || e);
     },
     [id, onChange]

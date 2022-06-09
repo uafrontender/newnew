@@ -12,6 +12,7 @@ interface IPaymentSuccessModal {
   postType: TPostType;
   isVisible: boolean;
   closeModal: () => void;
+  children: React.ReactNode;
 }
 
 const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
@@ -24,7 +25,7 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
 
   return (
     <Modal show={isVisible} additionalz={14} onClose={closeModal}>
-      <SContainer onClick={(e) => e.stopPropagation()}>
+      <SContainer onClick={(e: any) => e.stopPropagation()}>
         <SModal>
           <SModalTitle variant={6}>
             {t(`PaymentSuccessModal.title.${postType}`)}

@@ -4,18 +4,17 @@ import styled from 'styled-components';
 import General from './General';
 import ErrorBoundary from '../organisms/ErrorBoundary';
 
-const MyProfileSettingsLayout: React.FunctionComponent = (props) => {
-  const { children } = props;
+interface IReactFunction {
+  children: React.ReactNode;
+}
 
-  return (
-    <ErrorBoundary>
-      <SGeneral>
-        <SSettingsLayout>{children}</SSettingsLayout>
-      </SGeneral>
-    </ErrorBoundary>
-  );
-};
-
+const MyProfileSettingsLayout: React.FC<IReactFunction> = ({ children }) => (
+  <ErrorBoundary>
+    <SGeneral>
+      <SSettingsLayout>{children}</SSettingsLayout>
+    </SGeneral>
+  </ErrorBoundary>
+);
 export default MyProfileSettingsLayout;
 
 const SGeneral = styled(General)`

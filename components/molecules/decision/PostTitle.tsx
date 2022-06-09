@@ -6,6 +6,7 @@ import Headline from '../../atoms/Headline';
 
 interface IPostTitle {
   shrink?: boolean;
+  children: React.ReactNode;
 }
 
 const PostTitle: React.FunctionComponent<IPostTitle> = ({

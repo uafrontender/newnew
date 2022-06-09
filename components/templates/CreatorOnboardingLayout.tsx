@@ -20,6 +20,7 @@ import HeroVisual from './HeroVisual';
 
 export interface ICreatorOnboardingLayout {
   hideOnboardingHeader?: boolean;
+  children: React.ReactNode;
 }
 
 const SCreatorOnboardingLayout = styled.div`
@@ -104,6 +105,10 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
   };
 
 export default CreatorOnboardingLayout;
+
+CreatorOnboardingLayout.defaultProps = {
+  hideOnboardingHeader: false,
+};
 
 const HomeLogoButton = () => (
   <SHomeLogoButton>

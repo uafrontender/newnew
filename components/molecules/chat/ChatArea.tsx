@@ -593,7 +593,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
             onSubmit={async ({ reasons, message }) => {
               if (chatRoom?.visavis?.uuid) {
                 await reportUser(chatRoom.visavis.uuid, reasons, message).catch(
-                  (e) => console.error(e)
+                  (e: any) => console.error(e)
                 );
               }
             }}

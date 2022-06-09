@@ -20,6 +20,7 @@ interface IMcOptionCardSelectVotesModal {
   handleClose: () => void;
   handleOpenCustomAmountModal: () => void;
   handleSetAmountAndOpenModal: (votesAmount: string) => void;
+  children: React.ReactNode;
 }
 
 const McOptionCardSelectVotesModal: React.FunctionComponent<IMcOptionCardSelectVotesModal> =

@@ -88,7 +88,7 @@ export const PostList: React.FC<IList> = ({
           ))}
       {collection.length === 0 && loading && (
         <SAnimationContainer
-          onClick={(e) => {
+          onClick={(e: any) => {
             e.stopPropagation();
           }}
         >

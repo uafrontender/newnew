@@ -7,6 +7,7 @@ interface IUploadPictureErrorModal {
   isOpen: boolean;
   zIndex: number;
   onClose: () => void;
+  children: React.ReactNode;
 }
 
 const UploadPictureErrorModal: React.FunctionComponent<IUploadPictureErrorModal> =
@@ -14,7 +15,7 @@ const UploadPictureErrorModal: React.FunctionComponent<IUploadPictureErrorModal>
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
-          onClick={(e) => {
+          onClick={(e: any) => {
             e.stopPropagation();
           }}
         >

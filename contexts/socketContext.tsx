@@ -6,7 +6,11 @@ const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_URL ?? '';
 
 export const SocketContext = createContext<Socket>({} as any);
 
-const SocketContextProvider: React.FC = ({ children }) => {
+interface IReactFunction {
+  children: React.ReactNode;
+}
+
+const SocketContextProvider: React.FC<IReactFunction> = ({ children }) => {
   const [socket, setSocket] = useState({} as Socket);
   const [cookies] = useCookies();
 

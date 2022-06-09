@@ -57,7 +57,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
       <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
         <SWrapper>
           <SContentContainer
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
             }}
           >
@@ -111,7 +111,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
-          onClick={(e) => {
+          onClick={(e: any) => {
             e.stopPropagation();
           }}
         >

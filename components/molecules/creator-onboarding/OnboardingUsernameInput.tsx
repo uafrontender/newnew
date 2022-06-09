@@ -67,7 +67,7 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<TOnboardingSection
                 setErrorBordersShown(false);
               }
             }}
-            onFocus={(e) => {
+            onFocus={(e: any) => {
               if (onFocus) onFocus(e);
               setFocused(true);
               setIsPopupVisible(true);

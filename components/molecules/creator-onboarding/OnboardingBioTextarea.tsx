@@ -42,7 +42,7 @@ const OnboardingBioTextarea: React.FunctionComponent<TOnboardingBioTextarea> =
             value={value}
             maxLength={maxChars}
             onChange={onChange}
-            onPaste={(e) => {
+            onPaste={(e: any) => {
               const data = e.clipboardData.getData('Text');
 
               if (!data || data.length > maxChars) {

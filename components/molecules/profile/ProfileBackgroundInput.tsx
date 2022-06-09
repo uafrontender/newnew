@@ -149,9 +149,9 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
           </>
         ) : (
           <SLabel
-            onDragOver={(e) => handleOnDragOver(e)}
+            onDragOver={(e: any) => handleOnDragOver(e)}
             onDragLeave={() => handleOnDragLeave()}
-            onDrop={(e) => handleOnDrop(e)}
+            onDrop={(e: any) => handleOnDrop(e)}
           >
             <SImageInput
               ref={inputRef}

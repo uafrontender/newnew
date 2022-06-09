@@ -90,9 +90,12 @@ export async function fetchProtobuf<
   credentials: Request['credentials'] = 'same-origin'
 ): Promise<APIResponse<ResponseType>> {
   const encoded = payload ? reqT.encode(payload).finish() : undefined;
-
+  let controller;
   try {
+    controller = new AbortController();
+    const signal = controller.signal;
     const buff: ArrayBuffer = await fetch(url, {
+      signal,
       method,
       headers: {
         'Content-type': 'application/x-protobuf',
@@ -106,7 +109,6 @@ export async function fetchProtobuf<
       .catch((err) => {
         throw err;
       });
-
     return {
       data: resT.decode(new Uint8Array(buff)),
     };

@@ -83,7 +83,10 @@ const MyApp = (props: IMyApp): ReactElement => {
   const PRE_FETCHING_DELAY = 2500;
   useEffect(() => {
     setTimeout(() => {
-      const currentTheme = getColorMode(store.getState()?.ui?.colorMode);
+      const currentTheme = getColorMode(
+        // @ts-ignore:next-line
+        store.getState()?.ui?.colorMode as string
+      );
       setPreFetchImages(currentTheme);
     }, PRE_FETCHING_DELAY);
   }, [store]);
@@ -100,6 +103,7 @@ const MyApp = (props: IMyApp): ReactElement => {
   }, []);
 
   useEffect(() => {
+    // @ts-ignore:next-line
     const currentResizeMode = store.getState()?.ui?.resizeMode;
 
     let resizeMode = 'mobile';
@@ -161,7 +165,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                             <ResizeMode>
                               <PostModalContextProvider>
                                 <GlobalTheme>
-                                  <div>
+                                  <>
                                     <ToastContainer />
                                     <VideoProcessingWrapper>
                                       {!pageProps.error ? (
@@ -175,7 +179,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                                         />
                                       )}
                                     </VideoProcessingWrapper>
-                                  </div>
+                                  </>
                                 </GlobalTheme>
                               </PostModalContextProvider>
                             </ResizeMode>

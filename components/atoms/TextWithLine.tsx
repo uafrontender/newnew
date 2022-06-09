@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 interface ITextWithLine {
   lineColor: string;
-  innerSpan: React.ComponentPropsWithoutRef<'span'>;
+  innerSpan: any;
 }
 
 const TextWithLine: React.FunctionComponent<ITextWithLine> = ({

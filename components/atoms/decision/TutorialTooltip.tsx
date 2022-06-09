@@ -31,7 +31,7 @@ export const TutorialTooltip: React.FC<ITutorialTooltip> = ({
       <STitle>{title}</STitle>
       {text && <SText>{text}</SText>}
       <SButton
-        onClick={(e) => {
+        onClick={(e: any) => {
           e.stopPropagation();
           closeTooltip();
         }}

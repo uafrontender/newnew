@@ -22,7 +22,11 @@ export const WalletContext = createContext<{
   handleSetWalletBalance: (newAmount: newnewapi.MoneyAmount) => {},
 });
 
-const WalletContextProvider: React.FC = ({ children }) => {
+interface IReactFunction {
+  children: React.ReactNode;
+}
+
+const WalletContextProvider: React.FC<IReactFunction> = ({ children }) => {
   const user = useAppSelector((state) => state.user);
   // Socket
   const socketConnection = useContext(SocketContext);

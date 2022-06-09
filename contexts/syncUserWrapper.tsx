@@ -20,7 +20,11 @@ import {
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { loadStateLS, removeStateLS, saveStateLS } from '../utils/localStorage';
 
-const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
+interface IReactFunction {
+  children: React.ReactNode;
+}
+
+const SyncUserWrapper: React.FC<IReactFunction> = ({ children }) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
 

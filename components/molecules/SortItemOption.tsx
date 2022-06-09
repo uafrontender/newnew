@@ -21,7 +21,7 @@ export const SortItemOption: React.FC<ISortItemOption> = (props) => {
   const { t } = useTranslation('home');
 
   const onChange = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       e.stopPropagation();
 

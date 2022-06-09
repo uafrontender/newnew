@@ -34,7 +34,7 @@ const SignInTextInput: React.FunctionComponent<TTextInput> = ({
             setErrorBordersShown(false);
           }
         }}
-        onFocus={(e) => {
+        onFocus={(e: any) => {
           if (onFocus) onFocus(e);
           setErrorBordersShown(false);
         }}

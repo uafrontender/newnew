@@ -130,7 +130,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<IOnboardingEditPr
         <SEditPictureMenu
           initial={MInitial}
           animate={MAnimation}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e: any) => e.stopPropagation()}
         >
           {isMobile ? (
             <SGoBackButtonMobile onClick={() => onClose()}>
@@ -181,7 +181,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<IOnboardingEditPr
               step={0.1}
               ariaLabel='Zoom'
               disabled={loading}
-              onChange={(e) => setZoomProfileImage(Number(e.target.value))}
+              onChange={(e: any) => setZoomProfileImage(Number(e.target.value))}
             />
             <Button
               iconOnly

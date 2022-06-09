@@ -4,6 +4,7 @@ import styled from 'styled-components';
 interface ITag {
   size?: 'sm';
   view?: 'primary';
+  children: React.ReactNode;
 }
 
 const Tag: React.FC<ITag> = (props) => {
