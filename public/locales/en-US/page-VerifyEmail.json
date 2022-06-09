@@ -3,16 +3,15 @@
     "title": "Email verification",
     "description": "Verify email"
   },
-  "goBackBtn": "Go back",
-  "heading": {
+  "top": {
     "heading": "Verify your email",
     "subheading": "Please enter the code we sent to"
   },
-  "timeExpired": {
-    "not_receieved": "I didn't get a code.",
-    "resendBtn": "Resend it"
+  "expired": {
+    "noCodeReceived": "I didn't get a code.",
+    "resendButtonText": "Resend it"
   },
-  "errors": {
+  "error": {
     "invalidCode": "Wrong code. Try again..."
   }
 }

@@ -15,7 +15,7 @@ import CodeVerificationMenu from '../components/organisms/CodeVerificationMenu';
 import assets from '../constants/assets';
 
 const VerifyEmail = () => {
-  const { t } = useTranslation('verify-email');
+  const { t } = useTranslation('page-VerifyEmail');
   const authLayoutContext = useContext(AuthLayoutContext);
 
   // Redirect if the user is logged in

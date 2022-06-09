@@ -21,7 +21,7 @@ import assets from '../constants/assets';
 interface IVerifyNewEmail {}
 
 const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
-  const { t } = useTranslation('verify-email');
+  const { t } = useTranslation('page-VerifyEmail');
 
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();

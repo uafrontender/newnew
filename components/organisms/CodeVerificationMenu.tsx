@@ -39,7 +39,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   expirationTime,
 }) => {
   const router = useRouter();
-  const { t } = useTranslation('verify-email');
+  const { t } = useTranslation('page-VerifyEmail');
 
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
@@ -240,11 +240,11 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         <AnimatedLogoEmailVerification
           isLoading={isSignInWithEmailLoading || isResendCodeLoading}
         />
-        <SHeadline variant={3}>{t('heading.heading')}</SHeadline>
+        <SHeadline variant={3}>{t('top.heading')}</SHeadline>
         <SSubheading variant={2} weight={600}>
           {signupEmailInput.length > 0 ? (
             <>
-              {t('heading.subheading')}
+              {t('top.subheading')}
               <br />
               {signupEmailInput}
             </>
@@ -273,9 +273,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
               delay={0.3}
             >
               <STimeExpired>
-                {t('timeExpired.not_receieved')}{' '}
+                {t('expired.noCodeReceived')}{' '}
                 <button type='button' onClick={() => handleResendCode()}>
-                  {t('timeExpired.resendBtn')}
+                  {t('expired.resendButtonText')}
                 </button>
               </STimeExpired>
             </AnimatedPresence>
@@ -286,7 +286,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         submitError &&
         !isSuccess ? (
           <AnimatedPresence animateWhenInView={false} animation='t-09'>
-            <SErrorDiv>{t('errors.invalidCode')}</SErrorDiv>
+            <SErrorDiv>{t('error.invalidCode')}</SErrorDiv>
           </AnimatedPresence>
         ) : null}
       </SCodeVerificationMenu>
