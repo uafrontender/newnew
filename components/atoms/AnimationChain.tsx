@@ -56,6 +56,8 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
       ) as HTMLVideoElement;
 
       if (currentVideo) {
+        // TODO: Handle the error as it can can fail due to...
+        // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
         currentVideo.play();
       }
     }, [videoSrcList, currentVideoIndex, getPreviousIndex]);

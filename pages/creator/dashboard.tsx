@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
@@ -11,15 +11,19 @@ import Content from '../../components/organisms/creator/Dashboard';
 
 import { NextPageWithLayout } from '../_app';
 import { useAppSelector } from '../../redux-store/store';
+import assets from '../../constants/assets';
 
 export const Dashboard = () => {
   const { t } = useTranslation('creator');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  if (!user.loggedIn) {
-    router.push('/sign-up?to=log-in');
-    return null;
-  }
+
+  useEffect(() => {
+    if (!user.loggedIn) {
+      router?.push('/sign-up?to=log-in');
+    }
+  }, [router, user.loggedIn]);
+
   return (
     <>
       <Head>
@@ -30,6 +34,7 @@ export const Dashboard = () => {
           property='og:description'
           content={t('dashboard.meta.description')}
         />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <Content />
     </>
@@ -49,6 +54,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'chat',
     'notifications',
   ]);
+
+  const { req } = context;
+
+  const accessToken = req.cookies?.accessToken;
+
+  if (!accessToken) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/',
+      },
+    };
+  }
 
   return {
     props: {
