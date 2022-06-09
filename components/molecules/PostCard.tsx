@@ -115,7 +115,6 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     // Check if video is ready to avoid errors
     const videoRef = useRef<HTMLVideoElement>();
-    const [videoReady, setVideoReady] = useState(false);
 
     // Hovered state
     const [hovered, setHovered] = useState(false);
@@ -389,38 +388,23 @@ export const PostCard: React.FC<ICard> = React.memo(
     }, [socketConnection]);
 
     useEffect(() => {
-      const handleCanplay = () => {
-        setVideoReady(true);
-      };
-
-      videoRef.current?.addEventListener('canplay', handleCanplay);
-      videoRef.current?.addEventListener('loadedmetadata', handleCanplay);
-
-      return () => {
-        videoRef.current?.removeEventListener('canplay', handleCanplay);
-        videoRef.current?.removeEventListener('loadedmetadata', handleCanplay);
-      };
-    }, [hovered]);
-
-    useEffect(() => {
       let timeout: any;
 
-      if (hovered && videoReady) {
+      if (hovered) {
         timeout = setTimeout(() => {
-          setShowVideo(true);
           videoRef.current?.play();
-        });
+          setShowVideo(true);
+        }, 300);
       } else {
         timeout = setTimeout(() => {
           setShowVideo(false);
-          videoRef.current?.play();
-        }, 600);
+        });
       }
 
       return () => {
         clearTimeout(timeout);
       };
-    }, [hovered, videoReady]);
+    }, [hovered]);
 
     if (type === 'inside') {
       return (
@@ -454,28 +438,29 @@ export const PostCard: React.FC<ICard> = React.memo(
                 }
                 alt='Post'
                 draggable={false}
-                hovered={hovered && showVideo}
+                hovered={showVideo}
               />
-              <video
-                ref={(el) => {
-                  videoRef.current = el!!;
-                }}
-                key={thumbnailUrl}
-                loop
-                muted
-                playsInline
-                poster={
-                  (coverImageUrl ||
-                    postParsed.announcement?.thumbnailImageUrl) ??
-                  ''
-                }
-              >
-                <source
+              {hovered && (
+                <video
+                  ref={(el) => {
+                    videoRef.current = el!!;
+                  }}
                   key={thumbnailUrl}
-                  src={thumbnailUrl}
-                  type='video/mp4'
-                />
-              </video>
+                  loop
+                  muted
+                  playsInline
+                  style={{
+                    opacity: showVideo ? 1 : 0,
+                    transition: '0.2s linear',
+                  }}
+                >
+                  <source
+                    key={thumbnailUrl}
+                    src={thumbnailUrl}
+                    type='video/mp4'
+                  />
+                </video>
+              )}
               <SImageMask />
               <STopContent>
                 <SButtonIcon
@@ -564,23 +549,29 @@ export const PostCard: React.FC<ICard> = React.memo(
               }
               alt='Post'
               draggable={false}
-              hovered={hovered && showVideo}
+              hovered={showVideo}
             />
-            <video
-              ref={(el) => {
-                videoRef.current = el!!;
-              }}
-              key={thumbnailUrl}
-              loop
-              muted
-              playsInline
-              poster={
-                (coverImageUrl || postParsed.announcement?.thumbnailImageUrl) ??
-                ''
-              }
-            >
-              <source key={thumbnailUrl} src={thumbnailUrl} type='video/mp4' />
-            </video>
+            {hovered && (
+              <video
+                ref={(el) => {
+                  videoRef.current = el!!;
+                }}
+                key={thumbnailUrl}
+                loop
+                muted
+                playsInline
+                style={{
+                  opacity: showVideo ? 1 : 0,
+                  transition: '0.2s linear',
+                }}
+              >
+                <source
+                  key={thumbnailUrl}
+                  src={thumbnailUrl}
+                  type='video/mp4'
+                />
+              </video>
+            )}
             <STopContent>
               <SButtonIcon
                 iconOnly
@@ -943,8 +934,7 @@ const SImageHolder = styled.div<ISWrapper>`
 const SThumnailHolder = styled.img<{
   hovered: boolean;
 }>`
-  opacity: ${({ hovered }) => (hovered ? 0 : 1)};
-  transition: 0.3s opacity;
+  z-index: ${({ hovered }) => (hovered ? -1 : 'unset')};
 `;
 
 const SImageMask = styled.div`
