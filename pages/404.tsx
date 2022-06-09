@@ -68,7 +68,7 @@ export default Custom404;
 export const getStaticProps: GetStaticProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    '404',
+    'page-404',
   ]);
 
   return {

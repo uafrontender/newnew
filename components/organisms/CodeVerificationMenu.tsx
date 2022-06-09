@@ -240,11 +240,11 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         <AnimatedLogoEmailVerification
           isLoading={isSignInWithEmailLoading || isResendCodeLoading}
         />
-        <SHeadline variant={3}>{t('top.heading')}</SHeadline>
+        <SHeadline variant={3}>{t('heading.mainHeading')}</SHeadline>
         <SSubheading variant={2} weight={600}>
           {signupEmailInput.length > 0 ? (
             <>
-              {t('top.subheading')}
+              {t('heading.subHeading')}
               <br />
               {signupEmailInput}
             </>
