@@ -408,10 +408,12 @@ export const PostCard: React.FC<ICard> = React.memo(
       if (hovered && videoReady) {
         timeout = setTimeout(() => {
           setShowVideo(true);
+          videoRef.current?.play();
         });
       } else {
         timeout = setTimeout(() => {
           setShowVideo(false);
+          videoRef.current?.play();
         }, 600);
       }
 
@@ -454,27 +456,26 @@ export const PostCard: React.FC<ICard> = React.memo(
                 draggable={false}
                 hovered={hovered && showVideo}
               />
-              {hovered && (
-                <video
-                  ref={(el) => {
-                    videoRef.current = el!!;
-                  }}
+              <video
+                ref={(el) => {
+                  videoRef.current = el!!;
+                }}
+                key={thumbnailUrl}
+                loop
+                muted
+                playsInline
+                poster={
+                  (coverImageUrl ||
+                    postParsed.announcement?.thumbnailImageUrl) ??
+                  ''
+                }
+              >
+                <source
                   key={thumbnailUrl}
-                  loop
-                  muted
-                  playsInline
-                  autoPlay
-                  style={{
-                    opacity: videoReady ? 1 : 0,
-                  }}
-                >
-                  <source
-                    key={thumbnailUrl}
-                    src={thumbnailUrl}
-                    type='video/mp4'
-                  />
-                </video>
-              )}
+                  src={thumbnailUrl}
+                  type='video/mp4'
+                />
+              </video>
               <SImageMask />
               <STopContent>
                 <SButtonIcon
@@ -565,27 +566,21 @@ export const PostCard: React.FC<ICard> = React.memo(
               draggable={false}
               hovered={hovered && showVideo}
             />
-            {hovered && (
-              <video
-                ref={(el) => {
-                  videoRef.current = el!!;
-                }}
-                key={thumbnailUrl}
-                loop
-                muted
-                playsInline
-                autoPlay
-                style={{
-                  opacity: videoReady ? 1 : 0,
-                }}
-              >
-                <source
-                  key={thumbnailUrl}
-                  src={thumbnailUrl}
-                  type='video/mp4'
-                />
-              </video>
-            )}
+            <video
+              ref={(el) => {
+                videoRef.current = el!!;
+              }}
+              key={thumbnailUrl}
+              loop
+              muted
+              playsInline
+              poster={
+                (coverImageUrl || postParsed.announcement?.thumbnailImageUrl) ??
+                ''
+              }
+            >
+              <source key={thumbnailUrl} src={thumbnailUrl} type='video/mp4' />
+            </video>
             <STopContent>
               <SButtonIcon
                 iconOnly
