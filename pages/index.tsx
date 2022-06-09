@@ -193,6 +193,11 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     if (user.loggedIn) {
       fetchFYPosts();
     }
+
+    return () => {
+      setPostModalOpen(false);
+      setDisplayedPost(undefined);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
