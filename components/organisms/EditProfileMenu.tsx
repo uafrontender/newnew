@@ -27,7 +27,6 @@ import ProfileImageInput from '../molecules/profile/ProfileImageInput';
 import ProfileBackgroundInput from '../molecules/profile/ProfileBackgroundInput';
 import DropdownSelect, { TDropdownSelectItem } from '../atoms/DropdownSelect';
 import HelperText from '../atoms/HelperText';
-import Text from '../atoms/Text';
 
 // Icons
 import CancelIcon from '../../public/images/svg/icons/outlined/Close.svg';
