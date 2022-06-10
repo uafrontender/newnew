@@ -65,10 +65,11 @@ export type NextPageWithLayout = NextPage & {
 interface IMyApp extends AppProps {
   Component: NextPageWithLayout;
   uaString: string;
+  colorMode: string;
 }
 
 const MyApp = (props: IMyApp): ReactElement => {
-  const { Component, pageProps, uaString } = props;
+  const { Component, pageProps, uaString, colorMode } = props;
   const store = useStore();
   const user = useAppSelector((state) => state.user);
 
@@ -166,7 +167,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                           <ChatsProvider>
                             <ResizeMode>
                               <PostModalContextProvider>
-                                <GlobalTheme>
+                                <GlobalTheme initialTheme={colorMode}>
                                   <div>
                                     <ToastContainer />
                                     <VideoProcessingWrapper>
@@ -213,6 +214,7 @@ MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
 
   return {
     ...appProps,
+    colorMode: appContext.ctx?.req.cookies?.colorMode ?? 'auto',
     uaString: appContext.ctx?.req?.headers?.['user-agent'],
   };
 };
