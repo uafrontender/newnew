@@ -12,17 +12,17 @@ const genderPronouns = [
     key: newnewapi.User.GenderPronouns[newnewapi.User.GenderPronouns.NONE],
   },
   {
-    name: 'she/her',
+    name: 'feminine',
     value: newnewapi.User.GenderPronouns.SHE_HER,
     key: newnewapi.User.GenderPronouns[newnewapi.User.GenderPronouns.SHE_HER],
   },
   {
-    name: 'he/him',
+    name: 'masculine',
     value: newnewapi.User.GenderPronouns.HE_HIM,
     key: newnewapi.User.GenderPronouns[newnewapi.User.GenderPronouns.HE_HIM],
   },
   {
-    name: 'they/them',
+    name: 'neutral',
     value: newnewapi.User.GenderPronouns.THEY_THEM,
     key: newnewapi.User.GenderPronouns[newnewapi.User.GenderPronouns.THEY_THEM],
   },
