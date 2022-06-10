@@ -320,6 +320,11 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
       }
     }
 
+    if (category === 'for-you' && !loggedIn) {
+      router?.push('/sign-up');
+      return;
+    }
+
     if (inView && category && !isCollectionLoading) {
       if (nextPageToken) {
         loadPosts({
@@ -364,7 +369,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     isCollectionLoading,
     router.query.category,
     router.query.sort,
+    loggedIn,
   ]);
+
   return (
     <>
       <Head>
