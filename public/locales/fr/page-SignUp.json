@@ -7,8 +7,9 @@
   },
   "backButton": "Go back",
   "heading": {
-    "signIn": "Sign up",
-    "signInTo": "Sign up to",
+    "sign-in": "Sign up",
+    "log-in": "Log in",
+    "sign-in-to": "Sign up to",
     "reason": {
       "comment": "comment",
       "bid": "bid",

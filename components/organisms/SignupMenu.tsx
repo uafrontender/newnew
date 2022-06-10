@@ -155,10 +155,10 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
         </SSignInBackButton>
         <SHeadline variant={3}>
           {reason && reason !== 'session_expired'
-            ? `${t('heading.signInTo')} ${t(`heading.reason.${reason}`)}`
+            ? `${t('heading.sign-in-to')} ${t(`heading.reason.${reason}`)}`
             : goal
             ? t(`heading.${goal}`)
-            : t('heading.signIn')}
+            : t('heading.sign-in')}
         </SHeadline>
         <SSubheading variant={2} weight={600}>
           {reason !== 'session_expired'
