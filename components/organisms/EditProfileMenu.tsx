@@ -47,9 +47,7 @@ import isBrowser from '../../utils/isBrowser';
 import isAnimatedImage from '../../utils/isAnimatedImage';
 import resizeImage from '../../utils/resizeImage';
 import genderPronouns from '../../constants/genderPronouns';
-import getGenderPronouns, {
-  isGenderPronounsDefined,
-} from '../../utils/genderPronouns';
+import getGenderPronouns from '../../utils/genderPronouns';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
