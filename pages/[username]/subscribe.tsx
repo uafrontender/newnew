@@ -253,12 +253,12 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                   </SSHeadingSectionAvatar>
                   <div>
                     <SHeadline variant={4}>
-                      {t('TopSection.headline.line_1', {
+                      {t('topSection.headline.line_1', {
                         username: user.username,
                       })}
                     </SHeadline>
                     <SHeadline variant={2}>
-                      {t('TopSection.headline.line_2')}
+                      {t('topSection.headline.line_2')}
                     </SHeadline>
                   </div>
                 </SHeadingSection>
@@ -288,10 +288,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                 <SBullet>
                   <SBulletImg alt='' src={assets.subscription.subDm} />
                   <SBulletTitle variant={5}>
-                    {t('TopSection.bullets.dms.title')}
+                    {t('topSection.bullets.dms.title')}
                   </SBulletTitle>
                   <SBulletBody variant={3}>
-                    {t('TopSection.bullets.dms.body', {
+                    {t('topSection.bullets.dms.body', {
                       nickname: user?.nickname,
                     })}
                   </SBulletBody>
@@ -299,10 +299,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                 <SBullet>
                   <SBulletImg alt='' src={assets.subscription.subVotes} />
                   <SBulletTitle variant={5}>
-                    {t('TopSection.bullets.freeVotes.title')}
+                    {t('topSection.bullets.freeVotes.title')}
                   </SBulletTitle>
                   <SBulletBody variant={3}>
-                    {t('TopSection.bullets.freeVotes.body', {
+                    {t('topSection.bullets.freeVotes.body', {
                       nickname: user?.nickname,
                     })}
                   </SBulletBody>
@@ -310,12 +310,12 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                 <SBullet>
                   <SBulletImg alt='' src={assets.subscription.subMC} />
                   <SBulletTitle variant={5}>
-                    {t('TopSection.bullets.suggestions.title')}
+                    {t('topSection.bullets.suggestions.title')}
                   </SBulletTitle>
                   <SBulletBody variant={3}>
                     <Trans
                       t={t}
-                      i18nKey='TopSection.bullets.suggestions.body'
+                      i18nKey='topSection.bullets.suggestions.body'
                       components={[
                         // @ts-ignore
                         <BoldSpan />,

@@ -4,7 +4,7 @@
     "subscribe": "Subscribe for ${{amount}}/mo",
     "learnMore": "Learn more"
   },
-  "TopSection": {
+  "topSection": {
     "headline": {
       "line_1": "Subscribe to {{username}}",
       "line_2": "for limited exclusives"
