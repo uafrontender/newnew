@@ -53,9 +53,29 @@ export const defaultUIState: UIStateInterface = {
   globalSearchActive: false,
 };
 
+const getDefaultUiState = () => {
+  const uiState = localStorage && localStorage?.getItem('persist:ui');
+
+  console.log(uiState);
+
+  if (uiState) {
+    const colorMode = JSON.parse(uiState)?.colorMode;
+
+    if (colorMode) {
+      const defaultState = {...defaultUIState}
+
+      defaultState.colorMode = colorMode;
+
+      return defaultState;
+    }
+  }
+
+  return defaultUIState;
+}
+
 export const uiSlice: Slice<UIStateInterface> = createSlice({
   name: 'uiState',
-  initialState: defaultUIState,
+  initialState: () => getDefaultUiState(),
   reducers: {
     setColorMode(state, { payload }: PayloadAction<TColorMode>) {
       state.colorMode = payload;

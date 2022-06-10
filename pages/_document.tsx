@@ -8,7 +8,6 @@ import Document, {
   DocumentInitialProps,
 } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
-import ThemeScriptTag from '../utils/setThemeHelper';
 
 export default class MyDocument extends Document {
   static async getInitialProps(
@@ -86,7 +85,6 @@ export default class MyDocument extends Document {
         <body>
           <Main />
           <NextScript />
-          <ThemeScriptTag />
           <div id='modal-root' />
         </body>
       </Html>
