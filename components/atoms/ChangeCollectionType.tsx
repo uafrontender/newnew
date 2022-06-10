@@ -26,7 +26,7 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (
 ) => {
   const { options, selected, disabled, onChange } = props;
   const theme = useTheme();
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('page-SeeMore');
   const ref: any = useRef();
   const [focused, setFocused] = useState(false);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -51,7 +51,7 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (
     return (
       <SCheckBox
         key={`change-collection-type-${item.key}`}
-        label={t(`${item.key}-search-block-title`)}
+        label={t(`collection.title.${item.key}`)}
         selected={isSelected}
         handleChange={!disabled ? handleItemClick : () => {}}
       />
@@ -68,7 +68,7 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (
   return (
     <SContainer ref={ref}>
       <SWrapper onClick={handleChangeCollectionTypeClick}>
-        <Headline variant={4}>{t(`${selected}-search-block-title`)}</Headline>
+        <Headline variant={4}>{t(`collection.title.${selected}`)}</Headline>
         <SInlineSVG
           svg={arrowDown}
           fill={theme.colorsThemed.text.primary}
@@ -82,7 +82,7 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (
           <SMobileListContainer focused={focused}>
             <SMobileList>{options.map(renderItem)}</SMobileList>
             <SCancelButton view='modalSecondary' onClick={handleCloseClick}>
-              {t('button-cancel')}
+              {t('collection.button.cancel')}
             </SCancelButton>
           </SMobileListContainer>
         </Modal>

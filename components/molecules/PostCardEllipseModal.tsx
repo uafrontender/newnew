@@ -35,7 +35,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   handleAddPostToState,
 }) => {
   const router = useRouter();
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('common');
   const user = useAppSelector((state) => state.user);
 
   // Share
@@ -146,7 +146,9 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
         >
           <SButton onClick={() => handleCopyLink()}>
             <Text variant={3}>
-              {isCopiedUrl ? t('ellipse.link-copied') : t('ellipse.copy-link')}
+              {isCopiedUrl
+                ? t('ellipseMenu.linkCopied')
+                : t('ellipseMenu.copyLink')}
             </Text>
           </SButton>
           <SSeparator />
@@ -156,10 +158,10 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
                 {!isFollowingLoading && (
                   <Text variant={3}>
                     {!isFollowingDecision
-                      ? t('ellipse.follow-decision', {
+                      ? t('ellipseMenu.followDecision', {
                           postType: t(`postType.${postType}`),
                         })
-                      : t('ellipse.unfollow-decision', {
+                      : t('ellipseMenu.unFollowDecision', {
                           postType: t(`postType.${postType}`),
                         })}
                   </Text>
@@ -173,7 +175,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
                 }}
               >
                 <Text variant={3} tone='error'>
-                  {t('ellipse.report')}
+                  {t('ellipseMenu.report')}
                 </Text>
               </SButton>
             </>
@@ -187,7 +189,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
           }}
           onClick={() => onClose()}
         >
-          {t('Cancel')}
+          {t('ellipseMenu.cancel')}
         </Button>
       </SWrapper>
     </Modal>

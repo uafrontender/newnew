@@ -16,7 +16,7 @@ interface ICardTimer {
 // Its strange how much resources this component consumes om initial render (5.3% before memo)
 const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
   ({ timestampSeconds }) => {
-    const { t } = useTranslation('home');
+    const { t } = useTranslation('component-PostCard');
     const parsed = (timestampSeconds - Date.now()) / 1000;
     const hasEnded = Date.now() > timestampSeconds;
     const expirationDate = new Date(timestampSeconds);
@@ -30,17 +30,17 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
     const parsedString = `
     ${
       parsedSeconds.days !== '0'
-        ? `${parsedSeconds.days}${t('card-time-left-days')}`
+        ? `${parsedSeconds.days}${t('timer.daysLeft')}`
         : ''
     }
     ${
       parsedSeconds.hours !== '0'
-        ? `${parsedSeconds.hours}${t('card-time-left-hours')}`
+        ? `${parsedSeconds.hours}${t('timer.hoursLeft')}`
         : ''
     }
     ${
       parsedSeconds.minutes !== '0'
-        ? `${parsedSeconds.minutes}${t('card-time-left-minutes')}`
+        ? `${parsedSeconds.minutes}${t('timer.minutesLeft')}`
         : ''
     }
   `;
@@ -62,12 +62,11 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
 
     return !hasEnded ? (
       <SCaption variant={2} weight={700}>
-        {t('card-time-left', { time: parsedString })}
+        {t('timer.timeLeft', { time: parsedString })}
       </SCaption>
     ) : (
       <SCaptionEnded variant={2} weight={700}>
-        {t('card-time-expired-ended-on')}{' '}
-        {expirationDate.toLocaleDateString('en-US')}
+        {t('timer.endedOn')} {expirationDate.toLocaleDateString('en-US')}
       </SCaptionEnded>
     );
   }

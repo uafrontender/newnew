@@ -1,7 +1,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useContext, useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation, Trans } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -380,7 +380,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'home',
     'subscribe-to-user',
     'payment-modal',
   ]);
