@@ -37,7 +37,7 @@ interface ISubscribeToUserPage {
 const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   const router = useRouter();
   const theme = useTheme();
-  const { t } = useTranslation('subscribe-to-user');
+  const { t } = useTranslation('page-SubscribeToUser');
   const { loggedIn, userData: currentUserData } = useAppSelector(
     (state) => state.user
   );
@@ -228,7 +228,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                   <SSubscribeButtonScrollDown
                     onClick={() => handleOpenPaymentModal()}
                   >
-                    {t('subscribeBtn', { amount: subPriceFormatted })}
+                    {t('button.subscribe', { amount: subPriceFormatted })}
                   </SSubscribeButtonScrollDown>
                 </SScrolledDownTopSection>
               )}
@@ -243,7 +243,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
             >
               {!isTablet && (
                 <SBackButton defer={500} onClick={() => router.back()}>
-                  {!isMobileOrTablet && t('backBtn')}
+                  {!isMobileOrTablet && t('button.back')}
                 </SBackButton>
               )}
               <UserInfoSection>
@@ -269,7 +269,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                     }}
                     onClick={() => handleOpenPaymentModal()}
                   >
-                    {t('subscribeBtn', { amount: subPriceFormatted })}
+                    {t('button.subscribe', { amount: subPriceFormatted })}
                   </SSubscribeButtonDesktop>
                   {/* <Button
                     view="quaternary"
@@ -280,7 +280,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                     }}
                     onClick={() => {}}
                   >
-                    {t('learnMoreBtn')}
+                    {t('button.learnMore')}
                   </Button> */}
                 </SButtonsSection>
               </UserInfoSection>
@@ -333,7 +333,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       {isMobile && (
         <SSubscribeButtonMobileContainer>
           <SSubscribeButtonMobile onClick={() => handleOpenPaymentModal()}>
-            {t('subscribeBtn', { amount: subPriceFormatted })}
+            {t('button.subscribe', { amount: subPriceFormatted })}
           </SSubscribeButtonMobile>
         </SSubscribeButtonMobileContainer>
       )}
@@ -346,11 +346,11 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         handlePayWithCardStripeRedirect={handlePayRegistered}
         showTocApply
         // handlePayWithWallet={handlePayRegistered}
-        // payButtonCaptionKey={t('paymentModalPayButton')}
+        // payButtonCaptionKey={t('paymentModal.payButton')}
       >
         <SPaymentModalHeader>
           <SPaymentModalTitle variant={3}>
-            {t('paymentModalHeader.subtitle')}
+            {t('paymentModal.header')}
           </SPaymentModalTitle>
           <SPaymentModalCreatorInfo>
             <SAvatar>
@@ -380,7 +380,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'subscribe-to-user',
+    'page-SubscribeToUser',
     'payment-modal',
   ]);
 
