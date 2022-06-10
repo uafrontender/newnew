@@ -84,7 +84,6 @@ export default ListPostModal;
 
 const SListPostModalWrapper = styled.div`
   width: 100%;
-  cursor: grab;
   display: flex;
   padding: 8px 0 0 0;
   position: relative;
