@@ -8,6 +8,7 @@ import Document, {
   DocumentInitialProps,
 } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
+import ThemeScriptTag from '../utils/setThemeHelper';
 
 export default class MyDocument extends Document {
   static async getInitialProps(
@@ -75,9 +76,9 @@ export default class MyDocument extends Document {
               __html: `
                 window.onUsersnapCXLoad = function(api) {
                   // store the Usersnap global api on the window, if case you want to use it in other contexts
-                  window.Usersnap = api; 
+                  window.Usersnap = api;
                   api.init();
-              }         
+              }
               `,
             }}
           />
@@ -85,6 +86,7 @@ export default class MyDocument extends Document {
         <body>
           <Main />
           <NextScript />
+          <ThemeScriptTag />
           <div id='modal-root' />
         </body>
       </Html>
