@@ -3,6 +3,6 @@
     "title": "NewNew - Bid, Vote & Crowdfund Decisions",
     "description": "Decide what people do next. Vote, bid and crowdfund with the community to watch people do things IRL on NewNew"
   },
-  "something-wrong": "Oops…Something went wrong",
-  "btn-text": "Go home"
+  "errorText": "Oops…Something went wrong",
+  "buttonText": "Go home"
 }

@@ -19,7 +19,7 @@ interface ISortItem {
 
 export const SortItem: React.FC<ISortItem> = (props) => {
   const { item, selected, category, handleChange } = props;
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('page-SeeMore');
 
   const renderItemOption = useCallback(
     (option: any, index: number, parentOption: any) => {
@@ -53,7 +53,7 @@ export const SortItem: React.FC<ISortItem> = (props) => {
   return (
     <SItemHolder>
       <SItemTitle variant={3} weight={600}>
-        {/* {t(`sort-title-option-${item.key}`)} */}
+        {/* {t(`sortingOption.${item.key}`)} */}
       </SItemTitle>
       {item.options.map((option: any, optIndex: number) =>
         renderItemOption(option, optIndex, item)

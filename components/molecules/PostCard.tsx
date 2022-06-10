@@ -102,7 +102,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     shouldStop,
     handleRemovePostFromState,
   }) => {
-    const { t } = useTranslation('home');
+    const { t } = useTranslation('component-PostCard');
     const theme = useTheme();
     const router = useRouter();
     const user = useAppSelector((state) => state.user);
@@ -220,13 +220,11 @@ export const PostCard: React.FC<ICard> = React.memo(
       try {
         if (videoReady) {
           if (inView && !shouldStop) {
-            try {
-              videoRef.current?.play();
-            } catch (err) {
+            videoRef.current?.play().catch((e) => {
               // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
               // Many browsers prevent autoplay
-              console.log(err);
-            }
+              console.log(e);
+            });
           } else {
             videoRef.current?.pause();
           }
@@ -545,7 +543,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   onClick={handleBidClick}
                   cardType={typeOfPost}
                 >
-                  {t(`button-card-singular-${typeOfPost}`, {
+                  {t('button.withActivity.mcSingular', {
                     votes: formatNumber(totalVotes ?? 0, true),
                     total: formatNumber(
                       (postParsed as newnewapi.Crowdfunding)
@@ -574,7 +572,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   }
                   withProgress={typeOfPost === 'cf'}
                 >
-                  {t(`button-card-${typeOfPost}`, {
+                  {t(`button.withActivity.${typeOfPost}`, {
                     votes: formatNumber(totalVotes ?? 0, true),
                     total: formatNumber(
                       (postParsed as newnewapi.Crowdfunding)
@@ -589,8 +587,8 @@ export const PostCard: React.FC<ICard> = React.memo(
             ) : (
               <SButtonFirst withShrink onClick={handleBidClick}>
                 {switchPostStatus(typeOfPost, postParsed.status) === 'voting'
-                  ? t(`button-card-first-${typeOfPost}`)
-                  : t(`button-card-see-${typeOfPost}`)}
+                  ? t(`button.withoutActivity.${typeOfPost}`)
+                  : t(`button.seeResults.${typeOfPost}`)}
               </SButtonFirst>
             )}
           </SBottomEnd>
