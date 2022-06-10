@@ -67,7 +67,7 @@ type ModalMenuUserData = {
   username: string;
   nickname: string;
   bio: string;
-  genderPronouns: newnewapi.User.GenderPronouns;
+  genderPronouns?: newnewapi.User.GenderPronouns;
 };
 
 type TFormErrors = {
@@ -164,7 +164,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     nickname: user.userData?.nickname ?? '',
     username: user.userData?.username ?? '',
     bio: user.userData?.bio ?? '',
-    genderPronouns: getGenderPronouns(user.userData?.genderPronouns).value,
+    genderPronouns: user.userData?.genderPronouns
+      ? getGenderPronouns(user.userData?.genderPronouns).value
+      : undefined,
   });
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
   const [isDataValid, setIsDataValid] = useState(false);
@@ -670,7 +672,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       nickname: user.userData?.nickname ?? '',
       username: user.userData?.username ?? '',
       bio: user.userData?.bio ?? '',
-      genderPronouns: getGenderPronouns(user.userData?.genderPronouns).value,
+      genderPronouns: user.userData?.genderPronouns
+        ? getGenderPronouns(user.userData?.genderPronouns).value
+        : undefined,
     };
 
     if (
@@ -865,7 +869,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     width='100%'
                     disabled={isLoading}
                     label={
-                      isGenderPronounsDefined(dataInEdit?.genderPronouns)
+                      dataInEdit?.genderPronouns
                         ? genderOptions.find(
                             (o) => o.value === dataInEdit.genderPronouns
                           )?.name!!
@@ -1297,7 +1301,7 @@ const SPreviewDiv = styled.div`
 
 const SDropdownSelect = styled(DropdownSelect)`
   ${(props) =>
-    !isGenderPronounsDefined(props.selected as number) &&
+    !props.selected &&
     css`
       & > button > span {
         color: ${({ theme }) => theme.colorsThemed.text.tertiary};
