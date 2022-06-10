@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled, { useTheme, css } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import { debounce, isEqual } from 'lodash';
 import validator from 'validator';
@@ -25,6 +25,8 @@ import UsernameInput from '../atoms/profile/UsernameInput';
 import NicknameInput from '../atoms/profile/NicknameInput';
 import ProfileImageInput from '../molecules/profile/ProfileImageInput';
 import ProfileBackgroundInput from '../molecules/profile/ProfileBackgroundInput';
+import DropdownSelect, { TDropdownSelectItem } from '../atoms/DropdownSelect';
+import HelperText from '../atoms/HelperText';
 
 // Icons
 import CancelIcon from '../../public/images/svg/icons/outlined/Close.svg';
@@ -44,6 +46,8 @@ import { CropperObjectFit } from '../molecules/profile/ProfileBackgroundCropper'
 import isBrowser from '../../utils/isBrowser';
 import isAnimatedImage from '../../utils/isAnimatedImage';
 import resizeImage from '../../utils/resizeImage';
+import genderPronouns from '../../constants/genderPronouns';
+import getGenderPronouns from '../../utils/genderPronouns';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -61,6 +65,7 @@ type ModalMenuUserData = {
   username: string;
   nickname: string;
   bio: string;
+  genderPronouns?: newnewapi.User.GenderPronouns;
 };
 
 type TFormErrors = {
@@ -157,6 +162,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     nickname: user.userData?.nickname ?? '',
     username: user.userData?.username ?? '',
     bio: user.userData?.bio ?? '',
+    genderPronouns: user.userData?.genderPronouns
+      ? getGenderPronouns(user.userData?.genderPronouns).value
+      : undefined,
   });
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
   const [isDataValid, setIsDataValid] = useState(false);
@@ -291,24 +299,28 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   );
 
   const handleUpdateDataInEdit = useCallback(
-    (key: keyof ModalMenuUserData, value: any) => {
+    <T extends keyof ModalMenuUserData>(
+      key: T,
+      value: ModalMenuUserData[T]
+    ) => {
       setIsDataValid(false);
 
-      const workingData = { ...dataInEdit };
+      const workingData: ModalMenuUserData = { ...dataInEdit };
       workingData[key] = value;
+
       setDataInEdit({ ...workingData });
 
       if (key === 'nickname') {
         validateTextViaAPIDebounced(
           newnewapi.ValidateTextRequest.Kind.USER_NICKNAME,
-          value
+          value as ModalMenuUserData['nickname']
         );
       } else if (key === 'username' && value !== user.userData?.username) {
-        validateUsernameViaAPIDebounced(value);
+        validateUsernameViaAPIDebounced(value as ModalMenuUserData['username']);
       } else if (key === 'bio') {
         validateTextViaAPIDebounced(
           newnewapi.ValidateTextRequest.Kind.USER_BIO,
-          value
+          value as ModalMenuUserData['bio']
         );
       }
     },
@@ -446,6 +458,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         ...(newCoverImgURL ? { coverUrl: newCoverImgURL } : {}),
         // Delete cover image, if it was deleted and no new image provided
         ...(!coverUrlInEdit ? { coverUrl: '' } : {}),
+        ...(dataInEdit.genderPronouns
+          ? { genderPronouns: dataInEdit.genderPronouns }
+          : {}),
       });
 
       const res = await updateMe(payload);
@@ -459,6 +474,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           avatarUrl: res.data.me?.avatarUrl,
           bio: res.data.me?.bio,
           coverUrl: res.data.me?.coverUrl,
+          genderPronouns: res.data.me?.genderPronouns,
           options: {
             ...user.userData?.options,
           },
@@ -654,6 +670,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       nickname: user.userData?.nickname ?? '',
       username: user.userData?.username ?? '',
       bio: user.userData?.bio ?? '',
+      genderPronouns: user.userData?.genderPronouns
+        ? getGenderPronouns(user.userData?.genderPronouns).value
+        : undefined,
     };
 
     if (
@@ -725,6 +744,20 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       }
     }
   }, [formErrors, dataInEdit]);
+
+  // Gender Pronouns
+  const genderOptions: TDropdownSelectItem<number>[] = useMemo(
+    () =>
+      Object.values(genderPronouns)
+        .filter(
+          (genderP) => genderP.value !== newnewapi.User.GenderPronouns.UNKNOWN
+        )
+        .map((genderP) => ({
+          name: t(`genderPronouns.${genderP.name}`),
+          value: genderP.value,
+        })),
+    [t]
+  );
 
   return (
     <SEditProfileMenu
@@ -826,9 +859,31 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   placeholder={t('EditProfileMenu.inputs.username.placeholder')}
                   isValid={!formErrors.usernameError}
                   onChange={(value) => {
-                    handleUpdateDataInEdit('username', value);
+                    handleUpdateDataInEdit('username', value as string);
                   }}
                 />
+                <SDropdownSelectWrapper>
+                  <SDropdownSelect<number>
+                    width='100%'
+                    disabled={isLoading}
+                    label={
+                      dataInEdit?.genderPronouns
+                        ? genderOptions.find(
+                            (o) => o.value === dataInEdit.genderPronouns
+                          )?.name!!
+                        : 'Gender'
+                    }
+                    options={genderOptions}
+                    selected={dataInEdit.genderPronouns}
+                    closeOnSelect
+                    onSelect={(value: number) =>
+                      handleUpdateDataInEdit('genderPronouns', value)
+                    }
+                  />
+                  <HelperText>
+                    {t('EditProfileMenu.inputs.genderPronouns.caption')}
+                  </HelperText>
+                </SDropdownSelectWrapper>
                 <BioTextarea
                   maxChars={150}
                   value={dataInEdit.bio}
@@ -1217,3 +1272,37 @@ const SUsernamePopupList = styled.div`
 
   color: #ffffff;
 `;
+
+const SDropdownSelectWrapper = styled.div`
+  margin-bottom: 16px;
+`;
+
+const SPreviewDiv = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-top: 6px;
+  margin-bottom: 16px;
+
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  & > div {
+    margin-right: 4px;
+  }
+`;
+
+const SDropdownSelect = styled(DropdownSelect)`
+  ${(props) =>
+    !props.selected &&
+    css`
+      & > button > span {
+        color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+      }
+    `}
+` as typeof DropdownSelect;

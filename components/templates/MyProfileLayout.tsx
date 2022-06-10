@@ -21,6 +21,7 @@ import Headline from '../atoms/Headline';
 import InlineSvg from '../atoms/InlineSVG';
 import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
+import BackButton from '../molecules/profile/BackButton';
 import ErrorBoundary from '../organisms/ErrorBoundary';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
 import EditProfileMenu, { TEditingStage } from '../organisms/EditProfileMenu';
@@ -32,7 +33,9 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 
 import isBrowser from '../../utils/isBrowser';
 import useSynchronizedHistory from '../../utils/hooks/useSynchronizedHistory';
-import BackButton from '../molecules/profile/BackButton';
+import getGenderPronouns, {
+  isGenderPronounsDefined,
+} from '../../utils/genderPronouns';
 
 type TPageType =
   | 'activelyBidding'
@@ -621,7 +624,18 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               alignItems: 'center',
             }}
           >
-            <SUsername variant={4}>{user.userData?.nickname}</SUsername>
+            <SUsernameWrapper>
+              <SUsername variant={4}>{user.userData?.nickname}</SUsername>
+              {isGenderPronounsDefined(user.userData?.genderPronouns) && (
+                <SGenderPronouns variant={2}>
+                  {t(
+                    `genderPronouns.${
+                      getGenderPronouns(user.userData?.genderPronouns!!).name
+                    }`
+                  )}
+                </SGenderPronouns>
+              )}
+            </SUsernameWrapper>
             <SShareDiv>
               <SUsernameButton
                 view='tertiary'
@@ -781,10 +795,18 @@ const SBackButton = styled(BackButton)`
   }
 `;
 
+const SUsernameWrapper = styled.div`
+  margin-bottom: 12px;
+`;
+
 const SUsername = styled(Headline)`
   text-align: center;
+`;
 
-  margin-bottom: 12px;
+const SGenderPronouns = styled(Text)`
+  text-align: center;
+  font-weight: 400;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SShareDiv = styled.div`
