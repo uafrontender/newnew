@@ -216,7 +216,7 @@ export async function getServerSideProps(
     const translationContext = await serverSideTranslations(context.locale!!, [
       'common',
       'profile',
-      'home',
+      'component-PostCard',
       'decision',
       'payment-modal',
     ]);

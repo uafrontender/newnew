@@ -18,7 +18,7 @@ interface ISortItemOption {
 
 export const SortItemOption: React.FC<ISortItemOption> = (props) => {
   const { item, parent, selected, category, handleChange } = props;
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('page-SeeMore');
 
   const onChange = useCallback(
     (e) => {
@@ -33,7 +33,7 @@ export const SortItemOption: React.FC<ISortItemOption> = (props) => {
   return (
     <SCheckBox
       label={t(
-        `sort-title-option-${parent.key}-${item.key}${
+        `sortingOption.${parent.key}-${item.key}${
           item.key === 'num_bids' && ['ac', 'mc', 'cf'].includes(category)
             ? `-${category}`
             : ''

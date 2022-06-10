@@ -1,20 +1,16 @@
 {
   "meta": {
     "title": "Sign up to NewNew",
-    "description": "Signing up to NewNew is fast and easy. Join now to be a Creator or watch people"
+    "description": "Signing up to NewNew is fast and easy. Join now to be a Creator or watch people",
+    "title-to-log-in": "Log in to NewNew",
+    "description-to-log-in": "Logging in to NewNew is fast and easy"
   },
-  "toLogIn": {
-    "meta": {
-      "title": "Log in to NewNew",
-      "description": "Logging in to NewNew is fast and easy"
-    }
-  },
-  "goBackBtn": "Go back",
+  "backButton": "Go back",
   "heading": {
     "sign-in": "Sign up",
     "log-in": "Log in",
     "sign-in-to": "Sign up to",
-    "reasons": {
+    "reason": {
       "comment": "comment",
       "bid": "bid",
       "subscribe": "subscribe",
@@ -26,7 +22,7 @@
     "subheading": "We'll log you in or create an account.",
     "subheadingSessionExpired": "Session expired, please sign in again"
   },
-  "signupOptions": {
+  "signUpOptions": {
     "google": "Continue with Google",
     "apple": "Continue with Apple ID",
     "facebook": "Continue with Facebook",
@@ -37,16 +33,16 @@
     "signInBtn": "Sign up",
     "logInBtn": "Log in"
   },
+  "error": {
+    "emailInvalid": "Invalid address",
+    "genericError": "An error occurred",
+    "Failed to fetch": "Failed to submit"
+  },
   "legalDisclaimer": {
-    "main_text": "By creating an account you agree to our ",
-    "privacy_policy": "Privacy Policy",
+    "mainText": "By creating an account you agree to our ",
+    "privacyPolicy": "Privacy Policy",
     "terms": "Terms",
     "and": "and",
-    "community_guidelines": "Community Guidelines"
-  },
-  "errors": {
-    "email_invalid": "Invalid address",
-    "generic_error": "An error occurred",
-    "Failed to fetch": "Failed to submit"
+    "communityGuidelines": "Community Guidelines"
   }
 }
