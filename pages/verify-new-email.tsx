@@ -21,7 +21,7 @@ import assets from '../constants/assets';
 interface IVerifyNewEmail {}
 
 const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
-  const { t } = useTranslation('verify-email');
+  const { t } = useTranslation('page-VerifyEmail');
 
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -128,7 +128,7 @@ export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
-    'verify-email',
+    'page-VerifyEmail',
   ]);
 
   return {

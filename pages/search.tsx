@@ -32,7 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'search',
-    'home',
+    'component-PostCard',
     'decision',
   ]);
 

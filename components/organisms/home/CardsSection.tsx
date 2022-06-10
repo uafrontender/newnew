@@ -53,7 +53,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     tutorialCard,
     handlePostClicked,
   }) => {
-    const { t } = useTranslation('home');
+    const { t } = useTranslation('page-Home');
     const router = useRouter();
     const ref: any = useRef();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -170,15 +170,11 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
 
       if (tutorialCard !== undefined && index === 0) {
         return (
-          <>
-            <SItemWrapper
-              key='tutorial-card'
-              name={`cards-section-${category}-${0}`}
-            >
+          <React.Fragment key={switchPostType(item)[0].postUuid}>
+            <SItemWrapper name={`cards-section-${category}-${0}`}>
               {tutorialCard}
             </SItemWrapper>
             <SItemWrapper
-              key={switchPostType(item)[0].postUuid}
               name={`cards-section-${category}-${
                 tutorialCard !== undefined ? index + 1 : index
               }`}
@@ -192,7 +188,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
                 height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
               />
             </SItemWrapper>
-          </>
+          </React.Fragment>
         );
       }
 
@@ -273,7 +269,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             <AnimatedPresence animation='t-01'>
               <SHeadline variant={4} animation='t-01'>
                 <SHeadlineInner>
-                  <div>{t('button-creator-on-the-rise')}</div>
+                  <div>{t('cardsSection.button.creatorOnTheRise')}</div>
                   <SCreatorsAvatars>
                     {collection
                       .map((post) => switchPostType(post)[0].creator)
@@ -299,8 +295,8 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             <SCaption weight={700} onClick={handleSeeMoreClick}>
               {t(
                 type === 'default'
-                  ? 'button-show-more'
-                  : 'button-show-more-creator',
+                  ? 'cardsSection.button.showMore'
+                  : 'cardsSection.button.showMoreCreator',
                 { name: formatString(user?.username, true) }
               )}
             </SCaption>
@@ -353,8 +349,8 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             <Button size='lg' view='secondary' onClick={handleSeeMoreClick}>
               {t(
                 type === 'default' || isMobile
-                  ? 'button-show-more'
-                  : 'button-show-more-creator',
+                  ? 'cardsSection.button.showMore'
+                  : 'cardsSection.button.showMoreCreator',
                 { name: formatString(user?.username, true) }
               )}
             </Button>
