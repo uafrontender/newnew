@@ -119,7 +119,7 @@ export async function getServerSideProps(
       'profile',
       'component-PostCard',
       'decision',
-      'payment-modal',
+      'modal-PaymentModal',
     ]);
 
     return {

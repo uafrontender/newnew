@@ -381,7 +381,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'page-SubscribeToUser',
-    'payment-modal',
+    'modal-PaymentModal',
   ]);
 
   if (!username || Array.isArray(username)) {

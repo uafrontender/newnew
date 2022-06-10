@@ -432,7 +432,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'page-SeeMore',
     'component-PostCard',
     'decision',
-    'payment-modal',
+    'modal-PaymentModal',
   ]);
 
   const top10payload = new newnewapi.EmptyRequest({});
