@@ -1,6 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-param-reassign */
 // TODO: adjust eslint no-param-reassign for Slices
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
+import { cookiesInstance } from '../../api/apiConfigs';
+import { AppThunk } from '../store';
 
 // This slice will be responsible for major UI state data:
 // the app' color mode; are some global, app-wide components
@@ -57,7 +60,7 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
   name: 'uiState',
   initialState: defaultUIState,
   reducers: {
-    setColorMode(state, { payload }: PayloadAction<TColorMode>) {
+    _setColorMode(state, { payload }: PayloadAction<TColorMode>) {
       state.colorMode = payload;
     },
     setResizeMode(state, { payload }: PayloadAction<TResizeMode>) {
@@ -84,10 +87,21 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
 export const {
   setBanner,
   setOverlay,
-  setColorMode,
+  _setColorMode,
   setResizeMode,
   toggleMutedMode,
   setGlobalSearchActive,
 } = uiSlice.actions;
+
+export const setColorMode = (payload: any): AppThunk =>
+(dispatch) => {
+  dispatch(_setColorMode(payload));
+
+  cookiesInstance.set('colorMode', payload, {
+    // Expire in 10 years
+    maxAge: 10 * 365 * 24 * 60 * 60,
+    path: '/',
+  });
+};
 
 export default uiSlice.reducer;
