@@ -320,6 +320,11 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
       }
     }
 
+    if (category === 'for-you' && !loggedIn) {
+      router?.push('/sign-up');
+      return;
+    }
+
     if (inView && category && !isCollectionLoading) {
       if (nextPageToken) {
         loadPosts({
@@ -364,7 +369,24 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     isCollectionLoading,
     router.query.category,
     router.query.sort,
+    loggedIn,
   ]);
+
+  // Clear sorting
+  useEffect(() => {
+    const category = router.query.category?.toString() ?? 'ac';
+    if (category === 'for-you') {
+      const newQuery = { ...router.query };
+
+      delete newQuery.sort;
+
+      router?.push({
+        query: newQuery,
+        pathname: router.pathname,
+      });
+    }
+  }, [router]);
+
   return (
     <>
       <Head>

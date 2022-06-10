@@ -25,9 +25,11 @@ export const SortItemOption: React.FC<ISortItemOption> = (props) => {
       e.preventDefault();
       e.stopPropagation();
 
+      if (selected) return;
+
       handleChange(item.key, parent.key);
     },
-    [handleChange, item.key, parent.key]
+    [handleChange, selected, item.key, parent.key]
   );
 
   return (

@@ -48,7 +48,7 @@ export const defaultUIState: UIStateInterface = {
   overlay: false,
   colorMode: 'auto',
   // colorMode: 'dark',
-  resizeMode: 'mobile',
+  resizeMode: 'laptop',
   mutedMode: true,
   globalSearchActive: false,
 };
