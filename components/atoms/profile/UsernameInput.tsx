@@ -10,6 +10,7 @@ type TUsernameInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   popupCaption: ReactElement;
   errorCaption: string;
+  onChange: (value: string) => void;
 };
 
 const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
