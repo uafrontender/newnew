@@ -535,10 +535,6 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
           id: '5-days',
           title: t('secondStep.field.expiresAt.options.5-days'),
         },
-        {
-          id: '7-days',
-          title: t('secondStep.field.expiresAt.options.7-days'),
-        },
       ],
       [t]
     );
