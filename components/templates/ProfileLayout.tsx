@@ -49,6 +49,9 @@ import { reportUser } from '../../api/endpoints/report';
 import BackButton from '../molecules/profile/BackButton';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 import UnsubscribeModal from '../molecules/profile/UnsubscribeModal';
+import getGenderPronouns, {
+  isGenderPronounsDefined,
+} from '../../utils/genderPronouns';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -526,7 +529,18 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               alignItems: 'center',
             }}
           >
-            <SUsername variant={4}>{user.nickname}</SUsername>
+            <SUsernameWrapper>
+              <SUsername variant={4}>{user.nickname}</SUsername>
+              {isGenderPronounsDefined(user.genderPronouns) && (
+                <SGenderPronouns>
+                  {t(
+                    `genderPronouns.${
+                      getGenderPronouns(user.genderPronouns!!).name
+                    }`
+                  )}
+                </SGenderPronouns>
+              )}
+            </SUsernameWrapper>
             <SShareDiv>
               <SUsernameButton
                 view='tertiary'
@@ -678,10 +692,25 @@ const SGeneral = styled(General)`
   }
 `;
 
+const SUsernameWrapper = styled.div`
+  margin-bottom: 12px;
+`;
+
 const SUsername = styled(Headline)`
   text-align: center;
+`;
 
-  margin-bottom: 12px;
+const SGenderPronouns = styled(Text)`
+  text-align: center;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 24px;
+  }
 `;
 
 const SShareDiv = styled.div`

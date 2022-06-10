@@ -15,7 +15,7 @@ export type TDropdownSelectItem<T> = {
   value: T;
 };
 
-interface IDropdownSelect<T> {
+export interface IDropdownSelect<T> {
   label: string;
   selected?: T;
   options: TDropdownSelectItem<T>[];
@@ -24,6 +24,7 @@ interface IDropdownSelect<T> {
   disabled?: boolean;
   closeOnSelect?: boolean;
   onSelect: (val: T) => void;
+  className?: string;
 }
 
 const DropdownSelect = <T,>({
@@ -35,6 +36,7 @@ const DropdownSelect = <T,>({
   disabled,
   closeOnSelect,
   onSelect,
+  className,
 }: IDropdownSelect<T>): ReactElement => {
   const theme = useTheme();
   const [isOpen, setIsOpen] = useState(false);
@@ -71,6 +73,7 @@ const DropdownSelect = <T,>({
       ref={(el) => {
         containerRef.current = el!!;
       }}
+      className={className}
     >
       <SLabelButton
         disabled={disabled ?? false}
@@ -135,6 +138,7 @@ DropdownSelect.defaultProps = {
   maxItems: undefined,
   disabled: false,
   closeOnSelect: false,
+  className: '',
 };
 
 export default DropdownSelect;
@@ -270,3 +274,4 @@ const SInlineSVG = styled(InlineSvg)<{
 }>`
   transform: ${({ focused }) => (focused ? 'rotate(180deg)' : 'unset')};
 `;
+
