@@ -128,12 +128,6 @@
     "table": {
       "subscribers": "Subscribers",
       "date": "Date subscribed",
-      "menu": {
-        "report": "Report",
-        "block": "Block",
-        "unblock": "Unblock",
-        "view": "View profile"
-      },
       "updateSub": "Update subscription"
     },
     "message-all": "DM all"
@@ -221,6 +215,7 @@
     "submitDesktop": "Turn on Subscription",
     "backButton": "Cancel",
     "updateRate": "Save",
+
     "removeSubscription": "Remove subscription"
   },
   "subscribersFeatures": {

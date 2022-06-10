@@ -168,8 +168,8 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
               <SButton onClick={() => handleCopyLink()}>
                 <Text variant={3}>
                   {isCopiedUrl
-                    ? t('ellipseMenu.linkCopied')
-                    : t('ellipseMenu.copyLink')}
+                    ? t('ellipse.linkCopied')
+                    : t('ellipse.copyLink')}
                 </Text>
               </SButton>
               {postCreator.uuid !== user.userData?.userUuid && (
@@ -178,10 +178,10 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
                     <SButton onClick={() => handleFollowDecision()}>
                       <Text variant={3}>
                         {!isFollowingDecision
-                          ? t('ellipseMenu.followDecision', {
+                          ? t('ellipse.followDecision', {
                               postType: t(`postType.${postType}`),
                             })
-                          : t('ellipseMenu.unFollowDecision', {
+                          : t('ellipse.unFollowDecision', {
                               postType: t(`postType.${postType}`),
                             })}
                       </Text>
@@ -201,7 +201,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
                     }}
                   >
                     <Text variant={3} tone='error'>
-                      {t('ellipseMenu.report')}
+                      {t('ellipse.report')}
                     </Text>
                   </SButton>
                 </>

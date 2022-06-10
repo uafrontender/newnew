@@ -146,9 +146,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
         >
           <SButton onClick={() => handleCopyLink()}>
             <Text variant={3}>
-              {isCopiedUrl
-                ? t('ellipseMenu.linkCopied')
-                : t('ellipseMenu.copyLink')}
+              {isCopiedUrl ? t('ellipse.linkCopied') : t('ellipse.copyLink')}
             </Text>
           </SButton>
           <SSeparator />
@@ -158,10 +156,10 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
                 {!isFollowingLoading && (
                   <Text variant={3}>
                     {!isFollowingDecision
-                      ? t('ellipseMenu.followDecision', {
+                      ? t('ellipse.followDecision', {
                           postType: t(`postType.${postType}`),
                         })
-                      : t('ellipseMenu.unFollowDecision', {
+                      : t('ellipse.unFollowDecision', {
                           postType: t(`postType.${postType}`),
                         })}
                   </Text>
@@ -175,7 +173,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
                 }}
               >
                 <Text variant={3} tone='error'>
-                  {t('ellipseMenu.report')}
+                  {t('ellipse.report')}
                 </Text>
               </SButton>
             </>
@@ -189,7 +187,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
           }}
           onClick={() => onClose()}
         >
-          {t('ellipseMenu.cancel')}
+          {t('ellipse.cancel')}
         </Button>
       </SWrapper>
     </Modal>

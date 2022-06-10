@@ -25,7 +25,7 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
   handleReportOpen,
   onClose,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('common');
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
@@ -38,10 +38,10 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
           <SButton onClick={() => handleFollowDecision()}>
             <Text variant={3}>
               {!isFollowingDecision
-                ? t('ellipse.follow-decision', {
+                ? t('ellipse.followDecision', {
                     postType: t(`postType.${postType}`),
                   })
-                : t('ellipse.unfollow-decision', {
+                : t('ellipse.unFollowDecision', {
                     postType: t(`postType.${postType}`),
                   })}
             </Text>
@@ -66,7 +66,7 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
           }}
           onClick={() => onClose()}
         >
-          {t('Cancel')}
+          {t('ellipse.cancel')}
         </Button>
       </SWrapper>
     </Modal>

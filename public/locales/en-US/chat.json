@@ -2,15 +2,6 @@
   "meta": {
     "title": "Direct Messages"
   },
-  "ellipse": {
-    "report-user": "Report user",
-    "report-group": "Report group",
-    "block-user": "Block user",
-    "unblock-user": "Unblock user",
-    "block-group": "Block group",
-    "unblock-group": "Unblock group",
-    "view-profile": "View profile"
-  },
   "chat": {
     "today": "Today",
     "placeholder": "Type a message...",

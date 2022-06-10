@@ -24,7 +24,7 @@ const CommentEllipseMenu: React.FC<ICommentEllipseMenu> = ({
   onDeleteComment,
   onUserReport,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
 
   useOnClickEsc(containerRef, handleClose);
@@ -53,13 +53,13 @@ const CommentEllipseMenu: React.FC<ICommentEllipseMenu> = ({
         >
           {canDeleteComment && (
             <SButton onClick={deleteCommentHandler}>
-              <Text variant={2}>{t('comments.delete')}</Text>
+              <Text variant={2}>{t('ellipse.delete')}</Text>
             </SButton>
           )}
           {!isMyComment && (
             <SButton onClick={reportUserHandler}>
               <Text variant={2} tone='error'>
-                {t('comments.report')}
+                {t('ellipse.report')}
               </Text>
             </SButton>
           )}

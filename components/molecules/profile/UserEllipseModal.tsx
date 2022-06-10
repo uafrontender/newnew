@@ -29,7 +29,7 @@ const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
   handleClickReport,
   handleClickBlock,
 }) => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('common');
 
   const reportUserHandler = () => {
     handleClickReport();
@@ -56,7 +56,7 @@ const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
         >
           {isSubscribed && (
             <SButton onClick={unsubHandler}>
-              <Text variant={2}>{t('ellipse.unsub')}</Text>
+              <Text variant={2}>{t('ellipse.unsubscribe')}</Text>
             </SButton>
           )}
           <SButton onClick={reportUserHandler}>

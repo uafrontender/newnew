@@ -26,7 +26,7 @@ const AcOptionCardModerationEllipseModal: React.FunctionComponent<IAcOptionCardM
     handleOpenBlockUserModal,
     handleOpenRemoveOptionModal,
   }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('common');
 
     return (
       <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
@@ -44,7 +44,7 @@ const AcOptionCardModerationEllipseModal: React.FunctionComponent<IAcOptionCardM
               }}
             >
               <Text variant={2} tone='error'>
-                {t('AcPostModeration.OptionsTab.OptionCard.ellipse.report')}
+                {t('ellipse.reportBid')}
               </Text>
             </SButton>
             <SButton
@@ -54,9 +54,7 @@ const AcOptionCardModerationEllipseModal: React.FunctionComponent<IAcOptionCardM
                 onClose();
               }}
             >
-              <Text variant={2}>
-                {t('AcPostModeration.OptionsTab.OptionCard.ellipse.block')}
-              </Text>
+              <Text variant={2}>{t('ellipse.blockUser')}</Text>
             </SButton>
             <SButton
               view='secondary'
@@ -66,9 +64,7 @@ const AcOptionCardModerationEllipseModal: React.FunctionComponent<IAcOptionCardM
                 onClose();
               }}
             >
-              <Text variant={2}>
-                {t('AcPostModeration.OptionsTab.OptionCard.ellipse.remove')}
-              </Text>
+              <Text variant={2}>{t('ellipse.removeBid')}</Text>
             </SButton>
           </SContentContainer>
           <Button

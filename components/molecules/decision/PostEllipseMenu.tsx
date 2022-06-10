@@ -25,7 +25,7 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = React.memo(
     handleReportOpen,
     onClose,
   }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('common');
     const containerRef = useRef<HTMLDivElement>();
 
     useOnClickEsc(containerRef, onClose);
@@ -45,10 +45,10 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = React.memo(
             <SButton onClick={() => handleFollowDecision()}>
               <Text variant={3}>
                 {!isFollowingDecision
-                  ? t('ellipse.follow-decision', {
+                  ? t('ellipse.followDecision', {
                       postType: t(`postType.${postType}`),
                     })
-                  : t('ellipse.unfollow-decision', {
+                  : t('ellipse.unFollowDecision', {
                       postType: t(`postType.${postType}`),
                     })}
               </Text>
