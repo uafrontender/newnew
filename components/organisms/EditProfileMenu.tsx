@@ -193,6 +193,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             );
             return errorsWorking;
           });
+        } else if (!validator.isLowercase(text)) {
+          setFormErrors((errors) => {
+            const errorsWorking = { ...errors };
+            errorsWorking.usernameError = 'generic';
+            return errorsWorking;
+          });
         } else {
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
@@ -700,13 +706,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       dataInEdit.username.length <= 25 &&
       validator.isAlphanumeric(dataInEdit.username) &&
       validator.isLowercase(dataInEdit.username);
-    const isNicknameValid = dataInEdit && dataInEdit.nickname.length > 0;
+    const isNicknameValid = dataInEdit && dataInEdit.nickname.length > 0 && dataInEdit.nickname.length <= 100;
 
     if (!isNicknameValid || !isUsernameValid) {
       setFormErrors((errors) => {
         const errorsWorking = { ...errors };
-        errorsWorking.usernameError = isUsernameValid ? '' : 'generic';
-        errorsWorking.nicknameError = isNicknameValid ? '' : 'generic';
+        errorsWorking.usernameError = isUsernameValid ? '' : errors.usernameError || 'generic';
+        errorsWorking.nicknameError = isNicknameValid ? '' : errors.nicknameError || 'generic';
         return errorsWorking;
       });
       setIsDataValid(false);
@@ -734,8 +740,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       if (!isNicknameValid || !isUsernameValid) {
         setFormErrors((errors) => {
           const errorsWorking = { ...errors };
-          errorsWorking.usernameError = isUsernameValid ? '' : 'generic';
-          errorsWorking.nicknameError = isNicknameValid ? '' : 'generic';
+          errorsWorking.usernameError = isUsernameValid ? '' : errors.usernameError || 'generic';
+          errorsWorking.nicknameError = isNicknameValid ? '' : errors.nicknameError || 'generic';
           return errorsWorking;
         });
         setIsDataValid(false);
