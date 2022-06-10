@@ -52,7 +52,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'common',
     'creator',
     'chat',
-    'notifications',
   ]);
 
   const { req } = context;

@@ -279,5 +279,6 @@
     "backButton": "Close",
     "updateButton": "Update payment info",
     "stripe-issue": "Stripe issue!"
-  }
+  },
+  "no-results": "Any new notifications you receive\nwill appear here"
 }
