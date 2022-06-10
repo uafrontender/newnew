@@ -1,5 +1,26 @@
 {
   "welcome": "Welcome to {{NEXT_PUBLIC_APP_NAME}}!",
+  "top-section-title": "Top 10 in {{country}}",
+  "heroSection": {
+    "title": "Come together \nto shape reality",
+    "subTitle": "Bid and vote on what the world does next",
+    "signIn": "Sign in",
+    "explore": "Explore Now",
+    "exploreMow": "Explore now"
+  },
+  "ellipseMenu": {
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied!",
+    "followDecision": "Favorite {{ postType }}",
+    "unFollowDecision": "Unfavorite {{ postType }}",
+    "report": "Report",
+    "cancel": "Cancel"
+  },
+  "postType": {
+    "ac": "Event",
+    "mc": "Superpoll",
+    "cf": "Goal"
+  },
   "mobile-bottom-navigation-add": "Create",
   "mobile-bottom-navigation-home": "Home",
   "mobile-bottom-navigation-more": "More",

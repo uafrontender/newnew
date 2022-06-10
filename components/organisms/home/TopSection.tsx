@@ -32,7 +32,7 @@ interface ITopSection {
 
 export const TopSection: React.FC<ITopSection> = React.memo(
   ({ collection, handlePostClicked }) => {
-    const { t } = useTranslation('home');
+    const { t } = useTranslation('common');
     const ref: any = useRef();
     const scrollContainerRef: any = useRef();
     const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -160,7 +160,7 @@ export const TopSection: React.FC<ITopSection> = React.memo(
         }}
       >
         <SHeadline variant={4} animation='t-01'>
-          {t('top-block-title', { country })}
+          {t('top-section-title', { country })}
         </SHeadline>
         <SListContainer ref={ref}>
           <SListWrapper

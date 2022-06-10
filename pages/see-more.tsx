@@ -45,7 +45,7 @@ interface ISearch {
 }
 
 const Search: NextPage<ISearch> = ({ top10posts }) => {
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('page-SeeMore');
   const { loggedIn } = useAppSelector((state) => state.user);
 
   const router = useRouter();
@@ -368,24 +368,18 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
   return (
     <>
       <Head>
-        <title>
-          {t(`search.meta.title-${router?.query?.category || 'ac'}`)}
-        </title>
+        <title>{t(`meta.${router?.query?.category || 'ac'}.title`)}</title>
         <meta
           name='description'
-          content={t(
-            `search.meta.description-${router?.query?.category || 'ac'}`
-          )}
+          content={t(`meta.${router?.query?.category || 'ac'}.description`)}
         />
         <meta
           property='og:title'
-          content={t(`search.meta.title-${router?.query?.category || 'ac'}`)}
+          content={t(`meta.${router?.query?.category || 'ac'}.title`)}
         />
         <meta
           property='og:description'
-          content={t(
-            `search.meta.description-${router?.query?.category || 'ac'}`
-          )}
+          content={t(`meta.${router?.query?.category || 'ac'}.description`)}
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
@@ -435,7 +429,8 @@ export default Search;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'home',
+    'page-SeeMore',
+    'component-PostCard',
     'decision',
     'payment-modal',
   ]);

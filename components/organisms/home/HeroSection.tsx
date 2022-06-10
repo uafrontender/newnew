@@ -21,7 +21,7 @@ import AnimationChain from '../../atoms/AnimationChain';
 export const HeroSection = React.memo(() => {
   const router = useRouter();
   const theme = useTheme();
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('common');
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const [animateTitle, setAnimateTitle] = useState(false);
@@ -109,7 +109,7 @@ export const HeroSection = React.memo(() => {
               delay={0.4}
               onAnimationEnd={handleTitleAnimationEnd}
             >
-              {t('hero-block-title')}
+              {t('heroSection.title')}
             </AnimatedPresence>
           </SHeadline>
           <SSubTitle weight={600}>
@@ -118,7 +118,7 @@ export const HeroSection = React.memo(() => {
               animation='t-02'
               onAnimationEnd={handleSubTitleAnimationEnd}
             >
-              {t('hero-block-subTitle')}
+              {t('heroSection.subTitle')}
             </AnimatedPresence>
           </SSubTitle>
           <AnimatedPresence start={animateButton} animation='t-01'>
@@ -131,7 +131,7 @@ export const HeroSection = React.memo(() => {
                     view='secondary'
                     onClick={handleSignInClick}
                   >
-                    {t('hero-block-sign-in')}
+                    {t('heroSection.signIn')}
                   </SButton>
                   <SButton
                     withDim
@@ -139,7 +139,7 @@ export const HeroSection = React.memo(() => {
                     view='primaryGrad'
                     onClick={handleExploreClick}
                   >
-                    {t('hero-block-explore')}
+                    {t('heroSection.explore')}
                   </SButton>
                 </>
               ) : (
@@ -149,7 +149,7 @@ export const HeroSection = React.memo(() => {
                   view='primaryGrad'
                   onClick={handleExploreClick}
                 >
-                  {t('hero-block-explore-now')}
+                  {t('heroSection.exploreNow')}
                 </SButton>
               )}
             </SButtonsHolder>
