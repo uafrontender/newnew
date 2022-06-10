@@ -79,6 +79,7 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
               },
               countryCode: data.me?.countryCode,
               usernameChangedAt: data.me.usernameChangedAt,
+              genderPronouns: data.me.genderPronouns,
 
               options: {
                 isActivityPrivate: data.me?.options?.isActivityPrivate,

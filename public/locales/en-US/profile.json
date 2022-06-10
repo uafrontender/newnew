@@ -105,6 +105,10 @@
           "3": "No space and special characters"
         }
       },
+      "genderPronouns": {
+        "placeholder": "Gender",
+        "caption": "This can be changed or removed later"
+      },
       "bio": {
         "placeholder": "Bio",
         "errors": {
@@ -292,5 +296,11 @@
     "no-content": {
       "description": "Any creators activity will be shown here"
     }
+  },
+  "genderPronouns": {
+    "none": "None",
+    "feminine": "She/Her",
+    "masculine": "He/Him",
+    "neutral": "They/Them"
   }
 }
