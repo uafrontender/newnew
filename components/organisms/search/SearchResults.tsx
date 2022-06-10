@@ -16,7 +16,7 @@ const SearchCreators = dynamic(() => import('./SearchCreators'));
 
 export const SearchResults = () => {
   const router = useRouter();
-  const { t } = useTranslation('search');
+  const { t } = useTranslation('page-Search');
   const theme = useTheme();
   const [searchValue, setSearchValue] = useState('');
   const [activeTab, setActiveTab] = useState<string>('decisions');
