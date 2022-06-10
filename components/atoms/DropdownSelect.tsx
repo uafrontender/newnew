@@ -15,7 +15,7 @@ export type TDropdownSelectItem<T> = {
   value: T;
 };
 
-export interface IDropdownSelect<T> {
+interface IDropdownSelect<T> {
   label: string;
   selected?: T;
   options: TDropdownSelectItem<T>[];
