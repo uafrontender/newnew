@@ -2,12 +2,11 @@
 import React, { useEffect, useMemo, useState, useContext } from 'react';
 import styled, { keyframes, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
-
+import { AuthLayoutContext } from './AuthLayout';
 import useImageLoaded from '../../utils/hooks/useImageLoaded';
 import assets from '../../constants/assets';
 // Cyclic dependency
 import isSafari from '../../utils/isSafari';
-import { AuthLayoutContext } from './AuthLayout';
 
 const HeroVisual = React.memo(() => {
   const theme = useTheme();

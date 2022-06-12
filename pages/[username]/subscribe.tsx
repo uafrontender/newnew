@@ -316,11 +316,8 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                     <Trans
                       t={t}
                       i18nKey='TopSection.bullets.suggestions.body'
-                      components={[
-                        // @ts-ignore
-                        <BoldSpan />,
-                        user?.nickname,
-                      ]}
+                      // @ts-ignore
+                      components={[<BoldSpan />, user?.nickname]}
                     />
                   </SBulletBody>
                 </SBullet>
@@ -371,7 +368,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 export default SubscribeToUserPage;
 
 interface IReactFunction {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const BoldSpan: React.FC<IReactFunction> = ({ children }) => (
@@ -379,6 +376,10 @@ const BoldSpan: React.FC<IReactFunction> = ({ children }) => (
     <em>{children}</em>
   </strong>
 );
+
+BoldSpan.defaultProps = {
+  children: undefined,
+};
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;

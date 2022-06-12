@@ -98,12 +98,17 @@ const MyApp = (props: IMyApp): ReactElement => {
     if (hotjarIdVariable && hotjarSvVariable) {
       const hotjarId = parseInt(hotjarIdVariable);
       const hotjarSv = parseInt(hotjarSvVariable);
-      hotjar.initialize(hotjarId, hotjarSv);
+      try {
+        hotjar.initialize(hotjarId, hotjarSv);
+      } catch (err) {
+        // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
+        // This is expected to happen from time to time, no need to react
+        console.log(err);
+      }
     }
   }, []);
 
   useEffect(() => {
-    // @ts-ignore:next-line
     const currentResizeMode = store.getState()?.ui?.resizeMode;
 
     let resizeMode = 'mobile';
@@ -124,7 +129,7 @@ const MyApp = (props: IMyApp): ReactElement => {
       // keep old mode in case mobile
       resizeMode = currentResizeMode;
     }
-
+    console.log(currentResizeMode, resizeMode);
     if (resizeMode !== currentResizeMode) {
       store.dispatch(setResizeMode(resizeMode));
     }
@@ -199,13 +204,10 @@ const MyApp = (props: IMyApp): ReactElement => {
   );
 };
 
-// @ts-ignore
 const MyAppWithTranslation = appWithTranslation(MyApp);
 
-// @ts-ignore
 const MyAppWithTranslationAndRedux = wrapper.withRedux(MyAppWithTranslation);
 
-// @ts-ignore
 MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
   const appProps = await App.getInitialProps(appContext);
 
