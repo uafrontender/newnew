@@ -8,12 +8,31 @@
     "explore": "Explore Now",
     "exploreNow": "Explore now"
   },
-  "ellipseMenu": {
+  "ellipse": {
     "copyLink": "Copy link",
     "linkCopied": "Link copied!",
     "followDecision": "Favorite {{ postType }}",
+    "followCreator": "Favorite creator",
     "unFollowDecision": "Unfavorite {{ postType }}",
+    "unFollowCreator": "Unfavorite creator",
+    "unsubscribe": "Unsubscribe",
+    "removeSubscription": "Remove subscription",
+    "removeBid": "Remove bid",
+    "removeOption": "Remove option",
+    "view": "View profile",
     "report": "Report",
+    "reportUser": "Report user",
+    "reportGroup": "Report group",
+    "reportBid": "Report bid",
+    "reportOption": "Report option",
+    "block": "Block",
+    "blockUser": "Block user",
+    "blockGroup": "Block group",
+    "unblock": "Unblock",
+    "unblockUser": "Unblock user",
+    "unblockGroup": "Unblock group",
+    "delete": "Delete",
+    "deleteDecision": "Delete {{ postType }}",
     "cancel": "Cancel"
   },
   "postType": {

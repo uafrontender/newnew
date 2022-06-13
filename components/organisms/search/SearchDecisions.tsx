@@ -36,7 +36,7 @@ interface IFunction {
 }
 
 export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
-  const { t } = useTranslation('search');
+  const { t } = useTranslation('page-Search');
   const theme = useTheme();
   const router = useRouter();
   const filterContainerRef: any = useRef();

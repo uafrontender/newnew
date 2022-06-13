@@ -12,7 +12,7 @@ export interface ICodeVerificationMenu {
 }
 
 const UnsubscribeMenu: React.FunctionComponent = () => {
-  const { t } = useTranslation('unsubscribe');
+  const { t } = useTranslation('page-Unsubscribe');
 
   return (
     <>
