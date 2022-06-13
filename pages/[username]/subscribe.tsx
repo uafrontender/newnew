@@ -316,11 +316,8 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                     <Trans
                       t={t}
                       i18nKey='topSection.bullets.suggestions.body'
-                      components={[
-                        // @ts-ignore
-                        <BoldSpan />,
-                        user?.nickname,
-                      ]}
+                      // @ts-ignore
+                      components={[<BoldSpan />, user?.nickname]}
                     />
                   </SBulletBody>
                 </SBullet>
