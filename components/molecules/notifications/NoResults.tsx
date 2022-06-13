@@ -7,7 +7,8 @@ import { useTranslation } from 'next-i18next';
 import emptyFolder from '../../../public/images/notifications/no-results.png';
 
 const NoResults: React.FC = React.memo(() => {
-  const { t } = useTranslation('notifications');
+  const { t } = useTranslation('creator');
+
   return (
     <SContainer>
       <SWrapper>

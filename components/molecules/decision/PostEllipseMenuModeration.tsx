@@ -24,7 +24,7 @@ const PostEllipseMenuModeration: React.FunctionComponent<IPostEllipseMenuModerat
       handleClose,
       handleOpenDeletePostModal,
     }) => {
-      const { t } = useTranslation('decision');
+      const { t } = useTranslation('common');
       const containerRef = useRef<HTMLDivElement>();
 
       useOnClickEsc(containerRef, handleClose);
