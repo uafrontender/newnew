@@ -47,6 +47,7 @@ import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import Headline from '../../atoms/Headline';
+import PostVotingTab from '../../molecules/decision/PostVotingTab';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -695,6 +696,11 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             decisionFailed={postStatus === 'failed'}
             showSelectingWinnerOption={showSelectingWinnerOption}
           >
+            <PostVotingTab>
+              {t('Bids')}
+              {` `}
+              {!!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''}
+            </PostVotingTab>
             <AcOptionsTab
               postId={post.postUuid}
               postStatus={postStatus}
