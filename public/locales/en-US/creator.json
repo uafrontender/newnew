@@ -144,7 +144,6 @@
       "description": "Earn income through cash auctions, polls, crowdfunding and subscription memberships"
     },
     "title": "Get Paid",
-    "title-set-up-stripe": "Set payment system",
     "title-stripe-active": "account is active",
     "bullets": {
       "1": "$2.00 USD NewNew withdrawal fee.",
@@ -205,17 +204,18 @@
       "search-placeholder": "Search"
     }
   },
-  "SubrateSection": {
+  "subRateSection": {
     "heading": "Set your subscription price",
     "selectInput": {
       "perMonth": "/month",
       "select": "Select",
       "featured": "Popular"
     },
-    "submitDesktop": "Turn on Subscription",
-    "backButton": "Cancel",
-    "updateRate": "Save",
-
+    "button": {
+      "enable": "Turn on Subscription",
+      "update": "Save",
+      "back": "Cancel"
+    },
     "removeSubscription": "Remove subscription"
   },
   "subscribersFeatures": {
@@ -265,7 +265,7 @@
       "title": "Payments made easy with Stripe",
       "description": "Connect a Stripe account to get paid on time."
     },
-    "title-set-up-stripe": "Get paid through",
+    "titleSetUpStripe": "Get paid through",
     "title-stripe-active": "account is active",
     "bullets": {
       "1": "Setting up a Stripe account is quick and easy",
@@ -274,11 +274,11 @@
     },
     "requestSetupLinkBtn": "Connect with Stripe",
     "stripeConnectedLinkBtn": "Stripe connected!",
-    "submitMobile": "Done",
-    "submitDesktop": "Done",
-    "backButton": "Close",
-    "updateButton": "Update payment info",
-    "stripe-issue": "Stripe issue!"
+    "button": {
+      "submit": "Done",
+      "update": "Update payment info",
+      "back": "Close"
+    }
   },
   "no-results": "Any new notifications you receive\nwill appear here"
 }

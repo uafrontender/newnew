@@ -151,7 +151,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
           defer={isMobile ? 250 : undefined}
           onClick={() => router.back()}
         >
-          <span>{t('backButton')}</span>
+          <span>{t('button.back')}</span>
         </SSignInBackButton>
         <SHeadline variant={3}>
           {reason && reason !== 'session_expired'

@@ -3,15 +3,12 @@
     "title": "Be a Creator on NewNew",
     "description": "Become a Creator at the best creator economy startup company"
   },
-  "progressbar": {
-    "of": "of"
-  },
-  "TosSection": {
+  "tosSection": {
     "heading": "Start making money on NewNew",
     "subheading": "Please review our terms...",
     "close": "Done"
   },
-  "DetailsSection": {
+  "detailsSection": {
     "leaveMsg": "Are you sure you want to leave? The changes will be discarded",
     "side": {
       "heading": "Tell us a little about yourself.",
@@ -78,7 +75,7 @@
           "emailTaken": "This email is already taken. Try another one"
         }
       },
-      "DoB": {
+      "dateOfBirth": {
         "label": "Date of birth",
         "captions": {
           "twoTimesOnly": "Birthday can be changed 2 times only.",
@@ -92,29 +89,36 @@
         "label": "Profile photo",
         "captionMobile": "*recommended resolution 200x200 px",
         "captionDesktop": "Recommended resolution 200x200 px",
-        "uploadBtn": "Upload photo",
-        "uploadNewBtn": "Upload new image"
+        "button": {
+          "upload": "Upload photo",
+          "uploadNew": "Upload new image"
+        }
       }
     },
-    "EditProfileImageModal": {
-      "goBackButton": "Edit Profile Image",
-      "saveButton": "Save changes",
-      "cancelButton": "Cancel"
+    "editProfileImageModal": {
+      "button": {
+        "back": "Edit Profile Image",
+        "save": "Save changes",
+        "cancel": "Cancel"
+      }
     },
-    "backButton": "Back",
-    "agreedToTosCheckbox": "I have read and agree to",
-    "submitDesktop": "Done",
-    "submitMobile": "Done"
+    "button": {
+      "back": "Back",
+      "submit": "Done"
+    },
+    "agreedToTosCheckbox": "I have read and agree to"
   },
-  "AboutSection": {
+  "aboutSection": {
     "meta": {
       "title": "Become a NewNew creator",
       "description": "Become a creator and make money on NewNew"
     },
+    "button": {
+      "submit": "Save changes",
+      "back": "Close"
+    },
     "heading": "This what your fans see",
-    "backButton": "Close",
-    "submitMobile": "Save changes",
-    "submitDesktop": "Save changes",
+
     "bio": {
       "title": "Bio",
       "placeholder": "Tell a few words about yourself...",
@@ -130,7 +134,7 @@
       "title": "What will you post about the most? Select at least three"
     }
   },
-  "StripeSection": {
+  "stripeSection": {
     "meta": {
       "title": "Get paid through",
       "description": "Connect a Stripe account to get paid on time."
@@ -139,7 +143,7 @@
       "heading": "Payments made easy with Stripe",
       "subheading": "Connect a Stripe account to get paid on time."
     },
-    "title-set-up-stripe": "Set payment system",
+    "titleSetUpStripe": "Set payment system",
     "title-stripe-active": "account is active",
     "bullets": {
       "1": "Setting up a Stripe account is quick and easy",
@@ -148,10 +152,11 @@
     },
     "requestSetupLinkBtn": "Connect with Stripe",
     "stripeConnectedLinkBtn": "Stripe connected!",
-    "submitMobile": "Submit",
-    "submitDesktop": "Submit"
+    "button": {
+      "submit": "Submit"
+    }
   },
-  "SubrateSection": {
+  "subRateSection": {
     "meta": {
       "title": "Grow your passive income.",
       "description": "Enable subscriptions for your channel and get paid monthly."
@@ -167,8 +172,9 @@
       "featured": "Popular",
       "noProduct": "No subscription"
     },
-    "submitMobile": "Save changes",
-    "submitDesktop": "Save changes",
-    "backButton": "Close"
+    "button": {
+      "submit": "Save changes",
+      "back": "Close"
+    }
   }
 }
