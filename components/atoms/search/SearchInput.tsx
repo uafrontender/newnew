@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
 import InlineSVG from '../InlineSVG';
@@ -24,6 +25,7 @@ import Lottie from '../Lottie';
 import NoResults from './NoResults';
 
 const SearchInput: React.FC = React.memo(() => {
+  const { t } = useTranslation('common');
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const inputRef: any = useRef();
@@ -246,7 +248,7 @@ const SearchInput: React.FC = React.memo(() => {
                   }}
                   view='quaternary'
                 >
-                  All results
+                  {t('search.allResults')}
                 </SButton>
               </>
             )}
@@ -287,7 +289,7 @@ const SearchInput: React.FC = React.memo(() => {
                 }}
                 view='quaternary'
               >
-                All results
+                {t('search.allResults')}
               </SButton>
             </>
           )}
