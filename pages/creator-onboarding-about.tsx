@@ -100,8 +100,8 @@ export default CreatorOnboardingAbout;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
+    'common',
     'creator-onboarding',
-    'profile',
   ]);
 
   try {

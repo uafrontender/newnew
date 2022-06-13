@@ -34,7 +34,7 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
       break;
     }
     case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'innappropriate';
+      errorMsg = 'inappropriate';
       break;
     }
     case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION: {

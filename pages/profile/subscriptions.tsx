@@ -52,7 +52,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
 }) => {
   const { isCreatorsImSubscribedToLoading, creatorsImSubscribedTo } =
     useGetSubscriptions();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   return (
     <div>
@@ -81,7 +81,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
           ) : (
             <NoContentCard>
               <NoContentDescription>
-                {t('Subscriptions.no-content.description')}
+                {t('Subscriptions.noContent.description')}
               </NoContentDescription>
             </NoContentCard>
           )}
@@ -116,7 +116,7 @@ export async function getServerSideProps(
   try {
     const translationContext = await serverSideTranslations(context.locale!!, [
       'common',
-      'profile',
+      'page-Profile',
       'component-PostCard',
       'decision',
       'modal-PaymentModal',
