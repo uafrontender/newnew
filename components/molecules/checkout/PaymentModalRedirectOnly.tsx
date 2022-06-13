@@ -38,7 +38,7 @@ const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
   children,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('payment-modal');
+  const { t } = useTranslation('modal-PaymentModal');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

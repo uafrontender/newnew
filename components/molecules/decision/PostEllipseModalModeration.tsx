@@ -24,7 +24,7 @@ const PostEllipseModalModeration: React.FunctionComponent<IPostEllipseModalModer
     onClose,
     handleOpenDeletePostModal,
   }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('common');
 
     return (
       <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
