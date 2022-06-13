@@ -18,7 +18,7 @@ const UnsubscribeModal: React.FC<IUnsubscribeModal> = ({
   user,
   closeModal,
 }) => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   const handleUnsubscribeCreator = async () => {
     try {
@@ -39,18 +39,18 @@ const UnsubscribeModal: React.FC<IUnsubscribeModal> = ({
     <Modal show={confirmUnsubscribe} onClose={closeModal}>
       <SContainer>
         <SModal>
-          <SModalTitle>{t('modal.unsubscribe-user.title')}</SModalTitle>
+          <SModalTitle>{t('modal.unsubscribeUser.title')}</SModalTitle>
           <SModalMessage>
-            {t(`modal.unsubscribe-user.message`, {
+            {t(`modal.unsubscribeUser.message`, {
               username: getDisplayname(user),
             })}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>
-              {t('modal.unsubscribe-user.button-cancel')}
+              {t('modal.unsubscribeUser.button.cancel')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmClick}>
-              {t('modal.unsubscribe-user.button-confirm')}
+              {t('modal.unsubscribeUser.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>

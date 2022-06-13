@@ -40,16 +40,20 @@
     "search-placeholder": "Search for messages or users"
   },
   "modal": {
-    "block-user": {
+    "blockUser": {
       "title": "Block",
-      "message-first-part": "Are you sure you want to block",
-      "message-second-part": "from messaging you?",
-      "button-cancel": "Cancel",
-      "button-confirm": "Block"
+      "messageFirstPart": "Are you sure you want to block",
+      "messageSecondPart": "from messaging you?",
+      "button": {
+        "cancel": "Cancel",
+        "confirm": "Block"
+      }
     },
-    "block-group": {
+    "blockGroup": {
       "title": "Block group",
-      "button-confirm": "Block group"
+      "button": {
+        "confirm": "Block group"
+      }
     },
     "report-user": {
       "title": "Report",
@@ -71,8 +75,8 @@
     },
     "delete-group": {
       "title": "Delete group",
-      "message-first-part": "Do you really want to delete",
-      "message-second-part": "group? You will not be able to undo this action.",
+      "messageFirstPart": "Do you really want to delete",
+      "messageSecondPart": "group? You will not be able to undo this action.",
       "button-cancel": "Keep it",
       "button-confirm": "Delete permanently"
     },

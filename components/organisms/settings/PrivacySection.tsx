@@ -30,7 +30,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
   handleUnblockUser,
   handleSetActive,
 }) => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   const [isConfirmDeleteMyAccountVisible, setIsConfirmDeleteMyAccountVisible] =
     useState(false);
@@ -40,11 +40,11 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
       <SHidingSubsectionsContainer>
         {/* <SHidingSubsection>
           <SHidingSubsectionTitle variant={2}>
-            {t('Settings.sections.Privacy.privacySubsections.spendings.title')}
+            {t('Settings.sections.privacy.privacySubsections.spendings.title')}
           </SHidingSubsectionTitle>
           <SHidingSubsectionCaption variant={2}>
             {t(
-              'Settings.sections.Privacy.privacySubsections.spendings.caption'
+              'Settings.sections.privacy.privacySubsections.spendings.caption'
             )}
           </SHidingSubsectionCaption>
           <Toggle
@@ -58,10 +58,10 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
         </SHidingSubsection> */}
         <SHidingSubsection>
           <SHidingSubsectionTitle variant={2}>
-            {t('Settings.sections.Privacy.privacySubsections.private.title')}
+            {t('Settings.sections.privacy.privacySubsections.private.title')}
           </SHidingSubsectionTitle>
           <SHidingSubsectionCaption variant={2}>
-            {t('Settings.sections.Privacy.privacySubsections.private.caption')}
+            {t('Settings.sections.privacy.privacySubsections.private.caption')}
           </SHidingSubsectionCaption>
           <Toggle
             checked={isAccountPrivate}
@@ -75,11 +75,11 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
       </SHidingSubsectionsContainer>
       <SBlockedUsersContainer>
         <SBlockedUsersContainerTitle variant={2}>
-          {t('Settings.sections.Privacy.blockedusers.title')}
+          {t('Settings.sections.privacy.blockedUsers.title')}
         </SBlockedUsersContainerTitle>
         {blockedUsers.length === 0 && (
           <Text variant={3}>
-            {t('Settings.sections.Privacy.blockedusers.no_blocked_users')}
+            {t('Settings.sections.privacy.blockedUsers.noBlockedUsers')}
           </Text>
         )}
         {blockedUsers &&
@@ -94,20 +94,20 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
                 onClick={() => handleUnblockUser(u.uuid)}
                 view='secondary'
               >
-                {t('Settings.sections.Privacy.blockedusers.unblockBtn')}
+                {t('Settings.sections.privacy.blockedUsers.button.unblock')}
               </SUnblockButton>
             </SBlockedUserCard>
           ))}
       </SBlockedUsersContainer>
       <SCloseAccountSubsection>
         <SHidingSubsectionTitle variant={2}>
-          {t('Settings.sections.Privacy.closeAccount.title')}
+          {t('Settings.sections.privacy.closeAccount.title')}
         </SHidingSubsectionTitle>
         <SCloseAccountButton
           onClick={() => setIsConfirmDeleteMyAccountVisible(true)}
           view='secondary'
         >
-          {t('Settings.sections.Privacy.closeAccount.closeBtn')}
+          {t('Settings.sections.privacy.closeAccount.button.delete')}
         </SCloseAccountButton>
         <ConfirmDeleteAccountModal
           isVisible={isConfirmDeleteMyAccountVisible}
