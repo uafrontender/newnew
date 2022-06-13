@@ -126,11 +126,7 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   const renderSortOption = useCallback(
     (option: string, key: string) => {
       const handleClick = () => {
-        const newSort: any = { ...(sort as object) };
-
-        delete newSort[key];
-
-        handleSortChange(newSort);
+        handleClearSorting();
       };
 
       return (
@@ -153,7 +149,7 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
         </SButton>
       );
     },
-    [handleSortChange, sort, disabled, category, t]
+    [disabled, t, category, handleClearSorting]
   );
 
   return (
