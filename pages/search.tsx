@@ -34,6 +34,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'search',
     'home',
     'decision',
+    'payment-modal',
   ]);
 
   return {
