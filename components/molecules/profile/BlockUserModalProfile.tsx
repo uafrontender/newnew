@@ -19,7 +19,7 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
   user,
   closeModal,
 }) => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   const { blockUser } = useGetBlockedUsers();
 
@@ -45,17 +45,17 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
     <Modal show={confirmBlockUser} onClose={closeModal}>
       <SContainer>
         <SModal>
-          <SModalTitle>{t('modal.block-user.title')}</SModalTitle>
+          <SModalTitle>{t('modal.blockUser.title')}</SModalTitle>
           <SModalMessage>
-            {t('modal.block-user.message-first-part')} {getDisplayname(user)}{' '}
-            {t('modal.block-user.message-second-part')}
+            {t('modal.blockUser.messageFirstPart')} {getDisplayname(user)}{' '}
+            {t('modal.blockUser.messageSecondPart')}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>
-              {t('modal.block-user.button-cancel')}
+              {t('modal.blockUser.button.cancel')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmClick}>
-              {t('modal.block-user.button-confirm')}
+              {t('modal.blockUser.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>

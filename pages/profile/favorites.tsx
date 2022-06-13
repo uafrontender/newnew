@@ -62,7 +62,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
@@ -200,7 +200,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
           {posts && posts.length === 0 && !isLoading && (
             <NoContentCard>
               <NoContentDescription>
-                {t('Favorites.no-content.description')}
+                {t('Favorites.noContent.description')}
               </NoContentDescription>
             </NoContentCard>
           )}
@@ -249,7 +249,7 @@ export async function getServerSideProps(
   try {
     const translationContext = await serverSideTranslations(context.locale!!, [
       'common',
-      'profile',
+      'page-Profile',
       'component-PostCard',
       'decision',
       'modal-PaymentModal',
