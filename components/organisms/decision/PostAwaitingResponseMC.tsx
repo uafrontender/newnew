@@ -23,8 +23,8 @@ import secondsToDHMS from '../../../utils/secondsToDHMS';
 const WaitingForResponseBox = dynamic(
   () => import('../../molecules/decision/waiting/WaitingForResponseBox')
 );
-const CommentsSuccess = dynamic(
-  () => import('../../molecules/decision/success/CommentsSuccess')
+const CommentsBottomSection = dynamic(
+  () => import('../../molecules/decision/success/CommentsBottomSection')
 );
 const McSuccessOptionsTab = dynamic(
   () =>
@@ -304,10 +304,9 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
             <SCommentsHeadline variant={4}>
               {t('SuccessCommon.Comments.heading')}
             </SCommentsHeadline>
-            <CommentsSuccess
+            <CommentsBottomSection
               postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => {}}
             />
           </SCommentsSection>
         )}

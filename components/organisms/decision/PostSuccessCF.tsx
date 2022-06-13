@@ -23,8 +23,8 @@ import { fetchPledges } from '../../../api/endpoints/crowdfunding';
 import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 
-const CommentsSuccess = dynamic(
-  () => import('../../molecules/decision/success/CommentsSuccess')
+const CommentsBottomSection = dynamic(
+  () => import('../../molecules/decision/success/CommentsBottomSection')
 );
 
 interface IPostSuccessCF {
@@ -328,10 +328,9 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
             <SCommentsHeadline variant={4}>
               {t('SuccessCommon.Comments.heading')}
             </SCommentsHeadline>
-            <CommentsSuccess
+            <CommentsBottomSection
               postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => {}}
             />
           </SCommentsSection>
         )}
