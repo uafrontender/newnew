@@ -125,7 +125,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'chat',
-    'payment-modal',
+    'modal-PaymentModal',
   ]);
 
   const { req } = context;

@@ -30,7 +30,7 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
   user,
   myRole,
 }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
   const router = useRouter();
 
@@ -64,28 +64,28 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
         >
           {myRole === 2 && !isAnnouncement && (
             <SButton onClick={viewUserProfile}>
-              <Text variant={2}>{t('ellipse.view-profile')}</Text>
+              <Text variant={2}>{t('ellipse.view')}</Text>
             </SButton>
           )}
           <SButton onClick={reportUserHandler}>
             <Text variant={2} tone='error'>
               {!isAnnouncement
-                ? t('ellipse.report-user')
-                : t('ellipse.report-group')}
+                ? t('ellipse.reportUser')
+                : t('ellipse.reportGroup')}
             </Text>
           </SButton>
           <SButton onClick={blockUserHandler}>
             {!isAnnouncement ? (
               <Text variant={2}>
                 {userBlocked
-                  ? t('ellipse.unblock-user')
-                  : t('ellipse.block-user')}
+                  ? t('ellipse.unblockUser')
+                  : t('ellipse.blockUser')}
               </Text>
             ) : (
               <Text variant={2}>
                 {userBlocked
-                  ? t('ellipse.unblock-group')
-                  : t('ellipse.block-group')}
+                  ? t('ellipse.unblockGroup')
+                  : t('ellipse.blockGroup')}
               </Text>
             )}
           </SButton>

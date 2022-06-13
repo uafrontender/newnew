@@ -231,7 +231,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               lineColor={theme.colorsThemed.background.outlines1}
               innerSpan={
                 <SContinueWithSpan>
-                  {t('signUpOptions.or_continue_with')}
+                  {t('signUpOptions.orContinueWith')}
                 </SContinueWithSpan>
               }
             />

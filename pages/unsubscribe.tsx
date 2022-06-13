@@ -12,7 +12,7 @@ import AuthLayout, {
 import UnsubscribeMenu from '../components/organisms/UnsubscribeMenu';
 
 const Unsubscribe = () => {
-  const { t } = useTranslation('unsubscribe');
+  const { t } = useTranslation('page-Unsubscribe');
   const authLayoutContext = useContext(AuthLayoutContext);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
-    'unsubscribe',
+    'page-Unsubscribe',
   ]);
 
   // TODO: get token from a magic link query parameters

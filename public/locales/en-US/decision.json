@@ -120,19 +120,6 @@
     "body": "Checkout more like it.",
     "ctaButton": "See more"
   },
-  "ellipse": {
-    "follow-creator": "Favorite creator",
-    "unfollow-creator": "Unfavorite creator",
-    "follow-decision": "Favorite {{ postType }}",
-    "unfollow-decision": "Unfavorite {{ postType }}",
-    "report": "Report",
-    "deleteDecision": "Delete {{ postType }}",
-    "cancel": "Cancel"
-  },
-  "ellipse-option": {
-    "report-option": "Report",
-    "delete-option": "Delete"
-  },
   "PostVideo": {
     "tabs": {
       "announcement": "Decision",
@@ -519,12 +506,7 @@
         "confirmBtn": "Confirm favorite bid"
       },
       "OptionCard": {
-        "pickBtn": "Select",
-        "ellipse": {
-          "report": "Report bid",
-          "block": "Block user",
-          "remove": "Remove bid"
-        }
+        "pickBtn": "Select"
       }
     },
     "WinnerTab": {
@@ -543,15 +525,6 @@
     }
   },
   "McPostModeration": {
-    "OptionsTab": {
-      "OptionCard": {
-        "ellipse": {
-          "report": "Report option",
-          "block": "Block user",
-          "remove": "Remove option"
-        }
-      }
-    },
     "WinnerTab": {
       "WinnerOptionCard": {
         "voters_told_you": "voters told you to",

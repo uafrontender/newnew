@@ -218,7 +218,7 @@ export async function getServerSideProps(
       'profile',
       'component-PostCard',
       'decision',
-      'payment-modal',
+      'modal-PaymentModal',
     ]);
 
     // const { req } = context;

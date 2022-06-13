@@ -28,7 +28,7 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<IMcOptionCardMo
     handleOpenBlockUserModal,
     handleOpenRemoveOptionModal,
   }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('common');
     const containerRef = useRef<HTMLDivElement>();
 
     useOnClickEsc(containerRef, handleClose);
@@ -54,7 +54,7 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<IMcOptionCardMo
                   }}
                 >
                   <Text variant={3} tone='error'>
-                    {t('McPostModeration.OptionsTab.OptionCard.ellipse.report')}
+                    {t('ellipse.reportOption')}
                   </Text>
                 </SButton>
                 <SButton
@@ -63,9 +63,7 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<IMcOptionCardMo
                     handleClose();
                   }}
                 >
-                  <Text variant={3}>
-                    {t('McPostModeration.OptionsTab.OptionCard.ellipse.block')}
-                  </Text>
+                  <Text variant={3}>{t('ellipse.blockUser')}</Text>
                 </SButton>
               </>
             ) : null}
@@ -76,9 +74,7 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<IMcOptionCardMo
                 handleClose();
               }}
             >
-              <Text variant={3}>
-                {t('McPostModeration.OptionsTab.OptionCard.ellipse.remove')}
-              </Text>
+              <Text variant={3}>{t('ellipse.removeOption')}</Text>
             </SButton>
           </SContainer>
         )}

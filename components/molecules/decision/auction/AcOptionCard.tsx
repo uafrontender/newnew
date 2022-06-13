@@ -50,8 +50,8 @@ import { setUserTutorialsProgress } from '../../../../redux-store/slices/userSta
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import getDisplayname from '../../../../utils/getDisplayname';
 import Headline from '../../../atoms/Headline';
-import OptionModal from '../OptionModal';
-import OptionMenu from '../OptionMenu';
+import OptionEllipseModal from '../OptionEllipseModal';
+import OptionEllipseMenu from '../OptionEllipseMenu';
 import ReportModal, { ReportData } from '../../chat/ReportModal';
 import { reportEventOption } from '../../../../api/endpoints/report';
 import { deleteAcOption } from '../../../../api/endpoints/auction';
@@ -768,7 +768,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Ellipse modal */}
       {isMobile && (
-        <OptionModal
+        <OptionEllipseModal
           zIndex={12}
           isOpen={isEllipseMenuOpen}
           isMyOption={isMyBid}
@@ -781,7 +781,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         />
       )}
       {!isMobile && (
-        <OptionMenu
+        <OptionEllipseMenu
           xy={optionMenuX}
           isVisible={isEllipseMenuOpen}
           isMyOption={isMyBid}

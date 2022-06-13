@@ -26,7 +26,7 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
   onUserReport,
   isAnnouncement,
 }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('common');
   const user = useAppSelector((state) => state.user);
 
   const blockUserHandler = () => {
@@ -50,7 +50,7 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
           {user.userData?.options?.isCreator && !isAnnouncement && (
             <>
               <SButton onClick={() => {}}>
-                <Text variant={2}>{t('ellipse.view-profile')}</Text>
+                <Text variant={2}>{t('ellipse.view')}</Text>
               </SButton>
               <SSeparator />
             </>
@@ -58,8 +58,8 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
           <SButton onClick={reportUserHandler}>
             <Text variant={2} tone='error'>
               {!isAnnouncement
-                ? t('ellipse.report-user')
-                : t('ellipse.report-group')}
+                ? t('ellipse.reportUser')
+                : t('ellipse.reportGroup')}
             </Text>
           </SButton>
           <SSeparator />
@@ -67,14 +67,14 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
             {!isAnnouncement ? (
               <Text variant={2}>
                 {userBlocked
-                  ? t('ellipse.unblock-user')
-                  : t('ellipse.block-user')}
+                  ? t('ellipse.unblockUser')
+                  : t('ellipse.blockUser')}
               </Text>
             ) : (
               <Text variant={2}>
                 {userBlocked
-                  ? t('ellipse.unblock-group')
-                  : t('ellipse.block-group')}
+                  ? t('ellipse.unblockGroup')
+                  : t('ellipse.blockGroup')}
               </Text>
             )}
           </SButton>
