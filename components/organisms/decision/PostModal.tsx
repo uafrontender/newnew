@@ -146,7 +146,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   useLeavePageConfirm(
     isConfirmToClosePost,
-    t('PostVideo.cannotLeavePageMsg'),
+    t('postVideo.cannotLeavePageMsg'),
     []
   );
 
@@ -310,7 +310,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const handleCloseAndGoBack = () => {
     if (
       isConfirmToClosePost &&
-      !window.confirm(t('PostVideo.cannotLeavePageMsg'))
+      !window.confirm(t('postVideo.cannotLeavePageMsg'))
     ) {
       return;
     }
@@ -330,7 +330,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const handleGoBackInsidePost = useCallback(() => {
     if (
       isConfirmToClosePost &&
-      !window.confirm(t('PostVideo.cannotLeavePageMsg'))
+      !window.confirm(t('postVideo.cannotLeavePageMsg'))
     ) {
       return;
     }
@@ -772,7 +772,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     const verify = async () => {
       if (
         isConfirmToClosePost &&
-        !window.confirm(t('PostVideo.cannotLeavePageMsg'))
+        !window.confirm(t('postVideo.cannotLeavePageMsg'))
       ) {
         return;
       }
@@ -1060,15 +1060,15 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               )
             ) : isMyPost ? (
               <PostFailedBox
-                title={t('PostDeletedByMe.title', {
+                title={t('postDeletedByMe.title', {
                   postType: t(`postType.${typeOfPost}`),
                 })}
                 body={
                   deletedByCreator
-                    ? t('PostDeletedByMe.body.by_creator', {
+                    ? t('postDeletedByMe.body.by_creator', {
                         postType: t(`postType.${typeOfPost}`),
                       })
-                    : t('PostDeletedByMe.body.by_admin', {
+                    : t('postDeletedByMe.body.by_admin', {
                         postType: t(`postType.${typeOfPost}`),
                       })
                 }
@@ -1077,28 +1077,28 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                     ? LIGHT_IMAGES[typeOfPost]
                     : DARK_IMAGES[typeOfPost]
                 }
-                buttonCaption={t('PostDeletedByMe.ctaButton')}
+                buttonCaption={t('postDeletedByMe.buttonText')}
                 handleButtonClick={() => {
                   router.push('/creation');
                 }}
               />
             ) : (
               <PostFailedBox
-                title={t('PostDeleted.title', {
+                title={t('postDeleted.title', {
                   postType: t(`postType.${typeOfPost}`),
                 })}
                 body={
                   deletedByCreator
-                    ? t('PostDeleted.body.by_creator', {
+                    ? t('postDeleted.body.by_creator', {
                         creator: getDisplayname(postParsed.creator!!),
                         postType: t(`postType.${typeOfPost}`),
                       })
-                    : t('PostDeleted.body.by_admin', {
+                    : t('postDeleted.body.by_admin', {
                         creator: getDisplayname(postParsed.creator!!),
                         postType: t(`postType.${typeOfPost}`),
                       })
                 }
-                buttonCaption={t('PostDeleted.ctaButton', {
+                buttonCaption={t('postDeleted.buttonText', {
                   postTypeMultiple: t(`postType.multiple.${typeOfPost}`),
                 })}
                 imageSrc={
@@ -1119,7 +1119,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               >
                 <Headline variant={4}>
                   {recommendedPosts.length > 0
-                    ? t('RecommendationsSection.heading')
+                    ? t('recommendationsSection.heading')
                     : null}
                 </Headline>
                 {recommendedPosts && (

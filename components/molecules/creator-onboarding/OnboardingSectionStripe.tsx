@@ -88,8 +88,8 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
           />
           <span>
             {isConnectedToStripe
-              ? t('stripeSection.stripeConnectedLinkBtn')
-              : t('stripeSection.requestSetupLinkBtn')}
+              ? t('stripeSection.button.stripeConnectedLink')
+              : t('stripeSection.button.requestSetupLink')}
           </span>
         </SButton>
         <SControlsDiv>

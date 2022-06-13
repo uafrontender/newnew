@@ -15,7 +15,7 @@ const CfMakeCustomPledgeCard: React.FunctionComponent<ICfMakeCustomPledgeCard> =
     return (
       <SStandardPledgeCard onClick={() => handleOpenMakePledgeForm()}>
         <SCardInfo>
-          <SCardAmount>{t('CfPost.BackersTab.custom')}</SCardAmount>
+          <SCardAmount>{t('cfPost.backersTab.custom')}</SCardAmount>
         </SCardInfo>
       </SStandardPledgeCard>
     );

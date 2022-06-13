@@ -107,7 +107,7 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
                 <img src={NoContentYetImg.src} alt='No content yet' />
               </SNoOptionsImgContainer>
               <SNoOptionsCaption variant={3}>
-                {t('AcPostModeration.OptionsTab.NoOptions.caption_1')}
+                {t('acPostModeration.optionsTab.noOptions.caption_1')}
               </SNoOptionsCaption>
             </SNoOptionsYet>
           ) : null}
@@ -149,7 +149,7 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
                 view='secondary'
                 onClick={() => handleLoadBids(pagingToken)}
               >
-                {t('loadMoreBtn')}
+                {t('loadMoreButton')}
               </SLoadMoreBtn>
             ) : null}
           </SBidsContainer>

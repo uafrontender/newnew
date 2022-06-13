@@ -52,10 +52,10 @@ const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>
-              {t('BlockUserModal.button-cancel')}
+              {t('BlockUserModal.buttonCancel')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmClick}>
-              {t('BlockUserModal.button-confirm')}
+              {t('BlockUserModal.buttonConfirm')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>

@@ -225,7 +225,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
         </STotalTextWrapper>
         {/* <STotalInsights>
           <STotalInsightsText>
-            {t(`dashboard.earnings.${isMobile ? 'insights' : 'insights_tablet'}`)}
+            {t(`dashboard.earnings.${isMobile ? 'insights' : 'insightsTablet'}`)}
           </STotalInsightsText>
           <STotalInsightsArrow
             svg={arrowRightIcon}

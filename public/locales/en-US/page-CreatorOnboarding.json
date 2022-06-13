@@ -144,16 +144,16 @@
       "subheading": "Connect a Stripe account to get paid on time."
     },
     "titleSetUpStripe": "Set payment system",
-    "title-stripe-active": "account is active",
     "bullets": {
       "1": "Setting up a Stripe account is quick and easy",
       "2": "Withdraw your NewNew earnings directly to your bank account",
       "3": "Stripe keeps your information private and secure"
     },
-    "requestSetupLinkBtn": "Connect with Stripe",
-    "stripeConnectedLinkBtn": "Stripe connected!",
+
     "button": {
-      "submit": "Submit"
+      "submit": "Submit",
+      "requestSetupLink": "Connect with Stripe",
+      "stripeConnectedLink": "Stripe connected!"
     }
   },
   "subRateSection": {

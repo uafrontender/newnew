@@ -61,7 +61,7 @@ const Cookie = React.memo(() => {
           onMouseOver={handleMouseOver}
           onMouseLeave={handleMouseLeave}
         >
-          <SText>{t('cookie-text')}</SText>
+          <SText>{t('cookieText')}</SText>
           <SInlineSVG svg={cookieIcon} width='20px' height='20px' />
           <Link href='https://privacy.newnew.co'>
             <a
@@ -69,7 +69,7 @@ const Cookie = React.memo(() => {
               target='_blank'
               rel='noreferrer'
             >
-              <STextLink>{t('cookie-link')}</STextLink>
+              <STextLink>{t('cookieLink')}</STextLink>
             </a>
           </Link>
           <InlineSVG

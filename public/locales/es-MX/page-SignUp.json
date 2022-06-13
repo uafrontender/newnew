@@ -26,11 +26,10 @@
     "apple": "Continue with Apple ID",
     "facebook": "Continue with Facebook",
     "twitter": "Continue with Twitter",
-    "moreOptionsBtn": "Show more options",
     "orContinueWith": "or continue with",
     "email": "Email",
-    "signInBtn": "Sign up",
-    "logInBtn": "Log in"
+    "signInButton": "Sign up",
+    "logInButton": "Log in"
   },
   "error": {
     "emailInvalid": "Invalid address",

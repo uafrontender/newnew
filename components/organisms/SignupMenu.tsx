@@ -282,8 +282,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               >
                 <span>
                   {goal !== 'log-in'
-                    ? t('signUpOptions.signInBtn')
-                    : t('signUpOptions.logInBtn')}
+                    ? t('signUpOptions.signInButton')
+                    : t('signUpOptions.logInButton')}
                 </span>
               </EmailSignInButton>
             </motion.div>

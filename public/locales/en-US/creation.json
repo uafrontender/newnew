@@ -48,7 +48,7 @@
       "subTitle": {
         "votesInfo": "People will spend a minimum of $2 to vote",
         "floating": "Upload your video to preview it here",
-        "floating-processing": "Preview will be available after processing"
+        "floatingProcessing": "Preview will be available after processing"
       }
     },
     "modal": {
@@ -244,7 +244,7 @@
   },
   "tutorials": {
     "heroPopupCommon": {
-      "heroBtnText": "Let's go"
+      "heroButtonText": "Let's go"
     },
     "heroPopupAC": {
       "title": "Events",

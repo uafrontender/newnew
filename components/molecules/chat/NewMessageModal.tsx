@@ -225,7 +225,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       <SContainer>
         <SModal>
           <SModalHeader>
-            <SModalTitle>{t('modal.new-message.title')}</SModalTitle>
+            <SModalTitle>{t('modal.newMessage.title')}</SModalTitle>
             {!isMobile ? (
               <CloseModalButton handleClick={closeModal} />
             ) : (
@@ -240,7 +240,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             )}
           </SModalHeader>
           <SearchInput
-            placeholderText={t('modal.new-message.search-placeholder')}
+            placeholderText={t('modal.newMessage.searchPlaceholder')}
             bgColor={theme.colorsThemed.background.tertiary}
             fontSize='16px'
             style={{ marginBottom: '16px' }}

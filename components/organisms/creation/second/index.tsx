@@ -1160,7 +1160,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                           variant={3}
                           weight={600}
                         >
-                          {t('secondStep.block.subTitle.floating-processing')}
+                          {t('secondStep.block.subTitle.floatingProcessing')}
                         </SFloatingSubSectionDescription>
                       </SFloatingSubSection>
                     )
