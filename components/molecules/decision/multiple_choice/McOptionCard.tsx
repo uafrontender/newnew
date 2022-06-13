@@ -48,12 +48,12 @@ import { setUserTutorialsProgress } from '../../../../redux-store/slices/userSta
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
-import OptionMenu from '../OptionMenu';
+import OptionEllipseMenu from '../OptionEllipseMenu';
 import ReportModal, { ReportData } from '../../chat/ReportModal';
 import { reportEventOption } from '../../../../api/endpoints/report';
 import InlineSvg from '../../../atoms/InlineSVG';
 import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
-import OptionModal from '../OptionModal';
+import OptionEllipseModal from '../OptionEllipseModal';
 import McConfirmDeleteOptionModal from './moderation/McConfirmDeleteOptionModal';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
@@ -818,7 +818,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       )}
       {/* Ellipse modal */}
       {isMobile && (
-        <OptionModal
+        <OptionEllipseModal
           zIndex={12}
           isOpen={isEllipseMenuOpen}
           isMyOption={isSuggestedByMe}
@@ -831,7 +831,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         />
       )}
       {!isMobile && (
-        <OptionMenu
+        <OptionEllipseMenu
           xy={optionMenuX}
           isVisible={isEllipseMenuOpen}
           isMyOption={isSuggestedByMe}

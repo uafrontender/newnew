@@ -159,10 +159,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { post_uuid } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'profile',
     'decision',
     'component-PostCard',
-    'payment-modal',
+    'modal-PaymentModal',
     'chat',
   ]);
 

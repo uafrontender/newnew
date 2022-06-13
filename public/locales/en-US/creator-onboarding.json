@@ -26,7 +26,7 @@
           "tooLong": "Firstname is too long",
           "tooShort": "Firstname is too short",
           "invalidChar": "Firstname has invalid characters",
-          "innappropriate": "Offensive words are forbidden",
+          "inappropriate": "Offensive words are forbidden",
           "linksForbidden": "Links not allowed"
         }
       },
@@ -37,7 +37,7 @@
           "tooLong": "Lastname is too long",
           "tooShort": "Lastname is too short",
           "invalidChar": "Lastname has invalid characters",
-          "innappropriate": "Offensive words are forbidden",
+          "inappropriate": "Offensive words are forbidden",
           "linksForbidden": "Links not allowed"
         }
       },
@@ -49,7 +49,7 @@
           "tooLong": "Username is too long",
           "tooShort": "Username is too short",
           "invalidChar": "Username has invalid characters",
-          "innappropriate": "Offensive words are forbidden",
+          "inappropriate": "Offensive words are forbidden",
           "taken": "This username is already taken. Try another one",
           "linksForbidden": "Links not allowed"
         },
@@ -66,7 +66,7 @@
           "tooLong": "Name is too long",
           "tooShort": "Name is too short",
           "invalidChar": "Name has invalid characters",
-          "innappropriate": "Offensive words are forbidden",
+          "inappropriate": "Offensive words are forbidden",
           "linksForbidden": "Links not allowed"
         }
       },
@@ -122,7 +122,7 @@
         "generic": "Please check input",
         "tooLong": "Bio is too long",
         "tooShort": "Bio is too short",
-        "innappropriate": "Offensive words are forbidden",
+        "inappropriate": "Offensive words are forbidden",
         "linksForbidden": "Links not allowed"
       }
     },

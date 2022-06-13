@@ -21,7 +21,7 @@ interface IOptionModal {
   handleOpenRemoveOptionModal?: () => void;
 }
 
-const OptionModal: React.FunctionComponent<IOptionModal> = ({
+const OptionEllipseModal: React.FunctionComponent<IOptionModal> = ({
   isOpen,
   zIndex,
   optionId,
@@ -32,7 +32,7 @@ const OptionModal: React.FunctionComponent<IOptionModal> = ({
   handleOpenReportOptionModal,
   handleOpenRemoveOptionModal,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('common');
 
   const [canDeleteOption, setCanDeleteOption] = useState(false);
   const [isCanDeleteOptionLoading, setIsCanDeleteOptionLoading] =
@@ -95,7 +95,7 @@ const OptionModal: React.FunctionComponent<IOptionModal> = ({
               }}
             >
               <Text variant={2} tone='error'>
-                {t('ellipse-option.delete-option')}
+                {t('ellipse.delete')}
               </Text>
             </SButton>
           )}
@@ -108,7 +108,7 @@ const OptionModal: React.FunctionComponent<IOptionModal> = ({
               }}
             >
               <Text variant={2} tone='error'>
-                {t('ellipse-option.report-option')}
+                {t('ellipse.report')}
               </Text>
             </SButton>
           )}
@@ -128,7 +128,7 @@ const OptionModal: React.FunctionComponent<IOptionModal> = ({
   );
 };
 
-OptionModal.defaultProps = {
+OptionEllipseModal.defaultProps = {
   optionId: undefined,
   optionCreatorUuid: undefined,
   optionType: undefined,
@@ -136,7 +136,7 @@ OptionModal.defaultProps = {
   handleOpenRemoveOptionModal: undefined,
 };
 
-export default OptionModal;
+export default OptionEllipseModal;
 
 const SWrapper = styled.div`
   width: 100%;

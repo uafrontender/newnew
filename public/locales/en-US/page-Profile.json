@@ -1,34 +1,73 @@
 {
-  "meta": {
-    "title": "NewNew Profile Page",
-    "description": "Customize your NewNew profile with username, display name, bio and more"
-  },
-  "subscribed-tag": "SUBSCRIBED",
-  "ellipse": {
-    "unsub": "Unsubscribe",
-    "report": "Report",
-    "block": "Block",
-    "unblock": "Unblock"
-  },
-  "modal": {
-    "block-user": {
-      "title": "Block user",
-      "message-first-part": "Do you really want to block",
-      "message-second-part": "?",
-      "button-cancel": "Cancel",
-      "button-confirm": "Block user"
+  "Active": {
+    "meta": {
+      "title": "NewNew Profile Page",
+      "description": "Customize your NewNew profile with username, display name, bio and more"
     },
-    "unsubscribe-user": {
-      "title": "Unsubscribe from creator",
-      "message": "Do you really want to unsubscribe from {{username}}?",
-      "button-cancel": "Cancel",
-      "button-confirm": "Unsubscribe"
+    "noContent": {
+      "description": "Posts you’re actively bidding on, voting\non, or backing will be shown here"
+    }
+  },
+  "MyPosts": {
+    "meta": {
+      "title": "My NewNew Posts",
+      "description": "Re-watch all of the posts you created on NewNew for the audience"
     },
-    "delete-my-account": {
-      "title": "Delete my account",
-      "body": "Are you sure you want to delete your account?\nYou won’t be able to access your account in the future\nand all of your history will be erased.",
-      "button-confirm": "Delete my account",
-      "button-cancel": "Cancel"
+    "noContent": {
+      "description": "Posts you created will be shown here"
+    }
+  },
+  "Purchases": {
+    "meta": {
+      "title": "My NewNew Purchases",
+      "description": "See what you buy on NewNew"
+    },
+    "noContent": {
+      "description": "Any purchases you make\nwill be shown here"
+    }
+  },
+  "ViewingHistory": {
+    "meta": {
+      "title": "NewNew History",
+      "description": "History of all posts you have ever visited on NewNew"
+    },
+    "noContent": {
+      "description": "All posts you previewed\nwill be kept here in your history"
+    }
+  },
+  "Subscriptions": {
+    "meta": {
+      "title": "NewNew Subscriptions",
+      "description": "Edit name, username, bio, profile photo and more in NewNew settings"
+    },
+    "noContent": {
+      "description": "You’re not subscribed\nto any creators yet"
+    }
+  },
+  "Favorites": {
+    "meta": {
+      "title": "NewNew Favorites",
+      "description": "Browse through all of your saved favorite posts, decisions and creators"
+    },
+    "noContent": {
+      "description": "Any creators you favorite\nwill be shown here"
+    }
+  },
+  "CreatorsDecisions": {
+    "noContent": {
+      "description": "Posts from the creator will be shown here"
+    }
+  },
+  "UserProfile": {
+    "noContent": {
+      "description": "{{username}} has no activity yet.",
+      "suggestion": "Explore what's new",
+      "button": "Explore"
+    }
+  },
+  "Activity": {
+    "noContent": {
+      "description": "Any creators activity will be shown here"
     }
   },
   "tabs": {
@@ -41,16 +80,36 @@
     "userInitial": "Posts",
     "activity": "Activity"
   },
-  "posts-filter": {
-    "decisions": "decisions",
-    "no-decisions": "No decisions yet",
-    "filter-0": "All",
-    "filter-1": "Auctions",
-    "filter-2": "Crowdfunding",
-    "filter-3": "Multiple choices"
+  "accountPrivate": "{{username}}'s activity is private",
+  "subscribed-tag": "SUBSCRIBED",
+  "modal": {
+    "blockUser": {
+      "title": "Block user",
+      "messageFirstPart": "Do you really want to block",
+      "messageSecondPart": "?",
+      "button:": {
+        "cancel": "Cancel",
+        "confirm": "Block user"
+      }
+    },
+    "unsubscribeUser": {
+      "title": "Unsubscribe from creator",
+      "message": "Do you really want to unsubscribe from {{username}}?",
+      "button": {
+        "cancel": "Cancel",
+        "confirm": "Unsubscribe"
+      }
+    },
+    "deleteMyAccount": {
+      "title": "Delete my account",
+      "body": "Are you sure you want to delete your account?\nYou won’t be able to access your account in the future\nand all of your history will be erased.",
+      "button": {
+        "confirm": "Delete my account",
+        "cancel": "Cancel"
+      }
+    }
   },
-  "AccountPrivate": "{{username}}'s activity is private",
-  "ProfileLayout": {
+  "profileLayout": {
     "headerButtons": {
       "edit": "Edit Profile",
       "settings": "Settings"
@@ -62,15 +121,14 @@
       "copied": "Link copied!"
     }
   },
-  "EditProfileMenu": {
-    "goBackBtn": {
-      "general": "Edit profile",
-      "profilePicture": "Edit Profile Image"
+  "editProfileMenu": {
+    "button": {
+      "backToProfile": "Edit profile",
+      "backToImage": "Edit Profile Image",
+      "save": "Save changes",
+      "cancel": "Cancel"
     },
     "confirmationWindow": "Closing will discard changes. Are you sure you want to leave?",
-    "saveButton": "Save changes",
-    "cancelButton": "Cancel",
-    "dragToReposition": "Drag to reposition image",
     "inputs": {
       "coverImage": {
         "changeCoverImage": "Change cover image"
@@ -82,7 +140,7 @@
           "tooLong": "Name is too long",
           "tooShort": "Name is too short",
           "invalidChar": "Name has invalid characters",
-          "innappropriate": "Offensive words are forbidden",
+          "inappropriate": "Offensive words are forbidden",
           "linksForbidden": "Links not allowed"
         }
       },
@@ -95,7 +153,7 @@
           "tooLong": "Username is too long",
           "tooShort": "Username is too short",
           "invalidChar": "Username has invalid characters",
-          "innappropriate": "Offensive words are forbidden",
+          "inappropriate": "Offensive words are forbidden",
           "taken": "Username is taken",
           "linksForbidden": "Links not allowed"
         },
@@ -115,7 +173,7 @@
           "generic": "Please check input",
           "tooLong": "Bio is too long",
           "tooShort": "Bio is too short",
-          "innappropriate": "Offensive words are forbidden",
+          "inappropriate": "Offensive words are forbidden",
           "linksForbidden": "No links allowed in bio"
         }
       }
@@ -127,7 +185,9 @@
       "description": "Customize your NewNew profile and settings"
     },
     "heading": "Settings",
-    "goBackBtn": "Back",
+    "button": {
+      "back": "Back"
+    },
     "colorModeSwitch": {
       "options": {
         "light": "Light",
@@ -136,24 +196,21 @@
       }
     },
     "sections": {
-      "Wallet": {
-        "empty": {
-          "balance": "My balance",
-          "caption": "Add funds to vote and bid without any fees",
-          "topUpBtn": "Add funds"
+      "wallet": {
+        "balance": "My balance",
+        "caption": "Add funds to vote and bid without any fees",
+        "button": {
+          "topUp": "Add funds"
         },
-        "non-empty": {
-          "balance": "My balance",
-          "topUpBtn": "Add funds"
-        },
-        "TopUpWalletModal": {
+        "topUpWalletModal": {
           "heading": "Add funds",
-          "checkoutButtonMobile": "Checkout",
-          "checkoutButtonDesktop": "Checkout",
-          "cancelButtonDesktop": "Cancel"
+          "button": {
+            "checkout": "Checkout",
+            "cancel": "Cancel"
+          }
         }
       },
-      "PersonalInformation": {
+      "personalInformation": {
         "title": "Personal information",
         "emailInput": {
           "label": "Email Address",
@@ -171,19 +228,19 @@
           "captions": {
             "twoTimesOnly": "Birthday can be changed 2 times only",
             "cannotChange": "You can only change this once"
-          },
-          "saveBtn": "Save",
-          "cancelBtn": "Cancel"
+          }
         },
-        "saveBtn": "Save changes",
-        "cancelBtn": "Cancel"
+        "button": {
+          "save": "Save changes",
+          "cancel": "Cancel"
+        }
       },
-      "Notifications": {
+      "notifications": {
         "title": "Notifications",
         "email": "Email Notifications",
         "push": "Push Notifications"
       },
-      "Transactions": {
+      "transactions": {
         "title": "Transactions",
         "you": "You",
         "type": {
@@ -200,7 +257,7 @@
           "5": "subscribed to"
         }
       },
-      "Privacy": {
+      "privacy": {
         "title": "Privacy",
         "privacySubsections": {
           "spendings": {
@@ -212,89 +269,25 @@
             "caption": "People will not be able to see any of your activity on events, superpolls and goals"
           }
         },
-        "blockedusers": {
+        "blockedUsers": {
           "title": "Blocked users",
-          "unblockBtn": "Unblock",
-          "no_blocked_users": "No blocked users"
+          "noBlockedUsers": "No blocked users",
+          "button": {
+            "unblock": "Unblock"
+          }
         },
         "closeAccount": {
           "title": "Delete my account",
           "caption": "Delete your account and account data.",
-          "closeBtn": "Delete"
+          "button": {
+            "delete": "Delete"
+          }
         }
       }
     },
     "bottomDiv": {
-      "languageTitle": "Choose language",
       "help": "Help",
       "logout": "Log out"
-    }
-  },
-  "MyPosts": {
-    "meta": {
-      "title": "My NewNew Posts",
-      "description": "Re-watch all of the posts you created on NewNew for the audience"
-    },
-    "no-content": {
-      "description": "Posts you created will be shown here"
-    }
-  },
-  "Active": {
-    "no-content": {
-      "description": "Posts you’re actively bidding on, voting\non, or backing will be shown here"
-    }
-  },
-  "Purchases": {
-    "meta": {
-      "title": "My NewNew Purchases",
-      "description": "See what you buy on NewNew"
-    },
-    "no-content": {
-      "description": "Any purchases you make\nwill be shown here"
-    }
-  },
-  "Viewing-history": {
-    "meta": {
-      "title": "NewNew History",
-      "description": "History of all posts you have ever visited on NewNew"
-    },
-    "no-content": {
-      "description": "All posts you previewed\nwill be kept here in your history"
-    }
-  },
-  "Subscriptions": {
-    "meta": {
-      "title": "NewNew Subscriptions",
-      "description": "Edit name, username, bio, profile photo and more in NewNew settings"
-    },
-    "no-content": {
-      "description": "You’re not subscribed\nto any creators yet"
-    }
-  },
-  "Favorites": {
-    "meta": {
-      "title": "NewNew Favorites",
-      "description": "Browse through all of your saved favorite posts, decisions and creators"
-    },
-    "no-content": {
-      "description": "Any creators you favorite\nwill be shown here"
-    }
-  },
-  "CreatorsDecisions": {
-    "no-content": {
-      "description": "Posts from the creator will be shown here"
-    }
-  },
-  "UserProfile": {
-    "no-content": {
-      "description": "{{username}} has no activity yet.",
-      "suggestion": "Explore what's new",
-      "button": "Explore"
-    }
-  },
-  "Activity": {
-    "no-content": {
-      "description": "Any creators activity will be shown here"
     }
   },
   "genderPronouns": {

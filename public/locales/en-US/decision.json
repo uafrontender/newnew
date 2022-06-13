@@ -120,19 +120,6 @@
     "body": "Checkout more like it.",
     "ctaButton": "See more"
   },
-  "ellipse": {
-    "follow-creator": "Favorite creator",
-    "unfollow-creator": "Unfavorite creator",
-    "follow-decision": "Favorite {{ postType }}",
-    "unfollow-decision": "Unfavorite {{ postType }}",
-    "report": "Report",
-    "deleteDecision": "Delete {{ postType }}",
-    "cancel": "Cancel"
-  },
-  "ellipse-option": {
-    "report-option": "Report",
-    "delete-option": "Delete"
-  },
   "PostVideo": {
     "tabs": {
       "announcement": "Decision",
@@ -233,8 +220,8 @@
   },
   "BlockUserModal": {
     "title": "Block user",
-    "message-first-part": "Do you really want to block",
-    "message-second-part": "?",
+    "messageFirstPart": "Do you really want to block",
+    "messageSecondPart": "?",
     "button-cancel": "Cancel",
     "button-confirm": "Block user"
   },
@@ -519,12 +506,7 @@
         "confirmBtn": "Confirm favorite bid"
       },
       "OptionCard": {
-        "pickBtn": "Select",
-        "ellipse": {
-          "report": "Report bid",
-          "block": "Block user",
-          "remove": "Remove bid"
-        }
+        "pickBtn": "Select"
       }
     },
     "WinnerTab": {
@@ -543,15 +525,6 @@
     }
   },
   "McPostModeration": {
-    "OptionsTab": {
-      "OptionCard": {
-        "ellipse": {
-          "report": "Report option",
-          "block": "Block user",
-          "remove": "Remove option"
-        }
-      }
-    },
     "WinnerTab": {
       "WinnerOptionCard": {
         "voters_told_you": "voters told you to",
@@ -692,7 +665,7 @@
       "generic": "Please check input",
       "tooLong": "Comment is too long",
       "tooShort": "Comment is too short",
-      "innappropriate": "Offensive words are forbidden",
+      "inappropriate": "Offensive words are forbidden",
       "linksForbidden": "No links allowed in comments"
     }
   },

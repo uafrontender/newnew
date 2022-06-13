@@ -28,7 +28,7 @@ interface IOptionMenu {
   handleOpenRemoveOptionModal?: () => void;
 }
 
-const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
+const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
   xy,
   isVisible,
   isMyOption,
@@ -39,7 +39,7 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
   handleOpenReportOptionModal,
   handleOpenRemoveOptionModal,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
 
   useOnClickEsc(containerRef, handleClose);
@@ -128,7 +128,7 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
                   disabled={!canDeleteOption || isCanDeleteOptionLoading}
                 >
                   <Text variant={3} tone='error'>
-                    {t('ellipse-option.delete-option')}
+                    {t('ellipse.delete')}
                   </Text>
                 </SButton>
               )}
@@ -140,7 +140,7 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
                   }}
                 >
                   <Text variant={3} tone='error'>
-                    {t('ellipse-option.report-option')}
+                    {t('ellipse.report')}
                   </Text>
                 </SButton>
               )}
@@ -155,7 +155,7 @@ const OptionMenu: React.FunctionComponent<IOptionMenu> = ({
   return null;
 };
 
-export default OptionMenu;
+export default OptionEllipseMenu;
 
 const SContainer = styled(motion.div)`
   position: absolute;
