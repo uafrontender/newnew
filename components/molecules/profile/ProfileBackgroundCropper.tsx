@@ -39,7 +39,7 @@ const ProfileBackgroundCropper: React.FunctionComponent<TProfileBackgroundCroppe
     onCropComplete,
     onZoomChange,
   }) => {
-    const { t } = useTranslation('profile');
+    const { t } = useTranslation('common');
     const { ui } = useAppSelector((state) => state);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       ui.resizeMode
@@ -59,7 +59,7 @@ const ProfileBackgroundCropper: React.FunctionComponent<TProfileBackgroundCroppe
         onTouchCancel={() => handleSetUnpressed()}
       >
         <DragToRepositionLabel
-          text={t('EditProfileMenu.dragToReposition')}
+          text={t('dragToReposition')}
           top='40px'
           customZ={1}
           isPressed={disabled ?? isPressed}

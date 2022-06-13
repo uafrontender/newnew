@@ -44,7 +44,7 @@ const findActiveTab = (
 
 const ProfileTabs: React.FunctionComponent<IProfileTabs> = (props) => {
   const { tabs, pageType } = props;
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
   const router = useRouter();
 
   return (

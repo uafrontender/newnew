@@ -98,7 +98,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   postsCachedMyPostsPageToken,
   children,
 }) => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -525,7 +525,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     }
 
     // eslint-disable-next-line no-alert
-    const result = window.confirm(t('EditProfileMenu.confirmationWindow'));
+    const result = window.confirm(t('editProfileMenu.confirmationWindow'));
     if (result) {
       handleCloseEditProfileMenu();
     }
@@ -586,7 +586,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                 width={isMobileOrTablet ? '16px' : '24px'}
                 height={isMobileOrTablet ? '16px' : '24px'}
               />
-              {isMobileOrTablet ? null : t('ProfileLayout.headerButtons.edit')}
+              {isMobileOrTablet ? null : t('profileLayout.headerButtons.edit')}
             </SButton>
             <SButton
               view='transparent'
@@ -602,7 +602,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               />
               {isMobileOrTablet
                 ? null
-                : t('ProfileLayout.headerButtons.settings')}
+                : t('profileLayout.headerButtons.settings')}
             </SButton>
           </ProfileBackground>
           <SBackButton
@@ -658,7 +658,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                 onClick={() => handleCopyLink()}
               >
                 {isCopiedUrl ? (
-                  t('ProfileLayout.buttons.copied')
+                  t('profileLayout.buttons.copied')
                 ) : (
                   <InlineSvg
                     svg={ShareIconFilled}

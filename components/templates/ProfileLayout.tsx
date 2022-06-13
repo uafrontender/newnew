@@ -42,7 +42,7 @@ import { markUser } from '../../api/endpoints/user';
 
 import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
 import UserEllipseModal from '../molecules/profile/UserEllipseModal';
-import BlockUserModal from '../molecules/profile/BlockUserModalProfile';
+import BlockUserModalProfile from '../molecules/profile/BlockUserModalProfile';
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
@@ -80,7 +80,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 }) => {
   const router = useRouter();
   const theme = useTheme();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -479,7 +479,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 height={isMobileOrTablet ? '16px' : '24px'}
               />
             </SSVGContainer>
-            {t('ProfileLayout.buttons.favorites')}
+            {t('profileLayout.buttons.favorites')}
           </SFavoritesButton> */}
           <SMoreButton
             view='transparent'
@@ -494,7 +494,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 height={isMobileOrTablet ? '16px' : '24px'}
               />
             </SSVGContainer>
-            {t('ProfileLayout.buttons.more')}
+            {t('profileLayout.buttons.more')}
           </SMoreButton>
           {!isMobile && (
             <UserEllipseMenu
@@ -560,7 +560,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 onClick={() => handleCopyLink()}
               >
                 {isCopiedUrl ? (
-                  t('ProfileLayout.buttons.copied')
+                  t('profileLayout.buttons.copied')
                 ) : (
                   <InlineSvg
                     svg={ShareIconFilled}
@@ -580,7 +580,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 }
               >
                 <SSendButton withShadow view='primaryGrad'>
-                  {t('ProfileLayout.buttons.sendMessage')}
+                  {t('profileLayout.buttons.sendMessage')}
                 </SSendButton>
               </Link>
             ) : null}
@@ -623,7 +623,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         user={user}
         closeModal={() => setUnsubscribeModalOpen(false)}
       />
-      <BlockUserModal
+      <BlockUserModalProfile
         confirmBlockUser={blockUserModalOpen}
         user={user}
         closeModal={() => setBlockUserModalOpen(false)}
