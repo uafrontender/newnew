@@ -19,7 +19,7 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
   isVisible,
   closeModal,
 }) => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
   const dispatch = useAppDispatch();
 
   async function deleteUser() {
@@ -42,14 +42,14 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
     <Modal show={isVisible} onClose={closeModal}>
       <SContainer>
         <SModal onClick={(e) => e.stopPropagation()}>
-          <SModalTitle>{t('modal.delete-my-account.title')}</SModalTitle>
-          <SModalMessage>{t('modal.delete-my-account.body')}</SModalMessage>
+          <SModalTitle>{t('modal.deleteMyAccount.title')}</SModalTitle>
+          <SModalMessage>{t('modal.deleteMyAccount.body')}</SModalMessage>
           <SModalButtons>
             <SConfirmButton onClick={handleConfirmClick}>
-              {t('modal.delete-my-account.button-confirm')}
+              {t('modal.deleteMyAccount.button.confirm')}
             </SConfirmButton>
             <SCancelButton onClick={closeModal}>
-              {t('modal.delete-my-account.button-cancel')}
+              {t('modal.deleteMyAccount.button.cancel')}
             </SCancelButton>
           </SModalButtons>
         </SModal>

@@ -47,8 +47,8 @@ const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
         <SModal>
           <SModalTitle>{t('BlockUserModal.title')}</SModalTitle>
           <SModalMessage>
-            {t('BlockUserModal.message-first-part')} {getDisplayname(user)}{' '}
-            {t('BlockUserModal.message-second-part')}
+            {t('BlockUserModal.messageFirstPart')} {getDisplayname(user)}{' '}
+            {t('BlockUserModal.messageSecondPart')}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>
