@@ -62,11 +62,19 @@ const SearchInput: React.FC = React.memo(() => {
   const handleInputChange = (e: any) => {
     setSearchValue(e.target.value);
   };
+
   const handleKeyDown = (e: any) => {
     if (e.keyCode === 27) {
       handleSearchClose();
     }
+
+    if (e.keyCode === 13 && searchValue) {
+      setIsResultsDropVisible(false);
+      router.push(`/search?query=${searchValue}&tab=decisions`);
+      setSearchValue('');
+    }
   };
+
   const handleSubmit = () => {};
   const handleCloseIconClick = () => {
     if (searchValue) {
