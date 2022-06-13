@@ -312,13 +312,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       </SWrapper>
       {postStatus === 'failed' && (
         <PostFailedBox
-          title={t('PostFailedBox.title', {
+          title={t('postFailedBox.title', {
             postType: t(`postType.${postType}`),
           })}
-          body={t(`PostFailedBox.reason.${failureReason}`, {
+          body={t(`postFailedBox.reason.${failureReason}`, {
             creator: getDisplayname(creator),
           })}
-          buttonCaption={t('PostFailedBox.buttonText', {
+          buttonCaption={t('postFailedBox.buttonText', {
             postTypeMultiple: t(`postType.multiple.${postType}`),
           })}
           imageSrc={

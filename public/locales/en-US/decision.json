@@ -72,7 +72,7 @@
     },
     "buttonText": "New {{ postType }}"
   },
-  "PostFailedBox": {
+  "postFailedBox": {
     "title": "This {{ postType }} is canceled",
     "reason": {
       "no-response": "{{ creator }} didn't post a response video in time",
@@ -218,7 +218,7 @@
     "cancelButton": "Cancel",
     "confirmButton": "Delete"
   },
-  "BlockUserModal": {
+  "blockUserModal": {
     "title": "Block user",
     "messageFirstPart": "Do you really want to block",
     "messageSecondPart": "?",
@@ -233,7 +233,7 @@
     "winner": "Winner",
     "history": "History"
   },
-  "PostViewProcessingAnnouncement": {
+  "postViewProcessingAnnouncement": {
     "stayTuned": {
       "ac": "This Event will begin once the video \nhas been processed",
       "mc": "This Superpoll will begin once the video \nhas been processed",
