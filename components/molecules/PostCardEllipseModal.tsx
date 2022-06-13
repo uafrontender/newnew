@@ -173,7 +173,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
                 }}
               >
                 <Text variant={3} tone='error'>
-                  {t('ellipse.report')}
+                  {t('ellipseMenu.report')}
                 </Text>
               </SButton>
             </>

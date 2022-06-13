@@ -201,7 +201,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
                     }}
                   >
                     <Text variant={3} tone='error'>
-                      {t('ellipse.report')}
+                      {t('ellipseMenu.report')}
                     </Text>
                   </SButton>
                 </>
