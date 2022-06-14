@@ -735,7 +735,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
         {post.isCommentsAllowed && (
           <SCommentsSection id='comments' ref={commentsSectionRef}>
             <SCommentsHeadline variant={4}>
-              {t('SuccessCommon.Comments.heading')}
+              {t('successCommon.comments.heading')}
             </SCommentsHeadline>
             <CommentsBottomSection
               postUuid={post.postUuid}

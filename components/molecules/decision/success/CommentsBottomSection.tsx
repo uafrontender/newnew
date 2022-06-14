@@ -153,6 +153,8 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
           if (!res.data || res.error)
             throw new Error(res.error?.message ?? 'Request failed');
 
+          console.log(res.data);
+
           if (res.data && res.data.messages) {
             setComments((curr) => {
               const workingArr = [
@@ -405,7 +407,7 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
     }, []);
 
     useEffect(() => {
-      async function findCommentById(id: string) {
+      async function findComment() {
         const flat: TCommentWithReplies[] = [];
         for (let i = 0; i < comments.length; i++) {
           if (
@@ -418,19 +420,23 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
           flat.push(comments[i]);
         }
 
-        const idx = flat.findIndex((comment) => comment.id === parseInt(id));
+        const idx = flat.findIndex(
+          (comment) => comment.id === parseInt(commentIdFromUrl as string)
+        );
 
-        if (idx === -1 && commentsNextPageToken) {
-          console.log('Looking further');
-          if (isMobile) {
+        if (idx === -1) {
+          // console.log('Looking further');
+          scrollRef.current?.scrollIntoView();
+
+          if (isMobile && commentsNextPageToken && !commentsLoading) {
             await fetchComments(commentsNextPageToken);
           } else {
             scrollRef.current?.scrollBy({
               top: scrollRef.current.scrollHeight,
             });
           }
-        } else if (idx !== -1) {
-          console.log('Found the comment');
+        } else {
+          // console.log('Found the comment');
 
           if (!flat[idx].parentId || flat[idx].parentId === 0) {
             const offset = (
@@ -477,17 +483,23 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
                   ?.classList.add('opened-flash');
               }, 200);
             }
-            handleResetCommentIdFromUrl?.();
           }
+
           handleResetCommentIdFromUrl?.();
         }
       }
 
       if (commentIdFromUrl) {
-        findCommentById(commentIdFromUrl);
+        findComment();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [commentIdFromUrl, commentsNextPageToken, comments, isMobile]);
+    }, [
+      commentIdFromUrl,
+      comments,
+      isMobile,
+      commentsNextPageToken,
+      commentsLoading,
+    ]);
 
     return (
       <>
