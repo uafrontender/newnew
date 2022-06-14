@@ -77,17 +77,15 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
           />
         </SImgContainer>
         {!isMobile && (
-          <STitle variant={6}>
-            {t(`PostScheduled.PostScheduledSection.${variant}.title`)}
-          </STitle>
+          <STitle variant={6}>{t(`postScheduled.${variant}.title`)}</STitle>
         )}
         <SSubtitle1 variant={2}>
-          {t(`PostScheduled.PostScheduledSection.${variant}.subtitle_1`, {
+          {t(`postScheduled.${variant}.subtitle_1`, {
             postType: t(`postType.${postType}`),
           })}
         </SSubtitle1>
         <SSubtitle2 variant={2}>
-          {t(`PostScheduled.PostScheduledSection.${variant}.subtitle_2`)}
+          {t(`postScheduled.${variant}.subtitle_2`)}
         </SSubtitle2>
       </SHeadingContainer>
       <STimer>
@@ -95,27 +93,27 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
           <STimerItem>
             <STimerTime>{parsedSeconds.days}</STimerTime>
             <STimerCaption variant={3}>
-              {t(`PostScheduled.PostScheduledSection.${variant}.timer.days`)}
+              {t(`postScheduled.${variant}.timer.days`)}
             </STimerCaption>
           </STimerItem>
         )}
         <STimerItem>
           <STimerTime>{parsedSeconds.hours}</STimerTime>
           <STimerCaption variant={3}>
-            {t(`PostScheduled.PostScheduledSection.${variant}.timer.hours`)}
+            {t(`postScheduled.${variant}.timer.hours`)}
           </STimerCaption>
         </STimerItem>
         <STimerItem>
           <STimerTime>{parsedSeconds.minutes}</STimerTime>
           <STimerCaption variant={3}>
-            {t(`PostScheduled.PostScheduledSection.${variant}.timer.minutes`)}
+            {t(`postScheduled.${variant}.timer.minutes`)}
           </STimerCaption>
         </STimerItem>
         {parsedSeconds.days === '00' && (
           <STimerItem>
             <STimerTime>{parsedSeconds.seconds}</STimerTime>
             <STimerCaption variant={3}>
-              {t(`PostScheduled.PostScheduledSection.${variant}.timer.seconds`)}
+              {t(`postScheduled.${variant}.timer.seconds`)}
             </STimerCaption>
           </STimerItem>
         )}
@@ -123,10 +121,10 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
       {/* {variant === 'decision' && (
         <SCTAButton view='primaryGrad' onClick={() => handleFollowDecision()}>
           {!isFollowing
-            ? t(`PostScheduled.PostScheduledSection.${variant}.followBtn`, {
+            ? t(`postScheduled.${variant}.followButton`, {
                 postType: t(`postType.${postType}`),
               })
-            : t(`PostScheduled.PostScheduledSection.${variant}.unfollowBtn`, {
+            : t(`postScheduled.${variant}.unFollowButton`, {
                 postType: t(`postType.${postType}`),
               })}
         </SCTAButton>

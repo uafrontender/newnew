@@ -18,7 +18,7 @@ const CfMakeStandardPledgeCard: React.FunctionComponent<ICfMakeStandardPledgeCar
       <SStandardPledgeCard onClick={() => handleOpenMakePledgeForm()}>
         {/* {grandsVipStatus ? (
         <SAdditionalLabel>
-          { t('CfPost.BackersTab.free_sub') }
+          { t('cfPost.backersTab.freeSub') }
         </SAdditionalLabel>
       ) : (
         <SCoinImg

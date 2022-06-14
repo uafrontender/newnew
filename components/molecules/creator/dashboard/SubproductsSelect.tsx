@@ -140,12 +140,12 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
               }
             >
               <Button view='quaternary'>
-                {t('SubrateSection.backButton')}
+                {t('subRateSection.button.back')}
               </Button>
             </Link>
             {!mySubscriptionProduct ? (
               <Button view='primaryGrad' onClick={() => handlerConfirmEnable()}>
-                {t('SubrateSection.submitDesktop')}
+                {t('subRateSection.button.enable')}
               </Button>
             ) : (
               <Button
@@ -156,7 +156,7 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
                 }
                 onClick={() => handlerUpdateRate()}
               >
-                {t('SubrateSection.updateRate')}
+                {t('subRateSection.button.update')}
               </Button>
             )}
           </SActions>
@@ -268,7 +268,7 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
               </SPrice>
             )}
             <SPerMonth variant={2} selected={selected ?? false}>
-              {t('SubrateSection.selectInput.perMonth')}
+              {t('subRateSection.selectInput.perMonth')}
             </SPerMonth>
             {currentProduct && (
               <SLabelCurrent selected={selected ?? false}>
@@ -277,7 +277,7 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
             )}
           </>
         ) : (
-          <Text variant={2}>{t('SubrateSection.selectInput.noProduct')}</Text>
+          <Text variant={2}>{t('subRateSection.selectInput.noProduct')}</Text>
         )}
       </SLabelContent>
     </SProductOption>

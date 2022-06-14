@@ -33,7 +33,7 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
   ({ hideOnboardingHeader, children }) => {
     const theme = useTheme();
     const router = useRouter();
-    const { t } = useTranslation('creator-onboarding');
+    const { t } = useTranslation('page-CreatorOnboarding');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -42,12 +42,12 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
 
     const SideTextSwitch = () => {
       if (router.pathname.includes('creator-onboarding-stripe')) {
-        return 'StripeSection';
+        return 'titleSetUpStripe';
       }
       if (router.pathname.includes('creator-onboarding-subrate')) {
-        return 'SubrateSection';
+        return 'subRateSection';
       }
-      return 'DetailsSection';
+      return 'detailsSection';
     };
 
     return (

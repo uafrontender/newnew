@@ -827,7 +827,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             isVisible={paymentSuccesModalOpen}
             closeModal={() => setPaymentSuccesModalOpen(false)}
           >
-            {t('PaymentSuccessModal.mc', {
+            {t('paymentSuccessModal.mc', {
               postCreator:
                 (post.creator?.nickname as string) ?? post.creator?.username,
               postDeadline: moment(

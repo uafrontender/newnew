@@ -76,7 +76,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
       }
     }
     countdownsrt = `${countdownsrt} ${t(
-      'dashboard.expirationPosts.expiresTime.left_to_respond'
+      'dashboard.expirationPosts.expiresTime.leftToRespond'
     )}`;
     return countdownsrt;
   };

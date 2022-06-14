@@ -342,8 +342,8 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                       : 0
                   } ${
                     chatRoom.memberCount && chatRoom.memberCount > 1
-                      ? t('new-announcement.members')
-                      : t('new-announcement.member')
+                      ? t('newAnnouncement.members')
+                      : t('newAnnouncement.member')
                   }`}
             </SUserAlias>
           </SUserData>

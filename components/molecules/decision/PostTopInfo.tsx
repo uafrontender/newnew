@@ -205,15 +205,15 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         {postType === 'ac' && amountInBids ? (
           <SBidsAmount>
             <span>${formatNumber(amountInBids / 100 ?? 0, true)}</span>{' '}
-            {t('AcPost.PostTopInfo.in_bids')}
+            {t('acPost.postTopInfo.inBids')}
           </SBidsAmount>
         ) : null}
         {postType === 'mc' && totalVotes ? (
           <SBidsAmount>
             <span>{formatNumber(totalVotes, true).replaceAll(/,/g, ' ')}</span>{' '}
             {totalVotes > 1
-              ? t('McPost.PostTopInfo.votes')
-              : t('McPost.PostTopInfo.vote')}
+              ? t('mcPost.postTopInfo.votes')
+              : t('mcPost.postTopInfo.vote')}
           </SBidsAmount>
         ) : null}
         <CreatorCard>
@@ -301,10 +301,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         {showSelectingWinnerOption ? (
           <SSelectingWinnerOption>
             <SHeadline variant={4}>
-              {t('AcPost.PostTopInfo.SelectWinner.title')}
+              {t('acPost.postTopInfo.selectWinner.title')}
             </SHeadline>
             <SText variant={3}>
-              {t('AcPost.PostTopInfo.SelectWinner.body')}
+              {t('acPost.postTopInfo.selectWinner.body')}
             </SText>
             <STrophyImg src={assets.decision.trophy} />
           </SSelectingWinnerOption>
@@ -312,13 +312,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       </SWrapper>
       {postStatus === 'failed' && (
         <PostFailedBox
-          title={t('PostFailedBox.title', {
+          title={t('postFailedBox.title', {
             postType: t(`postType.${postType}`),
           })}
-          body={t(`PostFailedBox.reason.${failureReason}`, {
+          body={t(`postFailedBox.reason.${failureReason}`, {
             creator: getDisplayname(creator),
           })}
-          buttonCaption={t('PostFailedBox.ctaButton', {
+          buttonCaption={t('postFailedBox.buttonText', {
             postTypeMultiple: t(`postType.multiple.${postType}`),
           })}
           imageSrc={

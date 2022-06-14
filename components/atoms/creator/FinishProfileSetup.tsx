@@ -58,7 +58,7 @@ export const FinishProfileSetup = () => {
         </SImageWrapper>
         <SDescriptionWrapper>
           <SDescription variant={2} weight={600}>
-            {t('dashboard.earnings.todosIssue.text')}
+            {t('dashboard.earnings.toDosIssue.text')}
           </SDescription>
         </SDescriptionWrapper>
       </SCashOutTopBlock>
@@ -73,7 +73,7 @@ export const FinishProfileSetup = () => {
       >
         <a>
           <SButton view='primaryGrad'>
-            {t('dashboard.earnings.todosIssue.btnText')}
+            {t('dashboard.earnings.toDosIssue.btnText')}
           </SButton>
         </a>
       </Link>

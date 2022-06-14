@@ -5,39 +5,37 @@
   "chat": {
     "today": "Today",
     "placeholder": "Type a message...",
-    "welcome-message": "You successfully subscribed! Now you can send a message to",
-    "no-messages-first-line": "No messages here yet...",
-    "no-messages-second-line": "Send a message to start conversation.",
-    "select-chat": "Select a chat to start messaging",
-    "typing": "Typing...",
-    "default-first-message": "👋 Hey, thank you for subscribing to my channel, I look forward to talking to you."
+    "welcomeMessage": "You successfully subscribed! Now you can send a message to",
+    "noMessagesFirstLine": "No messages here yet...",
+    "noMessagesSecondLine": "Send a message to start conversation.",
+    "typing": "Typing..."
   },
-  "user-blocked": {
+  "userBlocked": {
     "title": "You blocked ",
     "message": "Unblock them to chat. Don’t worry, they can’t see that you blocked them...",
-    "button-text": "Unblock"
+    "buttonText": "Unblock"
   },
-  "group-blocked": {
+  "groupBlocked": {
     "title": "Group blocked",
     "message": "Unblock the group, to continue conversation.",
-    "button-text": "Unblock"
+    "buttonText": "Unblock"
   },
-  "subscription-expired": {
+  "subscriptionExpired": {
     "title": "Subscription expired",
     "message": "Only subscribers can send messages. Renew subscription.",
-    "button-text": "Renew subscription"
+    "buttonText": "Renew subscription"
   },
-  "messaging-disabled": {
+  "messagingDisabled": {
     "title": "Messaging turned off",
     "message": " temporarily turned off their subscription. Check back soon!"
   },
-  "account-deleted": {
+  "accountDeleted": {
     "title": "Account deleted",
     "message": "Account is no longer available.",
-    "button-text": "Delete chat"
+    "buttonText": "Delete chat"
   },
   "toolbar": {
-    "search-placeholder": "Search for messages or users"
+    "searchPlaceholder": "Search for messages or users"
   },
   "modal": {
     "blockUser": {
@@ -55,45 +53,19 @@
         "confirm": "Block group"
       }
     },
-    "report-user": {
-      "title": "Report",
-      "subtitle": "Help us understand the problem. Please select a reason.",
-      "options": {
-        "spam": "Suspicious or spam",
-        "abuse": "Abusive or harmful",
-        "suicide": "Expresses intentions of self-harm or suicide",
-        "hate-speech": "Hate speech",
-        "harassment": "Harassment or bullying"
-      },
-      "additional-info": {
-        "label": "Additional info (optional)",
-        "placeholder": "Tell us more about the problem"
-      },
-      "button-cancel": "Cancel",
-      "button-confirm": "Report user",
-      "button-confirm-group": "Report group"
-    },
-    "delete-group": {
-      "title": "Delete group",
-      "messageFirstPart": "Do you really want to delete",
-      "messageSecondPart": "group? You will not be able to undo this action.",
-      "button-cancel": "Keep it",
-      "button-confirm": "Delete permanently"
-    },
-    "new-message": {
+    "newMessage": {
       "title": "New message",
-      "search-placeholder": "Search",
-      "no-results-title": "No results",
-      "no-results-text": "No results for",
-      "no-results-search-text": "Try a new name..."
+      "searchPlaceholder": "Search",
+      "noResultsText": "No results for",
+      "noResultsSearchText": "Try a new name..."
     },
-    "renewSubcriptionsSubtitle": "Renew subscription to"
+    "renewSubscriptionsSubtitle": "Renew subscription to"
   },
-  "empty-inbox": {
+  "emptyInbox": {
     "title": "Your inbox is empty",
     "text": "Once you start a new conversation, you’ll see it listed here"
   },
-  "new-announcement": {
+  "newAnnouncement": {
     "title": "New announcement",
     "text": "Only you can send messages to the group.",
     "created": "You created the announcement",
@@ -101,17 +73,14 @@
     "members": "members"
   },
   "default": {
-    "search-placeholder": "Search"
+    "searchPlaceholder": "Search"
   },
   "announcement": {
     "title": "'s announcement",
-    "top-message-start": "Only",
-    "top-message-end": "can send messages",
-    "bottom-message-first-line": "created the announcement.",
-    "bottom-message-second-line-start": "You and",
-    "bottom-message-second-line-end": "others joined it"
+    "topMessageStart": "Only",
+    "topMessageEnd": "can send messages"
   },
-  "usertypes": {
+  "userTypes": {
     "all": "All",
     "subscribers": "My Subscribers",
     "subscribing": "Creators"

@@ -185,7 +185,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                       : assets.creation.darkAcAnimated
                   }
                 >
-                  {t('AcPostSuccess.hero_text')}
+                  {t('acPostSuccess.heroText')}
                 </DecisionEndedBox>
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>
@@ -195,7 +195,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                       </a>
                       <a href={`/${post.creator?.username}`}>
                         <SWantsToKnow>
-                          {t('AcPostSuccess.wants_to_know', {
+                          {t('acPostSuccess.wantsToKnow', {
                             creator: post.creator?.nickname,
                           })}
                         </SWantsToKnow>
@@ -207,7 +207,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                           post.totalAmount.usdCents / 100 ?? 0,
                           true
                         )}`}{' '}
-                        <span>{t('AcPostSuccess.in_total_bids')}</span>
+                        <span>{t('acPostSuccess.inTotalBids')}</span>
                       </STotal>
                     )}
                   </SCreatorInfoDiv>
@@ -243,10 +243,10 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                                   winningOption.supporterCount,
                                   true
                                 )}{' '}
-                                {t('AcPostSuccess.others')}
+                                {t('acPostSuccess.others')}
                               </>
                             ) : null}{' '}
-                            {t('AcPostSuccess.bid')}
+                            {t('acPostSuccess.bid')}
                           </SWinningBidCreatorText>
                         </SCreator>
                       </SWinningBidCreator>
@@ -261,12 +261,12 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                       <SSeparator />
                       <SWinningOptionDetails>
                         <SWinningOptionDetailsBidChosen>
-                          {t('AcPostSuccess.bid_chosen')}
+                          {t('acPostSuccess.bidChosen')}
                         </SWinningOptionDetailsBidChosen>
                         <SWinningOptionDetailsSeeAll
                           onClick={() => setOpenedMainSection('bids')}
                         >
-                          {t('AcPostSuccess.see_all')}
+                          {t('acPostSuccess.seeAll')}
                         </SWinningOptionDetailsSeeAll>
                         <SWinningOptionDetailsTitle variant={4}>
                           {winningOption.title}
@@ -283,7 +283,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                           shouldView={!responseViewed}
                           onClick={() => setVideoTab('response')}
                         >
-                          {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
+                          {t('postVideoSuccess.tabs.watchResponseFirstTime')}
                         </SWatchResponseBtn>
                       </SWatchResponseWrapper>
                     ) : null}
@@ -293,13 +293,13 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                           shouldView={videoTab === 'announcement'}
                           onClick={() => setVideoTab('announcement')}
                         >
-                          {t('PostVideoSuccess.tabs.watch_original')}
+                          {t('postVideoSuccess.tabs.watchOriginal')}
                         </SChangeTabBtn>
                         <SChangeTabBtn
                           shouldView={videoTab === 'response'}
                           onClick={() => setVideoTab('response')}
                         >
-                          {t('PostVideoSuccess.tabs.watch_response')}
+                          {t('postVideoSuccess.tabs.watchResponse')}
                         </SChangeTabBtn>
                       </SToggleVideoWidget>
                     ) : null}
@@ -317,7 +317,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
         {post.isCommentsAllowed && (
           <SCommentsSection id='comments' ref={commentsSectionRef}>
             <SCommentsHeadline variant={4}>
-              {t('SuccessCommon.Comments.heading')}
+              {t('successCommon.comments.heading')}
             </SCommentsHeadline>
             <CommentsSuccess
               postUuid={post.postUuid}
