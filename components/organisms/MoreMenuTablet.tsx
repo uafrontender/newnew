@@ -62,7 +62,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
                     draggable={false}
                   />
                 </SAvatar>
-                <Text variant={2}>{t('mobile-top-navigation-profile')}</Text>
+                <Text variant={2}>{t('mobileTopNavigation-profile')}</Text>
               </SButton>
             </SLink>
           </Link>
@@ -89,13 +89,13 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
             />
             <Text variant={2}>
               {!isBalanceLoading && walletBalance && walletBalance?.usdCents > 0
-                ? t('mobile-top-navigation-my-balance', {
+                ? t('mobileTopNavigation-my-balance', {
                     value: formatNumber(
                       Math.floor(walletBalance.usdCents / 100),
                       true
                     ),
                   })
-                : t('mobile-top-navigation-my-balance')}
+                : t('mobileTopNavigation-my-balance')}
             </Text>
           </SButton> */}
         </SContainer>

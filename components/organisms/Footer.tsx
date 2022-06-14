@@ -149,22 +149,20 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
               </SIconHolder>
               <STopContent>
                 <SBlock>
-                  <SBlockTitle weight={700}>
-                    {t('footer-top-title')}
-                  </SBlockTitle>
+                  <SBlockTitle weight={700}>{t('footerTopTitle')}</SBlockTitle>
                   {topItems.map(renderItem)}
                 </SBlock>
                 {isMobile && <SSeparator />}
                 <SBlock>
                   <SBlockTitle weight={700}>
-                    {t('footer-center-title')}
+                    {t('footerCenterTitle')}
                   </SBlockTitle>
                   {centerItems.map(renderItem)}
                 </SBlock>
                 {/* {isMobile && <SSeparator />} */}
                 {/* <SBlock>
                   <SBlockTitle weight={700}>
-                    {t('footer-bottom-title')}
+                    {t('footerBottomTitle')}
                   </SBlockTitle>
                   <SBlockRow>
                     <Link href="https://www.instagram.com" passHref>

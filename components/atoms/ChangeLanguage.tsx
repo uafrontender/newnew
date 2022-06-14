@@ -50,7 +50,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
         selected={item === locale}
       >
         <SItemTitle variant={3} weight={600}>
-          {t(`dd-language-title-${item}`)}
+          {t(`ddLanguageTitle-${item}`)}
         </SItemTitle>
       </SButton>
     );
@@ -66,7 +66,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
   return (
     <SContainer ref={ref}>
       <Button view='changeLanguage' onClick={handleChangeLanguageClick}>
-        {t(`selected-language-title-${locale}`)}
+        {t(`selectedLanguageTitle-${locale}`)}
       </Button>
       {isMobile ? (
         <Modal show={focused} onClose={handleCloseClick}>
