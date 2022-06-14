@@ -153,8 +153,6 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
           if (!res.data || res.error)
             throw new Error(res.error?.message ?? 'Request failed');
 
-          console.log(res.data);
-
           if (res.data && res.data.messages) {
             setComments((curr) => {
               const workingArr = [
