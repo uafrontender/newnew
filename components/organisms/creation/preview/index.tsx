@@ -44,7 +44,7 @@ interface IPreviewContent {}
 
 export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { t: tCommon } = useTranslation();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -372,7 +372,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
                 resources={videoProcessing?.targetUrls}
               />
             ) : (
-              <SText variant={2}>{t('video-being-processed-caption')}</SText>
+              <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
             )}
           </SPlayerWrapper>
         </SContent>
@@ -411,7 +411,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
                 borderRadius='16px'
               />
             ) : (
-              <SText variant={2}>{t('video-being-processed-caption')}</SText>
+              <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
             )}
           </STabletPlayer>
         </SLeftPart>
