@@ -31,11 +31,11 @@ const PostVideoProcessingHolder: React.FunctionComponent<IPostVideoProcessingHol
           </SImgContainer>
           <SHeadline variant={6}>
             {t(
-              `PostViewProcessingAnnouncement.videoHolder.${holderText}.title`
+              `postViewProcessingAnnouncement.videoHolder.${holderText}.title`
             )}
           </SHeadline>
           <SText variant={3}>
-            {t(`PostViewProcessingAnnouncement.videoHolder.${holderText}.body`)}
+            {t(`postViewProcessingAnnouncement.videoHolder.${holderText}.body`)}
           </SText>
         </SHourglassCard>
       </SVideoWrapper>

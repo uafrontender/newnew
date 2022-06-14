@@ -65,7 +65,7 @@ export const EditSubscriptionRate: React.FC = React.memo(() => {
       {!isMobile && <Navigation />}
       <SContent>
         <STitleBlock>
-          <STitle variant={4}>{t('SubrateSection.heading')}</STitle>
+          <STitle variant={4}>{t('subRateSection.heading')}</STitle>
           {user.userData?.options?.isOfferingSubscription && (
             <>
               <SMoreButton

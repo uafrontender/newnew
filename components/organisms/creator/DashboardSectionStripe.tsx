@@ -55,7 +55,7 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
       <SContainer>
         {isMobile && <SGoBackButton onClick={() => router.back()} />}
         <SHeadline variant={5}>
-          <span>{t('stripe.title-set-up-stripe')}</span>
+          <span>{t('stripe.titleSetUpStripe')}</span>
           <InlineSvg svg={StripeLogo} width='80px' />
         </SHeadline>
         <SUl>
@@ -89,8 +89,8 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
             />
             <span>
               {isConnectedToStripe
-                ? t('stripe.stripeConnectedLinkBtn')
-                : t('stripe.requestSetupLinkBtn')}
+                ? t('stripe.button.stripeConnectedLink')
+                : t('stripe.button.requestSetupLink')}
             </span>
           </SButton>
           {isConnectedToStripe && (
@@ -100,7 +100,7 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
                 handleRedirectToStripesetup();
               }}
             >
-              {t('stripe.updateButton')}
+              {t('stripe.button.update')}
             </SButtonUpdate>
           )}
         </SButtons>
@@ -109,7 +109,7 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
             <Link href='/creator/dashboard'>
               <a>
                 <GoBackButton noArrow onClick={() => {}}>
-                  {t('stripe.backButton')}
+                  {t('stripe.button.back')}
                 </GoBackButton>
               </a>
             </Link>
@@ -123,9 +123,7 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
                   width: isMobile ? '100%' : 'initial',
                 }}
               >
-                {isMobile
-                  ? t('stripe.submitMobile')
-                  : t('stripe.submitDesktop')}
+                {t('stripe.button.submit')}
               </Button>
             </a>
           </Link>

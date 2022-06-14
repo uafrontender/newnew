@@ -71,7 +71,7 @@ const CfPledgesSection: React.FunctionComponent<ICfPledgesSection> = ({
         <SLoaderDiv ref={loadingRef} />
       ) : pagingToken ? (
         <SLoadMoreBtn onClick={() => handleLoadPledges(pagingToken)}>
-          {t('loadMoreBtn')}
+          {t('loadMoreButton')}
         </SLoadMoreBtn>
       ) : null}
     </SSectionContainer>

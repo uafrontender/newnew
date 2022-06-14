@@ -56,7 +56,7 @@ const HeroPopup: React.FC<IHeroPopup> = ({
           <STitle variant={4}>{t(`heroPopup${postType}.title`)}</STitle>
           <SText variant={2}>{t(`heroPopup${postType}.text`)}</SText>
           <SButton view='primary' onClick={closeModal}>
-            {t('heroPopupCommon.heroBtnText')}
+            {t('heroPopupCommon.heroButtonText')}
           </SButton>
         </SModal>
       </SContainer>

@@ -86,7 +86,7 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
             <span> </span>
           </>
         )}
-        {t('expiresResponse.left_to_respond')}
+        {t('expiresResponse.leftToRespond')}
       </SWrapper>
     </SContainer>
   );

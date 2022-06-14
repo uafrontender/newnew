@@ -226,7 +226,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             shouldView={!responseViewed}
             onClick={() => setOpenedTab('response')}
           >
-            {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
+            {t('postVideoSuccess.tabs.watchResponseFirstTime')}
           </SWatchResponseBtn>
         </SWatchResponseWrapper>
       ) : null}
@@ -236,13 +236,13 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             shouldView={openedTab === 'announcement'}
             onClick={() => setOpenedTab('announcement')}
           >
-            {t('PostVideoSuccess.tabs.announcement')}
+            {t('postVideoSuccess.tabs.announcement')}
           </SChangeTabBtn>
           <SChangeTabBtn
             shouldView={openedTab === 'response'}
             onClick={() => setOpenedTab('response')}
           >
-            {t('PostVideoSuccess.tabs.response')}
+            {t('postVideoSuccess.tabs.response')}
           </SChangeTabBtn>
         </SToggleVideoWidget>
       ) : null}

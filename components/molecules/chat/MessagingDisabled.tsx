@@ -23,11 +23,11 @@ const MessagingDisabled: React.FC<IMessagingDisabled> = React.memo(
           <SBottomActionIcon>🙊</SBottomActionIcon>
           <SBottomActionText>
             <SBottomActionTitle>
-              {t('messaging-disabled.title')}
+              {t('messagingDisabled.title')}
             </SBottomActionTitle>
             <SBottomActionMessage>
               {user.username ? user.username : user.nickname}{' '}
-              {t('messaging-disabled.message')}
+              {t('messagingDisabled.message')}
             </SBottomActionMessage>
           </SBottomActionText>
         </SBottomActionLeft>

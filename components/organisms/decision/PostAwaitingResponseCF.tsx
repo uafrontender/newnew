@@ -44,20 +44,20 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
       const dhms = secondsToDHMS(parsed, 'noTrim');
 
       let countdownsrt = `${dhms.days} ${t(
-        'AcPostAwaiting.hero.expires.days'
-      )} ${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')}`;
+        'acPostAwaiting.hero.expires.days'
+      )} ${dhms.hours} ${t('acPostAwaiting.hero.expires.hours')}`;
 
       if (dhms.days === '0') {
         countdownsrt = `${dhms.hours} ${t(
-          'AcPostAwaiting.hero.expires.hours'
-        )} ${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')}`;
+          'acPostAwaiting.hero.expires.hours'
+        )} ${dhms.minutes} ${t('acPostAwaiting.hero.expires.minutes')}`;
         if (dhms.hours === '0') {
           countdownsrt = `${dhms.minutes} ${t(
-            'AcPostAwaiting.hero.expires.minutes'
-          )} ${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
+            'acPostAwaiting.hero.expires.minutes'
+          )} ${dhms.seconds} ${t('acPostAwaiting.hero.expires.seconds')}`;
           if (dhms.minutes === '0') {
             countdownsrt = `${dhms.seconds} ${t(
-              'AcPostAwaiting.hero.expires.seconds'
+              'acPostAwaiting.hero.expires.seconds'
             )}`;
           }
         }
@@ -228,8 +228,8 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
           <SActivitesContainer>
             <>
               <WaitingForResponseBox
-                title={t('CfPostAwaiting.hero.title')}
-                body={t('CfPostAwaiting.hero.body', {
+                title={t('cfPostAwaiting.hero.title')}
+                body={t('cfPostAwaiting.hero.body', {
                   creator: post.creator?.nickname,
                   time: waitingTime,
                 })}
@@ -242,7 +242,7 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
                     </a>
                     <a href={`/${post.creator?.username}`}>
                       <SWantsToKnow>
-                        {t('CfPostAwaiting.wants_to_know', {
+                        {t('cfPostAwaiting.wantsToKnow', {
                           creator: post.creator?.nickname,
                         })}
                       </SWantsToKnow>
@@ -256,7 +256,7 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
                 <SSeparator />
                 <SBackersInfo>
                   <SCreatorsBackers>
-                    {t('CfPostAwaiting.creators_backers', {
+                    {t('cfPostAwaiting.creatorsBackers', {
                       creator: post.creator?.nickname,
                     })}
                   </SCreatorsBackers>
@@ -264,7 +264,7 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
                     {formatNumber(post.currentBackerCount, true)}
                   </SCurrentBackers>
                   <STargetBackers variant={6}>
-                    {t('CfPostAwaiting.of_target_backers', {
+                    {t('cfPostAwaiting.ofTargetBackers', {
                       target_count: formatNumber(post.targetBackerCount, true),
                     })}
                   </STargetBackers>
@@ -274,7 +274,7 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
                     <SSeparator />
                     <YouBackedInfo>
                       <SYouBackedFor>
-                        {t('CfPostAwaiting.you_backed_for')}
+                        {t('cfPostAwaiting.youBackedFor')}
                       </SYouBackedFor>
                       <SYouBackedAmount variant={4}>
                         {`$${formatNumber(
@@ -292,7 +292,7 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
         {post.isCommentsAllowed && (
           <SCommentsSection id='comments' ref={commentsSectionRef}>
             <SCommentsHeadline variant={4}>
-              {t('SuccessCommon.Comments.heading')}
+              {t('successCommon.comments.heading')}
             </SCommentsHeadline>
             <CommentsBottomSection
               postUuid={post.postUuid}

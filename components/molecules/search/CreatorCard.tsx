@@ -32,7 +32,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       <SUserName>@{creator.username}</SUserName>
       {subscriptionPrice !== undefined && subscriptionPrice > 0 && (
         <SSubscriptionPrice>
-          {t('creator-card.subscription-cost', {
+          {t('creatorCard.subscriptionCost', {
             amount: formatNumber(subscriptionPrice / 100, true),
           })}
         </SSubscriptionPrice>

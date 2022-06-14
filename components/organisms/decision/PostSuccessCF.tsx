@@ -236,7 +236,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     : assets.creation.darkCfAnimated
                 }
               >
-                {t('CfPostSuccess.hero_text')}
+                {t('CfPostSuccess.heroText')}
               </DecisionEndedBox>
               <SMainSectionWrapper>
                 <SCreatorInfoDiv>
@@ -246,7 +246,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     </a>
                     <a href={`/${post.creator?.username}`}>
                       <SWantsToKnow>
-                        {t('CfPostSuccess.wants_to_know', {
+                        {t('CfPostSuccess.wantsToKnow', {
                           creator: post.creator?.nickname,
                         })}
                       </SWantsToKnow>
@@ -260,7 +260,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                 <SSeparator />
                 <SBackersInfo>
                   <SCreatorsBackers>
-                    {t('CfPostSuccess.creators_backers', {
+                    {t('CfPostSuccess.creatorsBackers', {
                       creator: post.creator?.nickname,
                     })}
                   </SCreatorsBackers>
@@ -268,7 +268,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     {formatNumber(post.currentBackerCount, true)}
                   </SCurrentBackers>
                   <STargetBackers variant={6}>
-                    {t('CfPostSuccess.of_target_backers', {
+                    {t('CfPostSuccess.ofTargetBackers', {
                       target_count: formatNumber(post.targetBackerCount, true),
                     })}
                   </STargetBackers>
@@ -278,7 +278,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     <SSeparator />
                     <YouBackedInfo>
                       <SYouBackedFor>
-                        {t('CfPostSuccess.you_backed_for')}
+                        {t('CfPostSuccess.youBackedFor')}
                       </SYouBackedFor>
                       <SYouBackedAmount variant={4}>
                         {`$${formatNumber(
@@ -298,7 +298,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                         shouldView={!responseViewed}
                         onClick={() => setVideoTab('response')}
                       >
-                        {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
+                        {t('postVideoSuccess.tabs.watchResponseFirstTime')}
                       </SWatchResponseBtn>
                     </SWatchResponseWrapper>
                   ) : null}
@@ -308,13 +308,13 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                         shouldView={videoTab === 'announcement'}
                         onClick={() => setVideoTab('announcement')}
                       >
-                        {t('PostVideoSuccess.tabs.watch_original')}
+                        {t('postVideoSuccess.tabs.watchOriginal')}
                       </SChangeTabBtn>
                       <SChangeTabBtn
                         shouldView={videoTab === 'response'}
                         onClick={() => setVideoTab('response')}
                       >
-                        {t('PostVideoSuccess.tabs.watch_response')}
+                        {t('postVideoSuccess.tabs.watchResponse')}
                       </SChangeTabBtn>
                     </SToggleVideoWidget>
                   ) : null}
@@ -326,7 +326,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
         {post.isCommentsAllowed && (
           <SCommentsSection id='comments' ref={commentsSectionRef}>
             <SCommentsHeadline variant={4}>
-              {t('SuccessCommon.Comments.heading')}
+              {t('successCommon.comments.heading')}
             </SCommentsHeadline>
             <CommentsBottomSection
               postUuid={post.postUuid}

@@ -134,16 +134,16 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
                 <SSpanThin>
                   {option.supporterCount > 1
                     ? t(
-                        'AcPostModeration.WinnerTab.WinnerOptionCard.bidders_told_you'
+                        'acPostModeration.winnerTab.winnerOptionCard.biddersToldYou'
                       )
                     : t(
-                        'AcPostModeration.WinnerTab.WinnerOptionCard.bidder_told_you'
+                        'acPostModeration.winnerTab.winnerOptionCard.bidderToldYou'
                       )}
                 </SSpanThin>
               </SNumBidders>
               <SHeadline variant={4}>{option.title}</SHeadline>
               <SYouMade variant={3}>
-                {t('AcPostModeration.WinnerTab.WinnerOptionCard.you_made')}
+                {t('acPostModeration.winnerTab.winnerOptionCard.youMade')}
               </SYouMade>
               {option.totalAmount?.usdCents && (
                 <SHeadline variant={5}>
@@ -152,7 +152,7 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
               )}
               <SOptionCreator variant={3}>
                 <SSpanThin>
-                  {t('AcPostModeration.WinnerTab.WinnerOptionCard.created_by')}
+                  {t('acPostModeration.winnerTab.winnerOptionCard.createdBy')}
                 </SSpanThin>{' '}
                 <Link
                   href={`/${
@@ -193,12 +193,12 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
           </SWinnerOptionCard>
           {postStatus === 'succeeded' ? (
             <PostSuccessBoxModeration
-              title={t('PostSuccessModeration.title')}
-              body={t('PostSuccessModeration.body')}
+              title={t('postSuccessModeration.title')}
+              body={t('postSuccessModeration.body')}
               buttonCaption={
                 isCopiedUrl
-                  ? t('PostSuccessModeration.ctaButton-copied')
-                  : t('PostSuccessModeration.ctaButton')
+                  ? t('postSuccessModeration.linkCopiedButtonText')
+                  : t('postSuccessModeration.buttonText')
               }
               style={{
                 marginTop: '24px',

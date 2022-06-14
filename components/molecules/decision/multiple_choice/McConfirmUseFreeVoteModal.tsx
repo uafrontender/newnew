@@ -25,20 +25,20 @@ const McConfirmUseFreeVoteModal: React.FC<IMcConfirmUseFreeVoteModal> = ({
       // onClick={(e) => e.stopPropagation()}
       >
         <SModal>
-          <STag>{t('McPost.OptionsTab.ConfirmUseFreeVoteModal.tag')}</STag>
+          <STag>{t('mcPost.optionsTab.confirmUseFreeVoteModal.tag')}</STag>
           <SModalMessage>
             <Text variant={2}>
-              {t('McPost.OptionsTab.ConfirmUseFreeVoteModal.line_1')}
+              {t('mcPost.optionsTab.confirmUseFreeVoteModal.line_1')}
             </Text>
             <Text variant={2}>
-              {t('McPost.OptionsTab.ConfirmUseFreeVoteModal.line_2')}
+              {t('mcPost.optionsTab.confirmUseFreeVoteModal.line_2')}
             </Text>
             <Text variant={2}>
-              {t('McPost.OptionsTab.ConfirmUseFreeVoteModal.line_3')}
+              {t('mcPost.optionsTab.confirmUseFreeVoteModal.line_3')}
             </Text>
           </SModalMessage>
           <SDoneButton view='primaryGrad' onClick={() => handleMakeFreeVote()}>
-            {t('McPost.OptionsTab.ConfirmUseFreeVoteModal.useFreeVoteBtn')}
+            {t('mcPost.optionsTab.confirmUseFreeVoteModal.useFreeVoteButton')}
           </SDoneButton>
         </SModal>
       </SContainer>

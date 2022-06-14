@@ -402,9 +402,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
                 currentNumBackers={currentBackers}
               />
               <PostWaitingForResponseBox
-                title={t('PostWaitingForResponse.title')}
-                body={t('PostWaitingForResponse.body')}
-                buttonCaption={t('PostWaitingForResponse.ctaButton')}
+                title={t('postWaitingForResponse.title')}
+                body={t('postWaitingForResponse.body')}
+                buttonCaption={t('postWaitingForResponse.buttonText')}
                 style={{
                   marginTop: '24px',
                 }}
@@ -423,9 +423,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
                 currentNumBackers={currentBackers}
               />
               <PostSuccessBox
-                title={t('PostSuccess.title', { postType: t(`postType.cf`) })}
-                body={t('PostSuccess.body')}
-                buttonCaption={t('PostSuccess.ctaButton')}
+                title={t('postSuccess.title', { postType: t(`postType.cf`) })}
+                body={t('postSuccess.body')}
+                buttonCaption={t('postSuccess.buttonText')}
                 style={{
                   marginTop: '24px',
                 }}
@@ -770,7 +770,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
             isVisible={paymentSuccesModalOpen}
             closeModal={() => setPaymentSuccesModalOpen(false)}
           >
-            {t('PaymentSuccessModal.cf', {
+            {t('paymentSuccessModal.cf', {
               postCreator:
                 (post.creator?.nickname as string) ?? post.creator?.username,
               postDeadline: moment(
@@ -798,11 +798,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           {isMobile && !choosePledgeModalOpen && postStatus === 'voting' ? (
             <>
               <SActionButton
-                id='action-button-mobile'
                 view='primaryGrad'
                 onClick={() => setChoosePledgeModalOpen(true)}
               >
-                {t('CfPost.FloatingActionButton.choosePledgeBtn')}
+                {t('cfPost.floatingActionButton.choosePledgeButton')}
               </SActionButton>
               {user.userTutorialsProgress.remainingCfSteps &&
                 user.userTutorialsProgress.remainingCfSteps[0] ===
