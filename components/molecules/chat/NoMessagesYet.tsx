@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 const NoMessagesYet: React.FC = React.memo(() => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
 
   return (
     <SWelcomeMessage>

@@ -7,7 +7,7 @@ interface INoResults {
 }
 
 const NoResults: React.FC<INoResults> = ({ text }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
 
   return (
     <SEmptyInbox>

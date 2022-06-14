@@ -162,7 +162,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'modal-Post',
     'component-PostCard',
     'modal-PaymentModal',
-    'chat',
   ]);
 
   if (!post_uuid || Array.isArray(post_uuid)) {
