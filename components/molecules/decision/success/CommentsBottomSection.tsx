@@ -555,6 +555,7 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
             }
             positionTop={heightDelta}
             active={showTopGradient}
+            width='calc(100% - 16px)'
           />
           <GradientMask
             gradientType={
@@ -565,6 +566,7 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
                 : 'primary'
             }
             active={showBottomGradient}
+            width='calc(100% - 16px)'
           />
         </STabContainer>
       </>
@@ -644,14 +646,6 @@ const SNoCommentsYet = styled.div`
 
   width: 100%;
   min-height: 300px;
-
-  ${({ theme }) => theme.media.tablet} {
-    position: absolute;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    min-height: 500px;
-  }
 `;
 
 const SNoCommentsImgContainer = styled.div`
