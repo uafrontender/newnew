@@ -137,7 +137,13 @@
   },
   "search": {
     "topPosts": "Top Posts",
-    "popularCreators": "Popular Creators"
+    "popularCreators": "Popular Creators",
+    "allResults": "All results",
+    "noResults": {
+      "title": "We didn’t find anything",
+      "description": "Try searching for something else or explore what’s new",
+      "action": "Explore"
+    }
   },
   "creatorCard": {
     "subscriptionCost": "${{amount}} Monthly"
