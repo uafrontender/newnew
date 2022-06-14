@@ -41,10 +41,18 @@ interface ICommentsBottomSection {
   postUuid: string;
   commentsRoomId: number;
   canDeleteComments?: boolean;
+  onFormFocus?: () => void;
+  onFormBlur?: () => void;
 }
 
 const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
-  ({ postUuid, canDeleteComments, commentsRoomId }) => {
+  ({
+    postUuid,
+    canDeleteComments,
+    commentsRoomId,
+    onFormFocus,
+    onFormBlur,
+  }) => {
     const theme = useTheme();
     const { t } = useTranslation('decision');
     const user = useAppSelector((state) => state.user);
@@ -496,6 +504,8 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
               position='sticky'
               zIndex={1}
               onSubmit={(newMsg: string) => handleAddComment(newMsg)}
+              onBlur={onFormBlur ?? undefined}
+              onFocus={onFormFocus ?? undefined}
             />
             <SCommentsWrapper>
               {comments.length === 0 && !commentsLoading ? (
@@ -530,6 +540,8 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
                         handleAddComment(newMsg, item.id as number)
                       }
                       handleDeleteComment={handleDeleteComment}
+                      onFormBlur={onFormBlur ?? undefined}
+                      onFormFocus={onFormFocus ?? undefined}
                     />
                   );
                 })}
@@ -575,6 +587,8 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
 
 CommentsBottomSection.defaultProps = {
   canDeleteComments: false,
+  onFormFocus: () => {},
+  onFormBlur: () => {},
 };
 
 export default CommentsBottomSection;

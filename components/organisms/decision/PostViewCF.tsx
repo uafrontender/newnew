@@ -123,6 +123,18 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
       threshold: 0.8,
     });
 
+    const handleCommentFocus = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display =
+          'none';
+      }
+    };
+    const handleCommentBlur = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display = '';
+      }
+    };
+
     const goToNextStep = () => {
       if (
         user.userTutorialsProgress.remainingCfSteps &&
@@ -786,6 +798,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           {isMobile && !choosePledgeModalOpen && postStatus === 'voting' ? (
             <>
               <SActionButton
+                id='action-button-mobile'
                 view='primaryGrad'
                 onClick={() => setChoosePledgeModalOpen(true)}
               >
@@ -825,6 +838,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
             <CommentsBottomSection
               postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
+              onFormBlur={handleCommentBlur}
+              onFormFocus={handleCommentFocus}
             />
           </SCommentsSection>
         )}

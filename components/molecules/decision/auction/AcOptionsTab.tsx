@@ -693,6 +693,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       {isMobile && !suggestNewMobileOpen && postStatus === 'voting' ? (
         <>
           <SActionButton
+            id='action-button-mobile'
             view='primaryGrad'
             onClick={() => setSuggestNewMobileOpen(true)}
           >

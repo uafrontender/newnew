@@ -102,6 +102,18 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       threshold: 0.8,
     });
 
+    const handleCommentFocus = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display =
+          'none';
+      }
+    };
+    const handleCommentBlur = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display = '';
+      }
+    };
+
     // Post loading state
     const [postLoading, setPostLoading] = useState(false);
 
@@ -728,6 +740,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             <CommentsBottomSection
               postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
+              onFormBlur={handleCommentBlur}
+              onFormFocus={handleCommentFocus}
             />
           </SCommentsSection>
         )}
