@@ -24,18 +24,18 @@ const AcPickWinningOptionModal: React.FC<IAcPickWinningOptionModal> = ({
       <SContainer>
         <SModal onClick={(e) => e.stopPropagation()}>
           <SModalTitle>
-            {t('AcPostModeration.OptionsTab.selectWinner.title')}
+            {t('acPostModeration.optionsTab.selectWinner.title')}
           </SModalTitle>
           <SModalMessage>
-            {t('AcPostModeration.OptionsTab.selectWinner.body')}
+            {t('acPostModeration.optionsTab.selectWinner.body')}
           </SModalMessage>
           {children}
           <SModalButtons>
             <SCancelButton view='secondary' onClick={closeModal}>
-              {t('AcPostModeration.OptionsTab.selectWinner.cancelBtn')}
+              {t('acPostModeration.optionsTab.selectWinner.cancelButton')}
             </SCancelButton>
             <SConfirmButton view='primaryGrad' onClick={handleConfirm}>
-              {t('AcPostModeration.OptionsTab.selectWinner.confirmBtn')}
+              {t('acPostModeration.optionsTab.selectWinner.confirmButton')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>

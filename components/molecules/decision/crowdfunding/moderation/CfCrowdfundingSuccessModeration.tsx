@@ -98,7 +98,7 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
               {currentNumBackers}
             </SHeadlineNumBackers>
             <STarget weight={600}>
-              {t('CfPost.BackersStatsSection.of_backers', {
+              {t('cfPost.backersStatsSection.ofBackers', {
                 targetBackers: formatNumber(post.targetBackerCount, true),
               })}
             </STarget>
@@ -111,16 +111,16 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
               <SSpanThin>
                 {currentNumBackers > 1
                   ? t(
-                      'CfPostModeration.WinnerTab.WinnerOptionCard.backers_told_you'
+                      'cfPostModeration.winnerTab.winnerOptionCard.backersToldYou'
                     )
                   : t(
-                      'CfPostModeration.WinnerTab.WinnerOptionCard.backer_told_you'
+                      'cfPostModeration.winnerTab.winnerOptionCard.backerToldYou'
                     )}
               </SSpanThin>
             </SNumBidders>
             <SDetailsHeadline variant={4}>{post.title}</SDetailsHeadline>
             <SYouMade variant={3}>
-              {t('CfPostModeration.WinnerTab.WinnerOptionCard.you_made')}
+              {t('cfPostModeration.winnerTab.winnerOptionCard.youMade')}
             </SYouMade>
             <SDetailsHeadline variant={5}>
               $
@@ -136,12 +136,12 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
         </SWinnerCard>
         {postStatus === 'succeeded' ? (
           <PostSuccessBoxModeration
-            title={t('PostSuccessModeration.title')}
-            body={t('PostSuccessModeration.body')}
+            title={t('postSuccessModeration.title')}
+            body={t('postSuccessModeration.body')}
             buttonCaption={
               isCopiedUrl
-                ? t('PostSuccessModeration.ctaButton-copied')
-                : t('PostSuccessModeration.ctaButton')
+                ? t('postSuccessModeration.linkCopiedButtonText')
+                : t('postSuccessModeration.buttonText')
             }
             style={{
               marginTop: '24px',

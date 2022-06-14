@@ -165,7 +165,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
           {postType === 'ac' && amountInBids ? (
             <SBidsAmount>
               <span>${formatNumber(amountInBids / 100 ?? 0, true)}</span>{' '}
-              {t('AcPost.PostTopInfo.in_bids')}
+              {t('acPost.postTopInfo.inBids')}
             </SBidsAmount>
           ) : null}
           {postType === 'mc' && totalVotes ? (
@@ -174,8 +174,8 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
                 {formatNumber(totalVotes, true).replaceAll(/,/g, ' ')}
               </span>{' '}
               {totalVotes > 1
-                ? t('McPost.PostTopInfo.votes')
-                : t('McPost.PostTopInfo.vote')}
+                ? t('mcPost.postTopInfo.votes')
+                : t('mcPost.postTopInfo.vote')}
             </SBidsAmount>
           ) : null}
           <SActionsDiv>
@@ -249,10 +249,10 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
           {showWinnerOption ? (
             <SSelectWinnerOption>
               <SHeadline variant={4}>
-                {t('AcPostModeration.PostTopInfo.SelectWinner.title')}
+                {t('acPostModeration.postTopInfo.selectWinner.title')}
               </SHeadline>
               <SText variant={3}>
-                {t('AcPostModeration.PostTopInfo.SelectWinner.body')}
+                {t('acPostModeration.postTopInfo.selectWinner.body')}
               </SText>
               <STrophyImg src={assets.decision.trophy} />
             </SSelectWinnerOption>
@@ -260,10 +260,10 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
         </SWrapper>
         {postStatus === 'failed' && (
           <PostFailedBox
-            title={t('PostFailedBoxModeration.title', {
+            title={t('postFailedBoxModeration.title', {
               postType: t(`postType.${postType}`),
             })}
-            body={t(`PostFailedBoxModeration.reason.${failureReason}`)}
+            body={t(`postFailedBoxModeration.reason.${failureReason}`)}
             imageSrc={
               postType
                 ? theme.name === 'light'
@@ -271,7 +271,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
                   : DARK_IMAGES[postType]
                 : undefined
             }
-            buttonCaption={t('PostFailedBoxModeration.ctaButton', {
+            buttonCaption={t('postFailedBoxModeration.buttonText', {
               postType: t(`postType.${postType}`),
             })}
             handleButtonClick={() => {

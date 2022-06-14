@@ -166,12 +166,12 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                     </SSpanBiddersRegular>
                     <SSpanBiddersHighlighted className='spanHighlighted'>
                       {formatNumber(option.supporterCount - 1, true)}{' '}
-                      {t('AcPost.OptionsTab.OptionCard.others')}
+                      {t('acPost.optionsTab.optionCard.others')}
                     </SSpanBiddersHighlighted>
                   </>
                 ) : null}{' '}
                 <SSpanBiddersRegular className='spanRegular'>
-                  {t('AcPost.OptionsTab.OptionCard.bid')}
+                  {t('acPost.optionsTab.optionCard.bid')}
                 </SSpanBiddersRegular>
               </SBiddersInfo>
             </SBidDetails>
@@ -181,7 +181,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                   <SPickOptionButton
                     onClick={() => setIsPickOptionModalOpen(true)}
                   >
-                    {t('AcPostModeration.OptionsTab.OptionCard.pickBtn')}
+                    {t('acPostModeration.optionsTab.optionCard.pickButton')}
                   </SPickOptionButton>
                   <SDropdownButton onClick={() => setIsEllipseMenuOpen(true)}>
                     <InlineSvg
@@ -197,7 +197,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                   <SPickOptionButtonMobile
                     onClick={() => setIsPickOptionModalOpen(true)}
                   >
-                    {t('AcPostModeration.OptionsTab.OptionCard.pickBtn')}
+                    {t('acPostModeration.optionsTab.optionCard.pickButton')}
                   </SPickOptionButtonMobile>
                   <SEllipseButton onClick={() => setIsEllipseMenuOpen(true)}>
                     <InlineSvg
@@ -220,7 +220,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
               </SEllipseButton>
             ) : (
               <SEllipseButtonMobile onClick={() => setIsEllipseMenuOpen(true)}>
-                {t('AcPost.OptionsTab.OptionCard.moreBtn')}
+                {t('acPost.optionsTab.optionCard.moreButton')}
               </SEllipseButtonMobile>
             )}
             {!isMobile && (
@@ -311,12 +311,12 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                   </SSpanBiddersRegular>
                   <SSpanBiddersHighlighted className='spanHighlighted'>
                     {formatNumber(option.supporterCount - 1, true)}{' '}
-                    {t('AcPost.OptionsTab.OptionCard.others')}
+                    {t('acPost.optionsTab.optionCard.others')}
                   </SSpanBiddersHighlighted>
                 </>
               ) : null}{' '}
               <SSpanBiddersRegular className='spanRegular'>
-                {t('AcPost.OptionsTab.OptionCard.bid')}
+                {t('acPost.optionsTab.optionCard.bid')}
               </SSpanBiddersRegular>
             </SBiddersInfo>
           </SBidDetailsModal>

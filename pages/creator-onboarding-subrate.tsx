@@ -28,7 +28,7 @@ const OnboardingSectionSubrate = dynamic(
 );
 
 const CreatorOnboardingSubrate = () => {
-  const { t } = useTranslation('creator-onboarding');
+  const { t } = useTranslation('page-CreatorOnboarding');
 
   const [standardProducts, setStandardProducts] = useState<
     newnewapi.ISubscriptionProduct[]
@@ -132,7 +132,7 @@ export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
-    'creator-onboarding',
+    'page-CreatorOnboarding',
   ]);
 
   return {

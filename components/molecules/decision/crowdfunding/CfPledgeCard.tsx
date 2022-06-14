@@ -78,7 +78,7 @@ const CfPledgeCard: React.FunctionComponent<ICfPledgeCard> = ({
               }}
             >
               {creator?.uuid === user.userData?.userUuid
-                ? t('CfPost.OptionsTab.me')
+                ? t('cfPost.optionsTab.me')
                 : creator?.username}
             </SUsername>
             <SAmount>
@@ -86,16 +86,17 @@ const CfPledgeCard: React.FunctionComponent<ICfPledgeCard> = ({
                 ? `$${(pledge?.amount?.usdCents / 100).toFixed(2)}`
                 : '00.00'}
             </SAmount>
+            {/* TODO: why mcPost? do other have tags? Remove excess texts */}
             {creator?.uuid === user.userData?.userUuid ? (
-              <STag>{t('McPost.OptionsTab.tags.my_bid')}</STag>
+              <STag>{t('mcPost.optionsTab.tags.my_bid')}</STag>
             ) : null}
             {pledge.isHighest ? (
-              <STag>{t('McPost.OptionsTab.tags.highest')}</STag>
+              <STag>{t('mcPost.optionsTab.tags.highest')}</STag>
             ) : null}
             {/* Comment out for now */}
             {/* {creator.isVIP
               ? (
-                <STag>{t('McPost.OptionsTab.tags.vip')}</STag>
+                <STag>{t('mcPost.optionsTab.tags.vip')}</STag>
               ) : null} */}
           </SPledgeInfo>
           <SPledgeDate>

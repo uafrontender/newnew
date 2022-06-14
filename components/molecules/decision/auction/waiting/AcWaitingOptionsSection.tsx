@@ -236,7 +236,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<IAcWaitingOptionsSection>
               view='secondary'
               onClick={() => fetchBids(optionsNextPageToken)}
             >
-              {t('loadMoreBtn')}
+              {t('loadMoreButton')}
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
