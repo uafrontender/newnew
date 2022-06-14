@@ -665,7 +665,7 @@
   },
   "heroPopupCommon": {
     "heroButtonText": "Let's go",
-    "btnText": "Got it"
+    "button": "Got it"
   },
   "heroPopupAC": {
     "title": "Events",

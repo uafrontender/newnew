@@ -22,7 +22,7 @@ import UserAvatar from '../../UserAvatar';
 
 const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
 
   const { ref: scrollRef, inView } = useInView();
   const user = useAppSelector((state) => state.user);

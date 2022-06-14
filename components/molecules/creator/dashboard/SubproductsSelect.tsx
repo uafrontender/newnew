@@ -22,14 +22,14 @@ import EnableSubModal from '../../../atoms/dashboard/EnableSubModal';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { setUserData } from '../../../../redux-store/slices/userStateSlice';
 
-interface ISubproductsSelect {
+interface ISubProductsSelect {
   mySubscriptionProduct: newnewapi.ISubscriptionProduct | null;
 }
 
-const SubproductsSelect: React.FC<ISubproductsSelect> = ({
+const SubProductsSelect: React.FC<ISubProductsSelect> = ({
   mySubscriptionProduct,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const [standardProducts, setStandardProducts] = useState<
     newnewapi.ISubscriptionProduct[]
   >([]);
@@ -184,7 +184,7 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
   );
 };
 
-export default SubproductsSelect;
+export default SubProductsSelect;
 
 const SContainer = styled.div`
   display: flex;
@@ -231,7 +231,7 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
   handleClick,
   currentProduct,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const ref: any = useRef();
 
   useEffect(() => {

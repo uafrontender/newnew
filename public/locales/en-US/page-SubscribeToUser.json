@@ -10,7 +10,7 @@
       "line_2": "for limited exclusives"
     },
     "bullets": {
-      "dms": {
+      "directMessages": {
         "title": "1-on-1 messages",
         "body": "Have unlimited personal messages with {{nickname}}"
       },

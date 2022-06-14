@@ -36,7 +36,7 @@ export const TutorialTooltip: React.FC<ITutorialTooltip> = ({
           closeTooltip();
         }}
       >
-        {t('heroPopupCommon.btnText')}
+        {t('heroPopupCommon.button')}
       </SButton>
       <SDotWrapper position={dotPosition}>
         <SDot />

@@ -14,7 +14,7 @@ import { NextPageWithLayout } from '../../_app';
 import { useAppSelector } from '../../../redux-store/store';
 
 export const Subscriptions = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const user = useAppSelector((state) => state.user);
   const router = useRouter();
 
@@ -53,8 +53,7 @@ export default Subscriptions;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'creator',
-    'chat',
+    'page-Creator',
   ]);
 
   return {
