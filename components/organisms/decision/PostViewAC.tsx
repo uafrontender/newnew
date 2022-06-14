@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
@@ -24,27 +22,19 @@ import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import {
-  fetchAcOptionById,
   fetchCurrentBidsForPost,
   placeBidOnAuction,
 } from '../../../api/endpoints/auction';
 
-import Lottie from '../../atoms/Lottie';
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import DecisionTabs from '../../molecules/decision/PostTabs';
-
-// Assets
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 // Utils
-import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
-import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import Headline from '../../atoms/Headline';
 import PostVotingTab from '../../molecules/decision/PostVotingTab';
@@ -52,12 +42,6 @@ import PostVotingTab from '../../molecules/decision/PostVotingTab';
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
   () => import('../../molecules/decision/auction/AcOptionsTab')
-);
-const CommentsTab = dynamic(
-  () => import('../../molecules/decision/CommentsTab')
-);
-const AcWinnerTab = dynamic(
-  () => import('../../molecules/decision/auction/AcWinnerTab')
 );
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
 const PaymentSuccessModal = dynamic(
@@ -107,9 +91,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       resizeMode
     );
 
-    const { syncedHistoryPushState, syncedHistoryReplaceState } =
-      useSynchronizedHistory();
-
     const showSelectingWinnerOption = useMemo(
       () => postStatus === 'waiting_for_decision',
       [postStatus]
@@ -147,13 +128,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       useState<string | undefined | null>('');
     const [optionsLoading, setOptionsLoading] = useState(false);
     const [loadingOptionsError, setLoadingOptionsError] = useState('');
-
-    // Winning option
-    const [winningOption, setWinningOption] =
-      useState<newnewapi.Auction.Option | undefined>();
-
-    // Animating options
-    const [optionToAnimate, setOptionToAnimate] = useState('');
 
     // const currLocation = `/post/${post.postUuid}`;
 
@@ -345,11 +319,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
 
           return sortOptions(workingArrUnsorted);
         });
-        setOptionToAnimate(newOption.id.toString());
-
-        setTimeout(() => {
-          setOptionToAnimate('');
-        }, 3000);
       },
       [setOptions, sortOptions]
     );
@@ -409,28 +378,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [post.postUuid]);
-
-    useEffect(() => {
-      async function fetchAndSetWinningOption(id: number) {
-        try {
-          const payload = new newnewapi.GetAcOptionRequest({
-            optionId: id,
-          });
-
-          const res = await fetchAcOptionById(payload);
-
-          if (res.data?.option) {
-            setWinningOption(res.data.option as newnewapi.Auction.Option);
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      }
-
-      if (post.winningOptionId) {
-        fetchAndSetWinningOption(post.winningOptionId as number);
-      }
-    }, [post.winningOptionId]);
 
     useEffect(() => {
       const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -871,15 +818,6 @@ const SActivitesContainer = styled.div<{
             max-height: calc(580px - 120px);
           `}
   }
-`;
-
-const SAnimationContainer = styled.div`
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 // Comments
