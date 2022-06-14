@@ -1,6 +1,5 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 /* eslint-disable consistent-return */
@@ -11,6 +10,7 @@ import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
+import { useInView } from 'react-intersection-observer';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -26,16 +26,17 @@ import Button from '../../atoms/Button';
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import DecisionTabs from '../../molecules/decision/PostTabs';
 
 // Utils
-import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { DotPositionEnum } from '../../atoms/decision/TutorialTooltip';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import Headline from '../../atoms/Headline';
+import PostVotingTab from '../../molecules/decision/PostVotingTab';
+import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
@@ -45,9 +46,6 @@ const PaymentSuccessModal = dynamic(
 const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
 const TutorialTooltip = dynamic(
   () => import('../../atoms/decision/TutorialTooltip')
-);
-const CommentsTab = dynamic(
-  () => import('../../molecules/decision/CommentsTab')
 );
 const PostSuccessBox = dynamic(
   () => import('../../molecules/decision/PostSuccessBox')
@@ -120,37 +118,21 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
       post.isResponseViewedByMe ?? false
     );
 
-    // Tabs
-    const [currentTab, setCurrentTab] = useState<'backers' | 'comments'>(() => {
-      if (!isBrowser()) {
-        return 'backers';
-      }
-      const { hash } = window.location;
-      if (hash && (hash === '#backers' || hash === '#comments')) {
-        return hash.substring(1) as 'backers' | 'comments';
-      }
-      return 'backers';
+    // Comments
+    const { ref: commentsSectionRef, inView } = useInView({
+      threshold: 0.8,
     });
 
-    const handleChangeTab = (tab: string) => {
-      if (tab === 'comments' && isMobile) {
-        window.history.pushState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}#${tab}`
-        );
-      } else {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}#${tab}`
-        );
+    const handleCommentFocus = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display =
+          'none';
       }
-      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    };
+    const handleCommentBlur = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display = '';
+      }
     };
 
     const goToNextStep = () => {
@@ -173,27 +155,6 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
         );
       }
     };
-
-    useEffect(() => {
-      const handleHashChange = () => {
-        const { hash } = window.location;
-        if (!hash) {
-          setCurrentTab('backers');
-          return;
-        }
-        const parsedHash = hash.substring(1);
-        if (parsedHash === 'backers' || parsedHash === 'comments') {
-          setCurrentTab(parsedHash);
-        }
-      };
-
-      window.addEventListener('hashchange', handleHashChange, false);
-
-      return () => {
-        window.removeEventListener('hashchange', handleHashChange, false);
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user.userTutorialsProgress]);
 
     // Vote from sessionId
     const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -712,147 +673,176 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
       }
     }, [user]);
 
+    // Scroll to comments if hash is present
+    useEffect(() => {
+      const handleCommentsInitialHash = () => {
+        const { hash } = window.location;
+        if (!hash) {
+          return;
+        }
+
+        const parsedHash = hash.substring(1);
+
+        if (parsedHash === 'comments') {
+          document.getElementById('comments')?.scrollIntoView();
+        }
+      };
+
+      handleCommentsInitialHash();
+    }, []);
+
+    // Replace hash once scrolled to comments
+    useEffect(() => {
+      if (inView) {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}#comments`
+        );
+      } else {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}`
+        );
+      }
+    }, [inView, post.postUuid]);
+
     return (
-      <SWrapper>
-        <SExpiresSection>
-          {isMobile && (
-            <SGoBackButton
-              style={{
-                gridArea: 'closeBtnMobile',
-              }}
-              onClick={handleGoBack}
+      <>
+        <SWrapper>
+          <SExpiresSection>
+            {isMobile && (
+              <SGoBackButton
+                style={{
+                  gridArea: 'closeBtnMobile',
+                }}
+                onClick={handleGoBack}
+              />
+            )}
+            <PostTimer
+              timestampSeconds={new Date(
+                (post.expiresAt?.seconds as number) * 1000
+              ).getTime()}
+              postType='cf'
             />
-          )}
-          <PostTimer
-            timestampSeconds={new Date(
-              (post.expiresAt?.seconds as number) * 1000
-            ).getTime()}
+          </SExpiresSection>
+          <PostVideo
+            postId={post.postUuid}
+            announcement={post.announcement!!}
+            response={post.response ?? undefined}
+            responseViewed={responseViewed}
+            handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
+            isMuted={mutedMode}
+            handleToggleMuted={() => handleToggleMutedMode()}
+          />
+          <PostTopInfo
             postType='cf'
+            postId={post.postUuid}
+            postStatus={postStatus}
+            title={post.title}
+            creator={post.creator!!}
+            hasWinner={false}
+            totalPledges={currentBackers}
+            targetPledges={post.targetBackerCount}
+            isFollowingDecision={isFollowingDecision}
+            hasRecommendations={hasRecommendations}
+            handleSetIsFollowingDecision={handleSetIsFollowingDecision}
+            handleReportOpen={handleReportOpen}
+            handleRemovePostFromState={handleRemovePostFromState}
+            handleAddPostToState={handleAddPostToState}
           />
-        </SExpiresSection>
-        <PostVideo
-          postId={post.postUuid}
-          announcement={post.announcement!!}
-          response={post.response ?? undefined}
-          responseViewed={responseViewed}
-          handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
-          isMuted={mutedMode}
-          handleToggleMuted={() => handleToggleMutedMode()}
-        />
-        <PostTopInfo
-          postType='cf'
-          postId={post.postUuid}
-          postStatus={postStatus}
-          title={post.title}
-          creator={post.creator!!}
-          hasWinner={false}
-          totalPledges={currentBackers}
-          targetPledges={post.targetBackerCount}
-          isFollowingDecision={isFollowingDecision}
-          hasRecommendations={hasRecommendations}
-          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-          handleReportOpen={handleReportOpen}
-          handleRemovePostFromState={handleRemovePostFromState}
-          handleAddPostToState={handleAddPostToState}
-        />
-        <SActivitesContainer>
-          <DecisionTabs
-            tabs={[
-              {
-                label: 'backers',
-                value: 'backers',
-              },
-              ...(post.isCommentsAllowed
-                ? [
-                    {
-                      label: 'comments',
-                      value: 'comments',
-                    },
-                  ]
-                : []),
-            ]}
-            activeTab={currentTab}
-            handleChangeTab={handleChangeTab}
-          />
-          {currentTab === 'backers' ? (
-            renderBackersSection()
-          ) : post.isCommentsAllowed ? (
-            <CommentsTab
-              postUuid={post.postUuid}
-              commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => handleChangeTab('backers')}
+          <SActivitesContainer>
+            <PostVotingTab>{t('tabs.backers')}</PostVotingTab>
+            {renderBackersSection()}
+          </SActivitesContainer>
+          {/* Loading Modal */}
+          {loadingModalOpen && (
+            <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+          )}
+          {/* Payment success Modal */}
+          <PaymentSuccessModal
+            postType='cf'
+            isVisible={paymentSuccesModalOpen}
+            closeModal={() => setPaymentSuccesModalOpen(false)}
+          >
+            {t('paymentSuccessModal.cf', {
+              postCreator:
+                (post.creator?.nickname as string) ?? post.creator?.username,
+              postDeadline: moment(
+                (post.responseUploadDeadline?.seconds as number) * 1000
+              )
+                .subtract(3, 'days')
+                .calendar(),
+            })}
+          </PaymentSuccessModal>
+          {/* Choose pledge mobile modal */}
+          {isMobile ? (
+            <CfPledgeLevelsModal
+              zIndex={11}
+              post={post}
+              pledgeLevels={pledgeLevels}
+              isOpen={choosePledgeModalOpen}
+              onClose={() => setChoosePledgeModalOpen(false)}
+              handleAddPledgeFromResponse={handleAddPledgeFromResponse}
+              handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
+                setPaymentSuccesModalOpen(newValue)
+              }
             />
           ) : null}
-        </SActivitesContainer>
-        {/* Loading Modal */}
-        {loadingModalOpen && (
-          <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+          {/* Mobile floating button */}
+          {isMobile && !choosePledgeModalOpen && postStatus === 'voting' ? (
+            <>
+              <SActionButton
+                view='primaryGrad'
+                onClick={() => setChoosePledgeModalOpen(true)}
+              >
+                {t('cfPost.floatingActionButton.choosePledgeButton')}
+              </SActionButton>
+              {user.userTutorialsProgress.remainingCfSteps &&
+                user.userTutorialsProgress.remainingCfSteps[0] ===
+                  newnewapi.CfTutorialStep.CF_BACK_GOAL && (
+                  <STutorialTooltipHolderMobile>
+                    <TutorialTooltip
+                      isTooltipVisible={
+                        user.userTutorialsProgress.remainingCfSteps[0] ===
+                        newnewapi.CfTutorialStep.CF_BACK_GOAL
+                      }
+                      closeTooltip={goToNextStep}
+                      title={t('tutorials.cf.createYourBid.title')}
+                      text={t('tutorials.cf.createYourBid.text')}
+                      dotPosition={DotPositionEnum.BottomRight}
+                    />
+                  </STutorialTooltipHolderMobile>
+                )}
+            </>
+          ) : null}
+          {isPopupVisible && (
+            <HeroPopup
+              isPopupVisible={isPopupVisible}
+              postType='CF'
+              closeModal={goToNextStep}
+            />
+          )}
+        </SWrapper>
+        {post.isCommentsAllowed && (
+          <SCommentsSection id='comments' ref={commentsSectionRef}>
+            <SCommentsHeadline variant={4}>
+              {t('successCommon.comments.heading')}
+            </SCommentsHeadline>
+            <CommentsBottomSection
+              postUuid={post.postUuid}
+              commentsRoomId={post.commentsRoomId as number}
+              onFormBlur={handleCommentBlur}
+              onFormFocus={handleCommentFocus}
+            />
+          </SCommentsSection>
         )}
-        {/* Payment success Modal */}
-        <PaymentSuccessModal
-          postType='cf'
-          isVisible={paymentSuccesModalOpen}
-          closeModal={() => setPaymentSuccesModalOpen(false)}
-        >
-          {t('paymentSuccessModal.cf', {
-            postCreator:
-              (post.creator?.nickname as string) ?? post.creator?.username,
-            postDeadline: moment(
-              (post.responseUploadDeadline?.seconds as number) * 1000
-            )
-              .subtract(3, 'days')
-              .calendar(),
-          })}
-        </PaymentSuccessModal>
-        {/* Choose pledge mobile modal */}
-        {isMobile ? (
-          <CfPledgeLevelsModal
-            zIndex={11}
-            post={post}
-            pledgeLevels={pledgeLevels}
-            isOpen={choosePledgeModalOpen}
-            onClose={() => setChoosePledgeModalOpen(false)}
-            handleAddPledgeFromResponse={handleAddPledgeFromResponse}
-            handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
-              setPaymentSuccesModalOpen(newValue)
-            }
-          />
-        ) : null}
-        {/* Mobile floating button */}
-        {isMobile && !choosePledgeModalOpen && postStatus === 'voting' ? (
-          <>
-            <SActionButton
-              view='primaryGrad'
-              onClick={() => setChoosePledgeModalOpen(true)}
-            >
-              {t('cfPost.floatingActionButton.choosePledgeButton')}
-            </SActionButton>
-            {user.userTutorialsProgress.remainingCfSteps &&
-              user.userTutorialsProgress.remainingCfSteps[0] ===
-                newnewapi.CfTutorialStep.CF_BACK_GOAL && (
-                <STutorialTooltipHolderMobile>
-                  <TutorialTooltip
-                    isTooltipVisible={
-                      user.userTutorialsProgress.remainingCfSteps[0] ===
-                      newnewapi.CfTutorialStep.CF_BACK_GOAL
-                    }
-                    closeTooltip={goToNextStep}
-                    title={t('tutorials.cf.createYourBid.title')}
-                    text={t('tutorials.cf.createYourBid.text')}
-                    dotPosition={DotPositionEnum.BottomRight}
-                  />
-                </STutorialTooltipHolderMobile>
-              )}
-          </>
-        ) : null}
-        {isPopupVisible && (
-          <HeroPopup
-            isPopupVisible={isPopupVisible}
-            postType='CF'
-            closeModal={goToNextStep}
-          />
-        )}
-      </SWrapper>
+      </>
     );
   }
 );
@@ -969,3 +959,14 @@ const STutorialTooltipHolderMobile = styled.div`
     width: 190px;
   }
 `;
+
+// Comments
+const SCommentsHeadline = styled(Headline)`
+  margin-bottom: 8px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 16px;
+  }
+`;
+
+const SCommentsSection = styled.div``;
