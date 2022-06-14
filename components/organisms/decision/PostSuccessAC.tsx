@@ -28,8 +28,8 @@ import { fetchPostByUUID } from '../../../api/endpoints/post';
 const AcSuccessOptionsTab = dynamic(
   () => import('../../molecules/decision/auction/success/AcSuccessOptionsTab')
 );
-const CommentsSuccess = dynamic(
-  () => import('../../molecules/decision/success/CommentsSuccess')
+const CommentsBottomSection = dynamic(
+  () => import('../../molecules/decision/success/CommentsBottomSection')
 );
 
 interface IPostSuccessAC {
@@ -319,10 +319,9 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
             <SCommentsHeadline variant={4}>
               {t('successCommon.comments.heading')}
             </SCommentsHeadline>
-            <CommentsSuccess
+            <CommentsBottomSection
               postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => {}}
             />
           </SCommentsSection>
         )}

@@ -6,6 +6,7 @@ interface IGradientMask {
   active: boolean;
   positionTop?: boolean | number;
   positionBottom?: number;
+  width?: string;
   gradientType?: 'primary' | 'secondary' | 'tertiary';
 }
 
@@ -13,6 +14,7 @@ const GradientMask: React.FC<IGradientMask> = ({
   active,
   positionTop,
   positionBottom,
+  width,
   gradientType,
 }) => (
   <SGradientMask
@@ -20,11 +22,13 @@ const GradientMask: React.FC<IGradientMask> = ({
     positionTop={positionTop}
     positionBottom={positionBottom}
     gradientType={gradientType ?? undefined}
+    width={width ?? undefined}
   />
 );
 
 GradientMask.defaultProps = {
   gradientType: undefined,
+  width: undefined,
 };
 
 export default GradientMask;
@@ -38,7 +42,7 @@ const SGradientMask = styled.div<IGradientMask>`
   }};
   left: 0;
   right: 0;
-  width: calc(100%);
+  width: ${({ width }) => width ?? '100%'};
   height: ${(props) => (props.active ? '40px' : 0)};
   z-index: 1;
   position: absolute;
