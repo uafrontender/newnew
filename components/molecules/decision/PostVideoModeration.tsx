@@ -548,6 +548,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               id={postId}
               resources={announcement}
               muted={isMuted}
+              showPlayButton
             />
             {isSetThumbnailButtonIconOnly ? (
               <SSetThumbnailButtonIconOnly
@@ -621,6 +622,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               id={postId}
               resources={response}
               muted={isMuted}
+              showPlayButton
             />
             <SSoundButton
               id='sound-button'

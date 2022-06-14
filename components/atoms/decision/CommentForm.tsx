@@ -55,11 +55,12 @@ interface ICommentForm {
   zIndex?: number;
   isRoot?: boolean;
   onBlur?: () => void;
+  onFocus?: () => void;
   onSubmit: (text: string) => void;
 }
 
 const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
-  ({ postUuid, position, zIndex, isRoot, onBlur, onSubmit }, ref) => {
+  ({ postUuid, position, zIndex, isRoot, onBlur, onFocus, onSubmit }, ref) => {
     const theme = useTheme();
     const router = useRouter();
     const { t } = useTranslation('modal-Post');
@@ -195,6 +196,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
             }
             onFocus={() => {
               setFocusedInput(true);
+              onFocus?.();
             }}
             onBlur={handleBlur}
             onChange={handleChange}
@@ -232,6 +234,7 @@ export default CommentForm;
 
 CommentForm.defaultProps = {
   onBlur: () => {},
+  onFocus: () => {},
   zIndex: undefined,
   position: undefined,
   isRoot: false,

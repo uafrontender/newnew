@@ -747,6 +747,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       canVoteForFree ? (
         <>
           <SActionButton
+            id='action-button-mobile'
             view='primaryGrad'
             onClick={() => setSuggestNewMobileOpen(true)}
           >

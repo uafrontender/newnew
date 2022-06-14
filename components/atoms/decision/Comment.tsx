@@ -35,6 +35,8 @@ interface IComment {
   canDeleteComment?: boolean;
   handleAddComment: (newMsg: string) => void;
   handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
+  onFormFocus?: () => void;
+  onFormBlur?: () => void;
 }
 
 const Comment: React.FC<IComment> = ({
@@ -43,6 +45,8 @@ const Comment: React.FC<IComment> = ({
   canDeleteComment,
   handleAddComment,
   handleDeleteComment,
+  onFormFocus,
+  onFormBlur,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -169,6 +173,8 @@ const Comment: React.FC<IComment> = ({
                 ) : null}
                 <CommentForm
                   onSubmit={(newMsg: string) => handleAddComment(newMsg)}
+                  onBlur={onFormBlur ?? undefined}
+                  onFocus={onFormFocus ?? undefined}
                 />
               </>
             ))}
@@ -235,6 +241,8 @@ export default Comment;
 Comment.defaultProps = {
   lastChild: false,
   canDeleteComment: false,
+  onFormFocus: () => {},
+  onFormBlur: () => {},
 };
 
 const SUserAvatar = styled(UserAvatar)`

@@ -144,6 +144,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             id={`video-${postId}`}
             resources={response}
             muted={isMuted}
+            showPlayButton
           />
           <SSoundButton
             id='sound-button'
@@ -182,6 +183,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             id={postId}
             resources={announcement}
             muted={isMuted}
+            showPlayButton
           />
           <SSoundButton
             id='sound-button'

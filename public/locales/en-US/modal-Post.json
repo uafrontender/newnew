@@ -666,6 +666,7 @@
     "hideReplies": "Hide",
     "view-more": "View more comments",
     "comments": "Comments",
+    "seeMore": "See more",
     "noCommentsCaption": "Be the first to comment...",
     "errors": {
       "generic": "Please check input",
@@ -742,5 +743,6 @@
         "text": "Contribute to help the creator reach their Goal!"
       }
     }
-  }
+  },
+  "seeMore": ""
 }
