@@ -29,10 +29,10 @@ const DeleteCommentModal: React.FC<IDeleteCommentModal> = ({
           <SModalMessage>{t('DeleteCommentModal.body')}</SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={() => closeModal()}>
-              {t('DeleteCommentModal.cancelBtn')}
+              {t('DeleteCommentModal.cancelButton')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmDelete}>
-              {t('DeleteCommentModal.confirmBtn')}
+              {t('DeleteCommentModal.confirmButton')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>

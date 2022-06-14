@@ -75,31 +75,29 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
             <SHeadline variant={4}>
               {supportVotesAmount}{' '}
               {parseInt(supportVotesAmount) === 1
-                ? t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.vote')
-                : t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.votes')}
+                ? t('mcPost.optionsTab.optionCard.confirmVoteModal.vote')
+                : t('mcPost.optionsTab.optionCard.confirmVoteModal.votes')}
             </SHeadline>
             <SCreatorsText variant={2}>
               {parseInt(supportVotesAmount) === 1
                 ? t(
-                    'McPost.OptionsTab.OptionCard.ConfirmVoteModal.body_1_vote',
+                    'mcPost.optionsTab.optionCard.confirmVoteModal.buySingleVote',
                     { creator: postCreator }
                   )
                 : t(
-                    'McPost.OptionsTab.OptionCard.ConfirmVoteModal.body_multiple_votes',
+                    'mcPost.optionsTab.optionCard.confirmVoteModal.buyMultipleVotes',
                     { creator: postCreator, amount: supportVotesAmount }
                   )}
             </SCreatorsText>
             <SCaption variant={3}>
-              {t(
-                'McPost.OptionsTab.OptionCard.ConfirmVoteModal.option_caption'
-              )}
+              {t('mcPost.optionsTab.optionCard.confirmVoteModal.optionCaption')}
             </SCaption>
             <SOptionText variant={2}>{optionText}</SOptionText>
             <SVoteButton
               view='primary'
               onClick={() => handleOpenPaymentModal()}
             >
-              {t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.voteBtn')}
+              {t('mcPost.optionsTab.optionCard.confirmVoteModal.voteButton')}
             </SVoteButton>
           </SContentContainer>
         </SWrapper>
@@ -127,16 +125,15 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
             <img src={assets.decision.votes} alt='votes' />
           </SImageContainer>
           <SHeadline variant={4}>
-            {t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.custom')}
+            {t('mcPost.optionsTab.optionCard.confirmVoteModal.custom')}
           </SHeadline>
           <SCreatorsText variant={2}>
-            {t(
-              'McPost.OptionsTab.OptionCard.ConfirmVoteModal.body_custom_votes',
-              { creator: postCreator }
-            )}
+            {t('mcPost.optionsTab.optionCard.confirmVoteModal.buyAnyVotes', {
+              creator: postCreator,
+            })}
           </SCreatorsText>
           <SCaption variant={3}>
-            {t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.option_caption')}
+            {t('mcPost.optionsTab.optionCard.confirmVoteModal.optionCaption')}
           </SCaption>
           <SOptionText variant={2}>{optionText}</SOptionText>
           <VotesAmountInputModal
@@ -145,19 +142,19 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
             placeholder={
               minAmount > 1
                 ? t(
-                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
+                    'mcPost.optionsTab.actionSection.votesAmount.placeholder.votes'
                   )
                 : t(
-                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
+                    'mcPost.optionsTab.actionSection.votesAmount.placeholder.vote'
                   )
             }
             pseudoPlaceholder={
               !supportVotesAmount || parseInt(supportVotesAmount) > 1
                 ? t(
-                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
+                    'mcPost.optionsTab.actionSection.votesAmount.placeholder.votes'
                   )
                 : t(
-                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
+                    'mcPost.optionsTab.actionSection.votesAmount.placeholder.vote'
                   )
             }
             onChange={(newValue: string) =>
@@ -166,10 +163,10 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
             bottomPlaceholder={
               !supportVotesAmount || parseInt(supportVotesAmount) === 1
                 ? `${1} ${t(
-                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
+                    'mcPost.optionsTab.actionSection.votesAmount.placeholder.vote'
                   )} = $ ${1 * votePrice}`
                 : `${supportVotesAmount} ${t(
-                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
+                    'mcPost.optionsTab.actionSection.votesAmount.placeholder.votes'
                   )} = $ ${parseInt(supportVotesAmount) * votePrice}`
             }
             minAmount={minAmount}
@@ -181,7 +178,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
             }
             onClick={() => handleOpenPaymentModal()}
           >
-            {t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.voteBtn')}
+            {t('mcPost.optionsTab.optionCard.confirmVoteModal.voteButton')}
           </SVoteButton>
         </SContentContainer>
       </SWrapper>

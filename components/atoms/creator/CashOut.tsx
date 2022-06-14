@@ -41,7 +41,7 @@ const CashOut: React.FC<ICashOut> = ({
             </>
           ) : (
             <SDescription variant={3} weight={600}>
-              {t('dashboard.earnings.cashOut.no-payouts')}
+              {t('dashboard.earnings.cashOut.noPayouts')}
             </SDescription>
           )}
           {nextCashoutDate && (

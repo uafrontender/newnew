@@ -15,7 +15,7 @@ const WelcomeMessage: React.FC<IWelcomeMessage> = React.memo(
         <div>
           <span>🎉</span>
           <p>
-            {t('chat.welcome-message')} @{userAlias}.
+            {t('chat.welcomeMessage')} @{userAlias}.
           </p>
         </div>
       </SWelcomeMessage>

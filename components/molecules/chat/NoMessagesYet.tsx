@@ -9,8 +9,8 @@ const NoMessagesYet: React.FC = React.memo(() => {
     <SWelcomeMessage>
       <div>
         <span>👋</span>
-        <p>{t('chat.no-messages-first-line')}</p>
-        <p>{t('chat.no-messages-second-line')}</p>
+        <p>{t('chat.noMessagesFirstLine')}</p>
+        <p>{t('chat.noMessagesSecondLine')}</p>
       </div>
     </SWelcomeMessage>
   );

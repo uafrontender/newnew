@@ -219,14 +219,14 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         <SToggleVideoWidget>
           {openedTab === 'response' ? (
             <SChangeTabBtn onClick={() => setOpenedTab('announcement')}>
-              {t('PostVideo.tabs.back_to_original')}
+              {t('postVideo.tabs.backToOriginalVideo')}
             </SChangeTabBtn>
           ) : (
             <SChangeTabBtn
               shouldView={!responseViewed}
               onClick={() => setOpenedTab('response')}
             >
-              {t('PostVideo.tabs.back_to_response')}
+              {t('postVideo.tabs.backToResponse')}
             </SChangeTabBtn>
           )}
         </SToggleVideoWidget>

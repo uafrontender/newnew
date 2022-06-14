@@ -110,7 +110,7 @@ export const Subscriptions: React.FC = React.memo(() => {
             >
               <a>
                 <Button view='primaryGrad'>
-                  {t('subscriptions.message-all')}
+                  {t('subscriptions.messageAll')}
                 </Button>
               </a>
             </Link>

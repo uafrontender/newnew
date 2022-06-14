@@ -27,11 +27,11 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
       <SContainer onClick={(e) => e.stopPropagation()}>
         <SModal>
           <SModalTitle variant={6}>
-            {t(`PaymentSuccessModal.title.${postType}`)}
+            {t(`paymentSuccessModal.title.${postType}`)}
           </SModalTitle>
           <SModalMessage>{children}</SModalMessage>
           <SDoneButton onClick={closeModal}>
-            {t('PaymentSuccessModal.doneBtn')}
+            {t('paymentSuccessModal.doneButton')}
           </SDoneButton>
         </SModal>
       </SContainer>

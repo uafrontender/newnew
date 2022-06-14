@@ -23,7 +23,7 @@ const OnboardingSectionStripe = dynamic(
 );
 
 const CreatorOnboardingStripe = () => {
-  const { t } = useTranslation('creator-onboarding');
+  const { t } = useTranslation('page-CreatorOnboarding');
 
   const [onboardingState, setOnboardingState] =
     useState<newnewapi.GetMyOnboardingStateResponse>();
@@ -104,7 +104,7 @@ export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
-    'creator-onboarding',
+    'page-CreatorOnboarding',
   ]);
 
   return {

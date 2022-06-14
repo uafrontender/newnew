@@ -42,7 +42,7 @@ export const PostVideoResponsePreviewModal: React.FC<IPostVideoResponsePreviewMo
           {!isMobile && (
             <SModalTopLine>
               <SModalTopLineTitleTablet variant={6}>
-                {t('PostVideo.UploadResponseForm.video.full.title')}
+                {t('postVideo.uploadResponseForm.video.full.title')}
               </SModalTopLineTitleTablet>
             </SModalTopLine>
           )}
@@ -59,11 +59,11 @@ export const PostVideoResponsePreviewModal: React.FC<IPostVideoResponsePreviewMo
           <SControlsContainer>
             {!isMobile && (
               <SCancelButton view='secondary' onClick={handleClose}>
-                {t('PostVideo.UploadResponseForm.video.full.cancelBtn')}
+                {t('postVideo.uploadResponseForm.video.full.cancelButton')}
               </SCancelButton>
             )}
             <SPublishButton view='primaryGrad' onClick={handleConfirm}>
-              {t('PostVideo.UploadResponseForm.video.full.publishBtn')}
+              {t('postVideo.uploadResponseForm.video.full.publishButton')}
             </SPublishButton>
           </SControlsContainer>
           {isMobile && (

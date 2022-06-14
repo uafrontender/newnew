@@ -76,14 +76,11 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
 };
 
 BlockUserModal.defaultProps = {
+  isAnnouncement: false,
   onUserBlock: () => {},
 };
 
 export default BlockUserModal;
-
-BlockUserModal.defaultProps = {
-  isAnnouncement: false,
-};
 
 const SContainer = styled.div`
   display: flex;

@@ -132,10 +132,10 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                   {option.voteCount && option.voteCount > 0
                     ? `${formatNumber(option?.voteCount, true)} ${
                         option.voteCount === 1
-                          ? t('McPost.OptionsTab.OptionCard.vote')
-                          : t('McPost.OptionsTab.OptionCard.votes')
+                          ? t('mcPost.optionsTab.optionCard.vote')
+                          : t('mcPost.optionsTab.optionCard.votes')
                       }`
-                    : t('McPost.OptionsTab.OptionCard.noVotes')}
+                    : t('mcPost.optionsTab.optionCard.noVotes')}
                 </div>
               </SBidAmount>
               <SOptionInfo variant={3}>{option.text}</SOptionInfo>
@@ -178,7 +178,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
               </SEllipseButton>
             ) : (
               <SEllipseButtonMobile onClick={() => setIsEllipseMenuOpen(true)}>
-                {t('McPost.OptionsTab.OptionCard.moreBtn')}
+                {t('mcPost.optionsTab.optionCard.moreButton')}
               </SEllipseButtonMobile>
             )}
             {!isMobile && (

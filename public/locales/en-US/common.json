@@ -64,7 +64,7 @@
   "button-sign-up": "Sign up",
   "button-dashboard": "Dashboard",
   "button-create-on-newnew": "Create now",
-  "button-cancel": "Cancel",
+  "buttonCancel": "Cancel",
   "footer-top-title": "NewNew",
   "footer-center-title": "Connect",
   "footer-bottom-title": "Social",
@@ -96,9 +96,9 @@
   "dd-currency-subTitle-eur": "EUR - €",
   "selected-currency-title-usd": "USD",
   "selected-currency-title-eur": "EUR",
-  "cookie-text": "We use",
-  "cookie-link": "Learn more",
-  "report-bug": "Report a bug",
+  "cookieText": "We use",
+  "cookieLink": "Learn more",
+  "reportBug": "Report a bug",
   "error": {
     "text": {
       "min": "Text is too short, min {{value}} characters",
@@ -108,26 +108,24 @@
     }
   },
   "modal": {
-    "report-user": {
+    "reportUser": {
       "title": "Report",
       "subtitle": "Help us understand so that we can investigate...",
       "options": {
         "spam": "Suspicious or spam",
         "abuse": "Abusive or harmful",
         "suicide": "Expresses intentions of self-harm or suicide",
-        "hate-speech": "Hate speech",
+        "hateSpeech": "Hate speech",
         "harassment": "Harassment or bullying",
         "copyright": "Copyright",
         "other": "Other"
       },
-      "additional-info": {
+      "additionalInfo": {
         "placeholder": "Please tell us a bit more..."
       },
-      "button-cancel": "Cancel",
-      "button-confirm": "Report user",
-      "button-confirm-group": "Report group"
+      "buttonCancel": "Cancel"
     },
-    "report-sent": {
+    "reportSent": {
       "title": "We’re on it!",
       "subtitle": "We appreciate you letting us know. We’ll take a look into this ASAP and take the appropriate steps to ensure everyone’s safety.",
       "button": "Got it"
@@ -138,16 +136,16 @@
     "copied": "Link Copied!"
   },
   "search": {
-    "top-posts": "Top Posts",
-    "popular-creators": "Popular Creators",
+    "topPosts": "Top Posts",
+    "popularCreators": "Popular Creators",
     "allResults": "All results",
     "noResults": {
       "title": "We didn’t find anything",
       "description": "Try searching for something else or explore what’s new",
-      "action": "Explore" 
+      "action": "Explore"
     }
   },
-  "creator-card": {
-    "subscription-cost": "${{amount}} Monthly"
+  "creatorCard": {
+    "subscriptionCost": "${{amount}} Monthly"
   }
 }
