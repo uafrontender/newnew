@@ -36,6 +36,7 @@ import NoContentYetImg from '../../../../public/images/decision/no-content-yet-m
 import MakeFirstBidArrow from '../../../../public/images/svg/icons/filled/MakeFirstBidArrow.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import Text from '../../../atoms/Text';
+import Button from '../../../atoms/Button';
 
 interface ICommentsBottomSection {
   postUuid: string;
@@ -404,7 +405,7 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
     }, []);
 
     useEffect(() => {
-      if (commentIdFromUrl) {
+      async function findCommentById(id: string) {
         const flat: TCommentWithReplies[] = [];
         for (let i = 0; i < comments.length; i++) {
           if (
@@ -417,17 +418,19 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
           flat.push(comments[i]);
         }
 
-        const idx = flat.findIndex(
-          (comment) => comment.id === parseInt(commentIdFromUrl)
-        );
+        const idx = flat.findIndex((comment) => comment.id === parseInt(id));
 
-        if (idx === -1) {
-          // console.log('Looking further');
-          scrollRef.current?.scrollBy({
-            top: scrollRef.current.scrollHeight,
-          });
-        } else {
-          // console.log('Found the comment');
+        if (idx === -1 && commentsNextPageToken) {
+          console.log('Looking further');
+          if (isMobile) {
+            await fetchComments(commentsNextPageToken);
+          } else {
+            scrollRef.current?.scrollBy({
+              top: scrollRef.current.scrollHeight,
+            });
+          }
+        } else if (idx !== -1) {
+          console.log('Found the comment');
 
           if (!flat[idx].parentId || flat[idx].parentId === 0) {
             const offset = (
@@ -474,13 +477,17 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
                   ?.classList.add('opened-flash');
               }, 200);
             }
+            handleResetCommentIdFromUrl?.();
           }
-
           handleResetCommentIdFromUrl?.();
         }
       }
+
+      if (commentIdFromUrl) {
+        findCommentById(commentIdFromUrl);
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [commentIdFromUrl, comments]);
+    }, [commentIdFromUrl, commentsNextPageToken, comments, isMobile]);
 
     return (
       <>
@@ -548,13 +555,22 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
               <SLoaderDiv
                 ref={loadingRef}
                 style={{
-                  ...(commentsLoading
+                  ...(commentsLoading || isMobile
                     ? {
                         display: 'none',
                       }
                     : {}),
                 }}
               />
+              {isMobile && commentsNextPageToken && (
+                <SLoadMoreButton
+                  view='secondary'
+                  disabled={commentsLoading}
+                  onClick={() => fetchComments(commentsNextPageToken)}
+                >
+                  {t('See more')}
+                </SLoadMoreButton>
+              )}
             </SCommentsWrapper>
           </SActionSection>
           <GradientMask
@@ -599,8 +615,9 @@ const STabContainer = styled(motion.div)`
   height: calc(100% - 50px);
   align-self: flex-end;
 
+  margin-bottom: 40px;
   ${({ theme }) => theme.media.tablet} {
-    /* height: calc(100% - 56px); */
+    margin-bottom: 56px;
   }
 `;
 
@@ -698,4 +715,9 @@ const SMakeBidArrowSvg = styled(InlineSvg)`
   top: -56px;
 
   transform: scale(1, -1);
+`;
+
+const SLoadMoreButton = styled(Button)`
+  width: calc(100% - 12px);
+  margin-bottom: 12px;
 `;
