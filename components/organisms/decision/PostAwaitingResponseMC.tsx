@@ -49,20 +49,20 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
       const dhms = secondsToDHMS(parsed, 'noTrim');
 
       let countdownsrt = `${dhms.days} ${t(
-        'AcPostAwaiting.hero.expires.days'
-      )} ${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')}`;
+        'acPostAwaiting.hero.expires.days'
+      )} ${dhms.hours} ${t('acPostAwaiting.hero.expires.hours')}`;
 
       if (dhms.days === '0') {
         countdownsrt = `${dhms.hours} ${t(
-          'AcPostAwaiting.hero.expires.hours'
-        )} ${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')}`;
+          'acPostAwaiting.hero.expires.hours'
+        )} ${dhms.minutes} ${t('acPostAwaiting.hero.expires.minutes')}`;
         if (dhms.hours === '0') {
           countdownsrt = `${dhms.minutes} ${t(
-            'AcPostAwaiting.hero.expires.minutes'
-          )} ${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
+            'acPostAwaiting.hero.expires.minutes'
+          )} ${dhms.seconds} ${t('acPostAwaiting.hero.expires.seconds')}`;
           if (dhms.minutes === '0') {
             countdownsrt = `${dhms.seconds} ${t(
-              'AcPostAwaiting.hero.expires.seconds'
+              'acPostAwaiting.hero.expires.seconds'
             )}`;
           }
         }
@@ -196,7 +196,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                       </a>
                       <a href={`/${post.creator?.username}`}>
                         <SWantsToKnow>
-                          {t('McPostSuccess.wants_to_know', {
+                          {t('mcPostSuccess.wantsToKnow', {
                             creator: post.creator?.nickname,
                           })}
                         </SWantsToKnow>
@@ -204,7 +204,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                     </SCreator>
                     <STotal>
                       {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
-                      <span>{t('McPostSuccess.in_total_votes')}</span>
+                      <span>{t('mcPostSuccess.inTotalVotes')}</span>
                     </STotal>
                   </SCreatorInfoDiv>
                   <SPostTitle variant={4}>{post.title}</SPostTitle>
@@ -260,28 +260,28 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                                   winningOption.supporterCount,
                                   true
                                 )}{' '}
-                                {t('McPostSuccess.others')}
+                                {t('mcPostSuccess.others')}
                               </>
                             ) : null}{' '}
-                            {t('McPostSuccess.voted')}
+                            {t('mcPostSuccess.voted')}
                           </SWinningBidCreatorText>
                         </SCreator>
                       </SWinningBidCreator>
                       <SWinningOptionAmount variant={4}>
                         {`${formatNumber(winningOption.voteCount ?? 0, true)}`}{' '}
                         {winningOption.voteCount > 1
-                          ? t('McPostSuccess.votes')
-                          : t('McPostSuccess.vote')}
+                          ? t('mcPostSuccess.votes')
+                          : t('mcPostSuccess.vote')}
                       </SWinningOptionAmount>
                       <SSeparator />
                       <SWinningOptionDetails>
                         <SWinningOptionDetailsBidChosen>
-                          {t('McPostSuccess.option_chosen')}
+                          {t('mcPostSuccess.optionChosen')}
                         </SWinningOptionDetailsBidChosen>
                         <SWinningOptionDetailsSeeAll
                           onClick={() => setOpenedMainSection('options')}
                         >
-                          {t('McPostSuccess.see_all')}
+                          {t('mcPostSuccess.seeAll')}
                         </SWinningOptionDetailsSeeAll>
                         <SWinningOptionDetailsTitle variant={4}>
                           {winningOption.text}
@@ -302,7 +302,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
         {post.isCommentsAllowed && (
           <SCommentsSection id='comments' ref={commentsSectionRef}>
             <SCommentsHeadline variant={4}>
-              {t('SuccessCommon.Comments.heading')}
+              {t('successCommon.comments.heading')}
             </SCommentsHeadline>
             <CommentsSuccess
               postUuid={post.postUuid}

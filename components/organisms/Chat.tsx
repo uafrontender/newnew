@@ -98,7 +98,7 @@ export const Chat: React.FC<IChat> = ({ username }) => {
             />
           )}
           <SearchInput
-            placeholderText={t('toolbar.search-placeholder')}
+            placeholderText={t('toolbar.searchPlaceholder')}
             style={{ marginRight: '16px', fontSize: '16px' }}
             passInputValue={passInputValue}
           />

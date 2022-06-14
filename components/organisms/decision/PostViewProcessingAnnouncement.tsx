@@ -179,7 +179,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
             }
           />
           <SText variant={2} weight={600}>
-            {t(`PostViewProcessingAnnouncement.stayTuned.${postType}`)}
+            {t(`postViewProcessingAnnouncement.stayTuned.${postType}`)}
           </SText>
         </SActivitesContainer>
       </SWrapper>

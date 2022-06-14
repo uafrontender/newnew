@@ -151,7 +151,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
           defer={isMobile ? 250 : undefined}
           onClick={() => router.back()}
         >
-          <span>{t('backButton')}</span>
+          <span>{t('button.back')}</span>
         </SSignInBackButton>
         <SHeadline variant={3}>
           {reason && reason !== 'session_expired'
@@ -282,8 +282,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               >
                 <span>
                   {goal !== 'log-in'
-                    ? t('signUpOptions.signInBtn')
-                    : t('signUpOptions.logInBtn')}
+                    ? t('signUpOptions.signInButton')
+                    : t('signUpOptions.logInButton')}
                 </span>
               </EmailSignInButton>
             </motion.div>

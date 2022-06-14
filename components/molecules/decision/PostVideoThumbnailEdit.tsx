@@ -215,11 +215,11 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
             )}
             {isMobile ? (
               <SModalTopLineTitle variant={3} weight={600}>
-                {t('PostVideoThumbnailEdit.title')}
+                {t('postVideoThumbnailEdit.title')}
               </SModalTopLineTitle>
             ) : (
               <SModalTopLineTitleTablet variant={6}>
-                {t('PostVideoThumbnailEdit.title')}
+                {t('postVideoThumbnailEdit.title')}
               </SModalTopLineTitleTablet>
             )}
             {!isMobile && (
@@ -284,23 +284,23 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
           </SSelectLine>
           {!isMobile && (
             <SDescription>
-              <SText>{t('PostVideoThumbnailEdit.description')}</SText>
+              <SText>{t('postVideoThumbnailEdit.description')}</SText>
             </SDescription>
           )}
         </SModalTopContent>
         {isMobile ? (
           <SModalButtonContainer>
             <Button view='primaryGrad' onClick={onSubmit}>
-              {t('PostVideoThumbnailEdit.submit')}
+              {t('postVideoThumbnailEdit.submit')}
             </Button>
           </SModalButtonContainer>
         ) : (
           <SButtonsWrapper>
             <Button view='secondary' onClick={handleClose}>
-              {t('PostVideoThumbnailEdit.cancel')}
+              {t('postVideoThumbnailEdit.cancel')}
             </Button>
             <Button view='primaryGrad' onClick={onSubmit}>
-              {t('PostVideoThumbnailEdit.submit')}
+              {t('postVideoThumbnailEdit.submit')}
             </Button>
           </SButtonsWrapper>
         )}

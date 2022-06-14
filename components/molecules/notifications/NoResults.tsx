@@ -14,11 +14,11 @@ const NoResults: React.FC = React.memo(() => {
       <SWrapper>
         <Image
           src={emptyFolder}
-          alt={t('no-results')}
+          alt={t('noNotifications')}
           width={110}
           height={110}
         />
-        <SText>{t('no-results')}</SText>
+        <SText>{t('noNotifications')}</SText>
       </SWrapper>
     </SContainer>
   );

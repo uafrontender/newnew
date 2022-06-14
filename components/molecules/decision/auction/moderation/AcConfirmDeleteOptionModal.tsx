@@ -22,17 +22,17 @@ const AcConfirmDeleteOptionModal: React.FC<IAcConfirmDeleteOptionModal> = ({
       <SContainer>
         <SModal>
           <SModalTitle>
-            {t('AcPostModeration.DeleteOptionModal.title')}
+            {t('acPostModeration.deleteOptionModal.title')}
           </SModalTitle>
           <SModalMessage>
-            {t('AcPostModeration.DeleteOptionModal.body')}
+            {t('acPostModeration.deleteOptionModal.body')}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>
-              {t('AcPostModeration.DeleteOptionModal.cancelBtn')}
+              {t('acPostModeration.deleteOptionModal.cancelButton')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmDelete}>
-              {t('AcPostModeration.DeleteOptionModal.confirmBtn')}
+              {t('acPostModeration.deleteOptionModal.confirmButton')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>

@@ -73,7 +73,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
           <SMobileListContainer focused={focused}>
             <SMobileList>{options.map(renderItem)}</SMobileList>
             <SCancelButton view='modalSecondary' onClick={handleCloseClick}>
-              {t('button-cancel')}
+              {t('buttonCancel')}
             </SCancelButton>
           </SMobileListContainer>
         </Modal>

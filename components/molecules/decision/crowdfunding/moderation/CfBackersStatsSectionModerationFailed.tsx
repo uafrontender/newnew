@@ -48,7 +48,7 @@ const CfBackersStatsSectionModerationFailed: React.FunctionComponent<ICfBackersS
         <SCaptionSection>
           <SHeadline variant={3}>{currentNumBackers}</SHeadline>
           <STarget>
-            {t('CfPost.BackersStatsSection.of_backers', {
+            {t('cfPost.backersStatsSection.ofBackers', {
               targetBackers: formatNumber(targetBackerCount, true),
             })}
           </STarget>

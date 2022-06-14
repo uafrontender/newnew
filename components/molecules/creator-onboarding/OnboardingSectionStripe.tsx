@@ -26,7 +26,7 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
   ({ isConnectedToStripe }) => {
     const router = useRouter();
     const theme = useTheme();
-    const { t } = useTranslation('creator-onboarding');
+    const { t } = useTranslation('page-CreatorOnboarding');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -55,13 +55,13 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
       <SContainer>
         {isMobile && <SGoBackButton onClick={() => router.back()} />}
         <SHeadline variant={5}>
-          <span>{t('StripeSection.title-set-up-stripe')}</span>
+          <span>{t('stripeSection.stripeSection')}</span>
           <InlineSvg svg={StripeLogo} width='80px' />
         </SHeadline>
         <SUl>
-          <li>{t('StripeSection.bullets.1')}</li>
-          <li>{t('StripeSection.bullets.2')}</li>
-          <li>{t('StripeSection.bullets.3')}</li>
+          <li>{t('stripeSection.bullets.1')}</li>
+          <li>{t('stripeSection.bullets.2')}</li>
+          <li>{t('stripeSection.bullets.3')}</li>
         </SUl>
         <SButton
           view='primaryGrad'
@@ -88,8 +88,8 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
           />
           <span>
             {isConnectedToStripe
-              ? t('StripeSection.stripeConnectedLinkBtn')
-              : t('StripeSection.requestSetupLinkBtn')}
+              ? t('stripeSection.button.stripeConnectedLink')
+              : t('stripeSection.button.requestSetupLink')}
           </span>
         </SButton>
         <SControlsDiv>
@@ -97,7 +97,7 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
             <Link href='/creator/dashboard'>
               <a>
                 <GoBackButton noArrow onClick={() => {}}>
-                  {t('AboutSection.backButton')}
+                  {t('aboutSection.button.back')}
                 </GoBackButton>
               </a>
             </Link>
@@ -111,9 +111,7 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
                   width: isMobile ? '100%' : 'initial',
                 }}
               >
-                {isMobile
-                  ? t('StripeSection.submitMobile')
-                  : t('StripeSection.submitDesktop')}
+                {t('stripeSection.button.submit')}
               </Button>
             </a>
           </Link>

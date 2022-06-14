@@ -137,7 +137,7 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
               <div>
                 {option.voteCount && option.voteCount > 0
                   ? `${formatNumber(option?.voteCount, true)}`
-                  : t('McPost.OptionsTab.OptionCard.noVotes')}
+                  : t('mcPost.optionsTab.optionCard.noVotes')}
               </div>
             </SBidAmount>
             <SOptionInfo variant={3}>{option.text}</SOptionInfo>
@@ -156,10 +156,10 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
                       </SSpanBiddersRegularDoubleVote>
                       <SSpanBiddersHighlightedDoubleVote>
                         {formatNumber(supporterCountSubsctracted, true)}{' '}
-                        {t('McPost.OptionsTab.OptionCard.others')}
+                        {t('mcPost.optionsTab.optionCard.others')}
                       </SSpanBiddersHighlightedDoubleVote>{' '}
                       <SSpanBiddersRegularDoubleVote>
-                        {t('McPost.OptionsTab.OptionCard.voted')}
+                        {t('mcPost.optionsTab.optionCard.voted')}
                       </SSpanBiddersRegularDoubleVote>
                     </>
                   ) : null}
@@ -186,15 +186,12 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
                     }}
                   >
                     {isSuggestedByMe
-                      ? t('McPost.OptionsTab.OptionCard.my_suggestion')
-                      : t(
-                          'McPost.OptionsTab.OptionCard.subscriber_suggestion',
-                          {
-                            nickname:
-                              option.creator?.nickname ??
-                              option.creator?.username,
-                          }
-                        )}
+                      ? t('mcPost.optionsTab.optionCard.mySuggestion')
+                      : t('mcPost.optionsTab.optionCard.subscriberSuggestion', {
+                          nickname:
+                            option.creator?.nickname ??
+                            option.creator?.username,
+                        })}
                   </SSpanBiddersHighlightedDoubleVote>
                   {isSupportedByMe && !isSuggestedByMe ? (
                     <SSpanBiddersHighlightedDoubleVote>
@@ -213,25 +210,25 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
                           true
                         )}{' '}
                         {option.isCreatedBySubscriber || option.isSupportedByMe
-                          ? t('McPost.OptionsTab.OptionCard.others')
-                          : t('McPost.OptionsTab.OptionCard.voters')}
+                          ? t('mcPost.optionsTab.optionCard.others')
+                          : t('mcPost.optionsTab.optionCard.voters')}
                       </SSpanBiddersHighlightedDoubleVote>
                     </>
                   ) : null}{' '}
                   <SSpanBiddersRegularDoubleVote>
-                    {t('McPost.OptionsTab.OptionCard.voted')}
+                    {t('mcPost.optionsTab.optionCard.voted')}
                   </SSpanBiddersRegularDoubleVote>
                 </>
               )}
             </SBiddersInfo>
             <SDoubleMyVote>
               <SDoubleMyVoteCaption>
-                {t('McPost.OptionsTab.OptionCard.doubleMyVoteCaption')}
+                {t('mcPost.optionsTab.optionCard.doubleMyVoteCaption')}
               </SDoubleMyVoteCaption>
               <SDoubleMyVoteButton
                 onClick={() => handleTogglePaymentModalOpen()}
               >
-                {t('McPost.OptionsTab.OptionCard.doubleMyVoteButton')}
+                {t('mcPost.optionsTab.optionCard.doubleMyVoteButton')}
               </SDoubleMyVoteButton>
             </SDoubleMyVote>
           </SBidDetailsDoubleVote>
@@ -251,7 +248,7 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
           >
             <SPaymentModalHeader>
               <SPaymentModalTitle variant={3}>
-                {t('McPost.paymentModalHeader.subtitle')}
+                {t('mcPost.paymentModalHeader.subtitle')}
               </SPaymentModalTitle>
               <SPaymentModalOptionText>{option.text}</SPaymentModalOptionText>
             </SPaymentModalHeader>

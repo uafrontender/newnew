@@ -80,7 +80,7 @@ export const Navigation = () => {
       {collection.map(renderItem)}
       <Link href='/creation'>
         <a>
-          <Button>{t('navigation.new-post')}</Button>
+          <Button>{t('navigation.newPost')}</Button>
         </a>
       </Link>
     </SContainer>

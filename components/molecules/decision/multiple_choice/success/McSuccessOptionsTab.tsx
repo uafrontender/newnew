@@ -176,7 +176,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
   return (
     <SWrapper>
       <GoBackButton onClick={handleGoBack}>
-        {t('AcPostSuccess.OptionsTab.backBtn')}
+        {t('acPostSuccess.optionsTab.backButton')}
       </GoBackButton>
       {!isMobile && <SSeparator />}
       <SBidsContainer
@@ -229,7 +229,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
             view='secondary'
             onClick={() => fetchOptions(optionsNextPageToken)}
           >
-            {t('loadMoreBtn')}
+            {t('loadMoreButton')}
           </SLoadMoreBtn>
         ) : null}
       </SBidsContainer>

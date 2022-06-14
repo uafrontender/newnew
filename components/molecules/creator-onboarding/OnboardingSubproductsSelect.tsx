@@ -81,7 +81,7 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
   product,
   handleClick,
 }) => {
-  const { t } = useTranslation('creator-onboarding');
+  const { t } = useTranslation('page-CreatorOnboarding');
   const ref: any = useRef();
 
   useEffect(() => {
@@ -118,16 +118,16 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
               </Text>
             )}
             <SPerMonth variant={2}>
-              {t('SubrateSection.selectInput.perMonth')}
+              {t('subRateSection.selectInput.perMonth')}
             </SPerMonth>
             {featured && (
               <SFeaturedLabel>
-                {t('SubrateSection.selectInput.featured')}
+                {t('subRateSection.selectInput.featured')}
               </SFeaturedLabel>
             )}
           </>
         ) : (
-          <Text variant={2}>{t('SubrateSection.selectInput.noProduct')}</Text>
+          <Text variant={2}>{t('subRateSection.selectInput.noProduct')}</Text>
         )}
       </SLabelContent>
     </SProductOption>

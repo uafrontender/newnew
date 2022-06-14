@@ -18,9 +18,9 @@ const AccountDeleted: React.FC = React.memo(() => {
       <SBottomActionLeft>
         <SBottomActionIcon>😞</SBottomActionIcon>
         <SBottomActionText>
-          <SBottomActionTitle>{t('account-deleted.title')}</SBottomActionTitle>
+          <SBottomActionTitle>{t('accountDeleted.title')}</SBottomActionTitle>
           <SBottomActionMessage>
-            {t('account-deleted.message')}
+            {t('accountDeleted.message')}
           </SBottomActionMessage>
         </SBottomActionText>
       </SBottomActionLeft>
@@ -32,7 +32,7 @@ const AccountDeleted: React.FC = React.memo(() => {
           console.log('Delete chat');
         }}
       >
-        {t('account-deleted.button-text')}
+        {t('accountDeleted.buttonText')}
       </SBottomActionButton>
     </SBottomAction>
   );

@@ -105,7 +105,7 @@ const CfBackersStatsSection: React.FunctionComponent<ICfBackersStatsSection> =
           <SCaptionSection>
             <SHeadline variant={3}>{currentNumBackers}</SHeadline>
             <STarget>
-              {t('CfPost.BackersStatsSection.of_backers', {
+              {t('cfPost.backersStatsSection.ofBackers', {
                 targetBackers: formatNumber(targetBackerCount, true),
               })}
             </STarget>
@@ -117,9 +117,9 @@ const CfBackersStatsSection: React.FunctionComponent<ICfBackersStatsSection> =
               </SMyPledgeHeadline>
               {isMobile && (
                 <SMyPledgeCaption variant={3}>
-                  <SSpanBold>{t('CfPost.BackersStatsSection.my')}</SSpanBold>{' '}
+                  <SSpanBold>{t('cfPost.backersStatsSection.my')}</SSpanBold>{' '}
                   <SSpanThin>
-                    {t('CfPost.BackersStatsSection.pledge')}
+                    {t('cfPost.backersStatsSection.pledge')}
                   </SSpanThin>
                 </SMyPledgeCaption>
               )}
@@ -133,8 +133,8 @@ const CfBackersStatsSection: React.FunctionComponent<ICfBackersStatsSection> =
             </SMyPledgeHeadline>
             {isMobile && (
               <SMyPledgeCaption variant={3}>
-                <SSpanBold>{t('CfPost.BackersStatsSection.my')}</SSpanBold>{' '}
-                <SSpanThin>{t('CfPost.BackersStatsSection.pledge')}</SSpanThin>
+                <SSpanBold>{t('cfPost.backersStatsSection.my')}</SSpanBold>{' '}
+                <SSpanThin>{t('cfPost.backersStatsSection.pledge')}</SSpanThin>
               </SMyPledgeCaption>
             )}
           </SMyPledgeAmount>
