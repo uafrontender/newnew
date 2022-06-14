@@ -30,8 +30,8 @@ const McSuccessOptionsTab = dynamic(
       '../../molecules/decision/multiple_choice/success/McSuccessOptionsTab'
     )
 );
-const CommentsSuccess = dynamic(
-  () => import('../../molecules/decision/success/CommentsSuccess')
+const CommentsBottomSection = dynamic(
+  () => import('../../molecules/decision/success/CommentsBottomSection')
 );
 const DecisionEndedBox = dynamic(
   () => import('../../molecules/decision/success/DecisionEndedBox')
@@ -344,10 +344,9 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
             <SCommentsHeadline variant={4}>
               {t('successCommon.comments.heading')}
             </SCommentsHeadline>
-            <CommentsSuccess
+            <CommentsBottomSection
               postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => {}}
             />
           </SCommentsSection>
         )}
