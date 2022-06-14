@@ -33,7 +33,7 @@ interface IPostSuccessCF {
 
 const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
   ({ post }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const theme = useTheme();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
@@ -236,7 +236,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     : assets.creation.darkCfAnimated
                 }
               >
-                {t('CfPostSuccess.heroText')}
+                {t('cfPostSuccess.heroText')}
               </DecisionEndedBox>
               <SMainSectionWrapper>
                 <SCreatorInfoDiv>
@@ -246,7 +246,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     </a>
                     <a href={`/${post.creator?.username}`}>
                       <SWantsToKnow>
-                        {t('CfPostSuccess.wantsToKnow', {
+                        {t('cfPostSuccess.wantsToKnow', {
                           creator: post.creator?.nickname,
                         })}
                       </SWantsToKnow>
@@ -260,7 +260,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                 <SSeparator />
                 <SBackersInfo>
                   <SCreatorsBackers>
-                    {t('CfPostSuccess.creatorsBackers', {
+                    {t('cfPostSuccess.creatorsBackers', {
                       creator: post.creator?.nickname,
                     })}
                   </SCreatorsBackers>
@@ -268,7 +268,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     {formatNumber(post.currentBackerCount, true)}
                   </SCurrentBackers>
                   <STargetBackers variant={6}>
-                    {t('CfPostSuccess.ofTargetBackers', {
+                    {t('cfPostSuccess.ofTargetBackers', {
                       target_count: formatNumber(post.targetBackerCount, true),
                     })}
                   </STargetBackers>
@@ -278,7 +278,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     <SSeparator />
                     <YouBackedInfo>
                       <SYouBackedFor>
-                        {t('CfPostSuccess.youBackedFor')}
+                        {t('cfPostSuccess.youBackedFor')}
                       </SYouBackedFor>
                       <SYouBackedAmount variant={4}>
                         {`$${formatNumber(

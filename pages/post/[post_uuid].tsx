@@ -46,7 +46,7 @@ interface IPostPage {
 
 const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { mutedMode, resizeMode } = useAppSelector((state) => state.ui);
@@ -159,7 +159,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { post_uuid } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'decision',
+    'modal-Post',
     'component-PostCard',
     'modal-PaymentModal',
     'chat',

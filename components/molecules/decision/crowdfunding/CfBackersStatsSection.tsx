@@ -20,7 +20,7 @@ interface ICfBackersStatsSection {
 const CfBackersStatsSection: React.FunctionComponent<ICfBackersStatsSection> =
   ({ targetBackerCount, currentNumBackers, myPledgeAmount }) => {
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isTablet = ['tablet'].includes(resizeMode);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

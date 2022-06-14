@@ -46,7 +46,7 @@ const Comment: React.FC<IComment> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('page-Decision');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -116,7 +116,7 @@ const Comment: React.FC<IComment> = ({
                   ? comment.sender?.uuid === user.userData?.userUuid
                     ? t('comments.me')
                     : comment.sender?.nickname ?? comment.sender?.username
-                  : t('comments.comment_deleted')}
+                  : t('comments.commentDeleted')}
               </SNickname>
             </Link>
             <SBid> </SBid>
@@ -159,12 +159,12 @@ const Comment: React.FC<IComment> = ({
           <SText>{comment.content?.text}</SText>
           {!comment.parentId &&
             (!isReplyFormOpen ? (
-              <SReply onClick={replyHandler}>{t('comments.send-reply')}</SReply>
+              <SReply onClick={replyHandler}>{t('comments.sendReply')}</SReply>
             ) : (
               <>
                 {replies.length === 0 ? (
                   <SReply onClick={replyHandler}>
-                    {t('comments.hide-replies')}
+                    {t('comments.hideReplies')}
                   </SReply>
                 ) : null}
                 <CommentForm
@@ -175,8 +175,8 @@ const Comment: React.FC<IComment> = ({
           {!comment.parentId && replies && replies.length > 0 && (
             <SReply onClick={replyHandler}>
               {isReplyFormOpen
-                ? t('comments.hide-replies')
-                : t('comments.view-replies')}{' '}
+                ? t('comments.hideReplies')
+                : t('comments.viewReplies')}{' '}
               {replies.length}{' '}
               {replies.length > 1 ? t('comments.replies') : t('comments.reply')}
             </SReply>

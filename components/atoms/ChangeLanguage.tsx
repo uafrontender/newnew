@@ -16,7 +16,7 @@ import { SUPPORTED_LANGUAGES } from '../../constants/general';
 interface IChangeLanguage {}
 
 export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
   const ref: any = useRef();
   const { push, locale, pathname } = useRouter();
   const [focused, setFocused] = useState(false);

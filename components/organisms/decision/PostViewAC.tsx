@@ -95,7 +95,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     handleRemovePostFromState,
     handleAddPostToState,
   }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);

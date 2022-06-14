@@ -38,7 +38,7 @@ interface IPostSuccessAC {
 
 const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
   ({ post }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const theme = useTheme();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);

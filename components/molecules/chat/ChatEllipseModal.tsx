@@ -87,7 +87,7 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
           }}
           onClick={onClose}
         >
-          {t('Cancel')}
+          {t('ellipse.cancel')}
         </Button>
       </SWrapper>
     </Modal>

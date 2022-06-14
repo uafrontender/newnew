@@ -28,7 +28,7 @@ interface IDropDown {
 
 export const DropDown: React.FC<IDropDown> = (props) => {
   const { value, options, disabled, handleChange } = props;
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
   const theme = useTheme();
   const ref: any = useRef();
   const [focused, setFocused] = useState(false);
