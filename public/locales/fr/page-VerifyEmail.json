@@ -13,5 +13,6 @@
   },
   "error": {
     "invalidCode": "Wrong code. Try again..."
-  }
+  },
+  "backButton": "Back"
 }

@@ -38,6 +38,7 @@ import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import Headline from '../../atoms/Headline';
 import PostVotingTab from '../../molecules/decision/PostVotingTab';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -90,6 +91,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+
+    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     const showSelectingWinnerOption = useMemo(
       () => postStatus === 'waiting_for_decision',
@@ -337,17 +340,19 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     // Increment channel subs after mounting
     // Decrement when unmounting
     useEffect(() => {
-      addChannel(post.postUuid, {
-        postUpdates: {
-          postUuid: post.postUuid,
-        },
-      });
+      if (socketConnection.connected) {
+        addChannel(post.postUuid, {
+          postUpdates: {
+            postUuid: post.postUuid,
+          },
+        });
+      }
 
       return () => {
         removeChannel(post.postUuid);
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [socketConnection.connected]);
 
     // Mark post as viewed if logged in
     useEffect(() => {
@@ -520,11 +525,11 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
         resetSessionId();
       };
 
-      if (socketConnection.active) {
+      if (socketConnection.connected) {
         makeBidFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection.active, sessionId]);
+    }, [socketConnection.connected, sessionId]);
 
     const goToNextStep = () => {
       if (
@@ -589,22 +594,11 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     // Replace hash once scrolled to comments
     useEffect(() => {
       if (inView) {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}#comments`
-        );
+        syncedHistoryReplaceState({}, `/post/${post.postUuid}#comments`);
       } else {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}`
-        );
+        syncedHistoryReplaceState({}, `/post/${post.postUuid}`);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inView, post.postUuid]);
 
     return (
