@@ -31,7 +31,7 @@ export const NotificationsItem: React.FC<INotificationItem> = (props) => {
               </SLinkTitle>
             </a>
           </Link>{' '}
-          decision.
+          post.
         </SSubTitle>
       </SCenterContent>
       <SUserAvatarRight avatarUrl={item.bidForUser.avatar} />

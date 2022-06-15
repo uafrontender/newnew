@@ -27,7 +27,7 @@ const WaitingForResponseBox: React.FunctionComponent<IWaitingForResponseBox> =
                 ? assets.decision.darkHourglassAnimated
                 : assets.decision.lightHourglassAnimated
             }
-            alt='decision'
+            alt='post'
           />
         </SImageContainer>
       </SBox>

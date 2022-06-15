@@ -72,7 +72,7 @@ const SearchInput: React.FC = React.memo(() => {
 
     if (e.keyCode === 13 && searchValue) {
       setIsResultsDropVisible(false);
-      router.push(`/search?query=${searchValue}&tab=decisions`);
+      router.push(`/search?query=${searchValue}&tab=posts`);
       setSearchValue('');
     }
   };
@@ -244,7 +244,7 @@ const SearchInput: React.FC = React.memo(() => {
                 )}
                 <SButton
                   onClick={() => {
-                    router.push(`/search?query=${searchValue}&tab=decisions`);
+                    router.push(`/search?query=${searchValue}&tab=posts`);
                   }}
                   view='quaternary'
                 >
@@ -285,7 +285,7 @@ const SearchInput: React.FC = React.memo(() => {
               )}
               <SButton
                 onClick={() => {
-                  router.push(`/search?query=${searchValue}&tab=decisions`);
+                  router.push(`/search?query=${searchValue}&tab=posts`);
                 }}
                 view='quaternary'
               >
