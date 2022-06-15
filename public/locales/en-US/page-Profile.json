@@ -47,7 +47,7 @@
   "Favorites": {
     "meta": {
       "title": "NewNew Favorites",
-      "description": "Browse through all of your saved favorite posts, decisions and creators"
+      "description": "Browse through all of your saved favorite posts, posts and creators"
     },
     "noContent": {
       "description": "Any creators you favorite\nwill be shown here"
@@ -250,7 +250,7 @@
         },
         "actions": {
           "topup": "top-up your wallet.",
-          "decision": "decision.",
+          "decision": "post.",
           "1": "bid on",
           "2": "voted on",
           "3": "backed on",
