@@ -26,7 +26,7 @@ const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
                 </SUserAvatar>
                 <SPostData>
                   <SCreatorUsername>{creator.nickname}</SCreatorUsername>
-                  <SLink>See decisions</SLink>
+                  <SLink>{t('search.creatorSubtitle')}</SLink>
                 </SPostData>
               </SLeftSide>
             </SPost>

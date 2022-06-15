@@ -122,7 +122,7 @@
   },
   "postVideo": {
     "tabs": {
-      "announcement": "Decision",
+      "announcement": "Post",
       "response": "Response",
       "backToOriginalVideo": "Back to original",
       "backToResponse": "Watch response"
@@ -145,13 +145,13 @@
       "block": {
         "title": {
           "file": "Upload file",
-          "decision": "Decision information",
+          "decision": "Post information",
           "advanced": "Advanced settings",
           "floating": "Preview"
         },
         "subTitle": {
           "votesInfo": "All votes start at a $1 dollar by default",
-          "floating": "Upload file to preview your brand new decision"
+          "floating": "Upload file to preview your brand new post"
         }
       },
       "modal": {
@@ -448,7 +448,7 @@
     "backersTab": {
       "info": {
         "title": "Back {{creator}}'s Goal",
-        "caption": "You won't get charged until a decision has been made."
+        "caption": "You won't get charged until a post has been made."
       },
       "customPledge": {
         "pledgeButton": "Pledge",

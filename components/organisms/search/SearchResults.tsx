@@ -19,7 +19,7 @@ export const SearchResults = () => {
   const { t } = useTranslation('page-Search');
   const theme = useTheme();
   const [searchValue, setSearchValue] = useState('');
-  const [activeTab, setActiveTab] = useState<string>('decisions');
+  const [activeTab, setActiveTab] = useState<string>('posts');
 
   useEffect(() => {
     if (router) {
@@ -27,7 +27,7 @@ export const SearchResults = () => {
       if (router.query.tab) {
         router.query.tab === 'creators'
           ? setActiveTab('creators')
-          : setActiveTab('decisions');
+          : setActiveTab('posts');
       }
     }
   }, [router]);
@@ -35,7 +35,7 @@ export const SearchResults = () => {
   const tabTypes = useMemo(
     () => [
       {
-        id: 'decisions',
+        id: 'posts',
         title: t('mainContent.tabs.decisions'),
       },
       {
@@ -90,7 +90,7 @@ export const SearchResults = () => {
         </SPageTitle>
       </SHeader>
       <Tabs />
-      {activeTab === 'decisions' ? (
+      {activeTab === 'posts' ? (
         <SearchDecisions query={searchValue} />
       ) : (
         <SearchCreators query={searchValue} />
