@@ -16,7 +16,7 @@ interface IMessagingDisabled {
 
 const MessagingDisabled: React.FC<IMessagingDisabled> = React.memo(
   ({ user }) => {
-    const { t } = useTranslation('chat');
+    const { t } = useTranslation('page-Chat');
     return (
       <SBottomAction>
         <SBottomActionLeft>

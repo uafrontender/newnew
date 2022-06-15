@@ -26,7 +26,7 @@ const CfPledgeCard: React.FunctionComponent<ICfPledgeCard> = ({
   creator,
   index,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const createdAtParsed = new Date(

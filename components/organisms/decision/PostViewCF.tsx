@@ -101,7 +101,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
     handleAddPostToState,
   }) => {
     const router = useRouter();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);

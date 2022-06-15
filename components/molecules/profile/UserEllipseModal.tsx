@@ -80,7 +80,7 @@ const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
           }}
           onClick={onClose}
         >
-          {t('Cancel')}
+          {t('ellipse.cancel')}
         </Button>
       </SWrapper>
     </Modal>

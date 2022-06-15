@@ -19,7 +19,7 @@ const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
   user,
   closeModal,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
 
   const { blockUser } = useGetBlockedUsers();
 
@@ -52,10 +52,10 @@ const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>
-              {t('blockUserModal.buttonCancel')}
+              {t('blockUserModal.button.cancel')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmClick}>
-              {t('blockUserModal.buttonConfirm')}
+              {t('blockUserModal.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>

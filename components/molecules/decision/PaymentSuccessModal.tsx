@@ -20,7 +20,7 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
   closeModal,
   children,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
 
   return (
     <Modal show={isVisible} additionalz={14} onClose={closeModal}>

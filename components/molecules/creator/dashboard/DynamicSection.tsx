@@ -37,7 +37,7 @@ const Tabs = dynamic(() => import('../../Tabs'));
 
 export const DynamicSection = () => {
   const theme = useTheme();
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -178,7 +178,7 @@ export const DynamicSection = () => {
                   </SIndicatorContainer>
                 )}
               </SIconHolder>
-              {t('dashboard.button.dms')}
+              {t('dashboard.button.directMessages')}
             </SButton>
           )}
         </>

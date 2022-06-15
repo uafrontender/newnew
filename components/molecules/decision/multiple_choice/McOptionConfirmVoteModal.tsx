@@ -46,7 +46,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
   handleOpenPaymentModal,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

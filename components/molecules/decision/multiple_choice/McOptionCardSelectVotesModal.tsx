@@ -33,7 +33,7 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<IMcOptionCardSelectV
     children,
   }) => {
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
 
     const { appConstants } = useGetAppConstants();
 

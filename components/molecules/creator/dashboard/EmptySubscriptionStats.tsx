@@ -7,7 +7,7 @@ import Headline from '../../../atoms/Headline';
 import { useAppSelector } from '../../../../redux-store/store';
 
 export const EmptySubscriptionStats = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const user = useAppSelector((state) => state.user);
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 

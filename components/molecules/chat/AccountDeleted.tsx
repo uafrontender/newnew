@@ -11,7 +11,7 @@ import {
 } from '../../atoms/chat/styles';
 
 const AccountDeleted: React.FC = React.memo(() => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
 
   return (
     <SBottomAction>

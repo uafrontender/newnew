@@ -22,7 +22,7 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
   closeModal,
   isAnnouncement,
 }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
 
   const { blockUser } = useGetBlockedUsers();
 

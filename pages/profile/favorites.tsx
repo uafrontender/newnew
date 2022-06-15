@@ -251,7 +251,7 @@ export async function getServerSideProps(
       'common',
       'page-Profile',
       'component-PostCard',
-      'decision',
+      'modal-Post',
       'modal-PaymentModal',
     ]);
 
