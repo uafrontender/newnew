@@ -351,17 +351,19 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     // Increment channel subs after mounting
     // Decrement when unmounting
     useEffect(() => {
-      addChannel(post.postUuid, {
-        postUpdates: {
-          postUuid: post.postUuid,
-        },
-      });
+      if (socketConnection.connected) {
+        addChannel(post.postUuid, {
+          postUpdates: {
+            postUuid: post.postUuid,
+          },
+        });
+      }
 
       return () => {
         removeChannel(post.postUuid);
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [socketConnection.connected]);
 
     // Mark post as viewed if logged in
     useEffect(() => {
@@ -536,11 +538,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
         resetSessionId();
       };
 
-      if (socketConnection.active) {
+      if (socketConnection.connected) {
         makeVoteFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection.active, sessionId]);
+    }, [socketConnection.connected, sessionId]);
 
     const goToNextStep = () => {
       if (
