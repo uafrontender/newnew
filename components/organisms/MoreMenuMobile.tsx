@@ -75,7 +75,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
                     variant={2}
                     active={router.route.includes('direct-messages')}
                   >
-                    {t('mobileBottomNavigation-dms')}
+                    {t('mobileBottomNavigation.dms')}
                   </SText>
                   <InlineSvg
                     svg={ChatIconFilled}
@@ -91,7 +91,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
               )}
               <SButton onClick={handleShareMenuClick}>
                 <SText variant={2} active={router.route.includes('share')}>
-                  {t('mobileBottomNavigation-share')}
+                  {t('mobileBottomNavigation.share')}
                 </SText>
                 <InlineSvg
                   svg={ShareIcon}

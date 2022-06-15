@@ -63,7 +63,7 @@ export const Desktop: React.FC = React.memo(() => {
             {user.userData?.options?.isCreator && (
               <SItemWithMargin style={{ paddingRight: 16 }}>
                 <SNavText variant={3} weight={600} onClick={handlerCopy}>
-                  {isCopiedUrl ? t('myLinkCopied') : t('myLink')}
+                  {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}
                 </SNavText>
               </SItemWithMargin>
             )}
@@ -116,7 +116,7 @@ export const Desktop: React.FC = React.memo(() => {
                 <SItemWithMargin>
                   <Link href='/creator/dashboard'>
                     <a>
-                      <Button view='quaternary'>{t('buttonDashboard')}</Button>
+                      <Button view='quaternary'>{t('button.dashboard')}</Button>
                     </a>
                   </Link>
                 </SItemWithMargin>
@@ -130,7 +130,7 @@ export const Desktop: React.FC = React.memo(() => {
                   >
                     <a>
                       <Button withShadow view='primaryGrad'>
-                        {t('buttonCreateDecision')}
+                        {t('button.createDecision')}
                       </Button>
                     </a>
                   </Link>
@@ -164,7 +164,7 @@ export const Desktop: React.FC = React.memo(() => {
                   >
                     <a>
                       <Button withDim withShadow withShrink view='primaryGrad'>
-                        {t('buttonCreateOnNewnew')}
+                        {t('button.createOnNewnew')}
                       </Button>
                     </a>
                   </Link>
@@ -193,7 +193,7 @@ export const Desktop: React.FC = React.memo(() => {
             <SItemWithMargin>
               <Link href='/sign-up?to=log-in'>
                 <a>
-                  <Button view='quaternary'>{t('buttonLoginIn')}</Button>
+                  <Button view='quaternary'>{t('button.loginIn')}</Button>
                 </a>
               </Link>
             </SItemWithMargin>
@@ -201,7 +201,7 @@ export const Desktop: React.FC = React.memo(() => {
               <Link href='/sign-up'>
                 <a>
                   <Button withDim withShrink withShadow view='primaryGrad'>
-                    {t('buttonSignUp')}
+                    {t('button.signUp')}
                   </Button>
                 </a>
               </Link>

@@ -384,7 +384,7 @@ const MyProfileSettingsIndex = () => {
         <SBottomLinksDiv>
           {/* TEMP */}
           {/* <SBlockOptionButton>
-            {commonT(`selectedLanguageTitle-${router.locale}`)}
+            {commonT(`language.selectedLanguageTitle/${router.locale}`)}
           </SBlockOptionButton> */}
           <SBlockOption href='https://faqs.newnew.co' target='_blank'>
             {t('Settings.bottomDiv.help')}

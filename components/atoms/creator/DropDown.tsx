@@ -99,7 +99,7 @@ export const DropDown: React.FC<IDropDown> = (props) => {
           <SMobileListContainer focused={focused}>
             <SMobileList>{options.map(renderItem)}</SMobileList>
             <SCancelButton view='modalSecondary' onClick={handleCloseClick}>
-              {t('buttonCancel')}
+              {t('button.cancel')}
             </SCancelButton>
           </SMobileListContainer>
         </Modal>

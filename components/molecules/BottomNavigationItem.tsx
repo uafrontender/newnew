@@ -96,7 +96,7 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
         )}
       </SSVGContainer>
       <SCaption variant={3} active={active}>
-        {t(`mobileBottomNavigation-${item.key}`)}
+        {t(`mobileBottomNavigation.${item.key}`)}
       </SCaption>
     </SContainer>
   ) : (
@@ -122,7 +122,7 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
             )}
           </SSVGContainer>
           <SCaption variant={3} active={active}>
-            {t(`mobileBottomNavigation-${item.key}`)}
+            {t(`mobileBottomNavigation.${item.key}`)}
           </SCaption>
         </a>
       </Link>
