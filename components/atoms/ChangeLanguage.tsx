@@ -50,7 +50,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
         selected={item === locale}
       >
         <SItemTitle variant={3} weight={600}>
-          {t(`languageddLanguageTitle.${item}`)}
+          {t(`language.ddLanguageTitle.${item}`)}
         </SItemTitle>
       </SButton>
     );
