@@ -19,6 +19,7 @@ import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess'
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../molecules/decision/waiting/WaitingForResponseBox')
@@ -42,6 +43,8 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { mutedMode } = useAppSelector((state) => state.ui);
+
+    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     const waitingTime = useMemo(() => {
       const end = (post.responseUploadDeadline?.seconds as number) * 1000;
@@ -117,22 +120,11 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     // Replace hash once scrolled to comments
     useEffect(() => {
       if (inView) {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}#comments`
-        );
+        syncedHistoryReplaceState({}, `/post/${post.postUuid}#comments`);
       } else {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}`
-        );
+        syncedHistoryReplaceState({}, `/post/${post.postUuid}`);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inView, post.postUuid]);
 
     // Load winning option

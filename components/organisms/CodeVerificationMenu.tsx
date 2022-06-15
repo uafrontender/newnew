@@ -224,7 +224,12 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   return (
     <>
       {!isMobileOrTablet && (
-        <SBackButtonDesktop onClick={() => router.back()} />
+        <SBackButtonDesktop
+          longArrow={!isMobileOrTablet}
+          onClick={() => router.back()}
+        >
+          {!isMobileOrTablet ? t('backButton') : ''}
+        </SBackButtonDesktop>
       )}
       <SCodeVerificationMenu
         onClick={() => {
@@ -392,14 +397,11 @@ const SBackButtonDesktop = styled(GoBackButton)`
     left: 104px;
 
     justify-content: center;
+    align-items: center;
 
-    width: 36px;
+    width: fit-content;
     height: 36px;
     padding: 0;
-
-    border-radius: 12px;
-
-    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
 
     div {
       margin-right: 0;
