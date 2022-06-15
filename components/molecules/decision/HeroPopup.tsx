@@ -33,7 +33,7 @@ const HeroPopup: React.FC<IHeroPopup> = ({
   postType,
   closeModal,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const theme = useTheme();
 
   return (

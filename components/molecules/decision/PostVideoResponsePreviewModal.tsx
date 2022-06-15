@@ -27,7 +27,7 @@ interface IPostVideoResponsePreviewModal {
 export const PostVideoResponsePreviewModal: React.FC<IPostVideoResponsePreviewModal> =
   ({ open, value, handleClose, handleConfirm }) => {
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 

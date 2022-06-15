@@ -41,7 +41,7 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
   postStatus,
 }) => {
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

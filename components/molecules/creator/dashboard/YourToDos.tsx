@@ -12,8 +12,8 @@ import { useAppSelector } from '../../../../redux-store/store';
 import RadioIcon from '../../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 
-export const YourTodos = () => {
-  const { t } = useTranslation('creator');
+export const YourToDos = () => {
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
 
@@ -97,7 +97,7 @@ export const YourTodos = () => {
   );
 };
 
-export default YourTodos;
+export default YourToDos;
 
 const SContainer = styled.div`
   left: -16px;

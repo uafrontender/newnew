@@ -44,9 +44,8 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<
-    newnewapi.IPost | undefined
-  >();
+  const [displayedPost, setDisplayedPost] =
+    useState<newnewapi.IPost | undefined>();
 
   // Loading state
   const { ref: loadingRef, inView } = useInView();
@@ -67,9 +66,8 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   const [initialLoad, setInitialLoad] = useState(false);
   const [loadingPosts, setLoadingPosts] = useState(false);
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
-  const [postsNextPageToken, setPostsRoomsNextPageToken] = useState<
-    string | undefined | null
-  >('');
+  const [postsNextPageToken, setPostsRoomsNextPageToken] =
+    useState<string | undefined | null>('');
 
   useOnClickOutside(filterContainerRef, () => {
     if (isFilterOpened) {
@@ -219,7 +217,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
         pathname: '/search',
         query: {
           query,
-          tab: 'decision',
+          tab: 'posts',
           filter: routerArr.length > 0 ? routerArr.join('-') : '',
           sorting: activeFilter,
         },

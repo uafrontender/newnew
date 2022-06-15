@@ -288,10 +288,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                 <SBullet>
                   <SBulletImg alt='' src={assets.subscription.subDm} />
                   <SBulletTitle variant={5}>
-                    {t('topSection.bullets.dms.title')}
+                    {t('topSection.bullets.directMessages.title')}
                   </SBulletTitle>
                   <SBulletBody variant={3}>
-                    {t('topSection.bullets.dms.body', {
+                    {t('topSection.bullets.directMessages.body', {
                       nickname: user?.nickname,
                     })}
                   </SBulletBody>

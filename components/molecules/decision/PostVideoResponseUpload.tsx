@@ -72,7 +72,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   handleResetVideoUploadAndProcessingState,
   handleUploadVideoNotProcessed,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const [showVideoDelete, setShowVideoDelete] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const playerRef: any = useRef();

@@ -18,7 +18,7 @@ const ToggleVideoWidget: React.FunctionComponent<IToggleVideoWidget> = ({
   wrapperCSS,
   handleChangeTab,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
 
   return (
     <SToggleVideoWidget

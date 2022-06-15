@@ -1,6 +1,6 @@
 {
   "welcome": "Welcome to {{NEXT_PUBLIC_APP_NAME}}!",
-  "top-section-title": "Top 10 in {{country}}",
+  "topSectionTitle": "Top 10 in {{country}}",
   "heroSection": {
     "title": "Come together \nto shape reality",
     "subTitle": "Bid and vote on what the world does next",
@@ -8,6 +8,7 @@
     "explore": "Explore Now",
     "exploreNow": "Explore now"
   },
+  "shareTo": "Share to",
   "ellipse": {
     "copyLink": "Copy link",
     "linkCopied": "Link copied!",
@@ -41,63 +42,61 @@
     "cf": "Goal"
   },
   "dragToReposition": "Drag to reposition image",
-  "mobile-bottom-navigation-add": "Create",
-  "mobile-bottom-navigation-home": "Home",
-  "mobile-bottom-navigation-more": "More",
-  "mobile-bottom-navigation-share": "Share",
-  "mobile-bottom-navigation-dashboard": "Dashboard",
-  "mobile-bottom-navigation-dms": "DMs",
-  "mobile-bottom-navigation": "Dashboard",
-  "mobile-bottom-navigation-notifications": "Notifications",
-  "mobile-top-navigation-notifications": "Notifications",
-  "mobile-top-navigation-direct-messages": "DMs",
-  "mobile-top-navigation-share": "Share",
-  "mobile-top-navigation-my-balance": "My Balance: ${{value}}",
-  "mobile-top-navigation-my-balance-tablet": "${{value}}",
-  "mobile-top-navigation-my-balance-empty": "Wallet balance",
-  "mobile-top-navigation-profile": "Profile",
-  "my-link": "My link",
-  "my-link-copied": "Copied!",
-  "button-create-decision": "New post",
-  "button-create": "Create",
-  "button-login-in": "Log in",
-  "button-sign-up": "Sign up",
-  "button-dashboard": "Dashboard",
-  "button-create-on-newnew": "Create now",
-  "buttonCancel": "Cancel",
-  "footer-top-title": "NewNew",
-  "footer-center-title": "Connect",
-  "footer-bottom-title": "Social",
-  "footer-about": "About",
-  "footer-press": "Press",
-  "footer-jobs": "Work @ NewNew",
-  "footer-help": "Help",
-  "footer-faq": "FAQs",
-  "footer-twitter": "Twitter",
-  "footer-how-it-works": "How it works",
-  "footer-guidelines": "Community Guidelines",
-  "footer-accessibility": "Accessibility",
-  "footer-suggest-a-feature": "Suggest a feature",
-  "footer-inc": "© NewNew Inc",
-  "footer-terms": "Terms",
-  "footer-privacy": "Privacy",
-  "dd-language-title-en-US": "English",
-  "dd-language-title-es-MX": "Español",
-  "dd-language-title-fr": "Français",
-  "dd-language-subTitle-en-US": "United states",
-  "dd-language-subTitle-es-MX": "México",
-  "dd-language-subTitle-fr": "France",
-  "selected-language-title-en-US": "English",
-  "selected-language-title-es-MX": "Español (MX)",
-  "selected-language-title-fr": "Français (FR)",
-  "dd-currency-title-usd": "United States dollar",
-  "dd-currency-title-eur": "Euro",
-  "dd-currency-subTitle-usd": "USD - $",
-  "dd-currency-subTitle-eur": "EUR - €",
-  "selected-currency-title-usd": "USD",
-  "selected-currency-title-eur": "EUR",
-  "cookieText": "We use",
-  "cookieLink": "Learn more",
+  "mobileBottomNavigation": {
+    "add": "Create",
+    "home": "Home",
+    "more": "More",
+    "share": "Share",
+    "dashboard": "Dashboard",
+    "dms": "DMs",
+    "notifications": "Notifications"
+  },
+  "mobileTopNavigation": {
+    "myBalance": "My Balance: ${{value}}",
+    "profile": "Profile"
+  },
+  "button": {
+    "createDecision": "New post",
+    "create": "Create",
+    "loginIn": "Log in",
+    "signUp": "Sign up",
+    "dashboard": "Dashboard",
+    "createOnNewnew": "Create now",
+    "cancel": "Cancel"
+  },
+  "footer": {
+    "topTitle": "NewNew",
+    "centerTitle": "Connect",
+    "bottomTitle": "Social",
+    "about": "About",
+    "press": "Press",
+    "jobs": "Work @ NewNew",
+    "help": "Help",
+    "faq": "FAQs",
+    "twitter": "Twitter",
+    "howItWorks": "How it works",
+    "guidelines": "Community Guidelines",
+    "accessibility": "Accessibility",
+    "inc": "© NewNew Inc",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  },
+  "language": {
+    "ddLanguageTitle": {
+      "en-US": "English",
+      "es-MX": "Español",
+      "fr": "Français"
+    },
+    "selectedLanguageTitle": {
+      "en-US": "English",
+      "es-MX": "Español (MX)",
+      "fr": "Français (FR)"
+    }
+  },
+  "cookie": {
+    "text": "We use",
+    "link": "Learn more"
+  },
   "reportBug": "Report a bug",
   "error": {
     "text": {
@@ -123,13 +122,19 @@
       "additionalInfo": {
         "placeholder": "Please tell us a bit more..."
       },
-      "buttonCancel": "Cancel"
+      "button": {
+        "cancel": "Cancel"
+      }
     },
     "reportSent": {
       "title": "We’re on it!",
       "subtitle": "We appreciate you letting us know. We’ll take a look into this ASAP and take the appropriate steps to ensure everyone’s safety.",
       "button": "Got it"
     }
+  },
+  "myLink": {
+    "copy": "My link",
+    "copied": "Copied!"
   },
   "socials": {
     "copy": "Copy Link",
@@ -138,6 +143,7 @@
   "search": {
     "topPosts": "Top Posts",
     "popularCreators": "Popular Creators",
+    "creatorSubtitle": "See posts",
     "allResults": "All results",
     "noResults": {
       "title": "We didn’t find anything",

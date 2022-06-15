@@ -46,7 +46,7 @@ const ChatList: React.FC<IFunctionProps> = ({
   searchText,
   username,
 }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const { unreadCountForCreator, unreadCountForUser } = useGetChats();

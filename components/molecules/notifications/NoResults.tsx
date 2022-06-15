@@ -7,7 +7,7 @@ import { useTranslation } from 'next-i18next';
 import emptyFolder from '../../../public/images/notifications/no-results.png';
 
 const NoResults: React.FC = React.memo(() => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
 
   return (
     <SContainer>
