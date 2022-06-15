@@ -1,12 +1,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
-import Modal from '../../organisms/Modal';
-import InlineSVG, { InlineSvg } from '../../atoms/InlineSVG';
-import Headline from '../../atoms/Headline';
+import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
+import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
+
+import InlineSvg from '../../atoms/InlineSVG';
 
 import copyIcon from '../../../public/images/svg/icons/outlined/Link.svg';
 import tiktokIcon from '../../../public/images/svg/icons/socials/TikTok.svg';
@@ -14,7 +16,6 @@ import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
 import Caption from '../../atoms/Caption';
-import Button from '../../atoms/Button';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -24,41 +25,44 @@ const SOCIAL_ICONS: any = {
   instagram: instagramIcon,
 };
 
-interface IPostShareModal {
-  isOpen: boolean;
-  zIndex: number;
+interface IPostShareEllipseMenu {
   postId: string;
+  isVisible: boolean;
   onClose: () => void;
 }
 
-const PostShareModal: React.FunctionComponent<IPostShareModal> = React.memo(
-  ({ isOpen, zIndex, postId, onClose }) => {
-    const { t } = useTranslation('decision');
+const PostShareEllipseMenu: React.FunctionComponent<IPostShareEllipseMenu> =
+  React.memo(({ postId, isVisible, onClose }) => {
+    const { t } = useTranslation('common');
+    const containerRef = useRef<HTMLDivElement>();
 
-    // const socialButtons = useMemo(() => [
-    //   {
-    //     key: 'twitter',
-    //   },
-    //   {
-    //     key: 'facebook',
-    //   },
-    //   {
-    //     key: 'instagram',
-    //   },
-    //   {
-    //     key: 'tiktok',
-    //   },
-    //   {
-    //     key: 'copy',
-    //   },
-    // ], []);
+    useOnClickEsc(containerRef, onClose);
+    useOnClickOutside(containerRef, onClose);
+
+    // const socialButtons = useMemo(
+    //   () => [
+    //     {
+    //       key: 'twitter',
+    //     },
+    //     {
+    //       key: 'facebook',
+    //     },
+    //     {
+    //       key: 'instagram',
+    //     },
+    //     {
+    //       key: 'tiktok',
+    //     },
+    //   ],
+    //   []
+    // );
     // const renderItem = (item: any) => (
     //   <SItem key={item.key}>
     //     <SItemButton type={item.key}>
-    //       <InlineSVG
+    //       <InlineSvg
     //         svg={SOCIAL_ICONS[item.key] as string}
-    //         width="50%"
-    //         height="50%"
+    //         width='50%'
+    //         height='50%'
     //       />
     //     </SItemButton>
     //     <SItemTitle variant={3} weight={600}>
@@ -86,105 +90,86 @@ const PostShareModal: React.FunctionComponent<IPostShareModal> = React.memo(
             setIsCopiedUrl(true);
             setTimeout(() => {
               setIsCopiedUrl(false);
-              onClose();
-            }, 1000);
+            }, 1500);
           })
           .catch((err) => {
             console.log(err);
           });
       }
-    }, [postId, onClose]);
+    }, [postId]);
 
     return (
-      <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
-        <SWrapper>
-          <SContentContainer
-            onClick={(e) => {
-              e.stopPropagation();
+      <AnimatePresence>
+        {isVisible && (
+          <SContainer
+            ref={(el) => {
+              containerRef.current = el!!;
             }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <Headline variant={6}>{t('socials.share-to')}</Headline>
-            <SSocialsSection>
-              {/* <SSocials>
-              {socialButtons.map(renderItem)}
-            </SSocials> */}
-              <SItem>
-                <SItemButtonWide
-                  type='copy'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handlerCopy();
-                  }}
-                >
-                  <InlineSvg
-                    svg={SOCIAL_ICONS.copy as string}
-                    width='24px'
-                    height='24px'
-                  />
-                  {isCopiedUrl ? t('socials.copied') : t('socials.copy')}
-                </SItemButtonWide>
-              </SItem>
-            </SSocialsSection>
-          </SContentContainer>
-          <Button
-            view='secondary'
-            style={{
-              height: '56px',
-              width: 'calc(100% - 32px)',
-            }}
-            onClick={onClose}
-          >
-            {t('Cancel')}
-          </Button>
-        </SWrapper>
-      </Modal>
+            {/* <SSocials>
+            {socialButtons.map(renderItem)}
+          </SSocials> */}
+            {/* <SSeparator /> */}
+            <SItem>
+              <SItemButtonWide
+                type='copy'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlerCopy();
+                }}
+              >
+                <InlineSvg
+                  svg={SOCIAL_ICONS.copy as string}
+                  width='24px'
+                  height='24px'
+                />
+                {isCopiedUrl ? t('ellipse.linkCopied') : t('ellipse.copyLink')}
+              </SItemButtonWide>
+            </SItem>
+          </SContainer>
+        )}
+      </AnimatePresence>
     );
-  }
-);
+  });
 
-export default PostShareModal;
+export default PostShareEllipseMenu;
 
-const SWrapper = styled.div`
-  width: 100%;
-  height: 100%;
+const SContainer = styled(motion.div)`
+  position: absolute;
+  top: calc(100% - 10px);
+  z-index: 10;
+  right: 48px;
+  max-width: 260px;
+  min-width: 260px;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding-bottom: 16px;
-`;
-
-const SContentContainer = styled.div`
-  width: calc(100% - 32px);
-  height: fit-content;
-
-  z-index: 15;
-
-  padding: 16px;
-
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-
+  /* padding: 16px; */
+  padding: 12px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  ${({ theme }) => theme.media.tablet} {
-    width: 480px;
-    height: 480px;
-    margin: auto;
-  }
-`;
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
-const SSocialsSection = styled.div`
-  padding: 16px;
+  ${({ theme }) => theme.media.laptop} {
+    right: 48px;
+  }
 `;
 
 const SSocials = styled.div`
+  gap: 24px;
   display: flex;
+  margin-top: 16px;
   align-items: center;
   flex-direction: row;
   justify-content: space-between;
+`;
+
+const SSeparator = styled.div`
+  border-bottom: 1px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
+  margin-top: 16px;
+  margin-bottom: 16px;
 `;
 
 const SItem = styled.div`
@@ -199,12 +184,12 @@ interface ISItemButton {
 }
 
 const SItemButton = styled.div<ISItemButton>`
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   display: flex;
   overflow: hidden;
   align-items: center;
-  border-radius: 16px;
+  border-radius: 12px;
   justify-content: center;
   background: ${(props) => props.theme.colorsThemed.social[props.type].main};
 `;

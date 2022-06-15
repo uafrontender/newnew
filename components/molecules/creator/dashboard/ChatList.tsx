@@ -19,7 +19,7 @@ import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
 
 export const ChatList = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const router = useRouter();
   const user = useAppSelector((state) => state.user);

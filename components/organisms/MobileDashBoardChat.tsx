@@ -24,7 +24,7 @@ const MobileDashBoardChat: React.FC<IMobileDashBoardChat> = ({ closeChat }) => {
   const openChat = ({ chatRoom }: IChatData) => {
     setChatData({ chatRoom, showChatList });
   };
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const [chatListHidden, setChatListHidden] =
     useState<boolean | undefined>(false);
   const [newMessage, setNewMessage] =

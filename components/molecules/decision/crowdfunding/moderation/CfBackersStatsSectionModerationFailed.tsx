@@ -18,7 +18,7 @@ interface ICfBackersStatsSectionModerationFailed {
 const CfBackersStatsSectionModerationFailed: React.FunctionComponent<ICfBackersStatsSectionModerationFailed> =
   ({ targetBackerCount, currentNumBackers }) => {
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isTablet = ['tablet'].includes(resizeMode);
     const size = isTablet ? 240 : 280;

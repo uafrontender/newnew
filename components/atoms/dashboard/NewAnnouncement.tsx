@@ -11,7 +11,7 @@ interface INewAnnouncement {
 
 const NewAnnouncement: React.FC<INewAnnouncement> = ({ handleClick }) => {
   const theme = useTheme();
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
 
   return (
     <SWrapper onClick={handleClick}>

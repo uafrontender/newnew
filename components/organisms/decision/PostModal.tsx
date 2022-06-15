@@ -77,11 +77,11 @@ const PostAwaitingResponseMC = dynamic(
 const PostAwaitingResponseCF = dynamic(
   () => import('./PostAwaitingResponseCF')
 );
-const PostShareModal = dynamic(
-  () => import('../../molecules/decision/PostShareModal')
+const PostShareEllipseModal = dynamic(
+  () => import('../../molecules/decision/PostShareEllipseModal')
 );
-const PostShareMenu = dynamic(
-  () => import('../../molecules/decision/PostShareMenu')
+const PostShareEllipseMenu = dynamic(
+  () => import('../../molecules/decision/PostShareEllipseMenu')
 );
 const PostEllipseModal = dynamic(
   () => import('../../molecules/decision/PostEllipseModal')
@@ -131,7 +131,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -936,14 +936,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             </SWaitingSuccessControlsBtn>
             {/* Share menu */}
             {!isMobile && postParsed?.postUuid && (
-              <PostShareMenu
+              <PostShareEllipseMenu
                 postId={postParsed.postUuid}
                 isVisible={shareMenuOpen}
                 onClose={handleShareClose}
               />
             )}
             {isMobile && shareMenuOpen && postParsed?.postUuid && (
-              <PostShareModal
+              <PostShareEllipseModal
                 isOpen={shareMenuOpen}
                 zIndex={11}
                 postId={postParsed.postUuid}
@@ -1065,10 +1065,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 })}
                 body={
                   deletedByCreator
-                    ? t('postDeletedByMe.body.by_creator', {
+                    ? t('postDeletedByMe.body.byCreator', {
                         postType: t(`postType.${typeOfPost}`),
                       })
-                    : t('postDeletedByMe.body.by_admin', {
+                    : t('postDeletedByMe.body.byAdmin', {
                         postType: t(`postType.${typeOfPost}`),
                       })
                 }
@@ -1089,11 +1089,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 })}
                 body={
                   deletedByCreator
-                    ? t('postDeleted.body.by_creator', {
+                    ? t('postDeleted.body.byCreator', {
                         creator: getDisplayname(postParsed.creator!!),
                         postType: t(`postType.${typeOfPost}`),
                       })
-                    : t('postDeleted.body.by_admin', {
+                    : t('postDeleted.body.byAdmin', {
                         creator: getDisplayname(postParsed.creator!!),
                         postType: t(`postType.${typeOfPost}`),
                       })

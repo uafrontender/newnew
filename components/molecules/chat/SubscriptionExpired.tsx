@@ -26,7 +26,7 @@ interface ISubscriptionExpired {
 
 const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
   ({ user }) => {
-    const { t } = useTranslation('chat');
+    const { t } = useTranslation('page-Chat');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode

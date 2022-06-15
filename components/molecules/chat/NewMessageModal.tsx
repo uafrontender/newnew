@@ -54,7 +54,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   showModal,
   closeModal,
 }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
   const theme = useTheme();
   const scrollRef: any = useRef();
   const { resizeMode } = useAppSelector((state) => state.ui);

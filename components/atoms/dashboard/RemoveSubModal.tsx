@@ -18,7 +18,7 @@ const RemoveSubModal: React.FC<IRemoveSubModal> = ({
   closeModal,
   subDisabled,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const handleSubmit = () => {
     subDisabled();
   };
@@ -37,7 +37,7 @@ const RemoveSubModal: React.FC<IRemoveSubModal> = ({
             <SText>{t('removeSubModal.note')}</SText>
           </SModalContent>
           <SConfirmButton view='danger' onClick={handleSubmit}>
-            {t('removeSubModal.bntText')}
+            {t('removeSubModal.button')}
           </SConfirmButton>
         </SModal>
       </SContainer>

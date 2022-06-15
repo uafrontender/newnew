@@ -27,7 +27,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
   hasMyPosts,
   earnings,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const [filter, setFilter] = useState('7_days');
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [myEarnings, setMyEarnings] =
@@ -248,8 +248,8 @@ export const Earnings: React.FC<IFunctionProps> = ({
         />
       ) : hasMyPosts && myEarnings?.nextCashoutAmount ? (
         <CashOut
-          nextCashoutAmount={myEarnings?.nextCashoutAmount}
-          nextCashoutDate={myEarnings?.nextCashoutDate}
+          nextCashOutAmount={myEarnings?.nextCashoutAmount}
+          nextCashOutDate={myEarnings?.nextCashoutDate}
         />
       ) : (
         <MakeDecision />
