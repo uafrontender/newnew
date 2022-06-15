@@ -406,7 +406,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   />
                 )}
               </STopContent>
-              {/* <SBottomContent>
+              <SBottomContent>
                 <SUserAvatar
                   withClick
                   avatarUrl={
@@ -422,7 +422,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 <SText variant={3} weight={600}>
                   {postParsed.title}
                 </SText>
-              </SBottomContent> */}
+              </SBottomContent>
             </SImageHolder>
           </SContent>
           {postParsed?.creator && isReportModalOpen && (
@@ -865,6 +865,23 @@ const STopContent = styled.div`
   justify-content: flex-end;
 `;
 
+const SBottomContent = styled.div`
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+`;
+
+const SText = styled(Text)`
+  color: ${(props) => props.theme.colors.white};
+  display: -webkit-box;
+  overflow: hidden;
+  position: relative;
+  margin-left: 12px;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+`;
+
 const SWrapperOutside = styled.div<ISWrapper>`
   width: ${(props) => props.width};
   cursor: pointer;
@@ -1137,6 +1154,15 @@ const SButtonFirst = styled(Button)`
     span {
       color: #ffffff;
     }
+  }
+`;
+
+const SUserAvatar = styled(UserAvatar)`
+  ${(props) => props.theme.media.tablet} {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
   }
 `;
 
