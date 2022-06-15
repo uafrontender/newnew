@@ -7,7 +7,7 @@
     "title": "My Dashboard",
     "button": {
       "notifications": "Notifications",
-      "dms": "DMs",
+      "directMessages": "DMs",
       "markAllAsRead": "Mark all as read",
       "minimize": "Minimize",
       "new": "New",
@@ -34,11 +34,11 @@
       },
       "toDosIssue": {
         "text": "Add a bio and your bank info to withdraw your earnings",
-        "btnText": "Add"
+        "button": "Add"
       },
       "makeDecision": {
-        "text": "Make a decision. Start earning.",
-        "btnText": "Make a decision"
+        "text": "Make a post. Start earning.",
+        "button": "Make a post"
       },
       "list": {
         "ac": "Events",
@@ -210,14 +210,14 @@
   "enableSubModal": {
     "title": "Turn on subscription",
     "note": "This subscription price is locked for 30 days from the day you enable it",
-    "bntText": "Yes, turn on subscription",
+    "button": "Yes, turn on subscription",
     "confirmationTextFirstPart": "Confirm",
     "confirmationTextSecondPart": "monthly subscription"
   },
   "removeSubModal": {
     "title": "Remove my subscription",
     "note": "If you remove your subscription, you won’t be able to gain new subscribers and your subscription will end for your current subscribers. You will also lose the abilitiy to chat with your subscribers.\n You can turn your subscription back on at any time. ",
-    "bntText": "Remove my subscription"
+    "button": "Remove my subscription"
   },
   "noResults": {
     "text": "Share your profile to let others\n know about your subscription",

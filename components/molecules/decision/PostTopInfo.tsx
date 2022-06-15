@@ -18,8 +18,8 @@ import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
 import PostFailedBox from './PostFailedBox';
-import PostShareMenu from './PostShareMenu';
-import PostShareModal from './PostShareModal';
+import PostShareEllipseMenu from './PostShareEllipseMenu';
+import PostShareEllipseModal from './PostShareEllipseModal';
 import PostEllipseMenu from './PostEllipseMenu';
 import PostEllipseModal from './PostEllipseModal';
 
@@ -84,7 +84,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -258,14 +258,14 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           </SMoreButton>
           {/* Share menu */}
           {!isMobile && (
-            <PostShareMenu
+            <PostShareEllipseMenu
               postId={postId}
               isVisible={shareMenuOpen}
               onClose={handleCloseShareMenu}
             />
           )}
           {isMobile && shareMenuOpen ? (
-            <PostShareModal
+            <PostShareEllipseModal
               isOpen={shareMenuOpen}
               zIndex={11}
               postId={postId}

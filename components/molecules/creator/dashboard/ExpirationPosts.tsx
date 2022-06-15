@@ -26,7 +26,7 @@ interface IExpirationPosts {
 export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   expirationPosts,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
 

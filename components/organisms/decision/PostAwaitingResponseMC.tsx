@@ -39,7 +39,7 @@ interface IPostAwaitingResponseMC {
 
 const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
   React.memo(({ post }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { mutedMode } = useAppSelector((state) => state.ui);
@@ -174,8 +174,8 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
             {openedMainSection === 'main' ? (
               <>
                 <WaitingForResponseBox
-                  title={t('McPostAwaiting.hero.title')}
-                  body={t('McPostAwaiting.hero.body', {
+                  title={t('mcPostAwaiting.hero.title')}
+                  body={t('mcPostAwaiting.hero.body', {
                     creator: post.creator?.nickname,
                     time: waitingTime,
                   })}

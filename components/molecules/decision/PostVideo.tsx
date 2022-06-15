@@ -39,7 +39,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
   isMuted,
   handleToggleMuted,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [

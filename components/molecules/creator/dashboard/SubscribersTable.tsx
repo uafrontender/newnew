@@ -21,7 +21,7 @@ const SubscriberRow = dynamic(
 const InlineSVG = dynamic(() => import('../../../atoms/InlineSVG'));
 
 export const SubscribersTable = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const { mySubscribersTotal } = useGetSubscriptions();
 

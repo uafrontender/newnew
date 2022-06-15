@@ -1,7 +1,4 @@
 {
-  "my": "my",
-  "me": "me",
-  "I": "I",
   "meta": {
     "ac": {
       "title": "NewNew Event",
@@ -16,6 +13,9 @@
       "description": "Make money, pledge in crowdfunding campaigns with friends and support creators on NewNew"
     }
   },
+  "my": "my",
+  "me": "me",
+  "I": "I",
   "postType": {
     "ac": "Event",
     "mc": "Superpoll",
@@ -86,16 +86,16 @@
   "postDeletedByMe": {
     "title": "This {{ postType }} has been deleted",
     "body": {
-      "by_creator": "You deleted this {{ postType }}",
-      "by_admin": "This {{ postType }} was in violation of our Community Guidelines"
+      "byCreator": "You deleted this {{ postType }}",
+      "byAdmin": "This {{ postType }} was in violation of our Community Guidelines"
     },
     "buttonText": "Make a new one"
   },
   "postDeleted": {
     "title": "This {{ postType }} has been deleted",
     "body": {
-      "by_creator": "{{ creator }} deleted this {{ postType }}",
-      "by_admin": "This {{ postType }} was in violation of our Community Guidelines"
+      "byCreator": "{{ creator }} deleted this {{ postType }}",
+      "byAdmin": "This {{ postType }} was in violation of our Community Guidelines"
     },
     "buttonText": "See new {{ postTypeMultiple }}"
   },
@@ -122,7 +122,7 @@
   },
   "postVideo": {
     "tabs": {
-      "announcement": "Decision",
+      "announcement": "Post",
       "response": "Response",
       "backToOriginalVideo": "Back to original",
       "backToResponse": "Watch response"
@@ -145,13 +145,13 @@
       "block": {
         "title": {
           "file": "Upload file",
-          "decision": "Decision information",
+          "decision": "Post information",
           "advanced": "Advanced settings",
           "floating": "Preview"
         },
         "subTitle": {
           "votesInfo": "All votes start at a $1 dollar by default",
-          "floating": "Upload file to preview your brand new decision"
+          "floating": "Upload file to preview your brand new post"
         }
       },
       "modal": {
@@ -209,21 +209,27 @@
   "deletePostModal": {
     "title": "Delete {{ postType }}",
     "body": "Are you sure you want to delete this {{ postType }}? You won't be able to restore it once it's deleted...",
-    "cancelButton": "Cancel",
-    "confirmButton": "Delete"
+    "button": {
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
   },
-  "DeleteCommentModal": {
+  "deleteCommentModal": {
     "title": "Delete comment",
     "body": "Are you sure you want to delete this comment?",
-    "cancelButton": "Cancel",
-    "confirmButton": "Delete"
+    "button": {
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
   },
   "blockUserModal": {
     "title": "Block user",
     "messageFirstPart": "Do you really want to block",
     "messageSecondPart": "?",
-    "buttonCancel": "Cancel",
-    "buttonConfirm": "Block user"
+    "button": {
+      "cancel": "Cancel",
+      "confirm": "Block user"
+    }
   },
   "tabs": {
     "comments": "Comments",
@@ -442,7 +448,7 @@
     "backersTab": {
       "info": {
         "title": "Back {{creator}}'s Goal",
-        "caption": "You won't get charged until a decision has been made."
+        "caption": "You won't get charged until a post has been made."
       },
       "customPledge": {
         "pledgeButton": "Pledge",
@@ -497,8 +503,10 @@
       "selectWinner": {
         "title": "Confirm favorite bid",
         "body": "If you choose this as your favorite bid you'll need to upload a video of yourself doing it!",
-        "cancelButton": "Cancel",
-        "confirmButton": "Confirm favorite bid"
+        "button": {
+          "cancel": "Cancel",
+          "confirm": "Confirm favorite bid"
+        }
       },
       "optionCard": {
         "pickButton": "Select"
@@ -515,8 +523,10 @@
     "deleteOptionModal": {
       "title": "Delete option",
       "body": "Are you sure you want to delete this option?",
-      "cancelButton": "Cancel",
-      "confirmButton": "Delete"
+      "button": {
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      }
     }
   },
   "mcPostModeration": {
@@ -531,8 +541,10 @@
     "deleteOptionModal": {
       "title": "Delete option",
       "body": "Are you sure you want to delete this option?",
-      "cancelButton": "Cancel",
-      "confirmButton": "Delete"
+      "button": {
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      }
     }
   },
   "cfPostModeration": {
@@ -570,7 +582,7 @@
       "backButton": "Back"
     }
   },
-  "CfPostSuccess": {
+  "cfPostSuccess": {
     "heroText": "This Goal has ended!",
     "wantsToKnow": "{{ creator }}'s Goal",
     "creatorsBackers": "{{ creator }}'s backers",
@@ -597,7 +609,7 @@
       "backButton": "Back"
     }
   },
-  "McPostAwaiting": {
+  "mcPostAwaiting": {
     "hero": {
       "title": "Votes are in!",
       "body": "{{ creator }} has {{ time }} to do this option. Stay tuned!",
@@ -643,17 +655,18 @@
     "me": "me",
     "title": "Comments",
     "placeholder": "Add a comment...",
-    "comment_deleted": "Comment deleted",
+    "commentDeleted": "Comment deleted",
     "bid": "bid",
     "report": "Report",
-    "send-reply": "Reply",
+    "sendReply": "Reply",
     "reply": "reply",
     "delete": "Delete",
     "replies": "replies",
-    "view-replies": "View",
-    "hide-replies": "Hide",
+    "viewReplies": "View",
+    "hideReplies": "Hide",
     "view-more": "View more comments",
     "comments": "Comments",
+    "seeMore": "See more",
     "noCommentsCaption": "Be the first to comment...",
     "errors": {
       "generic": "Please check input",
@@ -665,7 +678,7 @@
   },
   "heroPopupCommon": {
     "heroButtonText": "Let's go",
-    "btnText": "Got it"
+    "button": "Got it"
   },
   "heroPopupAC": {
     "title": "Events",
@@ -730,5 +743,6 @@
         "text": "Contribute to help the creator reach their Goal!"
       }
     }
-  }
+  },
+  "seeMore": ""
 }

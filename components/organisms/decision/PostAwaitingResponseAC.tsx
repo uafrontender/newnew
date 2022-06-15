@@ -33,7 +33,7 @@ interface IPostAwaitingResponseAC {
 
 const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
   React.memo(({ post }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isTablet = ['tablet'].includes(resizeMode);

@@ -52,7 +52,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
 
   // const { walletBalance } = useContext(WalletContext);

@@ -27,7 +27,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
   handleGoBack,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

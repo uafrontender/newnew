@@ -10,7 +10,7 @@
   "second-step-auction-title": "Event",
   "second-step-multiple-choice-title": "Superpoll",
   "second-step-crowdfunding-title": "Goal",
-  "video-being-processed-caption": "Your video will be available once processed",
+  "videoBeingProcessedCaption": "Your video will be available once processed",
   "tabs": {
     "auction": "Event",
     "multiple-choice": "Superpoll",
@@ -113,9 +113,9 @@
           "title": "Start date",
           "type": {
             "schedule": "Schedule",
-            "right-away": "Right away"
+            "rightAway": "Right away"
           },
-          "hours-format": {
+          "hoursFormat": {
             "pm": "PM",
             "am": "AM"
           },
@@ -132,7 +132,7 @@
         "tablet": {
           "type": {
             "schedule": "Schedule for a certain date",
-            "right-away": "Post right away once I publish it"
+            "rightAway": "Post right away once I publish it"
           }
         }
       },
@@ -164,7 +164,7 @@
         "info": "Learn more",
         "title": "Set preview",
         "submit": "Save changes",
-        "description": "Select a 3 sec snippet as decision cover. A good preview draws viewer's attention."
+        "description": "Select a 3 sec snippet as preview cover. A good preview draws viewer's attention."
       },
       "full": {
         "title": "Video preview"
@@ -224,12 +224,6 @@
       "submit-scheduled": "See scheduled {{value}}"
     },
     "texts": {
-      "subTitle-published": "Expand your reach and share decision with others.",
-      "subTitle-scheduled": "Your decision scheduled on {{value}}. Expand your reach and share decision with others.",
-      "desktop": {
-        "subTitle-published": "Your decision is successfully created. Expand your reach and share decision with others.",
-        "subTitle-scheduled": "Your decision is successfully created and scheduled on {{value}}. Expand your reach and share decision with others."
-      },
       "title-published": "It’s live...now share it!",
       "title-scheduled": "It’s scheduled... share the info!"
     },

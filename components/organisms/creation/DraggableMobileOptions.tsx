@@ -27,7 +27,7 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (
 ) => {
   const { id, min, options, onChange, validation } = props;
   const theme = useTheme();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
 
   const onReorder = (value: any) => {
     onChange(id, value);

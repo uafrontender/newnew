@@ -18,7 +18,7 @@ interface ICfBackersStatsSectionModeration {
 const CfBackersStatsSectionModeration: React.FunctionComponent<ICfBackersStatsSectionModeration> =
   ({ targetBackerCount, currentNumBackers }) => {
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isTablet = ['tablet'].includes(resizeMode);
 

@@ -44,7 +44,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   showModal,
   closeModal,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const scrollRef: any = useRef();
   const router = useRouter();

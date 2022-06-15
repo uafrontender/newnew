@@ -94,7 +94,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
