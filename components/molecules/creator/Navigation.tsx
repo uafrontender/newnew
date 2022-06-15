@@ -16,7 +16,7 @@ import { useAppSelector } from '../../../redux-store/store';
 
 export const Navigation = () => {
   const theme = useTheme();
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 

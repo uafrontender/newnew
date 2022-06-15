@@ -161,7 +161,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
               <SModalButtons>
                 {!isMobile && (
                   <SCancelButton onClick={handleClose}>
-                    {t('modal.reportUser.buttonCancel')}
+                    {t('modal.reportUser.button.cancel')}
                   </SCancelButton>
                 )}
                 <SConfirmButton

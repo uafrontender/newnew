@@ -17,7 +17,7 @@ interface IChat {
 }
 
 const Chat: NextPage<IChat> = ({ username }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
@@ -47,7 +47,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'chat',
+    'page-Chat',
     'modal-PaymentModal',
   ]);
 

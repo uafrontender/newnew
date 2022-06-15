@@ -60,7 +60,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
   }) => {
     const router = useRouter();
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.user);
 

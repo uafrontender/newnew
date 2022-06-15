@@ -26,7 +26,7 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
   ({ isConnectedToStripe }) => {
     const router = useRouter();
     const theme = useTheme();
-    const { t } = useTranslation('creator');
+    const { t } = useTranslation('page-Creator');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode

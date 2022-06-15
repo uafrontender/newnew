@@ -32,7 +32,7 @@ const CfPledgesSection: React.FunctionComponent<ICfPledgesSection> = ({
   heightDelta,
   handleLoadPledges,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
