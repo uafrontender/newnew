@@ -15,7 +15,7 @@ import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
-import InlineSVG, { InlineSvg } from '../atoms/InlineSVG';
+import InlineSVG from '../atoms/InlineSVG';
 import UserAvatar from './UserAvatar';
 
 import { formatNumber } from '../../utils/format';
@@ -1176,6 +1176,6 @@ const SButtonIcon = styled(Button)`
   }
 `;
 
-const SInlineSVG = styled(InlineSvg)`
+const SInlineSVG = styled(InlineSVG)`
   margin-left: 2px;
 `;
