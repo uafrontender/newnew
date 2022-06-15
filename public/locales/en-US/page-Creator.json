@@ -37,8 +37,8 @@
         "button": "Add"
       },
       "makeDecision": {
-        "text": "Make a decision. Start earning.",
-        "button": "Make a decision"
+        "text": "Make a post. Start earning.",
+        "button": "Make a post"
       },
       "list": {
         "ac": "Events",
