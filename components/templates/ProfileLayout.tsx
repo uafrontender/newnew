@@ -33,10 +33,7 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
 // import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 // import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
-import {
-  getSubscriptionStatus,
-  unsubscribeFromCreator,
-} from '../../api/endpoints/subscription';
+import { getSubscriptionStatus } from '../../api/endpoints/subscription';
 // import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
 
@@ -52,6 +49,7 @@ import UnsubscribeModal from '../molecules/profile/UnsubscribeModal';
 import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
+import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -530,7 +528,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             }}
           >
             <SUsernameWrapper>
-              <SUsername variant={4}>{user.nickname}</SUsername>
+              <SUsername variant={4}>
+                {user.nickname}
+                {user.options?.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='32px'
+                    height='32px'
+                  />
+                )}
+              </SUsername>
               {isGenderPronounsDefined(user.genderPronouns) && (
                 <SGenderPronouns variant={2}>
                   {t(
@@ -698,6 +705,8 @@ const SUsernameWrapper = styled.div`
 
 const SUsername = styled(Headline)`
   text-align: center;
+  display: flex;
+  align-items: center;
 `;
 
 const SGenderPronouns = styled(Text)`
@@ -920,4 +929,8 @@ const SSubcribedTag = styled.div`
   ${({ theme }) => theme.media.laptop} {
     top: 275px;
   }
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  margin-left: 4px;
 `;

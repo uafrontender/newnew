@@ -15,7 +15,7 @@ import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
-import InlineSVG from '../atoms/InlineSVG';
+import InlineSVG, { InlineSvg } from '../atoms/InlineSVG';
 import UserAvatar from './UserAvatar';
 
 import { formatNumber } from '../../utils/format';
@@ -42,6 +42,7 @@ import iconDark8 from '../../public/images/svg/numbers/8_dark.svg';
 import iconDark9 from '../../public/images/svg/numbers/9_dark.svg';
 import iconDark10 from '../../public/images/svg/numbers/10_dark.svg';
 import moreIcon from '../../public/images/svg/icons/filled/More.svg';
+import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
 // Utils
 import switchPostType from '../../utils/switchPostType';
@@ -405,7 +406,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   />
                 )}
               </STopContent>
-              <SBottomContent>
+              {/* <SBottomContent>
                 <SUserAvatar
                   withClick
                   avatarUrl={
@@ -421,7 +422,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 <SText variant={3} weight={600}>
                   {postParsed.title}
                 </SText>
-              </SBottomContent>
+              </SBottomContent> */}
             </SImageHolder>
           </SContent>
           {postParsed?.creator && isReportModalOpen && (
@@ -527,6 +528,13 @@ export const PostCard: React.FC<ICard> = React.memo(
                     isMobile ? 15 : 9
                   )}...`
                 : postParsed.creator?.nickname}
+              {postParsed.creator?.options?.isVerified && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                />
+              )}
             </SUsername>
             <CardTimer timestampSeconds={timestampSeconds} />
           </SBottomStart>
@@ -857,23 +865,6 @@ const STopContent = styled.div`
   justify-content: flex-end;
 `;
 
-const SBottomContent = styled.div`
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-`;
-
-const SText = styled(Text)`
-  color: ${(props) => props.theme.colors.white};
-  display: -webkit-box;
-  overflow: hidden;
-  position: relative;
-  margin-left: 12px;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-`;
-
 const SWrapperOutside = styled.div<ISWrapper>`
   width: ${(props) => props.width};
   cursor: pointer;
@@ -1028,7 +1019,8 @@ const SUserAvatarOutside = styled(UserAvatar)`
 
 const SUsername = styled(Text)`
   grid-area: nickname;
-
+  display: flex;
+  align-items: center;
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
@@ -1148,15 +1140,6 @@ const SButtonFirst = styled(Button)`
   }
 `;
 
-const SUserAvatar = styled(UserAvatar)`
-  ${(props) => props.theme.media.tablet} {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
-  }
-`;
-
 const SButtonIcon = styled(Button)`
   padding: 8px;
   border-radius: 12px;
@@ -1165,4 +1148,8 @@ const SButtonIcon = styled(Button)`
     opacity: 0;
     transition: all ease 0.5s;
   }
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  margin-left: 2px;
 `;
