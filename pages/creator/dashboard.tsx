@@ -14,7 +14,7 @@ import { useAppSelector } from '../../redux-store/store';
 import assets from '../../constants/assets';
 
 export const Dashboard = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
@@ -50,8 +50,8 @@ export default Dashboard;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'creator',
-    'chat',
+    'page-Creator',
+    'page-Chat',
   ]);
 
   const { req } = context;

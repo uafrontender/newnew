@@ -22,7 +22,7 @@ const EnableSubModal: React.FC<IEnableSubModal> = ({
   closeModal,
   subEnabled,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const handleSubmit = () => {
     subEnabled();
   };
@@ -47,7 +47,7 @@ const EnableSubModal: React.FC<IEnableSubModal> = ({
             <SNote>{t('enableSubModal.note')}</SNote>
           </SModalContent>
           <SConfirmButton view='primaryGrad' onClick={handleSubmit}>
-            {t('enableSubModal.bntText')}
+            {t('enableSubModal.button')}
           </SConfirmButton>
         </SModal>
       </SContainer>

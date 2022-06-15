@@ -81,7 +81,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   handleUpdatePostStatus,
   handleUpdateResponseVideo,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

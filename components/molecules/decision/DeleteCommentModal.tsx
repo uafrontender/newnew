@@ -15,7 +15,7 @@ const DeleteCommentModal: React.FC<IDeleteCommentModal> = ({
   closeModal,
   handleConfirmDelete,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
 
   return (
     <Modal show={isVisible} additionalz={12} onClose={closeModal}>
@@ -25,14 +25,14 @@ const DeleteCommentModal: React.FC<IDeleteCommentModal> = ({
         }}
       >
         <SModal>
-          <SModalTitle>{t('DeleteCommentModal.title')}</SModalTitle>
-          <SModalMessage>{t('DeleteCommentModal.body')}</SModalMessage>
+          <SModalTitle>{t('deleteCommentModal.title')}</SModalTitle>
+          <SModalMessage>{t('deleteCommentModal.body')}</SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={() => closeModal()}>
-              {t('DeleteCommentModal.cancelButton')}
+              {t('deleteCommentModal.button.cancel')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmDelete}>
-              {t('DeleteCommentModal.confirmButton')}
+              {t('deleteCommentModal.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>

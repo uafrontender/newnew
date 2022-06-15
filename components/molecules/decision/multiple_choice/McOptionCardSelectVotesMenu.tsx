@@ -31,7 +31,7 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVo
     handleOpenCustomAmountModal,
     handleSetAmountAndOpenModal,
   }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const containerRef = useRef<HTMLDivElement>();
 
     const { appConstants } = useGetAppConstants();

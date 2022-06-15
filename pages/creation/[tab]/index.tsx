@@ -20,7 +20,7 @@ interface ICreationSecondStep {}
 
 export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
   const router = useRouter();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const dispatch = useAppDispatch();
 
   useLeavePageConfirm(
@@ -77,7 +77,7 @@ export async function getServerSideProps(
 ): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'creation']
+    ['common', 'page-Creation']
   );
 
   // @ts-ignore
