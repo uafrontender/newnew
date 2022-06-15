@@ -138,6 +138,7 @@
   "search": {
     "topPosts": "Top Posts",
     "popularCreators": "Popular Creators",
+    "creatorSubtitle": "See posts",
     "allResults": "All results",
     "noResults": {
       "title": "We didn’t find anything",
