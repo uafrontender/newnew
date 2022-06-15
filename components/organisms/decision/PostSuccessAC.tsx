@@ -24,6 +24,7 @@ import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 
 const AcSuccessOptionsTab = dynamic(
   () => import('../../molecules/decision/auction/success/AcSuccessOptionsTab')
@@ -46,6 +47,8 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+
+    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     // Winninfg option
     const [winningOption, setWinningOption] =
@@ -120,22 +123,11 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     // Replace hash once scrolled to comments
     useEffect(() => {
       if (inView) {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}#comments`
-        );
+        syncedHistoryReplaceState({}, `/post/${post.postUuid}#comments`);
       } else {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}`
-        );
+        syncedHistoryReplaceState({}, `/post/${post.postUuid}`);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inView, post.postUuid]);
 
     // Load winning option

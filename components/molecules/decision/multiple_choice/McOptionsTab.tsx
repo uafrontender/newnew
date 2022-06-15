@@ -153,12 +153,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
   // Handlers
-
-  // Redirect to user's page
-  const handleRedirectToPostCreator = () => {
-    router.push(`/${post.creator?.username}/subscribe`);
-  };
-
   const validateTextViaAPI = useCallback(async (text: string) => {
     setIsAPIValidateLoading(true);
     try {
@@ -583,13 +577,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 creator: post.creator?.nickname,
               })}
             </SText>
-            <SSubscribeButton
-              onClick={() => {
-                handleRedirectToPostCreator();
-              }}
-            >
-              {t('mcPost.optionsTab.actionSection.subscribeButton')}
-            </SSubscribeButton>
+            <Link href={`/${post.creator?.username}/subscribe`}>
+              <SSubscribeButton>
+                {t('mcPost.optionsTab.actionSection.subscribeButton')}
+              </SSubscribeButton>
+            </Link>
           </SActionSectionSubscribe>
         ) : (
           <div

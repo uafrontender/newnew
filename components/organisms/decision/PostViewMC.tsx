@@ -34,6 +34,7 @@ import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
 import Headline from '../../atoms/Headline';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import PostVotingTab from '../../molecules/decision/PostVotingTab';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
@@ -86,6 +87,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+
+    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     const { appConstants } = useGetAppConstants();
     // Socket
@@ -606,24 +609,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     // Replace hash once scrolled to comments
     useEffect(() => {
       if (inView) {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}#comments`
-        );
+        syncedHistoryReplaceState({}, `/post/${post.postUuid}#comments`);
       } else {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}`
-        );
+        syncedHistoryReplaceState({}, `/post/${post.postUuid}`);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inView, post.postUuid]);
-
     return (
       <>
         <SWrapper>
