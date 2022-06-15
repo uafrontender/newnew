@@ -74,7 +74,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
             {user.userData?.options?.isOfferingSubscription && (
               <SItemWithMargin>
                 <SNavText variant={3} weight={600} onClick={handlerCopy}>
-                  {isCopiedUrl ? t('my-link-copied') : t('my-link')}
+                  {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}
                 </SNavText>
               </SItemWithMargin>
             )}
@@ -139,7 +139,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                         view='primaryGrad'
                         withShadow={!globalSearchActive}
                       >
-                        {t('button-create-decision')}
+                        {t('button.createDecision')}
                       </Button>
                     </a>
                   </Link>
@@ -174,7 +174,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                         view='primaryGrad'
                         withShadow={!globalSearchActive}
                       >
-                        {t('button-create-on-newnew')}
+                        {t('button.createOnNewnew')}
                       </Button>
                     </a>
                   </Link>
@@ -203,7 +203,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
             <SItemWithMargin>
               <Link href='/sign-up?to=log-in'>
                 <a>
-                  <Button view='quaternary'>{t('button-login-in')}</Button>
+                  <Button view='quaternary'>{t('button.loginIn')}</Button>
                 </a>
               </Link>
             </SItemWithMargin>
@@ -216,7 +216,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                     view='primaryGrad'
                     withShadow={!globalSearchActive}
                   >
-                    {t('button-sign-up')}
+                    {t('button.signUp')}
                   </Button>
                 </a>
               </Link>

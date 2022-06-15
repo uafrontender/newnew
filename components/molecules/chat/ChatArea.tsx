@@ -40,7 +40,7 @@ const GoBackButton = dynamic(() => import('../GoBackButton'));
 
 const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
 
   const { ref: scrollRef, inView } = useInView();
   const user = useAppSelector((state) => state.user);

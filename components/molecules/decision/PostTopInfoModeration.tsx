@@ -19,8 +19,8 @@ import Button from '../../atoms/Button';
 import PostFailedBox from './PostFailedBox';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
-import PostShareMenu from './PostShareMenu';
-import PostShareModal from './PostShareModal';
+import PostShareEllipseMenu from './PostShareEllipseMenu';
+import PostShareEllipseModal from './PostShareEllipseModal';
 import PostConfirmDeleteModal from './PostConfirmDeleteModal';
 import PostEllipseMenuModeration from './PostEllipseMenuModeration';
 import PostEllipseModalModeration from './PostEllipseModalModeration';
@@ -73,7 +73,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
   }) => {
     const theme = useTheme();
     const router = useRouter();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -210,14 +210,14 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
             </SMoreButton>
             {/* Share menu */}
             {!isMobile && (
-              <PostShareMenu
+              <PostShareEllipseMenu
                 postId={postId}
                 isVisible={shareMenuOpen}
                 onClose={handleCloseShareMenu}
               />
             )}
             {isMobile && shareMenuOpen ? (
-              <PostShareModal
+              <PostShareEllipseModal
                 isOpen={shareMenuOpen}
                 zIndex={11}
                 postId={postId}

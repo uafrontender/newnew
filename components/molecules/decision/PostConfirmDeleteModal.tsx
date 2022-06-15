@@ -17,7 +17,7 @@ const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
   closeModal,
   handleConfirmDelete,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
 
   return (
     <Modal show={isVisible} additionalz={12} onClose={closeModal}>
@@ -33,10 +33,10 @@ const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>
-              {t('deletePostModal.cancelButton')}
+              {t('deletePostModal.button.cancel')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmDelete}>
-              {t('deletePostModal.confirmButton')}
+              {t('deletePostModal.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>

@@ -61,7 +61,7 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
   }) => {
     const router = useRouter();
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const user = useAppSelector((state) => state.user);
 
     const isSupportedByMe = useMemo(

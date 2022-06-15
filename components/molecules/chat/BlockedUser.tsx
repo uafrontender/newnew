@@ -31,7 +31,7 @@ const BlockedUser: React.FC<IBlockedUser> = ({
   closeModal,
   isAnnouncement,
 }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
 
   return (
     <>

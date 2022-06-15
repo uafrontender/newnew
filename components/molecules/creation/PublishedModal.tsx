@@ -42,7 +42,7 @@ interface IPublishedModal {
 const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const { open, handleClose } = props;
   const router = useRouter();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { post, videoProcessing, fileProcessing, postData } = useAppSelector(
@@ -221,7 +221,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
                   borderRadius='16px'
                 />
               ) : (
-                <SText variant={2}>{t('video-being-processed-caption')}</SText>
+                <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
               )
             ) : null}
           </SPlayerWrapper>

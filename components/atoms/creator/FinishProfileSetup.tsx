@@ -11,7 +11,7 @@ import InlineSVG from '../InlineSVG';
 import { useAppSelector } from '../../../redux-store/store';
 
 export const FinishProfileSetup = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
 
@@ -73,7 +73,7 @@ export const FinishProfileSetup = () => {
       >
         <a>
           <SButton view='primaryGrad'>
-            {t('dashboard.earnings.toDosIssue.btnText')}
+            {t('dashboard.earnings.toDosIssue.button')}
           </SButton>
         </a>
       </Link>
