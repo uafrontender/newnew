@@ -36,6 +36,13 @@ export const PostList: React.FC<IList> = ({
     resizeMode
   );
 
+  const isTablet = ['tablet'].includes(resizeMode);
+
+  const isSmallDesktops = ['laptop', 'laptopM'].includes(resizeMode);
+
+  const skeletonNumber =
+    (isMobile && 1) || (isTablet && 3) || (isSmallDesktops && 4) || 5; // calculations how menu skeletons to display
+
   const renderItem = (item: any, index: number) => {
     const handleItemClick = () => {
       handlePostClicked(item);
@@ -58,23 +65,25 @@ export const PostList: React.FC<IList> = ({
   };
 
   return (
-    <SListWrapper>
-      {collection?.map(renderItem)}
-      {collection.length > 0 &&
-        loading &&
-        Array(5)
-          .fill('_')
-          .map((_, i) => (
-            <CardSkeleton
-              key={i}
-              count={1}
-              cardWidth='100%'
-              cardHeight='100%'
-              bgColor={skeletonsBgColor}
-              highlightColor={skeletonsHighlightColor}
-            />
-          ))}
-      {collection.length === 0 && loading && (
+    <>
+      <SListWrapper>
+        {collection?.map(renderItem)}
+        {collection.length === 0 &&
+          loading &&
+          Array(skeletonNumber)
+            .fill('_')
+            .map((_, i) => (
+              <CardSkeleton
+                key={i}
+                count={1}
+                cardWidth='100%'
+                cardHeight='100%'
+                bgColor={skeletonsBgColor}
+                highlightColor={skeletonsHighlightColor}
+              />
+            ))}
+      </SListWrapper>
+      {collection.length > 0 && loading && (
         <SAnimationContainer
           onClick={(e: any) => {
             e.stopPropagation();
@@ -91,7 +100,7 @@ export const PostList: React.FC<IList> = ({
           />
         </SAnimationContainer>
       )}
-    </SListWrapper>
+    </>
   );
 };
 
@@ -104,7 +113,6 @@ export default PostList;
 
 const SListWrapper = styled.div`
   width: 100%;
-  cursor: grab;
   display: flex;
   padding: 8px 0 0 0;
   padding-left: 16px !important;
@@ -167,6 +175,10 @@ const SItemWrapper = styled.div`
   width: 100%;
   margin: 16px 0;
 
+  & > div {
+    max-width: 100%;
+  }
+
   ${(props) => props.theme.media.tablet} {
     width: calc(33% - 16px);
     margin: 0 8px 24px 8px;
@@ -188,7 +200,7 @@ const SItemWrapper = styled.div`
 
 const SAnimationContainer = styled.div`
   width: 100%;
-  height: 100%;
+  flex: 1;
 
   display: flex;
   justify-content: center;

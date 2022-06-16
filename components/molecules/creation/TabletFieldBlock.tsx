@@ -37,7 +37,7 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
     formattedDescription,
     onChange,
   } = props;
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const inputRef: any = useRef();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isTablet = ['tablet'].includes(resizeMode);

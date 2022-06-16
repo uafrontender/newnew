@@ -30,7 +30,7 @@ const TopUpWalletModal: React.FunctionComponent<ITopUpWalletModal> = ({
   onClose,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -69,7 +69,7 @@ const TopUpWalletModal: React.FunctionComponent<ITopUpWalletModal> = ({
         >
           {isMobile && (
             <SGoBackButton onClick={() => onClose()}>
-              {t('Settings.sections.Wallet.TopUpWalletModal.heading')}
+              {t('Settings.sections.wallet.topUpWalletModal.heading')}
             </SGoBackButton>
           )}
           {!isMobile && (
@@ -84,7 +84,7 @@ const TopUpWalletModal: React.FunctionComponent<ITopUpWalletModal> = ({
           )}
           {!isMobile && (
             <SHeaderContainer>
-              {t('Settings.sections.Wallet.TopUpWalletModal.heading')}
+              {t('Settings.sections.wallet.topUpWalletModal.heading')}
             </SHeaderContainer>
           )}
           <TopUpWalletInput
@@ -118,18 +118,14 @@ const TopUpWalletModal: React.FunctionComponent<ITopUpWalletModal> = ({
           {!isMobile && (
             <SControlsDiv>
               <SCancelButton view='transparent' onClick={() => onClose()}>
-                {t(
-                  'Settings.sections.Wallet.TopUpWalletModal.cancelButtonDesktop'
-                )}
+                {t('Settings.sections.wallet.topUpWalletModal.button.cancel')}
               </SCancelButton>
               <Button
                 view='primaryGrad'
                 disabled={amount <= 4}
                 onClick={() => handleSubmit()}
               >
-                {t(
-                  'Settings.sections.Wallet.TopUpWalletModal.checkoutButtonDesktop'
-                )}
+                {t('Settings.sections.wallet.topUpWalletModal.button.checkout')}
               </Button>
             </SControlsDiv>
           )}
@@ -139,9 +135,7 @@ const TopUpWalletModal: React.FunctionComponent<ITopUpWalletModal> = ({
               disabled={amount <= 4}
               onClick={() => handleSubmit()}
             >
-              {t(
-                'Settings.sections.Wallet.TopUpWalletModal.checkoutButtonMobile'
-              )}
+              {t('Settings.sections.wallet.topUpWalletModal.button.checkout')}
             </SButtonCheckoutMobile>
           )}
         </SContentContainer>

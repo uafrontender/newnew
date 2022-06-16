@@ -43,7 +43,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
   handleSetResponseViewed,
   handleToggleMuted,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
@@ -147,6 +147,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             id={`video-${postId}`}
             resources={response}
             muted={isMuted}
+            showPlayButton
           />
           <SSoundButton
             id='sound-button'
@@ -185,6 +186,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             id={postId}
             resources={announcement}
             muted={isMuted}
+            showPlayButton
           />
           <SSoundButton
             id='sound-button'
@@ -224,7 +226,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             shouldView={!responseViewed}
             onClick={() => setOpenedTab('response')}
           >
-            {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
+            {t('postVideoSuccess.tabs.watchResponseFirstTime')}
           </SWatchResponseBtn>
         </SWatchResponseWrapper>
       ) : null}
@@ -234,13 +236,13 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             shouldView={openedTab === 'announcement'}
             onClick={() => setOpenedTab('announcement')}
           >
-            {t('PostVideoSuccess.tabs.announcement')}
+            {t('postVideoSuccess.tabs.announcement')}
           </SChangeTabBtn>
           <SChangeTabBtn
             shouldView={openedTab === 'response'}
             onClick={() => setOpenedTab('response')}
           >
-            {t('PostVideoSuccess.tabs.response')}
+            {t('postVideoSuccess.tabs.response')}
           </SChangeTabBtn>
         </SToggleVideoWidget>
       ) : null}

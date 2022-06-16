@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
 import InlineSVG from '../InlineSVG';
@@ -24,6 +25,7 @@ import Lottie from '../Lottie';
 import NoResults from './NoResults';
 
 const SearchInput: React.FC = React.memo(() => {
+  const { t } = useTranslation('common');
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const inputRef: any = useRef();
@@ -62,11 +64,19 @@ const SearchInput: React.FC = React.memo(() => {
   const handleInputChange = (e: any) => {
     setSearchValue(e.target.value);
   };
+
   const handleKeyDown = (e: any) => {
     if (e.keyCode === 27) {
       handleSearchClose();
     }
+
+    if (e.keyCode === 13 && searchValue) {
+      setIsResultsDropVisible(false);
+      router.push(`/search?query=${searchValue}&tab=posts`);
+      setSearchValue('');
+    }
   };
+
   const handleSubmit = () => {};
   const handleCloseIconClick = () => {
     if (searchValue) {
@@ -234,11 +244,11 @@ const SearchInput: React.FC = React.memo(() => {
                 )}
                 <SButton
                   onClick={() => {
-                    router.push(`/search?query=${searchValue}&tab=decisions`);
+                    router.push(`/search?query=${searchValue}&tab=posts`);
                   }}
                   view='quaternary'
                 >
-                  All results
+                  {t('search.allResults')}
                 </SButton>
               </>
             )}
@@ -275,11 +285,11 @@ const SearchInput: React.FC = React.memo(() => {
               )}
               <SButton
                 onClick={() => {
-                  router.push(`/search?query=${searchValue}&tab=decisions`);
+                  router.push(`/search?query=${searchValue}&tab=posts`);
                 }}
                 view='quaternary'
               >
-                All results
+                {t('search.allResults')}
               </SButton>
             </>
           )}

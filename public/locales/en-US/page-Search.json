@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "title": "Search"
+  },
+  "mainContent": {
+    "title": "Results for",
+    "tabs": {
+      "decisions": "Posts",
+      "creators": "Creators"
+    }
+  },
+  "decisions": {
+    "postTypes": {
+      "events": "Events",
+      "superpolls": "Superpolls",
+      "goals": "Goals"
+    },
+    "sort": {
+      "title": "Sort",
+      "all": "All",
+      "numberOfParticipants": "Number of participants",
+      "newest": "Newest"
+    }
+  }
+}

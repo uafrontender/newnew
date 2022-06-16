@@ -37,7 +37,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<IOnboardingEditPr
     onClose,
   }) => {
     const theme = useTheme();
-    const { t } = useTranslation('creator-onboarding');
+    const { t } = useTranslation('page-CreatorOnboarding');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -134,13 +134,11 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<IOnboardingEditPr
         >
           {isMobile ? (
             <SGoBackButtonMobile onClick={() => onClose()}>
-              {t('DetailsSection.EditProfileImageModal.goBackButton')}
+              {t('detailsSection.editProfileImageModal.button.back')}
             </SGoBackButtonMobile>
           ) : (
             <SGoBackButtonDesktop onClick={() => onClose()}>
-              <div>
-                {t('DetailsSection.EditProfileImageModal.goBackButton')}
-              </div>
+              <div>{t('detailsSection.editProfileImageModal.button.back')}</div>
               <InlineSvg
                 svg={CancelIcon}
                 fill={theme.colorsThemed.text.primary}
@@ -204,14 +202,14 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<IOnboardingEditPr
               disabled={loading}
               onClick={handleSetStageToEditingGeneralUnsetPicture}
             >
-              {t('DetailsSection.EditProfileImageModal.cancelButton')}
+              {t('detailsSection.editProfileImageModal.button.cancel')}
             </Button>
             <Button
               withShadow
               disabled={loading}
               onClick={completeProfileImageCropAndUpdateImageToSave}
             >
-              {t('DetailsSection.EditProfileImageModal.saveButton')}
+              {t('detailsSection.editProfileImageModal.button.save')}
             </Button>
           </SControlsWrapperPicture>
         </SEditPictureMenu>

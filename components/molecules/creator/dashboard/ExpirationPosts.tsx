@@ -26,7 +26,7 @@ interface IExpirationPosts {
 export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   expirationPosts,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -76,7 +76,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
       }
     }
     countdownsrt = `${countdownsrt} ${t(
-      'dashboard.expirationPosts.expiresTime.left_to_respond'
+      'dashboard.expirationPosts.expiresTime.leftToRespond'
     )}`;
     return countdownsrt;
   };

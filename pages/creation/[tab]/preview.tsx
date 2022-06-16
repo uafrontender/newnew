@@ -14,7 +14,7 @@ import { NextPageWithLayout } from '../../_app';
 interface ICreationPreview {}
 
 export const CreationPreview: React.FC<ICreationPreview> = (props) => {
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const router = useRouter();
 
   return (
@@ -38,7 +38,7 @@ export async function getServerSideProps(
 ): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'creation']
+    ['common', 'page-Creation']
   );
 
   // @ts-ignore

@@ -13,41 +13,41 @@ import { formatNumber } from '../../../utils/format';
 import cashOutIcon from '../../../public/images/svg/icons/filled/CashOut.svg';
 
 interface ICashOut {
-  nextCashoutAmount: newnewapi.IMoneyAmount;
-  nextCashoutDate: google.protobuf.ITimestamp | null | undefined;
+  nextCashOutAmount: newnewapi.IMoneyAmount;
+  nextCashOutDate: google.protobuf.ITimestamp | null | undefined;
 }
 
 const CashOut: React.FC<ICashOut> = ({
-  nextCashoutAmount,
-  nextCashoutDate,
+  nextCashOutAmount,
+  nextCashOutDate,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   return (
     <SCashOutContainer>
       <SCashOutTopBlock>
         <SInlineSVG svg={cashOutIcon} width='48px' height='48px' />
         <SDescriptionWrapper>
-          {nextCashoutAmount && nextCashoutAmount.usdCents ? (
+          {nextCashOutAmount && nextCashOutAmount.usdCents ? (
             <>
               <SDescription variant={3} weight={600}>
                 {t('dashboard.earnings.cashOut.amount')}
               </SDescription>
               <SAmount variant={3} weight={600}>
                 {`$${formatNumber(
-                  nextCashoutAmount?.usdCents / 100 ?? 0,
+                  nextCashOutAmount?.usdCents / 100 ?? 0,
                   true
                 )}`}
               </SAmount>
             </>
           ) : (
             <SDescription variant={3} weight={600}>
-              {t('dashboard.earnings.cashOut.no-payouts')}
+              {t('dashboard.earnings.cashOut.noPayouts')}
             </SDescription>
           )}
-          {nextCashoutDate && (
+          {nextCashOutDate && (
             <SDescription variant={3} weight={600}>
               {t('dashboard.earnings.cashOut.date', {
-                date: moment((nextCashoutDate.seconds as number) * 1000).format(
+                date: moment((nextCashOutDate.seconds as number) * 1000).format(
                   'MMM DD YYYY'
                 ),
               })}

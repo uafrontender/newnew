@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 
 import GlobalStyle from './globalStyles';
@@ -7,16 +7,25 @@ import getColorMode from '../utils/getColorMode';
 import { useAppSelector } from '../redux-store/store';
 import { darkTheme, lightTheme } from './themes';
 
-interface IReactFunction {
+const GlobalTheme: React.FunctionComponent<{
   children: React.ReactNode;
-}
-
-const GlobalTheme: React.FC<IReactFunction> = ({ children }) => {
+  initialTheme: string;
+}> = ({ initialTheme, children }) => {
   const { colorMode } = useAppSelector((state) => state.ui);
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <ThemeProvider
-      theme={getColorMode(colorMode) === 'light' ? lightTheme : darkTheme}
+      theme={
+        getColorMode(!mounted ? initialTheme : colorMode) === 'light'
+          ? lightTheme
+          : darkTheme
+      }
     >
       <GlobalStyle />
       {children}

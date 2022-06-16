@@ -32,7 +32,7 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVo
     handleOpenCustomAmountModal,
     handleSetAmountAndOpenModal,
   }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const containerRef = useRef<HTMLDivElement>();
 
     const { appConstants } = useGetAppConstants();
@@ -100,9 +100,9 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVo
             >
               <STitleText variant={3}>
                 {!isSupportedByMe
-                  ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.title')
+                  ? t('mcPost.optionsTab.optionCard.selectVotesMenu.title')
                   : t(
-                      'McPost.OptionsTab.OptionCard.selectVotesMenu.title_more_votes'
+                      'mcPost.optionsTab.optionCard.selectVotesMenu.titleMoreVotes'
                     )}
               </STitleText>
               {availableVotes.map((amount) => (
@@ -114,9 +114,9 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVo
                     <SBoldSpan>
                       {amount}{' '}
                       {amount === 1
-                        ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.vote')
+                        ? t('mcPost.optionsTab.optionCard.selectVotesMenu.vote')
                         : t(
-                            'McPost.OptionsTab.OptionCard.selectVotesMenu.votes'
+                            'mcPost.optionsTab.optionCard.selectVotesMenu.votes'
                           )}
                     </SBoldSpan>{' '}
                     <SOpaqueSpan>
@@ -129,7 +129,7 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVo
               ))}
               <SButton onClick={() => handleOpenCustomAmountModal()}>
                 <Text variant={3}>
-                  {t('McPost.OptionsTab.OptionCard.selectVotesMenu.custom')}
+                  {t('mcPost.optionsTab.optionCard.selectVotesMenu.custom')}
                 </Text>
               </SButton>
             </SContainer>

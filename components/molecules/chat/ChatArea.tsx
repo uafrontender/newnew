@@ -40,7 +40,7 @@ const GoBackButton = dynamic(() => import('../GoBackButton'));
 
 const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
 
   const { ref: scrollRef, inView } = useInView();
   const user = useAppSelector((state) => state.user);
@@ -458,8 +458,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                       : 0
                   } ${
                     chatRoom.memberCount && chatRoom.memberCount > 1
-                      ? t('new-announcement.members')
-                      : t('new-announcement.member')
+                      ? t('newAnnouncement.members')
+                      : t('newAnnouncement.member')
                   }`}
             </SUserAlias>
           </SUserData>
@@ -508,9 +508,9 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       {isAnnouncement && !isMyAnnouncement && chatRoom && (
         <SAnnouncementHeader>
           <SAnnouncementText>
-            {t('announcement.top-message-start')}{' '}
+            {t('announcement.topMessageStart')}{' '}
             <SAnnouncementName>{chatRoom.visavis?.username}</SAnnouncementName>{' '}
-            {t('announcement.top-message-end')}
+            {t('announcement.topMessageEnd')}
           </SAnnouncementText>
         </SAnnouncementHeader>
       )}

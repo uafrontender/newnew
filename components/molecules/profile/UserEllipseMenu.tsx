@@ -28,7 +28,7 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
   handleClickReport,
   handleClickBlock,
 }) => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
 
   useOnClickEsc(containerRef, handleClose);
@@ -62,7 +62,7 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
         >
           {isSubscribed && (
             <SButton onClick={unsubHandler}>
-              <Text variant={2}>{t('ellipse.unsub')}</Text>
+              <Text variant={2}>{t('ellipse.unsubscribe')}</Text>
             </SButton>
           )}
           <SButton onClick={reportUserHandler}>

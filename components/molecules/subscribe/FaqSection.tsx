@@ -12,7 +12,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 import ArrowDown from '../../../public/images/svg/icons/outlined/ChevronDown.svg';
 
 const FaqSection: React.FunctionComponent = () => {
-  const { t } = useTranslation('subscribe-to-user');
+  const { t } = useTranslation('page-SubscribeToUser');
 
   return (
     <SContainer>

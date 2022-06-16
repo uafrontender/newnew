@@ -118,7 +118,6 @@ export default PostList;
 
 const SListWrapper = styled.div`
   width: 100%;
-  cursor: grab;
   display: flex;
   padding: 8px 0 0 0;
   padding-left: 16px !important;

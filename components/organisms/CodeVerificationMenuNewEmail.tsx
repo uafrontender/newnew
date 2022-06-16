@@ -39,7 +39,7 @@ export interface ICodeVerificationMenuNewEmail {
 const CodeVerificationMenuNewEmail: React.FunctionComponent<ICodeVerificationMenuNewEmail> =
   ({ expirationTime, newEmail, redirect }) => {
     const router = useRouter();
-    const { t } = useTranslation('verify-email');
+    const { t } = useTranslation('page-VerifyEmail');
 
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobileOrTablet = [
@@ -215,7 +215,12 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<ICodeVerificationMen
     return (
       <>
         {!isMobileOrTablet && (
-          <SBackButtonDesktop onClick={() => router.back()} />
+          <SBackButtonDesktop
+            longArrow={!isMobileOrTablet}
+            onClick={() => router.back()}
+          >
+            {!isMobileOrTablet ? t('backButton') : ''}
+          </SBackButtonDesktop>
         )}
         <SCodeVerificationMenuNewEmail
           onClick={() => {
@@ -231,9 +236,9 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<ICodeVerificationMen
           <AnimatedLogoEmailVerification
             isLoading={isSigninWithEmailLoading || isResendCodeLoading}
           />
-          <SHeadline variant={3}>{t('heading.heading')}</SHeadline>
+          <SHeadline variant={3}>{t('heading.mainHeading')}</SHeadline>
           <SSubheading variant={2} weight={600}>
-            {t('heading.subheading')}
+            {t('heading.subHeading')}
             <br />
             {/* NB! Temp */}
             {newEmail}
@@ -263,9 +268,9 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<ICodeVerificationMen
                 delay={0.3}
               >
                 <STimeExpired>
-                  {t('timeExpired.not_receieved')}{' '}
+                  {t('expired.noCodeReceived')}{' '}
                   <button type='button' onClick={() => handleResendCode()}>
-                    {t('timeExpired.resendBtn')}
+                    {t('expired.resendButtonText')}
                   </button>
                 </STimeExpired>
               </AnimatedPresence>
@@ -276,7 +281,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<ICodeVerificationMen
           submitError &&
           !isSucces ? (
             <AnimatedPresence animateWhenInView={false} animation='t-09'>
-              <SErrorDiv>{t('errors.invalidCode')}</SErrorDiv>
+              <SErrorDiv>{t('error.invalidCode')}</SErrorDiv>
             </AnimatedPresence>
           ) : null}
         </SCodeVerificationMenuNewEmail>
@@ -381,14 +386,11 @@ const SBackButtonDesktop = styled(GoBackButton)`
     left: 104px;
 
     justify-content: center;
+    align-items: center;
 
-    width: 36px;
+    width: fit-content;
     height: 36px;
     padding: 0;
-
-    border-radius: 12px;
-
-    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
 
     div {
       margin-right: 0;

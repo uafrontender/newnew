@@ -14,7 +14,7 @@ type TOnboardingBioTextarea = React.ComponentPropsWithoutRef<'textarea'> & {
 
 const OnboardingBioTextarea: React.FunctionComponent<TOnboardingBioTextarea> =
   ({ maxChars, value, isValid, errorCaption, onChange, ...rest }) => {
-    const { t } = useTranslation('creator-onboarding');
+    const { t } = useTranslation('page-CreatorOnboarding');
     const [charCounter, setCharCounter] = useState((value as string).length);
 
     const [errorBordersShown, setErrorBordersShown] = useState(false);
@@ -32,7 +32,7 @@ const OnboardingBioTextarea: React.FunctionComponent<TOnboardingBioTextarea> =
     return (
       <SWrapper>
         <SLabelDiv>
-          <div>{t('AboutSection.bio.title')}</div>
+          <div>{t('aboutSection.bio.title')}</div>
           <SCharCounter>
             {charCounter}/{maxChars}
           </SCharCounter>

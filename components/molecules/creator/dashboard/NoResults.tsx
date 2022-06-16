@@ -11,7 +11,7 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import assets from '../../../../constants/assets';
 
 export const NoResults = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const user = useAppSelector((state) => state.user);
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
   const [linkText, setLinkText] = useState('');

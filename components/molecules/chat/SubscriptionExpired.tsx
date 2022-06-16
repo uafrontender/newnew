@@ -26,7 +26,7 @@ interface ISubscriptionExpired {
 
 const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
   ({ user }) => {
-    const { t } = useTranslation('chat');
+    const { t } = useTranslation('page-Chat');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -59,10 +59,10 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
           <SBottomActionIcon>🙊</SBottomActionIcon>
           <SBottomActionText>
             <SBottomActionTitle>
-              {t('subscription-expired.title')}
+              {t('subscriptionExpired.title')}
             </SBottomActionTitle>
             <SBottomActionMessage>
-              {t('subscription-expired.message')}
+              {t('subscriptionExpired.message')}
             </SBottomActionMessage>
           </SBottomActionText>
         </SBottomActionLeft>
@@ -74,7 +74,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
             setPaymentModalOpen(true);
           }}
         >
-          {t('subscription-expired.button-text')}
+          {t('subscriptionExpired.buttonText')}
         </SBottomActionButton>
 
         <PaymentModal
@@ -87,7 +87,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
         >
           <div>
             <SPaymentModalTitle variant={3}>
-              {t('modal.renewSubcriptionsSubtitle')}
+              {t('modal.renewSubscriptionsSubtitle')}
             </SPaymentModalTitle>
             <SPaymentModalCreatorInfo>
               {user.avatarUrl && (

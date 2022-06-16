@@ -32,7 +32,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
   ];
 
   const theme = useTheme();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const wrapperRef: any = useRef();
   const [open, setOpen] = useState(false);
   const [animate, setAnimate] = useState(false);

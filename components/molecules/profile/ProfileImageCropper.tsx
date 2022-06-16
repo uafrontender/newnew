@@ -31,7 +31,7 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
   onCropComplete,
   onZoomChange,
 }) => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('common');
   const { ui } = useAppSelector((state) => state);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     ui.resizeMode
@@ -56,7 +56,7 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
     >
       {avatarUrlInEdit && !isMobile ? (
         <DragToRepositionLabel
-          text={t('EditProfileMenu.dragToReposition')}
+          text={t('dragToReposition')}
           isPressed={disabled ?? isPressed}
         />
       ) : null}

@@ -17,7 +17,7 @@ interface IOnboardingProfileImageInput {
 const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileImageInput> =
   ({ imageInEditUrl, handleChangeImageInEdit }) => {
     const theme = useTheme();
-    const { t } = useTranslation('creator-onboarding');
+    const { t } = useTranslation('page-CreatorOnboarding');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobileOrTablet = [
       'mobile',
@@ -31,7 +31,7 @@ const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileIma
 
     return (
       <SContainer>
-        <SLabel>{t('DetailsSection.form.profilePicture.label')}</SLabel>
+        <SLabel>{t('detailsSection.form.profilePicture.label')}</SLabel>
         <SInputContainer>
           {imageInEditUrl && (
             <SProfileImage>
@@ -53,8 +53,8 @@ const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileIma
               fill={theme.colorsThemed.text.primary}
             />
             {!imageInEditUrl
-              ? t('DetailsSection.form.profilePicture.uploadBtn')
-              : t('DetailsSection.form.profilePicture.uploadNewBtn')}
+              ? t('detailsSection.form.profilePicture.button.upload')
+              : t('detailsSection.form.profilePicture.button.uploadNew')}
           </SUploadButton>
           <SImageInput
             type='file'
@@ -73,8 +73,8 @@ const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileIma
         </SInputContainer>
         <SCaption>
           {isMobileOrTablet
-            ? t('DetailsSection.form.profilePicture.captionMobile')
-            : t('DetailsSection.form.profilePicture.captionDesktop')}
+            ? t('detailsSection.form.profilePicture.captionMobile')
+            : t('detailsSection.form.profilePicture.captionDesktop')}
         </SCaption>
       </SContainer>
     );

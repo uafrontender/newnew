@@ -52,7 +52,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
 
   // const { walletBalance } = useContext(WalletContext);
@@ -270,7 +270,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
                     <SText>{`$${(p.usdCents / 100).toFixed(0)}`}</SText>
                     {/* {i === arr.length - 1 ? (
                     <SAdditionalLabel>
-                      {t('CfPost.BackersTab.free_sub')}
+                      {t('cfPost.backersTab.freeSub')}
                     </SAdditionalLabel>
                   ) : null} */}
                   </SItem>
@@ -283,7 +283,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
                 handleOpenCustomPledgeForm();
               }}
             >
-              <SText>{t('CfPost.BackersTab.custom')}</SText>
+              <SText>{t('cfPost.backersTab.custom')}</SText>
             </SItem>
           </SContentContainer>
           <Button
@@ -294,7 +294,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
             }}
             onClick={onClose}
           >
-            {t('CfPost.BackersTab.cancel')}
+            {t('cfPost.backersTab.cancel')}
           </Button>
         </SWrapper>
       </Modal>
@@ -310,7 +310,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
               position: 'relative',
             }}
           >
-            {t('CfPost.BackersTab.CustomPledge.pledgeBtn')}
+            {t('cfPost.backersTab.customPledge.pledgeButton')}
             <SCloseButton onClick={() => handleCloseCustomPledgeForm()}>
               <InlineSvg
                 svg={CancelIcon}
@@ -337,9 +337,9 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
             disabled={customPledgeAmount === ''}
             onClick={() => handleCustomPledgePaymentModal()}
           >
-            {t('CfPost.BackersTab.CustomPledge.continue')}
+            {t('cfPost.backersTab.customPledge.continue')}
           </Button>
-          <SCaption>{t('CfPost.BackersTab.info.caption')}</SCaption>
+          <SCaption>{t('cfPost.backersTab.info.caption')}</SCaption>
         </SCustomPledgeMobileContainer>
       </OptionActionMobileModal>
       {/* Payment Modal */}
@@ -363,7 +363,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
             <>
               {post.creator && (
                 <SPaymentSign variant={3}>
-                  {t('CfPost.paymentModalFooter.body', {
+                  {t('cfPost.paymentModalFooter.body', {
                     creator: post.creator,
                   })}
                 </SPaymentSign>
@@ -375,14 +375,14 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
                     href='https://terms.newnew.co'
                     target='_blank'
                   >
-                    {t('CfPost.paymentModalFooter.terms')}
+                    {t('cfPost.paymentModalFooter.terms')}
                   </SPaymentTermsLink>
                 </Link>{' '}
-                {t('CfPost.paymentModalFooter.apply')}
+                {t('cfPost.paymentModalFooter.apply')}
               </SPaymentTerms>
             </>
           }
-          // payButtonCaptionKey={t('CfPost.paymentModalPayButton')}
+          // payButtonCaptionKey={t('cfPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
             <SPaymentModalHeading>
@@ -397,7 +397,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
                 {post.creator
-                  ? t('CfPost.paymentModalHeader.title', {
+                  ? t('cfPost.paymentModalHeader.title', {
                       creator: getDisplayname(post.creator),
                     })
                   : ''}

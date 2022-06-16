@@ -46,7 +46,7 @@ export const Chat: React.FC<IChat> = ({ username }) => {
 
     setChatData({ chatRoom, showChatList });
   };
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
   const [chatListHidden, setChatListHidden] =
     useState<boolean | undefined>(undefined);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -98,7 +98,7 @@ export const Chat: React.FC<IChat> = ({ username }) => {
             />
           )}
           <SearchInput
-            placeholderText={t('toolbar.search-placeholder')}
+            placeholderText={t('toolbar.searchPlaceholder')}
             style={{ marginRight: '16px', fontSize: '16px' }}
             passInputValue={passInputValue}
           />

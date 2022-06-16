@@ -81,7 +81,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   handleUpdatePostStatus,
   handleUpdateResponseVideo,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -140,10 +140,10 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       if (res.error) throw new Error('Request failed');
 
       setIsEditThumbnailModalOpen(false);
-      toast.success(t('PostVideoThumbnailEdit.toast.success'));
+      toast.success(t('postVideoThumbnailEdit.toast.success'));
     } catch (err) {
       console.error(err);
-      toast.error(t('PostVideoThumbnailEdit.toast.error'));
+      toast.error(t('postVideoThumbnailEdit.toast.error'));
     }
   };
 
@@ -378,7 +378,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       const res = await uploadPostResponse(payload);
 
       if (res.data) {
-        toast.success(t('PostVideo.responseUploadedNonProcessed'));
+        toast.success(t('postVideo.responseUploadedNonProcessed'));
         handleUpdatePostStatus('PROCESSING_RESPONSE');
         setUploadedResponseVideoUrl('');
       }
@@ -548,6 +548,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               id={postId}
               resources={announcement}
               muted={isMuted}
+              showPlayButton
             />
             {isSetThumbnailButtonIconOnly ? (
               <SSetThumbnailButtonIconOnly
@@ -581,7 +582,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
                     : {}),
                 }}
               >
-                {t('PostVideo.setThumbnail')}
+                {t('postVideo.setThumbnail')}
               </SSetThumbnailButton>
             )}
             <SSoundButton
@@ -621,6 +622,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               id={postId}
               resources={response}
               muted={isMuted}
+              showPlayButton
             />
             <SSoundButton
               id='sound-button'
@@ -724,7 +726,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             document.getElementById('upload-response-btn')?.click();
           }}
         >
-          {t('PostVideo.floatingUploadResponseBtn')}
+          {t('postVideo.floatingUploadResponseButton')}
         </SUploadResponseButton>
       ) : null}
       {/* Edit thumbnail */}

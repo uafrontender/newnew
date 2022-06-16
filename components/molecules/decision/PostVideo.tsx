@@ -39,7 +39,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
   isMuted,
   handleToggleMuted,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
@@ -144,6 +144,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             id={`video-${postId}`}
             resources={response}
             muted={isMuted}
+            showPlayButton
           />
           <SSoundButton
             id='sound-button'
@@ -182,6 +183,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             id={postId}
             resources={announcement}
             muted={isMuted}
+            showPlayButton
           />
           <SSoundButton
             id='sound-button'
@@ -219,14 +221,14 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         <SToggleVideoWidget>
           {openedTab === 'response' ? (
             <SChangeTabBtn onClick={() => setOpenedTab('announcement')}>
-              {t('PostVideo.tabs.back_to_original')}
+              {t('postVideo.tabs.backToOriginalVideo')}
             </SChangeTabBtn>
           ) : (
             <SChangeTabBtn
               shouldView={!responseViewed}
               onClick={() => setOpenedTab('response')}
             >
-              {t('PostVideo.tabs.back_to_response')}
+              {t('postVideo.tabs.backToResponse')}
             </SChangeTabBtn>
           )}
         </SToggleVideoWidget>

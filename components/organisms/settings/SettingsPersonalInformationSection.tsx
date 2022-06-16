@@ -36,7 +36,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
   ({ currentEmail, currentDate, isMobile, handleSetActive }) => {
     const dispatch = useAppDispatch();
     const router = useRouter();
-    const { t } = useTranslation('profile');
+    const { t } = useTranslation('page-Profile');
     const user = useAppSelector((state) => state.user);
 
     const [wasModifed, setWasModified] = useState(false);
@@ -193,19 +193,19 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
             value={emailInEdit}
             isValid={emailInEdit.length > 0 ? emailError === '' : true}
             labelCaption={t(
-              'Settings.sections.PersonalInformation.emailInput.label'
+              'Settings.sections.personalInformation.emailInput.label'
             )}
             placeholder={t(
-              'Settings.sections.PersonalInformation.emailInput.placeholder'
+              'Settings.sections.personalInformation.emailInput.placeholder'
             )}
             // Temp
             errorCaption={
               emailError === 'Taken'
                 ? t(
-                    'Settings.sections.PersonalInformation.emailInput.errors.emailTaken'
+                    'Settings.sections.personalInformation.emailInput.errors.emailTaken'
                   )
                 : t(
-                    'Settings.sections.PersonalInformation.emailInput.errors.invalidEmail'
+                    'Settings.sections.personalInformation.emailInput.errors.invalidEmail'
                   )
             }
             onChange={handleEmailInput}
@@ -222,16 +222,16 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
             submitError={
               dateError
                 ? t(
-                    `Settings.sections.PersonalInformation.birthDateInput.errors.${dateError}`
+                    `Settings.sections.personalInformation.birthDateInput.errors.${dateError}`
                   )
                 : undefined
             }
             handleResetSubmitError={() => setDateError('')}
             labelCaption={t(
-              'Settings.sections.PersonalInformation.birthDateInput.label'
+              'Settings.sections.personalInformation.birthDateInput.label'
             )}
             bottomCaption={t(
-              'Settings.sections.PersonalInformation.birthDateInput.captions.twoTimesOnly'
+              'Settings.sections.personalInformation.birthDateInput.captions.twoTimesOnly'
             )}
             onChange={handleDateInput}
             handleSetActive={() => handleSetActive()}
@@ -249,7 +249,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
                 onClick={() => handleSaveModifications()}
                 disabled={isLoading || emailError !== ''}
               >
-                {t('Settings.sections.PersonalInformation.saveBtn')}
+                {t('Settings.sections.personalInformation.button.save')}
               </Button>
               <Button
                 view='secondary'
@@ -258,7 +258,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
                 }}
                 onClick={() => handleResetModifications()}
               >
-                {t('Settings.sections.PersonalInformation.cancelBtn')}
+                {t('Settings.sections.personalInformation.button.cancel')}
               </Button>
             </SControlsWrapper>
           ) : null}

@@ -15,7 +15,7 @@ interface IOnboardingTosSubmitForm {
 
 const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm> =
   ({ handleGoToNext, hasScrolledDown, hasScrolledDownDesktop }) => {
-    const { t } = useTranslation('creator-onboarding');
+    const { t } = useTranslation('page-CreatorOnboarding');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -31,7 +31,7 @@ const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm>
             disabled={!hasScrolledDown}
             onClick={() => handleGoToNext()}
           >
-            {t('TosSection.submitMobile')}
+            {t('tosSection.button.submit')}
           </SMobileButton>
         </SMobileButtonContainer>
       );
@@ -42,8 +42,8 @@ const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm>
         <SCheckBox
           label={
             hasScrolledDownDesktop
-              ? t('TosSection.agreedToTosCheckbox')
-              : t('TosSection.scrollDownToContinue')
+              ? t('tosSection.agreedToTosCheckbox')
+              : t('tosSection.scrollDownToContinue')
           }
           selected={agreed}
           disabled={!hasScrolledDownDesktop}
@@ -54,7 +54,7 @@ const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm>
           disabled={!agreed}
           onClick={() => handleGoToNext()}
         >
-          {t('TosSection.submitDesktop')}
+          {t('tosSection.button.submit')}
         </Button>
       </STabletForm>
     );
