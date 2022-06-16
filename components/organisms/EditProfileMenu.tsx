@@ -193,12 +193,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             );
             return errorsWorking;
           });
-        } else if (!validator.isLowercase(text)) {
-          setFormErrors((errors) => {
-            const errorsWorking = { ...errors };
-            errorsWorking.usernameError = 'generic';
-            return errorsWorking;
-          });
         } else {
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
@@ -321,8 +315,19 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           newnewapi.ValidateTextRequest.Kind.USER_NICKNAME,
           value as ModalMenuUserData['nickname']
         );
-      } else if (key === 'username' && value !== user.userData?.username) {
-        validateUsernameViaAPIDebounced(value as ModalMenuUserData['username']);
+      } else if (key === 'username') {
+        if (value === user.userData?.username) {
+          // reset error if username equal to initial username
+          setFormErrors((errors) => {
+            const errorsWorking = { ...errors };
+            errorsWorking.usernameError = '';
+            return errorsWorking;
+          });
+        } else {
+          validateUsernameViaAPIDebounced(
+            value as ModalMenuUserData['username']
+          );
+        }
       } else if (key === 'bio') {
         validateTextViaAPIDebounced(
           newnewapi.ValidateTextRequest.Kind.USER_BIO,
@@ -699,57 +704,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     coverUrlInEdit,
   ]);
 
-  // Check fields validity
   useEffect(() => {
-    const isUsernameValid =
-      dataInEdit.username.length >= 2 &&
-      dataInEdit.username.length <= 25 &&
-      validator.isAlphanumeric(dataInEdit.username) &&
-      validator.isLowercase(dataInEdit.username);
-    const isNicknameValid = dataInEdit && dataInEdit.nickname.length > 0 && dataInEdit.nickname.length <= 100;
-
-    if (!isNicknameValid || !isUsernameValid) {
-      setFormErrors((errors) => {
-        const errorsWorking = { ...errors };
-        errorsWorking.usernameError = isUsernameValid ? '' : errors.usernameError || 'generic';
-        errorsWorking.nicknameError = isNicknameValid ? '' : errors.nicknameError || 'generic';
-        return errorsWorking;
-      });
-      setIsDataValid(false);
-    } else {
-      setFormErrors({
-        usernameError: '',
-        nicknameError: '',
-      });
+    if (Object.values(formErrors).every((v) => v === '')) {
       setIsDataValid(true);
-    }
-  }, [dataInEdit]);
-
-  // Set and unset form errors
-  useEffect(() => {
-    if (Object.values(formErrors).some((v) => v !== '')) {
-      setIsDataValid(false);
     } else {
-      const isUsernameValid =
-        dataInEdit.username.length >= 2 &&
-        dataInEdit.username.length <= 25 &&
-        validator.isAlphanumeric(dataInEdit.username) &&
-        validator.isLowercase(dataInEdit.username);
-      const isNicknameValid = dataInEdit && dataInEdit.nickname.length > 0;
-
-      if (!isNicknameValid || !isUsernameValid) {
-        setFormErrors((errors) => {
-          const errorsWorking = { ...errors };
-          errorsWorking.usernameError = isUsernameValid ? '' : errors.usernameError || 'generic';
-          errorsWorking.nicknameError = isNicknameValid ? '' : errors.nicknameError || 'generic';
-          return errorsWorking;
-        });
-        setIsDataValid(false);
-      } else {
-        setIsDataValid(true);
-      }
+      setIsDataValid(false);
     }
-  }, [formErrors, dataInEdit]);
+  }, [formErrors]);
 
   // Gender Pronouns
   const genderOptions: TDropdownSelectItem<number>[] = useMemo(
