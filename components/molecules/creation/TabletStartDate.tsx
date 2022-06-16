@@ -56,7 +56,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
       <SCheckBoxWrapper>
         <CheckBox
           id='right-away'
-          label={t('secondStep.field.startsAt.tablet.type.rightAway')}
+          label={t('secondStep.field.startsAt.tablet.type.right-away')}
           selected={value.type === 'right-away'}
           handleChange={handleTypeChange}
         />

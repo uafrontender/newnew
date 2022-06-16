@@ -116,7 +116,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
         },
         {
           id: 'right-away',
-          title: t('secondStep.field.startsAt.modal.type.rightAway'),
+          title: t('secondStep.field.startsAt.modal.type.right-away'),
         },
       ];
       const formatOptions = [

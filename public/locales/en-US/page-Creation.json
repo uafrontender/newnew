@@ -113,7 +113,7 @@
           "title": "Start date",
           "type": {
             "schedule": "Schedule",
-            "rightAway": "Right away"
+            "right-away": "Right away"
           },
           "hoursFormat": {
             "pm": "PM",
@@ -132,7 +132,7 @@
         "tablet": {
           "type": {
             "schedule": "Schedule for a certain date",
-            "rightAway": "Post right away once I publish it"
+            "right-away": "Post right away once I publish it"
           }
         }
       },
