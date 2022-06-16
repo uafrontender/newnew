@@ -1,4 +1,5 @@
 /* eslint-disable no-nested-ternary */
+import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { scroller } from 'react-scroll';
@@ -12,6 +13,7 @@ interface IFunctionProps {
 }
 
 const NoResults: React.FC<IFunctionProps> = ({ closeDrop }) => {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -32,11 +34,11 @@ const NoResults: React.FC<IFunctionProps> = ({ closeDrop }) => {
   };
   return (
     <SNoResults>
-      <SEmptyInboxTitle>We didn’t find anything</SEmptyInboxTitle>
+      <SEmptyInboxTitle>{t('search.noResults.title')}</SEmptyInboxTitle>
       <SEmptyInboxText>
-        Try searching for something else or explore what’s new
+      {t('search.noResults.description')}
       </SEmptyInboxText>
-      <Button onClick={exploreHandler}>Explore</Button>
+      <Button onClick={exploreHandler}>{t('search.noResults.action')}</Button>
     </SNoResults>
   );
 };

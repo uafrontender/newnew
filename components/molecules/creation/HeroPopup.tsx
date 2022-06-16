@@ -33,7 +33,7 @@ const HeroPopup: React.FC<IHeroPopup> = ({
   postType,
   closeModal,
 }) => {
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const theme = useTheme();
 
   return (
@@ -60,7 +60,7 @@ const HeroPopup: React.FC<IHeroPopup> = ({
           <SText variant={2}>{t(`tutorials.heroPopup${postType}.line2`)}</SText>
           <SText variant={2}>{t(`tutorials.heroPopup${postType}.line3`)}</SText>
           <SButton view='primary' onClick={closeModal}>
-            {t('tutorials.heroPopupCommon.heroBtnText')}
+            {t('tutorials.heroPopupCommon.heroButtonText')}
           </SButton>
         </SModal>
       </SContainer>

@@ -42,7 +42,7 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   const [isDragging, setIsDragging] = useState(false);
   const y = useMotionValue(0);
   const theme = useTheme();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const dragControls = useDragControls();
 
   const handleInputChange = (e: any) => {

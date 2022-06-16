@@ -7,7 +7,7 @@ import Headline from '../../../atoms/Headline';
 import { useAppSelector } from '../../../../redux-store/store';
 
 export const EmptySubscriptionStats = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const user = useAppSelector((state) => state.user);
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
@@ -41,11 +41,11 @@ export const EmptySubscriptionStats = () => {
       <SHeaderLine>
         <STitle variant={6}>{t('dashboard.subscriptionStats.title')}</STitle>
       </SHeaderLine>
-      <SContent>{t('dashboard.subscriptionStats.no-subs')}</SContent>
+      <SContent>{t('dashboard.subscriptionStats.noSubs')}</SContent>
       <SButton view='primaryGrad' onClick={handlerCopy} disabled={isCopiedUrl}>
         {isCopiedUrl
           ? t('dashboard.subscriptionStats.copied')
-          : t('dashboard.subscriptionStats.copy-link')}
+          : t('dashboard.subscriptionStats.copyLink')}
       </SButton>
     </SContainer>
   );

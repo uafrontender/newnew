@@ -48,7 +48,7 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
     onZoomChange,
   }) => {
     const theme = useTheme();
-    const { t } = useTranslation('profile');
+    const { t } = useTranslation('page-Profile');
 
     const [mobileCropWidth, setMobileCropWidth] = useState(0);
     const containerRef = useRef<HTMLDivElement>();
@@ -181,7 +181,7 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
                 height='24px'
               />
               <div>
-                {t('EditProfileMenu.inputs.coverImage.changeCoverImage')}
+                {t('editProfileMenu.inputs.coverImage.changeCoverImage')}
               </div>
             </SChangeImageCaption>
           </SLabel>

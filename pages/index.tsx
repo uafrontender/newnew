@@ -500,9 +500,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'common',
     'page-Home',
     'component-PostCard',
-    'decision',
-    'payment-modal',
-    'chat',
+    'modal-Post',
+    'modal-PaymentModal',
+    'page-Chat',
   ]);
 
   const top10payload = new newnewapi.EmptyRequest({});

@@ -71,7 +71,7 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
 
   return (
     <SContainer>
-      <SBlockTitle>{t('search.top-posts')}</SBlockTitle>
+      <SBlockTitle>{t('search.topPosts')}</SBlockTitle>
       {posts.map(renderItem)}
     </SContainer>
   );

@@ -19,7 +19,7 @@ interface ICfCrowdfundingSuccess {
 
 const CfCrowdfundingSuccess: React.FunctionComponent<ICfCrowdfundingSuccess> =
   ({ post, currentNumBackers }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -40,7 +40,7 @@ const CfCrowdfundingSuccess: React.FunctionComponent<ICfCrowdfundingSuccess> =
             {currentNumBackers}
           </SHeadlineNumBackers>
           <STarget>
-            {t('CfPost.BackersStatsSection.of_backers', {
+            {t('cfPost.backersStatsSection.ofBackers', {
               targetBackers: formatNumber(post.targetBackerCount, true),
             })}
           </STarget>
@@ -51,8 +51,8 @@ const CfCrowdfundingSuccess: React.FunctionComponent<ICfCrowdfundingSuccess> =
               <SSpanBold>{formatNumber(currentNumBackers, true)}</SSpanBold>{' '}
               <SSpanThin>
                 {currentNumBackers > 1
-                  ? t('CfPost.WinnerTab.WinnerOptionCard.backers_founded')
-                  : t('CfPost.WinnerTab.WinnerOptionCard.backer_founded')}
+                  ? t('cfPost.winnerTab.winnerOptionCard.backersFounded')
+                  : t('cfPost.winnerTab.winnerOptionCard.backerFounded')}
               </SSpanThin>
             </SNumBidders>
             <SHeadline variant={4}>{post.title}</SHeadline>

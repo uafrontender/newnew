@@ -10,7 +10,7 @@ import SearchResults from '../components/organisms/search/SearchResults';
 import { NextPageWithLayout } from './_app';
 
 export const Search = () => {
-  const { t } = useTranslation('search');
+  const { t } = useTranslation('page-Search');
 
   return (
     <>
@@ -31,9 +31,10 @@ export default Search;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'search',
+    'page-Search',
     'component-PostCard',
-    'decision',
+    'modal-PaymentModal',
+    'modal-Post',
   ]);
 
   return {

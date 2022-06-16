@@ -1,12 +1,16 @@
 {
-  "backBtn": "Back",
-  "TopSection": {
+  "button": {
+    "back": "Back",
+    "subscribe": "Subscribe for ${{amount}}/mo",
+    "learnMore": "Learn more"
+  },
+  "topSection": {
     "headline": {
       "line_1": "Subscribe to {{username}}",
       "line_2": "for limited exclusives"
     },
     "bullets": {
-      "dms": {
+      "directMessages": {
         "title": "1-on-1 messages",
         "body": "Have unlimited personal messages with {{nickname}}"
       },
@@ -20,8 +24,10 @@
       }
     }
   },
-  "subscribeBtn": "Subscribe for ${{amount}}/mo",
-  "learnMoreBtn": "Learn more",
+  "paymentModal": {
+    "header": "Subscribe to",
+    "payButton": "Subscribe for"
+  },
   "FAQ": {
     "heading": "Frequently asked questions",
     "helpCenterFooter": {
@@ -50,10 +56,5 @@
         "a": "No. Although every creator can offer subscriptions, some creators choose not to."
       }
     }
-  },
-  "paymentModalHeader": {
-    "subtitle": "Subscribe to",
-    "numSubscribers": "subscribers"
-  },
-  "paymentModalPayButton": "Subscribe for"
+  }
 }

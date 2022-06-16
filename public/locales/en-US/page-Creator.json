@@ -7,7 +7,7 @@
     "title": "My Dashboard",
     "button": {
       "notifications": "Notifications",
-      "dms": "DMs",
+      "directMessages": "DMs",
       "markAllAsRead": "Mark all as read",
       "minimize": "Minimize",
       "new": "New",
@@ -25,20 +25,20 @@
       "earnedToday": "earned today",
       "earnedYesterday": "earned yesterday",
       "insights": "Insights",
-      "insights_tablet": "Go to insights",
+      "insightsTablet": "Go to insights",
       "cashOut": {
         "amount": "Your next payout of",
         "date": "will automatically be sent on {{date}}.",
         "submit": "Learn More",
-        "no-payouts": "You don’t have any upcoming payouts"
+        "noPayouts": "You don’t have any upcoming payouts"
       },
-      "todosIssue": {
+      "toDosIssue": {
         "text": "Add a bio and your bank info to withdraw your earnings",
-        "btnText": "Add"
+        "button": "Add"
       },
       "makeDecision": {
-        "text": "Make a decision. Start earning.",
-        "btnText": "Make a decision"
+        "text": "Make a post. Start earning.",
+        "button": "Make a post"
       },
       "list": {
         "ac": "Events",
@@ -79,15 +79,14 @@
         "hours": "h",
         "minutes": "m",
         "seconds": "s",
-        "left_to_respond": "left to respond"
+        "leftToRespond": "left to respond"
       }
     },
     "subscriptionStats": {
       "title": "Subscriptions",
-      "no-subs": "Bring more exposure to your business, share with your network",
+      "noSubs": "Bring more exposure to your business, share with your network",
       "newTitle": "Recently subscribed",
       "newLink": "Subscriptions",
-      "newLink_tablet": "Go to subscriptions",
       "seeAll": "See all new subs",
       "prevWeek": "vs prev week",
       "banner": {
@@ -107,17 +106,17 @@
         "last_90_days": "Last 90 days",
         "last_12_months": "Last 12 months"
       },
-      "copy-link": "Copy your link",
+      "copyLink": "Copy your link",
       "copied": "Copied"
     },
-    "todos": {
+    "toDos": {
       "title": "Complete these steps to get paid",
       "subtitle": "Made💰? Finish these steps to withdraw your earnings...",
-      "sign-up": "Sign up as a Creator",
-      "complete-profile": "Add a bio",
-      "complete-profile-btn": "Add",
-      "add-cashout-method": "Add bank info",
-      "add-cashout-method-btn": "Add"
+      "signUp": "Sign up as a Creator",
+      "completeProfile": "Add a bio",
+      "completeProfileButton": "Add",
+      "addCashOutMethod": "Add bank info",
+      "addCashOutMethodButton": "Add"
     }
   },
   "subscriptions": {
@@ -128,15 +127,9 @@
     "table": {
       "subscribers": "Subscribers",
       "date": "Date subscribed",
-      "menu": {
-        "report": "Report",
-        "block": "Block",
-        "unblock": "Unblock",
-        "view": "View profile"
-      },
       "updateSub": "Update subscription"
     },
-    "message-all": "DM all"
+    "messageAll": "DM all"
   },
   "earnings": {
     "meta": {
@@ -148,18 +141,7 @@
     "meta": {
       "title": "Get Paid on NewNew",
       "description": "Earn income through cash auctions, polls, crowdfunding and subscription memberships"
-    },
-    "title": "Get Paid",
-    "title-set-up-stripe": "Set payment system",
-    "title-stripe-active": "account is active",
-    "bullets": {
-      "1": "$2.00 USD NewNew withdrawal fee.",
-      "2": "Stripe may charge additional fees for sending and withdrawing funds.",
-      "3": "Set up will take you to Stripe."
-    },
-    "requestSetupLinkBtn": "Connect with Stripe",
-    "getPaidBtn": "Get paid",
-    "updateBtn": "Update account"
+    }
   },
   "transactions": {
     "meta": {
@@ -176,7 +158,7 @@
     "getPaid": "Add Bank",
     "getPaidEdit": "Edit Bank",
     "transactions": "Transactions",
-    "new-post": "New post"
+    "newPost": "New post"
   },
   "tabs": {
     "chat": "DMs",
@@ -185,42 +167,37 @@
   "chat": {
     "today": "Today",
     "placeholder": "Type a message...",
-    "welcome-message": "You successfully subscribed! Now you can send a message to",
-    "no-messages-first-line": "No messages here yet...",
-    "no-messages-second-line": "Send a message to start conversation.",
-    "select-chat": "Select a chat to start messaging",
+    "noMessagesFirstLine": "No messages here yet...",
     "typing": "Typing...",
-    "default-first-message": "👋 Hey, thank you for subscribing to my channel, I look forward to talking to you.",
     "toolbar": {
-      "search-placeholder": "Search for messages or users"
+      "searchPlaceholder": "Search for messages or users"
     },
     "modal": {
-      "new-message": {
+      "newMessage": {
         "title": "New message",
-        "search-placeholder": "Search",
-        "no-results-title": "No results",
-        "no-results-text": "There were no results for",
-        "no-results-search-text": "Try a new search."
+        "searchPlaceholder": "Search"
       }
     },
-    "empty-inbox": {
+    "emptyInbox": {
       "title": "Your inbox is empty",
       "text": "Once you start a new conversation, you’ll see it listed here"
     },
     "default": {
-      "search-placeholder": "Search"
+      "searchPlaceholder": "Search"
     }
   },
-  "SubrateSection": {
+  "subRateSection": {
     "heading": "Set your subscription price",
     "selectInput": {
       "perMonth": "/month",
       "select": "Select",
       "featured": "Popular"
     },
-    "submitDesktop": "Turn on Subscription",
-    "backButton": "Cancel",
-    "updateRate": "Save",
+    "button": {
+      "enable": "Turn on Subscription",
+      "update": "Save",
+      "back": "Cancel"
+    },
     "removeSubscription": "Remove subscription"
   },
   "subscribersFeatures": {
@@ -233,29 +210,26 @@
   "enableSubModal": {
     "title": "Turn on subscription",
     "note": "This subscription price is locked for 30 days from the day you enable it",
-    "bntText": "Yes, turn on subscription",
+    "button": "Yes, turn on subscription",
     "confirmationTextFirstPart": "Confirm",
     "confirmationTextSecondPart": "monthly subscription"
   },
   "removeSubModal": {
     "title": "Remove my subscription",
     "note": "If you remove your subscription, you won’t be able to gain new subscribers and your subscription will end for your current subscribers. You will also lose the abilitiy to chat with your subscribers.\n You can turn your subscription back on at any time. ",
-    "bntText": "Remove my subscription"
+    "button": "Remove my subscription"
   },
   "noResults": {
     "text": "Share your profile to let others\n know about your subscription",
     "updateSub": "Update subscription"
   },
   "modal": {
-    "new-message": {
+    "newMessage": {
       "title": "New message",
-      "search-placeholder": "Search",
-      "no-results-title": "No results",
-      "no-results-text": "There were no results for",
-      "no-results-search-text": "Try a new search."
+      "searchPlaceholder": "Search"
     }
   },
-  "new-announcement": {
+  "newAnnouncement": {
     "title": "New announcement",
     "text": "Only you can send messages to the group.",
     "created": "You created the announcement",
@@ -270,19 +244,19 @@
       "title": "Payments made easy with Stripe",
       "description": "Connect a Stripe account to get paid on time."
     },
-    "title-set-up-stripe": "Get paid through",
-    "title-stripe-active": "account is active",
+    "titleSetUpStripe": "Get paid through",
     "bullets": {
       "1": "Setting up a Stripe account is quick and easy",
       "2": "Withdraw your NewNew earnings directly to your bank account",
       "3": "Stripe keeps your information private and secure"
     },
-    "requestSetupLinkBtn": "Connect with Stripe",
-    "stripeConnectedLinkBtn": "Stripe connected!",
-    "submitMobile": "Done",
-    "submitDesktop": "Done",
-    "backButton": "Close",
-    "updateButton": "Update payment info",
-    "stripe-issue": "Stripe issue!"
-  }
+    "button": {
+      "submit": "Done",
+      "update": "Update payment info",
+      "requestSetupLink": "Connect with Stripe",
+      "stripeConnectedLink": "Stripe connected!",
+      "back": "Close"
+    }
+  },
+  "noNotifications": "Any new notifications you receive\nwill appear here"
 }

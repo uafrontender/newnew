@@ -25,7 +25,7 @@ const CommentEllipseModal: React.FunctionComponent<ICommentEllipseModal> = ({
   onDeleteComment,
   onUserReport,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('common');
 
   const reportUserHandler = () => {
     onUserReport();
@@ -47,13 +47,13 @@ const CommentEllipseModal: React.FunctionComponent<ICommentEllipseModal> = ({
         >
           {canDeleteComment && (
             <SButton onClick={deleteCommentHandler}>
-              <Text variant={2}>{t('comments.delete')}</Text>
+              <Text variant={2}>{t('ellipse.delete')}</Text>
             </SButton>
           )}
           {!isMyComment && (
             <SButton onClick={reportUserHandler}>
               <Text variant={2} tone='error'>
-                {t('comments.report')}
+                {t('ellipse.report')}
               </Text>
             </SButton>
           )}
@@ -66,7 +66,7 @@ const CommentEllipseModal: React.FunctionComponent<ICommentEllipseModal> = ({
           }}
           onClick={onClose}
         >
-          {t('Cancel')}
+          {t('ellipse.cancel')}
         </Button>
       </SWrapper>
     </Modal>

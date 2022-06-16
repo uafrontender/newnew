@@ -48,7 +48,7 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
   handleFetchComments,
   closeCommentsModalMobile,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const scrollRef = useRef<HTMLDivElement>();
   const commentsWrapper = useRef<HTMLDivElement>();
 

@@ -96,7 +96,7 @@ interface ICreationSecondStepContent {}
 export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
   () => {
     const { t: tCommon } = useTranslation();
-    const { t } = useTranslation('creation');
+    const { t } = useTranslation('page-Creation');
     const theme = useTheme();
     const router = useRouter();
     const dispatch = useAppDispatch();
@@ -1160,7 +1160,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                           variant={3}
                           weight={600}
                         >
-                          {t('secondStep.block.subTitle.floating-processing')}
+                          {t('secondStep.block.subTitle.floatingProcessing')}
                         </SFloatingSubSectionDescription>
                       </SFloatingSubSection>
                     )

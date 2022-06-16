@@ -30,7 +30,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   postType,
   isTutorialVisible,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const { user } = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
   const { resizeMode } = useAppSelector((state) => state.ui);

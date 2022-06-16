@@ -18,7 +18,7 @@ const ToggleVideoWidget: React.FunctionComponent<IToggleVideoWidget> = ({
   wrapperCSS,
   handleChangeTab,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
 
   return (
     <SToggleVideoWidget
@@ -32,23 +32,23 @@ const ToggleVideoWidget: React.FunctionComponent<IToggleVideoWidget> = ({
             active={currentTab === 'announcement'}
             onClick={() => handleChangeTab('announcement')}
           >
-            {t('PostVideo.tabs.announcement')}
+            {t('postVideo.tabs.announcement')}
           </STabBtn>
           <STabBtn
             disabled={disabled}
             active={currentTab === 'response'}
             onClick={() => handleChangeTab('response')}
           >
-            {t('PostVideo.tabs.response')}
+            {t('postVideo.tabs.response')}
           </STabBtn>
         </SWrapper>
       ) : currentTab === 'response' ? (
         <SBackToOriginalBtn onClick={() => handleChangeTab('announcement')}>
-          {t('PostVideo.tabs.back_to_original')}
+          {t('postVideo.tabs.backToOriginalVideo')}
         </SBackToOriginalBtn>
       ) : (
         <SBackToOriginalBtn onClick={() => handleChangeTab('response')}>
-          {t('PostVideo.tabs.back_to_response')}
+          {t('postVideo.tabs.backToResponse')}
         </SBackToOriginalBtn>
       )}
     </SToggleVideoWidget>

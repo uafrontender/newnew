@@ -23,7 +23,7 @@ interface IOnboardingSectionSubrate {
 const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrate> =
   ({ standardProducts, featuredProductsIds, currentProduct }) => {
     const router = useRouter();
-    const { t } = useTranslation('creator-onboarding');
+    const { t } = useTranslation('page-CreatorOnboarding');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -96,7 +96,7 @@ const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrat
       <SContainer>
         {isMobile && <SGoBackButton onClick={() => router.back()} />}
         <SHeadline variant={5}>
-          <span>{t('SubrateSection.heading')}</span>
+          <span>{t('subRateSection.heading')}</span>
         </SHeadline>
         <OnboardingSubproductSelect
           currentProduct={selectedProduct}
@@ -107,7 +107,7 @@ const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrat
         <SControlsDiv>
           {!isMobile && (
             <GoBackButton noArrow onClick={() => router.back()}>
-              {t('AboutSection.backButton')}
+              {t('aboutSection.button.back')}
             </GoBackButton>
           )}
           <Button
@@ -117,9 +117,7 @@ const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrat
             }}
             onClick={() => handleSubmit()}
           >
-            {isMobile
-              ? t('AboutSection.submitMobile')
-              : t('AboutSection.submitDesktop')}
+            {t('aboutSection.button.submit')}
           </Button>
         </SControlsDiv>
         {/* Loading Modal */}

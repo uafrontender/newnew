@@ -87,7 +87,7 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
       break;
     }
     case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'innappropriate';
+      errorMsg = 'inappropriate';
       break;
     }
     case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION: {
@@ -121,7 +121,7 @@ const errorSwitchUsername = (
       break;
     }
     case newnewapi.ValidateUsernameResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'innappropriate';
+      errorMsg = 'inappropriate';
       break;
     }
     case newnewapi.ValidateUsernameResponse.Status.USERNAME_TAKEN: {
@@ -146,7 +146,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   handleSetStageToEditingGeneral,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   const dispatch = useAppDispatch();
   const { user, ui } = useAppSelector((state) => state);
@@ -742,11 +742,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           >
             {isMobile ? (
               <SGoBackButtonMobile onClick={handleClosePreventDiscarding}>
-                {t('EditProfileMenu.goBackBtn.general')}
+                {t('editProfileMenu.button.backToProfile')}
               </SGoBackButtonMobile>
             ) : (
               <SGoBackButtonDesktop onClick={handleClosePreventDiscarding}>
-                <div>{t('EditProfileMenu.goBackBtn.general')}</div>
+                <div>{t('editProfileMenu.button.backToProfile')}</div>
                 <InlineSvg
                   svg={CancelIcon}
                   fill={theme.colorsThemed.text.primary}
@@ -782,9 +782,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   type='text'
                   value={dataInEdit.nickname as string}
                   disabled={isLoading}
-                  placeholder={t('EditProfileMenu.inputs.nickname.placeholder')}
+                  placeholder={t('editProfileMenu.inputs.nickname.placeholder')}
                   errorCaption={t(
-                    `EditProfileMenu.inputs.nickname.errors.${formErrors.nicknameError}`
+                    `editProfileMenu.inputs.nickname.errors.${formErrors.nicknameError}`
                   )}
                   isValid={!formErrors.nicknameError}
                   onChange={(e) =>
@@ -799,20 +799,20 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     <UsernamePopupList
                       points={[
                         {
-                          text: t('EditProfileMenu.inputs.username.points.1'),
+                          text: t('editProfileMenu.inputs.username.points.1'),
                           isValid: dataInEdit.username
                             ? dataInEdit.username.length >= 2 &&
                               dataInEdit.username.length <= 25
                             : false,
                         },
                         {
-                          text: t('EditProfileMenu.inputs.username.points.2'),
+                          text: t('editProfileMenu.inputs.username.points.2'),
                           isValid: dataInEdit.username
                             ? validator.isLowercase(dataInEdit.username)
                             : false,
                         },
                         {
-                          text: t('EditProfileMenu.inputs.username.points.3'),
+                          text: t('editProfileMenu.inputs.username.points.3'),
                           isValid: dataInEdit.username
                             ? validator.isAlphanumeric(dataInEdit.username)
                             : false,
@@ -821,9 +821,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     />
                   }
                   errorCaption={t(
-                    `EditProfileMenu.inputs.username.errors.${formErrors.usernameError}`
+                    `editProfileMenu.inputs.username.errors.${formErrors.usernameError}`
                   )}
-                  placeholder={t('EditProfileMenu.inputs.username.placeholder')}
+                  placeholder={t('editProfileMenu.inputs.username.placeholder')}
                   isValid={!formErrors.usernameError}
                   onChange={(value) => {
                     handleUpdateDataInEdit('username', value as string);
@@ -855,9 +855,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   maxChars={150}
                   value={dataInEdit.bio}
                   disabled={isLoading}
-                  placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
+                  placeholder={t('editProfileMenu.inputs.bio.placeholder')}
                   errorCaption={t(
-                    `EditProfileMenu.inputs.bio.errors.${formErrors.bioError}`
+                    `editProfileMenu.inputs.bio.errors.${formErrors.bioError}`
                   )}
                   isValid={!formErrors.bioError}
                   onChange={(e) =>
@@ -869,7 +869,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             <SControlsWrapper>
               {!isMobile ? (
                 <Button view='secondary' onClick={() => handleClose()}>
-                  {t('EditProfileMenu.cancelButton')}
+                  {t('editProfileMenu.button.cancel')}
                 </Button>
               ) : null}
               <Button
@@ -883,7 +883,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 }}
                 onClick={() => handleUpdateUserData()}
               >
-                {t('EditProfileMenu.saveButton')}
+                {t('editProfileMenu.button.save')}
               </Button>
             </SControlsWrapper>
           </SEditProfileGeneral>
@@ -898,13 +898,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               <SGoBackButtonMobile
                 onClick={handleSetStageToEditingGeneralUnsetPicture}
               >
-                {t('EditProfileMenu.goBackBtn.profilePicture')}
+                {t('editProfileMenu.button.backToImage')}
               </SGoBackButtonMobile>
             ) : (
               <SGoBackButtonDesktop
                 onClick={handleSetStageToEditingGeneralUnsetPicture}
               >
-                <div>{t('EditProfileMenu.goBackBtn.profilePicture')}</div>
+                <div>{t('editProfileMenu.button.backToImage')}</div>
                 <InlineSvg
                   svg={CancelIcon}
                   fill={theme.colorsThemed.text.primary}
@@ -970,14 +970,14 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 disabled={updateProfileImageLoading}
                 onClick={handleSetStageToEditingGeneralUnsetPicture}
               >
-                {t('EditProfileMenu.cancelButton')}
+                {t('editProfileMenu.button.cancel')}
               </Button>
               <Button
                 withShadow
                 disabled={updateProfileImageLoading}
                 onClick={completeProfileImageCropAndSave}
               >
-                {t('EditProfileMenu.saveButton')}
+                {t('editProfileMenu.button.save')}
               </Button>
             </SControlsWrapperPicture>
           </SEditProfilePicture>

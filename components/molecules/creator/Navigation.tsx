@@ -16,7 +16,7 @@ import { useAppSelector } from '../../../redux-store/store';
 
 export const Navigation = () => {
   const theme = useTheme();
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
@@ -80,7 +80,7 @@ export const Navigation = () => {
       {collection.map(renderItem)}
       <Link href='/creation'>
         <a>
-          <Button>{t('navigation.new-post')}</Button>
+          <Button>{t('navigation.newPost')}</Button>
         </a>
       </Link>
     </SContainer>

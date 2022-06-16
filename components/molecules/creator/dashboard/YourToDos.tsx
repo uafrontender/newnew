@@ -12,8 +12,8 @@ import { useAppSelector } from '../../../../redux-store/store';
 import RadioIcon from '../../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 
-export const YourTodos = () => {
-  const { t } = useTranslation('creator');
+export const YourToDos = () => {
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
 
@@ -21,20 +21,20 @@ export const YourTodos = () => {
     () => [
       {
         id: 'sign-up',
-        title: t('dashboard.todos.sign-up'),
+        title: t('dashboard.toDos.signUp'),
         completed: true,
       },
       {
         id: 'complete-profile',
-        title: t('dashboard.todos.complete-profile'),
+        title: t('dashboard.toDos.completeProfile'),
         completed:
           user.creatorData?.hasCreatorTags &&
           user.userData?.bio &&
           user.userData?.bio.length > 0,
       },
       {
-        id: 'add-cashout-method',
-        title: t('dashboard.todos.add-cashout-method'),
+        id: 'add-cash-out-method',
+        title: t('dashboard.toDos.addCashOutMethod'),
         completed: user.creatorData?.options?.isCreatorConnectedToStripe,
       },
     ],
@@ -66,16 +66,16 @@ export const YourTodos = () => {
           <Link href='/creator-onboarding-about'>
             <a>
               <SBottomActionButton withDim withShrink view='primaryGrad'>
-                {t('dashboard.todos.complete-profile-btn')}
+                {t('dashboard.toDos.completeProfileButton')}
               </SBottomActionButton>
             </a>
           </Link>
         )}
-        {!item.completed && item.id === 'add-cashout-method' && (
+        {!item.completed && item.id === 'add-cash-out-method' && (
           <Link href='/creator/get-paid'>
             <a>
               <SBottomActionButton withDim withShrink view='primaryGrad'>
-                {t('dashboard.todos.add-cashout-method-btn')}
+                {t('dashboard.toDos.addCashOutMethodButton')}
               </SBottomActionButton>
             </a>
           </Link>
@@ -87,17 +87,17 @@ export const YourTodos = () => {
   return (
     <SContainer>
       <SHeaderLine>
-        <STitle variant={6}>{t('dashboard.todos.title')}</STitle>
+        <STitle variant={6}>{t('dashboard.toDos.title')}</STitle>
       </SHeaderLine>
       <SDescription variant={3} weight={600}>
-        {t('dashboard.todos.subtitle')}
+        {t('dashboard.toDos.subtitle')}
         <SList>{collection.map(renderItem)}</SList>
       </SDescription>
     </SContainer>
   );
 };
 
-export default YourTodos;
+export default YourToDos;
 
 const SContainer = styled.div`
   left: -16px;

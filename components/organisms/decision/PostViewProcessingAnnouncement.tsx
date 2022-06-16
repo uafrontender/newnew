@@ -65,7 +65,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
     handleAddPostToState,
     handleReportOpen,
   }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const theme = useTheme();
     const { user } = useAppSelector((state) => state);
     const { resizeMode } = useAppSelector((state) => state.ui);
@@ -179,7 +179,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
             }
           />
           <SText variant={2} weight={600}>
-            {t(`PostViewProcessingAnnouncement.stayTuned.${postType}`)}
+            {t(`postViewProcessingAnnouncement.stayTuned.${postType}`)}
           </SText>
         </SActivitesContainer>
       </SWrapper>

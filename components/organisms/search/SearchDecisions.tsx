@@ -15,16 +15,17 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
-import Sort from '../../../public/images/svg/icons/outlined/Sort.svg';
-import Close from '../../../public/images/svg/icons/outlined/Close.svg';
+
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import { searchPosts } from '../../../api/endpoints/search';
 import isBrowser from '../../../utils/isBrowser';
-import Lottie from '../../atoms/Lottie';
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import switchPostType from '../../../utils/switchPostType';
+
+import Sort from '../../../public/images/svg/icons/outlined/Sort.svg';
+import Close from '../../../public/images/svg/icons/outlined/Close.svg';
 
 const PostList = dynamic(() => import('./PostList'));
 const PostModal = dynamic(() => import('../decision/PostModal'));
@@ -36,7 +37,7 @@ interface IFunction {
 }
 
 export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
-  const { t } = useTranslation('search');
+  const { t } = useTranslation('page-Search');
   const theme = useTheme();
   const router = useRouter();
   const filterContainerRef: any = useRef();
@@ -76,7 +77,6 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
 
   const getSearchResult = useCallback(
     async (pageToken?: string) => {
-      if (loadingPosts) return;
       try {
         setLoadingPosts(true);
 
@@ -89,6 +89,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
           sorting: postSorting,
           filters: activeTabs,
         });
+
         const res = await searchPosts(payload);
 
         if (!res.data || res.error)
@@ -98,26 +99,34 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
 
         if (res.data.posts && res.data.posts.length > 0) {
           if (hasNoResults) setHasNoResults(false);
+
           setResultsPosts((curr) => {
+            if (!pageToken) {
+              return res.data?.posts || [];
+            }
+
             const arr = [...curr, ...(res.data?.posts as newnewapi.IPost[])];
+
             return arr;
           });
           setPostsRoomsNextPageToken(res.data.paging?.nextPageToken);
         } else {
+          setResultsPosts([]);
           setHasNoResults(true);
         }
 
-        if (!res.data.paging?.nextPageToken && postsNextPageToken) {
+        if (!res.data.paging?.nextPageToken) {
           setPostsRoomsNextPageToken(null);
         }
+
         setLoadingPosts(false);
       } catch (err) {
         setLoadingPosts(false);
         console.error(err);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loadingPosts, postSorting, query, initialLoad, activeTabs]
+
+    [postSorting, query, initialLoad, activeTabs, hasNoResults]
   );
 
   const handleRemovePostFromState = (postUuid: string) => {
@@ -130,72 +139,56 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   };
 
   useEffect(() => {
-    if (initialLoad) {
-      if (router.query.sorting) {
-        switch (router.query.sorting) {
-          case 'numberOfParticipants':
-            setPostSorting(newnewapi.PostSorting.MOST_VOTED_FIRST);
-            break;
-          case 'mostFunded':
-            setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
-            break;
-          case 'newest':
-            setPostSorting(newnewapi.PostSorting.NEWEST_FIRST);
-            break;
-          default:
-            setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
-        }
+    if (router.query.sorting) {
+      switch (router.query.sorting) {
+        case 'numberOfParticipants':
+          setPostSorting(newnewapi.PostSorting.MOST_VOTED_FIRST);
+          break;
+        case 'mostFunded':
+          setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
+          break;
+        case 'newest':
+          setPostSorting(newnewapi.PostSorting.NEWEST_FIRST);
+          break;
+        default:
+          setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
       }
     }
-  }, [initialLoad, router.query.sorting]);
+  }, [router.query.sorting]);
 
   useEffect(() => {
-    if (initialLoad) {
-      if (router.query.filter) {
-        const filters = (router.query.filter as string).split('-');
+    if (router.query.filter) {
+      const filters = (router.query.filter as string).split('-');
 
-        setActiveTabs(() => {
-          const arr: newnewapi.Post.Filter[] = [];
+      setActiveTabs(() => {
+        const arr: newnewapi.Post.Filter[] = [];
 
-          filters.forEach((filter) => {
-            switch (filter) {
-              case 'ac':
-                arr.push(newnewapi.Post.Filter.AUCTIONS);
-                break;
-              case 'mc':
-                arr.push(newnewapi.Post.Filter.MULTIPLE_CHOICES);
-                break;
-              case 'cf':
-                arr.push(newnewapi.Post.Filter.CROWDFUNDINGS);
-                break;
-              default:
-                arr.push(newnewapi.Post.Filter.ALL);
-            }
-          });
-          return arr;
+        filters.forEach((filter) => {
+          switch (filter) {
+            case 'ac':
+              arr.push(newnewapi.Post.Filter.AUCTIONS);
+              break;
+            case 'mc':
+              arr.push(newnewapi.Post.Filter.MULTIPLE_CHOICES);
+              break;
+            case 'cf':
+              arr.push(newnewapi.Post.Filter.CROWDFUNDINGS);
+              break;
+            default:
+              arr.push(newnewapi.Post.Filter.ALL);
+          }
         });
-      } else {
-        setActiveTabs([newnewapi.Post.Filter.ALL]);
-      }
+        return arr;
+      });
+    } else {
+      setActiveTabs([newnewapi.Post.Filter.ALL]);
     }
-  }, [initialLoad, router.query.filter]);
+  }, [router.query.filter]);
 
   useEffect(() => {
-    if (query.length > 0) {
-      setResultsPosts([]);
-      getSearchResult();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
-
-  useEffect(() => {
-    if (initialLoad) {
-      setResultsPosts([]);
-      setPostsRoomsNextPageToken(null);
-      getSearchResult();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postSorting, activeTabs]);
+    setPostsRoomsNextPageToken(null);
+    getSearchResult();
+  }, [getSearchResult]);
 
   useEffect(() => {
     if (inView && !loadingPosts && postsNextPageToken) {
@@ -224,7 +217,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
         pathname: '/search',
         query: {
           query,
-          tab: 'decision',
+          tab: 'posts',
           filter: routerArr.length > 0 ? routerArr.join('-') : '',
           sorting: activeFilter,
         },
@@ -348,8 +341,12 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
 
   return (
     <div>
-      {resultsPosts.length > 1 && (
-        <SToolBar disabled={hasNoResults}>
+      {!(
+        activeTabs.length === 1 &&
+        activeTabs.includes(newnewapi.Post.Filter.ALL) &&
+        hasNoResults
+      ) && (
+        <SToolBar disabled={loadingPosts}>
           <Tabs />
           <SSort>
             <SSortButton
@@ -386,50 +383,32 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
         </SToolBar>
       )}
 
-      {!hasNoResults ? (
-        <>
-          <SCardsSection>
-            {initialLoad && (
-              <PostList
-                loading={loadingPosts}
-                collection={resultsPosts}
-                handlePostClicked={handleOpenPostModal}
-              />
-            )}
-          </SCardsSection>
-          {postsNextPageToken && !loadingPosts && (
-            <SRef ref={loadingRef}>Loading...</SRef>
-          )}
-          {displayedPost && postModalOpen && (
-            <PostModal
-              isOpen={postModalOpen}
-              post={displayedPost}
-              manualCurrLocation={isBrowser() ? window.location.href : ''}
-              handleClose={() => handleClosePostModal()}
-              handleOpenAnotherPost={handleSetDisplayedPost}
-              handleRemovePostFromState={() =>
-                handleRemovePostFromState(
-                  switchPostType(displayedPost)[0].postUuid
-                )
-              }
-            />
-          )}
-        </>
-      ) : (
+      <SCardsSection>
+        <PostList
+          loading={loadingPosts}
+          collection={resultsPosts}
+          handlePostClicked={handleOpenPostModal}
+        />
+      </SCardsSection>
+      {postsNextPageToken && !loadingPosts && (
+        <SRef ref={loadingRef}>Loading...</SRef>
+      )}
+      {displayedPost && postModalOpen && (
+        <PostModal
+          isOpen={postModalOpen}
+          post={displayedPost}
+          manualCurrLocation={isBrowser() ? window.location.href : ''}
+          handleClose={() => handleClosePostModal()}
+          handleOpenAnotherPost={handleSetDisplayedPost}
+          handleRemovePostFromState={() =>
+            handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
+          }
+        />
+      )}
+
+      {hasNoResults && initialLoad && (
         <SNoResults>
-          {initialLoad ? (
-            <NoResults />
-          ) : (
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
-              }}
-            />
-          )}
+          <NoResults />
         </SNoResults>
       )}
     </div>

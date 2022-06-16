@@ -24,7 +24,7 @@ const MobileDashBoardChat: React.FC<IMobileDashBoardChat> = ({ closeChat }) => {
   const openChat = ({ chatRoom }: IChatData) => {
     setChatData({ chatRoom, showChatList });
   };
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const [chatListHidden, setChatListHidden] =
     useState<boolean | undefined>(false);
   const [newMessage, setNewMessage] =
@@ -64,7 +64,7 @@ const MobileDashBoardChat: React.FC<IMobileDashBoardChat> = ({ closeChat }) => {
         <SToolbar>
           <GoBackButton onClick={closeChat} />
           <SearchInput
-            placeholderText={t('chat.toolbar.search-placeholder')}
+            placeholderText={t('chat.toolbar.searchPlaceholder')}
             style={{ marginRight: '16px', fontSize: '16px' }}
             passInputValue={passInputValue}
           />

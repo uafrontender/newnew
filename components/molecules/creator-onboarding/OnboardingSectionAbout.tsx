@@ -36,7 +36,7 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
       break;
     }
     case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'innappropriate';
+      errorMsg = 'inappropriate';
       break;
     }
     case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION: {
@@ -59,7 +59,7 @@ interface IOnboardingSectionAbout {
 const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
   ({ availableTags, currentTags }) => {
     const router = useRouter();
-    const { t } = useTranslation('creator-onboarding');
+    const { t } = useTranslation('page-CreatorOnboarding');
     const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.user);
     const { resizeMode } = useAppSelector((state) => state.ui);
@@ -212,14 +212,14 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
       <>
         <SContainer>
           {isMobile && <SGoBackButton onClick={() => router.back()} />}
-          <SHeading variant={5}>{t('AboutSection.heading')}</SHeading>
+          <SHeading variant={5}>{t('aboutSection.heading')}</SHeading>
           <STopContainer>
             <SFormItemContainer>
               <OnboardingBioTextarea
                 value={bioInEdit}
                 isValid={bioError === ''}
-                errorCaption={t(`AboutSection.bio.errors.${bioError}`)}
-                placeholder={t('AboutSection.bio.placeholder')}
+                errorCaption={t(`aboutSection.bio.errors.${bioError}`)}
+                placeholder={t('aboutSection.bio.placeholder')}
                 maxChars={150}
                 onChange={handleUpdateBioInEdit}
               />
@@ -237,7 +237,7 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
           <SControlsDiv>
             {!isMobile && (
               <GoBackButton noArrow onClick={() => router.back()}>
-                {t('AboutSection.backButton')}
+                {t('aboutSection.button.back')}
               </GoBackButton>
             )}
             <Button
@@ -249,9 +249,7 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
               }}
               onClick={() => handleSubmit()}
             >
-              {isMobile
-                ? t('AboutSection.submitMobile')
-                : t('AboutSection.submitDesktop')}
+              {t('aboutSection.button.submit')}
             </Button>
           </SControlsDiv>
         </SContainer>

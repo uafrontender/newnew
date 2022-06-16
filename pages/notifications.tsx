@@ -27,7 +27,7 @@ const Notification = dynamic(
 );
 
 export const Notifications = () => {
-  const { t } = useTranslation('notifications');
+  const { t } = useTranslation('page-Notifications');
   const { ref: scrollRef, inView } = useInView();
   const [notifications, setNotifications] =
     useState<newnewapi.INotification[] | null>(null);
@@ -228,7 +228,7 @@ export default Notifications;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'notifications',
+    'page-Notifications',
   ]);
 
   return {
