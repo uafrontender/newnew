@@ -7,18 +7,18 @@ import { useTranslation } from 'next-i18next';
 import emptyFolder from '../../../public/images/notifications/no-results.png';
 
 const NoResults: React.FC = React.memo(() => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
 
   return (
     <SContainer>
       <SWrapper>
         <Image
           src={emptyFolder}
-          alt={t('no-results')}
+          alt={t('noNotifications')}
           width={110}
           height={110}
         />
-        <SText>{t('no-results')}</SText>
+        <SText>{t('noNotifications')}</SText>
       </SWrapper>
     </SContainer>
   );

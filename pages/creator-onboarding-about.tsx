@@ -31,7 +31,7 @@ interface ICreatorOnboardingAbout {
 const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = ({
   availableTags,
 }) => {
-  const { t } = useTranslation('creator-onboarding');
+  const { t } = useTranslation('page-CreatorOnboarding');
   const [currentTags, setCurrentTags] = useState<newnewapi.ICreatorTag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -57,12 +57,12 @@ const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = ({
   return (
     <>
       <Head>
-        <title>{t('AboutSection.meta.title')}</title>
-        <meta name='description' content={t('AboutSection.meta.description')} />
-        <meta property='og:title' content={t('AboutSection.meta.title')} />
+        <title>{t('aboutSection.meta.title')}</title>
+        <meta name='description' content={t('aboutSection.meta.description')} />
+        <meta property='og:title' content={t('aboutSection.meta.title')} />
         <meta
           property='og:description'
-          content={t('AboutSection.meta.description')}
+          content={t('aboutSection.meta.description')}
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
@@ -101,7 +101,7 @@ export default CreatorOnboardingAbout;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'creator-onboarding',
+    'page-CreatorOnboarding',
   ]);
 
   try {

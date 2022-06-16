@@ -14,7 +14,7 @@ interface IPostVideoProcessingHolder {
 const PostVideoProcessingHolder: React.FunctionComponent<IPostVideoProcessingHolder> =
   ({ holderText }) => {
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     return (
       <SVideoWrapper>
         <SHourglassCard>
@@ -31,11 +31,11 @@ const PostVideoProcessingHolder: React.FunctionComponent<IPostVideoProcessingHol
           </SImgContainer>
           <SHeadline variant={6}>
             {t(
-              `PostViewProcessingAnnouncement.videoHolder.${holderText}.title`
+              `postViewProcessingAnnouncement.videoHolder.${holderText}.title`
             )}
           </SHeadline>
           <SText variant={3}>
-            {t(`PostViewProcessingAnnouncement.videoHolder.${holderText}.body`)}
+            {t(`postViewProcessingAnnouncement.videoHolder.${holderText}.body`)}
           </SText>
         </SHourglassCard>
       </SVideoWrapper>

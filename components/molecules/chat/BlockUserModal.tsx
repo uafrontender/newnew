@@ -22,7 +22,7 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
   closeModal,
   isAnnouncement,
 }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
 
   const { blockUser } = useGetBlockedUsers();
 
@@ -76,14 +76,11 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
 };
 
 BlockUserModal.defaultProps = {
+  isAnnouncement: false,
   onUserBlock: () => {},
 };
 
 export default BlockUserModal;
-
-BlockUserModal.defaultProps = {
-  isAnnouncement: false,
-};
 
 const SContainer = styled.div`
   display: flex;

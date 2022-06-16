@@ -10,12 +10,12 @@ interface ICfMakeCustomPledgeCard {
 
 const CfMakeCustomPledgeCard: React.FunctionComponent<ICfMakeCustomPledgeCard> =
   ({ handleOpenMakePledgeForm }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
 
     return (
       <SStandardPledgeCard onClick={() => handleOpenMakePledgeForm()}>
         <SCardInfo>
-          <SCardAmount>{t('CfPost.BackersTab.custom')}</SCardAmount>
+          <SCardAmount>{t('cfPost.backersTab.custom')}</SCardAmount>
         </SCardInfo>
       </SStandardPledgeCard>
     );

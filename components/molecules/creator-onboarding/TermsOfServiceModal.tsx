@@ -19,7 +19,7 @@ const TermsOfServiceModal: React.FunctionComponent<ITermsOfServiceModal> = ({
   zIndex,
   onClose,
 }) => {
-  const { t } = useTranslation('creator-onboarding');
+  const { t } = useTranslation('page-CreatorOnboarding');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -65,9 +65,9 @@ const TermsOfServiceModal: React.FunctionComponent<ITermsOfServiceModal> = ({
     <Modal show={isOpen} overlaydim additionalz={zIndex}>
       <Container>
         <Content>
-          <SHeading variant={5}>{t('TosSection.heading')}</SHeading>
+          <SHeading variant={5}>{t('tosSection.heading')}</SHeading>
           <SSubheading variant={1} weight={600}>
-            {t('TosSection.subheading')}
+            {t('tosSection.subheading')}
           </SSubheading>
           <SContainer>
             {!isMobile && (
@@ -93,7 +93,7 @@ const TermsOfServiceModal: React.FunctionComponent<ITermsOfServiceModal> = ({
               }}
             />
           </SContainer>
-          <SButton onClick={() => onClose()}>{t('TosSection.close')}</SButton>
+          <SButton onClick={() => onClose()}>{t('tosSection.close')}</SButton>
         </Content>
       </Container>
     </Modal>

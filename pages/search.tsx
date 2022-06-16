@@ -35,7 +35,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'component-PostCard',
     'page-SeeMore',
     'modal-PaymentModal',
-    'decision',
+    'modal-Post',
   ]);
 
   return {

@@ -32,7 +32,7 @@ const CfPledgesSection: React.FunctionComponent<ICfPledgesSection> = ({
   heightDelta,
   handleLoadPledges,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -71,7 +71,7 @@ const CfPledgesSection: React.FunctionComponent<ICfPledgesSection> = ({
         <SLoaderDiv ref={loadingRef} />
       ) : pagingToken ? (
         <SLoadMoreBtn onClick={() => handleLoadPledges(pagingToken)}>
-          {t('loadMoreBtn')}
+          {t('loadMoreButton')}
         </SLoadMoreBtn>
       ) : null}
     </SSectionContainer>

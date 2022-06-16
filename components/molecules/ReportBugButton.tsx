@@ -38,7 +38,7 @@ const ReportBugButton: React.FC<ReportBugButtonI> = React.memo(
           <Tail />
         </IconContainer>
         <TextContainer onClick={handleClick}>
-          <ReportText>{t('report-bug')}</ReportText>
+          <ReportText>{t('reportBug')}</ReportText>
         </TextContainer>
       </Container>
     );

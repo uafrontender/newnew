@@ -5,7 +5,6 @@
     "title-to-log-in": "Log in to NewNew",
     "description-to-log-in": "Logging in to NewNew is fast and easy"
   },
-  "backButton": "Go back",
   "heading": {
     "sign-in": "Sign up",
     "log-in": "Log in",
@@ -15,7 +14,7 @@
       "bid": "bid",
       "subscribe": "subscribe",
       "pledge": "make pledge",
-      "follow-decision": "favorite decision",
+      "follow-decision": "favorite post",
       "follow-creator": "favorite creator",
       "report": "make a report"
     },
@@ -27,11 +26,10 @@
     "apple": "Continue with Apple ID",
     "facebook": "Continue with Facebook",
     "twitter": "Continue with Twitter",
-    "moreOptionsBtn": "Show more options",
     "orContinueWith": "or continue with",
     "email": "Email",
-    "signInBtn": "Sign up",
-    "logInBtn": "Log in"
+    "signInButton": "Sign up",
+    "logInButton": "Log in"
   },
   "error": {
     "emailInvalid": "Invalid address",
@@ -44,5 +42,8 @@
     "terms": "Terms",
     "and": "and",
     "communityGuidelines": "Community Guidelines"
+  },
+  "button": {
+    "back": "Go back"
   }
 }

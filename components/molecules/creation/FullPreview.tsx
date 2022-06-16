@@ -27,7 +27,7 @@ const FullPreview: React.FC<IFullPreview> = (props) => {
   const { open, value, handleClose } = props;
 
   const theme = useTheme();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 

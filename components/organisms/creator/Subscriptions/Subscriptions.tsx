@@ -25,7 +25,7 @@ const Navigation = dynamic(
 );
 
 export const Subscriptions: React.FC = React.memo(() => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -110,7 +110,7 @@ export const Subscriptions: React.FC = React.memo(() => {
             >
               <a>
                 <Button view='primaryGrad'>
-                  {t('subscriptions.message-all')}
+                  {t('subscriptions.messageAll')}
                 </Button>
               </a>
             </Link>

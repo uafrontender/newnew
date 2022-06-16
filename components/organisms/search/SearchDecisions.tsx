@@ -224,7 +224,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
       pathname: '/search',
       query: {
         query,
-        tab: 'decision',
+        tab: 'posts',
         filter: routerArr.length > 0 ? routerArr.join('-') : '',
         sorting: postSorting,
       },

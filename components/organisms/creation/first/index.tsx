@@ -6,7 +6,7 @@ import List from '../List';
 import Headline from '../../../atoms/Headline';
 
 export const CreationFirstStepContent = () => {
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
 
   const collection = useMemo(
     () => [

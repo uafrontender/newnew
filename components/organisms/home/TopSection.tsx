@@ -160,7 +160,7 @@ export const TopSection: React.FC<ITopSection> = React.memo(
         }}
       >
         <SHeadline variant={4} animation='t-01'>
-          {t('top-section-title', { country })}
+          {t('topSectionTitle', { country })}
         </SHeadline>
         <SListContainer ref={ref}>
           <SListWrapper

@@ -33,7 +33,7 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<IMcOptionCardSelectV
     children,
   }) => {
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
 
     const { appConstants } = useGetAppConstants();
 
@@ -43,9 +43,9 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<IMcOptionCardSelectV
           <STitleContainer>
             <STitleText variant={6}>
               {!isSupportedByMe
-                ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.title')
+                ? t('mcPost.optionsTab.optionCard.selectVotesMenu.title')
                 : t(
-                    'McPost.OptionsTab.OptionCard.selectVotesMenu.title_more_votes'
+                    'mcPost.optionsTab.optionCard.selectVotesMenu.titleMoreVotes'
                   )}
             </STitleText>
             <SCancelButton
@@ -72,8 +72,8 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<IMcOptionCardSelectV
                   <SBoldSpan>
                     {amount}{' '}
                     {amount === 1
-                      ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.vote')
-                      : t('McPost.OptionsTab.OptionCard.selectVotesMenu.votes')}
+                      ? t('mcPost.optionsTab.optionCard.selectVotesMenu.vote')
+                      : t('mcPost.optionsTab.optionCard.selectVotesMenu.votes')}
                   </SBoldSpan>{' '}
                   <SOpaqueSpan>
                     {`($${
@@ -85,7 +85,7 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<IMcOptionCardSelectV
             ))}
             <SButton onClick={() => handleOpenCustomAmountModal()}>
               <Text variant={3}>
-                {t('McPost.OptionsTab.OptionCard.selectVotesMenu.custom')}
+                {t('mcPost.optionsTab.optionCard.selectVotesMenu.custom')}
               </Text>
             </SButton>
           </SButtonsContainer>

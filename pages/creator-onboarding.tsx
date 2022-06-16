@@ -46,14 +46,14 @@ interface ICreatorOnboarding {
 const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
   availableCountriesRes,
 }) => {
-  const { t } = useTranslation('creator-onboarding');
+  const { t } = useTranslation('page-CreatorOnboarding');
 
   const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
 
-  useLeavePageConfirm(true, t('DetailsSection.leaveMsg'), [
+  useLeavePageConfirm(true, t('detailsSection.leaveMsg'), [
     '/creator/dashboard',
     '/verify-new-email',
   ]);
@@ -143,7 +143,7 @@ export default CreatorOnboarding;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'creator-onboarding',
+    'page-CreatorOnboarding',
   ]);
 
   try {
