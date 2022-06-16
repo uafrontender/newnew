@@ -848,7 +848,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     }
                   />
                   <HelperText>
-                    {t('EditProfileMenu.inputs.genderPronouns.caption')}
+                    {t('editProfileMenu.inputs.genderPronouns.caption')}
                   </HelperText>
                 </SDropdownSelectWrapper>
                 <BioTextarea
