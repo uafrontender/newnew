@@ -35,7 +35,7 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
 
   return (
     <SWrapper>
-      <SBioTextareaDiv>
+      <SBioTextareaDiv errorBordersShown={errorBordersShown}>
         <textarea
           value={value}
           maxLength={maxChars}
@@ -144,7 +144,13 @@ const SBioTextareaDiv = styled.div<ISBioTextareaDiv>`
     &:active:enabled {
       outline: none;
 
-      border-color: ${({ theme }) => theme.colorsThemed.background.outlines2};
+      border-color: ${({ theme, errorBordersShown }) => {
+        if (!errorBordersShown) {
+          // NB! Temp
+          return theme.colorsThemed.background.outlines2;
+        }
+        return theme.colorsThemed.accent.error;
+      }};
     }
 
     &:disabled {
