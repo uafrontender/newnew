@@ -1045,7 +1045,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               cursor: 'pointer',
             }}
           >
-            {`${t('me')}`}
+            {supporterCount > 1 ? t('me') : t('I')}
           </SSpanBiddersHighlighted>
         </Link>
         <SSpanBiddersRegular className='spanRegular'>
