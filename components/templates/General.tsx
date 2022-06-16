@@ -216,6 +216,7 @@ export const General: React.FC<IGeneral> = (props) => {
               (chatButtonVisible ? 72 : 0)
             }
             right={4}
+            zIndex={moreMenuMobileOpen ? 9 : undefined}
           />
         </SWrapper>
       </SkeletonTheme>
