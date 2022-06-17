@@ -501,24 +501,24 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       };
 
       if (socketConnection) {
-        socketConnection.on(
+        socketConnection?.on(
           'McOptionCreatedOrUpdated',
           socketHandlerOptionCreatedOrUpdated
         );
-        socketConnection.on('McOptionDeleted', socketHandlerOptionDeleted);
-        socketConnection.on('PostUpdated', socketHandlerPostData);
-        socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
+        socketConnection?.on('McOptionDeleted', socketHandlerOptionDeleted);
+        socketConnection?.on('PostUpdated', socketHandlerPostData);
+        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off(
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
             'McOptionCreatedOrUpdated',
             socketHandlerOptionCreatedOrUpdated
           );
-          socketConnection.off('McOptionDeleted', socketHandlerOptionDeleted);
-          socketConnection.off('PostUpdated', socketHandlerPostData);
-          socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
+          socketConnection?.off('McOptionDeleted', socketHandlerOptionDeleted);
+          socketConnection?.off('PostUpdated', socketHandlerPostData);
+          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps

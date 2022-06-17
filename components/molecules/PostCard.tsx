@@ -326,17 +326,17 @@ export const PostCard: React.FC<ICard> = React.memo(
       };
 
       if (socketConnection) {
-        socketConnection.on('PostUpdated', handlerSocketPostUpdated);
-        socketConnection.on(
+        socketConnection?.on('PostUpdated', handlerSocketPostUpdated);
+        socketConnection?.on(
           'PostThumbnailUpdated',
           handlerSocketThumbnailUpdated
         );
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off('PostUpdated', handlerSocketPostUpdated);
-          socketConnection.off(
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off('PostUpdated', handlerSocketPostUpdated);
+          socketConnection?.off(
             'PostThumbnailUpdated',
             handlerSocketThumbnailUpdated
           );
