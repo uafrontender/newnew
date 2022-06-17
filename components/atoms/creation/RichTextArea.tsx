@@ -52,10 +52,7 @@ export const RichTextArea: React.FC<IRichTextArea> = React.memo((props) => {
         }
 
         if (chunk.type === 'hashtag') {
-          return `<span class="hashtag">${chunk.text.replaceAll(
-            ' ',
-            '&nbsp;'
-          )}</span>`;
+          return `<span class="hashtag">${chunk.text}</span>`;
         }
 
         // TODO: Add assertNever
@@ -170,6 +167,7 @@ const SContent = styled.div<ISContent>`
 
     span {
       display: inline-block;
+      white-space: nowrap;
     }
 
     .hashtag {
