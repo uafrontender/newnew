@@ -130,21 +130,23 @@ const Comment: React.FC<IComment> = ({
               {moment((comment.createdAt?.seconds as number) * 1000).fromNow()}
             </SDate>
             <SActionsDiv>
-              <SMoreButton
-                view='transparent'
-                iconOnly
-                onClick={(e: any) => {
-                  e.stopPropagation();
-                  handleOpenEllipseMenu();
-                }}
-              >
-                <InlineSVG
-                  svg={MoreIconFilled}
-                  fill={theme.colorsThemed.text.secondary}
-                  width='20px'
-                  height='20px'
-                />
-              </SMoreButton>
+              {!comment.isDeleted && (
+                <SMoreButton
+                  view='transparent'
+                  iconOnly
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    handleOpenEllipseMenu();
+                  }}
+                >
+                  <InlineSVG
+                    svg={MoreIconFilled}
+                    fill={theme.colorsThemed.text.secondary}
+                    width='20px'
+                    height='20px'
+                  />
+                </SMoreButton>
+              )}
               {/* Ellipse menu */}
               {!isMobile && (
                 <CommentEllipseMenu

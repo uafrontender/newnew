@@ -1,79 +1,134 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-expressions */
 /* eslint-disable default-case */
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import Button from '../../atoms/Button';
-import InlineSvg from '../../atoms/InlineSVG';
+import Sorting from '../Sorting';
 
-import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import { searchPosts } from '../../../api/endpoints/search';
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 
-import Sort from '../../../public/images/svg/icons/outlined/Sort.svg';
-import Close from '../../../public/images/svg/icons/outlined/Close.svg';
-
 const PostList = dynamic(() => import('./PostList'));
 const PostModal = dynamic(() => import('../decision/PostModal'));
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
-const CheckBox = dynamic(() => import('../../molecules/CheckBox'));
 
 interface IFunction {
   query: string;
 }
 
+const parseFilterToArray = (filter: string): newnewapi.Post.Filter[] => {
+  const filterArr = filter.split('-');
+
+  const arr: newnewapi.Post.Filter[] = [];
+
+  filterArr.forEach((f) => {
+    switch (f) {
+      case 'ac':
+        arr.push(newnewapi.Post.Filter.AUCTIONS);
+        break;
+      case 'mc':
+        arr.push(newnewapi.Post.Filter.MULTIPLE_CHOICES);
+        break;
+      case 'cf':
+        arr.push(newnewapi.Post.Filter.CROWDFUNDINGS);
+        break;
+      default:
+        arr.push(newnewapi.Post.Filter.ALL);
+    }
+  });
+
+  return arr;
+};
+
+const getSortingValue = (sorting: string) => {
+  switch (sorting) {
+    case 'num_bids':
+      return newnewapi.PostSorting.MOST_VOTED_FIRST;
+      break;
+    case 'all':
+      return newnewapi.PostSorting.MOST_FUNDED_FIRST;
+      break;
+    case 'newest':
+      return newnewapi.PostSorting.NEWEST_FIRST;
+      break;
+    default:
+      return newnewapi.PostSorting.MOST_FUNDED_FIRST;
+  }
+};
+
+const sortOptions: any = [
+  {
+    key: 'sortingtype',
+    options: [
+      {
+        key: 'all',
+      },
+      {
+        key: 'num_bids',
+      },
+      {
+        key: 'newest',
+      },
+    ],
+  },
+];
+
 export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
-  const { t } = useTranslation('page-Search');
-  const theme = useTheme();
+  const { t: tCommon } = useTranslation('common');
   const router = useRouter();
-  const filterContainerRef: any = useRef();
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >();
+
+  const handleOpenPostModal = (post: newnewapi.IPost) => {
+    setDisplayedPost(post);
+    setPostModalOpen(true);
+  };
+  const handleClosePostModal = () => {
+    setPostModalOpen(false);
+    setDisplayedPost(undefined);
+  };
+
+  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
+    setDisplayedPost(post);
+  }, []);
 
   // Loading state
   const { ref: loadingRef, inView } = useInView();
 
-  const [activeTabs, setActiveTabs] = useState<newnewapi.Post.Filter[]>([
-    newnewapi.Post.Filter.ALL,
-    // newnewapi.Post.Filter.AUCTIONS,
-    // newnewapi.Post.Filter.CROWDFUNDINGS,
-    // newnewapi.Post.Filter.MULTIPLE_CHOICES,
-  ]);
-  const [activeFilter, setActiveFilter] = useState<string>('mostFunded');
-  const [postSorting, setPostSorting] = useState<newnewapi.PostSorting>(
-    newnewapi.PostSorting.MOST_FUNDED_FIRST
+  const { sorting = '', filter = '' } = router.query;
+
+  const [activeTabs, setActiveTabs] = useState<newnewapi.Post.Filter[]>(
+    parseFilterToArray(filter as string)
   );
-  const [isFilterOpened, setIsFilterOpened] = useState(false);
+
+  const [postSorting, setPostSorting] = useState<string>(
+    (sorting as string) || 'all'
+  );
+
+  const selectedSorting = useMemo(
+    () => ({
+      sortingtype: postSorting,
+    }),
+    [postSorting]
+  );
 
   const [hasNoResults, setHasNoResults] = useState(true);
   const [initialLoad, setInitialLoad] = useState(false);
   const [loadingPosts, setLoadingPosts] = useState(false);
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
-  const [postsNextPageToken, setPostsRoomsNextPageToken] =
-    useState<string | undefined | null>('');
-
-  useOnClickOutside(filterContainerRef, () => {
-    if (isFilterOpened) {
-      setIsFilterOpened(false);
-    }
-  });
+  const [postsNextPageToken, setPostsRoomsNextPageToken] = useState<
+    string | undefined | null
+  >('');
 
   const getSearchResult = useCallback(
     async (pageToken?: string) => {
@@ -86,7 +141,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
             limit: 20,
             pageToken: pageToken ?? null,
           },
-          sorting: postSorting,
+          sorting: getSortingValue(postSorting),
           filters: activeTabs,
         });
 
@@ -139,53 +194,6 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   };
 
   useEffect(() => {
-    if (router.query.sorting) {
-      switch (router.query.sorting) {
-        case 'numberOfParticipants':
-          setPostSorting(newnewapi.PostSorting.MOST_VOTED_FIRST);
-          break;
-        case 'mostFunded':
-          setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
-          break;
-        case 'newest':
-          setPostSorting(newnewapi.PostSorting.NEWEST_FIRST);
-          break;
-        default:
-          setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
-      }
-    }
-  }, [router.query.sorting]);
-
-  useEffect(() => {
-    if (router.query.filter) {
-      const filters = (router.query.filter as string).split('-');
-
-      setActiveTabs(() => {
-        const arr: newnewapi.Post.Filter[] = [];
-
-        filters.forEach((filter) => {
-          switch (filter) {
-            case 'ac':
-              arr.push(newnewapi.Post.Filter.AUCTIONS);
-              break;
-            case 'mc':
-              arr.push(newnewapi.Post.Filter.MULTIPLE_CHOICES);
-              break;
-            case 'cf':
-              arr.push(newnewapi.Post.Filter.CROWDFUNDINGS);
-              break;
-            default:
-              arr.push(newnewapi.Post.Filter.ALL);
-          }
-        });
-        return arr;
-      });
-    } else {
-      setActiveTabs([newnewapi.Post.Filter.ALL]);
-    }
-  }, [router.query.filter]);
-
-  useEffect(() => {
     setPostsRoomsNextPageToken(null);
     getSearchResult();
   }, [getSearchResult]);
@@ -198,81 +206,72 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   }, [inView, loadingPosts, postsNextPageToken]);
 
   useEffect(() => {
-    if (initialLoad) {
-      const routerArr: string[] = [];
-      activeTabs.forEach((filter) => {
-        switch (filter) {
-          case newnewapi.Post.Filter.AUCTIONS:
-            routerArr.push('ac');
-            break;
-          case newnewapi.Post.Filter.MULTIPLE_CHOICES:
-            routerArr.push('mc');
-            break;
-          case newnewapi.Post.Filter.CROWDFUNDINGS:
-            routerArr.push('cf');
-            break;
-        }
-      });
-      router.push({
-        pathname: '/search',
-        query: {
-          query,
-          tab: 'posts',
-          filter: routerArr.length > 0 ? routerArr.join('-') : '',
-          sorting: activeFilter,
-        },
-      });
-    }
+    const routerArr: string[] = [];
+    activeTabs.forEach((filterValue) => {
+      switch (filterValue) {
+        case newnewapi.Post.Filter.AUCTIONS:
+          routerArr.push('ac');
+          break;
+        case newnewapi.Post.Filter.MULTIPLE_CHOICES:
+          routerArr.push('mc');
+          break;
+        case newnewapi.Post.Filter.CROWDFUNDINGS:
+          routerArr.push('cf');
+          break;
+      }
+    });
+    router.push({
+      pathname: '/search',
+      query: {
+        query,
+        tab: 'posts',
+        filter: routerArr.length > 0 ? routerArr.join('-') : '',
+        sorting: postSorting,
+      },
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postSorting, activeTabs]);
+  }, [postSorting, activeTabs, query]);
 
   const tabTypes = useMemo(
     () => [
       {
         type: newnewapi.Post.Filter.AUCTIONS,
         id: 'auction',
-        title: t('decisions.postTypes.events'),
+        title: tCommon('postType.ac'),
       },
       {
         type: newnewapi.Post.Filter.MULTIPLE_CHOICES,
         id: 'multipleChoice',
-        title: t('decisions.postTypes.superpolls'),
+        title: tCommon('postType.mc'),
       },
       {
         type: newnewapi.Post.Filter.CROWDFUNDINGS,
         id: 'crowdfunding',
-        title: t('decisions.postTypes.goals'),
+        title: tCommon('postType.cf'),
       },
     ],
-    [t]
+    [tCommon]
   );
 
-  const filterTypes = useMemo(
-    () => [
-      {
-        id: 'mostFunded',
-        title: t('decisions.sort.all'),
-      },
-      {
-        id: 'numberOfParticipants',
-        title: t('decisions.sort.numberOfParticipants'),
-      },
-      {
-        id: 'newest',
-        title: t('decisions.sort.newest'),
-      },
-    ],
-    [t]
-  );
+  const updateActiveTabs = useCallback(
+    (type: newnewapi.Post.Filter) => {
+      if (!loadingPosts) {
+        setActiveTabs((curr) => {
+          const arr = [...curr];
+          const index = arr.findIndex((item) => item === type);
 
-  const updateActiveTabs = useCallback((type: newnewapi.Post.Filter) => {
-    setActiveTabs((curr) => {
-      const arr = [...curr];
-      const index = arr.findIndex((item) => item === type);
-      index < 0 ? arr.push(type) : arr.splice(index, 1);
-      return arr;
-    });
-  }, []);
+          if (index < 0) {
+            arr.push(type);
+          } else {
+            arr.splice(index, 1);
+          }
+
+          return arr;
+        });
+      }
+    },
+    [loadingPosts]
+  );
 
   const Tabs = useCallback(
     () => (
@@ -294,50 +293,13 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   );
 
   const handleTypeChange = useCallback(
-    (e: React.MouseEvent, id: string | undefined) => {
-      /* eslint-disable no-unused-expressions */
-      if (id && id !== activeFilter) {
-        setActiveFilter(id);
-        const routerArr: string[] = [];
-        activeTabs.forEach((filter) => {
-          switch (filter) {
-            case newnewapi.Post.Filter.AUCTIONS:
-              routerArr.push('ac');
-              break;
-            case newnewapi.Post.Filter.MULTIPLE_CHOICES:
-              routerArr.push('mc');
-              break;
-            case newnewapi.Post.Filter.CROWDFUNDINGS:
-              routerArr.push('cf');
-              break;
-          }
-        });
-        router.push({
-          pathname: '/search',
-          query: {
-            ...router.query,
-            sorting: id,
-            filter: routerArr.length > 0 ? routerArr.join('-') : '',
-          },
-        });
+    (newSort: { sortingtype: string }) => {
+      if (!loadingPosts) {
+        setPostSorting(newSort.sortingtype);
       }
-      setIsFilterOpened(false);
     },
-    [activeFilter, activeTabs, router]
+    [loadingPosts]
   );
-
-  const handleOpenPostModal = (post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-    setPostModalOpen(true);
-  };
-  const handleClosePostModal = () => {
-    setPostModalOpen(false);
-    setDisplayedPost(undefined);
-  };
-
-  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-  }, []);
 
   return (
     <div>
@@ -346,40 +308,14 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
         activeTabs.includes(newnewapi.Post.Filter.ALL) &&
         hasNoResults
       ) && (
-        <SToolBar disabled={loadingPosts}>
+        <SToolBar disabled={false}>
           <Tabs />
-          <SSort>
-            <SSortButton
-              size='sm'
-              view='secondary'
-              onClick={() => {
-                setIsFilterOpened(true);
-              }}
-            >
-              {t('decisions.sort.title')}
-              <InlineSvg
-                // @ts-ignore
-                svg={isFilterOpened === true ? Close : Sort}
-                fill={theme.colorsThemed.text.secondary}
-                width='24px'
-                height='24px'
-              />
-            </SSortButton>
-            {isFilterOpened && (
-              <SCheckBoxList ref={filterContainerRef}>
-                {filterTypes.map((item) => (
-                  <SCheckBoxWrapper key={item.id}>
-                    <CheckBox
-                      id={item.id}
-                      label={item.title}
-                      selected={activeFilter === item.id}
-                      handleChange={handleTypeChange}
-                    />
-                  </SCheckBoxWrapper>
-                ))}
-              </SCheckBoxList>
-            )}
-          </SSort>
+          <Sorting
+            category=''
+            options={sortOptions}
+            selected={selectedSorting}
+            onChange={handleTypeChange}
+          />
         </SToolBar>
       )}
 
@@ -448,10 +384,6 @@ const SToolBar = styled.div<ISToolBar>`
   }}
 `;
 
-const SSort = styled.div`
-  position: relative;
-`;
-
 const STabs = styled.div`
   display: flex;
 `;
@@ -477,39 +409,6 @@ const STab = styled(Button)<ISTab>`
       background: ${props.theme.colorsThemed.background.secondary};
     `;
   }}
-`;
-
-const SSortButton = styled(Button)`
-  border-radius: 12px !important;
-  padding: 8px 16px;
-  span {
-    display: flex;
-    div {
-      margin-left: 12px;
-    }
-  }
-`;
-
-const SCheckBoxList = styled.div`
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  right: 0;
-  top: 50px;
-  background: ${(props) => props.theme.colorsThemed.background.secondary};
-  border-radius: 16px;
-  padding: 18px;
-  width: 230px;
-  z-index: 100;
-  text-align: left;
-`;
-
-const SCheckBoxWrapper = styled.div`
-  margin-bottom: 22px;
-  font-size: 14px;
-  &:last-child {
-    margin-bottom: 0;
-  }
 `;
 
 const SCardsSection = styled.div`
