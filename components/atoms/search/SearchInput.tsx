@@ -23,6 +23,7 @@ import PopularCreatorsResults from './PopularCreatorsResults';
 import Button from '../Button';
 import Lottie from '../Lottie';
 import NoResults from './NoResults';
+import PopularTagsResults from './PopularTagsResults';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
@@ -37,6 +38,10 @@ const SearchInput: React.FC = React.memo(() => {
   const [isLoading, setIsLoading] = useState(false);
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
   const [resultsCreators, setResultsCreators] = useState<newnewapi.IUser[]>([]);
+
+  // TODO: use real data, remove lint mute
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [resultsTags, setResultsTags] = useState(['tatoo', 'tatuin', 'tag']);
 
   const { resizeMode, globalSearchActive } = useAppSelector(
     (state) => state.ui
@@ -241,6 +246,9 @@ const SearchInput: React.FC = React.memo(() => {
                 )}
                 {resultsCreators.length > 0 && (
                   <PopularCreatorsResults creators={resultsCreators} />
+                )}
+                {resultsTags.length > 0 && (
+                  <PopularTagsResults hashtags={resultsTags} />
                 )}
                 <SButton
                   onClick={() => {
