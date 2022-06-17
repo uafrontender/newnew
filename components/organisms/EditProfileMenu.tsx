@@ -317,6 +317,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         );
       } else if (key === 'username') {
         if (value === user.userData?.username) {
+          validateUsernameViaAPIDebounced.cancel();
           // reset error if username equal to initial username
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
@@ -848,7 +849,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     }
                   />
                   <HelperText>
-                    {t('EditProfileMenu.inputs.genderPronouns.caption')}
+                    {t('editProfileMenu.inputs.genderPronouns.caption')}
                   </HelperText>
                 </SDropdownSelectWrapper>
                 <BioTextarea

@@ -38,7 +38,12 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   useEffect(() => {
     if (focused) return;
     if (isValid) setErrorBordersShown(false);
-  }, [focused, isValid]);
+
+    if (!isValid && errorCaption) {
+      setErrorBordersShown(true);
+    }
+  }, [focused, isValid, errorCaption]);
+ 
 
   return (
     <SWrapper>
@@ -50,11 +55,6 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
         onBlur={() => {
           setIsPopupVisible(false);
           setFocused(false);
-          if (!isValid && errorCaption) {
-            setErrorBordersShown(true);
-          } else {
-            setErrorBordersShown(false);
-          }
         }}
         onFocus={(e) => {
           if (onFocus) onFocus(e);
