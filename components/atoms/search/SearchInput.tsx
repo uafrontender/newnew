@@ -39,8 +39,7 @@ const SearchInput: React.FC = React.memo(() => {
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
   const [resultsCreators, setResultsCreators] = useState<newnewapi.IUser[]>([]);
 
-  // TODO: use real data, remove lint mute
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // TODO: use real data
   const [resultsTags, setResultsTags] = useState(['tatoo', 'tatuin', 'tag']);
 
   const { resizeMode, globalSearchActive } = useAppSelector(
@@ -134,6 +133,7 @@ const SearchInput: React.FC = React.memo(() => {
   const resetResults = () => {
     setResultsCreators([]);
     setResultsPosts([]);
+    setResultsTags([]);
   };
 
   async function getQuickSearchResult(query: string) {
@@ -148,6 +148,8 @@ const SearchInput: React.FC = React.memo(() => {
 
       if (res.data.creators) setResultsCreators(res.data.creators);
       if (res.data.posts) setResultsPosts(res.data.posts);
+      // TODO: Enable when API updated
+      // if (res.data.tags) setResultsTags(res.data.tags);
       setIsLoading(false);
     } catch (err) {
       setIsLoading(false);

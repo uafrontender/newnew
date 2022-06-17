@@ -25,9 +25,13 @@ export const SearchResults = () => {
     if (router) {
       if (router.query.query) setSearchValue(router.query.query as string);
       if (router.query.tab) {
-        router.query.tab === 'creators'
-          ? setActiveTab('creators')
-          : setActiveTab('posts');
+        if (router.query.tab === 'creators') {
+          setActiveTab('creators');
+        } else if (router.query.tab === 'tags') {
+          setActiveTab('tags');
+        } else {
+          setActiveTab('posts');
+        }
       }
     }
   }, [router]);
@@ -93,6 +97,10 @@ export const SearchResults = () => {
       {activeTab === 'posts' ? (
         <SearchDecisions query={searchValue} />
       ) : (
+        /* activeTab === 'tags' ? */
+        // TODO: New page or parameter or just different query ?
+        /* <SearchDecisions query={searchValue} />
+      ) : ( */
         <SearchCreators query={searchValue} />
       )}
     </SContainer>
