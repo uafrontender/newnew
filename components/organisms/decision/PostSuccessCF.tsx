@@ -23,6 +23,7 @@ import { fetchPledges } from '../../../api/endpoints/crowdfunding';
 import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import parseText from '../../../utils/parseText/parseText';
 
 const CommentsBottomSection = dynamic(
   () => import('../../molecules/decision/success/CommentsBottomSection')
@@ -248,7 +249,20 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     {`$${formatNumber(post.totalAmount?.usdCents ?? 0, true)}`}
                   </STotal> */}
                 </SCreatorInfoDiv>
-                <SPostTitle variant={4}>{post.title}</SPostTitle>
+                <SPostTitle variant={4}>
+                  {parseText(post.title).map((chunk) => {
+                    if (chunk.type === 'text') {
+                      return chunk.text;
+                    }
+
+                    if (chunk.type === 'hashtag') {
+                      return <Hashtag href='#'>{chunk.text}</Hashtag>;
+                    }
+
+                    // TODO: Add assertNever
+                    throw new Error('Unexpected chunk');
+                  })}
+                </SPostTitle>
                 <SSeparator />
                 <SBackersInfo>
                   <SCreatorsBackers>
@@ -504,6 +518,11 @@ const SPostTitle = styled(Headline)`
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
   }
+`;
+
+const Hashtag = styled.a`
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
+  font-weight: 600;
 `;
 
 // Backers info

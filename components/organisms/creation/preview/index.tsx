@@ -32,6 +32,7 @@ import {
 
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
+import parseText from '../../../../utils/parseText/parseText';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -357,7 +358,18 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               onClick={handleGoBack}
             />
             <SHeadlineMobile variant={2} weight={600}>
-              {post.title}
+              {parseText(post.title).map((chunk) => {
+                if (chunk.type === 'text') {
+                  return chunk.text;
+                }
+
+                if (chunk.type === 'hashtag') {
+                  return <Hashtag href='#'>{chunk.text}</Hashtag>;
+                }
+
+                // TODO: add assertNever
+                throw new Error('Unexpected chunk');
+              })}
             </SHeadlineMobile>
           </STopLine>
           {tab === 'multiple-choice' && (
@@ -416,7 +428,20 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           </STabletPlayer>
         </SLeftPart>
         <SRightPart>
-          <SHeadline variant={5}>{post.title}</SHeadline>
+          <SHeadline variant={5}>
+            {parseText(post.title).map((chunk) => {
+              if (chunk.type === 'text') {
+                return chunk.text;
+              }
+
+              if (chunk.type === 'hashtag') {
+                return <Hashtag href='#'>{chunk.text}</Hashtag>;
+              }
+
+              // TODO: Add assertNever
+              throw new Error('Unexpected chunk');
+            })}
+          </SHeadline>
           {tab === 'multiple-choice' && (
             <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>
           )}
@@ -614,6 +639,11 @@ const STopLine = styled.div`
 const SInlineSVG = styled(InlineSVG)`
   min-width: 20px;
   min-height: 20px;
+`;
+
+const Hashtag = styled.a`
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
+  font-weight: 600;
 `;
 
 const SText = styled(Text)`

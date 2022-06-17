@@ -20,6 +20,7 @@ import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import parseText from '../../../utils/parseText/parseText';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../molecules/decision/waiting/WaitingForResponseBox')
@@ -199,7 +200,20 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                       <span>{t('mcPostSuccess.inTotalVotes')}</span>
                     </STotal>
                   </SCreatorInfoDiv>
-                  <SPostTitle variant={4}>{post.title}</SPostTitle>
+                  <SPostTitle variant={4}>
+                    {parseText(post.title).map((chunk) => {
+                      if (chunk.type === 'text') {
+                        return chunk.text;
+                      }
+
+                      if (chunk.type === 'hashtag') {
+                        return <Hashtag href='#'>{chunk.text}</Hashtag>;
+                      }
+
+                      // TODO: Add assertNever
+                      throw new Error('Unexpected chunk');
+                    })}
+                  </SPostTitle>
                   <SSeparator />
                   {winningOption && (
                     <>
@@ -479,6 +493,11 @@ const SPostTitle = styled(Headline)`
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
   }
+`;
+
+const Hashtag = styled.a`
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
+  font-weight: 600;
 `;
 
 // Winning option info

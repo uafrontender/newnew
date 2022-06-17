@@ -28,6 +28,7 @@ import PostEllipseModalModeration from './PostEllipseModalModeration';
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import assets from '../../../constants/assets';
+import parseText from '../../../utils/parseText/parseText';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -245,7 +246,20 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
               />
             ) : null}
           </SActionsDiv>
-          <SPostTitle variant={5}>{title}</SPostTitle>
+          <SPostTitle variant={5}>
+            {parseText(title).map((chunk) => {
+              if (chunk.type === 'text') {
+                return chunk.text;
+              }
+
+              if (chunk.type === 'hashtag') {
+                return <Hashtag href='#'>{chunk.text}</Hashtag>;
+              }
+
+              // TODO: Add assertNever
+              throw new Error('Unexpected chunk');
+            })}
+          </SPostTitle>
           {showWinnerOption ? (
             <SSelectWinnerOption>
               <SHeadline variant={4}>
@@ -360,6 +374,11 @@ const SWrapper = styled.div<{
 
 const SPostTitle = styled(Headline)`
   grid-area: title;
+`;
+
+const Hashtag = styled.a`
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
+  font-weight: 600;
 `;
 
 // Action buttons

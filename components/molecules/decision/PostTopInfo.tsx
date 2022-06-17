@@ -32,6 +32,7 @@ import { FollowingsContext } from '../../../contexts/followingContext';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
+import parseText from '../../../utils/parseText/parseText';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -296,7 +297,20 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           ) : null}
         </SActionsDiv>
         <SPostTitle>
-          <Headline variant={5}>{title}</Headline>
+          <Headline variant={5}>
+            {parseText(title).map((chunk) => {
+              if (chunk.type === 'text') {
+                return chunk.text;
+              }
+
+              if (chunk.type === 'hashtag') {
+                return <Hashtag href='#'>{chunk.text}</Hashtag>;
+              }
+
+              // TODO: Add assertNever
+              throw new Error('Unexpected chunk');
+            })}
+          </Headline>
         </SPostTitle>
         {showSelectingWinnerOption ? (
           <SSelectingWinnerOption>
@@ -409,6 +423,11 @@ const SPostTitle = styled.div`
   ${({ theme }) => theme.media.laptop} {
     min-height: 64px;
   }
+`;
+
+const Hashtag = styled.a`
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
+  font-weight: 600;
 `;
 
 // Creator card
