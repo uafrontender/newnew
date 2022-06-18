@@ -1,14 +1,4 @@
-interface TextChunk {
-  type: 'text';
-  text: string;
-}
-
-interface HashtagChunk {
-  type: 'hashtag';
-  text: string;
-}
-
-type Chunk = TextChunk | HashtagChunk;
+import { Chunk } from './Chunk';
 
 function getChunks(text: string, ignoreStart: boolean): Chunk[] {
   if (text.length < 1) {
