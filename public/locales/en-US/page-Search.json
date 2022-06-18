@@ -10,11 +10,6 @@
     }
   },
   "decisions": {
-    "postTypes": {
-      "events": "Events",
-      "superpolls": "Superpolls",
-      "goals": "Goals"
-    },
     "sort": {
       "title": "Sort",
       "all": "All",

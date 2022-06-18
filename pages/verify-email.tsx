@@ -13,11 +13,15 @@ import AuthLayout, {
 } from '../components/templates/AuthLayout';
 import CodeVerificationMenu from '../components/organisms/CodeVerificationMenu';
 import assets from '../constants/assets';
+import { useAppSelector } from '../redux-store/store';
 
 const VerifyEmail = () => {
   const { t } = useTranslation('page-VerifyEmail');
   const authLayoutContext = useContext(AuthLayoutContext);
-
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   // Redirect if the user is logged in
   // useEffect(() => {
   //   if (loggedIn) router.push('/');
@@ -39,7 +43,7 @@ const VerifyEmail = () => {
       </Head>
       <motion.div
         initial={{
-          x: 500,
+          x: isMobile ? 0 : 500,
           y: 0,
           opacity: 0,
         }}
@@ -48,7 +52,7 @@ const VerifyEmail = () => {
           y: 0,
           opacity: 1,
           transition: {
-            duration: 1,
+            duration: isMobile ? 1.7 : 1,
           },
         }}
       >

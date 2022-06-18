@@ -18,7 +18,7 @@ export const SearchResults = () => {
   const router = useRouter();
   const { t } = useTranslation('page-Search');
   const theme = useTheme();
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState(router.query.query as string);
   const [activeTab, setActiveTab] = useState<string>('posts');
 
   useEffect(() => {
