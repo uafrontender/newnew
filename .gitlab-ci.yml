@@ -18,4 +18,3 @@ test:
     - npm run test
     - npm run lint
     - npm run build
-    - npm run start & npx wait-on http://localhost:4000
