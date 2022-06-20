@@ -2,8 +2,8 @@
   "meta": {
     "title": "Sign up to NewNew",
     "description": "Signing up to NewNew is fast and easy. Join now to be a Creator or watch people",
-    "title-to-log-in": "Log in to NewNew",
-    "description-to-log-in": "Logging in to NewNew is fast and easy"
+    "title-log-in": "Log in to NewNew",
+    "description-log-in": "Logging in to NewNew is fast and easy"
   },
   "heading": {
     "sign-in": "Sign up",
