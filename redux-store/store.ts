@@ -124,7 +124,7 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   Action<string>
 >;
 
-export const useAppDispatch = (): any => useDispatch<AppDispatch>();
+export const useAppDispatch = (): any => useDispatch<any>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 type AppStore = ReturnType<typeof makeStore>;

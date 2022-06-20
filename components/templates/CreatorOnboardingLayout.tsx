@@ -103,6 +103,10 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
     );
   };
 
+CreatorOnboardingLayout.defaultProps = {
+  hideOnboardingHeader: undefined,
+};
+
 export default CreatorOnboardingLayout;
 
 const HomeLogoButton = () => (
