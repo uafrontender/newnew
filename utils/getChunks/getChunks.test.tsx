@@ -14,8 +14,8 @@ describe('text', () => {
 
     expect(chunks.length).toBe(1);
 
-    expect(chunks[0].type === 'text');
-    expect(chunks[0].text === input);
+    expect(chunks[0].type).toBe('text');
+    expect(chunks[0].text).toBe(input);
   });
 });
 
@@ -26,8 +26,8 @@ describe('parses hashtags', () => {
 
     expect(chunks.length).toBe(1);
 
-    expect(chunks[0].type === 'text');
-    expect(chunks[0].text === input);
+    expect(chunks[0].type).toBe('text');
+    expect(chunks[0].text).toBe(input);
   });
 
   it('single', () => {
@@ -36,8 +36,8 @@ describe('parses hashtags', () => {
 
     expect(chunks.length).toBe(1);
 
-    expect(chunks[0].type === 'hashtag');
-    expect(chunks[0].text === input);
+    expect(chunks[0].type).toBe('hashtag');
+    expect(chunks[0].text).toBe(input);
   });
 
   it('with undescore', () => {
@@ -46,8 +46,8 @@ describe('parses hashtags', () => {
 
     expect(chunks.length).toBe(1);
 
-    expect(chunks[0].type === 'hashtag');
-    expect(chunks[0].text === input);
+    expect(chunks[0].type).toBe('hashtag');
+    expect(chunks[0].text).toBe(input);
   });
 
   it('with capital letter', () => {
@@ -56,8 +56,8 @@ describe('parses hashtags', () => {
 
     expect(chunks.length).toBe(1);
 
-    expect(chunks[0].type === 'hashtag');
-    expect(chunks[0].text === input);
+    expect(chunks[0].type).toBe('hashtag');
+    expect(chunks[0].text).toBe(input);
   });
 
   it('with number', () => {
@@ -66,8 +66,8 @@ describe('parses hashtags', () => {
 
     expect(chunks.length).toBe(1);
 
-    expect(chunks[0].type === 'hashtag');
-    expect(chunks[0].text === input);
+    expect(chunks[0].type).toBe('hashtag');
+    expect(chunks[0].text).toBe(input);
   });
 
   it('multiple', () => {
@@ -76,14 +76,14 @@ describe('parses hashtags', () => {
 
     expect(chunks.length).toBe(3);
 
-    expect(chunks[0].type === 'hashtag');
-    expect(chunks[0].text === '#hashtag');
+    expect(chunks[0].type).toBe('hashtag');
+    expect(chunks[0].text).toBe('#hashtag');
 
-    expect(chunks[1].type === 'text');
-    expect(chunks[1].text === ' ');
+    expect(chunks[1].type).toBe('text');
+    expect(chunks[1].text).toBe(' ');
 
-    expect(chunks[2].type === 'hashtag');
-    expect(chunks[2].text === '#another-hashtag');
+    expect(chunks[2].type).toBe('hashtag');
+    expect(chunks[2].text).toBe('#another_hashtag');
   });
 
   it('merged', () => {
@@ -92,11 +92,11 @@ describe('parses hashtags', () => {
 
     expect(chunks.length).toBe(2);
 
-    expect(chunks[0].type === 'hashtag');
-    expect(chunks[0].text === '#hashtag');
+    expect(chunks[0].type).toBe('hashtag');
+    expect(chunks[0].text).toBe('#hashtag');
 
-    expect(chunks[1].type === 'text');
-    expect(chunks[1].text === '#anotherhashtag');
+    expect(chunks[1].type).toBe('text');
+    expect(chunks[1].text).toBe('#anotherhashtag');
   });
 
   it('keeps spaces', () => {
@@ -105,14 +105,14 @@ describe('parses hashtags', () => {
 
     expect(chunks.length).toBe(3);
 
-    expect(chunks[0].type === 'text');
-    expect(chunks[0].text === '  ');
+    expect(chunks[0].type).toBe('text');
+    expect(chunks[0].text).toBe('  ');
 
-    expect(chunks[1].type === 'hashtag');
-    expect(chunks[1].text === '#hashtag');
+    expect(chunks[1].type).toBe('hashtag');
+    expect(chunks[1].text).toBe('#hashtag');
 
-    expect(chunks[1].type === 'text');
-    expect(chunks[1].text === '  ');
+    expect(chunks[2].type).toBe('text');
+    expect(chunks[2].text).toBe('  ');
   });
 });
 
