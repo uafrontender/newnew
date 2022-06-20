@@ -6,7 +6,9 @@ import Row from '../atoms/Grid/Row';
 import Container from '../atoms/Grid/Container';
 import ErrorBoundary from '../organisms/ErrorBoundary';
 
-interface ICreationLayout {}
+interface ICreationLayout {
+  children: React.ReactNode;
+}
 
 const CreationLayout: React.FC<ICreationLayout> = (props) => {
   const { children } = props;
