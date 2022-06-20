@@ -17,25 +17,25 @@ const AcPickWinningOptionModal: React.FC<IAcPickWinningOptionModal> = ({
   handleConfirm,
   children,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
 
   return (
     <Modal show={isVisible} additionalz={12} onClose={closeModal}>
       <SContainer>
         <SModal onClick={(e) => e.stopPropagation()}>
           <SModalTitle>
-            {t('AcPostModeration.OptionsTab.selectWinner.title')}
+            {t('acPostModeration.optionsTab.selectWinner.title')}
           </SModalTitle>
           <SModalMessage>
-            {t('AcPostModeration.OptionsTab.selectWinner.body')}
+            {t('acPostModeration.optionsTab.selectWinner.body')}
           </SModalMessage>
           {children}
           <SModalButtons>
             <SCancelButton view='secondary' onClick={closeModal}>
-              {t('AcPostModeration.OptionsTab.selectWinner.cancelBtn')}
+              {t('acPostModeration.optionsTab.selectWinner.button.cancel')}
             </SCancelButton>
             <SConfirmButton view='primaryGrad' onClick={handleConfirm}>
-              {t('AcPostModeration.OptionsTab.selectWinner.confirmBtn')}
+              {t('acPostModeration.optionsTab.selectWinner.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>

@@ -41,7 +41,7 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
   postStatus,
 }) => {
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -67,6 +67,7 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
         router.push(
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
         );
+        return;
       }
       const markAsFavoritePayload = new newnewapi.MarkPostRequest({
         markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
@@ -151,8 +152,8 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
               <SSpanBold>{formatNumber(option.supporterCount, true)}</SSpanBold>{' '}
               <SSpanThin>
                 {option.supporterCount > 1
-                  ? t('McPost.WinnerTab.WinnerOptionCard.voters_told_you')
-                  : t('McPost.WinnerTab.WinnerOptionCard.voter_told_you')}
+                  ? t('mcPost.winnerTab.winnerOptionCard.votersToldYou')
+                  : t('mcPost.winnerTab.winnerOptionCard.voterToldYou')}
               </SSpanThin>
             </SNumBidders>
             <SHeadline variant={4}>{option.text}</SHeadline>
@@ -161,7 +162,7 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
             </SHeadline>
             <SOptionCreator variant={3}>
               <SSpanThin>
-                {t('McPost.WinnerTab.WinnerOptionCard.created_by')}
+                {t('mcPost.winnerTab.winnerOptionCard.createdBy')}
               </SSpanThin>{' '}
               <Link
                 href={
@@ -180,7 +181,7 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
                   }}
                 >
                   {isMySuggestion
-                    ? t('McPost.OptionsTab.me')
+                    ? t('mcPost.optionsTab.me')
                     : isCreatorsBid
                     ? getDisplayname(postCreator)
                     : getDisplayname(option.creator!!)}
@@ -212,9 +213,9 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
         </SWinnerOptionCard>
         {postStatus === 'waiting_for_response' && (
           <PostWaitingForResponseBox
-            title={t('PostWaitingForResponse.title')}
-            body={t('PostWaitingForResponse.body')}
-            buttonCaption={t('PostWaitingForResponse.ctaButton')}
+            title={t('postWaitingForResponse.title')}
+            body={t('postWaitingForResponse.body')}
+            buttonCaption={t('postWaitingForResponse.buttonText')}
             style={{
               marginTop: '24px',
             }}
@@ -225,9 +226,9 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
         )}
         {postStatus === 'succeeded' && (
           <PostSuccessBox
-            title={t('PostSuccess.title', { postType: t(`postType.mc`) })}
-            body={t('PostSuccess.body')}
-            buttonCaption={t('PostSuccess.ctaButton')}
+            title={t('postSuccess.title', { postType: t(`postType.mc`) })}
+            body={t('postSuccess.body')}
+            buttonCaption={t('postSuccess.buttonText')}
             style={{
               marginTop: '24px',
             }}

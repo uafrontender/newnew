@@ -16,11 +16,11 @@ interface IOnboardingTagsSelection {
 
 const OnboardingTagsSelection: React.FunctionComponent<IOnboardingTagsSelection> =
   ({ selectedTags, availableTags, handleAddTag, handleRemoveTag }) => {
-    const { t } = useTranslation('creator-onboarding');
+    const { t } = useTranslation('page-CreatorOnboarding');
 
     return (
       <SContainer>
-        <SLabel>{t('AboutSection.tags.title')}</SLabel>
+        <SLabel>{t('aboutSection.tags.title')}</SLabel>
         <STagsContainer>
           {availableTags &&
             availableTags.map((tag) => (

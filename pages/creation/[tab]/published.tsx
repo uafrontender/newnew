@@ -15,7 +15,7 @@ import { NextPageWithLayout } from '../../_app';
 interface ICreationPublished {}
 
 export const CreationPublished: React.FC<ICreationPublished> = (props) => {
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const router = useRouter();
   const {
     post: {
@@ -50,7 +50,7 @@ export async function getServerSideProps(
 ): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'creation']
+    ['common', 'page-Creation']
   );
 
   // @ts-ignore

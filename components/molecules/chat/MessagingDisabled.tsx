@@ -16,18 +16,18 @@ interface IMessagingDisabled {
 
 const MessagingDisabled: React.FC<IMessagingDisabled> = React.memo(
   ({ user }) => {
-    const { t } = useTranslation('chat');
+    const { t } = useTranslation('page-Chat');
     return (
       <SBottomAction>
         <SBottomActionLeft>
           <SBottomActionIcon>🙊</SBottomActionIcon>
           <SBottomActionText>
             <SBottomActionTitle>
-              {t('messaging-disabled.title')}
+              {t('messagingDisabled.title')}
             </SBottomActionTitle>
             <SBottomActionMessage>
               {user.username ? user.username : user.nickname}{' '}
-              {t('messaging-disabled.message')}
+              {t('messagingDisabled.message')}
             </SBottomActionMessage>
           </SBottomActionText>
         </SBottomActionLeft>

@@ -27,6 +27,7 @@ import { useNotifications } from '../../contexts/notificationsContext';
 import { useGetChats } from '../../contexts/chatContext';
 import ReportBugButton from '../molecules/ReportBugButton';
 import { usePostModalState } from '../../contexts/postModalContext';
+import useHasMounted from '../../utils/hooks/useHasMounted';
 
 interface IGeneral {
   children: React.ReactNode;
@@ -44,6 +45,8 @@ export const General: React.FC<IGeneral> = (props) => {
   const { unreadNotificationCount } = useNotifications();
   const { unreadCount } = useGetChats();
   const { postOverlayOpen } = usePostModalState();
+
+  const hasMounted = useHasMounted();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
 
@@ -184,20 +187,26 @@ export const General: React.FC<IGeneral> = (props) => {
             </Container>
           </SContent>
           <Footer />
-          <BottomNavigation
-            collection={bottomNavigation}
-            moreMenuMobileOpen={moreMenuMobileOpen}
-            handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-            visible={mobileNavigationVisible}
-          />
-          <SortingContainer
-            id='sorting-container'
-            withCookie={cookies.accepted !== 'true'}
-            bottomNavigationVisible={mobileNavigationVisible}
-          />
-          <CookieContainer bottomNavigationVisible={mobileNavigationVisible}>
-            <Cookie />
-          </CookieContainer>
+          {hasMounted && (
+            <>
+              <BottomNavigation
+                collection={bottomNavigation}
+                moreMenuMobileOpen={moreMenuMobileOpen}
+                handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
+                visible={mobileNavigationVisible}
+              />
+              <SortingContainer
+                id='sorting-container'
+                withCookie={cookies.accepted !== 'true'}
+                bottomNavigationVisible={mobileNavigationVisible}
+              />
+              <CookieContainer
+                bottomNavigationVisible={mobileNavigationVisible}
+              >
+                <Cookie />
+              </CookieContainer>
+            </>
+          )}
           {chatButtonVisible && (
             <ChatContainer bottomNavigationVisible={mobileNavigationVisible}>
               {!isOpenedChat ? (
@@ -216,6 +225,7 @@ export const General: React.FC<IGeneral> = (props) => {
               (chatButtonVisible ? 72 : 0)
             }
             right={4}
+            zIndex={moreMenuMobileOpen ? 9 : undefined}
           />
         </SWrapper>
       </SkeletonTheme>

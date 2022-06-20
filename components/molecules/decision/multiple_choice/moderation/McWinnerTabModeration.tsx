@@ -34,7 +34,7 @@ interface MAcWinnerTabModeration {
 
 const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
   ({ postId, postCreator, option, postStatus }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -151,16 +151,16 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
                 <SSpanThin>
                   {option.supporterCount > 1
                     ? t(
-                        'McPostModeration.WinnerTab.WinnerOptionCard.voters_told_you'
+                        'mcPostModeration.winnerTab.winnerOptionCard.votersToldYou'
                       )
                     : t(
-                        'McPostModeration.WinnerTab.WinnerOptionCard.voter_told_you'
+                        'mcPostModeration.winnerTab.winnerOptionCard.voterToldYou'
                       )}
                 </SSpanThin>
               </SNumBidders>
               <SHeadline variant={4}>{option.text}</SHeadline>
               <SYouMade variant={3}>
-                {t('McPostModeration.WinnerTab.WinnerOptionCard.you_made')}
+                {t('mcPostModeration.winnerTab.winnerOptionCard.youMade')}
               </SYouMade>
               <SHeadline variant={5}>
                 $
@@ -171,7 +171,7 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
               </SHeadline>
               <SOptionCreator variant={3}>
                 <SSpanThin>
-                  {t('McPostModeration.WinnerTab.WinnerOptionCard.created_by')}
+                  {t('mcPostModeration.winnerTab.winnerOptionCard.createdBy')}
                 </SSpanThin>{' '}
                 <Link
                   href={
@@ -190,7 +190,7 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
                     }}
                   >
                     {isCreatorsBid
-                      ? t('McPost.OptionsTab.me')
+                      ? t('mcPost.optionsTab.me')
                       : getDisplayname(option.creator!!)}
                   </SSpanBold>
                 </Link>
@@ -220,12 +220,12 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
           </SWinnerOptionCard>
           {postStatus === 'succeeded' ? (
             <PostSuccessBoxModeration
-              title={t('PostSuccessModeration.title')}
-              body={t('PostSuccessModeration.body')}
+              title={t('postSuccessModeration.title')}
+              body={t('postSuccessModeration.body')}
               buttonCaption={
                 isCopiedUrl
-                  ? t('PostSuccessModeration.ctaButton-copied')
-                  : t('PostSuccessModeration.ctaButton')
+                  ? t('postSuccessModeration.linkCopiedButtonText')
+                  : t('postSuccessModeration.buttonText')
               }
               style={{
                 marginTop: '24px',

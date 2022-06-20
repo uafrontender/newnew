@@ -19,7 +19,7 @@ type ITransactionCard = {
 const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
   transaction,
 }) => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
   const user = useAppSelector((state) => state.user);
 
   return (
@@ -28,12 +28,12 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
         <img alt={user.userData?.username} src={user.userData?.avatarUrl} />
       </SAvatar>
       <SActor variant={3} weight={600}>
-        {t('Settings.sections.Transactions.you')}
+        {t('Settings.sections.transactions.you')}
       </SActor>
       {transaction.transactionType === 5 ? (
         <SAction variant={2}>
           {`${t(
-            `Settings.sections.Transactions.actions.${transaction.transactionType}`
+            `Settings.sections.transactions.actions.${transaction.transactionType}`
           )} `}
           <Link href={`/${transaction.relatedCreator?.nicknameOrUsername}`}>
             {`@${transaction.relatedCreator?.nicknameOrUsername}`}
@@ -42,13 +42,13 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
       ) : (
         <SAction variant={2}>
           {`${t(
-            `Settings.sections.Transactions.actions.${transaction.transactionType}`
+            `Settings.sections.transactions.actions.${transaction.transactionType}`
           )} `}
           <Link href={`/${transaction.relatedCreator?.nicknameOrUsername}`}>
             {`@${transaction.relatedCreator?.nicknameOrUsername}`}
           </Link>
           {`'s ${t(
-            `Settings.sections.Transactions.type.${transaction.transactionType}`
+            `Settings.sections.transactions.type.${transaction.transactionType}`
           )}`}
         </SAction>
       )}

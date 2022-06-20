@@ -8,14 +8,14 @@ interface IWelcomeMessage {
 
 const WelcomeMessage: React.FC<IWelcomeMessage> = React.memo(
   ({ userAlias }) => {
-    const { t } = useTranslation('chat');
+    const { t } = useTranslation('page-Chat');
 
     return (
       <SWelcomeMessage>
         <div>
           <span>🎉</span>
           <p>
-            {t('chat.welcome-message')} @{userAlias}.
+            {t('chat.welcomeMessage')} @{userAlias}.
           </p>
         </div>
       </SWelcomeMessage>

@@ -45,7 +45,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   } = props;
   const inputRef: any = useRef();
   const theme = useTheme();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const [focused, setFocused] = useState(false);
 
   const handleChange = useCallback(
@@ -122,11 +122,11 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       const formatOptions = [
         {
           id: 'am',
-          title: t('secondStep.field.startsAt.modal.hours-format.am'),
+          title: t('secondStep.field.startsAt.modal.hoursFormat.am'),
         },
         {
           id: 'pm',
-          title: t('secondStep.field.startsAt.modal.hours-format.pm'),
+          title: t('secondStep.field.startsAt.modal.hoursFormat.pm'),
         },
       ];
       const renderDay = (el: any) => (

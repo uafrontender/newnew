@@ -10,7 +10,7 @@ import emptyFolder from '../../../../public/images/dashboard/turnon-sub.png';
 import { useAppSelector } from '../../../../redux-store/store';
 
 export const EnableSubscription = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const user = useAppSelector((state) => state.user);
 
   return (

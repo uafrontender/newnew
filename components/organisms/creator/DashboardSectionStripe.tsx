@@ -31,7 +31,7 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
   ({ isConnectedToStripe, stripeConnectStatus }) => {
     const router = useRouter();
     const theme = useTheme();
-    const { t } = useTranslation('creator');
+    const { t } = useTranslation('page-Creator');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -110,7 +110,7 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
       <SContainer>
         {isMobile && <SGoBackButton onClick={() => router.back()} />}
         <SHeadline variant={5}>
-          <span>{t('stripe.title-set-up-stripe')}</span>
+          <span>{t('stripe.titleSetUpStripe')}</span>
           <InlineSvg svg={StripeLogo} width='80px' />
         </SHeadline>
         <SUl>
@@ -161,7 +161,7 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
                 handleRedirectToStripesetup();
               }}
             >
-              {t('stripe.updateButton')}
+              {t('stripe.button.update')}
             </SButtonUpdate>
           )}
         </SButtons>
@@ -170,7 +170,7 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
             <Link href='/creator/dashboard'>
               <a>
                 <GoBackButton noArrow onClick={() => {}}>
-                  {t('stripe.backButton')}
+                  {t('stripe.button.back')}
                 </GoBackButton>
               </a>
             </Link>
@@ -184,9 +184,7 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
                   width: isMobile ? '100%' : 'initial',
                 }}
               >
-                {isMobile
-                  ? t('stripe.submitMobile')
-                  : t('stripe.submitDesktop')}
+                {t('stripe.button.submit')}
               </Button>
             </a>
           </Link>

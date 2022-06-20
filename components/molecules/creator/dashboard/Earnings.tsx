@@ -27,7 +27,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
   hasMyPosts,
   earnings,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const [filter, setFilter] = useState('7_days');
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [myEarnings, setMyEarnings] =
@@ -225,7 +225,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
         </STotalTextWrapper>
         {/* <STotalInsights>
           <STotalInsightsText>
-            {t(`dashboard.earnings.${isMobile ? 'insights' : 'insights_tablet'}`)}
+            {t(`dashboard.earnings.${isMobile ? 'insights' : 'insightsTablet'}`)}
           </STotalInsightsText>
           <STotalInsightsArrow
             svg={arrowRightIcon}
@@ -248,8 +248,8 @@ export const Earnings: React.FC<IFunctionProps> = ({
         />
       ) : hasMyPosts && myEarnings?.nextCashoutAmount ? (
         <CashOut
-          nextCashoutAmount={myEarnings?.nextCashoutAmount}
-          nextCashoutDate={myEarnings?.nextCashoutDate}
+          nextCashOutAmount={myEarnings?.nextCashoutAmount}
+          nextCashOutDate={myEarnings?.nextCashoutDate}
         />
       ) : (
         <MakeDecision />

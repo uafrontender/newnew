@@ -15,7 +15,7 @@ const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
   const { t } = useTranslation('common');
   return (
     <SContainer>
-      <SBlockTitle>{t('search.popular-creators')}</SBlockTitle>
+      <SBlockTitle>{t('search.popularCreators')}</SBlockTitle>
       {creators.map((creator) => (
         <Link href={`/${creator.username}`} key={creator.uuid}>
           <a>
@@ -26,7 +26,7 @@ const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
                 </SUserAvatar>
                 <SPostData>
                   <SCreatorUsername>{creator.nickname}</SCreatorUsername>
-                  <SLink>See decisions</SLink>
+                  <SLink>{t('search.creatorSubtitle')}</SLink>
                 </SPostData>
               </SLeftSide>
             </SPost>

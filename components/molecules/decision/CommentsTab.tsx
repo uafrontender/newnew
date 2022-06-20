@@ -53,7 +53,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
   handleGoBack,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -352,14 +352,20 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
     };
 
     if (socketConnection) {
-      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
-      socketConnection.on('ChatMessageDeleted', socketHandlerMessageDeleted);
+      socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
+      socketConnection?.on('ChatMessageDeleted', socketHandlerMessageDeleted);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
-        socketConnection.off('ChatMessageDeleted', socketHandlerMessageDeleted);
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
+          'ChatMessageCreated',
+          socketHandlerMessageCreated
+        );
+        socketConnection?.off(
+          'ChatMessageDeleted',
+          socketHandlerMessageDeleted
+        );
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

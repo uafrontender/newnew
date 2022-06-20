@@ -34,7 +34,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
 ) => {
   const { open, value, thumbnails, handleClose, handleSubmit } = props;
   const theme = useTheme();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const videoThumbs: any = useRef({ ...thumbnails });
   const [chunks, setChunks] = useState<string[]>([]);
   const [videoDuration, setVideoDuration] = useState<number>(0);
@@ -315,15 +315,26 @@ const SContainer = styled.div`
   min-height: 100vh;
   background: ${(props) => props.theme.colorsThemed.background.primary};
 
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
   ${({ theme }) => theme.media.mobileL} {
     top: 50%;
     height: unset;
     margin: 0 auto;
-    overflow: hidden;
+    overflow-x: hidden;
     max-width: 464px;
     transform: translateY(-50%);
     min-height: unset;
     background: ${(props) => props.theme.colorsThemed.background.secondary};
+    border-radius: 16px;
+
     border-radius: 16px;
   }
 
@@ -363,13 +374,10 @@ const SModalTopLineTitle = styled(Text)`
 const SModalTopContent = styled.div``;
 
 const SModalButtonContainer = styled.div`
-  left: 0;
-  bottom: 24px;
-  position: absolute;
+  margin-top: 56px;
 
   button {
-    width: calc(100vw - 32px);
-    margin: 0 16px;
+    width: 100%;
     padding: 16px 20px;
   }
 `;

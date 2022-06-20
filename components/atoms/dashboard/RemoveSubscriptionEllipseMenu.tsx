@@ -19,7 +19,7 @@ interface IRemoveSubscriptionEllipseMenu {
 
 const RemoveSubscriptionEllipseMenu: React.FC<IRemoveSubscriptionEllipseMenu> =
   ({ isVisible, handleClose }) => {
-    const { t } = useTranslation('creator');
+    const { t } = useTranslation('common');
     const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.user);
     const containerRef = useRef<HTMLDivElement>();
@@ -67,7 +67,7 @@ const RemoveSubscriptionEllipseMenu: React.FC<IRemoveSubscriptionEllipseMenu> =
             exit={{ opacity: 0 }}
           >
             <SButton view='danger' onClick={() => handlerConfirmEnable()}>
-              {t('SubrateSection.removeSubscription')}
+              {t('ellipse.removeSubscription')}
             </SButton>
             <RemoveSubModal
               confirmEnableSub={confirmSubEnable}

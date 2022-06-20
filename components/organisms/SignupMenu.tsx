@@ -58,7 +58,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('sign-up');
+  const { t } = useTranslation('page-SignUp');
 
   const authLayoutContext = useContext(AuthLayoutContext);
 
@@ -115,7 +115,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
       }
     } catch (err: any) {
       setIsSubmitLoading(false);
-      setSubmitError(err?.message ?? 'generic_error');
+      setSubmitError(err?.message ?? 'genericError');
     }
   };
 
@@ -151,11 +151,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
           defer={isMobile ? 250 : undefined}
           onClick={() => router.back()}
         >
-          <span>{t('goBackBtn')}</span>
+          <span>{t('button.back')}</span>
         </SSignInBackButton>
         <SHeadline variant={3}>
           {reason && reason !== 'session_expired'
-            ? `${t('heading.sign-in-to')} ${t(`heading.reasons.${reason}`)}`
+            ? `${t('heading.sign-in-to')} ${t(`heading.reason.${reason}`)}`
             : goal
             ? t(`heading.${goal}`)
             : t('heading.sign-in')}
@@ -178,7 +178,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 )
               }
             >
-              {t('signupOptions.google')}
+              {t('signUpOptions.google')}
             </SignInButton>
           </motion.div> */}
           <motion.div variants={item}>
@@ -194,7 +194,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 )
               }
             >
-              {t('signupOptions.apple')}
+              {t('signUpOptions.apple')}
             </SignInButton>
           </motion.div>
           <motion.div variants={item}>
@@ -208,7 +208,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 handleSignupRedirect(`${BASE_URL_AUTH}/fb${redirectUrlParam}`)
               }
             >
-              {t('signupOptions.facebook')}
+              {t('signUpOptions.facebook')}
             </SignInButton>
           </motion.div>
           <motion.div variants={item}>
@@ -223,7 +223,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 )
               }
             >
-              {t('signupOptions.twitter')}
+              {t('signUpOptions.twitter')}
             </SignInButton>
           </motion.div>
           <motion.div variants={item}>
@@ -231,7 +231,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               lineColor={theme.colorsThemed.background.outlines1}
               innerSpan={
                 <SContinueWithSpan>
-                  {t('signupOptions.or_continue_with')}
+                  {t('signUpOptions.orContinueWith')}
                 </SContinueWithSpan>
               }
             />
@@ -260,15 +260,15 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                   if (submitError) setSubmitError('');
                 }}
                 onChange={(e) => setEmailInput(e.target.value)}
-                placeholder={t('signupOptions.email')}
-                errorCaption={t('errors.email_invalid')}
+                placeholder={t('signUpOptions.email')}
+                errorCaption={t('error.emailInvalid')}
               />
             </motion.div>
             {submitError ? (
               <AnimatedPresence animateWhenInView={false} animation='t-09'>
                 <SErrorDiv>
                   <InlineSvg svg={AlertIcon} width='16px' height='16px' />
-                  {t(`errors.${submitError}`)}
+                  {t(`error.${submitError}`)}
                 </SErrorDiv>
               </AnimatedPresence>
             ) : null}
@@ -282,8 +282,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               >
                 <span>
                   {goal !== 'log-in'
-                    ? t('signupOptions.signInBtn')
-                    : t('signupOptions.logInBtn')}
+                    ? t('signUpOptions.signInButton')
+                    : t('signUpOptions.logInButton')}
                 </span>
               </EmailSignInButton>
             </motion.div>
@@ -295,11 +295,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
           delay={1.1}
         >
           <SLegalText>
-            {t('legalDisclaimer.main_text')}
+            {t('legalDisclaimer.mainText')}
             <br />
             <Link href='https://privacy.newnew.co'>
               <a href='https://privacy.newnew.co' target='_blank'>
-                {t('legalDisclaimer.privacy_policy')}
+                {t('legalDisclaimer.privacyPolicy')}
               </a>
             </Link>
             {', '}
@@ -311,7 +311,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
             {t('legalDisclaimer.and')}{' '}
             <Link href='https://communityguidelines.newnew.co'>
               <a href='https://communityguidelines.newnew.co' target='_blank'>
-                {t('legalDisclaimer.community_guidelines')}
+                {t('legalDisclaimer.communityGuidelines')}
               </a>
             </Link>
           </SLegalText>
@@ -343,7 +343,7 @@ const item: Variants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.6,
+      duration: 1,
     },
   },
 };

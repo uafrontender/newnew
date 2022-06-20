@@ -37,12 +37,12 @@ const EmptySubscriptionStats = dynamic(
 const Earnings = dynamic(
   () => import('../../molecules/creator/dashboard/Earnings')
 );
-const YourTodos = dynamic(
-  () => import('../../molecules/creator/dashboard/YourTodos')
+const YourToDos = dynamic(
+  () => import('../../molecules/creator/dashboard/YourToDos')
 );
 
 export const Dashboard: React.FC = React.memo(() => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -52,7 +52,7 @@ export const Dashboard: React.FC = React.memo(() => {
   const { mySubscribers } = useGetSubscriptions();
   const [mySubscriptionProduct, setMySubscriptionProduct] =
     useState<newnewapi.ISubscriptionProduct | null>(null);
-  const [isTodosCompleted, setIsTodosCompleted] =
+  const [isToDosCompleted, setIsToDosCompleted] =
     useState<boolean | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [isEarningsLoading, setIsEarningsLoading] = useState(true);
@@ -72,8 +72,8 @@ export const Dashboard: React.FC = React.memo(() => {
       user.userData?.bio &&
       user.userData?.bio.length > 0 &&
       user.creatorData?.options?.isCreatorConnectedToStripe
-        ? setIsTodosCompleted(true)
-        : setIsTodosCompleted(false);
+        ? setIsToDosCompleted(true)
+        : setIsToDosCompleted(false);
     }
   }, [user.creatorData, user.userData?.bio]);
 
@@ -193,9 +193,9 @@ export const Dashboard: React.FC = React.memo(() => {
             />
           </SBlock>
         ) : (
-          !isTodosCompleted && (
+          !isToDosCompleted && (
             <SBlock name='your-todos'>
-              <YourTodos />
+              <YourToDos />
             </SBlock>
           )
         )}
@@ -220,8 +220,8 @@ export const Dashboard: React.FC = React.memo(() => {
         )}
         <SBlock>
           {!isEarningsLoading ? (
-            isTodosCompleted !== undefined ? (
-              isTodosCompleted ? (
+            isToDosCompleted !== undefined ? (
+              isToDosCompleted ? (
                 <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
               ) : (
                 <FinishProfileSetup />

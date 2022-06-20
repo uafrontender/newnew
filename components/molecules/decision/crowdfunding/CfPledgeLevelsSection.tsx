@@ -60,7 +60,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
   }) => {
     const router = useRouter();
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.user);
 
@@ -294,7 +294,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
         >
           <SInfoSubsection>
             <STitle variant={2} weight={600}>
-              {t('CfPost.BackersTab.info.title', {
+              {t('cfPost.backersTab.info.title', {
                 creator: post.creator?.nickname,
               })}
             </STitle>
@@ -321,7 +321,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                 }
                 onClick={() => handleCustomPledgePaymentModal()}
               >
-                {t('CfPost.BackersTab.CustomPledge.pledgeBtn')}
+                {t('cfPost.backersTab.customPledge.pledgeButton')}
               </Button>
               <SCancelButton
                 view='transparent'
@@ -414,7 +414,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
               <>
                 {post.creator && (
                   <SPaymentSign variant={3}>
-                    {t('CfPost.paymentModalFooter.body', {
+                    {t('cfPost.paymentModalFooter.body', {
                       creator: getDisplayname(post.creator),
                     })}
                   </SPaymentSign>
@@ -426,14 +426,14 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                       href='https://terms.newnew.co'
                       target='_blank'
                     >
-                      {t('CfPost.paymentModalFooter.terms')}
+                      {t('cfPost.paymentModalFooter.terms')}
                     </SPaymentTermsLink>
                   </Link>{' '}
-                  {t('CfPost.paymentModalFooter.apply')}
+                  {t('cfPost.paymentModalFooter.apply')}
                 </SPaymentTerms>
               </>
             }
-            // payButtonCaptionKey={t('CfPost.paymentModalPayButton')}
+            // payButtonCaptionKey={t('cfPost.paymentModalPayButton')}
           >
             <SPaymentModalHeader>
               <SPaymentModalHeading>
@@ -448,7 +448,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                 </SPaymentModalHeadingPostSymbol>
                 <SPaymentModalHeadingPostCreator variant={3}>
                   {post.creator
-                    ? t('CfPost.paymentModalHeader.title', {
+                    ? t('cfPost.paymentModalHeader.title', {
                         creator: getDisplayname(post.creator),
                       })
                     : ''}

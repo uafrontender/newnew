@@ -27,7 +27,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
   handleGoBack,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -192,7 +192,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
   return (
     <SWrapper>
       <GoBackButton onClick={handleGoBack}>
-        {t('AcPostSuccess.OptionsTab.backBtn')}
+        {t('acPostSuccess.optionsTab.backButton')}
       </GoBackButton>
       {!isMobile && <SSeparator />}
       <SBidsContainer
@@ -241,7 +241,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
             view='secondary'
             onClick={() => fetchBids(optionsNextPageToken)}
           >
-            {t('loadMoreBtn')}
+            {t('loadMoreButton')}
           </SLoadMoreBtn>
         ) : null}
       </SBidsContainer>

@@ -21,7 +21,7 @@ import Lottie from '../../../atoms/Lottie';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 
 export const SubscriptionStats = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const [filter, setFilter] = useState('7_days');
   const [mySubscribersIsLoading, setMySubscribersIsLoading] =
     useState<boolean | null>(null);

@@ -32,7 +32,7 @@ interface IChat {
 
 export const Chat: React.FC<IChat> = ({ roomID }) => {
   const theme = useTheme();
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const router = useRouter();
 
   const { ref: scrollRef, inView } = useInView();
@@ -157,12 +157,15 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       }
     };
     if (socketConnection) {
-      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+      socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
+          'ChatMessageCreated',
+          socketHandlerMessageCreated
+        );
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -375,8 +378,8 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
                   : 0
               } ${
                 chatRoom.memberCount && chatRoom.memberCount > 1
-                  ? t('new-announcement.members')
-                  : t('new-announcement.member')
+                  ? t('newAnnouncement.members')
+                  : t('newAnnouncement.member')
               }`}
             </SUserName>
           </SUserDescription>

@@ -9,7 +9,7 @@ import money from '../../../public/images/svg/icons/filled/Money.svg';
 import InlineSVG from '../InlineSVG';
 
 export const MakeDecision = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
 
   return (
@@ -31,7 +31,7 @@ export const MakeDecision = () => {
       </SCashOutTopBlock>
       <Link href='/creation'>
         <SButton view='primaryGrad'>
-          {t('dashboard.earnings.makeDecision.btnText')}
+          {t('dashboard.earnings.makeDecision.button')}
         </SButton>
       </Link>
     </SCashOutContainer>

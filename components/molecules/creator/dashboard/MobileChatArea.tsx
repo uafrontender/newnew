@@ -22,7 +22,7 @@ import UserAvatar from '../../UserAvatar';
 
 const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
 
   const { ref: scrollRef, inView } = useInView();
   const user = useAppSelector((state) => state.user);
@@ -130,12 +130,15 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       }
     };
     if (socketConnection) {
-      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+      socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
+          'ChatMessageCreated',
+          socketHandlerMessageCreated
+        );
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -342,8 +345,8 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                       : 0
                   } ${
                     chatRoom.memberCount && chatRoom.memberCount > 1
-                      ? t('new-announcement.members')
-                      : t('new-announcement.member')
+                      ? t('newAnnouncement.members')
+                      : t('newAnnouncement.member')
                   }`}
             </SUserAlias>
           </SUserData>

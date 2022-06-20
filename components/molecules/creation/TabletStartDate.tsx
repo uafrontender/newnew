@@ -16,7 +16,7 @@ interface ITabletStartDate {
 
 const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
   const { id, value, onChange } = props;
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const [animate, setAnimate] = useState(value.type === 'schedule');
   const [animation, setAnimation] = useState('o-12');
 

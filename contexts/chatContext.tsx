@@ -66,7 +66,7 @@ export const ChatsProvider: React.FC = ({ children }) => {
     };
 
     if (socketConnection) {
-      socketConnection.on(
+      socketConnection?.on(
         'ChatUnreadCountsChanged',
         socketHandlerMessageCreated
       );

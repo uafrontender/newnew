@@ -11,16 +11,16 @@ import {
 } from '../../atoms/chat/styles';
 
 const AccountDeleted: React.FC = React.memo(() => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
 
   return (
     <SBottomAction>
       <SBottomActionLeft>
         <SBottomActionIcon>😞</SBottomActionIcon>
         <SBottomActionText>
-          <SBottomActionTitle>{t('account-deleted.title')}</SBottomActionTitle>
+          <SBottomActionTitle>{t('accountDeleted.title')}</SBottomActionTitle>
           <SBottomActionMessage>
-            {t('account-deleted.message')}
+            {t('accountDeleted.message')}
           </SBottomActionMessage>
         </SBottomActionText>
       </SBottomActionLeft>
@@ -32,7 +32,7 @@ const AccountDeleted: React.FC = React.memo(() => {
           console.log('Delete chat');
         }}
       >
-        {t('account-deleted.button-text')}
+        {t('accountDeleted.buttonText')}
       </SBottomActionButton>
     </SBottomAction>
   );
