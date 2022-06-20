@@ -12,6 +12,7 @@ interface IPaymentSuccessModal {
   postType: TPostType;
   isVisible: boolean;
   closeModal: () => void;
+  children?: React.ReactNode;
 }
 
 const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
