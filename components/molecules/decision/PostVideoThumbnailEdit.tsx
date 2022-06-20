@@ -316,7 +316,7 @@ const SContainer = styled.div`
   height: 100%;
   padding: 18px;
   position: relative;
-  min-height: 100vh;
+  min-height: 100%;
   background: ${(props) => props.theme.colorsThemed.background.primary};
 
   max-height: calc(100vh - 64px);
