@@ -149,9 +149,9 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
             <span>
               {isConnectedToStripe
                 ? stripeConnectStatus === 4
-                  ? t('stripe.stripeConnecting')
-                  : t('stripe.stripeConnectedLinkBtn')
-                : t('stripe.requestSetupLinkBtn')}
+                  ? t('stripe.button.stripeConnecting')
+                  : t('stripe.button.stripeConnectedLink')
+                : t('stripe.button.requestSetupLink')}
             </span>
           </SButton>
           {isConnectedToStripe && (

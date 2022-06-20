@@ -36,6 +36,8 @@ const GetPaid = () => {
         const payload = new newnewapi.EmptyRequest({});
         const res = await getMyOnboardingState(payload);
         if (res.data) {
+          console.log(res.data);
+
           setOnboardingState(res.data);
 
           dispatch(

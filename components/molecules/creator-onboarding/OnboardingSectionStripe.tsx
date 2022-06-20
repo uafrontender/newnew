@@ -160,9 +160,9 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
           <span>
             {isConnectedToStripe
               ? stripeConnectStatus === 4
-                ? t('StripeSection.stripeConnecting')
-                : t('StripeSection.stripeConnectedLinkBtn')
-              : t('StripeSection.requestSetupLinkBtn')}
+                ? t('stripeSection.button.stripeConnecting')
+                : t('stripeSection.button.stripeConnectedLinkBtn')
+              : t('stripeSection.button.requestSetupLinkBtn')}
           </span>
         </SButton>
         <SControlsDiv>

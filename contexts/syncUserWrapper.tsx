@@ -76,6 +76,8 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
         newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus.PROCESSING &&
       socketConnection
     ) {
+      console.log('listening');
+
       const handlerStripeAccountChanged = async (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.StripeAccountChanged.decode(arr);
@@ -83,6 +85,7 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
         if (decoded._isActive) {
           const payload = new newnewapi.EmptyRequest({});
           const res = await getMyOnboardingState(payload);
+          console.log(res.data);
 
           if (res.data) {
             dispatch(
