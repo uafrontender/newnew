@@ -13,6 +13,7 @@ import { useCookies } from 'react-cookie';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
+import { useUpdateEffect } from 'react-use';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
@@ -262,7 +263,7 @@ const MyProfileSettingsIndex = () => {
     },
   ];
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (!loggedIn) router.push('/');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loggedIn, router]);

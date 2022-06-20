@@ -6,7 +6,9 @@ import InlineSvg from '../../atoms/InlineSVG';
 
 import StatisticsIconFilled from '../../../public/images/svg/icons/filled/Statistics.svg';
 
-const PostVotingTab: React.FunctionComponent = ({ children }) => {
+const PostVotingTab: React.FunctionComponent<{
+  children?: React.ReactNode;
+}> = ({ children }) => {
   const theme = useTheme();
 
   return (

@@ -442,6 +442,8 @@
   "cfPost": {
     "backersStatsSection": {
       "ofBackers": "of {{ targetBackers }} backers",
+      "myBacking": "My backing:",
+      "myBacking_NEED_TRANSLATION": "My backing:",
       "my": "my",
       "pledge": "pledge"
     },
