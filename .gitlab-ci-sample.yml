@@ -58,8 +58,6 @@ cache:
 
 # Test using Cypress tests and Jest tests
 test:
-  rules:
-    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   image: cypress/browsers:node16.5.0-chrome94-ff93
   stage: test
   script:
