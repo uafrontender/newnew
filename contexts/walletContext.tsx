@@ -90,12 +90,12 @@ const WalletContextProvider: React.FC = ({ children }) => {
     };
 
     if (socketConnection && user.loggedIn) {
-      socketConnection.on('WalletBalanceChanged', handlerBalanceUpdated);
+      socketConnection?.on('WalletBalanceChanged', handlerBalanceUpdated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected && user.loggedIn) {
-        socketConnection.off('WalletBalanceChanged', handlerBalanceUpdated);
+      if (socketConnection && socketConnection?.connected && user.loggedIn) {
+        socketConnection?.off('WalletBalanceChanged', handlerBalanceUpdated);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
