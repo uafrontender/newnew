@@ -1,3 +1,5 @@
+image: node:latest
+
 stages:
   - test
 
@@ -10,7 +12,6 @@ cache:
 
 # Tests for gitlab
 test:
-  image: npm:latest
   stage: test
   script:
     - npm ci --include=dev
