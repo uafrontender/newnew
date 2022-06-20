@@ -1,0 +1,25 @@
+stages:
+  - test
+  - build
+
+# Cache using branch name
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .cache/*
+    - cache/Cypress
+    - node_modules
+    - .next
+
+# Test
+test:
+  rules:
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+  image: cypress/browsers:node16.5.0-chrome94-ff93
+  stage: test
+  script:
+    - npm ci --include=dev
+    - npm run test
+    - npm run lint
+    - npm run build
+    - npm run start & npx wait-on http://localhost:4000
