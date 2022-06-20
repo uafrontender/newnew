@@ -10,7 +10,7 @@ cache:
 
 # Tests for gitlab
 test:
-  rules:
+  image: npm:latest
   stage: test
   script:
     - npm ci --include=dev
