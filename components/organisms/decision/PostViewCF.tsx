@@ -38,6 +38,7 @@ import Headline from '../../atoms/Headline';
 import PostVotingTab from '../../molecules/decision/PostVotingTab';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import CfBackersStatsSectionFailed from '../../molecules/decision/crowdfunding/CfBackersStatsSectionFailed';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
@@ -444,13 +445,27 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
             </>
           );
         }
+        case 'failed': {
+          return (
+            <>
+              <CfBackersStatsSectionFailed
+                targetBackerCount={post.targetBackerCount}
+                currentNumBackers={currentBackers}
+                myPledgeAmount={myPledgeAmount}
+              />
+            </>
+          );
+        }
         default: {
-          <>
-            <CfCrowdfundingSuccess
-              post={post}
-              currentNumBackers={currentBackers}
-            />
-          </>;
+          return (
+            <>
+              <CfBackersStatsSection
+                targetBackerCount={post.targetBackerCount}
+                currentNumBackers={currentBackers}
+                myPledgeAmount={myPledgeAmount}
+              />
+            </>
+          );
         }
       }
 

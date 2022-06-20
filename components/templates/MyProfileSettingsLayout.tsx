@@ -4,7 +4,9 @@ import styled from 'styled-components';
 import General from './General';
 import ErrorBoundary from '../organisms/ErrorBoundary';
 
-const MyProfileSettingsLayout: React.FunctionComponent = (props) => {
+const MyProfileSettingsLayout: React.FunctionComponent<{
+  children?: React.ReactNode;
+}> = (props) => {
   const { children } = props;
 
   return (
