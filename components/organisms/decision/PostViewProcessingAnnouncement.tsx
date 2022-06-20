@@ -111,12 +111,12 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
       };
 
       if (socketConnection) {
-        socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
+        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps

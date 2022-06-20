@@ -23,6 +23,8 @@
     "react/function-component-definition": "off",
     "@typescript-eslint/no-use-before-define": "off",
     "react/default-props-match-prop-types": "off",
+    "react/require-default-props": "off",
+    "react/no-unused-prop-types": "off",
 
     // Useful, but require gradual integration
     "@typescript-eslint/ban-ts-comment": "off", // DANGEROUS PRACTICE! ignores compilation errors

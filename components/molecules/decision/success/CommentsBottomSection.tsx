@@ -357,17 +357,17 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
       };
 
       if (socketConnection) {
-        socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
-        socketConnection.on('ChatMessageDeleted', socketHandlerMessageDeleted);
+        socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
+        socketConnection?.on('ChatMessageDeleted', socketHandlerMessageDeleted);
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off(
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
             'ChatMessageCreated',
             socketHandlerMessageCreated
           );
-          socketConnection.off(
+          socketConnection?.off(
             'ChatMessageDeleted',
             socketHandlerMessageDeleted
           );

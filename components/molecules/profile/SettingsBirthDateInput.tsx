@@ -153,6 +153,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       );
     };
 
+    // eslint-disable-next-line react/no-unstable-nested-components
     const CustomInputForwardRef = forwardRef<
       HTMLInputElement,
       React.DetailedHTMLProps<
