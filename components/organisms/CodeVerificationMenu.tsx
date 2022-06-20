@@ -251,7 +251,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
             <>
               {t('heading.subHeading')}
               <br />
-              {signupEmailInput}
+              {signupEmailInput.toLowerCase()}
             </>
           ) : null}
         </SSubheading>

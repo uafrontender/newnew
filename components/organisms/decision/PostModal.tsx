@@ -113,6 +113,9 @@ interface IPostModal {
   isOpen: boolean;
   post?: newnewapi.IPost;
   manualCurrLocation?: string;
+  sessionIdFromRedirect?: string;
+  commentIdFromUrl?: string;
+  commentContentFromUrl?: string;
   handleClose: () => void;
   handleOpenAnotherPost?: (post: newnewapi.Post) => void;
   handleRemovePostFromState?: () => void;
@@ -124,6 +127,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   isOpen,
   post,
   manualCurrLocation,
+  sessionIdFromRedirect,
+  commentIdFromUrl,
+  commentContentFromUrl,
   handleClose,
   handleOpenAnotherPost,
   handleRemovePostFromState,
@@ -261,31 +267,22 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     manualCurrLocation ?? (isBrowser() ? window.location.href : '')
   );
 
-  const [sessionId, setSessionId] = useState(() =>
-    isBrowser()
-      ? new URL(window.location.href).searchParams.get('?session_id') ||
-        new URL(window.location.href).searchParams.get('session_id')
-      : undefined
+  const [sessionId, setSessionId] = useState(
+    () => sessionIdFromRedirect ?? undefined
   );
 
   const { handleSetCommentIdFromUrl, handleSetNewCommentContentFromUrl } =
     useContext(CommentFromUrlContext);
 
   useEffect(() => {
-    const commentId = isBrowser()
-      ? new URL(window.location.href).searchParams.get('?comment_id') ||
-        new URL(window.location.href).searchParams.get('comment_id')
-      : undefined;
-
-    const commentContent = isBrowser()
-      ? new URL(window.location.href).searchParams.get('?comment_content') ||
-        new URL(window.location.href).searchParams.get('comment_content')
-      : undefined;
-
-    handleSetCommentIdFromUrl?.(commentId ?? '');
-    handleSetNewCommentContentFromUrl?.(commentContent ?? '');
+    if (commentIdFromUrl) {
+      handleSetCommentIdFromUrl?.(commentIdFromUrl);
+    }
+    if (commentContentFromUrl) {
+      handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [commentIdFromUrl, commentContentFromUrl]);
 
   const resetSessionId = useCallback(
     () => setSessionId(undefined),
