@@ -1,5 +1,5 @@
 import React from 'react';
-import { AnimateSharedLayout } from 'framer-motion';
+import { LayoutGroup } from 'framer-motion';
 
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
@@ -13,13 +13,13 @@ const CreationLayout: React.FC<ICreationLayout> = (props) => {
 
   return (
     <ErrorBoundary>
-      <AnimateSharedLayout>
+      <LayoutGroup>
         <Container>
           <Row>
             <Col>{children}</Col>
           </Row>
         </Container>
-      </AnimateSharedLayout>
+      </LayoutGroup>
     </ErrorBoundary>
   );
 };

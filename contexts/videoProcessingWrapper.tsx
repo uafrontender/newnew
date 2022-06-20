@@ -70,12 +70,12 @@ const VideoProcessingWrapper: React.FunctionComponent = ({ children }) => {
 
   useEffect(() => {
     if (socketConnection) {
-      socketConnection.on('VideoProcessingProgress', handlerSocketUpdated);
+      socketConnection?.on('VideoProcessingProgress', handlerSocketUpdated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('VideoProcessingProgress', handlerSocketUpdated);
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('VideoProcessingProgress', handlerSocketUpdated);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

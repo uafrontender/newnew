@@ -83,12 +83,12 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
     };
 
     if (socketConnection) {
-      socketConnection.on('MeUpdated', handlerSocketMeUpdated);
+      socketConnection?.on('MeUpdated', handlerSocketMeUpdated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('MeUpdated', handlerSocketMeUpdated);
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('MeUpdated', handlerSocketMeUpdated);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
