@@ -407,9 +407,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     setCropCoverImage(location);
   };
 
-  const onCropCompleteCoverImage = useCallback((_, croppedAreaPixels: Area) => {
-    setCroppedAreaCoverImage(croppedAreaPixels);
-  }, []);
+  const onCropCompleteCoverImage = useCallback(
+    (_: any, croppedAreaPixels: Area) => {
+      setCroppedAreaCoverImage(croppedAreaPixels);
+    },
+    []
+  );
 
   const handleUpdateUserData = useCallback(async () => {
     if (isAPIValidateLoading) return;
@@ -594,7 +597,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   };
 
   const onCropCompleteProfileImage = useCallback(
-    (_, croppedAreaPixels: Area) => {
+    (_: any, croppedAreaPixels: Area) => {
       setCroppedAreaProfileImage(croppedAreaPixels);
     },
     []

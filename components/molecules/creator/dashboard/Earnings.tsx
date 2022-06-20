@@ -177,7 +177,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
   );
 
   const renderListItem = useCallback(
-    (item) => (
+    (item: { id: string }) => (
       <SListItem key={`list-item-earnings-${item.id}`}>
         <SListItemTitle variant={2} weight={700}>
           {t(`dashboard.earnings.list.${item.id}`)}

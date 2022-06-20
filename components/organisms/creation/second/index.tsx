@@ -350,7 +350,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       }
     }, [dispatch, post?.announcementVideoUrl, videoProcessing?.taskUuid]);
     const handleVideoUpload = useCallback(
-      async (value) => {
+      async (value: File) => {
         try {
           dispatch(setCreationFileUploadETA(100));
           dispatch(setCreationFileUploadProgress(1));

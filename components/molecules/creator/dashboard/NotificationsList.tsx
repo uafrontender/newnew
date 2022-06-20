@@ -48,7 +48,7 @@ export const NotificationsList: React.FC<IFunction> = ({
     useState<number>(0);
 
   const fetchNotification = useCallback(
-    async (args?) => {
+    async (args?: any) => {
       if (loading) return;
       setLoading(true);
       const limit: number = args && args.limit ? args.limit : defaultLimit;

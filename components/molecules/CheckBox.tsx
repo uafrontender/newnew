@@ -10,7 +10,7 @@ interface ICheckBox {
   id?: string;
   label: string;
   selected?: boolean;
-  handleChange: (e: any, id?: string) => void;
+  handleChange: (e: React.MouseEvent, id?: string) => void;
 }
 
 const CheckBox: React.FC<ICheckBox> = (props) => {
@@ -18,7 +18,7 @@ const CheckBox: React.FC<ICheckBox> = (props) => {
   const ref: any = useRef();
 
   const onClick = useCallback(
-    (e) => {
+    (e: React.MouseEvent) => {
       handleChange(e, id);
     },
     [id, handleChange]

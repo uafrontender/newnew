@@ -12,7 +12,7 @@ interface ITextArea {
   value: string;
   error?: string;
   maxlength?: number;
-  onChange: (key: string, value: string | boolean) => void;
+  onChange: (key: string, value: string) => void;
   placeholder: string;
 }
 

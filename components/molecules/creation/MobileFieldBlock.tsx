@@ -49,7 +49,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const [focused, setFocused] = useState(false);
 
   const handleChange = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       onChange(id, e.target.value);
     },
     [id, onChange]
