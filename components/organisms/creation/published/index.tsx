@@ -127,9 +127,9 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
               url += postData.multipleChoice.postUuid;
             }
 
-            router.push(url);
-
-            dispatch(clearCreation({}));
+            router.push(url).then(() => {
+              dispatch(clearCreation({}));
+            });
           }
         }
       }

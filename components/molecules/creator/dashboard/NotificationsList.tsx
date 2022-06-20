@@ -13,7 +13,7 @@ import UserAvatar from '../../UserAvatar';
 import Lottie from '../../../atoms/Lottie';
 import Caption from '../../../atoms/Caption';
 import Indicator from '../../../atoms/Indicator';
-import NoResults from '../../notifications/NoResults';
+import NoResults from './notifications/NoResults';
 import { useAppSelector } from '../../../../redux-store/store';
 import {
   getMyNotifications,

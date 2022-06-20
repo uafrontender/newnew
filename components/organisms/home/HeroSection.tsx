@@ -82,7 +82,7 @@ export const HeroSection = React.memo(() => {
               body {
                 background-color: #090813 !important;
               }
-      
+
               #top-nav-header {
                 background-color: #090813 !important;
               }
@@ -95,7 +95,8 @@ export const HeroSection = React.memo(() => {
         )}
       </Head>
       <SWrapper
-        layoutId='heroSection'
+        // I believe can be commented out now as there's no need for an animation
+        // layoutId='heroSection'
         transition={{
           ease: 'easeInOut',
           duration: 1,
