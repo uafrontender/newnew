@@ -69,6 +69,10 @@ const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({
   );
 };
 
+CreatorStripeLayout.defaultProps = {
+  hideProgressBar: undefined,
+};
+
 export default CreatorStripeLayout;
 
 const HomeLogoButton: React.FunctionComponent = () => (

@@ -10,6 +10,7 @@ import Desktop from '../molecules/header/Desktop';
 import Container from '../atoms/Grid/Container';
 
 import { useAppSelector } from '../../redux-store/store';
+import useHasMounted from '../../utils/hooks/useHasMounted';
 
 interface IHeader {
   visible: boolean;
@@ -18,6 +19,10 @@ interface IHeader {
 export const Header: React.FC<IHeader> = React.memo((props) => {
   const { visible } = props;
   const { banner, resizeMode } = useAppSelector((state) => state.ui);
+
+  const hasMounted = useHasMounted();
+
+  if (!hasMounted) return null;
 
   return (
     <SWrapper

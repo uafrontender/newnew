@@ -167,7 +167,7 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
     };
 
     if (socketConnection) {
-      socketConnection.on(
+      socketConnection?.on(
         'CreatorSubscriptionChanged',
         handlerSubscriptionUpdated
       );

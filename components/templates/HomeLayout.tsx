@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-boolean-value */
 import React from 'react';
-import { AnimateSharedLayout } from 'framer-motion';
+import { LayoutGroup } from 'framer-motion';
 
 import ErrorBoundary from '../organisms/ErrorBoundary';
 import GeneralTemplate from './General';
@@ -10,13 +10,13 @@ const HomeLayout: React.FC = (props) => {
 
   return (
     <ErrorBoundary>
-      <AnimateSharedLayout>
+      <LayoutGroup>
         <GeneralTemplate
         // restrictMaxWidth={true}
         >
           {children}
         </GeneralTemplate>
-      </AnimateSharedLayout>
+      </LayoutGroup>
     </ErrorBoundary>
   );
 };

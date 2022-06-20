@@ -72,7 +72,7 @@ export const NotificationsProvider: React.FC = ({ children }) => {
       }
     };
     if (socketConnection) {
-      socketConnection.on(
+      socketConnection?.on(
         'NotificationUnreadCountsChanged',
         socketHandlerNotificationUnreadCountsChanged
       );
