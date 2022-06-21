@@ -121,8 +121,8 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     return (
       <>
         <Modal show={show} onClose={handleClose}>
-          <SContainer>
-            <SModal onClick={preventParentClick()}>
+          <SContainer onClick={preventParentClick()}>
+            <SModal>
               <SModalHeader>
                 {isMobile && <GoBackButton onClick={handleClose} />}
                 <SModalTitle>
@@ -176,7 +176,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
           </SContainer>
         </Modal>
         <Modal show={reportSent} onClose={handleClose}>
-          <SContainer>
+          <SContainer onClick={preventParentClick()}>
             <ConformationContainer>
               <CloseButton onClick={handleClose}>
                 <InlineSvg svg={CloseIcon} />

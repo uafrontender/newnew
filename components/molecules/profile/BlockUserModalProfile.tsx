@@ -7,6 +7,7 @@ import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import getDisplayname from '../../../utils/getDisplayname';
+import preventParentClick from '../../../utils/preventParentClick';
 
 interface IBlockUserModalProfile {
   user: newnewapi.IUser;
@@ -44,7 +45,7 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
   return (
     <Modal show={confirmBlockUser} onClose={closeModal}>
       <SContainer>
-        <SModal>
+        <SModal onClick={preventParentClick()}>
           <SModalTitle>{t('modal.blockUser.title')}</SModalTitle>
           <SModalMessage>
             {t('modal.blockUser.messageFirstPart')} {getDisplayname(user)}{' '}
