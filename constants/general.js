@@ -1,15 +1,13 @@
 module.exports = {
   DEFAULT_LANGUAGE: 'en-US',
   // SUPPORTED_LANGUAGES: ['en-US', 'es-MX', 'fr'],
-  SUPPORTED_LANGUAGES: ['en-US'],
+  SUPPORTED_LANGUAGES:
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'production'
+      ? ['en-US' /*, 'es', 'zh'*/]
+      : ['en-US', 'es', 'zh'],
   DEFAULT_CURRENCY: 'usd',
   SUPPORTED_CURRENCIES: ['usd', 'eur'],
-  SUPPORTED_AUTH_PROVIDERS: [
-    'google',
-    'apple',
-    'fb',
-    'twitter',
-  ],
+  SUPPORTED_AUTH_PROVIDERS: ['google', 'apple', 'fb', 'twitter'],
   // MAX_VIDEO_SIZE: 104857600, // 100 mb
   MAX_VIDEO_SIZE: 10000000000, // 10 gb
   MIN_VIDEO_DURATION: 10, // 10 sec

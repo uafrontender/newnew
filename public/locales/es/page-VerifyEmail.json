@@ -1,0 +1,18 @@
+{
+  "meta": {
+    "title": "Verificación de correo electrónico",
+    "description": "Verificar correo electrónico"
+  },
+  "heading": {
+    "mainHeading": "Verifica tu correo electrónico",
+    "subHeading": "Por favor, introduce el código que hemos enviado a"
+  },
+  "expired": {
+    "noCodeReceived": "No recibí un código.",
+    "resendButtonText": "Reenviar código"
+  },
+  "error": {
+    "invalidCode": "Código incorrecto. Inténtalo de nuevo..."
+  },
+  "backButton": "Back"
+}
