@@ -34,7 +34,7 @@ interface ISignup {
 }
 
 const Signup: NextPage<ISignup> = ({ reason, goal, redirectURL }) => {
-  const { t } = useTranslation('sign-up');
+  const { t } = useTranslation('page-SignUp');
 
   const router = useRouter();
 
@@ -45,8 +45,6 @@ const Signup: NextPage<ISignup> = ({ reason, goal, redirectURL }) => {
 
   useEffect(() => {
     const handlerHistory = () => {
-      console.log('Popstate');
-
       const postId = window?.history?.state?.postId;
       if (postId && window?.history?.state?.fromPost) {
         router.push(`/post/${postId}`);
@@ -63,30 +61,18 @@ const Signup: NextPage<ISignup> = ({ reason, goal, redirectURL }) => {
   return (
     <>
       <Head>
-        <title>
-          {goal === 'log-in' ? t('toLogIn.meta.title') : t('meta.title')}
-        </title>
+        <title>{t(`meta.title${goal ? `-${goal}` : ''}`)}</title>
         <meta
           name='description'
-          content={
-            goal === 'log-in'
-              ? t('toLogIn.meta.description')
-              : t('meta.description')
-          }
+          content={t(`meta.description${goal ? `-${goal}` : ''}`)}
         />
         <meta
           property='og:title'
-          content={
-            goal === 'log-in' ? t('toLogIn.meta.title') : t('meta.title')
-          }
+          content={t(`meta.title${goal ? `-${goal}` : ''}`)}
         />
         <meta
           property='og:description'
-          content={
-            goal === 'log-in'
-              ? t('toLogIn.meta.description')
-              : t('meta.description')
-          }
+          content={t(`meta.description${goal ? `-${goal}` : ''}`)}
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
@@ -126,8 +112,8 @@ export default Signup;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { to, reason, redirect } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
-    'sign-up',
-    'verify-email',
+    'page-SignUp',
+    'page-VerifyEmail',
   ]);
 
   const redirectURL = redirect && !Array.isArray(redirect) ? redirect : '';

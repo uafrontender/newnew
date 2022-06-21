@@ -46,7 +46,7 @@ const ChatList: React.FC<IFunctionProps> = ({
   searchText,
   username,
 }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const { unreadCountForCreator, unreadCountForUser } = useGetChats();
@@ -77,11 +77,11 @@ const ChatList: React.FC<IFunctionProps> = ({
     () => [
       {
         id: 'chatRoomsSubs',
-        title: t('usertypes.subscribers'),
+        title: t('userTypes.subscribers'),
       },
       {
         id: 'chatRoomsCreators',
-        title: t('usertypes.subscribing'),
+        title: t('userTypes.subscribing'),
       },
     ],
     [t]
@@ -391,7 +391,7 @@ const ChatList: React.FC<IFunctionProps> = ({
   );
 
   const renderChatItem = useCallback(
-    (chat: newnewapi.IChatRoom, index) => {
+    (chat: newnewapi.IChatRoom, index: number) => {
       const localChat = chat;
       const handleItemClick = async () => {
         if (searchedRooms) setSearchedRooms(null);
@@ -446,9 +446,9 @@ const ChatList: React.FC<IFunctionProps> = ({
 
       if (chat.myRole === 2 && !lastMsg) {
         if (chat.kind === 4) {
-          lastMsg = textTrim(t('new-announcement.created'));
+          lastMsg = textTrim(t('newAnnouncement.created'));
         } else {
-          lastMsg = textTrim(t('chat.no-messages-first-line'));
+          lastMsg = textTrim(t('chat.noMessagesFirstLine'));
         }
       }
 

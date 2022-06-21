@@ -20,12 +20,9 @@ interface ICfBackersStatsSection {
 const CfBackersStatsSection: React.FunctionComponent<ICfBackersStatsSection> =
   ({ targetBackerCount, currentNumBackers, myPledgeAmount }) => {
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isTablet = ['tablet'].includes(resizeMode);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
 
     const percentage = useMemo(() => {
       const realPercentage = (currentNumBackers / targetBackerCount) * 100;
@@ -104,41 +101,20 @@ const CfBackersStatsSection: React.FunctionComponent<ICfBackersStatsSection> =
           </SProgressRingSvg>
           <SCaptionSection>
             <SHeadline variant={3}>{currentNumBackers}</SHeadline>
-            <STarget>
-              {t('CfPost.BackersStatsSection.of_backers', {
+            <STarget variant={2}>
+              {t('cfPost.backersStatsSection.ofBackers', {
                 targetBackers: formatNumber(targetBackerCount, true),
               })}
             </STarget>
-          </SCaptionSection>
-          {myPledgeAmount && !isMobile && (
-            <SMyPledgeAmount>
-              <SMyPledgeHeadline variant={6}>
+            {myPledgeAmount && (
+              <SMyPledgeAmountDiv>
+                {t('cfPost.backersStatsSection.myBacking')}
+                {` `}
                 {`$${formatNumber(myPledgeAmount.usdCents / 100 ?? 0, true)}`}
-              </SMyPledgeHeadline>
-              {isMobile && (
-                <SMyPledgeCaption variant={3}>
-                  <SSpanBold>{t('CfPost.BackersStatsSection.my')}</SSpanBold>{' '}
-                  <SSpanThin>
-                    {t('CfPost.BackersStatsSection.pledge')}
-                  </SSpanThin>
-                </SMyPledgeCaption>
-              )}
-            </SMyPledgeAmount>
-          )}
-        </SSectionContainer>
-        {myPledgeAmount && isMobile && (
-          <SMyPledgeAmount>
-            <SMyPledgeHeadline variant={4}>
-              {`$${formatNumber(myPledgeAmount.usdCents / 100 ?? 0, true)}`}
-            </SMyPledgeHeadline>
-            {isMobile && (
-              <SMyPledgeCaption variant={3}>
-                <SSpanBold>{t('CfPost.BackersStatsSection.my')}</SSpanBold>{' '}
-                <SSpanThin>{t('CfPost.BackersStatsSection.pledge')}</SSpanThin>
-              </SMyPledgeCaption>
+              </SMyPledgeAmountDiv>
             )}
-          </SMyPledgeAmount>
-        )}
+          </SCaptionSection>
+        </SSectionContainer>
       </>
     );
   };
@@ -201,47 +177,23 @@ const STarget = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
-// My pledge
-const SMyPledgeAmount = styled.div`
-  width: 100%;
+const SMyPledgeAmountDiv = styled.div`
+  background-color: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colorsThemed.background.secondary
+      : 'rgba(255, 255, 255, 0.06)'};
+  border-radius: 16px;
+  padding: 12px 24px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
+  margin-top: 8px;
 
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  padding: 12px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 24px;
 
   ${({ theme }) => theme.media.tablet} {
-    position: absolute;
-    top: 14px;
-    right: 0;
-
-    width: fit-content;
-    justify-content: center;
-
-    padding: 16px;
+    font-size: 16px;
+    line-height: 24px;
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    right: 16px;
-  }
-`;
-
-const SMyPledgeHeadline = styled(Headline)`
-  color: #ffffff;
-`;
-
-const SMyPledgeCaption = styled(Text)``;
-
-const SSpanBold = styled.span`
-  color: #ffffff;
-`;
-
-const SSpanThin = styled.span`
-  color: #ffffff;
-  opacity: 0.8;
 `;

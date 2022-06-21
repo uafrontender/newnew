@@ -16,23 +16,32 @@ import {
 } from 'bitmovin-player';
 
 import logoAnimation from '../../../public/animations/mobile_logo.json';
+import PlayIcon from '../../../public/images/svg/icons/filled/Play.svg';
 import Lottie from '../../atoms/Lottie';
-import isSafari from '../../../utils/isSafari';
+import InlineSvg from '../../atoms/InlineSVG';
 
 interface IPostBitmovinPlayer {
   id: string;
   muted?: boolean;
   resources?: newnewapi.IVideoUrls;
+  showPlayButton?: boolean;
 }
 
 export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   id,
   muted,
   resources,
+  showPlayButton,
 }) => {
   // const [init, setInit] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isPaused, setIsPaused] = useState(false);
+
+  const handleSetIsPaused = useCallback((stateValue: boolean) => {
+    setIsPaused(stateValue);
+  }, []);
 
   const playerConfig = useMemo<PlayerConfig>(
     () => ({
@@ -82,12 +91,12 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
     player?.current?.play();
   }, []);
 
-  const destroyPlayer = useCallback(() => {
+  const destroyPlayer = useCallback(async () => {
     if (player.current != null) {
       // setInit(false);
-      player.current.destroy();
+      await player.current.destroy();
     }
-  }, []);
+  }, [player]);
 
   const setupPlayer = useCallback(() => {
     player.current = new Player(playerRef.current, playerConfig);
@@ -131,22 +140,39 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   }, [player, muted, loaded]);
 
   useEffect(() => {
+    let cancel = false;
     async function load() {
       setIsLoading(true);
       // console.log(player.current);
       try {
-        await player?.current?.load(playerSource);
-        player.current?.play();
-        setLoaded(true);
-        setIsLoading(false);
+        await player?.current
+          ?.load(playerSource)
+          .then(() => {
+            if (cancel) return;
+            player.current?.play();
+            setLoaded(true);
+            setIsLoading(false);
+          })
+          .catch(() => {
+            if (cancel) return;
+            console.error('Player load failed');
+          });
       } catch (err) {
         setLoaded(true);
         setIsLoading(false);
         console.error(`Error while creating Bitmovin Player instance, ${err}`);
       }
     }
-
     load();
+    return () => {
+      cancel = true;
+    };
+  }, [playerSource]);
+
+  useEffect(() => {
+    player.current?.on(PlayerEvent.Paused, () => handleSetIsPaused(true));
+    player.current?.on(PlayerEvent.Play, () => handleSetIsPaused(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerSource]);
 
   return (
@@ -156,7 +182,7 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
         <SWrapper
           id={id}
           onClick={() => {
-            if (isSafari()) {
+            if (loaded) {
               if (player.current?.isPlaying()) {
                 player.current?.pause();
               } else {
@@ -166,6 +192,26 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
           }}
           ref={playerRef}
         />
+        {showPlayButton && isPaused && (
+          <SPlayPsuedoButton
+            onClick={() => {
+              if (loaded) {
+                if (player.current?.isPlaying()) {
+                  player.current?.pause();
+                } else {
+                  player.current?.play();
+                }
+              }
+            }}
+          >
+            <InlineSvg
+              svg={PlayIcon}
+              width='32px'
+              height='32px'
+              fill='#FFFFFF'
+            />
+          </SPlayPsuedoButton>
+        )}
       </SVideoWrapper>
       {isLoading && (
         <SLoader>
@@ -190,6 +236,7 @@ export default PostBitmovinPlayer;
 PostBitmovinPlayer.defaultProps = {
   muted: true,
   resources: {},
+  showPlayButton: false,
 };
 
 const SContent = styled.div`
@@ -258,4 +305,27 @@ const SLoader = styled.div`
   top: calc(50% - 30px);
   left: calc(50% - 32.5px);
   z-index: 1;
+`;
+
+const SPlayPsuedoButton = styled.button`
+  position: absolute;
+  top: calc(50% - 32px);
+  left: calc(50% - 32px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 64px;
+  height: 64px;
+  background: rgba(11, 10, 19, 0.65);
+  border-radius: 21px;
+  border: transparent;
+
+  cursor: pointer;
+
+  &:focus,
+  &:active {
+    outline: none;
+  }
 `;

@@ -27,7 +27,7 @@ interface ISorting {
 
 export const Sorting: React.FC<ISorting> = (props) => {
   const { category, options, selected, onChange } = props;
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('page-SeeMore');
   const ref: any = useRef();
   const theme = useTheme();
   const [animate, setAnimate] = useState(false);
@@ -105,7 +105,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
         onClick={handleToggleSortingClick}
       >
         <SButtonContent>
-          {/* {t('sort-title')} */}
+          {/* {t('sorting.title')} */}
           {!!selectedCount && isMobile && (
             <SSelectedCounter>
               <SSelectedCounterText variant={2} weight={700}>
@@ -134,7 +134,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
           <SMobileListContainer focused={focused}>
             <SMobileList>
               <STopLine>
-                <Headline variant={6}>{t('sort-title')}</Headline>
+                <Headline variant={6}>{t('sorting.title')}</Headline>
                 <SCloseIconWrapper onClick={handleCloseClick}>
                   <InlineSVG
                     svg={closeIcon}
@@ -147,7 +147,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
               {options.map(renderItem)}
             </SMobileList>
             <SCancelButton withShadow view='primaryGrad' onClick={handleSubmit}>
-              {t('button-show-results')}
+              {t('sorting.button.showResults')}
             </SCancelButton>
           </SMobileListContainer>
         </Modal>

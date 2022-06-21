@@ -18,14 +18,14 @@ const SubscribersTable = dynamic(
   () => import('../../../molecules/creator/dashboard/SubscribersTable')
 );
 const NoResults = dynamic(
-  () => import('../../../molecules/creator/dashboard/NoResults')
+  () => import('../../../molecules/creator/dashboard/subscriptions/NoResults')
 );
 const Navigation = dynamic(
   () => import('../../../molecules/creator/Navigation')
 );
 
 export const Subscriptions: React.FC = React.memo(() => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -110,7 +110,7 @@ export const Subscriptions: React.FC = React.memo(() => {
             >
               <a>
                 <Button view='primaryGrad'>
-                  {t('subscriptions.message-all')}
+                  {t('subscriptions.messageAll')}
                 </Button>
               </a>
             </Link>

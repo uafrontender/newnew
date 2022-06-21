@@ -10,7 +10,7 @@ import InlineSvg from '../InlineSVG';
 import assets from '../../../constants/assets';
 
 const SubsFeatures = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
 
   return (
     <SContainer>

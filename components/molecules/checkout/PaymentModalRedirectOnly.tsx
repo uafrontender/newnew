@@ -23,6 +23,7 @@ interface IPaymentModalRedirectOnly {
   amount?: string;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
+  children: React.ReactNode;
   onClose: () => void;
   handlePayWithCardStripeRedirect?: () => void;
 }
@@ -33,12 +34,12 @@ const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
   amount,
   showTocApply,
   bottomCaption,
+  children,
   onClose,
   handlePayWithCardStripeRedirect,
-  children,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('payment-modal');
+  const { t } = useTranslation('modal-PaymentModal');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

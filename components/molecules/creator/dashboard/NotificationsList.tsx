@@ -13,7 +13,7 @@ import UserAvatar from '../../UserAvatar';
 import Lottie from '../../../atoms/Lottie';
 import Caption from '../../../atoms/Caption';
 import Indicator from '../../../atoms/Indicator';
-import NoResults from '../../notifications/NoResults';
+import NoResults from './notifications/NoResults';
 import { useAppSelector } from '../../../../redux-store/store';
 import {
   getMyNotifications,
@@ -48,7 +48,7 @@ export const NotificationsList: React.FC<IFunction> = ({
     useState<number>(0);
 
   const fetchNotification = useCallback(
-    async (args?) => {
+    async (args?: any) => {
       if (loading) return;
       setLoading(true);
       const limit: number = args && args.limit ? args.limit : defaultLimit;
@@ -187,7 +187,7 @@ export const NotificationsList: React.FC<IFunction> = ({
 
   const renderNotificationItem = useCallback(
     (item: newnewapi.INotification) => (
-      <Link href={getUrl(item.target)}>
+      <Link href={getUrl(item.target)} key={item.id as number}>
         <a>
           <SNotificationItem key={`notification-item-${item.id}`}>
             {item.content?.relatedUser?.uuid !== user.userData?.userUuid ? (

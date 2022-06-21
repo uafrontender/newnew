@@ -35,7 +35,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   handleAddPostToState,
 }) => {
   const router = useRouter();
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('common');
   const user = useAppSelector((state) => state.user);
 
   // Share
@@ -79,6 +79,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
             `${process.env.NEXT_PUBLIC_APP_URL}/post/${postUuid}`
           )}`
         );
+        return;
       }
       const markAsFavoritePayload = new newnewapi.MarkPostRequest({
         markAs: !isFollowingDecision
@@ -145,7 +146,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
         >
           <SButton onClick={() => handleCopyLink()}>
             <Text variant={3}>
-              {isCopiedUrl ? t('ellipse.link-copied') : t('ellipse.copy-link')}
+              {isCopiedUrl ? t('ellipse.linkCopied') : t('ellipse.copyLink')}
             </Text>
           </SButton>
           <SSeparator />
@@ -155,10 +156,10 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
                 {!isFollowingLoading && (
                   <Text variant={3}>
                     {!isFollowingDecision
-                      ? t('ellipse.follow-decision', {
+                      ? t('ellipse.followDecision', {
                           postType: t(`postType.${postType}`),
                         })
-                      : t('ellipse.unfollow-decision', {
+                      : t('ellipse.unFollowDecision', {
                           postType: t(`postType.${postType}`),
                         })}
                   </Text>
@@ -186,7 +187,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
           }}
           onClick={() => onClose()}
         >
-          {t('Cancel')}
+          {t('ellipse.cancel')}
         </Button>
       </SWrapper>
     </Modal>

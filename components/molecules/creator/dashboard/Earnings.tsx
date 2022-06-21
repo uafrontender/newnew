@@ -27,7 +27,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
   hasMyPosts,
   earnings,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const [filter, setFilter] = useState('7_days');
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [myEarnings, setMyEarnings] =
@@ -177,7 +177,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
   );
 
   const renderListItem = useCallback(
-    (item) => (
+    (item: { id: string }) => (
       <SListItem key={`list-item-earnings-${item.id}`}>
         <SListItemTitle variant={2} weight={700}>
           {t(`dashboard.earnings.list.${item.id}`)}
@@ -225,7 +225,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
         </STotalTextWrapper>
         {/* <STotalInsights>
           <STotalInsightsText>
-            {t(`dashboard.earnings.${isMobile ? 'insights' : 'insights_tablet'}`)}
+            {t(`dashboard.earnings.${isMobile ? 'insights' : 'insightsTablet'}`)}
           </STotalInsightsText>
           <STotalInsightsArrow
             svg={arrowRightIcon}
@@ -248,8 +248,8 @@ export const Earnings: React.FC<IFunctionProps> = ({
         />
       ) : hasMyPosts && myEarnings?.nextCashoutAmount ? (
         <CashOut
-          nextCashoutAmount={myEarnings?.nextCashoutAmount}
-          nextCashoutDate={myEarnings?.nextCashoutDate}
+          nextCashOutAmount={myEarnings?.nextCashoutAmount}
+          nextCashOutDate={myEarnings?.nextCashoutDate}
         />
       ) : (
         <MakeDecision />

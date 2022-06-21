@@ -49,7 +49,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
   handleSetPosts,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
@@ -162,7 +162,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
               />
             </SPrivateLock>
             <SAccountPrivateText variant={1}>
-              {t('AccountPrivate', {
+              {t('accountPrivate', {
                 username: user.nickname ?? user.username,
               })}
             </SAccountPrivateText>
@@ -185,7 +185,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
             {posts && posts.length === 0 && !isLoading && (
               <NoContentCard>
                 <NoContentDescription>
-                  {t('Activity.no-content.description')}
+                  {t('Activity.noContent.description')}
                 </NoContentDescription>
               </NoContentCard>
             )}
@@ -245,10 +245,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'profile',
-    'home',
-    'decision',
-    'payment-modal',
+    'page-Profile',
+    'component-PostCard',
+    'modal-Post',
+    'modal-PaymentModal',
   ]);
 
   if (!username || Array.isArray(username)) {

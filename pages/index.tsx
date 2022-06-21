@@ -50,7 +50,7 @@ interface IHome {
 
 // No sense to memorize
 const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
 
@@ -193,6 +193,11 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     if (user.loggedIn) {
       fetchFYPosts();
     }
+
+    return () => {
+      setPostModalOpen(false);
+      setDisplayedPost(undefined);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -338,10 +343,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   return (
     <>
       <Head>
-        <title>{t('home.meta.title')}</title>
-        <meta name='description' content={t('home.meta.description')} />
-        <meta property='og:title' content={t('home.meta.title')} />
-        <meta property='og:description' content={t('home.meta.description')} />
+        <title>{t('meta.title')}</title>
+        <meta name='description' content={t('meta.description')} />
+        <meta property='og:title' content={t('meta.title')} />
+        <meta property='og:description' content={t('meta.description')} />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       {!user.loggedIn && <HeroSection />}
@@ -355,7 +360,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
         !collectionFYError &&
         (collectionFYInitialLoading || collectionFY?.length > 0) && (
           <CardsSection
-            title={t('for-you-block-title')}
+            title={t('cardsSection.title.for-you')}
             category='for-you'
             collection={collectionFY}
             loading={collectionFYInitialLoading}
@@ -364,7 +369,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
         )}
       {!collectionACError && (
         <CardsSection
-          title={t('ac-block-title')}
+          title={t('cardsSection.title.ac')}
           category='ac'
           collection={collectionAC}
           loading={collectionACInitialLoading}
@@ -377,8 +382,8 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
                     ? assets.creation.lightAcAnimated
                     : assets.creation.darkAcAnimated
                 }
-                title={t('ac-block-tutorial-card.title')}
-                caption={t('ac-block-tutorial-card.caption')}
+                title={t('tutorial.ac.title')}
+                caption={t('tutorial.ac.caption')}
                 imageStyle={{
                   position: 'relative',
                   left: '10%',
@@ -391,7 +396,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       )}
       {!collectionMCError && (
         <CardsSection
-          title={t('mc-block-title')}
+          title={t('cardsSection.title.mc')}
           category='mc'
           collection={collectionMC}
           loading={collectionMCInitialLoading}
@@ -404,8 +409,8 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
                     ? assets.creation.lightMcAnimated
                     : assets.creation.darkMcAnimated
                 }
-                title={t('mc-block-tutorial-card.title')}
-                caption={t('mc-block-tutorial-card.caption')}
+                title={t('tutorial.mc.title')}
+                caption={t('tutorial.mc.caption')}
               />
             ) : undefined
           }
@@ -413,7 +418,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       )}
       {!collectionCFError && (
         <CardsSection
-          title={t('cf-block-title')}
+          title={t('cardsSection.title.cf')}
           category='cf'
           collection={collectionCF}
           loading={collectionCFInitialLoading}
@@ -426,8 +431,8 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
                     ? assets.creation.lightCfAnimated
                     : assets.creation.darkCfAnimated
                 }
-                title={t('cf-block-tutorial-card.title')}
-                caption={t('cf-block-tutorial-card.caption')}
+                title={t('tutorial.cf.title')}
+                caption={t('tutorial.cf.caption')}
                 imageStyle={{
                   position: 'relative',
                   left: '5%',
@@ -441,7 +446,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       collectionBiggestInitialLoading &&
       collectionBiggest?.length > 0 ? (
         <CardsSection
-          title={t('biggest-block-title')}
+          title={t('cardsSection.title.biggest')}
           category='biggest'
           collection={collectionBiggest}
           loading={collectionBiggestInitialLoading}
@@ -493,10 +498,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'home',
-    'decision',
-    'payment-modal',
-    'chat',
+    'page-Home',
+    'component-PostCard',
+    'modal-Post',
+    'modal-PaymentModal',
+    'page-Chat',
   ]);
 
   const top10payload = new newnewapi.EmptyRequest({});

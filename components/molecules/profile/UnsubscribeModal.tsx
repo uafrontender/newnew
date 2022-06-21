@@ -6,19 +6,22 @@ import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import { unsubscribeFromCreator } from '../../../api/endpoints/subscription';
 import getDisplayname from '../../../utils/getDisplayname';
+import preventParentClick from '../../../utils/preventParentClick';
 
 interface IUnsubscribeModal {
   user: newnewapi.IUser;
   confirmUnsubscribe: boolean;
   closeModal: () => void;
+  onUnsubcribeSuccess?: () => void;
 }
 
 const UnsubscribeModal: React.FC<IUnsubscribeModal> = ({
   confirmUnsubscribe,
   user,
   closeModal,
+  onUnsubcribeSuccess,
 }) => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   const handleUnsubscribeCreator = async () => {
     try {
@@ -27,6 +30,7 @@ const UnsubscribeModal: React.FC<IUnsubscribeModal> = ({
       });
       const res = await unsubscribeFromCreator(payload);
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+      onUnsubcribeSuccess?.();
       closeModal();
     } catch (err) {
       console.error(err);
@@ -37,20 +41,20 @@ const UnsubscribeModal: React.FC<IUnsubscribeModal> = ({
   };
   return (
     <Modal show={confirmUnsubscribe} onClose={closeModal}>
-      <SContainer>
+      <SContainer onClick={preventParentClick()}>
         <SModal>
-          <SModalTitle>{t('modal.unsubscribe-user.title')}</SModalTitle>
+          <SModalTitle>{t('modal.unsubscribeUser.title')}</SModalTitle>
           <SModalMessage>
-            {t(`modal.unsubscribe-user.message`, {
+            {t(`modal.unsubscribeUser.message`, {
               username: getDisplayname(user),
             })}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>
-              {t('modal.unsubscribe-user.button-cancel')}
+              {t('modal.unsubscribeUser.button.cancel')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmClick}>
-              {t('modal.unsubscribe-user.button-confirm')}
+              {t('modal.unsubscribeUser.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>

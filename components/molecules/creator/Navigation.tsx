@@ -14,13 +14,20 @@ import walletOutlinedIcon from '../../../public/images/svg/icons/outlined/Wallet
 import Button from '../../atoms/Button';
 import { useAppSelector } from '../../../redux-store/store';
 
+interface NavigationItem {
+  url: string;
+  label: string;
+  iconFilled: any;
+  iconOutlined: any;
+}
+
 export const Navigation = () => {
   const theme = useTheme();
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
-  const collection = useMemo(
+  const collection: NavigationItem[] = useMemo(
     () => [
       {
         url: '/creator/dashboard',
@@ -48,25 +55,23 @@ export const Navigation = () => {
   );
 
   const renderItem = useCallback(
-    (item) => {
+    (item: NavigationItem) => {
       const active = router.route.includes(item.url);
       return (
         <Link href={item.url} key={item.url}>
-          <a>
-            <SItem active={active}>
-              <SInlineSVG
-                svg={active ? item.iconFilled : item.iconOutlined}
-                fill={
-                  active
-                    ? theme.colorsThemed.accent.blue
-                    : theme.colorsThemed.text.tertiary
-                }
-                width='24px'
-                height='24px'
-              />
-              <SLabel>{item.label}</SLabel>
-            </SItem>
-          </a>
+          <SItem active={active}>
+            <SInlineSVG
+              svg={active ? item.iconFilled : item.iconOutlined}
+              fill={
+                active
+                  ? theme.colorsThemed.accent.blue
+                  : theme.colorsThemed.text.tertiary
+              }
+              width='24px'
+              height='24px'
+            />
+            <SLabel>{item.label}</SLabel>
+          </SItem>
         </Link>
       );
     },
@@ -82,7 +87,7 @@ export const Navigation = () => {
       {collection.map(renderItem)}
       <Link href='/creation'>
         <a>
-          <Button>{t('navigation.new-post')}</Button>
+          <Button>{t('navigation.newPost')}</Button>
         </a>
       </Link>
     </SContainer>

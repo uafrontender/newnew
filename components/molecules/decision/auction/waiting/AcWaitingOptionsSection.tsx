@@ -24,7 +24,7 @@ interface IAcWaitingOptionsSection {
 
 const AcWaitingOptionsSection: React.FunctionComponent<IAcWaitingOptionsSection> =
   ({ post, heightDelta }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const { user } = useAppSelector((state) => state);
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -236,7 +236,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<IAcWaitingOptionsSection>
               view='secondary'
               onClick={() => fetchBids(optionsNextPageToken)}
             >
-              {t('loadMoreBtn')}
+              {t('loadMoreButton')}
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>

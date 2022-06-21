@@ -22,7 +22,7 @@ interface IResponseTimer {
 const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
   timestampSeconds,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -86,7 +86,7 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
             <span> </span>
           </>
         )}
-        {t('expiresResponse.left_to_respond')}
+        {t('expiresResponse.leftToRespond')}
       </SWrapper>
     </SContainer>
   );

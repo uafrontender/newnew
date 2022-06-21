@@ -18,7 +18,11 @@ const ChatsContext = createContext({
   unreadCount: 0,
 });
 
-export const ChatsProvider: React.FC = ({ children }) => {
+interface IChatsProvider {
+  children: React.ReactNode;
+}
+
+export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   const user = useAppSelector((state) => state.user);
   const [unreadCountForUser, setUnreadCountForUser] = useState<number>(0);
   const [unreadCountForCreator, setUnreadCountForCreator] = useState<number>(0);
@@ -66,7 +70,7 @@ export const ChatsProvider: React.FC = ({ children }) => {
     };
 
     if (socketConnection) {
-      socketConnection.on(
+      socketConnection?.on(
         'ChatUnreadCountsChanged',
         socketHandlerMessageCreated
       );

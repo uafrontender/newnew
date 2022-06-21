@@ -21,7 +21,7 @@ import assets from '../constants/assets';
 interface IVerifyNewEmail {}
 
 const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
-  const { t } = useTranslation('verify-email');
+  const { t } = useTranslation('page-VerifyEmail');
 
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -83,12 +83,12 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
     };
 
     if (socketConnection) {
-      socketConnection.on('MeUpdated', handlerSocketMeUpdated);
+      socketConnection?.on('MeUpdated', handlerSocketMeUpdated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('MeUpdated', handlerSocketMeUpdated);
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('MeUpdated', handlerSocketMeUpdated);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -128,7 +128,7 @@ export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
-    'verify-email',
+    'page-VerifyEmail',
   ]);
 
   return {

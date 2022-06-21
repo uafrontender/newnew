@@ -40,7 +40,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
 
   const topItems: TItem[] = [
     {
-      key: 'how-it-works',
+      key: 'howItWorks',
       url: '/how-it-works',
       // external: true,
     },
@@ -112,7 +112,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
             </SSvgHolder>
           ) : null}
           <SBlockOption>
-            {!item.email ? t(`footer-${item.key}`) : item.url}
+            {!item.email ? t(`footer.${item.key}`) : item.url}
           </SBlockOption>
         </SExternalLink>
       );
@@ -125,7 +125,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
         passHref
       >
         <SBlockOption target='_blank'>
-          {!item.email ? t(`footer-${item.key}`) : item.url}
+          {!item.email ? t(`footer.${item.key}`) : item.url}
         </SBlockOption>
       </Link>
     );
@@ -149,22 +149,20 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
               </SIconHolder>
               <STopContent>
                 <SBlock>
-                  <SBlockTitle weight={700}>
-                    {t('footer-top-title')}
-                  </SBlockTitle>
+                  <SBlockTitle weight={700}>{t('footer.topTitle')}</SBlockTitle>
                   {topItems.map(renderItem)}
                 </SBlock>
                 {isMobile && <SSeparator />}
                 <SBlock>
                   <SBlockTitle weight={700}>
-                    {t('footer-center-title')}
+                    {t('footer.centerTitle')}
                   </SBlockTitle>
                   {centerItems.map(renderItem)}
                 </SBlock>
                 {/* {isMobile && <SSeparator />} */}
                 {/* <SBlock>
                   <SBlockTitle weight={700}>
-                    {t('footer-bottom-title')}
+                    {t('footer.bottomTitle')}
                   </SBlockTitle>
                   <SBlockRow>
                     <Link href="https://www.instagram.com" passHref>
@@ -207,19 +205,19 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
               <SBlockBottomRow>
                 <SLeftBlock>
                   <SBottomBlockOptionInc>
-                    {t('footer-inc')}
+                    {t('footer.inc')}
                   </SBottomBlockOptionInc>
                   <SBottomBlockOption
                     href='https://terms.newnew.co'
                     target='_blank'
                   >
-                    {t('footer-terms')}
+                    {t('footer.terms')}
                   </SBottomBlockOption>
                   <SBottomBlockOption
                     href='https://privacy.newnew.co'
                     target='_blank'
                   >
-                    {t('footer-privacy')}
+                    {t('footer.privacy')}
                   </SBottomBlockOption>
                 </SLeftBlock>
                 <SRightBlock>

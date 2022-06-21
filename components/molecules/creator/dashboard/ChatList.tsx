@@ -19,7 +19,7 @@ import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
 
 export const ChatList = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
@@ -198,9 +198,9 @@ export const ChatList = () => {
 
       if (!lastMsg) {
         if (chat.kind === 4) {
-          lastMsg = textTrim(t('new-announcement.created'));
+          lastMsg = textTrim(t('newAnnouncement.created'));
         } else {
-          lastMsg = textTrim(t('chat.no-messages-first-line'));
+          lastMsg = textTrim(t('chat.noMessagesFirstLine'));
         }
       }
 

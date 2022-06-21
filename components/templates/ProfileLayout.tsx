@@ -42,13 +42,16 @@ import { markUser } from '../../api/endpoints/user';
 
 import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
 import UserEllipseModal from '../molecules/profile/UserEllipseModal';
-import BlockUserModal from '../molecules/profile/BlockUserModalProfile';
+import BlockUserModalProfile from '../molecules/profile/BlockUserModalProfile';
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
 import BackButton from '../molecules/profile/BackButton';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 import UnsubscribeModal from '../molecules/profile/UnsubscribeModal';
+import getGenderPronouns, {
+  isGenderPronounsDefined,
+} from '../../utils/genderPronouns';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -63,6 +66,7 @@ interface IProfileLayout {
   postsCachedActivityFilter?: newnewapi.Post.Filter;
   postsCachedActivityPageToken?: string | null | undefined;
   postsCachedActivityCount?: number;
+  children: React.ReactNode;
 }
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
@@ -80,7 +84,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 }) => {
   const router = useRouter();
   const theme = useTheme();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -479,7 +483,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 height={isMobileOrTablet ? '16px' : '24px'}
               />
             </SSVGContainer>
-            {t('ProfileLayout.buttons.favorites')}
+            {t('profileLayout.buttons.favorites')}
           </SFavoritesButton> */}
           <SMoreButton
             view='transparent'
@@ -494,7 +498,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 height={isMobileOrTablet ? '16px' : '24px'}
               />
             </SSVGContainer>
-            {t('ProfileLayout.buttons.more')}
+            {t('profileLayout.buttons.more')}
           </SMoreButton>
           {!isMobile && (
             <UserEllipseMenu
@@ -526,7 +530,18 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               alignItems: 'center',
             }}
           >
-            <SUsername variant={4}>{user.nickname}</SUsername>
+            <SUsernameWrapper>
+              <SUsername variant={4}>{user.nickname}</SUsername>
+              {isGenderPronounsDefined(user.genderPronouns) && (
+                <SGenderPronouns variant={2}>
+                  {t(
+                    `genderPronouns.${
+                      getGenderPronouns(user.genderPronouns!!).name
+                    }`
+                  )}
+                </SGenderPronouns>
+              )}
+            </SUsernameWrapper>
             <SShareDiv>
               <SUsernameButton
                 view='tertiary'
@@ -560,7 +575,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 onClick={() => handleCopyLink()}
               >
                 {isCopiedUrl ? (
-                  t('ProfileLayout.buttons.copied')
+                  t('profileLayout.buttons.copied')
                 ) : (
                   <InlineSvg
                     svg={ShareIconFilled}
@@ -580,7 +595,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 }
               >
                 <SSendButton withShadow view='primaryGrad'>
-                  {t('ProfileLayout.buttons.sendMessage')}
+                  {t('profileLayout.buttons.sendMessage')}
                 </SSendButton>
               </Link>
             ) : null}
@@ -623,7 +638,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         user={user}
         closeModal={() => setUnsubscribeModalOpen(false)}
       />
-      <BlockUserModal
+      <BlockUserModalProfile
         confirmBlockUser={blockUserModalOpen}
         user={user}
         closeModal={() => setBlockUserModalOpen(false)}
@@ -631,10 +646,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       <ReportModal
         show={confirmReportUser}
         reportedDisplayname={
-          currentUser.userData
-            ? currentUser.userData.nickname ||
-              `@${currentUser.userData.username}`
-            : ''
+          user.nickname ? user.nickname || `@${user.username}` : ''
         }
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
@@ -678,10 +690,18 @@ const SGeneral = styled(General)`
   }
 `;
 
+const SUsernameWrapper = styled.div`
+  margin-bottom: 12px;
+`;
+
 const SUsername = styled(Headline)`
   text-align: center;
+`;
 
-  margin-bottom: 12px;
+const SGenderPronouns = styled(Text)`
+  text-align: center;
+  font-weight: 400;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SShareDiv = styled.div`

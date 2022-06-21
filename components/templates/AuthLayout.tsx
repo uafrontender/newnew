@@ -23,7 +23,13 @@ export const AuthLayoutContext = createContext({
   setShouldHeroUnmount: (newValue: boolean) => {},
 });
 
-const AuthLayoutContextProvider: React.FC = ({ children }) => {
+interface IAuthLayoutContextProvider {
+  children: React.ReactNode;
+}
+
+const AuthLayoutContextProvider: React.FC<IAuthLayoutContextProvider> = ({
+  children,
+}) => {
   const [shouldHeroUnmount, setShouldHeroUnmount] = useState(false);
 
   const contextValue = useMemo(
@@ -43,7 +49,9 @@ const AuthLayoutContextProvider: React.FC = ({ children }) => {
   );
 };
 
-export interface IAuthLayout {}
+export interface IAuthLayout {
+  children: React.ReactNode;
+}
 
 const SAuthLayout = styled.div`
   position: relative;

@@ -71,7 +71,7 @@ const ShareMenu: React.FC<IShareMenu> = ({
         >
           <SItemButtonWide onClick={handlerCopy}>
             <InlineSvg svg={copyIcon} width='24px' height='24px' />
-            {isCopiedUrl ? t('my-link-copied') : t('my-link')}
+            {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}
           </SItemButtonWide>
         </SContainer>
       )}

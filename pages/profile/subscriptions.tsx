@@ -52,7 +52,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
 }) => {
   const { isCreatorsImSubscribedToLoading, creatorsImSubscribedTo } =
     useGetSubscriptions();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   return (
     <div>
@@ -77,11 +77,12 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
               collection={creatorsImSubscribedTo}
               subscribedTo
               showSubscriptionPrice
+              withEllipseMenu
             />
           ) : (
             <NoContentCard>
               <NoContentDescription>
-                {t('Subscriptions.no-content.description')}
+                {t('Subscriptions.noContent.description')}
               </NoContentDescription>
             </NoContentCard>
           )}
@@ -116,10 +117,10 @@ export async function getServerSideProps(
   try {
     const translationContext = await serverSideTranslations(context.locale!!, [
       'common',
-      'profile',
-      'home',
-      'decision',
-      'payment-modal',
+      'page-Profile',
+      'component-PostCard',
+      'modal-Post',
+      'modal-PaymentModal',
     ]);
 
     return {

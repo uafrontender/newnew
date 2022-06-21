@@ -20,7 +20,13 @@ import {
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { loadStateLS, removeStateLS, saveStateLS } from '../utils/localStorage';
 
-const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
+interface ISyncUserWrapper {
+  children: React.ReactNode;
+}
+
+const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
+  children,
+}) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
 
@@ -79,6 +85,7 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
               },
               countryCode: data.me?.countryCode,
               usernameChangedAt: data.me.usernameChangedAt,
+              genderPronouns: data.me.genderPronouns,
 
               options: {
                 isActivityPrivate: data.me?.options?.isActivityPrivate,

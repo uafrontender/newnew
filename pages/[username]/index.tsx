@@ -56,7 +56,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   handleSetPosts,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
   const [displayedPost, setDisplayedPost] =
@@ -175,7 +175,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
               />
             </SPrivateLock>
             <SAccountPrivateText variant={1}>
-              {t('AccountPrivate', {
+              {t('accountPrivate', {
                 username: user.nickname ?? user.username,
               })}
             </SAccountPrivateText>
@@ -201,7 +201,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
               !isLoading && (
                 <NoContentCard>
                   <NoContentDescription>
-                    {t('CreatorsDecisions.no-content.description')}
+                    {t('CreatorsDecisions.noContent.description')}
                   </NoContentDescription>
                 </NoContentCard>
               )}
@@ -212,16 +212,16 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
               !isLoading && (
                 <NoContentCard>
                   <NoContentDescription>
-                    {t('UserProfile.no-content.description', {
+                    {t('UserProfile.noContent.description', {
                       username: getDisplayname(user),
                     })}
                   </NoContentDescription>
                   <NoContentSuggestion>
-                    {t('UserProfile.no-content.suggestion')}
+                    {t('UserProfile.noContent.suggestion')}
                   </NoContentSuggestion>
                   <Link href='/'>
                     <SButton view='primaryGrad'>
-                      {t('UserProfile.no-content.button')}
+                      {t('UserProfile.noContent.button')}
                     </SButton>
                   </Link>
                 </NoContentCard>
@@ -292,10 +292,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'profile',
-    'home',
-    'decision',
-    'payment-modal',
+    'page-Profile',
+    'component-PostCard',
+    'modal-Post',
+    'modal-PaymentModal',
   ]);
 
   if (!username || Array.isArray(username)) {
