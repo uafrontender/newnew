@@ -87,6 +87,12 @@ const MEDIA_ICONS = {
   'forbes-c': ForbesCLogo,
 };
 
+type StaticImageData = {
+  src: string;
+  height: number;
+  width: number;
+};
+
 const ICONS: Record<TColorMode, { [key: string]: StaticImageData }> = {
   light: {
     votes: VotesIconLight,
