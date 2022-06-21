@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "title": "NewNew — 出價、投票和眾籌帖子",
+    "description": "帖子人們接下來做什麼，與社區一起投票、出價投標和眾籌，觀看人們在NewNew上實際做的事情"
+  },
+  "cardsSection": {
+    "title": {
+      "biggest": "史上最棒",
+      "for-you": "為你而設",
+      "ac": "超大Event",
+      "mc": "熱門Superpoll",
+      "cf": "熱門Goal"
+    },
+    "button": {
+      "showMore": "查看更多",
+      "showMoreCreator": "查看更多{{name}}的動態",
+      "creatorOnTheRise": "冉冉上升"
+    }
+  },
+  "tutorial": {
+    "ac": {
+      "title": "Event",
+      "caption": "給創作者發送出價，說明你想讓他們做什麼，你願意花多少錢，看他們是否願意接受你的出價。"
+    },
+    "mc": {
+      "title": "Superpoll",
+      "caption": "創作者發起Superpoll，你花錢去投票，時間到了之後，看創作者完成得到最多票數的選項。"
+    },
+    "cf": {
+      "title": "Goal",
+      "caption": "與其他人集資，支持你喜歡的創作者的Goal。如果支持這個Goal的人足夠多，你就會看著創作者照做。"
+    }
+  }
+}
