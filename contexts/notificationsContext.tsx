@@ -16,7 +16,13 @@ const NotificationsContext = createContext({
   fetchNotificationCount: () => {},
 });
 
-export const NotificationsProvider: React.FC = ({ children }) => {
+interface INotificationsProvider {
+  children: React.ReactNode;
+}
+
+export const NotificationsProvider: React.FC<INotificationsProvider> = ({
+  children,
+}) => {
   const user = useAppSelector((state) => state.user);
   const [unreadNotificationCount, setUnreadNotificationCount] =
     useState<number>(0);

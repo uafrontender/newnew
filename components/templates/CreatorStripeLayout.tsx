@@ -15,6 +15,7 @@ import HeroVisual from './HeroVisual';
 
 export interface ICreatorStripeLayout {
   hideProgressBar?: boolean;
+  children: React.ReactNode;
 }
 
 const SCreatorStripeLayout = styled.div`

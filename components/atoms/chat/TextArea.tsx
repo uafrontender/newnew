@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { ChangeEvent, useCallback } from 'react';
 import styled from 'styled-components';
 import TextAreaAutoSize from 'react-textarea-autosize';
 
@@ -12,7 +12,7 @@ interface ITextArea {
   value: string;
   error?: string;
   maxlength?: number;
-  onChange: (key: string, value: string | boolean) => void;
+  onChange: (key: string, value: string) => void;
   placeholder: string;
 }
 
@@ -20,7 +20,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
   const { id = '', maxlength, value, error, onChange, placeholder } = props;
 
   const handleChange = useCallback(
-    (e) => {
+    (e: ChangeEvent<HTMLTextAreaElement>) => {
       onChange(id, e.target.value);
     },
     [id, onChange]

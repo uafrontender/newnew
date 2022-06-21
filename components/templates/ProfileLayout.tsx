@@ -66,7 +66,7 @@ interface IProfileLayout {
   postsCachedActivityFilter?: newnewapi.Post.Filter;
   postsCachedActivityPageToken?: string | null | undefined;
   postsCachedActivityCount?: number;
-  children?: React.ReactNode;
+  children: React.ReactNode;
 }
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
