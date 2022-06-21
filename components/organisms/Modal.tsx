@@ -13,8 +13,8 @@ interface IModal {
   overlaydim?: boolean;
   additionalz?: number;
   custombackdropfiltervalue?: number;
-  onClose?: () => void;
   children: ReactNode;
+  onClose?: () => void;
 }
 
 const Modal: React.FC<IModal> = React.memo((props) => {
@@ -24,8 +24,8 @@ const Modal: React.FC<IModal> = React.memo((props) => {
     overlaydim,
     additionalz,
     custombackdropfiltervalue,
-    onClose,
     children,
+    onClose,
   } = props;
   const dispatch = useAppDispatch();
 

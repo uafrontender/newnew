@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 interface IProfileBackground {
   pictureURL: string;
+  children?: React.ReactNode;
 }
 
 const ProfileBackground: React.FunctionComponent<IProfileBackground> = ({

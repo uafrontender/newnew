@@ -44,7 +44,7 @@ export const Notifications = () => {
     useState<number>(0);
 
   const fetchNotification = useCallback(
-    async (args?) => {
+    async (args?: any) => {
       if (loading) return;
       const limit: number = args && args.limit ? args.limit : defaultLimit;
       const pageToken: string = args && args.pageToken ? args.pageToken : null;
@@ -161,7 +161,9 @@ export const Notifications = () => {
   }, [inView, loading, notificationsNextPageToken]);
 
   const renderNotification = useCallback(
-    (item) => <Notification key={item.id} {...item} />,
+    (item: newnewapi.INotification) => (
+      <Notification key={item.id as any} {...item} />
+    ),
     []
   );
 
