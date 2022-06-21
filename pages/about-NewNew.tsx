@@ -436,6 +436,13 @@ export const getServerSideProps = async (context: NextPageContext) => {
 const AboutLayout = styled.div`
   & > div {
     overflow-x: hidden !important;
+    // hide scrollbar
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none; /* Firefox */
+
+    &::-webkit-scrollbar {
+      display: none; /* Safari and Chrome */
+    }
   }
 `;
 
@@ -1275,6 +1282,10 @@ const SGradient = styled.div<ISGradient>`
 
 // INVESTORS
 const SSectionInvestors = styled(SSection)`
+  ${SSectionTitle} {
+    margin-bottom: 20px;
+  }
+
   ${({ theme }) => theme.media.tablet} {
     display: flex;
     padding-top: 40px;
@@ -1289,16 +1300,10 @@ const SInvestorsList = styled.ul`
   list-style: none;
   width: 100%;
   z-index: 1;
-  border-top: 1px solid
-    ${({ theme }) =>
-      theme.name === 'light'
-        ? theme.colorsThemed.background.outlines1
-        : theme.colorsThemed.background.outlines2};
 
   ${({ theme }) => theme.media.tablet} {
     max-width: 57%;
     margin-left: auto;
-    border-top: none;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -1315,10 +1320,7 @@ const SInvestor = styled.li`
 
   padding: 15px 0;
   border-bottom: 1px solid
-    ${({ theme }) =>
-      theme.name === 'light'
-        ? theme.colorsThemed.background.outlines1
-        : theme.colorsThemed.background.outlines2};
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 
   ${({ theme }) => theme.media.tablet} {
     &:first-child {
@@ -1331,8 +1333,8 @@ const SInvestor = styled.li`
   ${({ theme }) => theme.media.laptop} {
     &:hover > h5 {
       /* transform: scale(2); */
-      font-size: 56px;
-      line-height: 64px;
+      font-size: 28px;
+      line-height: 32px;
     }
 
     padding: 24px 0;
