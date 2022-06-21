@@ -7,6 +7,7 @@ interface ICreatorListItem {
   item: newnewapi.IUser;
   subscribedTo: boolean;
   showSubscriptionPrice: boolean;
+  withEllipseMenu?: boolean;
 }
 
 // This component fetches subscription price for a creator and returns a card.
@@ -20,6 +21,7 @@ export const CreatorCardWithSubscriptionPrice: React.FC<ICreatorListItem> = ({
   item,
   subscribedTo,
   showSubscriptionPrice,
+  withEllipseMenu,
 }) => {
   const [subscriptionPrice, setSubscriptionPrice] = useState<
     number | undefined
@@ -54,6 +56,7 @@ export const CreatorCardWithSubscriptionPrice: React.FC<ICreatorListItem> = ({
       creator={item}
       sign={sign}
       subscriptionPrice={subscriptionPrice}
+      withEllipseMenu={withEllipseMenu}
     />
   );
 };

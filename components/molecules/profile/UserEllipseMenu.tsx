@@ -12,6 +12,8 @@ interface IUserEllipseMenu {
   isSubscribed: boolean;
   isBlocked: boolean;
   loggedIn: boolean;
+  top?: string;
+  right?: string;
   handleClose: () => void;
   handleClickUnsubscribe: () => void;
   handleClickReport: () => void;
@@ -23,6 +25,8 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
   isSubscribed,
   isBlocked,
   loggedIn,
+  top,
+  right,
   handleClose,
   handleClickUnsubscribe,
   handleClickReport,
@@ -34,17 +38,22 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
 
-  const reportUserHandler = () => {
+  const reportUserHandler = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.stopPropagation();
     handleClickReport();
     handleClose();
   };
 
-  const blockHandler = () => {
+  const blockHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.stopPropagation();
     handleClickBlock();
     handleClose();
   };
 
-  const unsubHandler = () => {
+  const unsubHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.stopPropagation();
     handleClickUnsubscribe();
     handleClose();
   };
@@ -59,6 +68,9 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          top={top ?? undefined}
+          right={right ?? undefined}
+          onClick={(e) => e.stopPropagation()}
         >
           {isSubscribed && (
             <SButton onClick={unsubHandler}>
@@ -85,10 +97,13 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
 
 export default UserEllipseMenu;
 
-const SContainer = styled(motion.div)`
+const SContainer = styled(motion.div)<{
+  top?: string;
+  right?: string;
+}>`
   position: absolute;
-  top: 260px;
-  right: 0px;
+  top: ${({ top }) => top ?? '260px'};
+  right: ${({ right }) => right ?? '0px'};
   z-index: 10;
   min-width: 180px;
 

@@ -31,6 +31,7 @@ export const CreatorsList: React.FC<IList> = ({
 }) => {
   const renderItem = (item: newnewapi.IUser) => {
     const handleItemClick = () => {
+      console.log('hello');
       router.push(`/${item.username}`);
     };
 
@@ -40,6 +41,7 @@ export const CreatorsList: React.FC<IList> = ({
           subscribedTo={subscribedTo}
           showSubscriptionPrice={showSubscriptionPrice}
           item={item}
+          withEllipseMenu
         />
       </SItemWrapper>
     );
