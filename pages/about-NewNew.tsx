@@ -239,7 +239,7 @@ PrevArrow.defaultProps = {
   className: '',
 };
 
-export const HowItWorks = () => {
+export const About = () => {
   const { t } = useTranslation('about');
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -393,7 +393,7 @@ export const HowItWorks = () => {
                   description: string;
                 }[]
               ).map((investor) => (
-                <SInvestor>
+                <SInvestor key={investor.name}>
                   <SInvestorTitle variant={5}>{investor.name}</SInvestorTitle>
                   <SBackerDescription variant={2}>
                     {investor.description}
@@ -412,13 +412,13 @@ export const HowItWorks = () => {
   );
 };
 
-(HowItWorks as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
+(About as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
   <AboutLayout>
     <HomeLayout>{page}</HomeLayout>
   </AboutLayout>
 );
 
-export default HowItWorks;
+export default About;
 
 export const getServerSideProps = async (context: NextPageContext) => {
   const translationContext = await serverSideTranslations(context.locale!!, [

@@ -50,7 +50,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
     },
     {
       key: 'about',
-      url: '/about',
+      url: '/about-NewNew',
     },
 
     {
