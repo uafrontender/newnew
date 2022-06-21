@@ -76,7 +76,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   const [showVideoDelete, setShowVideoDelete] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const playerRef: any = useRef();
-  const [localFile, setLocalFile] = useState(null);
+  const [localFile, setLocalFile] = useState<File | null>(null);
 
   const handleButtonClick = useCallback(() => {
     inputRef.current?.click();
@@ -96,8 +96,14 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   }, [handleCloseDeleteVideoClick, id, onChange]);
 
   const handleFileChange = useCallback(
-    async (e) => {
-      const file = e.target?.files[0];
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { files } = e.target;
+
+      if (!files) {
+        return;
+      }
+
+      const file = files[0];
 
       if (file.size > MAX_VIDEO_SIZE) {
         toast.error(t('postVideo.uploadResponseForm.video.error.maxSize'));

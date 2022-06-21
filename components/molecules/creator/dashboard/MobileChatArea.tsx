@@ -165,7 +165,7 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newMessage]);
 
-  const handleChange = useCallback((id, value) => {
+  const handleChange = useCallback((id: string, value: string) => {
     setMessageText(value);
   }, []);
 
@@ -200,7 +200,7 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   }, [messageText]);
 
   const renderMessage = useCallback(
-    (item: newnewapi.IChatMessage, index) => {
+    (item: newnewapi.IChatMessage, index: number) => {
       const prevElement = messages[index - 1];
       const nextElement = messages[index + 1];
 

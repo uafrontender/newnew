@@ -391,7 +391,7 @@ const ChatList: React.FC<IFunctionProps> = ({
   );
 
   const renderChatItem = useCallback(
-    (chat: newnewapi.IChatRoom, index) => {
+    (chat: newnewapi.IChatRoom, index: number) => {
       const localChat = chat;
       const handleItemClick = async () => {
         if (searchedRooms) setSearchedRooms(null);

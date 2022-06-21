@@ -30,14 +30,14 @@ import { usePostModalState } from '../../contexts/postModalContext';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 
 interface IGeneral {
-  children: React.ReactNode;
   withChat?: boolean;
   specialStatusBarColor?: string;
   restrictMaxWidth?: boolean;
+  children: React.ReactNode;
 }
 
 export const General: React.FC<IGeneral> = (props) => {
-  const { children, withChat, specialStatusBarColor, restrictMaxWidth } = props;
+  const { withChat, specialStatusBarColor, restrictMaxWidth, children } = props;
   const user = useAppSelector((state) => state.user);
   const { banner, resizeMode } = useAppSelector((state) => state.ui);
   const theme = useTheme();
