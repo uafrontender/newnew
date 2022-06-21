@@ -110,7 +110,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   }
 
   const renderItem = useCallback(
-    (item, index) => {
+    (item: newnewapi.IPost, index: number) => {
       const postType = Object.keys(item)[0];
       const data = Object.values(item)[0] as
         | newnewapi.Auction

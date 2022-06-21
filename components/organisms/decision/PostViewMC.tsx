@@ -660,9 +660,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           />
           <SActivitesContainer decisionFailed={postStatus === 'failed'}>
             <PostVotingTab>
-              {t('tabs.options')}
-              {` `}
-              {!!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''}
+              {`${t('tabs.options')} ${
+                !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
+              }`}
             </PostVotingTab>
             <McOptionsTab
               post={post}

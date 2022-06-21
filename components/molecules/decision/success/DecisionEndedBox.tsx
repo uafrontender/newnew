@@ -6,6 +6,7 @@ import Headline from '../../../atoms/Headline';
 interface IDecisionEndedBox {
   imgSrc: string;
   type?: 'ac' | 'mc' | 'cf';
+  children: string;
 }
 
 const DecisionEndedBox: React.FunctionComponent<IDecisionEndedBox> = ({
