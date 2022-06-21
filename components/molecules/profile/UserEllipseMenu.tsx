@@ -119,7 +119,8 @@ const SContainer = styled(motion.div)<{
       : props.theme.colorsThemed.background.tertiary};
 
   ${({ theme }) => theme.media.laptop} {
-    top: 312px;
+    top: ${({ top }) => top ?? '312px'};
+    right: ${({ right }) => right ?? '0px'};
   }
 `;
 

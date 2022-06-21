@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
 import CreatorCard from '../../molecules/search/CreatorCard';
@@ -23,11 +24,13 @@ export const CreatorCardWithSubscriptionPrice: React.FC<ICreatorListItem> = ({
   showSubscriptionPrice,
   withEllipseMenu,
 }) => {
+  const { t } = useTranslation('common');
+
   const [subscriptionPrice, setSubscriptionPrice] = useState<
     number | undefined
   >(showSubscriptionPrice ? 0 : undefined);
 
-  const sign = subscribedTo ? 'subscribed' : undefined;
+  const sign = subscribedTo ? t('creatorCard.subscribed') : undefined;
 
   useEffect(() => {
     async function fetchSubscriptionPrice(userId: string) {

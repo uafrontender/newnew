@@ -183,7 +183,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
           <UserAvatar avatarUrl={creator.avatarUrl ?? ''} />
         </SUserAvatar>
         {sign && isSubscribed && <AvatarSign>{sign}</AvatarSign>}
-        {wasSubscribed && <AvatarSign>Cancelled</AvatarSign>}
+        {wasSubscribed && <AvatarSign>{t('creatorCard.cancelled')}</AvatarSign>}
       </SUserAvatarContainer>
       <SDisplayName>{creator.nickname}</SDisplayName>
       <SUserName>@{creator.username}</SUserName>
@@ -225,6 +225,10 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         confirmUnsubscribe={unsubscribeModalOpen}
         user={creator}
         closeModal={() => setUnsubscribeModalOpen(false)}
+        onUnsubcribeSuccess={() => {
+          setIsSubscribed(false);
+          setWasSubscribed(true);
+        }}
       />
       <BlockUserModalProfile
         confirmBlockUser={blockUserModalOpen}
