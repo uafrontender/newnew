@@ -543,6 +543,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       () => (
         <>
           <SItemWrapper>
+            {/* TODO: move to locales */}
             <SInputLabel htmlFor='title'>Title</SInputLabel>
             <TextArea
               id='title'

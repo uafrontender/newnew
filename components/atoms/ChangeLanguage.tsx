@@ -34,9 +34,11 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
   const handleChangeLanguageClick = () => {
     setFocused(!focused);
   };
+
   const handleCloseClick = () => {
     setFocused(false);
   };
+
   const renderItem = (item: string) => {
     const handleItemClick = () => {
       push(pathname, pathname, { locale: item });
@@ -62,6 +64,10 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
       handleCloseClick();
     }
   });
+
+  if (options.length < 2) {
+    return null;
+  }
 
   return (
     <SContainer ref={ref}>
@@ -92,7 +98,8 @@ const SContainer = styled.div`
   position: relative;
 
   /* TEMP */
-  display: none;
+  // Enabled for vlad/apply-translations branch
+  // display: none;
 `;
 
 interface ISListHolder {
