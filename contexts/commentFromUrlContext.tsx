@@ -16,29 +16,34 @@ export const CommentFromUrlContext = createContext<{
   handleSetNewCommentContentFromUrl: () => {},
 });
 
-const CommentFromUrlContextProvider: React.FC = ({ children }) => {
-  const [commentId, setCommentId] = useState('');
-  const [newCommentContent, setNewCommentContent] = useState('');
+interface ICommentFromUrlContextProvider {
+  children: React.ReactNode;
+}
 
-  const contextValue = useMemo(
-    () => ({
-      commentIdFromUrl: commentId,
-      handleResetCommentIdFromUrl: () => setCommentId(''),
-      handleSetCommentIdFromUrl: (newValue: string) => setCommentId(newValue),
-      newCommentContentFromUrl: newCommentContent,
-      handleResetNewCommentContentFromUrl: () => setNewCommentContent(''),
-      handleSetNewCommentContentFromUrl: (newValue: string) =>
-        setNewCommentContent(newValue),
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [commentId, newCommentContent]
-  );
+const CommentFromUrlContextProvider: React.FC<ICommentFromUrlContextProvider> =
+  ({ children }) => {
+    const [commentId, setCommentId] = useState('');
+    const [newCommentContent, setNewCommentContent] = useState('');
 
-  return (
-    <CommentFromUrlContext.Provider value={contextValue}>
-      {children}
-    </CommentFromUrlContext.Provider>
-  );
-};
+    const contextValue = useMemo(
+      () => ({
+        commentIdFromUrl: commentId,
+        handleResetCommentIdFromUrl: () => setCommentId(''),
+        handleSetCommentIdFromUrl: (newValue: string) => setCommentId(newValue),
+        newCommentContentFromUrl: newCommentContent,
+        handleResetNewCommentContentFromUrl: () => setNewCommentContent(''),
+        handleSetNewCommentContentFromUrl: (newValue: string) =>
+          setNewCommentContent(newValue),
+      }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [commentId, newCommentContent]
+    );
+
+    return (
+      <CommentFromUrlContext.Provider value={contextValue}>
+        {children}
+      </CommentFromUrlContext.Provider>
+    );
+  };
 
 export default CommentFromUrlContextProvider;

@@ -265,7 +265,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     setConfirmReportUser(true);
   };
 
-  const handleChange = useCallback((id, value) => {
+  const handleChange = useCallback((id: string, value: string) => {
     setMessageText(value);
   }, []);
 
@@ -300,7 +300,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   }, [messageText]);
 
   const renderMessage = useCallback(
-    (item: newnewapi.IChatMessage, index) => {
+    (item: newnewapi.IChatMessage, index: number) => {
       const prevElement = messages[index - 1];
       const nextElement = messages[index + 1];
 

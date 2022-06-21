@@ -13,7 +13,7 @@ interface ICustomToggle {
 const CustomToggle: React.FC<ICustomToggle> = (props) => {
   const { options, selected, disabled, onChange } = props;
   const renderOption = useCallback(
-    (item) => {
+    (item: any) => {
       const isSelected = selected === item.id;
       const handleClick = () => {
         if (!disabled) {

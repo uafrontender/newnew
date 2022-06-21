@@ -114,7 +114,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     );
 
     const handleChange = useCallback(
-      (id, value) => {
+      (id: string, value: string) => {
         setCommentText(value);
         validateTextViaAPIDebounced(value);
       },
@@ -122,7 +122,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     );
 
     const handleSubmit = useCallback(
-      async (e) => {
+      async (e: React.MouseEvent | React.KeyboardEvent) => {
         e.preventDefault();
         if (isAPIValidateLoading) return;
 

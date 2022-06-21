@@ -24,7 +24,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
     setAnimate(false);
   }, []);
   const handleTimeChange = useCallback(
-    (key, time: any) => {
+    (key: string, time: any) => {
       onChange(id, { [key]: time });
     },
     [id, onChange]
@@ -36,7 +36,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
     [id, onChange]
   );
   const handleTypeChange = useCallback(
-    (e, type) => {
+    (e: any, type: any) => {
       const changeBody: any = { type };
       if (type === 'right-away') {
         changeBody.date = moment().format();

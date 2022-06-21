@@ -7,15 +7,16 @@ import Button from '../../../../atoms/Button';
 
 interface IAcPickWinningOptionModal {
   isVisible: boolean;
+  children: React.ReactNode;
   closeModal: () => void;
   handleConfirm: () => void;
 }
 
 const AcPickWinningOptionModal: React.FC<IAcPickWinningOptionModal> = ({
   isVisible,
+  children,
   closeModal,
   handleConfirm,
-  children,
 }) => {
   const { t } = useTranslation('modal-Post');
 
