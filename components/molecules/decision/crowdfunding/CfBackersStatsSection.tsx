@@ -178,7 +178,10 @@ const STarget = styled(Text)`
 `;
 
 const SMyPledgeAmountDiv = styled.div`
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colorsThemed.background.secondary
+      : 'rgba(255, 255, 255, 0.06)'};
   border-radius: 16px;
   padding: 12px 24px;
 

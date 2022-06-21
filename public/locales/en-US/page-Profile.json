@@ -87,7 +87,7 @@
       "title": "Block user",
       "messageFirstPart": "Do you really want to block",
       "messageSecondPart": "?",
-      "button:": {
+      "button": {
         "cancel": "Cancel",
         "confirm": "Block user"
       }

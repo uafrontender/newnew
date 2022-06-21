@@ -61,12 +61,12 @@ export async function getServerSideProps(
 const SWrapper = styled.div`
   display: flex;
   min-height: calc(100vh - 60px);
-  margin: 30px;
   padding-bottom: 104px;
   flex-direction: column;
   justify-content: center;
 
   ${({ theme }) => theme.media.tablet} {
+    margin: 30px;
     padding-bottom: unset;
   }
 `;

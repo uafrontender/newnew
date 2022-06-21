@@ -152,6 +152,10 @@
     }
   },
   "creatorCard": {
-    "subscriptionCost": "${{amount}} Monthly"
+    "subscriptionCost": "${{amount}} Monthly",
+    "subscribed": "subscribed",
+    "subscribed_NEED_TRANSLATION": "subscribed",
+    "cancelled": "cancelled",
+    "cancelled_NEED_TRANSLATION": "cancelled"
   }
 }
