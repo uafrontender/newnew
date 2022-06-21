@@ -240,7 +240,7 @@ PrevArrow.defaultProps = {
 };
 
 export const About = () => {
-  const { t } = useTranslation('about');
+  const { t } = useTranslation('page-About');
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -423,7 +423,7 @@ export default About;
 export const getServerSideProps = async (context: NextPageContext) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'about',
+    'page-About',
   ]);
 
   return {
