@@ -77,6 +77,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
               collection={creatorsImSubscribedTo}
               subscribedTo
               showSubscriptionPrice
+              withEllipseMenu
             />
           ) : (
             <NoContentCard>

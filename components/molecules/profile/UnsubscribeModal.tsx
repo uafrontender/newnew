@@ -6,17 +6,20 @@ import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import { unsubscribeFromCreator } from '../../../api/endpoints/subscription';
 import getDisplayname from '../../../utils/getDisplayname';
+import preventParentClick from '../../../utils/preventParentClick';
 
 interface IUnsubscribeModal {
   user: newnewapi.IUser;
   confirmUnsubscribe: boolean;
   closeModal: () => void;
+  onUnsubcribeSuccess?: () => void;
 }
 
 const UnsubscribeModal: React.FC<IUnsubscribeModal> = ({
   confirmUnsubscribe,
   user,
   closeModal,
+  onUnsubcribeSuccess,
 }) => {
   const { t } = useTranslation('page-Profile');
 
@@ -27,6 +30,7 @@ const UnsubscribeModal: React.FC<IUnsubscribeModal> = ({
       });
       const res = await unsubscribeFromCreator(payload);
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+      onUnsubcribeSuccess?.();
       closeModal();
     } catch (err) {
       console.error(err);
@@ -37,7 +41,7 @@ const UnsubscribeModal: React.FC<IUnsubscribeModal> = ({
   };
   return (
     <Modal show={confirmUnsubscribe} onClose={closeModal}>
-      <SContainer>
+      <SContainer onClick={preventParentClick()}>
         <SModal>
           <SModalTitle>{t('modal.unsubscribeUser.title')}</SModalTitle>
           <SModalMessage>

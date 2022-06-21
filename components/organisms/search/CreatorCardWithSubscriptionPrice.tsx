@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
 import CreatorCard from '../../molecules/search/CreatorCard';
@@ -7,6 +8,7 @@ interface ICreatorListItem {
   item: newnewapi.IUser;
   subscribedTo: boolean;
   showSubscriptionPrice: boolean;
+  withEllipseMenu?: boolean;
 }
 
 // This component fetches subscription price for a creator and returns a card.
@@ -20,12 +22,15 @@ export const CreatorCardWithSubscriptionPrice: React.FC<ICreatorListItem> = ({
   item,
   subscribedTo,
   showSubscriptionPrice,
+  withEllipseMenu,
 }) => {
+  const { t } = useTranslation('common');
+
   const [subscriptionPrice, setSubscriptionPrice] = useState<
     number | undefined
   >(showSubscriptionPrice ? 0 : undefined);
 
-  const sign = subscribedTo ? 'subscribed' : undefined;
+  const sign = subscribedTo ? t('creatorCard.subscribed') : undefined;
 
   useEffect(() => {
     async function fetchSubscriptionPrice(userId: string) {
@@ -54,6 +59,7 @@ export const CreatorCardWithSubscriptionPrice: React.FC<ICreatorListItem> = ({
       creator={item}
       sign={sign}
       subscriptionPrice={subscriptionPrice}
+      withEllipseMenu={withEllipseMenu}
     />
   );
 };
