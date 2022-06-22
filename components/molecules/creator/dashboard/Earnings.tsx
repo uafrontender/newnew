@@ -141,7 +141,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
           return myEarnings?.auEarnings?.usdCents
             ? `$${formatNumber(
                 myEarnings.auEarnings.usdCents / 100 ?? 0,
-                true
+                false
               )}`
             : '$0.00';
 
@@ -149,7 +149,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
           return myEarnings?.cfEarnings?.usdCents
             ? `$${formatNumber(
                 myEarnings.cfEarnings.usdCents / 100 ?? 0,
-                true
+                false
               )}`
             : '$0.00';
 
@@ -157,7 +157,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
           return myEarnings?.mcEarnings?.usdCents
             ? `$${formatNumber(
                 myEarnings.mcEarnings.usdCents / 100 ?? 0,
-                true
+                false
               )}`
             : '$0.00';
 
@@ -165,7 +165,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
           return myEarnings?.subsEarnings?.usdCents
             ? `$${formatNumber(
                 myEarnings.subsEarnings.usdCents / 100 ?? 0,
-                true
+                false
               )}`
             : '$0.00';
 
@@ -218,7 +218,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
         <STotalTextWrapper>
           <STotal variant={4}>
             {totalEarnings
-              ? `$${formatNumber(totalEarnings / 100 ?? 0, true)}`
+              ? `$${formatNumber(totalEarnings / 100 ?? 0, false)}`
               : '$0.00'}
           </STotal>
           <STotalText weight={600}>{splitPeriod()}</STotalText>

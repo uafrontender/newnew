@@ -81,7 +81,7 @@ const SettingsWallet: React.FunctionComponent<ISettingsWallet> = () => {
       <SText variant={2}>{t('Settings.sections.wallet.balance')}</SText>
       <SActionDiv>
         <Headline variant={4}>
-          ${formatNumber(walletBalance?.usdCents / 100 ?? 0, true)}
+          ${formatNumber(walletBalance?.usdCents / 100 ?? 0, false)}
         </Headline>
         <Button
           view='primaryGrad'

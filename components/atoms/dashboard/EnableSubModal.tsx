@@ -40,7 +40,7 @@ const EnableSubModal: React.FC<IEnableSubModal> = ({
               <SProductInfo>{`${t('enableSubModal.confirmationTextFirstPart')}
             $${formatNumber(
               selectedProduct.monthlyRate.usdCents / 100 ?? 0,
-              true
+              false
             )}
             ${t('enableSubModal.confirmationTextSecondPart')}`}</SProductInfo>
             )}
