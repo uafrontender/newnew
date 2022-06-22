@@ -55,7 +55,7 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
       {transaction?.amount?.usdCents && (
         <SAmount variant={3} weight={600} direction='from'>
           <span>- </span>
-          {`$${formatNumber(transaction?.amount.usdCents / 100 ?? 0, true)}`}
+          {`$${formatNumber(transaction?.amount.usdCents / 100 ?? 0, false)}`}
         </SAmount>
       )}
       <SDate variant={2}>
