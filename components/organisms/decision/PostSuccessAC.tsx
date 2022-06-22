@@ -197,7 +197,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                       <STotal>
                         {`$${formatNumber(
                           post.totalAmount.usdCents / 100 ?? 0,
-                          false
+                          true
                         )}`}{' '}
                         <span>{t('acPostSuccess.inTotalBids')}</span>
                       </STotal>
@@ -246,7 +246,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                         <SWinningOptionAmount variant={4}>
                           {`$${formatNumber(
                             winningOption.totalAmount.usdCents / 100 ?? 0,
-                            false
+                            true
                           )}`}
                         </SWinningOptionAmount>
                       )}
