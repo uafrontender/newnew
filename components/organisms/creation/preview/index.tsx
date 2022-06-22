@@ -8,6 +8,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import { useUpdateEffect } from 'react-use';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -342,6 +343,12 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       </SChoiceItemTitle>
     </SChoiceItem>
   );
+
+  useUpdateEffect(() => {
+    if (!post.title) {
+      router?.push('/creation');
+    }
+  }, [post.title, router]);
 
   if (isMobile) {
     return (
