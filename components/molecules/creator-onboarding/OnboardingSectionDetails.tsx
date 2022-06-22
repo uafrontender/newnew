@@ -853,7 +853,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
               value={dateInEdit}
               maxDate={maxDate}
               locale={router.locale}
-              disabled={false}
+              disabled={user?.userData?.dateOfBirth ? Object.values(user?.userData?.dateOfBirth).some((dateOfBirthEl) => !!dateOfBirthEl) : false}
               isValid={dateError === ''}
               labelCaption={t('detailsSection.form.dateOfBirth.label')}
               bottomCaption={t(
