@@ -65,11 +65,13 @@ export type NextPageWithLayout = NextPage & {
 interface IMyApp extends AppProps {
   Component: NextPageWithLayout;
   uaString: string;
+  colorMode: string;
 }
 
 const MyApp = (props: IMyApp): ReactElement => {
-  const { Component, pageProps, uaString } = props;
+  const { Component, pageProps, uaString, colorMode } = props;
   const store = useStore();
+  const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
 
   // Shared layouts
@@ -83,7 +85,10 @@ const MyApp = (props: IMyApp): ReactElement => {
   const PRE_FETCHING_DELAY = 2500;
   useEffect(() => {
     setTimeout(() => {
-      const currentTheme = getColorMode(store.getState()?.ui?.colorMode);
+      const currentTheme = getColorMode(
+        // @ts-ignore:next-line
+        store.getState()?.ui?.colorMode as string
+      );
       setPreFetchImages(currentTheme);
     }, PRE_FETCHING_DELAY);
   }, [store]);
@@ -106,31 +111,28 @@ const MyApp = (props: IMyApp): ReactElement => {
   }, []);
 
   useEffect(() => {
-    const currentResizeMode = store.getState()?.ui?.resizeMode;
-
-    let resizeMode = 'mobile';
+    let newResizeMode = 'mobile';
     const ua = parse(
       uaString || (isBrowser() ? window?.navigator?.userAgent : '')
     );
 
     if (ua.isTablet) {
-      resizeMode = 'tablet';
+      newResizeMode = 'tablet';
     } else if (ua.isDesktop) {
-      resizeMode = 'laptop';
+      newResizeMode = 'laptop';
 
-      if (['laptopL', 'desktop'].includes(currentResizeMode)) {
+      if (['laptopL', 'desktop'].includes(resizeMode)) {
         // keep old mode in case laptop
-        resizeMode = currentResizeMode;
+        newResizeMode = resizeMode;
       }
-    } else if (['mobileL', 'mobileM', 'mobileS'].includes(currentResizeMode)) {
+    } else if (['mobileL', 'mobileM', 'mobileS'].includes(resizeMode)) {
       // keep old mode in case mobile
-      resizeMode = currentResizeMode;
+      newResizeMode = resizeMode;
     }
-
-    if (resizeMode !== currentResizeMode) {
+    if (newResizeMode !== resizeMode) {
       store.dispatch(setResizeMode(resizeMode));
     }
-  }, [store, uaString]);
+  }, [resizeMode, uaString, store]);
 
   // TODO: move to the store logic
   useEffect(() => {
@@ -166,8 +168,8 @@ const MyApp = (props: IMyApp): ReactElement => {
                           <ChatsProvider>
                             <ResizeMode>
                               <PostModalContextProvider>
-                                <GlobalTheme>
-                                  <div>
+                                <GlobalTheme initialTheme={colorMode}>
+                                  <>
                                     <ToastContainer />
                                     <VideoProcessingWrapper>
                                       {!pageProps.error ? (
@@ -181,7 +183,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                                         />
                                       )}
                                     </VideoProcessingWrapper>
-                                  </div>
+                                  </>
                                 </GlobalTheme>
                               </PostModalContextProvider>
                             </ResizeMode>
@@ -201,18 +203,16 @@ const MyApp = (props: IMyApp): ReactElement => {
   );
 };
 
-// @ts-ignore
 const MyAppWithTranslation = appWithTranslation(MyApp);
 
-// @ts-ignore
 const MyAppWithTranslationAndRedux = wrapper.withRedux(MyAppWithTranslation);
 
-// @ts-ignore
 MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
   const appProps = await App.getInitialProps(appContext);
 
   return {
     ...appProps,
+    colorMode: appContext.ctx?.req.cookies?.colorMode ?? 'auto',
     uaString: appContext.ctx?.req?.headers?.['user-agent'],
   };
 };

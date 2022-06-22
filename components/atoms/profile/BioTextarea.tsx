@@ -27,7 +27,11 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
   useEffect(() => {
     if (focused) return;
     if (isValid) setErrorBordersShown(false);
-  }, [focused, isValid]);
+
+    if (!isValid && errorCaption) {
+      setErrorBordersShown(true);
+    }
+  }, [focused, isValid, errorCaption]);
 
   useEffect(() => {
     setCharCounter((value as string).length);
@@ -35,7 +39,7 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
 
   return (
     <SWrapper>
-      <SBioTextareaDiv>
+      <SBioTextareaDiv errorBordersShown={errorBordersShown}>
         <textarea
           value={value}
           maxLength={maxChars}
@@ -49,11 +53,6 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
           }}
           onBlur={() => {
             setFocused(false);
-            if (!isValid) {
-              setErrorBordersShown(true);
-            } else {
-              setErrorBordersShown(false);
-            }
           }}
           onFocus={() => {
             setFocused(true);
@@ -144,7 +143,13 @@ const SBioTextareaDiv = styled.div<ISBioTextareaDiv>`
     &:active:enabled {
       outline: none;
 
-      border-color: ${({ theme }) => theme.colorsThemed.background.outlines2};
+      border-color: ${({ theme, errorBordersShown }) => {
+        if (!errorBordersShown) {
+          // NB! Temp
+          return theme.colorsThemed.background.outlines2;
+        }
+        return theme.colorsThemed.accent.error;
+      }};
     }
 
     &:disabled {

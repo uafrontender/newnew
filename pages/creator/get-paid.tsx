@@ -20,7 +20,7 @@ const DashboardSectionStripe = dynamic(
 );
 
 const GetPaid = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
 
   const [onboardingState, setOnboardingState] =
     useState<newnewapi.GetMyOnboardingStateResponse>();
@@ -100,7 +100,9 @@ export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
-    'creator',
+    'common',
+    'page-Creator',
+    'page-Chat',
   ]);
 
   return {

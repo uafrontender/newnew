@@ -21,7 +21,13 @@ export const PostModalContext = createContext<{
   handleSetIsConfirmToClosePost: (newState: boolean) => {},
 });
 
-const PostModalContextProvider: React.FC = ({ children }) => {
+interface IPostModalContextProvider {
+  children: React.ReactNode;
+}
+
+const PostModalContextProvider: React.FC<IPostModalContextProvider> = ({
+  children,
+}) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [isConfirmToClosePost, setIsConfirmToClosePost] = useState(false);
 

@@ -22,7 +22,7 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
   closeModal,
   isAnnouncement,
 }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
 
   const { blockUser } = useGetBlockedUsers();
 
@@ -51,22 +51,22 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
         <SModal>
           <SModalTitle>
             {isAnnouncement
-              ? t('modal.block-group.title')
-              : `${t('modal.block-user.title')} ${user.username}`}
+              ? t('modal.blockGroup.title')
+              : `${t('modal.blockUser.title')} ${user.username}`}
           </SModalTitle>
           <SModalMessage>
-            {`${t('modal.block-user.message-first-part')} ${user.username} ${t(
-              'modal.block-user.message-second-part'
+            {`${t('modal.blockUser.messageFirstPart')} ${user.username} ${t(
+              'modal.blockUser.messageSecondPart'
             )}`}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>
-              {t('modal.block-user.button-cancel')}
+              {t('modal.blockUser.button.cancel')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmClick}>
               {isAnnouncement
-                ? t('modal.block-group.button-confirm')
-                : t('modal.block-user.button-confirm')}
+                ? t('modal.blockGroup.button.confirm')
+                : t('modal.blockUser.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>
@@ -76,14 +76,11 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
 };
 
 BlockUserModal.defaultProps = {
+  isAnnouncement: false,
   onUserBlock: () => {},
 };
 
 export default BlockUserModal;
-
-BlockUserModal.defaultProps = {
-  isAnnouncement: false,
-};
 
 const SContainer = styled.div`
   display: flex;

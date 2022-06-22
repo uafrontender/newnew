@@ -45,7 +45,7 @@ interface ISearch {
 }
 
 const Search: NextPage<ISearch> = ({ top10posts }) => {
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('page-SeeMore');
   const { loggedIn } = useAppSelector((state) => state.user);
 
   const router = useRouter();
@@ -320,6 +320,11 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
       }
     }
 
+    if (category === 'for-you' && !loggedIn) {
+      router?.push('/sign-up');
+      return;
+    }
+
     if (inView && category && !isCollectionLoading) {
       if (nextPageToken) {
         loadPosts({
@@ -364,28 +369,39 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     isCollectionLoading,
     router.query.category,
     router.query.sort,
+    loggedIn,
   ]);
+
+  // Clear sorting
+  useEffect(() => {
+    const category = router.query.category?.toString() ?? 'ac';
+    if (category === 'for-you') {
+      const newQuery = { ...router.query };
+
+      delete newQuery.sort;
+
+      router?.push({
+        query: newQuery,
+        pathname: router.pathname,
+      });
+    }
+  }, [router]);
+
   return (
     <>
       <Head>
-        <title>
-          {t(`search.meta.title-${router?.query?.category || 'ac'}`)}
-        </title>
+        <title>{t(`meta.${router?.query?.category || 'ac'}.title`)}</title>
         <meta
           name='description'
-          content={t(
-            `search.meta.description-${router?.query?.category || 'ac'}`
-          )}
+          content={t(`meta.${router?.query?.category || 'ac'}.description`)}
         />
         <meta
           property='og:title'
-          content={t(`search.meta.title-${router?.query?.category || 'ac'}`)}
+          content={t(`meta.${router?.query?.category || 'ac'}.title`)}
         />
         <meta
           property='og:description'
-          content={t(
-            `search.meta.description-${router?.query?.category || 'ac'}`
-          )}
+          content={t(`meta.${router?.query?.category || 'ac'}.description`)}
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
@@ -435,9 +451,10 @@ export default Search;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'home',
-    'decision',
-    'payment-modal',
+    'page-SeeMore',
+    'component-PostCard',
+    'modal-Post',
+    'modal-PaymentModal',
   ]);
 
   const top10payload = new newnewapi.EmptyRequest({});

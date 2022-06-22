@@ -28,7 +28,13 @@ const SubscriptionsContext = createContext({
   fetchCreatorsImSubscribedTo: () => {},
 });
 
-export const SubscriptionsProvider: React.FC = ({ children }) => {
+interface ISubscriptionsProvider {
+  children: React.ReactNode;
+}
+
+export const SubscriptionsProvider: React.FC<ISubscriptionsProvider> = ({
+  children,
+}) => {
   const user = useAppSelector((state) => state.user);
   const [mySubscribers, setMySubscribers] = useState<newnewapi.ISubscriber[]>(
     []
@@ -167,7 +173,7 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
     };
 
     if (socketConnection) {
-      socketConnection.on(
+      socketConnection?.on(
         'CreatorSubscriptionChanged',
         handlerSubscriptionUpdated
       );

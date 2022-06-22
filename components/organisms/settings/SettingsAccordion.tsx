@@ -110,6 +110,16 @@ const SSettingsAccordionItem = styled.div<{
   opacity: ${({ isDimmed }) => (isDimmed ? 0.5 : 1)};
 
   transition: opacity 0.2s linear;
+
+  &:first-child > button {
+    padding-top: 4px;
+  }
+
+  ${({theme}) => theme.media.laptop} {
+    &:first-child > button {
+      padding-top: 0;
+    }
+  }
 `;
 
 const SSettingsAccordionItemHeading = styled.button<{
@@ -121,7 +131,7 @@ const SSettingsAccordionItemHeading = styled.button<{
 
   width: 100%;
 
-  margin: 34px 0px;
+  padding: 34px 0px;
 
   outline: none;
   border: none;

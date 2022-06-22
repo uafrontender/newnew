@@ -530,24 +530,24 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       };
 
       if (socketConnection) {
-        socketConnection.on(
+        socketConnection?.on(
           'AcOptionCreatedOrUpdated',
           socketHandlerOptionCreatedOrUpdated
         );
-        socketConnection.on('AcOptionDeleted', socketHandlerOptionDeleted);
-        socketConnection.on('PostUpdated', socketHandlerPostData);
-        socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
+        socketConnection?.on('AcOptionDeleted', socketHandlerOptionDeleted);
+        socketConnection?.on('PostUpdated', socketHandlerPostData);
+        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off(
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
             'AcOptionCreatedOrUpdated',
             socketHandlerOptionCreatedOrUpdated
           );
-          socketConnection.off('AcOptionDeleted', socketHandlerOptionDeleted);
-          socketConnection.off('PostUpdated', socketHandlerPostData);
-          socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
+          socketConnection?.off('AcOptionDeleted', socketHandlerOptionDeleted);
+          socketConnection?.off('PostUpdated', socketHandlerPostData);
+          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps

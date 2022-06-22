@@ -130,13 +130,13 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
     setAnimate(false);
   }, []);
   const handleTimeChange = useCallback(
-    (value: any) => {
+    (value: string) => {
       onChange('time', value);
     },
     [onChange]
   );
   const handleFormatChange = useCallback(
-    (value: any) => {
+    (value: string) => {
       onChange('hours-format', value);
     },
     [onChange]

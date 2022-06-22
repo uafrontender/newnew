@@ -24,6 +24,7 @@ interface IAnimatedWords {
   animation: TAnimation;
   onAnimationEnd?: () => void;
   animateWhenInView?: boolean;
+  children: React.ReactNode;
 }
 
 export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {

@@ -8,10 +8,11 @@ import InlineSvg from '../atoms/InlineSVG';
 interface ReportBugButtonI {
   bottom: number;
   right: number;
+  zIndex?: number;
 }
 
 const ReportBugButton: React.FC<ReportBugButtonI> = React.memo(
-  ({ bottom, right }) => {
+  ({ bottom, right, zIndex }) => {
     const { t } = useTranslation('common');
     const { user } = useAppSelector((state) => state);
     // Check if need to be positioned higher
@@ -20,7 +21,8 @@ const ReportBugButton: React.FC<ReportBugButtonI> = React.memo(
       const userSnapApi = (window as any).Usersnap;
       if (userSnapApi) {
         userSnapApi.on('open', (event: any) => {
-          event.api.setValue('visitor', user.userData?.username);
+          event.api.setValue('visitor', user.userData?.email);
+          event.api.setValue('custom', { username: user.userData?.username });
         });
         userSnapApi.logEvent('show_bug_report');
       }
@@ -32,22 +34,30 @@ const ReportBugButton: React.FC<ReportBugButtonI> = React.memo(
     }
 
     return (
-      <Container bottom={bottom} right={right}>
+      <Container bottom={bottom} right={right} zIndex={zIndex}>
         <IconContainer onClick={handleClick}>
           <InlineSvg svg={BugIcon} fill='none' width='20px' height='20px' />
           <Tail />
         </IconContainer>
         <TextContainer onClick={handleClick}>
-          <ReportText>{t('report-bug')}</ReportText>
+          <ReportText>{t('reportBug')}</ReportText>
         </TextContainer>
       </Container>
     );
   }
 );
 
+ReportBugButton.defaultProps = {
+  zIndex: undefined,
+};
+
 export default ReportBugButton;
 
-const Container = styled.div<{ bottom: number; right: number }>`
+const Container = styled.div<{
+  bottom: number;
+  right: number;
+  zIndex?: number;
+}>`
   position: fixed;
   bottom: ${({ bottom }) => `${bottom}px`};
   right: ${({ right }) => `${right}px`};
@@ -55,7 +65,7 @@ const Container = styled.div<{ bottom: number; right: number }>`
   flex-direction: column;
   align-items: center;
   pointer-events: none;
-  z-index: 2147483647;
+  z-index: ${({ zIndex }) => zIndex || '2147483647'};
   transition: bottom ease 0.5s;
 `;
 

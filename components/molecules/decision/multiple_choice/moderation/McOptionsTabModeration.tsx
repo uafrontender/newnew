@@ -36,7 +36,7 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
     handleRemoveOption,
   }) => {
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -100,7 +100,7 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
               <SLoaderDiv ref={loadingRef} />
             ) : pagingToken ? (
               <SLoadMoreBtn onClick={() => handleLoadOptions(pagingToken)}>
-                {t('loadMoreBtn')}
+                {t('loadMoreButton')}
               </SLoadMoreBtn>
             ) : null}
           </SBidsContainer>

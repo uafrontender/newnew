@@ -24,7 +24,7 @@ const OptionWallet: React.FunctionComponent<IOptionWallet> = ({
   selected,
   handleClick,
 }) => {
-  const { t } = useTranslation('payment-modal');
+  const { t } = useTranslation('modal-PaymentModal');
   const ref: any = useRef();
 
   const { walletBalance } = useContext(WalletContext);
@@ -67,7 +67,7 @@ const OptionWallet: React.FunctionComponent<IOptionWallet> = ({
             <Text variant={2}>
               {t('options.wallet.name')}
               {walletBalance &&
-                ` ($${formatNumber(walletBalance.usdCents / 100 ?? 0, true)})`}
+                ` ($${formatNumber(walletBalance.usdCents / 100 ?? 0, false)})`}
             </Text>
           )}
         </div>

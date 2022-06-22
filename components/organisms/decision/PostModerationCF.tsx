@@ -388,16 +388,16 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
       };
 
       if (socketConnection) {
-        socketConnection.on('CfPledgeCreated', socketHandlerPledgeCreated);
-        socketConnection.on('PostUpdated', socketHandlerPostData);
-        socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
+        socketConnection?.on('CfPledgeCreated', socketHandlerPledgeCreated);
+        socketConnection?.on('PostUpdated', socketHandlerPostData);
+        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off('CfPledgeCreated', socketHandlerPledgeCreated);
-          socketConnection.off('PostUpdated', socketHandlerPostData);
-          socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off('CfPledgeCreated', socketHandlerPledgeCreated);
+          socketConnection?.off('PostUpdated', socketHandlerPostData);
+          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -27,7 +27,7 @@ const Notification = dynamic(
 );
 
 export const Notifications = () => {
-  const { t } = useTranslation('notifications');
+  const { t } = useTranslation('page-Notifications');
   const { ref: scrollRef, inView } = useInView();
   const [notifications, setNotifications] =
     useState<newnewapi.INotification[] | null>(null);
@@ -44,7 +44,7 @@ export const Notifications = () => {
     useState<number>(0);
 
   const fetchNotification = useCallback(
-    async (args?) => {
+    async (args?: any) => {
       if (loading) return;
       const limit: number = args && args.limit ? args.limit : defaultLimit;
       const pageToken: string = args && args.pageToken ? args.pageToken : null;
@@ -161,7 +161,9 @@ export const Notifications = () => {
   }, [inView, loading, notificationsNextPageToken]);
 
   const renderNotification = useCallback(
-    (item) => <Notification key={item.id} {...item} />,
+    (item: newnewapi.INotification) => (
+      <Notification key={item.id as any} {...item} />
+    ),
     []
   );
 
@@ -228,7 +230,7 @@ export default Notifications;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'notifications',
+    'page-Notifications',
   ]);
 
   return {

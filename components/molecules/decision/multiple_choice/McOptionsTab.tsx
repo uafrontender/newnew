@@ -94,7 +94,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -153,12 +153,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
   // Handlers
-
-  // Redirect to user's page
-  const handleRedirectToPostCreator = () => {
-    router.push(`/${post.creator?.username}/subscribe`);
-  };
-
   const validateTextViaAPI = useCallback(async (text: string) => {
     setIsAPIValidateLoading(true);
     try {
@@ -418,6 +412,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     } else {
       setHeightDelta(0);
     }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
   }, [
     hasVotedOptionId,
     postLoading,
@@ -517,7 +515,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             <SLoaderDiv ref={loadingRef} />
           ) : pagingToken ? (
             <SLoadMoreBtn onClick={() => handleLoadOptions(pagingToken)}>
-              {t('loadMoreBtn')}
+              {t('loadMoreButton')}
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
@@ -534,7 +532,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               value={newOptionText}
               disabled={optionBeingSupported !== ''}
               placeholder={t(
-                'McPost.OptionsTab.ActionSection.suggestionPlaceholder'
+                'mcPost.optionsTab.actionSection.suggestionPlaceholder'
               )}
               onChange={handleUpdateNewOptionText}
             />
@@ -550,7 +548,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               }}
               onClick={() => setUseFreeVoteModalOpen(true)}
             >
-              {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
+              {t('mcPost.optionsTab.actionSection.placeABidButton')}
             </SAddFreeVoteButton>
             {user.userTutorialsProgress.remainingMcSteps && (
               <STutorialTooltipTextAreaHolder>
@@ -579,17 +577,15 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             }}
           >
             <SText variant={3}>
-              {t('McPost.OptionsTab.ActionSection.subscribeToCreatorCaption', {
+              {t('mcPost.optionsTab.actionSection.subscribeToCreatorCaption', {
                 creator: post.creator?.nickname,
               })}
             </SText>
-            <SSubscribeButton
-              onClick={() => {
-                handleRedirectToPostCreator();
-              }}
-            >
-              {t('McPost.OptionsTab.ActionSection.subscribeBtn')}
-            </SSubscribeButton>
+            <Link href={`/${post.creator?.username}/subscribe`}>
+              <SSubscribeButton>
+                {t('mcPost.optionsTab.actionSection.subscribeButton')}
+              </SSubscribeButton>
+            </Link>
           </SActionSectionSubscribe>
         ) : (
           <div
@@ -643,7 +639,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               }}
               onClick={() => setUseFreeVoteModalOpen(true)}
             >
-              {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
+              {t('mcPost.optionsTab.actionSection.placeABidButton')}
             </SAddFreeVoteButton>
           </SSuggestNewContainer>
         </OptionActionMobileModal>
@@ -682,7 +678,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           bottomCaption={
             <>
               <SPaymentSign variant={3}>
-                {t('McPost.paymentModalFooter.body', { creator: postCreator })}
+                {t('mcPost.paymentModalFooter.body', { creator: postCreator })}
               </SPaymentSign>
               <SPaymentTerms variant={3}>
                 *{' '}
@@ -691,14 +687,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                     href='https://terms.newnew.co'
                     target='_blank'
                   >
-                    {t('McPost.paymentModalFooter.terms')}
+                    {t('mcPost.paymentModalFooter.terms')}
                   </SPaymentTermsLink>
                 </Link>{' '}
-                {t('McPost.paymentModalFooter.apply')}
+                {t('mcPost.paymentModalFooter.apply')}
               </SPaymentTerms>
             </>
           }
-          // payButtonCaptionKey={t('McPost.paymentModalPayButton')}
+          // payButtonCaptionKey={t('mcPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
             <SPaymentModalHeading>
@@ -708,7 +704,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
-                {t('McPost.paymentModalHeader.title', {
+                {t('mcPost.paymentModalHeader.title', {
                   creator: postCreator,
                 })}
               </SPaymentModalHeadingPostCreator>
@@ -717,7 +713,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               {post.title}
             </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
-              {t('McPost.paymentModalHeader.subtitle')}
+              {t('mcPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
             <SPaymentModalOptionText variant={5}>
               {newOptionText}
@@ -733,7 +729,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         isVisible={paymentSuccessModalOpen}
         closeModal={() => setPaymentSuccessModalOpen(false)}
       >
-        {t('PaymentSuccessModal.mc', {
+        {t('paymentSuccessModal.mc', {
           postCreator,
           postDeadline,
         })}
@@ -747,10 +743,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       canVoteForFree ? (
         <>
           <SActionButton
+            id='action-button-mobile'
             view='primaryGrad'
             onClick={() => setSuggestNewMobileOpen(true)}
           >
-            {t('McPost.FloatingActionButton.suggestNewBtn')}
+            {t('mcPost.floatingActionButton.suggestNewButton')}
           </SActionButton>
           {user.userTutorialsProgress.remainingMcSteps && (
             <STutorialTooltipHolderMobile>

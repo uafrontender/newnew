@@ -37,17 +37,11 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
     formattedDescription,
     onChange,
   } = props;
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const inputRef: any = useRef();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const handleChange = useCallback(
-    (e) => {
-      onChange(id, e?.target?.value || e);
-    },
-    [id, onChange]
-  );
   const handleBlur = useCallback(() => {
     if (inputProps?.type === 'number' && (inputProps?.min as number) > value) {
       onChange(id, inputProps?.min as number);
@@ -81,7 +75,9 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
                 ref={inputRef}
                 value={value}
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(e) => {
+                  onChange(id, e?.target?.value);
+                }}
                 withLabel={!!inputLabel}
                 placeholder={t(`secondStep.field.${id}.placeholder`)}
                 {...inputProps}
@@ -98,7 +94,9 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
             options={getSelectOptions()}
             selected={value}
             maxItems={maxItems}
-            onSelect={handleChange}
+            onSelect={(newValue) => {
+              onChange(id, newValue);
+            }}
           />
         )}
         <SDescription variant={3} weight={600}>

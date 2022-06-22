@@ -1,7 +1,11 @@
 import React from 'react';
 import * as Sentry from '@sentry/react';
 
-export class ErrorBoundary extends React.Component {
+interface IErrorBoundary {
+  children: React.ReactNode;
+}
+
+export class ErrorBoundary extends React.Component<IErrorBoundary> {
   componentDidCatch(error: Error, errorInfo: any) {
     console.error(error, errorInfo);
   }

@@ -16,6 +16,7 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import { TThumbnailParameters } from '../../../redux-store/slices/creationStateSlice';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -24,9 +25,9 @@ const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
 interface IThumbnailPreviewEdit {
   open: boolean;
   value: any;
-  thumbnails: any;
+  thumbnails: TThumbnailParameters;
   handleClose: () => void;
-  handleSubmit: (value: any) => void;
+  handleSubmit: (value: TThumbnailParameters) => void;
 }
 
 export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
@@ -34,7 +35,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
 ) => {
   const { open, value, thumbnails, handleClose, handleSubmit } = props;
   const theme = useTheme();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const videoThumbs: any = useRef({ ...thumbnails });
   const [chunks, setChunks] = useState<string[]>([]);
   const [videoDuration, setVideoDuration] = useState<number>(0);
@@ -54,7 +55,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
     handleSubmit(videoThumbs.current);
   }, [handleSubmit]);
   const renderChunks = useCallback(
-    (chunk, index) => (
+    (chunk: any, index: number) => (
       <SProgressSeparator
         key={`chunk-${index}`}
         height={index % 5 === 0 ? '16px' : '6px'}
@@ -62,7 +63,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
     ),
     []
   );
-  const setDuration = useCallback((duration) => {
+  const setDuration = useCallback((duration: number) => {
     const percentage = (3 * 100) / duration;
     const durationCount = 100 / percentage;
     const separatorsCount = +(durationCount * 8).toFixed(0);
@@ -70,7 +71,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
     setChunks(Array(separatorsCount).fill('_'));
     setVideoDuration(duration);
   }, []);
-  const setCurrentTime = useCallback((time) => {
+  const setCurrentTime = useCallback((time: number) => {
     const percentage = ((time - videoThumbs.current.startTime) * 100) / 3;
     const position = (percentage * 70) / 100;
 
@@ -79,7 +80,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
     }
   }, []);
 
-  const getTime = useCallback((position) => {
+  const getTime = useCallback((position: 'start' | 'end') => {
     let seconds = videoThumbs.current.endTime;
 
     if (position === 'start') {
@@ -312,18 +313,29 @@ const SContainer = styled.div`
   height: 100%;
   padding: 18px;
   position: relative;
-  min-height: 100vh;
+  min-height: 100%;
   background: ${(props) => props.theme.colorsThemed.background.primary};
+
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   ${({ theme }) => theme.media.mobileL} {
     top: 50%;
     height: unset;
     margin: 0 auto;
-    overflow: hidden;
+    overflow-x: hidden;
     max-width: 464px;
     transform: translateY(-50%);
     min-height: unset;
     background: ${(props) => props.theme.colorsThemed.background.secondary};
+    border-radius: 16px;
+
     border-radius: 16px;
   }
 
@@ -363,13 +375,10 @@ const SModalTopLineTitle = styled(Text)`
 const SModalTopContent = styled.div``;
 
 const SModalButtonContainer = styled.div`
-  left: 0;
-  bottom: 24px;
-  position: absolute;
+  margin-top: 56px;
 
   button {
-    width: calc(100vw - 32px);
-    margin: 0 16px;
+    width: 100%;
     padding: 16px 20px;
   }
 `;

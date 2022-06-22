@@ -21,7 +21,7 @@ interface ISettingsWallet {}
 
 const SettingsWallet: React.FunctionComponent<ISettingsWallet> = () => {
   const theme = useTheme();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
@@ -46,26 +46,26 @@ const SettingsWallet: React.FunctionComponent<ISettingsWallet> = () => {
   if (!walletBalance || walletBalance.usdCents === 0) {
     return (
       <SSettingsWalletContainer>
-        <SIconConatainer>
+        <SIconContainer>
           <InlineSvg
             svg={WalletIcon}
             fill={theme.colorsThemed.text.primary}
             width='24px'
             height='24px'
           />
-        </SIconConatainer>
+        </SIconContainer>
         <SBalanceText variant={2} weight={600}>
-          {t('Settings.sections.Wallet.empty.balance')}
+          {t('Settings.sections.wallet.balance')}
         </SBalanceText>
         <Headline variant={4}>$0.00</Headline>
         <SCaptionText variant={2} weight={600}>
-          {t('Settings.sections.Wallet.empty.caption')}
+          {t('Settings.sections.wallet.caption')}
         </SCaptionText>
         <Button
           view='primaryGrad'
           onClick={() => setIsTopWalletModalOpen(true)}
         >
-          {t('Settings.sections.Wallet.empty.topUpBtn')}
+          {t('Settings.sections.wallet.button.topUp')}
         </Button>
         <TopUpWalletModal
           zIndex={12}
@@ -78,18 +78,16 @@ const SettingsWallet: React.FunctionComponent<ISettingsWallet> = () => {
 
   return (
     <SSettingsWalletContainer>
-      <SText variant={2}>
-        {t('Settings.sections.Wallet.non-empty.balance')}
-      </SText>
+      <SText variant={2}>{t('Settings.sections.wallet.balance')}</SText>
       <SActionDiv>
         <Headline variant={4}>
-          ${formatNumber(walletBalance?.usdCents / 100 ?? 0, true)}
+          ${formatNumber(walletBalance?.usdCents / 100 ?? 0, false)}
         </Headline>
         <Button
           view='primaryGrad'
           onClick={() => setIsTopWalletModalOpen(true)}
         >
-          {t('Settings.sections.Wallet.non-empty.topUpBtn')}
+          {t('Settings.sections.wallet.button.topUp')}
         </Button>
       </SActionDiv>
       <TopUpWalletModal
@@ -133,7 +131,7 @@ const SSettingsWalletContainer = styled.div`
   }
 `;
 
-const SIconConatainer = styled.div`
+const SIconContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;

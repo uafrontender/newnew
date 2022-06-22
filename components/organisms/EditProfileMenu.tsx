@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled, { useTheme, css } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import { debounce, isEqual } from 'lodash';
 import validator from 'validator';
@@ -25,6 +25,8 @@ import UsernameInput from '../atoms/profile/UsernameInput';
 import NicknameInput from '../atoms/profile/NicknameInput';
 import ProfileImageInput from '../molecules/profile/ProfileImageInput';
 import ProfileBackgroundInput from '../molecules/profile/ProfileBackgroundInput';
+import DropdownSelect, { TDropdownSelectItem } from '../atoms/DropdownSelect';
+import HelperText from '../atoms/HelperText';
 
 // Icons
 import CancelIcon from '../../public/images/svg/icons/outlined/Close.svg';
@@ -44,6 +46,8 @@ import { CropperObjectFit } from '../molecules/profile/ProfileBackgroundCropper'
 import isBrowser from '../../utils/isBrowser';
 import isAnimatedImage from '../../utils/isAnimatedImage';
 import resizeImage from '../../utils/resizeImage';
+import genderPronouns from '../../constants/genderPronouns';
+import getGenderPronouns from '../../utils/genderPronouns';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -61,6 +65,7 @@ type ModalMenuUserData = {
   username: string;
   nickname: string;
   bio: string;
+  genderPronouns?: newnewapi.User.GenderPronouns;
 };
 
 type TFormErrors = {
@@ -82,7 +87,7 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
       break;
     }
     case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'innappropriate';
+      errorMsg = 'inappropriate';
       break;
     }
     case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION: {
@@ -116,7 +121,7 @@ const errorSwitchUsername = (
       break;
     }
     case newnewapi.ValidateUsernameResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'innappropriate';
+      errorMsg = 'inappropriate';
       break;
     }
     case newnewapi.ValidateUsernameResponse.Status.USERNAME_TAKEN: {
@@ -141,7 +146,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   handleSetStageToEditingGeneral,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   const dispatch = useAppDispatch();
   const { user, ui } = useAppSelector((state) => state);
@@ -157,6 +162,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     nickname: user.userData?.nickname ?? '',
     username: user.userData?.username ?? '',
     bio: user.userData?.bio ?? '',
+    genderPronouns: user.userData?.genderPronouns
+      ? getGenderPronouns(user.userData?.genderPronouns).value
+      : undefined,
   });
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
   const [isDataValid, setIsDataValid] = useState(false);
@@ -291,24 +299,40 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   );
 
   const handleUpdateDataInEdit = useCallback(
-    (key: keyof ModalMenuUserData, value: any) => {
+    <T extends keyof ModalMenuUserData>(
+      key: T,
+      value: ModalMenuUserData[T]
+    ) => {
       setIsDataValid(false);
 
-      const workingData = { ...dataInEdit };
+      const workingData: ModalMenuUserData = { ...dataInEdit };
       workingData[key] = value;
+
       setDataInEdit({ ...workingData });
 
       if (key === 'nickname') {
         validateTextViaAPIDebounced(
           newnewapi.ValidateTextRequest.Kind.USER_NICKNAME,
-          value
+          value as ModalMenuUserData['nickname']
         );
-      } else if (key === 'username' && value !== user.userData?.username) {
-        validateUsernameViaAPIDebounced(value);
+      } else if (key === 'username') {
+        if (value === user.userData?.username) {
+          validateUsernameViaAPIDebounced.cancel();
+          // reset error if username equal to initial username
+          setFormErrors((errors) => {
+            const errorsWorking = { ...errors };
+            errorsWorking.usernameError = '';
+            return errorsWorking;
+          });
+        } else {
+          validateUsernameViaAPIDebounced(
+            value as ModalMenuUserData['username']
+          );
+        }
       } else if (key === 'bio') {
         validateTextViaAPIDebounced(
           newnewapi.ValidateTextRequest.Kind.USER_BIO,
-          value
+          value as ModalMenuUserData['bio']
         );
       }
     },
@@ -369,7 +393,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             }
 
             setCropCoverImage({ x: 0, y: 0 });
-            setCoverUrlInEdit(reader.result as string);
+            setCoverUrlInEdit(properlySizedImage.url);
             setCoverUrlInEditAnimated(isAnimatedImage(file.name));
           });
         }
@@ -383,9 +407,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     setCropCoverImage(location);
   };
 
-  const onCropCompleteCoverImage = useCallback((_, croppedAreaPixels: Area) => {
-    setCroppedAreaCoverImage(croppedAreaPixels);
-  }, []);
+  const onCropCompleteCoverImage = useCallback(
+    (_: any, croppedAreaPixels: Area) => {
+      setCroppedAreaCoverImage(croppedAreaPixels);
+    },
+    []
+  );
 
   const handleUpdateUserData = useCallback(async () => {
     if (isAPIValidateLoading) return;
@@ -446,6 +473,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         ...(newCoverImgURL ? { coverUrl: newCoverImgURL } : {}),
         // Delete cover image, if it was deleted and no new image provided
         ...(!coverUrlInEdit ? { coverUrl: '' } : {}),
+        ...(dataInEdit.genderPronouns
+          ? { genderPronouns: dataInEdit.genderPronouns }
+          : {}),
       });
 
       const res = await updateMe(payload);
@@ -459,6 +489,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           avatarUrl: res.data.me?.avatarUrl,
           bio: res.data.me?.bio,
           coverUrl: res.data.me?.coverUrl,
+          genderPronouns: res.data.me?.genderPronouns,
           options: {
             ...user.userData?.options,
           },
@@ -566,7 +597,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   };
 
   const onCropCompleteProfileImage = useCallback(
-    (_, croppedAreaPixels: Area) => {
+    (_: any, croppedAreaPixels: Area) => {
       setCroppedAreaProfileImage(croppedAreaPixels);
     },
     []
@@ -654,6 +685,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       nickname: user.userData?.nickname ?? '',
       username: user.userData?.username ?? '',
       bio: user.userData?.bio ?? '',
+      genderPronouns: user.userData?.genderPronouns
+        ? getGenderPronouns(user.userData?.genderPronouns).value
+        : undefined,
     };
 
     if (
@@ -674,57 +708,27 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     coverUrlInEdit,
   ]);
 
-  // Check fields validity
   useEffect(() => {
-    const isUsernameValid =
-      dataInEdit.username.length >= 2 &&
-      dataInEdit.username.length <= 25 &&
-      validator.isAlphanumeric(dataInEdit.username) &&
-      validator.isLowercase(dataInEdit.username);
-    const isNicknameValid = dataInEdit && dataInEdit.nickname.length > 0;
-
-    if (!isNicknameValid || !isUsernameValid) {
-      setFormErrors((errors) => {
-        const errorsWorking = { ...errors };
-        errorsWorking.usernameError = isUsernameValid ? '' : 'generic';
-        errorsWorking.nicknameError = isNicknameValid ? '' : 'generic';
-        return errorsWorking;
-      });
-      setIsDataValid(false);
-    } else {
-      setFormErrors({
-        usernameError: '',
-        nicknameError: '',
-      });
+    if (Object.values(formErrors).every((v) => v === '')) {
       setIsDataValid(true);
-    }
-  }, [dataInEdit]);
-
-  // Set and unset form errors
-  useEffect(() => {
-    if (Object.values(formErrors).some((v) => v !== '')) {
-      setIsDataValid(false);
     } else {
-      const isUsernameValid =
-        dataInEdit.username.length >= 2 &&
-        dataInEdit.username.length <= 25 &&
-        validator.isAlphanumeric(dataInEdit.username) &&
-        validator.isLowercase(dataInEdit.username);
-      const isNicknameValid = dataInEdit && dataInEdit.nickname.length > 0;
-
-      if (!isNicknameValid || !isUsernameValid) {
-        setFormErrors((errors) => {
-          const errorsWorking = { ...errors };
-          errorsWorking.usernameError = isUsernameValid ? '' : 'generic';
-          errorsWorking.nicknameError = isNicknameValid ? '' : 'generic';
-          return errorsWorking;
-        });
-        setIsDataValid(false);
-      } else {
-        setIsDataValid(true);
-      }
+      setIsDataValid(false);
     }
   }, [formErrors, dataInEdit]);
+
+  // Gender Pronouns
+  const genderOptions: TDropdownSelectItem<number>[] = useMemo(
+    () =>
+      Object.values(genderPronouns)
+        .filter(
+          (genderP) => genderP.value !== newnewapi.User.GenderPronouns.UNKNOWN
+        )
+        .map((genderP) => ({
+          name: t(`genderPronouns.${genderP.name}`),
+          value: genderP.value,
+        })),
+    [t]
+  );
 
   return (
     <SEditProfileMenu
@@ -742,11 +746,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           >
             {isMobile ? (
               <SGoBackButtonMobile onClick={handleClosePreventDiscarding}>
-                {t('EditProfileMenu.goBackBtn.general')}
+                {t('editProfileMenu.button.backToProfile')}
               </SGoBackButtonMobile>
             ) : (
               <SGoBackButtonDesktop onClick={handleClosePreventDiscarding}>
-                <div>{t('EditProfileMenu.goBackBtn.general')}</div>
+                <div>{t('editProfileMenu.button.backToProfile')}</div>
                 <InlineSvg
                   svg={CancelIcon}
                   fill={theme.colorsThemed.text.primary}
@@ -782,9 +786,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   type='text'
                   value={dataInEdit.nickname as string}
                   disabled={isLoading}
-                  placeholder={t('EditProfileMenu.inputs.nickname.placeholder')}
+                  placeholder={t('editProfileMenu.inputs.nickname.placeholder')}
                   errorCaption={t(
-                    `EditProfileMenu.inputs.nickname.errors.${formErrors.nicknameError}`
+                    `editProfileMenu.inputs.nickname.errors.${formErrors.nicknameError}`
                   )}
                   isValid={!formErrors.nicknameError}
                   onChange={(e) =>
@@ -799,20 +803,20 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     <UsernamePopupList
                       points={[
                         {
-                          text: t('EditProfileMenu.inputs.username.points.1'),
+                          text: t('editProfileMenu.inputs.username.points.1'),
                           isValid: dataInEdit.username
                             ? dataInEdit.username.length >= 2 &&
                               dataInEdit.username.length <= 25
                             : false,
                         },
                         {
-                          text: t('EditProfileMenu.inputs.username.points.2'),
+                          text: t('editProfileMenu.inputs.username.points.2'),
                           isValid: dataInEdit.username
                             ? validator.isLowercase(dataInEdit.username)
                             : false,
                         },
                         {
-                          text: t('EditProfileMenu.inputs.username.points.3'),
+                          text: t('editProfileMenu.inputs.username.points.3'),
                           isValid: dataInEdit.username
                             ? validator.isAlphanumeric(dataInEdit.username)
                             : false,
@@ -821,21 +825,43 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     />
                   }
                   errorCaption={t(
-                    `EditProfileMenu.inputs.username.errors.${formErrors.usernameError}`
+                    `editProfileMenu.inputs.username.errors.${formErrors.usernameError}`
                   )}
-                  placeholder={t('EditProfileMenu.inputs.username.placeholder')}
+                  placeholder={t('editProfileMenu.inputs.username.placeholder')}
                   isValid={!formErrors.usernameError}
                   onChange={(value) => {
-                    handleUpdateDataInEdit('username', value);
+                    handleUpdateDataInEdit('username', value as string);
                   }}
                 />
+                <SDropdownSelectWrapper>
+                  <SDropdownSelect<number>
+                    width='100%'
+                    disabled={isLoading}
+                    label={
+                      dataInEdit?.genderPronouns
+                        ? genderOptions.find(
+                            (o) => o.value === dataInEdit.genderPronouns
+                          )?.name!!
+                        : 'Gender'
+                    }
+                    options={genderOptions}
+                    selected={dataInEdit.genderPronouns}
+                    closeOnSelect
+                    onSelect={(value: number) =>
+                      handleUpdateDataInEdit('genderPronouns', value)
+                    }
+                  />
+                  <HelperText>
+                    {t('editProfileMenu.inputs.genderPronouns.caption')}
+                  </HelperText>
+                </SDropdownSelectWrapper>
                 <BioTextarea
                   maxChars={150}
                   value={dataInEdit.bio}
                   disabled={isLoading}
-                  placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
+                  placeholder={t('editProfileMenu.inputs.bio.placeholder')}
                   errorCaption={t(
-                    `EditProfileMenu.inputs.bio.errors.${formErrors.bioError}`
+                    `editProfileMenu.inputs.bio.errors.${formErrors.bioError}`
                   )}
                   isValid={!formErrors.bioError}
                   onChange={(e) =>
@@ -847,7 +873,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             <SControlsWrapper>
               {!isMobile ? (
                 <Button view='secondary' onClick={() => handleClose()}>
-                  {t('EditProfileMenu.cancelButton')}
+                  {t('editProfileMenu.button.cancel')}
                 </Button>
               ) : null}
               <Button
@@ -861,7 +887,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 }}
                 onClick={() => handleUpdateUserData()}
               >
-                {t('EditProfileMenu.saveButton')}
+                {t('editProfileMenu.button.save')}
               </Button>
             </SControlsWrapper>
           </SEditProfileGeneral>
@@ -876,13 +902,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               <SGoBackButtonMobile
                 onClick={handleSetStageToEditingGeneralUnsetPicture}
               >
-                {t('EditProfileMenu.goBackBtn.profilePicture')}
+                {t('editProfileMenu.button.backToImage')}
               </SGoBackButtonMobile>
             ) : (
               <SGoBackButtonDesktop
                 onClick={handleSetStageToEditingGeneralUnsetPicture}
               >
-                <div>{t('EditProfileMenu.goBackBtn.profilePicture')}</div>
+                <div>{t('editProfileMenu.button.backToImage')}</div>
                 <InlineSvg
                   svg={CancelIcon}
                   fill={theme.colorsThemed.text.primary}
@@ -948,14 +974,14 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 disabled={updateProfileImageLoading}
                 onClick={handleSetStageToEditingGeneralUnsetPicture}
               >
-                {t('EditProfileMenu.cancelButton')}
+                {t('editProfileMenu.button.cancel')}
               </Button>
               <Button
                 withShadow
                 disabled={updateProfileImageLoading}
                 onClick={completeProfileImageCropAndSave}
               >
-                {t('EditProfileMenu.saveButton')}
+                {t('editProfileMenu.button.save')}
               </Button>
             </SControlsWrapperPicture>
           </SEditProfilePicture>
@@ -1217,3 +1243,37 @@ const SUsernamePopupList = styled.div`
 
   color: #ffffff;
 `;
+
+const SDropdownSelectWrapper = styled.div`
+  margin-bottom: 16px;
+`;
+
+const SPreviewDiv = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-top: 6px;
+  margin-bottom: 16px;
+
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  & > div {
+    margin-right: 4px;
+  }
+`;
+
+const SDropdownSelect = styled(DropdownSelect)`
+  ${(props) =>
+    !props.selected &&
+    css`
+      & > button > span {
+        color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+      }
+    `}
+` as typeof DropdownSelect;

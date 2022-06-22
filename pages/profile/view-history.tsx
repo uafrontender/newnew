@@ -61,7 +61,7 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
@@ -144,15 +144,15 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
   return (
     <div>
       <Head>
-        <title>{t('Viewing-history.meta.title')}</title>
+        <title>{t('ViewingHistory.meta.title')}</title>
         <meta
           name='description'
-          content={t('Viewing-history.meta.description')}
+          content={t('ViewingHistory.meta.description')}
         />
-        <meta property='og:title' content={t('Viewing-history.meta.title')} />
+        <meta property='og:title' content={t('ViewingHistory.meta.title')} />
         <meta
           property='og:description'
-          content={t('Viewing-history.meta.description')}
+          content={t('ViewingHistory.meta.description')}
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
@@ -172,7 +172,7 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
           {posts && posts.length === 0 && !isLoading && (
             <NoContentCard>
               <NoContentDescription>
-                {t('Viewing-history.no-content.description')}
+                {t('ViewingHistory.noContent.description')}
               </NoContentDescription>
             </NoContentCard>
           )}
@@ -215,10 +215,10 @@ export async function getServerSideProps(
   try {
     const translationContext = await serverSideTranslations(context.locale!!, [
       'common',
-      'profile',
-      'home',
-      'decision',
-      'payment-modal',
+      'page-Profile',
+      'component-PostCard',
+      'modal-Post',
+      'modal-PaymentModal',
     ]);
 
     // const { req } = context;

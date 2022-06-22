@@ -102,7 +102,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     shouldStop,
     handleRemovePostFromState,
   }) => {
-    const { t } = useTranslation('home');
+    const { t } = useTranslation('component-PostCard');
     const theme = useTheme();
     const router = useRouter();
     const user = useAppSelector((state) => state.user);
@@ -220,13 +220,11 @@ export const PostCard: React.FC<ICard> = React.memo(
       try {
         if (videoReady) {
           if (inView && !shouldStop) {
-            try {
-              videoRef.current?.play();
-            } catch (err) {
-              // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
+            videoRef.current?.play().catch((e) => {
+              // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission .
               // Many browsers prevent autoplay
-              console.log(err);
-            }
+              console.log(e);
+            });
           } else {
             videoRef.current?.pause();
           }
@@ -328,17 +326,17 @@ export const PostCard: React.FC<ICard> = React.memo(
       };
 
       if (socketConnection) {
-        socketConnection.on('PostUpdated', handlerSocketPostUpdated);
-        socketConnection.on(
+        socketConnection?.on('PostUpdated', handlerSocketPostUpdated);
+        socketConnection?.on(
           'PostThumbnailUpdated',
           handlerSocketThumbnailUpdated
         );
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off('PostUpdated', handlerSocketPostUpdated);
-          socketConnection.off(
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off('PostUpdated', handlerSocketPostUpdated);
+          socketConnection?.off(
             'PostThumbnailUpdated',
             handlerSocketThumbnailUpdated
           );
@@ -545,7 +543,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   onClick={handleBidClick}
                   cardType={typeOfPost}
                 >
-                  {t(`button-card-singular-${typeOfPost}`, {
+                  {t('button.withActivity.mcSingular', {
                     votes: formatNumber(totalVotes ?? 0, true),
                     total: formatNumber(
                       (postParsed as newnewapi.Crowdfunding)
@@ -553,7 +551,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                       true
                     ),
                     backed: formatNumber(currentBackerCount ?? 0, true),
-                    amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
+                    amount: `$${formatNumber(totalAmount / 100 ?? 0, false)}`,
                   })}
                 </SButton>
               ) : (
@@ -574,7 +572,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   }
                   withProgress={typeOfPost === 'cf'}
                 >
-                  {t(`button-card-${typeOfPost}`, {
+                  {t(`button.withActivity.${typeOfPost}`, {
                     votes: formatNumber(totalVotes ?? 0, true),
                     total: formatNumber(
                       (postParsed as newnewapi.Crowdfunding)
@@ -582,15 +580,15 @@ export const PostCard: React.FC<ICard> = React.memo(
                       true
                     ),
                     backed: formatNumber(currentBackerCount ?? 0, true),
-                    amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
+                    amount: `$${formatNumber(totalAmount / 100 ?? 0, false)}`,
                   })}
                 </SButton>
               )
             ) : (
               <SButtonFirst withShrink onClick={handleBidClick}>
                 {switchPostStatus(typeOfPost, postParsed.status) === 'voting'
-                  ? t(`button-card-first-${typeOfPost}`)
-                  : t(`button-card-see-${typeOfPost}`)}
+                  ? t(`button.withoutActivity.${typeOfPost}`)
+                  : t(`button.seeResults.${typeOfPost}`)}
               </SButtonFirst>
             )}
           </SBottomEnd>

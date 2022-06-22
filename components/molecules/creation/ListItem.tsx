@@ -10,7 +10,10 @@ import Caption from '../../atoms/Caption';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import assets from '../../../constants/assets';
-import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
+import {
+  clearCreation,
+  clearPostData,
+} from '../../../redux-store/slices/creationStateSlice';
 
 const DARK_IMAGES_ANIMATED: any = {
   auction: assets.creation.darkAcAnimated,
@@ -41,7 +44,7 @@ interface IListItem {
 }
 
 const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -189,6 +192,3 @@ const SImageWrapper = styled.div`
     min-height: 120px;
   }
 `;
-function clearPostData(arg0: {}): any {
-  throw new Error('Function not implemented.');
-}

@@ -19,7 +19,7 @@ const CheckMark: React.FC<ICheckMark> = (props) => {
   const theme = useTheme();
 
   const onClick = useCallback(
-    (e) => {
+    (e: React.MouseEvent) => {
       if (disabled) return;
       handleChange(e, id);
     },
