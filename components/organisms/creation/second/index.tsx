@@ -580,6 +580,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                   formattedDescription={auction.minimalBid}
                   inputProps={{
                     min: 5,
+                    max: 10000,
                     type: 'number',
                     pattern: '[0-9]*',
                   }}
@@ -641,6 +642,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                       formattedDescription={auction.minimalBid}
                       inputProps={{
                         min: 5,
+                        max: 10000,
                         type: 'number',
                         pattern: '[0-9]*',
                       }}
