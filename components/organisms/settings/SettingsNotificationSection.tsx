@@ -122,7 +122,7 @@ const SSubsection = styled.div`
   display: flex;
   flex-direction: column;
 
-  margin-top: 16px;
+  padding-top: 16px;
   padding-bottom: 16px;
 
   ${({ theme }) => theme.media.tablet} {
