@@ -147,7 +147,7 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
               </SYouMade>
               {option.totalAmount?.usdCents && (
                 <SHeadline variant={5}>
-                  ${formatNumber(option.totalAmount.usdCents / 100, true)}
+                  ${formatNumber(option.totalAmount.usdCents / 100, false)}
                 </SHeadline>
               )}
               <SOptionCreator variant={3}>

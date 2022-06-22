@@ -153,7 +153,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
                   <STotal>
                     {`$${formatNumber(
                       post.totalAmount.usdCents / 100 ?? 0,
-                      true
+                      false
                     )}`}{' '}
                     <span>{t('acPostAwaiting.inTotalBids')}</span>
                   </STotal>

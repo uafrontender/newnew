@@ -470,7 +470,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               {option.totalAmount?.usdCents
                 ? `$${formatNumber(
                     option?.totalAmount?.usdCents / 100 ?? 0,
-                    true
+                    false
                   )}`
                 : '$0'}
             </div>

@@ -367,6 +367,28 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
             handlePostClicked={handleOpenPostModal}
           />
         )}
+      {!collectionMCError && (
+        <CardsSection
+          title={t('cardsSection.title.mc')}
+          category='mc'
+          collection={collectionMC}
+          loading={collectionMCInitialLoading}
+          handlePostClicked={handleOpenPostModal}
+          tutorialCard={
+            !user.loggedIn || collectionMC.length === 0 ? (
+              <TutorialCard
+                image={
+                  theme.name === 'light'
+                    ? assets.creation.lightMcAnimated
+                    : assets.creation.darkMcAnimated
+                }
+                title={t('tutorial.mc.title')}
+                caption={t('tutorial.mc.caption')}
+              />
+            ) : undefined
+          }
+        />
+      )}
       {!collectionACError && (
         <CardsSection
           title={t('cardsSection.title.ac')}
@@ -389,28 +411,6 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
                   left: '10%',
                   bottom: '6px',
                 }}
-              />
-            ) : undefined
-          }
-        />
-      )}
-      {!collectionMCError && (
-        <CardsSection
-          title={t('cardsSection.title.mc')}
-          category='mc'
-          collection={collectionMC}
-          loading={collectionMCInitialLoading}
-          handlePostClicked={handleOpenPostModal}
-          tutorialCard={
-            !user.loggedIn || collectionMC.length === 0 ? (
-              <TutorialCard
-                image={
-                  theme.name === 'light'
-                    ? assets.creation.lightMcAnimated
-                    : assets.creation.darkMcAnimated
-                }
-                title={t('tutorial.mc.title')}
-                caption={t('tutorial.mc.caption')}
               />
             ) : undefined
           }
