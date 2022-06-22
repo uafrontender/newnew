@@ -70,7 +70,7 @@ const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
         ref={(el) => {
           inputRef.current = el!!;
         }}
-        value={value ? `$${formatNumber(parseInt(value), false)}` : value}
+        value={value ? `$${formatNumber(parseInt(value), true)}` : value}
         disabled={disabled ?? false}
         align={inputAlign}
         inputMode='numeric'

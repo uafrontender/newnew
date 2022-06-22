@@ -58,7 +58,7 @@ const CfBackersStatsSectionFailed: React.FunctionComponent<ICfBackersStatsSectio
             <SMyPledgeAmountDiv>
               {t('cfPost.backersStatsSection.myBacking')}
               {` `}
-              {`$${formatNumber(myPledgeAmount.usdCents / 100 ?? 0, false)}`}
+              {`$${formatNumber(myPledgeAmount.usdCents / 100 ?? 0, true)}`}
             </SMyPledgeAmountDiv>
           )}
         </SCaptionSection>
