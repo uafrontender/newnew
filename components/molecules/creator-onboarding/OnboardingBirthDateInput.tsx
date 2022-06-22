@@ -169,6 +169,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
                 selected={value?.day !== null ? value?.day : undefined}
                 maxItems={6}
                 onSelect={handleUpdateDay}
+                disabled={disabled ?? false}
               />
               <DropdownSelect<number>
                 closeOnSelect
@@ -182,6 +183,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
                 selected={value?.month !== null ? value?.month : undefined}
                 maxItems={6}
                 onSelect={handleUpdateMonth}
+                disabled={disabled ?? false}
               />
               <DropdownSelect<number>
                 closeOnSelect
@@ -195,6 +197,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
                 selected={value?.year !== null ? value?.year : undefined}
                 maxItems={6}
                 onSelect={handleUpdateYear}
+                disabled={disabled ?? false}
               />
             </SDropdownsContainer>
           ) : (
