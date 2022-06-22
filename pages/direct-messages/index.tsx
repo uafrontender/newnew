@@ -6,6 +6,7 @@ import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import { useUpdateEffect } from 'react-use';
 
 import General from '../../components/templates/General';
 
@@ -17,7 +18,7 @@ import Lottie from '../../components/atoms/Lottie';
 import loadingAnimation from '../../public/animations/logo-loading-blue.json';
 
 export const Chat = () => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -75,7 +76,7 @@ export const Chat = () => {
     }
   };
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (!user.loggedIn) {
       router?.push('/sign-up?to=log-in');
     }
@@ -124,8 +125,8 @@ export default Chat;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'chat',
-    'payment-modal',
+    'page-Chat',
+    'modal-PaymentModal',
   ]);
 
   const { req } = context;

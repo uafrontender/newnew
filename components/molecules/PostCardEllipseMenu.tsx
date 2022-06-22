@@ -40,7 +40,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
     }) => {
       const theme = useTheme();
       const router = useRouter();
-      const { t } = useTranslation('home');
+      const { t } = useTranslation('common');
       const containerRef = useRef<HTMLDivElement>();
       const user = useAppSelector((state) => state.user);
 
@@ -168,8 +168,8 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
               <SButton onClick={() => handleCopyLink()}>
                 <Text variant={3}>
                   {isCopiedUrl
-                    ? t('ellipse.link-copied')
-                    : t('ellipse.copy-link')}
+                    ? t('ellipse.linkCopied')
+                    : t('ellipse.copyLink')}
                 </Text>
               </SButton>
               {postCreator.uuid !== user.userData?.userUuid && (
@@ -178,10 +178,10 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
                     <SButton onClick={() => handleFollowDecision()}>
                       <Text variant={3}>
                         {!isFollowingDecision
-                          ? t('ellipse.follow-decision', {
+                          ? t('ellipse.followDecision', {
                               postType: t(`postType.${postType}`),
                             })
-                          : t('ellipse.unfollow-decision', {
+                          : t('ellipse.unFollowDecision', {
                               postType: t(`postType.${postType}`),
                             })}
                       </Text>

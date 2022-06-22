@@ -37,7 +37,7 @@ const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
 interface IPublishedContent {}
 
 export const PublishedContent: React.FC<IPublishedContent> = () => {
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -127,9 +127,9 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
               url += postData.multipleChoice.postUuid;
             }
 
-            router.push(url);
-
-            dispatch(clearCreation({}));
+            router.push(url).then(() => {
+              dispatch(clearCreation({}));
+            });
           }
         }
       }
@@ -214,7 +214,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
               thumbnails={post.thumbnailParameters}
             />
           ) : (
-            <SText variant={2}>{t('video-being-processed-caption')}</SText>
+            <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
           )}
         </SPlayerWrapper>
         <SUserBlock>

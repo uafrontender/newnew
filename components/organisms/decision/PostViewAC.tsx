@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
@@ -16,6 +14,7 @@ import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
+import { useInView } from 'react-intersection-observer';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -23,37 +22,27 @@ import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import {
-  fetchAcOptionById,
   fetchCurrentBidsForPost,
   placeBidOnAuction,
 } from '../../../api/endpoints/auction';
 
-import Lottie from '../../atoms/Lottie';
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import DecisionTabs from '../../molecules/decision/PostTabs';
-
-// Assets
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 // Utils
-import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
+import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
+import Headline from '../../atoms/Headline';
+import PostVotingTab from '../../molecules/decision/PostVotingTab';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
   () => import('../../molecules/decision/auction/AcOptionsTab')
-);
-const CommentsTab = dynamic(
-  () => import('../../molecules/decision/CommentsTab')
-);
-const AcWinnerTab = dynamic(
-  () => import('../../molecules/decision/auction/AcWinnerTab')
 );
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
 const PaymentSuccessModal = dynamic(
@@ -95,7 +84,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     handleRemovePostFromState,
     handleAddPostToState,
   }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -103,8 +92,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       resizeMode
     );
 
-    const { syncedHistoryPushState, syncedHistoryReplaceState } =
-      useSynchronizedHistory();
+    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     const showSelectingWinnerOption = useMemo(
       () => postStatus === 'waiting_for_decision',
@@ -120,105 +108,22 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       post.isResponseViewedByMe ?? false
     );
 
-    // Tabs
-    const tabs = useMemo(() => {
-      if (post.winningOptionId) {
-        return [
-          {
-            label: 'winner',
-            value: 'winner',
-          },
-          {
-            label: 'bids',
-            value: 'bids',
-          },
-          ...(post.isCommentsAllowed
-            ? [
-                {
-                  label: 'comments',
-                  value: 'comments',
-                },
-              ]
-            : []),
-        ];
-      }
-      return [
-        {
-          label: 'bids',
-          value: 'bids',
-        },
-        ...(post.isCommentsAllowed
-          ? [
-              {
-                label: 'comments',
-                value: 'comments',
-              },
-            ]
-          : []),
-      ];
-    }, [post.isCommentsAllowed, post.winningOptionId]);
-
-    const [currentTab, setCurrentTab] = useState<
-      'bids' | 'comments' | 'winner'
-    >(() => {
-      if (!isBrowser()) {
-        return 'bids';
-      }
-      const { hash } = window.location;
-      if (
-        hash &&
-        (hash === '#bids' || hash === '#comments' || hash === '#winner')
-      ) {
-        return hash.substring(1) as 'bids' | 'comments' | 'winner';
-      }
-      if (post.winningOptionId) return 'winner';
-      return 'bids';
+    // Comments
+    const { ref: commentsSectionRef, inView } = useInView({
+      threshold: 0.8,
     });
 
-    const handleChangeTab = (tab: string) => {
-      if (tab === 'comments' && isMobile) {
-        window.history.pushState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}#${tab}`
-        );
-      } else {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}#${tab}`
-        );
+    const handleCommentFocus = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display =
+          'none';
       }
-      window.dispatchEvent(new HashChangeEvent('hashchange'));
     };
-
-    useEffect(() => {
-      const handleHashChange = () => {
-        const { hash } = window.location;
-        if (!hash) {
-          setCurrentTab('bids');
-          return;
-        }
-        const parsedHash = hash.substring(1);
-        if (
-          parsedHash === 'bids' ||
-          parsedHash === 'comments' ||
-          parsedHash === 'winner'
-        ) {
-          setCurrentTab(parsedHash);
-        }
-      };
-
-      window.addEventListener('hashchange', handleHashChange, false);
-
-      return () => {
-        window.removeEventListener('hashchange', handleHashChange, false);
-      };
-    }, []);
+    const handleCommentBlur = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display = '';
+      }
+    };
 
     // Vote from sessionId
     const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -238,13 +143,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       useState<string | undefined | null>('');
     const [optionsLoading, setOptionsLoading] = useState(false);
     const [loadingOptionsError, setLoadingOptionsError] = useState('');
-
-    // Winning option
-    const [winningOption, setWinningOption] =
-      useState<newnewapi.Auction.Option | undefined>();
-
-    // Animating options
-    const [optionToAnimate, setOptionToAnimate] = useState('');
 
     // const currLocation = `/post/${post.postUuid}`;
 
@@ -436,28 +334,25 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
 
           return sortOptions(workingArrUnsorted);
         });
-        setOptionToAnimate(newOption.id.toString());
-
-        setTimeout(() => {
-          setOptionToAnimate('');
-        }, 3000);
       },
       [setOptions, sortOptions]
     );
     // Increment channel subs after mounting
     // Decrement when unmounting
     useEffect(() => {
-      addChannel(post.postUuid, {
-        postUpdates: {
-          postUuid: post.postUuid,
-        },
-      });
+      if (socketConnection?.connected) {
+        addChannel(post.postUuid, {
+          postUpdates: {
+            postUuid: post.postUuid,
+          },
+        });
+      }
 
       return () => {
         removeChannel(post.postUuid);
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [socketConnection?.connected]);
 
     // Mark post as viewed if logged in
     useEffect(() => {
@@ -500,28 +395,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [post.postUuid]);
-
-    useEffect(() => {
-      async function fetchAndSetWinningOption(id: number) {
-        try {
-          const payload = new newnewapi.GetAcOptionRequest({
-            optionId: id,
-          });
-
-          const res = await fetchAcOptionById(payload);
-
-          if (res.data?.option) {
-            setWinningOption(res.data.option as newnewapi.Auction.Option);
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      }
-
-      if (post.winningOptionId) {
-        fetchAndSetWinningOption(post.winningOptionId as number);
-      }
-    }, [post.winningOptionId]);
 
     useEffect(() => {
       const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -589,24 +462,24 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       };
 
       if (socketConnection) {
-        socketConnection.on(
+        socketConnection?.on(
           'AcOptionCreatedOrUpdated',
           socketHandlerOptionCreatedOrUpdated
         );
-        socketConnection.on('AcOptionDeleted', socketHandlerOptionDeleted);
-        socketConnection.on('PostUpdated', socketHandlerPostData);
-        socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
+        socketConnection?.on('AcOptionDeleted', socketHandlerOptionDeleted);
+        socketConnection?.on('PostUpdated', socketHandlerPostData);
+        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off(
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
             'AcOptionCreatedOrUpdated',
             socketHandlerOptionCreatedOrUpdated
           );
-          socketConnection.off('AcOptionDeleted', socketHandlerOptionDeleted);
-          socketConnection.off('PostUpdated', socketHandlerPostData);
-          socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
+          socketConnection?.off('AcOptionDeleted', socketHandlerOptionDeleted);
+          socketConnection?.off('PostUpdated', socketHandlerPostData);
+          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -652,11 +525,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
         resetSessionId();
       };
 
-      if (socketConnection.active) {
+      if (socketConnection?.connected) {
+        console.log(sessionId);
         makeBidFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection.active, sessionId]);
+    }, [socketConnection?.connected, sessionId]);
 
     const goToNextStep = () => {
       if (
@@ -700,59 +574,87 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       }
     }, [options, user]);
 
+    // Scroll to comments if hash is present
+    useEffect(() => {
+      const handleCommentsInitialHash = () => {
+        const { hash } = window.location;
+        if (!hash) {
+          return;
+        }
+
+        const parsedHash = hash.substring(1);
+
+        if (parsedHash === 'comments') {
+          document.getElementById('comments')?.scrollIntoView();
+        }
+      };
+
+      handleCommentsInitialHash();
+    }, []);
+
+    // Replace hash once scrolled to comments
+    useEffect(() => {
+      if (inView) {
+        syncedHistoryReplaceState({}, `/post/${post.postUuid}#comments`);
+      } else {
+        syncedHistoryReplaceState({}, `/post/${post.postUuid}`);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inView, post.postUuid]);
+
     return (
-      <SWrapper>
-        <SExpiresSection>
-          {isMobile && (
-            <SGoBackButton
-              style={{
-                gridArea: 'closeBtnMobile',
-              }}
-              onClick={handleGoBack}
+      <>
+        <SWrapper>
+          <SExpiresSection>
+            {isMobile && (
+              <SGoBackButton
+                style={{
+                  gridArea: 'closeBtnMobile',
+                }}
+                onClick={handleGoBack}
+              />
+            )}
+            <PostTimer
+              timestampSeconds={new Date(
+                (post.expiresAt?.seconds as number) * 1000
+              ).getTime()}
+              postType='ac'
+              isTutorialVisible={options.length > 0}
             />
-          )}
-          <PostTimer
-            timestampSeconds={new Date(
-              (post.expiresAt?.seconds as number) * 1000
-            ).getTime()}
+          </SExpiresSection>
+          <PostVideo
+            postId={post.postUuid}
+            announcement={post.announcement!!}
+            response={post.response ?? undefined}
+            responseViewed={responseViewed}
+            handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
+            isMuted={mutedMode}
+            handleToggleMuted={() => handleToggleMutedMode()}
+          />
+          <PostTopInfo
             postType='ac'
-            isTutorialVisible={options.length > 0}
+            postId={post.postUuid}
+            postStatus={postStatus}
+            title={post.title}
+            amountInBids={totalAmount}
+            hasWinner={!!post.winningOptionId}
+            creator={post.creator!!}
+            isFollowingDecision={isFollowingDecision}
+            hasRecommendations={hasRecommendations}
+            handleSetIsFollowingDecision={handleSetIsFollowingDecision}
+            handleReportOpen={handleReportOpen}
+            handleRemovePostFromState={handleRemovePostFromState}
+            handleAddPostToState={handleAddPostToState}
           />
-        </SExpiresSection>
-        <PostVideo
-          postId={post.postUuid}
-          announcement={post.announcement!!}
-          response={post.response ?? undefined}
-          responseViewed={responseViewed}
-          handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
-          isMuted={mutedMode}
-          handleToggleMuted={() => handleToggleMutedMode()}
-        />
-        <PostTopInfo
-          postType='ac'
-          postId={post.postUuid}
-          postStatus={postStatus}
-          title={post.title}
-          amountInBids={totalAmount}
-          hasWinner={!!post.winningOptionId}
-          creator={post.creator!!}
-          isFollowingDecision={isFollowingDecision}
-          hasRecommendations={hasRecommendations}
-          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-          handleReportOpen={handleReportOpen}
-          handleRemovePostFromState={handleRemovePostFromState}
-          handleAddPostToState={handleAddPostToState}
-        />
-        <SActivitesContainer
-          decisionFailed={postStatus === 'failed'}
-          showSelectingWinnerOption={showSelectingWinnerOption}
-        >
-          <DecisionTabs
-            tabs={tabs}
-            activeTab={currentTab}
-            handleChangeTab={handleChangeTab}
-          />
-          {currentTab === 'bids' ? (
+          <SActivitesContainer
+            decisionFailed={postStatus === 'failed'}
+            showSelectingWinnerOption={showSelectingWinnerOption}
+          >
+            <PostVotingTab>
+              {`${t('tabs.bids')} ${
+                !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
+              }`}
+            </PostVotingTab>
             <AcOptionsTab
               postId={post.postUuid}
               postStatus={postStatus}
@@ -780,75 +682,52 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
               }
               handleRemoveOption={handleRemoveOption}
             />
-          ) : currentTab === 'comments' && post.isCommentsAllowed ? (
-            <CommentsTab
-              postUuid={post.postUuid}
-              commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => handleChangeTab('bids')}
-            />
-          ) : winningOption ? (
-            <AcWinnerTab
-              postId={post.postUuid}
-              option={winningOption}
-              postStatus={postStatus}
-            />
-          ) : currentTab === 'comments' && post.isCommentsAllowed ? (
-            <CommentsTab
-              postUuid={post.postUuid}
-              commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => handleChangeTab('bids')}
-            />
-          ) : winningOption ? (
-            <AcWinnerTab
-              postId={post.postUuid}
-              option={winningOption}
-              postStatus={postStatus}
-            />
-          ) : (
-            <SAnimationContainer>
-              <Lottie
-                width={64}
-                height={64}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: loadingAnimation,
-                }}
-              />
-            </SAnimationContainer>
-          )}
-        </SActivitesContainer>
+          </SActivitesContainer>
 
-        {/* Loading Modal */}
-        {loadingModalOpen && (
-          <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+          {/* Loading Modal */}
+          {loadingModalOpen && (
+            <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+          )}
+          {/* Payment success Modal */}
+          {paymentSuccesModalOpen && (
+            <PaymentSuccessModal
+              postType='ac'
+              isVisible={paymentSuccesModalOpen}
+              closeModal={() => setPaymentSuccesModalOpen(false)}
+            >
+              {t('paymentSuccessModal.ac', {
+                postCreator:
+                  (post.creator?.nickname as string) ?? post.creator?.username,
+                postDeadline: moment(
+                  (post.responseUploadDeadline?.seconds as number) * 1000
+                )
+                  .subtract(3, 'days')
+                  .calendar(),
+              })}
+            </PaymentSuccessModal>
+          )}
+          {isPopupVisible && (
+            <HeroPopup
+              isPopupVisible={isPopupVisible}
+              postType='AC'
+              closeModal={goToNextStep}
+            />
+          )}
+        </SWrapper>
+        {post.isCommentsAllowed && (
+          <SCommentsSection id='comments' ref={commentsSectionRef}>
+            <SCommentsHeadline variant={4}>
+              {t('successCommon.comments.heading')}
+            </SCommentsHeadline>
+            <CommentsBottomSection
+              postUuid={post.postUuid}
+              commentsRoomId={post.commentsRoomId as number}
+              onFormBlur={handleCommentBlur}
+              onFormFocus={handleCommentFocus}
+            />
+          </SCommentsSection>
         )}
-        {/* Payment success Modal */}
-        {paymentSuccesModalOpen && (
-          <PaymentSuccessModal
-            postType='ac'
-            isVisible={paymentSuccesModalOpen}
-            closeModal={() => setPaymentSuccesModalOpen(false)}
-          >
-            {t('PaymentSuccessModal.ac', {
-              postCreator:
-                (post.creator?.nickname as string) ?? post.creator?.username,
-              postDeadline: moment(
-                (post.responseUploadDeadline?.seconds as number) * 1000
-              )
-                .subtract(3, 'days')
-                .calendar(),
-            })}
-          </PaymentSuccessModal>
-        )}
-        {isPopupVisible && (
-          <HeroPopup
-            isPopupVisible={isPopupVisible}
-            postType='AC'
-            closeModal={goToNextStep}
-          />
-        )}
-      </SWrapper>
+      </>
     );
   }
 );
@@ -950,11 +829,13 @@ const SActivitesContainer = styled.div<{
   }
 `;
 
-const SAnimationContainer = styled.div`
-  width: 100%;
-  height: 100%;
+// Comments
+const SCommentsHeadline = styled(Headline)`
+  margin-bottom: 8px;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 16px;
+  }
 `;
+
+const SCommentsSection = styled.div``;

@@ -22,7 +22,7 @@ const EnableSubModal: React.FC<IEnableSubModal> = ({
   closeModal,
   subEnabled,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const handleSubmit = () => {
     subEnabled();
   };
@@ -40,14 +40,14 @@ const EnableSubModal: React.FC<IEnableSubModal> = ({
               <SProductInfo>{`${t('enableSubModal.confirmationTextFirstPart')}
             $${formatNumber(
               selectedProduct.monthlyRate.usdCents / 100 ?? 0,
-              true
+              false
             )}
             ${t('enableSubModal.confirmationTextSecondPart')}`}</SProductInfo>
             )}
             <SNote>{t('enableSubModal.note')}</SNote>
           </SModalContent>
           <SConfirmButton view='primaryGrad' onClick={handleSubmit}>
-            {t('enableSubModal.bntText')}
+            {t('enableSubModal.button')}
           </SConfirmButton>
         </SModal>
       </SContainer>

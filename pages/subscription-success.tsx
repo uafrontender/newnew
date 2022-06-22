@@ -66,15 +66,15 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
     };
 
     if (socketConnection) {
-      socketConnection.on(
+      socketConnection?.on(
         'CreatorSubscriptionChanged',
         handlerSubscriptionUpdated
       );
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off(
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
           'CreatorSubscriptionChanged',
           handlerSubscriptionUpdated
         );

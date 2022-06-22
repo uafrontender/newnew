@@ -5,7 +5,7 @@ const { i18n } = require('./next-i18next.config');
 const moduleExports = {
   i18n,
   assetPrefix: process.env.NEXT_JS_ASSET_URL,
-  reactStrictMode: true,
+  reactStrictMode: false,
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,

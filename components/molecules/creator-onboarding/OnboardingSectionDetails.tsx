@@ -65,7 +65,7 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
       break;
     }
     case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'innappropriate';
+      errorMsg = 'inappropriate';
       break;
     }
     case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION: {
@@ -99,7 +99,7 @@ const errorSwitchUsername = (
       break;
     }
     case newnewapi.ValidateUsernameResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'innappropriate';
+      errorMsg = 'inappropriate';
       break;
     }
     case newnewapi.ValidateUsernameResponse.Status.USERNAME_TAKEN: {
@@ -133,7 +133,7 @@ interface IOnboardingSectionDetails {
 const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetails> =
   ({ isAvatarCustom, availableCountries }) => {
     const router = useRouter();
-    const { t } = useTranslation('creator-onboarding');
+    const { t } = useTranslation('page-CreatorOnboarding');
     const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.user);
     const { resizeMode } = useAppSelector((state) => state.ui);
@@ -742,7 +742,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     return (
       <>
         <SContainer isMobile={isMobile}>
-          <SHeading variant={5}>{t('DetailsSection.heading')}</SHeading>
+          <SHeading variant={5}>{t('detailsSection.heading')}</SHeading>
           <STopContainer>
             <SFieldPairContainer>
               <OnboardingInput
@@ -750,10 +750,10 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                 type='text'
                 value={firstNameInEdit}
                 isValid={firstNameInEdit.length > 1 ? true : false}
-                placeholder={t('DetailsSection.form.firstName.placeholder')}
+                placeholder={t('detailsSection.form.firstName.placeholder')}
                 onChange={handleFirstnameInput}
                 errorCaption={t(
-                  'DetailsSection.form.firstName.errors.tooShort'
+                  'detailsSection.form.firstName.errors.tooShort'
                 )}
               />
               <OnboardingInput
@@ -761,9 +761,9 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                 type='text'
                 value={lastNameInEdit}
                 isValid={lastNameInEdit.length > 1 ? true : false}
-                placeholder={t('DetailsSection.form.lastName.placeholder')}
+                placeholder={t('detailsSection.form.lastName.placeholder')}
                 onChange={handleLastnameInput}
-                errorCaption={t('DetailsSection.form.lastName.errors.tooShort')}
+                errorCaption={t('detailsSection.form.lastName.errors.tooShort')}
               />
             </SFieldPairContainer>
             <SFieldPairContainer>
@@ -775,20 +775,20 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                   <UsernamePopupList
                     points={[
                       {
-                        text: t('DetailsSection.form.username.points.1'),
+                        text: t('detailsSection.form.username.points.1'),
                         isValid: usernameInEdit
                           ? usernameInEdit.length >= 2 &&
                             usernameInEdit.length <= 25
                           : false,
                       },
                       {
-                        text: t('DetailsSection.form.username.points.2'),
+                        text: t('detailsSection.form.username.points.2'),
                         isValid: usernameInEdit
                           ? validator.isLowercase(usernameInEdit)
                           : false,
                       },
                       {
-                        text: t('DetailsSection.form.username.points.3'),
+                        text: t('detailsSection.form.username.points.3'),
                         isValid: usernameInEdit
                           ? validator.isAlphanumeric(usernameInEdit)
                           : false,
@@ -797,12 +797,12 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                   />
                 }
                 frequencyCaption={t(
-                  'DetailsSection.form.username.frequencyCaption'
+                  'detailsSection.form.username.frequencyCaption'
                 )}
                 errorCaption={t(
-                  `DetailsSection.form.username.errors.${usernameError}`
+                  `detailsSection.form.username.errors.${usernameError}`
                 )}
-                placeholder={t('DetailsSection.form.username.placeholder')}
+                placeholder={t('detailsSection.form.username.placeholder')}
                 isValid={usernameError === ''}
                 onChange={handleUpdateUsername}
               />
@@ -810,9 +810,9 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                 type='text'
                 value={nicknameInEdit}
                 disabled={loadingModalOpen}
-                placeholder={t('DetailsSection.form.nickname.placeholder')}
+                placeholder={t('detailsSection.form.nickname.placeholder')}
                 errorCaption={t(
-                  `DetailsSection.form.nickname.errors.${nicknameError}`
+                  `detailsSection.form.nickname.errors.${nicknameError}`
                 )}
                 isValid={nicknameError === ''}
                 onChange={handleUpdateNickname}
@@ -825,14 +825,14 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                 value={emailInEdit}
                 isValid={emailInEdit.length > 0 ? fieldsValid.email : true}
                 isTaken={emailError === 'emailTaken'}
-                placeholder={t('DetailsSection.form.email.placeholder')}
+                placeholder={t('detailsSection.form.email.placeholder')}
                 cantChangeInfoCaption={t(
-                  'DetailsSection.form.email.cantChangeInfoCaption'
+                  'detailsSection.form.email.cantChangeInfoCaption'
                 )}
                 errorCaption={
                   emailError
-                    ? t('DetailsSection.form.email.errors.emailTaken')
-                    : t('DetailsSection.form.email.errors.invalidEmail')
+                    ? t('detailsSection.form.email.errors.emailTaken')
+                    : t('detailsSection.form.email.errors.invalidEmail')
                 }
                 onChange={handleEmailInput}
               />
@@ -853,11 +853,15 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
               value={dateInEdit}
               maxDate={maxDate}
               locale={router.locale}
-              disabled={false}
+              disabled={user?.userData?.dateOfBirth ? Object.values(user?.userData?.dateOfBirth).every((dateOfBirthEl) => !!dateOfBirthEl) : false}
               isValid={dateError === ''}
-              labelCaption={t('DetailsSection.form.DoB.label')}
-              bottomCaption={t('DetailsSection.form.DoB.captions.twoTimesOnly')}
-              errorCaption={t('DetailsSection.form.DoB.errors.tooYoung')}
+              labelCaption={t('detailsSection.form.dateOfBirth.label')}
+              bottomCaption={t(
+                'detailsSection.form.dateOfBirth.captions.twoTimesOnly'
+              )}
+              errorCaption={t(
+                'detailsSection.form.dateOfBirth.errors.tooYoung'
+              )}
               onChange={handleDateInput}
               handleResetIsValid={() => setDateError('')}
             />
@@ -871,7 +875,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           </SPhotoContainer>
           {(isMobile || isTablet) && (
             <CheckboxWithALink
-              label={t('DetailsSection.agreedToTosCheckbox')}
+              label={t('detailsSection.agreedToTosCheckbox')}
               linkText='NewNew’s terms'
               value={agreedToTos}
               onLinkClicked={() => setTermsVisible(true)}
@@ -883,14 +887,14 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           {!isMobile && (
             <BackButtonSection>
               <GoBackButton longArrow onClick={() => router.back()}>
-                {t('DetailsSection.backButton')}
+                {t('detailsSection.button.back')}
               </GoBackButton>
             </BackButtonSection>
           )}
           <ControlsSection>
             {!isMobile && !isTablet && (
               <CheckboxWithALink
-                label={t('DetailsSection.agreedToTosCheckbox')}
+                label={t('detailsSection.agreedToTosCheckbox')}
                 linkText={"NewNew's terms"}
                 value={agreedToTos}
                 onLinkClicked={() => setTermsVisible(true)}
@@ -906,9 +910,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
               }}
               onClick={() => handleSaveChangesAndGoToDashboard()}
             >
-              {isMobile
-                ? t('DetailsSection.submitMobile')
-                : t('DetailsSection.submitDesktop')}
+              {t('detailsSection.button.submit')}
             </SButton>
           </ControlsSection>
         </SControlsDiv>

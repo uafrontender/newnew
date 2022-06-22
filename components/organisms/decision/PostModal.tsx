@@ -77,11 +77,11 @@ const PostAwaitingResponseMC = dynamic(
 const PostAwaitingResponseCF = dynamic(
   () => import('./PostAwaitingResponseCF')
 );
-const PostShareModal = dynamic(
-  () => import('../../molecules/decision/PostShareModal')
+const PostShareEllipseModal = dynamic(
+  () => import('../../molecules/decision/PostShareEllipseModal')
 );
-const PostShareMenu = dynamic(
-  () => import('../../molecules/decision/PostShareMenu')
+const PostShareEllipseMenu = dynamic(
+  () => import('../../molecules/decision/PostShareEllipseMenu')
 );
 const PostEllipseModal = dynamic(
   () => import('../../molecules/decision/PostEllipseModal')
@@ -113,6 +113,9 @@ interface IPostModal {
   isOpen: boolean;
   post?: newnewapi.IPost;
   manualCurrLocation?: string;
+  sessionIdFromRedirect?: string;
+  commentIdFromUrl?: string;
+  commentContentFromUrl?: string;
   handleClose: () => void;
   handleOpenAnotherPost?: (post: newnewapi.Post) => void;
   handleRemovePostFromState?: () => void;
@@ -124,6 +127,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   isOpen,
   post,
   manualCurrLocation,
+  sessionIdFromRedirect,
+  commentIdFromUrl,
+  commentContentFromUrl,
   handleClose,
   handleOpenAnotherPost,
   handleRemovePostFromState,
@@ -131,7 +137,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -146,7 +152,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   useLeavePageConfirm(
     isConfirmToClosePost,
-    t('PostVideo.cannotLeavePageMsg'),
+    t('postVideo.cannotLeavePageMsg'),
     []
   );
 
@@ -261,31 +267,22 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     manualCurrLocation ?? (isBrowser() ? window.location.href : '')
   );
 
-  const [sessionId, setSessionId] = useState(() =>
-    isBrowser()
-      ? new URL(window.location.href).searchParams.get('?session_id') ||
-        new URL(window.location.href).searchParams.get('session_id')
-      : undefined
+  const [sessionId, setSessionId] = useState(
+    () => sessionIdFromRedirect ?? undefined
   );
 
   const { handleSetCommentIdFromUrl, handleSetNewCommentContentFromUrl } =
     useContext(CommentFromUrlContext);
 
   useEffect(() => {
-    const commentId = isBrowser()
-      ? new URL(window.location.href).searchParams.get('?comment_id') ||
-        new URL(window.location.href).searchParams.get('comment_id')
-      : undefined;
-
-    const commentContent = isBrowser()
-      ? new URL(window.location.href).searchParams.get('?comment_content') ||
-        new URL(window.location.href).searchParams.get('comment_content')
-      : undefined;
-
-    handleSetCommentIdFromUrl?.(commentId ?? '');
-    handleSetNewCommentContentFromUrl?.(commentContent ?? '');
+    if (commentIdFromUrl) {
+      handleSetCommentIdFromUrl?.(commentIdFromUrl);
+    }
+    if (commentContentFromUrl) {
+      handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [commentIdFromUrl, commentContentFromUrl]);
 
   const resetSessionId = useCallback(
     () => setSessionId(undefined),
@@ -310,7 +307,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const handleCloseAndGoBack = () => {
     if (
       isConfirmToClosePost &&
-      !window.confirm(t('PostVideo.cannotLeavePageMsg'))
+      !window.confirm(t('postVideo.cannotLeavePageMsg'))
     ) {
       return;
     }
@@ -330,7 +327,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const handleGoBackInsidePost = useCallback(() => {
     if (
       isConfirmToClosePost &&
-      !window.confirm(t('PostVideo.cannotLeavePageMsg'))
+      !window.confirm(t('postVideo.cannotLeavePageMsg'))
     ) {
       return;
     }
@@ -772,7 +769,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     const verify = async () => {
       if (
         isConfirmToClosePost &&
-        !window.confirm(t('PostVideo.cannotLeavePageMsg'))
+        !window.confirm(t('postVideo.cannotLeavePageMsg'))
       ) {
         return;
       }
@@ -936,14 +933,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             </SWaitingSuccessControlsBtn>
             {/* Share menu */}
             {!isMobile && postParsed?.postUuid && (
-              <PostShareMenu
+              <PostShareEllipseMenu
                 postId={postParsed.postUuid}
                 isVisible={shareMenuOpen}
                 onClose={handleShareClose}
               />
             )}
             {isMobile && shareMenuOpen && postParsed?.postUuid && (
-              <PostShareModal
+              <PostShareEllipseModal
                 isOpen={shareMenuOpen}
                 zIndex={11}
                 postId={postParsed.postUuid}
@@ -1060,15 +1057,15 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               )
             ) : isMyPost ? (
               <PostFailedBox
-                title={t('PostDeletedByMe.title', {
+                title={t('postDeletedByMe.title', {
                   postType: t(`postType.${typeOfPost}`),
                 })}
                 body={
                   deletedByCreator
-                    ? t('PostDeletedByMe.body.by_creator', {
+                    ? t('postDeletedByMe.body.byCreator', {
                         postType: t(`postType.${typeOfPost}`),
                       })
-                    : t('PostDeletedByMe.body.by_admin', {
+                    : t('postDeletedByMe.body.byAdmin', {
                         postType: t(`postType.${typeOfPost}`),
                       })
                 }
@@ -1077,28 +1074,28 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                     ? LIGHT_IMAGES[typeOfPost]
                     : DARK_IMAGES[typeOfPost]
                 }
-                buttonCaption={t('PostDeletedByMe.ctaButton')}
+                buttonCaption={t('postDeletedByMe.buttonText')}
                 handleButtonClick={() => {
                   router.push('/creation');
                 }}
               />
             ) : (
               <PostFailedBox
-                title={t('PostDeleted.title', {
+                title={t('postDeleted.title', {
                   postType: t(`postType.${typeOfPost}`),
                 })}
                 body={
                   deletedByCreator
-                    ? t('PostDeleted.body.by_creator', {
+                    ? t('postDeleted.body.byCreator', {
                         creator: getDisplayname(postParsed.creator!!),
                         postType: t(`postType.${typeOfPost}`),
                       })
-                    : t('PostDeleted.body.by_admin', {
+                    : t('postDeleted.body.byAdmin', {
                         creator: getDisplayname(postParsed.creator!!),
                         postType: t(`postType.${typeOfPost}`),
                       })
                 }
-                buttonCaption={t('PostDeleted.ctaButton', {
+                buttonCaption={t('postDeleted.buttonText', {
                   postTypeMultiple: t(`postType.multiple.${typeOfPost}`),
                 })}
                 imageSrc={
@@ -1119,7 +1116,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               >
                 <Headline variant={4}>
                   {recommendedPosts.length > 0
-                    ? t('RecommendationsSection.heading')
+                    ? t('recommendationsSection.heading')
                     : null}
                 </Headline>
                 {recommendedPosts && (

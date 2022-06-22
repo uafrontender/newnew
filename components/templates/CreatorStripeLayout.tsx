@@ -15,6 +15,7 @@ import HeroVisual from './HeroVisual';
 
 export interface ICreatorStripeLayout {
   hideProgressBar?: boolean;
+  children: React.ReactNode;
 }
 
 const SCreatorStripeLayout = styled.div`
@@ -67,6 +68,10 @@ const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({
       </SkeletonTheme>
     </ErrorBoundary>
   );
+};
+
+CreatorStripeLayout.defaultProps = {
+  hideProgressBar: undefined,
 };
 
 export default CreatorStripeLayout;

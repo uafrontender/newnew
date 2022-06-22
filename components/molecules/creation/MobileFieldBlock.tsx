@@ -27,6 +27,7 @@ interface IMobileFieldBlock {
     min?: number;
     type?: 'text' | 'number' | 'tel';
     pattern?: string;
+    max?: number;
   };
   formattedValue?: any;
   formattedDescription?: any;
@@ -45,11 +46,11 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   } = props;
   const inputRef: any = useRef();
   const theme = useTheme();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const [focused, setFocused] = useState(false);
 
   const handleChange = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       onChange(id, e.target.value);
     },
     [id, onChange]
@@ -65,6 +66,9 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
 
     if (inputProps?.type === 'number' && (inputProps?.min as number) > value) {
       onChange(id, inputProps?.min as number);
+    }
+    if (inputProps?.type === 'number' && (inputProps?.max as number) < value) {
+      onChange(id, inputProps?.max as number);
     }
   }, [inputProps, id, onChange, value]);
   const preventCLick = (e: any) => {
@@ -122,11 +126,11 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       const formatOptions = [
         {
           id: 'am',
-          title: t('secondStep.field.startsAt.modal.hours-format.am'),
+          title: t('secondStep.field.startsAt.modal.hoursFormat.am'),
         },
         {
           id: 'pm',
-          title: t('secondStep.field.startsAt.modal.hours-format.pm'),
+          title: t('secondStep.field.startsAt.modal.hoursFormat.pm'),
         },
       ];
       const renderDay = (el: any) => (

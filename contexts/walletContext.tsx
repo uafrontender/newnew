@@ -22,7 +22,13 @@ export const WalletContext = createContext<{
   handleSetWalletBalance: (newAmount: newnewapi.MoneyAmount) => {},
 });
 
-const WalletContextProvider: React.FC = ({ children }) => {
+interface IWalletContextProvider {
+  children: React.ReactNode;
+}
+
+const WalletContextProvider: React.FC<IWalletContextProvider> = ({
+  children,
+}) => {
   const user = useAppSelector((state) => state.user);
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -90,12 +96,12 @@ const WalletContextProvider: React.FC = ({ children }) => {
     };
 
     if (socketConnection && user.loggedIn) {
-      socketConnection.on('WalletBalanceChanged', handlerBalanceUpdated);
+      socketConnection?.on('WalletBalanceChanged', handlerBalanceUpdated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected && user.loggedIn) {
-        socketConnection.off('WalletBalanceChanged', handlerBalanceUpdated);
+      if (socketConnection && socketConnection?.connected && user.loggedIn) {
+        socketConnection?.off('WalletBalanceChanged', handlerBalanceUpdated);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,7 +1,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useContext, useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation, Trans } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -37,7 +37,7 @@ interface ISubscribeToUserPage {
 const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   const router = useRouter();
   const theme = useTheme();
-  const { t } = useTranslation('subscribe-to-user');
+  const { t } = useTranslation('page-SubscribeToUser');
   const { loggedIn, userData: currentUserData } = useAppSelector(
     (state) => state.user
   );
@@ -79,7 +79,9 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
   const subPriceFormatted = useMemo(
     () =>
-      subscriptionPrice ? formatNumber(subscriptionPrice / 100 ?? 0, true) : '',
+      subscriptionPrice
+        ? formatNumber(subscriptionPrice / 100 ?? 0, false)
+        : '',
     [subscriptionPrice]
   );
 
@@ -228,7 +230,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                   <SSubscribeButtonScrollDown
                     onClick={() => handleOpenPaymentModal()}
                   >
-                    {t('subscribeBtn', { amount: subPriceFormatted })}
+                    {t('button.subscribe', { amount: subPriceFormatted })}
                   </SSubscribeButtonScrollDown>
                 </SScrolledDownTopSection>
               )}
@@ -243,7 +245,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
             >
               {!isTablet && (
                 <SBackButton defer={500} onClick={() => router.back()}>
-                  {!isMobileOrTablet && t('backBtn')}
+                  {!isMobileOrTablet && t('button.back')}
                 </SBackButton>
               )}
               <UserInfoSection>
@@ -253,12 +255,12 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                   </SSHeadingSectionAvatar>
                   <div>
                     <SHeadline variant={4}>
-                      {t('TopSection.headline.line_1', {
+                      {t('topSection.headline.line_1', {
                         username: user.username,
                       })}
                     </SHeadline>
                     <SHeadline variant={2}>
-                      {t('TopSection.headline.line_2')}
+                      {t('topSection.headline.line_2')}
                     </SHeadline>
                   </div>
                 </SHeadingSection>
@@ -269,7 +271,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                     }}
                     onClick={() => handleOpenPaymentModal()}
                   >
-                    {t('subscribeBtn', { amount: subPriceFormatted })}
+                    {t('button.subscribe', { amount: subPriceFormatted })}
                   </SSubscribeButtonDesktop>
                   {/* <Button
                     view="quaternary"
@@ -280,7 +282,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                     }}
                     onClick={() => {}}
                   >
-                    {t('learnMoreBtn')}
+                    {t('button.learnMore')}
                   </Button> */}
                 </SButtonsSection>
               </UserInfoSection>
@@ -288,10 +290,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                 <SBullet>
                   <SBulletImg alt='' src={assets.subscription.subDm} />
                   <SBulletTitle variant={5}>
-                    {t('TopSection.bullets.dms.title')}
+                    {t('topSection.bullets.directMessages.title')}
                   </SBulletTitle>
                   <SBulletBody variant={3}>
-                    {t('TopSection.bullets.dms.body', {
+                    {t('topSection.bullets.directMessages.body', {
                       nickname: user?.nickname,
                     })}
                   </SBulletBody>
@@ -299,10 +301,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                 <SBullet>
                   <SBulletImg alt='' src={assets.subscription.subVotes} />
                   <SBulletTitle variant={5}>
-                    {t('TopSection.bullets.freeVotes.title')}
+                    {t('topSection.bullets.freeVotes.title')}
                   </SBulletTitle>
                   <SBulletBody variant={3}>
-                    {t('TopSection.bullets.freeVotes.body', {
+                    {t('topSection.bullets.freeVotes.body', {
                       nickname: user?.nickname,
                     })}
                   </SBulletBody>
@@ -310,17 +312,14 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                 <SBullet>
                   <SBulletImg alt='' src={assets.subscription.subMC} />
                   <SBulletTitle variant={5}>
-                    {t('TopSection.bullets.suggestions.title')}
+                    {t('topSection.bullets.suggestions.title')}
                   </SBulletTitle>
                   <SBulletBody variant={3}>
                     <Trans
                       t={t}
-                      i18nKey='TopSection.bullets.suggestions.body'
-                      components={[
-                        // @ts-ignore
-                        <BoldSpan />,
-                        user?.nickname,
-                      ]}
+                      i18nKey='topSection.bullets.suggestions.body'
+                      // @ts-ignore
+                      components={[<BoldSpan />, user?.nickname]}
                     />
                   </SBulletBody>
                 </SBullet>
@@ -333,7 +332,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       {isMobile && (
         <SSubscribeButtonMobileContainer>
           <SSubscribeButtonMobile onClick={() => handleOpenPaymentModal()}>
-            {t('subscribeBtn', { amount: subPriceFormatted })}
+            {t('button.subscribe', { amount: subPriceFormatted })}
           </SSubscribeButtonMobile>
         </SSubscribeButtonMobileContainer>
       )}
@@ -346,11 +345,11 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         handlePayWithCardStripeRedirect={handlePayRegistered}
         showTocApply
         // handlePayWithWallet={handlePayRegistered}
-        // payButtonCaptionKey={t('paymentModalPayButton')}
+        // payButtonCaptionKey={t('paymentModal.payButton')}
       >
         <SPaymentModalHeader>
           <SPaymentModalTitle variant={3}>
-            {t('paymentModalHeader.subtitle')}
+            {t('paymentModal.header')}
           </SPaymentModalTitle>
           <SPaymentModalCreatorInfo>
             <SAvatar>
@@ -370,7 +369,11 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
 export default SubscribeToUserPage;
 
-const BoldSpan: React.FC = ({ children }) => (
+interface IBoldSpan {
+  children: string;
+}
+
+const BoldSpan: React.FC<IBoldSpan> = ({ children }) => (
   <strong>
     <em>{children}</em>
   </strong>
@@ -380,9 +383,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'home',
-    'subscribe-to-user',
-    'payment-modal',
+    'page-SubscribeToUser',
+    'modal-PaymentModal',
   ]);
 
   if (!username || Array.isArray(username)) {

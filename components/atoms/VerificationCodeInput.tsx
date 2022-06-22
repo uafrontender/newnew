@@ -72,7 +72,7 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
 
     const regex = /[0-9]/;
 
-    data = data.split(' ').join('');
+    data = data.replaceAll(/\s/g, '');
 
     if (data && !Array.isArray(data) && data.length === 6 && regex.test(data)) {
       const pastedCode = data.split('');

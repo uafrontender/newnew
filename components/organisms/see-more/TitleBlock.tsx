@@ -25,7 +25,7 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   disabled,
   authenticated,
 }) => {
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('page-SeeMore');
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -126,11 +126,7 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   const renderSortOption = useCallback(
     (option: string, key: string) => {
       const handleClick = () => {
-        const newSort: any = { ...(sort as object) };
-
-        delete newSort[key];
-
-        handleSortChange(newSort);
+        handleClearSorting();
       };
 
       return (
@@ -140,9 +136,9 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
           disabled={disabled}
           onClick={handleClick}
         >
-          {t(`sort-title-option-${key}`)} (
+          {t(`sortingOption.${key}`)} (
           {t(
-            `sort-title-option-${key}-${option}${
+            `sortingOption.${key}-${option}${
               option === 'num_bids' && ['ac', 'mc', 'cf'].includes(category)
                 ? `-${category}`
                 : ''
@@ -153,7 +149,7 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
         </SButton>
       );
     },
-    [handleSortChange, sort, disabled, category, t]
+    [disabled, t, category, handleClearSorting]
   );
 
   return (

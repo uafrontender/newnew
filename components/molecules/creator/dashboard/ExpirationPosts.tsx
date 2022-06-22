@@ -26,7 +26,7 @@ interface IExpirationPosts {
 export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   expirationPosts,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -76,7 +76,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
       }
     }
     countdownsrt = `${countdownsrt} ${t(
-      'dashboard.expirationPosts.expiresTime.left_to_respond'
+      'dashboard.expirationPosts.expiresTime.leftToRespond'
     )}`;
     return countdownsrt;
   };
@@ -98,7 +98,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
         centsQty = localData.totalAmount.usdCents;
       }
     }
-    return `$${formatNumber(centsQty / 100 ?? 0, true)}`;
+    return `$${formatNumber(centsQty / 100 ?? 0, false)}`;
   };
 
   async function copyPostUrlToClipboard(url: string) {
@@ -110,7 +110,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   }
 
   const renderItem = useCallback(
-    (item, index) => {
+    (item: newnewapi.IPost, index: number) => {
       const postType = Object.keys(item)[0];
       const data = Object.values(item)[0] as
         | newnewapi.Auction

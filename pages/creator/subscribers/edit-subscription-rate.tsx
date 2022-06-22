@@ -11,7 +11,7 @@ import Content from '../../../components/organisms/creator/Subscriptions/EditSub
 import { NextPageWithLayout } from '../../_app';
 
 export const Subscriptions = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
 
   return (
     <>
@@ -32,7 +32,8 @@ export default Subscriptions;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'creator',
+    'page-Creator',
+    'page-Chat',
   ]);
 
   return {

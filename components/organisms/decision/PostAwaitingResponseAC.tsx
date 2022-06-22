@@ -14,6 +14,7 @@ import { formatNumber } from '../../../utils/format';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../molecules/decision/waiting/WaitingForResponseBox')
@@ -22,8 +23,8 @@ const AcWaitingOptionsSection = dynamic(
   () =>
     import('../../molecules/decision/auction/waiting/AcWaitingOptionsSection')
 );
-const CommentsSuccess = dynamic(
-  () => import('../../molecules/decision/success/CommentsSuccess')
+const CommentsBottomSection = dynamic(
+  () => import('../../molecules/decision/success/CommentsBottomSection')
 );
 
 interface IPostAwaitingResponseAC {
@@ -32,10 +33,12 @@ interface IPostAwaitingResponseAC {
 
 const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
   React.memo(({ post }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isTablet = ['tablet'].includes(resizeMode);
+
+    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     const waitingTime = useMemo(() => {
       const end = (post.responseUploadDeadline?.seconds as number) * 1000;
@@ -43,20 +46,20 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
       const dhms = secondsToDHMS(parsed, 'noTrim');
 
       let countdownsrt = `${dhms.days} ${t(
-        'AcPostAwaiting.hero.expires.days'
-      )} ${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')}`;
+        'acPostAwaiting.hero.expires.days'
+      )} ${dhms.hours} ${t('acPostAwaiting.hero.expires.hours')}`;
 
       if (dhms.days === '0') {
         countdownsrt = `${dhms.hours} ${t(
-          'AcPostAwaiting.hero.expires.hours'
-        )} ${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')}`;
+          'acPostAwaiting.hero.expires.hours'
+        )} ${dhms.minutes} ${t('acPostAwaiting.hero.expires.minutes')}`;
         if (dhms.hours === '0') {
           countdownsrt = `${dhms.minutes} ${t(
-            'AcPostAwaiting.hero.expires.minutes'
-          )} ${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
+            'acPostAwaiting.hero.expires.minutes'
+          )} ${dhms.seconds} ${t('acPostAwaiting.hero.expires.seconds')}`;
           if (dhms.minutes === '0') {
             countdownsrt = `${dhms.seconds} ${t(
-              'AcPostAwaiting.hero.expires.seconds'
+              'acPostAwaiting.hero.expires.seconds'
             )}`;
           }
         }
@@ -103,22 +106,11 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
     // Replace hash once scrolled to comments
     useEffect(() => {
       if (inView) {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}#comments`
-        );
+        syncedHistoryReplaceState({}, `/post/${post.postUuid}#comments`);
       } else {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}`
-        );
+        syncedHistoryReplaceState({}, `/post/${post.postUuid}`);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inView, post.postUuid]);
 
     return (
@@ -137,8 +129,8 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
           />
           <SActivitesContainer>
             <WaitingForResponseBox
-              title={t('AcPostAwaiting.hero.title')}
-              body={t('AcPostAwaiting.hero.body', {
+              title={t('acPostAwaiting.hero.title')}
+              body={t('acPostAwaiting.hero.body', {
                 creator: post.creator?.nickname,
                 time: waitingTime,
               })}
@@ -151,7 +143,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
                   </a>
                   <a href={`/${post.creator?.username}`}>
                     <SWantsToKnow>
-                      {t('AcPostAwaiting.wants_to_know', {
+                      {t('acPostAwaiting.wantsToKnow', {
                         creator: post.creator?.nickname,
                       })}
                     </SWantsToKnow>
@@ -161,9 +153,9 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
                   <STotal>
                     {`$${formatNumber(
                       post.totalAmount.usdCents / 100 ?? 0,
-                      true
+                      false
                     )}`}{' '}
-                    <span>{t('AcPostAwaiting.in_total_bids')}</span>
+                    <span>{t('acPostAwaiting.inTotalBids')}</span>
                   </STotal>
                 )}
               </SCreatorInfoDiv>
@@ -179,12 +171,11 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
         {post.isCommentsAllowed && (
           <SCommentsSection id='comments' ref={commentsSectionRef}>
             <SCommentsHeadline variant={4}>
-              {t('SuccessCommon.Comments.heading')}
+              {t('successCommon.comments.heading')}
             </SCommentsHeadline>
-            <CommentsSuccess
+            <CommentsBottomSection
               postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => {}}
             />
           </SCommentsSection>
         )}

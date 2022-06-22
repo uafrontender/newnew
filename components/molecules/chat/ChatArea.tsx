@@ -40,7 +40,7 @@ const GoBackButton = dynamic(() => import('../GoBackButton'));
 
 const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
 
   const { ref: scrollRef, inView } = useInView();
   const user = useAppSelector((state) => state.user);
@@ -171,12 +171,15 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       }
     };
     if (socketConnection) {
-      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+      socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
+          'ChatMessageCreated',
+          socketHandlerMessageCreated
+        );
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -262,7 +265,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     setConfirmReportUser(true);
   };
 
-  const handleChange = useCallback((id, value) => {
+  const handleChange = useCallback((id: string, value: string) => {
     setMessageText(value);
   }, []);
 
@@ -297,7 +300,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   }, [messageText]);
 
   const renderMessage = useCallback(
-    (item: newnewapi.IChatMessage, index) => {
+    (item: newnewapi.IChatMessage, index: number) => {
       const prevElement = messages[index - 1];
       const nextElement = messages[index + 1];
 
@@ -458,8 +461,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                       : 0
                   } ${
                     chatRoom.memberCount && chatRoom.memberCount > 1
-                      ? t('new-announcement.members')
-                      : t('new-announcement.member')
+                      ? t('newAnnouncement.members')
+                      : t('newAnnouncement.member')
                   }`}
             </SUserAlias>
           </SUserData>
@@ -508,9 +511,9 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       {isAnnouncement && !isMyAnnouncement && chatRoom && (
         <SAnnouncementHeader>
           <SAnnouncementText>
-            {t('announcement.top-message-start')}{' '}
+            {t('announcement.topMessageStart')}{' '}
             <SAnnouncementName>{chatRoom.visavis?.username}</SAnnouncementName>{' '}
-            {t('announcement.top-message-end')}
+            {t('announcement.topMessageEnd')}
           </SAnnouncementText>
         </SAnnouncementHeader>
       )}

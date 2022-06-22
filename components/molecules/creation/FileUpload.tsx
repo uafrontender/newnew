@@ -36,6 +36,7 @@ import {
   setCreationFileUploadProgress,
   setCreationVideo,
   setCreationVideoProcessing,
+  TThumbnailParameters,
 } from '../../../redux-store/slices/creationStateSlice';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
@@ -56,7 +57,7 @@ interface IFileUpload {
   errorProcessing: boolean;
   loadingProcessing: boolean;
   progressProcessing: number;
-  thumbnails: any;
+  thumbnails: TThumbnailParameters;
   onChange: (id: string, value: any) => void;
   handleCancelVideoUpload: () => void;
 }
@@ -79,10 +80,10 @@ const FileUpload: React.FC<IFileUpload> = ({
   const [showVideoDelete, setShowVideoDelete] = useState(false);
   const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
   const [showFullPreview, setShowFullPreview] = useState(false);
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const inputRef = useRef<HTMLInputElement>(null);
   const playerRef: any = useRef();
-  const [localFile, setLocalFile] = useState(null);
+  const [localFile, setLocalFile] = useState<File | null>(null);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const { post, videoProcessing } = useAppSelector((state) => state.creation);
   const dispatch = useAppDispatch();
@@ -134,7 +135,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   }, [handleCloseDeleteVideoClick, id, onChange]);
 
   const handlePreviewEditSubmit = useCallback(
-    (params) => {
+    (params: TThumbnailParameters) => {
       handleCloseThumbnailEditClick();
       onChange('thumbnailParameters', params);
     },
@@ -142,8 +143,14 @@ const FileUpload: React.FC<IFileUpload> = ({
   );
 
   const handleFileChange = useCallback(
-    async (e) => {
-      const file = e.target?.files[0];
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { files } = e.target;
+
+      if (!files) {
+        return;
+      }
+
+      const file = files[0];
 
       if (file.size > MAX_VIDEO_SIZE) {
         toast.error(t('secondStep.video.error.maxSize'));

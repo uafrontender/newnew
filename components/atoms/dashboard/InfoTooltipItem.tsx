@@ -16,7 +16,7 @@ const InfoTooltipItem: React.FC<IInfoTooltipItem> = ({
   money,
   closeTooltip,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const ref: any = useRef();
 
   useOnClickOutside(ref, () => {

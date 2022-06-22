@@ -1,9 +1,10 @@
-import React, { ReactElement, useEffect } from 'react';
+import React, { ReactElement } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { GetServerSideProps } from 'next';
+import { useUpdateEffect } from 'react-use';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import General from '../../components/templates/General';
@@ -14,11 +15,11 @@ import { useAppSelector } from '../../redux-store/store';
 import assets from '../../constants/assets';
 
 export const Dashboard = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (!user.loggedIn) {
       router?.push('/sign-up?to=log-in');
     }
@@ -50,9 +51,8 @@ export default Dashboard;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'creator',
-    'chat',
-    'notifications',
+    'page-Creator',
+    'page-Chat',
   ]);
 
   const { req } = context;

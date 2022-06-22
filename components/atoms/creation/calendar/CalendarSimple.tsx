@@ -32,7 +32,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
   ];
 
   const theme = useTheme();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const wrapperRef: any = useRef();
   const [open, setOpen] = useState(false);
   const [animate, setAnimate] = useState(false);
@@ -84,12 +84,12 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
     [t]
   );
   const renderMonth = useCallback(
-    (el, index) => {
+    (el: moment.Moment, index: number) => {
       const opts: any = {
         date: el,
       };
 
-      if (el === 0) {
+      if (index === 0) {
         opts.minDate = moment().startOf('day');
       }
 

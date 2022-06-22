@@ -65,7 +65,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
     handleAddPostToState,
     handleReportOpen,
   }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const theme = useTheme();
     const { user } = useAppSelector((state) => state);
     const { resizeMode } = useAppSelector((state) => state.ui);
@@ -111,12 +111,12 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
       };
 
       if (socketConnection) {
-        socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
+        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -179,7 +179,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
             }
           />
           <SText variant={2} weight={600}>
-            {t(`PostViewProcessingAnnouncement.stayTuned.${postType}`)}
+            {t(`postViewProcessingAnnouncement.stayTuned.${postType}`)}
           </SText>
         </SActivitesContainer>
       </SWrapper>

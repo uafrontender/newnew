@@ -49,6 +49,7 @@ for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
 
   if (localeName === 'en') localeName = 'en-us';
   if (localeName === 'es-MX') localeName = 'es';
+  if (localeName === 'zh') localeName = 'zh-TW';
 
   const importedLocale = require(`date-fns/locale/${localeName}/index.js`);
   registerLocale(SUPPORTED_LANGUAGES[i], importedLocale as any);
@@ -153,6 +154,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       );
     };
 
+    // eslint-disable-next-line react/no-unstable-nested-components
     const CustomInputForwardRef = forwardRef<
       HTMLInputElement,
       React.DetailedHTMLProps<

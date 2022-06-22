@@ -6,11 +6,12 @@ import Modal from '../../organisms/Modal';
 interface IOptionActionMobileModal {
   isOpen: boolean;
   zIndex: number;
+  children: React.ReactNode;
   onClose: () => void;
 }
 
 const OptionActionMobileModal: React.FunctionComponent<IOptionActionMobileModal> =
-  ({ isOpen, zIndex, onClose, children }) => (
+  ({ isOpen, zIndex, children, onClose }) => (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer

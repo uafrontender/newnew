@@ -26,7 +26,7 @@ const SubscriberEllipseMenu: React.FC<ISubscriberEllipseMenu> = ({
   onUserReport,
   user,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
 
   useOnClickEsc(containerRef, handleClose);
@@ -56,18 +56,16 @@ const SubscriberEllipseMenu: React.FC<ISubscriberEllipseMenu> = ({
           <Link href={`/${user.username}`}>
             <a>
               <SButton>
-                <Text variant={2}>{t('subscriptions.table.menu.view')}</Text>
+                <Text variant={2}>{t('ellipse.view')}</Text>
               </SButton>
             </a>
           </Link>
           <SButton onClick={reportUserHandler}>
-            <Text variant={2}>{t('subscriptions.table.menu.report')}</Text>
+            <Text variant={2}>{t('ellipse.report')}</Text>
           </SButton>
           <SButton onClick={blockUserHandler}>
             <Text variant={2}>
-              {userBlocked
-                ? t('subscriptions.table.menu.unblock')
-                : t('subscriptions.table.menu.block')}
+              {userBlocked ? t('ellipse.unblock') : t('ellipse.block')}
             </Text>
           </SButton>
         </SContainer>

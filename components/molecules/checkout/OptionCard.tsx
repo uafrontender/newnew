@@ -18,7 +18,7 @@ const OptionCard: React.FunctionComponent<IOptionCard> = ({
   selected,
   handleClick,
 }) => {
-  const { t } = useTranslation('payment-modal');
+  const { t } = useTranslation('modal-PaymentModal');
   const ref: any = useRef();
 
   useEffect(() => {

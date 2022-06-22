@@ -12,7 +12,7 @@ import loadingAnimation from '../../../public/animations/logo-loading-blue.json'
 import Toggle from '../../atoms/Toggle';
 
 const SettingsNotificationsSection = () => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
   const [isLoading, setLoading] = useState<boolean | null>(null);
   const [myNotificationState, setMyNotificationState] =
     useState<newnewapi.INotificationState[] | null>(null);
@@ -92,15 +92,15 @@ const SettingsNotificationsSection = () => {
             <Text variant={2} weight={600}>
               {subsection.notificationSource &&
               subsection.notificationSource === 1
-                ? t('Settings.sections.Notifications.email')
-                : t('Settings.sections.Notifications.push')}
+                ? t('Settings.sections.notifications.email')
+                : t('Settings.sections.notifications.push')}
             </Text>
             <Toggle
               title={
                 subsection.notificationSource &&
                 subsection.notificationSource === 1
-                  ? t('Settings.sections.Notifications.email')
-                  : t('Settings.sections.Notifications.push')
+                  ? t('Settings.sections.notifications.email')
+                  : t('Settings.sections.notifications.push')
               }
               checked={subsection.isEnabled ?? false}
               onChange={() => handleUpdateItem(idx)}
@@ -122,7 +122,7 @@ const SSubsection = styled.div`
   display: flex;
   flex-direction: column;
 
-  margin-top: 16px;
+  padding-top: 16px;
   padding-bottom: 16px;
 
   ${({ theme }) => theme.media.tablet} {
