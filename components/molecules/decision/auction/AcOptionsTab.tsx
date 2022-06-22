@@ -405,6 +405,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     if (actionSectionContainer.current) {
       resizeObserver.observe(actionSectionContainer.current!!);
     }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
