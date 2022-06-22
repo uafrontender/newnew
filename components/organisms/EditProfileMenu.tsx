@@ -393,7 +393,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             }
 
             setCropCoverImage({ x: 0, y: 0 });
-            setCoverUrlInEdit(reader.result as string);
+            setCoverUrlInEdit(properlySizedImage.url);
             setCoverUrlInEditAnimated(isAnimatedImage(file.name));
           });
         }
