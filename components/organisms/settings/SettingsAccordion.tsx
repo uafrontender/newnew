@@ -112,7 +112,13 @@ const SSettingsAccordionItem = styled.div<{
   transition: opacity 0.2s linear;
 
   &:first-child > button {
-    padding-top: 0;
+    padding-top: 4px;
+  }
+
+  ${({theme}) => theme.media.laptop} {
+    &:first-child > button {
+      padding-top: 0;
+    }
   }
 `;
 
