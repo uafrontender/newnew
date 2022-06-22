@@ -714,7 +714,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     } else {
       setIsDataValid(false);
     }
-  }, [formErrors]);
+  }, [formErrors, dataInEdit]);
 
   // Gender Pronouns
   const genderOptions: TDropdownSelectItem<number>[] = useMemo(

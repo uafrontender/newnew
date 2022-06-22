@@ -40,7 +40,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<
   const { t } = useTranslation('page-Profile');
   const user = useAppSelector((state) => state.user);
 
-  const [wasModifed, setWasModified] = useState(false);
+  const [wasModified, setWasModified] = useState(false);
 
   const [emailInEdit, setEmailInEdit] = useState(currentEmail ?? '');
   const [emailError, setEmailError] = useState('');
@@ -60,7 +60,9 @@ const SettingsPersonalInformationSection: React.FunctionComponent<
       setDateInEdit(undefined);
       return;
     }
-    setDateInEdit(value);
+    setDateInEdit(
+      new Date(value.getFullYear(), value.getMonth(), value.getDate())
+    );
   };
 
   const handleResetModifications = () => {
@@ -237,7 +239,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<
         />
       </SInputsWrapper>
       <AnimatePresence>
-        {wasModifed ? (
+        {wasModified ? (
           <SControlsWrapper
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
