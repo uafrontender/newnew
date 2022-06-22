@@ -66,6 +66,7 @@ interface IProfileLayout {
   postsCachedActivityFilter?: newnewapi.Post.Filter;
   postsCachedActivityPageToken?: string | null | undefined;
   postsCachedActivityCount?: number;
+  children: React.ReactNode;
 }
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
@@ -645,10 +646,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       <ReportModal
         show={confirmReportUser}
         reportedDisplayname={
-          currentUser.userData
-            ? currentUser.userData.nickname ||
-              `@${currentUser.userData.username}`
-            : ''
+          user.nickname ? user.nickname || `@${user.username}` : ''
         }
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}

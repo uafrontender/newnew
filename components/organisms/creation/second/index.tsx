@@ -350,7 +350,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       }
     }, [dispatch, post?.announcementVideoUrl, videoProcessing?.taskUuid]);
     const handleVideoUpload = useCallback(
-      async (value) => {
+      async (value: File) => {
         try {
           dispatch(setCreationFileUploadETA(100));
           dispatch(setCreationFileUploadProgress(1));
@@ -543,6 +543,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       () => (
         <>
           <SItemWrapper>
+            {/* TODO: move to locales */}
             <SInputLabel htmlFor='title'>Title</SInputLabel>
             <TextArea
               id='title'
@@ -579,6 +580,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                   formattedDescription={auction.minimalBid}
                   inputProps={{
                     min: 5,
+                    max: 10000,
                     type: 'number',
                     pattern: '[0-9]*',
                   }}
@@ -640,6 +642,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                       formattedDescription={auction.minimalBid}
                       inputProps={{
                         min: 5,
+                        max: 10000,
                         type: 'number',
                         pattern: '[0-9]*',
                       }}

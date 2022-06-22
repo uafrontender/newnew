@@ -21,7 +21,9 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
   const user = useAppSelector((state) => state.user);
 
   const renderItem = useCallback(
-    (item) => <BottomNavigationItem key={item.key} item={item} />,
+    (item: TBottomNavigationItem) => (
+      <BottomNavigationItem key={item.key} item={item} />
+    ),
     []
   );
 

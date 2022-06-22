@@ -401,6 +401,10 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
       if (commentFormRef.current) {
         resizeObserver.observe(commentFormRef.current!!);
       }
+
+      return () => {
+        resizeObserver.disconnect();
+      };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

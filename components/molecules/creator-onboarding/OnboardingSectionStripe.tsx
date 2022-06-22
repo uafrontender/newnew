@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -18,180 +18,131 @@ import GoBackButton from '../GoBackButton';
 import StripeLogo from '../../../public/images/svg/StripeLogo.svg';
 import StripeLogoS from '../../../public/images/svg/icons/filled/StripeLogoS.svg';
 import VerificationPassedInverted from '../../../public/images/svg/icons/filled/VerificationPassedInverted.svg';
-import { updateMe } from '../../../api/endpoints/user';
-// import { setUserData } from '../../../redux-store/slices/userStateSlice';
 
-interface IOnboardingSectionStripe {
-  isConnectedToStripe: boolean;
-  stripeConnectStatus:
-    | newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
-    | undefined;
-}
+const OnboardingSectionStripe: React.FunctionComponent = () => {
+  const router = useRouter();
+  const theme = useTheme();
+  // const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
+  const { t } = useTranslation('page-CreatorOnboarding');
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe> =
-  ({ isConnectedToStripe, stripeConnectStatus }) => {
-    const router = useRouter();
-    const theme = useTheme();
-    // const dispatch = useAppDispatch();
-    const user = useAppSelector((state) => state.user);
-    const { t } = useTranslation('page-CreatorOnboarding');
-    const { resizeMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
+  const [stripeProcessing, setStripeProcessing] = useState(false);
+  const [isConnectedToStripe, setIsConnectedToStripe] = useState(false);
 
-    const [stripeProcessing, setStripeProcessing] = useState(false);
-    const [loadingStripeProcessing, setLoadingStripeProcessing] =
-      useState(false);
+  useEffect(() => {
+    if (user.creatorData?.options.stripeConnectStatus === 4) {
+      setStripeProcessing(true);
+    } else {
+      setStripeProcessing(false);
+    }
+  }, [user.creatorData?.options.stripeConnectStatus]);
 
-    const handleStripeProcessing = useCallback(async () => {
-      if (loadingStripeProcessing) return;
-      try {
-        setLoadingStripeProcessing(true);
+  useEffect(() => {
+    if (user.creatorData?.options.isCreatorConnectedToStripe) {
+      setIsConnectedToStripe(true);
+    } else {
+      setIsConnectedToStripe(false);
+    }
+  }, [user.creatorData?.options.isCreatorConnectedToStripe]);
 
-        const payload = new newnewapi.UpdateMeRequest({
-          isStripeAccountProcessing: stripeProcessing,
-        });
+  const handleRedirectToStripesetup = async () => {
+    try {
+      const locationUrl = window.location.href;
+      const payload = new newnewapi.SetupStripeCreatorAccountRequest({
+        refreshUrl: locationUrl,
+        returnUrl: locationUrl,
+      });
 
-        const updateMeRes = await updateMe(payload);
+      const res = await fetchSetStripeLinkCreator(payload);
 
-        if (!updateMeRes.data || updateMeRes.error)
-          throw new Error(updateMeRes.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
 
-        console.log(payload, updateMeRes);
+      const url = res.data.setupUrl;
+      window.location.href = url;
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-        // dispatch(
-        //   setUserData({
-        //     bio: updateMeRes.data.me?.bio,
-        //   })
-        // );
-
-        setLoadingStripeProcessing(false);
-      } catch (err) {
-        console.log(err);
-        setLoadingStripeProcessing(false);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loadingStripeProcessing, stripeProcessing]);
-
-    useEffect(() => {
-      if (
-        router &&
-        router.query &&
-        !isConnectedToStripe &&
-        stripeConnectStatus === 4
-      ) {
-        if (router.query.query && router.query.query === 'stripe_processing') {
-          setStripeProcessing(true);
-        }
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [router.query, isConnectedToStripe, stripeConnectStatus]);
-
-    useEffect(() => {
-      if (stripeProcessing && !loadingStripeProcessing) {
-        handleStripeProcessing();
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [stripeProcessing, loadingStripeProcessing]);
-
-    const handleRedirectToStripesetup = async () => {
-      try {
-        console.log(user.creatorData?.options);
-
-        let returnUrl = window.location.href;
-        if (!window.location.href.includes('stripe_processing')) {
-          returnUrl = `${window.location.href}?query=stripe_processing`;
-        }
-        const payload = new newnewapi.SetupStripeCreatorAccountRequest({
-          refreshUrl: window.location.href,
-          returnUrl,
-        });
-
-        const res = await fetchSetStripeLinkCreator(payload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        const url = res.data.setupUrl;
-        window.location.href = url;
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    return (
-      <SContainer>
-        {isMobile && <SGoBackButton onClick={() => router.back()} />}
-        <SHeadline variant={5}>
-          <span>{t('stripeSection.stripeSection')}</span>
-          <InlineSvg svg={StripeLogo} width='80px' />
-        </SHeadline>
-        <SUl>
-          <li>{t('stripeSection.bullets.1')}</li>
-          <li>{t('stripeSection.bullets.2')}</li>
-          <li>{t('stripeSection.bullets.3')}</li>
-        </SUl>
-        <SButton
-          view='primaryGrad'
-          isConnectedToStripe={isConnectedToStripe && stripeConnectStatus !== 4}
-          style={{
-            ...(isConnectedToStripe && stripeConnectStatus !== 4
-              ? {
-                  background: theme.colorsThemed.accent.success,
-                }
-              : {}),
-          }}
-          onClick={() => {
-            if (!isConnectedToStripe && stripeConnectStatus !== 4) {
-              handleRedirectToStripesetup();
-            }
-          }}
-        >
-          <InlineSvg
-            svg={
-              !isConnectedToStripe && stripeConnectStatus !== 4
-                ? StripeLogoS
-                : VerificationPassedInverted
-            }
-            width='24px'
-            height='24px'
-          />
-          <span>
-            {isConnectedToStripe
-              ? stripeConnectStatus === 4
-                ? t('stripeSection.button.stripeConnecting')
-                : t('stripeSection.button.stripeConnectedLinkBtn')
-              : t('stripeSection.button.requestSetupLinkBtn')}
-          </span>
-        </SButton>
-        <SControlsDiv>
-          {!isMobile && (
-            <Link href='/creator/dashboard'>
-              <a>
-                <GoBackButton noArrow onClick={() => {}}>
-                  {t('aboutSection.button.back')}
-                </GoBackButton>
-              </a>
-            </Link>
-          )}
-          <Link href='/creator-onboarding-subrate'>
+  return (
+    <SContainer>
+      {isMobile && <SGoBackButton onClick={() => router.back()} />}
+      <SHeadline variant={5}>
+        <span>{t('stripeSection.stripeSection')}</span>
+        <InlineSvg svg={StripeLogo} width='80px' />
+      </SHeadline>
+      <SUl>
+        <li>{t('stripeSection.bullets.1')}</li>
+        <li>{t('stripeSection.bullets.2')}</li>
+        <li>{t('stripeSection.bullets.3')}</li>
+      </SUl>
+      <SButton
+        view='primaryGrad'
+        isConnectedToStripe={isConnectedToStripe || stripeProcessing}
+        style={{
+          ...(isConnectedToStripe && !stripeProcessing
+            ? {
+                background: theme.colorsThemed.accent.success,
+              }
+            : {}),
+        }}
+        onClick={() => {
+          if (!isConnectedToStripe && !stripeProcessing) {
+            handleRedirectToStripesetup();
+          }
+        }}
+      >
+        <InlineSvg
+          svg={
+            !isConnectedToStripe || stripeProcessing
+              ? StripeLogoS
+              : VerificationPassedInverted
+          }
+          width='24px'
+          height='24px'
+        />
+        {stripeProcessing && (
+          <span>{t('stripeSection.button.stripeConnecting')}</span>
+        )}
+        {isConnectedToStripe && !stripeProcessing && (
+          <span>{t('stripeSection.button.stripeConnectedLink')}</span>
+        )}
+        {!isConnectedToStripe && !stripeProcessing && (
+          <span>{t('stripeSection.button.requestSetupLink')}</span>
+        )}
+      </SButton>
+      <SControlsDiv>
+        {!isMobile && (
+          <Link href='/creator/dashboard'>
             <a>
-              <Button
-                view='primaryGrad'
-                disabled={!isConnectedToStripe}
-                style={{
-                  width: isMobile ? '100%' : 'initial',
-                }}
-              >
-                {t('stripeSection.button.submit')}
-              </Button>
+              <GoBackButton noArrow onClick={() => {}}>
+                {t('aboutSection.button.back')}
+              </GoBackButton>
             </a>
           </Link>
-        </SControlsDiv>
-      </SContainer>
-    );
-  };
+        )}
+        <Link href='/creator-onboarding-subrate'>
+          <a>
+            <Button
+              view='primaryGrad'
+              disabled={!isConnectedToStripe}
+              style={{
+                width: isMobile ? '100%' : 'initial',
+              }}
+            >
+              {t('stripeSection.button.submit')}
+            </Button>
+          </a>
+        </Link>
+      </SControlsDiv>
+    </SContainer>
+  );
+};
 
 export default OnboardingSectionStripe;
 

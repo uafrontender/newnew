@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
 import styled from 'styled-components';
 import CommentTextAreaAutoSize from 'react-textarea-autosize';
 
@@ -15,7 +15,7 @@ interface ICommentTextArea {
   maxlength?: number;
   onBlur?: (key: string, value: string) => void;
   onFocus?: (key: string) => void;
-  onChange: (key: string, value: string | boolean) => void;
+  onChange: (key: string, value: string) => void;
   placeholder: string;
 }
 
@@ -33,7 +33,7 @@ export const CommentTextArea: React.FC<ICommentTextArea> = (props) => {
   } = props;
 
   const handleChange = useCallback(
-    (e) => {
+    (e: ChangeEvent<HTMLTextAreaElement>) => {
       onChange(id, e.target.value);
     },
     [id, onChange]
@@ -42,7 +42,7 @@ export const CommentTextArea: React.FC<ICommentTextArea> = (props) => {
     onFocus(id);
   }, [id, onFocus]);
   const handleBlur = useCallback(
-    (e) => {
+    (e: FocusEvent<HTMLTextAreaElement>) => {
       onBlur(id, e.target.value);
     },
     [id, onBlur]

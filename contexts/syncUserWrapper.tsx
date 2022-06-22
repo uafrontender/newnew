@@ -27,7 +27,13 @@ import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
 import { loadStateLS, removeStateLS, saveStateLS } from '../utils/localStorage';
 
-const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
+interface ISyncUserWrapper {
+  children: React.ReactNode;
+}
+
+const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
+  children,
+}) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const socketConnection = useContext(SocketContext);
@@ -63,21 +69,12 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
   }, [creatorDataSteps]);
 
   useEffect(() => {
-    console.log(
-      !user.creatorData?.options.isCreatorConnectedToStripe,
-      user.creatorData?.options.stripeConnectStatus ===
-        newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus.PROCESSING,
-      socketConnection
-    );
-
     if (
       !user.creatorData?.options.isCreatorConnectedToStripe &&
       user.creatorData?.options.stripeConnectStatus ===
         newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus.PROCESSING &&
       socketConnection
     ) {
-      console.log('listening');
-
       const handlerStripeAccountChanged = async (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.StripeAccountChanged.decode(arr);
@@ -85,7 +82,6 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
         if (decoded._isActive) {
           const payload = new newnewapi.EmptyRequest({});
           const res = await getMyOnboardingState(payload);
-          console.log(res.data);
 
           if (res.data) {
             dispatch(

@@ -21,7 +21,7 @@ export const SortItemOption: React.FC<ISortItemOption> = (props) => {
   const { t } = useTranslation('page-SeeMore');
 
   const onChange = useCallback(
-    (e) => {
+    (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
 

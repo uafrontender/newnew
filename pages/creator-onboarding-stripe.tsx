@@ -25,9 +25,7 @@ const OnboardingSectionStripe = dynamic(
 const CreatorOnboardingStripe = () => {
   const { t } = useTranslation('page-CreatorOnboarding');
 
-  const [onboardingState, setOnboardingState] =
-    useState<newnewapi.GetMyOnboardingStateResponse>();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<null | boolean>(null);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
 
@@ -39,9 +37,6 @@ const CreatorOnboardingStripe = () => {
         const payload = new newnewapi.EmptyRequest({});
         const res = await getMyOnboardingState(payload);
         if (res.data) {
-          setOnboardingState(res.data);
-          console.log(res.data);
-
           dispatch(
             setCreatorData({
               options: {
@@ -72,12 +67,7 @@ const CreatorOnboardingStripe = () => {
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       {!isLoading ? (
-        <OnboardingSectionStripe
-          isConnectedToStripe={
-            onboardingState?.isCreatorConnectedToStripe ?? false
-          }
-          stripeConnectStatus={onboardingState?.stripeConnectStatus}
-        />
+        <OnboardingSectionStripe />
       ) : (
         <Lottie
           width={64}

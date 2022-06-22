@@ -12,9 +12,9 @@
   "ellipse": {
     "copyLink": "Copy link",
     "linkCopied": "Link copied!",
-    "followDecision": "Favorite {{ postType }}",
+    "followDecision": "Favorite {{postType}}",
     "followCreator": "Favorite creator",
-    "unFollowDecision": "Unfavorite {{ postType }}",
+    "unFollowDecision": "Unfavorite {{postType}}",
     "unFollowCreator": "Unfavorite creator",
     "unsubscribe": "Unsubscribe",
     "removeSubscription": "Remove subscription",
@@ -33,7 +33,7 @@
     "unblockUser": "Unblock user",
     "unblockGroup": "Unblock group",
     "delete": "Delete",
-    "deleteDecision": "Delete {{ postType }}",
+    "deleteDecision": "Delete {{postType}}",
     "cancel": "Cancel"
   },
   "postType": {
@@ -84,13 +84,15 @@
   "language": {
     "ddLanguageTitle": {
       "en-US": "English",
-      "es-MX": "Español",
-      "fr": "Français"
+      "es": "Español",
+      "fr": "Français",
+      "zh": "漢語"
     },
     "selectedLanguageTitle": {
       "en-US": "English",
-      "es-MX": "Español (MX)",
-      "fr": "Français (FR)"
+      "es": "Español",
+      "fr": "Français (FR)",
+      "zh": "漢語"
     }
   },
   "cookie": {
@@ -152,6 +154,8 @@
     }
   },
   "creatorCard": {
-    "subscriptionCost": "${{amount}} Monthly"
+    "subscriptionCost": "${{amount}} Monthly",
+    "subscribed": "subscribed",
+    "cancelled": "cancelled"
   }
 }

@@ -21,9 +21,6 @@ const DashboardSectionStripe = dynamic(
 
 const GetPaid = () => {
   const { t } = useTranslation('page-Creator');
-
-  const [onboardingState, setOnboardingState] =
-    useState<newnewapi.GetMyOnboardingStateResponse>();
   const [isLoading, setIsLoading] = useState<null | boolean>(null);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -36,10 +33,6 @@ const GetPaid = () => {
         const payload = new newnewapi.EmptyRequest({});
         const res = await getMyOnboardingState(payload);
         if (res.data) {
-          console.log(res.data);
-
-          setOnboardingState(res.data);
-
           dispatch(
             setCreatorData({
               options: {
@@ -72,12 +65,7 @@ const GetPaid = () => {
         />
       </Head>
       {isLoading === false ? (
-        <DashboardSectionStripe
-          isConnectedToStripe={
-            onboardingState?.isCreatorConnectedToStripe ?? false
-          }
-          stripeConnectStatus={onboardingState?.stripeConnectStatus}
-        />
+        <DashboardSectionStripe />
       ) : (
         <Lottie
           width={64}
@@ -105,7 +93,9 @@ export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
+    'common',
     'page-Creator',
+    'page-Chat',
   ]);
 
   return {
