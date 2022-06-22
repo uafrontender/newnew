@@ -551,7 +551,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                       true
                     ),
                     backed: formatNumber(currentBackerCount ?? 0, true),
-                    amount: `$${formatNumber(totalAmount / 100 ?? 0, false)}`,
+                    amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
                   })}
                 </SButton>
               ) : (
@@ -580,7 +580,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                       true
                     ),
                     backed: formatNumber(currentBackerCount ?? 0, true),
-                    amount: `$${formatNumber(totalAmount / 100 ?? 0, false)}`,
+                    amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
                   })}
                 </SButton>
               )

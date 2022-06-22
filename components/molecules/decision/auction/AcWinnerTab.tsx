@@ -151,7 +151,7 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
             </SNumBidders>
             {option.totalAmount?.usdCents && (
               <SHeadline variant={4}>
-                ${formatNumber(option.totalAmount.usdCents / 100, false)}
+                ${formatNumber(option.totalAmount.usdCents / 100, true)}
               </SHeadline>
             )}
             <SOptionCreator variant={3}>
