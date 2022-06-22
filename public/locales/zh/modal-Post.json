@@ -2,746 +2,746 @@
   "meta": {
     "ac": {
       "title": "NewNew Event",
-      "description": "Make money, bid in auctions with friends and support creators on NewNew"
+      "description": "賺錢，與朋友一起出價競拍，支持NewNew上的創作者"
     },
     "mc": {
       "title": "NewNew Superpoll",
-      "description": "Make money, vote with friends and support creators on NewNew"
+      "description": "賺錢，與朋友一起投票，支持NewNew上的創作者"
     },
     "cf": {
       "title": "NewNew Goal",
-      "description": "Make money, pledge in crowdfunding campaigns with friends and support creators on NewNew"
+      "description": "賺錢，與朋友一起在眾籌活動中認捐，支持NewNew上的創作者"
     }
   },
-  "my": "my",
-  "me": "me",
-  "I": "I",
+  "my": "我的",
+  "me": "我",
+  "I": "我",
   "postType": {
     "ac": "Event",
     "mc": "Superpoll",
     "cf": "Goal",
     "multiple": {
-      "ac": "Events",
-      "mc": "Superpolls",
-      "cf": "Goals"
+      "ac": "Event",
+      "mc": "Superpoll",
+      "cf": "Goal"
     }
   },
-  "loadMoreButton": "Load more",
+  "loadMoreButton": "載入更多",
   "expires": {
-    "days": "d",
-    "hours": "h",
-    "minutes": "m",
-    "seconds": "s",
-    "ended_on": "ended on"
+    "days": "天",
+    "hours": "小時",
+    "minutes": "分",
+    "seconds": "秒",
+    "ended_on": "結束於"
   },
   "expiresResponse": {
-    "days": "d",
-    "hours": "h",
-    "minutes": "m",
-    "seconds": "s",
-    "leftToRespond": "left to respond"
+    "days": "天",
+    "hours": "小時",
+    "minutes": "分",
+    "seconds": "秒",
+    "leftToRespond": "後回應時間截止"
   },
   "socials": {
-    "share-to": "Share to",
+    "share-to": "分享到",
     "twitter": "Twitter",
     "facebook": "Facebook",
     "instagram": "Instagram",
     "tiktok": "TikTok",
-    "copy": "Copy Link",
-    "copied": "Link copied!"
+    "copy": "複製連結",
+    "copied": "連結已複製！"
   },
   "paymentSuccessModal": {
     "title": {
-      "ac": "Your bid is in!",
-      "mc": "Your vote is in!",
-      "cf": "You’re backing this goal!"
+      "ac": "你已出價！",
+      "mc": "你已投票！",
+      "cf": "你選擇支持這個Goal！"
     },
-    "doneButton": "Sounds good!",
-    "ac": "{{postCreator}} will pick their favorite bid once the event is over.",
-    "mc": "{{postCreator}} will do the option with the most amount of votes when the superpoll is over.",
-    "cf": "{{postCreator}} will do the goal once it gets enough backers."
+    "doneButton": "聽起來不錯！",
+    "ac": "{{postCreator}}將在Event結束後挑選他們最喜歡的出價。",
+    "mc": "{{postCreator}}將在Superpoll結束後完成得票數最多的選項。",
+    "cf": "{{postCreator}}在獲得足夠的支持者后，就會完成這個Goal。"
   },
   "postFailedBoxModeration": {
-    "title": "{{postType}} is cancelled",
+    "title": "{{postType}}}被取消",
     "reason": {
-      "no-response": "Response was not uploaded",
-      "ac-no-winner": "Winner was not selected",
-      "ac": "Time ran out before any bids were made",
-      "mc": "Time ran out before any votes were made",
-      "cf": "Time ran out before the goal was reached"
+      "no-response": "回應沒有上傳",
+      "ac-no-winner": "贏家尚未被選出",
+      "ac": "時間在進行出價之前已經用完",
+      "mc": "時間在進行投票之前已經用完",
+      "cf": "時間在達到Goal之前已經用完"
     },
-    "buttonText": "New {{postType}}"
+    "buttonText": "新的{{postType}}"
   },
   "postFailedBox": {
-    "title": "This {{postType}} is canceled",
+    "title": "該{{postType}}已被取消",
     "reason": {
-      "no-response": "{{ creator }} didn't post a response video in time",
-      "ac-no-winner": "{{ creator }} didn't choose a bid in time",
-      "ac": "Time ran out before any bids were made",
-      "mc": "Time ran out before any votes were made",
-      "cf": "Time ran out before the goal was reached"
+      "no-response": "{{creator}}沒有及時發佈回應視頻",
+      "ac-no-winner": "{{creator}}沒有及時選擇出價",
+      "ac": "時間在出價之前已經用完",
+      "mc": "時間在進行投票之前已經用完",
+      "cf": "時間在達到Goal之前已經用完"
     },
-    "buttonText": "See new {{ postTypeMultiple }}"
+    "buttonText": "參見新的{{postTypeMultiple}}"
   },
   "postDeletedByMe": {
-    "title": "This {{postType}} has been deleted",
+    "title": "該{{postType}}已被刪除",
     "body": {
-      "byCreator": "You deleted this {{postType}}",
-      "byAdmin": "This {{postType}} was in violation of our Community Guidelines"
+      "byCreator": "你刪除了這個{{postType}}",
+      "byAdmin": "這個{{postType}}違反了我們的社區指南"
     },
-    "buttonText": "Make a new one"
+    "buttonText": "發佈新的"
   },
   "postDeleted": {
-    "title": "This {{postType}} has been deleted",
+    "title": "該{{postType}}已被刪除",
     "body": {
-      "byCreator": "{{ creator }} deleted this {{postType}}",
-      "byAdmin": "This {{postType}} was in violation of our Community Guidelines"
+      "byCreator": "{{creator}}刪除了這個{{postType}}",
+      "byAdmin": "該{{postType}}違反了我們的社區指南"
     },
-    "buttonText": "See new {{ postTypeMultiple }}"
+    "buttonText": "參見新的{{postTypeMultiple}}"
   },
   "postSuccessModeration": {
-    "title": "Your response is live!",
-    "body": "Let others see it",
-    "buttonText": "Share it",
-    "linkCopiedButtonText": "Link copied"
+    "title": "你的回應已上線！",
+    "body": "讓其他人看到",
+    "buttonText": "分享該回應",
+    "linkCopiedButtonText": "連結已複製"
   },
   "postWaitingForResponse": {
-    "title": "Time for response",
-    "body": "Don't miss the update. Stay tuned!",
-    "buttonText": "Notify me"
+    "title": "現在是回應時間了",
+    "body": "不要錯過更新。請繼續關注！",
+    "buttonText": "通知我"
   },
   "successCommon": {
     "comments": {
-      "heading": "Comments"
+      "heading": "評論"
     }
   },
   "postSuccess": {
-    "title": "This {{postType}} is finished!",
-    "body": "Checkout more like it.",
-    "buttonText": "See more"
+    "title": "該{{postType}}}已完成",
+    "body": "查看更多類似的。",
+    "buttonText": "查看更多"
   },
   "postVideo": {
     "tabs": {
-      "announcement": "Post",
-      "response": "Response",
-      "backToOriginalVideo": "Back to original",
-      "backToResponse": "Watch response"
+      "announcement": "帖子",
+      "response": "回應",
+      "backToOriginalVideo": "回到原帖",
+      "backToResponse": "觀看回應"
     },
-    "cannotLeavePageMsg": "Are you sure you want to close this page? Upload progress will be lost",
-    "floatingUploadResponseButton": "Make a response video",
-    "setThumbnail": "Set a thumbnail",
-    "responseUploadedNonProcessed": "Success! Your response will be available once the video was processed",
+    "cannotLeavePageMsg": "你確定要關閉這個頁面嗎？上傳進度會丟失",
+    "floatingUploadResponseButton": "製作回應視頻",
+    "setThumbnail": "設置縮略圖",
+    "responseUploadedNonProcessed": "成功！你的回應將在視頻處理完畢後可見",
     "uploadResponseForm": {
       "fileUpload": {
-        "title_1": "Your audience is waiting!",
-        "title_2": "Upload your video response now..",
-        "description": "Max size of the video 10 GB",
-        "button": "Select file"
+        "title_1": "你的觀眾在等著呢！",
+        "title_2": "馬上上傳你的回應視頻......",
+        "description": "視頻的最大尺寸為10GB",
+        "button": "選擇檔案"
       },
       "button": {
-        "retry": "Retry",
-        "cancel": "Cancel"
+        "retry": "重試",
+        "cancel": "取消"
       },
       "block": {
         "title": {
-          "file": "Upload file",
-          "decision": "Post information",
-          "advanced": "Advanced settings",
-          "floating": "Preview"
+          "file": "上傳文件",
+          "decision": "帖子資訊",
+          "advanced": "高級設置",
+          "floating": "預覽"
         },
         "subTitle": {
-          "votesInfo": "All votes start at a $1 dollar by default",
-          "floating": "Upload file to preview your brand new post"
+          "votesInfo": "所有投票默認1美元起",
+          "floating": "上傳文件以預覽你的全新帖子"
         }
       },
       "modal": {
         "leave": {
-          "message": "Are you sure want to leave this page?"
+          "message": "你確定要離開此頁面嗎？"
         },
         "deleteFile": {
-          "title": "Delete file",
-          "description": "Are you sure you want to delete this file?"
+          "title": "刪除檔案",
+          "description": "你確定要刪除該檔案嗎？"
         }
       },
       "video": {
         "error": {
-          "minLength": "Video duration too small, choose from 10 seconds",
-          "maxLength": "Video duration too long, choose up to 10 minutes",
-          "maxSize": "Video size too big, choose up to 10gb",
-          "title": "Ooops...",
-          "description": "There was an error and your file could not be uploaded. Would you like to try again."
+          "minLength": "視頻時長太短，從10秒開始選擇",
+          "maxLength": "視頻時長太長，最多選擇10分鐘",
+          "maxSize": "視頻大小太大，最多選擇10gb",
+          "title": "糟糕…...",
+          "description": "出現錯誤，你的檔案未能上傳。想再試一次嗎。"
         },
-        "deleteFile": "Delete file",
-        "previewFull": "Preview",
+        "deleteFile": "刪除檔案",
+        "previewFull": "預覽",
         "full": {
-          "title": "Preview",
-          "cancelButton": "Cancel",
-          "publishButton": "Publish"
+          "title": "預覽",
+          "cancelButton": "取消",
+          "publishButton": "發佈"
         },
         "loading": {
-          "title": "Uploading video",
-          "description": "We're uploading your video response... hang tight!",
-          "process": "{{progress}}% • {{time}} left"
+          "title": "上傳視頻",
+          "description": "我們正在上傳你的視頻回復......馬上就好！",
+          "process": "{{progress}}% • 還需{{time}}"
         },
         "processing": {
-          "title": "Processing the video",
-          "description": "You can publish the response while the video is being processed",
-          "process": "{{progress}}% • {{time}} left",
-          "uploadNonProcessed": "Publish"
+          "title": "處理視頻",
+          "description": "你可以在視頻處理過程中發佈回復",
+          "process": "{{progress}}% • 還需{{time}}",
+          "uploadNonProcessed": "發佈"
         },
         "processingPublished": {
-          "title": "Processing the video",
-          "description": "Your video will be available once it's processed",
-          "process": "{{progress}}% • {{time}} left"
+          "title": "處理視頻",
+          "description": "你的視頻處理完畢後即可以觀看",
+          "process": "{{progress}}% • 還需{{time}}"
         }
       }
     }
   },
   "postVideoSuccess": {
     "tabs": {
-      "announcement": "Original",
-      "response": "Response",
-      "watchOriginal": "Watch original",
-      "watchResponse": "Watch response",
-      "watchResponseFirstTime": "Watch it happen!"
+      "announcement": "原帖",
+      "response": "回應",
+      "watchOriginal": "觀看原帖",
+      "watchResponse": "觀看回應",
+      "watchResponseFirstTime": "看它發生！"
     }
   },
   "deletePostModal": {
-    "title": "Delete {{postType}}",
-    "body": "Are you sure you want to delete this {{postType}}? You won't be able to restore it once it's deleted...",
+    "title": "刪除{{postType}}",
+    "body": "你確定要刪除這個{{postType}}嗎？刪除後將無法恢復......",
     "button": {
-      "cancel": "Cancel",
-      "confirm": "Delete"
+      "cancel": "取消",
+      "confirm": "刪除"
     }
   },
   "deleteCommentModal": {
-    "title": "Delete comment",
-    "body": "Are you sure you want to delete this comment?",
+    "title": "刪除評論",
+    "body": "你確定要刪除這條評論嗎？",
     "button": {
-      "cancel": "Cancel",
-      "confirm": "Delete"
+      "cancel": "取消",
+      "confirm": "刪除"
     }
   },
   "blockUserModal": {
-    "title": "Block user",
-    "messageFirstPart": "Do you really want to block",
+    "title": "屏蔽用戶",
+    "messageFirstPart": "你真的想屏蔽",
     "messageSecondPart": "?",
     "button": {
-      "cancel": "Cancel",
-      "confirm": "Block user"
+      "cancel": "取消",
+      "confirm": "屏蔽用戶"
     }
   },
   "tabs": {
-    "comments": "Comments",
-    "bids": "Bids",
-    "options": "Options",
-    "backers": "Backers",
-    "winner": "Winner",
-    "history": "History"
+    "comments": "評論",
+    "bids": "出價",
+    "options": "選項",
+    "backers": "支持者",
+    "winner": "贏家",
+    "history": "歷史"
   },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
-      "ac": "This Event will begin once the video \nhas been processed",
-      "mc": "This Superpoll will begin once the video \nhas been processed",
-      "cf": "This Goal will begin once the video \nhas been processed"
+      "ac": "這個 Event 將在\n視頻處理完成後開始",
+      "mc": "這個Superpoll將在\n視頻處理後開始",
+      "cf": "這個Goal將在\n視頻處理後開始"
     },
     "videoHolder": {
       "decision": {
-        "title": "Just a minute...",
-        "body": "The video is processing. This will only take a few minutes..."
+        "title": "稍等......",
+        "body": "視頻處理中，只需要幾分鐘的時間......"
       },
       "moderation": {
-        "title": "Just a minute...",
-        "body": "Your video is processing. This will only take a few minutes..."
+        "title": "稍等片刻......",
+        "body": "視頻處理中，只需要幾分鐘......"
       }
     }
   },
   "postScheduled": {
     "decision": {
-      "title": "Coming soon...",
-      "subtitle_1": "{{postType}} will be live shortly.",
-      "subtitle_2": "Get notified once it's up!",
+      "title": "即將開始......",
+      "subtitle_1": "{{postType}}很快就會上線。",
+      "subtitle_2": "獲取上線通知！",
       "timer": {
-        "days": "Days",
-        "hours": "Hours",
-        "minutes": "Minutes",
-        "seconds": "Seconds"
+        "days": "天",
+        "hours": "小時",
+        "minutes": "分",
+        "seconds": "秒"
       },
-      "followButton": "Favorite {{postType}}",
-      "unFollowButton": "Unfavorite {{postType}}"
+      "followButton": "喜歡 {{postType}}",
+      "unFollowButton": "不喜歡 {{postType}}"
     },
     "moderation": {
-      "title": "Coming soon",
-      "subtitle_1": "Your {{postType}} is not active yet.",
-      "subtitle_2": "It will start in",
+      "title": "即將開始",
+      "subtitle_1": "你的{{postType}}還沒有被啟動",
+      "subtitle_2": "距離啓動時間：",
       "timer": {
-        "days": "Days",
-        "hours": "Hours",
-        "minutes": "Minutes",
-        "seconds": "Seconds"
+        "days": "天",
+        "hours": "小時",
+        "minutes": "分鐘",
+        "seconds": "秒"
       }
     }
   },
   "acPost": {
     "paymentModalHeader": {
-      "title": "{{ creator }}'s Event",
-      "subtitle": "Your bid"
+      "title": "{{creator}}的Event",
+      "subtitle": "你的出價"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} chooses your bid.",
-      "terms": "Terms",
-      "apply": "apply"
+      "body": "你的銀行卡信息將被暫時保留。\n只有當{{creator}}選擇了你的出價時，你才會被扣款。",
+      "terms": "條款",
+      "apply": "應用"
     },
-    "paymentModalPayButton": "Bid",
+    "paymentModalPayButton": "出價",
     "postTopInfo": {
       "selectWinner": {
-        "title": "Time's up!",
-        "body": "Auction ended. Now it's time for the creator to choose a winner. Stay tuned!"
+        "title": "時間到！",
+        "body": "拍賣結束。現在是創作者選擇贏家的時候了。請繼續關注！"
       },
-      "inBids": "in total bids"
+      "inBids": "在總出價中"
     },
     "optionsTab": {
-      "me": "me",
+      "me": "我",
       "noOptions": {
-        "caption_1": "No bids yet...",
-        "caption_2": "Place a bid below"
+        "caption_1": "還沒有出價......",
+        "caption_2": "在下面出價"
       },
       "tags": {
-        "my_vote": "My vote",
-        "my_bid": "My bid",
-        "highest": "Highest",
+        "my_vote": "我的投票",
+        "my_bid": "我的出價",
+        "highest": "最高的",
         "vip": "VIP"
       },
       "optionCard": {
-        "by": "by",
-        "bidders": "bidders",
-        "others": "others",
-        "bid": "bid",
-        "supportButton": "Boost",
-        "supportAgainButton": "Boost \nagain",
-        "raiseBidButton": "Boost bid",
-        "placeABidButton": "Place bid",
-        "cancelButton": "Cancel",
-        "moreButton": "More"
+        "by": "由",
+        "bidders": "出價者",
+        "others": "其他",
+        "bid": "出價",
+        "supportButton": "提升",
+        "supportAgainButton": "再次\n提升",
+        "raiseBidButton": "提升出價",
+        "placeABidButton": "出價",
+        "cancelButton": "取消",
+        "moreButton": "更多"
       },
       "bidCard": {
-        "didABid": "bid"
+        "didABid": "出價"
       },
       "actionSection": {
-        "suggestionPlaceholder": "Add a suggestion ...",
-        "suggestionPlaceholderDesktop": "What should {{username}} do?",
-        "amountPlaceholderDesktop": "Min bid ${{amount}}",
-        "amountPlaceholderBoost": "Boost bid ${{amount}}",
-        "placeABidButton": "Place bid"
+        "suggestionPlaceholder": "增加一個建議......",
+        "suggestionPlaceholderDesktop": "{{username}}應該怎麼做？",
+        "amountPlaceholderDesktop": "最小出價 ${{amount}}",
+        "amountPlaceholderBoost": "提高出價 ${{amount}}",
+        "placeABidButton": "出價"
       }
     },
     "winnerTab": {
       "winnerOptionCard": {
-        "biddersBidAmount": "bidders bid",
-        "bidderBidAmount": "bidder bid",
-        "on": "on",
-        "suggestedByMe": "my",
-        "suggestedByUser": "{{username}}'s",
-        "bidTo": "bid to"
+        "biddersBidAmount": "出價人出價",
+        "bidderBidAmount": "出價人出價",
+        "on": "對",
+        "suggestedByMe": "我的",
+        "suggestedByUser": "{{username}}的",
+        "bidTo": "出價目標"
       }
     },
     "floatingActionButton": {
-      "suggestNewButton": "Place bid"
+      "suggestNewButton": "出價"
     }
   },
   "mcPost": {
     "postTopInfo": {
-      "vote": "vote",
-      "votes": "total votes"
+      "vote": "投票",
+      "votes": "總票數"
     },
     "paymentModalHeader": {
-      "title": "{{ creator }}'s Superpoll",
-      "subtitle": "Option you chose"
+      "title": "{{creator}}的Superpoll",
+      "subtitle": "你選擇的選項"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if the option you chose gets the most votes.",
-      "terms": "Terms",
-      "apply": "apply"
+      "body": "你的銀行卡信息將被暫時保留。\n只有當你選擇的選項獲得最多的票數時，你才會被扣款。",
+      "terms": "條款",
+      "apply": "應用"
     },
-    "paymentModalPayButton": "Vote for",
+    "paymentModalPayButton": "投票給",
     "optionsTab": {
-      "me": "me",
+      "me": "我",
       "tags": {
-        "my_vote": "My vote",
-        "my_bid": "My option",
-        "highest": "Highest",
+        "my_vote": "我的投票",
+        "my_bid": "我的選項",
+        "highest": "最高",
         "vip": "VIP"
       },
       "optionCard": {
-        "noVotes": "no votes",
-        "votes": "votes",
-        "vote": "vote",
-        "mySuggestion": "My suggestion",
-        "subscriberSuggestion": "{{ nickname }}'s suggestion",
-        "others": "others",
-        "voters": "voters",
-        "voted": "voted",
-        "freeVoteButton": "Free \nvote",
-        "supportButton": "Vote",
-        "supportAgainButton": "Vote \nagain",
-        "raiseBidButton": "Vote",
-        "doubleMyVoteCaption": "Want to see this option win, then increase the chances of success and double your bid!",
-        "doubleMyVoteButton": "Double my vote",
-        "placeABidButton": "Place a vote",
-        "cancelButton": "Cancel",
-        "moreButton": "More",
+        "noVotes": "沒有投票",
+        "votes": "票數",
+        "vote": "投票",
+        "mySuggestion": "我的建議",
+        "subscriberSuggestion": "{{ nickname }}的建議",
+        "others": "其他",
+        "voters": "投票者",
+        "voted": "投票",
+        "freeVoteButton": "免費\n投票",
+        "supportButton": "投票",
+        "supportAgainButton": "再次\n投票",
+        "raiseBidButton": "投票",
+        "doubleMyVoteCaption": "想看到這個選項獲勝，那就增加成功的機會，雙倍出價！",
+        "doubleMyVoteButton": "雙倍投票",
+        "placeABidButton": "投一票",
+        "cancelButton": "取消",
+        "moreButton": "更多",
         "selectVotesMenu": {
-          "title": "Buy votes",
-          "titleMoreVotes": "Buy more votes",
-          "vote": "vote",
-          "votes": "votes",
-          "custom": "Custom votes"
+          "title": "購買投票",
+          "titleMoreVotes": "購買更多的投票",
+          "vote": "投票",
+          "votes": "票數",
+          "custom": "自定義票數"
         },
         "confirmVoteModal": {
-          "vote": "vote",
-          "votes": "votes",
-          "custom": "Custom votes",
-          "buySingleVote": "Buy 1 vote to vote on {{ creator }}'s Superpoll",
-          "buyMultipleVotes": "Buy {{amount}} votes to vote on {{ creator }}'s Superpoll",
-          "buyAnyVotes": "Buy any number of votes you want to vote on {{ creator }}'s Superpoll",
-          "optionCaption": "Superpoll option",
-          "voteButton": "Vote"
+          "vote": "投票",
+          "votes": "票數",
+          "custom": "自定義投票",
+          "buySingleVote": "購買1票，在{{creator}}的Superpoll中投票",
+          "buyMultipleVotes": "購買{{amount}}票，以便在{{創造者}}的Superpoll中投票",
+          "buyAnyVotes": "購買任意數量的票數在{{creator}}的Superpoll上投票",
+          "optionCaption": "Superpoll選項",
+          "voteButton": "投票"
         }
       },
       "confirmUseFreeVoteModal": {
-        "tag": "Free vote",
-        "line_1": "Ready to use your free vote on this option?",
-        "line_2": "Once you do, you won't be able to change the vote.",
-        "line_3": "You can always buy more votes later if you want to add even more!",
-        "useFreeVoteButton": "Use my free vote"
+        "tag": "免費投票",
+        "line_1": "準備對這個選項使用你的免費投票嗎？",
+        "line_2": "使用後將不能再改變投票。",
+        "line_3": "如果想增加更多的票數，以後總能買到更多的投票！",
+        "useFreeVoteButton": "使用我的免費投票"
       },
       "actionSection": {
         "votesAmount": {
           "placeholder": {
-            "votes": "votes",
-            "vote": "vote"
+            "votes": "票數",
+            "vote": "投票"
           }
         },
-        "subscribeToCreatorCaption": "Subscribe to {{ creator }} to add your own options to this Superpoll!",
-        "subscribeButton": "Subscribe",
-        "suggestionPlaceholder": "Add your own option...",
-        "placeABidButton": "Add my option"
+        "subscribeToCreatorCaption": "訂閱{{creator}}，為本次Superpoll添加你自己的選項！",
+        "subscribeButton": "訂閱",
+        "suggestionPlaceholder": "添加你自己的選項……",
+        "placeABidButton": "添加我的選項"
       }
     },
     "winnerTab": {
       "winnerOptionCard": {
-        "votersToldYou": "voters told to",
-        "voterToldYou": "voter told to",
-        "createdBy": "The option was created by"
+        "votersToldYou": "投票者被告知",
+        "voterToldYou": "投票者被告知",
+        "createdBy": "該選項的創建者是"
       }
     },
     "floatingActionButton": {
-      "suggestNewButton": "Add my option"
+      "suggestNewButton": "添加我的選項"
     }
   },
   "cfPost": {
     "backersStatsSection": {
-      "ofBackers": "of {{ targetBackers }} backers",
+      "ofBackers": "的{{ targetBackers }}支持者",
       "myBacking_NEED_TRANSLATION": "My backing:",
-      "my": "my",
-      "pledge": "pledge"
+      "my": "我的",
+      "pledge": "認捐"
     },
     "backersTab": {
       "info": {
-        "title": "Back {{creator}}'s Goal",
-        "caption": "You won't get charged until a post has been made."
+        "title": "支持{{creator}}的Goal",
+        "caption": "在做出決定之前，不會向你收費。"
       },
       "customPledge": {
-        "pledgeButton": "Pledge",
-        "continue": "Continue",
-        "cancelButton": "Cancel"
+        "pledgeButton": "認捐",
+        "continue": "繼續",
+        "cancelButton": "取消"
       },
-      "freeSub": "FREE SUB",
-      "custom": "Custom",
-      "cancel": "Cancel"
+      "freeSub": "免費訂閲",
+      "custom": "自定義",
+      "cancel": "取消"
     },
     "winnerTab": {
       "winnerOptionCard": {
-        "backersFounded": "backers successfully funded",
-        "backerFounded": "backer successfully funded"
+        "backersFounded": "支持者注資成功",
+        "backerFounded": "支持者注資成功"
       }
     },
     "paymentModalHeader": {
-      "title": "{{ creator }}'s Goal"
+      "title": "{{creator}}的Goal"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} reaches their goal.",
-      "terms": "Terms",
-      "apply": "apply"
+      "body": "你的銀行卡信息將被暫時保留。\n只有當{{creator}}達到他們的Goal時，你才會被扣款。",
+      "terms": "條款",
+      "apply": "應用"
     },
-    "paymentModalPayButton": "Back it for",
+    "paymentModalPayButton": "支持它",
     "floatingActionButton": {
-      "choosePledgeButton": "Back this goal"
+      "choosePledgeButton": "支持這個Goal"
     }
   },
   "postVideoThumbnailEdit": {
-    "title": "Set a thumbnail",
-    "description": "Select a snippet from the video",
-    "submit": "Save",
-    "cancel": "Cancel",
+    "title": "設置縮略圖",
+    "description": "從視頻中選擇一個片段",
+    "submit": "保存",
+    "cancel": "取消",
     "toast": {
-      "success": "Success! Thumbnail will be changed once processed",
-      "error": "An error occurred"
+      "success": "成功！縮略圖將在處理後更改",
+      "error": "發生錯誤"
     }
   },
   "acPostModeration": {
     "postTopInfo": {
       "selectWinner": {
-        "title": "Time to choose!",
-        "body": "Select your favorite bid then upload a response video before time runs out"
+        "title": "做出選擇的時間到了！",
+        "body": "選擇你最喜歡的出價，然後在時間到期前上傳一個回應視頻"
       }
     },
     "optionsTab": {
-      "me": "me",
+      "me": "我",
       "noOptions": {
-        "caption_1": "Be the first to bid..."
+        "caption_1": "成為第一個出價的人......"
       },
       "selectWinner": {
-        "title": "Confirm favorite bid",
-        "body": "If you choose this as your favorite bid you'll need to upload a video of yourself doing it!",
+        "title": "確認最喜歡的出價",
+        "body": "如果你選擇這個作為你最喜歡的投標，你需要上傳一段你自己的視頻！",
         "button": {
-          "cancel": "Cancel",
-          "confirm": "Confirm favorite bid"
+          "cancel": "取消",
+          "confirm": "確認最喜歡的出價"
         }
       },
       "optionCard": {
-        "pickButton": "Select"
+        "pickButton": "選擇"
       }
     },
     "winnerTab": {
       "winnerOptionCard": {
-        "biddersToldYou": "bidders told you to",
-        "bidderToldYou": "bidder told you to",
-        "youMade": "You made",
-        "createdBy": "The bid was created by"
+        "biddersToldYou": "出價者想讓你",
+        "bidderToldYou": "出價者想讓你",
+        "youMade": "你製作了",
+        "createdBy": "該出價的創建者是"
       }
     },
     "deleteOptionModal": {
-      "title": "Delete option",
-      "body": "Are you sure you want to delete this option?",
+      "title": "刪除選項",
+      "body": "確定要刪除這個選項嗎？",
       "button": {
-        "cancel": "Cancel",
-        "confirm": "Delete"
+        "cancel": "取消",
+        "confirm": "刪除"
       }
     }
   },
   "mcPostModeration": {
     "winnerTab": {
       "winnerOptionCard": {
-        "votersToldYou": "voters told you to",
-        "voterToldYou": "voter told you to",
-        "youMade": "You made",
-        "createdBy": "The option was created by"
+        "votersToldYou": "投票者想讓你",
+        "voterToldYou": "投票者想讓你",
+        "youMade": "你製作了",
+        "createdBy": "該選項的創建者是"
       }
     },
     "deleteOptionModal": {
-      "title": "Delete option",
-      "body": "Are you sure you want to delete this option?",
+      "title": "刪除選項",
+      "body": "確定要刪除這個選項嗎？",
       "button": {
-        "cancel": "Cancel",
-        "confirm": "Delete"
+        "cancel": "取消",
+        "confirm": "刪除"
       }
     }
   },
   "cfPostModeration": {
     "winnerTab": {
       "winnerOptionCard": {
-        "backersToldYou": "backers successfully funded",
-        "backerToldYou": "backer successfully funded",
-        "youMade": "You made"
+        "backersToldYou": "支持者注資成功",
+        "backerToldYou": "支持者注資成功",
+        "youMade": "你製作了"
       }
     }
   },
   "acPostSuccess": {
-    "heroText": "This Event has ended!",
-    "wantsToKnow": "{{ creator }} wants to know...",
-    "inTotalBids": "in total bids",
-    "others": "others",
-    "bid": "bid",
-    "bidChosen": "Bid chosen",
-    "seeAll": "see all bids",
+    "heroText": "本次Event已結束！",
+    "wantsToKnow": "{{creator}}想知道......",
+    "inTotalBids": "在總的出價中",
+    "others": "其他",
+    "bid": "出價",
+    "bidChosen": "選擇的出價",
+    "seeAll": "查看所有出價",
     "optionsTab": {
-      "backButton": "Back"
+      "backButton": "返回"
     }
   },
   "mcPostSuccess": {
-    "heroText": "This Superpoll has ended!",
-    "wantsToKnow": "{{ creator }} wants to know...",
-    "inTotalVotes": "total votes",
-    "others": "others",
-    "voted": "voted",
-    "votes": "votes",
-    "vote": "vote",
-    "optionChosen": "Highest voted option",
-    "seeAll": "see all options",
+    "heroText": "本次Superpoll已結束！",
+    "wantsToKnow": "{{creator}}想知道......",
+    "inTotalVotes": "總票數",
+    "others": "其他",
+    "voted": "已投票",
+    "votes": "票數",
+    "vote": "投票",
+    "optionChosen": "最高票數的選項",
+    "seeAll": "查看所有選項",
     "optionsTab": {
-      "backButton": "Back"
+      "backButton": "返回"
     }
   },
   "cfPostSuccess": {
-    "heroText": "This Goal has ended!",
-    "wantsToKnow": "{{ creator }}'s Goal",
-    "creatorsBackers": "{{ creator }}'s backers",
-    "ofTargetBackers": "of {{ target_count }} backers",
-    "youBackedFor": "You backed it for"
+    "heroText": "本次Goal已結束！",
+    "wantsToKnow": "{{creator}}的Goal",
+    "creatorsBackers": "{{creator}}的支持者",
+    "ofTargetBackers": "共需 {{ target_count }}支持者",
+    "youBackedFor": "你支持的金額是"
   },
   "acPostAwaiting": {
     "hero": {
-      "title": "Time's up!",
-      "body": "{{ creator }} has {{ time }} to select and do their favorite bid!",
+      "title": "時間到了！",
+      "body": "{{creator}}有{{time}} 進行選擇並完成他們最喜歡的投標！",
       "expires": {
-        "days": "days",
-        "hours": "hours",
-        "minutes": "minutes",
-        "seconds": "seconds"
+        "days": "天",
+        "hours": "小時",
+        "minutes": "分",
+        "seconds": "秒"
       }
     },
-    "wantsToKnow": "{{ creator }} wants to know...",
-    "inTotalBids": "in total bids",
-    "others": "others",
-    "bid": "bid",
-    "seeAll": "see all bids",
+    "wantsToKnow": "{{creator}}想知道......",
+    "inTotalBids": "在總的出價中",
+    "others": "其他",
+    "bid": "出價",
+    "seeAll": "查看所有出價",
     "optionsTab": {
-      "backButton": "Back"
+      "backButton": "返回"
     }
   },
   "mcPostAwaiting": {
     "hero": {
-      "title": "Votes are in!",
-      "body": "{{ creator }} has {{ time }} to do this option. Stay tuned!",
+      "title": "投票結果出來了！",
+      "body": "{{creator}}有{{time}}完成這個選項。請繼續關注！",
       "expires": {
-        "days": "days",
-        "hours": "hours",
-        "minutes": "minutes",
-        "seconds": "seconds"
+        "days": "天",
+        "hours": "小時",
+        "minutes": "分",
+        "seconds": "秒"
       }
     },
-    "wantsToKnow": "{{ creator }} wants to know...",
-    "inTotalVotes": "total votes",
-    "others": "others",
-    "voted": "voted",
-    "votes": "votes",
-    "vote": "vote",
-    "optionChosen": "Highest voted option",
-    "seeAll": "see all options",
+    "wantsToKnow": "{{creator}}想知道......",
+    "inTotalVotes": "總票數",
+    "others": "其他",
+    "voted": "已投票",
+    "votes": "票數",
+    "vote": "投票",
+    "optionChosen": "最高票數的選項",
+    "seeAll": "查看所有選項",
     "optionsTab": {
-      "backButton": "Back"
+      "backButton": "返回"
     }
   },
   "cfPostAwaiting": {
     "hero": {
-      "title": "It's happening!",
-      "body": "{{ creator }} has {{ time }} to show you this Goal. Stay tuned!",
+      "title": "它正在進行！",
+      "body": "{{creator}}有{{time}}向你展示這個Goal。請繼續關注！",
       "expires": {
-        "days": "days",
-        "hours": "hours",
-        "minutes": "minutes",
-        "seconds": "seconds"
+        "days": "天",
+        "hours": "小時",
+        "minutes": "分",
+        "seconds": "秒"
       }
     },
-    "wantsToKnow": "{{ creator }}'s Goal",
-    "creatorsBackers": "{{ creator }}'s backers",
-    "ofTargetBackers": "of {{ target_count }} backers",
-    "youBackedFor": "You backed it for"
+    "wantsToKnow": "{{creator}}的Goal",
+    "creatorsBackers": "{{creator}}的支持者",
+    "ofTargetBackers": "共需{{ target_count }}的支持者",
+    "youBackedFor": "你的支持金額是"
   },
   "recommendationsSection": {
-    "heading": "More like this"
+    "heading": "更多類似"
   },
   "comments": {
-    "me": "me",
-    "title": "Comments",
-    "placeholder": "Add a comment...",
-    "commentDeleted": "Comment deleted",
-    "bid": "bid",
-    "report": "Report",
-    "sendReply": "Reply",
-    "reply": "reply",
-    "delete": "Delete",
-    "replies": "replies",
-    "viewReplies": "View",
-    "hideReplies": "Hide",
-    "view-more": "View more comments",
-    "comments": "Comments",
-    "seeMore": "See more",
-    "noCommentsCaption": "Be the first to comment...",
+    "me": "我",
+    "title": "評論",
+    "placeholder": "添加評論......",
+    "commentDeleted": "評論被刪除",
+    "bid": "出價",
+    "report": "舉報",
+    "sendReply": "回復",
+    "reply": "回復",
+    "delete": "刪除",
+    "replies": "回復",
+    "viewReplies": "查看",
+    "hideReplies": "隱藏",
+    "view-more": "查看更多評論",
+    "comments": "評論",
+    "seeMore": "查看更多",
+    "noCommentsCaption": "成為第一個評論者......",
     "errors": {
-      "generic": "Please check input",
-      "tooLong": "Comment is too long",
-      "tooShort": "Comment is too short",
-      "inappropriate": "Offensive words are forbidden",
-      "linksForbidden": "No links allowed in comments"
+      "generic": "請檢查輸入",
+      "tooLong": "評論太長",
+      "tooShort": "評論太短",
+      "inappropriate": "禁止使用冒犯性詞語",
+      "linksForbidden": "評論中不允許插入連結"
     }
   },
   "heroPopupCommon": {
-    "heroButtonText": "Let's go",
-    "button": "Got it"
+    "heroButtonText": "我們開始吧",
+    "button": "知道了"
   },
   "heroPopupAC": {
-    "title": "Events",
-    "text": "Control the outcome...\n Send the creator a bid with what you want them to do, how much you’d spend, then watch them do the bid!"
+    "title": "Event",
+    "text": "控制結果......\n給創作者發送出價，說明你想讓他們做什麼，你願意花多少錢，然後看他們完成！"
   },
   "heroPopupMC": {
-    "title": "Superpolls",
-    "text": "The creator makes a poll you pay to vote on.\n When the time’s up, watch the creator do the option that got the most amount of votes!"
+    "title": "Superpoll",
+    "text": "創作者發起投票，你花錢去投票。時間到期後，觀看創作者完成得到最多票的選項！"
   },
   "heroPopupCF": {
-    "title": "Goals",
-    "text": "Pool money with others to back goals made by your favorite creators. If enough people back the goal, you’ll watch the creator do it!"
+    "title": "Goal",
+    "text": "與其他人集資，支持你喜歡的創作者的Goal。如果支援這個Goal的人足夠多，你就會看著創作者照做！"
   },
   "tutorials": {
     "ac": {
       "timer": {
-        "title": "Countdown",
-        "text": "When time’s up, the creator picks their favorite bid and posts a video doing the bid."
+        "title": "倒計時",
+        "text": "時間到期後，創作者會選擇他們最喜歡的Goal，並發佈一個完成這個Goal的視頻。"
       },
       "peopleBids": {
-        "title": "All bids",
-        "text": "These are all the bids submitted for the creator to choose from."
+        "title": "所有出價",
+        "text": "此處是提交的所有出價，供創作者選擇。"
       },
       "supportPeopleBids": {
-        "title": "Boost a bid",
-        "text": "Boost existing bids that you want to see happen IRL."
+        "title": "提升出價",
+        "text": "提升你想看到實際完成的現有出價。"
       },
       "createYourBid": {
-        "title": "Make your own!",
-        "text": "Come up with your own bid and set your price."
+        "title": "製作你自己的！",
+        "text": "想一個你自己的出價並設定你的價格。"
       }
     },
     "mc": {
       "timer": {
-        "title": "Countdown",
-        "text": "When time’s up, the creator posts a video doing the option with the most votes."
+        "title": "倒計時",
+        "text": "時間到期後，創作者會發佈一個視頻，展示其完成做得最多的選項。"
       },
       "peopleBids": {
-        "title": "All options",
-        "text": "These are all the options you can vote on."
+        "title": "所有選項",
+        "text": "此處是你可以投票的所有選項。"
       },
       "supportPeopleBids": {
-        "title": "Voting",
-        "text": "Vote on your favorite option. The option with the most amount of votes wins!"
+        "title": "投票",
+        "text": "對你最喜歡的選項進行投票。得票最多的選項獲勝！"
       },
       "createYourBid": {
-        "title": "Make your own!",
-        "text": "Come up with your own bid and set your price."
+        "title": "自己製作！",
+        "text": "想出你自己的出價，並設定你的價格。"
       }
     },
     "cf": {
       "timer": {
-        "title": "Countdown",
-        "text": "If the Goal is reached before the time is up, the creator will post a video doing the Goal."
+        "title": "倒計時",
+        "text": "如果在時間到期前達到Goal，創作者將發佈一個做Goal的視頻。"
       },
       "peopleBids": {
-        "title": "Goal progress",
-        "text": "See how close the Creator is to reaching their Goal."
+        "title": "Goal進度",
+        "text": "查看創作者距離完成他們的Goal還有多遠。"
       },
       "createYourBid": {
-        "title": "Back the Goal",
-        "text": "Contribute to help the creator reach their Goal!"
+        "title": "支持Goal",
+        "text": "捐款幫助創作者完成他們的Goal！"
       }
     }
   },

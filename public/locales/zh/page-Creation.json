@@ -154,7 +154,7 @@
         "minLength": "視頻時長過短，至少選擇10秒",
         "maxLength": "視頻時長過長，最多選擇10分鐘",
         "maxSize": "視頻大小太大，最多選擇10gb",
-        "title": "糟糕...",
+        "title": "糟糕......",
         "description": "發生錯誤，檔案無法上傳，想再試一次嗎？"
       },
       "setThumbnail": "設置縮略圖",
@@ -171,7 +171,7 @@
       },
       "loading": {
         "title": "上傳視頻",
-        "description": "文件正在上傳。不會花很長時間...",
+        "description": "文件正在上傳。不會花很長時間......",
         "process": "{{progress}}% • 還需{{time}}"
       },
       "processing": {

@@ -75,13 +75,13 @@
   "postFailedBox": {
     "title": "This {{postType}} is canceled",
     "reason": {
-      "no-response": "{{ creator }} didn't post a response video in time",
-      "ac-no-winner": "{{ creator }} didn't choose a bid in time",
+      "no-response": "{{creator}} didn't post a response video in time",
+      "ac-no-winner": "{{creator}} didn't choose a bid in time",
       "ac": "Time ran out before any bids were made",
       "mc": "Time ran out before any votes were made",
       "cf": "Time ran out before the goal was reached"
     },
-    "buttonText": "See new {{ postTypeMultiple }}"
+    "buttonText": "See new {{postTypeMultiple}}"
   },
   "postDeletedByMe": {
     "title": "This {{postType}} has been deleted",
@@ -94,10 +94,10 @@
   "postDeleted": {
     "title": "This {{postType}} has been deleted",
     "body": {
-      "byCreator": "{{ creator }} deleted this {{postType}}",
+      "byCreator": "{{creator}} deleted this {{postType}}",
       "byAdmin": "This {{postType}} was in violation of our Community Guidelines"
     },
-    "buttonText": "See new {{ postTypeMultiple }}"
+    "buttonText": "See new {{postTypeMultiple}}"
   },
   "postSuccessModeration": {
     "title": "Your response is live!",
@@ -284,11 +284,11 @@
   },
   "acPost": {
     "paymentModalHeader": {
-      "title": "{{ creator }}'s Event",
+      "title": "{{creator}}'s Event",
       "subtitle": "Your bid"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} chooses your bid.",
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{creator}} chooses your bid.",
       "terms": "Terms",
       "apply": "apply"
     },
@@ -355,7 +355,7 @@
       "votes": "total votes"
     },
     "paymentModalHeader": {
-      "title": "{{ creator }}'s Superpoll",
+      "title": "{{creator}}'s Superpoll",
       "subtitle": "Option you chose"
     },
     "paymentModalFooter": {
@@ -401,9 +401,9 @@
           "vote": "vote",
           "votes": "votes",
           "custom": "Custom votes",
-          "buySingleVote": "Buy 1 vote to vote on {{ creator }}'s Superpoll",
-          "buyMultipleVotes": "Buy {{amount}} votes to vote on {{ creator }}'s Superpoll",
-          "buyAnyVotes": "Buy any number of votes you want to vote on {{ creator }}'s Superpoll",
+          "buySingleVote": "Buy 1 vote to vote on {{creator}}'s Superpoll",
+          "buyMultipleVotes": "Buy {{amount}} votes to vote on {{creator}}'s Superpoll",
+          "buyAnyVotes": "Buy any number of votes you want to vote on {{creator}}'s Superpoll",
           "optionCaption": "Superpoll option",
           "voteButton": "Vote"
         }
@@ -422,7 +422,7 @@
             "vote": "vote"
           }
         },
-        "subscribeToCreatorCaption": "Subscribe to {{ creator }} to add your own options to this Superpoll!",
+        "subscribeToCreatorCaption": "Subscribe to {{creator}} to add your own options to this Superpoll!",
         "subscribeButton": "Subscribe",
         "suggestionPlaceholder": "Add your own option...",
         "placeABidButton": "Add my option"
@@ -467,10 +467,10 @@
       }
     },
     "paymentModalHeader": {
-      "title": "{{ creator }}'s Goal"
+      "title": "{{creator}}'s Goal"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} reaches their goal.",
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{creator}} reaches their goal.",
       "terms": "Terms",
       "apply": "apply"
     },
@@ -559,7 +559,7 @@
   },
   "acPostSuccess": {
     "heroText": "This Event has ended!",
-    "wantsToKnow": "{{ creator }} wants to know...",
+    "wantsToKnow": "{{creator}} wants to know...",
     "inTotalBids": "in total bids",
     "others": "others",
     "bid": "bid",
@@ -571,7 +571,7 @@
   },
   "mcPostSuccess": {
     "heroText": "This Superpoll has ended!",
-    "wantsToKnow": "{{ creator }} wants to know...",
+    "wantsToKnow": "{{creator}} wants to know...",
     "inTotalVotes": "total votes",
     "others": "others",
     "voted": "voted",
@@ -585,15 +585,15 @@
   },
   "cfPostSuccess": {
     "heroText": "This Goal has ended!",
-    "wantsToKnow": "{{ creator }}'s Goal",
-    "creatorsBackers": "{{ creator }}'s backers",
+    "wantsToKnow": "{{creator}}'s Goal",
+    "creatorsBackers": "{{creator}}'s backers",
     "ofTargetBackers": "of {{ target_count }} backers",
     "youBackedFor": "You backed it for"
   },
   "acPostAwaiting": {
     "hero": {
       "title": "Time's up!",
-      "body": "{{ creator }} has {{ time }} to select and do their favorite bid!",
+      "body": "{{creator}} has {{time}} to select and do their favorite bid!",
       "expires": {
         "days": "days",
         "hours": "hours",
@@ -601,7 +601,7 @@
         "seconds": "seconds"
       }
     },
-    "wantsToKnow": "{{ creator }} wants to know...",
+    "wantsToKnow": "{{creator}} wants to know...",
     "inTotalBids": "in total bids",
     "others": "others",
     "bid": "bid",
@@ -613,7 +613,7 @@
   "mcPostAwaiting": {
     "hero": {
       "title": "Votes are in!",
-      "body": "{{ creator }} has {{ time }} to do this option. Stay tuned!",
+      "body": "{{creator}} has {{time}} to do this option. Stay tuned!",
       "expires": {
         "days": "days",
         "hours": "hours",
@@ -621,7 +621,7 @@
         "seconds": "seconds"
       }
     },
-    "wantsToKnow": "{{ creator }} wants to know...",
+    "wantsToKnow": "{{creator}} wants to know...",
     "inTotalVotes": "total votes",
     "others": "others",
     "voted": "voted",
@@ -636,7 +636,7 @@
   "cfPostAwaiting": {
     "hero": {
       "title": "It's happening!",
-      "body": "{{ creator }} has {{ time }} to show you this Goal. Stay tuned!",
+      "body": "{{creator}} has {{time}} to show you this Goal. Stay tuned!",
       "expires": {
         "days": "days",
         "hours": "hours",
@@ -644,8 +644,8 @@
         "seconds": "seconds"
       }
     },
-    "wantsToKnow": "{{ creator }}'s Goal",
-    "creatorsBackers": "{{ creator }}'s backers",
+    "wantsToKnow": "{{creator}}'s Goal",
+    "creatorsBackers": "{{creator}}'s backers",
     "ofTargetBackers": "of {{ target_count }} backers",
     "youBackedFor": "You backed it for"
   },

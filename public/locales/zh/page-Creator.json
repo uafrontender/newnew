@@ -111,7 +111,7 @@
     },
     "toDos": {
       "title": "完成這些步驟並獲得報酬",
-      "subtitle": "賺到💰？完成下列步驟即可提取你的收入...",
+      "subtitle": "賺到💰？完成下列步驟即可提取你的收入......",
       "signUp": "註冊成為創作者",
       "completeProfile": "添加個人簡介",
       "completeProfileButton": "添加",
@@ -167,7 +167,7 @@
   "chat": {
     "today": "今天",
     "placeholder": "輸入訊息......",
-    "noMessagesFirstLine": "沒有訊息...",
+    "noMessagesFirstLine": "沒有訊息......",
     "typing": "正在輸入......",
     "toolbar": {
       "searchPlaceholder": "搜索訊息或用戶"
@@ -241,8 +241,8 @@
   },
   "stripe": {
     "meta": {
-      "title": "使用Stripe，支付更輕鬆",
-      "description": "與Stripe帳戶綁定，即可按時獲得付款,"
+      "title": "使用Stripe，收付更輕鬆",
+      "description": "與Stripe帳戶綁定，即可按時獲得付款。"
     },
     "titleSetUpStripe": "獲得付款",
     "bullets": {
@@ -253,8 +253,8 @@
     "button": {
       "submit": "完成",
       "update": "更新支付資訊",
-      "requestSetupLink": "與Stripe連接",
-      "stripeConnectedLink": "Stripe已連接！",
+      "requestSetupLink": "與Stripe綁定",
+      "stripeConnectedLink": "Stripe已綁定！",
       "back": "關閉"
     }
   },

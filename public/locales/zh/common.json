@@ -145,7 +145,7 @@
   "search": {
     "topPosts": "熱門帖子",
     "popularCreators": "熱門創作者",
-    "creatorSubtitle": "See posts",
+    "creatorSubtitle_NEED_TRANSLATION": "See posts",
     "allResults": "所有結果",
     "noResults": {
       "title": "沒有找到任何內容",
