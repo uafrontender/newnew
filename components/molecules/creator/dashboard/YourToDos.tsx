@@ -41,7 +41,7 @@ export const YourToDos = () => {
       {
         id: 'add-cash-out-method',
         title: t('dashboard.toDos.addCashOutMethod'),
-        completed: !!user.creatorData?.options?.isCreatorConnectedToStripe,
+        completed: user.creatorData?.options?.stripeConnectStatus === 2,
       },
     ],
     [t, user.creatorData, user.userData]
