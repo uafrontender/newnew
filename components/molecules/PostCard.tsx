@@ -89,6 +89,7 @@ interface ICard {
   index: number;
   width?: string;
   height?: string;
+  maxWidthTablet?: string;
   shouldStop?: boolean;
   handleRemovePostFromState?: () => void;
 }
@@ -100,6 +101,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     index,
     width,
     height,
+    maxWidthTablet,
     shouldStop,
     handleRemovePostFromState,
   }) => {
@@ -449,7 +451,11 @@ export const PostCard: React.FC<ICard> = React.memo(
     }
 
     return (
-      <SWrapperOutside ref={cardRef} width={width}>
+      <SWrapperOutside
+        ref={cardRef}
+        width={width}
+        maxWidthTablet={maxWidthTablet ?? undefined}
+      >
         <SImageBG id='backgroundPart' height={height}>
           <SImageHolderOutside id='animatedPart'>
             <img
@@ -637,6 +643,7 @@ PostCard.defaultProps = {
 interface ISWrapper {
   index?: number;
   width?: string;
+  maxWidthTablet?: string;
 }
 
 const SWrapper = styled.div<ISWrapper>`
@@ -906,7 +913,7 @@ const SWrapperOutside = styled.div<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
-    max-width: 200px;
+    max-width: ${({ maxWidthTablet }) => maxWidthTablet ?? '200px'};
 
     transition: transform ease 0.5s;
 

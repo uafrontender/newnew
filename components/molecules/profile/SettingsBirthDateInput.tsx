@@ -42,6 +42,7 @@ import getLocalizedMonth from '../../../utils/getMonth';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import { useAppSelector } from '../../../redux-store/store';
 
 // Import and register locales (for weekdays)
 for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
@@ -100,6 +101,11 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
     handleResetSubmitError,
   }) => {
     const theme = useTheme();
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
+
     const [calendarOpen, setCalendarOpen] = useState(false);
     const months: TDropdownSelectItem<number>[] = Array(12)
       .fill('')
@@ -313,7 +319,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
             renderCustomHeader={handleRenderCustomHeader}
             customInput={<CustomInputForwardRef disabled={disabled} />}
             // Calendar
-            popperPlacement='top-end'
+            popperPlacement={isMobile ? 'bottom' : 'bottom-end'}
             popperModifiers={[
               {
                 name: 'offset',

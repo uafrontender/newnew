@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
 import InlineSVG from '../atoms/InlineSVG';
@@ -84,6 +84,13 @@ const SContainer = styled.div<ISContainer>`
   align-items: center;
   justify-content: center;
 
+  ${({ active }) =>
+    !active
+      ? css`
+          background: none;
+        `
+      : ''}
+
   &::after {
     top: 0;
     left: 0;
@@ -96,6 +103,13 @@ const SContainer = styled.div<ISContainer>`
     animation: shimmer 5s ease infinite;
     background: ${(props) => props.theme.gradients.bannerPink};
     content: '';
+
+    ${({ active }) =>
+      !active
+        ? css`
+            background: none;
+          `
+        : ''}
   }
 
   @keyframes shimmer {
