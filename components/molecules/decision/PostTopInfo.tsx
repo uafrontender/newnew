@@ -7,7 +7,6 @@ import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -218,13 +217,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           </SBidsAmount>
         ) : null}
         <CreatorCard>
-          <Link href={`/${creator.username}`}>
+          <a href={`/${creator.username}`}>
             <SAvatarArea>
               <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
             </SAvatarArea>
-          </Link>
-          <Link href={`/${creator.username}`}>
-            <SUsername>
+          </a>
+          <a href={`/${creator.username}`}>
+            <SUsername className='username'>
               {creator.nickname ?? `@${creator.username}`}{' '}
               {creator.options?.isVerified && (
                 <SInlineSVG
@@ -234,7 +233,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
                 />
               )}
             </SUsername>
-          </Link>
+          </a>
         </CreatorCard>
         <SActionsDiv>
           <SShareButton
@@ -436,12 +435,12 @@ const CreatorCard = styled.div`
 
   padding-right: 8px;
 
-  & > div:nth-child(2) {
+  .username {
     transition: 0.2s linear;
   }
 
   &:hover {
-    & > div:nth-child(2) {
+    .username {
       color: ${({ theme }) => theme.colorsThemed.text.primary};
     }
   }
