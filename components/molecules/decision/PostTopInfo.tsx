@@ -25,6 +25,7 @@ import PostEllipseModal from './PostEllipseModal';
 
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 import { formatNumber } from '../../../utils/format';
 import { markPost } from '../../../api/endpoints/post';
@@ -223,7 +224,16 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             </SAvatarArea>
           </Link>
           <Link href={`/${creator.username}`}>
-            <SUsername>{creator.nickname ?? `@${creator.username}`}</SUsername>
+            <SUsername>
+              {creator.nickname ?? `@${creator.username}`}{' '}
+              {creator.options?.isVerified && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                />
+              )}
+            </SUsername>
           </Link>
         </CreatorCard>
         <SActionsDiv>
@@ -460,7 +470,8 @@ const SAvatarArea = styled.div`
 
 const SUsername = styled.div`
   grid-area: username;
-
+  display: flex;
+  align-items: center;
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;
@@ -574,5 +585,9 @@ const SHeadline = styled(Headline)`
 `;
 
 const SText = styled(Text)`
-  color: #ffffff;
+  color: #fff;
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  margin-left: 2px;
 `;
