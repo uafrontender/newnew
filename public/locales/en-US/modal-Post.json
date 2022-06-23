@@ -62,7 +62,7 @@
     "cf": "{{postCreator}} will do the goal once it gets enough backers."
   },
   "postFailedBoxModeration": {
-    "title": "{{ postType }} is cancelled",
+    "title": "{{postType}} is cancelled",
     "reason": {
       "no-response": "Response was not uploaded",
       "ac-no-winner": "Winner was not selected",
@@ -70,10 +70,10 @@
       "mc": "Time ran out before any votes were made",
       "cf": "Time ran out before the goal was reached"
     },
-    "buttonText": "New {{ postType }}"
+    "buttonText": "New {{postType}}"
   },
   "postFailedBox": {
-    "title": "This {{ postType }} is canceled",
+    "title": "This {{postType}} is canceled",
     "reason": {
       "no-response": "{{ creator }} didn't post a response video in time",
       "ac-no-winner": "{{ creator }} didn't choose a bid in time",
@@ -84,18 +84,18 @@
     "buttonText": "See new {{ postTypeMultiple }}"
   },
   "postDeletedByMe": {
-    "title": "This {{ postType }} has been deleted",
+    "title": "This {{postType}} has been deleted",
     "body": {
-      "byCreator": "You deleted this {{ postType }}",
-      "byAdmin": "This {{ postType }} was in violation of our Community Guidelines"
+      "byCreator": "You deleted this {{postType}}",
+      "byAdmin": "This {{postType}} was in violation of our Community Guidelines"
     },
     "buttonText": "Make a new one"
   },
   "postDeleted": {
-    "title": "This {{ postType }} has been deleted",
+    "title": "This {{postType}} has been deleted",
     "body": {
-      "byCreator": "{{ creator }} deleted this {{ postType }}",
-      "byAdmin": "This {{ postType }} was in violation of our Community Guidelines"
+      "byCreator": "{{ creator }} deleted this {{postType}}",
+      "byAdmin": "This {{postType}} was in violation of our Community Guidelines"
     },
     "buttonText": "See new {{ postTypeMultiple }}"
   },
@@ -116,7 +116,7 @@
     }
   },
   "postSuccess": {
-    "title": "This {{ postType }} is finished!",
+    "title": "This {{postType}} is finished!",
     "body": "Checkout more like it.",
     "buttonText": "See more"
   },
@@ -165,8 +165,8 @@
       },
       "video": {
         "error": {
-          "minLength": "Video duration too small, choose from 10 seconds",
-          "maxLength": "Video duration too long, choose up to 10 minutes",
+          "minLength": "Video must be at least 10 seconds long",
+          "maxLength": "Video must be less than 10 minutes long",
           "maxSize": "Video size too big, choose up to 10gb",
           "title": "Ooops...",
           "description": "There was an error and your file could not be uploaded. Would you like to try again."
@@ -207,8 +207,8 @@
     }
   },
   "deletePostModal": {
-    "title": "Delete {{ postType }}",
-    "body": "Are you sure you want to delete this {{ postType }}? You won't be able to restore it once it's deleted...",
+    "title": "Delete {{postType}}",
+    "body": "Are you sure you want to delete this {{postType}}? You won't be able to restore it once it's deleted...",
     "button": {
       "cancel": "Cancel",
       "confirm": "Delete"
@@ -259,7 +259,7 @@
   "postScheduled": {
     "decision": {
       "title": "Coming soon...",
-      "subtitle_1": "{{ postType }} will be live shortly.",
+      "subtitle_1": "{{postType}} will be live shortly.",
       "subtitle_2": "Get notified once it's up!",
       "timer": {
         "days": "Days",
@@ -267,12 +267,12 @@
         "minutes": "Minutes",
         "seconds": "Seconds"
       },
-      "followButton": "Favorite {{ postType }}",
-      "unFollowButton": "Unfavorite {{ postType }}"
+      "followButton": "Favorite {{postType}}",
+      "unFollowButton": "Unfavorite {{postType}}"
     },
     "moderation": {
       "title": "Coming soon",
-      "subtitle_1": "Your {{ postType }} is not active yet.",
+      "subtitle_1": "Your {{postType}} is not active yet.",
       "subtitle_2": "It will start in",
       "timer": {
         "days": "Days",
@@ -442,6 +442,7 @@
   "cfPost": {
     "backersStatsSection": {
       "ofBackers": "of {{ targetBackers }} backers",
+      "myBacking": "My backing:",
       "my": "my",
       "pledge": "pledge"
     },

@@ -126,11 +126,11 @@ const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
     };
 
     if (socketConnection) {
-      socketConnection.on('AcBidCreated', socketHandler);
+      socketConnection?.on('AcBidCreated', socketHandler);
     }
 
     return () => {
-      socketConnection.off('AcBidCreated', socketHandler);
+      socketConnection?.off('AcBidCreated', socketHandler);
     };
   }, [socketConnection, overviewedOption, setBidsHistory]);
 

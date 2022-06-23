@@ -9,6 +9,7 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import { useUpdateEffect } from 'react-use';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -72,6 +73,7 @@ interface IMyProfileLayout {
   postsCachedMyPostsFilter?: newnewapi.Post.Filter;
   postsCachedMyPostsCount?: number;
   postsCachedMyPostsPageToken?: string | null | undefined;
+  children: React.ReactNode;
 }
 
 const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
@@ -536,7 +538,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   }, [wasModified, handleCloseEditProfileMenu, t]);
 
   // Redirect to / if user is not logged in
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (!user.loggedIn) {
       router.push('/');
     }

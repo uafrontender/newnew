@@ -1,9 +1,10 @@
-import React, { ReactElement, useEffect } from 'react';
+import React, { ReactElement } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { GetServerSideProps } from 'next';
+import { useUpdateEffect } from 'react-use';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import General from '../../components/templates/General';
@@ -18,7 +19,7 @@ export const Dashboard = () => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (!user.loggedIn) {
       router?.push('/sign-up?to=log-in');
     }

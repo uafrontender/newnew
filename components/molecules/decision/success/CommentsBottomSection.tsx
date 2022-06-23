@@ -357,17 +357,17 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
       };
 
       if (socketConnection) {
-        socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
-        socketConnection.on('ChatMessageDeleted', socketHandlerMessageDeleted);
+        socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
+        socketConnection?.on('ChatMessageDeleted', socketHandlerMessageDeleted);
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off(
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
             'ChatMessageCreated',
             socketHandlerMessageCreated
           );
-          socketConnection.off(
+          socketConnection?.off(
             'ChatMessageDeleted',
             socketHandlerMessageDeleted
           );
@@ -401,6 +401,10 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
       if (commentFormRef.current) {
         resizeObserver.observe(commentFormRef.current!!);
       }
+
+      return () => {
+        resizeObserver.disconnect();
+      };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

@@ -57,7 +57,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
     handleSubmit(videoThumbs.current);
   }, [handleSubmit]);
   const renderChunks = useCallback(
-    (chunk, index) => (
+    (chunk: any, index: number) => (
       <SProgressSeparator
         key={`chunk-${index}`}
         height={index % 5 === 0 ? '16px' : '6px'}
@@ -65,7 +65,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
     ),
     []
   );
-  const setDuration = useCallback((duration) => {
+  const setDuration = useCallback((duration: number) => {
     const percentage = (3 * 100) / duration;
     const durationCount = 100 / percentage;
     const separatorsCount = +(durationCount * 8).toFixed(0);
@@ -73,7 +73,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
     setChunks(Array(separatorsCount).fill('_'));
     setVideoDuration(duration);
   }, []);
-  const setCurrentTime = useCallback((time) => {
+  const setCurrentTime = useCallback((time: number) => {
     const percentage = ((time - videoThumbs.current.startTime) * 100) / 3;
     const position = (percentage * 70) / 100;
 
@@ -82,7 +82,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
     }
   }, []);
 
-  const getTime = useCallback((position) => {
+  const getTime = useCallback((position: 'start' | 'end') => {
     let seconds = videoThumbs.current.endTime;
 
     if (position === 'start') {
@@ -316,18 +316,29 @@ const SContainer = styled.div`
   height: 100%;
   padding: 18px;
   position: relative;
-  min-height: 100vh;
+  min-height: 100%;
   background: ${(props) => props.theme.colorsThemed.background.primary};
+
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   ${({ theme }) => theme.media.mobileL} {
     top: 50%;
     height: unset;
     margin: 0 auto;
-    overflow: hidden;
+    overflow-x: hidden;
     max-width: 464px;
     transform: translateY(-50%);
     min-height: unset;
     background: ${(props) => props.theme.colorsThemed.background.secondary};
+    border-radius: 16px;
+
     border-radius: 16px;
   }
 
@@ -368,13 +379,10 @@ const SModalTopLineTitle = styled(Text)`
 const SModalTopContent = styled.div``;
 
 const SModalButtonContainer = styled.div`
-  left: 0;
-  bottom: 24px;
-  position: absolute;
+  margin-top: 56px;
 
   button {
-    width: calc(100vw - 32px);
-    margin: 0 16px;
+    width: 100%;
     padding: 16px 20px;
   }
 `;

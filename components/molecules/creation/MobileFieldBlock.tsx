@@ -27,6 +27,7 @@ interface IMobileFieldBlock {
     min?: number;
     type?: 'text' | 'number' | 'tel';
     pattern?: string;
+    max?: number;
   };
   formattedValue?: any;
   formattedDescription?: any;
@@ -49,7 +50,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const [focused, setFocused] = useState(false);
 
   const handleChange = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       onChange(id, e.target.value);
     },
     [id, onChange]
@@ -65,6 +66,9 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
 
     if (inputProps?.type === 'number' && (inputProps?.min as number) > value) {
       onChange(id, inputProps?.min as number);
+    }
+    if (inputProps?.type === 'number' && (inputProps?.max as number) < value) {
+      onChange(id, inputProps?.max as number);
     }
   }, [inputProps, id, onChange, value]);
   const preventCLick = (e: any) => {
@@ -116,7 +120,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
         },
         {
           id: 'right-away',
-          title: t('secondStep.field.startsAt.modal.type.rightAway'),
+          title: t('secondStep.field.startsAt.modal.type.right-away'),
         },
       ];
       const formatOptions = [

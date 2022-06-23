@@ -18,7 +18,7 @@ const SubscribersTable = dynamic(
   () => import('../../../molecules/creator/dashboard/SubscribersTable')
 );
 const NoResults = dynamic(
-  () => import('../../../molecules/creator/dashboard/NoResults')
+  () => import('../../../molecules/creator/dashboard/subscriptions/NoResults')
 );
 const Navigation = dynamic(
   () => import('../../../molecules/creator/Navigation')

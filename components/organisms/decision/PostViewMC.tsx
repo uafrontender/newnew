@@ -354,7 +354,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     // Increment channel subs after mounting
     // Decrement when unmounting
     useEffect(() => {
-      if (socketConnection.connected) {
+      if (socketConnection?.connected) {
         addChannel(post.postUuid, {
           postUpdates: {
             postUuid: post.postUuid,
@@ -366,7 +366,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
         removeChannel(post.postUuid);
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection.connected]);
+    }, [socketConnection?.connected]);
 
     // Mark post as viewed if logged in
     useEffect(() => {
@@ -477,24 +477,24 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       };
 
       if (socketConnection) {
-        socketConnection.on(
+        socketConnection?.on(
           'McOptionCreatedOrUpdated',
           socketHandlerOptionCreatedOrUpdated
         );
-        socketConnection.on('McOptionDeleted', socketHandlerOptionDeleted);
-        socketConnection.on('PostUpdated', socketHandlerPostData);
-        socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
+        socketConnection?.on('McOptionDeleted', socketHandlerOptionDeleted);
+        socketConnection?.on('PostUpdated', socketHandlerPostData);
+        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off(
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
             'McOptionCreatedOrUpdated',
             socketHandlerOptionCreatedOrUpdated
           );
-          socketConnection.off('McOptionDeleted', socketHandlerOptionDeleted);
-          socketConnection.off('PostUpdated', socketHandlerPostData);
-          socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
+          socketConnection?.off('McOptionDeleted', socketHandlerOptionDeleted);
+          socketConnection?.off('PostUpdated', socketHandlerPostData);
+          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -541,11 +541,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
         resetSessionId();
       };
 
-      if (socketConnection.connected) {
+      if (socketConnection?.connected) {
         makeVoteFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection.connected, sessionId]);
+    }, [socketConnection?.connected, sessionId]);
 
     const goToNextStep = () => {
       if (
@@ -660,9 +660,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           />
           <SActivitesContainer decisionFailed={postStatus === 'failed'}>
             <PostVotingTab>
-              {t('tabs.options')}
-              {` `}
-              {!!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''}
+              {`${t('tabs.options')} ${
+                !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
+              }`}
             </PostVotingTab>
             <McOptionsTab
               post={post}

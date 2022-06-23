@@ -315,8 +315,20 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           newnewapi.ValidateTextRequest.Kind.USER_NICKNAME,
           value as ModalMenuUserData['nickname']
         );
-      } else if (key === 'username' && value !== user.userData?.username) {
-        validateUsernameViaAPIDebounced(value as ModalMenuUserData['username']);
+      } else if (key === 'username') {
+        if (value === user.userData?.username) {
+          validateUsernameViaAPIDebounced.cancel();
+          // reset error if username equal to initial username
+          setFormErrors((errors) => {
+            const errorsWorking = { ...errors };
+            errorsWorking.usernameError = '';
+            return errorsWorking;
+          });
+        } else {
+          validateUsernameViaAPIDebounced(
+            value as ModalMenuUserData['username']
+          );
+        }
       } else if (key === 'bio') {
         validateTextViaAPIDebounced(
           newnewapi.ValidateTextRequest.Kind.USER_BIO,
@@ -381,7 +393,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             }
 
             setCropCoverImage({ x: 0, y: 0 });
-            setCoverUrlInEdit(reader.result as string);
+            setCoverUrlInEdit(properlySizedImage.url);
             setCoverUrlInEditAnimated(isAnimatedImage(file.name));
           });
         }
@@ -395,9 +407,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     setCropCoverImage(location);
   };
 
-  const onCropCompleteCoverImage = useCallback((_, croppedAreaPixels: Area) => {
-    setCroppedAreaCoverImage(croppedAreaPixels);
-  }, []);
+  const onCropCompleteCoverImage = useCallback(
+    (_: any, croppedAreaPixels: Area) => {
+      setCroppedAreaCoverImage(croppedAreaPixels);
+    },
+    []
+  );
 
   const handleUpdateUserData = useCallback(async () => {
     if (isAPIValidateLoading) return;
@@ -582,7 +597,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   };
 
   const onCropCompleteProfileImage = useCallback(
-    (_, croppedAreaPixels: Area) => {
+    (_: any, croppedAreaPixels: Area) => {
       setCroppedAreaProfileImage(croppedAreaPixels);
     },
     []
@@ -693,55 +708,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     coverUrlInEdit,
   ]);
 
-  // Check fields validity
   useEffect(() => {
-    const isUsernameValid =
-      dataInEdit.username.length >= 2 &&
-      dataInEdit.username.length <= 25 &&
-      validator.isAlphanumeric(dataInEdit.username) &&
-      validator.isLowercase(dataInEdit.username);
-    const isNicknameValid = dataInEdit && dataInEdit.nickname.length > 0;
-
-    if (!isNicknameValid || !isUsernameValid) {
-      setFormErrors((errors) => {
-        const errorsWorking = { ...errors };
-        errorsWorking.usernameError = isUsernameValid ? '' : 'generic';
-        errorsWorking.nicknameError = isNicknameValid ? '' : 'generic';
-        return errorsWorking;
-      });
-      setIsDataValid(false);
-    } else {
-      setFormErrors({
-        usernameError: '',
-        nicknameError: '',
-      });
+    if (Object.values(formErrors).every((v) => v === '')) {
       setIsDataValid(true);
-    }
-  }, [dataInEdit]);
-
-  // Set and unset form errors
-  useEffect(() => {
-    if (Object.values(formErrors).some((v) => v !== '')) {
-      setIsDataValid(false);
     } else {
-      const isUsernameValid =
-        dataInEdit.username.length >= 2 &&
-        dataInEdit.username.length <= 25 &&
-        validator.isAlphanumeric(dataInEdit.username) &&
-        validator.isLowercase(dataInEdit.username);
-      const isNicknameValid = dataInEdit && dataInEdit.nickname.length > 0;
-
-      if (!isNicknameValid || !isUsernameValid) {
-        setFormErrors((errors) => {
-          const errorsWorking = { ...errors };
-          errorsWorking.usernameError = isUsernameValid ? '' : 'generic';
-          errorsWorking.nicknameError = isNicknameValid ? '' : 'generic';
-          return errorsWorking;
-        });
-        setIsDataValid(false);
-      } else {
-        setIsDataValid(true);
-      }
+      setIsDataValid(false);
     }
   }, [formErrors, dataInEdit]);
 
@@ -881,7 +852,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     }
                   />
                   <HelperText>
-                    {t('EditProfileMenu.inputs.genderPronouns.caption')}
+                    {t('editProfileMenu.inputs.genderPronouns.caption')}
                   </HelperText>
                 </SDropdownSelectWrapper>
                 <BioTextarea

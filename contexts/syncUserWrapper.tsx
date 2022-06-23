@@ -1,6 +1,12 @@
 import _ from 'lodash';
 import { newnewapi } from 'newnew-api';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   getMe,
   getMyCreatorTags,
@@ -18,12 +24,19 @@ import {
 } from '../redux-store/slices/userStateSlice';
 
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
+import { SocketContext } from './socketContext';
 import { loadStateLS, removeStateLS, saveStateLS } from '../utils/localStorage';
 
-const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
+interface ISyncUserWrapper {
+  children: React.ReactNode;
+}
+
+const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
+  children,
+}) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-
+  const socketConnection = useContext(SocketContext);
   const [creatorDataSteps, setCreatorDataSteps] = useState(0);
   const userWasLoggedIn = useRef(false);
 
@@ -53,7 +66,61 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
         })
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [creatorDataSteps]);
+
+  // eslint-disable-next-line consistent-return
+  useEffect(() => {
+    if (
+      !user.creatorData?.options.isCreatorConnectedToStripe &&
+      user.creatorData?.options.stripeConnectStatus ===
+        newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus.PROCESSING &&
+      socketConnection
+    ) {
+      const handlerStripeAccountChanged = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.StripeAccountChanged.decode(arr);
+        if (!decoded) return;
+        if (decoded.isActive) {
+          const payload = new newnewapi.EmptyRequest({});
+          const res = await getMyOnboardingState(payload);
+
+          if (res.data) {
+            dispatch(
+              setCreatorData({
+                options: {
+                  ...user.creatorData?.options,
+                  ...res.data,
+                },
+              })
+            );
+          }
+        }
+      };
+
+      if (socketConnection) {
+        socketConnection.on(
+          'StripeAccountChanged',
+          handlerStripeAccountChanged
+        );
+      }
+
+      return () => {
+        if (socketConnection && socketConnection.connected) {
+          socketConnection.off(
+            'StripeAccountChanged',
+            handlerStripeAccountChanged
+          );
+        }
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    user.creatorData?.options.isCreatorConnectedToStripe,
+    user.creatorData?.options.stripeConnectStatus,
+    user.creatorData?.options,
+    socketConnection,
+  ]);
 
   useEffect(() => {
     async function syncUserData() {
@@ -94,8 +161,8 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
         }
         if (data?.me?.options?.isCreator) {
           try {
-            const payload = new newnewapi.EmptyRequest({});
-            const res = await getMyOnboardingState(payload);
+            const getMyOnboardingStatePayload = new newnewapi.EmptyRequest({});
+            const res = await getMyOnboardingState(getMyOnboardingStatePayload);
 
             if (res.data) {
               dispatch(

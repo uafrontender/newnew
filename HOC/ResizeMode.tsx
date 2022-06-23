@@ -20,7 +20,7 @@ export const ResizeMode: React.FC<IResizeMode> = (props) => {
   const handleResizeObserver = useCallback(() => {
     let newResizeMode: string = '';
     _map(sizes, (value: number, key: string) => {
-      if (!newResizeMode && ref.current.offsetWidth >= value) {
+      if (!newResizeMode && ref.current && ref.current.offsetWidth >= value) {
         newResizeMode = key;
       }
     });

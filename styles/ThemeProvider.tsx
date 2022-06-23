@@ -1,18 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
+import { useCookies } from 'react-cookie';
 
 import GlobalStyle from './globalStyles';
 
 import getColorMode from '../utils/getColorMode';
-import { useAppSelector } from '../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { darkTheme, lightTheme } from './themes';
+import { setColorMode } from '../redux-store/slices/uiStateSlice';
 
-const GlobalTheme: React.FunctionComponent<{
+interface IGlobalTheme {
   initialTheme: string;
-}> = ({ initialTheme, children }) => {
+  children: React.ReactNode;
+}
+
+const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
+  initialTheme,
+  children,
+}) => {
+  const dispatch = useAppDispatch();
   const { colorMode } = useAppSelector((state) => state.ui);
+  const [cookies] = useCookies();
 
   const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    if (!cookies?.colorMode) {
+      dispatch(setColorMode('auto'));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cookies.colorMode]);
 
   useEffect(() => {
     setMounted(true);

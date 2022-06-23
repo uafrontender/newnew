@@ -24,7 +24,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
     setAnimate(false);
   }, []);
   const handleTimeChange = useCallback(
-    (key, time: any) => {
+    (key: string, time: any) => {
       onChange(id, { [key]: time });
     },
     [id, onChange]
@@ -36,7 +36,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
     [id, onChange]
   );
   const handleTypeChange = useCallback(
-    (e, type) => {
+    (e: any, type: any) => {
       const changeBody: any = { type };
       if (type === 'right-away') {
         changeBody.date = moment().format();
@@ -56,7 +56,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
       <SCheckBoxWrapper>
         <CheckBox
           id='right-away'
-          label={t('secondStep.field.startsAt.tablet.type.rightAway')}
+          label={t('secondStep.field.startsAt.tablet.type.right-away')}
           selected={value.type === 'right-away'}
           handleChange={handleTypeChange}
         />

@@ -47,7 +47,7 @@
   "Favorites": {
     "meta": {
       "title": "NewNew Favorites",
-      "description": "Browse through all of your saved favorite posts, posts and creators"
+      "description": "Browse through all of your saved favorite posts and creator"
     },
     "noContent": {
       "description": "Any creators you favorite\nwill be shown here"
@@ -87,7 +87,7 @@
       "title": "Block user",
       "messageFirstPart": "Do you really want to block",
       "messageSecondPart": "?",
-      "button:": {
+      "button": {
         "cancel": "Cancel",
         "confirm": "Block user"
       }

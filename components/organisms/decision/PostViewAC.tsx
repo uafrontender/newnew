@@ -340,7 +340,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     // Increment channel subs after mounting
     // Decrement when unmounting
     useEffect(() => {
-      if (socketConnection.connected) {
+      if (socketConnection?.connected) {
         addChannel(post.postUuid, {
           postUpdates: {
             postUuid: post.postUuid,
@@ -352,7 +352,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
         removeChannel(post.postUuid);
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection.connected]);
+    }, [socketConnection?.connected]);
 
     // Mark post as viewed if logged in
     useEffect(() => {
@@ -462,24 +462,24 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       };
 
       if (socketConnection) {
-        socketConnection.on(
+        socketConnection?.on(
           'AcOptionCreatedOrUpdated',
           socketHandlerOptionCreatedOrUpdated
         );
-        socketConnection.on('AcOptionDeleted', socketHandlerOptionDeleted);
-        socketConnection.on('PostUpdated', socketHandlerPostData);
-        socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
+        socketConnection?.on('AcOptionDeleted', socketHandlerOptionDeleted);
+        socketConnection?.on('PostUpdated', socketHandlerPostData);
+        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off(
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
             'AcOptionCreatedOrUpdated',
             socketHandlerOptionCreatedOrUpdated
           );
-          socketConnection.off('AcOptionDeleted', socketHandlerOptionDeleted);
-          socketConnection.off('PostUpdated', socketHandlerPostData);
-          socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
+          socketConnection?.off('AcOptionDeleted', socketHandlerOptionDeleted);
+          socketConnection?.off('PostUpdated', socketHandlerPostData);
+          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -525,11 +525,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
         resetSessionId();
       };
 
-      if (socketConnection.connected) {
+      if (socketConnection?.connected) {
+        console.log(sessionId);
         makeBidFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection.connected, sessionId]);
+    }, [socketConnection?.connected, sessionId]);
 
     const goToNextStep = () => {
       if (
@@ -650,9 +651,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             showSelectingWinnerOption={showSelectingWinnerOption}
           >
             <PostVotingTab>
-              {t('tabs.bids')}
-              {` `}
-              {!!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''}
+              {`${t('tabs.bids')} ${
+                !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
+              }`}
             </PostVotingTab>
             <AcOptionsTab
               postId={post.postUuid}

@@ -412,6 +412,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     } else {
       setHeightDelta(0);
     }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
   }, [
     hasVotedOptionId,
     postLoading,

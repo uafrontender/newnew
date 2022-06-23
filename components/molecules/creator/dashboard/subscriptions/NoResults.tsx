@@ -3,12 +3,11 @@ import Image from 'next/image';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
-
-import copyIcon from '../../../../public/images/svg/icons/outlined/Link.svg';
-import Button from '../../../atoms/Button';
-import { useAppSelector } from '../../../../redux-store/store';
-import InlineSvg from '../../../atoms/InlineSVG';
-import assets from '../../../../constants/assets';
+import copyIcon from '../../../../../public/images/svg/icons/outlined/Link.svg';
+import Button from '../../../../atoms/Button';
+import { useAppSelector } from '../../../../../redux-store/store';
+import InlineSvg from '../../../../atoms/InlineSVG';
+import assets from '../../../../../constants/assets';
 
 export const NoResults = () => {
   const { t } = useTranslation('page-Creator');

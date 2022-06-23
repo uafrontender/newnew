@@ -113,7 +113,7 @@
           "title": "Start date",
           "type": {
             "schedule": "Schedule",
-            "rightAway": "Right away"
+            "right-away": "Right away"
           },
           "hoursFormat": {
             "pm": "PM",
@@ -132,7 +132,7 @@
         "tablet": {
           "type": {
             "schedule": "Schedule for a certain date",
-            "rightAway": "Post right away once I publish it"
+            "right-away": "Post right away once I publish it"
           }
         }
       },
@@ -151,8 +151,8 @@
     },
     "video": {
       "error": {
-        "minLength": "Video duration too small, choose from 10 seconds",
-        "maxLength": "Video duration too long, choose up to 10 minutes",
+        "minLength": "Video must be at least 10 seconds long",
+        "maxLength": "Video must be less than 10 minutes long",
         "maxSize": "Video size too big, choose up to 10gb",
         "title": "Ooops...",
         "description": "There was an error and your file could not be uploaded. Would you like to try again."

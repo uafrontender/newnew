@@ -222,7 +222,7 @@ export const PostCard: React.FC<ICard> = React.memo(
         if (videoReady) {
           if (inView && !shouldStop) {
             videoRef.current?.play().catch((e) => {
-              // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
+              // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission .
               // Many browsers prevent autoplay
               console.log(e);
             });
@@ -327,17 +327,17 @@ export const PostCard: React.FC<ICard> = React.memo(
       };
 
       if (socketConnection) {
-        socketConnection.on('PostUpdated', handlerSocketPostUpdated);
-        socketConnection.on(
+        socketConnection?.on('PostUpdated', handlerSocketPostUpdated);
+        socketConnection?.on(
           'PostThumbnailUpdated',
           handlerSocketThumbnailUpdated
         );
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off('PostUpdated', handlerSocketPostUpdated);
-          socketConnection.off(
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off('PostUpdated', handlerSocketPostUpdated);
+          socketConnection?.off(
             'PostThumbnailUpdated',
             handlerSocketThumbnailUpdated
           );

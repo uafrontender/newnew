@@ -240,7 +240,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<ICodeVerificationMen
             {t('heading.subHeading')}
             <br />
             {/* NB! Temp */}
-            {newEmail}
+            {newEmail.toLowerCase()}
           </SSubheading>
           <VerficationCodeInput
             initialValue={codeInitial}

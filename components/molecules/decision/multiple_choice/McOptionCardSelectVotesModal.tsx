@@ -17,6 +17,7 @@ interface IMcOptionCardSelectVotesModal {
   isVisible: boolean;
   isSupportedByMe: boolean;
   availableVotes: number[];
+  children: React.ReactNode;
   handleClose: () => void;
   handleOpenCustomAmountModal: () => void;
   handleSetAmountAndOpenModal: (votesAmount: string) => void;
@@ -27,10 +28,10 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<IMcOptionCardSelectV
     isVisible,
     isSupportedByMe,
     availableVotes,
+    children,
     handleClose,
     handleOpenCustomAmountModal,
     handleSetAmountAndOpenModal,
-    children,
   }) => {
     const theme = useTheme();
     const { t } = useTranslation('modal-Post');
