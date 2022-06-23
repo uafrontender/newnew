@@ -255,7 +255,8 @@
       "update": "Update payment info",
       "requestSetupLink": "Connect with Stripe",
       "stripeConnectedLink": "Stripe connected!",
-      "back": "Close"
+      "back": "Close",
+      "stripeConnecting": "Connecting..."
     }
   },
   "noNotifications": "Any new notifications you receive\nwill appear here"

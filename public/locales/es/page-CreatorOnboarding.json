@@ -153,7 +153,8 @@
     "button": {
       "submit": "Submit",
       "requestSetupLink": "Connect with Stripe",
-      "stripeConnectedLink": "Stripe connected!"
+      "stripeConnectedLink": "Stripe connected!",
+      "stripeConnecting_NEED_TRANSLATION": "Connecting..."
     }
   },
   "subRateSection": {
