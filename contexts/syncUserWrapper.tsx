@@ -66,8 +66,10 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         })
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [creatorDataSteps]);
 
+  // eslint-disable-next-line consistent-return
   useEffect(() => {
     if (
       !user.creatorData?.options.isCreatorConnectedToStripe &&
@@ -79,7 +81,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         const arr = new Uint8Array(data);
         const decoded = newnewapi.StripeAccountChanged.decode(arr);
         if (!decoded) return;
-        if (decoded._isActive) {
+        if (decoded.isActive) {
           const payload = new newnewapi.EmptyRequest({});
           const res = await getMyOnboardingState(payload);
 
@@ -112,9 +114,11 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         }
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     user.creatorData?.options.isCreatorConnectedToStripe,
     user.creatorData?.options.stripeConnectStatus,
+    user.creatorData?.options,
     socketConnection,
   ]);
 
@@ -157,8 +161,8 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         }
         if (data?.me?.options?.isCreator) {
           try {
-            const payload = new newnewapi.EmptyRequest({});
-            const res = await getMyOnboardingState(payload);
+            const getMyOnboardingStatePayload = new newnewapi.EmptyRequest({});
+            const res = await getMyOnboardingState(getMyOnboardingStatePayload);
 
             if (res.data) {
               dispatch(
