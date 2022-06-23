@@ -918,32 +918,6 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTabIndex]);
 
-    // useEffect(() => {
-    //   async function validateMcOptions() {
-    //     try {
-    //       if (tab !== 'multiple-choice') {
-    //         setOptionsAreValid(true);
-    //       } else {
-    //         const areOptionsValid =
-    //           (await multiplechoice.choices.findIndex(async (item) =>
-    //             validateT(
-    //               item.text,
-    //               CREATION_OPTION_MIN,
-    //               CREATION_OPTION_MAX,
-    //               newnewapi.ValidateTextRequest.Kind.POST_OPTION
-    //             )
-    //           )) !== -1;
-
-    //         setOptionsAreValid(areOptionsValid);
-    //       }
-    //     } catch (err) {
-    //       console.error(err);
-    //     }
-    //   }
-
-    //   validateMcOptions();
-    // }, [tab, multiplechoice.choices, validateT]);
-
     useEffect(() => {
       if (user.userTutorialsProgressSynced) {
         switch (tutorialType) {
