@@ -255,7 +255,8 @@
       "update": "更新支付資訊",
       "requestSetupLink": "與Stripe連接",
       "stripeConnectedLink": "Stripe已連接！",
-      "back": "關閉"
+      "back": "關閉",
+      "stripeConnecting_NEED_TRANSLATION": "Connecting..."
     }
   },
   "noNotifications": "你收到的任何新通知\n都會出現在這裡"
