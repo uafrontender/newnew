@@ -153,7 +153,8 @@
     "button": {
       "submit": "提交",
       "requestSetupLink": "與Stripe綁定",
-      "stripeConnectedLink": "Stripe已綁定！"
+      "stripeConnectedLink": "Stripe已綁定！",
+      "stripeConnecting_NEED_TRANSLATION": "Connecting..."
     }
   },
   "subRateSection": {
