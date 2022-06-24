@@ -309,7 +309,7 @@ interface ICookieContainer {
 const CookieContainer = styled.div<ICookieContainer>`
   left: 50%;
   bottom: ${(props) => (props.bottomNavigationVisible ? 62 : 6)}px;
-  z-index: ${(props) => props.zIndex}px;
+  z-index: ${(props) => props.zIndex};
   position: fixed;
   transform: translateX(-50%);
   transition: bottom ease 0.5s;
@@ -328,7 +328,7 @@ interface IChatContainer {
 const ChatContainer = styled.div<IChatContainer>`
   right: 16px;
   bottom: ${(props) => (props.bottomNavigationVisible ? 72 : 16)}px;
-  z-index: ${(props) => props.zIndex}px;
+  z-index: ${(props) => props.zIndex};
   position: fixed;
   transition: bottom ease 0.5s;
 `;
