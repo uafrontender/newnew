@@ -20,7 +20,6 @@ import ScrollArrowPermanent from '../components/atoms/ScrollArrowPermanent';
 import { NextPageWithLayout } from './_app';
 import { useAppSelector } from '../redux-store/store';
 import { TColorMode } from '../redux-store/slices/uiStateSlice';
-import { sizes } from '../styles/media';
 
 // assets
 import ArrowRightIcon from '../public/images/svg/icons/outlined/ArrowRight.svg';
@@ -263,19 +262,6 @@ export const About = () => {
     prevArrow: <PrevArrow />,
     infinite: false,
     arrows: true,
-    responsive: [
-      {
-        breakpoint: sizes.tablet,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          variableWidth: true,
-          nextArrow: undefined,
-          prevArrow: undefined,
-          arrows: false,
-        },
-      },
-    ],
   };
 
   return (
@@ -316,45 +302,88 @@ export const About = () => {
           {/* PRESS SECTION */}
           <SMediaSection>
             <SSectionTitle variant={4}>{t('press.title')}</SSectionTitle>
-            <Slider {...settings}>
-              {MEDIAS.map((media, i) => (
-                <SMedia key={media.id}>
-                  <a
-                    href={media.link}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    key={media.id}
-                    draggable={false}
-                  >
-                    <SMediaPreview>
-                      <SMediaPreviewPic
-                        src={media.previewSrc}
-                        name={media.pressName as MediaNames}
-                      />
-                      <SMediaLogo
-                        src={MEDIA_ICONS[media.pressName as MediaNames].src}
-                        name={media.pressName as MediaNames}
-                      />
-                    </SMediaPreview>
-                    <SMediaInfo>
-                      <SMediaTitle variant={1}>
-                        {(
-                          t(`press.items`, { returnObjects: true }) as {
-                            title: string;
-                          }[]
-                        )[i]?.title ?? ''}
-                      </SMediaTitle>
-                      <SMediaPreviewIcon
-                        svg={ArrowRightIcon}
-                        width='30px'
-                        height='30px'
-                        fill='currentColor'
-                      />
-                    </SMediaInfo>
-                  </a>
-                </SMedia>
-              ))}
-            </Slider>
+            {isMobile && (
+              <SMediaWrapper>
+                {MEDIAS.map((media, i) => (
+                  <SMedia key={media.id}>
+                    <a
+                      href={media.link}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      key={media.id}
+                      draggable={false}
+                    >
+                      <SMediaPreview>
+                        <SMediaPreviewPic
+                          src={media.previewSrc}
+                          name={media.pressName as MediaNames}
+                        />
+                        <SMediaLogo
+                          src={MEDIA_ICONS[media.pressName as MediaNames].src}
+                          name={media.pressName as MediaNames}
+                        />
+                      </SMediaPreview>
+                      <SMediaInfo>
+                        <SMediaTitle variant={1}>
+                          {(
+                            t(`press.items`, { returnObjects: true }) as {
+                              title: string;
+                            }[]
+                          )[i]?.title ?? ''}
+                        </SMediaTitle>
+                        <SMediaPreviewIcon
+                          svg={ArrowRightIcon}
+                          width='30px'
+                          height='30px'
+                          fill='currentColor'
+                        />
+                      </SMediaInfo>
+                    </a>
+                  </SMedia>
+                ))}
+              </SMediaWrapper>
+            )}
+            {!isMobile && (
+              <Slider {...settings}>
+                {MEDIAS.map((media, i) => (
+                  <SMedia key={media.id}>
+                    <a
+                      href={media.link}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      key={media.id}
+                      draggable={false}
+                    >
+                      <SMediaPreview>
+                        <SMediaPreviewPic
+                          src={media.previewSrc}
+                          name={media.pressName as MediaNames}
+                        />
+                        <SMediaLogo
+                          src={MEDIA_ICONS[media.pressName as MediaNames].src}
+                          name={media.pressName as MediaNames}
+                        />
+                      </SMediaPreview>
+                      <SMediaInfo>
+                        <SMediaTitle variant={1}>
+                          {(
+                            t(`press.items`, { returnObjects: true }) as {
+                              title: string;
+                            }[]
+                          )[i]?.title ?? ''}
+                        </SMediaTitle>
+                        <SMediaPreviewIcon
+                          svg={ArrowRightIcon}
+                          width='30px'
+                          height='30px'
+                          fill='currentColor'
+                        />
+                      </SMediaInfo>
+                    </a>
+                  </SMedia>
+                ))}
+              </Slider>
+            )}
           </SMediaSection>
 
           {/* BACKERS SECTION */}
@@ -874,11 +903,33 @@ const SScrollArrow = styled(ScrollArrowPermanent)<ISScrollArrow>`
       : ''}
 `;
 
+const SMediaWrapper = styled.div`
+  display: flex;
+  overflow-x: scroll;
+  margin: 0 -16px;
+
+  // hide scrollbar
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+
+  &::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+`;
+
 const SMedia = styled.div`
   max-width: 252px;
+  min-width: 252px;
+  margin-right: 16px;
+
+  &:first-child {
+    margin-left: 16px;
+  }
 
   ${({ theme }) => theme.media.tablet} {
     max-width: unset;
+    min-width: unset;
+    margin-right: 0;
   }
 `;
 
