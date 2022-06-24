@@ -512,7 +512,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     const handleItemChange = useCallback(
       async (key: string, value: any) => {
         if (key === 'title') {
-          dispatch(setCreationTitle(value));
+          dispatch(setCreationTitle(value.trim() ? value : ''));
         } else if (key === 'minimalBid') {
           dispatch(setCreationMinBid(value));
         } else if (key === 'comments') {
