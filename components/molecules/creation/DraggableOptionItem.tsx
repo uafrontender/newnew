@@ -47,10 +47,10 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   const dragControls = useDragControls();
 
   const handleInputChange = (e: any) => {
-    setValue(e.target.value);
+    setValue(e.target.value.trim() ? e.target.value : '');
     handleChange(index, {
       ...item,
-      text: e.target.value,
+      text: e.target.value.trim() ? e.target.value : '',
     });
   };
   const handleInputBlur = async (e: any) => {
