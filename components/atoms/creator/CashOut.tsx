@@ -35,7 +35,7 @@ const CashOut: React.FC<ICashOut> = ({
               <SAmount variant={3} weight={600}>
                 {`$${formatNumber(
                   nextCashOutAmount?.usdCents / 100 ?? 0,
-                  true
+                  false
                 )}`}
               </SAmount>
             </>

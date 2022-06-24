@@ -79,7 +79,9 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
   const subPriceFormatted = useMemo(
     () =>
-      subscriptionPrice ? formatNumber(subscriptionPrice / 100 ?? 0, true) : '',
+      subscriptionPrice
+        ? formatNumber(subscriptionPrice / 100 ?? 0, false)
+        : '',
     [subscriptionPrice]
   );
 

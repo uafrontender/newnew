@@ -27,6 +27,7 @@ interface IMobileFieldBlock {
     min?: number;
     type?: 'text' | 'number' | 'tel';
     pattern?: string;
+    max?: number;
   };
   formattedValue?: any;
   formattedDescription?: any;
@@ -65,6 +66,9 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
 
     if (inputProps?.type === 'number' && (inputProps?.min as number) > value) {
       onChange(id, inputProps?.min as number);
+    }
+    if (inputProps?.type === 'number' && (inputProps?.max as number) < value) {
+      onChange(id, inputProps?.max as number);
     }
   }, [inputProps, id, onChange, value]);
   const preventCLick = (e: any) => {

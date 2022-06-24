@@ -37,6 +37,7 @@ import useSynchronizedHistory from '../../utils/hooks/useSynchronizedHistory';
 import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
+import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
 type TPageType =
   | 'activelyBidding'
@@ -627,7 +628,16 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             }}
           >
             <SUsernameWrapper>
-              <SUsername variant={4}>{user.userData?.nickname}</SUsername>
+              <SUsername variant={4}>
+                {user.userData?.nickname}
+                {user.userData?.options?.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='32px'
+                    height='32px'
+                  />
+                )}
+              </SUsername>
               {isGenderPronounsDefined(user.userData?.genderPronouns) && (
                 <SGenderPronouns variant={2}>
                   {t(
@@ -803,6 +813,8 @@ const SUsernameWrapper = styled.div`
 
 const SUsername = styled(Headline)`
   text-align: center;
+  display: flex;
+  align-items: center;
 `;
 
 const SGenderPronouns = styled(Text)`
@@ -879,4 +891,8 @@ const SMyProfileLayout = styled.div`
   ${(props) => props.theme.media.laptop} {
     margin-top: -16px;
   }
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  margin-left: 4px;
 `;

@@ -98,7 +98,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
         centsQty = localData.totalAmount.usdCents;
       }
     }
-    return `$${formatNumber(centsQty / 100 ?? 0, true)}`;
+    return `$${formatNumber(centsQty / 100 ?? 0, false)}`;
   };
 
   async function copyPostUrlToClipboard(url: string) {

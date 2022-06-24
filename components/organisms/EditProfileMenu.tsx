@@ -393,7 +393,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             }
 
             setCropCoverImage({ x: 0, y: 0 });
-            setCoverUrlInEdit(reader.result as string);
+            setCoverUrlInEdit(properlySizedImage.url);
             setCoverUrlInEditAnimated(isAnimatedImage(file.name));
           });
         }
@@ -714,7 +714,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     } else {
       setIsDataValid(false);
     }
-  }, [formErrors]);
+  }, [formErrors, dataInEdit]);
 
   // Gender Pronouns
   const genderOptions: TDropdownSelectItem<number>[] = useMemo(

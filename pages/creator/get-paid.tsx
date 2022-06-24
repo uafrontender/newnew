@@ -21,21 +21,18 @@ const DashboardSectionStripe = dynamic(
 
 const GetPaid = () => {
   const { t } = useTranslation('page-Creator');
-
-  const [onboardingState, setOnboardingState] =
-    useState<newnewapi.GetMyOnboardingStateResponse>();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<null | boolean>(null);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
 
   useEffect(() => {
     async function fetchOnboardingState() {
+      if (isLoading) return;
       try {
+        setIsLoading(true);
         const payload = new newnewapi.EmptyRequest({});
         const res = await getMyOnboardingState(payload);
-
         if (res.data) {
-          setOnboardingState(res.data);
           dispatch(
             setCreatorData({
               options: {
@@ -49,9 +46,9 @@ const GetPaid = () => {
         setIsLoading(false);
       } catch (err) {
         console.error(err);
+        setIsLoading(false);
       }
     }
-
     fetchOnboardingState();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -67,12 +64,8 @@ const GetPaid = () => {
           content={t('getPaid.meta.description')}
         />
       </Head>
-      {!isLoading ? (
-        <DashboardSectionStripe
-          isConnectedToStripe={
-            onboardingState?.isCreatorConnectedToStripe ?? false
-          }
-        />
+      {isLoading === false ? (
+        <DashboardSectionStripe />
       ) : (
         <Lottie
           width={64}
@@ -100,7 +93,9 @@ export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
+    'common',
     'page-Creator',
+    'page-Chat',
   ]);
 
   return {

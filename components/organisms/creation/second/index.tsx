@@ -61,8 +61,6 @@ import {
 import {
   CREATION_TITLE_MIN,
   CREATION_TITLE_MAX,
-  CREATION_OPTION_MAX,
-  CREATION_OPTION_MIN,
 } from '../../../../constants/general';
 
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
@@ -212,22 +210,54 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       },
       [tCommon, validateTextAPI]
     );
+
+    const validateMcOption = useCallback(
+      async (
+        text: string,
+        min: number,
+        max: number,
+        type: newnewapi.ValidateTextRequest.Kind,
+        index: number
+      ) => {
+        const error = await validateT(text, min, max, type);
+
+        if (error) {
+          setInvalidMcOptionsIndicies((curr) => {
+            const newSet = new Set([...curr]);
+
+            newSet.add(index);
+
+            return newSet;
+          });
+        } else {
+          setInvalidMcOptionsIndicies((curr) => {
+            const newSet = new Set([...curr]);
+
+            newSet.delete(index);
+
+            return newSet;
+          });
+        }
+
+        return error;
+      },
+      [validateT]
+    );
+
     const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
     const isTablet = ['tablet'].includes(resizeMode);
     const isDesktop = !isMobile && !isTablet;
-    const optionsAreValid =
-      tab !== 'multiple-choice' ||
-      multiplechoice.choices.findIndex((item) =>
-        validateT(
-          item.text,
-          CREATION_OPTION_MIN,
-          CREATION_OPTION_MAX,
-          newnewapi.ValidateTextRequest.Kind.POST_OPTION
-        )
-      ) !== -1;
+
+    const [invalidMcOptionsIndicies, setInvalidMcOptionsIndicies] = useState<
+      Set<number>
+    >(new Set());
+    const optionsAreValid = useMemo(
+      () => tab !== 'multiple-choice' || invalidMcOptionsIndicies.size === 0,
+      [tab, invalidMcOptionsIndicies]
+    );
 
     const targetBackersValid =
       tab !== 'crowdfunding' ||
@@ -563,7 +593,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                 min={2}
                 options={multiplechoice.choices}
                 onChange={handleItemChange}
-                validation={validateT}
+                validation={validateMcOption}
               />
               {isMobile && <SSeparator margin='16px 0' />}
             </>
@@ -580,6 +610,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                   formattedDescription={auction.minimalBid}
                   inputProps={{
                     min: 5,
+                    max: 10000,
                     type: 'number',
                     pattern: '[0-9]*',
                   }}
@@ -618,7 +649,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
         t,
         tab,
         multiplechoice.choices,
-        validateT,
+        validateMcOption,
         isMobile,
         auction.minimalBid,
         crowdfunding.targetBackerCount,
@@ -641,6 +672,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                       formattedDescription={auction.minimalBid}
                       inputProps={{
                         min: 5,
+                        max: 10000,
                         type: 'number',
                         pattern: '[0-9]*',
                       }}

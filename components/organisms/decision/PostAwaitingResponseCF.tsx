@@ -241,7 +241,7 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
                     </a>
                   </SCreator>
                   {/* <STotal>
-                  {`$${formatNumber(post.totalAmount?.usdCents ?? 0, true)}`}
+                  {`$${formatNumber(post.totalAmount?.usdCents/100 ?? 0, true)}`}
                 </STotal> */}
                 </SCreatorInfoDiv>
                 <SPostTitle variant={4}>{post.title}</SPostTitle>
