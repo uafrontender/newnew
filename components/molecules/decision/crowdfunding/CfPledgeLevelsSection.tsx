@@ -40,6 +40,7 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import getDisplayname from '../../../../utils/getDisplayname';
 import assets from '../../../../constants/assets';
 import Headline from '../../../atoms/Headline';
+import { formatNumber } from '../../../../utils/format';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsSection {
@@ -398,7 +399,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
           <PaymentModal
             isOpen={paymentModalOpen}
             zIndex={12}
-            amount={pledgeAmount ? `$${(pledgeAmount / 100)?.toFixed(0)}` : '0'}
+            amount={
+              pledgeAmount
+                ? `$${formatNumber(pledgeAmount / 100 ?? 0, true)}`
+                : '0'
+            }
             // {...(walletBalance?.usdCents &&
             // pledgeAmount &&
             // walletBalance.usdCents >= pledgeAmount
