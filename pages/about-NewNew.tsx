@@ -930,6 +930,10 @@ const SMedia = styled.div`
     max-width: unset;
     min-width: unset;
     margin-right: 0;
+
+    &:first-child {
+      margin-left: 0;
+    }
   }
 `;
 
@@ -1079,8 +1083,8 @@ const SMediaPreviewPic = styled.div<ISMediaPreviewPic>`
 
 const SMediaPreviewIcon = styled(InlineSVG)`
   flex-shrink: 0;
-  width: 42px;
-  height: 25px;
+  width: 24px;
+  height: 24px;
   margin-left: auto;
   transform: rotate(-45deg);
 
