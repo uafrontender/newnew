@@ -51,6 +51,7 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
+import { formatNumber } from '../../../../utils/format';
 
 interface IAcOptionsTab {
   postId: string;
@@ -621,7 +622,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${newBidAmount}`}
+          amount={`$${formatNumber(parseInt(newBidAmount) ?? 0, true)}`}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * 100
           //   ? {}
