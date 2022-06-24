@@ -694,7 +694,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         <PaymentModalRedirectOnly
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${supportBidAmount}`}
+          amount={`$${formatNumber(parseInt(supportBidAmount) ?? 0, true)}`}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(supportBidAmount) * 100
           //   ? {}
