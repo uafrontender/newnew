@@ -24,9 +24,9 @@
   "signUpOptions": {
     "google": "使用Google登入",
     "apple": "使用Apple ID登入",
-    "facebook": "使用Facebook繼續",
-    "twitter": "用Twitter繼續",
-    "orContinueWith": "或繼續使用",
+    "facebook": "使用Facebook登入",
+    "twitter": "用Twitter登入",
+    "orContinueWith": "或使用",
     "email": "電子郵件",
     "signInButton": "註冊",
     "logInButton": "登錄"
@@ -39,7 +39,7 @@
   },
   "legalDisclaimer": {
     "mainText": "創建帳戶即表明你同意我們的",
-    "privacyPolicy": "隱私政策",
+    "privacyPolicy": "隱私政策、",
     "terms": "條款",
     "and": "和",
     "communityGuidelines": "社區指南"

@@ -81,7 +81,7 @@
       "mc": "時間在進行投票之前已經用完",
       "cf": "時間在達到Goal之前已經用完"
     },
-    "buttonText": "參見新的{{postTypeMultiple}}"
+    "buttonText": "查看新的{{postTypeMultiple}}"
   },
   "postDeletedByMe": {
     "title": "該{{postType}}已被刪除",
@@ -97,7 +97,7 @@
       "byCreator": "{{creator}}刪除了這個{{postType}}",
       "byAdmin": "該{{postType}}違反了我們的社區指南"
     },
-    "buttonText": "參見新的{{postTypeMultiple}}"
+    "buttonText": "查看新的{{postTypeMultiple}}"
   },
   "postSuccessModeration": {
     "title": "你的回應已上線！",
@@ -290,7 +290,7 @@
     "paymentModalFooter": {
       "body": "你的銀行卡信息將被暫時保留。\n只有當{{creator}}選擇了你的出價時，你才會被扣款。",
       "terms": "條款",
-      "apply": "應用"
+      "apply": "適用"
     },
     "paymentModalPayButton": "出價",
     "postTopInfo": {
@@ -298,7 +298,7 @@
         "title": "時間到！",
         "body": "拍賣結束。現在是創作者選擇贏家的時候了。請繼續關注！"
       },
-      "inBids": "在總出價中"
+      "inBids": "總出價"
     },
     "optionsTab": {
       "me": "我",
@@ -317,9 +317,9 @@
         "bidders": "出價者",
         "others": "其他",
         "bid": "出價",
-        "supportButton": "提升",
-        "supportAgainButton": "再次\n提升",
-        "raiseBidButton": "提升出價",
+        "supportButton": "提高",
+        "supportAgainButton": "再次\n提高",
+        "raiseBidButton": "提高出價",
         "placeABidButton": "出價",
         "cancelButton": "取消",
         "moreButton": "更多"
@@ -330,7 +330,7 @@
       "actionSection": {
         "suggestionPlaceholder": "增加一個建議......",
         "suggestionPlaceholderDesktop": "{{username}}應該怎麼做？",
-        "amountPlaceholderDesktop": "最小出價 ${{amount}}",
+        "amountPlaceholderDesktop": "最低出價 ${{amount}}",
         "amountPlaceholderBoost": "提高出價 ${{amount}}",
         "placeABidButton": "出價"
       }
@@ -351,8 +351,8 @@
   },
   "mcPost": {
     "postTopInfo": {
-      "vote": "投票",
-      "votes": "總票數"
+      "vote": "票",
+      "votes": "票"
     },
     "paymentModalHeader": {
       "title": "{{creator}}的Superpoll",
@@ -361,7 +361,7 @@
     "paymentModalFooter": {
       "body": "你的銀行卡信息將被暫時保留。\n只有當你選擇的選項獲得最多的票數時，你才會被扣款。",
       "terms": "條款",
-      "apply": "應用"
+      "apply": "適用"
     },
     "paymentModalPayButton": "投票給",
     "optionsTab": {
@@ -374,8 +374,8 @@
       },
       "optionCard": {
         "noVotes": "沒有投票",
-        "votes": "票數",
-        "vote": "投票",
+        "votes": "票",
+        "vote": "票",
         "mySuggestion": "我的建議",
         "subscriberSuggestion": "{{ nickname }}的建議",
         "others": "其他",
@@ -393,17 +393,17 @@
         "selectVotesMenu": {
           "title": "購買投票",
           "titleMoreVotes": "購買更多的投票",
-          "vote": "投票",
-          "votes": "票數",
+          "vote": "票",
+          "votes": "票",
           "custom": "自定義票數"
         },
         "confirmVoteModal": {
-          "vote": "投票",
-          "votes": "票數",
+          "vote": "票",
+          "votes": "票",
           "custom": "自定義投票",
           "buySingleVote": "購買1票，在{{creator}}的Superpoll中投票",
-          "buyMultipleVotes": "購買{{amount}}票，以便在{{創造者}}的Superpoll中投票",
-          "buyAnyVotes": "購買任意數量的票數在{{creator}}的Superpoll上投票",
+          "buyMultipleVotes": "購買{{amount}}票，在{{ creator }}的Superpoll中投票",
+          "buyAnyVotes": "購買任意數量的票數並在{{creator}}的Superpoll上投票",
           "optionCaption": "Superpoll選項",
           "voteButton": "投票"
         }
@@ -418,8 +418,8 @@
       "actionSection": {
         "votesAmount": {
           "placeholder": {
-            "votes": "票數",
-            "vote": "投票"
+            "votes": "票",
+            "vote": "票"
           }
         },
         "subscribeToCreatorCaption": "訂閱{{creator}}，為本次Superpoll添加你自己的選項！",
@@ -444,7 +444,7 @@
       "ofBackers": "的{{ targetBackers }}支持者",
       "myBacking_NEED_TRANSLATION": "My backing:",
       "my": "我的",
-      "pledge": "認捐"
+      "pledge": "確認"
     },
     "backersTab": {
       "info": {
@@ -452,7 +452,7 @@
         "caption": "在做出決定之前，不會向你收費。"
       },
       "customPledge": {
-        "pledgeButton": "認捐",
+        "pledgeButton": "確認",
         "continue": "繼續",
         "cancelButton": "取消"
       },
@@ -470,9 +470,9 @@
       "title": "{{creator}}的Goal"
     },
     "paymentModalFooter": {
-      "body": "你的銀行卡信息將被暫時保留。\n只有當{{creator}}達到他們的Goal時，你才會被扣款。",
+      "body": "你的銀行卡信息將被暫時保留。\n只有{{ creator }}完成其Goal後，你才會被扣款。",
       "terms": "條款",
-      "apply": "應用"
+      "apply": "適用"
     },
     "paymentModalPayButton": "支持它",
     "floatingActionButton": {
@@ -575,8 +575,8 @@
     "inTotalVotes": "總票數",
     "others": "其他",
     "voted": "已投票",
-    "votes": "票數",
-    "vote": "投票",
+    "votes": "票",
+    "vote": "票",
     "optionChosen": "最高票數的選項",
     "seeAll": "查看所有選項",
     "optionsTab": {
@@ -625,7 +625,7 @@
     "inTotalVotes": "總票數",
     "others": "其他",
     "voted": "已投票",
-    "votes": "票數",
+    "votes": "票",
     "vote": "投票",
     "optionChosen": "最高票數的選項",
     "seeAll": "查看所有選項",
@@ -704,8 +704,8 @@
         "text": "此處是提交的所有出價，供創作者選擇。"
       },
       "supportPeopleBids": {
-        "title": "提升出價",
-        "text": "提升你想看到實際完成的現有出價。"
+        "title": "提高出價",
+        "text": "提高你想看到實際完成的現有出價。"
       },
       "createYourBid": {
         "title": "製作你自己的！",

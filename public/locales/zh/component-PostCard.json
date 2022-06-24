@@ -2,9 +2,9 @@
   "button": {
     "withActivity": {
       "ac": "已出價{{amount}}",
-      "mc": "票數{{votes}} ",
-      "mcSingular": "票數{{votes}} ",
-      "cf": "{{backed}} 需 {{total}} 位支持者"
+      "mc": "{{votes}} 票",
+      "mcSingular": "{{votes}} 票",
+      "cf": "{{backed}} 人已支持，共需 {{total}} 位支持者"
     },
     "withoutActivity": {
       "ac": "現在出價",

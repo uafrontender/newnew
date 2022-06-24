@@ -36,7 +36,7 @@
     },
     "fileUpload": {
       "description": "視頻檔案大小最高10GB",
-      "button": "選擇檔案案"
+      "button": "選擇檔案"
     },
     "block": {
       "title": {
@@ -46,7 +46,7 @@
         "floating": "預覽"
       },
       "subTitle": {
-        "votesInfo": "大家如要投票，需要花費至少2美元票",
+        "votesInfo": "大家如要投票，需要花費至少2美元",
         "floating": "上傳視頻並在此預覽",
         "floatingProcessing": "預覽將在處理完成之後可用"
       }
@@ -99,10 +99,10 @@
           "1-hour": "1小時後",
           "6-hours": "6小時後",
           "12-hours": "12小時後",
-          "1-day": "1天后",
-          "3-days": "3天后",
-          "5-days": "5天后",
-          "7-days": "7天后"
+          "1-day": "1天後",
+          "3-days": "3天後",
+          "5-days": "5天後",
+          "7-days": "7天後"
         }
       },
       "startsAt": {
@@ -204,17 +204,17 @@
     },
     "values": {
       "minimalBid": "${{value}}",
-      "comments-allowed": "打開",
+      "comments-allowed": "開啓",
       "comments-forbidden": "關閉",
-      "allowSuggestions-allowed": "打開",
+      "allowSuggestions-allowed": "開啓",
       "allowSuggestions-forbidden": "關閉"
     }
   },
   "published": {
     "meta": {
-      "title-auction-published": "創建 | Event | 發佈",
-      "title-multiple-choice-published": "創建 | Superpoll | 發佈",
-      "title-crowdfunding-published": "創建 | Goal | 發佈",
+      "title-auction-published": "創建 | Event | 已發佈",
+      "title-multiple-choice-published": "創建 | Superpoll | 已發佈",
+      "title-crowdfunding-published": "創建 | Goal | 已發佈",
       "title-auction-scheduled": "創建 | Event | 已計畫",
       "title-multiple-choice-scheduled": "創建 | Superpoll | 已計畫",
       "title-crowdfunding-scheduled": "創建 | Goal | 已計畫"

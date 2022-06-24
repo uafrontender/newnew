@@ -14,5 +14,5 @@
   "error": {
     "invalidCode": "代碼錯誤。再試一次......"
   },
-  "backButton_NEED_TRANSLATION": "Back"
+  "backButton": "返回"
 }

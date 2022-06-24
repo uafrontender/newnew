@@ -5,7 +5,7 @@
       "description": "自定義用戶名、顯示名稱、個人簡介和更多內容，定制你的NewNew個人資料"
     },
     "noContent": {
-      "description": "你正在出價標、投票或\n支持的帖子將在這裡顯示"
+      "description": "你出價、投票或\n支持的帖子將在這裡顯示"
     }
   },
   "MyPosts": {
@@ -47,7 +47,7 @@
   "Favorites": {
     "meta": {
       "title": "NewNew收藏",
-      "description": "流覽你保存的所有喜愛的帖子和創作者"
+      "description": "瀏覽你保存的所有喜愛的帖子和創作者"
     },
     "noContent": {
       "description": "所有你喜歡的創作者\n都在這裡顯示"
@@ -67,21 +67,21 @@
   },
   "Activity": {
     "noContent": {
-      "description": "任何創作者的活動記錄都將在這裡顯示"
+      "description": "創作者的所有活動都將在這裡顯示"
     }
   },
   "tabs": {
     "activelyBidding": "活躍",
-    "purchases": "購買",
-    "viewHistory": "流覽歷史",
-    "subscriptions": "訂閱",
+    "purchases": "已購買",
+    "viewHistory": "瀏覽歷史",
+    "subscriptions": "已訂閱",
     "myposts": "我的帖子",
     "favorites": "收藏",
     "userInitial": "帖子",
     "activity": "活動"
   },
   "accountPrivate": "{{username}}的活動設為隱秘",
-  "subscribed-tag": "訂閱",
+  "subscribed-tag": "已訂閱",
   "modal": {
     "blockUser": {
       "title": "屏蔽用戶",
@@ -213,11 +213,11 @@
       "personalInformation": {
         "title": "個人資訊",
         "emailInput": {
-          "label": "電子郵寄地址",
+          "label": "電子郵件地址",
           "placeholder": "email@email.com",
           "errors": {
-            "invalidEmail": "請輸入有效的電子郵寄地址",
-            "emailTaken": "使用的電子郵件"
+            "invalidEmail": "請輸入有效的電子郵件地址",
+            "emailTaken": "電子郵件已被佔用"
           }
         },
         "birthDateInput": {

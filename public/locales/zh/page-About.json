@@ -1,65 +1,65 @@
 {
   "meta": {
-    "title": "About NewNew",
-    "description": "Learn more about creator economy company NewNew’s investors, press & media "
+    "title": "關於NewNew",
+    "description": "瞭解更多關於創作者經濟公司NewNew的投資者、新聞和媒體報道"
   },
   "intro": {
-    "title": "NewNew is where people come together to bid and vote on the world’s biggest decisions",
-    "text": "We empower people to take control and have more interactive experiences"
+    "title": "NewNew是人們聚集在一起對世界上最熱門的決策進行出價和投票的地方",
+    "text": "我們使人們有能力掌控互動體驗並獲得更多的體驗"
   },
   "press": {
-    "title": "Press",
+    "title": "新聞報導",
     "items": [
       {
-        "title": "The app that lets you pay to control another person's life."
+        "title": "讓你付費控制另一個人的生活的應用程式。"
       },
       {
-        "title": "For Creators, Everything Is for Sale"
+        "title": "對創作者來說，萬物皆可售"
       },
       {
-        "title": "Monetizing the ‘creator economy,’ with NewNew."
+        "title": "在NewNew上將「創作者經濟」變現。"
       },
       {
-        "title": "20 creator economy startups to watch as the space heats up..."
+        "title": "隨著這方面的升溫，有20家創作者者經濟初創公司值得關注......"
       },
       {
-        "title": "Smart VCs Recognize That Black Female Founders May Lead..."
+        "title": "聰明的風險投資商認識到黑人女性創始人可能會引領......"
       },
       {
-        "title": "Quicktake “Take the Lead” (03/25/2020)"
+        "title": "Quicktake 「率先行動」 (03/25/2020)"
       },
       {
-        "title": "How polling app NewNew represents the new class of..."
+        "title": "投票應用程式NewNew如何代表新一類的..."
       },
       {
-        "title": "This tech 'outsider' CEO from Toronto went from Drake’s inner..."
+        "title": "這位來自多倫多的科技「外行」CEO從Drake的內部..."
       },
       {
-        "title": "Former Drake Executive Discusses Her Transition To Tech And... "
+        "title": "Drake前克高管講述她向科技界的過渡和... "
       }
     ]
   },
   "backers": {
-    "title": "Backers"
+    "title": "支持者"
   },
   "investors": {
-    "title": "Individual Investors",
+    "title": "個人投資者",
     "participants": [
       {
         "name": "Michael Ovitz",
-        "description": "Founder, Creative Artists Agency (CAA)"
+        "description": "Creative Artists Agency（CAA）創始人"
       },
       {
         "name": "Stephen Pagliuca",
-        "description": "Co-Chairman, Bain Capital"
+        "description": "貝恩資本聯合主席"
       },
       {
         "name": "Kevin Mayer",
-        "description": "Chairman, DAZN Group (Former TikTok CEO  & Disney Chairman)"
+        "description": "DAZN集團主席（TikTok前首席執行官、迪士尼前主席）"
       },
       {
         "name": "Steven Galanis",
-        "description": "Founder, Cameo"
+        "description": "Cameo公司創始人"
       }
     ]
   }
