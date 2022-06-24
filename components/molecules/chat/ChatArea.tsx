@@ -7,6 +7,7 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
+import Link from 'next/link';
 
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import Text from '../../atoms/Text';
@@ -315,16 +316,22 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           mine={isMine}
           prevSameUser={prevSameUser}
         >
-          {!prevSameUser && (
-            <SUserAvatar
-              mine={isMine}
-              avatarUrl={
-                !isMine && chatRoom && chatRoom.visavis?.avatarUrl
-                  ? chatRoom.visavis?.avatarUrl
-                  : user.userData?.avatarUrl
-              }
-            />
-          )}
+          {!prevSameUser &&
+            (isMine ? (
+              <SUserAvatar
+                mine={isMine}
+                avatarUrl={user.userData?.avatarUrl ?? ''}
+              />
+            ) : (
+              <Link href={`/${chatRoom?.visavis?.username}`}>
+                <a>
+                  <SUserAvatar
+                    mine={isMine}
+                    avatarUrl={chatRoom?.visavis?.avatarUrl ?? ''}
+                  />
+                </a>
+              </Link>
+            ))}
           <SMessageContent
             mine={isMine}
             prevSameUser={prevSameUser}

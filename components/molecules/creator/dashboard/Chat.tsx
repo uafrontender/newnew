@@ -334,10 +334,10 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
 
   const handleUserClick = useCallback(() => {
     if (chatRoom?.visavis?.username) {
-      router.push(`/u/${chatRoom?.visavis?.username}`);
+      router.push(`/${chatRoom?.visavis?.username}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageText]);
+  }, [messageText, chatRoom?.visavis?.username]);
 
   return (
     <SContainer>
@@ -351,11 +351,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           onClick={handleGoBack}
         />
         {chatRoom?.kind === 4 ? (
-          <SUserAvatar
-            withClick
-            onClick={handleUserClick}
-            avatarUrl={user?.userData?.avatarUrl ?? ''}
-          />
+          <SUserAvatar avatarUrl={user?.userData?.avatarUrl ?? ''} />
         ) : (
           <SUserAvatar
             withClick
@@ -566,9 +562,6 @@ const SMessageContent = styled.div<ISMessageContent>`
     }
     if (props.mine) {
       return props.theme.colorsThemed.accent.blue;
-    }
-    if (props.theme.name === 'light') {
-      return props.theme.colors.white;
     }
 
     return props.theme.colorsThemed.background.tertiary;
