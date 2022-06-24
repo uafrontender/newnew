@@ -34,7 +34,8 @@
   "error": {
     "emailInvalid": "無效的地址",
     "genericError": "發生錯誤",
-    "Failed to fetch": "提交失敗"
+    "Failed to fetch": "提交失敗",
+    "An error occurred": "發生錯誤"
   },
   "legalDisclaimer": {
     "mainText": "創建帳戶即表明你同意我們的",

@@ -350,7 +350,8 @@ const SAnimatedContainer = styled.div`
   border-radius: 24px;
   width: 500px;
   right: -16px;
-  height: 800px;
+  height: 80vh;
+  max-height: 800px;
 
   ${(props) => props.theme.media.laptop} {
     left: unset;

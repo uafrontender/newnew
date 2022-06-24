@@ -42,6 +42,7 @@ import iconDark8 from '../../public/images/svg/numbers/8_dark.svg';
 import iconDark9 from '../../public/images/svg/numbers/9_dark.svg';
 import iconDark10 from '../../public/images/svg/numbers/10_dark.svg';
 import moreIcon from '../../public/images/svg/icons/filled/More.svg';
+import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
 // Utils
 import switchPostType from '../../utils/switchPostType';
@@ -88,6 +89,7 @@ interface ICard {
   index: number;
   width?: string;
   height?: string;
+  maxWidthTablet?: string;
   shouldStop?: boolean;
   handleRemovePostFromState?: () => void;
 }
@@ -99,6 +101,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     index,
     width,
     height,
+    maxWidthTablet,
     shouldStop,
     handleRemovePostFromState,
   }) => {
@@ -448,7 +451,11 @@ export const PostCard: React.FC<ICard> = React.memo(
     }
 
     return (
-      <SWrapperOutside ref={cardRef} width={width}>
+      <SWrapperOutside
+        ref={cardRef}
+        width={width}
+        maxWidthTablet={maxWidthTablet ?? undefined}
+      >
         <SImageBG id='backgroundPart' height={height}>
           <SImageHolderOutside id='animatedPart'>
             <img
@@ -527,6 +534,13 @@ export const PostCard: React.FC<ICard> = React.memo(
                     isMobile ? 15 : 9
                   )}...`
                 : postParsed.creator?.nickname}
+              {postParsed.creator?.options?.isVerified && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                />
+              )}
             </SUsername>
             <CardTimer timestampSeconds={timestampSeconds} />
           </SBottomStart>
@@ -629,6 +643,7 @@ PostCard.defaultProps = {
 interface ISWrapper {
   index?: number;
   width?: string;
+  maxWidthTablet?: string;
 }
 
 const SWrapper = styled.div<ISWrapper>`
@@ -898,7 +913,7 @@ const SWrapperOutside = styled.div<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
-    max-width: 200px;
+    max-width: ${({ maxWidthTablet }) => maxWidthTablet ?? '200px'};
 
     transition: transform ease 0.5s;
 
@@ -1028,7 +1043,8 @@ const SUserAvatarOutside = styled(UserAvatar)`
 
 const SUsername = styled(Text)`
   grid-area: nickname;
-
+  display: flex;
+  align-items: center;
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
@@ -1165,4 +1181,8 @@ const SButtonIcon = styled(Button)`
     opacity: 0;
     transition: all ease 0.5s;
   }
+`;
+
+const SInlineSVG = styled(InlineSVG)`
+  margin-left: 2px;
 `;

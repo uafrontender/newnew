@@ -642,7 +642,6 @@ const SActionSection = styled.div`
   max-height: 500px;
 
   overflow-y: auto;
-  padding-left: 12px;
 
   // Scrollbar
   &::-webkit-scrollbar {
