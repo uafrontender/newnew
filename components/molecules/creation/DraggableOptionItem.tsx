@@ -30,7 +30,8 @@ interface IOptionItem {
     value: string,
     min: number,
     max: number,
-    kind: newnewapi.ValidateTextRequest.Kind
+    kind: newnewapi.ValidateTextRequest.Kind,
+    index: number
   ) => Promise<string>;
   handleChange: (index: number, item: object | null) => void;
 }
@@ -63,7 +64,8 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
         e.target.value,
         CREATION_OPTION_MIN,
         CREATION_OPTION_MAX,
-        newnewapi.ValidateTextRequest.Kind.POST_OPTION
+        newnewapi.ValidateTextRequest.Kind.POST_OPTION,
+        index
       )
     );
   };
@@ -86,19 +88,22 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   useEffect(() => {
     const func = async () => {
       if (validateTitleDebounced) {
+        const trimmedTitle = (validateTitleDebounced as string).trim();
+
         setError(
           await validation(
-            validateTitleDebounced,
+            trimmedTitle,
             CREATION_OPTION_MIN,
             CREATION_OPTION_MAX,
-            newnewapi.ValidateTextRequest.Kind.POST_OPTION
+            newnewapi.ValidateTextRequest.Kind.POST_OPTION,
+            index
           )
         );
       }
     };
 
     func();
-  }, [validation, validateTitleDebounced]);
+  }, [validation, index, validateTitleDebounced]);
 
   return (
     <SWrapper
