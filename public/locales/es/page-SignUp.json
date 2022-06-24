@@ -34,7 +34,8 @@
   "error": {
     "emailInvalid": "Correo electrónico inválido",
     "genericError": "Se ha producido un error",
-    "Failed to fetch": "No se ha podido enviar"
+    "Failed to fetch": "No se ha podido enviar",
+    "An error occurred": "Se ha producido un error"
   },
   "legalDisclaimer": {
     "mainText": "Al crear una cuenta, estás aceptando nuestra ",
