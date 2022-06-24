@@ -158,7 +158,7 @@ export const General: React.FC<IGeneral> = (props) => {
   };
 
   const chatButtonVisible =
-    withChat && user.userData?.options?.isOfferingSubscription;
+    isMobile && withChat && user.userData?.options?.isOfferingSubscription;
 
   const mobileNavigationVisible = isMobile && scrollDirection !== 'down';
 
@@ -214,13 +214,17 @@ export const General: React.FC<IGeneral> = (props) => {
               />
               <CookieContainer
                 bottomNavigationVisible={mobileNavigationVisible}
+                zIndex={moreMenuMobileOpen ? 9 : 10}
               >
                 <Cookie />
               </CookieContainer>
             </>
           )}
           {chatButtonVisible && (
-            <ChatContainer bottomNavigationVisible={mobileNavigationVisible}>
+            <ChatContainer
+              bottomNavigationVisible={mobileNavigationVisible}
+              zIndex={moreMenuMobileOpen ? 9 : 10}
+            >
               {!isOpenedChat ? (
                 <FloatingMessages withCounter openChat={openChat} />
               ) : (
@@ -299,12 +303,13 @@ const SContent = styled.main`
 
 interface ICookieContainer {
   bottomNavigationVisible: boolean;
+  zIndex: number;
 }
 
 const CookieContainer = styled.div<ICookieContainer>`
   left: 50%;
   bottom: ${(props) => (props.bottomNavigationVisible ? 62 : 6)}px;
-  z-index: 10;
+  z-index: ${(props) => props.zIndex}px;
   position: fixed;
   transform: translateX(-50%);
   transition: bottom ease 0.5s;
@@ -317,12 +322,13 @@ const CookieContainer = styled.div<ICookieContainer>`
 
 interface IChatContainer {
   bottomNavigationVisible: boolean;
+  zIndex: number;
 }
 
 const ChatContainer = styled.div<IChatContainer>`
   right: 16px;
   bottom: ${(props) => (props.bottomNavigationVisible ? 72 : 16)}px;
-  z-index: 10;
+  z-index: ${(props) => props.zIndex}px;
   position: fixed;
   transition: bottom ease 0.5s;
 `;
