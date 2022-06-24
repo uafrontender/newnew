@@ -83,15 +83,13 @@
   },
   "language": {
     "ddLanguageTitle": {
-      "en-US": "英語",
-      "es-MX": "西班牙語",
-      "fr": "法語",
+      "en-US": "English",
+      "es": "Español",
       "zh": "漢語"
     },
     "selectedLanguageTitle": {
-      "en-US": "英語",
-      "es-MX": "西班牙語",
-      "fr": "法語",
+      "en-US": "English",
+      "es": "Español",
       "zh": "漢語"
     }
   },
