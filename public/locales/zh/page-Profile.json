@@ -87,7 +87,7 @@
       "title": "屏蔽用戶",
       "messageFirstPart": "你真的想屏蔽",
       "messageSecondPart": "?",
-      "button:": {
+      "button": {
         "cancel": "取消",
         "confirm": "屏蔽用戶"
       }
