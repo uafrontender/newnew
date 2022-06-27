@@ -1,0 +1,27 @@
+{
+  "button": {
+    "withActivity": {
+      "ac": "已出價{{amount}}",
+      "mc": "{{votes}} 票",
+      "mcSingular": "{{votes}} 票",
+      "cf": "{{backed}} 人已支持，共需 {{total}} 位支持者"
+    },
+    "withoutActivity": {
+      "ac": "現在出價",
+      "mc": "現在投票",
+      "cf": "支持該Goal"
+    },
+    "seeResults": {
+      "ac": "查看Event",
+      "mc": "查看Superpoll",
+      "cf": "查看Goal"
+    }
+  },
+  "timer": {
+    "timeLeft": "剩餘{{time}}",
+    "daysLeft": "天",
+    "hoursLeft": "小時",
+    "minutesLeft": "分鐘",
+    "endedOn": "結束於"
+  }
+}

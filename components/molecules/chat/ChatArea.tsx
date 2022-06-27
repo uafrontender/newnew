@@ -7,6 +7,7 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
+import Link from 'next/link';
 
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import Text from '../../atoms/Text';
@@ -265,7 +266,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     setConfirmReportUser(true);
   };
 
-  const handleChange = useCallback((id, value) => {
+  const handleChange = useCallback((id: string, value: string) => {
     setMessageText(value);
   }, []);
 
@@ -300,7 +301,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   }, [messageText]);
 
   const renderMessage = useCallback(
-    (item: newnewapi.IChatMessage, index) => {
+    (item: newnewapi.IChatMessage, index: number) => {
       const prevElement = messages[index - 1];
       const nextElement = messages[index + 1];
 
@@ -315,16 +316,22 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           mine={isMine}
           prevSameUser={prevSameUser}
         >
-          {!prevSameUser && (
-            <SUserAvatar
-              mine={isMine}
-              avatarUrl={
-                !isMine && chatRoom && chatRoom.visavis?.avatarUrl
-                  ? chatRoom.visavis?.avatarUrl
-                  : user.userData?.avatarUrl
-              }
-            />
-          )}
+          {!prevSameUser &&
+            (isMine ? (
+              <SUserAvatar
+                mine={isMine}
+                avatarUrl={user.userData?.avatarUrl ?? ''}
+              />
+            ) : (
+              <Link href={`/${chatRoom?.visavis?.username}`}>
+                <a>
+                  <SUserAvatar
+                    mine={isMine}
+                    avatarUrl={chatRoom?.visavis?.avatarUrl ?? ''}
+                  />
+                </a>
+              </Link>
+            ))}
           <SMessageContent
             mine={isMine}
             prevSameUser={prevSameUser}

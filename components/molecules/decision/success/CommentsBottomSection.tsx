@@ -401,6 +401,10 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
       if (commentFormRef.current) {
         resizeObserver.observe(commentFormRef.current!!);
       }
+
+      return () => {
+        resizeObserver.disconnect();
+      };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -638,7 +642,6 @@ const SActionSection = styled.div`
   max-height: 500px;
 
   overflow-y: auto;
-  padding-left: 12px;
 
   // Scrollbar
   &::-webkit-scrollbar {

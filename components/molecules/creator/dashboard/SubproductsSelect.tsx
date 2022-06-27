@@ -34,7 +34,7 @@ const SubProductsSelect: React.FC<ISubProductsSelect> = ({
     newnewapi.ISubscriptionProduct[]
   >([]);
   const [selectedProduct, setSelectedProduct] =
-    useState<newnewapi.ISubscriptionProduct>();
+    useState<newnewapi.ISubscriptionProduct | null>(mySubscriptionProduct);
   const [isLoading, setIsLoading] = useState(true);
   const [confirmSubEnable, setConfirmSubEnable] = useState<boolean>(false);
   const router = useRouter();
@@ -49,7 +49,9 @@ const SubProductsSelect: React.FC<ISubProductsSelect> = ({
           getStandardProductsPayload
         );
         if (getStandardProductsRes.data) {
-          setStandardProducts(getStandardProductsRes.data.products);
+          const newStandardProducts = getStandardProductsRes.data.products;
+          setStandardProducts(newStandardProducts);
+          setSelectedProduct((curr) => curr || newStandardProducts[0]);
         }
         setIsLoading(false);
       } catch (err) {
@@ -59,16 +61,6 @@ const SubProductsSelect: React.FC<ISubProductsSelect> = ({
 
     fetchOnboardingState();
   }, []);
-
-  useEffect(() => {
-    if (mySubscriptionProduct) {
-      setSelectedProduct(mySubscriptionProduct);
-    } else {
-      if (standardProducts.length > 0) {
-        setSelectedProduct(standardProducts[0]);
-      }
-    }
-  }, [mySubscriptionProduct, standardProducts]);
 
   const handleSetSelectedProduct = (
     product: newnewapi.ISubscriptionProduct
@@ -151,7 +143,7 @@ const SubProductsSelect: React.FC<ISubProductsSelect> = ({
               <Button
                 view='primaryGrad'
                 disabled={
-                  selectedProduct &&
+                  !!selectedProduct &&
                   mySubscriptionProduct.id === selectedProduct.id
                 }
                 onClick={() => handlerUpdateRate()}
@@ -234,6 +226,7 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
   const { t } = useTranslation('page-Creator');
   const ref: any = useRef();
 
+  // Should non selected option be animated?
   useEffect(() => {
     ref.current.anim.stop();
 
@@ -246,7 +239,7 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
   }, [ref, selected]);
 
   return (
-    <SProductOption selected={selected ?? false} onClick={handleClick}>
+    <SProductOption selected={selected} onClick={handleClick}>
       <SAnimation>
         <Lottie
           ref={ref}
@@ -263,17 +256,15 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
         {product.id !== '' ? (
           <>
             {product?.monthlyRate?.usdCents && (
-              <SPrice variant={1} weight={600} selected={selected ?? false}>
+              <SPrice variant={1} weight={600} selected={selected}>
                 ${formatNumber(product.monthlyRate.usdCents / 100 ?? 0, true)}
               </SPrice>
             )}
-            <SPerMonth variant={2} selected={selected ?? false}>
+            <SPerMonth variant={2} selected={selected}>
               {t('subRateSection.selectInput.perMonth')}
             </SPerMonth>
             {currentProduct && (
-              <SLabelCurrent selected={selected ?? false}>
-                Current
-              </SLabelCurrent>
+              <SLabelCurrent selected={selected}>Current</SLabelCurrent>
             )}
           </>
         ) : (

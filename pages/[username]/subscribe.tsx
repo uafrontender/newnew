@@ -79,7 +79,9 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
   const subPriceFormatted = useMemo(
     () =>
-      subscriptionPrice ? formatNumber(subscriptionPrice / 100 ?? 0, true) : '',
+      subscriptionPrice
+        ? formatNumber(subscriptionPrice / 100 ?? 0, false)
+        : '',
     [subscriptionPrice]
   );
 
@@ -367,7 +369,11 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
 export default SubscribeToUserPage;
 
-const BoldSpan: React.FC = ({ children }) => (
+interface IBoldSpan {
+  children: string;
+}
+
+const BoldSpan: React.FC<IBoldSpan> = ({ children }) => (
   <strong>
     <em>{children}</em>
   </strong>

@@ -51,6 +51,7 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
+import { formatNumber } from '../../../../utils/format';
 
 interface IAcOptionsTab {
   postId: string;
@@ -405,6 +406,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     if (actionSectionContainer.current) {
       resizeObserver.observe(actionSectionContainer.current!!);
     }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -431,60 +436,61 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               {t('acPost.optionsTab.noOptions.caption_2')}
             </SNoOptionsCaption>
           </SNoOptionsYet>
-        ) : null}
-        <SBidsContainer
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
-          heightDelta={heightDelta}
-        >
-          {!isMobile ? (
-            <>
-              <GradientMask
-                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                positionTop
-                active={showTopGradient}
+        ) : (
+          <SBidsContainer
+            ref={(el) => {
+              containerRef.current = el!!;
+            }}
+            heightDelta={heightDelta}
+          >
+            {!isMobile ? (
+              <>
+                <GradientMask
+                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+                  positionTop
+                  active={showTopGradient}
+                />
+                <GradientMask
+                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+                  positionBottom={gradientMaskBottomPosition}
+                  active={showBottomGradient}
+                />
+              </>
+            ) : null}
+            {options.map((option, i) => (
+              <AcOptionCard
+                key={option.id.toString()}
+                option={option as TAcOptionWithHighestField}
+                // shouldAnimate={optionToAnimate === option.id.toString()}
+                postId={postId}
+                postCreator={postCreator}
+                postDeadline={postDeadline}
+                postText={postText}
+                index={i}
+                minAmount={parseInt((appConstants.minAcBid / 100).toFixed(0))}
+                votingAllowed={postStatus === 'voting'}
+                optionBeingSupported={optionBeingSupported}
+                handleSetSupportedBid={(id: string) =>
+                  setOptionBeingSupported(id)
+                }
+                handleAddOrUpdateOptionFromResponse={
+                  handleAddOrUpdateOptionFromResponse
+                }
+                handleRemoveOption={() => handleRemoveOption(option)}
               />
-              <GradientMask
-                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                positionBottom={gradientMaskBottomPosition}
-                active={showBottomGradient}
-              />
-            </>
-          ) : null}
-          {options.map((option, i) => (
-            <AcOptionCard
-              key={option.id.toString()}
-              option={option as TAcOptionWithHighestField}
-              // shouldAnimate={optionToAnimate === option.id.toString()}
-              postId={postId}
-              postCreator={postCreator}
-              postDeadline={postDeadline}
-              postText={postText}
-              index={i}
-              minAmount={parseInt((appConstants.minAcBid / 100).toFixed(0))}
-              votingAllowed={postStatus === 'voting'}
-              optionBeingSupported={optionBeingSupported}
-              handleSetSupportedBid={(id: string) =>
-                setOptionBeingSupported(id)
-              }
-              handleAddOrUpdateOptionFromResponse={
-                handleAddOrUpdateOptionFromResponse
-              }
-              handleRemoveOption={() => handleRemoveOption(option)}
-            />
-          ))}
-          {!isMobile ? (
-            <SLoaderDiv ref={loadingRef} />
-          ) : pagingToken ? (
-            <SLoadMoreBtn
-              view='secondary'
-              onClick={() => handleLoadBids(pagingToken)}
-            >
-              {t('loadMoreButton')}
-            </SLoadMoreBtn>
-          ) : null}
-        </SBidsContainer>
+            ))}
+            {!isMobile ? (
+              <SLoaderDiv ref={loadingRef} />
+            ) : pagingToken ? (
+              <SLoadMoreBtn
+                view='secondary'
+                onClick={() => handleLoadBids(pagingToken)}
+              >
+                {t('loadMoreButton')}
+              </SLoadMoreBtn>
+            ) : null}
+          </SBidsContainer>
+        )}
         {postStatus === 'voting' && (
           <SActionSection
             ref={(el) => {
@@ -617,7 +623,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${newBidAmount}`}
+          amount={`$${formatNumber(parseInt(newBidAmount) ?? 0, true)}`}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * 100
           //   ? {}

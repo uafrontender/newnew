@@ -11,14 +11,15 @@ import { TPostType } from '../../../utils/switchPostType';
 interface IPaymentSuccessModal {
   postType: TPostType;
   isVisible: boolean;
+  children: React.ReactNode;
   closeModal: () => void;
 }
 
 const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
   postType,
   isVisible,
-  closeModal,
   children,
+  closeModal,
 }) => {
   const { t } = useTranslation('modal-Post');
 

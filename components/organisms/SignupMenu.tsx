@@ -302,7 +302,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 {t('legalDisclaimer.privacyPolicy')}
               </a>
             </Link>
-            {', '}
             <Link href='https://terms.newnew.co'>
               <a href='https://terms.newnew.co' target='_blank'>
                 {t('legalDisclaimer.terms')}

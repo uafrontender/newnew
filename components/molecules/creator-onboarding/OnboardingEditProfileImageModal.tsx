@@ -78,7 +78,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<IOnboardingEditPr
     };
 
     const onCropCompleteProfileImage = useCallback(
-      (_, croppedAreaPixels: Area) => {
+      (_: any, croppedAreaPixels: Area) => {
         setCroppedAreaProfileImage(croppedAreaPixels);
       },
       []

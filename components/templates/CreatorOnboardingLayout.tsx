@@ -20,6 +20,7 @@ import HeroVisual from './HeroVisual';
 
 export interface ICreatorOnboardingLayout {
   hideOnboardingHeader?: boolean;
+  children: React.ReactNode;
 }
 
 const SCreatorOnboardingLayout = styled.div`

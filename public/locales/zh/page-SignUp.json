@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "title": "註冊NewNew",
+    "description": "註冊NewNew快速而簡單。現在就加入，成為創作者或觀看別人",
+    "title-to-log-in": "登錄NewNew",
+    "description-to-log-in": "登錄到NewNew快速而簡單"
+  },
+  "heading": {
+    "sign-in": "註冊",
+    "log-in": "登錄",
+    "sign-in-to": "注冊",
+    "reason": {
+      "comment": "評論",
+      "bid": "出價",
+      "subscribe": "訂閱",
+      "pledge": "作出承諾",
+      "follow-decision": "最喜歡的帖子",
+      "follow-creator": "最喜愛的創作者",
+      "report": "提交舉報"
+    },
+    "subheading": "我們會爲你登錄或創建一個帳戶。",
+    "subheadingSessionExpired": "會話過期，請重新登錄"
+  },
+  "signUpOptions": {
+    "google": "使用Google登入",
+    "apple": "使用Apple ID登入",
+    "facebook": "使用Facebook登入",
+    "twitter": "用Twitter登入",
+    "orContinueWith": "或使用",
+    "email": "電子郵件",
+    "signInButton": "註冊",
+    "logInButton": "登錄"
+  },
+  "error": {
+    "emailInvalid": "無效的地址",
+    "genericError": "發生錯誤",
+    "Failed to fetch": "提交失敗",
+    "An error occurred": "發生錯誤"
+  },
+  "legalDisclaimer": {
+    "mainText": "創建帳戶即表明你同意我們的",
+    "privacyPolicy": "隱私政策、",
+    "terms": "條款",
+    "and": "和",
+    "communityGuidelines": "社區指南"
+  },
+  "button": {
+    "back": "返回"
+  }
+}

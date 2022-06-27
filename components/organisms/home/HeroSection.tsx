@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { scroller } from 'react-scroll';
-import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
+import Link from 'next/link';
 import Head from 'next/head';
 
 import Text from '../../atoms/Text';
@@ -19,7 +19,6 @@ import assets from '../../../constants/assets';
 import AnimationChain from '../../atoms/AnimationChain';
 
 export const HeroSection = React.memo(() => {
-  const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('common');
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -31,9 +30,6 @@ export const HeroSection = React.memo(() => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const handleSignInClick = () => {
-    router.push('/sign-up');
-  };
   const handleExploreClick = () => {
     if (document.getElementsByName('topSection').length > 0) {
       scroller.scrollTo('topSection', {
@@ -65,12 +61,6 @@ export const HeroSection = React.memo(() => {
     }, 0);
   }, []);
 
-  // Try to pre-fetch the content
-  useEffect(() => {
-    router.prefetch('/sign-up');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <>
       <Head>
@@ -82,7 +72,7 @@ export const HeroSection = React.memo(() => {
               body {
                 background-color: #090813 !important;
               }
-      
+
               #top-nav-header {
                 background-color: #090813 !important;
               }
@@ -95,7 +85,8 @@ export const HeroSection = React.memo(() => {
         )}
       </Head>
       <SWrapper
-        layoutId='heroSection'
+        // I believe can be commented out now as there's no need for an animation
+        // layoutId='heroSection'
         transition={{
           ease: 'easeInOut',
           duration: 1,
@@ -125,14 +116,13 @@ export const HeroSection = React.memo(() => {
             <SButtonsHolder>
               {isMobile ? (
                 <>
-                  <SButton
-                    withDim
-                    withShrink
-                    view='secondary'
-                    onClick={handleSignInClick}
-                  >
-                    {t('heroSection.signIn')}
-                  </SButton>
+                  <Link href='/sign-up?to=log-in'>
+                    <a>
+                      <SButton withDim withShrink view='secondary'>
+                        {t('heroSection.signIn')}
+                      </SButton>
+                    </a>
+                  </Link>
                   <SButton
                     withDim
                     withShrink

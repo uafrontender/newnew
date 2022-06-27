@@ -14,13 +14,20 @@ import walletOutlinedIcon from '../../../public/images/svg/icons/outlined/Wallet
 import Button from '../../atoms/Button';
 import { useAppSelector } from '../../../redux-store/store';
 
+interface NavigationItem {
+  url: string;
+  label: string;
+  iconFilled: any;
+  iconOutlined: any;
+}
+
 export const Navigation = () => {
   const theme = useTheme();
   const { t } = useTranslation('page-Creator');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
-  const collection = useMemo(
+  const collection: NavigationItem[] = useMemo(
     () => [
       {
         url: '/creator/dashboard',
@@ -48,7 +55,7 @@ export const Navigation = () => {
   );
 
   const renderItem = useCallback(
-    (item) => {
+    (item: NavigationItem) => {
       const active = router.route.includes(item.url);
       return (
         <Link href={item.url} key={item.url}>

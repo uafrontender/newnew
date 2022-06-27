@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "title": "私訊"
+  },
+  "chat": {
+    "today": "今天",
+    "placeholder": "輸入訊息...",
+    "welcomeMessage": "已成功訂閱！你可以開始發送訊息給",
+    "noMessagesFirstLine": "還沒有訊息...",
+    "noMessagesSecondLine": "發送訊息，開始對話,",
+    "typing": "正在輸入......"
+  },
+  "userBlocked": {
+    "title": "你屏蔽了",
+    "message": "解除對他們的屏蔽並開始聊天,別擔心，他們看不到你屏蔽了他們......",
+    "buttonText": "解除屏蔽"
+  },
+  "groupBlocked": {
+    "title": "組被屏蔽",
+    "message": "解除對該組的屏蔽，繼續對話,",
+    "buttonText": "解除屏蔽"
+  },
+  "subscriptionExpired": {
+    "title": "訂閱已過期",
+    "message": "只有訂閱者可以發送訊息。更新訂閱。",
+    "buttonText": "更新訂閱"
+  },
+  "messagingDisabled": {
+    "title": "訊息傳遞已關閉",
+    "message": "暫時關閉了他們的訂閱。儘快回來查看！"
+  },
+  "accountDeleted": {
+    "title": "帳戶已刪除",
+    "message": "帳戶已不可用。",
+    "buttonText": "刪除聊天"
+  },
+  "toolbar": {
+    "searchPlaceholder": "搜索訊息或用戶"
+  },
+  "modal": {
+    "blockUser": {
+      "title": "阻止",
+      "messageFirstPart": "你確定要阻止",
+      "messageSecondPart": "給你發訊息？",
+      "button": {
+        "cancel": "取消",
+        "confirm": "阻止"
+      }
+    },
+    "blockGroup": {
+      "title": "屏蔽該組",
+      "button": {
+        "confirm": "屏蔽該組"
+      }
+    },
+    "newMessage": {
+      "title": "新訊息",
+      "searchPlaceholder": "搜索",
+      "noResultsText": "沒有結果",
+      "noResultsSearchText": "換一個名字......"
+    },
+    "renewSubscriptionsSubtitle": "更新訂閱"
+  },
+  "emptyInbox": {
+    "title": "收件箱為空",
+    "text": "開啓新的對話後，對話會列在此處"
+  },
+  "newAnnouncement": {
+    "title": "新公告",
+    "text": "只有你能向該組群發訊息。",
+    "created": "你創建了公告",
+    "member": "成員",
+    "members": "成員"
+  },
+  "default": {
+    "searchPlaceholder": "搜索"
+  },
+  "announcement": {
+    "title": "的公告",
+    "topMessageStart": "只有",
+    "topMessageEnd": "可以發送訊息"
+  },
+  "userTypes": {
+    "all": "所有的",
+    "subscribers": "我的訂閱者",
+    "subscribing": "創作者"
+  },
+  "dates": {
+    "now": "現在",
+    "min": "分鐘",
+    "today": "今天"
+  }
+}
