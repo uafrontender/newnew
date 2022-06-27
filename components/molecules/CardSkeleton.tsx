@@ -238,10 +238,6 @@ const SCardSkeletonListWrapper = styled.div`
       ${(props) => props.theme.media.laptopL} {
         width: calc(20% - 32px);
       }
-
-      ${(props) => props.theme.media.desktop} {
-        width: calc(16.65% - 32px);
-      }
     }
   }
 `;
