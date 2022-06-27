@@ -885,7 +885,7 @@ const SBidDetails = styled.div<{
     grid-template-areas:
       'amount bidders'
       'optionInfo optionInfo';
-    grid-template-columns: 3fr 7fr;
+    grid-template-columns: 5fr 4fr;
 
     padding: 16px;
 
