@@ -377,7 +377,7 @@
         "votes": "票",
         "vote": "票",
         "mySuggestion": "我的建議",
-        "subscriberSuggestion": "{{ nickname }}的建議",
+        "subscriberSuggestion": "{{nickname}}的建議",
         "others": "其他",
         "voters": "投票者",
         "voted": "投票",
@@ -402,7 +402,7 @@
           "votes": "票",
           "custom": "自定義投票",
           "buySingleVote": "購買1票，在{{creator}}的Superpoll中投票",
-          "buyMultipleVotes": "購買{{amount}}票，在{{ creator }}的Superpoll中投票",
+          "buyMultipleVotes": "購買{{amount}}票，在{{creator}}的Superpoll中投票",
           "buyAnyVotes": "購買任意數量的票數並在{{creator}}的Superpoll上投票",
           "optionCaption": "Superpoll選項",
           "voteButton": "投票"
@@ -470,7 +470,7 @@
       "title": "{{creator}}的Goal"
     },
     "paymentModalFooter": {
-      "body": "你的銀行卡信息將被暫時保留。\n只有{{ creator }}完成其Goal後，你才會被扣款。",
+      "body": "你的銀行卡信息將被暫時保留。\n只有{{creator}}完成其Goal後，你才會被扣款。",
       "terms": "條款",
       "apply": "適用"
     },
@@ -587,7 +587,7 @@
     "heroText": "本次Goal已結束！",
     "wantsToKnow": "{{creator}}的Goal",
     "creatorsBackers": "{{creator}}的支持者",
-    "ofTargetBackers": "共需 {{ target_count }}支持者",
+    "ofTargetBackers": "共需 {{target_count}}支持者",
     "youBackedFor": "你支持的金額是"
   },
   "acPostAwaiting": {
@@ -646,7 +646,7 @@
     },
     "wantsToKnow": "{{creator}}的Goal",
     "creatorsBackers": "{{creator}}的支持者",
-    "ofTargetBackers": "共需{{ target_count }}的支持者",
+    "ofTargetBackers": "共需{{target_count}}的支持者",
     "youBackedFor": "你的支持金額是"
   },
   "recommendationsSection": {

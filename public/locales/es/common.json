@@ -1,85 +1,85 @@
 {
-  "welcome": "Welcome to {{NEXT_PUBLIC_APP_NAME}}!",
-  "topSectionTitle": "Top 10 in {{country}}",
+  "welcome": "Bienvenido a {{NEXT_PUBLIC_APP_NAME}}!",
+  "topSectionTitle": "Top 10 en {{country}}",
   "heroSection": {
-    "title": "Come together \nto shape reality",
-    "subTitle": "Bid and vote on what the world does next",
-    "signIn": "Sign in",
-    "explore": "Explore Now",
+    "title": "Únete y \nmoldea la realidad",
+    "subTitle": "Haz ofertas y vota por lo que sucederá a continuación en el mundo",
+    "signIn": "Iniciar sesión",
+    "explore": "Explorar ahora",
     "exploreNow": "Explore now"
   },
-  "shareTo": "Share to",
+  "shareTo": "Compartir a",
   "ellipse": {
-    "copyLink": "Copy link",
-    "linkCopied": "Link copied!",
-    "followDecision": "Favorite {{postType}}",
-    "followCreator": "Favorite creator",
-    "unFollowDecision": "Unfavorite {{postType}}",
-    "unFollowCreator": "Unfavorite creator",
-    "unsubscribe": "Unsubscribe",
-    "removeSubscription": "Remove subscription",
-    "removeBid": "Remove bid",
-    "removeOption": "Remove option",
-    "view": "View profile",
-    "report": "Report",
-    "reportUser": "Report user",
-    "reportGroup": "Report group",
-    "reportBid": "Report bid",
-    "reportOption": "Report option",
-    "block": "Block",
-    "blockUser": "Block user",
-    "blockGroup": "Block group",
-    "unblock": "Unblock",
-    "unblockUser": "Unblock user",
-    "unblockGroup": "Unblock group",
-    "delete": "Delete",
-    "deleteDecision": "Delete {{postType}}",
-    "cancel": "Cancel"
+    "copyLink": "Copiar enlace",
+    "linkCopied": "¡Enlace copiado!",
+    "followDecision": "Marcar {{postType}} como favorito",
+    "followCreator": "Marcar seguidor como favorito",
+    "unFollowDecision": "Quitar {{postType}} de favoritos",
+    "unFollowCreator": "Quitar creador de favoritos",
+    "unsubscribe": "Anular suscripción",
+    "removeSubscription": "Eliminar suscripción",
+    "removeBid": "Eliminar oferta",
+    "removeOption": "Eliminar opción",
+    "view": "Ver perfil",
+    "report": "Reportar",
+    "reportUser": "Reportar usuario",
+    "reportGroup": "Reportar grupo",
+    "reportBid": "Reportar oferta",
+    "reportOption": "Reportar opción",
+    "block": "Bloquear",
+    "blockUser": "Bloquear usuario",
+    "blockGroup": "Bloquear grupo",
+    "unblock": "Desbloquear",
+    "unblockUser": "Desbloquear usuario",
+    "unblockGroup": "Desbloquear grupo",
+    "delete": "Borrar",
+    "deleteDecision": "Borrar {{postType}}",
+    "cancel": "Cancelar"
   },
   "postType": {
     "ac": "Event",
     "mc": "Superpoll",
     "cf": "Goal"
   },
-  "dragToReposition": "Drag to reposition image",
+  "dragToReposition": "Arrastra para reposicionar la imagen",
   "mobileBottomNavigation": {
-    "add": "Create",
-    "home": "Home",
-    "more": "More",
-    "share": "Share",
-    "dashboard": "Dashboard",
-    "dms": "DMs",
-    "notifications": "Notifications"
+    "add": "Crear",
+    "home": "Inicio",
+    "more": "Más",
+    "share": "Compartir",
+    "dashboard": "Panel",
+    "dms": "Mensajes directos",
+    "notifications": "Notificaciones"
   },
   "mobileTopNavigation": {
-    "myBalance": "My Balance: ${{value}}",
-    "profile": "Profile"
+    "myBalance": "Mi balance: ${{value}}",
+    "profile": "Perfil"
   },
   "button": {
-    "createDecision": "New post",
-    "create": "Create",
-    "loginIn": "Log in",
-    "signUp": "Sign up",
-    "dashboard": "Dashboard",
-    "createOnNewnew": "Create now",
-    "cancel": "Cancel"
+    "createDecision": "Nueva publicación",
+    "create": "Crear",
+    "loginIn": "Iniciar sesión",
+    "signUp": "Registrarse",
+    "dashboard": "Panel",
+    "createOnNewnew": "Crear ahora",
+    "cancel": "Cancelar"
   },
   "footer": {
     "topTitle": "NewNew",
-    "centerTitle": "Connect",
+    "centerTitle": "Conecta con nosotros",
     "bottomTitle": "Social",
-    "about": "About",
-    "press": "Press",
-    "jobs": "Work @ NewNew",
-    "help": "Help",
-    "faq": "FAQs",
+    "about": "Acerca de nosotros",
+    "press": "Prensa",
+    "jobs": "Trabaja en NewNew",
+    "help": "Ayuda",
+    "faq": "Preguntas frecuentes",
     "twitter": "Twitter",
-    "howItWorks": "How it works",
-    "guidelines": "Community Guidelines",
-    "accessibility": "Accessibility",
+    "howItWorks": "Cómo funciona",
+    "guidelines": "Normas comunitarias",
+    "accessibility": "Accesibilidad",
     "inc": "© NewNew Inc",
-    "terms": "Terms",
-    "privacy": "Privacy"
+    "terms": "Términos",
+    "privacy": "Privacidad"
   },
   "language": {
     "ddLanguageTitle": {
@@ -94,64 +94,64 @@
     }
   },
   "cookie": {
-    "text": "We use",
-    "link": "Learn more"
+    "text": "Usamos",
+    "link": "Más información"
   },
-  "reportBug": "Report a bug",
+  "reportBug": "Reportar un error",
   "error": {
     "text": {
-      "min": "Text is too short, min {{value}} characters",
-      "max": "Text is too long, max {{value}} characters",
-      "badWords": "Text contains swear words",
-      "containsLinks": "Links not allowed"
+      "min": "El texto es demasiado corto, mínimo {{value}} caracteres",
+      "max": "El texto es demasiado largo, máximo {{value}} caracteres",
+      "badWords": "El texto contiene malas palabras",
+      "containsLinks": "Enlaces no permitidos"
     }
   },
   "modal": {
     "reportUser": {
-      "title": "Report",
-      "subtitle": "Help us understand so that we can investigate...",
+      "title": "Reportar",
+      "subtitle": "Ayúdanos a entender para que podamos investigar...",
       "options": {
-        "spam": "Suspicious or spam",
-        "abuse": "Abusive or harmful",
-        "suicide": "Expresses intentions of self-harm or suicide",
-        "hateSpeech": "Hate speech",
-        "harassment": "Harassment or bullying",
-        "copyright": "Copyright",
-        "other": "Other"
+        "spam": "Sospechoso o spam",
+        "abuse": "Abusivo o dañino",
+        "suicide": "Expresa intenciones de autolesionarse o suicidarse",
+        "hateSpeech": "Discurso de odio",
+        "harassment": "Acoso o intimidación",
+        "copyright": "Derechos de autor",
+        "other": "Otro"
       },
       "additionalInfo": {
-        "placeholder": "Please tell us a bit more..."
+        "placeholder": "Por favor, cuéntanos un poco más..."
       },
       "button": {
-        "cancel": "Cancel"
+        "cancel": "Cancelar"
       }
     },
     "reportSent": {
-      "title": "We’re on it!",
-      "subtitle": "We appreciate you letting us know. We’ll take a look into this ASAP and take the appropriate steps to ensure everyone’s safety.",
-      "button": "Got it"
+      "title": "¡Estamos en ello!",
+      "subtitle": "Te agradecemos que te pongas en contacto con nosotros. Investigaremos tu reporte lo antes posible y tomaremos las medidas necesarias para garantizar la seguridad de todos.",
+      "button": "Aceptar"
     }
   },
   "myLink": {
-    "copy": "My link",
-    "copied": "Copied!"
+    "copy": "Mi enlace",
+    "copied": "¡Copiado!"
   },
   "socials": {
-    "copy": "Copy Link",
-    "copied": "Link Copied!"
+    "copy": "Copiar enlace",
+    "copied": "¡Enlace copiado!"
   },
   "search": {
-    "topPosts": "Top Posts",
-    "popularCreators": "Popular Creators",
-    "creatorSubtitle": "See posts",
-    "allResults": "All results",
+    "topPosts": "Publicaciones populares",
+    "popularCreators": "Creadores populares",
+    "creatorSubtitle": "Ver publicaciones",
+    "allResults": "Todos los resultados",
     "noResults": {
-      "title": "We didn’t find anything",
-      "description": "Try searching for something else or explore what’s new",
-      "action": "Explore"
+      "title": "No encontramos nada",
+      "description": "Intenta cambiar tu búsqueda o explora las novedades",
+      "action": "Explorar"
     }
   },
   "creatorCard": {
-    "subscriptionCost": "${{amount}} Monthly"
+    "subscriptionCost": "${{amount}} Mensual"
   }
 }
