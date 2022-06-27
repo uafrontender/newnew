@@ -459,19 +459,26 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                 : chatRoom.visavis?.nickname}
               {isAnnouncement && t('announcement.title')}
             </SUserName>
-            <SUserAlias>
-              {!isAnnouncement
-                ? `@${chatRoom.visavis?.username}`
-                : `${
-                    chatRoom.memberCount && chatRoom.memberCount > 0
-                      ? chatRoom.memberCount
-                      : 0
-                  } ${
-                    chatRoom.memberCount && chatRoom.memberCount > 1
-                      ? t('newAnnouncement.members')
-                      : t('newAnnouncement.member')
-                  }`}
-            </SUserAlias>
+            {!isAnnouncement && (
+              <Link href={`/${chatRoom?.visavis?.username}`}>
+                <a style={{ display: 'flex' }}>
+                  <SUserAlias>{`@${chatRoom.visavis?.username}`}</SUserAlias>
+                </a>
+              </Link>
+            )}
+            {isAnnouncement && (
+              <SUserAlias>
+                {`${
+                  chatRoom.memberCount && chatRoom.memberCount > 0
+                    ? chatRoom.memberCount
+                    : 0
+                } ${
+                  chatRoom.memberCount && chatRoom.memberCount > 1
+                    ? t('newAnnouncement.members')
+                    : t('newAnnouncement.member')
+                }`}
+              </SUserAlias>
+            )}
           </SUserData>
           <SActionsDiv>
             {!isMyAnnouncement && (
