@@ -24,7 +24,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import parseText from '../../../utils/parseText/parseText';
+import getChunks from '../../../utils/getChunks/getChunks';
 
 const McSuccessOptionsTab = dynamic(
   () =>
@@ -211,13 +211,19 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                     </STotal>
                   </SCreatorInfoDiv>
                   <SPostTitle variant={4}>
-                    {parseText(post.title).map((chunk) => {
+                    {getChunks(post.title).map((chunk) => {
                       if (chunk.type === 'text') {
                         return chunk.text;
                       }
 
                       if (chunk.type === 'hashtag') {
-                        return <Hashtag href='#'>{chunk.text}</Hashtag>;
+                        return (
+                          <Hashtag
+                            href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
+                          >
+                            #{chunk.text}
+                          </Hashtag>
+                        );
                       }
 
                       // TODO: Add assertNever

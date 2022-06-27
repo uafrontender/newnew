@@ -17,7 +17,10 @@ const PopularTagsResults: React.FC<IHashtagsResults> = ({ hashtags }) => {
     <SContainer>
       <SBlockTitle>{t('search.popularTags')}</SBlockTitle>
       {hashtags.map((hashtag) => (
-        <Link href={`/${hashtag.text}`} key={hashtag.text}>
+        <Link
+          href={`/search?query=${hashtag.text}&type=hashtags&tab=posts`}
+          key={hashtag.text}
+        >
           <a>
             <SPost>
               <SLeftSide>
@@ -30,7 +33,7 @@ const PopularTagsResults: React.FC<IHashtagsResults> = ({ hashtags }) => {
                   />
                 </HashtagIcon>
                 <STagData>
-                  <SCreatorUsername>{hashtag.text}</SCreatorUsername>
+                  <SCreatorUsername>#{hashtag.text}</SCreatorUsername>
                 </STagData>
               </SLeftSide>
             </SPost>

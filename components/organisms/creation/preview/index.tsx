@@ -33,7 +33,7 @@ import {
 
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
-import parseText from '../../../../utils/parseText/parseText';
+import getChunks from '../../../../utils/getChunks/getChunks';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -365,13 +365,19 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               onClick={handleGoBack}
             />
             <SHeadlineMobile variant={2} weight={600}>
-              {parseText(post.title).map((chunk) => {
+              {getChunks(post.title).map((chunk) => {
                 if (chunk.type === 'text') {
                   return chunk.text;
                 }
 
                 if (chunk.type === 'hashtag') {
-                  return <Hashtag href='#'>{chunk.text}</Hashtag>;
+                  return (
+                    <Hashtag
+                      href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
+                    >
+                      #{chunk.text}
+                    </Hashtag>
+                  );
                 }
 
                 // TODO: add assertNever
@@ -436,13 +442,19 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         </SLeftPart>
         <SRightPart>
           <SHeadline variant={5}>
-            {parseText(post.title).map((chunk) => {
+            {getChunks(post.title).map((chunk) => {
               if (chunk.type === 'text') {
                 return chunk.text;
               }
 
               if (chunk.type === 'hashtag') {
-                return <Hashtag href='#'>{chunk.text}</Hashtag>;
+                return (
+                  <Hashtag
+                    href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
+                  >
+                    #{chunk.text}
+                  </Hashtag>
+                );
               }
 
               // TODO: Add assertNever

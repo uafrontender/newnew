@@ -23,7 +23,7 @@ import { fetchPledges } from '../../../api/endpoints/crowdfunding';
 import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import parseText from '../../../utils/parseText/parseText';
+import getChunks from '../../../utils/getChunks/getChunks';
 
 const CommentsBottomSection = dynamic(
   () => import('../../molecules/decision/success/CommentsBottomSection')
@@ -250,13 +250,19 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                   </STotal> */}
                 </SCreatorInfoDiv>
                 <SPostTitle variant={4}>
-                  {parseText(post.title).map((chunk) => {
+                  {getChunks(post.title).map((chunk) => {
                     if (chunk.type === 'text') {
                       return chunk.text;
                     }
 
                     if (chunk.type === 'hashtag') {
-                      return <Hashtag href='#'>{chunk.text}</Hashtag>;
+                      return (
+                        <Hashtag
+                          href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
+                        >
+                          #{chunk.text}
+                        </Hashtag>
+                      );
                     }
 
                     // TODO: Add assertNever

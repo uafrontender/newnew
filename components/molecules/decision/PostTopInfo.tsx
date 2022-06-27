@@ -32,7 +32,7 @@ import { FollowingsContext } from '../../../contexts/followingContext';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
-import parseText from '../../../utils/parseText/parseText';
+import getChunks from '../../../utils/getChunks/getChunks';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -307,13 +307,19 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         </SActionsDiv>
         <SPostTitle>
           <Headline variant={5}>
-            {parseText(title).map((chunk) => {
+            {getChunks(title).map((chunk) => {
               if (chunk.type === 'text') {
                 return chunk.text;
               }
 
               if (chunk.type === 'hashtag') {
-                return <Hashtag href='#'>{chunk.text}</Hashtag>;
+                return (
+                  <Hashtag
+                    href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
+                  >
+                    #{chunk.text}
+                  </Hashtag>
+                );
               }
 
               // TODO: Add assertNever

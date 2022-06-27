@@ -6,7 +6,7 @@ import InlineSvg from '../InlineSVG';
 import AnimatedPresence from '../AnimatedPresence';
 
 import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-import parseText from '../../../utils/parseText/parseText';
+import getChunks from '../../../utils/getChunks/getChunks';
 
 interface IRichTextArea {
   id?: string;
@@ -44,7 +44,7 @@ export const RichTextArea: React.FC<IRichTextArea> = React.memo((props) => {
 
   // Will do hashes only for now, can be expanded
   const decorateValue = (rawValue: string) => {
-    const chunks = parseText(rawValue);
+    const chunks = getChunks(rawValue);
     return chunks
       .map((chunk) => {
         if (chunk.type === 'text') {
@@ -52,7 +52,7 @@ export const RichTextArea: React.FC<IRichTextArea> = React.memo((props) => {
         }
 
         if (chunk.type === 'hashtag') {
-          return `<span class="hashtag">${chunk.text}</span>`;
+          return `<span class="hashtag">#${chunk.text}</span>`;
         }
 
         // TODO: Add assertNever

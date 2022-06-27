@@ -21,7 +21,7 @@ import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
 import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
-import parseText from '../../../utils/parseText/parseText';
+import getChunks from '../../../utils/getChunks/getChunks';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -240,13 +240,19 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             </SCaption>
           </SUserBlock>
           <SPostTitleText variant={3} weight={600}>
-            {parseText(post?.title).map((chunk) => {
+            {getChunks(post?.title).map((chunk) => {
               if (chunk.type === 'text') {
                 return chunk.text;
               }
 
               if (chunk.type === 'hashtag') {
-                return <Hashtag href='#'>{chunk.text}</Hashtag>;
+                return (
+                  <Hashtag
+                    href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
+                  >
+                    #{chunk.text}
+                  </Hashtag>
+                );
               }
 
               // TODO: Add assertNever

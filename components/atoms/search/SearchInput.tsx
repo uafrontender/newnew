@@ -24,6 +24,7 @@ import Button from '../Button';
 import Lottie from '../Lottie';
 import NoResults from './NoResults';
 import PopularTagsResults from './PopularTagsResults';
+import getChunks from '../../../utils/getChunks/getChunks';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
@@ -58,6 +59,19 @@ const SearchInput: React.FC = React.memo(() => {
     'tablet',
   ].includes(resizeMode);
 
+  const handleSeeResults = (query: string) => {
+    const chunks = getChunks(query);
+    const firstChunk = chunks[0];
+    const isHashtag = chunks.length === 1 && firstChunk.type === 'hashtag';
+
+    if (isHashtag) {
+      router.push(`/search?query=${firstChunk.text}&type=hashtags&tab=posts`);
+    } else {
+      const clearedQuery = query.replaceAll('#', '');
+      router.push(`/search?query=${clearedQuery}&tab=posts`);
+    }
+  };
+
   const handleSearchClick = useCallback(() => {
     dispatch(setGlobalSearchActive(!globalSearchActive));
   }, [dispatch, globalSearchActive]);
@@ -76,7 +90,7 @@ const SearchInput: React.FC = React.memo(() => {
 
     if (e.keyCode === 13 && searchValue) {
       setIsResultsDropVisible(false);
-      router.push(`/search?query=${searchValue}&tab=posts`);
+      handleSeeResults(searchValue);
       setSearchValue('');
     }
   };
@@ -224,7 +238,9 @@ const SearchInput: React.FC = React.memo(() => {
         </SInputWrapper>
         {!isMobileOrTablet && isResultsDropVisible && (
           <SResultsDrop>
-            {resultsPosts.length === 0 && resultsCreators.length === 0 ? (
+            {resultsPosts.length === 0 &&
+            resultsCreators.length === 0 &&
+            resultsHashtags.length === 0 ? (
               !isLoading ? (
                 <SNoResults>
                   <NoResults closeDrop={handleCloseIconClick} />
@@ -254,9 +270,7 @@ const SearchInput: React.FC = React.memo(() => {
                   <PopularTagsResults hashtags={resultsHashtags} />
                 )}
                 <SButton
-                  onClick={() => {
-                    router.push(`/search?query=${searchValue}&tab=posts`);
-                  }}
+                  onClick={() => handleSeeResults(searchValue)}
                   view='quaternary'
                 >
                   {t('search.allResults')}
