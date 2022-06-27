@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "title": "關於NewNew",
+    "description": "瞭解更多關於創作者經濟公司NewNew的投資者、新聞和媒體報道"
+  },
+  "intro": {
+    "title": "NewNew是人們聚集在一起對世界上最熱門的決策進行出價和投票的地方",
+    "text": "我們使人們有能力掌控互動體驗並獲得更多的體驗"
+  },
+  "press": {
+    "title": "新聞報導",
+    "items": [
+      {
+        "title": "讓你付費控制另一個人的生活的應用程式。"
+      },
+      {
+        "title": "對創作者來說，萬物皆可售"
+      },
+      {
+        "title": "在NewNew上將「創作者經濟」變現。"
+      },
+      {
+        "title": "隨著這方面的升溫，有20家創作者者經濟初創公司值得關注......"
+      },
+      {
+        "title": "聰明的風險投資商認識到黑人女性創始人可能會引領......"
+      },
+      {
+        "title": "Quicktake 「率先行動」 (03/25/2020)"
+      },
+      {
+        "title": "投票應用程式NewNew如何代表新一類的..."
+      },
+      {
+        "title": "這位來自多倫多的科技「外行」CEO從Drake的內部..."
+      },
+      {
+        "title": "Drake前克高管講述她向科技界的過渡和... "
+      }
+    ]
+  },
+  "backers": {
+    "title": "支持者"
+  },
+  "investors": {
+    "title": "個人投資者",
+    "participants": [
+      {
+        "name": "Michael Ovitz",
+        "description": "Creative Artists Agency（CAA）創始人"
+      },
+      {
+        "name": "Stephen Pagliuca",
+        "description": "貝恩資本聯合主席"
+      },
+      {
+        "name": "Kevin Mayer",
+        "description": "DAZN集團主席（TikTok前首席執行官、迪士尼前主席）"
+      },
+      {
+        "name": "Steven Galanis",
+        "description": "Cameo公司創始人"
+      }
+    ]
+  }
+}

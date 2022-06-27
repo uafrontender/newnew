@@ -66,11 +66,11 @@
   },
   "footer": {
     "topTitle": "NewNew",
-    "centerTitle": "連接",
+    "centerTitle": "聯絡我們",
     "bottomTitle": "社交",
     "about": "關於",
     "press": "新聞報道",
-    "jobs": "Work @ NewNew",
+    "jobs": "NewNew工作機會",
     "help": "幫助",
     "faq": "常見問題",
     "twitter": "Twitter",
@@ -143,7 +143,7 @@
   "search": {
     "topPosts": "熱門帖子",
     "popularCreators": "熱門創作者",
-    "creatorSubtitle": "See posts",
+    "creatorSubtitle": "查看帖子",
     "allResults": "所有結果",
     "noResults": {
       "title": "沒有找到任何內容",
