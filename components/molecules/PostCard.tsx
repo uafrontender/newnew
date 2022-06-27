@@ -600,7 +600,8 @@ export const PostCard: React.FC<ICard> = React.memo(
               )
             ) : (
               <SButtonFirst withShrink onClick={handleBidClick}>
-                {switchPostStatus(typeOfPost, postParsed.status) === 'voting'
+                {switchPostStatus(typeOfPost, postParsed.status) === 'voting' &&
+                postParsed.creator?.uuid !== user.userData?.userUuid
                   ? t(`button.withoutActivity.${typeOfPost}`)
                   : t(`button.seeResults.${typeOfPost}`)}
               </SButtonFirst>
