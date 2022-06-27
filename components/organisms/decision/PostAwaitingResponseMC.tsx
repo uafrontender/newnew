@@ -170,7 +170,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
-          <SActivitesContainer>
+          <SActivitesContainer dimmedBackground={openedMainSection === 'main'}>
             {openedMainSection === 'main' ? (
               <>
                 <WaitingForResponseBox
@@ -334,10 +334,13 @@ const SWrapper = styled.div`
   }
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitesContainer = styled.div<{
+  dimmedBackground: boolean;
+}>`
   grid-area: activities;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme, dimmedBackground }) =>
+    dimmedBackground ? theme.colorsThemed.background.secondary : 'transparent'};
   overflow: hidden;
   border-radius: 16px;
 
