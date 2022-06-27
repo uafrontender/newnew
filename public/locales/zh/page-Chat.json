@@ -12,7 +12,7 @@
   },
   "userBlocked": {
     "title": "你屏蔽了",
-    "message": "解除對他們的屏蔽並開始聊天,別擔心，他們看不到你屏蔽了他們...",
+    "message": "解除對他們的屏蔽並開始聊天,別擔心，他們看不到你屏蔽了他們......",
     "buttonText": "解除屏蔽"
   },
   "groupBlocked": {
@@ -57,7 +57,7 @@
       "title": "新訊息",
       "searchPlaceholder": "搜索",
       "noResultsText": "沒有結果",
-      "noResultsSearchText": "換一個名字..."
+      "noResultsSearchText": "換一個名字......"
     },
     "renewSubscriptionsSubtitle": "更新訂閱"
   },
