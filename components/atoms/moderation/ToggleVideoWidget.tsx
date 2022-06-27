@@ -99,6 +99,8 @@ const STabBtn = styled.button<{
   line-height: 16px;
   color: ${({ active }) => (active ? '#2C2C33' : '#9BA2B1')};
 
+  width: 50%;
+
   padding: 8px 16px;
 
   cursor: pointer;
