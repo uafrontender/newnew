@@ -136,7 +136,7 @@
   },
   "stripeSection": {
     "meta": {
-      "title": "獲得付款",
+      "title": "推薦獲得付款方式：",
       "description": "與Stripe帳戶綁定，即可按時獲得付款。"
     },
     "side": {
@@ -154,7 +154,7 @@
       "submit": "提交",
       "requestSetupLink": "與Stripe綁定",
       "stripeConnectedLink": "Stripe已綁定！",
-      "stripeConnecting_NEED_TRANSLATION": "Connecting..."
+      "stripeConnecting": "連接中......"
     }
   },
   "subRateSection": {

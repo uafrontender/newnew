@@ -441,8 +441,8 @@
   },
   "cfPost": {
     "backersStatsSection": {
-      "ofBackers": "的{{ targetBackers }}支持者",
-      "myBacking_NEED_TRANSLATION": "My backing:",
+      "ofBackers": "共需{{targetBackers}}位支持者",
+      "myBacking": "我的支持：",
       "my": "我的",
       "pledge": "確認"
     },
