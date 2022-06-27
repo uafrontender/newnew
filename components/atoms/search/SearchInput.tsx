@@ -11,7 +11,7 @@ import InlineSVG from '../InlineSVG';
 import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 
-import { quickSearchPostsAndCreators } from '../../../api/endpoints/search';
+import { quickSearch } from '../../../api/endpoints/search';
 import { setGlobalSearchActive } from '../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
@@ -38,9 +38,9 @@ const SearchInput: React.FC = React.memo(() => {
   const [isLoading, setIsLoading] = useState(false);
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
   const [resultsCreators, setResultsCreators] = useState<newnewapi.IUser[]>([]);
-
-  // TODO: use real data
-  const [resultsTags, setResultsTags] = useState(['tatoo', 'tatuin', 'tag']);
+  const [resultsHashtags, setResultsHashtags] = useState<newnewapi.IHashtag[]>(
+    []
+  );
 
   const { resizeMode, globalSearchActive } = useAppSelector(
     (state) => state.ui
@@ -133,21 +133,22 @@ const SearchInput: React.FC = React.memo(() => {
   const resetResults = () => {
     setResultsCreators([]);
     setResultsPosts([]);
-    setResultsTags([]);
+    setResultsHashtags([]);
   };
 
   async function getQuickSearchResult(query: string) {
     try {
       setIsLoading(true);
-      const payload = new newnewapi.QuickSearchPostsAndCreatorsRequest({
+      const payload = new newnewapi.QuickSearchRequest({
         query,
       });
-      const res = await quickSearchPostsAndCreators(payload);
+      const res = await quickSearch(payload);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
       if (res.data.creators) setResultsCreators(res.data.creators);
       if (res.data.posts) setResultsPosts(res.data.posts);
+      if (res.data.hashtags) setResultsHashtags(res.data.hashtags);
       // TODO: Enable when API updated
       // if (res.data.tags) setResultsTags(res.data.tags);
       setIsLoading(false);
@@ -249,8 +250,8 @@ const SearchInput: React.FC = React.memo(() => {
                 {resultsCreators.length > 0 && (
                   <PopularCreatorsResults creators={resultsCreators} />
                 )}
-                {resultsTags.length > 0 && (
-                  <PopularTagsResults hashtags={resultsTags} />
+                {resultsHashtags.length > 0 && (
+                  <PopularTagsResults hashtags={resultsHashtags} />
                 )}
                 <SButton
                   onClick={() => {

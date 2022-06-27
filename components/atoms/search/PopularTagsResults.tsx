@@ -2,11 +2,12 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled from 'styled-components';
+import { newnewapi } from 'newnew-api';
 import hashtagIcon from '../../../public/images/svg/icons/outlined/Hashtag.svg';
 import InlineSvg from '../InlineSVG';
 
 interface IHashtagsResults {
-  hashtags: string[];
+  hashtags: newnewapi.IHashtag[];
 }
 
 const PopularTagsResults: React.FC<IHashtagsResults> = ({ hashtags }) => {
@@ -16,7 +17,7 @@ const PopularTagsResults: React.FC<IHashtagsResults> = ({ hashtags }) => {
     <SContainer>
       <SBlockTitle>{t('search.popularTags')}</SBlockTitle>
       {hashtags.map((hashtag) => (
-        <Link href={`/${hashtag}`} key={hashtag}>
+        <Link href={`/${hashtag.text}`} key={hashtag.text}>
           <a>
             <SPost>
               <SLeftSide>
@@ -29,7 +30,7 @@ const PopularTagsResults: React.FC<IHashtagsResults> = ({ hashtags }) => {
                   />
                 </HashtagIcon>
                 <STagData>
-                  <SCreatorUsername>{hashtag}</SCreatorUsername>
+                  <SCreatorUsername>{hashtag.text}</SCreatorUsername>
                 </STagData>
               </SLeftSide>
             </SPost>
