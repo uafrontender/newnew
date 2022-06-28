@@ -24,28 +24,12 @@ interface IChat {
 export const Chat: React.FC<IChat> = ({ username }) => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
+  const [isInitialLoaded, setIsInitialLoaded] = useState<boolean>(false);
   const [chatData, setChatData] = useState<IChatData>({
     chatRoom: null,
     showChatList: null,
   });
 
-  const openChat = ({ chatRoom }: IChatData) => {
-    let route = '';
-
-    if (chatRoom?.visavis?.username) {
-      chatRoom.kind === 1
-        ? (route = chatRoom?.visavis?.username)
-        : (route = `${chatRoom?.visavis?.username}-announcement`);
-    } else {
-      chatRoom && chatRoom.kind === 4 && chatRoom.myRole === 2
-        ? (route = `${user.userData?.username}-announcement`)
-        : '';
-    }
-
-    router.push(`/direct-messages/${route}`);
-
-    setChatData({ chatRoom, showChatList });
-  };
   const { t } = useTranslation('page-Chat');
   const [chatListHidden, setChatListHidden] =
     useState<boolean | undefined>(undefined);
@@ -61,17 +45,38 @@ export const Chat: React.FC<IChat> = ({ username }) => {
     useState<newnewapi.IChatMessage | null | undefined>();
   const [searchText, setSearchText] = useState<string>('');
 
-  useEffect(() => {
-    /* eslint-disable no-unused-expressions */
-    isMobileOrTablet ? setChatListHidden(true) : setChatListHidden(undefined);
-  }, [isMobileOrTablet]);
+  const showChatList = () => {
+    setChatListHidden(false);
+  };
+
+  const openChat = useCallback(
+    ({ chatRoom }: IChatData) => {
+      let route = '';
+
+      if (chatRoom?.visavis?.username) {
+        chatRoom.kind === 1
+          ? (route = chatRoom?.visavis?.username)
+          : (route = `${chatRoom?.visavis?.username}-announcement`);
+      } else {
+        chatRoom && chatRoom.kind === 4 && chatRoom.myRole === 2
+          ? (route = `${user.userData?.username}-announcement`)
+          : '';
+      }
+
+      router.push(`/direct-messages/${route}`);
+
+      setChatData({ chatRoom, showChatList });
+      if (isMobileOrTablet) {
+        isInitialLoaded ? setChatListHidden(true) : setIsInitialLoaded(true);
+      }
+    },
+    [isInitialLoaded, router, isMobileOrTablet, user.userData?.username]
+  );
 
   useEffect(() => {
-    if (!chatListHidden && isMobileOrTablet) {
-      setChatListHidden(true);
-    }
-    /* eslint-disable react-hooks/exhaustive-deps */
-  }, [chatData]);
+    /* eslint-disable no-unused-expressions */
+    isMobileOrTablet ? setChatListHidden(false) : setChatListHidden(undefined);
+  }, [isMobileOrTablet]);
 
   useEffect(() => {
     if (newMessage) {
@@ -79,10 +84,6 @@ export const Chat: React.FC<IChat> = ({ username }) => {
     }
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [newMessage]);
-
-  const showChatList = () => {
-    setChatListHidden(false);
-  };
 
   const passInputValue = useCallback((str: string) => setSearchText(str), []);
 
@@ -108,6 +109,7 @@ export const Chat: React.FC<IChat> = ({ username }) => {
           searchText={searchText}
           openChat={openChat}
           username={username}
+          switchedTab={() => setChatListHidden(false)}
         />
       </SSidebar>
       <SContent>

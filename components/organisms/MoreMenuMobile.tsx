@@ -65,7 +65,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
                   onClick={() =>
                     router.route.includes('direct-messages')
                       ? handleClose()
-                      : handleClick('/direct-messages')
+                      : handleClick('direct-messages')
                   }
                 >
                   {unreadCount && unreadCount > 0 ? (
