@@ -26,6 +26,7 @@ import { ChannelsContext } from '../../../contexts/channelsContext';
 import { SocketContext } from '../../../contexts/socketContext';
 import { reportUser } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
+import isSafari from '../../../utils/isSafari';
 
 const UserAvatar = dynamic(() => import('../UserAvatar'));
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
@@ -545,7 +546,19 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           ) : (
             <NoMessagesYet />
           ))}
-        {messages.length > 0 && messages.map(renderMessage)}
+        {messages.length > 0 &&
+          messages.map((item, index) => {
+            if (index < messages.length - 1) {
+              return renderMessage(item, index);
+            }
+            if (document && isSafari() && isMobile && messages[0].id) {
+              const element = document.getElementById(
+                messages[0].id.toString()
+              );
+              if (element) element.scrollIntoView({ block: 'center' });
+            }
+            return null;
+          })}
       </SCenterPart>
       <SBottomPart>
         {(isVisavisBlocked === true || confirmBlockUser) &&
