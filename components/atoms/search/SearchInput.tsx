@@ -308,6 +308,9 @@ const SearchInput: React.FC = React.memo(() => {
               {resultsCreators.length > 0 && (
                 <PopularCreatorsResults creators={resultsCreators} />
               )}
+              {resultsHashtags.length > 0 && (
+                <PopularTagsResults hashtags={resultsHashtags} />
+              )}
               <SButton
                 onClick={() => {
                   router.push(`/search?query=${searchValue}&tab=posts`);
@@ -369,9 +372,10 @@ const SResultsDrop = styled.div`
   position: fixed;
   border-radius: 0;
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 112px);
   top: 56px;
   padding: 16px;
+  overflow: auto;
 
   ${({ theme }) => theme.media.laptop} {
     position: absolute;
@@ -410,10 +414,11 @@ const SResultsDropMobile = styled.div`
   position: fixed;
   border-radius: 0;
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 112px);
   top: 56px;
   left: 0;
   padding: 16px;
+  overflow: auto;
 
   ${({ theme }) => theme.media.tablet} {
     margin-top: 16px;
