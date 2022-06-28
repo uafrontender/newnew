@@ -33,6 +33,7 @@ import {
 
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -364,7 +365,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               onClick={handleGoBack}
             />
             <SHeadlineMobile variant={2} weight={600}>
-              {post.title}
+              <PostTitleContent>{post.title}</PostTitleContent>
             </SHeadlineMobile>
           </STopLine>
           {tab === 'multiple-choice' && (
@@ -423,7 +424,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           </STabletPlayer>
         </SLeftPart>
         <SRightPart>
-          <SHeadline variant={5}>{post.title}</SHeadline>
+          <SHeadline variant={5}>
+            <PostTitleContent>{post.title}</PostTitleContent>
+          </SHeadline>
           {tab === 'multiple-choice' && (
             <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>
           )}

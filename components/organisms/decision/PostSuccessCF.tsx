@@ -23,6 +23,7 @@ import { fetchPledges } from '../../../api/endpoints/crowdfunding';
 import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const CommentsBottomSection = dynamic(
   () => import('../../molecules/decision/success/CommentsBottomSection')
@@ -248,7 +249,9 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     {`$${formatNumber(post.totalAmount?.usdCents/100 ?? 0, true)}`}
                   </STotal> */}
                 </SCreatorInfoDiv>
-                <SPostTitle variant={4}>{post.title}</SPostTitle>
+                <SPostTitle variant={4}>
+                  <PostTitleContent>{post.title}</PostTitleContent>
+                </SPostTitle>
                 <SSeparator />
                 <SBackersInfo>
                   <SCreatorsBackers>
