@@ -61,7 +61,8 @@
       }
     },
     "card": {
-      "left": "剩餘{{time}}"
+      "left": "剩餘{{time}}",
+      "soon": "即將開始"
     },
     "button": {
       "retry": "重試",

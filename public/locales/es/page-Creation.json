@@ -61,7 +61,8 @@
       }
     },
     "card": {
-      "left": "{{time}} left"
+      "left": "{{time}} left",
+      "soon_NEED_TRANSLATION": "Coming Soon"
     },
     "button": {
       "retry": "Retry",
