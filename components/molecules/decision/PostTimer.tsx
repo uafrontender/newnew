@@ -182,7 +182,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
     <SWrapper shouldTurnRed={shouldTurnRed}>
       {!hasEnded ? (
         <>
-          {parsedSeconds.days !== '00' && (
+          {parsedSeconds.days !== '0' && (
             <>
               <STimerItem className='timerItem'>
                 <div>{parsedSeconds.days}</div>
@@ -230,7 +230,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
             <div>{parsedSeconds.minutes}</div>
             <TimeUnit>{t('expires.minutes')}</TimeUnit>
           </STimerItem>
-          {parsedSeconds.days === '00' && (
+          {parsedSeconds.days === '0' && (
             <>
               <div>:</div>
               <STimerItem className='timerItem'>
