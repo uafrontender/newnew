@@ -25,6 +25,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const AcSuccessOptionsTab = dynamic(
   () => import('../../molecules/decision/auction/success/AcSuccessOptionsTab')
@@ -203,7 +204,9 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                       </STotal>
                     )}
                   </SCreatorInfoDiv>
-                  <SPostTitle variant={4}>{post.title}</SPostTitle>
+                  <SPostTitle variant={4}>
+                    <PostTitleContent>{post.title}</PostTitleContent>
+                  </SPostTitle>
                   <SSeparator />
                   {winningOption && (
                     <>

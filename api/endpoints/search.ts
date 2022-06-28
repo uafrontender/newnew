@@ -3,16 +3,11 @@ import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
 const BASE_URL_CHAT = `${BASE_URL}/search`;
 
-export const quickSearchPostsAndCreators = (
-  payload: newnewapi.QuickSearchPostsAndCreatorsRequest
-) =>
-  fetchProtobuf<
-    newnewapi.QuickSearchPostsAndCreatorsRequest,
-    newnewapi.QuickSearchPostsAndCreatorsResponse
-  >(
-    newnewapi.QuickSearchPostsAndCreatorsRequest,
-    newnewapi.QuickSearchPostsAndCreatorsResponse,
-    `${BASE_URL_CHAT}/quick_search_posts_and_creators`,
+export const quickSearch = (payload: newnewapi.QuickSearchRequest) =>
+  fetchProtobuf<newnewapi.QuickSearchRequest, newnewapi.QuickSearchResponse>(
+    newnewapi.QuickSearchRequest,
+    newnewapi.QuickSearchResponse,
+    `${BASE_URL_CHAT}/quick_search`,
     'post',
     payload
   );

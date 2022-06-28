@@ -19,8 +19,8 @@ function getChunks(text: string, ignoreStart: boolean): Chunk[] {
     } else if (match[1].length > 0) {
       chunks.push({ type: 'text', text: match[1] });
     }
-
-    chunks.push({ type: 'hashtag', text: match[2] });
+    const hashtagText = match[2].replace('#', '');
+    chunks.push({ type: 'hashtag', text: hashtagText });
 
     const remainder = text.slice((match.index || 0) + match[0].length);
     chunks.push(...getChunks(remainder, true));
