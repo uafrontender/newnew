@@ -44,7 +44,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const theme = useTheme();
   const [cookies] = useCookies();
   const { unreadNotificationCount } = useNotifications();
-  const { unreadCount } = useGetChats();
+  const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
   const { postOverlayOpen } = usePostModalState();
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
@@ -147,14 +147,12 @@ export const General: React.FC<IGeneral> = (props) => {
     resizeMode
   );
 
-  const [isOpenedChat, setIsOpenedChat] = useState(false);
-
   const openChat = () => {
-    setIsOpenedChat(true);
+    setMobileChatOpened(true);
   };
 
   const closeChat = () => {
-    setIsOpenedChat(false);
+    setMobileChatOpened(false);
   };
 
   const chatButtonVisible =
@@ -225,7 +223,7 @@ export const General: React.FC<IGeneral> = (props) => {
               bottomNavigationVisible={mobileNavigationVisible}
               zIndex={moreMenuMobileOpen ? 9 : 10}
             >
-              {!isOpenedChat ? (
+              {!mobileChatOpened ? (
                 <FloatingMessages withCounter openChat={openChat} />
               ) : (
                 <MobileDashBoardChat closeChat={closeChat} />
