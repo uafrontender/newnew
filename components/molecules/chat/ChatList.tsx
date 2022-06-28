@@ -39,16 +39,26 @@ interface IFunctionProps {
   openChat: (arg: IChatData) => void;
   searchText: string;
   username?: string;
+  switchedTab?: () => void;
 }
 
 const ChatList: React.FC<IFunctionProps> = ({
   openChat,
   searchText,
   username,
+  switchedTab,
 }) => {
   const { t } = useTranslation('page-Chat');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
   const { unreadCountForCreator, unreadCountForUser } = useGetChats();
   const { ref: scrollRef, inView } = useInView();
   const [activeChatIndex, setActiveChatIndex] = useState<string | null>(null);
@@ -219,6 +229,7 @@ const ChatList: React.FC<IFunctionProps> = ({
       if (res.data && res.data.rooms.length > 0) {
         if (res.data.rooms[0].myRole === 1) {
           setActiveTab('chatRoomsCreators');
+          if (isMobileOrTablet && switchedTab !== undefined) switchedTab();
         }
         openRoom(res.data.rooms[0]);
         setUpdatedChat(res.data.rooms[0]);
@@ -386,8 +397,16 @@ const ChatList: React.FC<IFunctionProps> = ({
         );
       }
       setActiveTab(tabName);
+      if (isMobileOrTablet && switchedTab !== undefined) switchedTab();
     },
-    [activeTab, openChat, chatRoomsCreators, chatRoomsSubs]
+    [
+      activeTab,
+      openChat,
+      chatRoomsCreators,
+      chatRoomsSubs,
+      switchedTab,
+      isMobileOrTablet,
+    ]
   );
 
   const renderChatItem = useCallback(
@@ -573,6 +592,7 @@ export default ChatList;
 
 ChatList.defaultProps = {
   username: '',
+  switchedTab: () => {},
 };
 
 const SSectionContent = styled.div`
