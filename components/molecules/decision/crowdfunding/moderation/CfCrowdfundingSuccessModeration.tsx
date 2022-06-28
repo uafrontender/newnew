@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -14,6 +14,7 @@ import { formatNumber } from '../../../../../utils/format';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
 import assets from '../../../../../constants/assets';
+import { getMyEarningsByPosts } from '../../../../../api/endpoints/payments';
 
 interface ICfCrowdfundingSuccessModeration {
   post: newnewapi.Crowdfunding;
@@ -30,6 +31,11 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
       resizeMode
     );
     const isTablet = ['tablet'].includes(resizeMode);
+
+    // Earned amount
+    const [earnedAmount, setEarnedAmount] =
+      useState<newnewapi.MoneyAmount | undefined>(undefined);
+    const [earnedAmountLoading, setEarnedAmountLoading] = useState(false);
 
     // Share
     const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -62,6 +68,32 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
     const percentage = (currentNumBackers / post.targetBackerCount) * 100;
     const size = useMemo(() => 130, []);
     const radius = (size - 12) / 2;
+
+    useEffect(() => {
+      async function loadEarnedAmount() {
+        setEarnedAmountLoading(true);
+        try {
+          const payload = new newnewapi.GetMyEarningsByPostsRequest({
+            postUuids: [post.postUuid],
+          });
+
+          const res = await getMyEarningsByPosts(payload);
+
+          if (!res.data || !res.data?.earningsByPosts[0]?.earnings || res.error)
+            throw new Error('Request failed');
+
+          setEarnedAmount(
+            res.data.earningsByPosts[0].earnings as newnewapi.MoneyAmount
+          );
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setEarnedAmountLoading(false);
+        }
+      }
+
+      loadEarnedAmount();
+    }, [post.postUuid]);
 
     return (
       <SSectionContainer>
@@ -119,18 +151,16 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
               </SSpanThin>
             </SNumBidders>
             <SDetailsHeadline variant={4}>{post.title}</SDetailsHeadline>
-            <SYouMade variant={3}>
-              {t('cfPostModeration.winnerTab.winnerOptionCard.youMade')}
-            </SYouMade>
-            <SDetailsHeadline variant={5}>
-              $
-              {formatNumber(
-                post.totalAmount?.usdCents
-                  ? post.totalAmount.usdCents / 100
-                  : 100,
-                true
-              )}
-            </SDetailsHeadline>
+            {!earnedAmountLoading && earnedAmount && (
+              <>
+                <SYouMade variant={3}>
+                  {t('cfPostModeration.winnerTab.winnerOptionCard.youMade')}
+                </SYouMade>
+                <SDetailsHeadline variant={5}>
+                  ${formatNumber(earnedAmount.usdCents / 100, false)}
+                </SDetailsHeadline>
+              </>
+            )}
           </SOptionDetails>
           {isMobile && <STrophyImgCard src={assets.decision.trophy} />}
         </SWinnerCard>
