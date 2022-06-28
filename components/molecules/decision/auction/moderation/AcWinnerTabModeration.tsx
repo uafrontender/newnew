@@ -104,7 +104,7 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
       }
 
       loadEarnedAmount();
-    }, [postId]);
+    }, [postId, postStatus]);
 
     useEffect(() => {
       const handler = (e: Event) => {
