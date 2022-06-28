@@ -18,8 +18,9 @@ const PostList = dynamic(() => import('./PostList'));
 const PostModal = dynamic(() => import('../decision/PostModal'));
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
 
-interface IFunction {
+interface ISearchDecisions {
   query: string;
+  type: string;
 }
 
 const parseFilterToArray = (filter: string): newnewapi.Post.Filter[] => {
@@ -79,15 +80,17 @@ const sortOptions: any = [
   },
 ];
 
-export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
+export const SearchDecisions: React.FC<ISearchDecisions> = ({
+  query,
+  type,
+}) => {
   const { t: tCommon } = useTranslation('common');
   const router = useRouter();
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<
-    newnewapi.IPost | undefined
-  >();
+  const [displayedPost, setDisplayedPost] =
+    useState<newnewapi.IPost | undefined>();
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
     setDisplayedPost(post);
@@ -126,9 +129,8 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   const [initialLoad, setInitialLoad] = useState(false);
   const [loadingPosts, setLoadingPosts] = useState(false);
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
-  const [postsNextPageToken, setPostsRoomsNextPageToken] = useState<
-    string | undefined | null
-  >('');
+  const [postsNextPageToken, setPostsRoomsNextPageToken] =
+    useState<string | undefined | null>('');
 
   const getSearchResult = useCallback(
     async (pageToken?: string) => {
@@ -137,6 +139,10 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
 
         const payload = new newnewapi.SearchPostsRequest({
           query,
+          searchType:
+            type === 'hashtags'
+              ? newnewapi.SearchPostsRequest.SearchType.HASHTAGS
+              : newnewapi.SearchPostsRequest.SearchType.UNSET,
           paging: {
             limit: 20,
             pageToken: pageToken ?? null,
@@ -181,7 +187,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
       }
     },
 
-    [postSorting, query, initialLoad, activeTabs, hasNoResults]
+    [postSorting, query, type, initialLoad, activeTabs, hasNoResults]
   );
 
   const handleRemovePostFromState = (postUuid: string) => {
@@ -220,17 +226,19 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
           break;
       }
     });
+
     router.push({
       pathname: '/search',
       query: {
         query,
+        type,
         tab: 'posts',
         filter: routerArr.length > 0 ? routerArr.join('-') : '',
         sorting: postSorting,
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postSorting, activeTabs, query]);
+  }, [postSorting, activeTabs, query, type]);
 
   const tabTypes = useMemo(
     () => [
@@ -254,14 +262,14 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   );
 
   const updateActiveTabs = useCallback(
-    (type: newnewapi.Post.Filter) => {
+    (tabType: newnewapi.Post.Filter) => {
       if (!loadingPosts) {
         setActiveTabs((curr) => {
           const arr = [...curr];
-          const index = arr.findIndex((item) => item === type);
+          const index = arr.findIndex((item) => item === tabType);
 
           if (index < 0) {
-            arr.push(type);
+            arr.push(tabType);
           } else {
             arr.splice(index, 1);
           }

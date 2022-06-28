@@ -20,6 +20,7 @@ import { formatNumber } from '../../../utils/format';
 import { fetchPledges } from '../../../api/endpoints/crowdfunding';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../molecules/decision/waiting/WaitingForResponseBox')
@@ -244,7 +245,9 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
                   {`$${formatNumber(post.totalAmount?.usdCents/100 ?? 0, true)}`}
                 </STotal> */}
                 </SCreatorInfoDiv>
-                <SPostTitle variant={4}>{post.title}</SPostTitle>
+                <SPostTitle variant={4}>
+                  <PostTitleContent>{post.title}</PostTitleContent>
+                </SPostTitle>
                 <SSeparator />
                 <SBackersInfo>
                   <SCreatorsBackers>

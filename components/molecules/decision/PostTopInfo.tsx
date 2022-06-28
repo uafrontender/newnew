@@ -32,6 +32,7 @@ import { FollowingsContext } from '../../../contexts/followingContext';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -305,7 +306,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           ) : null}
         </SActionsDiv>
         <SPostTitle>
-          <Headline variant={5}>{title}</Headline>
+          <Headline variant={5}>
+            <PostTitleContent>{title}</PostTitleContent>
+          </Headline>
         </SPostTitle>
         {showSelectingWinnerOption ? (
           <SSelectingWinnerOption>
