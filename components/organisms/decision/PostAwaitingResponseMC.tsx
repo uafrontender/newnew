@@ -50,7 +50,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     const waitingTime = useMemo(() => {
       const end = (post.responseUploadDeadline?.seconds as number) * 1000;
       const parsed = (end - Date.now()) / 1000;
-      const dhms = secondsToDHMS(parsed, 'noTrim');
+      const dhms = secondsToDHMS(parsed);
 
       let countdownsrt = `${dhms.days} ${t(
         'acPostAwaiting.hero.expires.days'
