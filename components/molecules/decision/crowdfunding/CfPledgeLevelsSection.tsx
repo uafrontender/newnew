@@ -561,7 +561,7 @@ const SCancelButton = styled(Button)`
   width: 48px;
   height: 48px;
 
-  padding: 0px;
+  /* padding: 0px; */
 
   flex-shrink: 0;
 

@@ -23,7 +23,7 @@ import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import getDisplayname from '../../../../../utils/getDisplayname';
 import assets from '../../../../../constants/assets';
-import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
+import { getMyEarningsByPosts } from '../../../../../api/endpoints/payments';
 
 interface MAcWinnerTabModeration {
   postId: string;
@@ -40,7 +40,10 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
       resizeMode
     );
 
-    const { appConstants } = useGetAppConstants();
+    // Earned amount
+    const [earnedAmount, setEarnedAmount] =
+      useState<newnewapi.MoneyAmount | undefined>(undefined);
+    const [earnedAmountLoading, setEarnedAmountLoading] = useState(false);
 
     const isCreatorsBid = useMemo(
       () => option.creator?.uuid === postCreator.uuid,
@@ -90,6 +93,32 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
         }
       }
     }, []);
+
+    useEffect(() => {
+      async function loadEarnedAmount() {
+        setEarnedAmountLoading(true);
+        try {
+          const payload = new newnewapi.GetMyEarningsByPostsRequest({
+            postUuids: [postId],
+          });
+
+          const res = await getMyEarningsByPosts(payload);
+
+          if (!res.data || !res.data?.earningsByPosts[0]?.earnings || res.error)
+            throw new Error('Request failed');
+
+          setEarnedAmount(
+            res.data.earningsByPosts[0].earnings as newnewapi.MoneyAmount
+          );
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setEarnedAmountLoading(false);
+        }
+      }
+
+      loadEarnedAmount();
+    }, [postId]);
 
     useEffect(() => {
       const handler = (e: Event) => {
@@ -159,16 +188,16 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
                 </SSpanThin>
               </SNumBidders>
               <SHeadline variant={4}>{option.text}</SHeadline>
-              <SYouMade variant={3}>
-                {t('mcPostModeration.winnerTab.winnerOptionCard.youMade')}
-              </SYouMade>
-              <SHeadline variant={5}>
-                $
-                {formatNumber(
-                  option.voteCount * Math.round(appConstants.mcVotePrice / 100),
-                  true
-                )}
-              </SHeadline>
+              {!earnedAmountLoading && earnedAmount && (
+                <>
+                  <SYouMade variant={3}>
+                    {t('mcPostModeration.winnerTab.winnerOptionCard.youMade')}
+                  </SYouMade>
+                  <SHeadline variant={5}>
+                    ${formatNumber(earnedAmount.usdCents / 100, false)}
+                  </SHeadline>
+                </>
+              )}
               <SOptionCreator variant={3}>
                 <SSpanThin>
                   {t('mcPostModeration.winnerTab.winnerOptionCard.createdBy')}
