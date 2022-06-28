@@ -22,6 +22,7 @@
     "daysLeft": "天",
     "hoursLeft": "小時",
     "minutesLeft": "分鐘",
-    "endedOn": "結束於"
+    "endedOn": "結束於",
+    "soon": "即將開始"
   }
 }

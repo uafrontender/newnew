@@ -22,6 +22,7 @@
     "daysLeft": "d",
     "hoursLeft": "h",
     "minutesLeft": "m",
-    "endedOn": "Ended on "
+    "endedOn": "Ended on ",
+    "soon": "Coming Soon"
   }
 }
