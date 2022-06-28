@@ -128,3 +128,17 @@ export const getMyTransactions = (
     'post',
     payload
   );
+
+export const getMyEarningsByPosts = (
+  payload: newnewapi.GetMyEarningsByPostsRequest
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.GetMyEarningsByPostsRequest,
+    newnewapi.GetMyEarningsByPostsResponse
+  >(
+    newnewapi.GetMyEarningsByPostsRequest,
+    newnewapi.GetMyEarningsByPostsResponse,
+    `${BASE_URL_PAYMENTS}/get_my_earnings_by_posts`,
+    'post',
+    payload
+  );
