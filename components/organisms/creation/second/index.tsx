@@ -19,7 +19,7 @@ import styled, { useTheme } from 'styled-components';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
-import TextArea from '../../../atoms/creation/TextArea';
+import RichTextArea from '../../../atoms/creation/RichTextArea';
 import FileUpload from '../../../molecules/creation/FileUpload';
 import Tabs, { Tab } from '../../../molecules/Tabs';
 import TabletStartDate from '../../../molecules/creation/TabletStartDate';
@@ -575,7 +575,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
           <SItemWrapper>
             {/* TODO: move to locales */}
             <SInputLabel htmlFor='title'>Title</SInputLabel>
-            <TextArea
+            <RichTextArea
               id='title'
               value={post?.title}
               error={titleError}
