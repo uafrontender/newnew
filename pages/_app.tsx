@@ -17,6 +17,7 @@ import { parse } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
 import * as Sentry from '@sentry/browser';
+import { useRouter } from 'next/router';
 
 // Custom error page
 import Error from './_error';
@@ -73,6 +74,7 @@ const MyApp = (props: IMyApp): ReactElement => {
   const store = useStore();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
+  const { locale } = useRouter();
 
   // Shared layouts
   const getLayout = useMemo(
@@ -92,6 +94,17 @@ const MyApp = (props: IMyApp): ReactElement => {
       setPreFetchImages(currentTheme);
     }, PRE_FETCHING_DELAY);
   }, [store]);
+
+  useEffect(() => {
+    // Imported one by one not to reak import\no-dynamic-require
+    if (locale === 'zh') {
+      // eslint-disable-next-line global-require
+      require('moment/locale/zh-tw');
+    } else if (locale === 'es') {
+      // eslint-disable-next-line global-require
+      require('moment/locale/es');
+    }
+  });
 
   useEffect(() => {
     const hotjarIdVariable = process.env.NEXT_PUBLIC_HOTJAR_ID;

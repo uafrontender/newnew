@@ -31,7 +31,7 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
   const parsed = (timestampSeconds - Date.now()) / 1000;
 
   const [parsedSeconds, setParsedSeconds] = useState<DHMS>(
-    secondsToDHMS(parsed, 'noTrim')
+    secondsToDHMS(parsed)
   );
   const [seconds, setSeconds] = useState(parsed);
   const interval = useRef<number>();
@@ -46,7 +46,7 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
   }, []);
 
   useEffect(() => {
-    setParsedSeconds(secondsToDHMS(seconds, 'noTrim'));
+    setParsedSeconds(secondsToDHMS(seconds));
   }, [seconds]);
 
   return (

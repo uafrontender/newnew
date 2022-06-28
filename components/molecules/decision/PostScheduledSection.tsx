@@ -44,7 +44,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   const expirationDate = new Date(timestampSeconds);
 
   const [parsedSeconds, setParsedSeconds] = useState<DHMS>(
-    secondsToDHMS(parsed)
+    secondsToDHMS(parsed, 'noTrim')
   );
   const [seconds, setSeconds] = useState(parsed);
   const interval = useRef<number>();
@@ -59,7 +59,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   }, []);
 
   useEffect(() => {
-    setParsedSeconds(secondsToDHMS(seconds));
+    setParsedSeconds(secondsToDHMS(seconds, 'noTrim'));
   }, [seconds]);
 
   return (

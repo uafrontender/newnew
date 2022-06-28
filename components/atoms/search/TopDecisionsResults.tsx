@@ -28,7 +28,10 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
       (data.expiresAt?.seconds as number) * 1000
     ).getTime();
 
-    const parsed = secondsToDHMS((timestampSeconds - Date.now()) / 1000);
+    const parsed = secondsToDHMS(
+      (timestampSeconds - Date.now()) / 1000,
+      'noTrim'
+    );
 
     switch (postType) {
       case 'auction':

@@ -144,13 +144,21 @@ export const PostCard: React.FC<ICard> = React.memo(
         : 0
     );
 
-    const timestampSeconds = useMemo(() => {
+    const endsAtTime = useMemo(() => {
       if (postParsed.expiresAt?.seconds) {
         return (postParsed.expiresAt.seconds as number) * 1000;
       }
 
       return 0;
     }, [postParsed.expiresAt?.seconds]);
+
+    const startsAtTime = useMemo(() => {
+      if (postParsed.startsAt?.seconds) {
+        return (postParsed.startsAt.seconds as number) * 1000;
+      }
+
+      return 0;
+    }, [postParsed.startsAt?.seconds]);
 
     const [thumbnailUrl, setThumbnailUrl] = useState(
       postParsed.announcement?.thumbnailUrl ?? ''
@@ -505,7 +513,7 @@ export const PostCard: React.FC<ICard> = React.memo(
           </SImageHolderOutside>
         </SImageBG>
         <SBottomContentOutside>
-          <SBottomStart hasEnded={Date.now() > timestampSeconds}>
+          <SBottomStart hasEnded={Date.now() > endsAtTime}>
             <SUserAvatarOutside
               avatarUrl={
                 postParsed?.creator?.avatarUrl
@@ -519,7 +527,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               }}
             />
             <SUsername variant={2}>
-              {Date.now() > timestampSeconds
+              {Date.now() > endsAtTime
                 ? postParsed.creator?.nickname &&
                   postParsed.creator?.nickname?.length > (isMobile ? 7 : 5)
                   ? `${postParsed.creator?.nickname?.substring(
@@ -542,7 +550,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 />
               )}
             </SUsername>
-            <CardTimer timestampSeconds={timestampSeconds} />
+            <CardTimer startsAt={startsAtTime} endsAt={endsAtTime} />
           </SBottomStart>
           <STextOutside variant={3} weight={600}>
             {postParsed.title}

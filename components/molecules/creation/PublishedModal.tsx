@@ -234,9 +234,11 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
                 : user.userData?.nickname}
             </SUserTitle>
             <SCaption variant={2} weight={700}>
-              {t('secondStep.card.left', {
-                time: formatExpiresAtNoStartsAt().fromNow(true),
-              })}
+              {post.startsAt.type === 'right-away'
+                ? t('secondStep.card.left', {
+                    time: formatExpiresAtNoStartsAt().fromNow(true),
+                  })
+                : t('secondStep.card.soon')}
             </SCaption>
           </SUserBlock>
           <SPostTitleText variant={3} weight={600}>
