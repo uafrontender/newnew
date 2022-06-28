@@ -208,7 +208,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           )}
           <STimerItem className='timerItem'>
             <div>{parsedSeconds.hours}</div>
-            <div>{t('expires.hours')}</div>
+            <TimeUnit>{t('expires.hours')}</TimeUnit>
             {parsedSeconds.days === '00' && isTooltipVisible && (
               <STutorialTooltipHolder>
                 <TutorialTooltip
@@ -228,14 +228,14 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           <div>:</div>
           <STimerItem className='timerItem'>
             <div>{parsedSeconds.minutes}</div>
-            <div>{t('expires.minutes')}</div>
+            <TimeUnit>{t('expires.minutes')}</TimeUnit>
           </STimerItem>
           {parsedSeconds.days === '00' && (
             <>
               <div>:</div>
               <STimerItem className='timerItem'>
                 <div>{parsedSeconds.seconds}</div>
-                <div>{t('expires.seconds')}</div>
+                <TimeUnit>{t('expires.seconds')}</TimeUnit>
               </STimerItem>
             </>
           )}
@@ -326,6 +326,10 @@ const STimerItem = styled.div`
     text-align: left;
     margin-left: 2px;
   }
+`;
+
+const TimeUnit = styled.div`
+  white-space: nowrap;
 `;
 
 const STimerItemEnded = styled.div`
