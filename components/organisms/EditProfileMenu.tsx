@@ -842,7 +842,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                         ? genderOptions.find(
                             (o) => o.value === dataInEdit.genderPronouns
                           )?.name!!
-                        : 'Gender'
+                        : t('editProfileMenu.inputs.genderPronouns.placeholder')
                     }
                     options={genderOptions}
                     selected={dataInEdit.genderPronouns}
