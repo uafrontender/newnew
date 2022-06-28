@@ -156,6 +156,7 @@ const SearchInput: React.FC = React.memo(() => {
       const payload = new newnewapi.QuickSearchRequest({
         query,
       });
+
       const res = await quickSearch(payload);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
@@ -282,7 +283,9 @@ const SearchInput: React.FC = React.memo(() => {
       </SContainer>
       {isMobileOrTablet && isResultsDropVisible && (
         <SResultsDropMobile>
-          {resultsPosts.length === 0 && resultsCreators.length === 0 ? (
+          {resultsPosts.length === 0 &&
+          resultsCreators.length === 0 &&
+          resultsHashtags.length === 0 ? (
             !isLoading ? (
               <SNoResults>
                 <NoResults closeDrop={handleCloseIconClick} />
