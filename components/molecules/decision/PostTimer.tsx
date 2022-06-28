@@ -209,7 +209,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           <STimerItem className='timerItem'>
             <div>{parsedSeconds.hours}</div>
             <TimeUnit>{t('expires.hours')}</TimeUnit>
-            {parsedSeconds.days === '00' && isTooltipVisible && (
+            {parsedSeconds.days === '0' && isTooltipVisible && (
               <STutorialTooltipHolder>
                 <TutorialTooltip
                   isTooltipVisible={isTooltipVisible}
