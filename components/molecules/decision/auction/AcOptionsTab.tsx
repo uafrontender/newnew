@@ -436,61 +436,60 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               {t('acPost.optionsTab.noOptions.caption_2')}
             </SNoOptionsCaption>
           </SNoOptionsYet>
-        ) : (
-          <SBidsContainer
-            ref={(el) => {
-              containerRef.current = el!!;
-            }}
-            heightDelta={heightDelta}
-          >
-            {!isMobile ? (
-              <>
-                <GradientMask
-                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                  positionTop
-                  active={showTopGradient}
-                />
-                <GradientMask
-                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                  positionBottom={gradientMaskBottomPosition}
-                  active={showBottomGradient}
-                />
-              </>
-            ) : null}
-            {options.map((option, i) => (
-              <AcOptionCard
-                key={option.id.toString()}
-                option={option as TAcOptionWithHighestField}
-                // shouldAnimate={optionToAnimate === option.id.toString()}
-                postId={postId}
-                postCreator={postCreator}
-                postDeadline={postDeadline}
-                postText={postText}
-                index={i}
-                minAmount={parseInt((appConstants.minAcBid / 100).toFixed(0))}
-                votingAllowed={postStatus === 'voting'}
-                optionBeingSupported={optionBeingSupported}
-                handleSetSupportedBid={(id: string) =>
-                  setOptionBeingSupported(id)
-                }
-                handleAddOrUpdateOptionFromResponse={
-                  handleAddOrUpdateOptionFromResponse
-                }
-                handleRemoveOption={() => handleRemoveOption(option)}
+        ) : null}
+        <SBidsContainer
+          ref={(el) => {
+            containerRef.current = el!!;
+          }}
+          heightDelta={heightDelta}
+        >
+          {!isMobile ? (
+            <>
+              <GradientMask
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+                positionTop
+                active={showTopGradient}
               />
-            ))}
-            {!isMobile ? (
-              <SLoaderDiv ref={loadingRef} />
-            ) : pagingToken ? (
-              <SLoadMoreBtn
-                view='secondary'
-                onClick={() => handleLoadBids(pagingToken)}
-              >
-                {t('loadMoreButton')}
-              </SLoadMoreBtn>
-            ) : null}
-          </SBidsContainer>
-        )}
+              <GradientMask
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+                positionBottom={gradientMaskBottomPosition}
+                active={showBottomGradient}
+              />
+            </>
+          ) : null}
+          {options.map((option, i) => (
+            <AcOptionCard
+              key={option.id.toString()}
+              option={option as TAcOptionWithHighestField}
+              // shouldAnimate={optionToAnimate === option.id.toString()}
+              postId={postId}
+              postCreator={postCreator}
+              postDeadline={postDeadline}
+              postText={postText}
+              index={i}
+              minAmount={parseInt((appConstants.minAcBid / 100).toFixed(0))}
+              votingAllowed={postStatus === 'voting'}
+              optionBeingSupported={optionBeingSupported}
+              handleSetSupportedBid={(id: string) =>
+                setOptionBeingSupported(id)
+              }
+              handleAddOrUpdateOptionFromResponse={
+                handleAddOrUpdateOptionFromResponse
+              }
+              handleRemoveOption={() => handleRemoveOption(option)}
+            />
+          ))}
+          {!isMobile ? (
+            <SLoaderDiv ref={loadingRef} />
+          ) : pagingToken ? (
+            <SLoadMoreBtn
+              view='secondary'
+              onClick={() => handleLoadBids(pagingToken)}
+            >
+              {t('loadMoreButton')}
+            </SLoadMoreBtn>
+          ) : null}
+        </SBidsContainer>
         {postStatus === 'voting' && (
           <SActionSection
             ref={(el) => {
