@@ -20,6 +20,7 @@ import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../molecules/decision/waiting/WaitingForResponseBox')
@@ -199,7 +200,9 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                       <span>{t('mcPostSuccess.inTotalVotes')}</span>
                     </STotal>
                   </SCreatorInfoDiv>
-                  <SPostTitle variant={4}>{post.title}</SPostTitle>
+                  <SPostTitle variant={4}>
+                    <PostTitleContent>{post.title}</PostTitleContent>
+                  </SPostTitle>
                   <SSeparator />
                   {winningOption && (
                     <>
