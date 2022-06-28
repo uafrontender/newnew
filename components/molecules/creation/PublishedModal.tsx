@@ -21,7 +21,7 @@ import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
 import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
-import getChunks from '../../../utils/getChunks/getChunks';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -240,24 +240,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             </SCaption>
           </SUserBlock>
           <SPostTitleText variant={3} weight={600}>
-            {getChunks(post?.title).map((chunk) => {
-              if (chunk.type === 'text') {
-                return chunk.text;
-              }
-
-              if (chunk.type === 'hashtag') {
-                return (
-                  <Hashtag
-                    href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
-                  >
-                    #{chunk.text}
-                  </Hashtag>
-                );
-              }
-
-              // TODO: Add assertNever
-              throw new Error('Unexpected chunk');
-            })}
+            <PostTitleContent>{post.title}</PostTitleContent>
           </SPostTitleText>
           <STitle variant={6}>
             {t(
@@ -416,11 +399,6 @@ const SPostTitleText = styled(Text)`
   width: 224px;
   margin-left: auto;
   margin-right: auto;
-`;
-
-const Hashtag = styled.a`
-  color: ${(props) => props.theme.colorsThemed.accent.blue};
-  font-weight: 600;
 `;
 
 const SCaption = styled(Caption)`

@@ -25,7 +25,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import getChunks from '../../../utils/getChunks/getChunks';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const AcSuccessOptionsTab = dynamic(
   () => import('../../molecules/decision/auction/success/AcSuccessOptionsTab')
@@ -205,24 +205,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                     )}
                   </SCreatorInfoDiv>
                   <SPostTitle variant={4}>
-                    {getChunks(post.title).map((chunk) => {
-                      if (chunk.type === 'text') {
-                        return chunk.text;
-                      }
-
-                      if (chunk.type === 'hashtag') {
-                        return (
-                          <Hashtag
-                            href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
-                          >
-                            #{chunk.text}
-                          </Hashtag>
-                        );
-                      }
-
-                      // TODO: Add assertNever
-                      throw new Error('Unexpected chunk');
-                    })}
+                    <PostTitleContent>{post.title}</PostTitleContent>
                   </SPostTitle>
                   <SSeparator />
                   {winningOption && (
@@ -518,11 +501,6 @@ const SPostTitle = styled(Headline)`
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
   }
-`;
-
-const Hashtag = styled.a`
-  color: ${(props) => props.theme.colorsThemed.accent.blue};
-  font-weight: 600;
 `;
 
 // Winning option info

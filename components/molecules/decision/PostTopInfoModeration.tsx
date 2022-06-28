@@ -28,7 +28,7 @@ import PostEllipseModalModeration from './PostEllipseModalModeration';
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import assets from '../../../constants/assets';
-import getChunks from '../../../utils/getChunks/getChunks';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -247,24 +247,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
             ) : null}
           </SActionsDiv>
           <SPostTitle variant={5}>
-            {getChunks(title).map((chunk) => {
-              if (chunk.type === 'text') {
-                return chunk.text;
-              }
-
-              if (chunk.type === 'hashtag') {
-                return (
-                  <Hashtag
-                    href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
-                  >
-                    #{chunk.text}
-                  </Hashtag>
-                );
-              }
-
-              // TODO: Add assertNever
-              throw new Error('Unexpected chunk');
-            })}
+            <PostTitleContent>{title}</PostTitleContent>
           </SPostTitle>
           {showWinnerOption ? (
             <SSelectWinnerOption>
@@ -380,11 +363,6 @@ const SWrapper = styled.div<{
 
 const SPostTitle = styled(Headline)`
   grid-area: title;
-`;
-
-const Hashtag = styled.a`
-  color: ${(props) => props.theme.colorsThemed.accent.blue};
-  font-weight: 600;
 `;
 
 // Action buttons

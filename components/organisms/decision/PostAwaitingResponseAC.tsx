@@ -15,7 +15,7 @@ import secondsToDHMS from '../../../utils/secondsToDHMS';
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import getChunks from '../../../utils/getChunks/getChunks';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../molecules/decision/waiting/WaitingForResponseBox')
@@ -161,24 +161,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
                 )}
               </SCreatorInfoDiv>
               <SPostTitle variant={4}>
-                {getChunks(post.title).map((chunk) => {
-                  if (chunk.type === 'text') {
-                    return chunk.text;
-                  }
-
-                  if (chunk.type === 'hashtag') {
-                    return (
-                      <Hashtag
-                        href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
-                      >
-                        #{chunk.text}
-                      </Hashtag>
-                    );
-                  }
-
-                  // TODO: Add assertNever
-                  throw new Error('Unexpected chunk');
-                })}
+                <PostTitleContent>{post.title}</PostTitleContent>
               </SPostTitle>
               <SSeparator />
               <AcWaitingOptionsSection
@@ -376,11 +359,6 @@ const SPostTitle = styled(Headline)`
   ${({ theme }) => theme.media.laptop} {
     max-height: 120px;
   }
-`;
-
-const Hashtag = styled.a`
-  color: ${(props) => props.theme.colorsThemed.accent.blue};
-  font-weight: 600;
 `;
 
 // Comments

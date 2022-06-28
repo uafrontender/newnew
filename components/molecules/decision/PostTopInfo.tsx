@@ -32,7 +32,7 @@ import { FollowingsContext } from '../../../contexts/followingContext';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
-import getChunks from '../../../utils/getChunks/getChunks';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -307,24 +307,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         </SActionsDiv>
         <SPostTitle>
           <Headline variant={5}>
-            {getChunks(title).map((chunk) => {
-              if (chunk.type === 'text') {
-                return chunk.text;
-              }
-
-              if (chunk.type === 'hashtag') {
-                return (
-                  <Hashtag
-                    href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
-                  >
-                    #{chunk.text}
-                  </Hashtag>
-                );
-              }
-
-              // TODO: Add assertNever
-              throw new Error('Unexpected chunk');
-            })}
+            <PostTitleContent>{title}</PostTitleContent>
           </Headline>
         </SPostTitle>
         {showSelectingWinnerOption ? (
@@ -438,11 +421,6 @@ const SPostTitle = styled.div`
   ${({ theme }) => theme.media.laptop} {
     min-height: 64px;
   }
-`;
-
-const Hashtag = styled.a`
-  color: ${(props) => props.theme.colorsThemed.accent.blue};
-  font-weight: 600;
 `;
 
 // Creator card
