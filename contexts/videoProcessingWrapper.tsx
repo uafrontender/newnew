@@ -63,7 +63,7 @@ const VideoProcessingWrapper: React.FunctionComponent<IVideoProcessingWrapper> =
           decoded.postUuid &&
           decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
         ) {
-          toast.error('An error occured when processing your video', {
+          toast.error('An error occurred when processing your video', {
             onClick: () => {
               router.push(`/post/${decoded.postUuid}`);
             },
