@@ -87,7 +87,8 @@ export async function fetchProtobuf<
   payload?: RequestType,
   headers: any = {},
   mode: Request['mode'] = 'cors',
-  credentials: Request['credentials'] = 'same-origin'
+  credentials: Request['credentials'] = 'same-origin',
+  signal: RequestInit['signal'] = undefined,
 ): Promise<APIResponse<ResponseType>> {
   const encoded = payload ? reqT.encode(payload).finish() : undefined;
 
@@ -101,6 +102,7 @@ export async function fetchProtobuf<
       mode,
       credentials,
       ...(encoded ? { body: encoded } : {}),
+      ...(signal ? { signal } : {}),
     })
       .then((response) => handleProtobufResponse(response))
       .catch((err) => {
@@ -162,6 +164,7 @@ export async function fetchProtobufProtectedIntercepted<
   url: string,
   method: Request['method'],
   payload?: RequestType,
+  signal?: RequestInit['signal'],
   serverSideTokens?: {
     accessToken: string;
     refreshToken: string;
@@ -189,7 +192,10 @@ export async function fetchProtobufProtectedIntercepted<
       payload,
       {
         'x-auth-token': accessToken,
-      }
+      },
+      'cors',
+      'same-origin',
+      signal ?? undefined,
     );
 
     // Throw an error if the access token was invalid
@@ -237,9 +243,8 @@ export async function fetchProtobufProtectedIntercepted<
               path: '/',
             }
           );
-        } else {
+        } else if (resRefresh.data.credential?.expiresAt?.seconds) {
           // Server-side
-          if (resRefresh.data.credential?.expiresAt?.seconds)
             updateCookieServerSideCallback?.([
               {
                 name: 'accessToken',
