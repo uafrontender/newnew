@@ -24,6 +24,10 @@
       "earned": "上次賺的",
       "earnedToday": "今天賺的",
       "earnedYesterday": "昨天賺的",
+      "units": {
+        "days": "天",
+        "months": "個月"
+      },
       "insights": "深入瞭解",
       "insightsTablet": "轉至深入瞭解",
       "cashOut": {

@@ -24,6 +24,10 @@
       "earned": "earned in last",
       "earnedToday": "earned today",
       "earnedYesterday": "earned yesterday",
+      "units": {
+        "days_NEED_TRANSLATION": "days",
+        "months_NEED_TRANSLATION": "months"
+      },
       "insights": "Insights",
       "insightsTablet": "Go to insights",
       "cashOut": {

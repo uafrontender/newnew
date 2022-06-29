@@ -165,7 +165,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
       const res = await validateText(payload);
 
-      if (!res.data?.status) throw new Error('An error occured');
+      if (!res.data?.status) throw new Error('An error occurred');
 
       if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
         setNewOptionTextValid(false);

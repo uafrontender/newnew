@@ -171,7 +171,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
       const res = await validateText(payload);
 
-      if (!res.data?.status) throw new Error('An error occured');
+      if (!res.data?.status) throw new Error('An error occurred');
 
       if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
         setNewBidTextValid(false);

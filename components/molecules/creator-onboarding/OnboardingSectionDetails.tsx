@@ -199,7 +199,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
 
           const res = await validateUsernameTextField(payload);
 
-          if (!res.data?.status) throw new Error('An error occured');
+          if (!res.data?.status) throw new Error('An error occurred');
           if (
             res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK
           ) {
@@ -248,7 +248,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
 
           const res = await validateText(payload);
 
-          if (!res.data?.status) throw new Error('An error occured');
+          if (!res.data?.status) throw new Error('An error occurred');
 
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
             setNicknameError(errorSwitch(res.data?.status));
@@ -853,7 +853,13 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
               value={dateInEdit}
               maxDate={maxDate}
               locale={router.locale}
-              disabled={user?.userData?.dateOfBirth ? Object.values(user?.userData?.dateOfBirth).every((dateOfBirthEl) => !!dateOfBirthEl) : false}
+              disabled={
+                user?.userData?.dateOfBirth
+                  ? Object.values(user?.userData?.dateOfBirth).every(
+                      (dateOfBirthEl) => !!dateOfBirthEl
+                    )
+                  : false
+              }
               isValid={dateError === ''}
               labelCaption={t('detailsSection.form.dateOfBirth.label')}
               bottomCaption={t(

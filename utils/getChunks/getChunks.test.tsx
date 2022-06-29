@@ -86,19 +86,6 @@ describe('parses hashtags', () => {
     expect(chunks[2].text).toBe('another_hashtag');
   });
 
-  it('merged', () => {
-    const input = '#hashtag#anotherhashtag';
-    const chunks = getChunks(input);
-
-    expect(chunks.length).toBe(2);
-
-    expect(chunks[0].type).toBe('hashtag');
-    expect(chunks[0].text).toBe('hashtag');
-
-    expect(chunks[1].type).toBe('text');
-    expect(chunks[1].text).toBe('#anotherhashtag');
-  });
-
   it('keeps spaces', () => {
     const input = '  #hashtag  ';
     const chunks = getChunks(input);
@@ -113,6 +100,28 @@ describe('parses hashtags', () => {
 
     expect(chunks[2].type).toBe('text');
     expect(chunks[2].text).toBe('  ');
+  });
+});
+
+describe('dont parses hashtags', () => {
+  it('with hash', () => {
+    const input = '#hello#world';
+    const chunks = getChunks(input);
+
+    expect(chunks.length).toBe(1);
+
+    expect(chunks[0].type).toBe('text');
+    expect(chunks[0].text).toBe('#hello#world');
+  });
+
+  it('with exclamation mark', () => {
+    const input = '#hello!there';
+    const chunks = getChunks(input);
+
+    expect(chunks.length).toBe(1);
+
+    expect(chunks[0].type).toBe('text');
+    expect(chunks[0].text).toBe('#hello!there');
   });
 });
 
