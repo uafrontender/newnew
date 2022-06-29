@@ -25,12 +25,11 @@
       "earnedToday": "ganados hoy",
       "earnedYesterday": "ganados ayer",
       "units": {
-        "days_NEED_TRANSLATION": "days",
-        "months_NEED_TRANSLATION": "months"
+        "days": "días",
+        "months": "meses"
       },
       "insights": "Estadísticas",
       "insightsTablet": "Ir a estadísticas",
-
       "cashOut": {
         "amount": "Tu próximo pago de",
         "date": "se enviará automáticamente el {{date}}.",

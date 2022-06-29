@@ -340,9 +340,9 @@
         "biddersBidAmount": "bidders bid",
         "bidderBidAmount": "bidder bid",
         "on": "on",
-        "suggestedByMe": "my",
-        "suggestedByUser": "{{username}}'s",
-        "bidTo": "bid to"
+        "suggestedByMe": "my bid",
+        "suggestedByUser": "{{username}}'s bid",
+        "to": "to"
       }
     },
     "floatingActionButton": {
@@ -742,6 +742,5 @@
         "text": "Contribute to help the creator reach their Goal!"
       }
     }
-  },
-  "seeMore": ""
+  }
 }

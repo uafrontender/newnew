@@ -340,9 +340,9 @@
         "biddersBidAmount": "出價人出價",
         "bidderBidAmount": "出價人出價",
         "on": "對",
-        "suggestedByMe": "我的",
-        "suggestedByUser": "{{username}}的",
-        "bidTo": "出價目標"
+        "suggestedByMe": "我的出價",
+        "suggestedByUser": "{{username}}的出價",
+        "to": "目標"
       }
     },
     "floatingActionButton": {
@@ -742,6 +742,5 @@
         "text": "捐款幫助創作者完成他們的Goal！"
       }
     }
-  },
-  "seeMore": ""
+  }
 }

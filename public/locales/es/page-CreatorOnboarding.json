@@ -19,7 +19,7 @@
       "firstName": {
         "placeholder": "Nombre",
         "errors": {
-          "generic": "Por favor, comprueba lo que introduciste",
+          "generic": "Por favor, comprueba lo que introdujiste",
           "tooLong": "El nombre es demasiado largo",
           "tooShort": "El nombre es demasiado corto",
           "invalidChar": "El nombre contiene caracteres inválidios",
@@ -30,7 +30,7 @@
       "lastName": {
         "placeholder": "Apellido",
         "errors": {
-          "generic": "Por favor, comprueba lo que introduciste",
+          "generic": "Por favor, comprueba lo que introdujiste",
           "tooLong": "El nombre es demasiado largo",
           "tooShort": "El nombre es demasiado corto",
           "invalidChar": "El nombre contiene caracteres inválidios",
@@ -42,7 +42,7 @@
         "placeholder": "Usuario",
         "frequencyCaption": "El usuario puede ser cambiado una vez al mes.",
         "errors": {
-          "generic": "Por favor, comprueba lo que introduciste",
+          "generic": "Por favor, comprueba lo que introdujiste",
           "tooLong": "El usuario es demasiado largo",
           "tooShort": "El usuario es demasiado corto",
           "invalidChar": "El usuario contiene caracteres inválidios",
@@ -59,7 +59,7 @@
       "nickname": {
         "placeholder": "Nombre para mostrar",
         "errors": {
-          "generic": "Por favor, comprueba lo que introduciste",
+          "generic": "Por favor, comprueba lo que introdujiste",
           "tooLong": "El nombre es demasiado largo",
           "tooShort": "El nombre es demasiado corto",
           "invalidChar": "El nombre contiene caracteres inválidios",
@@ -123,7 +123,7 @@
       "title": "Bio",
       "placeholder": "Cuéntanos un poco sobre ti...",
       "errors": {
-        "generic": "Por favor, comprueba lo que introduciste",
+        "generic": "Por favor, comprueba lo que introdujiste",
         "tooLong": "Tu biografía es muy larga",
         "tooShort": "Tu biografía es muy corta",
         "inappropriate": "Las palabras ofensivas están prohibidas",

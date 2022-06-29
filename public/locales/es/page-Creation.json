@@ -62,7 +62,7 @@
     },
     "card": {
       "left": "Quedan {{time}}",
-      "soon_NEED_TRANSLATION": "Coming Soon"
+      "soon": "Próximamente"
     },
     "button": {
       "retry": "Reintentar",
