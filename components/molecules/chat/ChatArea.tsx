@@ -850,7 +850,7 @@ const SMessageContent = styled.div<ISMessageContent>`
           border-radius: 16px 16px 8px 16px;
 
           ${props.theme.media.tablet} {
-            border-radius: 16px 16px 16px 8px;
+            border-radius: 16px;
           }
         `;
       }
@@ -863,7 +863,7 @@ const SMessageContent = styled.div<ISMessageContent>`
         }
 
         return css`
-          border-radius: 16px 16px 8px 16px;
+          border-radius: 16px 8px 16px 16px;
 
           ${props.theme.media.tablet} {
             border-radius: 16px 16px 16px 8px;
@@ -892,6 +892,10 @@ const SMessageContent = styled.div<ISMessageContent>`
         return css`
           margin-top: 8px;
           border-radius: 16px 16px 16px 8px;
+
+          ${props.theme.media.tablet} {
+            border-radius: 16px;
+          }
         `;
       }
 
@@ -904,6 +908,10 @@ const SMessageContent = styled.div<ISMessageContent>`
 
         return css`
           border-radius: 8px 16px 16px 16px;
+
+          ${props.theme.media.tablet} {
+            border-radius: 16px 16px 16px 8px;
+          }
         `;
       }
       return css`
