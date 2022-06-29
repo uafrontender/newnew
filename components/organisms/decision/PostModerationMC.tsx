@@ -13,6 +13,7 @@ import React, {
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -85,6 +86,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+    const router = useRouter();
 
     // Socket
     const socketConnection = useContext(SocketContext);
@@ -152,7 +154,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             postId: post.postUuid,
           },
           'Post',
-          `/post/${post.postUuid}#${tab}`
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#${tab}`
         );
       } else {
         window.history.replaceState(
@@ -160,7 +164,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             postId: post.postUuid,
           },
           'Post',
-          `/post/${post.postUuid}#${tab}`
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#${tab}`
         );
       }
       window.dispatchEvent(new HashChangeEvent('hashchange'));

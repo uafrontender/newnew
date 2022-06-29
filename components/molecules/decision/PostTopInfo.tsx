@@ -218,12 +218,20 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           </SBidsAmount>
         ) : null}
         <CreatorCard>
-          <a href={`/${creator.username}`}>
+          <a
+            href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
+              creator.username
+            }`}
+          >
             <SAvatarArea>
               <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
             </SAvatarArea>
           </a>
-          <a href={`/${creator.username}`}>
+          <a
+            href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
+              creator.username
+            }`}
+          >
             <SUsername className='username'>
               {creator.nickname ?? `@${creator.username}`}{' '}
               {creator.options?.isVerified && (
