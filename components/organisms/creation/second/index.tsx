@@ -166,7 +166,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
 
           const res = await validateText(payload);
 
-          if (!res?.data?.status) throw new Error('An error occured');
+          if (!res?.data?.status) throw new Error('An error occurred');
 
           switch (res.data.status) {
             case newnewapi.ValidateTextResponse.Status.TOO_SHORT:
@@ -827,13 +827,13 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
               dispatch(setCreationFileProcessingLoading(false));
             } else {
               dispatch(setCreationFileUploadError(true));
-              toast.error('An error occured');
+              toast.error('An error occurred');
             }
           } else if (
             decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
           ) {
             dispatch(setCreationFileUploadError(true));
-            toast.error('An error occured');
+            toast.error('An error occurred');
           }
         }
       },
@@ -852,7 +852,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
           dispatch(setCreationFileProcessingLoading(false));
         } else {
           dispatch(setCreationFileUploadError(true));
-          toast.error('An error occured');
+          toast.error('An error occurred');
         }
       }
 
