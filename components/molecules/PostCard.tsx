@@ -526,7 +526,13 @@ export const PostCard: React.FC<ICard> = React.memo(
                 handleUserClick(postParsed.creator?.username!!);
               }}
             />
-            <SUsername variant={2}>
+            <SUsername
+              variant={2}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleUserClick(postParsed.creator?.username!!);
+              }}
+            >
               {Date.now() > endsAtTime
                 ? postParsed.creator?.nickname &&
                   postParsed.creator?.nickname?.length > (isMobile ? 7 : 5)

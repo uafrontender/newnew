@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -38,6 +39,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
     const dispatch = useAppDispatch();
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isTablet = ['tablet'].includes(resizeMode);
+    const router = useRouter();
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
@@ -107,12 +109,22 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
     // Replace hash once scrolled to comments
     useEffect(() => {
       if (inView) {
-        syncedHistoryReplaceState({}, `/post/${post.postUuid}#comments`);
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#comments`
+        );
       } else {
-        syncedHistoryReplaceState({}, `/post/${post.postUuid}`);
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }`
+        );
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid]);
+    }, [inView, post.postUuid, router.locale]);
 
     return (
       <>

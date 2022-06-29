@@ -10,6 +10,7 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -53,6 +54,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+    const router = useRouter();
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
@@ -128,12 +130,22 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
     // Replace hash once scrolled to comments
     useEffect(() => {
       if (inView) {
-        syncedHistoryReplaceState({}, `/post/${post.postUuid}#comments`);
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#comments`
+        );
       } else {
-        syncedHistoryReplaceState({}, `/post/${post.postUuid}`);
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }`
+        );
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid]);
+    }, [inView, post.postUuid, router.locale]);
 
     // Load winning option
     useEffect(() => {
