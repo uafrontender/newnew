@@ -56,7 +56,7 @@ const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
     if (response.status >= 401 && response.status < 404) {
       reject(new Error('Access token invalid'));
     }
-    reject(new Error('An error occured'));
+    reject(new Error('An error occurred'));
   });
 };
 

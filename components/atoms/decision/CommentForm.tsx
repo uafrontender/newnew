@@ -90,7 +90,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
 
         const res = await validateText(payload);
 
-        if (!res.data?.status) throw new Error('An error occured');
+        if (!res.data?.status) throw new Error('An error occurred');
 
         if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
           setCommentTextError(errorSwitch(res.data?.status));
