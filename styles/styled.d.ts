@@ -119,6 +119,7 @@ declare module 'styled-components' {
           transparent: string;
           changeLanguage: string;
           danger: string;
+          alternative: string;
         };
         background: {
           primary: string;

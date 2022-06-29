@@ -210,6 +210,20 @@
           }
         }
       },
+      "cards": {
+        "title": "My cards",
+        "myPaymentMethods": "My payment methods",
+        "saveUpCards": "Save up to {{ numbersOfCards }} cards",
+        "button": {
+          "addPaymentMethod": "Add your payment method",
+          "addCard": "Add card"
+        },
+        "primary": "Primary",
+        "ellipse": {
+          "makePrimary": "Make it primary",
+          "removeCard": "Remove card"
+        }
+      },
       "personalInformation": {
         "title": "Personal information",
         "emailInput": {

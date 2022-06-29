@@ -210,6 +210,20 @@
           }
         }
       },
+      "cards": {
+        "title_NEED_TRANSLATION": "My cards",
+        "myPaymentMethods_NEED_TRANSLATION": "My payment methods",
+        "saveUpCards_NEED_TRANSLATION": "Save up to {{ numbersOfCards }} cards",
+        "button": {
+          "addPaymentMethod_NEED_TRANSLATION": "Add your payment method",
+          "addCard_NEED_TRANSLATION": "Add card"
+        },
+        "primary_NEED_TRANSLATION": "Primary",
+        "ellipse": {
+          "makePrimary_NEED_TRANSLATION": "Make it primary",
+          "removeCard_NEED_TRANSLATION": "Remove card"
+        }
+      },
       "personalInformation": {
         "title": "個人資訊",
         "emailInput": {

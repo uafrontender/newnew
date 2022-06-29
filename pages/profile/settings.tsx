@@ -47,6 +47,7 @@ import SettingsAccordion, {
 } from '../../components/organisms/settings/SettingsAccordion';
 import SettingsPersonalInformationSection from '../../components/organisms/settings/SettingsPersonalInformationSection';
 import SettingsNotificationsSection from '../../components/organisms/settings/SettingsNotificationSection';
+import SettingsCardsSection from '../../components/organisms/settings/SettingsCards';
 import TransactionsSection from '../../components/organisms/settings/TransactionsSection';
 import PrivacySection from '../../components/organisms/settings/PrivacySection';
 import { SocketContext } from '../../contexts/socketContext';
@@ -202,6 +203,10 @@ const MyProfileSettingsIndex = () => {
   }, []);
 
   const accordionSections: AccordionSection[] = [
+    {
+      title: t('Settings.sections.cards.title'),
+      content: <SettingsCardsSection />,
+    },
     {
       title: t('Settings.sections.personalInformation.title'),
       content: (
@@ -410,7 +415,7 @@ const MyProfileSettingsIndex = () => {
 
 export default MyProfileSettingsIndex;
 
-const SMain = styled.main`
+const SMain = styled.div`
   position: relative;
 
   padding: 0px 16px;

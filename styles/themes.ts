@@ -363,6 +363,7 @@ export const darkTheme: DefaultTheme = {
         transparent: '#FFFFFF',
         changeLanguage: '#FFFFFF',
         danger: '#FFFFFF',
+        alternative: '#2C2C33',
       },
       background: {
         primary: '#1D6AFF',
