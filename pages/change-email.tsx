@@ -43,7 +43,7 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
         const res = await setMyEmail(requestPayload);
 
         if (!res!! || res!!.error || !res.data)
-          throw new Error(res!!.error?.message ?? 'An error occured');
+          throw new Error(res!!.error?.message ?? 'An error occurred');
 
         const { data } = res!!;
 
@@ -106,7 +106,7 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
                 top: 'calc(50% + 48px)',
               }}
             >
-              An error occured
+              An error occurred
             </div>
           ) : null}
         </div>
