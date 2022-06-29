@@ -14,6 +14,7 @@ import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -85,6 +86,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+    const router = useRouter();
 
     const showSelectWinnerOption = useMemo(
       () => postStatus === 'waiting_for_decision',
@@ -162,7 +164,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             postId: post.postUuid,
           },
           'Post',
-          `/post/${post.postUuid}#${tab}`
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#${tab}`
         );
       } else {
         window.history.replaceState(
@@ -170,7 +174,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             postId: post.postUuid,
           },
           'Post',
-          `/post/${post.postUuid}#${tab}`
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#${tab}`
         );
       }
       window.dispatchEvent(new HashChangeEvent('hashchange'));
