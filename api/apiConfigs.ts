@@ -3,6 +3,8 @@ import { newnewapi } from 'newnew-api';
 import * as $protobuf from 'protobufjs';
 import { Cookies } from 'react-cookie';
 
+const logsOn = process.env.NEXT_PUBLIC_PROTOBUF_LOGS === 'true'
+
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 // Initialize global Cookies instance available throughout the whole app
@@ -109,10 +111,52 @@ export async function fetchProtobuf<
         throw err;
       });
 
+    const data = resT.decode(new Uint8Array(buff));
+
+    if (logsOn) {
+      // @ts-ignore
+      console.groupCollapsed(`Success: ${reqT?.name} -> ${resT?.name}`);
+      console.debug(`
+      %c Payload Type: %c ${
+        // @ts-ignore
+        reqT?.name
+      }
+      %c Payload: %c ${JSON.stringify(payload, null, 2)}
+      `, 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;', 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;')
+      console.debug(`
+      %c Response Type: %c ${
+        // @ts-ignore
+        resT?.name
+      }
+      %c Response: %c ${JSON.stringify(data, null, 2)}
+      `, 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;', 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;')
+      console.groupEnd()
+    }
+
     return {
-      data: resT.decode(new Uint8Array(buff)),
+      data,
     };
   } catch (err) {
+    if (logsOn) {
+      // @ts-ignore
+      console.groupCollapsed(`Error: ${reqT?.name} -> ${resT?.name}`);
+      console.debug(`
+      %c Payload Type: %c ${
+        // @ts-ignore
+        reqT?.name
+      }
+      %c Payload: %c ${JSON.stringify(payload, null, 2)}
+      `, 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;', 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;')
+      console.debug(`
+      %c Response Type: %c ${
+        // @ts-ignore
+        resT?.name
+      }
+      %c Error: %c ${err}
+      `, 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;', 'font-size: 14px; color: red;', 'font-size: 12px; color: black;')
+      console.groupEnd()
+    }
+
     return {
       error: err as Error,
     };
