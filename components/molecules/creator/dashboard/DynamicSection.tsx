@@ -188,6 +188,8 @@ export const DynamicSection = () => {
         animation={animation as TAnimation}
         onAnimationEnd={handleAnimationEnd}
         animateWhenInView={false}
+        delay={0}
+        duration={0.2}
       >
         <SAnimatedContainer ref={containerRef}>
           {tab === 'direct-messages' ? (
