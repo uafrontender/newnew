@@ -373,13 +373,15 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         {
           postId: newPostParsed.postUuid,
         },
-        `/post/${newPostParsed.postUuid}`
+        `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+          newPostParsed.postUuid
+        }`
       );
       setRecommendedPosts([]);
       setNextPageToken('');
       setTriedLoading(false);
     },
-    [post, handleOpenAnotherPost, syncedHistoryPushState]
+    [handleOpenAnotherPost, post, syncedHistoryPushState, router.locale]
   );
 
   const loadRecommendedPosts = useCallback(
@@ -686,14 +688,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           {
             postId: postParsed.postUuid,
           },
-          `/post/${postParsed.postUuid}${additionalHash ?? ''}`
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            postParsed.postUuid
+          }${additionalHash ?? ''}`
         );
       } else {
         syncedHistoryReplaceState(
           {
             postId: postParsed.postUuid,
           },
-          `/post/${postParsed.postUuid}${additionalHash ?? ''}`
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            postParsed.postUuid
+          }${additionalHash ?? ''}`
         );
       }
 
@@ -711,7 +717,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [router.locale]);
 
   useEffect(() => {
     async function fetchIsFavorited() {
@@ -748,7 +754,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           {
             postId: state.postId,
           },
-          `/post/${state.postId}`
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            state.postId
+          }`
         );
         return false;
       }
@@ -762,7 +770,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [router.locale]);
 
   // Close modal on back btn
   useEffect(() => {
