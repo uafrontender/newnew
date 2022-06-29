@@ -154,7 +154,7 @@
       "submit": "Hecho",
       "requestSetupLink": "Conectar con Stripe",
       "stripeConnectedLink": "¡Stripe conectado!",
-      "stripeConnecting_NEED_TRANSLATION": "Connecting..."
+      "stripeConnecting": "Conectando..."
     }
   },
   "subRateSection": {
