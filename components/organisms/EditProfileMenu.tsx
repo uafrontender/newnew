@@ -184,7 +184,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
         const res = await validateUsernameTextField(payload);
 
-        if (!res.data?.status) throw new Error('An error occured');
+        if (!res.data?.status) throw new Error('An error occurred');
         if (res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK) {
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
@@ -239,7 +239,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
         const res = await validateText(payload);
 
-        if (!res.data?.status) throw new Error('An error occured');
+        if (!res.data?.status) throw new Error('An error occurred');
 
         if (kind === newnewapi.ValidateTextRequest.Kind.USER_NICKNAME) {
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
@@ -441,7 +441,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         const res = await getImageUploadUrl(imageUrlPayload);
 
         if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'An error occured');
+          throw new Error(res.error?.message ?? 'An error occurred');
 
         const uploadResponse = await fetch(res.data.uploadUrl, {
           method: 'PUT',
@@ -621,7 +621,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       const res = await getImageUploadUrl(imageUrlPayload);
 
       if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'An error occured');
+        throw new Error(res.error?.message ?? 'An error occurred');
 
       const uploadResponse = await fetch(res.data.uploadUrl, {
         method: 'PUT',
@@ -842,7 +842,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                         ? genderOptions.find(
                             (o) => o.value === dataInEdit.genderPronouns
                           )?.name!!
-                        : 'Gender'
+                        : t('editProfileMenu.inputs.genderPronouns.placeholder')
                     }
                     options={genderOptions}
                     selected={dataInEdit.genderPronouns}

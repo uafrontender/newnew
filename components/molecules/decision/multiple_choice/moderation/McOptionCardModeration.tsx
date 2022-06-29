@@ -41,10 +41,18 @@ interface IMcOptionCardModeration {
   index: number;
   canBeDeleted: boolean;
   isCreatorsBid: boolean;
+  handleRemoveOption?: () => void;
 }
 
 const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
-  ({ option, creator, index, canBeDeleted, isCreatorsBid }) => {
+  ({
+    option,
+    creator,
+    index,
+    canBeDeleted,
+    isCreatorsBid,
+    handleRemoveOption,
+  }) => {
     const theme = useTheme();
     const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
@@ -76,7 +84,8 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
         console.log(res);
 
         if (!res.error) {
-          console.log('deleted');
+          setIsDeleteModalOpen(false);
+          handleRemoveOption?.();
         }
       } catch (err) {
         console.error(err);

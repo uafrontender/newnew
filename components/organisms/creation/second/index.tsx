@@ -19,7 +19,7 @@ import styled, { useTheme } from 'styled-components';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
-import TextArea from '../../../atoms/creation/TextArea';
+import RichTextArea from '../../../atoms/creation/RichTextArea';
 import FileUpload from '../../../molecules/creation/FileUpload';
 import Tabs, { Tab } from '../../../molecules/Tabs';
 import TabletStartDate from '../../../molecules/creation/TabletStartDate';
@@ -166,7 +166,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
 
           const res = await validateText(payload);
 
-          if (!res?.data?.status) throw new Error('An error occured');
+          if (!res?.data?.status) throw new Error('An error occurred');
 
           switch (res.data.status) {
             case newnewapi.ValidateTextResponse.Status.TOO_SHORT:
@@ -575,7 +575,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
           <SItemWrapper>
             {/* TODO: move to locales */}
             <SInputLabel htmlFor='title'>Title</SInputLabel>
-            <TextArea
+            <RichTextArea
               id='title'
               value={post?.title}
               error={titleError}
@@ -827,13 +827,13 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
               dispatch(setCreationFileProcessingLoading(false));
             } else {
               dispatch(setCreationFileUploadError(true));
-              toast.error('An error occured');
+              toast.error('An error occurred');
             }
           } else if (
             decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
           ) {
             dispatch(setCreationFileUploadError(true));
-            toast.error('An error occured');
+            toast.error('An error occurred');
           }
         }
       },
@@ -852,7 +852,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
           dispatch(setCreationFileProcessingLoading(false));
         } else {
           dispatch(setCreationFileUploadError(true));
-          toast.error('An error occured');
+          toast.error('An error occurred');
         }
       }
 

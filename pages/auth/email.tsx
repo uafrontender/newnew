@@ -54,7 +54,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
         const res = await signInWithEmail(requestPayload);
 
         if (!res!! || res!!.error || !res.data)
-          throw new Error(res!!.error?.message ?? 'An error occured');
+          throw new Error(res!!.error?.message ?? 'An error occurred');
 
         const { data } = res!!;
 
@@ -152,7 +152,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
                 top: 'calc(50% + 48px)',
               }}
             >
-              An error occured
+              An error occurred
             </div>
           ) : null}
         </div>

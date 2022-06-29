@@ -19,9 +19,16 @@ import dateToTimestamp from '../../../../utils/dateToTimestamp';
 import { getMyRooms } from '../../../../api/endpoints/chat';
 import Lottie from '../../../atoms/Lottie';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
+import { useAppSelector } from '../../../../redux-store/store';
+import { useGetChats } from '../../../../contexts/chatContext';
 
 export const SubscriptionStats = () => {
   const { t } = useTranslation('page-Creator');
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const { setMobileChatOpened } = useGetChats();
   const [filter, setFilter] = useState('7_days');
   const [mySubscribersIsLoading, setMySubscribersIsLoading] =
     useState<boolean | null>(null);
@@ -135,35 +142,7 @@ export const SubscriptionStats = () => {
     ],
     [t]
   );
-  // const renderListItem = useCallback(
-  //   (item) => (
-  //     <SListItem key={`list-item-subscriptionStats-${item.id}`}>
-  //       <SListItemTitle variant={2} weight={700}>
-  //         {t(`dashboard.subscriptionStats.list.${item.id}`)}
-  //       </SListItemTitle>
-  //       <SListItemCenterBlock>
-  //         <SListItemValue variant={6}>{item.value}</SListItemValue>
-  //         <SListItemDirection>
-  //           <InlineSVG
-  //             svg={item.direction === 'up' ? arrowUpIcon : arrowDownIcon}
-  //             fill={item.direction === 'up' ? theme.colorsThemed.accent.success : theme.colorsThemed.accent.error}
-  //             width="16px"
-  //             height="16px"
-  //           />
-  //           <SListItemDirectionValue weight={600} variant={3} direction={item.direction}>
-  //             {item.score}
-  //           </SListItemDirectionValue>
-  //         </SListItemDirection>
-  //       </SListItemCenterBlock>
-  //       {!isMobile && (
-  //         <SListItemBottomDescription variant={3} weight={600}>
-  //           {t('dashboard.subscriptionStats.prevWeek')}
-  //         </SListItemBottomDescription>
-  //       )}
-  //     </SListItem>
-  //   ),
-  //   [t, isMobile, theme.colorsThemed.accent.error, theme.colorsThemed.accent.success]
-  // );
+
   const renderSubscriber = useCallback(
     (item: newnewapi.ISubscriber, index: number) => {
       if (index < 6) {
@@ -245,15 +224,24 @@ export const SubscriptionStats = () => {
               {t('dashboard.subscriptionStats.banner.description')}
             </SDescription>
           </SBannerTopBlock>
-          <Link
-            href={`/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoomId}`}
-          >
-            <a>
-              <SButton view='primaryGrad'>
-                {t('dashboard.subscriptionStats.banner.submit')}
-              </SButton>
-            </a>
-          </Link>
+          {!isMobile ? (
+            <Link
+              href={`/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoomId}`}
+            >
+              <a>
+                <SButton view='primaryGrad'>
+                  {t('dashboard.subscriptionStats.banner.submit')}
+                </SButton>
+              </a>
+            </Link>
+          ) : (
+            <SButton
+              view='primaryGrad'
+              onClick={() => setMobileChatOpened(true)}
+            >
+              {t('dashboard.subscriptionStats.banner.submit')}
+            </SButton>
+          )}
         </SBannerContainer>
       )}
     </SContainer>

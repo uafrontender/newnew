@@ -28,6 +28,7 @@ import PostEllipseModalModeration from './PostEllipseModalModeration';
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import assets from '../../../constants/assets';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -245,7 +246,9 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
               />
             ) : null}
           </SActionsDiv>
-          <SPostTitle variant={5}>{title}</SPostTitle>
+          <SPostTitle variant={5}>
+            <PostTitleContent>{title}</PostTitleContent>
+          </SPostTitle>
           {showWinnerOption ? (
             <SSelectWinnerOption>
               <SHeadline variant={4}>

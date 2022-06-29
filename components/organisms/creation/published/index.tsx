@@ -21,6 +21,7 @@ import tiktokIcon from '../../../../public/images/svg/icons/socials/TikTok.svg';
 import twitterIcon from '../../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -225,13 +226,15 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
               : user.userData?.nickname}
           </SUserTitle>
           <SCaption variant={2} weight={700}>
-            {t('secondStep.card.left', {
-              time: formatExpiresAtNoStartsAt().fromNow(true),
-            })}
+            {post.startsAt.type === 'right-away'
+              ? t('secondStep.card.left', {
+                  time: formatExpiresAtNoStartsAt().fromNow(true),
+                })
+              : t('secondStep.card.soon')}
           </SCaption>
         </SUserBlock>
         <SPostTitleText variant={3} weight={600}>
-          {post?.title}
+          <PostTitleContent>{post.title}</PostTitleContent>
         </SPostTitleText>
         <STitle variant={6}>
           {t(

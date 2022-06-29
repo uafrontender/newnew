@@ -22,6 +22,7 @@
     "daysLeft": "d",
     "hoursLeft": "h",
     "minutesLeft": "m",
-    "endedOn": "Terminó el "
+    "endedOn": "Terminó el ",
+    "soon_NEED_TRANSLATION": "Coming Soon"
   }
 }

@@ -23,12 +23,22 @@ interface IFunctionProps {
   earnings: newnewapi.GetMyEarningsResponse | undefined;
 }
 
+const EARNINGS_FILTER_TYPES = [
+  '0_days',
+  '1_days',
+  '7_days',
+  '30_days',
+  '90_days',
+  '12_months',
+] as const;
+type EarningsFilterType = typeof EARNINGS_FILTER_TYPES[number];
+
 export const Earnings: React.FC<IFunctionProps> = ({
   hasMyPosts,
   earnings,
 }) => {
   const { t } = useTranslation('page-Creator');
-  const [filter, setFilter] = useState('7_days');
+  const [filter, setFilter] = useState<EarningsFilterType>('7_days');
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [myEarnings, setMyEarnings] =
     useState<newnewapi.GetMyEarningsResponse | undefined>();
@@ -104,7 +114,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
     ],
     []
   );
-  const filterOptions = useMemo(
+  const filterOptions: { id: EarningsFilterType; label: string }[] = useMemo(
     () => [
       {
         id: '0_days',
@@ -199,7 +209,9 @@ export const Earnings: React.FC<IFunctionProps> = ({
     const arr = filter.split('_');
     if (arr[0] === '0') return t('dashboard.earnings.earnedToday');
     if (arr[0] === '1') return t('dashboard.earnings.earnedYesterday');
-    return `${t('dashboard.earnings.earned')} ${arr[0]} ${arr[1]}`;
+    return `${t('dashboard.earnings.earned')} ${arr[0]} ${t(
+      `dashboard.earnings.units.${arr[1]}`
+    )}`;
   };
   /* eslint-disable no-nested-ternary */
   return (

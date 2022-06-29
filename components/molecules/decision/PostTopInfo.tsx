@@ -32,6 +32,7 @@ import { FollowingsContext } from '../../../contexts/followingContext';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -217,12 +218,20 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           </SBidsAmount>
         ) : null}
         <CreatorCard>
-          <a href={`/${creator.username}`}>
+          <a
+            href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
+              creator.username
+            }`}
+          >
             <SAvatarArea>
               <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
             </SAvatarArea>
           </a>
-          <a href={`/${creator.username}`}>
+          <a
+            href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
+              creator.username
+            }`}
+          >
             <SUsername className='username'>
               {creator.nickname ?? `@${creator.username}`}{' '}
               {creator.options?.isVerified && (
@@ -305,7 +314,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           ) : null}
         </SActionsDiv>
         <SPostTitle>
-          <Headline variant={5}>{title}</Headline>
+          <Headline variant={5}>
+            <PostTitleContent>{title}</PostTitleContent>
+          </Headline>
         </SPostTitle>
         {showSelectingWinnerOption ? (
           <SSelectingWinnerOption>
