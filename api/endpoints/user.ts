@@ -11,7 +11,7 @@ const BASE_URL_USER = `${BASE_URL}/user`;
 
 // Own data
 export const validateUsernameTextField = (
-  payload: newnewapi.ValidateUsernameRequest
+  payload: newnewapi.ValidateUsernameRequest, signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.ValidateUsernameRequest,
@@ -21,10 +21,11 @@ export const validateUsernameTextField = (
     newnewapi.ValidateUsernameResponse,
     `${BASE_URL_USER}/validate_username`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
-export const getMe = (payload: newnewapi.EmptyRequest) =>
+export const getMe = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
     newnewapi.GetMeResponse
@@ -33,10 +34,11 @@ export const getMe = (payload: newnewapi.EmptyRequest) =>
     newnewapi.GetMeResponse,
     `${BASE_URL_USER}/get_me`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
-export const updateMe = (payload: newnewapi.UpdateMeRequest) =>
+export const updateMe = (payload: newnewapi.UpdateMeRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.UpdateMeRequest,
     newnewapi.UpdateMeResponse
@@ -45,12 +47,13 @@ export const updateMe = (payload: newnewapi.UpdateMeRequest) =>
     newnewapi.UpdateMeResponse,
     `${BASE_URL_USER}/update_me`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
 // Same endpoint, but different method, for convenience
 export const sendVerificationNewEmail = (
-  payload: newnewapi.SendVerificationEmailRequest
+  payload: newnewapi.SendVerificationEmailRequest, signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.SendVerificationEmailRequest,
@@ -60,11 +63,12 @@ export const sendVerificationNewEmail = (
     newnewapi.SendVerificationEmailResponse,
     `${BASE_URL}/auth/send_verification_email`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
 // NB! Maybe the auth should be optional
-export const setMyEmail = (payload: newnewapi.SetMyEmailRequest) =>
+export const setMyEmail = (payload: newnewapi.SetMyEmailRequest, signal?: RequestInit['signal']) =>
   fetchProtobuf<newnewapi.SetMyEmailRequest, newnewapi.SetMyEmailResponse>(
     newnewapi.SetMyEmailRequest,
     newnewapi.SetMyEmailResponse,
@@ -76,10 +80,13 @@ export const setMyEmail = (payload: newnewapi.SetMyEmailRequest) =>
       ? {
           'x-auth-token': cookiesInstance.get('accessToken'),
         }
-      : {}
+      : {},
+      'cors',
+      'same-origin',
+      signal ?? undefined,
   );
 
-export const acceptCreatorTerms = (payload: newnewapi.EmptyRequest) =>
+export const acceptCreatorTerms = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
     newnewapi.EmptyResponse
@@ -88,10 +95,11 @@ export const acceptCreatorTerms = (payload: newnewapi.EmptyRequest) =>
     newnewapi.EmptyResponse,
     `${BASE_URL_USER}/accept_creator_terms`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
-export const getMyOnboardingState = (payload: newnewapi.EmptyRequest) =>
+export const getMyOnboardingState = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
     newnewapi.GetMyOnboardingStateResponse
@@ -100,10 +108,11 @@ export const getMyOnboardingState = (payload: newnewapi.EmptyRequest) =>
     newnewapi.GetMyOnboardingStateResponse,
     `${BASE_URL_USER}/get_my_onboarding_state`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
-export const becomeCreator = (payload: newnewapi.EmptyRequest) =>
+export const becomeCreator = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
     newnewapi.BecomeCreatorResponse
@@ -112,10 +121,11 @@ export const becomeCreator = (payload: newnewapi.EmptyRequest) =>
     newnewapi.BecomeCreatorResponse,
     `${BASE_URL_USER}/become_creator`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
-export const logout = (payload: newnewapi.EmptyRequest) =>
+export const logout = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
     newnewapi.EmptyResponse
@@ -124,11 +134,12 @@ export const logout = (payload: newnewapi.EmptyRequest) =>
     newnewapi.EmptyResponse,
     `${BASE_URL_USER}/log_out`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
 export const getMyPosts = (
-  payload: newnewapi.GetRelatedToMePostsRequest,
+  payload: newnewapi.GetRelatedToMePostsRequest, signal?: RequestInit['signal'],
   tokens?: {
     accessToken: string;
     refreshToken: string;
@@ -144,11 +155,12 @@ export const getMyPosts = (
     `${BASE_URL}/post/get_related_to_me_posts`,
     'post',
     payload,
+    signal ?? undefined,
     tokens,
     updateCookieServerSideCallback
   );
 
-export const markUser = (payload: newnewapi.MarkUserRequest) =>
+export const markUser = (payload: newnewapi.MarkUserRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.MarkUserRequest,
     newnewapi.EmptyResponse
@@ -157,10 +169,11 @@ export const markUser = (payload: newnewapi.MarkUserRequest) =>
     newnewapi.EmptyResponse,
     `${BASE_URL_USER}/mark_user`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
-export const getCreatorsIFollow = (payload: newnewapi.EmptyRequest) =>
+export const getCreatorsIFollow = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
     newnewapi.GetCreatorsIFollowResponse
@@ -169,30 +182,39 @@ export const getCreatorsIFollow = (payload: newnewapi.EmptyRequest) =>
     newnewapi.GetCreatorsIFollowResponse,
     `${BASE_URL_USER}/get_creators_i_follow`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
 // Other users
-export const getUserByUsername = (payload: newnewapi.GetUserRequest) =>
+export const getUserByUsername = (payload: newnewapi.GetUserRequest, signal?: RequestInit['signal']) =>
   fetchProtobuf<newnewapi.GetUserRequest, newnewapi.User>(
     newnewapi.GetUserRequest,
     newnewapi.User,
     `${BASE_URL_USER}/get_user`,
     'post',
-    payload
+    payload,
+    {},
+    'cors',
+    'same-origin',
+    signal ?? undefined,
   );
 
 // Creator tags
-export const getAvailableCreatorTags = (payload: newnewapi.EmptyRequest) =>
+export const getAvailableCreatorTags = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
   fetchProtobuf<newnewapi.EmptyRequest, newnewapi.CreatorTags>(
     newnewapi.EmptyRequest,
     newnewapi.CreatorTags,
     `${BASE_URL_USER}/get_available_creator_tags`,
     'post',
-    payload
+    payload,
+    {},
+    'cors',
+    'same-origin',
+    signal ?? undefined,
   );
 
-export const setMyCreatorTags = (payload: newnewapi.SetMyCreatorTagsRequest) =>
+export const setMyCreatorTags = (payload: newnewapi.SetMyCreatorTagsRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.SetMyCreatorTagsRequest,
     newnewapi.EmptyResponse
@@ -201,10 +223,11 @@ export const setMyCreatorTags = (payload: newnewapi.SetMyCreatorTagsRequest) =>
     newnewapi.EmptyResponse,
     `${BASE_URL_USER}/set_my_creator_tags`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
-export const getMyCreatorTags = (payload: newnewapi.EmptyRequest) =>
+export const getMyCreatorTags = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
     newnewapi.CreatorTags
@@ -213,10 +236,11 @@ export const getMyCreatorTags = (payload: newnewapi.EmptyRequest) =>
     newnewapi.CreatorTags,
     `${BASE_URL_USER}/get_my_creator_tags`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
-export const getMyBlockedUsers = (payload: newnewapi.EmptyRequest) =>
+export const getMyBlockedUsers = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
     newnewapi.GetMyBlockedUsersResponse
@@ -225,10 +249,11 @@ export const getMyBlockedUsers = (payload: newnewapi.EmptyRequest) =>
     newnewapi.GetMyBlockedUsersResponse,
     `${BASE_URL_USER}/get_my_blocked_users`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
-export const getTutorialsStatus = (payload: newnewapi.EmptyRequest) =>
+export const getTutorialsStatus = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
     newnewapi.GetTutorialsStatusResponse
@@ -237,11 +262,12 @@ export const getTutorialsStatus = (payload: newnewapi.EmptyRequest) =>
     newnewapi.GetTutorialsStatusResponse,
     `${BASE_URL_USER}/get_tutorials_status`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
 export const markTutorialStepAsCompleted = (
-  payload: newnewapi.MarkTutorialStepAsCompletedRequest
+  payload: newnewapi.MarkTutorialStepAsCompletedRequest, signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.MarkTutorialStepAsCompletedRequest,
@@ -251,10 +277,11 @@ export const markTutorialStepAsCompleted = (
     newnewapi.EmptyResponse,
     `${BASE_URL_USER}/mark_tutorial_step_as_completed`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
-export const deleteMyAccount = (payload: newnewapi.EmptyRequest) =>
+export const deleteMyAccount = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
     newnewapi.EmptyResponse
@@ -263,5 +290,6 @@ export const deleteMyAccount = (payload: newnewapi.EmptyRequest) =>
     newnewapi.EmptyResponse,
     `${BASE_URL_USER}/delete_my_account`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
