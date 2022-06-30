@@ -71,9 +71,11 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
     }
 
     if (hasEnded) {
-      <SCaptionEnded variant={2} weight={700}>
-        {t('timer.endedOn')} {expirationDate.toLocaleDateString('en-US')}
-      </SCaptionEnded>;
+      return (
+        <SCaptionEnded variant={2} weight={700}>
+          {t('timer.endedOn')} {expirationDate.toLocaleDateString('en-US')}
+        </SCaptionEnded>
+      );
     }
 
     return (
