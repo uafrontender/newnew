@@ -51,10 +51,11 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
         const res = await signInWithTwitter(requestPayload);
 
-        if (!res!! || res!!.error || !res.data)
+        if (!res || res.error || !res.data)
           throw new Error(res!!.error?.message ?? 'An error occurred');
 
-        const { data } = res!!;
+        console.log(`signInWithTwitter response: ${res.data}`);
+        const { data } = res;
 
         if (!data || data.status !== newnewapi.SignInResponse.Status.SUCCESS)
           throw new Error('No data');
