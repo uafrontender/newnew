@@ -95,6 +95,8 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
     }, []);
 
     useEffect(() => {
+      const controller = new AbortController();
+
       async function loadEarnedAmount() {
         setEarnedAmountLoading(true);
         try {
@@ -102,10 +104,10 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
             postUuids: [postId],
           });
 
-          const res = await getMyEarningsByPosts(payload);
+          const res = await getMyEarningsByPosts(payload, controller.signal);
 
           if (!res.data || !res.data?.earningsByPosts[0]?.earnings || res.error)
-            throw new Error('Request failed');
+            throw new Error(res.error?.message ?? 'Request failed');
 
           setEarnedAmount(
             res.data.earningsByPosts[0].earnings as newnewapi.MoneyAmount
@@ -118,6 +120,10 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
       }
 
       loadEarnedAmount();
+
+      return () => {
+        controller.abort();
+      };
     }, [postId]);
 
     useEffect(() => {

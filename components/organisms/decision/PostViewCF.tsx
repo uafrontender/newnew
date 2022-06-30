@@ -655,11 +655,11 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
         resetSessionId();
       };
 
-      if (socketConnection?.connected) {
+      if (socketConnection?.connected && !loadingModalOpen) {
         makePledgeFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection?.connected, sessionId]);
+    }, [socketConnection?.connected, sessionId, loadingModalOpen]);
 
     useEffect(() => {
       const workingAmount = pledges
