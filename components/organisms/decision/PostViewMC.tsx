@@ -543,11 +543,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
         resetSessionId();
       };
 
-      if (socketConnection?.connected) {
+      if (socketConnection?.connected && !loadingModalOpen) {
         makeVoteFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection?.connected, sessionId]);
+    }, [socketConnection?.connected, sessionId, loadingModalOpen]);
 
     const goToNextStep = () => {
       if (
