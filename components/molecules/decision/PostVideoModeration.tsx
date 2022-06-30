@@ -424,13 +424,13 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             setResponseFileProcessingLoading(false);
           } else {
             setResponseFileUploadError(true);
-            toast.error('An error occured');
+            toast.error('An error occurred');
           }
         } else if (
           decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
         ) {
           setResponseFileUploadError(true);
-          toast.error('An error occured');
+          toast.error('An error occurred');
         }
       }
     },
@@ -467,7 +467,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         setResponseFileProcessingLoading(false);
       } else {
         setResponseFileUploadError(true);
-        toast.error('An error occured');
+        toast.error('An error occurred');
       }
     }
 

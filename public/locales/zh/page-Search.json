@@ -1,20 +1,20 @@
 {
   "meta": {
-    "title": "Search"
+    "title": "搜索"
   },
   "mainContent": {
-    "title": "Results for",
+    "title": "結果",
     "tabs": {
-      "decisions": "Posts",
-      "creators": "Creators"
+      "decisions": "帖子",
+      "creators": "創作者"
     }
   },
   "decisions": {
     "sort": {
-      "title": "Sort",
-      "all": "All",
-      "numberOfParticipants": "Number of participants",
-      "newest": "Newest"
+      "title": "排序",
+      "all": "全部",
+      "numberOfParticipants": "參與者人數",
+      "newest": "最新"
     }
   }
 }

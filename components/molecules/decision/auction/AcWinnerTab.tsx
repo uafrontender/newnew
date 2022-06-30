@@ -174,9 +174,7 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
                       })}
                 </SSpanBold>
               </Link>{' '}
-              <SSpanThin>
-                {t('acPost.winnerTab.winnerOptionCard.bidTo')}
-              </SSpanThin>{' '}
+              <SSpanThin>{t('acPost.winnerTab.winnerOptionCard.to')}</SSpanThin>{' '}
             </SOptionCreator>
             <SHeadline variant={4}>{option.title}</SHeadline>
           </SOptionDetails>

@@ -677,7 +677,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <PaymentModal
             zIndex={12}
             isOpen={paymentModalOpen}
-            amount={`$${parseInt(supportBidAmount) * votePrice}`}
+            amount={`$${formatNumber(
+              parseInt(supportBidAmount) * votePrice ?? 0,
+              true
+            )}`}
             // {...(walletBalance?.usdCents &&
             // walletBalance.usdCents >=
             //   parseInt(supportBidAmount) * votePrice * 100
@@ -1137,7 +1140,7 @@ const SBidDetails = styled.div<{
     grid-template-areas:
       'amount bidders'
       'optionInfo optionInfo';
-    grid-template-columns: 3fr 7fr;
+    grid-template-columns: 5fr 4fr;
 
     padding: 16px;
 

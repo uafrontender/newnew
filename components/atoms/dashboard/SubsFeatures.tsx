@@ -68,7 +68,6 @@ const SContainer = styled.div`
 `;
 const SContent = styled.div`
   display: flex;
-  align-items: center;
   flex-direction: column;
 
   ${(props) => props.theme.media.tablet} {
@@ -81,9 +80,11 @@ const SContent = styled.div`
 const STitle = styled(Headline)`
   margin-top: 16px;
   font-weight: 700;
+  text-align: center;
 
   ${(props) => props.theme.media.tablet} {
     margin-top: unset;
+    text-align: left;
   }
 `;
 

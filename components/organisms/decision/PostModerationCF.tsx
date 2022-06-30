@@ -13,6 +13,7 @@ import React, {
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -86,6 +87,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+    const router = useRouter();
 
     // Socket
     const socketConnection = useContext(SocketContext);
@@ -110,7 +112,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
             postId: post.postUuid,
           },
           'Post',
-          `/post/${post.postUuid}#${tab}`
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#${tab}`
         );
       } else {
         window.history.replaceState(
@@ -118,7 +122,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
             postId: post.postUuid,
           },
           'Post',
-          `/post/${post.postUuid}#${tab}`
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#${tab}`
         );
       }
       window.dispatchEvent(new HashChangeEvent('hashchange'));

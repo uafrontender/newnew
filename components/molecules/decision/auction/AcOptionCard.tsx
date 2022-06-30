@@ -694,7 +694,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         <PaymentModalRedirectOnly
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${supportBidAmount}`}
+          amount={`$${formatNumber(parseInt(supportBidAmount) ?? 0, true)}`}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(supportBidAmount) * 100
           //   ? {}
@@ -885,7 +885,7 @@ const SBidDetails = styled.div<{
     grid-template-areas:
       'amount bidders'
       'optionInfo optionInfo';
-    grid-template-columns: 3fr 7fr;
+    grid-template-columns: 5fr 4fr;
 
     padding: 16px;
 

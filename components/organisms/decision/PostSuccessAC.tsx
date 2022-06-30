@@ -10,6 +10,7 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -25,6 +26,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const AcSuccessOptionsTab = dynamic(
   () => import('../../molecules/decision/auction/success/AcSuccessOptionsTab')
@@ -47,6 +49,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+    const router = useRouter();
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
@@ -123,12 +126,22 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     // Replace hash once scrolled to comments
     useEffect(() => {
       if (inView) {
-        syncedHistoryReplaceState({}, `/post/${post.postUuid}#comments`);
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#comments`
+        );
       } else {
-        syncedHistoryReplaceState({}, `/post/${post.postUuid}`);
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }`
+        );
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid]);
+    }, [inView, post.postUuid, router.locale]);
 
     // Load winning option
     useEffect(() => {
@@ -167,7 +180,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
-          <SActivitesContainer>
+          <SActivitesContainer dimmedBackground={openedMainSection === 'main'}>
             {openedMainSection === 'main' ? (
               <>
                 <DecisionEndedBox
@@ -203,7 +216,9 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                       </STotal>
                     )}
                   </SCreatorInfoDiv>
-                  <SPostTitle variant={4}>{post.title}</SPostTitle>
+                  <SPostTitle variant={4}>
+                    <PostTitleContent>{post.title}</PostTitleContent>
+                  </SPostTitle>
                   <SSeparator />
                   {winningOption && (
                     <>
@@ -350,10 +365,13 @@ const SWrapper = styled.div`
   }
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitesContainer = styled.div<{
+  dimmedBackground: boolean;
+}>`
   grid-area: activities;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme, dimmedBackground }) =>
+    dimmedBackground ? theme.colorsThemed.background.secondary : 'transparent'};
   overflow: hidden;
   border-radius: 16px;
 

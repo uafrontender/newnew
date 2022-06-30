@@ -18,7 +18,8 @@ interface IDraggableMobileOptions {
     text: string,
     min: number,
     max: number,
-    kind: newnewapi.ValidateTextRequest.Kind
+    kind: newnewapi.ValidateTextRequest.Kind,
+    index: number
   ) => Promise<string>;
 }
 

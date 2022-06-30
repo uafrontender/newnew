@@ -24,6 +24,10 @@
       "earned": "earned in last",
       "earnedToday": "earned today",
       "earnedYesterday": "earned yesterday",
+      "units": {
+        "days": "days",
+        "months": "months"
+      },
       "insights": "Insights",
       "insightsTablet": "Go to insights",
       "cashOut": {
@@ -129,6 +133,7 @@
       "date": "Date subscribed",
       "updateSub": "Update subscription"
     },
+    "messageOne": "DM",
     "messageAll": "DM all"
   },
   "earnings": {
@@ -255,7 +260,8 @@
       "update": "Update payment info",
       "requestSetupLink": "Connect with Stripe",
       "stripeConnectedLink": "Stripe connected!",
-      "back": "Close"
+      "back": "Close",
+      "stripeConnecting": "Connecting..."
     }
   },
   "noNotifications": "Any new notifications you receive\nwill appear here"

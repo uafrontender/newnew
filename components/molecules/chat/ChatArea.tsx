@@ -7,6 +7,7 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
+import Link from 'next/link';
 
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import Text from '../../atoms/Text';
@@ -25,6 +26,7 @@ import { ChannelsContext } from '../../../contexts/channelsContext';
 import { SocketContext } from '../../../contexts/socketContext';
 import { reportUser } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
+import isSafari from '../../../utils/isSafari';
 
 const UserAvatar = dynamic(() => import('../UserAvatar'));
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
@@ -85,8 +87,9 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
-  const [messagesNextPageToken, setMessagesNextPageToken] =
-    useState<string | undefined | null>('');
+  const [messagesNextPageToken, setMessagesNextPageToken] = useState<
+    string | undefined | null
+  >('');
   const [messagesLoading, setMessagesLoading] = useState(false);
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
@@ -309,26 +312,50 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       const prevSameUser = prevElement?.sender?.uuid === item.sender?.uuid;
       const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
 
+      const prevSameDay =
+        !!prevElement?.createdAt &&
+        !!item.createdAt &&
+        moment((prevElement?.createdAt.seconds as number) * 1000).isSame(
+          (item.createdAt.seconds as number) * 1000,
+          'day'
+        );
+
+      const nextSameDay =
+        !!nextElement?.createdAt &&
+        !!item.createdAt &&
+        moment((nextElement?.createdAt.seconds as number) * 1000).isSame(
+          (item.createdAt.seconds as number) * 1000,
+          'day'
+        );
+
       const content = (
         <SMessage
           id={item.id?.toString()}
           mine={isMine}
           prevSameUser={prevSameUser}
         >
-          {!prevSameUser && (
-            <SUserAvatar
-              mine={isMine}
-              avatarUrl={
-                !isMine && chatRoom && chatRoom.visavis?.avatarUrl
-                  ? chatRoom.visavis?.avatarUrl
-                  : user.userData?.avatarUrl
-              }
-            />
-          )}
+          {(!prevSameUser || !prevSameDay) &&
+            (isMine ? (
+              <SUserAvatar
+                mine={isMine}
+                avatarUrl={user.userData?.avatarUrl ?? ''}
+              />
+            ) : (
+              <Link href={`/${chatRoom?.visavis?.username}`}>
+                <a>
+                  <SUserAvatar
+                    mine={isMine}
+                    avatarUrl={chatRoom?.visavis?.avatarUrl ?? ''}
+                  />
+                </a>
+              </Link>
+            ))}
           <SMessageContent
             mine={isMine}
             prevSameUser={prevSameUser}
             nextSameUser={nextSameUser}
+            prevSameDay={prevSameDay}
+            nextSameDay={nextSameDay}
           >
             <SMessageText mine={isMine} weight={600} variant={3}>
               {item.content?.text}
@@ -452,19 +479,26 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                 : chatRoom.visavis?.nickname}
               {isAnnouncement && t('announcement.title')}
             </SUserName>
-            <SUserAlias>
-              {!isAnnouncement
-                ? `@${chatRoom.visavis?.username}`
-                : `${
-                    chatRoom.memberCount && chatRoom.memberCount > 0
-                      ? chatRoom.memberCount
-                      : 0
-                  } ${
-                    chatRoom.memberCount && chatRoom.memberCount > 1
-                      ? t('newAnnouncement.members')
-                      : t('newAnnouncement.member')
-                  }`}
-            </SUserAlias>
+            {!isAnnouncement && (
+              <Link href={`/${chatRoom?.visavis?.username}`}>
+                <a style={{ display: 'flex' }}>
+                  <SUserAlias>{`@${chatRoom.visavis?.username}`}</SUserAlias>
+                </a>
+              </Link>
+            )}
+            {isAnnouncement && (
+              <SUserAlias>
+                {`${
+                  chatRoom.memberCount && chatRoom.memberCount > 0
+                    ? chatRoom.memberCount
+                    : 0
+                } ${
+                  chatRoom.memberCount && chatRoom.memberCount > 1
+                    ? t('newAnnouncement.members')
+                    : t('newAnnouncement.member')
+                }`}
+              </SUserAlias>
+            )}
           </SUserData>
           <SActionsDiv>
             {!isMyAnnouncement && (
@@ -531,7 +565,19 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           ) : (
             <NoMessagesYet />
           ))}
-        {messages.length > 0 && messages.map(renderMessage)}
+        {messages.length > 0 &&
+          messages.map((item, index) => {
+            if (index < messages.length - 1) {
+              return renderMessage(item, index);
+            }
+            if (document && isSafari() && isMobile && messages[0].id) {
+              const element = document.getElementById(
+                messages[0].id.toString()
+              );
+              if (element) element.scrollIntoView({ block: 'center' });
+            }
+            return null;
+          })}
       </SCenterPart>
       <SBottomPart>
         {(isVisavisBlocked === true || confirmBlockUser) &&
@@ -779,6 +825,8 @@ interface ISMessageContent {
   mine?: boolean;
   prevSameUser?: boolean;
   nextSameUser?: boolean;
+  prevSameDay?: boolean;
+  nextSameDay?: boolean;
 }
 
 const SMessageContent = styled.div<ISMessageContent>`
@@ -798,8 +846,8 @@ const SMessageContent = styled.div<ISMessageContent>`
   }};
   ${(props) => {
     if (props.mine) {
-      if (props.prevSameUser) {
-        if (props.nextSameUser) {
+      if (props.prevSameUser && props.prevSameDay) {
+        if (props.nextSameUser && props.nextSameDay) {
           if (props.type === 'info') {
             return css`
               margin: 8px 0;
@@ -820,6 +868,10 @@ const SMessageContent = styled.div<ISMessageContent>`
         return css`
           margin-top: 8px;
           border-radius: 16px 16px 8px 16px;
+
+          ${props.theme.media.tablet} {
+            border-radius: 16px;
+          }
         `;
       }
 
@@ -831,12 +883,16 @@ const SMessageContent = styled.div<ISMessageContent>`
         }
 
         return css`
-          border-radius: 16px 16px 16px 8px;
+          border-radius: 16px 8px 16px 16px;
+
+          ${props.theme.media.tablet} {
+            border-radius: 16px 16px 16px 8px;
+          }
         `;
       }
     } else {
-      if (props.prevSameUser) {
-        if (props.nextSameUser) {
+      if (props.prevSameUser && props.prevSameDay) {
+        if (props.nextSameUser && props.nextSameDay) {
           if (props.type === 'info') {
             return css`
               margin: 8px 0;
@@ -856,6 +912,10 @@ const SMessageContent = styled.div<ISMessageContent>`
         return css`
           margin-top: 8px;
           border-radius: 16px 16px 16px 8px;
+
+          ${props.theme.media.tablet} {
+            border-radius: 16px;
+          }
         `;
       }
 
@@ -868,6 +928,10 @@ const SMessageContent = styled.div<ISMessageContent>`
 
         return css`
           border-radius: 8px 16px 16px 16px;
+
+          ${props.theme.media.tablet} {
+            border-radius: 16px 16px 16px 8px;
+          }
         `;
       }
       return css`
@@ -882,7 +946,11 @@ const SMessageContent = styled.div<ISMessageContent>`
     }
 
     return css`
-      border-radius: 16px 16px 16px 8px;
+      border-radius: 16px 16px 8px 16px;
+
+      ${props.theme.media.tablet} {
+        border-radius: 16px 16px 16px 8px;
+      }
     `;
   }}
 `;

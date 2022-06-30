@@ -24,6 +24,10 @@
       "earned": "上次賺的",
       "earnedToday": "今天賺的",
       "earnedYesterday": "昨天賺的",
+      "units": {
+        "days": "天",
+        "months": "個月"
+      },
       "insights": "深入瞭解",
       "insightsTablet": "轉至深入瞭解",
       "cashOut": {
@@ -110,8 +114,8 @@
       "copied": "已複製的"
     },
     "toDos": {
-      "title": "完成這些步驟並獲得報酬",
-      "subtitle": "賺到💰？完成下列步驟即可提取你的收入...",
+      "title": "完成這些步驟以獲得報酬",
+      "subtitle": "已經賺到💰了？完成下列步驟即可提取你的收入......",
       "signUp": "註冊成為創作者",
       "completeProfile": "添加個人簡介",
       "completeProfileButton": "添加",
@@ -129,6 +133,7 @@
       "date": "訂閱日期",
       "updateSub": "更新訂閱"
     },
+    "messageOne": "私訊",
     "messageAll": "私訊全部"
   },
   "earnings": {
@@ -167,7 +172,7 @@
   "chat": {
     "today": "今天",
     "placeholder": "輸入訊息......",
-    "noMessagesFirstLine": "沒有訊息...",
+    "noMessagesFirstLine": "沒有訊息......",
     "typing": "正在輸入......",
     "toolbar": {
       "searchPlaceholder": "搜索訊息或用戶"
@@ -241,8 +246,8 @@
   },
   "stripe": {
     "meta": {
-      "title": "使用Stripe，支付更輕鬆",
-      "description": "與Stripe帳戶綁定，即可按時獲得付款,"
+      "title": "使用Stripe，收付更輕鬆",
+      "description": "與Stripe帳戶綁定，即可按時獲得付款。"
     },
     "titleSetUpStripe": "獲得付款",
     "bullets": {
@@ -253,9 +258,10 @@
     "button": {
       "submit": "完成",
       "update": "更新支付資訊",
-      "requestSetupLink": "與Stripe連接",
-      "stripeConnectedLink": "Stripe已連接！",
-      "back": "關閉"
+      "requestSetupLink": "與Stripe綁定",
+      "stripeConnectedLink": "Stripe已綁定！",
+      "back": "關閉",
+      "stripeConnecting": "連接中......"
     }
   },
   "noNotifications": "你收到的任何新通知\n都會出現在這裡"

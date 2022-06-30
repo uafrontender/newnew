@@ -24,6 +24,7 @@ import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
 import SuggestionActionMobileModal from '../OptionActionMobileModal';
 
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
+import { formatNumber } from '../../../../utils/format';
 
 interface IAcOptionTopInfo {
   creator: newnewapi.IUser;
@@ -349,7 +350,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${supportBidAmount}`}
+          amount={`$${formatNumber(parseInt(supportBidAmount) ?? 0, true)}`}
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}

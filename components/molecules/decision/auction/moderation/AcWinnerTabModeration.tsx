@@ -15,6 +15,7 @@ import Text from '../../../../atoms/Text';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
 import assets from '../../../../../constants/assets';
+import { getMyEarningsByPosts } from '../../../../../api/endpoints/payments';
 
 interface IAcWinnerTabModeration {
   postId: string;
@@ -32,6 +33,11 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
 
     const containerRef = useRef<HTMLDivElement>();
     const [isScrolledDown, setIsScrolledDown] = useState(false);
+
+    // Earned amount
+    const [earnedAmount, setEarnedAmount] =
+      useState<newnewapi.MoneyAmount | undefined>(undefined);
+    const [earnedAmountLoading, setEarnedAmountLoading] = useState(false);
 
     // Share
     const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -73,6 +79,32 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
         }
       }
     }, []);
+
+    useEffect(() => {
+      async function loadEarnedAmount() {
+        setEarnedAmountLoading(true);
+        try {
+          const payload = new newnewapi.GetMyEarningsByPostsRequest({
+            postUuids: [postId],
+          });
+
+          const res = await getMyEarningsByPosts(payload);
+
+          if (!res.data || !res.data?.earningsByPosts[0]?.earnings || res.error)
+            throw new Error('Request failed');
+
+          setEarnedAmount(
+            res.data.earningsByPosts[0].earnings as newnewapi.MoneyAmount
+          );
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setEarnedAmountLoading(false);
+        }
+      }
+
+      loadEarnedAmount();
+    }, [postId, postStatus]);
 
     useEffect(() => {
       const handler = (e: Event) => {
@@ -142,13 +174,15 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
                 </SSpanThin>
               </SNumBidders>
               <SHeadline variant={4}>{option.title}</SHeadline>
-              <SYouMade variant={3}>
-                {t('acPostModeration.winnerTab.winnerOptionCard.youMade')}
-              </SYouMade>
-              {option.totalAmount?.usdCents && (
-                <SHeadline variant={5}>
-                  ${formatNumber(option.totalAmount.usdCents / 100, true)}
-                </SHeadline>
+              {!earnedAmountLoading && earnedAmount && (
+                <>
+                  <SYouMade variant={3}>
+                    {t('acPostModeration.winnerTab.winnerOptionCard.youMade')}
+                  </SYouMade>
+                  <SHeadline variant={5}>
+                    ${formatNumber(earnedAmount.usdCents / 100, false)}
+                  </SHeadline>
+                </>
               )}
               <SOptionCreator variant={3}>
                 <SSpanThin>

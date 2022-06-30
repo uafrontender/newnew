@@ -15,6 +15,7 @@ import { toast } from 'react-toastify';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import { useInView } from 'react-intersection-observer';
+import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -91,6 +92,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+    const router = useRouter();
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
@@ -493,7 +495,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
 
     useEffect(() => {
       const makeBidFromSessionId = async () => {
-        if (!sessionId) return;
+        if (!sessionId || loadingModalOpen) return;
         try {
           setLoadingModalOpen(true);
           const payload = new newnewapi.FulfillPaymentPurposeRequest({
@@ -525,12 +527,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
         resetSessionId();
       };
 
-      if (socketConnection?.connected) {
+      if (socketConnection?.connected && !loadingModalOpen) {
         console.log(sessionId);
         makeBidFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection?.connected, sessionId]);
+    }, [socketConnection?.connected, sessionId, loadingModalOpen]);
 
     const goToNextStep = () => {
       if (
@@ -595,12 +597,22 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     // Replace hash once scrolled to comments
     useEffect(() => {
       if (inView) {
-        syncedHistoryReplaceState({}, `/post/${post.postUuid}#comments`);
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#comments`
+        );
       } else {
-        syncedHistoryReplaceState({}, `/post/${post.postUuid}`);
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }`
+        );
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid]);
+    }, [inView, post.postUuid, router.locale]);
 
     return (
       <>

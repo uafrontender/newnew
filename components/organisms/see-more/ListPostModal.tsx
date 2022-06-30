@@ -47,6 +47,7 @@ export const ListPostModal: React.FC<IListPostModal> = React.memo(
             index={index + 1}
             width='100%'
             height={isMobile ? '564px' : '336px'}
+            maxWidthTablet='none'
           />
         </SItemWrapper>
       );
@@ -134,7 +135,7 @@ const SItemWrapper = styled.div`
   margin: 16px 0;
 
   ${(props) => props.theme.media.tablet} {
-    width: calc(25% - 16px);
+    width: calc(30%);
     margin: 0 8px 24px 8px;
   }
 

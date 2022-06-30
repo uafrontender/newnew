@@ -53,6 +53,7 @@ import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
+import { formatNumber } from '../../../../utils/format';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -164,7 +165,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
       const res = await validateText(payload);
 
-      if (!res.data?.status) throw new Error('An error occured');
+      if (!res.data?.status) throw new Error('An error occurred');
 
       if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
         setNewOptionTextValid(false);
@@ -655,7 +656,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${parseInt(newBidAmount) * votePrice}`}
+          amount={`$${formatNumber(
+            parseInt(newBidAmount) * votePrice ?? 0,
+            true
+          )}`}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * votePrice * 100
           //   ? {}

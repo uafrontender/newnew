@@ -13,7 +13,6 @@ import InlineSvg from '../../atoms/InlineSVG';
 
 import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
-import isSafari from '../../../utils/isSafari';
 import isBrowser from '../../../utils/isBrowser';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
@@ -153,13 +152,6 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             onClick={(e) => {
               e.stopPropagation();
               handleToggleMuted();
-              if (isSafari()) {
-                (
-                  document?.getElementById(
-                    `bitmovinplayer-video-${postId}`
-                  ) as HTMLVideoElement
-                )?.play();
-              }
             }}
             style={{
               ...(soundBtnBottomOverriden
@@ -192,13 +184,6 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             onClick={(e) => {
               e.stopPropagation();
               handleToggleMuted();
-              if (isSafari()) {
-                (
-                  document?.getElementById(
-                    `bitmovinplayer-video-${postId}`
-                  ) as HTMLVideoElement
-                )?.play();
-              }
             }}
             style={{
               ...(soundBtnBottomOverriden
