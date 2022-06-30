@@ -495,7 +495,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
 
     useEffect(() => {
       const makeBidFromSessionId = async () => {
-        if (!sessionId) return;
+        if (!sessionId || loadingModalOpen) return;
         try {
           setLoadingModalOpen(true);
           const payload = new newnewapi.FulfillPaymentPurposeRequest({
@@ -527,12 +527,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
         resetSessionId();
       };
 
-      if (socketConnection?.connected) {
+      if (socketConnection?.connected && !loadingModalOpen) {
         console.log(sessionId);
         makeBidFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection?.connected, sessionId]);
+    }, [socketConnection?.connected, sessionId, loadingModalOpen]);
 
     const goToNextStep = () => {
       if (
