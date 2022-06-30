@@ -15,12 +15,12 @@
         "body": "Ten conversaciones personales ilimitadas con {{nickname}}"
       },
       "freeVotes": {
-        "title": "Votos gratuitos en superencuestas",
-        "body": "Obtén un voto gratis en cada superencuesta realizada por {{nickname}}"
+        "title": "Votos gratuitos en Superpolls",
+        "body": "Obtén un voto gratis en cada Superpoll realizada por {{nickname}}"
       },
       "suggestions": {
         "title": "Mayor control",
-        "body": "Soloy <0>tú</0> tendrás el poder de añadir opciones personalizadas a las superencuestas de <1/>"
+        "body": "Solo <0>tú</0> tendrás el poder de añadir opciones personalizadas a las Superpolls de <1/>"
       }
     }
   },
@@ -37,7 +37,7 @@
     "items": {
       "0": {
         "q": "¿Cómo funcionan las suscripciones?",
-        "a": "La suscripción a tu creador favorito te permite desbloquear extras exclusivos. Estos incluyen conversaciones 1 a 1 con ese creador, votos gratuitos en todas las Superencuestas que haga ese creador y el poder de añadir tus propias opciones a sus Superencuestas."
+        "a": "La suscripción a tu creador favorito te permite desbloquear extras exclusivos. Estos incluyen conversaciones 1 a 1 con ese creador, votos gratuitos en todas las Superpolls que haga ese creador y el poder de añadir tus propias opciones a sus Superpolls."
       },
       "1": {
         "q": "¿Cuánto cuesta una suscripción?",
