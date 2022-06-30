@@ -8,6 +8,7 @@ import Caption from './Caption';
 
 import isBrowser from '../../utils/isBrowser';
 import secondsToDHM, { DHM } from '../../utils/secondsToDHM';
+import usePageVisibility from '../../utils/hooks/usePageVisibility';
 
 interface ICardTimer {
   startsAt: number;
@@ -18,6 +19,7 @@ interface ICardTimer {
 const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
   ({ startsAt, endsAt }) => {
     const { t } = useTranslation('component-PostCard');
+    const isPageVisible = usePageVisibility();
     const parsed = (endsAt - Date.now()) / 1000;
     const hasStarted = Date.now() > startsAt;
     const hasEnded = Date.now() > endsAt;
@@ -50,13 +52,13 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
     useEffect(() => {
       // TODO: we can set the interval recursively and first one can
       // be equal to seconds + milliseconds portion of the time left
-      if (isBrowser()) {
+      if (isBrowser() && isPageVisible) {
         interval.current = window.setInterval(() => {
-          setSeconds((s) => s - 60);
+          setSeconds(() => (endsAt - Date.now()) / 1000);
         }, 1000 * 60);
       }
       return () => clearInterval(interval.current);
-    }, []);
+    }, [endsAt, isPageVisible]);
 
     useEffect(() => {
       setParsedSeconds(secondsToDHM(seconds, 'noTrim'));

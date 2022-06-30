@@ -10,6 +10,7 @@ import styled, { css } from 'styled-components';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+import usePageVisibility from '../../../utils/hooks/usePageVisibility';
 import isBrowser from '../../../utils/isBrowser';
 import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
 import { TPostType } from '../../../utils/switchPostType';
@@ -41,6 +42,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
     'mobileL',
     'tablet',
   ].includes(resizeMode);
+  const isPageVisible = usePageVisibility();
 
   const parsed = (timestampSeconds - Date.now()) / 1000;
   const hasEnded = Date.now() > timestampSeconds;
@@ -59,13 +61,14 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
 
   useEffect(() => {
-    if (isBrowser()) {
+    console.log(isPageVisible);
+    if (isBrowser() && isPageVisible) {
       interval.current = window.setInterval(() => {
-        setSeconds((s) => s - 1);
+        setSeconds(() => (timestampSeconds - Date.now()) / 1000);
       }, 1000);
     }
     return () => clearInterval(interval.current);
-  }, []);
+  }, [isPageVisible, timestampSeconds]);
 
   const [tutorialTitle, setTutorialTitle] = useState('Countdown');
   const [tutorialText, setTutorialText] = useState('');
