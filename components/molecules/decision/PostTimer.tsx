@@ -61,7 +61,6 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
 
   useEffect(() => {
-    console.log(isPageVisible);
     if (isBrowser() && isPageVisible) {
       interval.current = window.setInterval(() => {
         setSeconds(() => (timestampSeconds - Date.now()) / 1000);
