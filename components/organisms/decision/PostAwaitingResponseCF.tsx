@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -20,6 +21,7 @@ import { formatNumber } from '../../../utils/format';
 import { fetchPledges } from '../../../api/endpoints/crowdfunding';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../molecules/decision/waiting/WaitingForResponseBox')
@@ -38,13 +40,14 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { mutedMode } = useAppSelector((state) => state.ui);
+    const router = useRouter();
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     const waitingTime = useMemo(() => {
       const end = (post.responseUploadDeadline?.seconds as number) * 1000;
       const parsed = (end - Date.now()) / 1000;
-      const dhms = secondsToDHMS(parsed, 'noTrim');
+      const dhms = secondsToDHMS(parsed);
 
       let countdownsrt = `${dhms.days} ${t(
         'acPostAwaiting.hero.expires.days'
@@ -162,12 +165,22 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
     // Replace hash once scrolled to comments
     useEffect(() => {
       if (inView) {
-        syncedHistoryReplaceState({}, `/post/${post.postUuid}#comments`);
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#comments`
+        );
       } else {
-        syncedHistoryReplaceState({}, `/post/${post.postUuid}`);
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }`
+        );
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid]);
+    }, [inView, post.postUuid, router.locale]);
 
     useEffect(() => {
       fetchPledgesForPost();
@@ -244,7 +257,9 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
                   {`$${formatNumber(post.totalAmount?.usdCents/100 ?? 0, true)}`}
                 </STotal> */}
                 </SCreatorInfoDiv>
-                <SPostTitle variant={4}>{post.title}</SPostTitle>
+                <SPostTitle variant={4}>
+                  <PostTitleContent>{post.title}</PostTitleContent>
+                </SPostTitle>
                 <SSeparator />
                 <SBackersInfo>
                   <SCreatorsBackers>

@@ -7,7 +7,6 @@ import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -25,6 +24,7 @@ import PostEllipseModal from './PostEllipseModal';
 
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 import { formatNumber } from '../../../utils/format';
 import { markPost } from '../../../api/endpoints/post';
@@ -32,6 +32,7 @@ import { FollowingsContext } from '../../../contexts/followingContext';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -217,14 +218,31 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           </SBidsAmount>
         ) : null}
         <CreatorCard>
-          <Link href={`/${creator.username}`}>
+          <a
+            href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
+              creator.username
+            }`}
+          >
             <SAvatarArea>
               <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
             </SAvatarArea>
-          </Link>
-          <Link href={`/${creator.username}`}>
-            <SUsername>{creator.nickname ?? `@${creator.username}`}</SUsername>
-          </Link>
+          </a>
+          <a
+            href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
+              creator.username
+            }`}
+          >
+            <SUsername className='username'>
+              {creator.nickname ?? `@${creator.username}`}{' '}
+              {creator.options?.isVerified && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                />
+              )}
+            </SUsername>
+          </a>
         </CreatorCard>
         <SActionsDiv>
           <SShareButton
@@ -296,7 +314,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           ) : null}
         </SActionsDiv>
         <SPostTitle>
-          <Headline variant={5}>{title}</Headline>
+          <Headline variant={5}>
+            <PostTitleContent>{title}</PostTitleContent>
+          </Headline>
         </SPostTitle>
         {showSelectingWinnerOption ? (
           <SSelectingWinnerOption>
@@ -426,12 +446,12 @@ const CreatorCard = styled.div`
 
   padding-right: 8px;
 
-  & > div:nth-child(2) {
+  .username {
     transition: 0.2s linear;
   }
 
   &:hover {
-    & > div:nth-child(2) {
+    .username {
       color: ${({ theme }) => theme.colorsThemed.text.primary};
     }
   }
@@ -460,7 +480,8 @@ const SAvatarArea = styled.div`
 
 const SUsername = styled.div`
   grid-area: username;
-
+  display: flex;
+  align-items: center;
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;
@@ -574,5 +595,9 @@ const SHeadline = styled(Headline)`
 `;
 
 const SText = styled(Text)`
-  color: #ffffff;
+  color: #fff;
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  margin-left: 2px;
 `;

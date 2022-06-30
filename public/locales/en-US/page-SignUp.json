@@ -34,11 +34,12 @@
   "error": {
     "emailInvalid": "Invalid address",
     "genericError": "An error occurred",
-    "Failed to fetch": "Failed to submit"
+    "Failed to fetch": "Failed to submit",
+    "An error occurred": "An error occurred"
   },
   "legalDisclaimer": {
     "mainText": "By creating an account you agree to our ",
-    "privacyPolicy": "Privacy Policy",
+    "privacyPolicy": "Privacy Policy, ",
     "terms": "Terms",
     "and": "and",
     "communityGuidelines": "Community Guidelines"

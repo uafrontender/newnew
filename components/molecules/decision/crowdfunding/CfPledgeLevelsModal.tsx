@@ -27,6 +27,7 @@ import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import getDisplayname from '../../../../utils/getDisplayname';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
+import { formatNumber } from '../../../../utils/format';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsModal {
@@ -347,7 +348,11 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={14}
-          amount={pledgeAmount ? `$${(pledgeAmount / 100)?.toFixed(0)}` : '0'}
+          amount={
+            pledgeAmount
+              ? `$${formatNumber(pledgeAmount / 100 ?? 0, true)}`
+              : '0'
+          }
           // {...(walletBalance?.usdCents &&
           // pledgeAmount &&
           // walletBalance.usdCents >= pledgeAmount
@@ -364,7 +369,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
               {post.creator && (
                 <SPaymentSign variant={3}>
                   {t('cfPost.paymentModalFooter.body', {
-                    creator: post.creator,
+                    creator: getDisplayname(post.creator),
                   })}
                 </SPaymentSign>
               )}

@@ -110,49 +110,54 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
                 {t('acPostModeration.optionsTab.noOptions.caption_1')}
               </SNoOptionsCaption>
             </SNoOptionsYet>
-          ) : null}
-          <SBidsContainer
-            ref={(el) => {
-              containerRef.current = el!!;
-            }}
-          >
-            {!isMobile ? (
-              <>
-                <GradientMask
-                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                  positionTop
-                  active={showTopGradient}
+          ) : (
+            <SBidsContainer
+              ref={(el) => {
+                containerRef.current = el!!;
+              }}
+            >
+              {!isMobile ? (
+                <>
+                  <GradientMask
+                    gradientType={
+                      theme.name === 'dark' ? 'secondary' : 'primary'
+                    }
+                    positionTop
+                    active={showTopGradient}
+                  />
+                  <GradientMask
+                    gradientType={
+                      theme.name === 'dark' ? 'secondary' : 'primary'
+                    }
+                    positionBottom={0}
+                    active={showBottomGradient}
+                  />
+                </>
+              ) : null}
+              {options.map((option, i) => (
+                <AcOptionCardModeration
+                  index={i}
+                  key={option.id.toString()}
+                  postStatus={postStatus}
+                  option={option as TAcOptionWithHighestField}
+                  handleRemoveOption={handleRemoveOption}
+                  handleConfirmWinningOption={() =>
+                    handleConfirmWinningOption(option)
+                  }
                 />
-                <GradientMask
-                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                  positionBottom={0}
-                  active={showBottomGradient}
-                />
-              </>
-            ) : null}
-            {options.map((option, i) => (
-              <AcOptionCardModeration
-                index={i}
-                key={option.id.toString()}
-                postStatus={postStatus}
-                option={option as TAcOptionWithHighestField}
-                handleRemoveOption={handleRemoveOption}
-                handleConfirmWinningOption={() =>
-                  handleConfirmWinningOption(option)
-                }
-              />
-            ))}
-            {!isMobile ? (
-              <SLoaderDiv ref={loadingRef} />
-            ) : pagingToken ? (
-              <SLoadMoreBtn
-                view='secondary'
-                onClick={() => handleLoadBids(pagingToken)}
-              >
-                {t('loadMoreButton')}
-              </SLoadMoreBtn>
-            ) : null}
-          </SBidsContainer>
+              ))}
+              {!isMobile ? (
+                <SLoaderDiv ref={loadingRef} />
+              ) : pagingToken ? (
+                <SLoadMoreBtn
+                  view='secondary'
+                  onClick={() => handleLoadBids(pagingToken)}
+                >
+                  {t('loadMoreButton')}
+                </SLoadMoreBtn>
+              ) : null}
+            </SBidsContainer>
+          )}
         </STabContainer>
       </>
     );

@@ -655,11 +655,11 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
         resetSessionId();
       };
 
-      if (socketConnection?.connected) {
+      if (socketConnection?.connected && !loadingModalOpen) {
         makePledgeFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection?.connected, sessionId]);
+    }, [socketConnection?.connected, sessionId, loadingModalOpen]);
 
     useEffect(() => {
       const workingAmount = pledges
@@ -714,12 +714,22 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
     // Replace hash once scrolled to comments
     useEffect(() => {
       if (inView) {
-        syncedHistoryReplaceState({}, `/post/${post.postUuid}#comments`);
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#comments`
+        );
       } else {
-        syncedHistoryReplaceState({}, `/post/${post.postUuid}`);
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }`
+        );
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid]);
+    }, [inView, post.postUuid, router.locale]);
 
     return (
       <>

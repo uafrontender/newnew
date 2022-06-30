@@ -94,6 +94,7 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
                 isCreatorsBid={
                   !option.creator || option.creator?.uuid === post.creator?.uuid
                 }
+                handleRemoveOption={() => handleRemoveOption(option)}
               />
             ))}
             {!isMobile ? (

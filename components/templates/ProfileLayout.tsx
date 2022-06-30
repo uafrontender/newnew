@@ -33,10 +33,7 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
 // import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 // import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
-import {
-  getSubscriptionStatus,
-  unsubscribeFromCreator,
-} from '../../api/endpoints/subscription';
+import { getSubscriptionStatus } from '../../api/endpoints/subscription';
 // import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
 
@@ -52,6 +49,8 @@ import UnsubscribeModal from '../molecules/profile/UnsubscribeModal';
 import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
+import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
+import CustomLink from '../atoms/CustomLink';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -101,8 +100,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [wasSubscribed, setWasSubscribed] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
+  const [wasSubscribed, setWasSubscribed] = useState<boolean | null>(null);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
   // Share
@@ -503,7 +502,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           {!isMobile && (
             <UserEllipseMenu
               isVisible={ellipseMenuOpen}
-              isSubscribed={isSubscribed}
+              isSubscribed={!!isSubscribed}
               isBlocked={isUserBlocked}
               loggedIn={currentUser.loggedIn}
               handleClose={() => setIsEllipseMenuOpen(false)}
@@ -531,7 +530,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             }}
           >
             <SUsernameWrapper>
-              <SUsername variant={4}>{user.nickname}</SUsername>
+              <SUsername variant={4}>
+                {user.nickname}
+                {user.options?.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='32px'
+                    height='32px'
+                  />
+                )}
+              </SUsername>
               {isGenderPronounsDefined(user.genderPronouns) && (
                 <SGenderPronouns variant={2}>
                   {t(
@@ -587,17 +595,18 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               </SShareButton>
             </SShareDiv>
             {user.options?.isOfferingSubscription ? (
-              <Link
+              <CustomLink
                 href={
                   !isSubscribed && !wasSubscribed
                     ? `/${user.username}/subscribe`
                     : `/direct-messages/${user.username}`
                 }
+                disabled={isSubscribed === null || wasSubscribed === null}
               >
                 <SSendButton withShadow view='primaryGrad'>
                   {t('profileLayout.buttons.sendMessage')}
                 </SSendButton>
-              </Link>
+              </CustomLink>
             ) : null}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
           </div>
@@ -614,7 +623,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         <UserEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={10}
-          isSubscribed={isSubscribed}
+          isSubscribed={!!isSubscribed}
           isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           onClose={() => setIsEllipseMenuOpen(false)}
@@ -696,6 +705,8 @@ const SUsernameWrapper = styled.div`
 
 const SUsername = styled(Headline)`
   text-align: center;
+  display: flex;
+  align-items: center;
 `;
 
 const SGenderPronouns = styled(Text)`
@@ -918,4 +929,8 @@ const SSubcribedTag = styled.div`
   ${({ theme }) => theme.media.laptop} {
     top: 275px;
   }
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  margin-left: 4px;
 `;

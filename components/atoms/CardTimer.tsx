@@ -8,18 +8,22 @@ import Caption from './Caption';
 
 import isBrowser from '../../utils/isBrowser';
 import secondsToDHM, { DHM } from '../../utils/secondsToDHM';
+import usePageVisibility from '../../utils/hooks/usePageVisibility';
 
 interface ICardTimer {
-  timestampSeconds: number;
+  startsAt: number;
+  endsAt: number;
 }
 
 // Its strange how much resources this component consumes om initial render (5.3% before memo)
 const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
-  ({ timestampSeconds }) => {
+  ({ startsAt, endsAt }) => {
     const { t } = useTranslation('component-PostCard');
-    const parsed = (timestampSeconds - Date.now()) / 1000;
-    const hasEnded = Date.now() > timestampSeconds;
-    const expirationDate = new Date(timestampSeconds);
+    const isPageVisible = usePageVisibility();
+    const parsed = (endsAt - Date.now()) / 1000;
+    const hasStarted = Date.now() > startsAt;
+    const hasEnded = Date.now() > endsAt;
+    const expirationDate = new Date(endsAt);
 
     const [parsedSeconds, setParsedSeconds] = useState<DHM>(
       secondsToDHM(parsed, 'noTrim')
@@ -48,26 +52,38 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
     useEffect(() => {
       // TODO: we can set the interval recursively and first one can
       // be equal to seconds + milliseconds portion of the time left
-      if (isBrowser()) {
+      if (isBrowser() && isPageVisible) {
         interval.current = window.setInterval(() => {
-          setSeconds((s) => s - 60);
+          setSeconds(() => (endsAt - Date.now()) / 1000);
         }, 1000 * 60);
       }
       return () => clearInterval(interval.current);
-    }, []);
+    }, [endsAt, isPageVisible]);
 
     useEffect(() => {
       setParsedSeconds(secondsToDHM(seconds, 'noTrim'));
     }, [seconds]);
 
-    return !hasEnded ? (
+    if (!hasStarted) {
+      return (
+        <SCaption variant={2} weight={700}>
+          {t('timer.soon')}
+        </SCaption>
+      );
+    }
+
+    if (hasEnded) {
+      return (
+        <SCaptionEnded variant={2} weight={700}>
+          {t('timer.endedOn')} {expirationDate.toLocaleDateString('en-US')}
+        </SCaptionEnded>
+      );
+    }
+
+    return (
       <SCaption variant={2} weight={700}>
         {t('timer.timeLeft', { time: parsedString })}
       </SCaption>
-    ) : (
-      <SCaptionEnded variant={2} weight={700}>
-        {t('timer.endedOn')} {expirationDate.toLocaleDateString('en-US')}
-      </SCaptionEnded>
     );
   }
 );

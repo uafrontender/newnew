@@ -14,6 +14,7 @@ import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
 // Icons
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import AlertIconInverted from '../../../public/images/svg/icons/filled/AlertInverted.svg';
+import usePageVisibility from '../../../utils/hooks/usePageVisibility';
 
 interface IResponseTimer {
   timestampSeconds: number;
@@ -27,26 +28,27 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const isPageVisible = usePageVisibility();
 
   const parsed = (timestampSeconds - Date.now()) / 1000;
 
   const [parsedSeconds, setParsedSeconds] = useState<DHMS>(
-    secondsToDHMS(parsed, 'noTrim')
+    secondsToDHMS(parsed)
   );
   const [seconds, setSeconds] = useState(parsed);
   const interval = useRef<number>();
 
   useEffect(() => {
-    if (isBrowser()) {
+    if (isBrowser() && isPageVisible) {
       interval.current = window.setInterval(() => {
-        setSeconds((s) => s - 1);
+        setSeconds(() => (timestampSeconds - Date.now()) / 1000);
       }, 1000);
     }
     return () => clearInterval(interval.current);
-  }, []);
+  }, [isPageVisible, timestampSeconds]);
 
   useEffect(() => {
-    setParsedSeconds(secondsToDHMS(seconds, 'noTrim'));
+    setParsedSeconds(secondsToDHMS(seconds));
   }, [seconds]);
 
   return (
