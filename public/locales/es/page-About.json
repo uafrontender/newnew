@@ -1,65 +1,65 @@
 {
   "meta": {
-    "title": "About NewNew",
-    "description": "Learn more about creator economy company NewNew’s investors, press & media "
+    "title": "Acerca de NewNew",
+    "description": "Conoce más sobre los inversionistas de la empresa de economía de creación NewNew y algunas apariciones especiales que ha hecho en la prensa y los medios de comunicación"
   },
   "intro": {
-    "title": "NewNew is where people come together to bid and vote on the world’s biggest decisions",
-    "text": "We empower people to take control and have more interactive experiences"
+    "title": "NewNew es el lugar donde la gente se reúne para ofertar y votar sobre las decisiones más importantes del mundo",
+    "text": "Permitimos a las personas tomar el control y tener experiencias más interactivas"
   },
   "press": {
-    "title": "Press",
+    "title": "Prensa",
     "items": [
       {
-        "title": "The app that lets you pay to control another person's life."
+        "title": "La aplicación que te permite pagar para controlar la vida de otra persona."
       },
       {
-        "title": "For Creators, Everything Is for Sale"
+        "title": "Para los creadores, todo está en venta"
       },
       {
-        "title": "Monetizing the ‘creator economy,’ with NewNew."
+        "title": "Monetizando la 'economía del creador' con NewNew."
       },
       {
-        "title": "20 creator economy startups to watch as the space heats up..."
+        "title": "20 startups de economía de creadores a las que hay que prestar atención mientras el espacio se vuelve tendencia..."
       },
       {
-        "title": "Smart VCs Recognize That Black Female Founders May Lead..."
+        "title": "Las empresas de capital de riesgo inteligentes reconocen que las fundadoras negras pueden ser líderes..."
       },
       {
         "title": "Quicktake “Take the Lead” (03/25/2020)"
       },
       {
-        "title": "How polling app NewNew represents the new class of..."
+        "title": "Cómo la aplicación de encuestas NewNew representa a la nueva clase de..."
       },
       {
-        "title": "This tech 'outsider' CEO from Toronto went from Drake’s inner..."
+        "title": "Este director general de Toronto, que es un 'outsider' de la tecnología, pasó de..."
       },
       {
-        "title": "Former Drake Executive Discusses Her Transition To Tech And... "
+        "title": "La exejecutiva de Drake habla de su transición a la tecnología y... "
       }
     ]
   },
   "backers": {
-    "title": "Backers"
+    "title": "Patrocinadores"
   },
   "investors": {
-    "title": "Individual Investors",
+    "title": "Inversionistas individuales",
     "participants": [
       {
         "name": "Michael Ovitz",
-        "description": "Founder, Creative Artists Agency (CAA)"
+        "description": "Fundador, Creative Artists Agency (CAA)"
       },
       {
         "name": "Stephen Pagliuca",
-        "description": "Co-Chairman, Bain Capital"
+        "description": "Copresidente, Bain Capital"
       },
       {
         "name": "Kevin Mayer",
-        "description": "Chairman, DAZN Group (Former TikTok CEO  & Disney Chairman)"
+        "description": "Presidente, DAZN Group (Former TikTok CEO  & Disney Chairman)"
       },
       {
         "name": "Steven Galanis",
-        "description": "Founder, Cameo"
+        "description": "Fundador, Cameo"
       }
     ]
   }
