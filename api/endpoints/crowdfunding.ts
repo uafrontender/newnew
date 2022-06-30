@@ -9,7 +9,7 @@ import {
 const BASE_URL_CROWDFUNDING = `${BASE_URL}/crowdfunding`;
 
 export const fetchTopCrowdfundings = (
-  payload: newnewapi.PagedCrowdfundingsRequest
+  payload: newnewapi.PagedCrowdfundingsRequest, signal?: RequestInit['signal']
 ) =>
   fetchProtobuf<
     newnewapi.PagedCrowdfundingsRequest,
@@ -19,10 +19,14 @@ export const fetchTopCrowdfundings = (
     newnewapi.PagedCrowdfundingsResponse,
     `${BASE_URL_CROWDFUNDING}/get_top_crowdfundings`,
     'post',
-    payload
+    payload,
+    {},
+    'cors',
+    'same-origin',
+    signal ?? undefined,
   );
 
-export const fetchPledges = (payload: newnewapi.GetPledgesRequest) =>
+export const fetchPledges = (payload: newnewapi.GetPledgesRequest, signal?: RequestInit['signal']) =>
   fetchProtobuf<newnewapi.GetPledgesRequest, newnewapi.GetPledgesResponse>(
     newnewapi.GetPledgesRequest,
     newnewapi.GetPledgesResponse,
@@ -34,11 +38,14 @@ export const fetchPledges = (payload: newnewapi.GetPledgesRequest) =>
       ? {
           'x-auth-token': cookiesInstance.get('accessToken'),
         }
-      : {}
+      : {},
+      'cors',
+      'same-origin',
+      signal ?? undefined,
   );
 
 export const doPledgeCrowdfunding = (
-  payload: newnewapi.FulfillPaymentPurposeRequest
+  payload: newnewapi.FulfillPaymentPurposeRequest, signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.FulfillPaymentPurposeRequest,
@@ -48,10 +55,11 @@ export const doPledgeCrowdfunding = (
     newnewapi.DoPledgeResponse,
     `${BASE_URL_CROWDFUNDING}/do_pledge`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
-export const doPledgeWithWallet = (payload: newnewapi.DoPledgeRequest) =>
+export const doPledgeWithWallet = (payload: newnewapi.DoPledgeRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.DoPledgeRequest,
     newnewapi.DoPledgeResponse
@@ -60,5 +68,6 @@ export const doPledgeWithWallet = (payload: newnewapi.DoPledgeRequest) =>
     newnewapi.DoPledgeResponse,
     `${BASE_URL_CROWDFUNDING}/do_pledge_with_wallet`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
