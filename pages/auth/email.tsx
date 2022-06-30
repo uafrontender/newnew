@@ -41,6 +41,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
   useEffect(() => {
     async function handleAuth() {
+      if (isLoading) return;
       try {
         setIsLoading(true);
 
