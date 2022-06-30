@@ -40,6 +40,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
   useEffect(() => {
     async function handleAuth() {
       if (isLoading) return;
+
       try {
         setIsLoading(true);
 
