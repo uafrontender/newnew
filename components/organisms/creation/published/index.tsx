@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -202,6 +202,18 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       </SItemTitle>
     </SItem>
   );
+
+  useEffect(() => {
+    router.beforePopState((state: any) => {
+      router.push('/profile/my-posts');
+      return false;
+    });
+
+    return () => {
+      router.beforePopState(() => true);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
