@@ -1,10 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
 
-import Modal from '../../organisms/Modal';
-import Button from '../../atoms/Button';
-import Text from '../../atoms/Text';
+import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
 
 interface ICommentEllipseModal {
   isOpen: boolean;
@@ -38,85 +35,19 @@ const CommentEllipseModal: React.FunctionComponent<ICommentEllipseModal> = ({
   };
 
   return (
-    <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
-      <SWrapper>
-        <SContentContainer
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          {canDeleteComment && (
-            <SButton onClick={deleteCommentHandler}>
-              <Text variant={2}>{t('ellipse.delete')}</Text>
-            </SButton>
-          )}
-          {!isMyComment && (
-            <SButton onClick={reportUserHandler}>
-              <Text variant={2} tone='error'>
-                {t('ellipse.report')}
-              </Text>
-            </SButton>
-          )}
-        </SContentContainer>
-        <Button
-          view='modalSecondary'
-          style={{
-            height: '56px',
-            width: 'calc(100% - 32px)',
-          }}
-          onClick={onClose}
-        >
-          {t('ellipse.cancel')}
-        </Button>
-      </SWrapper>
-    </Modal>
+    <EllipseModal show={isOpen} zIndex={zIndex} onClose={onClose}>
+      {canDeleteComment && (
+        <EllipseModalButton onClick={deleteCommentHandler}>
+          {t('ellipse.delete')}
+        </EllipseModalButton>
+      )}
+      {!isMyComment && (
+        <EllipseModalButton tone='error' onClick={reportUserHandler}>
+          {t('ellipse.report')}
+        </EllipseModalButton>
+      )}
+    </EllipseModal>
   );
 };
 
 export default CommentEllipseModal;
-
-const SWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding-bottom: 16px;
-`;
-
-const SContentContainer = styled.div`
-  width: calc(100% - 32px);
-  height: fit-content;
-
-  display: flex;
-  flex-direction: column;
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colors.white
-      : props.theme.colorsThemed.background.tertiary};
-
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  z-index: 1;
-
-  ${({ theme }) => theme.media.tablet} {
-    width: 480px;
-    height: 480px;
-    margin: auto;
-  }
-`;
-
-const SButton = styled.button`
-  background: none;
-  border: transparent;
-  text-align: center;
-  cursor: pointer;
-  padding: 16px;
-  &:focus {
-    outline: none;
-  }
-`;
