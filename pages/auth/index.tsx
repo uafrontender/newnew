@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -46,15 +46,20 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useUpdateEffect(() => {
     if (user.loggedIn) router?.push('/');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mounted]);
 
   useUpdateEffect(() => {
     async function handleAuth() {
-      if (isLoading) return;
+      if (isLoading || user.loggedIn) return;
       try {
         setIsLoading(true);
 
@@ -168,7 +173,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
 
     handleAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading]);
+  }, [mounted]);
 
   return (
     <div>
