@@ -27,7 +27,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
   oauth_verifier,
 }) => {
   const router = useRouter();
-  const [, setCookie] = useCookies();
+  const [getCookie, setCookie] = useCookies();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,6 +59,12 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
         if (!data || data.status !== newnewapi.SignInResponse.Status.SUCCESS)
           throw new Error('No data');
+
+        console.log(data);
+
+        console.log(user);
+        console.log(getCookie.accessToken);
+        console.log(getCookie.refreshToken);
 
         dispatch(
           setUserData({
@@ -97,6 +103,12 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
           path: '/',
         });
 
+        console.log(data);
+
+        console.log(user);
+        console.log(getCookie.accessToken);
+        console.log(getCookie.refreshToken);
+
         dispatch(setUserLoggedIn(true));
 
         setIsLoading(false);
@@ -116,7 +128,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
     handleAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isLoading]);
 
   return (
     <div>
