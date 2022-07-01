@@ -264,7 +264,9 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
               {t('subRateSection.selectInput.perMonth')}
             </SPerMonth>
             {currentProduct && (
-              <SLabelCurrent selected={selected}>Current</SLabelCurrent>
+              <SLabelCurrent selected={selected}>
+                {t('subRateSection.selectInput.current')}
+              </SLabelCurrent>
             )}
           </>
         ) : (

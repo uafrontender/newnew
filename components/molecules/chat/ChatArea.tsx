@@ -87,9 +87,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
-  const [messagesNextPageToken, setMessagesNextPageToken] = useState<
-    string | undefined | null
-  >('');
+  const [messagesNextPageToken, setMessagesNextPageToken] =
+    useState<string | undefined | null>('');
   const [messagesLoading, setMessagesLoading] = useState(false);
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
@@ -474,10 +473,18 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           {isMobileOrTablet && <GoBackButton onClick={clickHandler} />}
           <SUserData>
             <SUserName>
-              {isMyAnnouncement
-                ? user.userData?.nickname
-                : chatRoom.visavis?.nickname}
-              {isAnnouncement && t('announcement.title')}
+              {
+                // eslint-disable-next-line no-nested-ternary
+                isAnnouncement
+                  ? t('announcement.title', {
+                      username: isMyAnnouncement
+                        ? user.userData?.nickname
+                        : chatRoom.visavis?.nickname,
+                    })
+                  : isMyAnnouncement
+                  ? user.userData?.nickname
+                  : chatRoom.visavis?.nickname
+              }
             </SUserName>
             {!isAnnouncement && (
               <Link href={`/${chatRoom?.visavis?.username}`}>
