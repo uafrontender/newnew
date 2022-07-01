@@ -280,10 +280,7 @@ export async function fetchProtobufProtectedIntercepted<
           refreshToken,
         });
         const resRefresh = await refreshCredentials(refreshPayload);
-        console.log(`cookiesInstance refreshToken: ${refreshToken}`);
-        console.log(
-          `refreshCredentials response refreshToken: ${resRefresh?.data?.credential?.refreshToken}`
-        );
+
         // Refresh failed, session "expired"
         // (i.e. user probably logged in from another device, or exceeded
         // max number of logged in devices/browsers)
