@@ -18,7 +18,7 @@ interface IChangeLanguage {}
 export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
   const { t } = useTranslation('common');
   const ref: any = useRef();
-  const { push, locale, pathname } = useRouter();
+  const { push, locale, asPath, pathname } = useRouter();
   const [focused, setFocused] = useState(false);
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -41,7 +41,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
 
   const renderItem = (item: string) => {
     const handleItemClick = () => {
-      push(pathname, pathname, { locale: item });
+      push(pathname, asPath, { locale: item });
     };
 
     return (
