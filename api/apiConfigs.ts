@@ -3,7 +3,7 @@ import { newnewapi } from 'newnew-api';
 import * as $protobuf from 'protobufjs';
 import { Cookies } from 'react-cookie';
 
-const logsOn = process.env.NEXT_PUBLIC_PROTOBUF_LOGS === 'true'
+const logsOn = process.env.NEXT_PUBLIC_PROTOBUF_LOGS === 'true';
 
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -90,7 +90,7 @@ export async function fetchProtobuf<
   headers: any = {},
   mode: Request['mode'] = 'cors',
   credentials: Request['credentials'] = 'same-origin',
-  signal: RequestInit['signal'] = undefined,
+  signal: RequestInit['signal'] = undefined
 ): Promise<APIResponse<ResponseType>> {
   const encoded = payload ? reqT.encode(payload).finish() : undefined;
 
@@ -116,21 +116,33 @@ export async function fetchProtobuf<
     if (logsOn) {
       // @ts-ignore
       console.groupCollapsed(`Success: ${reqT?.name} -> ${resT?.name}`);
-      console.debug(`
+      console.debug(
+        `
       %c Payload Type: %c ${
         // @ts-ignore
         reqT?.name
       }
       %c Payload: %c ${JSON.stringify(payload, null, 2)}
-      `, 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;', 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;')
-      console.debug(`
+      `,
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;',
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;'
+      );
+      console.debug(
+        `
       %c Response Type: %c ${
         // @ts-ignore
         resT?.name
       }
       %c Response: %c ${JSON.stringify(data, null, 2)}
-      `, 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;', 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;')
-      console.groupEnd()
+      `,
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;',
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;'
+      );
+      console.groupEnd();
     }
 
     return {
@@ -140,21 +152,33 @@ export async function fetchProtobuf<
     if (logsOn) {
       // @ts-ignore
       console.groupCollapsed(`Error: ${reqT?.name} -> ${resT?.name}`);
-      console.debug(`
+      console.debug(
+        `
       %c Payload Type: %c ${
         // @ts-ignore
         reqT?.name
       }
       %c Payload: %c ${JSON.stringify(payload, null, 2)}
-      `, 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;', 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;')
-      console.debug(`
+      `,
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;',
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;'
+      );
+      console.debug(
+        `
       %c Response Type: %c ${
         // @ts-ignore
         resT?.name
       }
       %c Error: %c ${err}
-      `, 'font-size: 14px; color: blue;', 'font-size: 12px; color: black;', 'font-size: 14px; color: red;', 'font-size: 12px; color: black;')
-      console.groupEnd()
+      `,
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;',
+        'font-size: 14px; color: red;',
+        'font-size: 12px; color: black;'
+      );
+      console.groupEnd();
     }
 
     return {
@@ -239,7 +263,7 @@ export async function fetchProtobufProtectedIntercepted<
       },
       'cors',
       'same-origin',
-      signal ?? undefined,
+      signal ?? undefined
     );
 
     // Throw an error if the access token was invalid
@@ -289,21 +313,20 @@ export async function fetchProtobufProtectedIntercepted<
           );
         } else if (resRefresh.data.credential?.expiresAt?.seconds) {
           // Server-side
-            updateCookieServerSideCallback?.([
-              {
-                name: 'accessToken',
-                value: resRefresh.data.credential?.accessToken!!,
-                expires: new Date(
-                  (resRefresh.data.credential.expiresAt.seconds as number) *
-                    1000
-                ).toUTCString(),
-              },
-              {
-                name: 'refreshToken',
-                value: resRefresh.data.credential?.refreshToken!!,
-                maxAge: (10 * 365 * 24 * 60 * 60).toString(),
-              },
-            ]);
+          updateCookieServerSideCallback?.([
+            {
+              name: 'accessToken',
+              value: resRefresh.data.credential?.accessToken!!,
+              expires: new Date(
+                (resRefresh.data.credential.expiresAt.seconds as number) * 1000
+              ).toUTCString(),
+            },
+            {
+              name: 'refreshToken',
+              value: resRefresh.data.credential?.refreshToken!!,
+              maxAge: (10 * 365 * 24 * 60 * 60).toString(),
+            },
+          ]);
         }
         // Try request again with new credentials
         res = await fetchProtobuf<RequestType, ResponseType>(
