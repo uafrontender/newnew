@@ -39,8 +39,8 @@ interface IButton {
 }
 
 // Arguable optimization, depends on unstable onClick, but works according to profiling (1.8% => 0%)
-const Button: React.FunctionComponent<IButton & TButton> = React.memo(
-  React.forwardRef<HTMLAnchorElement & HTMLButtonElement, IButton>(
+const Button = React.memo(
+  React.forwardRef<HTMLAnchorElement & HTMLButtonElement, IButton & TButton>(
     (props, parentRef) => {
       const {
         loading,
