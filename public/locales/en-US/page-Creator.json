@@ -196,7 +196,8 @@
     "selectInput": {
       "perMonth": "/month",
       "select": "Select",
-      "featured": "Popular"
+      "featured": "Popular",
+      "current": "Current"
     },
     "button": {
       "enable": "Turn on Subscription",

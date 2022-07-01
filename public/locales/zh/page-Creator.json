@@ -196,7 +196,8 @@
     "selectInput": {
       "perMonth": "/月",
       "select": "選擇",
-      "featured": "熱門"
+      "featured": "熱門",
+      "current": "當前"
     },
     "button": {
       "enable": "開啟訂閱",
