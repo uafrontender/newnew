@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useCookies } from 'react-cookie';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -7,6 +7,7 @@ import { newnewapi } from 'newnew-api';
 import jsonwebtoken from 'jsonwebtoken';
 import getRawBody from 'raw-body';
 import qs from 'querystring';
+import { useUpdateEffect } from 'react-use';
 
 import Lottie from '../../components/atoms/Lottie';
 
@@ -46,13 +47,14 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (user.loggedIn) router?.push('/');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     async function handleAuth() {
+      if (isLoading) return;
       try {
         setIsLoading(true);
 
@@ -166,7 +168,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
 
     handleAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isLoading]);
 
   return (
     <div>
