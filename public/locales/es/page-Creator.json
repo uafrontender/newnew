@@ -197,7 +197,7 @@
       "perMonth": "/mes",
       "select": "Seleccionar",
       "featured": "Popular",
-      "curren": "Actual"
+      "current": "Actual"
     },
     "button": {
       "enable": "Activar la suscripción",
