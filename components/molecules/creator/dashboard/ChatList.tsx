@@ -180,18 +180,18 @@ export const ChatList = () => {
             />
           </SMyAvatarMassupdate>
         );
-        chatName = `${
-          user.userData?.nickname
+        chatName = t('announcement.title', {
+          username: user.userData?.nickname
             ? user.userData?.nickname
-            : user.userData?.username
-        } ${t('announcement.title')}`;
+            : user.userData?.username,
+        });
       }
       if (chat.kind === 4 && chat.myRole === 1) {
-        chatName = `${
-          chat.visavis?.nickname
+        chatName = t('announcement.title', {
+          username: chat.visavis?.nickname
             ? chat.visavis?.nickname
-            : chat.visavis?.username
-        } ${t('announcement.title')}`;
+            : chat.visavis?.username,
+        });
       }
 
       let lastMsg = chat.lastMessage?.content?.text;

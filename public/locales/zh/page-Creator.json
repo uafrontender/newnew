@@ -243,7 +243,7 @@
     "members": "成員"
   },
   "announcement": {
-    "title": "的公告"
+    "title": "{{username}}的公告"
   },
   "stripe": {
     "meta": {
