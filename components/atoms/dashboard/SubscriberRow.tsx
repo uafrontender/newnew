@@ -1,5 +1,5 @@
 /* eslint-disable no-lonely-if */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import moment from 'moment';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
@@ -89,6 +89,8 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
     setConfirmReportUser(true);
   };
 
+  const moreButtonRef: any = useRef<HTMLButtonElement>();
+
   return (
     <SContainer>
       <SUser>
@@ -118,6 +120,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
           view='transparent'
           iconOnly
           onClick={() => handleOpenEllipseMenu()}
+          ref={moreButtonRef}
         >
           <InlineSVG
             svg={MoreIconFilled}
@@ -135,6 +138,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
               userBlocked={isSubscriberBlocked}
               onUserBlock={onUserBlock}
               onUserReport={onUserReport}
+              anchorElement={moreButtonRef?.current}
             />
             <ReportModal
               show={confirmReportUser}

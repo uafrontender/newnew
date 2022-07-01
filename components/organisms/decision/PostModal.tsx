@@ -298,8 +298,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [recommendedPosts, setRecommendedPosts] = useState<newnewapi.Post[]>(
     []
   );
-  const [nextPageToken, setNextPageToken] =
-    useState<string | null | undefined>('');
+  const [nextPageToken, setNextPageToken] = useState<string | null | undefined>(
+    ''
+  );
   const [recommendedPostsLoading, setRecommendedPostsLoading] = useState(false);
   const [triedLoading, setTriedLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
@@ -883,6 +884,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const moreButtonRef: any = useRef();
+  const shareButtonRef: any = useRef();
+
   if (shouldRenderVotingFinishedModal && !isMyPost) {
     return (
       <>
@@ -919,6 +923,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               view='secondary'
               iconOnly
               onClick={() => setShareMenuOpen(true)}
+              ref={shareButtonRef}
             >
               <InlineSvg
                 svg={ShareIcon}
@@ -931,6 +936,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               view='secondary'
               iconOnly
               onClick={() => setEllipseMenuOpen(true)}
+              ref={moreButtonRef}
             >
               <InlineSvg
                 svg={MoreIcon}
@@ -945,6 +951,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 postId={postParsed.postUuid}
                 isVisible={shareMenuOpen}
                 onClose={handleShareClose}
+                anchorElement={shareButtonRef.current}
               />
             )}
             {isMobile && shareMenuOpen && postParsed?.postUuid && (
@@ -964,6 +971,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 handleFollowDecision={handleFollowDecision}
                 handleReportOpen={handleReportOpen}
                 onClose={handleEllipseMenuClose}
+                anchorElement={moreButtonRef.current}
               />
             )}
             {isMobile && ellipseMenuOpen ? (

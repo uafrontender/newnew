@@ -1,6 +1,12 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-lonely-if */
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  useRef,
+} from 'react';
 import dynamic from 'next/dynamic';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
@@ -69,8 +75,9 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   //   useState<boolean>(false);
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const [newMessage, setNewMessage] =
-    useState<newnewapi.IChatMessage | null | undefined>();
+  const [newMessage, setNewMessage] = useState<
+    newnewapi.IChatMessage | null | undefined
+  >();
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
@@ -467,6 +474,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     chatRoom,
   ]);
 
+  const moreButtonRef: any = useRef();
+
   return (
     <SContainer>
       {chatRoom && (
@@ -506,6 +515,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                 view='transparent'
                 iconOnly
                 onClick={() => handleOpenEllipseMenu()}
+                ref={moreButtonRef}
               >
                 <InlineSVG
                   svg={MoreIconFilled}
@@ -526,6 +536,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                 onUserBlock={onUserBlock}
                 onUserReport={onUserReport}
                 isAnnouncement={localUserData.isAnnouncement}
+                anchorElement={moreButtonRef.current}
               />
             )}
             {isMobile && ellipseMenuOpen ? (

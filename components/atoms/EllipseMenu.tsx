@@ -66,6 +66,7 @@ interface IEllipseMenu {
   };
   offsetRight?: string;
   offsetTop?: string;
+  withoutContainer?: boolean;
 }
 
 const EllipseMenu: React.FunctionComponent<IEllipseMenu> = ({
@@ -82,6 +83,7 @@ const EllipseMenu: React.FunctionComponent<IEllipseMenu> = ({
   },
   offsetRight,
   offsetTop,
+  withoutContainer,
   ...rest
 }) => {
   const containerRef = useRef<HTMLDivElement>();
@@ -170,6 +172,7 @@ const EllipseMenu: React.FunctionComponent<IEllipseMenu> = ({
             $maxWidth={maxWidth}
             $transformX={offsetRight}
             $transformY={offsetTop}
+            $withoutContainer={withoutContainer}
             {...rest}
           >
             {childrenWithProps}
@@ -187,10 +190,13 @@ export default EllipseMenu;
 
 interface IEllipseMenuButton {
   tone?: 'neutral' | 'error';
-  onClick: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   children: React.ReactNode;
   isCloseMenuOnClick?: boolean;
   onCloseMenu?: () => void;
+  withoutTextWrapper?: boolean;
+  variant?: 1 | 2 | 3 | 4 | 5;
+  disabled?: boolean;
 }
 
 export const EllipseMenuButton: React.FC<IEllipseMenuButton> = ({
@@ -199,20 +205,31 @@ export const EllipseMenuButton: React.FC<IEllipseMenuButton> = ({
   tone,
   isCloseMenuOnClick,
   onCloseMenu,
+  withoutTextWrapper,
+  variant = 2,
+  disabled,
+  ...rest
 }) => (
   <SButton
     onClick={(e) => {
-      e.stopPropagation();
-      onClick(e);
+      if (onClick) {
+        e.stopPropagation();
+        onClick(e);
+      }
 
       if (isCloseMenuOnClick && onCloseMenu) {
         onCloseMenu();
       }
     }}
+    disabled={disabled}
+    {...rest}
   >
-    <Text variant={2} tone={tone}>
-      {children}
-    </Text>
+    {withoutTextWrapper && children}
+    {!withoutTextWrapper && (
+      <Text tone={tone} variant={variant}>
+        {children}
+      </Text>
+    )}
   </SButton>
 );
 
@@ -223,12 +240,14 @@ const SContainer = styled(motion.div)<{
   $maxWidth?: string;
   $transformX?: string;
   $transformY?: string;
+  $withoutContainer?: boolean;
 }>`
   position: absolute;
   top: ${({ top }) => top};
   right: ${({ right }) => right};
   z-index: ${({ $zIndex }) => $zIndex || 10};
-  min-width: 180px;
+  min-width: ${({ $withoutContainer }) =>
+    $withoutContainer ? 'unset' : '180px'};
   max-width: ${({ $maxWidth }) => $maxWidth ?? 'unset'};
   transform: ${({ $transformX, $transformY }) =>
     `translate(${$transformX ?? 0}, ${$transformY ?? 0})`};
@@ -236,7 +255,7 @@ const SContainer = styled(motion.div)<{
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 8px;
+  padding: ${({ $withoutContainer }) => ($withoutContainer ? 0 : '8px')};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   background: ${(props) =>

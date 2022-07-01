@@ -1,11 +1,8 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
-import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
-import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
-import Text from '../../atoms/Text';
+import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 
 interface ICommentEllipseMenu {
   isVisible: boolean;
@@ -14,6 +11,7 @@ interface ICommentEllipseMenu {
   handleClose: () => void;
   onDeleteComment: () => void;
   onUserReport: () => void;
+  anchorElement: HTMLElement;
 }
 
 const CommentEllipseMenu: React.FC<ICommentEllipseMenu> = ({
@@ -23,12 +21,9 @@ const CommentEllipseMenu: React.FC<ICommentEllipseMenu> = ({
   handleClose,
   onDeleteComment,
   onUserReport,
+  anchorElement,
 }) => {
   const { t } = useTranslation('common');
-  const containerRef = useRef<HTMLDivElement>();
-
-  useOnClickEsc(containerRef, handleClose);
-  useOnClickOutside(containerRef, handleClose);
 
   const reportUserHandler = () => {
     onUserReport();
@@ -40,73 +35,39 @@ const CommentEllipseMenu: React.FC<ICommentEllipseMenu> = ({
     handleClose();
   };
 
+  useEffect(() => {
+    const postModal = document.getElementById('post-modal-container');
+    if (isVisible && postModal) {
+      postModal.style.overflow = 'hidden';
+    } else if (postModal) {
+      postModal.style.overflow = 'scroll';
+    }
+  }, [isVisible]);
+
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <SContainer
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {canDeleteComment && (
-            <SButton onClick={deleteCommentHandler}>
-              <Text variant={2}>{t('ellipse.delete')}</Text>
-            </SButton>
-          )}
-          {!isMyComment && (
-            <SButton onClick={reportUserHandler}>
-              <Text variant={2} tone='error'>
-                {t('ellipse.report')}
-              </Text>
-            </SButton>
-          )}
-        </SContainer>
+    <SEllipseMenu
+      isOpen={isVisible}
+      onClose={handleClose}
+      anchorElement={anchorElement}
+      zIndex={11}
+    >
+      {canDeleteComment && (
+        <EllipseMenuButton onClick={deleteCommentHandler}>
+          {t('ellipse.delete')}
+        </EllipseMenuButton>
       )}
-    </AnimatePresence>
+      {!isMyComment && (
+        <EllipseMenuButton onClick={reportUserHandler} tone='error'>
+          {t('ellipse.report')}
+        </EllipseMenuButton>
+      )}
+    </SEllipseMenu>
   );
 };
 
 export default CommentEllipseMenu;
 
-const SContainer = styled(motion.div)`
-  position: absolute;
-  top: 100%;
-  z-index: 10;
-  right: 16px;
+const SEllipseMenu = styled(EllipseMenu)`
+  position: fixed;
   width: 216px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 8px;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colors.white
-      : props.theme.colorsThemed.background.tertiary};
-
-  ${({ theme }) => theme.media.laptop} {
-    right: 16px;
-  }
-`;
-
-const SButton = styled.button`
-  background: none;
-  border: transparent;
-  text-align: left;
-  width: 100%;
-  cursor: pointer;
-  padding: 8px;
-  box-sizing: border-box;
-  border-radius: ${({ theme }) => theme.borderRadius.smallLg};
-  &:focus {
-    outline: none;
-  }
-  &:hover {
-    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
-  }
 `;

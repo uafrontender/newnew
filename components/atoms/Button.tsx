@@ -10,7 +10,7 @@ import RippleAnimation from './RippleAnimation';
 import logoAnimation from '../../public/animations/mobile_logo.json';
 
 type TButton = React.ComponentPropsWithoutRef<'button'>;
-type TView =
+export type TView =
   | 'primary'
   | 'primaryGrad'
   | 'primaryProgress'

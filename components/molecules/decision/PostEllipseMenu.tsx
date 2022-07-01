@@ -1,11 +1,8 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
-import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
-import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
-import Text from '../../atoms/Text';
+import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 
 interface IPostEllipseMenu {
   postType: string;
@@ -14,6 +11,7 @@ interface IPostEllipseMenu {
   handleFollowDecision: () => void;
   handleReportOpen: () => void;
   onClose: () => void;
+  anchorElement?: HTMLElement;
 }
 
 const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = React.memo(
@@ -24,91 +22,67 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = React.memo(
     handleFollowDecision,
     handleReportOpen,
     onClose,
+    anchorElement,
   }) => {
     const { t } = useTranslation('common');
-    const containerRef = useRef<HTMLDivElement>();
 
-    useOnClickEsc(containerRef, onClose);
-    useOnClickOutside(containerRef, onClose);
+    useEffect(() => {
+      const postModal = document.getElementById('post-modal-container');
+      if (isVisible && postModal) {
+        postModal.style.overflow = 'hidden';
+      } else if (postModal) {
+        postModal.style.overflow = 'scroll';
+      }
+    }, [isVisible]);
 
     return (
-      <AnimatePresence>
-        {isVisible && (
-          <SContainer
-            ref={(el) => {
-              containerRef.current = el!!;
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <SButton onClick={() => handleFollowDecision()}>
-              <Text variant={3}>
-                {!isFollowingDecision
-                  ? t('ellipse.followDecision', {
-                      postType: t(`postType.${postType}`),
-                    })
-                  : t('ellipse.unFollowDecision', {
-                      postType: t(`postType.${postType}`),
-                    })}
-              </Text>
-            </SButton>
-            <SSeparator />
-            <SButton
-              onClick={() => {
-                handleReportOpen();
-                onClose();
-              }}
-            >
-              <Text variant={3} tone='error'>
-                {t('ellipse.report')}
-              </Text>
-            </SButton>
-          </SContainer>
-        )}
-      </AnimatePresence>
+      <SEllipseMenu
+        isOpen={isVisible}
+        onClose={onClose}
+        anchorElement={anchorElement}
+      >
+        <SEllipseMenuButton variant={3} onClick={handleFollowDecision}>
+          {!isFollowingDecision
+            ? t('ellipse.followDecision', {
+                postType: t(`postType.${postType}`),
+              })
+            : t('ellipse.unFollowDecision', {
+                postType: t(`postType.${postType}`),
+              })}
+        </SEllipseMenuButton>
+        <SSeparator />
+        <SEllipseMenuButton
+          variant={3}
+          tone='error'
+          onClick={() => {
+            handleReportOpen();
+            onClose();
+          }}
+        >
+          {t('ellipse.report')}
+        </SEllipseMenuButton>
+      </SEllipseMenu>
     );
   }
 );
 
 export default PostEllipseMenu;
 
-const SContainer = styled(motion.div)`
-  position: absolute;
-  top: calc(100% - 10px);
-  z-index: 10;
-  right: 16px;
+const SEllipseMenu = styled(EllipseMenu)`
   width: 216px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-
-  padding: 16px;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-
-  ${({ theme }) => theme.media.laptop} {
-    right: 16px;
-  }
-`;
-
-const SButton = styled.button`
-  background: none;
-  border: transparent;
-
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-  }
+  position: fixed;
 `;
 
 const SSeparator = styled.div`
-  margin-top: 8px;
-  margin-bottom: 8px;
+  margin-top: 3px;
+  margin-bottom: 3px;
   width: 100%;
   border-bottom: 1px solid
     ${({ theme }) => theme.colorsThemed.background.outlines1};
+`;
+
+const SEllipseMenuButton = styled(EllipseMenuButton)`
+  :hover {
+    background: transparent;
+  }
 `;
