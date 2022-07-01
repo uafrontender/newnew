@@ -44,7 +44,7 @@ const getRightPosition = (
     case 'left':
       return window.innerWidth - anchorElRect.left;
     case 'center':
-      return anchorElRect.left + anchorElRect.width / 2;
+      return window.innerWidth - anchorElRect.left - anchorElRect.width / 2;
     case 'right':
       return window.innerWidth - anchorElRect.right;
     default:
