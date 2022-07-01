@@ -35,10 +35,13 @@ const EllipseModal: React.FunctionComponent<IEllipseModal> = ({
           }}
         >
           {listOfChildren.map((child, index) => (
-            <>
+            <React.Fragment
+              // eslint-disable-next-line react/no-array-index-key
+              key={index}
+            >
               {child}
               {index !== listOfChildren.length - 1 && <SSeparator />}
-            </>
+            </React.Fragment>
           ))}
         </SContentContainer>
         <CancelButton
