@@ -196,7 +196,8 @@
     "selectInput": {
       "perMonth": "/month",
       "select": "Select",
-      "featured": "Popular"
+      "featured": "Popular",
+      "current": "Current"
     },
     "button": {
       "enable": "Turn on Subscription",
@@ -242,7 +243,7 @@
     "members": "members"
   },
   "announcement": {
-    "title": "'s announcement"
+    "title": "{{username}}'s announcement"
   },
   "stripe": {
     "meta": {
