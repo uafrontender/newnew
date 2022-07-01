@@ -8,6 +8,7 @@ import React, {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -448,6 +449,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     // isSub ? setIsSubscribed(true) : setIsSubscribed(false);
   }, [creatorsImSubscribedTo, user.uuid]);
 
+  const moreButtonRef = useRef() as any;
+
   return (
     <ErrorBoundary>
       <SGeneral restrictMaxWidth>
@@ -484,10 +487,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             </SSVGContainer>
             {t('profileLayout.buttons.favorites')}
           </SFavoritesButton> */}
+
           <SMoreButton
             view='transparent'
             iconOnly
             onClick={() => setIsEllipseMenuOpen(true)}
+            ref={moreButtonRef}
           >
             <SSVGContainer active={ellipseMenuOpen}>
               <InlineSvg
@@ -517,6 +522,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               handleClickUnsubscribe={() => {
                 setUnsubscribeModalOpen(true);
               }}
+              anchorElement={moreButtonRef.current}
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
