@@ -423,6 +423,7 @@
         "subscribeToCreatorCaption": "訂閱{{creator}}，為本次Superpoll添加你自己的選項！",
         "subscribeButton": "訂閱",
         "suggestionPlaceholder": "添加你自己的選項……",
+        "suggestionPlaceholderDesktop": "添加選……",
         "placeABidButton": "添加我的選項"
       }
     },

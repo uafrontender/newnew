@@ -625,7 +625,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               value={newOptionText}
               disabled={optionBeingSupported !== ''}
               autofocus={suggestNewMobileOpen}
-              placeholder='Add a option ...'
+              placeholder={t(
+                'mcPost.optionsTab.actionSection.suggestionPlaceholderDesktop'
+              )}
               onChange={handleUpdateNewOptionText}
             />
             <SAddFreeVoteButton

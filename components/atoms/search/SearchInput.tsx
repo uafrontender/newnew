@@ -226,7 +226,7 @@ const SearchInput: React.FC = React.memo(() => {
             value={searchValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder='Search'
+            placeholder={t('search.placeholder')}
           />
           <SRightInlineSVG
             clickable
