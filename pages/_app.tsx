@@ -18,6 +18,7 @@ import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
 import * as Sentry from '@sentry/browser';
 import { useRouter } from 'next/router';
+import moment from 'moment';
 
 // Custom error page
 import Error from './_error';
@@ -100,9 +101,13 @@ const MyApp = (props: IMyApp): ReactElement => {
     if (locale === 'zh') {
       // eslint-disable-next-line global-require
       require('moment/locale/zh-tw');
+      moment.locale('zh-tw');
     } else if (locale === 'es') {
       // eslint-disable-next-line global-require
       require('moment/locale/es');
+      moment.locale('es');
+    } else if (locale === 'en-US') {
+      moment.locale('en-US');
     }
   });
 
