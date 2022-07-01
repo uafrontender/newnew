@@ -102,7 +102,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
       if (!data || error) throw new Error(error?.message ?? 'Request failed');
 
       dispatch(setSignupEmailInput(emailInput));
-      setIsSubmitLoading(false);
 
       authLayoutContext.setShouldHeroUnmount(true);
 
