@@ -76,7 +76,7 @@
     "searchPlaceholder": "搜索"
   },
   "announcement": {
-    "title": "的公告",
+    "title": "{{username}}的公告",
     "topMessageStart": "只有",
     "topMessageEnd": "可以發送訊息"
   },

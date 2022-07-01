@@ -216,11 +216,11 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
             />
           </SMyAvatar>
         );
-        chatName = `${
-          user.userData?.nickname
+        chatName = t('announcement.title', {
+          username: user.userData?.nickname
             ? user.userData?.nickname
-            : user.userData?.username
-        } ${t('announcement.title')}`;
+            : user.userData?.username,
+        });
       }
 
       let lastMsg = chat.lastMessage?.content?.text;
