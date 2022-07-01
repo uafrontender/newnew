@@ -131,8 +131,10 @@ const EllipseMenu: React.FunctionComponent<IEllipseMenu> = ({
   }, [anchorElement, anchorOrigin.horizontal, anchorOrigin.vertical]);
 
   useEffect(() => {
-    calculatePosition();
-  }, [calculatePosition]);
+    if (isOpen) {
+      calculatePosition();
+    }
+  }, [calculatePosition, isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
