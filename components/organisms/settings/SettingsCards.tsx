@@ -1,6 +1,6 @@
 /* eslint-disable no-unsafe-optional-chaining */
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import Text from '../../atoms/Text';
@@ -8,7 +8,6 @@ import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import Card from '../../molecules/settings/Card';
 
-import assets from '../../../constants/assets';
 import addIcon from '../../../public/images/svg/icons/filled/Add.svg';
 
 const CARDS = [
@@ -39,15 +38,15 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
 
   return (
     <SSettingsContainer>
-      {/* To prevent styles override for SCardsContainer */}
-      <div />
-      <SCardsContainer>
+      <SCardsContainer $isNoCards={CARDS.length === 0}>
         <Text variant={1} weight={600}>
           {t('Settings.sections.cards.myPaymentMethods')}
         </Text>
-        <SButtonSecondaryDesktop view='secondary'>
-          {t('Settings.sections.cards.button.addCard')}
-        </SButtonSecondaryDesktop>
+        {!!CARDS.length && (
+          <SButtonSecondaryDesktop view='secondary'>
+            {t('Settings.sections.cards.button.addCard')}
+          </SButtonSecondaryDesktop>
+        )}
 
         <SButtonSecondaryMobile view='secondary' iconOnly>
           <InlineSVG
@@ -58,22 +57,19 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
           />
         </SButtonSecondaryMobile>
 
-        <SSubText variant={3}>
-          {t('Settings.sections.cards.saveUpCards', { numbersOfCards: 5 })}
-        </SSubText>
         {!CARDS.length && (
-          <SButton view='quaternary'>
-            <SCoinIcon
-              src={assets.decision.gold}
-              alt='coin'
-              draggable={false}
-            />
-            {t('Settings.sections.cards.button.addPaymentMethod')}
-          </SButton>
+          <>
+            <SSubText variant={3}>
+              {t('Settings.sections.cards.hint')}
+            </SSubText>
+            <SButton size="sm">
+              {t('Settings.sections.cards.button.addNewCard')}
+            </SButton>
+          </>
         )}
         <SCardList>
           {CARDS.map((card) => (
-            <SCardListItem>
+            <SCardListItem key={card.id}>
               <Card
                 isPrimary={card.isPrimary}
                 name={card.name}
@@ -93,14 +89,29 @@ const SSettingsContainer = styled.div`
   padding-bottom: 24px;
 `;
 
-const SCardsContainer = styled.div`
+const SCardsContainer = styled.div<{
+  $isNoCards: boolean;
+}>`
   position: relative;
-  padding: 16px;
-  padding-top: 40px;
+  padding: ${({ $isNoCards }) => $isNoCards ? '30px 16px' : '16px'};
+  min-height: 243px;
   overflow: hidden;
 
   border-radius: ${({ theme }) => theme.borderRadius.large};
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+
+  ${({ $isNoCards }) => 
+    $isNoCards ?
+      css`
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      `
+      :
+      css`
+        display: block;
+      `
+  }
 
   /* No select */
   -webkit-touch-callout: none;
@@ -111,7 +122,7 @@ const SCardsContainer = styled.div`
   user-select: none;
 
   ${({ theme }) => theme.media.tablet} {
-    padding: 40px 24px 24px;
+    padding: ${({ $isNoCards }) => $isNoCards ? '30px 24px' : '24px'};
   }
 `;
 
@@ -127,8 +138,7 @@ const SSubText = styled(Text)`
 `;
 
 const SButton = styled(Button)`
-  padding: 24px;
-  margin-top: 24px;
+  margin-top: auto;
 
   & > span {
     display: flex;
@@ -139,7 +149,7 @@ const SButton = styled(Button)`
 const SButtonSecondary = styled(Button)`
   position: absolute;
   right: 12px;
-  top: 30px;
+  top: 16px;
 `;
 
 const SButtonSecondaryDesktop = styled(SButtonSecondary)`
@@ -158,20 +168,15 @@ const SButtonSecondaryMobile = styled(SButtonSecondary)`
   }
 `;
 
-const SCoinIcon = styled.img`
-  width: 24px;
-  height: 24px;
-  margin-right: 20px;
-`;
-
 const SCardList = styled.ul`
   display: flex;
   flex-direction: column;
   list-style: none;
+  margin-top: 24px;
 
   ${({ theme }) => theme.media.mobileL} {
     flex-direction: row;
-    margin: 0 -24px;
+    margin: 24px -24px 0;
 
     overflow-y: scroll;
 
@@ -195,7 +200,7 @@ const SCardListItem = styled.li`
   ${({ theme }) => theme.media.mobileL} {
     margin-right: 16px;
     margin-bottom: 0;
-    max-width: 311px;
+    max-width: 320px;
 
     &:last-child {
       margin-right: 24px;

@@ -213,9 +213,9 @@
       "cards": {
         "title_NEED_TRANSLATION": "My cards",
         "myPaymentMethods_NEED_TRANSLATION": "My payment methods",
-        "saveUpCards_NEED_TRANSLATION": "Save up to {{ numbersOfCards }} cards",
+        "hint_NEED_TRANSLATION": "You’ll need a card on file to participate in posts",
         "button": {
-          "addPaymentMethod_NEED_TRANSLATION": "Add your payment method",
+          "addNewCard_NEED_TRANSLATION": "Add a new card",
           "addCard_NEED_TRANSLATION": "Add card"
         },
         "primary_NEED_TRANSLATION": "Primary",

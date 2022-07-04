@@ -213,9 +213,9 @@
       "cards": {
         "title": "My cards",
         "myPaymentMethods": "My payment methods",
-        "saveUpCards": "Save up to {{ numbersOfCards }} cards",
+        "hint": "You’ll need a card on file to participate in posts",
         "button": {
-          "addPaymentMethod": "Add your payment method",
+          "addNewCard": "Add a new card",
           "addCard": "Add card"
         },
         "primary": "Primary",

@@ -35,21 +35,15 @@ const Card: React.FunctionComponent<ICard> = ({
     resizeMode
   );
 
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
-
   return (
     <SCard>
       <STopLine>
         {isPrimary && (
-          <SCardPrimaryText variant={2} weight={700}>
-            {t('Settings.sections.cards.primary')}
-          </SCardPrimaryText>
+          <SLabel>
+            <SCardPrimaryText variant={3} weight={700}>
+              {t('Settings.sections.cards.primary')}
+            </SCardPrimaryText>
+          </SLabel>
         )}
         <SMoreButton
           view='quaternary'
@@ -58,8 +52,8 @@ const Card: React.FunctionComponent<ICard> = ({
         >
           <InlineSvg
             svg={MoreIconFilled}
-            width={isMobileOrTablet ? '16px' : '24px'}
-            height={isMobileOrTablet ? '16px' : '24px'}
+            width="14px"
+            height="14px"
           />
         </SMoreButton>
         {!isMobile && (
@@ -82,9 +76,9 @@ const Card: React.FunctionComponent<ICard> = ({
         <SCardPrimaryText variant={2} weight={700}>
           {name}
         </SCardPrimaryText>
-        <Text variant={5} weight={700}>
+        <SCardNumber variant={5} weight={700}>
           **** {lastFourDigits}
-        </Text>
+        </SCardNumber>
       </SCardMainInfo>
     </SCard>
   );
@@ -99,9 +93,9 @@ const SCard = styled.div`
   width: 100%;
   height: 190px;
   flex-shrink: 0;
-  padding: 16px;
+  padding: 8px;
 
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  border-radius: ${({ theme }) => theme.borderRadius.smallLg};
   background: url('https://d3hqmhx7uxxlrw.cloudfront.net/assets/default-avatars-and-covers/cover_1.png');
 
   ${({ theme }) => theme.media.mobileM} {
@@ -109,21 +103,35 @@ const SCard = styled.div`
   }
 `;
 
+const SLabel = styled.div`
+  padding: 2px 16px;
+  background-color: #0B0A1333;
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+`
+
 const STopLine = styled.div`
   display: flex;
   align-items: center;
 `;
 
 const SCardPrimaryText = styled(Text)`
-  opacity: 0.6;
+  color: ${({ theme }) => theme.colors.white};
 `;
+
+const SCardNumber = styled(Text)`
+  color: ${({ theme }) => theme.colors.white};
+`
 
 const SCardMainInfo = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   margin-top: auto;
-  padding: 12px;
+  padding: 16px;
+
+  & > div:first-child {
+    opacity: 0.6;
+  }
 `;
 
 const SMoreButton = styled(Button)`
@@ -137,7 +145,7 @@ const SMoreButton = styled(Button)`
     background-color: ${({ theme }) => theme.colors.white};
 
     svg {
-      fill: ${({ theme }) => theme.colorsThemed.button.color.alternative};
+      fill: #2C2C33;
     }
   }
 `;
