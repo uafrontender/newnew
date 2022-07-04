@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, MotionStyle } from 'framer-motion';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
@@ -67,6 +67,7 @@ interface IEllipseMenu {
   offsetRight?: string;
   offsetTop?: string;
   withoutContainer?: boolean;
+  style?: MotionStyle;
 }
 
 const EllipseMenu: React.FunctionComponent<IEllipseMenu> = ({
@@ -248,7 +249,7 @@ const SContainer = styled(motion.div)<{
   z-index: ${({ $zIndex }) => $zIndex || 10};
   min-width: ${({ $withoutContainer }) =>
     $withoutContainer ? 'unset' : '180px'};
-  max-width: ${({ $maxWidth }) => $maxWidth ?? 'unset'};
+  max-width: ${({ $maxWidth }) => $maxWidth ?? '300px'};
   transform: ${({ $transformX, $transformY }) =>
     `translate(${$transformX ?? 0}, ${$transformY ?? 0})`};
 

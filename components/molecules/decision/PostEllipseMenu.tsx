@@ -4,6 +4,8 @@ import styled from 'styled-components';
 
 import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 
+import isBrowser from '../../../utils/isBrowser';
+
 interface IPostEllipseMenu {
   postType: string;
   isVisible: boolean;
@@ -27,11 +29,13 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = React.memo(
     const { t } = useTranslation('common');
 
     useEffect(() => {
-      const postModal = document.getElementById('post-modal-container');
-      if (isVisible && postModal) {
-        postModal.style.overflow = 'hidden';
-      } else if (postModal) {
-        postModal.style.overflow = 'scroll';
+      if (isBrowser()) {
+        const postModal = document.getElementById('post-modal-container');
+        if (isVisible && postModal) {
+          postModal.style.overflow = 'hidden';
+        } else if (postModal) {
+          postModal.style.overflow = 'scroll';
+        }
       }
     }, [isVisible]);
 
@@ -41,7 +45,7 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = React.memo(
         onClose={onClose}
         anchorElement={anchorElement}
       >
-        <SEllipseMenuButton variant={3} onClick={handleFollowDecision}>
+        <EllipseMenuButton variant={3} onClick={handleFollowDecision}>
           {!isFollowingDecision
             ? t('ellipse.followDecision', {
                 postType: t(`postType.${postType}`),
@@ -49,9 +53,9 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = React.memo(
             : t('ellipse.unFollowDecision', {
                 postType: t(`postType.${postType}`),
               })}
-        </SEllipseMenuButton>
+        </EllipseMenuButton>
         <SSeparator />
-        <SEllipseMenuButton
+        <EllipseMenuButton
           variant={3}
           tone='error'
           onClick={() => {
@@ -60,7 +64,7 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = React.memo(
           }}
         >
           {t('ellipse.report')}
-        </SEllipseMenuButton>
+        </EllipseMenuButton>
       </SEllipseMenu>
     );
   }
@@ -74,15 +78,9 @@ const SEllipseMenu = styled(EllipseMenu)`
 `;
 
 const SSeparator = styled.div`
-  margin-top: 3px;
-  margin-bottom: 3px;
+  margin-top: 4px;
+  margin-bottom: 4px;
   width: 100%;
   border-bottom: 1px solid
     ${({ theme }) => theme.colorsThemed.background.outlines1};
-`;
-
-const SEllipseMenuButton = styled(EllipseMenuButton)`
-  :hover {
-    background: transparent;
-  }
 `;

@@ -4,6 +4,8 @@ import styled from 'styled-components';
 
 import EllipseMenu, { EllipseMenuButton } from '../../../../atoms/EllipseMenu';
 
+import isBrowser from '../../../../../utils/isBrowser';
+
 interface IMcOptionCardModerationEllipseMenu {
   isVisible: boolean;
   isBySubscriber: boolean;
@@ -30,11 +32,13 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<
   const { t } = useTranslation('common');
 
   useEffect(() => {
-    const postModal = document.getElementById('post-modal-container');
-    if (isVisible && postModal) {
-      postModal.style.overflow = 'hidden';
-    } else if (postModal) {
-      postModal.style.overflow = 'scroll';
+    if (isBrowser()) {
+      const postModal = document.getElementById('post-modal-container');
+      if (isVisible && postModal) {
+        postModal.style.overflow = 'hidden';
+      } else if (postModal) {
+        postModal.style.overflow = 'scroll';
+      }
     }
   }, [isVisible]);
 
@@ -50,7 +54,7 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<
     >
       {isBySubscriber ? (
         <>
-          <SEllipseMenuButton
+          <EllipseMenuButton
             variant={3}
             tone='error'
             onClick={() => {
@@ -59,8 +63,8 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<
             }}
           >
             {t('ellipse.reportOption')}
-          </SEllipseMenuButton>
-          <SEllipseMenuButton
+          </EllipseMenuButton>
+          <EllipseMenuButton
             variant={3}
             onClick={() => {
               handleOpenBlockUserModal();
@@ -68,10 +72,10 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<
             }}
           >
             {t('ellipse.blockUser')}
-          </SEllipseMenuButton>
+          </EllipseMenuButton>
         </>
       ) : null}
-      <SEllipseMenuButton
+      <EllipseMenuButton
         variant={3}
         disabled={!canBeDeleted}
         onClick={() => {
@@ -80,7 +84,7 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<
         }}
       >
         {t('ellipse.removeOption')}
-      </SEllipseMenuButton>
+      </EllipseMenuButton>
     </SEllipseMenu>
   );
 };
@@ -91,10 +95,4 @@ const SEllipseMenu = styled(EllipseMenu)`
   width: 150px;
   min-width: 150px;
   position: fixed;
-`;
-
-const SEllipseMenuButton = styled(EllipseMenuButton)`
-  :hover {
-    background: transparent;
-  }
 `;

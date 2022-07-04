@@ -6,13 +6,15 @@ import styled from 'styled-components';
 
 import InlineSvg from '../../atoms/InlineSVG';
 import EllipseMenu from '../../atoms/EllipseMenu';
+import Caption from '../../atoms/Caption';
+
+import isBrowser from '../../../utils/isBrowser';
 
 import copyIcon from '../../../public/images/svg/icons/outlined/Link.svg';
 import tiktokIcon from '../../../public/images/svg/icons/socials/TikTok.svg';
 import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
-import Caption from '../../atoms/Caption';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -34,11 +36,13 @@ const PostShareEllipseMenu: React.FunctionComponent<IPostShareEllipseMenu> =
     const { t } = useTranslation('common');
 
     useEffect(() => {
-      const postModal = document.getElementById('post-modal-container');
-      if (isVisible && postModal) {
-        postModal.style.overflow = 'hidden';
-      } else if (postModal) {
-        postModal.style.overflow = 'scroll';
+      if (isBrowser()) {
+        const postModal = document.getElementById('post-modal-container');
+        if (isVisible && postModal) {
+          postModal.style.overflow = 'hidden';
+        } else if (postModal) {
+          postModal.style.overflow = 'scroll';
+        }
       }
     }, [isVisible]);
 

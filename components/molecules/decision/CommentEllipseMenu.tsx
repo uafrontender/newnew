@@ -4,6 +4,8 @@ import styled from 'styled-components';
 
 import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 
+import isBrowser from '../../../utils/isBrowser';
+
 interface ICommentEllipseMenu {
   isVisible: boolean;
   canDeleteComment: boolean;
@@ -36,11 +38,13 @@ const CommentEllipseMenu: React.FC<ICommentEllipseMenu> = ({
   };
 
   useEffect(() => {
-    const postModal = document.getElementById('post-modal-container');
-    if (isVisible && postModal) {
-      postModal.style.overflow = 'hidden';
-    } else if (postModal) {
-      postModal.style.overflow = 'scroll';
+    if (isBrowser()) {
+      const postModal = document.getElementById('post-modal-container');
+      if (isVisible && postModal) {
+        postModal.style.overflow = 'hidden';
+      } else if (postModal) {
+        postModal.style.overflow = 'scroll';
+      }
     }
   }, [isVisible]);
 

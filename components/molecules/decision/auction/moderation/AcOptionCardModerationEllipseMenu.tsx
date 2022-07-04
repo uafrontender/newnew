@@ -4,6 +4,8 @@ import styled from 'styled-components';
 
 import EllipseMenu, { EllipseMenuButton } from '../../../../atoms/EllipseMenu';
 
+import isBrowser from '../../../../../utils/isBrowser';
+
 interface IAcOptionCardModerationEllipseMenu {
   isVisible: boolean;
   canDeleteOption: boolean;
@@ -28,11 +30,13 @@ const AcOptionCardModerationEllipseMenu: React.FunctionComponent<
   const { t } = useTranslation('common');
 
   useEffect(() => {
-    const postModal = document.getElementById('post-modal-container');
-    if (isVisible && postModal) {
-      postModal.style.overflow = 'hidden';
-    } else if (postModal) {
-      postModal.style.overflow = 'scroll';
+    if (isBrowser()) {
+      const postModal = document.getElementById('post-modal-container');
+      if (isVisible && postModal) {
+        postModal.style.overflow = 'hidden';
+      } else if (postModal) {
+        postModal.style.overflow = 'scroll';
+      }
     }
   }, [isVisible]);
 

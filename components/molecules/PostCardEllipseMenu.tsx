@@ -160,18 +160,18 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       }, [user.loggedIn, postUuid]);
 
       return (
-        <SEllipseMenu
+        <EllipseMenu
           isOpen={isVisible}
           onClose={onClose}
           anchorElement={anchorElement}
         >
-          <EllipseMenuButton variant={3} onClick={() => handleCopyLink()}>
+          <SEllipseMenuButton variant={3} onClick={() => handleCopyLink()}>
             {isCopiedUrl ? t('ellipse.linkCopied') : t('ellipse.copyLink')}
-          </EllipseMenuButton>
+          </SEllipseMenuButton>
           {postCreator.uuid !== user.userData?.userUuid && (
             <>
               {!isFollowingLoading ? (
-                <EllipseMenuButton
+                <SEllipseMenuButton
                   variant={3}
                   onClick={() => handleFollowDecision()}
                 >
@@ -182,7 +182,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
                     : t('ellipse.unFollowDecision', {
                         postType: t(`postType.${postType}`),
                       })}
-                </EllipseMenuButton>
+                </SEllipseMenuButton>
               ) : (
                 <Skeleton
                   count={1}
@@ -191,7 +191,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
                   highlightColor={theme.colorsThemed.background.primary}
                 />
               )}
-              <EllipseMenuButton
+              <SEllipseMenuButton
                 variant={3}
                 tone='error'
                 onClick={() => {
@@ -200,16 +200,16 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
                 }}
               >
                 {t('ellipse.report')}
-              </EllipseMenuButton>
+              </SEllipseMenuButton>
             </>
           )}
-        </SEllipseMenu>
+        </EllipseMenu>
       );
     }
   );
 
 export default PostCardEllipseMenu;
 
-const SEllipseMenu = styled(EllipseMenu)`
-  gap: 16px;
+const SEllipseMenuButton = styled(EllipseMenuButton)`
+  text-align: right;
 `;
