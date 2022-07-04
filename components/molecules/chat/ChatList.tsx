@@ -31,6 +31,7 @@ import textTrim from '../../../utils/textTrim';
 import { IChatData } from '../../interfaces/ichat';
 import { useGetChats } from '../../../contexts/chatContext';
 import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
@@ -40,6 +41,9 @@ interface IFunctionProps {
   searchText: string;
   username?: string;
   switchedTab?: () => void;
+  newLastMessage?: {
+    chatId: number | Long.Long | null | undefined;
+  } | null;
 }
 
 const ChatList: React.FC<IFunctionProps> = ({
@@ -47,6 +51,7 @@ const ChatList: React.FC<IFunctionProps> = ({
   searchText,
   username,
   switchedTab,
+  newLastMessage,
 }) => {
   const { t } = useTranslation('page-Chat');
   const theme = useTheme();
@@ -192,7 +197,7 @@ const ChatList: React.FC<IFunctionProps> = ({
         }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [activeChatIndex]
   );
 
   const fetchLastActiveRoom = async () => {
@@ -263,6 +268,12 @@ const ChatList: React.FC<IFunctionProps> = ({
   }, []);
 
   useEffect(() => {
+    if (newLastMessage) {
+      fetchLastActiveRoom();
+    }
+  }, [newLastMessage]);
+
+  useEffect(() => {
     if (chatRooms && !searchedRooms && isInitialLoaded) {
       fetchLastActiveRoom();
     }
@@ -287,7 +298,7 @@ const ChatList: React.FC<IFunctionProps> = ({
               (chat) => chat.id === updatedChat.id
             ));
       }
-      if (isAlreadyAdded !== undefined) {
+      if (isAlreadyAdded !== undefined && isAlreadyAdded > -1) {
         const arr = displayAllRooms
           ? chatRooms
           : isChatWithSub
@@ -409,10 +420,33 @@ const ChatList: React.FC<IFunctionProps> = ({
     ]
   );
 
+  const sortChats = useCallback(() => {
+    if (activeTab === 'chatRoomsSubs') {
+      setChatRoomsSubs((curr) => {
+        const arr = curr;
+        arr.sort(
+          (a, b) =>
+            (b.updatedAt?.seconds as number) - (a.updatedAt?.seconds as number)
+        );
+        return arr;
+      });
+    } else {
+      setChatRoomsCreators((curr) => {
+        const arr = curr;
+        arr.sort(
+          (a, b) =>
+            (b.updatedAt?.seconds as number) - (a.updatedAt?.seconds as number)
+        );
+        return arr;
+      });
+    }
+  }, [activeTab]);
+
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom, index: number) => {
       const localChat = chat;
       const handleItemClick = async () => {
+        sortChats();
         if (searchedRooms) setSearchedRooms(null);
         setActiveChatIndex(chat.id ? chat.id.toString() : null);
         openChat({ chatRoom: chat, showChatList: null });
@@ -486,6 +520,13 @@ const ChatList: React.FC<IFunctionProps> = ({
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
                 {chatName}
+                {chat.visavis?.options?.isVerified && chat.kind !== 4 && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                  />
+                )}
               </SChatItemText>
               <SChatItemLastMessage variant={3} weight={600}>
                 {lastMsg}
@@ -519,7 +560,14 @@ const ChatList: React.FC<IFunctionProps> = ({
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeChatIndex, searchedRooms, chatRooms, displayAllRooms, activeTab]
+    [
+      searchedRooms,
+      chatRooms,
+      displayAllRooms,
+      activeTab,
+      activeChatIndex,
+      sortChats,
+    ]
   );
 
   const Tabs = useCallback(
