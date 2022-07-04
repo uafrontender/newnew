@@ -105,6 +105,8 @@ export const SChatItemText = styled(Text)`
   margin-bottom: 4px;
   max-width: 228px;
   overflow: hidden;
+  display: flex;
+  align-items: center;
 `;
 
 export const SChatItemLastMessage = styled(Text)`
@@ -118,7 +120,7 @@ export const SChatItemRight = styled.div`
   padding: 2px 0;
   align-items: flex-end;
   flex-direction: column;
-  margin-left: -12px;
+  margin-left: auto;
 `;
 
 export const SChatItemTime = styled(Text)`
