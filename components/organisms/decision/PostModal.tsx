@@ -304,7 +304,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [triedLoading, setTriedLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
 
-  const handleCloseAndGoBack = () => {
+  const handleCloseAndGoBack = useCallback(() => {
     if (
       isConfirmToClosePost &&
       !window.confirm(t('postVideo.cannotLeavePageMsg'))
@@ -322,7 +322,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     handleClose();
     syncedHistoryPushState({}, currLocation);
     innerHistoryStack.current = [];
-  };
+  }, [
+    currLocation,
+    handleClose,
+    isConfirmToClosePost,
+    router,
+    syncedHistoryPushState,
+    t,
+  ]);
 
   const handleGoBackInsidePost = useCallback(() => {
     if (
@@ -670,6 +677,100 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     return <div />;
   };
 
+  const renderPostSuccessOrWaitingControls = useCallback(() => {
+    return (
+      <SPostSuccessWaitingControlsDiv onClick={(e) => e.stopPropagation()}>
+        <SWaitingSuccessControlsBtn
+          view='secondary'
+          iconOnly
+          onClick={handleCloseAndGoBack}
+        >
+          <InlineSvg
+            svg={CancelIcon}
+            fill={theme.colorsThemed.text.primary}
+            width='24px'
+            height='24px'
+          />
+        </SWaitingSuccessControlsBtn>
+        <SWaitingSuccessControlsBtn
+          view='secondary'
+          iconOnly
+          onClick={() => setShareMenuOpen(true)}
+        >
+          <InlineSvg
+            svg={ShareIcon}
+            fill={theme.colorsThemed.text.primary}
+            width='24px'
+            height='24px'
+          />
+        </SWaitingSuccessControlsBtn>
+        <SWaitingSuccessControlsBtn
+          view='secondary'
+          iconOnly
+          onClick={() => setEllipseMenuOpen(true)}
+        >
+          <InlineSvg
+            svg={MoreIcon}
+            fill={theme.colorsThemed.text.primary}
+            width='24px'
+            height='24px'
+          />
+        </SWaitingSuccessControlsBtn>
+        {/* Share menu */}
+        {!isMobile && postParsed?.postUuid && (
+          <PostShareEllipseMenu
+            postId={postParsed.postUuid}
+            isVisible={shareMenuOpen}
+            onClose={handleShareClose}
+          />
+        )}
+        {isMobile && shareMenuOpen && postParsed?.postUuid && (
+          <PostShareEllipseModal
+            isOpen={shareMenuOpen}
+            zIndex={11}
+            postId={postParsed.postUuid}
+            onClose={handleShareClose}
+          />
+        )}
+        {/* Ellipse menu */}
+        {!isMobile && (
+          <PostEllipseMenu
+            postType={typeOfPost as string}
+            isFollowingDecision={isFollowingDecision}
+            isVisible={ellipseMenuOpen}
+            handleFollowDecision={handleFollowDecision}
+            handleReportOpen={handleReportOpen}
+            onClose={handleEllipseMenuClose}
+          />
+        )}
+        {isMobile && ellipseMenuOpen ? (
+          <PostEllipseModal
+            postType={typeOfPost as string}
+            isFollowingDecision={isFollowingDecision}
+            zIndex={11}
+            isOpen={ellipseMenuOpen}
+            handleFollowDecision={handleFollowDecision}
+            handleReportOpen={handleReportOpen}
+            onClose={handleEllipseMenuClose}
+          />
+        ) : null}
+      </SPostSuccessWaitingControlsDiv>
+    );
+  }, [
+    ellipseMenuOpen,
+    handleCloseAndGoBack,
+    handleEllipseMenuClose,
+    handleFollowDecision,
+    handleReportOpen,
+    handleShareClose,
+    isFollowingDecision,
+    isMobile,
+    postParsed?.postUuid,
+    shareMenuOpen,
+    theme.colorsThemed.text.primary,
+    typeOfPost,
+  ]);
+
   useEffect(() => {
     if (isOpen && postParsed) {
       let additionalHash;
@@ -902,82 +1003,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               content={t(`meta.${typeOfPost}.description`)}
             />
           </Head>
-          <SPostSuccessWaitingControlsDiv onClick={(e) => e.stopPropagation()}>
-            <SWaitingSuccessControlsBtn
-              view='secondary'
-              iconOnly
-              onClick={handleCloseAndGoBack}
-            >
-              <InlineSvg
-                svg={CancelIcon}
-                fill={theme.colorsThemed.text.primary}
-                width='24px'
-                height='24px'
-              />
-            </SWaitingSuccessControlsBtn>
-            <SWaitingSuccessControlsBtn
-              view='secondary'
-              iconOnly
-              onClick={() => setShareMenuOpen(true)}
-            >
-              <InlineSvg
-                svg={ShareIcon}
-                fill={theme.colorsThemed.text.primary}
-                width='24px'
-                height='24px'
-              />
-            </SWaitingSuccessControlsBtn>
-            <SWaitingSuccessControlsBtn
-              view='secondary'
-              iconOnly
-              onClick={() => setEllipseMenuOpen(true)}
-            >
-              <InlineSvg
-                svg={MoreIcon}
-                fill={theme.colorsThemed.text.primary}
-                width='24px'
-                height='24px'
-              />
-            </SWaitingSuccessControlsBtn>
-            {/* Share menu */}
-            {!isMobile && postParsed?.postUuid && (
-              <PostShareEllipseMenu
-                postId={postParsed.postUuid}
-                isVisible={shareMenuOpen}
-                onClose={handleShareClose}
-              />
-            )}
-            {isMobile && shareMenuOpen && postParsed?.postUuid && (
-              <PostShareEllipseModal
-                isOpen={shareMenuOpen}
-                zIndex={11}
-                postId={postParsed.postUuid}
-                onClose={handleShareClose}
-              />
-            )}
-            {/* Ellipse menu */}
-            {!isMobile && (
-              <PostEllipseMenu
-                postType={typeOfPost as string}
-                isFollowingDecision={isFollowingDecision}
-                isVisible={ellipseMenuOpen}
-                handleFollowDecision={handleFollowDecision}
-                handleReportOpen={handleReportOpen}
-                onClose={handleEllipseMenuClose}
-              />
-            )}
-            {isMobile && ellipseMenuOpen ? (
-              <PostEllipseModal
-                postType={typeOfPost as string}
-                isFollowingDecision={isFollowingDecision}
-                zIndex={11}
-                isOpen={ellipseMenuOpen}
-                handleFollowDecision={handleFollowDecision}
-                handleReportOpen={handleReportOpen}
-                onClose={handleEllipseMenuClose}
-              />
-            ) : null}
-          </SPostSuccessWaitingControlsDiv>
+          {!isMobile && renderPostSuccessOrWaitingControls()}
           {postParsed && typeOfPost ? (
             <SPostModalContainer
               id='post-modal-container'
@@ -1002,6 +1028,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               postStatus === 'waiting_for_decision'
                 ? renderPostWaitingForResponse(typeOfPost)
                 : null}
+              {isMobile && renderPostSuccessOrWaitingControls()}
             </SPostModalContainer>
           ) : null}
         </Modal>

@@ -338,11 +338,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     }, [tab, router]);
 
     const handleCloseClick = useCallback(() => {
-      if (router.query?.referer) {
-        router.push(router.query.referer as string);
-      } else {
-        router.push('/');
-      }
+      router?.push('/');
     }, [router]);
 
     const handleVideoDelete = useCallback(async () => {

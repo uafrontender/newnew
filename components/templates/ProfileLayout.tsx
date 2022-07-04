@@ -594,7 +594,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 )}
               </SShareButton>
             </SShareDiv>
-            {user.options?.isOfferingSubscription ? (
+            {user.options?.isOfferingSubscription &&
+            user.uuid !== currentUser.userData?.userUuid ? (
               <CustomLink
                 href={
                   !isSubscribed && !wasSubscribed
