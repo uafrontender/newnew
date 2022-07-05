@@ -295,6 +295,7 @@ const ChatArea: React.FC<IChatData> = ({
         const res = await sendMessage(payload);
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
+
         if (res.data.message) setMessages([res.data.message].concat(messages));
 
         setMessageText('');
@@ -598,7 +599,7 @@ const ChatArea: React.FC<IChatData> = ({
           ))}
         {messages.length > 0 &&
           messages.map((item, index) => {
-            if (index < messages.length - 1) {
+            if (index < messages.length) {
               return renderMessage(item, index);
             }
             if (document && isSafari() && isMobile && messages[0].id) {
