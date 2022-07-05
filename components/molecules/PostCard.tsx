@@ -187,7 +187,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     const handleReportOpen = useCallback(() => {
       if (!user.loggedIn) {
         router.push(
-          `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
+          `/sign-up?reason=report&redirect=${encodeURIComponent(
             `${process.env.NEXT_PUBLIC_APP_URL}/post/${postParsed.postUuid}`
           )}`
         );

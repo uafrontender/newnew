@@ -4,10 +4,11 @@ import moment from 'moment';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
+import { useTranslation } from 'next-i18next';
+
 import UserAvatar from '../../molecules/UserAvatar';
 import Button from '../Button';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
-
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import InlineSVG from '../InlineSVG';
 import SubscriberEllipseMenu from './SubscriberEllipseMenu';
@@ -23,6 +24,7 @@ interface ISubscriberRow {
 }
 
 const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -113,7 +115,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
           <Link
             href={`/creator/dashboard?tab=direct-messages&roomID=${subscriber.chatRoomId}`}
           >
-            DM
+            {t('subscriptions.messageOne')}
           </Link>
         )}
         <SMoreButton

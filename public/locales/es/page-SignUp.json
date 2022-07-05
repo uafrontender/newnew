@@ -14,7 +14,7 @@
       "bid": "ofertar",
       "subscribe": "suscribirse",
       "pledge": "hacer una contribución",
-      "follow-decision": "seguir una decisión",
+      "follow-decision": "marcar publicación como favorita",
       "follow-creator": "seguir un creador",
       "report": "hacer un reporte"
     },
@@ -38,7 +38,7 @@
     "An error occurred": "Se ha producido un error"
   },
   "legalDisclaimer": {
-    "mainText": "Al crear una cuenta, estás aceptando nuestra ",
+    "mainText": "Al crear una cuenta, aceptas nuestra ",
     "privacyPolicy": "Política de privacidad, ",
     "terms": "Términos",
     "and": "y",

@@ -1,15 +1,15 @@
 {
   "meta": {
     "title": "NewNew - Haz ofertas, vota y coopera sobre decisiones ajenas",
-    "description": "Decide qué será lo siguiente que las personas harán en sus vidas. Vota, haz ofertas y coopera con la comunidad en NewNew para ver a personas hacer cosas en la vida real"
+    "description": "Decide qué será lo siguiente que las personas harán con sus vidas. Vota, haz ofertas y coopera con la comunidad en NewNew para ver a personas hacer cosas en la vida real"
   },
   "cardsSection": {
     "title": {
       "biggest": "Lo mejor de todos los tiempos",
       "for-you": "Para ti",
-      "ac": "Los eventos más grandes",
-      "mc": "Superencuestas populares",
-      "cf": "Objetivos populares"
+      "ac": "Los Events más grandes",
+      "mc": "Superpolls populares",
+      "cf": "Goals populares"
     },
     "button": {
       "showMore": "Ver más",
@@ -19,16 +19,16 @@
   },
   "tutorial": {
     "ac": {
-      "title": "Evento",
-      "caption": "Envía al creador una oferta con lo que quieres que haga, cuánto estás dispuesto a gastar y ve si aceptan tu oferta."
+      "title": "Event",
+      "caption": "Envía al creador una oferta con lo que quieres que haga, cuánto estás dispuesto a gastar y ve si acepta tu oferta."
     },
     "mc": {
-      "title": "Superencuestas",
+      "title": "Superpoll",
       "caption": "Un creador hace una Superencuesta en la que pagas por votar. Cuando se acaba el tiempo, mira cómo el creador realiza la opción que obtiene la mayor cantidad de votos."
     },
     "cf": {
-      "title": "Objetivo",
-      "caption": "Reúne dinero con otros para respaldar los objetivos de tus creadores favoritos. Si un número suficiente de personas respalda el objetivo, verás cómo el creador lo realiza."
+      "title": "Goal",
+      "caption": "Reúne dinero con otros para respaldar los objetivos de tus creadores favoritos. Si un número suficiente de personas respalda el Goal, verás cómo el creador lo realiza."
     }
   }
 }

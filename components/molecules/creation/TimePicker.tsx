@@ -75,7 +75,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
         }
       }}
     >
-      <SInput type='time' value={value} readOnly />
+      <SInput type='text' value={value} readOnly />
       <SInlineSVG
         svg={chevronDown}
         fill={theme.colorsThemed.text.secondary}
@@ -137,19 +137,8 @@ const SInput = styled.input`
   font-weight: 500;
   line-height: 24px;
   background-color: transparent;
-  -webkit-appearance: none;
+  pointer-events: none;
 
-  ::-webkit-calendar-picker-indicator {
-    background: none;
-  }
-
-  ::-webkit-datetime-edit-ampm-field {
-    display: none;
-  }
-
-  ::-webkit-date-and-time-value {
-    text-align: left;
-  }
 `;
 
 const SInlineSVG = styled(InlineSVG)`

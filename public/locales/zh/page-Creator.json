@@ -133,6 +133,7 @@
       "date": "訂閱日期",
       "updateSub": "更新訂閱"
     },
+    "messageOne": "私訊",
     "messageAll": "私訊全部"
   },
   "earnings": {
@@ -195,7 +196,8 @@
     "selectInput": {
       "perMonth": "/月",
       "select": "選擇",
-      "featured": "熱門"
+      "featured": "熱門",
+      "current": "當前"
     },
     "button": {
       "enable": "開啟訂閱",
@@ -241,7 +243,7 @@
     "members": "成員"
   },
   "announcement": {
-    "title": "的公告"
+    "title": "{{username}}的公告"
   },
   "stripe": {
     "meta": {
