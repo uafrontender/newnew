@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -60,6 +60,8 @@ export const EditSubscriptionRate: React.FC = React.memo(() => {
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
+  const moreButtonRef: any = useRef<HTMLButtonElement>();
+
   return (
     <SContainer>
       {!isMobile && <Navigation />}
@@ -72,6 +74,7 @@ export const EditSubscriptionRate: React.FC = React.memo(() => {
                 view='transparent'
                 iconOnly
                 onClick={() => handleOpenEllipseMenu()}
+                ref={moreButtonRef}
               >
                 <InlineSVG
                   svg={MoreIconFilled}
@@ -84,6 +87,7 @@ export const EditSubscriptionRate: React.FC = React.memo(() => {
               <RemoveSubscriptionEllipseMenu
                 isVisible={ellipseMenuOpen}
                 handleClose={handleCloseEllipseMenu}
+                anchorElement={moreButtonRef?.current}
               />
             </>
           )}
