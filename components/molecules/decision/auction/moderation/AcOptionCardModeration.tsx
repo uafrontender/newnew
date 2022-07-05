@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import React, { useCallback, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
 
 import { useAppSelector } from '../../../../../redux-store/store';
@@ -39,6 +39,7 @@ interface IAcOptionCardModeration {
   index: number;
   option: TAcOptionWithHighestField;
   postStatus: TPostStatusStringified;
+  isWinner?: boolean;
   handleConfirmWinningOption: () => void;
   handleRemoveOption: (optionToDelete: newnewapi.Auction.Option) => void;
 }
@@ -48,6 +49,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
     index,
     option,
     postStatus,
+    isWinner,
     handleConfirmWinningOption,
     handleRemoveOption,
   }) => {
@@ -102,9 +104,9 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
             marginBottom: '16px',
           }}
         >
-          <SContainer>
-            <SBidDetails>
-              <SBidAmount>
+          <SContainer $isBlue={!!isWinner}>
+            <SBidDetails isBlue={!!isWinner}>
+              <SBidAmount isWhite={!!isWinner}>
                 <OptionActionIcon
                   src={
                     theme.name === 'light' ? BidIconLight.src : BidIconDark.src
@@ -119,7 +121,9 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                     : '$0'}
                 </div>
               </SBidAmount>
-              <SOptionInfo variant={3}>{option.title}</SOptionInfo>
+              <SOptionInfo isWhite={!!isWinner} variant={3}>
+                {option.title}
+              </SOptionInfo>
               <SBiddersInfo variant={3}>
                 {option.creator?.username ? (
                   <Link href={`/${option.creator?.username}`}>
@@ -127,7 +131,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                       className='spanHighlighted'
                       onClick={(e) => e.stopPropagation()}
                       style={{
-                        ...(option.isCreatedBySubscriber
+                        ...(!isWinner && option.isCreatedBySubscriber
                           ? {
                               color:
                                 theme.name === 'dark'
@@ -146,7 +150,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                     className='spanHighlighted'
                     onClick={(e) => e.stopPropagation()}
                     style={{
-                      ...(option.isCreatedBySubscriber
+                      ...(!isWinner && option.isCreatedBySubscriber
                         ? {
                             color:
                               theme.name === 'dark'
@@ -272,7 +276,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                     className='spanHighlighted'
                     onClick={(e) => e.stopPropagation()}
                     style={{
-                      ...(option.isCreatedBySubscriber
+                      ...(!isWinner && option.isCreatedBySubscriber
                         ? {
                             color:
                               theme.name === 'dark'
@@ -291,7 +295,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                   className='spanHighlighted'
                   onClick={(e) => e.stopPropagation()}
                   style={{
-                    ...(option.isCreatedBySubscriber
+                    ...(!isWinner && option.isCreatedBySubscriber
                       ? {
                           color:
                             theme.name === 'dark'
@@ -364,7 +368,9 @@ AcOptionCardModeration.defaultProps = {};
 
 export default AcOptionCardModeration;
 
-const SContainer = styled(motion.div)`
+const SContainer = styled(motion.div)<{
+  $isBlue: boolean;
+}>`
   position: relative;
 
   display: flex;
@@ -375,7 +381,10 @@ const SContainer = styled(motion.div)`
 
   padding: 16px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  background-color: ${({ theme, $isBlue }) =>
+    $isBlue
+      ? theme.colorsThemed.accent.blue
+      : theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   ${({ theme }) => theme.media.tablet} {
@@ -390,7 +399,9 @@ const SContainer = styled(motion.div)`
   }
 `;
 
-const SBidDetails = styled.div`
+const SBidDetails = styled.div<{
+  isBlue: boolean;
+}>`
   position: relative;
 
   display: grid;
@@ -402,20 +413,38 @@ const SBidDetails = styled.div`
 
   width: 100%;
 
+  ${({ isBlue }) =>
+    isBlue
+      ? css`
+          .spanRegular {
+            color: #ffffff;
+            opacity: 0.6;
+          }
+          .spanHighlighted {
+            color: #ffffff;
+          }
+        `
+      : null}
+
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
       'amount bidders'
       'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
 
-    background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+    background-color: ${({ theme, isBlue }) =>
+      isBlue
+        ? theme.colorsThemed.accent.blue
+        : theme.colorsThemed.background.tertiary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 14px;
   }
 `;
 
-const SBidAmount = styled.div`
+const SBidAmount = styled.div<{
+  isWhite?: boolean;
+}>`
   grid-area: amount;
 
   display: flex;
@@ -424,6 +453,13 @@ const SBidAmount = styled.div`
   gap: 8px;
 
   margin-bottom: 8px;
+
+  ${({ isWhite }) =>
+    isWhite
+      ? css`
+          color: #ffffff;
+        `
+      : null};
 
   font-weight: 700;
   font-size: 16px;
@@ -435,10 +471,19 @@ const OptionActionIcon = styled.img`
   width: 24px;
 `;
 
-const SOptionInfo = styled(Text)`
+const SOptionInfo = styled(Text)<{
+  isWhite?: boolean;
+}>`
   grid-area: optionInfo;
 
   margin-bottom: 8px;
+
+  ${({ isWhite }) =>
+    isWhite
+      ? css`
+          color: #ffffff;
+        `
+      : null};
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: initial;
