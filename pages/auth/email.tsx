@@ -4,6 +4,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useCookies } from 'react-cookie';
+import { useUpdateEffect } from 'react-use';
 
 import Lottie from '../../components/atoms/Lottie';
 
@@ -33,14 +34,20 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
   const [signInError, setSignInError] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (user.loggedIn) router?.push('/');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setMounted(true);
   }, []);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
+    if (user.loggedIn) router?.push('/');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
+
+  useUpdateEffect(() => {
     async function handleAuth() {
+      if (isLoading) return;
       try {
         setIsLoading(true);
 
@@ -119,7 +126,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
     handleAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mounted]);
 
   return (
     <div>

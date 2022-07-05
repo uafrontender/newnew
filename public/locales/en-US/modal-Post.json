@@ -340,9 +340,9 @@
         "biddersBidAmount": "bidders bid",
         "bidderBidAmount": "bidder bid",
         "on": "on",
-        "suggestedByMe": "my",
-        "suggestedByUser": "{{username}}'s",
-        "bidTo": "bid to"
+        "suggestedByMe": "my bid",
+        "suggestedByUser": "{{username}}'s bid",
+        "to": "to"
       }
     },
     "floatingActionButton": {
@@ -377,7 +377,7 @@
         "votes": "votes",
         "vote": "vote",
         "mySuggestion": "My suggestion",
-        "subscriberSuggestion": "{{ nickname }}'s suggestion",
+        "subscriberSuggestion": "{{nickname}}'s suggestion",
         "others": "others",
         "voters": "voters",
         "voted": "voted",
@@ -423,6 +423,7 @@
         "subscribeToCreatorCaption": "Subscribe to {{creator}} to add your own options to this Superpoll!",
         "subscribeButton": "Subscribe",
         "suggestionPlaceholder": "Add your own option...",
+        "suggestionPlaceholderDesktop": "Add an option ...",
         "placeABidButton": "Add my option"
       }
     },
@@ -585,7 +586,7 @@
     "heroText": "This Goal has ended!",
     "wantsToKnow": "{{creator}}'s Goal",
     "creatorsBackers": "{{creator}}'s backers",
-    "ofTargetBackers": "of {{ target_count }} backers",
+    "ofTargetBackers": "of {{target_count}} backers",
     "youBackedFor": "You backed it for"
   },
   "acPostAwaiting": {
@@ -644,7 +645,7 @@
     },
     "wantsToKnow": "{{creator}}'s Goal",
     "creatorsBackers": "{{creator}}'s backers",
-    "ofTargetBackers": "of {{ target_count }} backers",
+    "ofTargetBackers": "of {{target_count}} backers",
     "youBackedFor": "You backed it for"
   },
   "recommendationsSection": {
@@ -742,6 +743,5 @@
         "text": "Contribute to help the creator reach their Goal!"
       }
     }
-  },
-  "seeMore": ""
+  }
 }

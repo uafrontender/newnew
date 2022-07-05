@@ -1,6 +1,12 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 import styled, { keyframes, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -102,6 +108,8 @@ const Comment: React.FC<IComment> = ({
     }
   }, [comment.isOpen]);
 
+  const moreButtonRef: any = useRef<HTMLButtonElement>();
+
   return (
     <>
       <SComment key={comment.id.toString()} id={`comment_id_${comment.id}`}>
@@ -134,6 +142,7 @@ const Comment: React.FC<IComment> = ({
                 <SMoreButton
                   view='transparent'
                   iconOnly
+                  ref={moreButtonRef}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleOpenEllipseMenu();
@@ -158,6 +167,7 @@ const Comment: React.FC<IComment> = ({
                   handleClose={handleCloseEllipseMenu}
                   onDeleteComment={onDeleteComment}
                   onUserReport={onUserReport}
+                  anchorElement={moreButtonRef.current}
                 />
               )}
             </SActionsDiv>

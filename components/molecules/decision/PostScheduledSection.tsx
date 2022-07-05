@@ -14,6 +14,7 @@ import isBrowser from '../../../utils/isBrowser';
 import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
 import Button from '../../atoms/Button';
 import assets from '../../../constants/assets';
+import usePageVisibility from '../../../utils/hooks/usePageVisibility';
 // import assets from '../../../constants/assets';
 
 interface IPostScheduledSection {
@@ -37,6 +38,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const isPageVisible = usePageVisibility();
 
   // Timer
   const parsed = (timestampSeconds - Date.now()) / 1000;
@@ -50,13 +52,13 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   const interval = useRef<number>();
 
   useEffect(() => {
-    if (isBrowser()) {
+    if (isBrowser() && isPageVisible) {
       interval.current = window.setInterval(() => {
-        setSeconds((s) => s - 1);
+        setSeconds(() => (timestampSeconds - Date.now()) / 1000);
       }, 1000);
     }
     return () => clearInterval(interval.current);
-  }, []);
+  }, [isPageVisible, timestampSeconds]);
 
   useEffect(() => {
     setParsedSeconds(secondsToDHMS(seconds, 'noTrim'));

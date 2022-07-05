@@ -1,11 +1,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
-import Modal from '../../organisms/Modal';
-import InlineSVG, { InlineSvg } from '../../atoms/InlineSVG';
+import { InlineSvg } from '../../atoms/InlineSVG';
 import Headline from '../../atoms/Headline';
 
 import copyIcon from '../../../public/images/svg/icons/outlined/Link.svg';
@@ -13,8 +12,7 @@ import tiktokIcon from '../../../public/images/svg/icons/socials/TikTok.svg';
 import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
-import Caption from '../../atoms/Caption';
-import Button from '../../atoms/Button';
+import EllipseModal from '../../atoms/EllipseModal';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -96,96 +94,40 @@ const PostShareEllipseModal: React.FunctionComponent<IPostShareEllipseModal> =
     }, [postId, onClose]);
 
     return (
-      <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
-        <SWrapper>
-          <SContentContainer
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <Headline variant={6}>{t('shareTo')}</Headline>
-            <SSocialsSection>
-              {/* <SSocials>
-              {socialButtons.map(renderItem)}
-            </SSocials> */}
-              <SItem>
-                <SItemButtonWide
-                  type='copy'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handlerCopy();
-                  }}
-                >
-                  <InlineSvg
-                    svg={SOCIAL_ICONS.copy as string}
-                    width='24px'
-                    height='24px'
-                  />
-                  {isCopiedUrl
-                    ? t('ellipse.linkCopied')
-                    : t('ellipse.copyLink')}
-                </SItemButtonWide>
-              </SItem>
-            </SSocialsSection>
-          </SContentContainer>
-          <Button
-            view='secondary'
-            style={{
-              height: '56px',
-              width: 'calc(100% - 32px)',
-            }}
-            onClick={onClose}
-          >
-            {t('ellipse.cancel')}
-          </Button>
-        </SWrapper>
-      </Modal>
+      <EllipseModal show={isOpen} zIndex={zIndex} onClose={onClose}>
+        <ButtonsSection>
+          <Headline variant={6}>{t('shareTo')}</Headline>
+          <SSocialsSection>
+            <SItem>
+              <SItemButtonWide
+                type='copy'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlerCopy();
+                }}
+              >
+                <InlineSvg
+                  svg={SOCIAL_ICONS.copy as string}
+                  width='24px'
+                  height='24px'
+                />
+                {isCopiedUrl ? t('ellipse.linkCopied') : t('ellipse.copyLink')}
+              </SItemButtonWide>
+            </SItem>
+          </SSocialsSection>
+        </ButtonsSection>
+      </EllipseModal>
     );
   });
 
 export default PostShareEllipseModal;
 
-const SWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding-bottom: 16px;
-`;
-
-const SContentContainer = styled.div`
-  width: calc(100% - 32px);
-  height: fit-content;
-
-  z-index: 15;
-
+const ButtonsSection = styled.div`
   padding: 16px;
-
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  ${({ theme }) => theme.media.tablet} {
-    width: 480px;
-    height: 480px;
-    margin: auto;
-  }
 `;
 
 const SSocialsSection = styled.div`
   padding: 16px;
-`;
-
-const SSocials = styled.div`
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  justify-content: space-between;
 `;
 
 const SItem = styled.div`
@@ -198,22 +140,6 @@ const SItem = styled.div`
 interface ISItemButton {
   type: 'facebook' | 'twitter' | 'instagram' | 'tiktok' | 'copy';
 }
-
-const SItemButton = styled.div<ISItemButton>`
-  width: 48px;
-  height: 48px;
-  display: flex;
-  overflow: hidden;
-  align-items: center;
-  border-radius: 16px;
-  justify-content: center;
-  background: ${(props) => props.theme.colorsThemed.social[props.type].main};
-`;
-
-const SItemTitle = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  margin-top: 6px;
-`;
 
 const SItemButtonWide = styled.div<ISItemButton>`
   width: 100%;

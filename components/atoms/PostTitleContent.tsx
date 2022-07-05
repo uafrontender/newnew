@@ -32,4 +32,8 @@ export default PostTitleContent;
 const Hashtag = styled.a`
   color: ${(props) => props.theme.colorsThemed.accent.blue};
   font-weight: 600;
+
+  :hover {
+    filter: brightness(120%);
+  }
 `;

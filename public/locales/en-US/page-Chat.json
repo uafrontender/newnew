@@ -76,7 +76,7 @@
     "searchPlaceholder": "Search"
   },
   "announcement": {
-    "title": "'s announcement",
+    "title": "{{username}}'s announcement",
     "topMessageStart": "Only",
     "topMessageEnd": "can send messages"
   },

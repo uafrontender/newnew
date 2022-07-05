@@ -187,7 +187,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     const handleReportOpen = useCallback(() => {
       if (!user.loggedIn) {
         router.push(
-          `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
+          `/sign-up?reason=report&redirect=${encodeURIComponent(
             `${process.env.NEXT_PUBLIC_APP_URL}/post/${postParsed.postUuid}`
           )}`
         );
@@ -356,6 +356,9 @@ export const PostCard: React.FC<ICard> = React.memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socketConnection]);
 
+    const moreButtonInsideRef: any = useRef();
+    const moreButtonRef: any = useRef();
+
     if (type === 'inside') {
       return (
         <SWrapper ref={cardRef} index={index} width={width}>
@@ -396,6 +399,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   iconOnly
                   id='showMore'
                   view='transparent'
+                  ref={moreButtonInsideRef}
                   onClick={handleMoreClick}
                 >
                   <InlineSVG
@@ -413,6 +417,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                     postCreator={postParsed.creator as newnewapi.User}
                     handleReportOpen={handleReportOpen}
                     onClose={handleEllipseMenuClose}
+                    anchorElement={moreButtonInsideRef.current}
                   />
                 )}
               </STopContent>
@@ -488,6 +493,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 id='showMore'
                 view='transparent'
                 onClick={handleMoreClick}
+                ref={moreButtonRef}
               >
                 <InlineSVG
                   svg={moreIcon}
@@ -507,6 +513,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                     handleRemovePostFromState ?? undefined
                   }
                   onClose={handleEllipseMenuClose}
+                  anchorElement={moreButtonRef.current}
                 />
               )}
             </STopContent>

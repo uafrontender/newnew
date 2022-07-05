@@ -4,7 +4,7 @@ import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 const BASE_URL_UPLOAD = `${BASE_URL}/upload`;
 
 export const getImageUploadUrl = (
-  payload: newnewapi.GetImageUploadUrlRequest
+  payload: newnewapi.GetImageUploadUrlRequest, signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.GetImageUploadUrlRequest,
@@ -14,11 +14,12 @@ export const getImageUploadUrl = (
     newnewapi.GetImageUploadUrlResponse,
     `${BASE_URL_UPLOAD}/get_image_upload_url`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
 export const getVideoUploadUrl = (
-  payload: newnewapi.GetVideoUploadUrlRequest
+  payload: newnewapi.GetVideoUploadUrlRequest, signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.GetVideoUploadUrlRequest,
@@ -28,11 +29,12 @@ export const getVideoUploadUrl = (
     newnewapi.GetVideoUploadUrlResponse,
     `${BASE_URL_UPLOAD}/get_video_upload_url`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
 export const removeUploadedFile = (
-  payload: newnewapi.RemoveUploadedFileRequest
+  payload: newnewapi.RemoveUploadedFileRequest, signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.RemoveUploadedFileRequest,
@@ -42,11 +44,12 @@ export const removeUploadedFile = (
     newnewapi.EmptyResponse,
     `${BASE_URL_UPLOAD}/remove_uploaded_file`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
 export const startVideoProcessing = (
-  payload: newnewapi.StartVideoProcessingRequest
+  payload: newnewapi.StartVideoProcessingRequest, signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.StartVideoProcessingRequest,
@@ -56,11 +59,12 @@ export const startVideoProcessing = (
     newnewapi.StartVideoProcessingResponse,
     `${BASE_URL_UPLOAD}/start_video_processing`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
 
 export const stopVideoProcessing = (
-  payload: newnewapi.StopVideoProcessingRequest
+  payload: newnewapi.StopVideoProcessingRequest, signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.StopVideoProcessingRequest,
@@ -70,5 +74,6 @@ export const stopVideoProcessing = (
     newnewapi.StopVideoProcessingResponse,
     `${BASE_URL_UPLOAD}/stop_video_processing`,
     'post',
-    payload
+    payload,
+    signal ?? undefined,
   );
