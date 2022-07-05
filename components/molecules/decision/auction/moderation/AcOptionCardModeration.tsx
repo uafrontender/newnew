@@ -3,7 +3,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import { motion } from 'framer-motion';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -91,6 +91,8 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
     const handleReportClose = useCallback(() => {
       setIsReportModalOpen(false);
     }, []);
+
+    const ellipseButtonRef: any = useRef();
 
     return (
       <>
@@ -210,7 +212,10 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                 </>
               )
             ) : !isMobile ? (
-              <SEllipseButton onClick={() => setIsEllipseMenuOpen(true)}>
+              <SEllipseButton
+                onClick={() => setIsEllipseMenuOpen(true)}
+                ref={ellipseButtonRef}
+              >
                 <InlineSvg
                   svg={MoreIconFilled}
                   fill={theme.colorsThemed.text.secondary}
@@ -234,6 +239,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                 handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
                 handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
                 handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+                anchorElement={ellipseButtonRef.current as HTMLElement}
               />
             )}
           </SContainer>

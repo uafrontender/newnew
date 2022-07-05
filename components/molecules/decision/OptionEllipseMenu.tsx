@@ -1,14 +1,10 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useRef, useState } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import Text from '../../atoms/Text';
+import EllipseMenu, {EllipseMenuButton} from '../../atoms/EllipseMenu';
 
-import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
-import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import isBrowser from '../../../utils/isBrowser';
 import { checkCanDeleteMcOption } from '../../../api/endpoints/multiple_choice';
 import { checkCanDeleteAcOption } from '../../../api/endpoints/auction';
@@ -40,10 +36,6 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
   handleOpenRemoveOptionModal,
 }) => {
   const { t } = useTranslation('common');
-  const containerRef = useRef<HTMLDivElement>();
-
-  useOnClickEsc(containerRef, handleClose);
-  useOnClickOutside(containerRef, handleClose);
 
   const [canDeleteOption, setCanDeleteOption] = useState(false);
   const [isCanDeleteOptionLoading, setIsCanDeleteOptionLoading] =
@@ -102,97 +94,54 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
 
   if (!isVisible) return null;
 
-  if (isBrowser()) {
-    return ReactDOM.createPortal(
-      <StyledModalOverlay>
-        <AnimatePresence>
-          {isVisible && (
-            <SContainer
-              ref={(el) => {
-                containerRef.current = el!!;
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{
-                left: `${xy.x}px`,
-                top: `${xy.y}px`,
-              }}
-            >
-              {isMyOption && (
-                <SButton
-                  onClick={() => {
-                    handleOpenRemoveOptionModal?.();
-                    handleClose();
-                  }}
-                  disabled={!canDeleteOption || isCanDeleteOptionLoading}
-                >
-                  <Text variant={3} tone='error'>
-                    {t('ellipse.delete')}
-                  </Text>
-                </SButton>
-              )}
-              {!isMyOption && (
-                <SButton
-                  onClick={() => {
-                    handleOpenReportOptionModal();
-                    handleClose();
-                  }}
-                >
-                  <Text variant={3} tone='error'>
-                    {t('ellipse.report')}
-                  </Text>
-                </SButton>
-              )}
-            </SContainer>
-          )}
-        </AnimatePresence>
-      </StyledModalOverlay>,
-      document.getElementById('modal-root') as HTMLElement
-    );
-  }
-
-  return null;
+    return (
+      <SEllipseMenu
+        isOpen={isVisible}
+        onClose={handleClose}
+        style={{
+          left: `${xy.x}px`,
+          top: `${xy.y}px`,
+        }}
+      >
+        {isMyOption && (
+          <SEllipseMenuButton
+            variant={3}
+            tone='error'
+            onClick={() => {
+              handleOpenRemoveOptionModal?.();
+              handleClose();
+            }}
+            disabled={!canDeleteOption || isCanDeleteOptionLoading}
+          >
+            {t('ellipse.delete')}
+          </SEllipseMenuButton>
+        )}
+        {!isMyOption && (
+          <SEllipseMenuButton
+            variant={3}
+            tone='error'
+            onClick={() => {
+              handleOpenReportOptionModal();
+              handleClose();
+            }}
+          >
+            {t('ellipse.report')}
+          </SEllipseMenuButton>
+        )}
+    </SEllipseMenu>
+  )
 };
 
 export default OptionEllipseMenu;
 
-const SContainer = styled(motion.div)`
-  position: absolute;
-  top: 50px;
-  z-index: 10;
-
-  width: 120px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-
-  padding: 8px;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
+const SEllipseMenu = styled(EllipseMenu)`
+  position: fixed;
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
+  width: 120px;
+  min-width: 120px;
 `;
 
-const SButton = styled.button`
-  background: none;
-  border: transparent;
-
-  padding: 8px;
-  border-radius: 12px;
-
-  width: 100%;
-
-  text-align: left;
-
-  cursor: pointer;
-  transition: 0.2s linear;
-
-  &:focus,
-  &:hover {
-    outline: none;
-  }
-
+const SEllipseMenuButton = styled(EllipseMenuButton)`
   &:focus:enabled,
   &:hover:enabled {
     outline: none;
@@ -203,16 +152,4 @@ const SButton = styled.button`
     opacity: 0.5;
     cursor: default;
   }
-`;
-
-const StyledModalOverlay = styled(motion.div)`
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  bottom: 0;
-  z-index: 10;
-  overflow: hidden;
-  position: fixed;
-
-  background-color: transparent;
 `;
