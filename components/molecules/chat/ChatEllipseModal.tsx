@@ -1,5 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../redux-store/store';
 import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
@@ -12,6 +14,7 @@ interface IChatEllipseModal {
   onUserBlock: () => void;
   onUserReport: () => void;
   isAnnouncement?: boolean;
+  visavis: newnewapi.IUser | null | undefined;
 }
 
 const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
@@ -22,6 +25,7 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
   onUserBlock,
   onUserReport,
   isAnnouncement,
+  visavis,
 }) => {
   const { t } = useTranslation('common');
   const user = useAppSelector((state) => state.user);
@@ -38,10 +42,12 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
 
   return (
     <EllipseModal show={isOpen} zIndex={zIndex} onClose={onClose}>
-      {user.userData?.options?.isCreator && !isAnnouncement && (
-        <EllipseModalButton onClick={() => {}}>
-          {t('ellipse.view')}
-        </EllipseModalButton>
+      {user.userData?.options?.isCreator && !isAnnouncement && visavis && (
+        <Link href={`/${visavis.username}`}>
+          <a>
+            <EllipseModalButton>{t('ellipse.view')}</EllipseModalButton>
+          </a>
+        </Link>
       )}
       <EllipseModalButton tone='error' onClick={reportUserHandler}>
         {!isAnnouncement ? t('ellipse.reportUser') : t('ellipse.reportGroup')}

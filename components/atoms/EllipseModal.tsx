@@ -67,7 +67,7 @@ export default EllipseModal;
 interface IEllipseModalButton {
   tone?: 'neutral' | 'error';
   disabled?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
   children: string;
 }
 
@@ -88,11 +88,9 @@ const SButton = styled.button`
   padding: 18px;
   background: none;
   border: transparent;
-
+  width: 100%;
   text-align: center;
-
   cursor: pointer;
-
   &:focus {
     outline: none;
   }
