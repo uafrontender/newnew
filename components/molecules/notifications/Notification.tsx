@@ -78,8 +78,8 @@ const Notification: React.FC<newnewapi.INotification> = ({
                   clickable
                   svg={mobileLogo}
                   fill='#fff'
-                  width='48px'
-                  height='48px'
+                  width={isMobile ? '24px' : '48px'}
+                  height={isMobile ? '24px' : '48px'}
                 />
               </SIconHolder>
             </SAvatarHolder>
@@ -212,10 +212,18 @@ const SInlineSVG = styled(InlineSvg)`
 
 const SIconHolder = styled.div`
   background: ${(props) => props.theme.colorsThemed.accent.blue};
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  border-radius: 50%;
+  ${({ theme }) => theme.media.tablet} {
+    width: 72px;
+    height: 72px;
+    min-width: 72px;
+    min-height: 72px;
+  }
 `;
