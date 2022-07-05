@@ -128,6 +128,16 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
       useState<newnewapi.IVideoUrls | undefined>(undefined);
 
+    // Tabs
+    const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
+      post.response ||
+        responseFreshlyUploaded ||
+        postStatus === 'waiting_for_response' ||
+        postStatus === 'processing_response'
+        ? 'response'
+        : 'announcement'
+    );
+
     // Total amount
     const [totalAmount, setTotalAmount] = useState(
       post.totalAmount?.usdCents ?? 0
@@ -601,6 +611,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             }}
             postStatus={postStatus}
             isMuted={mutedMode}
+            openedTab={openedTab}
+            handleChangeTab={(newValue) => setOpenedTab(newValue)}
             handleToggleMuted={() => handleToggleMutedMode()}
             handleUpdateResponseVideo={(newValue) =>
               setResponseFreshlyUploaded(newValue)

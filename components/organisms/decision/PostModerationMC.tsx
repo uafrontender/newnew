@@ -120,9 +120,19 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       }
     };
 
-    // Respone upload
+    // Response upload
     const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
       useState<newnewapi.IVideoUrls | undefined>(undefined);
+
+    // Tabs
+    const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
+      post.response ||
+        responseFreshlyUploaded ||
+        postStatus === 'waiting_for_response' ||
+        postStatus === 'processing_response'
+        ? 'response'
+        : 'announcement'
+    );
 
     const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
@@ -571,6 +581,8 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             }}
             postStatus={postStatus}
             isMuted={mutedMode}
+            openedTab={openedTab}
+            handleChangeTab={(newValue) => setOpenedTab(newValue)}
             handleToggleMuted={() => handleToggleMutedMode()}
             handleUpdateResponseVideo={(newValue) =>
               setResponseFreshlyUploaded(newValue)

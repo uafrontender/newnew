@@ -65,6 +65,8 @@ interface IPostVideoModeration {
   response?: newnewapi.IVideoUrls;
   thumbnails: any;
   isMuted: boolean;
+  openedTab: 'announcement' | 'response';
+  handleChangeTab: (nevValue: 'announcement' | 'response') => void;
   handleToggleMuted: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleUpdateResponseVideo: (newResponse: newnewapi.IVideoUrls) => void;
@@ -77,6 +79,8 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   response,
   thumbnails,
   isMuted,
+  openedTab,
+  handleChangeTab,
   handleToggleMuted,
   handleUpdatePostStatus,
   handleUpdateResponseVideo,
@@ -99,15 +103,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   // Show controls on shorter screens
   const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] =
     useState<number | undefined>(undefined);
-
-  // Tabs
-  const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
-    response ||
-      postStatus === 'waiting_for_response' ||
-      postStatus === 'processing_response'
-      ? 'response'
-      : 'announcement'
-  );
 
   // Editing announcement video thumbnail
   const [isEditThumbnailModalOpen, setIsEditThumbnailModalOpen] =
@@ -702,7 +697,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
                   }
                 : {}),
             }}
-            handleChangeTab={(newValue) => setOpenedTab(newValue)}
+            handleChangeTab={handleChangeTab}
           />
         ) : null}
         {uploadedResponseVideoUrl &&

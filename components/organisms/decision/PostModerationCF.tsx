@@ -131,9 +131,19 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
     const [pledgesLoading, setPledgesLoading] = useState(false);
     const [loadingPledgesError, setLoadingPledgesError] = useState('');
 
-    // Respone upload
+    // Response upload
     const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
       useState<newnewapi.IVideoUrls | undefined>(undefined);
+
+    // Tabs
+    const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
+      post.response ||
+        responseFreshlyUploaded ||
+        postStatus === 'waiting_for_response' ||
+        postStatus === 'processing_response'
+        ? 'response'
+        : 'announcement'
+    );
 
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
@@ -488,6 +498,8 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
             }}
             postStatus={postStatus}
             isMuted={mutedMode}
+            openedTab={openedTab}
+            handleChangeTab={(newValue) => setOpenedTab(newValue)}
             handleToggleMuted={() => handleToggleMutedMode()}
             handleUpdateResponseVideo={(newValue) =>
               setResponseFreshlyUploaded(newValue)

@@ -23,6 +23,7 @@ export default function switchPostStatus(
     | newnewapi.Crowdfunding.Status
     | newnewapi.MultipleChoice.Status
 ): TPostStatusStringified {
+  return 'waiting_for_response'
   if (postType === 'ac') {
     switch (status as newnewapi.Auction.Status) {
       case newnewapi.Auction.Status.SCHEDULED: {
