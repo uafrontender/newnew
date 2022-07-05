@@ -194,9 +194,7 @@ const Comment: React.FC<IComment> = ({
             replies.map((item) => (
               <Comment
                 key={item.id.toString()}
-                canDeleteComment={
-                  isMyComment ? true : canDeleteComment ?? false
-                }
+                canDeleteComment={canDeleteComment}
                 comment={item}
                 handleAddComment={(newMsg: string) => handleAddComment(newMsg)}
                 handleDeleteComment={handleDeleteComment}

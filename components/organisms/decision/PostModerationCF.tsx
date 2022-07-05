@@ -14,6 +14,8 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
+import { useInView } from 'react-intersection-observer';
+import { useTranslation } from 'next-i18next';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -21,17 +23,20 @@ import { fetchPostByUUID } from '../../../api/endpoints/post';
 import { fetchPledges } from '../../../api/endpoints/crowdfunding';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-import DecisionTabs from '../../molecules/decision/PostTabs';
+
+import Headline from '../../atoms/Headline';
+import PostVotingTab from '../../molecules/decision/PostVotingTab';
+import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
-import switchPostType from '../../../utils/switchPostType';
-import isBrowser from '../../../utils/isBrowser';
 
 import switchPostStatus, {
   TPostStatusStringified,
 } from '../../../utils/switchPostStatus';
+import switchPostType from '../../../utils/switchPostType';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const CommentsTab = dynamic(
@@ -81,74 +86,38 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
     handleGoBack,
     handleRemovePostFromState,
   }) => {
+    const router = useRouter();
+    const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
-    const router = useRouter();
+
+    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     // Socket
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-    // Tabs
-    const [currentTab, setCurrentTab] = useState<'backers' | 'comments'>(() => {
-      if (!isBrowser()) {
-        return 'backers';
-      }
-      const { hash } = window.location;
-      if (hash && (hash === '#backers' || hash === '#comments')) {
-        return hash.substring(1) as 'backers' | 'comments';
-      }
-      return 'backers';
+    // Comments
+    const { ref: commentsSectionRef, inView } = useInView({
+      threshold: 0.8,
     });
 
-    const handleChangeTab = (tab: string) => {
-      if (tab === 'comments' && isMobile) {
-        window.history.pushState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#${tab}`
-        );
-      } else {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#${tab}`
-        );
+    const handleCommentFocus = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display =
+          'none';
       }
-      window.dispatchEvent(new HashChangeEvent('hashchange'));
     };
 
-    useEffect(() => {
-      const handleHashChange = () => {
-        const { hash } = window.location;
-        if (!hash) {
-          setCurrentTab('backers');
-          return;
-        }
-        const parsedHash = hash.substring(1);
-        if (parsedHash === 'backers' || parsedHash === 'comments') {
-          setCurrentTab(parsedHash);
-        }
-      };
-
-      window.addEventListener('hashchange', handleHashChange, false);
-
-      return () => {
-        window.removeEventListener('hashchange', handleHashChange, false);
-      };
-    }, []);
+    const handleCommentBlur = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display = '';
+      }
+    };
 
     // Current backers
     const [currentBackers, setCurrentBackers] = useState(
@@ -444,81 +413,102 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
       }
     }, [user]);
 
+    // Scroll to comments if hash is present
+    useEffect(() => {
+      const handleCommentsInitialHash = () => {
+        const { hash } = window.location;
+        if (!hash) {
+          return;
+        }
+
+        const parsedHash = hash.substring(1);
+
+        if (parsedHash === 'comments') {
+          document.getElementById('comments')?.scrollIntoView();
+        }
+      };
+
+      handleCommentsInitialHash();
+    }, []);
+
+    // Replace hash once scrolled to comments
+    useEffect(() => {
+      if (inView) {
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#comments`
+        );
+      } else {
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }`
+        );
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inView, post.postUuid, router.locale]);
+
     return (
-      <SWrapper>
-        <SExpiresSection>
-          {isMobile && (
-            <SGoBackButton
-              style={{
-                gridArea: 'closeBtnMobile',
-              }}
-              onClick={handleGoBack}
-            />
-          )}
-          {postStatus === 'waiting_for_response' ? (
-            <ResponseTimer
-              timestampSeconds={new Date(
-                (post.responseUploadDeadline?.seconds as number) * 1000
-              ).getTime()}
-            />
-          ) : (
-            <PostTimer
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='cf'
-            />
-          )}
-        </SExpiresSection>
-        <PostVideoModeration
-          postId={post.postUuid}
-          announcement={post.announcement!!}
-          response={(post.response || responseFreshlyUploaded) ?? undefined}
-          thumbnails={{
-            startTime: 1,
-            endTime: 3,
-          }}
-          postStatus={postStatus}
-          isMuted={mutedMode}
-          handleToggleMuted={() => handleToggleMutedMode()}
-          handleUpdateResponseVideo={(newValue) =>
-            setResponseFreshlyUploaded(newValue)
-          }
-          handleUpdatePostStatus={handleUpdatePostStatus}
-        />
-        <PostTopInfoModeration
-          postType='cf'
-          postStatus={postStatus}
-          title={post.title}
-          postId={post.postUuid}
-          hasWinner={false}
-          hasResponse={!!post.response}
-          totalPledges={currentBackers}
-          targetPledges={post.targetBackerCount}
-          handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState}
-        />
-        <SActivitesContainer>
-          <DecisionTabs
-            tabs={[
-              {
-                label: 'backers',
-                value: 'backers',
-              },
-              ...(post.isCommentsAllowed
-                ? [
-                    {
-                      label: 'comments',
-                      value: 'comments',
-                    },
-                  ]
-                : []),
-            ]}
-            activeTab={currentTab}
-            handleChangeTab={handleChangeTab}
+      <>
+        <SWrapper>
+          <SExpiresSection>
+            {isMobile && (
+              <SGoBackButton
+                style={{
+                  gridArea: 'closeBtnMobile',
+                }}
+                onClick={handleGoBack}
+              />
+            )}
+            {postStatus === 'waiting_for_response' ? (
+              <ResponseTimer
+                timestampSeconds={new Date(
+                  (post.responseUploadDeadline?.seconds as number) * 1000
+                ).getTime()}
+              />
+            ) : (
+              <PostTimer
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='cf'
+              />
+            )}
+          </SExpiresSection>
+          <PostVideoModeration
+            postId={post.postUuid}
+            announcement={post.announcement!!}
+            response={(post.response || responseFreshlyUploaded) ?? undefined}
+            thumbnails={{
+              startTime: 1,
+              endTime: 3,
+            }}
+            postStatus={postStatus}
+            isMuted={mutedMode}
+            handleToggleMuted={() => handleToggleMutedMode()}
+            handleUpdateResponseVideo={(newValue) =>
+              setResponseFreshlyUploaded(newValue)
+            }
+            handleUpdatePostStatus={handleUpdatePostStatus}
           />
-          {currentTab === 'backers' ? (
-            postStatus === 'waiting_for_response' ||
+          <PostTopInfoModeration
+            postType='cf'
+            postStatus={postStatus}
+            title={post.title}
+            postId={post.postUuid}
+            hasWinner={false}
+            hasResponse={!!post.response}
+            totalPledges={currentBackers}
+            targetPledges={post.targetBackerCount}
+            handleUpdatePostStatus={handleUpdatePostStatus}
+            handleRemovePostFromState={handleRemovePostFromState}
+          />
+          <SActivitesContainer>
+            <PostVotingTab>{t('tabs.backers')}</PostVotingTab>
+            {postStatus === 'waiting_for_response' ||
             postStatus === 'succeeded' ? (
               <CfCrowdfundingSuccessModeration
                 post={post}
@@ -535,24 +525,30 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
                 targetBackerCount={post.targetBackerCount}
                 currentNumBackers={currentBackers}
               />
-            )
-          ) : post.isCommentsAllowed ? (
-            <CommentsTab
-              postUuid={post.postUuid}
-              canDeleteComments={post.creator?.uuid === user.userData?.userUuid}
-              commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => handleChangeTab('backers')}
+            )}
+          </SActivitesContainer>
+          {isPopupVisible && (
+            <HeroPopup
+              isPopupVisible={isPopupVisible}
+              postType='CF'
+              closeModal={goToNextStep}
             />
-          ) : null}
-        </SActivitesContainer>
-        {isPopupVisible && (
-          <HeroPopup
-            isPopupVisible={isPopupVisible}
-            postType='CF'
-            closeModal={goToNextStep}
-          />
+          )}
+        </SWrapper>
+        {post.isCommentsAllowed && (
+          <SCommentsSection id='comments' ref={commentsSectionRef}>
+            <SCommentsHeadline variant={4}>
+              {t('successCommon.comments.heading')}
+            </SCommentsHeadline>
+            <CommentsBottomSection
+              postUuid={post.postUuid}
+              commentsRoomId={post.commentsRoomId as number}
+              onFormBlur={handleCommentBlur}
+              onFormFocus={handleCommentFocus}
+            />
+          </SCommentsSection>
         )}
-      </SWrapper>
+      </>
     );
   }
 );
@@ -628,3 +624,14 @@ const SActivitesContainer = styled.div`
   height: 100%;
   width: 100%;
 `;
+
+// Comments
+const SCommentsHeadline = styled(Headline)`
+  margin-bottom: 8px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 16px;
+  }
+`;
+
+const SCommentsSection = styled.div``;
