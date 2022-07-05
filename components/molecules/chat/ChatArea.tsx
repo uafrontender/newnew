@@ -1,6 +1,12 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-lonely-if */
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  useRef,
+} from 'react';
 import dynamic from 'next/dynamic';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
@@ -472,6 +478,8 @@ const ChatArea: React.FC<IChatData> = ({
     chatRoom,
   ]);
 
+  const moreButtonRef: any = useRef();
+
   return (
     <SContainer>
       {chatRoom && (
@@ -526,6 +534,7 @@ const ChatArea: React.FC<IChatData> = ({
                 view='transparent'
                 iconOnly
                 onClick={() => handleOpenEllipseMenu()}
+                ref={moreButtonRef}
               >
                 <InlineSVG
                   svg={MoreIconFilled}
@@ -546,6 +555,7 @@ const ChatArea: React.FC<IChatData> = ({
                 onUserBlock={onUserBlock}
                 onUserReport={onUserReport}
                 isAnnouncement={localUserData.isAnnouncement}
+                anchorElement={moreButtonRef.current}
               />
             )}
             {isMobile && ellipseMenuOpen ? (
@@ -556,6 +566,7 @@ const ChatArea: React.FC<IChatData> = ({
                 userBlocked={isVisavisBlocked}
                 onUserBlock={onUserBlock}
                 onUserReport={onUserReport}
+                visavis={chatRoom.visavis}
                 isAnnouncement={localUserData.isAnnouncement}
               />
             ) : null}

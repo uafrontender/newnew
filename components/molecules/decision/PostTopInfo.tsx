@@ -2,7 +2,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -200,6 +206,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     }
   }, [hasRecommendations, postType, router]);
 
+  const moreButtonRef: any = useRef();
+  const shareButtonRef: any = useRef();
+
   return (
     <SContainer>
       <SWrapper showSelectingWinnerOption={showSelectingWinnerOption}>
@@ -254,6 +263,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               padding: '8px',
             }}
             onClick={() => handleOpenShareMenu()}
+            ref={shareButtonRef}
           >
             <InlineSvg
               svg={ShareIconFilled}
@@ -266,6 +276,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             view='transparent'
             iconOnly
             onClick={() => handleOpenEllipseMenu()}
+            ref={moreButtonRef}
           >
             <InlineSvg
               svg={MoreIconFilled}
@@ -280,6 +291,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               postId={postId}
               isVisible={shareMenuOpen}
               onClose={handleCloseShareMenu}
+              anchorElement={shareButtonRef.current}
             />
           )}
           {isMobile && shareMenuOpen ? (
@@ -299,6 +311,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               handleFollowDecision={handleFollowDecision}
               handleReportOpen={handleReportOpen}
               onClose={handleCloseEllipseMenu}
+              anchorElement={moreButtonRef.current}
             />
           )}
           {isMobile && ellipseMenuOpen ? (

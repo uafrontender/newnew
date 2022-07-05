@@ -1,13 +1,10 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useRef } from 'react';
+import React from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 
-import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
-import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
-import Text from '../Text';
+import EllipseMenu, { EllipseMenuButton } from '../EllipseMenu';
 
 interface ISubscriberEllipseMenu {
   user: newnewapi.IUser;
@@ -16,6 +13,7 @@ interface ISubscriberEllipseMenu {
   onUserBlock: () => void;
   onUserReport: () => void;
   userBlocked?: boolean;
+  anchorElement?: HTMLElement;
 }
 
 const SubscriberEllipseMenu: React.FC<ISubscriberEllipseMenu> = ({
@@ -25,12 +23,9 @@ const SubscriberEllipseMenu: React.FC<ISubscriberEllipseMenu> = ({
   onUserBlock,
   onUserReport,
   user,
+  anchorElement,
 }) => {
   const { t } = useTranslation('common');
-  const containerRef = useRef<HTMLDivElement>();
-
-  useOnClickEsc(containerRef, handleClose);
-  useOnClickOutside(containerRef, handleClose);
 
   const blockUserHandler = () => {
     onUserBlock();
@@ -43,34 +38,23 @@ const SubscriberEllipseMenu: React.FC<ISubscriberEllipseMenu> = ({
   };
 
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <SContainer
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <Link href={`/${user.username}`}>
-            <a>
-              <SButton>
-                <Text variant={2}>{t('ellipse.view')}</Text>
-              </SButton>
-            </a>
-          </Link>
-          <SButton onClick={reportUserHandler}>
-            <Text variant={2}>{t('ellipse.report')}</Text>
-          </SButton>
-          <SButton onClick={blockUserHandler}>
-            <Text variant={2}>
-              {userBlocked ? t('ellipse.unblock') : t('ellipse.block')}
-            </Text>
-          </SButton>
-        </SContainer>
-      )}
-    </AnimatePresence>
+    <SEllipseMenu
+      isOpen={isVisible}
+      onClose={handleClose}
+      anchorElement={anchorElement}
+    >
+      <Link href={`/${user.username}`}>
+        <a style={{ width: '100%' }}>
+          <EllipseMenuButton>{t('ellipse.view')}</EllipseMenuButton>
+        </a>
+      </Link>
+      <EllipseMenuButton onClick={reportUserHandler}>
+        {t('ellipse.report')}
+      </EllipseMenuButton>
+      <EllipseMenuButton onClick={blockUserHandler}>
+        {userBlocked ? t('ellipse.unblock') : t('ellipse.block')}
+      </EllipseMenuButton>
+    </SEllipseMenu>
   );
 };
 
@@ -80,47 +64,7 @@ SubscriberEllipseMenu.defaultProps = {
 
 export default SubscriberEllipseMenu;
 
-const SContainer = styled(motion.div)`
-  position: absolute;
-  top: 100%;
-  z-index: 10;
-  right: 16px;
+const SEllipseMenu = styled(EllipseMenu)`
   width: 216px;
   box-shadow: 0px 0px 35px 20px rgba(0, 0, 0, 0.25);
-
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 8px;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colors.white
-      : props.theme.colorsThemed.background.tertiary};
-
-  ${({ theme }) => theme.media.laptop} {
-    right: 16px;
-  }
-  a {
-    display: block;
-    width: 100%;
-  }
-`;
-
-const SButton = styled.button`
-  background: none;
-  border: transparent;
-  text-align: left;
-  width: 100%;
-  cursor: pointer;
-  padding: 8px;
-  box-sizing: border-box;
-  border-radius: ${({ theme }) => theme.borderRadius.smallLg};
-  &:focus {
-    outline: none;
-  }
-  &:hover {
-    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
-  }
 `;
