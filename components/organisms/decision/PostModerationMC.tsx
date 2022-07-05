@@ -599,6 +599,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
               options={options}
               optionsLoading={optionsLoading}
               pagingToken={optionsNextPageToken}
+              winningOptionId={(winningOption?.id as number) ?? undefined}
               handleLoadOptions={fetchOptions}
               handleRemoveOption={handleRemoveOption}
             />

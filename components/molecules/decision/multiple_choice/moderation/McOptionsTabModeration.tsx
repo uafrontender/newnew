@@ -22,6 +22,7 @@ interface IMcOptionsTabModeration {
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
+  winningOptionId?: number;
   handleLoadOptions: (token?: string) => void;
   handleRemoveOption: (optionToRemove: newnewapi.MultipleChoice.Option) => void;
 }
@@ -32,6 +33,7 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
     options,
     optionsLoading,
     pagingToken,
+    winningOptionId,
     handleLoadOptions,
     handleRemoveOption,
   }) => {
@@ -91,6 +93,7 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
                 option={option as TMcOptionWithHighestField}
                 creator={option.creator ?? post.creator!!}
                 canBeDeleted={options.length > 2}
+                isWinner={winningOptionId?.toString() === option.id.toString()}
                 isCreatorsBid={
                   !option.creator || option.creator?.uuid === post.creator?.uuid
                 }
