@@ -677,6 +677,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     return <div />;
   };
 
+  const moreButtonRef: any = useRef();
+  const shareButtonRef: any = useRef();
   const renderPostSuccessOrWaitingControls = useCallback(() => {
     return (
       <SPostSuccessWaitingControlsDiv onClick={(e) => e.stopPropagation()}>
@@ -687,7 +689,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         >
           <InlineSvg
             svg={CancelIcon}
-            fill={theme.colorsThemed.text.primary}
+            fill={
+              theme.name === 'light' ? theme.colors.dark : theme.colors.white
+            }
             width='24px'
             height='24px'
           />
@@ -696,10 +700,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           view='secondary'
           iconOnly
           onClick={() => setShareMenuOpen(true)}
+          ref={shareButtonRef}
         >
           <InlineSvg
             svg={ShareIcon}
-            fill={theme.colorsThemed.text.primary}
+            fill={
+              theme.name === 'light' ? theme.colors.dark : theme.colors.white
+            }
             width='24px'
             height='24px'
           />
@@ -708,10 +715,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           view='secondary'
           iconOnly
           onClick={() => setEllipseMenuOpen(true)}
+          ref={moreButtonRef}
         >
           <InlineSvg
             svg={MoreIcon}
-            fill={theme.colorsThemed.text.primary}
+            fill={
+              theme.name === 'light' ? theme.colors.dark : theme.colors.white
+            }
             width='24px'
             height='24px'
           />
@@ -722,6 +732,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             postId={postParsed.postUuid}
             isVisible={shareMenuOpen}
             onClose={handleShareClose}
+            anchorElement={shareButtonRef.current as HTMLElement}
           />
         )}
         {isMobile && shareMenuOpen && postParsed?.postUuid && (
@@ -741,6 +752,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             handleFollowDecision={handleFollowDecision}
             handleReportOpen={handleReportOpen}
             onClose={handleEllipseMenuClose}
+            anchorElement={moreButtonRef.current as HTMLElement}
           />
         )}
         {isMobile && ellipseMenuOpen ? (
@@ -767,7 +779,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     isMobile,
     postParsed?.postUuid,
     shareMenuOpen,
-    theme.colorsThemed.text.primary,
+    theme.colors.dark,
+    theme.colors.white,
+    theme.name,
     typeOfPost,
   ]);
 
@@ -1375,6 +1389,6 @@ const SWaitingSuccessControlsBtn = styled(Button)`
   cursor: pointer;
 
   ${({ theme }) => theme.media.tablet} {
-    background: #fdfdfd10;
+    background: #96949410;
   }
 `;

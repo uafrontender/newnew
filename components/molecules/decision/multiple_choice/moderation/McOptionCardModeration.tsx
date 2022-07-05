@@ -5,7 +5,7 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
@@ -103,6 +103,8 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
       setIsReportModalOpen(false);
     }, []);
 
+    const ellipseMenuButton: any = useRef();
+
     return (
       <>
         <motion.div
@@ -177,7 +179,10 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
               </SBiddersInfo>
             </SBidDetails>
             {!isMobile ? (
-              <SEllipseButton onClick={() => setIsEllipseMenuOpen(true)}>
+              <SEllipseButton
+                onClick={() => setIsEllipseMenuOpen(true)}
+                ref={ellipseMenuButton}
+              >
                 <InlineSvg
                   svg={MoreIconFilled}
                   fill={theme.colorsThemed.text.secondary}
@@ -186,7 +191,10 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                 />
               </SEllipseButton>
             ) : (
-              <SEllipseButtonMobile onClick={() => setIsEllipseMenuOpen(true)}>
+              <SEllipseButtonMobile
+                ref={ellipseMenuButton}
+                onClick={() => setIsEllipseMenuOpen(true)}
+              >
                 {t('mcPost.optionsTab.optionCard.moreButton')}
               </SEllipseButtonMobile>
             )}
@@ -199,6 +207,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                 handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
                 handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
                 handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+                anchorElement={ellipseMenuButton.current}
               />
             )}
           </SContainer>
@@ -354,6 +363,7 @@ const SEllipseButton = styled(Button)`
   position: absolute;
   right: 0px;
   top: 12px;
+  align-self: center;
 
   padding: 0px 12px;
 
