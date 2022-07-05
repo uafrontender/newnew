@@ -128,6 +128,10 @@ const assets = {
   openGraphImage: {
     common: `${APP_ASSETS_ORIGIN}/open-graph-image/common.png`,
   },
+  common: {
+    lightAnimatedLogo: `${APP_ASSETS_ORIGIN}/common/darkAnimatedLogo.webp`,
+    darkAnimatedLogo: `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.webp`,
+  },
 };
 
 export default assets;
