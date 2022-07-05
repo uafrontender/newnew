@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
-import Text from '../../atoms/Text';
 
 interface ICardEllipseModal {
   isOpen: boolean;
@@ -22,7 +21,6 @@ const CardEllipseModal: React.FunctionComponent<ICardEllipseModal> = ({
   onClose,
 }) => {
   const { t } = useTranslation('page-Profile');
-  const { t: tCommon } = useTranslation('common');
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
@@ -32,29 +30,15 @@ const CardEllipseModal: React.FunctionComponent<ICardEllipseModal> = ({
             e.stopPropagation();
           }}
         >
+          <Button view="danger" style={{ marginBottom: '16px'}}>
+            {t('Settings.sections.cards.ellipse.removeCard')}
+          </Button>
           {!isPrimary && (
-            <SButton>
-              <Text variant={2}>
-                {t('Settings.sections.cards.ellipse.makePrimary')}
-              </Text>
-            </SButton>
+            <Button view="primary">
+              {t('Settings.sections.cards.ellipse.makePrimary')}
+            </Button>
           )}
-          <SButton>
-            <Text variant={2} tone='error'>
-              {t('Settings.sections.cards.ellipse.removeCard')}
-            </Text>
-          </SButton>
         </SContentContainer>
-        <Button
-          view='modalSecondary'
-          style={{
-            height: '56px',
-            width: 'calc(100% - 32px)',
-          }}
-          onClick={onClose}
-        >
-          {tCommon('ellipse.cancel')}
-        </Button>
       </SWrapper>
     </Modal>
   );
@@ -81,12 +65,6 @@ const SContentContainer = styled.div`
 
   display: flex;
   flex-direction: column;
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colors.white
-      : props.theme.colorsThemed.background.tertiary};
-
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   z-index: 1;
 
@@ -94,16 +72,5 @@ const SContentContainer = styled.div`
     width: 480px;
     height: 480px;
     margin: auto;
-  }
-`;
-
-const SButton = styled.button`
-  background: none;
-  border: transparent;
-  text-align: center;
-  cursor: pointer;
-  padding: 16px;
-  &:focus {
-    outline: none;
   }
 `;

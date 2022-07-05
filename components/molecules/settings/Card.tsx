@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
@@ -35,6 +35,8 @@ const Card: React.FunctionComponent<ICard> = ({
     resizeMode
   );
 
+  const moreButtonRef: any = useRef();
+
   return (
     <SCard>
       <STopLine>
@@ -49,6 +51,7 @@ const Card: React.FunctionComponent<ICard> = ({
           view='quaternary'
           iconOnly
           onClick={() => setIsEllipseMenuOpen(true)}
+          ref={moreButtonRef}
         >
           <InlineSvg
             svg={MoreIconFilled}
@@ -61,6 +64,7 @@ const Card: React.FunctionComponent<ICard> = ({
             isVisible={isEllipseMenuOpen}
             isPrimary={isPrimary}
             handleClose={() => setIsEllipseMenuOpen(false)}
+            anchorElement={moreButtonRef.current}
           />
         )}
         {isMobile && (

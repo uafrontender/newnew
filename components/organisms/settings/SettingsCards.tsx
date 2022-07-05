@@ -1,6 +1,6 @@
 /* eslint-disable no-unsafe-optional-chaining */
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import Text from '../../atoms/Text';
@@ -8,7 +8,7 @@ import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import Card from '../../molecules/settings/Card';
 
-import addIcon from '../../../public/images/svg/icons/filled/Add.svg';
+import addIconFilled from '../../../public/images/svg/icons/filled/Create.svg';
 
 const CARDS = [
   {
@@ -35,6 +35,7 @@ interface ISettingsCards {}
 
 const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   const { t } = useTranslation('page-Profile');
+  const theme = useTheme();
 
   return (
     <SSettingsContainer>
@@ -50,10 +51,10 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
 
         <SButtonSecondaryMobile view='secondary' iconOnly>
           <InlineSVG
-            svg={addIcon}
-            // fill={theme.colors.white}
-            width='20px'
-            height='20px'
+            svg={addIconFilled}
+            fill={theme.name === 'light' ?  theme.colors.darkGray : theme.colors.white }
+            width='24px'
+            height='24px'
           />
         </SButtonSecondaryMobile>
 
@@ -162,9 +163,19 @@ const SButtonSecondaryDesktop = styled(SButtonSecondary)`
   }
 `;
 
-const SButtonSecondaryMobile = styled(SButtonSecondary)`
+const SButtonSecondaryMobile = styled(Button)`
+  position: absolute;
+  right: 8px;
+  top: 10px;
+  padding: 6px;
+  border-radius: ${({ theme }) => theme.borderRadius.smallLg};
+
   ${({ theme }) => theme.media.tablet} {
     display: none;
+  }
+
+  & path {
+    fill: ${({ theme }) => theme.name === 'light' ? theme.colors.white: theme.colors.darkGray};
   }
 `;
 
