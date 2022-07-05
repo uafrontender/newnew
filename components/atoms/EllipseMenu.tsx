@@ -278,7 +278,11 @@ const SButton = styled.button`
   &:focus {
     outline: none;
   }
-  &:hover {
+  &:hover:enabled {
     background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
   }
 `;

@@ -44,213 +44,214 @@ interface IMcOptionCardModeration {
   handleRemoveOption?: () => void;
 }
 
-const McOptionCardModeration: React.FunctionComponent<
-  IMcOptionCardModeration
-> = ({
-  option,
-  creator,
-  index,
-  canBeDeleted,
-  isCreatorsBid,
-  handleRemoveOption,
-}) => {
-  const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
+  ({
+    option,
+    creator,
+    index,
+    canBeDeleted,
+    isCreatorsBid,
+    handleRemoveOption,
+  }) => {
+    const theme = useTheme();
+    const { t } = useTranslation('modal-Post');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const supporterCountSubstracted = useMemo(() => {
-    if (option.supporterCount === 0) {
-      return 0;
-    }
-    return option.supporterCount - 1;
-  }, [option.supporterCount]);
-
-  const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
-
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const handleConfirmDelete = async () => {
-    try {
-      const payload = new newnewapi.DeleteMcOptionRequest({
-        optionId: option.id,
-      });
-
-      const res = await deleteMcOption(payload);
-
-      console.log(res);
-
-      if (!res.error) {
-        setIsDeleteModalOpen(false);
-        handleRemoveOption?.();
+    const supporterCountSubstracted = useMemo(() => {
+      if (option.supporterCount === 0) {
+        return 0;
       }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+      return option.supporterCount - 1;
+    }, [option.supporterCount]);
 
-  const handleReportSubmit = useCallback(
-    async ({ reasons, message }: ReportData) => {
-      await reportSuperpollOption(option.id, reasons, message);
-    },
-    [option.id]
-  );
+    const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
-  const handleReportClose = useCallback(() => {
-    setIsReportModalOpen(false);
-  }, []);
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const ellipseMenuButton: any = useRef();
+    const handleConfirmDelete = async () => {
+      try {
+        const payload = new newnewapi.DeleteMcOptionRequest({
+          optionId: option.id,
+        });
 
-  return (
-    <>
-      <motion.div
-        key={index}
-        layout='position'
-        transition={{
-          type: 'spring',
-          damping: 20,
-          stiffness: 300,
-        }}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-          marginBottom: '16px',
-        }}
-      >
-        <SContainer
+        const res = await deleteMcOption(payload);
+
+        console.log(res);
+
+        if (!res.error) {
+          setIsDeleteModalOpen(false);
+          handleRemoveOption?.();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const handleReportSubmit = useCallback(
+      async ({ reasons, message }: ReportData) => {
+        await reportSuperpollOption(option.id, reasons, message);
+      },
+      [option.id]
+    );
+
+    const handleReportClose = useCallback(() => {
+      setIsReportModalOpen(false);
+    }, []);
+
+    const ellipseMenuButton: any = useRef();
+
+    return (
+      <>
+        <motion.div
+          key={index}
           layout='position'
           transition={{
             type: 'spring',
             damping: 20,
             stiffness: 300,
           }}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            marginBottom: '16px',
+          }}
         >
-          <SBidDetails>
-            <SBidAmount>
-              <OptionActionIcon
-                src={
-                  theme.name === 'light' ? VoteIconLight.src : VoteIconDark.src
-                }
+          <SContainer
+            layout='position'
+            transition={{
+              type: 'spring',
+              damping: 20,
+              stiffness: 300,
+            }}
+          >
+            <SBidDetails>
+              <SBidAmount>
+                <OptionActionIcon
+                  src={
+                    theme.name === 'light'
+                      ? VoteIconLight.src
+                      : VoteIconDark.src
+                  }
+                />
+                <div>
+                  {option.voteCount && option.voteCount > 0
+                    ? `${formatNumber(option?.voteCount, true)} ${
+                        option.voteCount === 1
+                          ? t('mcPost.optionsTab.optionCard.vote')
+                          : t('mcPost.optionsTab.optionCard.votes')
+                      }`
+                    : t('mcPost.optionsTab.optionCard.noVotes')}
+                </div>
+              </SBidAmount>
+              <SOptionInfo variant={3}>{option.text}</SOptionInfo>
+              <SBiddersInfo variant={3}>
+                <RenderSupportersInfo
+                  isCreatorsBid
+                  isSuggestedByMe={false}
+                  isSupportedByMe={false}
+                  optionCreator={
+                    option.creator ? getDisplayname(option.creator) : undefined
+                  }
+                  optionCreatorUsername={
+                    option.creator
+                      ? (option.creator.username as string)
+                      : undefined
+                  }
+                  firstVoter={
+                    option.firstVoter
+                      ? getDisplayname(option.firstVoter)
+                      : undefined
+                  }
+                  firstVoterUsername={
+                    option.firstVoter
+                      ? (option.firstVoter.username as string)
+                      : undefined
+                  }
+                  supporterCount={option.supporterCount}
+                  supporterCountSubstracted={supporterCountSubstracted}
+                />
+              </SBiddersInfo>
+            </SBidDetails>
+            {!isMobile ? (
+              <SEllipseButton
+                onClick={() => setIsEllipseMenuOpen(true)}
+                ref={ellipseMenuButton}
+              >
+                <InlineSvg
+                  svg={MoreIconFilled}
+                  fill={theme.colorsThemed.text.secondary}
+                  width='20px'
+                  height='20px'
+                />
+              </SEllipseButton>
+            ) : (
+              <SEllipseButtonMobile
+                ref={ellipseMenuButton}
+                onClick={() => setIsEllipseMenuOpen(true)}
+              >
+                {t('mcPost.optionsTab.optionCard.moreButton')}
+              </SEllipseButtonMobile>
+            )}
+            {!isMobile && (
+              <McOptionCardModerationEllipseMenu
+                isVisible={isEllipseMenuOpen}
+                isBySubscriber={!isCreatorsBid}
+                canBeDeleted={canBeDeleted}
+                handleClose={() => setIsEllipseMenuOpen(false)}
+                handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
+                handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
+                handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+                anchorElement={ellipseMenuButton.current}
               />
-              <div>
-                {option.voteCount && option.voteCount > 0
-                  ? `${formatNumber(option?.voteCount, true)} ${
-                      option.voteCount === 1
-                        ? t('mcPost.optionsTab.optionCard.vote')
-                        : t('mcPost.optionsTab.optionCard.votes')
-                    }`
-                  : t('mcPost.optionsTab.optionCard.noVotes')}
-              </div>
-            </SBidAmount>
-            <SOptionInfo variant={3}>{option.text}</SOptionInfo>
-            <SBiddersInfo variant={3}>
-              <RenderSupportersInfo
-                isCreatorsBid
-                isSuggestedByMe={false}
-                isSupportedByMe={false}
-                optionCreator={
-                  option.creator ? getDisplayname(option.creator) : undefined
-                }
-                optionCreatorUsername={
-                  option.creator
-                    ? (option.creator.username as string)
-                    : undefined
-                }
-                firstVoter={
-                  option.firstVoter
-                    ? getDisplayname(option.firstVoter)
-                    : undefined
-                }
-                firstVoterUsername={
-                  option.firstVoter
-                    ? (option.firstVoter.username as string)
-                    : undefined
-                }
-                supporterCount={option.supporterCount}
-                supporterCountSubstracted={supporterCountSubstracted}
-              />
-            </SBiddersInfo>
-          </SBidDetails>
-          {!isMobile ? (
-            <SEllipseButton
-              onClick={() => setIsEllipseMenuOpen(true)}
-              ref={ellipseMenuButton}
-            >
-              <InlineSvg
-                svg={MoreIconFilled}
-                fill={theme.colorsThemed.text.secondary}
-                width='20px'
-                height='20px'
-              />
-            </SEllipseButton>
-          ) : (
-            <SEllipseButtonMobile
-              ref={ellipseMenuButton}
-              onClick={() => setIsEllipseMenuOpen(true)}
-            >
-              {t('mcPost.optionsTab.optionCard.moreButton')}
-            </SEllipseButtonMobile>
-          )}
-          {!isMobile && (
-            <McOptionCardModerationEllipseMenu
-              isVisible={isEllipseMenuOpen}
-              isBySubscriber={!isCreatorsBid}
-              canBeDeleted={canBeDeleted}
-              handleClose={() => setIsEllipseMenuOpen(false)}
-              handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
-              handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
-              handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
-              anchorElement={ellipseMenuButton.current}
-            />
-          )}
-        </SContainer>
-      </motion.div>
-      {/* Modals */}
-      {/* Delete option */}
-      <McConfirmDeleteOptionModal
-        isVisible={isDeleteModalOpen}
-        closeModal={() => setIsDeleteModalOpen(false)}
-        handleConfirmDelete={handleConfirmDelete}
-      />
-      {/* Ellipse modal */}
-      {isMobile && (
-        <McOptionCardModerationEllipseModal
-          isOpen={isEllipseMenuOpen}
-          zIndex={16}
-          onClose={() => setIsEllipseMenuOpen(false)}
-          isBySubscriber={!isCreatorsBid}
-          canBeDeleted={canBeDeleted}
-          handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
-          handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
-          handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+            )}
+          </SContainer>
+        </motion.div>
+        {/* Modals */}
+        {/* Delete option */}
+        <McConfirmDeleteOptionModal
+          isVisible={isDeleteModalOpen}
+          closeModal={() => setIsDeleteModalOpen(false)}
+          handleConfirmDelete={handleConfirmDelete}
         />
-      )}
-      {/* Confirm block user modal */}
-      {!isCreatorsBid && (
-        <BlockUserModalPost
-          confirmBlockUser={isBlockModalOpen}
-          user={option.creator!!}
-          closeModal={() => setIsBlockModalOpen(false)}
-        />
-      )}
-      {/* Report modal */}
-      {option.isCreatedBySubscriber && option.creator && (
-        <ReportModal
-          show={isReportModalOpen}
-          reportedDisplayname={getDisplayname(option.creator)}
-          onSubmit={handleReportSubmit}
-          onClose={handleReportClose}
-        />
-      )}
-    </>
-  );
-};
+        {/* Ellipse modal */}
+        {isMobile && (
+          <McOptionCardModerationEllipseModal
+            isOpen={isEllipseMenuOpen}
+            zIndex={16}
+            onClose={() => setIsEllipseMenuOpen(false)}
+            isBySubscriber={!isCreatorsBid}
+            canBeDeleted={canBeDeleted}
+            handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
+            handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
+            handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+          />
+        )}
+        {/* Confirm block user modal */}
+        {!isCreatorsBid && (
+          <BlockUserModalPost
+            confirmBlockUser={isBlockModalOpen}
+            user={option.creator!!}
+            closeModal={() => setIsBlockModalOpen(false)}
+          />
+        )}
+        {/* Report modal */}
+        {option.isCreatedBySubscriber && option.creator && (
+          <ReportModal
+            show={isReportModalOpen}
+            reportedDisplayname={getDisplayname(option.creator)}
+            onSubmit={handleReportSubmit}
+            onClose={handleReportClose}
+          />
+        )}
+      </>
+    );
+  };
 
 McOptionCardModeration.defaultProps = {};
 
