@@ -1,7 +1,6 @@
 /* eslint-disable consistent-return */ import React, {
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 import { useTranslation } from 'next-i18next';
@@ -13,8 +12,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 import EllipseMenu, { EllipseMenuButton } from '../atoms/EllipseMenu';
 
-import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
-import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
+import isBrowser from '../../utils/isBrowser';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
 import switchPostType from '../../utils/switchPostType';
 import { useAppSelector } from '../../redux-store/store';
@@ -47,11 +45,18 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       const theme = useTheme();
       const router = useRouter();
       const { t } = useTranslation('common');
-      const containerRef = useRef<HTMLDivElement>();
       const user = useAppSelector((state) => state.user);
 
-      useOnClickEsc(containerRef, onClose);
-      useOnClickOutside(containerRef, onClose);
+      useEffect(() => {
+        if (isBrowser()) {
+          const postModal = document.getElementById('post-modal-container');
+          if (isVisible && postModal) {
+            postModal.style.overflow = 'hidden';
+          } else if (postModal) {
+            postModal.style.overflow = 'scroll';
+          }
+        }
+      }, [isVisible]);
 
       // Share
       const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -160,7 +165,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       }, [user.loggedIn, postUuid]);
 
       return (
-        <EllipseMenu
+        <SEllipseMenu
           isOpen={isVisible}
           onClose={onClose}
           anchorElement={anchorElement}
@@ -203,12 +208,16 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
               </SEllipseMenuButton>
             </>
           )}
-        </EllipseMenu>
+        </SEllipseMenu>
       );
     }
   );
 
 export default PostCardEllipseMenu;
+
+const SEllipseMenu = styled(EllipseMenu)`
+  position: fixed;
+`;
 
 const SEllipseMenuButton = styled(EllipseMenuButton)`
   text-align: right;

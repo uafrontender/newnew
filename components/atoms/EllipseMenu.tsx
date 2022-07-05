@@ -58,7 +58,6 @@ interface IEllipseMenu {
   zIndex?: number;
   maxWidth?: string;
   onClose: () => void;
-  isCloseOnItemClick?: boolean;
   anchorElement?: HTMLElement;
   anchorOrigin?: {
     vertical: 'top' | 'center' | 'bottom';
@@ -76,7 +75,6 @@ const EllipseMenu: React.FunctionComponent<IEllipseMenu> = ({
   children,
   maxWidth,
   onClose,
-  isCloseOnItemClick,
   anchorElement,
   anchorOrigin = {
     vertical: 'bottom',
@@ -96,18 +94,6 @@ const EllipseMenu: React.FunctionComponent<IEllipseMenu> = ({
   useEffect(() => {
     dispatch(setOverlay(isOpen));
   }, [isOpen, dispatch]);
-
-  const childrenWithProps = React.Children.map(children, (child) => {
-    if (React.isValidElement(child)) {
-      return React.cloneElement(
-        child,
-        isCloseOnItemClick
-          ? { isCloseMenuOnClick: isCloseOnItemClick, onCloseMenu: onClose }
-          : {}
-      );
-    }
-    return child;
-  });
 
   const [position, setPosition] = useState(() => ({
     top: getTopPosition(
@@ -176,7 +162,7 @@ const EllipseMenu: React.FunctionComponent<IEllipseMenu> = ({
             $withoutContainer={withoutContainer}
             {...rest}
           >
-            {childrenWithProps}
+            {children}
           </SContainer>
         )}
       </AnimatePresence>,
@@ -193,8 +179,6 @@ interface IEllipseMenuButton {
   tone?: 'neutral' | 'error';
   onClick?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   children: React.ReactNode;
-  isCloseMenuOnClick?: boolean;
-  onCloseMenu?: () => void;
   withoutTextWrapper?: boolean;
   variant?: 1 | 2 | 3 | 4 | 5;
   disabled?: boolean;
@@ -204,8 +188,6 @@ export const EllipseMenuButton: React.FC<IEllipseMenuButton> = ({
   onClick,
   children,
   tone,
-  isCloseMenuOnClick,
-  onCloseMenu,
   withoutTextWrapper,
   variant = 2,
   disabled,
@@ -216,10 +198,6 @@ export const EllipseMenuButton: React.FC<IEllipseMenuButton> = ({
       if (onClick) {
         e.stopPropagation();
         onClick(e);
-      }
-
-      if (isCloseMenuOnClick && onCloseMenu) {
-        onCloseMenu();
       }
     }}
     disabled={disabled}
