@@ -80,9 +80,8 @@ const ChatArea: React.FC<IChatData> = ({
   //   useState<boolean>(false);
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const [newMessage, setNewMessage] = useState<
-    newnewapi.IChatMessage | null | undefined
-  >();
+  const [newMessage, setNewMessage] =
+    useState<newnewapi.IChatMessage | null | undefined>();
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
@@ -567,6 +566,7 @@ const ChatArea: React.FC<IChatData> = ({
                 userBlocked={isVisavisBlocked}
                 onUserBlock={onUserBlock}
                 onUserReport={onUserReport}
+                visavis={chatRoom.visavis}
                 isAnnouncement={localUserData.isAnnouncement}
               />
             ) : null}
