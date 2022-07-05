@@ -38,7 +38,6 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
         const res = await getSubscriptionStatus(getStatusPayload);
 
         if (res.data?.status?.activeRenewsAt) {
-          console.log('Subscribed! Redirecting to chat');
           fetchCreatorsImSubscribedTo();
           // I think we should not check is room created or not at this point
           // we can do this on chat page and if not try to create again
