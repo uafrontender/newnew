@@ -1,5 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
@@ -137,6 +137,8 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
     // isSub ? setIsSubscribed(true) : setIsSubscribed(false);
   }, [creatorsImSubscribedTo, creator.uuid]);
 
+  const moreButtonRef: any = useRef();
+
   return (
     <SCard showSubscriptionPrice={subscriptionPrice !== undefined}>
       {withEllipseMenu && (
@@ -147,6 +149,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
             e.stopPropagation();
             handleOpenEllipseMenu();
           }}
+          ref={moreButtonRef}
         >
           <InlineSvg
             svg={MoreIconFilled}
@@ -176,6 +179,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
           handleClickUnsubscribe={() => {
             setUnsubscribeModalOpen(true);
           }}
+          anchorElement={moreButtonRef.current}
         />
       )}
       <SUserAvatarContainer>
