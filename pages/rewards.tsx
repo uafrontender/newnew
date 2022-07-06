@@ -18,6 +18,7 @@ import GoBackButton from '../components/molecules/GoBackButton';
 
 import CancelIcon from '../public/images/svg/icons/outlined/Close.svg';
 import InlineSvg from '../components/atoms/InlineSVG';
+import Button from '../components/atoms/Button';
 
 export const Rewards = () => {
   const router = useRouter();
@@ -109,8 +110,48 @@ export const Rewards = () => {
               </Step>
             </StepsContainer>
           </Section>
-          <Section />
-          <Section />
+          <Section>
+            <SectionTitle>{t('balance.title')}</SectionTitle>
+            <BalanceValue>
+              <InfoButton onClick={() => {}}>i</InfoButton>
+              {/* TODO: use data from API */}
+              $0.00
+            </BalanceValue>
+            <SButton>{t('balance.button')}</SButton>
+          </Section>
+          <Section>
+            <SectionTitle>{t('rewards.title')}</SectionTitle>
+            {/* TODO: Use data from API */}
+            {/* TODO: Move to a separate component/ molecule */}
+            <RewardsContainer>
+              <RewardCard received>
+                <RewardImage>
+                  <img src={assets.decision.gold} alt='' />
+                </RewardImage>
+                <RewardTitle received>Signed up</RewardTitle>
+                <RewardAmount received>
+                  <RewardAmountText>
+                    {t('rewards.earned', { value: '5.00' })}
+                  </RewardAmountText>
+                </RewardAmount>
+              </RewardCard>
+              <RewardCard>
+                <RewardImage>
+                  <img src={assets.decision.votes} alt='' />
+                </RewardImage>
+                <RewardTitle>Place a bid of $1000000000</RewardTitle>
+                <RewardAmount>
+                  {t('rewards.earn', { value: '5.00' })}
+                </RewardAmount>
+              </RewardCard>
+
+              {/* Placeholders for flex-wrap content alignment */}
+              <RewardCard holder />
+              <RewardCard holder />
+              <RewardCard holder />
+              <RewardCard holder />
+            </RewardsContainer>
+          </Section>
         </Content>
       </Container>
     </>
@@ -227,6 +268,7 @@ const Section = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
+  align-items: center;
   width: 100%;
   background-color: ${(props) => props.theme.colorsThemed.background.secondary};
   border-radius: 16px;
@@ -238,9 +280,6 @@ const Section = styled.div`
   ${({ theme }) => theme.media.laptop} {
     margin-bottom: 32px;
   }
-
-  //TODO: for tests only, remove
-  min-height: 300px;
 `;
 
 const SCloseButton = styled.button`
@@ -358,4 +397,126 @@ const StepDescription = styled.div`
   font-size: 12px;
   line-height: 16px;
   margin-top: 8px;
+`;
+
+const SectionTitle = styled.div`
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 28px;
+  margin-bottom: 4px;
+
+  ${({ theme }) => theme.media.tablet} {
+    line-height: 32px;
+  }
+`;
+
+const BalanceValue = styled.div`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  position: relative;
+  padding-left: 32px;
+  padding-right: 32px;
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 64px;
+  margin-bottom: 24px;
+`;
+
+const InfoButton = styled.div`
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  right: 0;
+  top: 4px;
+  width: 17px;
+  height: 17px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.5);
+  border: 1px solid;
+  border-radius: 100%;
+  cursor: pointer;
+  user-select: none;
+`;
+
+const SButton = styled(Button)`
+  width: 100%;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 176px;
+  }
+`;
+
+const RewardsContainer = styled.div`
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+`;
+
+const RewardCard = styled.div<{ received?: boolean; holder?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 16px;
+  padding: ${(props) => (props.holder ? 0 : '24px 16px;')};
+  width: 146px;
+  background-color: ${(props) =>
+    props.received
+      ? props.theme.colorsThemed.button.background.primary
+      : undefined};
+  border: ${(props) =>
+    props.received
+      ? undefined
+      : `1px solid ${props.theme.colorsThemed.tag.color.primary}`};
+
+  opacity: ${(props) => (props.holder ? 0 : 1)};
+`;
+
+const RewardImage = styled.div`
+  width: 56px;
+  height: 56px;
+  margin-bottom: 5px;
+
+  img {
+    width: 100%;
+    object-fit: contain;
+  }
+`;
+
+const RewardTitle = styled.div<{ received?: boolean }>`
+  flex-grow: 1;
+  color: ${(props) =>
+    props.received
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colorsThemed.text.secondary};
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  margin-bottom: 16px;
+`;
+
+const RewardAmount = styled.div<{ received?: boolean }>`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 34px;
+  width: 115px;
+  border-radius: 12px;
+  background: ${(props) =>
+    props.received
+      ? 'rgba(40, 41, 51, 0.25)'
+      : props.theme.colorsThemed.background.quinary};
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
+const RewardAmountText = styled.div`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
 `;

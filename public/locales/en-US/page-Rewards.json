@@ -21,5 +21,14 @@
       "title": "Spend your rewards",
       "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
     }
+  },
+  "balance": {
+    "title": "Rewards towards your next purchase",
+    "button": "Spend my Rewards!"
+  },
+  "rewards": {
+    "title": "My Milestones",
+    "earned": "earned ${{value}}",
+    "earn": "earn ${{value}}"
   }
 }
