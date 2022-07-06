@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 
 import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
-import { useAppSelector } from '../../../redux-store/store';
 
 interface IUserEllipseMenu {
   isVisible: boolean;
@@ -16,6 +15,7 @@ interface IUserEllipseMenu {
   handleClickReport: () => void;
   handleClickBlock: () => void;
   anchorElement?: HTMLElement;
+  offsetTop?: string;
 }
 
 const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
@@ -24,6 +24,7 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
   isBlocked,
   loggedIn,
   anchorElement,
+  offsetTop,
   handleClose,
   handleClickUnsubscribe,
   handleClickReport,
@@ -31,30 +32,37 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
 }) => {
   const { t } = useTranslation('common');
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
-
-  const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
-    resizeMode
-  );
-
   return (
     <EllipseMenu
       isOpen={isVisible}
       onClose={handleClose}
-      isCloseOnItemClick
       anchorElement={anchorElement}
-      offsetTop={isDesktop ? '-25px' : '0'}
+      offsetTop={offsetTop}
     >
       {isSubscribed && (
-        <EllipseMenuButton onClick={handleClickUnsubscribe}>
+        <EllipseMenuButton onClick={() => {
+          handleClickUnsubscribe();
+          handleClose();
+        }}>
           {t('ellipse.unsubscribe')}
         </EllipseMenuButton>
       )}
-      <EllipseMenuButton onClick={handleClickReport} tone='error'>
+      <EllipseMenuButton
+        onClick={() => {
+          handleClickReport();
+          handleClose();
+        }}
+        tone='error'
+      >
         {t('ellipse.report')}
       </EllipseMenuButton>
       {loggedIn && (
-        <EllipseMenuButton onClick={handleClickBlock}>
+        <EllipseMenuButton 
+          onClick={() => {
+            handleClickBlock();
+            handleClose();
+          }}
+        >
           {!isBlocked ? t('ellipse.block') : t('ellipse.unblock')}
         </EllipseMenuButton>
       )}

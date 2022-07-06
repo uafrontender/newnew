@@ -189,7 +189,10 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                   >
                     {t('acPostModeration.optionsTab.optionCard.pickButton')}
                   </SPickOptionButton>
-                  <SDropdownButton onClick={() => setIsEllipseMenuOpen(true)}>
+                  <SDropdownButton
+                    onClick={() => setIsEllipseMenuOpen(true)}
+                    ref={ellipseButtonRef}
+                  >
                     <InlineSvg
                       svg={ChevronDown}
                       fill={theme.colorsThemed.text.primary}
