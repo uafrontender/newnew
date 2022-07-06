@@ -47,6 +47,7 @@ import switchPostStatus, {
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
@@ -627,6 +628,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             amountInBids={totalAmount}
             hasWinner={!!winningOptionId}
             hasResponse={!!post.response}
+            hidden={openedTab === 'response'}
             handleUpdatePostStatus={handleUpdatePostStatus}
             handleRemovePostFromState={handleRemovePostFromState}
           />
@@ -634,23 +636,31 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             decisionFailed={postStatus === 'failed'}
             showSelectWinnerOption={showSelectWinnerOption}
           >
-            <PostVotingTab>
-              {`${t('tabs.bids')} ${
-                !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
-              }`}
-            </PostVotingTab>
-            <AcOptionsTabModeration
-              postId={post.postUuid}
-              postStatus={postStatus}
-              options={options}
-              optionsLoading={optionsLoading}
-              pagingToken={optionsNextPageToken}
-              winningOptionId={(winningOption?.id as number) ?? undefined}
-              handleLoadBids={fetchBids}
-              handleRemoveOption={handleRemoveOption}
-              handleUpdatePostStatus={handleUpdatePostStatus}
-              handleUpdateWinningOption={handleUpdateWinningOption}
-            />
+            {openedTab === 'announcement' ? (
+              <>
+                <PostVotingTab>
+                  {`${t('tabs.bids')} ${
+                    !!numberOfOptions && numberOfOptions > 0
+                      ? numberOfOptions
+                      : ''
+                  }`}
+                </PostVotingTab>
+                <AcOptionsTabModeration
+                  postId={post.postUuid}
+                  postStatus={postStatus}
+                  options={options}
+                  optionsLoading={optionsLoading}
+                  pagingToken={optionsNextPageToken}
+                  winningOptionId={(winningOption?.id as number) ?? undefined}
+                  handleLoadBids={fetchBids}
+                  handleRemoveOption={handleRemoveOption}
+                  handleUpdatePostStatus={handleUpdatePostStatus}
+                  handleUpdateWinningOption={handleUpdateWinningOption}
+                />
+              </>
+            ) : (
+              <PostResponseTabModeration />
+            )}
           </SActivitesContainer>
           {isPopupVisible && (
             <HeroPopup

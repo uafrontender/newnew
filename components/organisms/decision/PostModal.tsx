@@ -785,6 +785,112 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     typeOfPost,
   ]);
 
+  const renderPostModerationControls = useCallback(() => {
+    return (
+      <SPostSuccessWaitingControlsDiv onClick={(e) => e.stopPropagation()}>
+        <SWaitingSuccessControlsBtn
+          view='secondary'
+          iconOnly
+          onClick={handleCloseAndGoBack}
+        >
+          <InlineSvg
+            svg={CancelIcon}
+            fill={
+              theme.name === 'light' ? theme.colors.dark : theme.colors.white
+            }
+            width='24px'
+            height='24px'
+          />
+        </SWaitingSuccessControlsBtn>
+        <SWaitingSuccessControlsBtn
+          view='secondary'
+          iconOnly
+          onClick={() => setShareMenuOpen(true)}
+          ref={shareButtonRef}
+        >
+          <InlineSvg
+            svg={ShareIcon}
+            fill={
+              theme.name === 'light' ? theme.colors.dark : theme.colors.white
+            }
+            width='24px'
+            height='24px'
+          />
+        </SWaitingSuccessControlsBtn>
+        <SWaitingSuccessControlsBtn
+          view='secondary'
+          iconOnly
+          onClick={() => setEllipseMenuOpen(true)}
+          ref={moreButtonRef}
+        >
+          <InlineSvg
+            svg={MoreIcon}
+            fill={
+              theme.name === 'light' ? theme.colors.dark : theme.colors.white
+            }
+            width='24px'
+            height='24px'
+          />
+        </SWaitingSuccessControlsBtn>
+        {/* Share menu */}
+        {!isMobile && postParsed?.postUuid && (
+          <PostShareEllipseMenu
+            postId={postParsed.postUuid}
+            isVisible={shareMenuOpen}
+            onClose={handleShareClose}
+            anchorElement={shareButtonRef.current as HTMLElement}
+          />
+        )}
+        {isMobile && shareMenuOpen && postParsed?.postUuid && (
+          <PostShareEllipseModal
+            isOpen={shareMenuOpen}
+            zIndex={11}
+            postId={postParsed.postUuid}
+            onClose={handleShareClose}
+          />
+        )}
+        {/* Ellipse menu */}
+        {!isMobile && (
+          <PostEllipseMenu
+            postType={typeOfPost as string}
+            isFollowingDecision={isFollowingDecision}
+            isVisible={ellipseMenuOpen}
+            handleFollowDecision={handleFollowDecision}
+            handleReportOpen={handleReportOpen}
+            onClose={handleEllipseMenuClose}
+            anchorElement={moreButtonRef.current as HTMLElement}
+          />
+        )}
+        {isMobile && ellipseMenuOpen ? (
+          <PostEllipseModal
+            postType={typeOfPost as string}
+            isFollowingDecision={isFollowingDecision}
+            zIndex={11}
+            isOpen={ellipseMenuOpen}
+            handleFollowDecision={handleFollowDecision}
+            handleReportOpen={handleReportOpen}
+            onClose={handleEllipseMenuClose}
+          />
+        ) : null}
+      </SPostSuccessWaitingControlsDiv>
+    );
+  }, [
+    ellipseMenuOpen,
+    handleCloseAndGoBack,
+    handleEllipseMenuClose,
+    handleFollowDecision,
+    handleReportOpen,
+    handleShareClose,
+    isFollowingDecision,
+    isMobile,
+    postParsed?.postUuid,
+    shareMenuOpen,
+    theme.colors.dark,
+    theme.colors.white,
+    theme.name,
+    typeOfPost,
+  ]);
+
   useEffect(() => {
     if (isOpen && postParsed) {
       let additionalHash;
@@ -998,6 +1104,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Render Awaiting Response & Success Decision views
   if (shouldRenderVotingFinishedModal && !isMyPost) {
     return (
       <>
@@ -1058,6 +1165,71 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     );
   }
 
+  // Render Moderation view
+  if (isMyPost) {
+    return (
+      <>
+        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
+          <Head>
+            <title>{t(`meta.${typeOfPost}.title`)}</title>
+            <meta
+              name='description'
+              content={t(`meta.${typeOfPost}.description`)}
+            />
+            <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
+            <meta
+              property='og:description'
+              content={t(`meta.${typeOfPost}.description`)}
+            />
+          </Head>
+          {!isMobile && renderPostModerationControls()}
+          {postParsed && typeOfPost ? (
+            <SPostModalContainer
+              loaded={recommendedPosts && recommendedPosts.length > 0}
+              id='post-modal-container'
+              isMyPost={isMyPost}
+              onClick={(e) => e.stopPropagation()}
+              ref={(el) => {
+                modalContainerRef.current = el!!;
+              }}
+            >
+              {postStatus !== 'deleted_by_admin' &&
+              postStatus !== 'deleted_by_creator' ? (
+                renderPostModeration(typeOfPost)
+              ) : (
+                <PostFailedBox
+                  title={t('postDeletedByMe.title', {
+                    postType: t(`postType.${typeOfPost}`),
+                  })}
+                  body={
+                    deletedByCreator
+                      ? t('postDeletedByMe.body.byCreator', {
+                          postType: t(`postType.${typeOfPost}`),
+                        })
+                      : t('postDeletedByMe.body.byAdmin', {
+                          postType: t(`postType.${typeOfPost}`),
+                        })
+                  }
+                  imageSrc={
+                    theme.name === 'light'
+                      ? LIGHT_IMAGES[typeOfPost]
+                      : DARK_IMAGES[typeOfPost]
+                  }
+                  buttonCaption={t('postDeletedByMe.buttonText')}
+                  handleButtonClick={() => {
+                    router.push('/creation');
+                  }}
+                />
+              )}
+              {isMobile && renderPostModerationControls()}
+            </SPostModalContainer>
+          ) : null}
+        </Modal>
+      </>
+    );
+  }
+
+  // Render regular Decision view
   return (
     <>
       <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
@@ -1099,35 +1271,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           >
             {postStatus !== 'deleted_by_admin' &&
             postStatus !== 'deleted_by_creator' ? (
-              isMyPost ? (
-                renderPostModeration(typeOfPost)
-              ) : (
-                renderPostView(typeOfPost)
-              )
-            ) : isMyPost ? (
-              <PostFailedBox
-                title={t('postDeletedByMe.title', {
-                  postType: t(`postType.${typeOfPost}`),
-                })}
-                body={
-                  deletedByCreator
-                    ? t('postDeletedByMe.body.byCreator', {
-                        postType: t(`postType.${typeOfPost}`),
-                      })
-                    : t('postDeletedByMe.body.byAdmin', {
-                        postType: t(`postType.${typeOfPost}`),
-                      })
-                }
-                imageSrc={
-                  theme.name === 'light'
-                    ? LIGHT_IMAGES[typeOfPost]
-                    : DARK_IMAGES[typeOfPost]
-                }
-                buttonCaption={t('postDeletedByMe.buttonText')}
-                handleButtonClick={() => {
-                  router.push('/creation');
-                }}
-              />
+              renderPostView(typeOfPost)
             ) : (
               <PostFailedBox
                 title={t('postDeleted.title', {
@@ -1158,41 +1302,39 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 handleButtonClick={handleSeeNewDeletedBox}
               />
             )}
-            {!isMyPost && (
-              <SRecommendationsSection
-                id='recommendations-section-heading'
-                loaded={recommendedPosts && recommendedPosts.length > 0}
-              >
-                <Headline variant={4}>
-                  {recommendedPosts.length > 0
-                    ? t('recommendationsSection.heading')
-                    : null}
-                </Headline>
-                {recommendedPosts && (
-                  <ListPostModal
-                    loading={recommendedPostsLoading}
-                    collection={recommendedPosts}
-                    skeletonsBgColor={theme.colorsThemed.background.tertiary}
-                    skeletonsHighlightColor={
-                      theme.colorsThemed.background.secondary
-                    }
-                    handlePostClicked={handleOpenRecommendedPost}
-                  />
-                )}
-                <div
-                  ref={loadingRef}
-                  style={{
-                    position: 'relative',
-                    bottom: '10px',
-                    ...(recommendedPostsLoading
-                      ? {
-                          display: 'none',
-                        }
-                      : {}),
-                  }}
+            <SRecommendationsSection
+              id='recommendations-section-heading'
+              loaded={recommendedPosts && recommendedPosts.length > 0}
+            >
+              <Headline variant={4}>
+                {recommendedPosts.length > 0
+                  ? t('recommendationsSection.heading')
+                  : null}
+              </Headline>
+              {recommendedPosts && (
+                <ListPostModal
+                  loading={recommendedPostsLoading}
+                  collection={recommendedPosts}
+                  skeletonsBgColor={theme.colorsThemed.background.tertiary}
+                  skeletonsHighlightColor={
+                    theme.colorsThemed.background.secondary
+                  }
+                  handlePostClicked={handleOpenRecommendedPost}
                 />
-              </SRecommendationsSection>
-            )}
+              )}
+              <div
+                ref={loadingRef}
+                style={{
+                  position: 'relative',
+                  bottom: '10px',
+                  ...(recommendedPostsLoading
+                    ? {
+                        display: 'none',
+                      }
+                    : {}),
+                }}
+              />
+            </SRecommendationsSection>
           </SPostModalContainer>
         ) : null}
       </Modal>
