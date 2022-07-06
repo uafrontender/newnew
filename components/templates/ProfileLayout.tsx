@@ -99,6 +99,10 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     'tablet',
   ].includes(resizeMode);
 
+  const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
+    resizeMode
+  );
+
   // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
   const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
@@ -523,6 +527,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 setUnsubscribeModalOpen(true);
               }}
               anchorElement={moreButtonRef.current}
+              offsetTop={isDesktop ? '-25px' : '0'}
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
