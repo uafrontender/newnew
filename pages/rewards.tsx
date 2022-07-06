@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
@@ -13,18 +13,41 @@ import HomeLayout from '../components/templates/HomeLayout';
 import Headline from '../components/atoms/Headline';
 import Text from '../components/atoms/Text';
 import assets from '../constants/assets';
-// import { useAppSelector } from '../redux-store/store';
+import { useAppSelector } from '../redux-store/store';
 import GoBackButton from '../components/molecules/GoBackButton';
 
 import CancelIcon from '../public/images/svg/icons/outlined/Close.svg';
 import InlineSvg from '../components/atoms/InlineSVG';
 import Button from '../components/atoms/Button';
+import RewardList, { Reward } from '../components/molecules/RewardList';
+import { formatNumber } from '../utils/format';
 
 export const Rewards = () => {
   const router = useRouter();
   const { t } = useTranslation('page-Rewards');
   const theme = useTheme();
-  // const user = useAppSelector((state) => state.user);
+  const user = useAppSelector((state) => state.user);
+  // TODO: store in local storage (useLocalStorage)
+  const [instructionVisible, setInstructionVisible] = useState(true);
+
+  // TODO: Use data from API
+  const balance = 0;
+
+  // TODO: Use data from API
+  const rewards: Reward[] = [
+    {
+      received: true,
+      imageUrl: assets.decision.gold,
+      text: 'Signed up',
+      amount: 5,
+    },
+    {
+      received: false,
+      imageUrl: assets.decision.votes,
+      text: 'Place a bid of $1000000000',
+      amount: 5,
+    },
+  ];
 
   return (
     <>
@@ -56,101 +79,81 @@ export const Rewards = () => {
           <SideHeader />
         </SubHeader>
         <Content>
-          <Section>
-            <SCloseButton onClick={() => {}}>
-              <InlineSvg
-                svg={CancelIcon}
-                fill={theme.colorsThemed.text.primary}
-                width='20px'
-                height='20px'
-              />
-            </SCloseButton>
-            <InstructionsHeadline variant={6}>
-              {t('instruction.title')}
-            </InstructionsHeadline>
-            <StepsContainer>
-              <Step>
-                <StepImage>
-                  <img src={assets.decision.votes} alt='bid' />
-                </StepImage>
-                <StepCard>
-                  <Text variant={2} weight={600}>
-                    {t('instruction.bid.title')}
-                  </Text>
-                  <StepDescription>
-                    {t('instruction.bid.description')}
-                  </StepDescription>
-                </StepCard>
-              </Step>
-              <Step>
-                <StepImage>
-                  <img src={assets.decision.gold} alt='earn' />
-                </StepImage>
-                <StepCard>
-                  <Text variant={2} weight={600}>
-                    {t('instruction.earn.title')}
-                  </Text>
-                  <StepDescription>
-                    {t('instruction.earn.description')}
-                  </StepDescription>
-                </StepCard>
-              </Step>
-              <Step>
-                <StepImage>
-                  <img src={assets.decision.votes} alt='spend' />
-                </StepImage>
-                <StepCard>
-                  <Text variant={2} weight={600}>
-                    {t('instruction.spend.title')}
-                  </Text>
-                  <StepDescription>
-                    {t('instruction.spend.description')}
-                  </StepDescription>
-                </StepCard>
-              </Step>
-            </StepsContainer>
-          </Section>
+          {instructionVisible && (
+            <Section>
+              <SCloseButton onClick={() => setInstructionVisible(false)}>
+                <InlineSvg
+                  svg={CancelIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='20px'
+                  height='20px'
+                />
+              </SCloseButton>
+              <InstructionsHeadline variant={6}>
+                {t('instruction.title')}
+              </InstructionsHeadline>
+              <StepsContainer>
+                <Step>
+                  <StepImage>
+                    <img src={assets.decision.votes} alt='bid' />
+                  </StepImage>
+                  <StepCard>
+                    <Text variant={2} weight={600}>
+                      {t('instruction.bid.title')}
+                    </Text>
+                    <StepDescription>
+                      {t('instruction.bid.description')}
+                    </StepDescription>
+                  </StepCard>
+                </Step>
+                <Step>
+                  <StepImage>
+                    <img src={assets.decision.gold} alt='earn' />
+                  </StepImage>
+                  <StepCard>
+                    <Text variant={2} weight={600}>
+                      {t('instruction.earn.title')}
+                    </Text>
+                    <StepDescription>
+                      {t('instruction.earn.description')}
+                    </StepDescription>
+                  </StepCard>
+                </Step>
+                <Step>
+                  <StepImage>
+                    <img src={assets.decision.votes} alt='spend' />
+                  </StepImage>
+                  <StepCard>
+                    <Text variant={2} weight={600}>
+                      {t('instruction.spend.title')}
+                    </Text>
+                    <StepDescription>
+                      {t('instruction.spend.description')}
+                    </StepDescription>
+                  </StepCard>
+                </Step>
+              </StepsContainer>
+            </Section>
+          )}
+
           <Section>
             <SectionTitle>{t('balance.title')}</SectionTitle>
             <BalanceValue>
-              <InfoButton onClick={() => {}}>i</InfoButton>
-              {/* TODO: use data from API */}
-              $0.00
+              <InfoButton onClick={() => setInstructionVisible(true)}>
+                i
+              </InfoButton>
+              {user.loggedIn ? formatNumber(balance) : '2.00'}
             </BalanceValue>
-            <SButton>{t('balance.button')}</SButton>
+            <SButton>
+              {user.loggedIn
+                ? t('balance.button.spend')
+                : t('balance.button.signUp')}
+            </SButton>
           </Section>
+
           <Section>
             <SectionTitle>{t('rewards.title')}</SectionTitle>
-            {/* TODO: Use data from API */}
-            {/* TODO: Move to a separate component/ molecule */}
-            <RewardsContainer>
-              <RewardCard received>
-                <RewardImage>
-                  <img src={assets.decision.gold} alt='' />
-                </RewardImage>
-                <RewardTitle received>Signed up</RewardTitle>
-                <RewardAmount received>
-                  <RewardAmountText>
-                    {t('rewards.earned', { value: '5.00' })}
-                  </RewardAmountText>
-                </RewardAmount>
-              </RewardCard>
-              <RewardCard>
-                <RewardImage>
-                  <img src={assets.decision.votes} alt='' />
-                </RewardImage>
-                <RewardTitle>Place a bid of $1000000000</RewardTitle>
-                <RewardAmount>
-                  {t('rewards.earn', { value: '5.00' })}
-                </RewardAmount>
-              </RewardCard>
-
-              {/* Placeholders for flex-wrap content alignment */}
-              <RewardCard holder />
-              <RewardCard holder />
-              <RewardCard holder />
-              <RewardCard holder />
-            </RewardsContainer>
+            <RewardList rewards={rewards} />
           </Section>
         </Content>
       </Container>
@@ -335,7 +338,6 @@ const StepsContainer = styled.div`
 
   ${({ theme }) => theme.media.laptop} {
     gap: 32px;
-    padding-top: 58px;
   }
 `;
 
@@ -444,79 +446,7 @@ const SButton = styled(Button)`
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    width: 176px;
+    width: fit-content;
+    min-width: 176px;
   }
-`;
-
-const RewardsContainer = styled.div`
-  margin-top: 28px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 16px;
-`;
-
-const RewardCard = styled.div<{ received?: boolean; holder?: boolean }>`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-radius: 16px;
-  padding: ${(props) => (props.holder ? 0 : '24px 16px;')};
-  width: 146px;
-  background-color: ${(props) =>
-    props.received
-      ? props.theme.colorsThemed.button.background.primary
-      : undefined};
-  border: ${(props) =>
-    props.received
-      ? undefined
-      : `1px solid ${props.theme.colorsThemed.tag.color.primary}`};
-
-  opacity: ${(props) => (props.holder ? 0 : 1)};
-`;
-
-const RewardImage = styled.div`
-  width: 56px;
-  height: 56px;
-  margin-bottom: 5px;
-
-  img {
-    width: 100%;
-    object-fit: contain;
-  }
-`;
-
-const RewardTitle = styled.div<{ received?: boolean }>`
-  flex-grow: 1;
-  color: ${(props) =>
-    props.received
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colorsThemed.text.secondary};
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-  margin-bottom: 16px;
-`;
-
-const RewardAmount = styled.div<{ received?: boolean }>`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  height: 34px;
-  width: 115px;
-  border-radius: 12px;
-  background: ${(props) =>
-    props.received
-      ? 'rgba(40, 41, 51, 0.25)'
-      : props.theme.colorsThemed.background.quinary};
-  white-space: nowrap;
-  overflow: hidden;
-`;
-
-const RewardAmountText = styled.div`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
 `;

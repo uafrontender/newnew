@@ -24,7 +24,10 @@
   },
   "balance": {
     "title": "Rewards towards your next purchase",
-    "button": "Spend my Rewards!"
+    "button": {
+      "signUp": "Sign up to spend your rewards!",
+      "spend": "Spend my Rewards!"
+    }
   },
   "rewards": {
     "title": "My Milestones",
