@@ -93,6 +93,10 @@ const EllipseMenu: React.FunctionComponent<IEllipseMenu> = ({
 
   useEffect(() => {
     dispatch(setOverlay(isOpen));
+
+    return () => {
+      dispatch(setOverlay(false));
+    };
   }, [isOpen, dispatch]);
 
   const [position, setPosition] = useState(() => ({
