@@ -91,8 +91,6 @@ export const Earnings: React.FC<IFunctionProps> = ({
         sum += myEarnings.cfEarnings?.usdCents;
       if (myEarnings.mcEarnings?.usdCents)
         sum += myEarnings.mcEarnings?.usdCents;
-      if (myEarnings.auEarnings?.usdCents)
-        sum += myEarnings.auEarnings?.usdCents;
       setTotalEarnings(sum);
     }
   }, [myEarnings]);
