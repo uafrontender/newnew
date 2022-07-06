@@ -120,7 +120,7 @@ export default TransactionsSection;
 const SWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 13px;
+  gap: 18px;
   padding-bottom: 25px;
 `;
 interface ISButton {
