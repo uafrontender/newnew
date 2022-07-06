@@ -37,6 +37,7 @@ import switchPostType from '../../../utils/switchPostType';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import useResponseUpload from '../../../utils/hooks/useResponseUpload';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const CommentsTab = dynamic(
@@ -144,6 +145,33 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         ? 'response'
         : 'announcement'
     );
+
+    const {
+      handleCancelVideoUpload,
+      handleItemChange,
+      handleResetVideoUploadAndProcessingState,
+      handleUploadVideoNotProcessed,
+      handleUploadVideoProcessed,
+      handleVideoDelete,
+      responseFileProcessingETA,
+      responseFileProcessingError,
+      responseFileProcessingLoading,
+      responseFileProcessingProgress,
+      responseFileUploadETA,
+      responseFileUploadError,
+      responseFileUploadLoading,
+      responseFileUploadProgress,
+      uploadedResponseVideoUrl,
+      videoProcessing,
+      responseUploading,
+    } = useResponseUpload({
+      postId: post.postUuid,
+      postStatus,
+      openedTab,
+      handleUpdatePostStatus,
+      handleUpdateResponseVideo: (newValue) =>
+        setResponseFreshlyUploaded(newValue),
+    });
 
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
@@ -499,12 +527,30 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
             postStatus={postStatus}
             isMuted={mutedMode}
             openedTab={openedTab}
+            responseFileProcessingETA={responseFileProcessingETA}
+            responseFileProcessingError={responseFileProcessingError}
+            responseFileProcessingLoading={responseFileProcessingLoading}
+            responseFileProcessingProgress={responseFileProcessingProgress}
+            responseFileUploadETA={responseFileUploadETA}
+            responseFileUploadError={responseFileUploadError}
+            responseFileUploadLoading={responseFileUploadLoading}
+            responseFileUploadProgress={responseFileUploadProgress}
+            uploadedResponseVideoUrl={uploadedResponseVideoUrl}
+            videoProcessing={videoProcessing}
             handleChangeTab={(newValue) => setOpenedTab(newValue)}
             handleToggleMuted={() => handleToggleMutedMode()}
             handleUpdateResponseVideo={(newValue) =>
               setResponseFreshlyUploaded(newValue)
             }
             handleUpdatePostStatus={handleUpdatePostStatus}
+            handleCancelVideoUpload={handleCancelVideoUpload}
+            handleItemChange={handleItemChange}
+            handleResetVideoUploadAndProcessingState={
+              handleResetVideoUploadAndProcessingState
+            }
+            handleUploadVideoNotProcessed={handleUploadVideoNotProcessed}
+            handleUploadVideoProcessed={handleUploadVideoProcessed}
+            handleVideoDelete={handleVideoDelete}
           />
           <PostTopInfoModeration
             postType='cf'
