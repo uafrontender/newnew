@@ -139,9 +139,11 @@ export const Rewards = () => {
           <Section>
             <SectionTitle>{t('balance.title')}</SectionTitle>
             <BalanceValue>
-              <InfoButton onClick={() => setInstructionVisible(true)}>
-                i
-              </InfoButton>
+              {!instructionVisible && (
+                <InfoButton onClick={() => setInstructionVisible(true)}>
+                  i
+                </InfoButton>
+              )}
               {user.loggedIn ? formatNumber(balance) : '2.00'}
             </BalanceValue>
             <SButton>
