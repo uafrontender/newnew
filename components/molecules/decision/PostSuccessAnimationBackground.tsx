@@ -3,91 +3,96 @@ import React, { useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import assets from '../../../constants/assets';
 
-const PostSuccessAnimationBackground: React.FunctionComponent = React.memo(
-  () => {
-    const elements = useMemo(() => [1, 2, 3], []);
+const PostSuccessAnimationBackground: React.FunctionComponent<{
+  noBlur?: boolean;
+}> = React.memo(({ noBlur }) => {
+  const elements = useMemo(() => [1, 2, 3], []);
 
-    return (
-      <SContainer>
-        {elements.map((el, i) => (
-          <GoldCoin
-            key={el + 1}
-            index={i}
-            delay={0}
-            top={-200 - i * 60}
-            {...(i % 2 === 0
-              ? {
-                  left: i * 100,
-                }
-              : {
-                  right: 50 + i * 50,
-                })}
-          />
-        ))}
-        {elements.map((el, i) => (
-          <GoldCoin
-            key={el + 2}
-            index={i}
-            delay={2}
-            top={-200 - i * 50}
-            {...(i % 2 !== 0
-              ? {
-                  left: 50 + i * 200,
-                }
-              : {
-                  right: 100 + i * 200,
-                })}
-          />
-        ))}
-        {elements.map((el, i) => (
-          <GoldCoin
-            key={el + 3}
-            index={i}
-            delay={3}
-            top={-200 - i * 50}
-            {...(i % 2 === 0
-              ? {
-                  left: 100 + i * 100,
-                }
-              : {
-                  right: 50 + i * 200,
-                })}
-          />
-        ))}
-        {elements.map((el, i) => (
-          <GoldCoin
-            key={el + 4}
-            index={i}
-            delay={5}
-            top={-200 - i * 50}
-            {...(i % 2 !== 0
-              ? {
-                  left: 50 + i * 200,
-                }
-              : {
-                  right: 100 + i * 100,
-                })}
-          />
-        ))}
-        {elements.map((el, i) => (
-          <GoldCoin
-            key={el + 5}
-            index={i}
-            delay={8}
-            top={-200 - i * 50}
-            {...(i % 2 === 0
-              ? {
-                  left: 100 + i * 100,
-                }
-              : {
-                  right: 100 + i * 200,
-                })}
-          />
-        ))}
-      </SContainer>
-    );
-  }
-);
+  return (
+    <SContainer>
+      {elements.map((el, i) => (
+        <GoldCoin
+          key={el + 1}
+          index={i}
+          delay={0}
+          top={-200 - i * 60}
+          {...(i % 2 === 0
+            ? {
+                left: i * 100,
+              }
+            : {
+                right: 50 + i * 50,
+              })}
+          noBlur={noBlur}
+        />
+      ))}
+      {elements.map((el, i) => (
+        <GoldCoin
+          key={el + 2}
+          index={i}
+          delay={2}
+          top={-200 - i * 50}
+          {...(i % 2 !== 0
+            ? {
+                left: 50 + i * 200,
+              }
+            : {
+                right: 100 + i * 200,
+              })}
+          noBlur={noBlur}
+        />
+      ))}
+      {elements.map((el, i) => (
+        <GoldCoin
+          key={el + 3}
+          index={i}
+          delay={3}
+          top={-200 - i * 50}
+          {...(i % 2 === 0
+            ? {
+                left: 100 + i * 100,
+              }
+            : {
+                right: 50 + i * 200,
+              })}
+          noBlur={noBlur}
+        />
+      ))}
+      {elements.map((el, i) => (
+        <GoldCoin
+          key={el + 4}
+          index={i}
+          delay={5}
+          top={-200 - i * 50}
+          {...(i % 2 !== 0
+            ? {
+                left: 50 + i * 200,
+              }
+            : {
+                right: 100 + i * 100,
+              })}
+          noBlur={noBlur}
+        />
+      ))}
+      {elements.map((el, i) => (
+        <GoldCoin
+          key={el + 5}
+          index={i}
+          delay={8}
+          top={-200 - i * 50}
+          {...(i % 2 === 0
+            ? {
+                left: 100 + i * 100,
+              }
+            : {
+                right: 100 + i * 200,
+              })}
+          noBlur={noBlur}
+        />
+      ))}
+    </SContainer>
+  );
+});
 
 export default PostSuccessAnimationBackground;
 
@@ -104,6 +109,7 @@ interface IGoldCoin {
   left?: number;
   right?: number;
   delay: number;
+  noBlur?: boolean;
 }
 
 const GoldCoin: React.FunctionComponent<IGoldCoin> = ({
@@ -112,6 +118,7 @@ const GoldCoin: React.FunctionComponent<IGoldCoin> = ({
   left,
   right,
   delay,
+  noBlur,
 }) => {
   // const width = useMemo(() => Math.random() * 170, []);
   const width = useMemo(() => Math.random() * 170, []);
@@ -134,6 +141,7 @@ const GoldCoin: React.FunctionComponent<IGoldCoin> = ({
               right,
             }),
       }}
+      noBlur={noBlur}
     >
       <img src={assets.decision.gold} alt='coin' draggable={false} />
     </SGoldIcon>
@@ -154,6 +162,7 @@ const SGoldIcon = styled.div<{
   delay: number;
   transform: string;
   speed: number;
+  noBlur?: boolean;
 }>`
   display: flex;
 
@@ -168,6 +177,6 @@ const SGoldIcon = styled.div<{
     width: 100%;
     object-fit: contain;
 
-    filter: blur(4px);
+    filter: ${({ noBlur }) => (noBlur ? 'none' : 'blur(4px)')};
   }
 `;

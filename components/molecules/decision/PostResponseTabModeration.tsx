@@ -18,6 +18,7 @@ import { getMyEarningsByPosts } from '../../../api/endpoints/payments';
 import getDisplayname from '../../../utils/getDisplayname';
 import { useAppSelector } from '../../../redux-store/store';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import PostResponseSuccessModal from './PostResponseSuccessModal';
 
 // postResponseTabModeration
 // awaiting
@@ -465,6 +466,8 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
         >
           {t('postResponseTabModeration.awaiting.postResponseBtn')}
         </SUploadButton>
+        {/* Success modal */}
+        <PostResponseSuccessModal isOpen zIndex={20} />
       </SContainer>
     );
   };
