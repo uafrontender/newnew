@@ -16,9 +16,7 @@ import Text from '../../atoms/Text';
 import { useAppSelector } from '../../../redux-store/store';
 import { subscribeToCreator } from '../../../api/endpoints/subscription';
 
-const PaymentModal = dynamic(
-  () => import('../checkout/PaymentModalRedirectOnly')
-);
+const PaymentModal = dynamic(() => import('../checkout/PaymentModal'));
 
 interface ISubscriptionExpired {
   user: newnewapi.IUser;

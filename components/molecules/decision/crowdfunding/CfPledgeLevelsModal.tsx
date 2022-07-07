@@ -19,7 +19,7 @@ import Button from '../../../atoms/Button';
 import Modal from '../../../organisms/Modal';
 import LoadingModal from '../../LoadingModal';
 import InlineSvg from '../../../atoms/InlineSVG';
-import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 

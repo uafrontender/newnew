@@ -28,7 +28,7 @@ import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewM
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import McOptionConfirmVoteModal from './McOptionConfirmVoteModal';
 
 import { formatNumber } from '../../../../utils/format';

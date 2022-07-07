@@ -37,7 +37,7 @@ import Button from '../../../atoms/Button';
 import McOptionCard from './McOptionCard';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 // import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
-import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import LoadingModal from '../../LoadingModal';
 import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';

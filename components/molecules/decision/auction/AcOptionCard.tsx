@@ -31,7 +31,7 @@ import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
-import PaymentModalRedirectOnly from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import PaymentSuccessModal from '../PaymentSuccessModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import TutorialTooltip, {
@@ -691,7 +691,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       </SSupportBidForm>
       {/* Payment Modal */}
       {paymentModalOpen && (
-        <PaymentModalRedirectOnly
+        <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${formatNumber(parseInt(supportBidAmount) ?? 0, true)}`}
@@ -751,7 +751,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               {option.title}
             </SPaymentModalOptionText>
           </SPaymentModalHeader>
-        </PaymentModalRedirectOnly>
+        </PaymentModal>
       )}
       {/* Payment success Modal */}
       <PaymentSuccessModal

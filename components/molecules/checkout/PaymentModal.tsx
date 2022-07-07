@@ -2,7 +2,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect, ReactElement } from 'react';
+import React from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
@@ -14,8 +14,6 @@ import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
 import InlineSvg from '../../atoms/InlineSVG';
 import GoBackButton from '../GoBackButton';
-import OptionCard from './OptionCard';
-// import OptionWallet from './OptionWallet';
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
@@ -24,13 +22,9 @@ interface IPaymentModal {
   zIndex: number;
   amount?: string;
   showTocApply?: boolean;
-  // predefinedOption?: 'wallet' | 'card';
-  predefinedOption?: 'card';
   bottomCaption?: React.ReactNode;
-  payButtonCaptionKey?: string;
   children: React.ReactNode;
   onClose: () => void;
-  // handlePayWithWallet?: () => void;
   handlePayWithCardStripeRedirect?: () => void;
 }
 
@@ -39,12 +33,9 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   zIndex,
   amount,
   showTocApply,
-  predefinedOption,
   bottomCaption,
-  payButtonCaptionKey,
   children,
   onClose,
-  // handlePayWithWallet,
   handlePayWithCardStripeRedirect,
 }) => {
   const theme = useTheme();
@@ -53,18 +44,6 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-
-  // const [selectedOption, setSelectedOption] = useState<'wallet' | 'card'>(
-  //   predefinedOption ?? 'wallet'
-  // );
-
-  const [selectedOption, setSelectedOption] = useState('card');
-
-  useEffect(() => {
-    if (predefinedOption) {
-      setSelectedOption(predefinedOption);
-    }
-  }, [predefinedOption]);
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
@@ -87,61 +66,14 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             </SCloseButton>
           )}
           <SHeaderContainer>{children}</SHeaderContainer>
-          <SPaymentMethodTitle variant={3}>
-            {t('paymentMethodTitle')}
-          </SPaymentMethodTitle>
-          <SOptionsContainer>
-            {/* {!predefinedOption ? (
-              <>
-                <OptionWallet
-                  selected={selectedOption === 'wallet'}
-                  handleClick={() => setSelectedOption('wallet')}
-                />
-                <OptionCard
-                  selected={selectedOption === 'card'}
-                  handleClick={() => setSelectedOption('card')}
-                />
-              </>
-            ) : selectedOption === 'card' ? (
-              <OptionCard
-                selected={selectedOption === 'card'}
-                handleClick={() => setSelectedOption('card')}
-              />
-            ) : (
-              <OptionWallet
-                selected={selectedOption === 'wallet'}
-                handleClick={() => setSelectedOption('wallet')}
-              />
-            )} */}
-            {!predefinedOption ? (
-              <>
-                <OptionCard
-                  selected={selectedOption === 'card'}
-                  handleClick={() => setSelectedOption('card')}
-                />
-              </>
-            ) : (
-              <OptionCard
-                selected={selectedOption === 'card'}
-                handleClick={() => setSelectedOption('card')}
-              />
-            )}
-          </SOptionsContainer>
           <SPayButtonDiv>
             <SPayButton
               view='primaryGrad'
-              // onClick={() => {
-              //   if (selectedOption === 'card') {
-              //     handlePayWithCardStripeRedirect?.();
-              //   } else {
-              //     handlePayWithWallet?.();
-              //   }
-              // }}
               onClick={() => {
                 handlePayWithCardStripeRedirect?.();
               }}
             >
-              {payButtonCaptionKey ?? t('payButton')}
+              {t('payButton')}
               {amount && ` ${amount}`}
             </SPayButton>
             {bottomCaption || null}
@@ -166,10 +98,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
 PaymentModal.defaultProps = {
   amount: undefined,
   showTocApply: undefined,
-  predefinedOption: undefined,
   bottomCaption: null,
-  payButtonCaptionKey: undefined,
-  // handlePayWithWallet: () => {},
   handlePayWithCardStripeRedirect: () => {},
 };
 
@@ -235,6 +164,11 @@ const SCloseButton = styled.button`
   border: transparent;
   background: transparent;
 
+  background: ${({ theme }) =>
+    theme.name === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'};
+  padding: 8px;
+  border-radius: 11px;
+
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   font-size: 20px;
   line-height: 28px;
@@ -245,13 +179,9 @@ const SCloseButton = styled.button`
 `;
 
 const SHeaderContainer = styled.div`
-  padding-bottom: 16px;
   margin-bottom: 16px;
-  border-bottom: 1px solid
-    ${({ theme }) => theme.colorsThemed.background.outlines1};
 
   ${({ theme }) => theme.media.tablet} {
-    padding-bottom: 24px;
     margin-bottom: 24px;
   }
 `;

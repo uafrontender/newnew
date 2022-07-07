@@ -24,7 +24,7 @@ import Button from '../../../atoms/Button';
 import CfMakeCustomPledgeCard from './CfMakeCustomPledgeCard';
 import CfMakeStandardPledgeCard from './CfMakeStandardPledgeCard';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import useScrollGradientsHorizontal from '../../../../utils/hooks/useScrollGradientsHorizontal';
 import GradientMaskHorizontal from '../../../atoms/GradientMaskHorizontal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';

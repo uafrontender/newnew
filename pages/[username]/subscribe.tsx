@@ -24,7 +24,7 @@ import Button from '../../components/atoms/Button';
 import Headline from '../../components/atoms/Headline';
 import GoBackButton from '../../components/molecules/GoBackButton';
 import FaqSection from '../../components/molecules/subscribe/FaqSection';
-import PaymentModal from '../../components/molecules/checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../components/molecules/checkout/PaymentModal';
 
 import isBrowser from '../../utils/isBrowser';
 import { formatNumber } from '../../utils/format';
