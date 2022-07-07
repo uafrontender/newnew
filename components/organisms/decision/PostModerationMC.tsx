@@ -810,15 +810,6 @@ const SActivitesContainer = styled.div<{
   }
 `;
 
-const SAnimationContainer = styled.div`
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
 // Comments
 const SCommentsHeadline = styled(Headline)`
   margin-bottom: 8px;

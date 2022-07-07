@@ -120,7 +120,7 @@ export default McOptionsTabModeration;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  /* height: calc(100% - 56px); */
+  height: calc(100% - 56px);
 `;
 
 const SBidsContainer = styled.div`
