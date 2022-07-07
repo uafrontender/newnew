@@ -44,6 +44,7 @@ import PostVotingTab from '../../molecules/decision/PostVotingTab';
 
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import useResponseUpload from '../../../utils/hooks/useResponseUpload';
+import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
 
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
@@ -643,24 +644,46 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             totalVotes={totalVotes}
             hasWinner={false}
             hasResponse={!!post.response}
+            hidden={openedTab === 'response'}
             handleUpdatePostStatus={handleUpdatePostStatus}
             handleRemovePostFromState={handleRemovePostFromState}
           />
           <SActivitesContainer decisionFailed={postStatus === 'failed'}>
-            <PostVotingTab>
-              {`${t('tabs.options')} ${
-                !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
-              }`}
-            </PostVotingTab>
-            <McOptionsTabModeration
-              post={post}
-              options={options}
-              optionsLoading={optionsLoading}
-              pagingToken={optionsNextPageToken}
-              winningOptionId={(winningOption?.id as number) ?? undefined}
-              handleLoadOptions={fetchOptions}
-              handleRemoveOption={handleRemoveOption}
-            />
+            {openedTab === 'announcement' ? (
+              <>
+                <PostVotingTab>
+                  {`${t('tabs.options')} ${
+                    !!numberOfOptions && numberOfOptions > 0
+                      ? numberOfOptions
+                      : ''
+                  }`}
+                </PostVotingTab>
+                <McOptionsTabModeration
+                  post={post}
+                  options={options}
+                  optionsLoading={optionsLoading}
+                  pagingToken={optionsNextPageToken}
+                  winningOptionId={(winningOption?.id as number) ?? undefined}
+                  handleLoadOptions={fetchOptions}
+                  handleRemoveOption={handleRemoveOption}
+                />
+              </>
+            ) : (
+              <PostResponseTabModeration
+                postId={post.postUuid}
+                postType='mc'
+                postStatus={postStatus}
+                postTitle={post.title}
+                responseUploading={responseUploading}
+                responseReadyToBeUploaded={
+                  !!uploadedResponseVideoUrl &&
+                  !responseFileUploadLoading &&
+                  !responseFileProcessingLoading
+                }
+                winningOptionMc={winningOption}
+                handleUploadResponse={handleUploadVideoProcessed}
+              />
+            )}
           </SActivitesContainer>
           {/* Loading Modal */}
           {loadingModalOpen && (
@@ -703,8 +726,6 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 648px;
-
     display: grid;
     grid-template-areas:
       'expires expires'
@@ -767,14 +788,21 @@ const SActivitesContainer = styled.div<{
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    max-height: calc(500px);
+    ${({ decisionFailed }) =>
+      !decisionFailed
+        ? css`
+            max-height: 500px;
+          `
+        : css`
+            max-height: 500px;
+          `}
   }
 
   ${({ theme }) => theme.media.laptop} {
     ${({ decisionFailed }) =>
       !decisionFailed
         ? css`
-            max-height: 580px;
+            max-height: unset;
           `
         : css`
             max-height: calc(580px - 120px);

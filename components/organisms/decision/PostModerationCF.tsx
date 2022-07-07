@@ -38,6 +38,9 @@ import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateS
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import useResponseUpload from '../../../utils/hooks/useResponseUpload';
+import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
+import { formatNumber } from '../../../utils/format';
+import Text from '../../atoms/Text';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const CommentsTab = dynamic(
@@ -119,6 +122,11 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         document.getElementById('action-button-mobile')!!.style.display = '';
       }
     };
+
+    // Total amount
+    const [totalAmount, setTotalAmount] = useState<
+      newnewapi.MoneyAmount | undefined
+    >((post?.totalAmount as newnewapi.MoneyAmount) || undefined);
 
     // Current backers
     const [currentBackers, setCurrentBackers] = useState(
@@ -297,6 +305,11 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
           setCurrentBackers(res.data.crowdfunding.currentBackerCount as number);
           if (res.data.crowdfunding.status)
             handleUpdatePostStatus(res.data.crowdfunding.status);
+          if (res.data.crowdfunding.totalAmount) {
+            setTotalAmount(
+              res.data.crowdfunding.totalAmount as newnewapi.MoneyAmount
+            );
+          }
         }
       } catch (err) {
         console.error(err);
@@ -364,7 +377,11 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         if (decodedParsed.postUuid === post.postUuid) {
           if (decoded.post?.crowdfunding?.currentBackerCount)
             setCurrentBackers(decoded.post?.crowdfunding?.currentBackerCount);
-
+          if (decoded.post?.crowdfunding?.totalAmount) {
+            setTotalAmount(
+              decoded.post?.crowdfunding.totalAmount as newnewapi.MoneyAmount
+            );
+          }
           if (
             !responseFreshlyUploaded &&
             decoded.post?.crowdfunding?.response
@@ -561,27 +578,56 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
             hasResponse={!!post.response}
             totalPledges={currentBackers}
             targetPledges={post.targetBackerCount}
+            hidden={openedTab === 'response'}
             handleUpdatePostStatus={handleUpdatePostStatus}
             handleRemovePostFromState={handleRemovePostFromState}
           />
           <SActivitesContainer>
-            <PostVotingTab>{t('tabs.backers')}</PostVotingTab>
-            {postStatus === 'waiting_for_response' ||
-            postStatus === 'succeeded' ? (
-              <CfCrowdfundingSuccessModeration
-                post={post}
-                postStatus={postStatus}
-                currentNumBackers={currentBackers}
-              />
-            ) : postStatus === 'failed' ? (
-              <CfBackersStatsSectionModerationFailed
-                targetBackerCount={post.targetBackerCount}
-                currentNumBackers={currentBackers}
-              />
+            {openedTab === 'announcement' ? (
+              <>
+                <PostVotingTab>{t('tabs.backers')}</PostVotingTab>
+                {postStatus === 'waiting_for_response' ||
+                postStatus === 'succeeded' ? (
+                  <CfCrowdfundingSuccessModeration
+                    currentNumBackers={currentBackers}
+                    targetBackerCount={post.targetBackerCount}
+                  />
+                ) : postStatus === 'failed' ? (
+                  <CfBackersStatsSectionModerationFailed
+                    targetBackerCount={post.targetBackerCount}
+                    currentNumBackers={currentBackers}
+                  />
+                ) : (
+                  <CfBackersStatsSectionModeration
+                    targetBackerCount={post.targetBackerCount}
+                    currentNumBackers={currentBackers}
+                  />
+                )}
+                {postStatus !== 'failed' && totalAmount && (
+                  <SMoneyRaised>
+                    <SMoneyRaisedCopy variant={3} weight={600}>
+                      {t('cfPostModeration.moneyRaised')}
+                    </SMoneyRaisedCopy>
+                    <SMoneyRaisedAMount variant={6}>
+                      ${formatNumber(totalAmount.usdCents / 100 ?? 0, true)}
+                    </SMoneyRaisedAMount>
+                  </SMoneyRaised>
+                )}
+              </>
             ) : (
-              <CfBackersStatsSectionModeration
-                targetBackerCount={post.targetBackerCount}
-                currentNumBackers={currentBackers}
+              <PostResponseTabModeration
+                postId={post.postUuid}
+                postType='cf'
+                postStatus={postStatus}
+                postTitle={post.title}
+                responseUploading={responseUploading}
+                responseReadyToBeUploaded={
+                  !!uploadedResponseVideoUrl &&
+                  !responseFileUploadLoading &&
+                  !responseFileProcessingLoading
+                }
+                moneyBacked={totalAmount as newnewapi.MoneyAmount}
+                handleUploadResponse={handleUploadVideoProcessed}
               />
             )}
           </SActivitesContainer>
@@ -621,8 +667,6 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 648px;
-
     display: grid;
     grid-template-areas:
       'expires expires'
@@ -682,6 +726,19 @@ const SActivitesContainer = styled.div`
   height: 100%;
   width: 100%;
 `;
+
+const SMoneyRaised = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
+const SMoneyRaisedCopy = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+const SMoneyRaisedAMount = styled(Headline)``;
 
 // Comments
 const SCommentsHeadline = styled(Headline)`

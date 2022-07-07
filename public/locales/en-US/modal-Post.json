@@ -548,6 +548,7 @@
     }
   },
   "cfPostModeration": {
+    "moneyRaised": "Total raised",
     "winnerTab": {
       "winnerOptionCard": {
         "backersToldYou": "backers successfully funded",
@@ -694,25 +695,28 @@
   },
   "postResponseTabModeration": {
     "awaiting": {
-      "topHeader": "Time to post \nyour response",
+      "topHeader": "Time to post \nyour response!",
       "postResponseBtn": "Post Response",
       "youWillGet": "You'll get"
     },
-    "succeded": {
-      "topHeader": "You made",
+    "succeeded": {
+      "topHeader": "Response \npublished!",
+      "youMade": "You made",
       "shareBtn": "Share",
       "linkCopied": "Link copied!"
     },
     "winner": {
       "inResponseToYourPost": "In response to your post",
       "ac": {
+        "numBiddersChoseSingular": "{{amount}} bidder chose",
         "numBiddersChose": "{{amount}} bidders chose",
-        "optionCreator": "{{creator}}'s bid"
+        "optionCreator": "<0>{{nickname}}</0>'s bid"
       },
       "mc": {
-        "numBiddersChose": "{{amount}} votes chose",
-        "optionOwn": "option",
-        "optionCreator": "{{creator}}'s option"
+        "numBiddersChoseSingular": "{{amount}} voter chose",
+        "numBiddersChose": "{{amount}} voters chose",
+        "optionOwn": "the option",
+        "optionCreator": "<0>{{nickname}}</0>'s option"
       }
     }
   },

@@ -19,6 +19,7 @@ import Head from 'next/head';
 import dynamic from 'next/dynamic';
 
 import {
+  deleteMyPost,
   fetchMoreLikePosts,
   fetchPostByUUID,
   markPost,
@@ -52,6 +53,9 @@ import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory'
 import { usePostModalState } from '../../../contexts/postModalContext';
 import { ReportData } from '../../molecules/chat/ReportModal';
 import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
+import PostEllipseMenuModeration from '../../molecules/decision/PostEllipseMenuModeration';
+import PostEllipseModalModeration from '../../molecules/decision/PostEllipseModalModeration';
+import PostConfirmDeleteModal from '../../molecules/decision/PostConfirmDeleteModal';
 
 const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
 // Posts views
@@ -273,6 +277,33 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const { handleSetCommentIdFromUrl, handleSetNewCommentContentFromUrl } =
     useContext(CommentFromUrlContext);
+
+  const [deletePostOpen, setDeletePostOpen] = useState(false);
+
+  const handleOpenDeletePostModal = useCallback(
+    () => setDeletePostOpen(true),
+    []
+  );
+  const handleCloseDeletePostModal = () => setDeletePostOpen(false);
+
+  const handleDeletePost = useCallback(async () => {
+    try {
+      const payload = new newnewapi.DeleteMyPostRequest({
+        postUuid: postParsed?.postUuid,
+      });
+
+      const res = await deleteMyPost(payload);
+
+      if (!res.error) {
+        console.log('Post deleted/cancelled');
+        handleUpdatePostStatus('DELETED_BY_CREATOR');
+        handleRemovePostFromState?.();
+        handleCloseDeletePostModal();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [handleRemovePostFromState, handleUpdatePostStatus, postParsed?.postUuid]);
 
   useEffect(() => {
     if (commentIdFromUrl) {
@@ -681,7 +712,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const shareButtonRef: any = useRef();
   const renderPostSuccessOrWaitingControls = useCallback(() => {
     return (
-      <SPostSuccessWaitingControlsDiv onClick={(e) => e.stopPropagation()}>
+      <SPostSuccessWaitingControlsDiv
+        variant='decision'
+        onClick={(e) => e.stopPropagation()}
+      >
         <SWaitingSuccessControlsBtn
           view='secondary'
           iconOnly
@@ -787,7 +821,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const renderPostModerationControls = useCallback(() => {
     return (
-      <SPostSuccessWaitingControlsDiv onClick={(e) => e.stopPropagation()}>
+      <SPostSuccessWaitingControlsDiv
+        variant='moderation'
+        onClick={(e) => e.stopPropagation()}
+      >
         <SWaitingSuccessControlsBtn
           view='secondary'
           iconOnly
@@ -851,39 +888,45 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         )}
         {/* Ellipse menu */}
         {!isMobile && (
-          <PostEllipseMenu
+          <PostEllipseMenuModeration
             postType={typeOfPost as string}
-            isFollowingDecision={isFollowingDecision}
             isVisible={ellipseMenuOpen}
-            handleFollowDecision={handleFollowDecision}
-            handleReportOpen={handleReportOpen}
-            onClose={handleEllipseMenuClose}
-            anchorElement={moreButtonRef.current as HTMLElement}
+            canDeletePost={postStatus !== 'failed'}
+            handleClose={handleEllipseMenuClose}
+            handleOpenDeletePostModal={handleOpenDeletePostModal}
+            anchorElement={moreButtonRef.current}
           />
         )}
         {isMobile && ellipseMenuOpen ? (
-          <PostEllipseModal
+          <PostEllipseModalModeration
             postType={typeOfPost as string}
-            isFollowingDecision={isFollowingDecision}
             zIndex={11}
+            canDeletePost={postStatus !== 'failed'}
             isOpen={ellipseMenuOpen}
-            handleFollowDecision={handleFollowDecision}
-            handleReportOpen={handleReportOpen}
             onClose={handleEllipseMenuClose}
+            handleOpenDeletePostModal={handleOpenDeletePostModal}
           />
         ) : null}
+        {/* Confirm delete post */}
+        <PostConfirmDeleteModal
+          postType={typeOfPost as string}
+          isVisible={deletePostOpen}
+          closeModal={handleCloseDeletePostModal}
+          handleConfirmDelete={handleDeletePost}
+        />
       </SPostSuccessWaitingControlsDiv>
     );
   }, [
+    deletePostOpen,
     ellipseMenuOpen,
     handleCloseAndGoBack,
+    handleDeletePost,
     handleEllipseMenuClose,
-    handleFollowDecision,
-    handleReportOpen,
+    handleOpenDeletePostModal,
     handleShareClose,
-    isFollowingDecision,
     isMobile,
     postParsed?.postUuid,
+    postStatus,
     shareMenuOpen,
     theme.colors.dark,
     theme.colors.white,
@@ -1477,10 +1520,12 @@ const SGoBackButtonDesktop = styled(Button)`
 `;
 
 // Waiting and Success
-const SPostSuccessWaitingControlsDiv = styled.div`
+const SPostSuccessWaitingControlsDiv = styled.div<{
+  variant: 'decision' | 'moderation';
+}>`
   position: absolute;
   right: 16px;
-  top: 16px;
+  top: ${({ variant }) => (variant === 'moderation' ? '64px' : '16px')};
 
   display: flex;
   flex-direction: column;
@@ -1501,6 +1546,7 @@ const SPostSuccessWaitingControlsDiv = styled.div`
   cursor: pointer;
 
   ${({ theme }) => theme.media.tablet} {
+    top: 16px;
     flex-direction: row-reverse;
     gap: 16px;
   }

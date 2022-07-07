@@ -706,6 +706,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
               </>
             ) : (
               <PostResponseTabModeration
+                postId={post.postUuid}
                 postType='ac'
                 postStatus={postStatus}
                 postTitle={post.title}
@@ -757,8 +758,6 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 648px;
-
     display: inline-grid;
     grid-template-areas:
       'expires expires'
@@ -826,7 +825,18 @@ const SActivitesContainer = styled.div<{
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    max-height: calc(500px);
+    ${({ showSelectWinnerOption, decisionFailed }) =>
+      showSelectWinnerOption
+        ? css`
+            max-height: 500px;
+          `
+        : !decisionFailed
+        ? css`
+            max-height: 500px;
+          `
+        : css`
+            max-height: 500px;
+          `}
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -837,7 +847,7 @@ const SActivitesContainer = styled.div<{
           `
         : !decisionFailed
         ? css`
-            max-height: 580px;
+            max-height: unset;
           `
         : css`
             max-height: calc(580px - 120px);
