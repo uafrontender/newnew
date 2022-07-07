@@ -2,7 +2,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
@@ -10,22 +10,26 @@ import styled, { useTheme } from 'styled-components';
 import { useAppSelector } from '../../../redux-store/store';
 
 import Button from '../../atoms/Button';
-import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
 import InlineSvg from '../../atoms/InlineSVG';
 import GoBackButton from '../GoBackButton';
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import assets from '../../../constants/assets';
+import Toggle from '../../atoms/Toggle';
+import { RewardContext } from '../../../contexts/rewardContext';
+import { formatNumber } from '../../../utils/format';
 
 interface IPaymentModal {
   isOpen: boolean;
   zIndex: number;
-  amount?: string;
+  amount?: number;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
-  children: React.ReactNode;
+  noRewards?: boolean;
   onClose: () => void;
-  handlePayWithCardStripeRedirect?: () => void;
+  handlePayWithCardStripeRedirect?: (rewardAmount: number) => void;
+  children: React.ReactNode;
 }
 
 const PaymentModal: React.FC<IPaymentModal> = ({
@@ -34,9 +38,10 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   amount,
   showTocApply,
   bottomCaption,
-  children,
+  noRewards,
   onClose,
   handlePayWithCardStripeRedirect,
+  children,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
@@ -44,6 +49,14 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
+  const [useRewards, setUseRewards] = useState(false);
+
+  const rewardUsed =
+    useRewards && rewardBalance?.usdCents && amount
+      ? Math.min(rewardBalance.usdCents, amount)
+      : 0;
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
@@ -66,15 +79,38 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             </SCloseButton>
           )}
           <SHeaderContainer>{children}</SHeaderContainer>
+          {!noRewards && (
+            <RewardContainer>
+              <RewardImage src={assets.decision.gold} alt='reward balance' />
+              <RewardText>{t('rewardsText')}</RewardText>
+              <RewardBalance>
+                $
+                {rewardBalance?.usdCents
+                  ? Math.round(rewardBalance.usdCents / 100)
+                  : 0}
+              </RewardBalance>
+              <Toggle
+                checked={useRewards}
+                disabled={isRewardBalanceLoading}
+                onChange={() => {
+                  setUseRewards((curr) => !curr);
+                }}
+              />
+            </RewardContainer>
+          )}
           <SPayButtonDiv>
             <SPayButton
               view='primaryGrad'
               onClick={() => {
-                handlePayWithCardStripeRedirect?.();
+                handlePayWithCardStripeRedirect?.(rewardUsed);
               }}
             >
               {t('payButton')}
-              {amount && ` ${amount}`}
+              {amount &&
+                ` $${formatNumber(
+                  Math.max(amount - rewardUsed, 0) / 100,
+                  false
+                )}`}
             </SPayButton>
             {bottomCaption || null}
             {showTocApply && (
@@ -99,6 +135,7 @@ PaymentModal.defaultProps = {
   amount: undefined,
   showTocApply: undefined,
   bottomCaption: null,
+  noRewards: undefined,
   handlePayWithCardStripeRedirect: () => {},
 };
 
@@ -186,8 +223,47 @@ const SHeaderContainer = styled.div`
   }
 `;
 
-const SPaymentMethodTitle = styled(Text)`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+const RewardContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border: 1px solid;
+  border-color: ${({ theme }) => theme.colorsThemed.text.primary};
+  border-radius: 24px;
+  height: 78px;
+  margin-bottom: 16px;
+  padding-left: 16px;
+  padding-right: 18px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 24px;
+    padding-left: 20px;
+    padding-right: 30px;
+  }
+`;
+
+const RewardImage = styled.img`
+  height: 40px;
+  width: 40px;
+  margin-right: 16px;
+  object-fit: cover;
+`;
+
+const RewardText = styled.div`
+  ${({ theme }) => theme.colorsThemed.text.primary};
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  margin-right: 8px;
+  flex-grow: 1;
+`;
+
+const RewardBalance = styled.div`
+  ${({ theme }) => theme.colorsThemed.text.primary};
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 32px;
+  margin-right: 20px;
 `;
 
 const SPayButtonDiv = styled.div`

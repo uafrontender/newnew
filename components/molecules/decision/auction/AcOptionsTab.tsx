@@ -51,7 +51,6 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
-import { formatNumber } from '../../../../utils/format';
 
 interface IAcOptionsTab {
   postId: string;
@@ -329,43 +328,49 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   //   handleAddOrUpdateOptionFromResponse,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(async () => {
-    setLoadingModalOpen(true);
-    try {
-      const createPaymentSessionPayload =
-        new newnewapi.CreatePaymentSessionRequest({
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${postId}`,
-          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${postId}`,
-          ...(!user.loggedIn
-            ? {
-                nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-              }
-            : {}),
-          acBidRequest: {
-            amount: new newnewapi.MoneyAmount({
-              usdCents: parseInt(newBidAmount) * 100,
-            }),
-            optionTitle: newBidText,
-            postUuid: postId,
-          },
-        });
+  const handlePayWithCardStripeRedirect = useCallback(
+    async (rewardAmount: number) => {
+      setLoadingModalOpen(true);
+      try {
+        const createPaymentSessionPayload =
+          new newnewapi.CreatePaymentSessionRequest({
+            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${postId}`,
+            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${postId}`,
+            ...(!user.loggedIn
+              ? {
+                  nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+                }
+              : {}),
+            acBidRequest: {
+              amount: new newnewapi.MoneyAmount({
+                usdCents: parseInt(newBidAmount) * 100,
+              }),
+              rewardAmount: new newnewapi.MoneyAmount({
+                usdCents: rewardAmount,
+              }),
+              optionTitle: newBidText,
+              postUuid: postId,
+            },
+          });
 
-      const res = await createPaymentSession(createPaymentSessionPayload);
+        const res = await createPaymentSession(createPaymentSessionPayload);
 
-      if (!res.data || !res.data.sessionUrl || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || !res.data.sessionUrl || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
-      window.location.href = res.data.sessionUrl;
-    } catch (err) {
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-      console.error(err);
-    }
-  }, [user.loggedIn, router.locale, newBidAmount, newBidText, postId]);
+        window.location.href = res.data.sessionUrl;
+      } catch (err) {
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+        console.error(err);
+      }
+    },
+    [user.loggedIn, router.locale, newBidAmount, newBidText, postId]
+  );
 
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
@@ -622,7 +627,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${formatNumber(parseInt(newBidAmount) ?? 0, true)}`}
+          amount={parseInt(newBidAmount) * 100 || 0}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * 100
           //   ? {}

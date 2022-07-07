@@ -40,7 +40,6 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import getDisplayname from '../../../../utils/getDisplayname';
 import assets from '../../../../constants/assets';
 import Headline from '../../../atoms/Headline';
-import { formatNumber } from '../../../../utils/format';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsSection {
@@ -221,44 +220,50 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
     //   handleSetPaymentSuccesModalOpen,
     // ]);
 
-    const handlePayWithCardStripeRedirect = useCallback(async () => {
-      setLoadingModalOpen(true);
-      try {
-        const createPaymentSessionPayload =
-          new newnewapi.CreatePaymentSessionRequest({
-            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-              router.locale !== 'en-US' ? `${router.locale}/` : ''
-            }post/${post.postUuid}`,
-            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-              router.locale !== 'en-US' ? `${router.locale}/` : ''
-            }post/${post.postUuid}`,
-            ...(!user.loggedIn
-              ? {
-                  nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-                }
-              : {}),
-            cfPledgeRequest: {
-              amount: new newnewapi.MoneyAmount({
-                usdCents: parseInt(
-                  pledgeAmount ? pledgeAmount?.toString() : '0'
-                ),
-              }),
-              postUuid: post.postUuid,
-            },
-          });
+    const handlePayWithCardStripeRedirect = useCallback(
+      async (rewardAmount: number) => {
+        setLoadingModalOpen(true);
+        try {
+          const createPaymentSessionPayload =
+            new newnewapi.CreatePaymentSessionRequest({
+              successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+                router.locale !== 'en-US' ? `${router.locale}/` : ''
+              }post/${post.postUuid}`,
+              cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+                router.locale !== 'en-US' ? `${router.locale}/` : ''
+              }post/${post.postUuid}`,
+              ...(!user.loggedIn
+                ? {
+                    nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+                  }
+                : {}),
+              cfPledgeRequest: {
+                amount: new newnewapi.MoneyAmount({
+                  usdCents: parseInt(
+                    pledgeAmount ? pledgeAmount?.toString() : '0'
+                  ),
+                }),
+                rewardAmount: new newnewapi.MoneyAmount({
+                  usdCents: rewardAmount,
+                }),
+                postUuid: post.postUuid,
+              },
+            });
 
-        const res = await createPaymentSession(createPaymentSessionPayload);
+          const res = await createPaymentSession(createPaymentSessionPayload);
 
-        if (!res.data || !res.data.sessionUrl || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
+          if (!res.data || !res.data.sessionUrl || res.error)
+            throw new Error(res.error?.message ?? 'Request failed');
 
-        window.location.href = res.data.sessionUrl;
-      } catch (err) {
-        console.error(err);
-        setPaymentModalOpen(false);
-        setLoadingModalOpen(false);
-      }
-    }, [router.locale, post.postUuid, user.loggedIn, pledgeAmount]);
+          window.location.href = res.data.sessionUrl;
+        } catch (err) {
+          console.error(err);
+          setPaymentModalOpen(false);
+          setLoadingModalOpen(false);
+        }
+      },
+      [router.locale, post.postUuid, user.loggedIn, pledgeAmount]
+    );
 
     useEffect(() => {
       if (!paymentModalOpen) setPledgeAmount(undefined);
@@ -399,11 +404,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
           <PaymentModal
             isOpen={paymentModalOpen}
             zIndex={12}
-            amount={
-              pledgeAmount
-                ? `$${formatNumber(pledgeAmount / 100 ?? 0, true)}`
-                : '0'
-            }
+            amount={pledgeAmount || 0}
             // {...(walletBalance?.usdCents &&
             // pledgeAmount &&
             // walletBalance.usdCents >= pledgeAmount

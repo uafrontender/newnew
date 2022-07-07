@@ -33,8 +33,13 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
   // Socket
   const socketConnection = useContext(SocketContext);
 
-  const [rewardBalance, setRewardBalance] =
-    useState<newnewapi.MoneyAmount | undefined>(undefined);
+  // TODO: remove test data
+  const [rewardBalance, setRewardBalance] = useState<
+    newnewapi.MoneyAmount | undefined
+  >({
+    usdCents: 500,
+    toJSON: () => ({ usdCents: '500' }),
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSetRewardBalance = (newAmount: newnewapi.MoneyAmount) => {

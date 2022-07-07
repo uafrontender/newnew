@@ -24,7 +24,6 @@ import PaymentModal from '../../checkout/PaymentModal';
 import SuggestionActionMobileModal from '../OptionActionMobileModal';
 
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
-import { formatNumber } from '../../../../utils/format';
 
 interface IAcOptionTopInfo {
   creator: newnewapi.IUser;
@@ -203,43 +202,49 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   //   router.locale,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(async () => {
-    setLoadingModalOpen(true);
-    try {
-      const createPaymentSessionPayload =
-        new newnewapi.CreatePaymentSessionRequest({
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${postId}`,
-          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${postId}`,
-          ...(!user.loggedIn
-            ? {
-                nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-              }
-            : {}),
-          acBidRequest: {
-            amount: new newnewapi.MoneyAmount({
-              usdCents: parseInt(supportBidAmount) * 100,
-            }),
-            optionId: option.id,
-            postUuid: postId,
-          },
-        });
+  const handlePayWithCardStripeRedirect = useCallback(
+    async (rewardAmount: number) => {
+      setLoadingModalOpen(true);
+      try {
+        const createPaymentSessionPayload =
+          new newnewapi.CreatePaymentSessionRequest({
+            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${postId}`,
+            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${postId}`,
+            ...(!user.loggedIn
+              ? {
+                  nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+                }
+              : {}),
+            acBidRequest: {
+              amount: new newnewapi.MoneyAmount({
+                usdCents: parseInt(supportBidAmount) * 100,
+              }),
+              rewardAmount: new newnewapi.MoneyAmount({
+                usdCents: rewardAmount,
+              }),
+              optionId: option.id,
+              postUuid: postId,
+            },
+          });
 
-      const res = await createPaymentSession(createPaymentSessionPayload);
+        const res = await createPaymentSession(createPaymentSessionPayload);
 
-      if (!res.data || !res.data.sessionUrl || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || !res.data.sessionUrl || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
-      window.location.href = res.data.sessionUrl;
-    } catch (err) {
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-      console.error(err);
-    }
-  }, [user.loggedIn, supportBidAmount, option.id, postId, router.locale]);
+        window.location.href = res.data.sessionUrl;
+      } catch (err) {
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+        console.error(err);
+      }
+    },
+    [user.loggedIn, supportBidAmount, option.id, postId, router.locale]
+  );
 
   return (
     <SWrapper>
@@ -350,7 +355,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${formatNumber(parseInt(supportBidAmount) ?? 0, true)}`}
+          amount={parseInt(supportBidAmount) * 100 || 0}
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}

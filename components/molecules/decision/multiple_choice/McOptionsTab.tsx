@@ -53,7 +53,6 @@ import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
-import { formatNumber } from '../../../../utils/format';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -311,36 +310,42 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   //   handleAddOrUpdateOptionFromResponse,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(async () => {
-    setLoadingModalOpen(true);
-    try {
-      const createPaymentSessionPayload =
-        new newnewapi.CreatePaymentSessionRequest({
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${post.postUuid}`,
-          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${post.postUuid}`,
-          mcVoteRequest: {
-            votesCount: parseInt(newBidAmount),
-            optionText: newOptionText,
-            postUuid: post.postUuid,
-          },
-        });
+  const handlePayWithCardStripeRedirect = useCallback(
+    async (rewardAmount: number) => {
+      setLoadingModalOpen(true);
+      try {
+        const createPaymentSessionPayload =
+          new newnewapi.CreatePaymentSessionRequest({
+            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${post.postUuid}`,
+            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${post.postUuid}`,
+            mcVoteRequest: {
+              votesCount: parseInt(newBidAmount),
+              rewardAmount: new newnewapi.MoneyAmount({
+                usdCents: rewardAmount,
+              }),
+              optionText: newOptionText,
+              postUuid: post.postUuid,
+            },
+          });
 
-      const res = await createPaymentSession(createPaymentSessionPayload);
+        const res = await createPaymentSession(createPaymentSessionPayload);
 
-      if (!res.data || !res.data.sessionUrl || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || !res.data.sessionUrl || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
-      window.location.href = res.data.sessionUrl;
-    } catch (err) {
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-      console.error(err);
-    }
-  }, [newBidAmount, newOptionText, post.postUuid, router.locale]);
+        window.location.href = res.data.sessionUrl;
+      } catch (err) {
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+        console.error(err);
+      }
+    },
+    [newBidAmount, newOptionText, post.postUuid, router.locale]
+  );
 
   const handleVoteForFree = useCallback(async () => {
     setUseFreeVoteModalOpen(false);
@@ -658,10 +663,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${formatNumber(
-            parseInt(newBidAmount) * votePrice ?? 0,
-            true
-          )}`}
+          amount={(parseInt(newBidAmount) || 0) * votePrice}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * votePrice * 100
           //   ? {}

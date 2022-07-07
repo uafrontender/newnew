@@ -16,7 +16,6 @@ import {
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
-import Modal from '../../../organisms/Modal';
 import LoadingModal from '../../LoadingModal';
 import InlineSvg from '../../../atoms/InlineSVG';
 import PaymentModal from '../../checkout/PaymentModal';
@@ -27,7 +26,7 @@ import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import getDisplayname from '../../../../utils/getDisplayname';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
-import { formatNumber } from '../../../../utils/format';
+import EllipseModal, { EllipseModalButton } from '../../../atoms/EllipseModal';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsModal {
@@ -207,42 +206,50 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   //   onClose,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(async () => {
-    setLoadingModalOpen(true);
-    try {
-      const createPaymentSessionPayload =
-        new newnewapi.CreatePaymentSessionRequest({
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${post.postUuid}`,
-          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${post.postUuid}`,
-          ...(!user.loggedIn
-            ? {
-                nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-              }
-            : {}),
-          cfPledgeRequest: {
-            amount: new newnewapi.MoneyAmount({
-              usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
-            }),
-            postUuid: post.postUuid,
-          },
-        });
+  const handlePayWithCardStripeRedirect = useCallback(
+    async (rewardAmount: number) => {
+      setLoadingModalOpen(true);
+      try {
+        const createPaymentSessionPayload =
+          new newnewapi.CreatePaymentSessionRequest({
+            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${post.postUuid}`,
+            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${post.postUuid}`,
+            ...(!user.loggedIn
+              ? {
+                  nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+                }
+              : {}),
+            cfPledgeRequest: {
+              amount: new newnewapi.MoneyAmount({
+                usdCents: parseInt(
+                  pledgeAmount ? pledgeAmount?.toString() : '0'
+                ),
+              }),
+              rewardAmount: new newnewapi.MoneyAmount({
+                usdCents: rewardAmount,
+              }),
+              postUuid: post.postUuid,
+            },
+          });
 
-      const res = await createPaymentSession(createPaymentSessionPayload);
+        const res = await createPaymentSession(createPaymentSessionPayload);
 
-      if (!res.data || !res.data.sessionUrl || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || !res.data.sessionUrl || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
-      window.location.href = res.data.sessionUrl;
-    } catch (err) {
-      console.error(err);
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-    }
-  }, [user.loggedIn, pledgeAmount, post.postUuid, router.locale]);
+        window.location.href = res.data.sessionUrl;
+      } catch (err) {
+        console.error(err);
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+      }
+    },
+    [user.loggedIn, pledgeAmount, post.postUuid, router.locale]
+  );
 
   useEffect(() => {
     if (!paymentModalOpen) setPledgeAmount(undefined);
@@ -250,55 +257,30 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 
   return (
     <>
-      <Modal additionalz={zIndex} show={isOpen} onClose={() => onClose()}>
-        <SWrapper>
-          <SContentContainer
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            {pledgeLevels.map((p, i) =>
-              p.usdCents ? (
-                <React.Fragment key={p.usdCents}>
-                  <SItem
-                    key={i}
-                    onClick={() => {
-                      handleSetPledgeAmountAndOpenPaymentModal(
-                        p.usdCents ? p.usdCents : 0
-                      );
-                    }}
-                  >
-                    <SText>{`$${(p.usdCents / 100).toFixed(0)}`}</SText>
-                    {/* {i === arr.length - 1 ? (
-                    <SAdditionalLabel>
-                      {t('cfPost.backersTab.freeSub')}
-                    </SAdditionalLabel>
-                  ) : null} */}
-                  </SItem>
-                  <SSeparator />
-                </React.Fragment>
-              ) : null
-            )}
-            <SItem
+      <EllipseModal zIndex={zIndex} show={isOpen} onClose={() => onClose()}>
+        {pledgeLevels
+          .map((p, i) =>
+            p.usdCents ? (
+              <EllipseModalButton
+                key={p.usdCents}
+                onClick={() => {
+                  handleSetPledgeAmountAndOpenPaymentModal(
+                    p.usdCents ? p.usdCents : 0
+                  );
+                }}
+              >{`${(p.usdCents / 100).toFixed(0)}`}</EllipseModalButton>
+            ) : null
+          )
+          .concat(
+            <EllipseModalButton
               onClick={() => {
                 handleOpenCustomPledgeForm();
               }}
             >
-              <SText>{t('cfPost.backersTab.custom')}</SText>
-            </SItem>
-          </SContentContainer>
-          <Button
-            view='secondary'
-            style={{
-              height: '56px',
-              width: 'calc(100% - 32px)',
-            }}
-            onClick={onClose}
-          >
-            {t('cfPost.backersTab.cancel')}
-          </Button>
-        </SWrapper>
-      </Modal>
+              {t('cfPost.backersTab.custom')}
+            </EllipseModalButton>
+          )}
+      </EllipseModal>
       {/* Custom pledge modal */}
       <OptionActionMobileModal
         isOpen={isFormOpen}
@@ -348,11 +330,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={14}
-          amount={
-            pledgeAmount
-              ? `$${formatNumber(pledgeAmount / 100 ?? 0, true)}`
-              : '0'
-          }
+          amount={pledgeAmount || 0}
           // {...(walletBalance?.usdCents &&
           // pledgeAmount &&
           // walletBalance.usdCents >= pledgeAmount
@@ -422,63 +400,6 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 
 export default CfPledgeLevelsModal;
 
-const SWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding-bottom: 16px;
-`;
-
-const SContentContainer = styled.div`
-  width: calc(100% - 32px);
-  height: fit-content;
-
-  display: flex;
-  flex-direction: column;
-
-  padding: 16px;
-  padding-bottom: 30px;
-
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  ${({ theme }) => theme.media.tablet} {
-    width: 480px;
-    height: 480px;
-    margin: auto;
-  }
-`;
-
-const SItem = styled.button`
-  position: relative;
-
-  background: none;
-  border: transparent;
-
-  text-align: center;
-
-  height: 56px;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  cursor: pointer;
-  transition: 0.2s linear;
-
-  &:hover,
-  &:focus {
-    outline: none;
-    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
-  }
-`;
-
-const SText = styled(Text)``;
-
 const SCaption = styled(Text)`
   font-weight: 600;
   font-size: 10px;
@@ -507,12 +428,6 @@ const SCaption = styled(Text)`
 
 //   border-radius: 50px;
 // `;
-
-const SSeparator = styled.div`
-  width: 100%;
-  border-bottom: 1px solid
-    ${({ theme }) => theme.colorsThemed.background.outlines1};
-`;
 
 // Payment modal header
 const SPaymentModalHeader = styled.div``;
