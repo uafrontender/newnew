@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
@@ -21,6 +21,8 @@ import InlineSvg from '../components/atoms/InlineSVG';
 import Button from '../components/atoms/Button';
 import RewardList, { Reward } from '../components/molecules/RewardList';
 import { formatNumber } from '../utils/format';
+import { RewardContext } from '../contexts/rewardContext';
+import { useGetAppConstants } from '../contexts/appConstantsContext';
 
 export const Rewards = () => {
   const router = useRouter();
@@ -30,8 +32,8 @@ export const Rewards = () => {
   // TODO: store in local storage (useLocalStorage)
   const [instructionVisible, setInstructionVisible] = useState(true);
 
-  // TODO: Use data from API
-  const balance = 0;
+  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
+  const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
 
   // TODO: Use data from API
   const rewards: Reward[] = [
@@ -144,7 +146,12 @@ export const Rewards = () => {
                   i
                 </InfoButton>
               )}
-              {user.loggedIn ? formatNumber(balance) : '2.00'}
+              $
+              {!user.loggedIn
+                ? formatNumber(currentSignupRewardAmount)
+                : isRewardBalanceLoading || !rewardBalance
+                ? formatNumber(0)
+                : formatNumber(rewardBalance.usdCents! / 100 ?? 0)}
             </BalanceValue>
             <SButton>
               {user.loggedIn

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import Link from 'next/link';
@@ -19,6 +19,9 @@ import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import RewardButton from '../RewardButton';
+import { RewardContext } from '../../../contexts/rewardContext';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 interface ITablet {}
 
@@ -32,6 +35,8 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
+  const { rewardBalance } = useContext(RewardContext);
+  const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
@@ -197,6 +202,15 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 </SItemWithMargin>
               </>
             )}
+            <SItemWithMargin>
+              <RewardButton
+                balance={
+                  rewardBalance?.usdCents
+                    ? rewardBalance.usdCents / 100 || 0
+                    : 0
+                }
+              />
+            </SItemWithMargin>
           </>
         ) : (
           <>
@@ -221,6 +235,11 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 </a>
               </Link>
             </SItemWithMargin>
+            {currentSignupRewardAmount ? (
+              <SItemWithMargin>
+                <RewardButton balance={currentSignupRewardAmount} offer />
+              </SItemWithMargin>
+            ) : null}
           </>
         )}
       </SRightBlock>

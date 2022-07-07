@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -12,9 +12,12 @@ import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
 // import { WalletContext } from '../../../contexts/walletContext';
+import { RewardContext } from '../../../contexts/rewardContext';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import RewardButton from '../RewardButton';
 
 export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -24,6 +27,8 @@ export const Desktop: React.FC = React.memo(() => {
   const { unreadNotificationCount } = useNotifications();
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
+  const { rewardBalance } = useContext(RewardContext);
+  const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -187,6 +192,15 @@ export const Desktop: React.FC = React.memo(() => {
                 </SItemWithMargin>
               </>
             )}
+            <SItemWithMargin>
+              <RewardButton
+                balance={
+                  rewardBalance?.usdCents
+                    ? rewardBalance.usdCents / 100 || 0
+                    : 0
+                }
+              />
+            </SItemWithMargin>
           </>
         ) : (
           <>
@@ -206,6 +220,11 @@ export const Desktop: React.FC = React.memo(() => {
                 </a>
               </Link>
             </SItemWithMargin>
+            {currentSignupRewardAmount ? (
+              <SItemWithMargin>
+                <RewardButton balance={currentSignupRewardAmount} offer />
+              </SItemWithMargin>
+            ) : null}
           </>
         )}
       </SRightBlock>

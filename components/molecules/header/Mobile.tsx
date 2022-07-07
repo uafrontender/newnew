@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 
@@ -7,9 +7,14 @@ import Logo from '../Logo';
 import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/search/SearchInput';
 import { useAppSelector } from '../../../redux-store/store';
+import { RewardContext } from '../../../contexts/rewardContext';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import RewardButton from '../RewardButton';
 
 export const Mobile: React.FC = React.memo(() => {
   const user = useAppSelector((state) => state.user);
+  const { rewardBalance } = useContext(RewardContext);
+  const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
 
   return (
     <SContainer>
@@ -33,6 +38,19 @@ export const Mobile: React.FC = React.memo(() => {
             </a>
           </Link>
         </SItemWithMargin>
+        {user.loggedIn ? (
+          <SItemWithMargin>
+            <RewardButton
+              balance={
+                rewardBalance?.usdCents ? rewardBalance.usdCents / 100 || 0 : 0
+              }
+            />
+          </SItemWithMargin>
+        ) : currentSignupRewardAmount ? (
+          <SItemWithMargin>
+            <RewardButton balance={currentSignupRewardAmount} offer />
+          </SItemWithMargin>
+        ) : null}
       </SRightBlock>
     </SContainer>
   );
