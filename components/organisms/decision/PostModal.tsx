@@ -1213,6 +1213,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     return (
       <>
         <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
+          {(postStatus === 'succeeded' ||
+            postStatus === 'waiting_for_response') &&
+            !isMobile && <PostSuccessAnimationBackground />}
           <Head>
             <title>{t(`meta.${typeOfPost}.title`)}</title>
             <meta
