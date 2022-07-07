@@ -64,8 +64,6 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
     const user = useAppSelector((state) => state.user);
     const { appConstants } = useGetAppConstants();
 
-    console.log(moneyBacked);
-
     // Earned amount
     const [earnedAmount, setEarnedAmount] =
       useState<newnewapi.MoneyAmount | undefined>(undefined);

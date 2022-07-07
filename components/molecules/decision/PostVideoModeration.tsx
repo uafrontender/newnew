@@ -318,6 +318,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               muted={isMuted}
               showPlayButton
             />
+            <SReuploadButton onClick={() => handleVideoDelete()}>
+              {t('postVideo.reuploadButton')}
+            </SReuploadButton>
             <SSoundButton
               id='sound-button'
               iconOnly
@@ -510,5 +513,35 @@ const SSetThumbnailButton = styled(Button)`
     height: 48px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+`;
+
+const SReuploadButton = styled.button`
+  position: absolute;
+  left: 16px;
+  top: 32px;
+
+  color: ${({ theme }) => theme.colors.dark};
+  background: #ffffff;
+
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 24px;
+
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: transparent;
+
+  cursor: pointer;
+
+  &:active,
+  &:focus {
+    outline: none;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    left: initial;
+    right: 16px;
+    top: 16px;
   }
 `;

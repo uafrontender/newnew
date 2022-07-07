@@ -127,6 +127,7 @@
       "backToOriginalVideo": "回到原帖",
       "backToResponse": "觀看回應"
     },
+    "reuploadButton_NEED_TRANSLATION": "re-upload",
     "cannotLeavePageMsg": "你確定要關閉這個頁面嗎？上傳進度會丟失",
     "floatingUploadResponseButton": "製作回應視頻",
     "setThumbnail": "設置縮略圖",
@@ -185,7 +186,7 @@
         },
         "processing": {
           "title": "處理視頻",
-          "description": "你可以在視頻處理過程中發佈回復",
+          "description__NEED_TRANSLATION": "Your video is being processed... hang tight!",
           "process": "{{progress}}% • 還需{{time}}",
           "uploadNonProcessed": "發佈"
         },

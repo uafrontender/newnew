@@ -127,6 +127,7 @@
       "backToOriginalVideo": "Back to original",
       "backToResponse": "Watch response"
     },
+    "reuploadButton": "re-upload",
     "cannotLeavePageMsg": "Are you sure you want to close this page? Upload progress will be lost",
     "floatingUploadResponseButton": "Make a response video",
     "setThumbnail": "Set a thumbnail",
@@ -185,7 +186,7 @@
         },
         "processing": {
           "title": "Processing the video",
-          "description": "You can publish the response while the video is being processed",
+          "description": "Your video is being processed... hang tight!",
           "process": "{{progress}}% • {{time}} left",
           "uploadNonProcessed": "Publish"
         },
