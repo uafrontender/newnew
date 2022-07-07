@@ -633,7 +633,7 @@ const SPaymentSign = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap; ;
 `;
 
 const SPaymentTermsLink = styled.a`
