@@ -509,7 +509,8 @@
         }
       },
       "optionCard": {
-        "pickButton": "Select"
+        "pickButton": "Select",
+        "pickedButton": "Chosen"
       }
     },
     "winnerTab": {

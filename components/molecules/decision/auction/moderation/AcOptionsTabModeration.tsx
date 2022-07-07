@@ -114,6 +114,7 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
             </SNoOptionsYet>
           ) : (
             <SBidsContainer
+              id='acOptionsTabModeration__bidsContainer'
               ref={(el) => {
                 containerRef.current = el!!;
               }}

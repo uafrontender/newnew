@@ -3,7 +3,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import { motion } from 'framer-motion';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
@@ -34,6 +34,7 @@ import BlockUserModalPost from '../../BlockUserModalPost';
 import { reportEventOption } from '../../../../../api/endpoints/report';
 import ReportModal, { ReportData } from '../../../chat/ReportModal';
 import getDisplayname from '../../../../../utils/getDisplayname';
+import isBrowser from '../../../../../utils/isBrowser';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -95,6 +96,26 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
     }, []);
 
     const ellipseButtonRef: any = useRef();
+
+    useEffect(() => {
+      if (isBrowser()) {
+        const scrollArea = document.getElementById(
+          'acOptionsTabModeration__bidsContainer'
+        );
+        if (isEllipseMenuOpen && scrollArea) {
+          scrollArea.style.overflow = 'hidden';
+        } else if (scrollArea) {
+          scrollArea.style.overflow = 'auto';
+        }
+      }
+
+      return () => {
+        const scrollArea = document.getElementById(
+          'acOptionsTabModeration__bidsContainer'
+        );
+        if (scrollArea) scrollArea.style.overflow = 'auto';
+      };
+    }, [isEllipseMenuOpen]);
 
     return (
       <>
@@ -181,13 +202,19 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                 </SSpanBiddersRegular>
               </SBiddersInfo>
             </SBidDetails>
-            {postStatus === 'waiting_for_decision' ? (
+            {postStatus === 'waiting_for_decision' || isWinner ? (
               !isMobile ? (
                 <SSelectOptionWidget>
                   <SPickOptionButton
-                    onClick={() => setIsPickOptionModalOpen(true)}
+                    winner={!!isWinner}
+                    onClick={() => {
+                      if (isWinner) return;
+                      setIsPickOptionModalOpen(true);
+                    }}
                   >
-                    {t('acPostModeration.optionsTab.optionCard.pickButton')}
+                    {isWinner
+                      ? t('acPostModeration.optionsTab.optionCard.pickedButton')
+                      : t('acPostModeration.optionsTab.optionCard.pickButton')}
                   </SPickOptionButton>
                   <SDropdownButton
                     onClick={() => setIsEllipseMenuOpen(true)}
@@ -204,9 +231,15 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
               ) : (
                 <>
                   <SPickOptionButtonMobile
-                    onClick={() => setIsPickOptionModalOpen(true)}
+                    winner={!!isWinner}
+                    onClick={() => {
+                      if (isWinner) return;
+                      setIsPickOptionModalOpen(true);
+                    }}
                   >
-                    {t('acPostModeration.optionsTab.optionCard.pickButton')}
+                    {isWinner
+                      ? t('acPostModeration.optionsTab.optionCard.pickedButton')
+                      : t('acPostModeration.optionsTab.optionCard.pickButton')}
                   </SPickOptionButtonMobile>
                   <SEllipseButton onClick={() => setIsEllipseMenuOpen(true)}>
                     <InlineSvg
@@ -559,7 +592,9 @@ const SSelectOptionWidget = styled.div`
   height: 40px;
 `;
 
-const SPickOptionButton = styled.button`
+const SPickOptionButton = styled.button<{
+  winner: boolean;
+}>`
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;
@@ -579,6 +614,15 @@ const SPickOptionButton = styled.button`
     outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
   }
+
+  ${({ winner }) =>
+    winner
+      ? css`
+          cursor: default;
+          color: #ffffff;
+          background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
+        `
+      : null}
 `;
 
 const SDropdownButton = styled.button`
@@ -602,7 +646,9 @@ const SDropdownButton = styled.button`
   }
 `;
 
-const SPickOptionButtonMobile = styled.button`
+const SPickOptionButtonMobile = styled.button<{
+  winner: boolean;
+}>`
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;
@@ -622,8 +668,19 @@ const SPickOptionButtonMobile = styled.button`
   &:focus,
   &:hover {
     outline: none;
+    color: #ffffff;
     background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
+    filter: brightness(120%);
   }
+
+  ${({ winner }) =>
+    winner
+      ? css`
+          color: #ffffff;
+          background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
+          filter: brightness(120%);
+        `
+      : null}
 `;
 
 const SEllipseButtonMobile = styled.button`
