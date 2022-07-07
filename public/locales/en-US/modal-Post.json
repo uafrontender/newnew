@@ -692,6 +692,30 @@
     "title": "Goals",
     "text": "Pool money with others to back goals made by your favorite creators. If enough people back the goal, you’ll watch the creator do it!"
   },
+  "postResponseTabModeration": {
+    "awaiting": {
+      "topHeader": "Time to post \nyour response",
+      "postResponseBtn": "Post Response",
+      "youWillGet": "You'll get"
+    },
+    "succeded": {
+      "topHeader": "You made",
+      "shareBtn": "Share",
+      "linkCopied": "Link copied!"
+    },
+    "winner": {
+      "inResponseToYourPost": "In response to your post",
+      "ac": {
+        "numBiddersChose": "{{amount}} bidders chose",
+        "optionCreator": "{{creator}}'s bid"
+      },
+      "mc": {
+        "numBiddersChose": "{{amount}} votes chose",
+        "optionOwn": "option",
+        "optionCreator": "{{creator}}'s option"
+      }
+    }
+  },
   "tutorials": {
     "ac": {
       "timer": {

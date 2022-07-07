@@ -97,9 +97,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 }) => {
   const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -386,19 +383,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           />
         ) : null}
       </SVideoWrapper>
-      {isMobile &&
-      postStatus === 'waiting_for_response' &&
-      !responseFileUploadLoading &&
-      !responseFileProcessingLoading ? (
-        <SUploadResponseButton
-          view='primaryGrad'
-          onClick={() => {
-            document.getElementById('upload-response-btn')?.click();
-          }}
-        >
-          {t('postVideo.floatingUploadResponseButton')}
-        </SUploadResponseButton>
-      ) : null}
       {/* Edit thumbnail */}
       <PostVideoThumbnailEdit
         open={isEditThumbnailModalOpen}
@@ -527,14 +511,4 @@ const SSetThumbnailButton = styled(Button)`
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
-`;
-
-const SUploadResponseButton = styled(Button)`
-  position: fixed;
-  bottom: 16px;
-
-  width: calc(100% - 32px);
-  height: 56px;
-
-  z-index: 10;
 `;
