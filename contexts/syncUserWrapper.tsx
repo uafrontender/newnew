@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import {
   getMe,
-  getMyCreatorTags,
   getMyOnboardingState,
   getTutorialsStatus,
   markTutorialStepAsCompleted,
@@ -59,7 +58,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   }, [user.loggedIn]);
 
   useEffect(() => {
-    if (creatorDataSteps === 2) {
+    if (creatorDataSteps === 1) {
       dispatch(
         setCreatorData({
           isLoaded: true,
@@ -171,23 +170,6 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
                     ...user.creatorData?.options,
                     ...res.data,
                   },
-                })
-              );
-            }
-            updateCreatorDataSteps();
-          } catch (err) {
-            console.error(err);
-            updateCreatorDataSteps();
-          }
-
-          try {
-            const myTagsPayload = new newnewapi.EmptyRequest();
-            const tagsRes = await getMyCreatorTags(myTagsPayload);
-
-            if (tagsRes.data?.tags && tagsRes.data?.tags.length > 0) {
-              dispatch(
-                setCreatorData({
-                  hasCreatorTags: true,
                 })
               );
             }
