@@ -62,14 +62,20 @@ const RewardCard = styled.div<{ received?: boolean; holder?: boolean }>`
   border-radius: 16px;
   padding: ${(props) => (props.holder ? 0 : '24px 16px;')};
   width: 146px;
-  background-color: ${(props) =>
-    props.received
-      ? props.theme.colorsThemed.button.background.primary
-      : undefined};
+  background: ${(props) =>
+    props.received ? props.theme.gradients.blueReversedDiagonal : undefined};
   border: ${(props) =>
     props.received
       ? undefined
       : `1px solid ${props.theme.colorsThemed.background.quinary}`};
+  box-shadow: ${(props) =>
+    props.received
+      ? `0px 4px 24px ${
+          props.theme.name === 'light'
+            ? 'rgba(0, 0, 0, 0.25)'
+            : 'rgba(255, 255, 255, 0.25)'
+        };`
+      : undefined};
 
   opacity: ${(props) => (props.holder ? 0 : 1)};
 `;
@@ -112,7 +118,7 @@ const RewardAmount = styled.div<{ received?: boolean }>`
   color: ${(props) =>
     props.received
       ? props.theme.colorsThemed.button.color.primary
-      : props.theme.colorsThemed.text.secondary};
+      : props.theme.colorsThemed.text.primary};
   white-space: nowrap;
   overflow: hidden;
 `;

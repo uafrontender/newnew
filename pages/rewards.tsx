@@ -307,11 +307,19 @@ const SCloseButton = styled.button`
   height: 36px;
   border: none;
   border-radius: 11px;
-  background: rgba(255, 255, 255, 0.1);
+  background: ${({ theme }) =>
+    theme.name === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
   cursor: pointer;
+
+  :hover {
+    background: ${({ theme }) =>
+      theme.name === 'light'
+        ? 'rgba(0, 0, 0, 0.05)'
+        : 'rgba(255, 255, 255, 0.05)'};
+  }
 `;
 
 const InstructionsHeadline = styled(Headline)`
