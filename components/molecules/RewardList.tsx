@@ -69,7 +69,7 @@ const RewardCard = styled.div<{ received?: boolean; holder?: boolean }>`
   border: ${(props) =>
     props.received
       ? undefined
-      : `1px solid ${props.theme.colorsThemed.tag.color.primary}`};
+      : `1px solid ${props.theme.colorsThemed.background.quinary}`};
 
   opacity: ${(props) => (props.holder ? 0 : 1)};
 `;
@@ -89,7 +89,7 @@ const RewardTitle = styled.div<{ received?: boolean }>`
   flex-grow: 1;
   color: ${(props) =>
     props.received
-      ? props.theme.colorsThemed.text.primary
+      ? props.theme.colorsThemed.button.color.primary
       : props.theme.colorsThemed.text.secondary};
   font-weight: 600;
   font-size: 12px;
@@ -109,12 +109,15 @@ const RewardAmount = styled.div<{ received?: boolean }>`
     props.received
       ? 'rgba(40, 41, 51, 0.25)'
       : props.theme.colorsThemed.background.quinary};
+  color: ${(props) =>
+    props.received
+      ? props.theme.colorsThemed.button.color.primary
+      : props.theme.colorsThemed.text.secondary};
   white-space: nowrap;
   overflow: hidden;
 `;
 
 const RewardAmountText = styled.div`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;

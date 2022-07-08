@@ -397,7 +397,8 @@ const StepCard = styled.div`
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
-  background-color: ${(props) => props.theme.colorsThemed.background.tertiary};
+  background-color: ${(props) =>
+    props.theme.colorsThemed.background.quaternary};
   border-radius: 16px;
   padding: 50px 25px 28px 25px;
 `;
