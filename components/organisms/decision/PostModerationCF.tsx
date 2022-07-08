@@ -1,15 +1,9 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
@@ -43,9 +37,6 @@ import { formatNumber } from '../../../utils/format';
 import Text from '../../atoms/Text';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
-const CommentsTab = dynamic(
-  () => import('../../molecules/decision/CommentsTab')
-);
 const ResponseTimer = dynamic(
   () => import('../../molecules/decision/ResponseTimer')
 );

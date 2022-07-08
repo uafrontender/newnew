@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
@@ -27,18 +25,12 @@ import {
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
-import Lottie from '../../atoms/Lottie';
-import DecisionTabs from '../../molecules/decision/PostTabs';
 import Headline from '../../atoms/Headline';
 import PostVotingTab from '../../molecules/decision/PostVotingTab';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 
-// Icons
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-
-import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 import switchPostStatus, {
@@ -55,10 +47,6 @@ const ResponseTimer = dynamic(
   () => import('../../molecules/decision/ResponseTimer')
 );
 const PostTimer = dynamic(() => import('../../molecules/decision/PostTimer'));
-const AcWinnerTabModeration = dynamic(
-  () =>
-    import('../../molecules/decision/auction/moderation/AcWinnerTabModeration')
-);
 const AcOptionsTabModeration = dynamic(
   () =>
     import('../../molecules/decision/auction/moderation/AcOptionsTabModeration')
@@ -855,15 +843,6 @@ const SActivitesContainer = styled.div<{
             max-height: calc(580px - 120px);
           `}
   }
-`;
-
-const SAnimationContainer = styled.div`
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 // Comments

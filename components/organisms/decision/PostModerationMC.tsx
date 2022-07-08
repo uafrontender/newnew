@@ -1,15 +1,8 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
@@ -23,7 +16,6 @@ import {
   fetchCurrentOptionsForMCPost,
   getMcOption,
 } from '../../../api/endpoints/multiple_choice';
-import isBrowser from '../../../utils/isBrowser';
 import switchPostStatus, {
   TPostStatusStringified,
 } from '../../../utils/switchPostStatus';
@@ -35,14 +27,12 @@ import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 
-import Lottie from '../../atoms/Lottie';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import Headline from '../../atoms/Headline';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import PostVotingTab from '../../molecules/decision/PostVotingTab';
 
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import useResponseUpload from '../../../utils/hooks/useResponseUpload';
 import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
 
@@ -53,19 +43,10 @@ const ResponseTimer = dynamic(
   () => import('../../molecules/decision/ResponseTimer')
 );
 const PostTimer = dynamic(() => import('../../molecules/decision/PostTimer'));
-const CommentsTab = dynamic(
-  () => import('../../molecules/decision/CommentsTab')
-);
 const McOptionsTabModeration = dynamic(
   () =>
     import(
       '../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration'
-    )
-);
-const McWinnerTabModeration = dynamic(
-  () =>
-    import(
-      '../../molecules/decision/multiple_choice/moderation/McWinnerTabModeration'
     )
 );
 
