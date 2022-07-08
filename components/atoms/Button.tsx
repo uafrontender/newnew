@@ -52,7 +52,7 @@ const Button = React.memo(
         onClick,
         ...rest
       } = props;
-      const { ref, inView }: { ref: any; inView: boolean } = useInView();
+      const { ref, inView } = useInView();
 
       // Progress effect
       const [progress, setProgress] = useState(0);
