@@ -24,6 +24,9 @@ import {
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import Headline from '../../atoms/Headline';
+import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
+import PostVotingTab from '../../molecules/decision/PostVotingTab';
 
 // Utils
 import switchPostType from '../../../utils/switchPostType';
@@ -32,9 +35,6 @@ import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
-import Headline from '../../atoms/Headline';
-import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
-import PostVotingTab from '../../molecules/decision/PostVotingTab';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
@@ -627,6 +627,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inView, post.postUuid, router.locale]);
+
     return (
       <>
         <SWrapper>

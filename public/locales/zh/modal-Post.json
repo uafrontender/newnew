@@ -127,6 +127,7 @@
       "backToOriginalVideo": "回到原帖",
       "backToResponse": "觀看回應"
     },
+    "reuploadButton_NEED_TRANSLATION": "re-upload",
     "cannotLeavePageMsg": "你確定要關閉這個頁面嗎？上傳進度會丟失",
     "floatingUploadResponseButton": "製作回應視頻",
     "setThumbnail": "設置縮略圖",
@@ -185,7 +186,7 @@
         },
         "processing": {
           "title": "處理視頻",
-          "description": "你可以在視頻處理過程中發佈回復",
+          "description__NEED_TRANSLATION": "Your video is being processed... hang tight!",
           "process": "{{progress}}% • 還需{{time}}",
           "uploadNonProcessed": "發佈"
         },
@@ -509,7 +510,8 @@
         }
       },
       "optionCard": {
-        "pickButton": "選擇"
+        "pickButton": "選擇",
+        "pickedButton_NEED_TRANSLATION": "Chosen"
       }
     },
     "winnerTab": {
@@ -548,6 +550,7 @@
     }
   },
   "cfPostModeration": {
+    "moneyRaised_NEED_TRANSLATION": "Total raised",
     "winnerTab": {
       "winnerOptionCard": {
         "backersToldYou": "支持者注資成功",
@@ -691,6 +694,33 @@
   "heroPopupCF": {
     "title": "Goal",
     "text": "與其他人集資，支持你喜歡的創作者的Goal。如果支援這個Goal的人足夠多，你就會看著創作者照做！"
+  },
+  "postResponseTabModeration_NEED_TRANSLATION": {
+    "awaiting": {
+      "topHeader": "Time to post \nyour response!",
+      "postResponseBtn": "Post Response",
+      "youWillGet": "You'll get"
+    },
+    "succeeded": {
+      "topHeader": "Response \npublished!",
+      "youMade": "You made",
+      "shareBtn": "Share",
+      "linkCopied": "Link copied!"
+    },
+    "winner": {
+      "inResponseToYourPost": "In response to your post",
+      "ac": {
+        "numBiddersChoseSingular": "{{amount}} bidder chose",
+        "numBiddersChose": "{{amount}} bidders chose",
+        "optionCreator": "<0>{{nickname}}</0>'s bid"
+      },
+      "mc": {
+        "numBiddersChoseSingular": "{{amount}} voter chose",
+        "numBiddersChose": "{{amount}} voters chose",
+        "optionOwn": "the option",
+        "optionCreator": "<0>{{nickname}}</0>'s option"
+      }
+    }
   },
   "tutorials": {
     "ac": {
