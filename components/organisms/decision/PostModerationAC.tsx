@@ -332,6 +332,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           setNumberOfOptions(res.data.auction.optionCount as number);
           if (res.data.auction.status)
             handleUpdatePostStatus(res.data.auction.status);
+          if (!responseFreshlyUploaded && res.data.auction?.response) {
+            setResponseFreshlyUploaded(res.data.auction.response);
+          }
         }
       } catch (err) {
         console.error(err);

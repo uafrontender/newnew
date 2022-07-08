@@ -302,6 +302,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
               res.data.crowdfunding.totalAmount as newnewapi.MoneyAmount
             );
           }
+          if (!responseFreshlyUploaded && res.data.crowdfunding?.response) {
+            setResponseFreshlyUploaded(res.data.crowdfunding.response);
+          }
         }
       } catch (err) {
         console.error(err);

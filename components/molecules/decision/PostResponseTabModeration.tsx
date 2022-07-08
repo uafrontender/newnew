@@ -325,6 +325,12 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
               ? t('postResponseTabModeration.succeeded.linkCopied')
               : t('postResponseTabModeration.succeeded.shareBtn')}
           </SShareButton>
+          {/* Success modal */}
+          <PostResponseSuccessModal
+            amount={amountSwitch()}
+            isOpen={responseUploadSuccess}
+            zIndex={20}
+          />
         </SContainer>
       );
     }

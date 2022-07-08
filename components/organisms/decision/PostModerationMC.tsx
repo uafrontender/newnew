@@ -309,6 +309,10 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           setNumberOfOptions(res.data.multipleChoice.optionCount as number);
           if (res.data.multipleChoice.status)
             handleUpdatePostStatus(res.data.multipleChoice.status);
+
+          if (!responseFreshlyUploaded && res.data.multipleChoice?.response) {
+            setResponseFreshlyUploaded(res.data.multipleChoice.response);
+          }
         }
       } catch (err) {
         console.error(err);

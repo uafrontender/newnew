@@ -244,9 +244,9 @@ const useResponseUpload = ({
         if (res.data.crowdfunding) responseObj = res.data.crowdfunding.response;
         // @ts-ignore
         if (responseObj) handleUpdateResponseVideo(responseObj);
-        setResponseUploadSuccess(true)
         handleUpdatePostStatus('SUCCEEDED');
         setUploadedResponseVideoUrl('');
+        setResponseUploadSuccess(true);
       }
     } catch (err) {
       console.error(err);
