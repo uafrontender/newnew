@@ -271,10 +271,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
             {!isMobile && (
               <AcOptionCardModerationEllipseMenu
                 isVisible={isEllipseMenuOpen}
-                canDeleteOption={
-                  postStatus === 'voting' ||
-                  postStatus === 'waiting_for_decision'
-                }
+                canDeleteOption={postStatus === 'voting'}
                 handleClose={() => setIsEllipseMenuOpen(false)}
                 handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
                 handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
