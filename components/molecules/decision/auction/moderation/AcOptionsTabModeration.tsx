@@ -28,6 +28,7 @@ interface IAcOptionsTabModeration {
   options: newnewapi.Auction.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
+  winningOptionId?: number;
   handleLoadBids: (token?: string) => void;
   handleRemoveOption: (optionToDelete: newnewapi.Auction.Option) => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
@@ -41,6 +42,7 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
     options,
     optionsLoading,
     pagingToken,
+    winningOptionId,
     handleLoadBids,
     handleRemoveOption,
     handleUpdatePostStatus,
@@ -112,6 +114,7 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
             </SNoOptionsYet>
           ) : (
             <SBidsContainer
+              id='acOptionsTabModeration__bidsContainer'
               ref={(el) => {
                 containerRef.current = el!!;
               }}
@@ -140,6 +143,9 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
                   key={option.id.toString()}
                   postStatus={postStatus}
                   option={option as TAcOptionWithHighestField}
+                  isWinner={
+                    winningOptionId?.toString() === option.id.toString()
+                  }
                   handleRemoveOption={handleRemoveOption}
                   handleConfirmWinningOption={() =>
                     handleConfirmWinningOption(option)

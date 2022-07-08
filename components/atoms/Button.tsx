@@ -121,6 +121,7 @@ const Button = React.memo(
         <SButton
           ref={(el) => {
             ref(el);
+
             if (parentRef) {
               // eslint-disable-next-line no-param-reassign
               parentRef.current = el;

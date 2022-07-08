@@ -249,6 +249,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'component-PostCard',
     'modal-Post',
     'modal-PaymentModal',
+    'modal-ResponseSuccessModal',
   ]);
 
   if (!username || Array.isArray(username)) {

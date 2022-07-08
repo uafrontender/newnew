@@ -455,6 +455,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'component-PostCard',
     'modal-Post',
     'modal-PaymentModal',
+    'modal-ResponseSuccessModal',
   ]);
 
   const top10payload = new newnewapi.EmptyRequest({});
