@@ -287,7 +287,7 @@ export async function fetchProtobufProtectedIntercepted<
         if (!resRefresh.data || resRefresh.error)
           throw new Error('Refresh token invalid');
 
-        // Refreshed succeded, re-set access and refresh tokens
+        // Refreshed succeeded, re-set access and refresh tokens
         // Client side
         if (!serverSideTokens) {
           if (resRefresh.data.credential?.expiresAt?.seconds)

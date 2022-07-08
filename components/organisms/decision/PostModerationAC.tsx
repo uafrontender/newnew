@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
@@ -15,6 +13,8 @@ import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
+import { useInView } from 'react-intersection-observer';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -25,15 +25,12 @@ import {
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
-import Lottie from '../../atoms/Lottie';
-import DecisionTabs from '../../molecules/decision/PostTabs';
+import Headline from '../../atoms/Headline';
+import PostVotingTab from '../../molecules/decision/PostVotingTab';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
+import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 
-// Icons
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-
-import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 import switchPostStatus, {
@@ -41,19 +38,15 @@ import switchPostStatus, {
 } from '../../../utils/switchPostStatus';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
+import useResponseUpload from '../../../utils/hooks/useResponseUpload';
 
-const CommentsTab = dynamic(
-  () => import('../../molecules/decision/CommentsTab')
-);
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
   () => import('../../molecules/decision/ResponseTimer')
 );
 const PostTimer = dynamic(() => import('../../molecules/decision/PostTimer'));
-const AcWinnerTabModeration = dynamic(
-  () =>
-    import('../../molecules/decision/auction/moderation/AcWinnerTabModeration')
-);
 const AcOptionsTabModeration = dynamic(
   () =>
     import('../../molecules/decision/auction/moderation/AcOptionsTabModeration')
@@ -81,12 +74,15 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     handleRemovePostFromState,
   }) => {
     const dispatch = useAppDispatch();
+    const { t } = useTranslation('modal-Post');
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
     const router = useRouter();
+
+    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     const showSelectWinnerOption = useMemo(
       () => postStatus === 'waiting_for_decision',
@@ -101,114 +97,64 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       post.winningOptionId ?? undefined
     );
 
-    // Tabs
-    const tabs = useMemo(() => {
-      // NB! Will a check for winner option here
-      if (winningOptionId) {
-        return [
-          {
-            label: 'winner',
-            value: 'winner',
-          },
-          {
-            label: 'bids',
-            value: 'bids',
-          },
-          ...(post.isCommentsAllowed
-            ? [
-                {
-                  label: 'comments',
-                  value: 'comments',
-                },
-              ]
-            : []),
-        ];
-      }
-      return [
-        {
-          label: 'bids',
-          value: 'bids',
-        },
-        ...(post.isCommentsAllowed
-          ? [
-              {
-                label: 'comments',
-                value: 'comments',
-              },
-            ]
-          : []),
-      ];
-    }, [winningOptionId, post.isCommentsAllowed]);
-
-    const [currentTab, setCurrentTab] = useState<
-      'bids' | 'comments' | 'winner'
-    >(() => {
-      if (!isBrowser()) {
-        return 'bids';
-      }
-      const { hash } = window.location;
-      if (
-        hash &&
-        (hash === '#bids' || hash === '#comments' || hash === '#winner')
-      ) {
-        return hash.substring(1) as 'bids' | 'comments' | 'winner';
-      }
-      if (winningOptionId) return 'winner';
-      return 'bids';
+    // Comments
+    const { ref: commentsSectionRef, inView } = useInView({
+      threshold: 0.8,
     });
 
-    const handleChangeTab = (tab: string) => {
-      if (tab === 'comments' && isMobile) {
-        window.history.pushState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#${tab}`
-        );
-      } else {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#${tab}`
-        );
+    const handleCommentFocus = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display =
+          'none';
       }
-      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    };
+    const handleCommentBlur = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display = '';
+      }
     };
 
-    // Respone upload
+    // Response upload
     const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
       useState<newnewapi.IVideoUrls | undefined>(undefined);
 
-    useEffect(() => {
-      const handleHashChange = () => {
-        const { hash } = window.location;
-        if (!hash) {
-          setCurrentTab('bids');
-          return;
-        }
-        const parsedHash = hash.substring(1);
-        if (
-          parsedHash === 'bids' ||
-          parsedHash === 'comments' ||
-          parsedHash === 'winner'
-        ) {
-          setCurrentTab(parsedHash);
-        }
-      };
+    // Tabs
+    const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
+      post.response ||
+        responseFreshlyUploaded ||
+        postStatus === 'waiting_for_response' ||
+        postStatus === 'processing_response'
+        ? 'response'
+        : 'announcement'
+    );
 
-      window.addEventListener('hashchange', handleHashChange, false);
-
-      return () => {
-        window.removeEventListener('hashchange', handleHashChange, false);
-      };
-    }, []);
+    const {
+      handleCancelVideoUpload,
+      handleItemChange,
+      handleResetVideoUploadAndProcessingState,
+      handleUploadVideoNotProcessed,
+      handleUploadVideoProcessed,
+      handleVideoDelete,
+      responseFileProcessingETA,
+      responseFileProcessingError,
+      responseFileProcessingLoading,
+      responseFileProcessingProgress,
+      responseFileUploadETA,
+      responseFileUploadError,
+      responseFileUploadLoading,
+      responseFileUploadProgress,
+      uploadedResponseVideoUrl,
+      videoProcessing,
+      responseUploading,
+      responseUploadSuccess,
+    } = useResponseUpload({
+      postId: post.postUuid,
+      postStatus,
+      openedTab,
+      handleUpdatePostStatus,
+      handleUpdateResponseVideo: (newValue) =>
+        setResponseFreshlyUploaded(newValue),
+    });
 
     // Total amount
     const [totalAmount, setTotalAmount] = useState(
@@ -234,7 +180,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     ) => {
       setWinningOption(selectedOption);
       setWinningOptionId(selectedOption.id);
-      handleChangeTab('winner');
     };
 
     const handleToggleMutedMode = useCallback(() => {
@@ -381,13 +326,15 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
 
         if (res.data.auction?.winningOptionId && !winningOptionId) {
           setWinningOptionId(res.data.auction?.winningOptionId);
-          handleChangeTab('winner');
         }
         if (res.data.auction) {
           setTotalAmount(res.data.auction.totalAmount?.usdCents as number);
           setNumberOfOptions(res.data.auction.optionCount as number);
           if (res.data.auction.status)
             handleUpdatePostStatus(res.data.auction.status);
+          if (!responseFreshlyUploaded && res.data.auction?.response) {
+            setResponseFreshlyUploaded(res.data.auction.response);
+          }
         }
       } catch (err) {
         console.error(err);
@@ -608,117 +555,188 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       }
     }, [options, user]);
 
+    // Scroll to comments if hash is present
+    useEffect(() => {
+      const handleCommentsInitialHash = () => {
+        const { hash } = window.location;
+        if (!hash) {
+          return;
+        }
+
+        const parsedHash = hash.substring(1);
+
+        if (parsedHash === 'comments') {
+          document.getElementById('comments')?.scrollIntoView();
+        }
+      };
+
+      handleCommentsInitialHash();
+    }, []);
+
+    // Replace hash once scrolled to comments
+    useEffect(() => {
+      if (inView) {
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#comments`
+        );
+      } else {
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }`
+        );
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inView, post.postUuid, router.locale]);
+
     return (
-      <SWrapper>
-        <SExpiresSection>
-          {isMobile && (
-            <SGoBackButton
-              style={{
-                gridArea: 'closeBtnMobile',
-              }}
-              onClick={handleGoBack}
-            />
-          )}
-          {postStatus === 'waiting_for_response' ||
-          postStatus === 'waiting_for_decision' ? (
-            <ResponseTimer
-              timestampSeconds={new Date(
-                (post.responseUploadDeadline?.seconds as number) * 1000
-              ).getTime()}
-            />
-          ) : (
-            <PostTimer
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='ac'
-              isTutorialVisible={options.length > 0}
-            />
-          )}
-        </SExpiresSection>
-        <PostVideoModeration
-          postId={post.postUuid}
-          announcement={post.announcement!!}
-          response={(post.response || responseFreshlyUploaded) ?? undefined}
-          thumbnails={{
-            startTime: 1,
-            endTime: 3,
-          }}
-          postStatus={postStatus}
-          isMuted={mutedMode}
-          handleToggleMuted={() => handleToggleMutedMode()}
-          handleUpdateResponseVideo={(newValue) =>
-            setResponseFreshlyUploaded(newValue)
-          }
-          handleUpdatePostStatus={handleUpdatePostStatus}
-        />
-        <PostTopInfoModeration
-          postType='ac'
-          postStatus={postStatus}
-          title={post.title}
-          postId={post.postUuid}
-          amountInBids={totalAmount}
-          hasWinner={!!winningOptionId}
-          hasResponse={!!post.response}
-          handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState}
-        />
-        <SActivitesContainer
-          decisionFailed={postStatus === 'failed'}
-          showSelectWinnerOption={showSelectWinnerOption}
-        >
-          <DecisionTabs
-            tabs={tabs}
-            activeTab={currentTab}
-            handleChangeTab={handleChangeTab}
-          />
-          {currentTab === 'bids' ? (
-            <AcOptionsTabModeration
-              postId={post.postUuid}
-              postStatus={postStatus}
-              options={options}
-              optionsLoading={optionsLoading}
-              pagingToken={optionsNextPageToken}
-              handleLoadBids={fetchBids}
-              handleRemoveOption={handleRemoveOption}
-              handleUpdatePostStatus={handleUpdatePostStatus}
-              handleUpdateWinningOption={handleUpdateWinningOption}
-            />
-          ) : currentTab === 'comments' && post.isCommentsAllowed ? (
-            <CommentsTab
-              postUuid={post.postUuid}
-              canDeleteComments={post.creator?.uuid === user.userData?.userUuid}
-              commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => handleChangeTab('bids')}
-            />
-          ) : winningOption ? (
-            <AcWinnerTabModeration
-              postId={post.postUuid}
-              option={winningOption}
-              postStatus={postStatus}
-            />
-          ) : (
-            <SAnimationContainer>
-              <Lottie
-                width={64}
-                height={64}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: loadingAnimation,
+      <>
+        <SWrapper>
+          <SExpiresSection>
+            {isMobile && (
+              <SGoBackButton
+                style={{
+                  gridArea: 'closeBtnMobile',
                 }}
+                onClick={handleGoBack}
               />
-            </SAnimationContainer>
-          )}
-        </SActivitesContainer>
-        {isPopupVisible && (
-          <HeroPopup
-            isPopupVisible={isPopupVisible}
-            postType='AC'
-            closeModal={goToNextStep}
+            )}
+            {postStatus === 'waiting_for_response' ||
+            postStatus === 'waiting_for_decision' ? (
+              <ResponseTimer
+                timestampSeconds={new Date(
+                  (post.responseUploadDeadline?.seconds as number) * 1000
+                ).getTime()}
+              />
+            ) : (
+              <PostTimer
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='ac'
+                isTutorialVisible={options.length > 0}
+              />
+            )}
+          </SExpiresSection>
+          <PostVideoModeration
+            postId={post.postUuid}
+            announcement={post.announcement!!}
+            response={(post.response || responseFreshlyUploaded) ?? undefined}
+            thumbnails={{
+              startTime: 1,
+              endTime: 3,
+            }}
+            postStatus={postStatus}
+            isMuted={mutedMode}
+            openedTab={openedTab}
+            responseFileProcessingETA={responseFileProcessingETA}
+            responseFileProcessingError={responseFileProcessingError}
+            responseFileProcessingLoading={responseFileProcessingLoading}
+            responseFileProcessingProgress={responseFileProcessingProgress}
+            responseFileUploadETA={responseFileUploadETA}
+            responseFileUploadError={responseFileUploadError}
+            responseFileUploadLoading={responseFileUploadLoading}
+            responseFileUploadProgress={responseFileUploadProgress}
+            uploadedResponseVideoUrl={uploadedResponseVideoUrl}
+            videoProcessing={videoProcessing}
+            handleChangeTab={(newValue) => setOpenedTab(newValue)}
+            handleToggleMuted={() => handleToggleMutedMode()}
+            handleUpdateResponseVideo={(newValue) =>
+              setResponseFreshlyUploaded(newValue)
+            }
+            handleUpdatePostStatus={handleUpdatePostStatus}
+            handleCancelVideoUpload={handleCancelVideoUpload}
+            handleItemChange={handleItemChange}
+            handleResetVideoUploadAndProcessingState={
+              handleResetVideoUploadAndProcessingState
+            }
+            handleUploadVideoNotProcessed={handleUploadVideoNotProcessed}
+            handleUploadVideoProcessed={handleUploadVideoProcessed}
+            handleVideoDelete={handleVideoDelete}
           />
+          <PostTopInfoModeration
+            postType='ac'
+            postStatus={postStatus}
+            title={post.title}
+            postId={post.postUuid}
+            amountInBids={totalAmount}
+            hasWinner={!!winningOptionId}
+            hasResponse={!!post.response}
+            hidden={openedTab === 'response'}
+            handleUpdatePostStatus={handleUpdatePostStatus}
+            handleRemovePostFromState={handleRemovePostFromState}
+          />
+          <SActivitesContainer
+            decisionFailed={postStatus === 'failed'}
+            showSelectWinnerOption={showSelectWinnerOption}
+          >
+            {openedTab === 'announcement' ? (
+              <>
+                <PostVotingTab>
+                  {`${t('tabs.bids')} ${
+                    !!numberOfOptions && numberOfOptions > 0
+                      ? numberOfOptions
+                      : ''
+                  }`}
+                </PostVotingTab>
+                <AcOptionsTabModeration
+                  postId={post.postUuid}
+                  postStatus={postStatus}
+                  options={options}
+                  optionsLoading={optionsLoading}
+                  pagingToken={optionsNextPageToken}
+                  winningOptionId={(winningOption?.id as number) ?? undefined}
+                  handleLoadBids={fetchBids}
+                  handleRemoveOption={handleRemoveOption}
+                  handleUpdatePostStatus={handleUpdatePostStatus}
+                  handleUpdateWinningOption={handleUpdateWinningOption}
+                />
+              </>
+            ) : (
+              <PostResponseTabModeration
+                postId={post.postUuid}
+                postType='ac'
+                postStatus={postStatus}
+                postTitle={post.title}
+                responseUploading={responseUploading}
+                responseReadyToBeUploaded={
+                  !!uploadedResponseVideoUrl &&
+                  !responseFileUploadLoading &&
+                  !responseFileProcessingLoading
+                }
+                responseUploadSuccess={responseUploadSuccess}
+                winningOptionAc={winningOption}
+                handleUploadResponse={handleUploadVideoProcessed}
+              />
+            )}
+          </SActivitesContainer>
+          {isPopupVisible && (
+            <HeroPopup
+              isPopupVisible={isPopupVisible}
+              postType='AC'
+              closeModal={goToNextStep}
+            />
+          )}
+        </SWrapper>
+        {post.isCommentsAllowed && (
+          <SCommentsSection id='comments' ref={commentsSectionRef}>
+            <SCommentsHeadline variant={4}>
+              {t('successCommon.comments.heading')}
+            </SCommentsHeadline>
+            <CommentsBottomSection
+              postUuid={post.postUuid}
+              commentsRoomId={post.commentsRoomId as number}
+              canDeleteComments
+              onFormBlur={handleCommentBlur}
+              onFormFocus={handleCommentFocus}
+            />
+          </SCommentsSection>
         )}
-      </SWrapper>
+      </>
     );
   }
 );
@@ -733,8 +751,6 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 648px;
-
     display: inline-grid;
     grid-template-areas:
       'expires expires'
@@ -802,7 +818,18 @@ const SActivitesContainer = styled.div<{
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    max-height: calc(500px);
+    ${({ showSelectWinnerOption, decisionFailed }) =>
+      showSelectWinnerOption
+        ? css`
+            max-height: 500px;
+          `
+        : !decisionFailed
+        ? css`
+            max-height: 500px;
+          `
+        : css`
+            max-height: 500px;
+          `}
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -813,7 +840,7 @@ const SActivitesContainer = styled.div<{
           `
         : !decisionFailed
         ? css`
-            max-height: 580px;
+            max-height: unset;
           `
         : css`
             max-height: calc(580px - 120px);
@@ -821,11 +848,13 @@ const SActivitesContainer = styled.div<{
   }
 `;
 
-const SAnimationContainer = styled.div`
-  width: 100%;
-  height: 100%;
+// Comments
+const SCommentsHeadline = styled(Headline)`
+  margin-bottom: 8px;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 16px;
+  }
 `;
+
+const SCommentsSection = styled.div``;

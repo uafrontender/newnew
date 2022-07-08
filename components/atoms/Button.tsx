@@ -120,7 +120,7 @@ const Button = React.memo(
       return (
         <SButton
           ref={(el) => {
-            ref.current = el;
+            ref(el);
 
             if (parentRef) {
               // eslint-disable-next-line no-param-reassign
