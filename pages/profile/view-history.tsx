@@ -219,6 +219,7 @@ export async function getServerSideProps(
       'component-PostCard',
       'modal-Post',
       'modal-PaymentModal',
+      'modal-ResponseSuccessModal',
     ]);
 
     // const { req } = context;
