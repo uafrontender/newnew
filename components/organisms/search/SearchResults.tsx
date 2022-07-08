@@ -150,7 +150,6 @@ const SPageTitle = styled.h1`
 
 const Hashtag = styled.span`
   color: ${(props) => props.theme.colorsThemed.accent.blue};
-  font-weight: 600;
 `;
 
 const Query = styled.span`

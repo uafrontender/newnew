@@ -67,6 +67,7 @@ import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
+import getChunks from '../../../../utils/getChunks/getChunks';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -1182,7 +1183,17 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                         </SFloatingSubSectionUser>
                         <SBottomEnd>
                           <SBottomEndPostTitle variant={3} weight={600}>
-                            {post.title}
+                            {getChunks(post.title).map((chunk) => {
+                              if (chunk.type === 'hashtag') {
+                                return (
+                                  <SBottomEndPostTitleHashtag>
+                                    #{chunk.text}
+                                  </SBottomEndPostTitleHashtag>
+                                );
+                              }
+
+                              return chunk.text;
+                            })}
                           </SBottomEndPostTitle>
                         </SBottomEnd>
                       </SFloatingSubSectionWithPlayer>
@@ -1465,8 +1476,14 @@ const SBottomEnd = styled.div`
 `;
 
 const SBottomEndPostTitle = styled(Text)`
+  display: inline;
   max-width: 100%;
   line-break: loose;
+  white-space: pre-wrap;
+`;
+
+const SBottomEndPostTitleHashtag = styled.span`
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
 `;
 
 const SCaption = styled(Caption)`
