@@ -55,7 +55,9 @@ const useResponseUpload = ({
   const [responseFileProcessingError, setResponseFileProcessingError] =
     useState(false);
 
+  // Updating Post data
   const [responseUploading, setResponseUploading] = useState(false);
+  const [responseUploadSuccess, setResponseUploadSuccess] = useState(false);
 
   const { handleSetIsConfirmToClosePost } = usePostModalState();
 
@@ -242,6 +244,7 @@ const useResponseUpload = ({
         if (res.data.crowdfunding) responseObj = res.data.crowdfunding.response;
         // @ts-ignore
         if (responseObj) handleUpdateResponseVideo(responseObj);
+        setResponseUploadSuccess(true)
         handleUpdatePostStatus('SUCCEEDED');
         setUploadedResponseVideoUrl('');
       }
@@ -397,6 +400,7 @@ const useResponseUpload = ({
     videoProcessing,
     uploadedResponseVideoUrl,
     responseUploading,
+    responseUploadSuccess,
     responseFileUploadETA,
     responseFileUploadProgress,
     responseFileUploadLoading,

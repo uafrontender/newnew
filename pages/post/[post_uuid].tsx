@@ -173,6 +173,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'modal-Post',
+    'modal-ResponseSuccessModal',
     'component-PostCard',
     'modal-PaymentModal',
   ]);

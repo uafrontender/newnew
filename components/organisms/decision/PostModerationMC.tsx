@@ -154,6 +154,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       uploadedResponseVideoUrl,
       videoProcessing,
       responseUploading,
+      responseUploadSuccess,
     } = useResponseUpload({
       postId: post.postUuid,
       postStatus,
@@ -680,6 +681,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
                   !responseFileUploadLoading &&
                   !responseFileProcessingLoading
                 }
+                responseUploadSuccess={responseUploadSuccess}
                 winningOptionMc={winningOption}
                 handleUploadResponse={handleUploadVideoProcessed}
               />

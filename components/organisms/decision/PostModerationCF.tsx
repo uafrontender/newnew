@@ -172,6 +172,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
       uploadedResponseVideoUrl,
       videoProcessing,
       responseUploading,
+      responseUploadSuccess,
     } = useResponseUpload({
       postId: post.postUuid,
       postStatus,
@@ -626,6 +627,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
                   !responseFileUploadLoading &&
                   !responseFileProcessingLoading
                 }
+                responseUploadSuccess={responseUploadSuccess}
                 moneyBacked={totalAmount as newnewapi.MoneyAmount}
                 handleUploadResponse={handleUploadVideoProcessed}
               />

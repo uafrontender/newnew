@@ -42,6 +42,7 @@ interface IPostResponseTabModeration {
   postTitle: string;
   responseUploading: boolean;
   responseReadyToBeUploaded: boolean;
+  responseUploadSuccess: boolean;
   winningOptionAc?: newnewapi.Auction.Option;
   winningOptionMc?: newnewapi.MultipleChoice.Option;
   moneyBacked?: newnewapi.MoneyAmount;
@@ -56,6 +57,7 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
     postTitle,
     responseUploading,
     responseReadyToBeUploaded,
+    responseUploadSuccess,
     winningOptionAc,
     winningOptionMc,
     moneyBacked,
@@ -69,6 +71,40 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
     const [earnedAmount, setEarnedAmount] =
       useState<newnewapi.MoneyAmount | undefined>(undefined);
     const [earnedAmountLoading, setEarnedAmountLoading] = useState(false);
+
+    const amountSwitch = useCallback(() => {
+      if (earnedAmount && !earnedAmountLoading) {
+        return `$${formatNumber(earnedAmount.usdCents / 100 ?? 0, false)}`;
+      }
+
+      if (postType === 'ac' && winningOptionAc?.totalAmount?.usdCents) {
+        return `$${formatNumber(
+          winningOptionAc.totalAmount.usdCents / 100 ?? 0,
+          true
+        )}`;
+      }
+      if (postType === 'mc' && winningOptionMc?.voteCount) {
+        return `$${formatNumber(
+          winningOptionMc.voteCount *
+            Math.round(appConstants.mcVotePrice / 100),
+          true
+        )}`;
+      }
+
+      if (postType === 'mc' && moneyBacked?.usdCents) {
+        return `$${formatNumber(moneyBacked.usdCents / 100 ?? 0, true)}`;
+      }
+
+      return '';
+    }, [
+      appConstants.mcVotePrice,
+      earnedAmount,
+      earnedAmountLoading,
+      moneyBacked,
+      postType,
+      winningOptionAc?.totalAmount?.usdCents,
+      winningOptionMc?.voteCount,
+    ]);
 
     // Share
     const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -467,7 +503,11 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
           {t('postResponseTabModeration.awaiting.postResponseBtn')}
         </SUploadButton>
         {/* Success modal */}
-        <PostResponseSuccessModal isOpen zIndex={20} />
+        <PostResponseSuccessModal
+          amount={amountSwitch()}
+          isOpen={responseUploadSuccess}
+          zIndex={20}
+        />
       </SContainer>
     );
   };
