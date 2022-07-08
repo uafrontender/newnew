@@ -75,16 +75,16 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
         setCurrentTime(e.time);
       }
 
-      if (player.current.getCurrentTime() >= thumbnails.endTime) {
-        player.current.pause();
-        player.current.seek(thumbnails.startTime);
-        player.current.play();
+      if (player.current?.getCurrentTime() >= thumbnails.endTime) {
+        player.current?.pause();
+        player.current?.seek(thumbnails.startTime);
+        player.current?.play();
       }
     },
     [setCurrentTime, thumbnails]
   );
   const handlePlaybackFinished = useCallback(() => {
-    player.current.play();
+    player.current?.play();
   }, []);
   const toggleThumbnailVideoMuted = useCallback(() => {
     setIsMuted(!isMuted);
@@ -92,7 +92,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   const destroyPlayer = useCallback(() => {
     if (player.current != null) {
       setInit(false);
-      player.current.destroy();
+      player.current?.destroy();
     }
   }, []);
   const setupPlayer = useCallback(() => {
@@ -108,17 +108,17 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
     if (!isLoading && !loaded) {
       setIsLoading(true);
 
-      player.current.load(playerSource).then(
+      player.current?.load(playerSource).then(
         () => {
           setLoaded(true);
           setIsLoading(false);
 
           // TODO: Handle the error as it can can fail due to...
           // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
-          player.current.play();
+          player.current?.play();
 
           if (setDuration) {
-            setDuration(player.current.getDuration());
+            setDuration(player.current?.getDuration());
           }
         },
         (reason: any) => {
@@ -132,23 +132,23 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
     }
   }, [isLoading, loaded, playerSource, setDuration]);
   const subscribe = useCallback(() => {
-    if (player.current.handlePlaybackFinished) {
-      player.current.off(
+    if (player.current?.handlePlaybackFinished) {
+      player.current?.off(
         PlayerEvent.PlaybackFinished,
-        player.current.handlePlaybackFinished
+        player.current?.handlePlaybackFinished
       );
     }
-    player.current.on(PlayerEvent.PlaybackFinished, handlePlaybackFinished);
+    player.current?.on(PlayerEvent.PlaybackFinished, handlePlaybackFinished);
     player.current.handlePlaybackFinished = handlePlaybackFinished;
 
     if (thumbnails?.endTime) {
-      if (player.current.handleTimeChange) {
-        player.current.off(
+      if (player.current?.handleTimeChange) {
+        player.current?.off(
           PlayerEvent.TimeChanged,
-          player.current.handleTimeChange
+          player.current?.handleTimeChange
         );
       }
-      player.current.on(PlayerEvent.TimeChanged, handleTimeChange);
+      player.current?.on(PlayerEvent.TimeChanged, handleTimeChange);
       player.current.handleTimeChange = handleTimeChange;
     }
   }, [handlePlaybackFinished, handleTimeChange, thumbnails?.endTime]);
@@ -175,9 +175,9 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   useEffect(() => {
     if (player.current && loaded) {
       if (isMuted) {
-        player.current.mute();
+        player.current?.mute();
       } else {
-        player.current.unmute();
+        player.current?.unmute();
       }
     }
   }, [player, isMuted, loaded]);
