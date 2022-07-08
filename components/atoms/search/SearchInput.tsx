@@ -164,8 +164,6 @@ const SearchInput: React.FC = React.memo(() => {
       if (res.data.creators) setResultsCreators(res.data.creators);
       if (res.data.posts) setResultsPosts(res.data.posts);
       if (res.data.hashtags) setResultsHashtags(res.data.hashtags);
-      // TODO: Enable when API updated
-      // if (res.data.tags) setResultsTags(res.data.tags);
       setIsLoading(false);
     } catch (err) {
       setIsLoading(false);
