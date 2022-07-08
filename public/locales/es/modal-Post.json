@@ -512,7 +512,8 @@
         }
       },
       "optionCard": {
-        "pickButton": "Seleccionar"
+        "pickButton": "Seleccionar",
+        "pickedButton_NEED_TRANSLATION": "Chosen"
       }
     },
     "winnerTab": {
@@ -551,6 +552,7 @@
     }
   },
   "cfPostModeration": {
+    "moneyRaised_NEED_TRANSLATION": "Total raised",
     "winnerTab": {
       "winnerOptionCard": {
         "backersToldYou": "backers successfully funded",
@@ -694,6 +696,33 @@
   "heroPopupCF": {
     "title": "Goals",
     "text": "Reúne dinero con otros para respaldar los objetivos de tus creadores favoritos. Si un número suficiente de personas respalda el objetivo, ¡verás cómo el creador lo realiza!"
+  },
+  "postResponseTabModeration_NEED_TRANSLATION": {
+    "awaiting": {
+      "topHeader": "Time to post \nyour response!",
+      "postResponseBtn": "Post Response",
+      "youWillGet": "You'll get"
+    },
+    "succeeded": {
+      "topHeader": "Response \npublished!",
+      "youMade": "You made",
+      "shareBtn": "Share",
+      "linkCopied": "Link copied!"
+    },
+    "winner": {
+      "inResponseToYourPost": "In response to your post",
+      "ac": {
+        "numBiddersChoseSingular": "{{amount}} bidder chose",
+        "numBiddersChose": "{{amount}} bidders chose",
+        "optionCreator": "<0>{{nickname}}</0>'s bid"
+      },
+      "mc": {
+        "numBiddersChoseSingular": "{{amount}} voter chose",
+        "numBiddersChose": "{{amount}} voters chose",
+        "optionOwn": "the option",
+        "optionCreator": "<0>{{nickname}}</0>'s option"
+      }
+    }
   },
   "tutorials": {
     "ac": {
