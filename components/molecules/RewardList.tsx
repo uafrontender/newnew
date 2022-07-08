@@ -15,13 +15,15 @@ interface RewardListI {
   rewards: Reward[];
 }
 
+// TODO: use reward type
+// TODO: add reward item UI
 export const RewardList: React.FC<RewardListI> = ({ rewards }) => {
   const { t } = useTranslation('page-Rewards');
 
   return (
     <RewardsContainer>
       {rewards.map((reward) => (
-        <RewardCard received={reward.received}>
+        <RewardCard key={reward.text} received={reward.received}>
           <RewardImage>
             <img src={reward.imageUrl} alt='' />
           </RewardImage>

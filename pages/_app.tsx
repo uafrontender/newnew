@@ -59,6 +59,7 @@ import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
 import RewardContextProvider from '../contexts/rewardContext';
+import ModalNotificationsContextProvider from '../contexts/modalNotificationsProvider';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -180,41 +181,44 @@ const MyApp = (props: IMyApp): ReactElement => {
               <PersistanceProvider store={store}>
                 <SyncUserWrapper>
                   <NotificationsProvider>
-                    <BlockedUsersProvider>
-                      <FollowingsContextProvider>
-                        {/* <WalletContextProvider> */}
-                        <RewardContextProvider>
-                          <SubscriptionsProvider>
-                            <ChatsProvider>
-                              <ResizeMode>
-                                <PostModalContextProvider>
-                                  <GlobalTheme initialTheme={colorMode}>
-                                    <>
-                                      <ToastContainer />
-                                      <VideoProcessingWrapper>
-                                        {!pageProps.error ? (
-                                          getLayout(
-                                            <Component {...pageProps} />
-                                          )
-                                        ) : (
-                                          <Error
-                                            title={pageProps.error?.message}
-                                            statusCode={
-                                              pageProps.error?.statusCode ?? 500
-                                            }
-                                          />
-                                        )}
-                                      </VideoProcessingWrapper>
-                                    </>
-                                  </GlobalTheme>
-                                </PostModalContextProvider>
-                              </ResizeMode>
-                            </ChatsProvider>
-                          </SubscriptionsProvider>
-                        </RewardContextProvider>
-                        {/* </WalletContextProvider> */}
-                      </FollowingsContextProvider>
-                    </BlockedUsersProvider>
+                    <ModalNotificationsContextProvider>
+                      <BlockedUsersProvider>
+                        <FollowingsContextProvider>
+                          {/* <WalletContextProvider> */}
+                          <RewardContextProvider>
+                            <SubscriptionsProvider>
+                              <ChatsProvider>
+                                <ResizeMode>
+                                  <PostModalContextProvider>
+                                    <GlobalTheme initialTheme={colorMode}>
+                                      <>
+                                        <ToastContainer />
+                                        <VideoProcessingWrapper>
+                                          {!pageProps.error ? (
+                                            getLayout(
+                                              <Component {...pageProps} />
+                                            )
+                                          ) : (
+                                            <Error
+                                              title={pageProps.error?.message}
+                                              statusCode={
+                                                pageProps.error?.statusCode ??
+                                                500
+                                              }
+                                            />
+                                          )}
+                                        </VideoProcessingWrapper>
+                                      </>
+                                    </GlobalTheme>
+                                  </PostModalContextProvider>
+                                </ResizeMode>
+                              </ChatsProvider>
+                            </SubscriptionsProvider>
+                          </RewardContextProvider>
+                          {/* </WalletContextProvider> */}
+                        </FollowingsContextProvider>
+                      </BlockedUsersProvider>
+                    </ModalNotificationsContextProvider>
                   </NotificationsProvider>
                 </SyncUserWrapper>
               </PersistanceProvider>

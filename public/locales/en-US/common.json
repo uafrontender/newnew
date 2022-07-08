@@ -157,5 +157,17 @@
     "subscriptionCost": "${{amount}} Monthly",
     "subscribed": "subscribed",
     "cancelled": "cancelled"
+  },
+  "rewards": {
+    "1": {
+      "notification": {
+        "title": "You earned $2!",
+        "description": "...for placing a bid 0f 4$",
+        "button": "Great"
+      },
+      "item": {
+        "title": "Place a bid of 4$"
+      }
+    }
   }
 }

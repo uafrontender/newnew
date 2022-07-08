@@ -29,6 +29,7 @@ import ReportBugButton from '../molecules/ReportBugButton';
 import { usePostModalState } from '../../contexts/postModalContext';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+import ModalNotifications from '../molecules/ModalNotifications';
 
 interface IGeneral {
   withChat?: boolean;
@@ -242,6 +243,7 @@ export const General: React.FC<IGeneral> = (props) => {
             zIndex={moreMenuMobileOpen ? 9 : undefined}
           />
         </SWrapper>
+        <ModalNotifications />
       </SkeletonTheme>
     </ErrorBoundary>
   );

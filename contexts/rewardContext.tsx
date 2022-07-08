@@ -9,7 +9,9 @@ import React, {
   useContext,
 } from 'react';
 import { getRewardBalance } from '../api/endpoints/payments';
+import assets from '../constants/assets';
 import { useAppSelector } from '../redux-store/store';
+import { ModalNotificationsContext } from './modalNotificationsProvider';
 import { SocketContext } from './socketContext';
 
 export const RewardContext = createContext<{
@@ -29,6 +31,7 @@ interface IRewardContextProvider {
 const RewardContextProvider: React.FC<IRewardContextProvider> = ({
   children,
 }) => {
+  const { show } = useContext(ModalNotificationsContext);
   const user = useAppSelector((state) => state.user);
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -102,8 +105,13 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
 
       if (!decoded) return;
 
-      // TODO: Show modal, push to stack of modals
-      console.log(decoded.reward as newnewapi.Reward);
+      // TODO: Use different texts and images based on Notification type
+      show({
+        image: assets.decision.gold,
+        titleKey: 'rewards.1.notification.title',
+        descriptionKey: 'rewards.1.notification.description',
+        buttonTextKey: 'rewards.1.notification.button',
+      });
     };
 
     if (socketConnection && user.loggedIn) {
@@ -119,6 +127,22 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, user.loggedIn]);
+
+  // TODO: remove test data
+  useEffect(() => {
+    const interval = setInterval(() => {
+      show({
+        image: assets.decision.gold,
+        titleKey: 'rewards.1.notification.title',
+        descriptionKey: 'rewards.1.notification.description',
+        buttonTextKey: 'rewards.1.notification.button',
+      });
+    }, 10000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <RewardContext.Provider value={contextValue}>
