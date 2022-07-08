@@ -255,7 +255,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
           .map((p, i) =>
             p.usdCents ? (
               <EllipseModalButton
-                key={p.usdCents}
+                key={`${p.usdCents}_${i}`}
                 onClick={() => {
                   handleSetPledgeAmountAndOpenPaymentModal(
                     p.usdCents ? p.usdCents : 0

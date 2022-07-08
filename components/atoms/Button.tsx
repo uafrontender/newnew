@@ -120,6 +120,7 @@ const Button = React.memo(
       return (
         <SButton
           ref={(el) => {
+            ref(el);
             if (parentRef) {
               // eslint-disable-next-line no-param-reassign
               parentRef.current = el;
@@ -141,7 +142,7 @@ const Button = React.memo(
           onTouchEndCapture={handleRestoreRippling}
           {...rest}
         >
-          <span ref={ref}>{children}</span>
+          <span>{children}</span>
           {withProgress && <SProgress view={rest.view} progress={progress} />}
           {loading && (
             <SLoader size={rest.size}>
