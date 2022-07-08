@@ -123,7 +123,7 @@ export const Rewards = () => {
                 </Step>
                 <Step>
                   <StepImage>
-                    <img src={assets.decision.votes} alt='spend' />
+                    <img src={assets.common.darkAc} alt='spend' />
                   </StepImage>
                   <StepCard>
                     <Text variant={2} weight={600}>
