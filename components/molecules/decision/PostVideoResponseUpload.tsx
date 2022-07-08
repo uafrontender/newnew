@@ -302,7 +302,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
             >
               {t('postVideo.uploadResponseForm.button.cancel')}
             </SLoadingBottomBlockButton> */}
-            <SLoadingPublishButton
+            {/* <SLoadingPublishButton
               view='primary'
               onClick={() => {
                 handleUploadVideoNotProcessed();
@@ -311,7 +311,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
               {t(
                 'postVideo.uploadResponseForm.video.processing.uploadNonProcessed'
               )}
-            </SLoadingPublishButton>
+            </SLoadingPublishButton> */}
           </SLoadingBottomBlock>
           {/* <SSpinnerWrapper>
             <InlineSVG svg={spinnerIcon} width='16px' />
@@ -372,7 +372,6 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
     localFile,
-    handleUploadVideoNotProcessed,
     value,
     thumbnails,
     handleDeleteVideoShow,
@@ -585,11 +584,11 @@ const SLoadingBottomBlockButton = styled(Button)`
   }
 `;
 
-const SLoadingPublishButton = styled(Button)`
-  margin-left: auto;
+// const SLoadingPublishButton = styled(Button)`
+//   margin-left: auto;
 
-  padding: 10px;
-`;
+//   padding: 10px;
+// `;
 
 const SLoadingProgress = styled.div`
   width: 100%;
