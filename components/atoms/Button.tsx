@@ -52,7 +52,7 @@ const Button = React.memo(
         onClick,
         ...rest
       } = props;
-      const { ref, inView }: { ref: any; inView: boolean } = useInView();
+      const { ref, inView } = useInView();
 
       // Progress effect
       const [progress, setProgress] = useState(0);
@@ -120,8 +120,6 @@ const Button = React.memo(
       return (
         <SButton
           ref={(el) => {
-            ref.current = el;
-
             if (parentRef) {
               // eslint-disable-next-line no-param-reassign
               parentRef.current = el;
@@ -143,7 +141,7 @@ const Button = React.memo(
           onTouchEndCapture={handleRestoreRippling}
           {...rest}
         >
-          <span>{children}</span>
+          <span ref={ref}>{children}</span>
           {withProgress && <SProgress view={rest.view} progress={progress} />}
           {loading && (
             <SLoader size={rest.size}>
