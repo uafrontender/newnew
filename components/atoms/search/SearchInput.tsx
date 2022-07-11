@@ -315,9 +315,7 @@ const SearchInput: React.FC = React.memo(() => {
                 <PopularTagsResults hashtags={resultsHashtags} />
               )}
               <SButton
-                onClick={() => {
-                  router.push(`/search?query=${searchValue}&tab=posts`);
-                }}
+                onClick={() => handleSeeResults(searchValue)}
                 view='quaternary'
               >
                 {t('search.allResults')}
