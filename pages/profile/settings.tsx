@@ -13,6 +13,7 @@ import { useCookies } from 'react-cookie';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
+import { useUpdateEffect } from 'react-use';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
@@ -57,7 +58,7 @@ const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
   // Translations
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
   // TEMP
   // const { t: commonT } = useTranslation('common');
   // useCookies
@@ -202,7 +203,7 @@ const MyProfileSettingsIndex = () => {
 
   const accordionSections: AccordionSection[] = [
     {
-      title: t('Settings.sections.PersonalInformation.title'),
+      title: t('Settings.sections.personalInformation.title'),
       content: (
         <SettingsPersonalInformationSection
           currentEmail={userData?.email ?? ''}
@@ -231,11 +232,11 @@ const MyProfileSettingsIndex = () => {
       ),
     },
     {
-      title: t('Settings.sections.Notifications.title'),
+      title: t('Settings.sections.notifications.title'),
       content: <SettingsNotificationsSection />,
     },
     {
-      title: t('Settings.sections.Transactions.title'),
+      title: t('Settings.sections.transactions.title'),
       content: (
         <TransactionsSection
           transactions={myTransactions}
@@ -247,7 +248,7 @@ const MyProfileSettingsIndex = () => {
       hidden: myTransactionsTotal === 0,
     },
     {
-      title: t('Settings.sections.Privacy.title'),
+      title: t('Settings.sections.privacy.title'),
       content: (
         <PrivacySection
           isSpendingHidden={spendingHidden}
@@ -262,7 +263,7 @@ const MyProfileSettingsIndex = () => {
     },
   ];
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (!loggedIn) router.push('/');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loggedIn, router]);
@@ -288,12 +289,12 @@ const MyProfileSettingsIndex = () => {
     };
 
     if (socketConnection) {
-      socketConnection.on('MeUpdated', handlerSocketMeUpdated);
+      socketConnection?.on('MeUpdated', handlerSocketMeUpdated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('MeUpdated', handlerSocketMeUpdated);
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('MeUpdated', handlerSocketMeUpdated);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -339,7 +340,7 @@ const MyProfileSettingsIndex = () => {
       </Head>
       <SMain>
         <SGoBackButton onClick={() => router.back()}>
-          {isMobile ? t('Settings.heading') : t('Settings.goBackBtn')}
+          {isMobile ? t('Settings.heading') : t('Settings.button.back')}
         </SGoBackButton>
         {!isMobile ? (
           <SHeadline variant={4}>{t('Settings.heading')}</SHeadline>
@@ -384,7 +385,7 @@ const MyProfileSettingsIndex = () => {
         <SBottomLinksDiv>
           {/* TEMP */}
           {/* <SBlockOptionButton>
-            {commonT(`selected-language-title-${router.locale}`)}
+            {commonT(`language.selectedLanguageTitle/${router.locale}`)}
           </SBlockOptionButton> */}
           <SBlockOption href='https://faqs.newnew.co' target='_blank'>
             {t('Settings.bottomDiv.help')}
@@ -496,7 +497,7 @@ export async function getStaticProps(context: {
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
     'common',
-    'profile',
+    'page-Profile',
   ]);
 
   return {

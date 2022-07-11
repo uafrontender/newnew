@@ -43,31 +43,31 @@ const ReportModal: React.FC<IReportModal> = React.memo(
       () => [
         {
           id: newnewapi.ReportingReason.SPAM,
-          title: t('modal.report-user.options.spam'),
+          title: t('modal.reportUser.options.spam'),
         },
         {
           id: newnewapi.ReportingReason.HARMFUL,
-          title: t('modal.report-user.options.abuse'),
+          title: t('modal.reportUser.options.abuse'),
         },
         {
           id: newnewapi.ReportingReason.SUICIDE,
-          title: t('modal.report-user.options.suicide'),
+          title: t('modal.reportUser.options.suicide'),
         },
         {
           id: newnewapi.ReportingReason.HATE,
-          title: t('modal.report-user.options.hate-speech'),
+          title: t('modal.reportUser.options.hateSpeech'),
         },
         {
           id: newnewapi.ReportingReason.HARASSMENT,
-          title: t('modal.report-user.options.harassment'),
+          title: t('modal.reportUser.options.harassment'),
         },
         {
           id: newnewapi.ReportingReason.COPYRIGHT,
-          title: t('modal.report-user.options.copyright'),
+          title: t('modal.reportUser.options.copyright'),
         },
         {
           id: newnewapi.ReportingReason.OTHER,
-          title: t('modal.report-user.options.other'),
+          title: t('modal.reportUser.options.other'),
         },
       ],
       [t]
@@ -121,15 +121,15 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     return (
       <>
         <Modal show={show} onClose={handleClose}>
-          <SContainer>
-            <SModal onClick={preventParentClick()}>
+          <SContainer onClick={preventParentClick()}>
+            <SModal>
               <SModalHeader>
                 {isMobile && <GoBackButton onClick={handleClose} />}
                 <SModalTitle>
-                  {t('modal.report-user.title')} {reportedDisplayname}
+                  {t('modal.reportUser.title')} {reportedDisplayname}
                 </SModalTitle>
               </SModalHeader>
-              <SModalMessage>{t('modal.report-user.subtitle')}</SModalMessage>
+              <SModalMessage>{t('modal.reportUser.subtitle')}</SModalMessage>
               <SCheckBoxList>
                 {reportTypes.map((item) => (
                   <SCheckBoxWrapper key={item.id}>
@@ -154,14 +154,14 @@ const ReportModal: React.FC<IReportModal> = React.memo(
                   value={message}
                   onChange={handleMessageChange}
                   placeholder={`${t(
-                    'modal.report-user.additional-info.placeholder'
+                    'modal.reportUser.additionalInfo.placeholder'
                   )}`}
                 />
               </STextAreaWrapper>
               <SModalButtons>
                 {!isMobile && (
                   <SCancelButton onClick={handleClose}>
-                    {t('modal.report-user.button-cancel')}
+                    {t('modal.reportUser.button.cancel')}
                   </SCancelButton>
                 )}
                 <SConfirmButton
@@ -176,19 +176,19 @@ const ReportModal: React.FC<IReportModal> = React.memo(
           </SContainer>
         </Modal>
         <Modal show={reportSent} onClose={handleClose}>
-          <SContainer>
+          <SContainer onClick={preventParentClick()}>
             <ConformationContainer>
               <CloseButton onClick={handleClose}>
                 <InlineSvg svg={CloseIcon} />
               </CloseButton>
               <SConformationTitle>
-                {t('modal.report-sent.title')}
+                {t('modal.reportSent.title')}
               </SConformationTitle>
               <SConformationText>
-                {t('modal.report-sent.subtitle')}
+                {t('modal.reportSent.subtitle')}
               </SConformationText>
               <SAcknowledgementButton view='primaryGrad' onClick={handleClose}>
-                {t('modal.report-sent.button')}
+                {t('modal.reportSent.button')}
               </SAcknowledgementButton>
             </ConformationContainer>
           </SContainer>

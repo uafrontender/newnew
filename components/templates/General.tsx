@@ -27,23 +27,28 @@ import { useNotifications } from '../../contexts/notificationsContext';
 import { useGetChats } from '../../contexts/chatContext';
 import ReportBugButton from '../molecules/ReportBugButton';
 import { usePostModalState } from '../../contexts/postModalContext';
+import useHasMounted from '../../utils/hooks/useHasMounted';
+import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 
 interface IGeneral {
-  children: React.ReactNode;
   withChat?: boolean;
   specialStatusBarColor?: string;
   restrictMaxWidth?: boolean;
+  children: React.ReactNode;
 }
 
 export const General: React.FC<IGeneral> = (props) => {
-  const { children, withChat, specialStatusBarColor, restrictMaxWidth } = props;
+  const { withChat, specialStatusBarColor, restrictMaxWidth, children } = props;
   const user = useAppSelector((state) => state.user);
   const { banner, resizeMode } = useAppSelector((state) => state.ui);
   const theme = useTheme();
   const [cookies] = useCookies();
   const { unreadNotificationCount } = useNotifications();
-  const { unreadCount } = useGetChats();
+  const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
   const { postOverlayOpen } = usePostModalState();
+  const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
+
+  const hasMounted = useHasMounted();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
 
@@ -106,13 +111,20 @@ export const General: React.FC<IGeneral> = (props) => {
             width: '33%',
             counter: unreadNotificationCount,
           },
-          {
-            key: 'dms',
-            url: '/direct-messages',
-            width: '33%',
-            counter: unreadCount,
-          },
-        ];
+        ].concat(
+          (user.userData?.options?.isOfferingSubscription &&
+            mySubscribersTotal > 0) ||
+            creatorsImSubscribedTo.length > 0
+            ? [
+                {
+                  key: 'dms',
+                  url: '/direct-messages',
+                  width: '33%',
+                  counter: unreadCount,
+                },
+              ]
+            : []
+        );
       }
     }
 
@@ -121,7 +133,10 @@ export const General: React.FC<IGeneral> = (props) => {
     user.loggedIn,
     unreadNotificationCount,
     user.userData?.options?.isCreator,
+    user.userData?.options?.isOfferingSubscription,
     unreadCount,
+    creatorsImSubscribedTo.length,
+    mySubscribersTotal,
   ]);
 
   useOverlay(wrapperRef);
@@ -132,18 +147,16 @@ export const General: React.FC<IGeneral> = (props) => {
     resizeMode
   );
 
-  const [isOpenedChat, setIsOpenedChat] = useState(false);
-
   const openChat = () => {
-    setIsOpenedChat(true);
+    setMobileChatOpened(true);
   };
 
   const closeChat = () => {
-    setIsOpenedChat(false);
+    setMobileChatOpened(false);
   };
 
   const chatButtonVisible =
-    withChat && user.userData?.options?.isOfferingSubscription;
+    isMobile && withChat && user.userData?.options?.isOfferingSubscription;
 
   const mobileNavigationVisible = isMobile && scrollDirection !== 'down';
 
@@ -184,23 +197,33 @@ export const General: React.FC<IGeneral> = (props) => {
             </Container>
           </SContent>
           <Footer />
-          <BottomNavigation
-            collection={bottomNavigation}
-            moreMenuMobileOpen={moreMenuMobileOpen}
-            handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-            visible={mobileNavigationVisible}
-          />
-          <SortingContainer
-            id='sorting-container'
-            withCookie={cookies.accepted !== 'true'}
-            bottomNavigationVisible={mobileNavigationVisible}
-          />
-          <CookieContainer bottomNavigationVisible={mobileNavigationVisible}>
-            <Cookie />
-          </CookieContainer>
+          {hasMounted && (
+            <>
+              <BottomNavigation
+                collection={bottomNavigation}
+                moreMenuMobileOpen={moreMenuMobileOpen}
+                handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
+                visible={mobileNavigationVisible}
+              />
+              <SortingContainer
+                id='sorting-container'
+                withCookie={cookies.accepted !== 'true'}
+                bottomNavigationVisible={mobileNavigationVisible}
+              />
+              <CookieContainer
+                bottomNavigationVisible={mobileNavigationVisible}
+                zIndex={moreMenuMobileOpen ? 9 : 10}
+              >
+                <Cookie />
+              </CookieContainer>
+            </>
+          )}
           {chatButtonVisible && (
-            <ChatContainer bottomNavigationVisible={mobileNavigationVisible}>
-              {!isOpenedChat ? (
+            <ChatContainer
+              bottomNavigationVisible={mobileNavigationVisible}
+              zIndex={moreMenuMobileOpen ? 9 : 10}
+            >
+              {!mobileChatOpened ? (
                 <FloatingMessages withCounter openChat={openChat} />
               ) : (
                 <MobileDashBoardChat closeChat={closeChat} />
@@ -216,6 +239,7 @@ export const General: React.FC<IGeneral> = (props) => {
               (chatButtonVisible ? 72 : 0)
             }
             right={4}
+            zIndex={moreMenuMobileOpen ? 9 : undefined}
           />
         </SWrapper>
       </SkeletonTheme>
@@ -277,12 +301,13 @@ const SContent = styled.main`
 
 interface ICookieContainer {
   bottomNavigationVisible: boolean;
+  zIndex: number;
 }
 
 const CookieContainer = styled.div<ICookieContainer>`
   left: 50%;
   bottom: ${(props) => (props.bottomNavigationVisible ? 62 : 6)}px;
-  z-index: 10;
+  z-index: ${(props) => props.zIndex};
   position: fixed;
   transform: translateX(-50%);
   transition: bottom ease 0.5s;
@@ -295,12 +320,13 @@ const CookieContainer = styled.div<ICookieContainer>`
 
 interface IChatContainer {
   bottomNavigationVisible: boolean;
+  zIndex: number;
 }
 
 const ChatContainer = styled.div<IChatContainer>`
   right: 16px;
   bottom: ${(props) => (props.bottomNavigationVisible ? 72 : 16)}px;
-  z-index: 10;
+  z-index: ${(props) => props.zIndex};
   position: fixed;
   transition: bottom ease 0.5s;
 `;

@@ -32,7 +32,7 @@ export default class MyDocument extends Document {
             {initialProps.styles}
             {sheet.getStyleElement()}
           </>
-        ),
+        ) as any,
       };
     } finally {
       sheet.seal();
@@ -75,9 +75,9 @@ export default class MyDocument extends Document {
               __html: `
                 window.onUsersnapCXLoad = function(api) {
                   // store the Usersnap global api on the window, if case you want to use it in other contexts
-                  window.Usersnap = api; 
+                  window.Usersnap = api;
                   api.init();
-              }         
+              }
               `,
             }}
           />

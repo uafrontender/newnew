@@ -14,12 +14,10 @@ import GoBackButton from '../GoBackButton';
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import OnboardingBioTextarea from './OnboardingBioTextarea';
-import OnboardingTagsSelection from './OnboardingTagsSelection';
-import { setMyCreatorTags, updateMe } from '../../../api/endpoints/user';
+import { updateMe } from '../../../api/endpoints/user';
 import {
   logoutUserClearCookiesAndRedirect,
   setUserData,
-  setCreatorData,
 } from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
 
@@ -36,7 +34,7 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
       break;
     }
     case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'innappropriate';
+      errorMsg = 'inappropriate';
       break;
     }
     case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION: {
@@ -51,15 +49,12 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   return errorMsg;
 };
 
-interface IOnboardingSectionAbout {
-  availableTags: newnewapi.ICreatorTag[];
-  currentTags: newnewapi.ICreatorTag[];
-}
+interface IOnboardingSectionAbout {}
 
 const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
-  ({ availableTags, currentTags }) => {
+  () => {
     const router = useRouter();
-    const { t } = useTranslation('creator-onboarding');
+    const { t } = useTranslation('page-CreatorOnboarding');
     const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.user);
     const { resizeMode } = useAppSelector((state) => state.ui);
@@ -84,7 +79,7 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
 
           const res = await validateText(payload);
 
-          if (!res.data?.status) throw new Error('An error occured');
+          if (!res.data?.status) throw new Error('An error occurred');
 
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
             setBioError(errorSwitch(res.data?.status));
@@ -129,21 +124,6 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
       validateBioViaApiDebounced(e.target.value);
     };
 
-    // Tags
-    const [selectedTags, setSelectedTags] = useState(currentTags);
-
-    const handleAddTag = (tag: newnewapi.ICreatorTag) => {
-      if (selectedTags.find((i) => i.id?.toString() === tag.id?.toString()))
-        return;
-      setSelectedTags((tags) => [...tags, tag]);
-    };
-
-    const handleRemoveTag = (tag: newnewapi.ICreatorTag) => {
-      setSelectedTags((tags) =>
-        tags.filter((i) => i.id?.toString() !== tag.id?.toString())
-      );
-    };
-
     // Is form valid
     const [isFormValid, setIsFormValid] = useState(false);
 
@@ -166,21 +146,6 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
           })
         );
 
-        const updateTagsPayload = new newnewapi.SetMyCreatorTagsRequest({
-          tagIds: selectedTags.map((i) => i.id) as number[],
-        });
-
-        const updateTagsRes = await setMyCreatorTags(updateTagsPayload);
-
-        if (!updateTagsRes.data || updateTagsRes.error)
-          throw new Error(updateTagsRes.error?.message ?? 'Request failed');
-
-        dispatch(
-          setCreatorData({
-            hasCreatorTags: true,
-          })
-        );
-
         router.push('/creator-onboarding-stripe');
 
         setLoadingModalOpen(false);
@@ -198,46 +163,37 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
           );
         }
       }
-    }, [bioInEdit, dispatch, selectedTags, router]);
+    }, [bioInEdit, dispatch, router]);
 
     useEffect(() => {
-      if (selectedTags.length >= 3 && bioInEdit.length > 0 && bioError === '') {
+      if (bioInEdit.length > 0 && bioError === '') {
         setIsFormValid(true);
       } else {
         setIsFormValid(false);
       }
-    }, [selectedTags, bioError, bioInEdit]);
+    }, [bioError, bioInEdit]);
 
     return (
       <>
         <SContainer>
           {isMobile && <SGoBackButton onClick={() => router.back()} />}
-          <SHeading variant={5}>{t('AboutSection.heading')}</SHeading>
+          <SHeading variant={5}>{t('aboutSection.heading')}</SHeading>
           <STopContainer>
             <SFormItemContainer>
               <OnboardingBioTextarea
                 value={bioInEdit}
                 isValid={bioError === ''}
-                errorCaption={t(`AboutSection.bio.errors.${bioError}`)}
-                placeholder={t('AboutSection.bio.placeholder')}
+                errorCaption={t(`aboutSection.bio.errors.${bioError}`)}
+                placeholder={t('aboutSection.bio.placeholder')}
                 maxChars={150}
                 onChange={handleUpdateBioInEdit}
-              />
-            </SFormItemContainer>
-            <SSeparator />
-            <SFormItemContainer>
-              <OnboardingTagsSelection
-                availableTags={availableTags}
-                selectedTags={selectedTags}
-                handleAddTag={handleAddTag}
-                handleRemoveTag={handleRemoveTag}
               />
             </SFormItemContainer>
           </STopContainer>
           <SControlsDiv>
             {!isMobile && (
               <GoBackButton noArrow onClick={() => router.back()}>
-                {t('AboutSection.backButton')}
+                {t('aboutSection.button.back')}
               </GoBackButton>
             )}
             <Button
@@ -249,9 +205,7 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
               }}
               onClick={() => handleSubmit()}
             >
-              {isMobile
-                ? t('AboutSection.submitMobile')
-                : t('AboutSection.submitDesktop')}
+              {t('aboutSection.button.submit')}
             </Button>
           </SControlsDiv>
         </SContainer>
@@ -324,12 +278,6 @@ const SFormItemContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     /* width: 296px; */
   }
-`;
-
-const SSeparator = styled.div`
-  border-bottom: 1px solid
-    ${({ theme }) => theme.colorsThemed.background.outlines1};
-  margin-bottom: 16px;
 `;
 
 const SControlsDiv = styled.div`

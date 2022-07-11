@@ -2,12 +2,17 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -18,13 +23,14 @@ import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
 import PostFailedBox from './PostFailedBox';
-import PostShareMenu from './PostShareMenu';
-import PostShareModal from './PostShareModal';
+import PostShareEllipseMenu from './PostShareEllipseMenu';
+import PostShareEllipseModal from './PostShareEllipseModal';
 import PostEllipseMenu from './PostEllipseMenu';
 import PostEllipseModal from './PostEllipseModal';
 
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 import { formatNumber } from '../../../utils/format';
 import { markPost } from '../../../api/endpoints/post';
@@ -32,6 +38,7 @@ import { FollowingsContext } from '../../../contexts/followingContext';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -84,7 +91,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -199,32 +206,52 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     }
   }, [hasRecommendations, postType, router]);
 
+  const moreButtonRef: any = useRef();
+  const shareButtonRef: any = useRef();
+
   return (
     <SContainer>
       <SWrapper showSelectingWinnerOption={showSelectingWinnerOption}>
         {postType === 'ac' && amountInBids ? (
           <SBidsAmount>
             <span>${formatNumber(amountInBids / 100 ?? 0, true)}</span>{' '}
-            {t('AcPost.PostTopInfo.in_bids')}
+            {t('acPost.postTopInfo.inBids')}
           </SBidsAmount>
         ) : null}
         {postType === 'mc' && totalVotes ? (
           <SBidsAmount>
             <span>{formatNumber(totalVotes, true).replaceAll(/,/g, ' ')}</span>{' '}
             {totalVotes > 1
-              ? t('McPost.PostTopInfo.votes')
-              : t('McPost.PostTopInfo.vote')}
+              ? t('mcPost.postTopInfo.votes')
+              : t('mcPost.postTopInfo.vote')}
           </SBidsAmount>
         ) : null}
         <CreatorCard>
-          <Link href={`/${creator.username}`}>
+          <a
+            href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
+              creator.username
+            }`}
+          >
             <SAvatarArea>
               <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
             </SAvatarArea>
-          </Link>
-          <Link href={`/${creator.username}`}>
-            <SUsername>{creator.nickname ?? `@${creator.username}`}</SUsername>
-          </Link>
+          </a>
+          <a
+            href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
+              creator.username
+            }`}
+          >
+            <SUsername className='username'>
+              {creator.nickname ?? `@${creator.username}`}{' '}
+              {creator.options?.isVerified && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                />
+              )}
+            </SUsername>
+          </a>
         </CreatorCard>
         <SActionsDiv>
           <SShareButton
@@ -236,6 +263,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               padding: '8px',
             }}
             onClick={() => handleOpenShareMenu()}
+            ref={shareButtonRef}
           >
             <InlineSvg
               svg={ShareIconFilled}
@@ -248,6 +276,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             view='transparent'
             iconOnly
             onClick={() => handleOpenEllipseMenu()}
+            ref={moreButtonRef}
           >
             <InlineSvg
               svg={MoreIconFilled}
@@ -258,14 +287,15 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           </SMoreButton>
           {/* Share menu */}
           {!isMobile && (
-            <PostShareMenu
+            <PostShareEllipseMenu
               postId={postId}
               isVisible={shareMenuOpen}
               onClose={handleCloseShareMenu}
+              anchorElement={shareButtonRef.current}
             />
           )}
           {isMobile && shareMenuOpen ? (
-            <PostShareModal
+            <PostShareEllipseModal
               isOpen={shareMenuOpen}
               zIndex={11}
               postId={postId}
@@ -281,6 +311,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               handleFollowDecision={handleFollowDecision}
               handleReportOpen={handleReportOpen}
               onClose={handleCloseEllipseMenu}
+              anchorElement={moreButtonRef.current}
             />
           )}
           {isMobile && ellipseMenuOpen ? (
@@ -296,15 +327,17 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           ) : null}
         </SActionsDiv>
         <SPostTitle>
-          <Headline variant={5}>{title}</Headline>
+          <Headline variant={5}>
+            <PostTitleContent>{title}</PostTitleContent>
+          </Headline>
         </SPostTitle>
         {showSelectingWinnerOption ? (
           <SSelectingWinnerOption>
             <SHeadline variant={4}>
-              {t('AcPost.PostTopInfo.SelectWinner.title')}
+              {t('acPost.postTopInfo.selectWinner.title')}
             </SHeadline>
             <SText variant={3}>
-              {t('AcPost.PostTopInfo.SelectWinner.body')}
+              {t('acPost.postTopInfo.selectWinner.body')}
             </SText>
             <STrophyImg src={assets.decision.trophy} />
           </SSelectingWinnerOption>
@@ -312,13 +345,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       </SWrapper>
       {postStatus === 'failed' && (
         <PostFailedBox
-          title={t('PostFailedBox.title', {
+          title={t('postFailedBox.title', {
             postType: t(`postType.${postType}`),
           })}
-          body={t(`PostFailedBox.reason.${failureReason}`, {
+          body={t(`postFailedBox.reason.${failureReason}`, {
             creator: getDisplayname(creator),
           })}
-          buttonCaption={t('PostFailedBox.ctaButton', {
+          buttonCaption={t('postFailedBox.buttonText', {
             postTypeMultiple: t(`postType.multiple.${postType}`),
           })}
           imageSrc={
@@ -426,12 +459,12 @@ const CreatorCard = styled.div`
 
   padding-right: 8px;
 
-  & > div:nth-child(2) {
+  .username {
     transition: 0.2s linear;
   }
 
   &:hover {
-    & > div:nth-child(2) {
+    .username {
       color: ${({ theme }) => theme.colorsThemed.text.primary};
     }
   }
@@ -460,7 +493,8 @@ const SAvatarArea = styled.div`
 
 const SUsername = styled.div`
   grid-area: username;
-
+  display: flex;
+  align-items: center;
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;
@@ -574,5 +608,9 @@ const SHeadline = styled(Headline)`
 `;
 
 const SText = styled(Text)`
-  color: #ffffff;
+  color: #fff;
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  margin-left: 2px;
 `;

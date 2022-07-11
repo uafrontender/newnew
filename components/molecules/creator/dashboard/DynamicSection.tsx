@@ -37,7 +37,7 @@ const Tabs = dynamic(() => import('../../Tabs'));
 
 export const DynamicSection = () => {
   const theme = useTheme();
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -178,7 +178,7 @@ export const DynamicSection = () => {
                   </SIndicatorContainer>
                 )}
               </SIconHolder>
-              {t('dashboard.button.dms')}
+              {t('dashboard.button.directMessages')}
             </SButton>
           )}
         </>
@@ -188,6 +188,8 @@ export const DynamicSection = () => {
         animation={animation as TAnimation}
         onAnimationEnd={handleAnimationEnd}
         animateWhenInView={false}
+        delay={0}
+        duration={0.2}
       >
         <SAnimatedContainer ref={containerRef}>
           {tab === 'direct-messages' ? (
@@ -350,7 +352,8 @@ const SAnimatedContainer = styled.div`
   border-radius: 24px;
   width: 500px;
   right: -16px;
-  height: 800px;
+  height: 80vh;
+  max-height: 800px;
 
   ${(props) => props.theme.media.laptop} {
     left: unset;

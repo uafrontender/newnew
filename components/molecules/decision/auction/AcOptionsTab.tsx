@@ -51,6 +51,7 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
+import { formatNumber } from '../../../../utils/format';
 
 interface IAcOptionsTab {
   postId: string;
@@ -87,7 +88,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -170,7 +171,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
       const res = await validateText(payload);
 
-      if (!res.data?.status) throw new Error('An error occured');
+      if (!res.data?.status) throw new Error('An error occurred');
 
       if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
         setNewBidTextValid(false);
@@ -405,6 +406,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     if (actionSectionContainer.current) {
       resizeObserver.observe(actionSectionContainer.current!!);
     }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -425,10 +430,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               <img src={NoContentYetImg.src} alt='No content yet' />
             </SNoOptionsImgContainer>
             <SNoOptionsCaption variant={3}>
-              {t('AcPost.OptionsTab.NoOptions.caption_1')}
+              {t('acPost.optionsTab.noOptions.caption_1')}
             </SNoOptionsCaption>
             <SNoOptionsCaption variant={3}>
-              {t('AcPost.OptionsTab.NoOptions.caption_2')}
+              {t('acPost.optionsTab.noOptions.caption_2')}
             </SNoOptionsCaption>
           </SNoOptionsYet>
         ) : null}
@@ -481,7 +486,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               view='secondary'
               onClick={() => handleLoadBids(pagingToken)}
             >
-              {t('loadMoreBtn')}
+              {t('loadMoreButton')}
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
@@ -495,7 +500,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               value={newBidText}
               disabled={optionBeingSupported !== ''}
               placeholder={t(
-                'AcPost.OptionsTab.ActionSection.suggestionPlaceholder-desktop',
+                'acPost.optionsTab.actionSection.suggestionPlaceholderDesktop',
                 { username: postCreator }
               )}
               onChange={handleUpdateNewOptionText}
@@ -507,7 +512,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               minAmount={minAmount}
               placeholder={t(
-                'AcPost.OptionsTab.ActionSection.amountPlaceholder-desktop',
+                'acPost.optionsTab.actionSection.amountPlaceholderDesktop',
                 { amount: minAmount.toString() }
               )}
               style={{
@@ -529,7 +534,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              {t('AcPost.OptionsTab.ActionSection.placeABidBtn')}
+              {t('acPost.optionsTab.actionSection.placeABidButton')}
             </Button>
             {user?.userTutorialsProgress.remainingAcSteps && (
               <STutorialTooltipTextAreaHolder>
@@ -577,7 +582,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               disabled={optionBeingSupported !== ''}
               autofocus={suggestNewMobileOpen}
               placeholder={t(
-                'AcPost.OptionsTab.ActionSection.suggestionPlaceholder'
+                'acPost.optionsTab.actionSection.suggestionPlaceholder'
               )}
               onChange={handleUpdateNewOptionText}
             />
@@ -607,7 +612,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              {t('AcPost.OptionsTab.ActionSection.placeABidBtn')}
+              {t('acPost.optionsTab.actionSection.placeABidButton')}
             </Button>
           </SSuggestNewContainer>
         </OptionActionMobileModal>
@@ -617,7 +622,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${newBidAmount}`}
+          amount={`$${formatNumber(parseInt(newBidAmount) ?? 0, true)}`}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * 100
           //   ? {}
@@ -631,7 +636,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           bottomCaption={
             <>
               <SPaymentSign variant={3}>
-                {t('AcPost.paymentModalFooter.body', { creator: postCreator })}
+                {t('acPost.paymentModalFooter.body', { creator: postCreator })}
               </SPaymentSign>
               <SPaymentTerms variant={3}>
                 *{' '}
@@ -640,14 +645,14 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
                     href='https://terms.newnew.co'
                     target='_blank'
                   >
-                    {t('AcPost.paymentModalFooter.terms')}
+                    {t('acPost.paymentModalFooter.terms')}
                   </SPaymentTermsLink>
                 </Link>{' '}
-                {t('AcPost.paymentModalFooter.apply')}
+                {t('acPost.paymentModalFooter.apply')}
               </SPaymentTerms>
             </>
           }
-          // payButtonCaptionKey={t('AcPost.paymentModalPayButton')}
+          // payButtonCaptionKey={t('acPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
             <SPaymentModalHeading>
@@ -661,14 +666,14 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
                 />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
-                {t('AcPost.paymentModalHeader.title', { creator: postCreator })}
+                {t('acPost.paymentModalHeader.title', { creator: postCreator })}
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
               {postText}
             </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
-              {t('AcPost.paymentModalHeader.subtitle')}
+              {t('acPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
             <SPaymentModalOptionText variant={5}>
               {newBidText}
@@ -684,7 +689,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         isVisible={paymentSuccesModalOpen}
         closeModal={() => setPaymentSuccesModalOpen(false)}
       >
-        {t('PaymentSuccessModal.ac', {
+        {t('paymentSuccessModal.ac', {
           postCreator,
           postDeadline,
         })}
@@ -693,10 +698,11 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       {isMobile && !suggestNewMobileOpen && postStatus === 'voting' ? (
         <>
           <SActionButton
+            id='action-button-mobile'
             view='primaryGrad'
             onClick={() => setSuggestNewMobileOpen(true)}
           >
-            {t('AcPost.FloatingActionButton.suggestNewBtn')}
+            {t('acPost.floatingActionButton.suggestNewButton')}
           </SActionButton>
           {user?.userTutorialsProgress.remainingAcSteps && (
             <STutorialTooltipHolderMobile>
@@ -1005,7 +1011,7 @@ const SPaymentSign = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap; ;
 `;
 
 const SPaymentTermsLink = styled.a`

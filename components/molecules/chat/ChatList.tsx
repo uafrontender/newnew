@@ -31,6 +31,7 @@ import textTrim from '../../../utils/textTrim';
 import { IChatData } from '../../interfaces/ichat';
 import { useGetChats } from '../../../contexts/chatContext';
 import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
@@ -39,16 +40,30 @@ interface IFunctionProps {
   openChat: (arg: IChatData) => void;
   searchText: string;
   username?: string;
+  switchedTab?: () => void;
+  newLastMessage?: {
+    chatId: number | Long.Long | null | undefined;
+  } | null;
 }
 
 const ChatList: React.FC<IFunctionProps> = ({
   openChat,
   searchText,
   username,
+  switchedTab,
+  newLastMessage,
 }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
   const { unreadCountForCreator, unreadCountForUser } = useGetChats();
   const { ref: scrollRef, inView } = useInView();
   const [activeChatIndex, setActiveChatIndex] = useState<string | null>(null);
@@ -77,11 +92,11 @@ const ChatList: React.FC<IFunctionProps> = ({
     () => [
       {
         id: 'chatRoomsSubs',
-        title: t('usertypes.subscribers'),
+        title: t('userTypes.subscribers'),
       },
       {
         id: 'chatRoomsCreators',
-        title: t('usertypes.subscribing'),
+        title: t('userTypes.subscribing'),
       },
     ],
     [t]
@@ -182,7 +197,7 @@ const ChatList: React.FC<IFunctionProps> = ({
         }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [activeChatIndex]
   );
 
   const fetchLastActiveRoom = async () => {
@@ -219,6 +234,7 @@ const ChatList: React.FC<IFunctionProps> = ({
       if (res.data && res.data.rooms.length > 0) {
         if (res.data.rooms[0].myRole === 1) {
           setActiveTab('chatRoomsCreators');
+          if (isMobileOrTablet && switchedTab !== undefined) switchedTab();
         }
         openRoom(res.data.rooms[0]);
         setUpdatedChat(res.data.rooms[0]);
@@ -252,6 +268,12 @@ const ChatList: React.FC<IFunctionProps> = ({
   }, []);
 
   useEffect(() => {
+    if (newLastMessage) {
+      fetchLastActiveRoom();
+    }
+  }, [newLastMessage]);
+
+  useEffect(() => {
     if (chatRooms && !searchedRooms && isInitialLoaded) {
       fetchLastActiveRoom();
     }
@@ -276,7 +298,7 @@ const ChatList: React.FC<IFunctionProps> = ({
               (chat) => chat.id === updatedChat.id
             ));
       }
-      if (isAlreadyAdded !== undefined) {
+      if (isAlreadyAdded !== undefined && isAlreadyAdded > -1) {
         const arr = displayAllRooms
           ? chatRooms
           : isChatWithSub
@@ -386,14 +408,45 @@ const ChatList: React.FC<IFunctionProps> = ({
         );
       }
       setActiveTab(tabName);
+      if (isMobileOrTablet && switchedTab !== undefined) switchedTab();
     },
-    [activeTab, openChat, chatRoomsCreators, chatRoomsSubs]
+    [
+      activeTab,
+      openChat,
+      chatRoomsCreators,
+      chatRoomsSubs,
+      switchedTab,
+      isMobileOrTablet,
+    ]
   );
 
+  const sortChats = useCallback(() => {
+    if (activeTab === 'chatRoomsSubs') {
+      setChatRoomsSubs((curr) => {
+        const arr = curr;
+        arr.sort(
+          (a, b) =>
+            (b.updatedAt?.seconds as number) - (a.updatedAt?.seconds as number)
+        );
+        return arr;
+      });
+    } else {
+      setChatRoomsCreators((curr) => {
+        const arr = curr;
+        arr.sort(
+          (a, b) =>
+            (b.updatedAt?.seconds as number) - (a.updatedAt?.seconds as number)
+        );
+        return arr;
+      });
+    }
+  }, [activeTab]);
+
   const renderChatItem = useCallback(
-    (chat: newnewapi.IChatRoom, index) => {
+    (chat: newnewapi.IChatRoom, index: number) => {
       const localChat = chat;
       const handleItemClick = async () => {
+        sortChats();
         if (searchedRooms) setSearchedRooms(null);
         setActiveChatIndex(chat.id ? chat.id.toString() : null);
         openChat({ chatRoom: chat, showChatList: null });
@@ -428,27 +481,27 @@ const ChatList: React.FC<IFunctionProps> = ({
         );
       }
       if (chat.kind === 4 && chat.myRole === 2) {
-        chatName = `${
-          user.userData?.nickname
+        chatName = t('announcement.title', {
+          username: user.userData?.nickname
             ? user.userData?.nickname
-            : user.userData?.username
-        } ${t('announcement.title')}`;
+            : user.userData?.username,
+        });
       }
       if (chat.kind === 4 && chat.myRole === 1) {
-        chatName = `${
-          chat.visavis?.nickname
+        chatName = t('announcement.title', {
+          username: chat.visavis?.nickname
             ? chat.visavis?.nickname
-            : chat.visavis?.username
-        } ${t('announcement.title')}`;
+            : chat.visavis?.username,
+        });
       }
 
       let lastMsg = chat.lastMessage?.content?.text;
 
       if (chat.myRole === 2 && !lastMsg) {
         if (chat.kind === 4) {
-          lastMsg = textTrim(t('new-announcement.created'));
+          lastMsg = textTrim(t('newAnnouncement.created'));
         } else {
-          lastMsg = textTrim(t('chat.no-messages-first-line'));
+          lastMsg = textTrim(t('chat.noMessagesFirstLine'));
         }
       }
 
@@ -467,6 +520,13 @@ const ChatList: React.FC<IFunctionProps> = ({
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
                 {chatName}
+                {chat.visavis?.options?.isVerified && chat.kind !== 4 && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                  />
+                )}
               </SChatItemText>
               <SChatItemLastMessage variant={3} weight={600}>
                 {lastMsg}
@@ -500,7 +560,14 @@ const ChatList: React.FC<IFunctionProps> = ({
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeChatIndex, searchedRooms, chatRooms, displayAllRooms, activeTab]
+    [
+      searchedRooms,
+      chatRooms,
+      displayAllRooms,
+      activeTab,
+      activeChatIndex,
+      sortChats,
+    ]
   );
 
   const Tabs = useCallback(
@@ -573,6 +640,7 @@ export default ChatList;
 
 ChatList.defaultProps = {
   username: '',
+  switchedTab: () => {},
 };
 
 const SSectionContent = styled.div`

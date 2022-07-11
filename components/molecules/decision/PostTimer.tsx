@@ -10,6 +10,7 @@ import styled, { css } from 'styled-components';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+import usePageVisibility from '../../../utils/hooks/usePageVisibility';
 import isBrowser from '../../../utils/isBrowser';
 import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
 import { TPostType } from '../../../utils/switchPostType';
@@ -30,7 +31,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   postType,
   isTutorialVisible,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const { user } = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -41,6 +42,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
     'mobileL',
     'tablet',
   ].includes(resizeMode);
+  const isPageVisible = usePageVisibility();
 
   const parsed = (timestampSeconds - Date.now()) / 1000;
   const hasEnded = Date.now() > timestampSeconds;
@@ -59,13 +61,13 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
 
   useEffect(() => {
-    if (isBrowser()) {
+    if (isBrowser() && isPageVisible) {
       interval.current = window.setInterval(() => {
-        setSeconds((s) => s - 1);
+        setSeconds(() => (timestampSeconds - Date.now()) / 1000);
       }, 1000);
     }
     return () => clearInterval(interval.current);
-  }, []);
+  }, [isPageVisible, timestampSeconds]);
 
   const [tutorialTitle, setTutorialTitle] = useState('Countdown');
   const [tutorialText, setTutorialText] = useState('');
@@ -182,7 +184,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
     <SWrapper shouldTurnRed={shouldTurnRed}>
       {!hasEnded ? (
         <>
-          {parsedSeconds.days !== '00' && (
+          {parsedSeconds.days !== '0' && (
             <>
               <STimerItem className='timerItem'>
                 <div>{parsedSeconds.days}</div>
@@ -208,8 +210,8 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           )}
           <STimerItem className='timerItem'>
             <div>{parsedSeconds.hours}</div>
-            <div>{t('expires.hours')}</div>
-            {parsedSeconds.days === '00' && isTooltipVisible && (
+            <TimeUnit>{t('expires.hours')}</TimeUnit>
+            {parsedSeconds.days === '0' && isTooltipVisible && (
               <STutorialTooltipHolder>
                 <TutorialTooltip
                   isTooltipVisible={isTooltipVisible}
@@ -228,14 +230,14 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           <div>:</div>
           <STimerItem className='timerItem'>
             <div>{parsedSeconds.minutes}</div>
-            <div>{t('expires.minutes')}</div>
+            <TimeUnit>{t('expires.minutes')}</TimeUnit>
           </STimerItem>
-          {parsedSeconds.days === '00' && (
+          {parsedSeconds.days === '0' && (
             <>
               <div>:</div>
               <STimerItem className='timerItem'>
                 <div>{parsedSeconds.seconds}</div>
-                <div>{t('expires.seconds')}</div>
+                <TimeUnit>{t('expires.seconds')}</TimeUnit>
               </STimerItem>
             </>
           )}
@@ -326,6 +328,10 @@ const STimerItem = styled.div`
     text-align: left;
     margin-left: 2px;
   }
+`;
+
+const TimeUnit = styled.div`
+  white-space: nowrap;
 `;
 
 const STimerItemEnded = styled.div`

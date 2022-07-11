@@ -1,0 +1,158 @@
+{
+  "welcome": "歡迎使用{{NEXT_PUBLIC_APP_NAME}}！",
+  "topSectionTitle": "{{country}}前十名",
+  "heroSection": {
+    "title": "共同重塑現實",
+    "subTitle": "出價並就世界的下一步行動投票",
+    "signIn": "登入",
+    "explore": "開始瀏覽",
+    "exploreNow": "開始瀏覽"
+  },
+  "shareTo": "分享到",
+  "ellipse": {
+    "copyLink": "複製連結",
+    "linkCopied": "連結已複製！",
+    "followDecision": "最喜歡的 {{postType}}",
+    "followCreator": "最喜歡的創作者",
+    "unFollowDecision": "不喜歡的{{postType}}",
+    "unFollowCreator": "不喜歡的創作者",
+    "unsubscribe": "取消訂閱",
+    "removeSubscription": "移除訂閱",
+    "removeBid": "移除投標",
+    "removeOption": "移除選項",
+    "view": "查看個人資料",
+    "report": "舉報",
+    "reportUser": "舉報用戶",
+    "reportGroup": "舉報該組",
+    "reportBid": "舉報出價",
+    "reportOption": "舉報選項",
+    "block": "屏蔽",
+    "blockUser": "屏蔽用戶",
+    "blockGroup": "屏蔽該組",
+    "unblock": "解除屏蔽",
+    "unblockUser": "解除屏蔽用戶",
+    "unblockGroup": "解除屏蔽該組",
+    "delete": "刪除",
+    "deleteDecision": "刪除{{postType}}",
+    "cancel": "取消"
+  },
+  "postType": {
+    "ac": "Event",
+    "mc": "Superpoll",
+    "cf": "Goal"
+  },
+  "dragToReposition": "拖動以重新定位圖片",
+  "mobileBottomNavigation": {
+    "add": "創建",
+    "home": "主頁",
+    "more": "更多",
+    "share": "分享",
+    "dashboard": "儀錶板",
+    "dms": "私訊",
+    "notifications": "通知"
+  },
+  "mobileTopNavigation": {
+    "myBalance": "我的餘額：${{value}}",
+    "profile": "個人資料"
+  },
+  "button": {
+    "createDecision": "新帖子",
+    "create": "創建",
+    "loginIn": "登錄",
+    "signUp": "註冊",
+    "dashboard": "儀錶板",
+    "createOnNewnew": "開始創建",
+    "cancel": "取消"
+  },
+  "footer": {
+    "topTitle": "NewNew",
+    "centerTitle": "聯絡我們",
+    "bottomTitle": "社交",
+    "about": "關於",
+    "press": "新聞報道",
+    "jobs": "NewNew工作機會",
+    "help": "幫助",
+    "faq": "常見問題",
+    "twitter": "Twitter",
+    "howItWorks": "如何運作",
+    "guidelines": "社區指南",
+    "accessibility": "可訪問性",
+    "inc": "© NewNew Inc",
+    "terms": "條款",
+    "privacy": "隱私"
+  },
+  "language": {
+    "ddLanguageTitle": {
+      "en-US": "English",
+      "es": "Español",
+      "zh": "漢語"
+    },
+    "selectedLanguageTitle": {
+      "en-US": "English",
+      "es": "Español",
+      "zh": "漢語"
+    }
+  },
+  "cookie": {
+    "text": "我們使用",
+    "link": "瞭解更多"
+  },
+  "reportBug": "報告錯誤",
+  "error": {
+    "text": {
+      "min": "文本太短，最少{{value}}字元",
+      "max": "文本太長，最多{{value}}字元",
+      "badWords": "文本中有髒話",
+      "containsLinks": "不允許插入連結"
+    }
+  },
+  "modal": {
+    "reportUser": {
+      "title": "舉報",
+      "subtitle": "幫助我們瞭解，以便我們進行調查......",
+      "options": {
+        "spam": "可疑的或垃圾郵件",
+        "abuse": "辱駡或有害",
+        "suicide": "有自我傷害或自殺意圖",
+        "hateSpeech": "仇恨言論",
+        "harassment": "騷擾或霸淩",
+        "copyright": "版權",
+        "other": "其他"
+      },
+      "additionalInfo": {
+        "placeholder": "請再提供更多詳情......"
+      },
+      "button": {
+        "cancel": "取消"
+      }
+    },
+    "reportSent": {
+      "title": "我們馬上處理！",
+      "subtitle": "感謝告知,我們會儘快調查此事，並採取適當的措施，確保每個人的安全。",
+      "button": "知道了"
+    }
+  },
+  "myLink": {
+    "copy": "我的連結",
+    "copied": "已複製！"
+  },
+  "socials": {
+    "copy": "複製連結",
+    "copied": "連結已複製！"
+  },
+  "search": {
+    "placeholder": "搜索",
+    "topPosts": "熱門帖子",
+    "popularCreators": "熱門創作者",
+    "creatorSubtitle": "查看帖子",
+    "allResults": "所有結果",
+    "noResults": {
+      "title": "沒有找到任何內容",
+      "description": "嘗試搜索或瀏覽其他內容",
+      "action": "瀏覽"
+    }
+  },
+  "creatorCard": {
+    "subscriptionCost": "${{amount}} 每月"
+  }
+}

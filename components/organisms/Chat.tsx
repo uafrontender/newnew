@@ -24,29 +24,13 @@ interface IChat {
 export const Chat: React.FC<IChat> = ({ username }) => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
+  const [isInitialLoaded, setIsInitialLoaded] = useState<boolean>(false);
   const [chatData, setChatData] = useState<IChatData>({
     chatRoom: null,
     showChatList: null,
   });
 
-  const openChat = ({ chatRoom }: IChatData) => {
-    let route = '';
-
-    if (chatRoom?.visavis?.username) {
-      chatRoom.kind === 1
-        ? (route = chatRoom?.visavis?.username)
-        : (route = `${chatRoom?.visavis?.username}-announcement`);
-    } else {
-      chatRoom && chatRoom.kind === 4 && chatRoom.myRole === 2
-        ? (route = `${user.userData?.username}-announcement`)
-        : '';
-    }
-
-    router.push(`/direct-messages/${route}`);
-
-    setChatData({ chatRoom, showChatList });
-  };
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
   const [chatListHidden, setChatListHidden] =
     useState<boolean | undefined>(undefined);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -60,18 +44,46 @@ export const Chat: React.FC<IChat> = ({ username }) => {
   const [newMessage, setNewMessage] =
     useState<newnewapi.IChatMessage | null | undefined>();
   const [searchText, setSearchText] = useState<string>('');
+  const [newLastMessage, setNewLastMessage] =
+    useState<{
+      chatId: number | Long.Long | null | undefined;
+    } | null>(null);
+
+  const showChatList = () => {
+    setChatListHidden(false);
+  };
+
+  const updateLastMessage = (data: any) => {
+    setNewLastMessage(data);
+  };
+
+  const openChat = useCallback(
+    ({ chatRoom }: IChatData) => {
+      let route = '';
+
+      if (chatRoom?.visavis?.username) {
+        chatRoom.kind === 1
+          ? (route = chatRoom?.visavis?.username)
+          : (route = `${chatRoom?.visavis?.username}-announcement`);
+      } else {
+        chatRoom && chatRoom.kind === 4 && chatRoom.myRole === 2
+          ? (route = `${user.userData?.username}-announcement`)
+          : '';
+      }
+      router.push(`/direct-messages/${route}`);
+
+      setChatData({ chatRoom, showChatList });
+      if (isMobileOrTablet) {
+        isInitialLoaded ? setChatListHidden(true) : setIsInitialLoaded(true);
+      }
+    },
+    [isInitialLoaded, router, isMobileOrTablet, user.userData?.username]
+  );
 
   useEffect(() => {
     /* eslint-disable no-unused-expressions */
-    isMobileOrTablet ? setChatListHidden(true) : setChatListHidden(undefined);
+    isMobileOrTablet ? setChatListHidden(false) : setChatListHidden(undefined);
   }, [isMobileOrTablet]);
-
-  useEffect(() => {
-    if (!chatListHidden && isMobileOrTablet) {
-      setChatListHidden(true);
-    }
-    /* eslint-disable react-hooks/exhaustive-deps */
-  }, [chatData]);
 
   useEffect(() => {
     if (newMessage) {
@@ -79,10 +91,6 @@ export const Chat: React.FC<IChat> = ({ username }) => {
     }
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [newMessage]);
-
-  const showChatList = () => {
-    setChatListHidden(false);
-  };
 
   const passInputValue = useCallback((str: string) => setSearchText(str), []);
 
@@ -98,7 +106,7 @@ export const Chat: React.FC<IChat> = ({ username }) => {
             />
           )}
           <SearchInput
-            placeholderText={t('toolbar.search-placeholder')}
+            placeholderText={t('toolbar.searchPlaceholder')}
             style={{ marginRight: '16px', fontSize: '16px' }}
             passInputValue={passInputValue}
           />
@@ -108,6 +116,8 @@ export const Chat: React.FC<IChat> = ({ username }) => {
           searchText={searchText}
           openChat={openChat}
           username={username}
+          switchedTab={() => setChatListHidden(false)}
+          newLastMessage={newLastMessage}
         />
       </SSidebar>
       <SContent>
@@ -115,6 +125,7 @@ export const Chat: React.FC<IChat> = ({ username }) => {
           key={chatData.chatRoom?.id?.toString()}
           {...chatData}
           showChatList={showChatList}
+          updateLastMessage={updateLastMessage}
         />
       </SContent>
     </SContainer>

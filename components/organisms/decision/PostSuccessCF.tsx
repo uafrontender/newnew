@@ -9,6 +9,7 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -22,9 +23,11 @@ import { formatNumber } from '../../../utils/format';
 import { fetchPledges } from '../../../api/endpoints/crowdfunding';
 import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
-const CommentsSuccess = dynamic(
-  () => import('../../molecules/decision/success/CommentsSuccess')
+const CommentsBottomSection = dynamic(
+  () => import('../../molecules/decision/success/CommentsBottomSection')
 );
 
 interface IPostSuccessCF {
@@ -33,7 +36,7 @@ interface IPostSuccessCF {
 
 const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
   ({ post }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const theme = useTheme();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
@@ -41,6 +44,9 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+    const router = useRouter();
+
+    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     // My pledge amount
     const [myPledgeAmount, setMyPledgeAmount] =
@@ -160,23 +166,22 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
     // Replace hash once scrolled to comments
     useEffect(() => {
       if (inView) {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}#comments`
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#comments`
         );
       } else {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}`
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }`
         );
       }
-    }, [inView, post.postUuid]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inView, post.postUuid, router.locale]);
 
     useEffect(() => {
       fetchPledgesForPost();
@@ -236,7 +241,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     : assets.creation.darkCfAnimated
                 }
               >
-                {t('CfPostSuccess.hero_text')}
+                {t('cfPostSuccess.heroText')}
               </DecisionEndedBox>
               <SMainSectionWrapper>
                 <SCreatorInfoDiv>
@@ -246,21 +251,23 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     </a>
                     <a href={`/${post.creator?.username}`}>
                       <SWantsToKnow>
-                        {t('CfPostSuccess.wants_to_know', {
+                        {t('cfPostSuccess.wantsToKnow', {
                           creator: post.creator?.nickname,
                         })}
                       </SWantsToKnow>
                     </a>
                   </SCreator>
                   {/* <STotal>
-                    {`$${formatNumber(post.totalAmount?.usdCents ?? 0, true)}`}
+                    {`$${formatNumber(post.totalAmount?.usdCents/100 ?? 0, true)}`}
                   </STotal> */}
                 </SCreatorInfoDiv>
-                <SPostTitle variant={4}>{post.title}</SPostTitle>
+                <SPostTitle variant={4}>
+                  <PostTitleContent>{post.title}</PostTitleContent>
+                </SPostTitle>
                 <SSeparator />
                 <SBackersInfo>
                   <SCreatorsBackers>
-                    {t('CfPostSuccess.creators_backers', {
+                    {t('cfPostSuccess.creatorsBackers', {
                       creator: post.creator?.nickname,
                     })}
                   </SCreatorsBackers>
@@ -268,7 +275,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     {formatNumber(post.currentBackerCount, true)}
                   </SCurrentBackers>
                   <STargetBackers variant={6}>
-                    {t('CfPostSuccess.of_target_backers', {
+                    {t('cfPostSuccess.ofTargetBackers', {
                       target_count: formatNumber(post.targetBackerCount, true),
                     })}
                   </STargetBackers>
@@ -278,7 +285,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     <SSeparator />
                     <YouBackedInfo>
                       <SYouBackedFor>
-                        {t('CfPostSuccess.you_backed_for')}
+                        {t('cfPostSuccess.youBackedFor')}
                       </SYouBackedFor>
                       <SYouBackedAmount variant={4}>
                         {`$${formatNumber(
@@ -298,7 +305,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                         shouldView={!responseViewed}
                         onClick={() => setVideoTab('response')}
                       >
-                        {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
+                        {t('postVideoSuccess.tabs.watchResponseFirstTime')}
                       </SWatchResponseBtn>
                     </SWatchResponseWrapper>
                   ) : null}
@@ -308,13 +315,13 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                         shouldView={videoTab === 'announcement'}
                         onClick={() => setVideoTab('announcement')}
                       >
-                        {t('PostVideoSuccess.tabs.watch_original')}
+                        {t('postVideoSuccess.tabs.watchOriginal')}
                       </SChangeTabBtn>
                       <SChangeTabBtn
                         shouldView={videoTab === 'response'}
                         onClick={() => setVideoTab('response')}
                       >
-                        {t('PostVideoSuccess.tabs.watch_response')}
+                        {t('postVideoSuccess.tabs.watchResponse')}
                       </SChangeTabBtn>
                     </SToggleVideoWidget>
                   ) : null}
@@ -326,12 +333,11 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
         {post.isCommentsAllowed && (
           <SCommentsSection id='comments' ref={commentsSectionRef}>
             <SCommentsHeadline variant={4}>
-              {t('SuccessCommon.Comments.heading')}
+              {t('successCommon.comments.heading')}
             </SCommentsHeadline>
-            <CommentsSuccess
+            <CommentsBottomSection
               postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => {}}
             />
           </SCommentsSection>
         )}

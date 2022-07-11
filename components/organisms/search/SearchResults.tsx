@@ -16,18 +16,24 @@ const SearchCreators = dynamic(() => import('./SearchCreators'));
 
 export const SearchResults = () => {
   const router = useRouter();
-  const { t } = useTranslation('search');
+  const { t } = useTranslation('page-Search');
   const theme = useTheme();
-  const [searchValue, setSearchValue] = useState('');
-  const [activeTab, setActiveTab] = useState<string>('decisions');
+  const [searchValue, setSearchValue] = useState(router.query.query as string);
+  const [searchType, setSearchType] = useState(router.query.type as string);
+  const [activeTab, setActiveTab] = useState<string>('posts');
 
   useEffect(() => {
     if (router) {
       if (router.query.query) setSearchValue(router.query.query as string);
+      if (router.query.type) setSearchType(router.query.type as string);
       if (router.query.tab) {
-        router.query.tab === 'creators'
-          ? setActiveTab('creators')
-          : setActiveTab('decisions');
+        if (router.query.tab === 'creators') {
+          setActiveTab('creators');
+        } else if (router.query.tab === 'tags') {
+          setActiveTab('tags');
+        } else {
+          setActiveTab('posts');
+        }
       }
     }
   }, [router]);
@@ -35,7 +41,7 @@ export const SearchResults = () => {
   const tabTypes = useMemo(
     () => [
       {
-        id: 'decisions',
+        id: 'posts',
         title: t('mainContent.tabs.decisions'),
       },
       {
@@ -53,9 +59,15 @@ export const SearchResults = () => {
           <STab
             active={activeTab === tab.id}
             key={tab.id}
-            onClick={() =>
-              router.push(`/search?query=${searchValue}&tab=${tab.id}`)
-            }
+            onClick={() => {
+              if (tab.id === 'posts') {
+                router.push(
+                  `/search?query=${searchValue}&type=${searchType}&tab=${tab.id}`
+                );
+              } else {
+                router.push(`/search?query=${searchValue}&tab=${tab.id}`);
+              }
+            }}
           >
             <InlineSvg
               // @ts-ignore
@@ -86,12 +98,18 @@ export const SearchResults = () => {
     <SContainer>
       <SHeader>
         <SPageTitle>
-          {t('mainContent.title')} <span>{searchValue}</span>
+          {activeTab === 'posts' && searchType === 'hashtags' ? (
+            <Hashtag>#{searchValue}</Hashtag>
+          ) : (
+            <>
+              {t('mainContent.title')} <Query>{searchValue}</Query>
+            </>
+          )}
         </SPageTitle>
       </SHeader>
       <Tabs />
-      {activeTab === 'decisions' ? (
-        <SearchDecisions query={searchValue} />
+      {activeTab === 'posts' ? (
+        <SearchDecisions query={searchValue} type={searchType} />
       ) : (
         <SearchCreators query={searchValue} />
       )}
@@ -128,9 +146,14 @@ const SPageTitle = styled.h1`
   line-height: 56px;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   margin: 0;
-  span {
-    color: ${(props) => props.theme.colorsThemed.text.primary};
-  }
+`;
+
+const Hashtag = styled.span`
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
+`;
+
+const Query = styled.span`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
 `;
 
 const STabs = styled.div`

@@ -23,12 +23,22 @@ interface IFunctionProps {
   earnings: newnewapi.GetMyEarningsResponse | undefined;
 }
 
+const EARNINGS_FILTER_TYPES = [
+  '0_days',
+  '1_days',
+  '7_days',
+  '30_days',
+  '90_days',
+  '12_months',
+] as const;
+type EarningsFilterType = typeof EARNINGS_FILTER_TYPES[number];
+
 export const Earnings: React.FC<IFunctionProps> = ({
   hasMyPosts,
   earnings,
 }) => {
-  const { t } = useTranslation('creator');
-  const [filter, setFilter] = useState('7_days');
+  const { t } = useTranslation('page-Creator');
+  const [filter, setFilter] = useState<EarningsFilterType>('7_days');
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [myEarnings, setMyEarnings] =
     useState<newnewapi.GetMyEarningsResponse | undefined>();
@@ -81,8 +91,8 @@ export const Earnings: React.FC<IFunctionProps> = ({
         sum += myEarnings.cfEarnings?.usdCents;
       if (myEarnings.mcEarnings?.usdCents)
         sum += myEarnings.mcEarnings?.usdCents;
-      if (myEarnings.auEarnings?.usdCents)
-        sum += myEarnings.auEarnings?.usdCents;
+      if (myEarnings.subsEarnings?.usdCents)
+        sum += myEarnings.subsEarnings?.usdCents;
       setTotalEarnings(sum);
     }
   }, [myEarnings]);
@@ -104,7 +114,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
     ],
     []
   );
-  const filterOptions = useMemo(
+  const filterOptions: { id: EarningsFilterType; label: string }[] = useMemo(
     () => [
       {
         id: '0_days',
@@ -141,7 +151,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
           return myEarnings?.auEarnings?.usdCents
             ? `$${formatNumber(
                 myEarnings.auEarnings.usdCents / 100 ?? 0,
-                true
+                false
               )}`
             : '$0.00';
 
@@ -149,7 +159,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
           return myEarnings?.cfEarnings?.usdCents
             ? `$${formatNumber(
                 myEarnings.cfEarnings.usdCents / 100 ?? 0,
-                true
+                false
               )}`
             : '$0.00';
 
@@ -157,7 +167,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
           return myEarnings?.mcEarnings?.usdCents
             ? `$${formatNumber(
                 myEarnings.mcEarnings.usdCents / 100 ?? 0,
-                true
+                false
               )}`
             : '$0.00';
 
@@ -165,7 +175,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
           return myEarnings?.subsEarnings?.usdCents
             ? `$${formatNumber(
                 myEarnings.subsEarnings.usdCents / 100 ?? 0,
-                true
+                false
               )}`
             : '$0.00';
 
@@ -177,7 +187,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
   );
 
   const renderListItem = useCallback(
-    (item) => (
+    (item: { id: string }) => (
       <SListItem key={`list-item-earnings-${item.id}`}>
         <SListItemTitle variant={2} weight={700}>
           {t(`dashboard.earnings.list.${item.id}`)}
@@ -199,7 +209,9 @@ export const Earnings: React.FC<IFunctionProps> = ({
     const arr = filter.split('_');
     if (arr[0] === '0') return t('dashboard.earnings.earnedToday');
     if (arr[0] === '1') return t('dashboard.earnings.earnedYesterday');
-    return `${t('dashboard.earnings.earned')} ${arr[0]} ${arr[1]}`;
+    return `${t('dashboard.earnings.earned')} ${arr[0]} ${t(
+      `dashboard.earnings.units.${arr[1]}`
+    )}`;
   };
   /* eslint-disable no-nested-ternary */
   return (
@@ -218,14 +230,14 @@ export const Earnings: React.FC<IFunctionProps> = ({
         <STotalTextWrapper>
           <STotal variant={4}>
             {totalEarnings
-              ? `$${formatNumber(totalEarnings / 100 ?? 0, true)}`
+              ? `$${formatNumber(totalEarnings / 100 ?? 0, false)}`
               : '$0.00'}
           </STotal>
           <STotalText weight={600}>{splitPeriod()}</STotalText>
         </STotalTextWrapper>
         {/* <STotalInsights>
           <STotalInsightsText>
-            {t(`dashboard.earnings.${isMobile ? 'insights' : 'insights_tablet'}`)}
+            {t(`dashboard.earnings.${isMobile ? 'insights' : 'insightsTablet'}`)}
           </STotalInsightsText>
           <STotalInsightsArrow
             svg={arrowRightIcon}
@@ -248,8 +260,8 @@ export const Earnings: React.FC<IFunctionProps> = ({
         />
       ) : hasMyPosts && myEarnings?.nextCashoutAmount ? (
         <CashOut
-          nextCashoutAmount={myEarnings?.nextCashoutAmount}
-          nextCashoutDate={myEarnings?.nextCashoutDate}
+          nextCashOutAmount={myEarnings?.nextCashoutAmount}
+          nextCashOutDate={myEarnings?.nextCashoutDate}
         />
       ) : (
         <MakeDecision />

@@ -62,7 +62,7 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
@@ -167,7 +167,7 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({
           {posts && posts.length === 0 && !isLoading && (
             <NoContentCard>
               <NoContentDescription>
-                {t('Purchases.no-content.description')}
+                {t('Purchases.noContent.description')}
               </NoContentDescription>
             </NoContentCard>
           )}
@@ -210,10 +210,11 @@ export async function getServerSideProps(
   try {
     const translationContext = await serverSideTranslations(context.locale!!, [
       'common',
-      'profile',
-      'home',
-      'decision',
-      'payment-modal',
+      'page-Profile',
+      'component-PostCard',
+      'modal-Post',
+      'modal-PaymentModal',
+      'modal-ResponseSuccessModal',
     ]);
 
     // const { req } = context;

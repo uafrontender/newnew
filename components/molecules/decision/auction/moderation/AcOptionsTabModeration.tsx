@@ -28,6 +28,7 @@ interface IAcOptionsTabModeration {
   options: newnewapi.Auction.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
+  winningOptionId?: number;
   handleLoadBids: (token?: string) => void;
   handleRemoveOption: (optionToDelete: newnewapi.Auction.Option) => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
@@ -41,13 +42,14 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
     options,
     optionsLoading,
     pagingToken,
+    winningOptionId,
     handleLoadBids,
     handleRemoveOption,
     handleUpdatePostStatus,
     handleUpdateWinningOption,
   }) => {
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -107,52 +109,61 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
                 <img src={NoContentYetImg.src} alt='No content yet' />
               </SNoOptionsImgContainer>
               <SNoOptionsCaption variant={3}>
-                {t('AcPostModeration.OptionsTab.NoOptions.caption_1')}
+                {t('acPostModeration.optionsTab.noOptions.caption_1')}
               </SNoOptionsCaption>
             </SNoOptionsYet>
-          ) : null}
-          <SBidsContainer
-            ref={(el) => {
-              containerRef.current = el!!;
-            }}
-          >
-            {!isMobile ? (
-              <>
-                <GradientMask
-                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                  positionTop
-                  active={showTopGradient}
+          ) : (
+            <SBidsContainer
+              id='acOptionsTabModeration__bidsContainer'
+              ref={(el) => {
+                containerRef.current = el!!;
+              }}
+            >
+              {!isMobile ? (
+                <>
+                  <GradientMask
+                    gradientType={
+                      theme.name === 'dark' ? 'secondary' : 'primary'
+                    }
+                    positionTop
+                    active={showTopGradient}
+                  />
+                  <GradientMask
+                    gradientType={
+                      theme.name === 'dark' ? 'secondary' : 'primary'
+                    }
+                    positionBottom={0}
+                    active={showBottomGradient}
+                  />
+                </>
+              ) : null}
+              {options.map((option, i) => (
+                <AcOptionCardModeration
+                  index={i}
+                  key={option.id.toString()}
+                  postStatus={postStatus}
+                  option={option as TAcOptionWithHighestField}
+                  isWinner={
+                    winningOptionId?.toString() === option.id.toString()
+                  }
+                  handleRemoveOption={handleRemoveOption}
+                  handleConfirmWinningOption={() =>
+                    handleConfirmWinningOption(option)
+                  }
                 />
-                <GradientMask
-                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                  positionBottom={0}
-                  active={showBottomGradient}
-                />
-              </>
-            ) : null}
-            {options.map((option, i) => (
-              <AcOptionCardModeration
-                index={i}
-                key={option.id.toString()}
-                postStatus={postStatus}
-                option={option as TAcOptionWithHighestField}
-                handleRemoveOption={handleRemoveOption}
-                handleConfirmWinningOption={() =>
-                  handleConfirmWinningOption(option)
-                }
-              />
-            ))}
-            {!isMobile ? (
-              <SLoaderDiv ref={loadingRef} />
-            ) : pagingToken ? (
-              <SLoadMoreBtn
-                view='secondary'
-                onClick={() => handleLoadBids(pagingToken)}
-              >
-                {t('loadMoreBtn')}
-              </SLoadMoreBtn>
-            ) : null}
-          </SBidsContainer>
+              ))}
+              {!isMobile ? (
+                <SLoaderDiv ref={loadingRef} />
+              ) : pagingToken ? (
+                <SLoadMoreBtn
+                  view='secondary'
+                  onClick={() => handleLoadBids(pagingToken)}
+                >
+                  {t('loadMoreButton')}
+                </SLoadMoreBtn>
+              ) : null}
+            </SBidsContainer>
+          )}
         </STabContainer>
       </>
     );

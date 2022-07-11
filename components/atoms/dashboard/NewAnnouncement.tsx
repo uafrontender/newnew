@@ -11,7 +11,7 @@ interface INewAnnouncement {
 
 const NewAnnouncement: React.FC<INewAnnouncement> = ({ handleClick }) => {
   const theme = useTheme();
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
 
   return (
     <SWrapper onClick={handleClick}>
@@ -22,8 +22,8 @@ const NewAnnouncement: React.FC<INewAnnouncement> = ({ handleClick }) => {
         height='26px'
       />
       <SText>
-        <STitle>{t('new-announcement.title')}</STitle>
-        <p>{t('new-announcement.text')}</p>
+        <STitle>{t('newAnnouncement.title')}</STitle>
+        <p>{t('newAnnouncement.text')}</p>
       </SText>
     </SWrapper>
   );

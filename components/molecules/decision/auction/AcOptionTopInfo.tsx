@@ -24,6 +24,7 @@ import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
 import SuggestionActionMobileModal from '../OptionActionMobileModal';
 
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
+import { formatNumber } from '../../../../utils/format';
 
 interface IAcOptionTopInfo {
   creator: newnewapi.IUser;
@@ -48,7 +49,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const createdAtParsed = new Date(createdAtSeconds * 1000);
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -244,7 +245,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
     <SWrapper>
       <SBidsAmount>
         <span>${((amountInBids ?? 0) / 100).toFixed(2)}</span>{' '}
-        {t('AcPost.PostTopInfo.in_bids')}
+        {t('acPost.postTopInfo.inBids')}
       </SBidsAmount>
       <CreatorCard>
         <SAvatarArea>
@@ -253,7 +254,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
         <SUsername>
           {creator.uuid !== user.userData?.userUuid
             ? creator.username
-            : t('AcPost.OptionsTab.me')}
+            : t('acPost.optionsTab.me')}
         </SUsername>
         <SStartsAt>
           {createdAtParsed.getDate()}{' '}
@@ -290,7 +291,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
             view='secondary'
             onClick={() => handleOpenSupportForm()}
           >
-            {t('AcPost.OptionsTab.OptionCard.supportBtn')}
+            {t('acPost.optionsTab.optionCard.supportButton')}
           </SSupportButton>
         )}
       </SActionsDiv>
@@ -309,13 +310,13 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
             }
             onClick={() => handleTogglePaymentModalOpen()}
           >
-            {t('AcPost.OptionsTab.OptionCard.placeABidBtn')}
+            {t('acPost.optionsTab.optionCard.placeABidButton')}
           </Button>
           <SCancelButton
             view='secondary'
             onClick={() => handleCloseSupportForm()}
           >
-            {t('AcPost.OptionsTab.OptionCard.cancelBtn')}
+            {t('acPost.optionsTab.optionCard.cancelButton')}
           </SCancelButton>
         </SSupportBidForm>
       )}
@@ -339,7 +340,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
               disabled={!supportBidAmount}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              {t('AcPost.OptionsTab.OptionCard.placeABidBtn')}
+              {t('acPost.optionsTab.optionCard.placeABidButton')}
             </Button>
           </SSuggestSupportMobileContainer>
         </SuggestionActionMobileModal>
@@ -349,7 +350,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${supportBidAmount}`}
+          amount={`$${formatNumber(parseInt(supportBidAmount) ?? 0, true)}`}
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
@@ -357,7 +358,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
         >
           <SPaymentModalHeader>
             <SPaymentModalTitle variant={3}>
-              {t('AcPost.paymentModalHeader.subtitle')}
+              {t('acPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
             <SPaymentModalOptionText>{option.title}</SPaymentModalOptionText>
           </SPaymentModalHeader>

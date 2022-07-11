@@ -62,7 +62,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
@@ -144,10 +144,13 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   return (
     <>
       <Head>
-        <title>{t('meta.title')}</title>
-        <meta name='description' content={t('meta.description')} />
-        <meta property='og:title' content={t('meta.title')} />
-        <meta property='og:description' content={t('meta.description')} />
+        <title>{t('Active.meta.title')}</title>
+        <meta name='description' content={t('Active.meta.description')} />
+        <meta property='og:title' content={t('Active.meta.title')} />
+        <meta
+          property='og:description'
+          content={t('Active.meta.description')}
+        />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <div>
@@ -167,7 +170,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
             {posts && posts.length === 0 && !isLoading && (
               <NoContentCard>
                 <NoContentDescription>
-                  {t('Active.no-content.description')}
+                  {t('Active.noContent.description')}
                 </NoContentDescription>
               </NoContentCard>
             )}
@@ -211,10 +214,11 @@ export async function getServerSideProps(
   try {
     const translationContext = await serverSideTranslations(context.locale!!, [
       'common',
-      'profile',
-      'home',
-      'decision',
-      'payment-modal',
+      'page-Profile',
+      'component-PostCard',
+      'modal-Post',
+      'modal-PaymentModal',
+      'modal-ResponseSuccessModal',
     ]);
 
     // const { req } = context;

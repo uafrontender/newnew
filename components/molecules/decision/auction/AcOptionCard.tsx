@@ -50,8 +50,8 @@ import { setUserTutorialsProgress } from '../../../../redux-store/slices/userSta
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import getDisplayname from '../../../../utils/getDisplayname';
 import Headline from '../../../atoms/Headline';
-import OptionModal from '../OptionModal';
-import OptionMenu from '../OptionMenu';
+import OptionEllipseModal from '../OptionEllipseModal';
+import OptionEllipseMenu from '../OptionEllipseMenu';
 import ReportModal, { ReportData } from '../../chat/ReportModal';
 import { reportEventOption } from '../../../../api/endpoints/report';
 import { deleteAcOption } from '../../../../api/endpoints/auction';
@@ -92,7 +92,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 }) => {
   const router = useRouter();
   const theme = useTheme();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -547,12 +547,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                       (isSupportedByMe && !isMyBid ? 2 : 1),
                     true
                   )}{' '}
-                  {t('AcPost.OptionsTab.OptionCard.others')}
+                  {t('acPost.optionsTab.optionCard.others')}
                 </SSpanBiddersHighlighted>
               </>
             ) : null}{' '}
             <SSpanBiddersRegular className='spanRegular'>
-              {t('AcPost.OptionsTab.OptionCard.bid')}
+              {t('acPost.optionsTab.optionCard.bid')}
             </SSpanBiddersRegular>
           </SBiddersInfo>
         </SBidDetails>
@@ -569,8 +569,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           >
             <div>
               {!isSupportedByMe
-                ? t('AcPost.OptionsTab.OptionCard.raiseBidBtn')
-                : t('AcPost.OptionsTab.OptionCard.supportAgainBtn')}
+                ? t('acPost.optionsTab.optionCard.raiseBidButton')
+                : t('acPost.optionsTab.optionCard.supportAgainButton')}
             </div>
           </SSupportButton>
         ) : (
@@ -584,8 +584,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             }}
           >
             {!isSupportedByMe
-              ? t('AcPost.OptionsTab.OptionCard.supportBtn')
-              : t('AcPost.OptionsTab.OptionCard.supportAgainBtn')}
+              ? t('acPost.optionsTab.optionCard.supportButton')
+              : t('acPost.optionsTab.optionCard.supportAgainButton')}
           </SSupportButtonDesktop>
         )}
         {index === 0 &&
@@ -626,7 +626,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               onChange={(newValue: string) => setSupportBidAmount(newValue)}
               minAmount={minAmount}
               placeholder={t(
-                'AcPost.OptionsTab.ActionSection.amountPlaceholder-boost',
+                'acPost.optionsTab.actionSection.amountPlaceholderBoost',
                 { amount: minAmount.toString() }
               )}
               style={{
@@ -642,7 +642,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               }
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              {t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}
+              {t('acPost.optionsTab.optionCard.raiseBidButton')}
             </Button>
             <SCancelButton
               view='transparent'
@@ -683,7 +683,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 disabled={!supportBidAmount}
                 onClick={() => handleTogglePaymentModalOpen()}
               >
-                {t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}
+                {t('acPost.optionsTab.optionCard.raiseBidButton')}
               </Button>
             </SSuggestSupportMobileContainer>
           </OptionActionMobileModal>
@@ -694,7 +694,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         <PaymentModalRedirectOnly
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${supportBidAmount}`}
+          amount={`$${formatNumber(parseInt(supportBidAmount) ?? 0, true)}`}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(supportBidAmount) * 100
           //   ? {}
@@ -708,7 +708,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           bottomCaption={
             <>
               <SPaymentSign variant={3}>
-                {t('AcPost.paymentModalFooter.body', { creator: postCreator })}
+                {t('acPost.paymentModalFooter.body', { creator: postCreator })}
               </SPaymentSign>
               <SPaymentTerms variant={3}>
                 *{' '}
@@ -717,14 +717,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                     href='https://terms.newnew.co'
                     target='_blank'
                   >
-                    {t('AcPost.paymentModalFooter.terms')}
+                    {t('acPost.paymentModalFooter.terms')}
                   </SPaymentTermsLink>
                 </Link>{' '}
-                {t('AcPost.paymentModalFooter.apply')}
+                {t('acPost.paymentModalFooter.apply')}
               </SPaymentTerms>
             </>
           }
-          // payButtonCaptionKey={t('AcPost.paymentModalPayButton')}
+          // payButtonCaptionKey={t('acPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
             <SPaymentModalHeading>
@@ -738,14 +738,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
-                {t('AcPost.paymentModalHeader.title', { creator: postCreator })}
+                {t('acPost.paymentModalHeader.title', { creator: postCreator })}
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
               {postText}
             </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
-              {t('AcPost.paymentModalHeader.subtitle')}
+              {t('acPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
             <SPaymentModalOptionText variant={5}>
               {option.title}
@@ -759,7 +759,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         isVisible={paymentSuccesModalOpen}
         closeModal={() => setPaymentSuccesModalOpen(false)}
       >
-        {t('PaymentSuccessModal.ac', {
+        {t('paymentSuccessModal.ac', {
           postCreator,
           postDeadline,
         })}
@@ -768,7 +768,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Ellipse modal */}
       {isMobile && (
-        <OptionModal
+        <OptionEllipseModal
           zIndex={12}
           isOpen={isEllipseMenuOpen}
           isMyOption={isMyBid}
@@ -781,7 +781,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         />
       )}
       {!isMobile && (
-        <OptionMenu
+        <OptionEllipseMenu
           xy={optionMenuX}
           isVisible={isEllipseMenuOpen}
           isMyOption={isMyBid}
@@ -885,7 +885,7 @@ const SBidDetails = styled.div<{
     grid-template-areas:
       'amount bidders'
       'optionInfo optionInfo';
-    grid-template-columns: 3fr 7fr;
+    grid-template-columns: 5fr 4fr;
 
     padding: 16px;
 
@@ -1183,7 +1183,7 @@ const SPaymentSign = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap;
 `;
 
 const SPaymentTermsLink = styled.a`

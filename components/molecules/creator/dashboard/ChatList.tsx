@@ -19,7 +19,7 @@ import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
 
 export const ChatList = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
@@ -180,27 +180,27 @@ export const ChatList = () => {
             />
           </SMyAvatarMassupdate>
         );
-        chatName = `${
-          user.userData?.nickname
+        chatName = t('announcement.title', {
+          username: user.userData?.nickname
             ? user.userData?.nickname
-            : user.userData?.username
-        } ${t('announcement.title')}`;
+            : user.userData?.username,
+        });
       }
       if (chat.kind === 4 && chat.myRole === 1) {
-        chatName = `${
-          chat.visavis?.nickname
+        chatName = t('announcement.title', {
+          username: chat.visavis?.nickname
             ? chat.visavis?.nickname
-            : chat.visavis?.username
-        } ${t('announcement.title')}`;
+            : chat.visavis?.username,
+        });
       }
 
       let lastMsg = chat.lastMessage?.content?.text;
 
       if (!lastMsg) {
         if (chat.kind === 4) {
-          lastMsg = textTrim(t('new-announcement.created'));
+          lastMsg = textTrim(t('newAnnouncement.created'));
         } else {
-          lastMsg = textTrim(t('chat.no-messages-first-line'));
+          lastMsg = textTrim(t('chat.noMessagesFirstLine'));
         }
       }
 

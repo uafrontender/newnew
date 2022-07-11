@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
 import InlineSVG from '../InlineSVG';
@@ -10,7 +11,7 @@ import InlineSVG from '../InlineSVG';
 import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 
-import { quickSearchPostsAndCreators } from '../../../api/endpoints/search';
+import { quickSearch } from '../../../api/endpoints/search';
 import { setGlobalSearchActive } from '../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
@@ -22,8 +23,11 @@ import PopularCreatorsResults from './PopularCreatorsResults';
 import Button from '../Button';
 import Lottie from '../Lottie';
 import NoResults from './NoResults';
+import PopularTagsResults from './PopularTagsResults';
+import getChunks from '../../../utils/getChunks/getChunks';
 
 const SearchInput: React.FC = React.memo(() => {
+  const { t } = useTranslation('common');
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const inputRef: any = useRef();
@@ -35,6 +39,9 @@ const SearchInput: React.FC = React.memo(() => {
   const [isLoading, setIsLoading] = useState(false);
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
   const [resultsCreators, setResultsCreators] = useState<newnewapi.IUser[]>([]);
+  const [resultsHashtags, setResultsHashtags] = useState<newnewapi.IHashtag[]>(
+    []
+  );
 
   const { resizeMode, globalSearchActive } = useAppSelector(
     (state) => state.ui
@@ -52,6 +59,19 @@ const SearchInput: React.FC = React.memo(() => {
     'tablet',
   ].includes(resizeMode);
 
+  const handleSeeResults = (query: string) => {
+    const chunks = getChunks(query);
+    const firstChunk = chunks[0];
+    const isHashtag = chunks.length === 1 && firstChunk.type === 'hashtag';
+
+    if (isHashtag) {
+      router.push(`/search?query=${firstChunk.text}&type=hashtags&tab=posts`);
+    } else {
+      const clearedQuery = query.replaceAll('#', '');
+      router.push(`/search?query=${clearedQuery}&tab=posts`);
+    }
+  };
+
   const handleSearchClick = useCallback(() => {
     dispatch(setGlobalSearchActive(!globalSearchActive));
   }, [dispatch, globalSearchActive]);
@@ -62,11 +82,19 @@ const SearchInput: React.FC = React.memo(() => {
   const handleInputChange = (e: any) => {
     setSearchValue(e.target.value);
   };
+
   const handleKeyDown = (e: any) => {
     if (e.keyCode === 27) {
       handleSearchClose();
     }
+
+    if (e.keyCode === 13 && searchValue) {
+      setIsResultsDropVisible(false);
+      handleSeeResults(searchValue);
+      setSearchValue('');
+    }
   };
+
   const handleSubmit = () => {};
   const handleCloseIconClick = () => {
     if (searchValue) {
@@ -119,20 +147,23 @@ const SearchInput: React.FC = React.memo(() => {
   const resetResults = () => {
     setResultsCreators([]);
     setResultsPosts([]);
+    setResultsHashtags([]);
   };
 
   async function getQuickSearchResult(query: string) {
     try {
       setIsLoading(true);
-      const payload = new newnewapi.QuickSearchPostsAndCreatorsRequest({
+      const payload = new newnewapi.QuickSearchRequest({
         query,
       });
-      const res = await quickSearchPostsAndCreators(payload);
+
+      const res = await quickSearch(payload);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
       if (res.data.creators) setResultsCreators(res.data.creators);
       if (res.data.posts) setResultsPosts(res.data.posts);
+      if (res.data.hashtags) setResultsHashtags(res.data.hashtags);
       setIsLoading(false);
     } catch (err) {
       setIsLoading(false);
@@ -193,7 +224,7 @@ const SearchInput: React.FC = React.memo(() => {
             value={searchValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder='Search'
+            placeholder={t('search.placeholder')}
           />
           <SRightInlineSVG
             clickable
@@ -206,7 +237,9 @@ const SearchInput: React.FC = React.memo(() => {
         </SInputWrapper>
         {!isMobileOrTablet && isResultsDropVisible && (
           <SResultsDrop>
-            {resultsPosts.length === 0 && resultsCreators.length === 0 ? (
+            {resultsPosts.length === 0 &&
+            resultsCreators.length === 0 &&
+            resultsHashtags.length === 0 ? (
               !isLoading ? (
                 <SNoResults>
                   <NoResults closeDrop={handleCloseIconClick} />
@@ -232,13 +265,14 @@ const SearchInput: React.FC = React.memo(() => {
                 {resultsCreators.length > 0 && (
                   <PopularCreatorsResults creators={resultsCreators} />
                 )}
+                {resultsHashtags.length > 0 && (
+                  <PopularTagsResults hashtags={resultsHashtags} />
+                )}
                 <SButton
-                  onClick={() => {
-                    router.push(`/search?query=${searchValue}&tab=decisions`);
-                  }}
+                  onClick={() => handleSeeResults(searchValue)}
                   view='quaternary'
                 >
-                  All results
+                  {t('search.allResults')}
                 </SButton>
               </>
             )}
@@ -247,7 +281,9 @@ const SearchInput: React.FC = React.memo(() => {
       </SContainer>
       {isMobileOrTablet && isResultsDropVisible && (
         <SResultsDropMobile>
-          {resultsPosts.length === 0 && resultsCreators.length === 0 ? (
+          {resultsPosts.length === 0 &&
+          resultsCreators.length === 0 &&
+          resultsHashtags.length === 0 ? (
             !isLoading ? (
               <SNoResults>
                 <NoResults closeDrop={handleCloseIconClick} />
@@ -273,13 +309,16 @@ const SearchInput: React.FC = React.memo(() => {
               {resultsCreators.length > 0 && (
                 <PopularCreatorsResults creators={resultsCreators} />
               )}
+              {resultsHashtags.length > 0 && (
+                <PopularTagsResults hashtags={resultsHashtags} />
+              )}
               <SButton
                 onClick={() => {
-                  router.push(`/search?query=${searchValue}&tab=decisions`);
+                  router.push(`/search?query=${searchValue}&tab=posts`);
                 }}
                 view='quaternary'
               >
-                All results
+                {t('search.allResults')}
               </SButton>
             </>
           )}
@@ -334,9 +373,10 @@ const SResultsDrop = styled.div`
   position: fixed;
   border-radius: 0;
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 112px);
   top: 56px;
   padding: 16px;
+  overflow: auto;
 
   ${({ theme }) => theme.media.laptop} {
     position: absolute;
@@ -375,10 +415,11 @@ const SResultsDropMobile = styled.div`
   position: fixed;
   border-radius: 0;
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 112px);
   top: 56px;
   left: 0;
   padding: 16px;
+  overflow: auto;
 
   ${({ theme }) => theme.media.tablet} {
     margin-top: 16px;

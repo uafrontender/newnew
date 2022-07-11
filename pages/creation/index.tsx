@@ -11,7 +11,7 @@ import General from '../../components/templates/General';
 import assets from '../../constants/assets';
 
 export const CreationFirstStep = () => {
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
 
   return (
     <>
@@ -43,7 +43,7 @@ export async function getServerSideProps(
 ): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'creation']
+    ['common', 'page-Creation']
   );
 
   // @ts-ignore
@@ -64,5 +64,7 @@ export async function getServerSideProps(
 }
 
 const SWrapper = styled.div`
-  padding: 100px 0;
+  ${(props) => props.theme.media.tablet} {
+    padding: 100px 0;
+  }
 `;

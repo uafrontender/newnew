@@ -1,0 +1,17 @@
+{
+  "paymentMethodTitle": "支付方式",
+  "options": {
+    "wallet": {
+      "subtitle": "支付方式",
+      "name": "NewNew錢包",
+      "fees": "無費用"
+    },
+    "card": {
+      "name": "信用卡或借記卡",
+      "fees": "費率最高3%"
+    }
+  },
+  "payButton": "支付",
+  "tocApplyLink": "條款",
+  "tocApplyText": "適用"
+}

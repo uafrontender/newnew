@@ -10,7 +10,7 @@ import RippleAnimation from './RippleAnimation';
 import logoAnimation from '../../public/animations/mobile_logo.json';
 
 type TButton = React.ComponentPropsWithoutRef<'button'>;
-type TView =
+export type TView =
   | 'primary'
   | 'primaryGrad'
   | 'primaryProgress'
@@ -39,116 +39,129 @@ interface IButton {
 }
 
 // Arguable optimization, depends on unstable onClick, but works according to profiling (1.8% => 0%)
-const Button: React.FunctionComponent<IButton & TButton> = React.memo(
-  (props) => {
-    const {
-      loading,
-      children,
-      disabled,
-      withRipple,
-      withProgress,
-      customDebounce,
-      onClick,
-      ...rest
-    } = props;
-    const { ref, inView }: { ref: any; inView: boolean } = useInView();
-    // Progress effect
-    const [progress, setProgress] = useState(0);
-    // Ripple effect
-    const [rippleOrigin, setRippleOrigin] = useState<{ x: string; y: string }>({
-      x: '50%',
-      y: '50%',
-    });
-    const [isRippling, setIsRippling] = useState(false);
+const Button = React.memo(
+  React.forwardRef<HTMLAnchorElement & HTMLButtonElement, IButton & TButton>(
+    (props, parentRef) => {
+      const {
+        loading,
+        children,
+        disabled,
+        withRipple,
+        withProgress,
+        customDebounce,
+        onClick,
+        ...rest
+      } = props;
+      const { ref, inView } = useInView();
 
-    const handleClickDebounced = useMemo(
-      () => debounce(onClick!!, 800),
-      [onClick]
-    );
-    const handleRestoreRippling = useMemo(
-      () =>
-        debounce(() => {
-          if (!withRipple) return;
-          setIsRippling(false);
-        }, customDebounce ?? 750),
-      [withRipple, setIsRippling, customDebounce]
-    );
-
-    const handleOnBlurCapture = () => setIsRippling(false);
-    const handleOnMouseDown = (e: any) => {
-      if (disabled || !withRipple) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      setRippleOrigin({
-        x: `${x}px`,
-        y: `${y}px`,
-      });
-      setIsRippling(true);
-    };
-    const handleOnTouchStart = (e: any) => {
-      if (disabled || !withRipple) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.touches[0].clientX - rect.left;
-      const y = e.touches[0].clientY - rect.top;
-      setRippleOrigin({
-        x: `${x}px`,
-        y: `${y}px`,
-      });
-      setIsRippling(true);
-    };
-    const handleOnKeyDownCapture = () => {
-      if (disabled || !withRipple) return;
-      setRippleOrigin({
+      // Progress effect
+      const [progress, setProgress] = useState(0);
+      // Ripple effect
+      const [rippleOrigin, setRippleOrigin] = useState<{
+        x: string;
+        y: string;
+      }>({
         x: '50%',
         y: '50%',
       });
-      setIsRippling(true);
-    };
+      const [isRippling, setIsRippling] = useState(false);
 
-    useEffect(() => {
-      if (inView) {
-        setProgress(rest.progress ?? 0);
-      }
-    }, [rest.progress, inView]);
+      const handleClickDebounced = useMemo(
+        () => debounce(onClick!!, 800),
+        [onClick]
+      );
+      const handleRestoreRippling = useMemo(
+        () =>
+          debounce(() => {
+            if (!withRipple) return;
+            setIsRippling(false);
+          }, customDebounce ?? 750),
+        [withRipple, setIsRippling, customDebounce]
+      );
 
-    return (
-      <SButton
-        ref={ref}
-        onClick={!withRipple ? onClick : handleClickDebounced}
-        disabled={disabled}
-        withRipple={withRipple}
-        isRippling={!withRipple ? false : isRippling}
-        onMouseDown={handleOnMouseDown}
-        withProgress={withProgress}
-        rippleOrigin={rippleOrigin}
-        onTouchStart={handleOnTouchStart}
-        elementWidth={ref.current?.getBoundingClientRect()?.width ?? 800}
-        onBlurCapture={handleOnBlurCapture}
-        onKeyUpCapture={handleRestoreRippling}
-        onMouseUpCapture={handleRestoreRippling}
-        onKeyDownCapture={handleOnKeyDownCapture}
-        onTouchEndCapture={handleRestoreRippling}
-        {...rest}
-      >
-        <span>{children}</span>
-        {withProgress && <SProgress view={rest.view} progress={progress} />}
-        {loading && (
-          <SLoader size={rest.size}>
-            <Lottie
-              width={25}
-              height={20}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: logoAnimation,
-              }}
-            />
-          </SLoader>
-        )}
-      </SButton>
-    );
-  }
+      const handleOnBlurCapture = () => setIsRippling(false);
+      const handleOnMouseDown = (e: any) => {
+        if (disabled || !withRipple) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        setRippleOrigin({
+          x: `${x}px`,
+          y: `${y}px`,
+        });
+        setIsRippling(true);
+      };
+      const handleOnTouchStart = (e: any) => {
+        if (disabled || !withRipple) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.touches[0].clientX - rect.left;
+        const y = e.touches[0].clientY - rect.top;
+        setRippleOrigin({
+          x: `${x}px`,
+          y: `${y}px`,
+        });
+        setIsRippling(true);
+      };
+      const handleOnKeyDownCapture = () => {
+        if (disabled || !withRipple) return;
+        setRippleOrigin({
+          x: '50%',
+          y: '50%',
+        });
+        setIsRippling(true);
+      };
+
+      useEffect(() => {
+        if (inView) {
+          setProgress(rest.progress ?? 0);
+        }
+      }, [rest.progress, inView]);
+
+      return (
+        <SButton
+          ref={(el) => {
+            ref(el);
+
+            if (parentRef) {
+              // eslint-disable-next-line no-param-reassign
+              parentRef.current = el;
+            }
+          }}
+          onClick={!withRipple ? onClick : handleClickDebounced}
+          disabled={disabled}
+          withRipple={withRipple}
+          isRippling={!withRipple ? false : isRippling}
+          onMouseDown={handleOnMouseDown}
+          withProgress={withProgress}
+          rippleOrigin={rippleOrigin}
+          onTouchStart={handleOnTouchStart}
+          elementWidth={ref.current?.getBoundingClientRect()?.width ?? 800}
+          onBlurCapture={handleOnBlurCapture}
+          onKeyUpCapture={handleRestoreRippling}
+          onMouseUpCapture={handleRestoreRippling}
+          onKeyDownCapture={handleOnKeyDownCapture}
+          onTouchEndCapture={handleRestoreRippling}
+          {...rest}
+        >
+          <span>{children}</span>
+          {withProgress && <SProgress view={rest.view} progress={progress} />}
+          {loading && (
+            <SLoader size={rest.size}>
+              <Lottie
+                width={25}
+                height={20}
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: logoAnimation,
+                }}
+              />
+            </SLoader>
+          )}
+        </SButton>
+      );
+    }
+  )
 );
 
 Button.defaultProps = {

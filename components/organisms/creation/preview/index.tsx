@@ -8,6 +8,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import { useUpdateEffect } from 'react-use';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -34,6 +35,7 @@ import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/Chevro
 import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
 import urltoFile from '../../../../utils/urlToFile';
 import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -46,7 +48,7 @@ interface IPreviewContent {}
 
 export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { t: tCommon } = useTranslation();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -391,6 +393,12 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     </SChoiceItem>
   );
 
+  useUpdateEffect(() => {
+    if (!post.title) {
+      router?.push('/creation');
+    }
+  }, [post.title, router]);
+
   if (isMobile) {
     return (
       <>
@@ -405,7 +413,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               onClick={handleGoBack}
             />
             <SHeadlineMobile variant={2} weight={600}>
-              {post.title}
+              <PostTitleContent>{post.title}</PostTitleContent>
             </SHeadlineMobile>
           </STopLine>
           {tab === 'multiple-choice' && (
@@ -420,7 +428,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
                 resources={videoProcessing?.targetUrls}
               />
             ) : (
-              <SText variant={2}>{t('video-being-processed-caption')}</SText>
+              <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
             )}
           </SPlayerWrapper>
         </SContent>
@@ -459,12 +467,14 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
                 borderRadius='16px'
               />
             ) : (
-              <SText variant={2}>{t('video-being-processed-caption')}</SText>
+              <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
             )}
           </STabletPlayer>
         </SLeftPart>
         <SRightPart>
-          <SHeadline variant={5}>{post.title}</SHeadline>
+          <SHeadline variant={5}>
+            <PostTitleContent>{post.title}</PostTitleContent>
+          </SHeadline>
           {tab === 'multiple-choice' && (
             <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>
           )}

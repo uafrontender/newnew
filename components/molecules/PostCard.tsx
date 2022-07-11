@@ -41,6 +41,7 @@ import iconDark8 from '../../public/images/svg/numbers/8_dark.svg';
 import iconDark9 from '../../public/images/svg/numbers/9_dark.svg';
 import iconDark10 from '../../public/images/svg/numbers/10_dark.svg';
 import moreIcon from '../../public/images/svg/icons/filled/More.svg';
+import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
 // Utils
 import switchPostType from '../../utils/switchPostType';
@@ -88,6 +89,7 @@ interface ICard {
   index: number;
   width?: string;
   height?: string;
+  maxWidthTablet?: string;
   shouldStop?: boolean;
   handleRemovePostFromState?: () => void;
 }
@@ -99,10 +101,11 @@ export const PostCard: React.FC<ICard> = React.memo(
     index,
     width,
     height,
+    maxWidthTablet,
     shouldStop,
     handleRemovePostFromState,
   }) => {
-    const { t } = useTranslation('home');
+    const { t } = useTranslation('component-PostCard');
     const theme = useTheme();
     const router = useRouter();
     const user = useAppSelector((state) => state.user);
@@ -153,13 +156,21 @@ export const PostCard: React.FC<ICard> = React.memo(
         : 0
     );
 
-    const timestampSeconds = useMemo(() => {
+    const endsAtTime = useMemo(() => {
       if (postParsed.expiresAt?.seconds) {
         return (postParsed.expiresAt.seconds as number) * 1000;
       }
 
       return 0;
     }, [postParsed.expiresAt?.seconds]);
+
+    const startsAtTime = useMemo(() => {
+      if (postParsed.startsAt?.seconds) {
+        return (postParsed.startsAt.seconds as number) * 1000;
+      }
+
+      return 0;
+    }, [postParsed.startsAt?.seconds]);
 
     const [thumbnailUrl, setThumbnailUrl] = useState(
       postParsed.announcement?.thumbnailUrl ?? ''
@@ -192,7 +203,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     const handleReportOpen = useCallback(() => {
       if (!user.loggedIn) {
         router.push(
-          `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
+          `/sign-up?reason=report&redirect=${encodeURIComponent(
             `${process.env.NEXT_PUBLIC_APP_URL}/post/${postParsed.postUuid}`
           )}`
         );
@@ -360,8 +371,8 @@ export const PostCard: React.FC<ICard> = React.memo(
       };
 
       if (socketConnection) {
-        socketConnection.on('PostUpdated', handlerSocketPostUpdated);
-        socketConnection.on(
+        socketConnection?.on('PostUpdated', handlerSocketPostUpdated);
+        socketConnection?.on(
           'PostThumbnailUpdated',
           handlerSocketThumbnailUpdated
         );
@@ -372,9 +383,9 @@ export const PostCard: React.FC<ICard> = React.memo(
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off('PostUpdated', handlerSocketPostUpdated);
-          socketConnection.off(
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off('PostUpdated', handlerSocketPostUpdated);
+          socketConnection?.off(
             'PostThumbnailUpdated',
             handlerSocketThumbnailUpdated
           );
@@ -405,6 +416,8 @@ export const PostCard: React.FC<ICard> = React.memo(
         clearTimeout(timeout);
       };
     }, [hovered]);
+    const moreButtonInsideRef: any = useRef();
+    const moreButtonRef: any = useRef();
 
     if (type === 'inside') {
       return (
@@ -467,6 +480,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   iconOnly
                   id='showMore'
                   view='transparent'
+                  ref={moreButtonInsideRef}
                   onClick={handleMoreClick}
                 >
                   <InlineSVG
@@ -484,6 +498,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                     postCreator={postParsed.creator as newnewapi.User}
                     handleReportOpen={handleReportOpen}
                     onClose={handleEllipseMenuClose}
+                    anchorElement={moreButtonInsideRef.current}
                   />
                 )}
               </STopContent>
@@ -538,6 +553,7 @@ export const PostCard: React.FC<ICard> = React.memo(
         onTouchStart={() => handleSetHovered()}
         onMouseLeave={() => handleSetUnhovered()}
         width={width}
+        maxWidthTablet={maxWidthTablet ?? undefined}
       >
         <SImageBG id='backgroundPart' height={height}>
           <SImageHolderOutside id='animatedPart'>
@@ -578,6 +594,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 id='showMore'
                 view='transparent'
                 onClick={handleMoreClick}
+                ref={moreButtonRef}
               >
                 <InlineSVG
                   svg={moreIcon}
@@ -597,13 +614,14 @@ export const PostCard: React.FC<ICard> = React.memo(
                     handleRemovePostFromState ?? undefined
                   }
                   onClose={handleEllipseMenuClose}
+                  anchorElement={moreButtonRef.current}
                 />
               )}
             </STopContent>
           </SImageHolderOutside>
         </SImageBG>
         <SBottomContentOutside>
-          <SBottomStart hasEnded={Date.now() > timestampSeconds}>
+          <SBottomStart hasEnded={Date.now() > endsAtTime}>
             <SUserAvatarOutside
               avatarUrl={
                 postParsed?.creator?.avatarUrl
@@ -616,8 +634,14 @@ export const PostCard: React.FC<ICard> = React.memo(
                 handleUserClick(postParsed.creator?.username!!);
               }}
             />
-            <SUsername variant={2}>
-              {Date.now() > timestampSeconds
+            <SUsername
+              variant={2}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleUserClick(postParsed.creator?.username!!);
+              }}
+            >
+              {Date.now() > endsAtTime
                 ? postParsed.creator?.nickname &&
                   postParsed.creator?.nickname?.length > (isMobile ? 7 : 5)
                   ? `${postParsed.creator?.nickname?.substring(
@@ -632,8 +656,15 @@ export const PostCard: React.FC<ICard> = React.memo(
                     isMobile ? 15 : 9
                   )}...`
                 : postParsed.creator?.nickname}
+              {postParsed.creator?.options?.isVerified && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                />
+              )}
             </SUsername>
-            <CardTimer timestampSeconds={timestampSeconds} />
+            <CardTimer startsAt={startsAtTime} endsAt={endsAtTime} />
           </SBottomStart>
           <STextOutside variant={3} weight={600}>
             {postParsed.title}
@@ -648,7 +679,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   onClick={handleBidClick}
                   cardType={typeOfPost}
                 >
-                  {t(`button-card-singular-${typeOfPost}`, {
+                  {t('button.withActivity.mcSingular', {
                     votes: formatNumber(totalVotes ?? 0, true),
                     total: formatNumber(
                       (postParsed as newnewapi.Crowdfunding)
@@ -677,7 +708,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   }
                   withProgress={typeOfPost === 'cf'}
                 >
-                  {t(`button-card-${typeOfPost}`, {
+                  {t(`button.withActivity.${typeOfPost}`, {
                     votes: formatNumber(totalVotes ?? 0, true),
                     total: formatNumber(
                       (postParsed as newnewapi.Crowdfunding)
@@ -691,9 +722,10 @@ export const PostCard: React.FC<ICard> = React.memo(
               )
             ) : (
               <SButtonFirst withShrink onClick={handleBidClick}>
-                {switchPostStatus(typeOfPost, postParsed.status) === 'voting'
-                  ? t(`button-card-first-${typeOfPost}`)
-                  : t(`button-card-see-${typeOfPost}`)}
+                {switchPostStatus(typeOfPost, postParsed.status) === 'voting' &&
+                postParsed.creator?.uuid !== user.userData?.userUuid
+                  ? t(`button.withoutActivity.${typeOfPost}`)
+                  : t(`button.seeResults.${typeOfPost}`)}
               </SButtonFirst>
             )}
           </SBottomEnd>
@@ -734,6 +766,7 @@ PostCard.defaultProps = {
 interface ISWrapper {
   index?: number;
   width?: string;
+  maxWidthTablet?: string;
 }
 
 const SWrapper = styled.div<ISWrapper>`
@@ -1009,7 +1042,7 @@ const SWrapperOutside = styled.div<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
-    max-width: 200px;
+    max-width: ${({ maxWidthTablet }) => maxWidthTablet ?? '200px'};
 
     transition: transform ease 0.5s;
 
@@ -1139,7 +1172,8 @@ const SUserAvatarOutside = styled(UserAvatar)`
 
 const SUsername = styled(Text)`
   grid-area: nickname;
-
+  display: flex;
+  align-items: center;
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
@@ -1276,4 +1310,8 @@ const SButtonIcon = styled(Button)`
     opacity: 0;
     transition: all ease 0.5s;
   }
+`;
+
+const SInlineSVG = styled(InlineSVG)`
+  margin-left: 2px;
 `;

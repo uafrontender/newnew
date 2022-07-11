@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -14,6 +15,8 @@ import { formatNumber } from '../../../utils/format';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../molecules/decision/waiting/WaitingForResponseBox')
@@ -22,8 +25,8 @@ const AcWaitingOptionsSection = dynamic(
   () =>
     import('../../molecules/decision/auction/waiting/AcWaitingOptionsSection')
 );
-const CommentsSuccess = dynamic(
-  () => import('../../molecules/decision/success/CommentsSuccess')
+const CommentsBottomSection = dynamic(
+  () => import('../../molecules/decision/success/CommentsBottomSection')
 );
 
 interface IPostAwaitingResponseAC {
@@ -32,31 +35,34 @@ interface IPostAwaitingResponseAC {
 
 const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
   React.memo(({ post }) => {
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isTablet = ['tablet'].includes(resizeMode);
+    const router = useRouter();
+
+    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     const waitingTime = useMemo(() => {
       const end = (post.responseUploadDeadline?.seconds as number) * 1000;
       const parsed = (end - Date.now()) / 1000;
-      const dhms = secondsToDHMS(parsed, 'noTrim');
+      const dhms = secondsToDHMS(parsed);
 
       let countdownsrt = `${dhms.days} ${t(
-        'AcPostAwaiting.hero.expires.days'
-      )} ${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')}`;
+        'acPostAwaiting.hero.expires.days'
+      )} ${dhms.hours} ${t('acPostAwaiting.hero.expires.hours')}`;
 
       if (dhms.days === '0') {
         countdownsrt = `${dhms.hours} ${t(
-          'AcPostAwaiting.hero.expires.hours'
-        )} ${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')}`;
+          'acPostAwaiting.hero.expires.hours'
+        )} ${dhms.minutes} ${t('acPostAwaiting.hero.expires.minutes')}`;
         if (dhms.hours === '0') {
           countdownsrt = `${dhms.minutes} ${t(
-            'AcPostAwaiting.hero.expires.minutes'
-          )} ${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
+            'acPostAwaiting.hero.expires.minutes'
+          )} ${dhms.seconds} ${t('acPostAwaiting.hero.expires.seconds')}`;
           if (dhms.minutes === '0') {
             countdownsrt = `${dhms.seconds} ${t(
-              'AcPostAwaiting.hero.expires.seconds'
+              'acPostAwaiting.hero.expires.seconds'
             )}`;
           }
         }
@@ -103,23 +109,22 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
     // Replace hash once scrolled to comments
     useEffect(() => {
       if (inView) {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}#comments`
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#comments`
         );
       } else {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `/post/${post.postUuid}`
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }`
         );
       }
-    }, [inView, post.postUuid]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inView, post.postUuid, router.locale]);
 
     return (
       <>
@@ -137,8 +142,8 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
           />
           <SActivitesContainer>
             <WaitingForResponseBox
-              title={t('AcPostAwaiting.hero.title')}
-              body={t('AcPostAwaiting.hero.body', {
+              title={t('acPostAwaiting.hero.title')}
+              body={t('acPostAwaiting.hero.body', {
                 creator: post.creator?.nickname,
                 time: waitingTime,
               })}
@@ -151,7 +156,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
                   </a>
                   <a href={`/${post.creator?.username}`}>
                     <SWantsToKnow>
-                      {t('AcPostAwaiting.wants_to_know', {
+                      {t('acPostAwaiting.wantsToKnow', {
                         creator: post.creator?.nickname,
                       })}
                     </SWantsToKnow>
@@ -163,11 +168,13 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
                       post.totalAmount.usdCents / 100 ?? 0,
                       true
                     )}`}{' '}
-                    <span>{t('AcPostAwaiting.in_total_bids')}</span>
+                    <span>{t('acPostAwaiting.inTotalBids')}</span>
                   </STotal>
                 )}
               </SCreatorInfoDiv>
-              <SPostTitle variant={4}>{post.title}</SPostTitle>
+              <SPostTitle variant={4}>
+                <PostTitleContent>{post.title}</PostTitleContent>
+              </SPostTitle>
               <SSeparator />
               <AcWaitingOptionsSection
                 post={post}
@@ -179,12 +186,11 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
         {post.isCommentsAllowed && (
           <SCommentsSection id='comments' ref={commentsSectionRef}>
             <SCommentsHeadline variant={4}>
-              {t('SuccessCommon.Comments.heading')}
+              {t('successCommon.comments.heading')}
             </SCommentsHeadline>
-            <CommentsSuccess
+            <CommentsBottomSection
               postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => {}}
             />
           </SCommentsSection>
         )}

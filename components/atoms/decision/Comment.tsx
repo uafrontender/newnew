@@ -1,6 +1,12 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 import styled, { keyframes, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -35,6 +41,8 @@ interface IComment {
   canDeleteComment?: boolean;
   handleAddComment: (newMsg: string) => void;
   handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
+  onFormFocus?: () => void;
+  onFormBlur?: () => void;
 }
 
 const Comment: React.FC<IComment> = ({
@@ -43,10 +51,12 @@ const Comment: React.FC<IComment> = ({
   canDeleteComment,
   handleAddComment,
   handleDeleteComment,
+  onFormFocus,
+  onFormBlur,
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -98,6 +108,8 @@ const Comment: React.FC<IComment> = ({
     }
   }, [comment.isOpen]);
 
+  const moreButtonRef: any = useRef<HTMLButtonElement>();
+
   return (
     <>
       <SComment key={comment.id.toString()} id={`comment_id_${comment.id}`}>
@@ -116,7 +128,7 @@ const Comment: React.FC<IComment> = ({
                   ? comment.sender?.uuid === user.userData?.userUuid
                     ? t('comments.me')
                     : comment.sender?.nickname ?? comment.sender?.username
-                  : t('comments.comment_deleted')}
+                  : t('comments.commentDeleted')}
               </SNickname>
             </Link>
             <SBid> </SBid>
@@ -126,21 +138,24 @@ const Comment: React.FC<IComment> = ({
               {moment((comment.createdAt?.seconds as number) * 1000).fromNow()}
             </SDate>
             <SActionsDiv>
-              <SMoreButton
-                view='transparent'
-                iconOnly
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleOpenEllipseMenu();
-                }}
-              >
-                <InlineSVG
-                  svg={MoreIconFilled}
-                  fill={theme.colorsThemed.text.secondary}
-                  width='20px'
-                  height='20px'
-                />
-              </SMoreButton>
+              {!comment.isDeleted && (
+                <SMoreButton
+                  view='transparent'
+                  iconOnly
+                  ref={moreButtonRef}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenEllipseMenu();
+                  }}
+                >
+                  <InlineSVG
+                    svg={MoreIconFilled}
+                    fill={theme.colorsThemed.text.secondary}
+                    width='20px'
+                    height='20px'
+                  />
+                </SMoreButton>
+              )}
               {/* Ellipse menu */}
               {!isMobile && (
                 <CommentEllipseMenu
@@ -152,6 +167,7 @@ const Comment: React.FC<IComment> = ({
                   handleClose={handleCloseEllipseMenu}
                   onDeleteComment={onDeleteComment}
                   onUserReport={onUserReport}
+                  anchorElement={moreButtonRef.current}
                 />
               )}
             </SActionsDiv>
@@ -159,24 +175,26 @@ const Comment: React.FC<IComment> = ({
           <SText>{comment.content?.text}</SText>
           {!comment.parentId &&
             (!isReplyFormOpen ? (
-              <SReply onClick={replyHandler}>{t('comments.send-reply')}</SReply>
+              <SReply onClick={replyHandler}>{t('comments.sendReply')}</SReply>
             ) : (
               <>
                 {replies.length === 0 ? (
                   <SReply onClick={replyHandler}>
-                    {t('comments.hide-replies')}
+                    {t('comments.hideReplies')}
                   </SReply>
                 ) : null}
                 <CommentForm
                   onSubmit={(newMsg: string) => handleAddComment(newMsg)}
+                  onBlur={onFormBlur ?? undefined}
+                  onFocus={onFormFocus ?? undefined}
                 />
               </>
             ))}
           {!comment.parentId && replies && replies.length > 0 && (
             <SReply onClick={replyHandler}>
               {isReplyFormOpen
-                ? t('comments.hide-replies')
-                : t('comments.view-replies')}{' '}
+                ? t('comments.hideReplies')
+                : t('comments.viewReplies')}{' '}
               {replies.length}{' '}
               {replies.length > 1 ? t('comments.replies') : t('comments.reply')}
             </SReply>
@@ -186,9 +204,7 @@ const Comment: React.FC<IComment> = ({
             replies.map((item) => (
               <Comment
                 key={item.id.toString()}
-                canDeleteComment={
-                  isMyComment ? true : canDeleteComment ?? false
-                }
+                canDeleteComment={canDeleteComment}
                 comment={item}
                 handleAddComment={(newMsg: string) => handleAddComment(newMsg)}
                 handleDeleteComment={handleDeleteComment}
@@ -235,6 +251,8 @@ export default Comment;
 Comment.defaultProps = {
   lastChild: false,
   canDeleteComment: false,
+  onFormFocus: () => {},
+  onFormBlur: () => {},
 };
 
 const SUserAvatar = styled(UserAvatar)`

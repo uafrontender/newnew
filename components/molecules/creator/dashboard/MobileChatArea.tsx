@@ -22,7 +22,7 @@ import UserAvatar from '../../UserAvatar';
 
 const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
 
   const { ref: scrollRef, inView } = useInView();
   const user = useAppSelector((state) => state.user);
@@ -130,12 +130,15 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       }
     };
     if (socketConnection) {
-      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+      socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
+          'ChatMessageCreated',
+          socketHandlerMessageCreated
+        );
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -162,7 +165,7 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newMessage]);
 
-  const handleChange = useCallback((id, value) => {
+  const handleChange = useCallback((id: string, value: string) => {
     setMessageText(value);
   }, []);
 
@@ -197,7 +200,7 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   }, [messageText]);
 
   const renderMessage = useCallback(
-    (item: newnewapi.IChatMessage, index) => {
+    (item: newnewapi.IChatMessage, index: number) => {
       const prevElement = messages[index - 1];
       const nextElement = messages[index + 1];
 
@@ -328,10 +331,18 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           <GoBackButton onClick={clickHandler} />
           <SUserData>
             <SUserName>
-              {isMyAnnouncement
-                ? user.userData?.nickname
-                : chatRoom.visavis?.nickname}
-              {isAnnouncement && t('announcement.title')}
+              {
+                // eslint-disable-next-line no-nested-ternary
+                isAnnouncement
+                  ? t('announcement.title', {
+                      username: isMyAnnouncement
+                        ? user.userData?.nickname
+                        : chatRoom.visavis?.nickname,
+                    })
+                  : isMyAnnouncement
+                  ? user.userData?.nickname
+                  : chatRoom.visavis?.nickname
+              }
             </SUserName>
             <SUserAlias>
               {!isAnnouncement
@@ -342,8 +353,8 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                       : 0
                   } ${
                     chatRoom.memberCount && chatRoom.memberCount > 1
-                      ? t('new-announcement.members')
-                      : t('new-announcement.member')
+                      ? t('newAnnouncement.members')
+                      : t('newAnnouncement.member')
                   }`}
             </SUserAlias>
           </SUserData>

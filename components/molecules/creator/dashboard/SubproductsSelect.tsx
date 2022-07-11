@@ -22,19 +22,19 @@ import EnableSubModal from '../../../atoms/dashboard/EnableSubModal';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { setUserData } from '../../../../redux-store/slices/userStateSlice';
 
-interface ISubproductsSelect {
+interface ISubProductsSelect {
   mySubscriptionProduct: newnewapi.ISubscriptionProduct | null;
 }
 
-const SubproductsSelect: React.FC<ISubproductsSelect> = ({
+const SubProductsSelect: React.FC<ISubProductsSelect> = ({
   mySubscriptionProduct,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const [standardProducts, setStandardProducts] = useState<
     newnewapi.ISubscriptionProduct[]
   >([]);
   const [selectedProduct, setSelectedProduct] =
-    useState<newnewapi.ISubscriptionProduct>();
+    useState<newnewapi.ISubscriptionProduct | null>(mySubscriptionProduct);
   const [isLoading, setIsLoading] = useState(true);
   const [confirmSubEnable, setConfirmSubEnable] = useState<boolean>(false);
   const router = useRouter();
@@ -49,7 +49,9 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
           getStandardProductsPayload
         );
         if (getStandardProductsRes.data) {
-          setStandardProducts(getStandardProductsRes.data.products);
+          const newStandardProducts = getStandardProductsRes.data.products;
+          setStandardProducts(newStandardProducts);
+          setSelectedProduct((curr) => curr || newStandardProducts[0]);
         }
         setIsLoading(false);
       } catch (err) {
@@ -59,16 +61,6 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
 
     fetchOnboardingState();
   }, []);
-
-  useEffect(() => {
-    if (mySubscriptionProduct) {
-      setSelectedProduct(mySubscriptionProduct);
-    } else {
-      if (standardProducts.length > 0) {
-        setSelectedProduct(standardProducts[0]);
-      }
-    }
-  }, [mySubscriptionProduct, standardProducts]);
 
   const handleSetSelectedProduct = (
     product: newnewapi.ISubscriptionProduct
@@ -140,23 +132,23 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
               }
             >
               <Button view='quaternary'>
-                {t('SubrateSection.backButton')}
+                {t('subRateSection.button.back')}
               </Button>
             </Link>
             {!mySubscriptionProduct ? (
               <Button view='primaryGrad' onClick={() => handlerConfirmEnable()}>
-                {t('SubrateSection.submitDesktop')}
+                {t('subRateSection.button.enable')}
               </Button>
             ) : (
               <Button
                 view='primaryGrad'
                 disabled={
-                  selectedProduct &&
+                  !!selectedProduct &&
                   mySubscriptionProduct.id === selectedProduct.id
                 }
                 onClick={() => handlerUpdateRate()}
               >
-                {t('SubrateSection.updateRate')}
+                {t('subRateSection.button.update')}
               </Button>
             )}
           </SActions>
@@ -184,7 +176,7 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
   );
 };
 
-export default SubproductsSelect;
+export default SubProductsSelect;
 
 const SContainer = styled.div`
   display: flex;
@@ -231,9 +223,10 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
   handleClick,
   currentProduct,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const ref: any = useRef();
 
+  // Should non selected option be animated?
   useEffect(() => {
     ref.current.anim.stop();
 
@@ -246,7 +239,7 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
   }, [ref, selected]);
 
   return (
-    <SProductOption selected={selected ?? false} onClick={handleClick}>
+    <SProductOption selected={selected} onClick={handleClick}>
       <SAnimation>
         <Lottie
           ref={ref}
@@ -263,21 +256,21 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
         {product.id !== '' ? (
           <>
             {product?.monthlyRate?.usdCents && (
-              <SPrice variant={1} weight={600} selected={selected ?? false}>
+              <SPrice variant={1} weight={600} selected={selected}>
                 ${formatNumber(product.monthlyRate.usdCents / 100 ?? 0, true)}
               </SPrice>
             )}
-            <SPerMonth variant={2} selected={selected ?? false}>
-              {t('SubrateSection.selectInput.perMonth')}
+            <SPerMonth variant={2} selected={selected}>
+              {t('subRateSection.selectInput.perMonth')}
             </SPerMonth>
             {currentProduct && (
-              <SLabelCurrent selected={selected ?? false}>
-                Current
+              <SLabelCurrent selected={selected}>
+                {t('subRateSection.selectInput.current')}
               </SLabelCurrent>
             )}
           </>
         ) : (
-          <Text variant={2}>{t('SubrateSection.selectInput.noProduct')}</Text>
+          <Text variant={2}>{t('subRateSection.selectInput.noProduct')}</Text>
         )}
       </SLabelContent>
     </SProductOption>

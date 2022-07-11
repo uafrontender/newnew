@@ -5,8 +5,8 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useMemo, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -41,12 +41,22 @@ interface IMcOptionCardModeration {
   index: number;
   canBeDeleted: boolean;
   isCreatorsBid: boolean;
+  isWinner?: boolean;
+  handleRemoveOption?: () => void;
 }
 
 const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
-  ({ option, creator, index, canBeDeleted, isCreatorsBid }) => {
+  ({
+    option,
+    creator,
+    index,
+    canBeDeleted,
+    isCreatorsBid,
+    isWinner,
+    handleRemoveOption,
+  }) => {
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -76,7 +86,8 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
         console.log(res);
 
         if (!res.error) {
-          console.log('deleted');
+          setIsDeleteModalOpen(false);
+          handleRemoveOption?.();
         }
       } catch (err) {
         console.error(err);
@@ -93,6 +104,8 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
     const handleReportClose = useCallback(() => {
       setIsReportModalOpen(false);
     }, []);
+
+    const ellipseMenuButton: any = useRef();
 
     return (
       <>
@@ -118,9 +131,10 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
               damping: 20,
               stiffness: 300,
             }}
+            $isBlue={!!isWinner}
           >
-            <SBidDetails>
-              <SBidAmount>
+            <SBidDetails isBlue={!!isWinner}>
+              <SBidAmount isWhite={!!isWinner}>
                 <OptionActionIcon
                   src={
                     theme.name === 'light'
@@ -132,13 +146,15 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                   {option.voteCount && option.voteCount > 0
                     ? `${formatNumber(option?.voteCount, true)} ${
                         option.voteCount === 1
-                          ? t('McPost.OptionsTab.OptionCard.vote')
-                          : t('McPost.OptionsTab.OptionCard.votes')
+                          ? t('mcPost.optionsTab.optionCard.vote')
+                          : t('mcPost.optionsTab.optionCard.votes')
                       }`
-                    : t('McPost.OptionsTab.OptionCard.noVotes')}
+                    : t('mcPost.optionsTab.optionCard.noVotes')}
                 </div>
               </SBidAmount>
-              <SOptionInfo variant={3}>{option.text}</SOptionInfo>
+              <SOptionInfo isWhite={!!isWinner} variant={3}>
+                {option.text}
+              </SOptionInfo>
               <SBiddersInfo variant={3}>
                 <RenderSupportersInfo
                   isCreatorsBid
@@ -168,7 +184,10 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
               </SBiddersInfo>
             </SBidDetails>
             {!isMobile ? (
-              <SEllipseButton onClick={() => setIsEllipseMenuOpen(true)}>
+              <SEllipseButton
+                onClick={() => setIsEllipseMenuOpen(true)}
+                ref={ellipseMenuButton}
+              >
                 <InlineSvg
                   svg={MoreIconFilled}
                   fill={theme.colorsThemed.text.secondary}
@@ -177,8 +196,11 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                 />
               </SEllipseButton>
             ) : (
-              <SEllipseButtonMobile onClick={() => setIsEllipseMenuOpen(true)}>
-                {t('McPost.OptionsTab.OptionCard.moreBtn')}
+              <SEllipseButtonMobile
+                ref={ellipseMenuButton}
+                onClick={() => setIsEllipseMenuOpen(true)}
+              >
+                {t('mcPost.optionsTab.optionCard.moreButton')}
               </SEllipseButtonMobile>
             )}
             {!isMobile && (
@@ -190,6 +212,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                 handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
                 handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
                 handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+                anchorElement={ellipseMenuButton.current}
               />
             )}
           </SContainer>
@@ -239,7 +262,9 @@ McOptionCardModeration.defaultProps = {};
 
 export default McOptionCardModeration;
 
-const SContainer = styled(motion.div)`
+const SContainer = styled(motion.div)<{
+  $isBlue: boolean;
+}>`
   position: relative;
 
   display: flex;
@@ -250,7 +275,10 @@ const SContainer = styled(motion.div)`
 
   padding: 16px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  background-color: ${({ theme, $isBlue }) =>
+    $isBlue
+      ? theme.colorsThemed.accent.blue
+      : theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   ${({ theme }) => theme.media.tablet} {
@@ -265,7 +293,9 @@ const SContainer = styled(motion.div)`
   }
 `;
 
-const SBidDetails = styled.div`
+const SBidDetails = styled.div<{
+  isBlue: boolean;
+}>`
   position: relative;
 
   display: grid;
@@ -277,20 +307,38 @@ const SBidDetails = styled.div`
 
   width: 100%;
 
+  ${({ isBlue }) =>
+    isBlue
+      ? css`
+          .spanRegular {
+            color: #ffffff;
+            opacity: 0.6;
+          }
+          .spanHighlighted {
+            color: #ffffff;
+          }
+        `
+      : null}
+
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
       'amount bidders'
       'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
 
-    background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+    background-color: ${({ theme, isBlue }) =>
+      isBlue
+        ? theme.colorsThemed.accent.blue
+        : theme.colorsThemed.background.tertiary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 14px;
   }
 `;
 
-const SBidAmount = styled.div`
+const SBidAmount = styled.div<{
+  isWhite?: boolean;
+}>`
   grid-area: amount;
 
   display: flex;
@@ -298,6 +346,12 @@ const SBidAmount = styled.div`
   justify-content: flex-start;
   gap: 8px;
 
+  ${({ isWhite }) =>
+    isWhite
+      ? css`
+          color: #ffffff;
+        `
+      : null};
   font-weight: 700;
   font-size: 16px;
   line-height: 24px;
@@ -310,10 +364,19 @@ const OptionActionIcon = styled.img`
   width: 24px;
 `;
 
-const SOptionInfo = styled(Text)`
+const SOptionInfo = styled(Text)<{
+  isWhite?: boolean;
+}>`
   grid-area: optionInfo;
 
   margin-bottom: 8px;
+
+  ${({ isWhite }) =>
+    isWhite
+      ? css`
+          color: #ffffff;
+        `
+      : null};
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: initial;
@@ -345,6 +408,7 @@ const SEllipseButton = styled(Button)`
   position: absolute;
   right: 0px;
   top: 12px;
+  align-self: center;
 
   padding: 0px 12px;
 

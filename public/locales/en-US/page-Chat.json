@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "title": "Direct Messages"
+  },
+  "chat": {
+    "today": "Today",
+    "placeholder": "Type a message...",
+    "welcomeMessage": "You successfully subscribed! Now you can send a message to",
+    "noMessagesFirstLine": "No messages here yet...",
+    "noMessagesSecondLine": "Send a message to start conversation.",
+    "typing": "Typing..."
+  },
+  "userBlocked": {
+    "title": "You blocked ",
+    "message": "Unblock them to chat. Don’t worry, they can’t see that you blocked them...",
+    "buttonText": "Unblock"
+  },
+  "groupBlocked": {
+    "title": "Group blocked",
+    "message": "Unblock the group, to continue conversation.",
+    "buttonText": "Unblock"
+  },
+  "subscriptionExpired": {
+    "title": "Subscription expired",
+    "message": "Only subscribers can send messages. Renew subscription.",
+    "buttonText": "Renew subscription"
+  },
+  "messagingDisabled": {
+    "title": "Messaging turned off",
+    "message": " temporarily turned off their subscription. Check back soon!"
+  },
+  "accountDeleted": {
+    "title": "Account deleted",
+    "message": "Account is no longer available.",
+    "buttonText": "Delete chat"
+  },
+  "toolbar": {
+    "searchPlaceholder": "Search for messages or users"
+  },
+  "modal": {
+    "blockUser": {
+      "title": "Block",
+      "messageFirstPart": "Are you sure you want to block",
+      "messageSecondPart": "from messaging you?",
+      "button": {
+        "cancel": "Cancel",
+        "confirm": "Block"
+      }
+    },
+    "blockGroup": {
+      "title": "Block group",
+      "button": {
+        "confirm": "Block group"
+      }
+    },
+    "newMessage": {
+      "title": "New message",
+      "searchPlaceholder": "Search",
+      "noResultsText": "No results for",
+      "noResultsSearchText": "Try a new name..."
+    },
+    "renewSubscriptionsSubtitle": "Renew subscription to"
+  },
+  "emptyInbox": {
+    "title": "Your inbox is empty",
+    "text": "Once you start a new conversation, you’ll see it listed here"
+  },
+  "newAnnouncement": {
+    "title": "New announcement",
+    "text": "Only you can send messages to the group.",
+    "created": "You created the announcement",
+    "member": "member",
+    "members": "members"
+  },
+  "default": {
+    "searchPlaceholder": "Search"
+  },
+  "announcement": {
+    "title": "{{username}}'s announcement",
+    "topMessageStart": "Only",
+    "topMessageEnd": "can send messages"
+  },
+  "userTypes": {
+    "all": "All",
+    "subscribers": "My Subscribers",
+    "subscribing": "Creators"
+  },
+  "dates": {
+    "now": "now",
+    "min": "min",
+    "today": "Today"
+  }
+}

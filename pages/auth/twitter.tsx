@@ -4,6 +4,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useCookies } from 'react-cookie';
+import { useUpdateEffect } from 'react-use';
 
 import Lottie from '../../components/atoms/Lottie';
 
@@ -31,14 +32,20 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (user.loggedIn) router?.push('/');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setMounted(true);
   }, []);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
+    if (user.loggedIn) router?.push('/');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
+
+  useUpdateEffect(() => {
     async function handleAuth() {
+      if (isLoading || user.loggedIn) return;
       try {
         setIsLoading(true);
 
@@ -52,7 +59,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
         const res = await signInWithTwitter(requestPayload);
 
         if (!res!! || res!!.error || !res.data)
-          throw new Error(res!!.error?.message ?? 'An error occured');
+          throw new Error(res!!.error?.message ?? 'An error occurred');
 
         const { data } = res!!;
 
@@ -115,7 +122,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
     handleAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mounted]);
 
   return (
     <div>

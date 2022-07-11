@@ -6,6 +6,7 @@ import Headline from '../../../atoms/Headline';
 interface IDecisionEndedBox {
   imgSrc: string;
   type?: 'ac' | 'mc' | 'cf';
+  children: string;
 }
 
 const DecisionEndedBox: React.FunctionComponent<IDecisionEndedBox> = ({
@@ -18,7 +19,7 @@ const DecisionEndedBox: React.FunctionComponent<IDecisionEndedBox> = ({
       <SBox>
         <SHeadlineMC variant={2}>{children}</SHeadlineMC>
         <SImageContainerMC>
-          <img src={imgSrc} alt='decision' />
+          <img src={imgSrc} alt='post' />
         </SImageContainerMC>
       </SBox>
     );
@@ -28,7 +29,7 @@ const DecisionEndedBox: React.FunctionComponent<IDecisionEndedBox> = ({
     <SBox>
       <SHeadline variant={2}>{children}</SHeadline>
       <SImageContainer>
-        <img src={imgSrc} alt='decision' />
+        <img src={imgSrc} alt='post' />
       </SImageContainer>
     </SBox>
   );

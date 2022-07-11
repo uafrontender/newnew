@@ -8,6 +8,7 @@ import React, {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -33,22 +34,24 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
 // import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 // import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
-import {
-  getSubscriptionStatus,
-  unsubscribeFromCreator,
-} from '../../api/endpoints/subscription';
+import { getSubscriptionStatus } from '../../api/endpoints/subscription';
 // import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
 
 import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
 import UserEllipseModal from '../molecules/profile/UserEllipseModal';
-import BlockUserModal from '../molecules/profile/BlockUserModalProfile';
+import BlockUserModalProfile from '../molecules/profile/BlockUserModalProfile';
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
 import BackButton from '../molecules/profile/BackButton';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 import UnsubscribeModal from '../molecules/profile/UnsubscribeModal';
+import getGenderPronouns, {
+  isGenderPronounsDefined,
+} from '../../utils/genderPronouns';
+import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
+import CustomLink from '../atoms/CustomLink';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -63,6 +66,7 @@ interface IProfileLayout {
   postsCachedActivityFilter?: newnewapi.Post.Filter;
   postsCachedActivityPageToken?: string | null | undefined;
   postsCachedActivityCount?: number;
+  children: React.ReactNode;
 }
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
@@ -80,7 +84,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 }) => {
   const router = useRouter();
   const theme = useTheme();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -95,10 +99,14 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     'tablet',
   ].includes(resizeMode);
 
+  const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
+    resizeMode
+  );
+
   // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [wasSubscribed, setWasSubscribed] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
+  const [wasSubscribed, setWasSubscribed] = useState<boolean | null>(null);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
   // Share
@@ -445,6 +453,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     // isSub ? setIsSubscribed(true) : setIsSubscribed(false);
   }, [creatorsImSubscribedTo, user.uuid]);
 
+  const moreButtonRef = useRef() as any;
+
   return (
     <ErrorBoundary>
       <SGeneral restrictMaxWidth>
@@ -479,12 +489,14 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 height={isMobileOrTablet ? '16px' : '24px'}
               />
             </SSVGContainer>
-            {t('ProfileLayout.buttons.favorites')}
+            {t('profileLayout.buttons.favorites')}
           </SFavoritesButton> */}
+
           <SMoreButton
             view='transparent'
             iconOnly
             onClick={() => setIsEllipseMenuOpen(true)}
+            ref={moreButtonRef}
           >
             <SSVGContainer active={ellipseMenuOpen}>
               <InlineSvg
@@ -494,12 +506,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 height={isMobileOrTablet ? '16px' : '24px'}
               />
             </SSVGContainer>
-            {t('ProfileLayout.buttons.more')}
+            {t('profileLayout.buttons.more')}
           </SMoreButton>
           {!isMobile && (
             <UserEllipseMenu
               isVisible={ellipseMenuOpen}
-              isSubscribed={isSubscribed}
+              isSubscribed={!!isSubscribed}
               isBlocked={isUserBlocked}
               loggedIn={currentUser.loggedIn}
               handleClose={() => setIsEllipseMenuOpen(false)}
@@ -514,6 +526,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               handleClickUnsubscribe={() => {
                 setUnsubscribeModalOpen(true);
               }}
+              anchorElement={moreButtonRef.current}
+              offsetTop={isDesktop ? '-25px' : '0'}
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
@@ -526,7 +540,27 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               alignItems: 'center',
             }}
           >
-            <SUsername variant={4}>{user.nickname}</SUsername>
+            <SUsernameWrapper>
+              <SUsername variant={4}>
+                {user.nickname}
+                {user.options?.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='32px'
+                    height='32px'
+                  />
+                )}
+              </SUsername>
+              {isGenderPronounsDefined(user.genderPronouns) && (
+                <SGenderPronouns variant={2}>
+                  {t(
+                    `genderPronouns.${
+                      getGenderPronouns(user.genderPronouns!!).name
+                    }`
+                  )}
+                </SGenderPronouns>
+              )}
+            </SUsernameWrapper>
             <SShareDiv>
               <SUsernameButton
                 view='tertiary'
@@ -560,7 +594,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 onClick={() => handleCopyLink()}
               >
                 {isCopiedUrl ? (
-                  t('ProfileLayout.buttons.copied')
+                  t('profileLayout.buttons.copied')
                 ) : (
                   <InlineSvg
                     svg={ShareIconFilled}
@@ -571,18 +605,20 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 )}
               </SShareButton>
             </SShareDiv>
-            {user.options?.isOfferingSubscription ? (
-              <Link
+            {user.options?.isOfferingSubscription &&
+            user.uuid !== currentUser.userData?.userUuid ? (
+              <CustomLink
                 href={
                   !isSubscribed && !wasSubscribed
                     ? `/${user.username}/subscribe`
                     : `/direct-messages/${user.username}`
                 }
+                disabled={isSubscribed === null || wasSubscribed === null}
               >
                 <SSendButton withShadow view='primaryGrad'>
-                  {t('ProfileLayout.buttons.sendMessage')}
+                  {t('profileLayout.buttons.sendMessage')}
                 </SSendButton>
-              </Link>
+              </CustomLink>
             ) : null}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
           </div>
@@ -599,7 +635,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         <UserEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={10}
-          isSubscribed={isSubscribed}
+          isSubscribed={!!isSubscribed}
           isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           onClose={() => setIsEllipseMenuOpen(false)}
@@ -623,7 +659,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         user={user}
         closeModal={() => setUnsubscribeModalOpen(false)}
       />
-      <BlockUserModal
+      <BlockUserModalProfile
         confirmBlockUser={blockUserModalOpen}
         user={user}
         closeModal={() => setBlockUserModalOpen(false)}
@@ -631,10 +667,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       <ReportModal
         show={confirmReportUser}
         reportedDisplayname={
-          currentUser.userData
-            ? currentUser.userData.nickname ||
-              `@${currentUser.userData.username}`
-            : ''
+          user.nickname ? user.nickname || `@${user.username}` : ''
         }
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
@@ -678,10 +711,20 @@ const SGeneral = styled(General)`
   }
 `;
 
+const SUsernameWrapper = styled.div`
+  margin-bottom: 12px;
+`;
+
 const SUsername = styled(Headline)`
   text-align: center;
+  display: flex;
+  align-items: center;
+`;
 
-  margin-bottom: 12px;
+const SGenderPronouns = styled(Text)`
+  text-align: center;
+  font-weight: 400;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SShareDiv = styled.div`
@@ -898,4 +941,8 @@ const SSubcribedTag = styled.div`
   ${({ theme }) => theme.media.laptop} {
     top: 275px;
   }
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  margin-left: 4px;
 `;

@@ -28,6 +28,7 @@ interface IPaymentModal {
   predefinedOption?: 'card';
   bottomCaption?: React.ReactNode;
   payButtonCaptionKey?: string;
+  children: React.ReactNode;
   onClose: () => void;
   // handlePayWithWallet?: () => void;
   handlePayWithCardStripeRedirect?: () => void;
@@ -41,13 +42,13 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   predefinedOption,
   bottomCaption,
   payButtonCaptionKey,
+  children,
   onClose,
   // handlePayWithWallet,
   handlePayWithCardStripeRedirect,
-  children,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('payment-modal');
+  const { t } = useTranslation('modal-PaymentModal');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

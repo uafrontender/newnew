@@ -22,6 +22,7 @@ interface IMcOptionsTabModeration {
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
+  winningOptionId?: number;
   handleLoadOptions: (token?: string) => void;
   handleRemoveOption: (optionToRemove: newnewapi.MultipleChoice.Option) => void;
 }
@@ -32,11 +33,12 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
     options,
     optionsLoading,
     pagingToken,
+    winningOptionId,
     handleLoadOptions,
     handleRemoveOption,
   }) => {
     const theme = useTheme();
-    const { t } = useTranslation('decision');
+    const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -91,16 +93,18 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
                 option={option as TMcOptionWithHighestField}
                 creator={option.creator ?? post.creator!!}
                 canBeDeleted={options.length > 2}
+                isWinner={winningOptionId?.toString() === option.id.toString()}
                 isCreatorsBid={
                   !option.creator || option.creator?.uuid === post.creator?.uuid
                 }
+                handleRemoveOption={() => handleRemoveOption(option)}
               />
             ))}
             {!isMobile ? (
               <SLoaderDiv ref={loadingRef} />
             ) : pagingToken ? (
               <SLoadMoreBtn onClick={() => handleLoadOptions(pagingToken)}>
-                {t('loadMoreBtn')}
+                {t('loadMoreButton')}
               </SLoadMoreBtn>
             ) : null}
           </SBidsContainer>
@@ -116,7 +120,7 @@ export default McOptionsTabModeration;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  /* height: calc(100% - 56px); */
+  height: calc(100% - 56px);
 `;
 
 const SBidsContainer = styled.div`

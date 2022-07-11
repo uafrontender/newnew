@@ -11,27 +11,28 @@ import { TPostType } from '../../../utils/switchPostType';
 interface IPaymentSuccessModal {
   postType: TPostType;
   isVisible: boolean;
+  children: React.ReactNode;
   closeModal: () => void;
 }
 
 const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
   postType,
   isVisible,
-  closeModal,
   children,
+  closeModal,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
 
   return (
     <Modal show={isVisible} additionalz={14} onClose={closeModal}>
       <SContainer onClick={(e) => e.stopPropagation()}>
         <SModal>
           <SModalTitle variant={6}>
-            {t(`PaymentSuccessModal.title.${postType}`)}
+            {t(`paymentSuccessModal.title.${postType}`)}
           </SModalTitle>
           <SModalMessage>{children}</SModalMessage>
           <SDoneButton onClick={closeModal}>
-            {t('PaymentSuccessModal.doneBtn')}
+            {t('paymentSuccessModal.doneButton')}
           </SDoneButton>
         </SModal>
       </SContainer>

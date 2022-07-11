@@ -37,7 +37,7 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
   postStatus,
 }) => {
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -145,8 +145,8 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
               <SSpanBold>{formatNumber(option.supporterCount, true)}</SSpanBold>{' '}
               <SSpanThin>
                 {option.supporterCount > 1
-                  ? t('AcPost.WinnerTab.WinnerOptionCard.bidders_bid_amount')
-                  : t('AcPost.WinnerTab.WinnerOptionCard.bidder_bid_amount')}
+                  ? t('acPost.winnerTab.winnerOptionCard.biddersBidAmount')
+                  : t('acPost.winnerTab.winnerOptionCard.bidderBidAmount')}
               </SSpanThin>
             </SNumBidders>
             {option.totalAmount?.usdCents && (
@@ -155,7 +155,7 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
               </SHeadline>
             )}
             <SOptionCreator variant={3}>
-              <SSpanThin>{t('AcPost.WinnerTab.WinnerOptionCard.on')}</SSpanThin>{' '}
+              <SSpanThin>{t('acPost.winnerTab.winnerOptionCard.on')}</SSpanThin>{' '}
               <Link
                 href={`/${
                   option.creator?.username ? option.creator?.username : '/'
@@ -167,16 +167,14 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
                   }}
                 >
                   {isMySuggestion
-                    ? t('AcPost.WinnerTab.WinnerOptionCard.suggested_by_me')
-                    : t('AcPost.WinnerTab.WinnerOptionCard.suggested_by_user', {
+                    ? t('acPost.winnerTab.winnerOptionCard.suggestedByMe')
+                    : t('acPost.winnerTab.winnerOptionCard.suggestedByUser', {
                         username:
                           option.creator?.nickname ?? option.creator?.username,
                       })}
                 </SSpanBold>
               </Link>{' '}
-              <SSpanThin>
-                {t('AcPost.WinnerTab.WinnerOptionCard.bid_to')}
-              </SSpanThin>{' '}
+              <SSpanThin>{t('acPost.winnerTab.winnerOptionCard.to')}</SSpanThin>{' '}
             </SOptionCreator>
             <SHeadline variant={4}>{option.title}</SHeadline>
           </SOptionDetails>
@@ -204,9 +202,9 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
         </SWinnerOptionCard>
         {postStatus === 'waiting_for_response' && (
           <PostWaitingForResponseBox
-            title={t('PostWaitingForResponse.title')}
-            body={t('PostWaitingForResponse.body')}
-            buttonCaption={t('PostWaitingForResponse.ctaButton')}
+            title={t('postWaitingForResponse.title')}
+            body={t('postWaitingForResponse.body')}
+            buttonCaption={t('postWaitingForResponse.buttonText')}
             style={{
               marginTop: '24px',
             }}
@@ -217,9 +215,9 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
         )}
         {postStatus === 'succeeded' && (
           <PostSuccessBox
-            title={t('PostSuccess.title', { postType: t(`postType.ac`) })}
-            body={t('PostSuccess.body')}
-            buttonCaption={t('PostSuccess.ctaButton')}
+            title={t('postSuccess.title', { postType: t(`postType.ac`) })}
+            body={t('postSuccess.body')}
+            buttonCaption={t('postSuccess.buttonText')}
             style={{
               marginTop: '24px',
             }}

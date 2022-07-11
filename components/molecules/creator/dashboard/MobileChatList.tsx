@@ -26,7 +26,7 @@ interface IFunctionProps {
 }
 
 const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const { unreadCountForCreator } = useGetChats();
@@ -216,20 +216,20 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
             />
           </SMyAvatar>
         );
-        chatName = `${
-          user.userData?.nickname
+        chatName = t('announcement.title', {
+          username: user.userData?.nickname
             ? user.userData?.nickname
-            : user.userData?.username
-        } ${t('announcement.title')}`;
+            : user.userData?.username,
+        });
       }
 
       let lastMsg = chat.lastMessage?.content?.text;
 
       if (!lastMsg) {
         if (chat.kind === 4) {
-          lastMsg = textTrim(t('new-announcement.created'));
+          lastMsg = textTrim(t('newAnnouncement.created'));
         } else {
-          lastMsg = textTrim(t('chat.no-messages-first-line'));
+          lastMsg = textTrim(t('chat.noMessagesFirstLine'));
         }
       }
 

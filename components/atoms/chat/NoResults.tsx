@@ -7,16 +7,16 @@ interface INoResults {
 }
 
 const NoResults: React.FC<INoResults> = ({ text }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
 
   return (
     <SEmptyInbox>
       <SEmptyInboxIcon>👀</SEmptyInboxIcon>
       <SEmptyInboxText>
-        {t('modal.new-message.no-results-text')} “{text}”.
+        {t('modal.newMessage.noResultsText')} “{text}”.
       </SEmptyInboxText>
       <SEmptyInboxText>
-        {t('modal.new-message.no-results-search-text')}
+        {t('modal.newMessage.noResultsSearchText')}
       </SEmptyInboxText>
     </SEmptyInbox>
   );

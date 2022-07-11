@@ -32,7 +32,7 @@ interface IChat {
 
 export const Chat: React.FC<IChat> = ({ roomID }) => {
   const theme = useTheme();
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const router = useRouter();
 
   const { ref: scrollRef, inView } = useInView();
@@ -157,12 +157,15 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       }
     };
     if (socketConnection) {
-      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+      socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
+          'ChatMessageCreated',
+          socketHandlerMessageCreated
+        );
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -189,7 +192,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newMessage]);
 
-  const handleChange = useCallback((id, value) => {
+  const handleChange = useCallback((id: string, value: string) => {
     setMessageText(value);
   }, []);
 
@@ -228,7 +231,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
   }, [router]);
 
   const renderMessage = useCallback(
-    (item: newnewapi.IChatMessage, index) => {
+    (item: newnewapi.IChatMessage, index: number) => {
       const prevElement = messages[index - 1];
       const nextElement = messages[index + 1];
 
@@ -331,10 +334,10 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
 
   const handleUserClick = useCallback(() => {
     if (chatRoom?.visavis?.username) {
-      router.push(`/u/${chatRoom?.visavis?.username}`);
+      router.push(`/${chatRoom?.visavis?.username}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageText]);
+  }, [messageText, chatRoom?.visavis?.username]);
 
   return (
     <SContainer>
@@ -348,11 +351,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           onClick={handleGoBack}
         />
         {chatRoom?.kind === 4 ? (
-          <SUserAvatar
-            withClick
-            onClick={handleUserClick}
-            avatarUrl={user?.userData?.avatarUrl ?? ''}
-          />
+          <SUserAvatar avatarUrl={user?.userData?.avatarUrl ?? ''} />
         ) : (
           <SUserAvatar
             withClick
@@ -363,10 +362,11 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         {chatRoom?.kind === 4 ? (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
-              {user.userData?.nickname
-                ? user.userData?.nickname
-                : user.userData?.username}{' '}
-              {t('announcement.title')}
+              {t('announcement.title', {
+                username: user.userData?.nickname
+                  ? user.userData?.nickname
+                  : user.userData?.username,
+              })}
             </SUserNickName>
             <SUserName variant={2} weight={600}>
               {`${
@@ -375,8 +375,8 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
                   : 0
               } ${
                 chatRoom.memberCount && chatRoom.memberCount > 1
-                  ? t('new-announcement.members')
-                  : t('new-announcement.member')
+                  ? t('newAnnouncement.members')
+                  : t('newAnnouncement.member')
               }`}
             </SUserName>
           </SUserDescription>
@@ -563,9 +563,6 @@ const SMessageContent = styled.div<ISMessageContent>`
     }
     if (props.mine) {
       return props.theme.colorsThemed.accent.blue;
-    }
-    if (props.theme.name === 'light') {
-      return props.theme.colors.white;
     }
 
     return props.theme.colorsThemed.background.tertiary;

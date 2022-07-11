@@ -123,13 +123,13 @@ const SettingsColorModeSwitch: React.FunctionComponent<ISettingsColorModeSwitch>
               }}
               onClick={() => handleSetColorMode(option)}
               isActive={i === activeIcon}
+              key={`mode-${option}`}
               style={{
                 borderRadius: '50px',
                 ...(option === currentlySelectedMode
                   ? { cursor: 'default' }
                   : {}),
               }}
-              key={`color-mode-${option}`}
             >
               <div
                 style={{

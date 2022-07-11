@@ -96,7 +96,7 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
         )}
       </SSVGContainer>
       <SCaption variant={3} active={active}>
-        {t(`mobile-bottom-navigation-${item.key}`)}
+        {t(`mobileBottomNavigation.${item.key}`)}
       </SCaption>
     </SContainer>
   ) : (
@@ -122,7 +122,7 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
             )}
           </SSVGContainer>
           <SCaption variant={3} active={active}>
-            {t(`mobile-bottom-navigation-${item.key}`)}
+            {t(`mobileBottomNavigation.${item.key}`)}
           </SCaption>
         </a>
       </Link>
@@ -138,7 +138,6 @@ interface ISContainer {
 
 const SContainer = styled.div<ISContainer>`
   width: ${(props) => props.width};
-  margin: 0 8px;
   cursor: pointer;
   padding: 8px 2px;
   display: flex;
@@ -146,13 +145,22 @@ const SContainer = styled.div<ISContainer>`
   flex-direction: column;
   justify-content: center;
 
-  max-width: 56px;
+  max-width: 63px;
+
   a {
     display: flex;
     width: 100%;
     align-items: center;
     flex-direction: column;
     justify-content: center;
+  }
+
+  ${({ theme }) => theme.media.mobileM} {
+    margin: 0 5px;
+  }
+
+  ${({ theme }) => theme.media.mobileL} {
+    margin: 0 8px;
   }
 `;
 

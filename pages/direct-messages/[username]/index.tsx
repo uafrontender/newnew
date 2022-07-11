@@ -1,10 +1,11 @@
-import React, { ReactElement, useEffect } from 'react';
+import React, { ReactElement } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import type { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
+import { useUpdateEffect } from 'react-use';
 
 import General from '../../../components/templates/General';
 import Content from '../../../components/organisms/Chat';
@@ -17,11 +18,11 @@ interface IChat {
 }
 
 const Chat: NextPage<IChat> = ({ username }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('page-Chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (!user.loggedIn) {
       router?.push('/sign-up');
     }
@@ -47,8 +48,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'chat',
-    'payment-modal',
+    'page-Chat',
+    'modal-PaymentModal',
   ]);
 
   const { req } = context;

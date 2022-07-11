@@ -16,9 +16,9 @@ import { SUPPORTED_LANGUAGES } from '../../constants/general';
 interface IChangeLanguage {}
 
 export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
   const ref: any = useRef();
-  const { push, locale, pathname } = useRouter();
+  const { push, locale, asPath, pathname } = useRouter();
   const [focused, setFocused] = useState(false);
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -34,12 +34,14 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
   const handleChangeLanguageClick = () => {
     setFocused(!focused);
   };
+
   const handleCloseClick = () => {
     setFocused(false);
   };
+
   const renderItem = (item: string) => {
     const handleItemClick = () => {
-      push(pathname, pathname, { locale: item });
+      push(pathname, asPath, { locale: item });
     };
 
     return (
@@ -50,7 +52,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
         selected={item === locale}
       >
         <SItemTitle variant={3} weight={600}>
-          {t(`dd-language-title-${item}`)}
+          {t(`language.ddLanguageTitle.${item}`)}
         </SItemTitle>
       </SButton>
     );
@@ -63,17 +65,21 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
     }
   });
 
+  if (options.length < 2) {
+    return null;
+  }
+
   return (
     <SContainer ref={ref}>
       <Button view='changeLanguage' onClick={handleChangeLanguageClick}>
-        {t(`selected-language-title-${locale}`)}
+        {t(`language.selectedLanguageTitle.${locale}`)}
       </Button>
       {isMobile ? (
         <Modal show={focused} onClose={handleCloseClick}>
           <SMobileListContainer focused={focused}>
             <SMobileList>{options.map(renderItem)}</SMobileList>
             <SCancelButton view='modalSecondary' onClick={handleCloseClick}>
-              {t('button-cancel')}
+              {t('button.cancel')}
             </SCancelButton>
           </SMobileListContainer>
         </Modal>
@@ -92,7 +98,8 @@ const SContainer = styled.div`
   position: relative;
 
   /* TEMP */
-  display: none;
+  // Enabled for vlad/apply-translations branch
+  // display: none;
 `;
 
 interface ISListHolder {

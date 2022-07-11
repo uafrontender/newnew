@@ -19,7 +19,7 @@ import styled, { useTheme } from 'styled-components';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
-import TextArea from '../../../atoms/creation/TextArea';
+import RichTextArea from '../../../atoms/creation/RichTextArea';
 import FileUpload from '../../../molecules/creation/FileUpload';
 import Tabs, { Tab } from '../../../molecules/Tabs';
 import TabletStartDate from '../../../molecules/creation/TabletStartDate';
@@ -61,14 +61,13 @@ import {
 import {
   CREATION_TITLE_MIN,
   CREATION_TITLE_MAX,
-  CREATION_OPTION_MAX,
-  CREATION_OPTION_MIN,
 } from '../../../../constants/general';
 
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
+import getChunks from '../../../../utils/getChunks/getChunks';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -96,7 +95,7 @@ interface ICreationSecondStepContent {}
 export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
   () => {
     const { t: tCommon } = useTranslation();
-    const { t } = useTranslation('creation');
+    const { t } = useTranslation('page-Creation');
     const theme = useTheme();
     const router = useRouter();
     const dispatch = useAppDispatch();
@@ -168,7 +167,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
 
           const res = await validateText(payload);
 
-          if (!res?.data?.status) throw new Error('An error occured');
+          if (!res?.data?.status) throw new Error('An error occurred');
 
           switch (res.data.status) {
             case newnewapi.ValidateTextResponse.Status.TOO_SHORT:
@@ -212,22 +211,54 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       },
       [tCommon, validateTextAPI]
     );
+
+    const validateMcOption = useCallback(
+      async (
+        text: string,
+        min: number,
+        max: number,
+        type: newnewapi.ValidateTextRequest.Kind,
+        index: number
+      ) => {
+        const error = await validateT(text, min, max, type);
+
+        if (error) {
+          setInvalidMcOptionsIndicies((curr) => {
+            const newSet = new Set([...curr]);
+
+            newSet.add(index);
+
+            return newSet;
+          });
+        } else {
+          setInvalidMcOptionsIndicies((curr) => {
+            const newSet = new Set([...curr]);
+
+            newSet.delete(index);
+
+            return newSet;
+          });
+        }
+
+        return error;
+      },
+      [validateT]
+    );
+
     const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
     const isTablet = ['tablet'].includes(resizeMode);
     const isDesktop = !isMobile && !isTablet;
-    const optionsAreValid =
-      tab !== 'multiple-choice' ||
-      multiplechoice.choices.findIndex((item) =>
-        validateT(
-          item.text,
-          CREATION_OPTION_MIN,
-          CREATION_OPTION_MAX,
-          newnewapi.ValidateTextRequest.Kind.POST_OPTION
-        )
-      ) !== -1;
+
+    const [invalidMcOptionsIndicies, setInvalidMcOptionsIndicies] = useState<
+      Set<number>
+    >(new Set());
+    const optionsAreValid = useMemo(
+      () => tab !== 'multiple-choice' || invalidMcOptionsIndicies.size === 0,
+      [tab, invalidMcOptionsIndicies]
+    );
 
     const targetBackersValid =
       tab !== 'crowdfunding' ||
@@ -308,11 +339,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     }, [tab, router]);
 
     const handleCloseClick = useCallback(() => {
-      if (router.query?.referer) {
-        router.push(router.query.referer as string);
-      } else {
-        router.push('/');
-      }
+      router?.push('/');
     }, [router]);
 
     const handleVideoDelete = useCallback(async () => {
@@ -350,7 +377,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       }
     }, [dispatch, post?.announcementVideoUrl, videoProcessing?.taskUuid]);
     const handleVideoUpload = useCallback(
-      async (value) => {
+      async (value: File) => {
         try {
           dispatch(setCreationFileUploadETA(100));
           dispatch(setCreationFileUploadProgress(1));
@@ -482,7 +509,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     const handleItemChange = useCallback(
       async (key: string, value: any) => {
         if (key === 'title') {
-          dispatch(setCreationTitle(value));
+          dispatch(setCreationTitle(value.trim() ? value : ''));
         } else if (key === 'minimalBid') {
           dispatch(setCreationMinBid(value));
         } else if (key === 'comments') {
@@ -535,10 +562,6 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
           id: '5-days',
           title: t('secondStep.field.expiresAt.options.5-days'),
         },
-        {
-          id: '7-days',
-          title: t('secondStep.field.expiresAt.options.7-days'),
-        },
       ],
       [t]
     );
@@ -547,8 +570,9 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       () => (
         <>
           <SItemWrapper>
+            {/* TODO: move to locales */}
             <SInputLabel htmlFor='title'>Title</SInputLabel>
-            <TextArea
+            <RichTextArea
               id='title'
               value={post?.title}
               error={titleError}
@@ -566,7 +590,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                 min={2}
                 options={multiplechoice.choices}
                 onChange={handleItemChange}
-                validation={validateT}
+                validation={validateMcOption}
               />
               {isMobile && <SSeparator margin='16px 0' />}
             </>
@@ -583,6 +607,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                   formattedDescription={auction.minimalBid}
                   inputProps={{
                     min: 5,
+                    max: 10000,
                     type: 'number',
                     pattern: '[0-9]*',
                   }}
@@ -621,7 +646,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
         t,
         tab,
         multiplechoice.choices,
-        validateT,
+        validateMcOption,
         isMobile,
         auction.minimalBid,
         crowdfunding.targetBackerCount,
@@ -644,6 +669,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                       formattedDescription={auction.minimalBid}
                       inputProps={{
                         min: 5,
+                        max: 10000,
                         type: 'number',
                         pattern: '[0-9]*',
                       }}
@@ -798,13 +824,13 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
               dispatch(setCreationFileProcessingLoading(false));
             } else {
               dispatch(setCreationFileUploadError(true));
-              toast.error('An error occured');
+              toast.error('An error occurred');
             }
           } else if (
             decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
           ) {
             dispatch(setCreationFileUploadError(true));
-            toast.error('An error occured');
+            toast.error('An error occurred');
           }
         }
       },
@@ -823,7 +849,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
           dispatch(setCreationFileProcessingLoading(false));
         } else {
           dispatch(setCreationFileUploadError(true));
-          toast.error('An error occured');
+          toast.error('An error occurred');
         }
       }
 
@@ -851,12 +877,15 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
 
     useEffect(() => {
       if (socketConnection) {
-        socketConnection.on('VideoProcessingProgress', handlerSocketUpdated);
+        socketConnection?.on('VideoProcessingProgress', handlerSocketUpdated);
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off('VideoProcessingProgress', handlerSocketUpdated);
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
+            'VideoProcessingProgress',
+            handlerSocketUpdated
+          );
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1154,7 +1183,17 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                         </SFloatingSubSectionUser>
                         <SBottomEnd>
                           <SBottomEndPostTitle variant={3} weight={600}>
-                            {post.title}
+                            {getChunks(post.title).map((chunk) => {
+                              if (chunk.type === 'hashtag') {
+                                return (
+                                  <SBottomEndPostTitleHashtag>
+                                    #{chunk.text}
+                                  </SBottomEndPostTitleHashtag>
+                                );
+                              }
+
+                              return chunk.text;
+                            })}
                           </SBottomEndPostTitle>
                         </SBottomEnd>
                       </SFloatingSubSectionWithPlayer>
@@ -1164,7 +1203,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                           variant={3}
                           weight={600}
                         >
-                          {t('secondStep.block.subTitle.floating-processing')}
+                          {t('secondStep.block.subTitle.floatingProcessing')}
                         </SFloatingSubSectionDescription>
                       </SFloatingSubSection>
                     )
@@ -1437,8 +1476,14 @@ const SBottomEnd = styled.div`
 `;
 
 const SBottomEndPostTitle = styled(Text)`
+  display: inline;
   max-width: 100%;
   line-break: loose;
+  white-space: pre-wrap;
+`;
+
+const SBottomEndPostTitleHashtag = styled.span`
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
 `;
 
 const SCaption = styled(Caption)`

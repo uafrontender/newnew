@@ -4,10 +4,16 @@ import { Socket, io } from 'socket.io-client';
 
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_URL ?? '';
 
-export const SocketContext = createContext<Socket>({} as any);
+export const SocketContext = createContext<Socket | undefined>(undefined);
 
-const SocketContextProvider: React.FC = ({ children }) => {
-  const [socket, setSocket] = useState({} as Socket);
+interface ISocketContextProvider {
+  children: React.ReactNode;
+}
+
+const SocketContextProvider: React.FC<ISocketContextProvider> = ({
+  children,
+}) => {
+  const [socket, setSocket] = useState<Socket | undefined>(undefined);
   const [cookies] = useCookies();
 
   // Will use access token if it is available to connect to socket.io

@@ -16,7 +16,7 @@ interface ITabletStartDate {
 
 const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
   const { id, value, onChange } = props;
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const [animate, setAnimate] = useState(value.type === 'schedule');
   const [animation, setAnimation] = useState('o-12');
 
@@ -24,7 +24,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
     setAnimate(false);
   }, []);
   const handleTimeChange = useCallback(
-    (key, time: any) => {
+    (key: string, time: any) => {
       onChange(id, { [key]: time });
     },
     [id, onChange]
@@ -36,7 +36,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
     [id, onChange]
   );
   const handleTypeChange = useCallback(
-    (e, type) => {
+    (e: any, type: any) => {
       const changeBody: any = { type };
       if (type === 'right-away') {
         changeBody.date = moment().format();
@@ -80,6 +80,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
             <TimePicker
               time={value?.time}
               format={value?.['hours-format']}
+              currValue={value}
               onChange={handleTimeChange}
             />
           </STimeInput>

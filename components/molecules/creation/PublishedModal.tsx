@@ -21,6 +21,7 @@ import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
 import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -42,7 +43,7 @@ interface IPublishedModal {
 const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const { open, handleClose } = props;
   const router = useRouter();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { post, videoProcessing, fileProcessing, postData } = useAppSelector(
@@ -152,9 +153,9 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
               url += postData.multipleChoice.postUuid;
             }
 
-            router.push(url);
-
-            dispatch(clearCreation({}));
+            router.push(url).then(() => {
+              dispatch(clearCreation({}));
+            });
           }
         }
       }
@@ -221,7 +222,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
                   borderRadius='16px'
                 />
               ) : (
-                <SText variant={2}>{t('video-being-processed-caption')}</SText>
+                <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
               )
             ) : null}
           </SPlayerWrapper>
@@ -233,13 +234,15 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
                 : user.userData?.nickname}
             </SUserTitle>
             <SCaption variant={2} weight={700}>
-              {t('secondStep.card.left', {
-                time: formatExpiresAtNoStartsAt().fromNow(true),
-              })}
+              {post.startsAt.type === 'right-away'
+                ? t('secondStep.card.left', {
+                    time: formatExpiresAtNoStartsAt().fromNow(true),
+                  })
+                : t('secondStep.card.soon')}
             </SCaption>
           </SUserBlock>
           <SPostTitleText variant={3} weight={600}>
-            {post?.title}
+            <PostTitleContent>{post.title}</PostTitleContent>
           </SPostTitleText>
           <STitle variant={6}>
             {t(

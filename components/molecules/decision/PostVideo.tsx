@@ -13,7 +13,6 @@ import InlineSvg from '../../atoms/InlineSVG';
 
 import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
-import isSafari from '../../../utils/isSafari';
 import isBrowser from '../../../utils/isBrowser';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
@@ -39,7 +38,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
   isMuted,
   handleToggleMuted,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
@@ -144,6 +143,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             id={`video-${postId}`}
             resources={response}
             muted={isMuted}
+            showPlayButton
           />
           <SSoundButton
             id='sound-button'
@@ -152,13 +152,6 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             onClick={(e) => {
               e.stopPropagation();
               handleToggleMuted();
-              if (isSafari()) {
-                (
-                  document?.getElementById(
-                    `bitmovinplayer-video-${postId}`
-                  ) as HTMLVideoElement
-                )?.play();
-              }
             }}
             style={{
               ...(soundBtnBottomOverriden
@@ -182,6 +175,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             id={postId}
             resources={announcement}
             muted={isMuted}
+            showPlayButton
           />
           <SSoundButton
             id='sound-button'
@@ -190,13 +184,6 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             onClick={(e) => {
               e.stopPropagation();
               handleToggleMuted();
-              if (isSafari()) {
-                (
-                  document?.getElementById(
-                    `bitmovinplayer-video-${postId}`
-                  ) as HTMLVideoElement
-                )?.play();
-              }
             }}
             style={{
               ...(soundBtnBottomOverriden
@@ -219,14 +206,14 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         <SToggleVideoWidget>
           {openedTab === 'response' ? (
             <SChangeTabBtn onClick={() => setOpenedTab('announcement')}>
-              {t('PostVideo.tabs.back_to_original')}
+              {t('postVideo.tabs.backToOriginalVideo')}
             </SChangeTabBtn>
           ) : (
             <SChangeTabBtn
               shouldView={!responseViewed}
               onClick={() => setOpenedTab('response')}
             >
-              {t('PostVideo.tabs.back_to_response')}
+              {t('postVideo.tabs.backToResponse')}
             </SChangeTabBtn>
           )}
         </SToggleVideoWidget>

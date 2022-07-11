@@ -1,0 +1,28 @@
+{
+  "button": {
+    "withActivity": {
+      "ac": "{{amount}} in bids",
+      "mc": "{{votes}} votes",
+      "mcSingular": "{{votes}} vote",
+      "cf": "{{backed}} of {{total}} backers"
+    },
+    "withoutActivity": {
+      "ac": "Bid now",
+      "mc": "Vote now",
+      "cf": "Back this Goal"
+    },
+    "seeResults": {
+      "ac": "See Event",
+      "mc": "See Superpoll",
+      "cf": "See Goal"
+    }
+  },
+  "timer": {
+    "timeLeft": "{{time}} left",
+    "daysLeft": "d",
+    "hoursLeft": "h",
+    "minutesLeft": "m",
+    "endedOn": "Ended on ",
+    "soon": "Coming Soon"
+  }
+}

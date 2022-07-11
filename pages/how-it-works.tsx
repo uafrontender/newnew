@@ -17,7 +17,7 @@ import Button from '../components/atoms/Button';
 import { useAppSelector } from '../redux-store/store';
 
 export const HowItWorks = () => {
-  const { t } = useTranslation('how-it-works');
+  const { t } = useTranslation('page-HowItWorks');
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
@@ -162,7 +162,7 @@ export default HowItWorks;
 export const getServerSideProps = async (context: NextPageContext) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'how-it-works',
+    'page-HowItWorks',
   ]);
 
   return {

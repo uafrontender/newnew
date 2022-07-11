@@ -19,6 +19,7 @@ import Head from 'next/head';
 import dynamic from 'next/dynamic';
 
 import {
+  deleteMyPost,
   fetchMoreLikePosts,
   fetchPostByUUID,
   markPost,
@@ -52,6 +53,9 @@ import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory'
 import { usePostModalState } from '../../../contexts/postModalContext';
 import { ReportData } from '../../molecules/chat/ReportModal';
 import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
+import PostEllipseMenuModeration from '../../molecules/decision/PostEllipseMenuModeration';
+import PostEllipseModalModeration from '../../molecules/decision/PostEllipseModalModeration';
+import PostConfirmDeleteModal from '../../molecules/decision/PostConfirmDeleteModal';
 
 const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
 // Posts views
@@ -77,11 +81,11 @@ const PostAwaitingResponseMC = dynamic(
 const PostAwaitingResponseCF = dynamic(
   () => import('./PostAwaitingResponseCF')
 );
-const PostShareModal = dynamic(
-  () => import('../../molecules/decision/PostShareModal')
+const PostShareEllipseModal = dynamic(
+  () => import('../../molecules/decision/PostShareEllipseModal')
 );
-const PostShareMenu = dynamic(
-  () => import('../../molecules/decision/PostShareMenu')
+const PostShareEllipseMenu = dynamic(
+  () => import('../../molecules/decision/PostShareEllipseMenu')
 );
 const PostEllipseModal = dynamic(
   () => import('../../molecules/decision/PostEllipseModal')
@@ -113,6 +117,9 @@ interface IPostModal {
   isOpen: boolean;
   post?: newnewapi.IPost;
   manualCurrLocation?: string;
+  sessionIdFromRedirect?: string;
+  commentIdFromUrl?: string;
+  commentContentFromUrl?: string;
   handleClose: () => void;
   handleOpenAnotherPost?: (post: newnewapi.Post) => void;
   handleRemovePostFromState?: () => void;
@@ -124,6 +131,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   isOpen,
   post,
   manualCurrLocation,
+  sessionIdFromRedirect,
+  commentIdFromUrl,
+  commentContentFromUrl,
   handleClose,
   handleOpenAnotherPost,
   handleRemovePostFromState,
@@ -131,7 +141,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -146,7 +156,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   useLeavePageConfirm(
     isConfirmToClosePost,
-    t('PostVideo.cannotLeavePageMsg'),
+    t('postVideo.cannotLeavePageMsg'),
     []
   );
 
@@ -261,31 +271,49 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     manualCurrLocation ?? (isBrowser() ? window.location.href : '')
   );
 
-  const [sessionId, setSessionId] = useState(() =>
-    isBrowser()
-      ? new URL(window.location.href).searchParams.get('?session_id') ||
-        new URL(window.location.href).searchParams.get('session_id')
-      : undefined
+  const [sessionId, setSessionId] = useState(
+    () => sessionIdFromRedirect ?? undefined
   );
 
   const { handleSetCommentIdFromUrl, handleSetNewCommentContentFromUrl } =
     useContext(CommentFromUrlContext);
 
+  const [deletePostOpen, setDeletePostOpen] = useState(false);
+
+  const handleOpenDeletePostModal = useCallback(
+    () => setDeletePostOpen(true),
+    []
+  );
+  const handleCloseDeletePostModal = () => setDeletePostOpen(false);
+
+  const handleDeletePost = useCallback(async () => {
+    try {
+      const payload = new newnewapi.DeleteMyPostRequest({
+        postUuid: postParsed?.postUuid,
+      });
+
+      const res = await deleteMyPost(payload);
+
+      if (!res.error) {
+        console.log('Post deleted/cancelled');
+        handleUpdatePostStatus('DELETED_BY_CREATOR');
+        handleRemovePostFromState?.();
+        handleCloseDeletePostModal();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [handleRemovePostFromState, handleUpdatePostStatus, postParsed?.postUuid]);
+
   useEffect(() => {
-    const commentId = isBrowser()
-      ? new URL(window.location.href).searchParams.get('?comment_id') ||
-        new URL(window.location.href).searchParams.get('comment_id')
-      : undefined;
-
-    const commentContent = isBrowser()
-      ? new URL(window.location.href).searchParams.get('?comment_content') ||
-        new URL(window.location.href).searchParams.get('comment_content')
-      : undefined;
-
-    handleSetCommentIdFromUrl?.(commentId ?? '');
-    handleSetNewCommentContentFromUrl?.(commentContent ?? '');
+    if (commentIdFromUrl) {
+      handleSetCommentIdFromUrl?.(commentIdFromUrl);
+    }
+    if (commentContentFromUrl) {
+      handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [commentIdFromUrl, commentContentFromUrl]);
 
   const resetSessionId = useCallback(
     () => setSessionId(undefined),
@@ -307,10 +335,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [triedLoading, setTriedLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
 
-  const handleCloseAndGoBack = () => {
+  const handleCloseAndGoBack = useCallback(() => {
     if (
       isConfirmToClosePost &&
-      !window.confirm(t('PostVideo.cannotLeavePageMsg'))
+      !window.confirm(t('postVideo.cannotLeavePageMsg'))
     ) {
       return;
     }
@@ -325,12 +353,19 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     handleClose();
     syncedHistoryPushState({}, currLocation);
     innerHistoryStack.current = [];
-  };
+  }, [
+    currLocation,
+    handleClose,
+    isConfirmToClosePost,
+    router,
+    syncedHistoryPushState,
+    t,
+  ]);
 
   const handleGoBackInsidePost = useCallback(() => {
     if (
       isConfirmToClosePost &&
-      !window.confirm(t('PostVideo.cannotLeavePageMsg'))
+      !window.confirm(t('postVideo.cannotLeavePageMsg'))
     ) {
       return;
     }
@@ -376,13 +411,15 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         {
           postId: newPostParsed.postUuid,
         },
-        `/post/${newPostParsed.postUuid}`
+        `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+          newPostParsed.postUuid
+        }`
       );
       setRecommendedPosts([]);
       setNextPageToken('');
       setTriedLoading(false);
     },
-    [post, handleOpenAnotherPost, syncedHistoryPushState]
+    [handleOpenAnotherPost, post, syncedHistoryPushState, router.locale]
   );
 
   const loadRecommendedPosts = useCallback(
@@ -671,6 +708,232 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     return <div />;
   };
 
+  const moreButtonRef: any = useRef();
+  const shareButtonRef: any = useRef();
+  const renderPostSuccessOrWaitingControls = useCallback(() => {
+    return (
+      <SPostSuccessWaitingControlsDiv
+        variant='decision'
+        onClick={(e) => e.stopPropagation()}
+      >
+        <SWaitingSuccessControlsBtn
+          view='secondary'
+          iconOnly
+          onClick={handleCloseAndGoBack}
+        >
+          <InlineSvg
+            svg={CancelIcon}
+            fill={
+              theme.name === 'light' ? theme.colors.dark : theme.colors.white
+            }
+            width='24px'
+            height='24px'
+          />
+        </SWaitingSuccessControlsBtn>
+        <SWaitingSuccessControlsBtn
+          view='secondary'
+          iconOnly
+          onClick={() => setShareMenuOpen(true)}
+          ref={shareButtonRef}
+        >
+          <InlineSvg
+            svg={ShareIcon}
+            fill={
+              theme.name === 'light' ? theme.colors.dark : theme.colors.white
+            }
+            width='24px'
+            height='24px'
+          />
+        </SWaitingSuccessControlsBtn>
+        <SWaitingSuccessControlsBtn
+          view='secondary'
+          iconOnly
+          onClick={() => setEllipseMenuOpen(true)}
+          ref={moreButtonRef}
+        >
+          <InlineSvg
+            svg={MoreIcon}
+            fill={
+              theme.name === 'light' ? theme.colors.dark : theme.colors.white
+            }
+            width='24px'
+            height='24px'
+          />
+        </SWaitingSuccessControlsBtn>
+        {/* Share menu */}
+        {!isMobile && postParsed?.postUuid && (
+          <PostShareEllipseMenu
+            postId={postParsed.postUuid}
+            isVisible={shareMenuOpen}
+            onClose={handleShareClose}
+            anchorElement={shareButtonRef.current as HTMLElement}
+          />
+        )}
+        {isMobile && shareMenuOpen && postParsed?.postUuid && (
+          <PostShareEllipseModal
+            isOpen={shareMenuOpen}
+            zIndex={11}
+            postId={postParsed.postUuid}
+            onClose={handleShareClose}
+          />
+        )}
+        {/* Ellipse menu */}
+        {!isMobile && (
+          <PostEllipseMenu
+            postType={typeOfPost as string}
+            isFollowingDecision={isFollowingDecision}
+            isVisible={ellipseMenuOpen}
+            handleFollowDecision={handleFollowDecision}
+            handleReportOpen={handleReportOpen}
+            onClose={handleEllipseMenuClose}
+            anchorElement={moreButtonRef.current as HTMLElement}
+          />
+        )}
+        {isMobile && ellipseMenuOpen ? (
+          <PostEllipseModal
+            postType={typeOfPost as string}
+            isFollowingDecision={isFollowingDecision}
+            zIndex={11}
+            isOpen={ellipseMenuOpen}
+            handleFollowDecision={handleFollowDecision}
+            handleReportOpen={handleReportOpen}
+            onClose={handleEllipseMenuClose}
+          />
+        ) : null}
+      </SPostSuccessWaitingControlsDiv>
+    );
+  }, [
+    ellipseMenuOpen,
+    handleCloseAndGoBack,
+    handleEllipseMenuClose,
+    handleFollowDecision,
+    handleReportOpen,
+    handleShareClose,
+    isFollowingDecision,
+    isMobile,
+    postParsed?.postUuid,
+    shareMenuOpen,
+    theme.colors.dark,
+    theme.colors.white,
+    theme.name,
+    typeOfPost,
+  ]);
+
+  const renderPostModerationControls = useCallback(() => {
+    return (
+      <SPostSuccessWaitingControlsDiv
+        variant='moderation'
+        onClick={(e) => e.stopPropagation()}
+      >
+        <SWaitingSuccessControlsBtn
+          view='secondary'
+          iconOnly
+          onClick={handleCloseAndGoBack}
+        >
+          <InlineSvg
+            svg={CancelIcon}
+            fill={
+              theme.name === 'light' ? theme.colors.dark : theme.colors.white
+            }
+            width='24px'
+            height='24px'
+          />
+        </SWaitingSuccessControlsBtn>
+        <SWaitingSuccessControlsBtn
+          view='secondary'
+          iconOnly
+          onClick={() => setShareMenuOpen(true)}
+          ref={shareButtonRef}
+        >
+          <InlineSvg
+            svg={ShareIcon}
+            fill={
+              theme.name === 'light' ? theme.colors.dark : theme.colors.white
+            }
+            width='24px'
+            height='24px'
+          />
+        </SWaitingSuccessControlsBtn>
+        <SWaitingSuccessControlsBtn
+          view='secondary'
+          iconOnly
+          onClick={() => setEllipseMenuOpen(true)}
+          ref={moreButtonRef}
+        >
+          <InlineSvg
+            svg={MoreIcon}
+            fill={
+              theme.name === 'light' ? theme.colors.dark : theme.colors.white
+            }
+            width='24px'
+            height='24px'
+          />
+        </SWaitingSuccessControlsBtn>
+        {/* Share menu */}
+        {!isMobile && postParsed?.postUuid && (
+          <PostShareEllipseMenu
+            postId={postParsed.postUuid}
+            isVisible={shareMenuOpen}
+            onClose={handleShareClose}
+            anchorElement={shareButtonRef.current as HTMLElement}
+          />
+        )}
+        {isMobile && shareMenuOpen && postParsed?.postUuid && (
+          <PostShareEllipseModal
+            isOpen={shareMenuOpen}
+            zIndex={11}
+            postId={postParsed.postUuid}
+            onClose={handleShareClose}
+          />
+        )}
+        {/* Ellipse menu */}
+        {!isMobile && (
+          <PostEllipseMenuModeration
+            postType={typeOfPost as string}
+            isVisible={ellipseMenuOpen}
+            canDeletePost={postStatus !== 'failed'}
+            handleClose={handleEllipseMenuClose}
+            handleOpenDeletePostModal={handleOpenDeletePostModal}
+            anchorElement={moreButtonRef.current}
+          />
+        )}
+        {isMobile && ellipseMenuOpen ? (
+          <PostEllipseModalModeration
+            postType={typeOfPost as string}
+            zIndex={11}
+            canDeletePost={postStatus !== 'failed'}
+            isOpen={ellipseMenuOpen}
+            onClose={handleEllipseMenuClose}
+            handleOpenDeletePostModal={handleOpenDeletePostModal}
+          />
+        ) : null}
+        {/* Confirm delete post */}
+        <PostConfirmDeleteModal
+          postType={typeOfPost as string}
+          isVisible={deletePostOpen}
+          closeModal={handleCloseDeletePostModal}
+          handleConfirmDelete={handleDeletePost}
+        />
+      </SPostSuccessWaitingControlsDiv>
+    );
+  }, [
+    deletePostOpen,
+    ellipseMenuOpen,
+    handleCloseAndGoBack,
+    handleDeletePost,
+    handleEllipseMenuClose,
+    handleOpenDeletePostModal,
+    handleShareClose,
+    isMobile,
+    postParsed?.postUuid,
+    postStatus,
+    shareMenuOpen,
+    theme.colors.dark,
+    theme.colors.white,
+    theme.name,
+    typeOfPost,
+  ]);
+
   useEffect(() => {
     if (isOpen && postParsed) {
       let additionalHash;
@@ -689,14 +952,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           {
             postId: postParsed.postUuid,
           },
-          `/post/${postParsed.postUuid}${additionalHash ?? ''}`
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            postParsed.postUuid
+          }${additionalHash ?? ''}`
         );
       } else {
         syncedHistoryReplaceState(
           {
             postId: postParsed.postUuid,
           },
-          `/post/${postParsed.postUuid}${additionalHash ?? ''}`
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            postParsed.postUuid
+          }${additionalHash ?? ''}`
         );
       }
 
@@ -714,7 +981,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [router.locale]);
 
   useEffect(() => {
     async function fetchIsFavorited() {
@@ -751,7 +1018,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           {
             postId: state.postId,
           },
-          `/post/${state.postId}`
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            state.postId
+          }`
         );
         return false;
       }
@@ -765,14 +1034,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [router.locale]);
 
   // Close modal on back btn
   useEffect(() => {
     const verify = async () => {
       if (
         isConfirmToClosePost &&
-        !window.confirm(t('PostVideo.cannotLeavePageMsg'))
+        !window.confirm(t('postVideo.cannotLeavePageMsg'))
       ) {
         return;
       }
@@ -878,6 +1147,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Render Awaiting Response & Success Decision views
   if (shouldRenderVotingFinishedModal && !isMyPost) {
     return (
       <>
@@ -897,82 +1167,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               content={t(`meta.${typeOfPost}.description`)}
             />
           </Head>
-          <SPostSuccessWaitingControlsDiv onClick={(e) => e.stopPropagation()}>
-            <SWaitingSuccessControlsBtn
-              view='secondary'
-              iconOnly
-              onClick={handleCloseAndGoBack}
-            >
-              <InlineSvg
-                svg={CancelIcon}
-                fill={theme.colorsThemed.text.primary}
-                width='24px'
-                height='24px'
-              />
-            </SWaitingSuccessControlsBtn>
-            <SWaitingSuccessControlsBtn
-              view='secondary'
-              iconOnly
-              onClick={() => setShareMenuOpen(true)}
-            >
-              <InlineSvg
-                svg={ShareIcon}
-                fill={theme.colorsThemed.text.primary}
-                width='24px'
-                height='24px'
-              />
-            </SWaitingSuccessControlsBtn>
-            <SWaitingSuccessControlsBtn
-              view='secondary'
-              iconOnly
-              onClick={() => setEllipseMenuOpen(true)}
-            >
-              <InlineSvg
-                svg={MoreIcon}
-                fill={theme.colorsThemed.text.primary}
-                width='24px'
-                height='24px'
-              />
-            </SWaitingSuccessControlsBtn>
-            {/* Share menu */}
-            {!isMobile && postParsed?.postUuid && (
-              <PostShareMenu
-                postId={postParsed.postUuid}
-                isVisible={shareMenuOpen}
-                onClose={handleShareClose}
-              />
-            )}
-            {isMobile && shareMenuOpen && postParsed?.postUuid && (
-              <PostShareModal
-                isOpen={shareMenuOpen}
-                zIndex={11}
-                postId={postParsed.postUuid}
-                onClose={handleShareClose}
-              />
-            )}
-            {/* Ellipse menu */}
-            {!isMobile && (
-              <PostEllipseMenu
-                postType={typeOfPost as string}
-                isFollowingDecision={isFollowingDecision}
-                isVisible={ellipseMenuOpen}
-                handleFollowDecision={handleFollowDecision}
-                handleReportOpen={handleReportOpen}
-                onClose={handleEllipseMenuClose}
-              />
-            )}
-            {isMobile && ellipseMenuOpen ? (
-              <PostEllipseModal
-                postType={typeOfPost as string}
-                isFollowingDecision={isFollowingDecision}
-                zIndex={11}
-                isOpen={ellipseMenuOpen}
-                handleFollowDecision={handleFollowDecision}
-                handleReportOpen={handleReportOpen}
-                onClose={handleEllipseMenuClose}
-              />
-            ) : null}
-          </SPostSuccessWaitingControlsDiv>
+          {!isMobile && renderPostSuccessOrWaitingControls()}
           {postParsed && typeOfPost ? (
             <SPostModalContainer
               id='post-modal-container'
@@ -997,6 +1192,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               postStatus === 'waiting_for_decision'
                 ? renderPostWaitingForResponse(typeOfPost)
                 : null}
+              {isMobile && renderPostSuccessOrWaitingControls()}
             </SPostModalContainer>
           ) : null}
         </Modal>
@@ -1012,6 +1208,74 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     );
   }
 
+  // Render Moderation view
+  if (isMyPost) {
+    return (
+      <>
+        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
+          {(postStatus === 'succeeded' ||
+            postStatus === 'waiting_for_response') &&
+            !isMobile && <PostSuccessAnimationBackground />}
+          <Head>
+            <title>{t(`meta.${typeOfPost}.title`)}</title>
+            <meta
+              name='description'
+              content={t(`meta.${typeOfPost}.description`)}
+            />
+            <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
+            <meta
+              property='og:description'
+              content={t(`meta.${typeOfPost}.description`)}
+            />
+          </Head>
+          {!isMobile && renderPostModerationControls()}
+          {postParsed && typeOfPost ? (
+            <SPostModalContainer
+              loaded={recommendedPosts && recommendedPosts.length > 0}
+              id='post-modal-container'
+              isMyPost={isMyPost}
+              onClick={(e) => e.stopPropagation()}
+              ref={(el) => {
+                modalContainerRef.current = el!!;
+              }}
+            >
+              {postStatus !== 'deleted_by_admin' &&
+              postStatus !== 'deleted_by_creator' ? (
+                renderPostModeration(typeOfPost)
+              ) : (
+                <PostFailedBox
+                  title={t('postDeletedByMe.title', {
+                    postType: t(`postType.${typeOfPost}`),
+                  })}
+                  body={
+                    deletedByCreator
+                      ? t('postDeletedByMe.body.byCreator', {
+                          postType: t(`postType.${typeOfPost}`),
+                        })
+                      : t('postDeletedByMe.body.byAdmin', {
+                          postType: t(`postType.${typeOfPost}`),
+                        })
+                  }
+                  imageSrc={
+                    theme.name === 'light'
+                      ? LIGHT_IMAGES[typeOfPost]
+                      : DARK_IMAGES[typeOfPost]
+                  }
+                  buttonCaption={t('postDeletedByMe.buttonText')}
+                  handleButtonClick={() => {
+                    router.push('/creation');
+                  }}
+                />
+              )}
+              {isMobile && renderPostModerationControls()}
+            </SPostModalContainer>
+          ) : null}
+        </Modal>
+      </>
+    );
+  }
+
+  // Render regular Decision view
   return (
     <>
       <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
@@ -1053,52 +1317,24 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           >
             {postStatus !== 'deleted_by_admin' &&
             postStatus !== 'deleted_by_creator' ? (
-              isMyPost ? (
-                renderPostModeration(typeOfPost)
-              ) : (
-                renderPostView(typeOfPost)
-              )
-            ) : isMyPost ? (
-              <PostFailedBox
-                title={t('PostDeletedByMe.title', {
-                  postType: t(`postType.${typeOfPost}`),
-                })}
-                body={
-                  deletedByCreator
-                    ? t('PostDeletedByMe.body.by_creator', {
-                        postType: t(`postType.${typeOfPost}`),
-                      })
-                    : t('PostDeletedByMe.body.by_admin', {
-                        postType: t(`postType.${typeOfPost}`),
-                      })
-                }
-                imageSrc={
-                  theme.name === 'light'
-                    ? LIGHT_IMAGES[typeOfPost]
-                    : DARK_IMAGES[typeOfPost]
-                }
-                buttonCaption={t('PostDeletedByMe.ctaButton')}
-                handleButtonClick={() => {
-                  router.push('/creation');
-                }}
-              />
+              renderPostView(typeOfPost)
             ) : (
               <PostFailedBox
-                title={t('PostDeleted.title', {
+                title={t('postDeleted.title', {
                   postType: t(`postType.${typeOfPost}`),
                 })}
                 body={
                   deletedByCreator
-                    ? t('PostDeleted.body.by_creator', {
+                    ? t('postDeleted.body.byCreator', {
                         creator: getDisplayname(postParsed.creator!!),
                         postType: t(`postType.${typeOfPost}`),
                       })
-                    : t('PostDeleted.body.by_admin', {
+                    : t('postDeleted.body.byAdmin', {
                         creator: getDisplayname(postParsed.creator!!),
                         postType: t(`postType.${typeOfPost}`),
                       })
                 }
-                buttonCaption={t('PostDeleted.ctaButton', {
+                buttonCaption={t('postDeleted.buttonText', {
                   postTypeMultiple: t(`postType.multiple.${typeOfPost}`),
                 })}
                 imageSrc={
@@ -1112,41 +1348,39 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 handleButtonClick={handleSeeNewDeletedBox}
               />
             )}
-            {!isMyPost && (
-              <SRecommendationsSection
-                id='recommendations-section-heading'
-                loaded={recommendedPosts && recommendedPosts.length > 0}
-              >
-                <Headline variant={4}>
-                  {recommendedPosts.length > 0
-                    ? t('RecommendationsSection.heading')
-                    : null}
-                </Headline>
-                {recommendedPosts && (
-                  <ListPostModal
-                    loading={recommendedPostsLoading}
-                    collection={recommendedPosts}
-                    skeletonsBgColor={theme.colorsThemed.background.tertiary}
-                    skeletonsHighlightColor={
-                      theme.colorsThemed.background.secondary
-                    }
-                    handlePostClicked={handleOpenRecommendedPost}
-                  />
-                )}
-                <div
-                  ref={loadingRef}
-                  style={{
-                    position: 'relative',
-                    bottom: '10px',
-                    ...(recommendedPostsLoading
-                      ? {
-                          display: 'none',
-                        }
-                      : {}),
-                  }}
+            <SRecommendationsSection
+              id='recommendations-section-heading'
+              loaded={recommendedPosts && recommendedPosts.length > 0}
+            >
+              <Headline variant={4}>
+                {recommendedPosts.length > 0
+                  ? t('recommendationsSection.heading')
+                  : null}
+              </Headline>
+              {recommendedPosts && (
+                <ListPostModal
+                  loading={recommendedPostsLoading}
+                  collection={recommendedPosts}
+                  skeletonsBgColor={theme.colorsThemed.background.tertiary}
+                  skeletonsHighlightColor={
+                    theme.colorsThemed.background.secondary
+                  }
+                  handlePostClicked={handleOpenRecommendedPost}
                 />
-              </SRecommendationsSection>
-            )}
+              )}
+              <div
+                ref={loadingRef}
+                style={{
+                  position: 'relative',
+                  bottom: '10px',
+                  ...(recommendedPostsLoading
+                    ? {
+                        display: 'none',
+                      }
+                    : {}),
+                }}
+              />
+            </SRecommendationsSection>
           </SPostModalContainer>
         ) : null}
       </Modal>
@@ -1289,10 +1523,12 @@ const SGoBackButtonDesktop = styled(Button)`
 `;
 
 // Waiting and Success
-const SPostSuccessWaitingControlsDiv = styled.div`
+const SPostSuccessWaitingControlsDiv = styled.div<{
+  variant: 'decision' | 'moderation';
+}>`
   position: absolute;
   right: 16px;
-  top: 16px;
+  top: ${({ variant }) => (variant === 'moderation' ? '64px' : '16px')};
 
   display: flex;
   flex-direction: column;
@@ -1313,6 +1549,7 @@ const SPostSuccessWaitingControlsDiv = styled.div`
   cursor: pointer;
 
   ${({ theme }) => theme.media.tablet} {
+    top: 16px;
     flex-direction: row-reverse;
     gap: 16px;
   }
@@ -1343,6 +1580,6 @@ const SWaitingSuccessControlsBtn = styled(Button)`
   cursor: pointer;
 
   ${({ theme }) => theme.media.tablet} {
-    background: #fdfdfd10;
+    background: #96949410;
   }
 `;

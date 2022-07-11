@@ -23,22 +23,20 @@ const OnboardingSectionStripe = dynamic(
 );
 
 const CreatorOnboardingStripe = () => {
-  const { t } = useTranslation('creator-onboarding');
+  const { t } = useTranslation('page-CreatorOnboarding');
 
-  const [onboardingState, setOnboardingState] =
-    useState<newnewapi.GetMyOnboardingStateResponse>();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<null | boolean>(null);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
 
   useEffect(() => {
     async function fetchOnboardingState() {
+      if (isLoading) return;
       try {
+        setIsLoading(true);
         const payload = new newnewapi.EmptyRequest({});
         const res = await getMyOnboardingState(payload);
-
         if (res.data) {
-          setOnboardingState(res.data);
           dispatch(
             setCreatorData({
               options: {
@@ -52,6 +50,7 @@ const CreatorOnboardingStripe = () => {
         setIsLoading(false);
       } catch (err) {
         console.error(err);
+        setIsLoading(false);
       }
     }
     fetchOnboardingState();
@@ -68,11 +67,7 @@ const CreatorOnboardingStripe = () => {
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       {!isLoading ? (
-        <OnboardingSectionStripe
-          isConnectedToStripe={
-            onboardingState?.isCreatorConnectedToStripe ?? false
-          }
-        />
+        <OnboardingSectionStripe />
       ) : (
         <Lottie
           width={64}
@@ -104,7 +99,7 @@ export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
-    'creator-onboarding',
+    'page-CreatorOnboarding',
   ]);
 
   return {

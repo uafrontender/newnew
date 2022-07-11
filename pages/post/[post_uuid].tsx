@@ -42,11 +42,21 @@ interface IPostPage {
   top10posts: newnewapi.NonPagedPostsResponse;
   postUuid: string;
   post: newnewapi.Post;
+  session_id?: string;
+  comment_id?: string;
+  comment_content?: string;
 }
 
-const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
+const PostPage: NextPage<IPostPage> = ({
+  top10posts,
+  postUuid,
+  post,
+  session_id,
+  comment_id,
+  comment_content,
+}) => {
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { mutedMode, resizeMode } = useAppSelector((state) => state.ui);
@@ -140,6 +150,9 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
         <PostModal
           isOpen
           post={displayedPost}
+          sessionIdFromRedirect={session_id}
+          commentIdFromUrl={comment_id}
+          commentContentFromUrl={comment_content}
           // Required to avoid wierd cases when navigating back to the post using browser back button
           manualCurrLocation='forced_redirect_to_home'
           handleClose={() => handleClosePostModal()}
@@ -156,14 +169,13 @@ export default PostPage;
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { post_uuid } = context.query;
+  const { post_uuid, session_id, comment_id, comment_content } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'profile',
-    'decision',
-    'home',
-    'payment-modal',
-    'chat',
+    'modal-Post',
+    'modal-ResponseSuccessModal',
+    'component-PostCard',
+    'modal-PaymentModal',
   ]);
 
   if (!post_uuid || Array.isArray(post_uuid)) {
@@ -203,6 +215,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         : {}),
       postUuid: post_uuid,
       post: res.data.toJSON(),
+      ...(session_id
+        ? {
+            session_id,
+          }
+        : {}),
+      ...(comment_id
+        ? {
+            comment_id,
+          }
+        : {}),
+      ...(comment_content
+        ? {
+            comment_content,
+          }
+        : {}),
       ...translationContext,
     },
   };

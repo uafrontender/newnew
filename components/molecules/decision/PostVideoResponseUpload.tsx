@@ -72,11 +72,11 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   handleResetVideoUploadAndProcessingState,
   handleUploadVideoNotProcessed,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
   const [showVideoDelete, setShowVideoDelete] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const playerRef: any = useRef();
-  const [localFile, setLocalFile] = useState(null);
+  const [localFile, setLocalFile] = useState<File | null>(null);
 
   const handleButtonClick = useCallback(() => {
     inputRef.current?.click();
@@ -96,18 +96,24 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   }, [handleCloseDeleteVideoClick, id, onChange]);
 
   const handleFileChange = useCallback(
-    async (e) => {
-      const file = e.target?.files[0];
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { files } = e.target;
+
+      if (!files) {
+        return;
+      }
+
+      const file = files[0];
 
       if (file.size > MAX_VIDEO_SIZE) {
-        toast.error(t('PostVideo.UploadResponseForm.video.error.maxSize'));
+        toast.error(t('postVideo.uploadResponseForm.video.error.maxSize'));
       } else {
         const media: any = await loadVideo(file);
 
         if (media.duration < MIN_VIDEO_DURATION) {
-          toast.error(t('PostVideo.UploadResponseForm.video.error.minLength'));
+          toast.error(t('postVideo.uploadResponseForm.video.error.minLength'));
         } else if (media.duration > MAX_VIDEO_DURATION) {
-          toast.error(t('PostVideo.UploadResponseForm.video.error.maxLength'));
+          toast.error(t('postVideo.uploadResponseForm.video.error.maxLength'));
         } else {
           setLocalFile(file);
           onChange(id, file);
@@ -168,19 +174,19 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           }}
         />
         <SHeadline variant={6}>
-          {t('PostVideo.UploadResponseForm.fileUpload.title_1')}
+          {t('postVideo.uploadResponseForm.fileUpload.title_1')}
           <br />
-          {t('PostVideo.UploadResponseForm.fileUpload.title_2')}
+          {t('postVideo.uploadResponseForm.fileUpload.title_2')}
         </SHeadline>
         <SButton
           id='upload-response-btn'
           view='primaryGrad'
           onClick={handleButtonClick}
         >
-          {t('PostVideo.UploadResponseForm.fileUpload.button')}
+          {t('postVideo.uploadResponseForm.fileUpload.button')}
         </SButton>
         <SPlaceholder weight={600} variant={2}>
-          {t('PostVideo.UploadResponseForm.fileUpload.description')}
+          {t('postVideo.uploadResponseForm.fileUpload.description')}
         </SPlaceholder>
       </SDropBox>
     );
@@ -189,14 +195,14 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
       content = (
         <SLoadingBox>
           <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
-            {t('PostVideo.UploadResponseForm.video.loading.title')}
+            {t('postVideo.uploadResponseForm.video.loading.title')}
           </SLoadingTitleWithEllipseAnimated>
           <SLoadingDescription variant={2} weight={600}>
-            {t('PostVideo.UploadResponseForm.video.loading.description')}
+            {t('postVideo.uploadResponseForm.video.loading.description')}
           </SLoadingDescription>
           <SLoadingBottomBlock>
             <SLoadingDescription variant={2} weight={600}>
-              {t('PostVideo.UploadResponseForm.video.loading.process', {
+              {t('postVideo.uploadResponseForm.video.loading.process', {
                 time: `${etaUpload} seconds`,
                 progress: progressUpload,
               })}
@@ -205,7 +211,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
               view='secondary'
               onClick={handleCancelVideoUpload}
             >
-              {t('PostVideo.UploadResponseForm.button.cancel')}
+              {t('postVideo.uploadResponseForm.button.cancel')}
             </SLoadingBottomBlockButton>
           </SLoadingBottomBlock>
           <SLoadingProgress>
@@ -219,25 +225,25 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           <SErrorTitleWrapper>
             <SInlineSVG svg={errorIcon} width='16px' height='16px' />
             <SErrorTitle variant={3} weight={600}>
-              {t('PostVideo.UploadResponseForm.video.error.title')}
+              {t('postVideo.uploadResponseForm.video.error.title')}
             </SErrorTitle>
           </SErrorTitleWrapper>
           <SLoadingDescription variant={2} weight={600}>
-            {t('PostVideo.UploadResponseForm.video.error.description')}
+            {t('postVideo.uploadResponseForm.video.error.description')}
           </SLoadingDescription>
           <SErrorBottomBlock>
             <SLoadingBottomBlockButton
               view='secondary'
               onClick={handleCancelVideoProcessing}
             >
-              {t('PostVideo.UploadResponseForm.button.cancel')}
+              {t('postVideo.uploadResponseForm.button.cancel')}
             </SLoadingBottomBlockButton>
             <Button
               view='primaryGrad'
               onClick={handleRetryVideoUpload}
               disabled={!localFile}
             >
-              {t('PostVideo.UploadResponseForm.button.retry')}
+              {t('postVideo.uploadResponseForm.button.retry')}
             </Button>
           </SErrorBottomBlock>
         </SErrorBox>
@@ -246,18 +252,18 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
       content = (
         <SLoadingBox>
           <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
-            {t('PostVideo.UploadResponseForm.video.processingPublished.title')}
+            {t('postVideo.uploadResponseForm.video.processingPublished.title')}
           </SLoadingTitleWithEllipseAnimated>
           <SLoadingDescription variant={2} weight={600}>
             {t(
-              'PostVideo.UploadResponseForm.video.processingPublished.description'
+              'postVideo.uploadResponseForm.video.processingPublished.description'
             )}
           </SLoadingDescription>
           {/* <SLoadingBottomBlock>
             {etaProcessing > 0 && (
               <SLoadingDescription variant={2} weight={600}>
                 {t(
-                  'PostVideo.UploadResponseForm.video.processingPublished.process',
+                  'postVideo.uploadResponseForm.video.processingPublished.process',
                   {
                     time: `${etaProcessing} seconds`,
                     progress: progressProcessing,
@@ -275,14 +281,14 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
       content = (
         <SLoadingBox>
           <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
-            {t('PostVideo.UploadResponseForm.video.processing.title')}
+            {t('postVideo.uploadResponseForm.video.processing.title')}
           </SLoadingTitleWithEllipseAnimated>
           <SLoadingDescription variant={2} weight={600}>
-            {t('PostVideo.UploadResponseForm.video.processing.description')}
+            {t('postVideo.uploadResponseForm.video.processing.description')}
           </SLoadingDescription>
           <SLoadingBottomBlock>
             {/* <SLoadingDescription variant={2} weight={600}>
-              {t('PostVideo.UploadResponseForm.video.processing.process', {
+              {t('postVideo.uploadResponseForm.video.processing.process', {
                 time: `${etaProcessing} seconds`,
                 progress: progressProcessing,
               })}
@@ -294,18 +300,18 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
               }}
               disabled={!value?.hlsStreamUrl}
             >
-              {t('PostVideo.UploadResponseForm.button.cancel')}
+              {t('postVideo.uploadResponseForm.button.cancel')}
             </SLoadingBottomBlockButton> */}
-            <SLoadingPublishButton
+            {/* <SLoadingPublishButton
               view='primary'
               onClick={() => {
                 handleUploadVideoNotProcessed();
               }}
             >
               {t(
-                'PostVideo.UploadResponseForm.video.processing.uploadNonProcessed'
+                'postVideo.uploadResponseForm.video.processing.uploadNonProcessed'
               )}
-            </SLoadingPublishButton>
+            </SLoadingPublishButton> */}
           </SLoadingBottomBlock>
           {/* <SSpinnerWrapper>
             <InlineSVG svg={spinnerIcon} width='16px' />
@@ -341,7 +347,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           <SButtonsContainer>
             <SButtonsContainerLeft>
               <SVideoButton danger onClick={handleDeleteVideoShow}>
-                {t('PostVideo.UploadResponseForm.video.deleteFile')}
+                {t('postVideo.uploadResponseForm.video.deleteFile')}
               </SVideoButton>
             </SButtonsContainerLeft>
           </SButtonsContainer>
@@ -366,7 +372,6 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
     localFile,
-    handleUploadVideoNotProcessed,
     value,
     thumbnails,
     handleDeleteVideoShow,
@@ -579,11 +584,11 @@ const SLoadingBottomBlockButton = styled(Button)`
   }
 `;
 
-const SLoadingPublishButton = styled(Button)`
-  margin-left: auto;
+// const SLoadingPublishButton = styled(Button)`
+//   margin-left: auto;
 
-  padding: 10px;
-`;
+//   padding: 10px;
+// `;
 
 const SLoadingProgress = styled.div`
   width: 100%;

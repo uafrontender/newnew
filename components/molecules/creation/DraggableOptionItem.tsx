@@ -30,7 +30,8 @@ interface IOptionItem {
     value: string,
     min: number,
     max: number,
-    kind: newnewapi.ValidateTextRequest.Kind
+    kind: newnewapi.ValidateTextRequest.Kind,
+    index: number
   ) => Promise<string>;
   handleChange: (index: number, item: object | null) => void;
 }
@@ -42,14 +43,14 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   const [isDragging, setIsDragging] = useState(false);
   const y = useMotionValue(0);
   const theme = useTheme();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const dragControls = useDragControls();
 
   const handleInputChange = (e: any) => {
-    setValue(e.target.value);
+    setValue(e.target.value.trim() ? e.target.value : '');
     handleChange(index, {
       ...item,
-      text: e.target.value,
+      text: e.target.value.trim() ? e.target.value : '',
     });
   };
   const handleInputBlur = async (e: any) => {
@@ -63,7 +64,8 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
         e.target.value,
         CREATION_OPTION_MIN,
         CREATION_OPTION_MAX,
-        newnewapi.ValidateTextRequest.Kind.POST_OPTION
+        newnewapi.ValidateTextRequest.Kind.POST_OPTION,
+        index
       )
     );
   };
@@ -86,19 +88,22 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   useEffect(() => {
     const func = async () => {
       if (validateTitleDebounced) {
+        const trimmedTitle = (validateTitleDebounced as string).trim();
+
         setError(
           await validation(
-            validateTitleDebounced,
+            trimmedTitle,
             CREATION_OPTION_MIN,
             CREATION_OPTION_MAX,
-            newnewapi.ValidateTextRequest.Kind.POST_OPTION
+            newnewapi.ValidateTextRequest.Kind.POST_OPTION,
+            index
           )
         );
       }
     };
 
     func();
-  }, [validation, validateTitleDebounced]);
+  }, [validation, index, validateTitleDebounced]);
 
   return (
     <SWrapper
