@@ -25,7 +25,6 @@ export const SearchResults = () => {
   useEffect(() => {
     if (router) {
       if (router.query.query) setSearchValue(router.query.query as string);
-      if (router.query.type) setSearchType(router.query.type as string);
       if (router.query.tab) {
         if (router.query.tab === 'creators') {
           setActiveTab('creators');
@@ -34,6 +33,11 @@ export const SearchResults = () => {
         } else {
           setActiveTab('posts');
         }
+      }
+      if (router.query.type) {
+        setSearchType(router.query.type as string);
+      } else if (router.query.tab === 'posts') {
+        setSearchType('');
       }
     }
   }, [router]);

@@ -75,10 +75,12 @@ const SearchInput: React.FC = React.memo(() => {
   const handleSearchClick = useCallback(() => {
     dispatch(setGlobalSearchActive(!globalSearchActive));
   }, [dispatch, globalSearchActive]);
+
   const handleSearchClose = () => {
     setSearchValue('');
     dispatch(setGlobalSearchActive(false));
   };
+
   const handleInputChange = (e: any) => {
     setSearchValue(e.target.value);
   };
