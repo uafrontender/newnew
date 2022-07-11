@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
+import moment from 'moment';
 
 import InlineSVG from '../../atoms/InlineSVG';
 
@@ -16,11 +17,21 @@ export interface ITimeComponents {
 interface ITimePicker {
   value: string;
   disabled?: boolean;
+  isDaySame: boolean;
+  isTimeOfTheDaySame: boolean;
+  localTimeOfTheDay: 'am' | 'pm';
   onChange: (e: any) => void;
 }
 
 export const TimePicker: React.FC<ITimePicker> = (props) => {
-  const { value, disabled, onChange } = props;
+  const {
+    value,
+    disabled,
+    isDaySame,
+    isTimeOfTheDaySame,
+    localTimeOfTheDay,
+    onChange,
+  } = props;
   const theme = useTheme();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -34,17 +45,33 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
     };
   }, [value]);
 
-  const hours: TDropdownSelectItem<string>[] = useMemo(
-    () =>
-      new Array(12).fill('').map((_, i) => ({
-        value:
-          (i + 1).toString().length > 1
-            ? (i + 1).toString()
-            : `0${(i + 1).toString()}`,
-        name: (i + 1).toString(),
-      })),
-    []
-  );
+  const hours: TDropdownSelectItem<string>[] = useMemo(() => {
+    let offset;
+    if (isDaySame) {
+      const h = moment().hour();
+
+      if (isTimeOfTheDaySame && localTimeOfTheDay === 'pm') {
+        const hCorrected = h - 11;
+
+        offset = 12 - hCorrected;
+      } else if (isTimeOfTheDaySame && localTimeOfTheDay === 'am') {
+        offset = h - 1;
+      }
+    }
+    const hoursArray = new Array(12).fill('').map((_, i) => ({
+      value:
+        (i + 1).toString().length > 1
+          ? (i + 1).toString()
+          : `0${(i + 1).toString()}`,
+      name: (i + 1).toString(),
+    }));
+
+    if (offset) {
+      return hoursArray.slice(offset);
+    }
+
+    return hoursArray;
+  }, [isDaySame, isTimeOfTheDaySame, localTimeOfTheDay]);
 
   const minutes: TDropdownSelectItem<string>[] = useMemo(
     () =>
@@ -138,7 +165,6 @@ const SInput = styled.input`
   line-height: 24px;
   background-color: transparent;
   pointer-events: none;
-
 `;
 
 const SInlineSVG = styled(InlineSVG)`
