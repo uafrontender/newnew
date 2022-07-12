@@ -55,6 +55,7 @@ import getDisplayname from '../../utils/getDisplayname';
 import ReportModal, { ReportData } from './chat/ReportModal';
 import { reportPost } from '../../api/endpoints/report';
 import PostCardEllipseModal from './PostCardEllipseModal';
+import getChunks from '../../utils/getChunks/getChunks';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -359,6 +360,20 @@ export const PostCard: React.FC<ICard> = React.memo(
     const moreButtonInsideRef: any = useRef();
     const moreButtonRef: any = useRef();
 
+    function getTitleContent(title: string) {
+      return (
+        <>
+          {getChunks(title).map((chunk) => {
+            if (chunk.type === 'hashtag') {
+              return <Hashtag>#{chunk.text}</Hashtag>;
+            }
+
+            return chunk.text;
+          })}
+        </>
+      );
+    }
+
     if (type === 'inside') {
       return (
         <SWrapper ref={cardRef} index={index} width={width}>
@@ -435,7 +450,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   }}
                 />
                 <SText variant={3} weight={600}>
-                  {postParsed.title}
+                  {getTitleContent(postParsed.title)}
                 </SText>
               </SBottomContent>
             </SImageHolder>
@@ -566,7 +581,7 @@ export const PostCard: React.FC<ICard> = React.memo(
             <CardTimer startsAt={startsAtTime} endsAt={endsAtTime} />
           </SBottomStart>
           <STextOutside variant={3} weight={600}>
-            {postParsed.title}
+            {getTitleContent(postParsed.title)}
           </STextOutside>
           <SBottomEnd type={typeOfPost}>
             {totalVotes > 0 || totalAmount > 0 || currentBackerCount > 0 ? (
@@ -1038,6 +1053,10 @@ const STextOutside = styled(Text)`
   margin-bottom: 10px;
 
   height: 40px;
+`;
+
+const Hashtag = styled.span`
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
 `;
 
 const SBottomStart = styled.div<{
