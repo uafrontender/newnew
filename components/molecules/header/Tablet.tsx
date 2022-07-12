@@ -19,6 +19,7 @@ import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface ITablet {}
 
@@ -138,6 +139,11 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                       <Button
                         view='primaryGrad'
                         withShadow={!globalSearchActive}
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked ', {
+                            _button: 'New Post',
+                          });
+                        }}
                       >
                         {t('button.createDecision')}
                       </Button>
