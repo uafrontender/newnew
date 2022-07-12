@@ -8,6 +8,7 @@ import InlineSVG from '../../atoms/InlineSVG';
 import DraggableOptionItem from '../../molecules/creation/DraggableOptionItem';
 
 import plusIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IDraggableMobileOptions {
   id: string;
@@ -56,6 +57,7 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (
     />
   );
   const handleAddNewOption = () => {
+    Mixpanel.track('Superpoll Add New Option');
     onChange(id, [
       ...options,
       {

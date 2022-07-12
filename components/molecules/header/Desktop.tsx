@@ -15,6 +15,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -129,7 +130,15 @@ export const Desktop: React.FC = React.memo(() => {
                     }
                   >
                     <a>
-                      <Button withShadow view='primaryGrad'>
+                      <Button
+                        withShadow
+                        view='primaryGrad'
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked ', {
+                            _button: 'New Post',
+                          });
+                        }}
+                      >
                         {t('button.createDecision')}
                       </Button>
                     </a>

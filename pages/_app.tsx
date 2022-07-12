@@ -58,6 +58,7 @@ import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
+import { Mixpanel } from '../utils/mixpanel';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -127,6 +128,19 @@ const MyApp = (props: IMyApp): ReactElement => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (user.loggedIn && user.userData?.username) {
+      Mixpanel.identify(user.userData.username);
+      Mixpanel.people.set({
+        $name: user.userData.username,
+        $email: user.userData.email,
+        newnewId: user.userData.userUuid,
+      });
+      Mixpanel.track('Session started!');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.loggedIn]);
 
   useEffect(() => {
     let newResizeMode = 'mobile';
