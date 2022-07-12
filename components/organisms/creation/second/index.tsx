@@ -335,8 +335,22 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     }, [post.expiresAt]);
 
     const handleSubmit = useCallback(async () => {
+      // Validate title as the previous validation might be outdated due to debounce,
+      // or title input being focused
+      const errorText = await validateT(
+        post?.title,
+        CREATION_TITLE_MIN,
+        CREATION_TITLE_MAX,
+        newnewapi.ValidateTextRequest.Kind.POST_TITLE
+      );
+
+      if (errorText) {
+        setTitleError(errorText);
+        return;
+      }
+
       router.push(`/creation/${tab}/preview`);
-    }, [tab, router]);
+    }, [tab, router, post?.title, validateT]);
 
     const handleCloseClick = useCallback(() => {
       router?.push('/');
@@ -491,6 +505,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
         setTitleError('');
       }
     }, []);
+
     const handleItemBlur = useCallback(
       async (key: string, value: string) => {
         if (key === 'title' && value.length > 0) {
@@ -506,6 +521,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       },
       [validateT]
     );
+
     const handleItemChange = useCallback(
       async (key: string, value: any) => {
         if (key === 'title') {
