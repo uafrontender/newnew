@@ -1,11 +1,11 @@
 import { useTranslation } from 'next-i18next';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { ModalNotificationsContext } from '../../contexts/modalNotificationsProvider';
+import assets from '../../constants/assets';
+import { ModalNotificationsContext } from '../../contexts/modalNotificationsContext';
 import Button from '../atoms/Button';
 import Modal from '../organisms/Modal';
 
-// TODO: Finalize styling
 const ModalNotifications: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
   const { currentNotification, close } = useContext(ModalNotificationsContext);
@@ -38,12 +38,14 @@ const ModalNotifications: React.FC = React.memo(() => {
       {currentNotification && (
         <Container>
           <Content>
-            <NotificationImage src={currentNotification.image} />
-            <Title>{t(currentNotification.titleKey)}</Title>
-            <Description>{t(currentNotification.descriptionKey)}</Description>
-            <Button onClick={handleClose}>
+            <DataContainer>
+              <NotificationImage src={assets.decision.gold} />
+              <Title>{t(currentNotification.titleKey)}</Title>
+              <Description>{t(currentNotification.descriptionKey)}</Description>
+            </DataContainer>
+            <SButton onClick={handleClose}>
               {t(currentNotification.buttonTextKey)}
-            </Button>
+            </SButton>
           </Content>
         </Container>
       )}
@@ -62,29 +64,46 @@ const Container = styled.div`
 `;
 
 const Content = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
   height: 100%;
+  background: ${(props) => props.theme.colorsThemed.background.primary};
+  padding: 16px;
 
   ${({ theme }) => theme.media.tablet} {
     width: 500px;
     height: auto;
+    background: ${(props) => props.theme.colorsThemed.background.tertiary};
+    padding: 24px 40px 40px;
+    border-radius: 24px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    width: 100px;
-    height: 100px;
   }
+`;
+
+const DataContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  margin-bottom: 24px;
 `;
 
 const NotificationImage = styled.img`
   width: 200px;
   height: 200px;
   object-fit: cover;
+  margin-bottom: 24px;
 `;
 
 const Title = styled.div`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: 700;
+  margin-bottom: 4px;
 
   font-size: 32px;
   line-height: 40px;
@@ -106,4 +125,13 @@ const Description = styled.div`
 
   font-size: 16px;
   line-height: 20px;
+`;
+
+const SButton = styled(Button)`
+  width: 100%;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: auto;
+    min-width: 92px;
+  }
 `;

@@ -1,7 +1,6 @@
 import React, { createContext, useState, useMemo, useCallback } from 'react';
 
 export interface ModalNotification {
-  image: string;
   titleKey: string;
   descriptionKey: string;
   buttonTextKey: string;

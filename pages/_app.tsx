@@ -59,7 +59,7 @@ import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
 import RewardContextProvider from '../contexts/rewardContext';
-import ModalNotificationsContextProvider from '../contexts/modalNotificationsProvider';
+import ModalNotificationsContextProvider from '../contexts/modalNotificationsContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
