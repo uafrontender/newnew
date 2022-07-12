@@ -18,6 +18,7 @@ import {
   CREATION_OPTION_MAX,
   CREATION_OPTION_MIN,
 } from '../../../constants/general';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IOptionItem {
   item: {
@@ -54,6 +55,7 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
     });
   };
   const handleInputBlur = async (e: any) => {
+    Mixpanel.track('Superpoll Option Text Change', { _text: e.target.value });
     if (e.target.value.length < 1 && index > 1) {
       handleChange(index, null);
       return;
@@ -73,13 +75,16 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
     setError('');
   };
   const handleDelete = () => {
+    Mixpanel.track('Superpoll Delete Option');
     handleChange(index, null);
   };
   const handlePointerDown = (event: any) => {
+    Mixpanel.track('Superpoll Dragging Option Start');
     dragControls.start(event);
     setIsDragging(true);
   };
   const handlePointerUp = () => {
+    Mixpanel.track('Superpoll Dragging Option End');
     setIsDragging(false);
   };
 

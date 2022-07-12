@@ -36,6 +36,7 @@ import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
 import urltoFile from '../../../../utils/urlToFile';
 import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
 import PostTitleContent from '../../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -176,6 +177,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     [post.expiresAt, post.startsAt]
   );
   const handleClose = useCallback(() => {
+    Mixpanel.track('Post Edit');
     router.back();
   }, [router]);
   const handleCloseModal = useCallback(() => {
@@ -184,6 +186,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     dispatch(clearCreation({}));
   }, [dispatch, router]);
   const handleSubmit = useCallback(async () => {
+    if (loading) return;
+    Mixpanel.track('Publish Post');
     setLoading(true);
     try {
       let hasCoverImage = false;
@@ -297,16 +301,16 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     post.thumbnailParameters.startTime,
     post.thumbnailParameters.endTime,
     post.announcementVideoUrl,
+    loading,
+    tab,
+    router,
+    auction,
+    isMobile,
+    dispatch,
+    crowdfunding,
+    multiplechoice,
     formatStartsAt,
     formatExpiresAt,
-    tab,
-    dispatch,
-    isMobile,
-    auction.minimalBid,
-    multiplechoice.choices,
-    multiplechoice.options.allowSuggestions,
-    crowdfunding.targetBackerCount,
-    router,
   ]);
   const settings: any = useMemo(
     () =>
