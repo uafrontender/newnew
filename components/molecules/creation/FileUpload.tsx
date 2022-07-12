@@ -12,6 +12,8 @@ import Caption from '../../atoms/Caption';
 import InlineSVG from '../../atoms/InlineSVG';
 import FullPreview from './FullPreview';
 import DeleteVideo from './DeleteVideo';
+import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
+import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
 
 import { loadVideo } from '../../../utils/loadVideo';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
@@ -63,6 +65,9 @@ interface IFileUpload {
   handleCancelVideoUpload: () => void;
 }
 
+// secondStep.video.thumbnailEllipseMenu.selectSnippetButton
+// secondStep.video.thumbnailEllipseMenu.uploadImageButton
+
 const FileUpload: React.FC<IFileUpload> = ({
   id,
   value,
@@ -78,24 +83,30 @@ const FileUpload: React.FC<IFileUpload> = ({
   onChange,
   handleCancelVideoUpload,
 }) => {
-  const [showVideoDelete, setShowVideoDelete] = useState(false);
-  const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
-  const [showFullPreview, setShowFullPreview] = useState(false);
   const { t } = useTranslation('page-Creation');
-  const inputRef = useRef<HTMLInputElement>(null);
-  const playerRef: any = useRef();
-  const [localFile, setLocalFile] = useState<File | null>(null);
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const { post, videoProcessing } = useAppSelector((state) => state.creation);
   const dispatch = useAppDispatch();
-
+  const { post, videoProcessing } = useAppSelector((state) => state.creation);
+  const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
 
-  const handleButtonClick = useCallback(() => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const playerRef: any = useRef();
+  const [localFile, setLocalFile] = useState<File | null>(null);
+
+  const [showVideoDelete, setShowVideoDelete] = useState(false);
+
+  const ellipseButtonRef = useRef<HTMLButtonElement>();
+  const [showEllipseMenu, setShowEllipseMenu] = useState(false);
+  const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
+  const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
+
+  const [showFullPreview, setShowFullPreview] = useState(false);
+
+  const handleUploadButtonClick = useCallback(() => {
     inputRef.current?.click();
   }, []);
 
@@ -108,6 +119,12 @@ const FileUpload: React.FC<IFileUpload> = ({
     setShowFullPreview(false);
     playerRef.current.play();
   }, []);
+
+  const handleOpenEllipseMenu = useCallback(() => setShowEllipseMenu(true), []);
+  const handleCloseEllipseMenu = useCallback(
+    () => setShowEllipseMenu(false),
+    []
+  );
 
   const handleEditThumb = useCallback(() => {
     setShowThumbnailEdit(true);
@@ -238,7 +255,7 @@ const FileUpload: React.FC<IFileUpload> = ({
         <SPlaceholder weight={600} variant={2}>
           {t('secondStep.fileUpload.description')}
         </SPlaceholder>
-        <SButton view='primaryGrad' onClick={handleButtonClick}>
+        <SButton view='primaryGrad' onClick={handleUploadButtonClick}>
           {t('secondStep.fileUpload.button')}
         </SButton>
       </SDropBox>
@@ -362,7 +379,10 @@ const FileUpload: React.FC<IFileUpload> = ({
           </SPlayerWrapper>
           <SButtonsContainer>
             <SButtonsContainerLeft>
-              <SVideoButton onClick={handleEditThumb}>
+              <SVideoButton
+                ref={ellipseButtonRef as any}
+                onClick={handleOpenEllipseMenu}
+              >
                 {t('secondStep.video.setThumbnail')}
               </SVideoButton>
               <SVideoButton danger onClick={handleDeleteVideoShow}>
@@ -395,10 +415,10 @@ const FileUpload: React.FC<IFileUpload> = ({
     isDesktop,
     localFile,
     thumbnails,
-    handleEditThumb,
+    handleOpenEllipseMenu,
     handleFileChange,
     handleFullPreview,
-    handleButtonClick,
+    handleUploadButtonClick,
     handleDeleteVideoShow,
     handleRetryVideoUpload,
     handleCancelVideoProcessing,
@@ -425,6 +445,39 @@ const FileUpload: React.FC<IFileUpload> = ({
         handleSubmit={handlePreviewEditSubmit}
       />
       {renderContent()}
+      {/* Ellipse menu */}
+      {!isMobile && (
+        <SEllipseMenu
+          isOpen={showEllipseMenu}
+          onClose={handleCloseEllipseMenu}
+          anchorElement={ellipseButtonRef.current}
+          anchorOrigin={{
+            horizontal: 'right',
+            vertical: 'top',
+          }}
+        >
+          <EllipseMenuButton>
+            {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
+          </EllipseMenuButton>
+          <EllipseMenuButton>
+            {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
+          </EllipseMenuButton>
+        </SEllipseMenu>
+      )}
+      {isMobile && showEllipseMenu ? (
+        <EllipseModal
+          zIndex={11}
+          show={showEllipseMenu}
+          onClose={handleCloseEllipseMenu}
+        >
+          <EllipseModalButton>
+            {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
+          </EllipseModalButton>
+          <EllipseModalButton>
+            {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
+          </EllipseModalButton>
+        </EllipseModal>
+      ) : null}
     </SWrapper>
   );
 };
@@ -692,4 +745,10 @@ const SErrorBottomBlock = styled.div`
   ${({ theme }) => theme.media.tablet} {
     margin-top: 16px;
   }
+`;
+
+// Ellipse menu
+const SEllipseMenu = styled(EllipseMenu)`
+  width: 216px;
+  position: fixed;
 `;
