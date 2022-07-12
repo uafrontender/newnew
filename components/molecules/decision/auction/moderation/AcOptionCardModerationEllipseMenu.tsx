@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import EllipseMenu, { EllipseMenuButton } from '../../../../atoms/EllipseMenu';
 
@@ -87,6 +87,17 @@ export default AcOptionCardModerationEllipseMenu;
 
 const SEllipseMenu = styled(EllipseMenu)`
   position: fixed;
-  width: 120px;
-  min-width: 120px;
+  width: 176px;
+  min-width: 176px;
+
+  background: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colors.white
+      : theme.colorsThemed.background.tertiary};
+
+  ${({ theme }) =>
+    theme.name === 'light' &&
+    css`
+      box-shadow: 0px 0px 35px 0px rgba(0, 0, 0, 0.25);
+    `}
 `;
