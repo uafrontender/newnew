@@ -262,7 +262,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
           .map((p, i) =>
             p.usdCents ? (
               <EllipseModalButton
-                key={p.usdCents}
+                key={`${p.usdCents}_${i}`}
                 onClick={() => {
                   handleSetPledgeAmountAndOpenPaymentModal(
                     p.usdCents ? p.usdCents : 0
@@ -409,26 +409,6 @@ const SCaption = styled(Text)`
   text-align: center;
 `;
 
-// const SAdditionalLabel = styled.div`
-//   position: absolute;
-//   top: calc(50% - 12px);
-//   right: 8px;
-
-//   font-weight: bold;
-//   font-size: 10px;
-//   line-height: 24px;
-//   color: #2c2c33;
-//   text-align: center;
-
-//   background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
-
-//   height: 24px;
-//   padding-left: 8px;
-//   padding-right: 8px;
-
-//   border-radius: 50px;
-// `;
-
 // Payment modal header
 const SPaymentModalHeader = styled.div``;
 
@@ -508,7 +488,7 @@ const SPaymentSign = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap;
 `;
 
 const SPaymentTermsLink = styled.a`

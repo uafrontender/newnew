@@ -22,17 +22,11 @@ export const FinishProfileSetup = () => {
 
   useEffect(() => {
     if (user.creatorData?.isLoaded) {
-      user.creatorData?.hasCreatorTags &&
-      user.userData?.bio &&
-      user.userData?.bio.length > 0
+      user.userData?.bio && user.userData?.bio.length > 0
         ? setAccountDetailsCompleted(true)
         : setAccountDetailsCompleted(false);
     }
-  }, [
-    user.creatorData?.isLoaded,
-    user.creatorData?.hasCreatorTags,
-    user.userData?.bio,
-  ]);
+  }, [user.creatorData?.isLoaded, user.userData?.bio]);
 
   useEffect(() => {
     if (user.creatorData?.isLoaded) {
