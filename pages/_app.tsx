@@ -58,6 +58,7 @@ import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
+import { Mixpanel } from '../utils/mixpanel';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -127,6 +128,13 @@ const MyApp = (props: IMyApp): ReactElement => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (user.loggedIn && user.userData?.username) {
+      Mixpanel.identify(user.userData.username);
+    }
+    Mixpanel.track('Session started!');
+  }, [user.loggedIn, user.userData?.username]);
 
   useEffect(() => {
     let newResizeMode = 'mobile';
