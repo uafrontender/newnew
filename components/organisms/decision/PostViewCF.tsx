@@ -374,7 +374,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
                   post={post}
                   pledgeLevels={pledgeLevels}
                   handleAddPledgeFromResponse={handleAddPledgeFromResponse}
-                  handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
+                  handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
                     setPaymentSuccesModalOpen(newValue)
                   }
                 />
@@ -808,7 +808,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
               isOpen={choosePledgeModalOpen}
               onClose={() => setChoosePledgeModalOpen(false)}
               handleAddPledgeFromResponse={handleAddPledgeFromResponse}
-              handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
+              handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
                 setPaymentSuccesModalOpen(newValue)
               }
             />

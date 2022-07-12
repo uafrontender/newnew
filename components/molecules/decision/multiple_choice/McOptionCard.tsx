@@ -73,7 +73,7 @@ interface IMcOptionCard {
   optionBeingSupported?: string;
   handleResetFreeVote: () => void;
   handleSetSupportedBid: (id: string) => void;
-  handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
+  handleSetPaymentSuccessModalOpen: (newValue: boolean) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
   ) => void;
@@ -97,7 +97,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   handleResetFreeVote,
   handleSetSupportedBid,
   handleRemoveOption,
-  handleSetPaymentSuccesModalOpen,
+  handleSetPaymentSuccessModalOpen,
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
@@ -343,7 +343,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   //       setIsSupportMenuOpen(false);
   //       setPaymentModalOpen(false);
   //       setLoadingModalOpen(false);
-  //       handleSetPaymentSuccesModalOpen(true);
+  //       handleSetPaymentSuccessModalOpen(true);
   //     }
   //   } catch (err) {
   //     setPaymentModalOpen(false);
@@ -356,7 +356,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   //   setIsSupportMenuOpen,
   //   setSupportBidAmount,
   //   handleSetSupportedBid,
-  //   handleSetPaymentSuccesModalOpen,
+  //   handleSetPaymentSuccessModalOpen,
   //   handleAddOrUpdateOptionFromResponse,
   //   supportBidAmount,
   //   option.id,
@@ -434,7 +434,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
       setLoadingModalOpen(false);
       handleResetFreeVote();
-      handleSetPaymentSuccesModalOpen(true);
+      handleSetPaymentSuccessModalOpen(true);
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
@@ -444,7 +444,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     option.id,
     appConstants.mcFreeVoteCount,
     handleAddOrUpdateOptionFromResponse,
-    handleSetPaymentSuccesModalOpen,
+    handleSetPaymentSuccessModalOpen,
     handleResetFreeVote,
   ]);
   const goToNextStep = () => {

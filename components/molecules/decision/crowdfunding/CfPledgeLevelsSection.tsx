@@ -45,7 +45,7 @@ import Headline from '../../../atoms/Headline';
 interface ICfPledgeLevelsSection {
   pledgeLevels: newnewapi.IMoneyAmount[];
   post: newnewapi.Crowdfunding;
-  handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
+  handleSetPaymentSuccessModalOpen: (newValue: boolean) => void;
   handleAddPledgeFromResponse: (
     newPledge: newnewapi.Crowdfunding.Pledge
   ) => void;
@@ -55,7 +55,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
   ({
     pledgeLevels,
     post,
-    handleSetPaymentSuccesModalOpen,
+    handleSetPaymentSuccessModalOpen,
     handleAddPledgeFromResponse,
   }) => {
     const router = useRouter();
@@ -204,7 +204,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
     //       setIsFormOpen(false);
     //       setPaymentModalOpen(false);
     //       setLoadingModalOpen(false);
-    //       handleSetPaymentSuccesModalOpen(true);
+    //       handleSetPaymentSuccessModalOpen(true);
     //     }
     //   } catch (err) {
     //     console.error(err);
@@ -217,7 +217,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
     //   post.postUuid,
     //   pledgeAmount,
     //   handleAddPledgeFromResponse,
-    //   handleSetPaymentSuccesModalOpen,
+    //   handleSetPaymentSuccessModalOpen,
     // ]);
 
     const handlePayWithCardStripeRedirect = useCallback(

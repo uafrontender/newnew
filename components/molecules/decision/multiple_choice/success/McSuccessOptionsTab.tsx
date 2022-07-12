@@ -218,7 +218,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
             noAction
             handleResetFreeVote={() => {}}
             handleSetSupportedBid={() => {}}
-            handleSetPaymentSuccesModalOpen={() => {}}
+            handleSetPaymentSuccessModalOpen={() => {}}
             handleAddOrUpdateOptionFromResponse={() => {}}
           />
         ))}

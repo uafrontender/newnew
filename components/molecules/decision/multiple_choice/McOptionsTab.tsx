@@ -508,7 +508,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               handleSetSupportedBid={(id: string) =>
                 setOptionBeingSupported(id)
               }
-              handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
+              handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
                 setPaymentSuccessModalOpen(newValue)
               }
               handleAddOrUpdateOptionFromResponse={
