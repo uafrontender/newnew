@@ -68,6 +68,7 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 import getChunks from '../../../../utils/getChunks/getChunks';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -335,14 +336,17 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     }, [post.expiresAt]);
 
     const handleSubmit = useCallback(async () => {
+      Mixpanel.track('Creation Preview Button Click');
       router.push(`/creation/${tab}/preview`);
     }, [tab, router]);
 
     const handleCloseClick = useCallback(() => {
+      Mixpanel.track('Creation Close');
       router?.push('/');
     }, [router]);
 
     const handleVideoDelete = useCallback(async () => {
+      Mixpanel.track('Video Deleting');
       try {
         const payload = new newnewapi.RemoveUploadedFileRequest({
           publicUrl: post?.announcementVideoUrl,
@@ -378,6 +382,9 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     }, [dispatch, post?.announcementVideoUrl, videoProcessing?.taskUuid]);
     const handleVideoUpload = useCallback(
       async (value: File) => {
+        Mixpanel.track('Video Uploading', {
+          _filename: value.name,
+        });
         try {
           dispatch(setCreationFileUploadETA(100));
           dispatch(setCreationFileUploadProgress(1));
@@ -494,6 +501,9 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     const handleItemBlur = useCallback(
       async (key: string, value: string) => {
         if (key === 'title' && value.length > 0) {
+          Mixpanel.track('Title Text Change', {
+            _text: value,
+          });
           setTitleError(
             await validateT(
               value,
@@ -509,20 +519,28 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     const handleItemChange = useCallback(
       async (key: string, value: any) => {
         if (key === 'title') {
+          Mixpanel.track('Post Title Change', { _value: value });
           dispatch(setCreationTitle(value.trim() ? value : ''));
         } else if (key === 'minimalBid') {
+          Mixpanel.track('Minimal Big Change', { _value: value });
           dispatch(setCreationMinBid(value));
         } else if (key === 'comments') {
+          Mixpanel.track('Post Creation Comments Change', { _value: value });
           dispatch(setCreationComments(value));
         } else if (key === 'allowSuggestions') {
+          Mixpanel.track('Post Allow Suggestions Change', { _value: value });
           dispatch(setCreationAllowSuggestions(value));
         } else if (key === 'expiresAt') {
+          Mixpanel.track('Post expiresAt Change', { _value: value });
           dispatch(setCreationExpireDate(value));
         } else if (key === 'startsAt') {
+          Mixpanel.track('Post startsAt Change', { _value: value });
           dispatch(setCreationStartDate(value));
         } else if (key === 'targetBackerCount') {
+          Mixpanel.track('Backer Count Change', { _value: value });
           dispatch(setCreationTargetBackerCount(value));
         } else if (key === 'choices') {
+          Mixpanel.track('Post Creation Choices Change', { _value: value });
           dispatch(setCreationChoices(value));
         } else if (key === 'video') {
           if (value) {

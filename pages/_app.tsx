@@ -132,9 +132,15 @@ const MyApp = (props: IMyApp): ReactElement => {
   useEffect(() => {
     if (user.loggedIn && user.userData?.username) {
       Mixpanel.identify(user.userData.username);
+      Mixpanel.people.set({
+        $name: user.userData.username,
+        $email: user.userData.email,
+        newnewId: user.userData.userUuid,
+      });
+      Mixpanel.track('Session started!');
     }
-    Mixpanel.track('Session started!');
-  }, [user.loggedIn, user.userData?.username]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.loggedIn]);
 
   useEffect(() => {
     let newResizeMode = 'mobile';

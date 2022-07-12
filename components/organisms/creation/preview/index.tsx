@@ -34,6 +34,7 @@ import {
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
 import PostTitleContent from '../../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -173,6 +174,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     [post.expiresAt, post.startsAt]
   );
   const handleClose = useCallback(() => {
+    Mixpanel.track('Post Edit');
     router.back();
   }, [router]);
   const handleCloseModal = useCallback(() => {
@@ -181,6 +183,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     dispatch(clearCreation({}));
   }, [dispatch, router]);
   const handleSubmit = useCallback(async () => {
+    if (loading) return;
+    Mixpanel.track('Publish Post');
     setLoading(true);
     try {
       const body: Omit<newnewapi.CreatePostRequest, 'toJSON'> = {
@@ -249,6 +253,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       setLoading(false);
     }
   }, [
+    loading,
     tab,
     post,
     router,

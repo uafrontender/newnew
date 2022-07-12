@@ -15,6 +15,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -60,13 +61,6 @@ export const Desktop: React.FC = React.memo(() => {
       <SRightBlock>
         {user.loggedIn && !globalSearchActive && (
           <>
-            {/* <Button
-              onClick={() =>
-                Mixpanel.track('Played song', { genre: 'hip-hop' })
-              }
-            >
-              Mixpanel
-            </Button> */}
             {user.userData?.options?.isCreator && (
               <SItemWithMargin style={{ paddingRight: 16 }}>
                 <SNavText variant={3} weight={600} onClick={handlerCopy}>
@@ -136,7 +130,15 @@ export const Desktop: React.FC = React.memo(() => {
                     }
                   >
                     <a>
-                      <Button withShadow view='primaryGrad'>
+                      <Button
+                        withShadow
+                        view='primaryGrad'
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked ', {
+                            _button: 'New Post',
+                          });
+                        }}
+                      >
                         {t('button.createDecision')}
                       </Button>
                     </a>
