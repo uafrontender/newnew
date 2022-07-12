@@ -159,15 +159,18 @@
     "cancelled": "cancelled"
   },
   "rewards": {
-    "1": {
-      "notification": {
-        "title": "You earned $2!",
-        "description": "...for placing a bid of $4",
-        "button": "Great"
-      },
-      "item": {
-        "title": "Place a bid of $4"
-      }
+    "title": "My Milestones",
+    "earned": "earned ${{value}}",
+    "earn": "earn ${{value}}",
+    "modalTitle": "You earned ${{amount}}!",
+    "modalButton": "Great",
+    "modalDescription": {
+      "0": "...for signing up",
+      "1": "...for placing a bid of $4"
+    },
+    "itemDescription": {
+      "0": "Signed up",
+      "1": "Place a bid of $4"
     }
   }
 }

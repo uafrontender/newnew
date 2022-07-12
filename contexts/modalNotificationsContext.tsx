@@ -2,6 +2,7 @@ import React, { createContext, useState, useMemo, useCallback } from 'react';
 
 export interface ModalNotification {
   titleKey: string;
+  titleProps: any;
   descriptionKey: string;
   buttonTextKey: string;
 }

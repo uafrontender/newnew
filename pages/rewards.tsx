@@ -6,6 +6,7 @@ import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
+import { newnewapi } from 'newnew-api';
 
 import { NextPageWithLayout } from './_app';
 
@@ -19,7 +20,7 @@ import GoBackButton from '../components/molecules/GoBackButton';
 import CancelIcon from '../public/images/svg/icons/outlined/Close.svg';
 import InlineSvg from '../components/atoms/InlineSVG';
 import Button from '../components/atoms/Button';
-import RewardList, { Reward } from '../components/molecules/RewardList';
+import RewardList from '../components/molecules/RewardList';
 import { formatNumber } from '../utils/format';
 import { RewardContext } from '../contexts/rewardContext';
 import { useGetAppConstants } from '../contexts/appConstantsContext';
@@ -36,19 +37,17 @@ export const Rewards = () => {
   const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
 
   // TODO: Use data from API
-  const rewards: Reward[] = [
+  const rewards: newnewapi.Reward[] = [
     {
-      received: true,
-      imageUrl: assets.decision.gold,
-      text: 'Signed up',
-      amount: 5,
-    },
+      type: 0,
+      receivedAt: new Date(Date.now() - 1000000),
+      amount: { usdCents: 500 },
+    } as any,
     {
-      received: false,
-      imageUrl: assets.decision.votes,
-      text: 'Place a bid of $1000000000',
-      amount: 5,
-    },
+      type: 1,
+      receivedAt: undefined,
+      amount: { usdCents: 500 },
+    } as any,
   ];
 
   return (

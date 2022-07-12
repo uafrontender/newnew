@@ -9,7 +9,6 @@ import React, {
   useContext,
 } from 'react';
 import { getRewardBalance } from '../api/endpoints/payments';
-import assets from '../constants/assets';
 import { useAppSelector } from '../redux-store/store';
 import { ModalNotificationsContext } from './modalNotificationsContext';
 import { SocketContext } from './socketContext';
@@ -103,12 +102,12 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.RewardReceived.decode(arr);
 
-      if (!decoded || !decoded.reward || !decoded.reward.type) {
+      if (!decoded || !decoded.reward) {
         return;
       }
 
       const SUPPORTED_REWARDS_TYPES = [1];
-      const type: number = decoded.reward.type;
+      const type: number = decoded.reward.type!;
 
       if (!SUPPORTED_REWARDS_TYPES.includes(type)) {
         console.error(`Unsupported reward type ${type}`);
@@ -116,9 +115,12 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
       }
 
       show({
-        titleKey: `rewards.${type}.notification.title`,
-        descriptionKey: `rewards.${type}.notification.description`,
-        buttonTextKey: `rewards.${type}.notification.button`,
+        titleKey: `rewards.modalTitle`,
+        titleProps: {
+          amount: Math.floor(decoded.reward.amount!.usdCents! / 100),
+        },
+        descriptionKey: `rewards.modalDescription.${type}`,
+        buttonTextKey: `rewards.modalButton`,
       });
     };
 
@@ -135,6 +137,22 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, user.loggedIn]);
+
+  // TODO: Remove test data
+  /* useEffect(() => {
+    const i = setInterval(() => {
+      show({
+        titleKey: `rewards.modalTitle`,
+        titleProps: {
+          amount: 5,
+        },
+        descriptionKey: `rewards.modalDescription.${1}`,
+        buttonTextKey: `rewards.modalButton`,
+      });
+    }, 5000);
+
+    return () => clearInterval(i);
+  }, []); */
 
   return (
     <RewardContext.Provider value={contextValue}>

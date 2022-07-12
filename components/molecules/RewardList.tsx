@@ -1,38 +1,42 @@
 /* eslint-disable no-nested-ternary */
+import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import styled from 'styled-components';
+import assets from '../../constants/assets';
 import { formatNumber } from '../../utils/format';
 
-export interface Reward {
-  received: boolean;
-  imageUrl: string;
-  text: string;
-  amount: number;
-}
-
 interface RewardListI {
-  rewards: Reward[];
+  rewards: newnewapi.Reward[];
 }
 
-// TODO: use reward type
-// TODO: add reward item UI
 export const RewardList: React.FC<RewardListI> = ({ rewards }) => {
-  const { t } = useTranslation('page-Rewards');
+  const { t } = useTranslation('common');
 
   return (
     <RewardsContainer>
       {rewards.map((reward) => (
-        <RewardCard key={reward.text} received={reward.received}>
+        <RewardCard key={reward.type} received={!!reward.receivedAt}>
           <RewardImage>
-            <img src={reward.imageUrl} alt='' />
+            <img
+              src={
+                reward.receivedAt ? assets.decision.gold : assets.decision.votes
+              }
+              alt=''
+            />
           </RewardImage>
-          <RewardTitle received={reward.received}>{reward.text}</RewardTitle>
-          <RewardAmount received={reward.received}>
+          <RewardDescription received={!!reward.receivedAt}>
+            {t(`rewards.itemDescription.${reward.type}`)}
+          </RewardDescription>
+          <RewardAmount received={!!reward.receivedAt}>
             <RewardAmountText>
-              {reward.received
-                ? t('rewards.earned', { value: formatNumber(reward.amount) })
-                : t('rewards.earn', { value: formatNumber(reward.amount) })}
+              {reward.receivedAt
+                ? t('rewards.earned', {
+                    value: formatNumber(reward.amount!.usdCents! / 100),
+                  })
+                : t('rewards.earn', {
+                    value: formatNumber(reward.amount!.usdCents! / 100),
+                  })}
             </RewardAmountText>
           </RewardAmount>
         </RewardCard>
@@ -93,7 +97,7 @@ const RewardImage = styled.div`
   }
 `;
 
-const RewardTitle = styled.div<{ received?: boolean }>`
+const RewardDescription = styled.div<{ received?: boolean }>`
   flex-grow: 1;
   color: ${(props) =>
     props.received

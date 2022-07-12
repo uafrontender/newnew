@@ -40,7 +40,12 @@ const ModalNotifications: React.FC = React.memo(() => {
           <Content>
             <DataContainer>
               <NotificationImage src={assets.decision.gold} />
-              <Title>{t(currentNotification.titleKey)}</Title>
+              <Title>
+                {t(
+                  currentNotification.titleKey,
+                  currentNotification.titleProps
+                )}
+              </Title>
               <Description>{t(currentNotification.descriptionKey)}</Description>
             </DataContainer>
             <SButton onClick={handleClose}>
