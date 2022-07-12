@@ -1,8 +1,9 @@
 import mixpanel, { Dict, Query } from 'mixpanel-browser';
 
 const isProd = process.env.NODE_ENV === 'production';
+const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN || 'undefined';
 
-mixpanel.init(`7a9cf0a6b393eed146cfefd46209c7b6`, {
+mixpanel.init(token, {
   // Use your project's URL, adding a slug for all Mixpanel requests
   api_host: `${process.env.NEXT_PUBLIC_APP_URL}/mp`,
   debug: !isProd ? true : false,

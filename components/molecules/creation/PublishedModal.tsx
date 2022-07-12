@@ -22,6 +22,7 @@ import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg'
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
 import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
 import PostTitleContent from '../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -87,6 +88,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
   }, [postData]);
 
   async function copyPostUrlToClipboard(url: string) {
+    Mixpanel.track('Copy Post Url to Clipboard', { _url: url });
     if ('clipboard' in navigator) {
       await navigator.clipboard.writeText(url);
     } else {
@@ -139,6 +141,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const handleViewMyPost = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (postData) {
+        Mixpanel.track('See My Post Click');
         let url;
         if (window) {
           url = `${window.location.origin}/post/`;
