@@ -60,6 +60,13 @@ export const Desktop: React.FC = React.memo(() => {
       <SRightBlock>
         {user.loggedIn && !globalSearchActive && (
           <>
+            {/* <Button
+              onClick={() =>
+                Mixpanel.track('Played song', { genre: 'hip-hop' })
+              }
+            >
+              Mixpanel
+            </Button> */}
             {user.userData?.options?.isCreator && (
               <SItemWithMargin style={{ paddingRight: 16 }}>
                 <SNavText variant={3} weight={600} onClick={handlerCopy}>
