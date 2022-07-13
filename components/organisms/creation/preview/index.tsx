@@ -113,11 +113,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     CREATION_TITLE_MIN,
     CREATION_TITLE_MAX
   );
+
   const optionsAreValid =
     tab !== 'multiple-choice' ||
     multiplechoice.choices.findIndex((item) =>
       validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)
     ) === -1;
+
   const disabled =
     loading ||
     !titleIsValid ||
@@ -173,15 +175,18 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     },
     [post.expiresAt, post.startsAt]
   );
+
   const handleClose = useCallback(() => {
     Mixpanel.track('Post Edit');
     router.back();
   }, [router]);
+
   const handleCloseModal = useCallback(() => {
     setShowModal(false);
     router.push('/');
     dispatch(clearCreation({}));
   }, [dispatch, router]);
+
   const handleSubmit = useCallback(async () => {
     if (loading) return;
     Mixpanel.track('Publish Post');
