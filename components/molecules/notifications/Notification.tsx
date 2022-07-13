@@ -8,8 +8,21 @@ import { InlineSvg } from '../../atoms/InlineSVG';
 
 import MessageIcon from '../../../public/images/svg/icons/filled/MessageIcon.svg';
 import MessageCircle from '../../../public/images/svg/icons/filled/MessageCircle.svg';
+import NotificationsIcon from '../../../public/images/svg/icons/filled/Notifications.svg';
 import { useAppSelector } from '../../../redux-store/store';
 import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
+
+const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
+  if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
+    return MessageIcon;
+  }
+
+  if (target.creatorDashboard && target?.creatorDashboard.section === 1) {
+    return NotificationsIcon;
+  }
+
+  return MessageCircle;
+};
 
 const Notification: React.FC<newnewapi.INotification> = ({
   content,
@@ -59,11 +72,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
               {target && (
                 <SIcon>
                   <SInlineSVG
-                    svg={
-                      target === newnewapi.RoutingTarget.ChatRoomTarget
-                        ? MessageIcon
-                        : MessageCircle
-                    }
+                    svg={getNotificationIcon(target)}
                     fill={theme.colors.white}
                     width='14px'
                     height='14px'
@@ -78,8 +87,8 @@ const Notification: React.FC<newnewapi.INotification> = ({
                   clickable
                   svg={mobileLogo}
                   fill='#fff'
-                  width='48px'
-                  height='48px'
+                  width={isMobile ? '32px' : '48px'}
+                  height={isMobile ? '32px' : '48px'}
                 />
               </SIconHolder>
             </SAvatarHolder>
@@ -111,10 +120,13 @@ const SWrapper = styled.div`
   padding: 12px 0 0;
   border-bottom: 0;
   cursor: pointer;
+  min-height: 75px;
+
   ${({ theme }) => theme.media.tablet} {
     border-bottom: 1px solid
       ${(props) => props.theme.colorsThemed.background.outlines1};
     padding: 20px 0;
+    min-height: 'unset';
   }
 `;
 
@@ -188,20 +200,25 @@ const SDate = styled.div`
 
 const SIcon = styled.span`
   position: absolute;
-  right: calc(50% - 20px);
-  top: 36px;
+  right: calc(50% - 16px);
+  top: 32px;
   bottom: -5px;
-  width: 40px;
-  height: 40px;
-  background: ${(props) => props.theme.colors.blue};
-  border: 8px solid ${(props) => props.theme.colorsThemed.background.primary};
+  width: 32px;
+  height: 32px;
+  background: ${(props) => props.theme.colorsThemed.accent.blue};
+  border: 4px solid ${(props) => props.theme.colorsThemed.background.primary};
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+
   ${({ theme }) => theme.media.tablet} {
     right: -14px;
     top: -14px;
+
+    width: 40px;
+    height: 40px;
+    border: 8px solid ${(props) => props.theme.colorsThemed.background.primary};
   }
 `;
 
@@ -212,10 +229,15 @@ const SInlineSVG = styled(InlineSvg)`
 
 const SIconHolder = styled.div`
   background: ${(props) => props.theme.colorsThemed.accent.blue};
-  width: 72px;
-  height: 72px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 72px;
+    height: 72px;
+  }
 `;
