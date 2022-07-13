@@ -564,7 +564,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     useEffect(() => {
       if (
-        options.length > 0 &&
         user.userTutorialsProgressSynced &&
         user.userTutorialsProgress.remainingAcSteps &&
         user.userTutorialsProgress.remainingAcSteps[0] ===
@@ -574,7 +573,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       } else {
         setIsPopupVisible(false);
       }
-    }, [options, user]);
+    }, [user]);
 
     // Scroll to comments if hash is present
     useEffect(() => {
@@ -631,7 +630,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
                 (post.expiresAt?.seconds as number) * 1000
               ).getTime()}
               postType='ac'
-              isTutorialVisible={options.length > 0}
             />
           </SExpiresSection>
           <PostVideo

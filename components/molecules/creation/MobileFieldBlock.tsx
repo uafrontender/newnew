@@ -62,7 +62,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
     }
 
     return false;
-  }, [value.date]);
+  }, [value?.date]);
 
   const { isTimeOfTheDaySame, localTimeOfTheDay } = useMemo(() => {
     const h = moment().hour();
