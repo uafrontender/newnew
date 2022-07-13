@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
+import styled, { css } from 'styled-components';
 
 import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 
@@ -33,17 +34,19 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
   const { t } = useTranslation('common');
 
   return (
-    <EllipseMenu
+    <SEllipseMenu
       isOpen={isVisible}
       onClose={handleClose}
       anchorElement={anchorElement}
       offsetTop={offsetTop}
     >
       {isSubscribed && (
-        <EllipseMenuButton onClick={() => {
-          handleClickUnsubscribe();
-          handleClose();
-        }}>
+        <EllipseMenuButton
+          onClick={() => {
+            handleClickUnsubscribe();
+            handleClose();
+          }}
+        >
           {t('ellipse.unsubscribe')}
         </EllipseMenuButton>
       )}
@@ -57,7 +60,7 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
         {t('ellipse.report')}
       </EllipseMenuButton>
       {loggedIn && (
-        <EllipseMenuButton 
+        <EllipseMenuButton
           onClick={() => {
             handleClickBlock();
             handleClose();
@@ -66,8 +69,16 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
           {!isBlocked ? t('ellipse.block') : t('ellipse.unblock')}
         </EllipseMenuButton>
       )}
-    </EllipseMenu>
+    </SEllipseMenu>
   );
 };
+
+const SEllipseMenu = styled(EllipseMenu)`
+  ${({ theme }) =>
+    theme.name === 'light' &&
+    css`
+      box-shadow: 0px 0px 35px 0px rgba(0, 0, 0, 0.25);
+    `}
+`;
 
 export default UserEllipseMenu;
