@@ -167,9 +167,13 @@
       "previewFull": "Preview",
       "thumbnail": {
         "info": "Learn more",
-        "title": "Set preview",
-        "submit": "Save changes",
-        "description": "Select a 3 sec snippet as preview cover. A good preview draws viewer's attention.",
+        "title": "Set a thumbnail from the video",
+        "submit": "Save",
+        "description": "Select a snippet for your thumbnail. \nA good thumbnail gets viewers excited..."
+      },
+      "coverImage": {
+        "title": "Upload an image",
+        "submit": "Save",
         "uploadCoverImage": {
           "caption": "Select custom cover image",
           "uploadBtn": "Select",

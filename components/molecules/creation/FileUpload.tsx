@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useRef, useState, useCallback } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
+import styled, { css, keyframes } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
@@ -42,6 +42,8 @@ import {
   TThumbnailParameters,
 } from '../../../redux-store/slices/creationStateSlice';
 import { Mixpanel } from '../../../utils/mixpanel';
+import isBrowser from '../../../utils/isBrowser';
+import CoverImagePreviewEdit from './CoverImagePreviewEdit';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -125,20 +127,35 @@ const FileUpload: React.FC<IFileUpload> = ({
   }, []);
 
   const handleOpenEllipseMenu = useCallback(() => setShowEllipseMenu(true), []);
+
   const handleCloseEllipseMenu = useCallback(
     () => setShowEllipseMenu(false),
     []
   );
 
-  const handleEditThumb = useCallback(() => {
+  const handleOpenEditThumbnailMenu = useCallback(() => {
     Mixpanel.track('Edit Thumbnail');
     setShowThumbnailEdit(true);
+    setShowEllipseMenu(false);
     playerRef.current.pause();
   }, []);
 
   const handleCloseThumbnailEditClick = useCallback(() => {
     Mixpanel.track('Close Thumbnail Edit Dialog');
     setShowThumbnailEdit(false);
+    playerRef.current?.play();
+  }, []);
+
+  const handleOpenEditCoverImageMenu = useCallback(() => {
+    Mixpanel.track('Edit Cover Image');
+    setCoverImageModalOpen(true);
+    setShowEllipseMenu(false);
+    playerRef.current.pause();
+  }, []);
+
+  const handleCloseCoverImageEditClick = useCallback(() => {
+    Mixpanel.track('Close Cover Image Edit Dialog');
+    setCoverImageModalOpen(false);
     playerRef.current?.play();
   }, []);
 
@@ -406,6 +423,7 @@ const FileUpload: React.FC<IFileUpload> = ({
             <SButtonsContainerLeft>
               <SVideoButton
                 ref={ellipseButtonRef as any}
+                active={showEllipseMenu}
                 onClick={handleOpenEllipseMenu}
               >
                 {t('secondStep.video.setThumbnail')}
@@ -429,26 +447,43 @@ const FileUpload: React.FC<IFileUpload> = ({
     return content;
   }, [
     t,
-    value,
-    etaUpload,
-    errorUpload,
+    handleUploadButtonClick,
     loadingUpload,
-    progressUpload,
+    errorUpload,
     errorProcessing,
     loadingProcessing,
     progressProcessing,
-    isDesktop,
-    localFile,
-    thumbnails,
-    handleOpenEllipseMenu,
     handleFileChange,
-    handleFullPreview,
-    handleUploadButtonClick,
-    handleDeleteVideoShow,
-    handleRetryVideoUpload,
-    handleCancelVideoProcessing,
+    etaUpload,
+    progressUpload,
     handleCancelVideoUpload,
+    handleCancelVideoProcessing,
+    handleRetryVideoUpload,
+    localFile,
+    value,
+    thumbnails,
+    showEllipseMenu,
+    handleOpenEllipseMenu,
+    handleDeleteVideoShow,
+    isDesktop,
+    handleFullPreview,
   ]);
+
+  useEffect(() => {
+    if (isBrowser()) {
+      if (showEllipseMenu) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    return () => {
+      if (isBrowser()) {
+        document.body.style.overflow = 'auto';
+      }
+    };
+  }, [showEllipseMenu]);
 
   return (
     <SWrapper>
@@ -469,6 +504,11 @@ const FileUpload: React.FC<IFileUpload> = ({
         handleClose={handleCloseThumbnailEditClick}
         handleSubmit={handlePreviewEditSubmit}
       />
+      <CoverImagePreviewEdit
+        open={coverImageModalOpen}
+        handleClose={handleCloseCoverImageEditClick}
+        handleSubmit={() => {}}
+      />
       {renderContent()}
       {/* Ellipse menu */}
       {!isMobile && (
@@ -480,25 +520,26 @@ const FileUpload: React.FC<IFileUpload> = ({
             horizontal: 'right',
             vertical: 'top',
           }}
+          offsetRight='200px'
         >
-          <EllipseMenuButton>
+          <EllipseMenuButton onClick={() => handleOpenEditThumbnailMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
           </EllipseMenuButton>
-          <EllipseMenuButton>
+          <EllipseMenuButton onClick={() => handleOpenEditCoverImageMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
           </EllipseMenuButton>
         </SEllipseMenu>
       )}
       {isMobile && showEllipseMenu ? (
         <EllipseModal
-          zIndex={11}
+          zIndex={10}
           show={showEllipseMenu}
           onClose={handleCloseEllipseMenu}
         >
-          <EllipseModalButton>
+          <EllipseModalButton onClick={() => handleOpenEditThumbnailMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
           </EllipseModalButton>
-          <EllipseModalButton>
+          <EllipseModalButton onClick={() => handleOpenEditCoverImageMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
           </EllipseModalButton>
         </EllipseModal>
@@ -589,6 +630,7 @@ const SButtonsContainerLeft = styled.div`
 
 interface ISVideoButton {
   danger?: boolean;
+  active?: boolean;
 }
 
 const SVideoButton = styled.button<ISVideoButton>`
@@ -603,6 +645,20 @@ const SVideoButton = styled.button<ISVideoButton>`
   background: transparent;
   font-weight: bold;
   line-height: 24px;
+
+  padding: 8px 16px;
+
+  border-radius: 16px;
+
+  ${({ active }) =>
+    active
+      ? css`
+          background-color: ${({ theme }) =>
+            theme.name === 'light'
+              ? theme.colorsThemed.background.secondary
+              : theme.colorsThemed.background.tertiary};
+        `
+      : ''}
 `;
 
 const SLoadingBox = styled.div`
@@ -774,6 +830,11 @@ const SErrorBottomBlock = styled.div`
 
 // Ellipse menu
 const SEllipseMenu = styled(EllipseMenu)`
-  width: 216px;
-  position: fixed;
+  max-width: 216px;
+  position: fixed !important;
+
+  background: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colorsThemed.background.secondary
+      : theme.colorsThemed.background.primary} !important;
 `;

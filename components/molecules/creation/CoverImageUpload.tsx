@@ -12,7 +12,7 @@ import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 
 const CoverImageUpload: React.FunctionComponent = () => {
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const dispatch = useAppDispatch();
   const { customCoverImageUrl } = useAppSelector((state) => state.creation);
 
@@ -52,7 +52,7 @@ const CoverImageUpload: React.FunctionComponent = () => {
             view='transparent'
             onClick={() => dispatch(unsetCustomCoverImageUrl({}))}
           >
-            {t('secondStep.video.thumbnail.uploadCoverImage.deleteBtn')}
+            {t('secondStep.video.coverImage.uploadCoverImage.deleteBtn')}
           </SDeleteButton>
         </SSetCoverImageLabel>
       ) : (
@@ -73,13 +73,13 @@ const CoverImageUpload: React.FunctionComponent = () => {
             }}
           />
           <SCaption variant={2} weight={700}>
-            {t('secondStep.video.thumbnail.uploadCoverImage.caption')}
+            {t('secondStep.video.coverImage.uploadCoverImage.caption')}
           </SCaption>
           <SUploadButton
             view='secondary'
             onClick={() => imageInputRef.current?.click()}
           >
-            {t('secondStep.video.thumbnail.uploadCoverImage.uploadBtn')}
+            {t('secondStep.video.coverImage.uploadCoverImage.uploadBtn')}
           </SUploadButton>
         </SSetCoverImageLabel>
       )}
