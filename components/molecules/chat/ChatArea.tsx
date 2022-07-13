@@ -181,6 +181,8 @@ const ChatArea: React.FC<IChatData> = ({
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
       if (decoded) {
         setNewMessage(decoded.newMessage);
+        if (updateLastMessage && chatRoom)
+          updateLastMessage({ roomId: chatRoom.id });
       }
     };
     if (socketConnection) {

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import InlineSvg from '../../atoms/InlineSVG';
 import EllipseMenu from '../../atoms/EllipseMenu';
@@ -140,6 +140,12 @@ export default PostShareEllipseMenu;
 const SEllipseMenu = styled(EllipseMenu)`
   position: fixed;
   width: 260px;
+
+  ${({ theme }) =>
+    theme.name === 'light' &&
+    css`
+      box-shadow: 0px 0px 35px 0px rgba(0, 0, 0, 0.25);
+    `}
 `;
 
 const SSocials = styled.div`
