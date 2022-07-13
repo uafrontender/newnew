@@ -38,6 +38,7 @@ import {
   setCreationVideoProcessing,
   TThumbnailParameters,
 } from '../../../redux-store/slices/creationStateSlice';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -95,40 +96,48 @@ const FileUpload: React.FC<IFileUpload> = ({
   const isDesktop = !isMobile && !isTablet;
 
   const handleButtonClick = useCallback(() => {
+    Mixpanel.track('Select File Clicked');
     inputRef.current?.click();
   }, []);
 
   const handleFullPreview = useCallback(() => {
+    Mixpanel.track('Open Full Preview');
     setShowFullPreview(true);
     playerRef.current.pause();
   }, []);
 
   const handleCloseFullPreviewClick = useCallback(() => {
+    Mixpanel.track('Close Full Preview');
     setShowFullPreview(false);
     playerRef.current.play();
   }, []);
 
   const handleEditThumb = useCallback(() => {
+    Mixpanel.track('Edit Thumbnail');
     setShowThumbnailEdit(true);
     playerRef.current.pause();
   }, []);
 
   const handleCloseThumbnailEditClick = useCallback(() => {
+    Mixpanel.track('Close Thumbnail Edit Dialog');
     setShowThumbnailEdit(false);
     playerRef.current.play();
   }, []);
 
   const handleDeleteVideoShow = useCallback(() => {
+    Mixpanel.track('Show Delete Video Dialog');
     setShowVideoDelete(true);
     playerRef.current.pause();
   }, []);
 
   const handleCloseDeleteVideoClick = useCallback(() => {
+    Mixpanel.track('Close Delete Video Dialog');
     setShowVideoDelete(false);
     playerRef.current.play();
   }, []);
 
   const handleDeleteVideo = useCallback(() => {
+    Mixpanel.track('Delete Video Clicked');
     handleCloseDeleteVideoClick();
     setLocalFile(null);
     onChange(id, null);
@@ -136,6 +145,7 @@ const FileUpload: React.FC<IFileUpload> = ({
 
   const handlePreviewEditSubmit = useCallback(
     (params: TThumbnailParameters) => {
+      Mixpanel.track('Preview Edit Submit');
       handleCloseThumbnailEditClick();
       onChange('thumbnailParameters', params);
     },
@@ -152,10 +162,19 @@ const FileUpload: React.FC<IFileUpload> = ({
 
       const file = files[0];
 
+      Mixpanel.track('Video Selected', {
+        _file: {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+        },
+      });
+
       if (file.size > MAX_VIDEO_SIZE) {
         toast.error(t('secondStep.video.error.maxSize'));
       } else {
         const media: any = await loadVideo(file);
+        Mixpanel.track('Video Loading');
 
         if (media.duration < MIN_VIDEO_DURATION) {
           toast.error(t('secondStep.video.error.minLength'));
@@ -171,10 +190,16 @@ const FileUpload: React.FC<IFileUpload> = ({
   );
 
   const handleRetryVideoUpload = useCallback(() => {
+    Mixpanel.track('Retry Video Upload', {
+      _video: localFile,
+    });
     onChange(id, localFile);
   }, [id, localFile, onChange]);
 
   const handleCancelVideoProcessing = useCallback(async () => {
+    Mixpanel.track('Cancel Video Processing', {
+      _publicUrl: post?.announcementVideoUrl,
+    });
     try {
       const payload = new newnewapi.RemoveUploadedFileRequest({
         publicUrl: post?.announcementVideoUrl,

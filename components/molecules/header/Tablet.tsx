@@ -22,6 +22,7 @@ import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import RewardButton from '../RewardButton';
 import { RewardContext } from '../../../contexts/rewardContext';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface ITablet {}
 
@@ -143,6 +144,11 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                       <Button
                         view='primaryGrad'
                         withShadow={!globalSearchActive}
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked ', {
+                            _button: 'New Post',
+                          });
+                        }}
                       >
                         {t('button.createDecision')}
                       </Button>
