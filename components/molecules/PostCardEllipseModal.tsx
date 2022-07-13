@@ -139,31 +139,31 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
         {isCopiedUrl ? t('ellipse.linkCopied') : t('ellipse.copyLink')}
       </EllipseModalButton>
       {postCreator.uuid !== user.userData?.userUuid && (
-        <>
-          <EllipseModalButton onClick={handleFollowDecision}>
-            {
-              // eslint-disable-next-line no-nested-ternary
-              isFollowingLoading
-                ? ''
-                : !isFollowingDecision
-                ? t('ellipse.followDecision', {
-                    postType: t(`postType.${postType}`),
-                  })
-                : t('ellipse.unFollowDecision', {
-                    postType: t(`postType.${postType}`),
-                  })
-            }
-          </EllipseModalButton>
-          <EllipseModalButton
-            tone='error'
-            onClick={() => {
-              handleReportOpen();
-              onClose();
-            }}
-          >
-            {t('ellipse.report')}
-          </EllipseModalButton>
-        </>
+        <EllipseModalButton onClick={handleFollowDecision}>
+          {
+            // eslint-disable-next-line no-nested-ternary
+            isFollowingLoading
+              ? ''
+              : !isFollowingDecision
+              ? t('ellipse.followDecision', {
+                  postType: t(`postType.${postType}`),
+                })
+              : t('ellipse.unFollowDecision', {
+                  postType: t(`postType.${postType}`),
+                })
+          }
+        </EllipseModalButton>
+      )}
+      {postCreator.uuid !== user.userData?.userUuid && (
+        <EllipseModalButton
+          tone='error'
+          onClick={() => {
+            handleReportOpen();
+            onClose();
+          }}
+        >
+          {t('ellipse.report')}
+        </EllipseModalButton>
       )}
     </EllipseModal>
   );
