@@ -159,13 +159,26 @@
         "description": "Hubo un error y tu archivo no pudo ser cargado. ¿Quieres volver a intentarlo?."
       },
       "setThumbnail": "Establece una imagen de miniatura",
+      "thumbnailEllipseMenu_NEED_TRANSLATION": {
+        "selectSnippetButton": "Select a snippet",
+        "uploadImageButton": "Upload an image"
+      },
       "deleteFile": "Borrar archivo",
       "previewFull": "Vista previa",
       "thumbnail": {
         "info": "Más información",
-        "title": "Establecer vista previa",
-        "submit": "Guardar cambios",
-        "description": "Selecciona un fragmento de 3 segundos como portada de la vista previa. Una buena vista previa atrae la atención del espectador."
+        "title_NEED_TRANSLATION": "Set a thumbnail from the video",
+        "submit_NEED_TRANSLATION": "Save",
+        "description_NEED_TRANSLATION": "Select a snippet for your thumbnail. \nA good thumbnail gets viewers excited..."
+      },
+      "coverImage_NEED_TRANSLATION": {
+        "title": "Upload an image",
+        "submit": "Save",
+        "uploadCoverImage": {
+          "caption": "Select custom cover image",
+          "uploadBtn": "Select",
+          "deleteBtn": "Delete"
+        }
       },
       "full": {
         "title": "Vista previa de video"
@@ -176,7 +189,7 @@
         "process": "{{progress}}% • Quedan {{time}}"
       },
       "processing": {
-        "title": "Todavía puedes rellenar los datos de abajo y publicar tu publicación mientras se procesa el video.",
+        "title_NEED_TRANSLATION": "Your file is processing. It won’t take long...",
         "description": "Tu video se está procesando",
         "process": "{{progress}}% • Quedan {{time}}"
       }
