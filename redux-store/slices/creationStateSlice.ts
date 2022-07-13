@@ -58,6 +58,7 @@ export interface ICreationStateInterface {
     progress: number;
     eta: number;
   };
+  customCoverImageUrl?: string;
 }
 
 const defaultUIState: ICreationStateInterface = {
@@ -116,6 +117,7 @@ const defaultUIState: ICreationStateInterface = {
     progress: 0,
     eta: 0,
   },
+  customCoverImageUrl: undefined,
 };
 
 export const creationSlice: Slice<ICreationStateInterface> = createSlice({
@@ -194,6 +196,12 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
     ) {
       state.videoProcessing = payload;
     },
+    setCustomCoverImageUrl(state, { payload }: PayloadAction<string>) {
+      state.customCoverImageUrl = payload;
+    },
+    unsetCustomCoverImageUrl(state) {
+      state.customCoverImageUrl = undefined;
+    },
     clearCreation(state) {
       state.post = { ...defaultUIState.post };
       state.auction = { ...defaultUIState.auction };
@@ -203,6 +211,7 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
       state.fileProcessing = { ...defaultUIState.fileProcessing };
       // @ts-ignore
       state.videoProcessing = { ...defaultUIState.videoProcessing };
+      state.customCoverImageUrl = undefined;
     },
     clearPostData(state) {
       state.postData = {};
@@ -233,6 +242,8 @@ export const {
   setCreationFileProcessingError,
   setCreationFileProcessingProgress,
   setCreationFileProcessingETA,
+  setCustomCoverImageUrl,
+  unsetCustomCoverImageUrl,
 } = creationSlice.actions;
 
 export default creationSlice.reducer;

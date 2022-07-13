@@ -33,6 +33,8 @@ import {
 
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
+import urltoFile from '../../../../utils/urlToFile';
+import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 
@@ -61,6 +63,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     multiplechoice,
     videoProcessing,
     fileProcessing,
+    customCoverImageUrl,
   } = useAppSelector((state) => state.creation);
   const { userData } = useAppSelector((state) => state.user);
   const validateText = useCallback(
@@ -192,6 +195,43 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     Mixpanel.track('Publish Post');
     setLoading(true);
     try {
+      let hasCoverImage = false;
+
+      if (customCoverImageUrl) {
+        const coverImageFile = await urltoFile(
+          customCoverImageUrl,
+          'coverImage',
+          'image/jpeg'
+        );
+        const videoFileSubdirectory = post.announcementVideoUrl
+          .split('/')
+          .slice(-2, -1)
+          .join('');
+
+        const imageUrlPayload = new newnewapi.GetCoverImageUploadUrlRequest({
+          videoFileSubdirectory,
+        });
+
+        const res = await getCoverImageUploadUrl(imageUrlPayload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'An error occured');
+
+        const uploadResponse = await fetch(res.data.uploadUrl, {
+          method: 'PUT',
+          body: coverImageFile,
+          headers: {
+            'Content-Type': 'image/jpeg',
+          },
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Upload failed');
+        }
+
+        hasCoverImage = true;
+      }
+
       const body: Omit<newnewapi.CreatePostRequest, 'toJSON'> = {
         post: {
           title: post.title,
@@ -214,6 +254,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             },
           },
           announcementVideoUrl: post.announcementVideoUrl,
+          hasCoverImage,
         },
       };
 
@@ -258,9 +299,15 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       setLoading(false);
     }
   }, [
+    customCoverImageUrl,
+    post.title,
+    post.options,
+    post.startsAt.type,
+    post.thumbnailParameters.startTime,
+    post.thumbnailParameters.endTime,
+    post.announcementVideoUrl,
     loading,
     tab,
-    post,
     router,
     auction,
     isMobile,
