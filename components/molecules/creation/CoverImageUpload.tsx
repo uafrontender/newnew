@@ -1,20 +1,24 @@
+/* eslint-disable no-nested-ternary */
 import { useTranslation } from 'next-i18next';
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-import {
-  setCustomCoverImageUrl,
-  unsetCustomCoverImageUrl,
-} from '../../../redux-store/slices/creationStateSlice';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import isImage from '../../../utils/isImage';
 import resizeImage from '../../../utils/resizeImage';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 
-const CoverImageUpload: React.FunctionComponent = () => {
+interface ICoverImageUpload {
+  coverImageToBeSaved: string;
+  onFileChange: (newImageUrl: string, originalImageWidth: number) => void;
+  handleDeleteFile: () => void;
+}
+
+const CoverImageUpload: React.FunctionComponent<ICoverImageUpload> = ({
+  coverImageToBeSaved,
+  onFileChange,
+  handleDeleteFile,
+}) => {
   const { t } = useTranslation('page-Creation');
-  const dispatch = useAppDispatch();
-  const { customCoverImageUrl } = useAppSelector((state) => state.creation);
 
   const imageInputRef = useRef<HTMLInputElement>();
 
@@ -36,8 +40,7 @@ const CoverImageUpload: React.FunctionComponent = () => {
         if (reader.result) {
           const imageUrl = reader.result as string;
           const properlySizedImage = await resizeImage(imageUrl, 1000);
-
-          dispatch(setCustomCoverImageUrl(properlySizedImage.url));
+          onFileChange(properlySizedImage.url, properlySizedImage.width);
         }
       });
     }
@@ -45,13 +48,10 @@ const CoverImageUpload: React.FunctionComponent = () => {
 
   return (
     <SWrapper>
-      {customCoverImageUrl ? (
+      {coverImageToBeSaved ? (
         <SSetCoverImageLabel>
-          <SCoverPreview alt='cover' src={customCoverImageUrl} />
-          <SDeleteButton
-            view='transparent'
-            onClick={() => dispatch(unsetCustomCoverImageUrl({}))}
-          >
+          <SCoverPreview alt='cover' src={coverImageToBeSaved} />
+          <SDeleteButton view='transparent' onClick={() => handleDeleteFile()}>
             {t('secondStep.video.coverImage.uploadCoverImage.deleteBtn')}
           </SDeleteButton>
         </SSetCoverImageLabel>

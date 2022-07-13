@@ -1,6 +1,7 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { Area, Point } from 'react-easy-crop';
 
 import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
@@ -8,10 +9,20 @@ import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import Headline from '../../atoms/Headline';
 import CoverImageUpload from './CoverImageUpload';
+import CoverImageZoomSlider from '../../atoms/profile/ProfileImageZoomSlider';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+import CoverImageCropper from './CoverImageCropper';
+import getCroppedImg from '../../../utils/cropImage';
 
+// Icons
+import ZoomOutIcon from '../../../public/images/svg/icons/outlined/Minus.svg';
+import ZoomInIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import {
+  setCustomCoverImageUrl,
+  unsetCustomCoverImageUrl,
+} from '../../../redux-store/slices/creationStateSlice';
 
 interface ICoverImagePreviewEdit {
   open: boolean;
@@ -23,6 +34,8 @@ const CoverImagePreviewEdit: React.FunctionComponent<ICoverImagePreviewEdit> =
   ({ open, handleClose, handleSubmit }) => {
     const theme = useTheme();
     const { t } = useTranslation('page-Creation');
+    const dispatch = useAppDispatch();
+    const { customCoverImageUrl } = useAppSelector((state) => state.creation);
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
@@ -31,9 +44,104 @@ const CoverImagePreviewEdit: React.FunctionComponent<ICoverImagePreviewEdit> =
       e.stopPropagation();
     }, []);
 
-    const onSubmit = useCallback(() => {
+    // Image to be saved
+    const [coverImageToBeSaved, setCoverImageToBeSaved] = useState(
+      customCoverImageUrl ?? ''
+    );
+    const handleDeleteCoverImage = useCallback(() => {
+      setCoverImageToBeSaved('');
+    }, []);
+
+    // Edit picture
+    const [coverImageInEdit, setCoverImageInEdit] = useState('');
+    const [originalCoverImageWidth, setOriginalCoverImageWidth] = useState(0);
+    const [cropCoverImage, setCropCoverImage] = useState<Point>({
+      x: 0,
+      y: 0,
+    });
+    const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
+    const [zoomCoverImage, setZoomCoverImage] = useState(1);
+    const [updateCoverImageLoading, setUpdateCoverImageLoading] =
+      useState(false);
+
+    const hasChanged = useMemo(
+      () => customCoverImageUrl !== coverImageToBeSaved,
+      [coverImageToBeSaved, customCoverImageUrl]
+    );
+
+    const onFileChange = useCallback(
+      (newImageUrl: string, originalImageWidth: number) => {
+        setCoverImageInEdit(newImageUrl);
+        setOriginalCoverImageWidth(originalImageWidth);
+      },
+      []
+    );
+
+    const handleZoomOutCoverImage = () => {
+      if (zoomCoverImage <= 1) return;
+
+      setZoomCoverImage((z) => {
+        if (zoomCoverImage - 0.2 <= 1) return 1;
+        return z - 0.2;
+      });
+    };
+
+    const handleZoomInCoverImage = () => {
+      if (zoomCoverImage >= 3) return;
+
+      setZoomCoverImage((z) => {
+        if (zoomCoverImage + 0.2 >= 3) return 3;
+        return z + 0.2;
+      });
+    };
+
+    const onCropCompleteCoverImage = useCallback(
+      (_: any, croppedAreaPixels: Area) => {
+        setCroppedAreaCoverImage(croppedAreaPixels);
+      },
+      []
+    );
+
+    const completeCoverImageCropAndSave = useCallback(async () => {
+      setUpdateCoverImageLoading(true);
+      try {
+        const croppedImage = await getCroppedImg(
+          coverImageInEdit,
+          croppedAreaCoverImage!!,
+          0,
+          'avatarImage.jpeg'
+        );
+
+        const newImageUrl = URL.createObjectURL(croppedImage);
+
+        dispatch(setCustomCoverImageUrl(newImageUrl));
+        setCoverImageInEdit('');
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setUpdateCoverImageLoading(false);
+      }
+    }, [coverImageInEdit, croppedAreaCoverImage, dispatch]);
+
+    const onSubmit = useCallback(async () => {
+      if (coverImageToBeSaved) {
+        await completeCoverImageCropAndSave();
+      } else {
+        dispatch(unsetCustomCoverImageUrl({}));
+      }
       handleSubmit();
-    }, [handleSubmit]);
+    }, [
+      completeCoverImageCropAndSave,
+      coverImageToBeSaved,
+      dispatch,
+      handleSubmit,
+    ]);
+
+    useEffect(() => {
+      if (coverImageInEdit) {
+        setCoverImageToBeSaved(coverImageInEdit);
+      }
+    }, [coverImageInEdit]);
 
     return (
       <Modal show={open} onClose={handleClose}>
@@ -60,7 +168,65 @@ const CoverImagePreviewEdit: React.FunctionComponent<ICoverImagePreviewEdit> =
                 </SModalTopLineTitleTablet>
               )}
             </SModalTopLine>
-            <CoverImageUpload />
+            {coverImageInEdit ? (
+              <CoverImageContent>
+                <CoverImageCropper
+                  crop={cropCoverImage}
+                  zoom={zoomCoverImage}
+                  coverImageInEdit={coverImageInEdit}
+                  originalImageWidth={originalCoverImageWidth}
+                  disabled={updateCoverImageLoading}
+                  onCropChange={setCropCoverImage}
+                  onCropComplete={onCropCompleteCoverImage}
+                  onZoomChange={setZoomCoverImage}
+                />
+                <SSliderWrapper>
+                  <Button
+                    iconOnly
+                    size='sm'
+                    view='transparent'
+                    disabled={zoomCoverImage <= 1 || updateCoverImageLoading}
+                    onClick={handleZoomOutCoverImage}
+                  >
+                    <InlineSVG
+                      svg={ZoomOutIcon}
+                      fill={theme.colorsThemed.text.primary}
+                      width='24px'
+                      height='24px'
+                    />
+                  </Button>
+                  <CoverImageZoomSlider
+                    value={zoomCoverImage}
+                    min={1}
+                    max={3}
+                    step={0.1}
+                    ariaLabel='Zoom'
+                    disabled={updateCoverImageLoading}
+                    onChange={(e) => setZoomCoverImage(Number(e.target.value))}
+                  />
+                  <Button
+                    iconOnly
+                    size='sm'
+                    view='transparent'
+                    disabled={zoomCoverImage >= 3 || updateCoverImageLoading}
+                    onClick={handleZoomInCoverImage}
+                  >
+                    <InlineSVG
+                      svg={ZoomInIcon}
+                      fill={theme.colorsThemed.text.primary}
+                      width='24px'
+                      height='24px'
+                    />
+                  </Button>
+                </SSliderWrapper>
+              </CoverImageContent>
+            ) : (
+              <CoverImageUpload
+                coverImageToBeSaved={coverImageToBeSaved}
+                onFileChange={onFileChange}
+                handleDeleteFile={handleDeleteCoverImage}
+              />
+            )}
           </SModalTopContent>
           {isMobile ? (
             <SModalButtonContainer>
@@ -73,7 +239,11 @@ const CoverImagePreviewEdit: React.FunctionComponent<ICoverImagePreviewEdit> =
               <Button view='secondary' onClick={handleClose}>
                 {t('secondStep.button.cancel')}
               </Button>
-              <Button view='primaryGrad' onClick={onSubmit}>
+              <Button
+                view='primaryGrad'
+                disabled={!hasChanged}
+                onClick={onSubmit}
+              >
                 {t('secondStep.video.coverImage.submit')}
               </Button>
             </SButtonsWrapper>
@@ -177,4 +347,40 @@ const SButtonsWrapper = styled.div`
   margin-top: 30px;
   align-items: center;
   justify-content: space-between;
+`;
+
+// Cover image cropper
+const CoverImageContent = styled.div`
+  overflow-y: auto;
+  padding: 0 20px;
+`;
+
+const SSliderWrapper = styled.div`
+  display: none;
+
+  ${({ theme }) => theme.media.tablet} {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    margin-top: 24px;
+    padding: 0px 24px;
+
+    button {
+      background: transparent;
+
+      &:hover:enabled {
+        background: transparent;
+        cursor: pointer;
+      }
+      &:focus:enabled {
+        background: transparent;
+        cursor: pointer;
+      }
+    }
+
+    input {
+      margin: 0px 12px;
+    }
+  }
 `;

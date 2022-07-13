@@ -504,11 +504,13 @@ const FileUpload: React.FC<IFileUpload> = ({
         handleClose={handleCloseThumbnailEditClick}
         handleSubmit={handlePreviewEditSubmit}
       />
-      <CoverImagePreviewEdit
-        open={coverImageModalOpen}
-        handleClose={handleCloseCoverImageEditClick}
-        handleSubmit={() => {}}
-      />
+      {coverImageModalOpen && (
+        <CoverImagePreviewEdit
+          open={coverImageModalOpen}
+          handleClose={handleCloseCoverImageEditClick}
+          handleSubmit={handleCloseCoverImageEditClick}
+        />
+      )}
       {renderContent()}
       {/* Ellipse menu */}
       {!isMobile && (
