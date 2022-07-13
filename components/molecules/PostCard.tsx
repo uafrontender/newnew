@@ -92,6 +92,7 @@ interface ICard {
   maxWidthTablet?: string;
   shouldStop?: boolean;
   handleRemovePostFromState?: () => void;
+  handleAddPostToState?: () => void;
 }
 
 export const PostCard: React.FC<ICard> = React.memo(
@@ -104,6 +105,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     maxWidthTablet,
     shouldStop,
     handleRemovePostFromState,
+    handleAddPostToState,
   }) => {
     const { t } = useTranslation('component-PostCard');
     const theme = useTheme();
@@ -512,6 +514,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   handleRemovePostFromState={
                     handleRemovePostFromState ?? undefined
                   }
+                  handleAddPostToState={handleAddPostToState ?? undefined}
                   onClose={handleEllipseMenuClose}
                   anchorElement={moreButtonRef.current}
                 />
@@ -647,6 +650,7 @@ export const PostCard: React.FC<ICard> = React.memo(
             handleReportOpen={handleReportOpen}
             onClose={handleEllipseMenuClose}
             handleRemovePostFromState={handleRemovePostFromState ?? undefined}
+            handleAddPostToState={handleAddPostToState ?? undefined}
           />
         )}
       </SWrapperOutside>
