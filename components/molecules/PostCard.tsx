@@ -646,6 +646,7 @@ export const PostCard: React.FC<ICard> = React.memo(
             postCreator={postParsed.creator as newnewapi.User}
             handleReportOpen={handleReportOpen}
             onClose={handleEllipseMenuClose}
+            handleRemovePostFromState={handleRemovePostFromState ?? undefined}
           />
         )}
       </SWrapperOutside>
