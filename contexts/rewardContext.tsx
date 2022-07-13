@@ -106,10 +106,10 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
         return;
       }
 
-      const SUPPORTED_REWARDS_TYPES = [0, 1];
+      const MAX_SUPPORTED_REWARDS_TYPE = 15;
       const type: number = decoded.reward.type!;
 
-      if (!SUPPORTED_REWARDS_TYPES.includes(type)) {
+      if (type < 0 || type > MAX_SUPPORTED_REWARDS_TYPE) {
         console.error(`Unsupported reward type ${type}`);
         return;
       }

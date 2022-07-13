@@ -30,8 +30,6 @@
     }
   },
   "rewards": {
-    "title_NEED_TRANSLATION": "My Milestones",
-    "earned_NEED_TRANSLATION": "earned ${{value}}",
-    "earn_NEED_TRANSLATION": "earn ${{value}}"
+    "title_NEED_TRANSLATION": "My Milestones"
   }
 }
