@@ -1,4 +1,6 @@
 /* eslint-disable no-nested-ternary */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import styled, { css, useTheme } from 'styled-components';
@@ -75,10 +77,12 @@ const SearchInput: React.FC = React.memo(() => {
   const handleSearchClick = useCallback(() => {
     dispatch(setGlobalSearchActive(!globalSearchActive));
   }, [dispatch, globalSearchActive]);
+
   const handleSearchClose = () => {
     setSearchValue('');
     dispatch(setGlobalSearchActive(false));
   };
+
   const handleInputChange = (e: any) => {
     setSearchValue(e.target.value);
   };
@@ -181,6 +185,13 @@ const SearchInput: React.FC = React.memo(() => {
     }
   }, [searchValue, isMobileOrTablet]);
 
+  function closeSearch() {
+    handleSearchClose();
+    setSearchValue('');
+    setIsResultsDropVisible(false);
+    resetResults();
+  }
+
   return (
     <>
       {isMobileOrTablet && globalSearchActive ? (
@@ -188,10 +199,7 @@ const SearchInput: React.FC = React.memo(() => {
           view='tertiary'
           iconOnly
           onClick={() => {
-            handleSearchClose();
-            setSearchValue('');
-            setIsResultsDropVisible(false);
-            resetResults();
+            closeSearch();
           }}
         >
           <InlineSVG
@@ -258,7 +266,11 @@ const SearchInput: React.FC = React.memo(() => {
                 </SBlock>
               )
             ) : (
-              <>
+              <div
+                onClick={() => {
+                  closeSearch();
+                }}
+              >
                 {resultsPosts.length > 0 && (
                   <TopDecisionsResults posts={resultsPosts} />
                 )}
@@ -274,7 +286,7 @@ const SearchInput: React.FC = React.memo(() => {
                 >
                   {t('search.allResults')}
                 </SButton>
-              </>
+              </div>
             )}
           </SResultsDrop>
         )}
@@ -302,7 +314,7 @@ const SearchInput: React.FC = React.memo(() => {
               </SBlock>
             )
           ) : (
-            <>
+            <div onClick={() => closeSearch()}>
               {resultsPosts.length > 0 && (
                 <TopDecisionsResults posts={resultsPosts} />
               )}
@@ -313,14 +325,12 @@ const SearchInput: React.FC = React.memo(() => {
                 <PopularTagsResults hashtags={resultsHashtags} />
               )}
               <SButton
-                onClick={() => {
-                  router.push(`/search?query=${searchValue}&tab=posts`);
-                }}
+                onClick={() => handleSeeResults(searchValue)}
                 view='quaternary'
               >
                 {t('search.allResults')}
               </SButton>
-            </>
+            </div>
           )}
         </SResultsDropMobile>
       )}
