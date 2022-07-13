@@ -92,7 +92,11 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
         <>
           <SCardsSection>
             {initialLoad && (
-              <CreatorsList loading={loadingCreators} collection={creators} />
+              <CreatorsList
+                loading={loadingCreators}
+                collection={creators}
+                withEllipseMenu
+              />
             )}
           </SCardsSection>
           {creatorsNextPageToken && !loadingCreators && (
