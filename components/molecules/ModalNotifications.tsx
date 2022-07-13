@@ -15,6 +15,7 @@ const ModalNotifications: React.FC = React.memo(() => {
   const handleClose = () => {
     setDelayed(true);
     close();
+
     delayTimer.current = setTimeout(() => {
       setDelayed(false);
     }, 500);
@@ -34,6 +35,7 @@ const ModalNotifications: React.FC = React.memo(() => {
       show={!delayed && !!currentNotification}
       overlaydim
       additionalz={1000}
+      onClose={handleClose}
     >
       {currentNotification && (
         <Container>

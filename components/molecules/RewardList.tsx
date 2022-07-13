@@ -89,7 +89,7 @@ export const RewardList: React.FC<RewardListI> = () => {
       {receivedRewards.map((reward) => (
         <RewardCard key={reward.type} received>
           <RewardImage>
-            <img src={assets.decision.gold} alt='' />
+            <img src={assets.decision.gold} alt='received reward' />
           </RewardImage>
           <RewardDescription received>
             {t(`rewards.itemDescription.${reward.type}`)}
@@ -107,7 +107,7 @@ export const RewardList: React.FC<RewardListI> = () => {
       {availableRewards.map((reward) => (
         <RewardCard key={reward.type}>
           <RewardImage>
-            <img src={assets.decision.votes} alt='' />
+            <img src={assets.decision.votes} alt='available reward' />
           </RewardImage>
           <RewardDescription>
             {t(`rewards.itemDescription.${reward.type}`)}

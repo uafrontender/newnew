@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
@@ -23,14 +23,15 @@ import RewardList from '../components/molecules/RewardList';
 import { formatNumber } from '../utils/format';
 import { RewardContext } from '../contexts/rewardContext';
 import { useGetAppConstants } from '../contexts/appConstantsContext';
+import useRewardInstructionVisible from '../utils/hooks/useRewardInstructionVisible';
 
 export const Rewards = () => {
   const router = useRouter();
   const { t } = useTranslation('page-Rewards');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
-  // TODO: store in local storage (useLocalStorage)
-  const [instructionVisible, setInstructionVisible] = useState(true);
+  const [instructionVisible, setInstructionVisible] =
+    useRewardInstructionVisible();
 
   const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
   const { currentSignupRewardAmount } = useGetAppConstants().appConstants;

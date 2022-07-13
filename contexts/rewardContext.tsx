@@ -55,7 +55,7 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
 
   // Set up initial balance
   useEffect(() => {
-    async function fetchIds() {
+    async function fetchBalance() {
       if (!user.loggedIn) {
         setRewardBalance(undefined);
         return;
@@ -82,7 +82,7 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
       }
     }
 
-    fetchIds();
+    fetchBalance();
   }, [user.loggedIn]);
 
   // Listen for socket updates
@@ -106,7 +106,7 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
         return;
       }
 
-      const SUPPORTED_REWARDS_TYPES = [1];
+      const SUPPORTED_REWARDS_TYPES = [0, 1];
       const type: number = decoded.reward.type!;
 
       if (!SUPPORTED_REWARDS_TYPES.includes(type)) {
