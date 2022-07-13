@@ -479,6 +479,10 @@
       "choosePledgeButton": "Back this goal"
     }
   },
+  "thumbnailEllipseMenu": {
+    "selectSnippetButton": "Select a snippet",
+    "uploadImageButton": "Upload an image"
+  },
   "postVideoThumbnailEdit": {
     "title": "Set a thumbnail",
     "description": "Select a snippet from the video",
@@ -487,6 +491,16 @@
     "toast": {
       "success": "Success! Thumbnail will be changed once processed",
       "error": "An error occurred"
+    }
+  },
+  "postVideoCoverImageEdit": {
+    "title": "Upload an image",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "uploadCoverImage": {
+      "caption": "Select custom cover image",
+      "uploadBtn": "Select",
+      "deleteBtn": "Delete"
     }
   },
   "acPostModeration": {

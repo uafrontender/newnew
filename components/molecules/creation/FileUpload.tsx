@@ -1,5 +1,6 @@
-import React, { useRef, useState, useCallback } from 'react';
-import styled, { keyframes } from 'styled-components';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useRef, useState, useCallback, useEffect } from 'react';
+import styled, { css, keyframes } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
@@ -11,6 +12,8 @@ import Caption from '../../atoms/Caption';
 import InlineSVG from '../../atoms/InlineSVG';
 import FullPreview from './FullPreview';
 import DeleteVideo from './DeleteVideo';
+import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
+import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
 
 import { loadVideo } from '../../../utils/loadVideo';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
@@ -39,6 +42,8 @@ import {
   TThumbnailParameters,
 } from '../../../redux-store/slices/creationStateSlice';
 import { Mixpanel } from '../../../utils/mixpanel';
+import isBrowser from '../../../utils/isBrowser';
+import CoverImagePreviewEdit from './CoverImagePreviewEdit';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -63,6 +68,9 @@ interface IFileUpload {
   handleCancelVideoUpload: () => void;
 }
 
+// secondStep.video.thumbnailEllipseMenu.selectSnippetButton
+// secondStep.video.thumbnailEllipseMenu.uploadImageButton
+
 const FileUpload: React.FC<IFileUpload> = ({
   id,
   value,
@@ -78,24 +86,30 @@ const FileUpload: React.FC<IFileUpload> = ({
   onChange,
   handleCancelVideoUpload,
 }) => {
-  const [showVideoDelete, setShowVideoDelete] = useState(false);
-  const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
-  const [showFullPreview, setShowFullPreview] = useState(false);
   const { t } = useTranslation('page-Creation');
-  const inputRef = useRef<HTMLInputElement>(null);
-  const playerRef: any = useRef();
-  const [localFile, setLocalFile] = useState<File | null>(null);
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const { post, videoProcessing } = useAppSelector((state) => state.creation);
   const dispatch = useAppDispatch();
-
+  const { post, videoProcessing } = useAppSelector((state) => state.creation);
+  const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
 
-  const handleButtonClick = useCallback(() => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const playerRef: any = useRef();
+  const [localFile, setLocalFile] = useState<File | null>(null);
+
+  const [showVideoDelete, setShowVideoDelete] = useState(false);
+
+  const ellipseButtonRef = useRef<HTMLButtonElement>();
+  const [showEllipseMenu, setShowEllipseMenu] = useState(false);
+  const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
+  const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
+
+  const [showFullPreview, setShowFullPreview] = useState(false);
+
+  const handleUploadButtonClick = useCallback(() => {
     Mixpanel.track('Select File Clicked');
     inputRef.current?.click();
   }, []);
@@ -112,28 +126,49 @@ const FileUpload: React.FC<IFileUpload> = ({
     playerRef.current.play();
   }, []);
 
-  const handleEditThumb = useCallback(() => {
+  const handleOpenEllipseMenu = useCallback(() => setShowEllipseMenu(true), []);
+
+  const handleCloseEllipseMenu = useCallback(
+    () => setShowEllipseMenu(false),
+    []
+  );
+
+  const handleOpenEditThumbnailMenu = useCallback(() => {
     Mixpanel.track('Edit Thumbnail');
     setShowThumbnailEdit(true);
+    setShowEllipseMenu(false);
     playerRef.current.pause();
   }, []);
 
   const handleCloseThumbnailEditClick = useCallback(() => {
     Mixpanel.track('Close Thumbnail Edit Dialog');
     setShowThumbnailEdit(false);
-    playerRef.current.play();
+    playerRef.current?.play();
+  }, []);
+
+  const handleOpenEditCoverImageMenu = useCallback(() => {
+    Mixpanel.track('Edit Cover Image');
+    setCoverImageModalOpen(true);
+    setShowEllipseMenu(false);
+    playerRef.current.pause();
+  }, []);
+
+  const handleCloseCoverImageEditClick = useCallback(() => {
+    Mixpanel.track('Close Cover Image Edit Dialog');
+    setCoverImageModalOpen(false);
+    playerRef.current?.play();
   }, []);
 
   const handleDeleteVideoShow = useCallback(() => {
     Mixpanel.track('Show Delete Video Dialog');
     setShowVideoDelete(true);
-    playerRef.current.pause();
+    playerRef.current?.pause();
   }, []);
 
   const handleCloseDeleteVideoClick = useCallback(() => {
     Mixpanel.track('Close Delete Video Dialog');
     setShowVideoDelete(false);
-    playerRef.current.play();
+    playerRef.current?.play();
   }, []);
 
   const handleDeleteVideo = useCallback(() => {
@@ -262,7 +297,7 @@ const FileUpload: React.FC<IFileUpload> = ({
         <SPlaceholder weight={600} variant={2}>
           {t('secondStep.fileUpload.description')}
         </SPlaceholder>
-        <SButton view='primaryGrad' onClick={handleButtonClick}>
+        <SButton view='primaryGrad' onClick={handleUploadButtonClick}>
           {t('secondStep.fileUpload.button')}
         </SButton>
       </SDropBox>
@@ -386,7 +421,11 @@ const FileUpload: React.FC<IFileUpload> = ({
           </SPlayerWrapper>
           <SButtonsContainer>
             <SButtonsContainerLeft>
-              <SVideoButton onClick={handleEditThumb}>
+              <SVideoButton
+                ref={ellipseButtonRef as any}
+                active={showEllipseMenu}
+                onClick={handleOpenEllipseMenu}
+              >
                 {t('secondStep.video.setThumbnail')}
               </SVideoButton>
               <SVideoButton danger onClick={handleDeleteVideoShow}>
@@ -408,26 +447,43 @@ const FileUpload: React.FC<IFileUpload> = ({
     return content;
   }, [
     t,
-    value,
-    etaUpload,
-    errorUpload,
+    handleUploadButtonClick,
     loadingUpload,
-    progressUpload,
+    errorUpload,
     errorProcessing,
     loadingProcessing,
     progressProcessing,
-    isDesktop,
-    localFile,
-    thumbnails,
-    handleEditThumb,
     handleFileChange,
-    handleFullPreview,
-    handleButtonClick,
-    handleDeleteVideoShow,
-    handleRetryVideoUpload,
-    handleCancelVideoProcessing,
+    etaUpload,
+    progressUpload,
     handleCancelVideoUpload,
+    handleCancelVideoProcessing,
+    handleRetryVideoUpload,
+    localFile,
+    value,
+    thumbnails,
+    showEllipseMenu,
+    handleOpenEllipseMenu,
+    handleDeleteVideoShow,
+    isDesktop,
+    handleFullPreview,
   ]);
+
+  useEffect(() => {
+    if (isBrowser()) {
+      if (showEllipseMenu) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    return () => {
+      if (isBrowser()) {
+        document.body.style.overflow = 'auto';
+      }
+    };
+  }, [showEllipseMenu]);
 
   return (
     <SWrapper>
@@ -448,7 +504,48 @@ const FileUpload: React.FC<IFileUpload> = ({
         handleClose={handleCloseThumbnailEditClick}
         handleSubmit={handlePreviewEditSubmit}
       />
+      {coverImageModalOpen && (
+        <CoverImagePreviewEdit
+          open={coverImageModalOpen}
+          handleClose={handleCloseCoverImageEditClick}
+          handleSubmit={handleCloseCoverImageEditClick}
+        />
+      )}
       {renderContent()}
+      {/* Ellipse menu */}
+      {!isMobile && (
+        <SEllipseMenu
+          isOpen={showEllipseMenu}
+          onClose={handleCloseEllipseMenu}
+          anchorElement={ellipseButtonRef.current}
+          anchorOrigin={{
+            horizontal: 'right',
+            vertical: 'top',
+          }}
+          offsetRight='200px'
+        >
+          <EllipseMenuButton onClick={() => handleOpenEditThumbnailMenu()}>
+            {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
+          </EllipseMenuButton>
+          <EllipseMenuButton onClick={() => handleOpenEditCoverImageMenu()}>
+            {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
+          </EllipseMenuButton>
+        </SEllipseMenu>
+      )}
+      {isMobile && showEllipseMenu ? (
+        <EllipseModal
+          zIndex={10}
+          show={showEllipseMenu}
+          onClose={handleCloseEllipseMenu}
+        >
+          <EllipseModalButton onClick={() => handleOpenEditThumbnailMenu()}>
+            {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
+          </EllipseModalButton>
+          <EllipseModalButton onClick={() => handleOpenEditCoverImageMenu()}>
+            {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
+          </EllipseModalButton>
+        </EllipseModal>
+      ) : null}
     </SWrapper>
   );
 };
@@ -535,6 +632,7 @@ const SButtonsContainerLeft = styled.div`
 
 interface ISVideoButton {
   danger?: boolean;
+  active?: boolean;
 }
 
 const SVideoButton = styled.button<ISVideoButton>`
@@ -549,6 +647,20 @@ const SVideoButton = styled.button<ISVideoButton>`
   background: transparent;
   font-weight: bold;
   line-height: 24px;
+
+  padding: 8px 16px;
+
+  border-radius: 16px;
+
+  ${({ active }) =>
+    active
+      ? css`
+          background-color: ${({ theme }) =>
+            theme.name === 'light'
+              ? theme.colorsThemed.background.secondary
+              : theme.colorsThemed.background.tertiary};
+        `
+      : ''}
 `;
 
 const SLoadingBox = styled.div`
@@ -716,4 +828,15 @@ const SErrorBottomBlock = styled.div`
   ${({ theme }) => theme.media.tablet} {
     margin-top: 16px;
   }
+`;
+
+// Ellipse menu
+const SEllipseMenu = styled(EllipseMenu)`
+  max-width: 216px;
+  position: fixed !important;
+
+  background: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colorsThemed.background.secondary
+      : theme.colorsThemed.background.primary} !important;
 `;

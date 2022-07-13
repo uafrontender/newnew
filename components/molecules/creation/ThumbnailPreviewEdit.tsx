@@ -13,10 +13,9 @@ import Headline from '../../atoms/Headline';
 import InlineSVG from '../../atoms/InlineSVG';
 
 import { useAppSelector } from '../../../redux-store/store';
-
-import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import { TThumbnailParameters } from '../../../redux-store/slices/creationStateSlice';
+
+import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -71,13 +70,31 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
     setChunks(Array(separatorsCount).fill('_'));
     setVideoDuration(duration);
   }, []);
+
+  const progressIndicatorPositionMemo = useRef<number>();
+
   const setCurrentTime = useCallback((time: number) => {
     const percentage = ((time - videoThumbs.current.startTime) * 100) / 3;
     const position = (percentage * 70) / 100;
 
+    if (
+      progressIndicatorPositionMemo.current &&
+      progressIndicatorRef.current &&
+      progressIndicatorPositionMemo.current > position
+    ) {
+      progressIndicatorRef.current.style.transition = '';
+    } else if (
+      progressIndicatorPositionMemo.current &&
+      progressIndicatorRef.current &&
+      progressIndicatorPositionMemo.current < position
+    ) {
+      progressIndicatorRef.current.style.transition = 'all linear 0.3s';
+    }
+
     if (progressIndicatorRef.current) {
       progressIndicatorRef.current.style.transform = `translateX(${position}px)`;
     }
+    progressIndicatorPositionMemo.current = position;
   }, []);
 
   const getTime = useCallback((position: 'start' | 'end') => {
@@ -219,16 +236,6 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
                 {t('secondStep.video.thumbnail.title')}
               </SModalTopLineTitleTablet>
             )}
-            {!isMobile && (
-              <InlineSVG
-                clickable
-                svg={closeIcon}
-                fill={theme.colorsThemed.text.primary}
-                width='24px'
-                height='24px'
-                onClick={handleClose}
-              />
-            )}
           </SModalTopLine>
           <SPlayerWrapper>
             {open && (
@@ -336,6 +343,14 @@ const SContainer = styled.div`
     background: ${(props) => props.theme.colorsThemed.background.secondary};
     border-radius: 16px;
 
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     border-radius: 16px;
   }
 
@@ -357,13 +372,17 @@ const SModalTopLine = styled.div`
   ${({ theme }) => theme.media.mobileL} {
     padding: 10px 0;
     margin-bottom: 24px;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 `;
 
 const SModalTopLineTitleTablet = styled(Headline)`
   margin: 0 auto;
   color: ${(props) => props.theme.colorsThemed.text.primary};
+
+  ${({ theme }) => theme.media.mobileL} {
+    margin: initial;
+  }
 `;
 
 const SModalTopLineTitle = styled(Text)`
@@ -392,6 +411,8 @@ const SButtonsWrapper = styled.div`
 
 const SDescription = styled.div`
   margin-top: 24px;
+  text-align: center;
+  white-space: pre-wrap;
 `;
 
 const SText = styled.span`
@@ -507,7 +528,7 @@ const SProgressSeparator = styled.div<ISProgressSeparator>`
 
 const SProgressIndicator = styled.div`
   top: 0;
-  left: calc(50% - 34px);
+  left: calc(50% - 40px);
   width: 4px;
   height: 100%;
   z-index: 2;
@@ -516,6 +537,4 @@ const SProgressIndicator = styled.div`
   background: ${(props) => props.theme.colorsThemed.accent.yellow};
   border-radius: 2px;
   pointer-events: none;
-
-  transition: all linear 0.3s;
 `;
