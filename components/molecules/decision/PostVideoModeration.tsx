@@ -1,12 +1,19 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
+import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppSelector } from '../../../redux-store/store';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
@@ -19,18 +26,16 @@ import ThumbnailIcon from '../../../public/images/svg/icons/filled/AddImage.svg'
 
 import PostVideoResponseUpload from './PostVideoResponseUpload';
 import ToggleVideoWidget from '../../atoms/moderation/ToggleVideoWidget';
-import { getCoverImageUploadUrl } from '../../../api/endpoints/upload';
 import {
   TThumbnailParameters,
   TVideoProcessingData,
 } from '../../../redux-store/slices/creationStateSlice';
-import {
-  setPostCoverImage,
-  setPostThumbnail,
-} from '../../../api/endpoints/post';
+import { setPostThumbnail } from '../../../api/endpoints/post';
 import isSafari from '../../../utils/isSafari';
 import isBrowser from '../../../utils/isBrowser';
-import urltoFile from '../../../utils/urlToFile';
+import PostVideoCoverImageEdit from './PostVideoCoverImageEdit';
+import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
+import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
@@ -109,23 +114,58 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     'mobileL',
     'tablet',
   ].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+
+  const ellipseButtonRef = useRef<HTMLButtonElement>();
+  const [currentCoverUrl, setCurrentCoverUrl] = useState(
+    announcement.coverImageUrl ?? undefined
+  );
+  const [showEllipseMenu, setShowEllipseMenu] = useState(false);
+  const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
+  const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
+
+  const handleOpenEllipseMenu = useCallback(() => setShowEllipseMenu(true), []);
+
+  const handleCloseEllipseMenu = useCallback(
+    () => setShowEllipseMenu(false),
+    []
+  );
+
+  const handleOpenEditThumbnailMenu = useCallback(() => {
+    Mixpanel.track('Edit Thumbnail');
+    setShowThumbnailEdit(true);
+    setShowEllipseMenu(false);
+  }, []);
+
+  const handleCloseThumbnailEditClick = useCallback(() => {
+    Mixpanel.track('Close Thumbnail Edit Dialog');
+    setShowThumbnailEdit(false);
+  }, []);
+
+  const handleOpenEditCoverImageMenu = useCallback(() => {
+    Mixpanel.track('Edit Cover Image');
+    setCoverImageModalOpen(true);
+    setShowEllipseMenu(false);
+  }, []);
+
+  const handleCloseCoverImageEditClick = useCallback(() => {
+    Mixpanel.track('Close Cover Image Edit Dialog');
+    setCoverImageModalOpen(false);
+  }, []);
+
+  const handleSubmitNewCoverImage = useCallback(
+    (newCoverUrl: string | undefined) => {
+      setCurrentCoverUrl(newCoverUrl);
+      setCoverImageModalOpen(false);
+    },
+    []
+  );
 
   // Show controls on shorter screens
   const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] =
     useState<number | undefined>(undefined);
-
-  // Editing announcement video thumbnail
-  const [isEditThumbnailModalOpen, setIsEditThumbnailModalOpen] =
-    useState(false);
-
-  const [coverImageInEdit, setCoverImageInEdit] = useState(
-    announcement.coverImageUrl ?? undefined
-  );
-
-  const handleSetCustomCoverImageUrl = (objUrl: string) =>
-    setCoverImageInEdit(objUrl);
-
-  const handleUnsetCustomCoverImageUrl = () => setCoverImageInEdit(undefined);
 
   const isSetThumbnailButtonIconOnly = useMemo(
     () =>
@@ -137,75 +177,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
   const handleSubmitNewThumbnail = async (params: TThumbnailParameters) => {
     try {
-      const shouldUpdateCoverImage =
-        !!coverImageInEdit && coverImageInEdit !== announcement.coverImageUrl;
-      const shouldDeleteCoverImage =
-        !coverImageInEdit && !!announcement.coverImageUrl;
-
-      console.log(shouldUpdateCoverImage);
-      console.log(shouldDeleteCoverImage);
-
-      if (shouldUpdateCoverImage) {
-        const coverImageFile = await urltoFile(
-          coverImageInEdit,
-          'coverImage',
-          'image/jpeg'
-        );
-
-        const imageUrlPayload = new newnewapi.GetCoverImageUploadUrlRequest({
-          postUuid: postId,
-        });
-
-        console.log(imageUrlPayload);
-
-        const res = await getCoverImageUploadUrl(imageUrlPayload);
-
-        console.log(res);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'An error occured');
-
-        const uploadResponse = await fetch(res.data.uploadUrl, {
-          method: 'PUT',
-          body: coverImageFile,
-          headers: {
-            'Content-Type': 'image/jpeg',
-          },
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error('Upload failed');
-        }
-
-        const updateCoverImagePayload = new newnewapi.SetPostCoverImageRequest({
-          postUuid: postId,
-          action: newnewapi.SetPostCoverImageRequest.Action.COVER_UPLOADED,
-        });
-
-        const updateCoverImageRes = await setPostCoverImage(
-          updateCoverImagePayload
-        );
-
-        if (updateCoverImageRes.error) {
-          throw new Error('Could not update cover image');
-        }
-      } else if (shouldDeleteCoverImage) {
-        const updateCoverImagePayload = new newnewapi.SetPostCoverImageRequest({
-          postUuid: postId,
-          action: newnewapi.SetPostCoverImageRequest.Action.DELETE_COVER,
-        });
-
-        console.log(updateCoverImagePayload);
-
-        const updateCoverImageRes = await setPostCoverImage(
-          updateCoverImagePayload
-        );
-
-        if (updateCoverImageRes.error) {
-          throw new Error('Could not delete cover image');
-        }
-      }
-
       const payload = new newnewapi.SetPostThumbnailRequest({
         postUuid: postId,
         thumbnailParameters: {
@@ -222,7 +193,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
       if (res.error) throw new Error('Request failed');
 
-      setIsEditThumbnailModalOpen(false);
+      handleCloseThumbnailEditClick();
       toast.success(t('postVideoThumbnailEdit.toast.success'));
     } catch (err) {
       console.error(err);
@@ -296,7 +267,8 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               <SSetThumbnailButtonIconOnly
                 iconOnly
                 view='transparent'
-                onClick={() => setIsEditThumbnailModalOpen(true)}
+                ref={ellipseButtonRef as any}
+                onClick={() => handleOpenEllipseMenu()}
                 style={{
                   ...(soundBtnBottomOverriden
                     ? {
@@ -315,7 +287,8 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             ) : (
               <SSetThumbnailButton
                 view='transparent'
-                onClick={() => setIsEditThumbnailModalOpen(true)}
+                ref={ellipseButtonRef as any}
+                onClick={() => handleOpenEllipseMenu()}
                 style={{
                   ...(soundBtnBottomOverriden
                     ? {
@@ -469,17 +442,58 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           />
         ) : null}
       </SVideoWrapper>
+      {/* Ellipse menu */}
+      {!isMobile && (
+        <SEllipseMenu
+          isOpen={showEllipseMenu}
+          onClose={handleCloseEllipseMenu}
+          anchorElement={ellipseButtonRef.current}
+          anchorOrigin={{
+            horizontal: 'right',
+            vertical: 'top',
+          }}
+          offsetRight='200px'
+        >
+          <EllipseMenuButton onClick={() => handleOpenEditThumbnailMenu()}>
+            {t('thumbnailEllipseMenu.selectSnippetButton')}
+          </EllipseMenuButton>
+          <EllipseMenuButton onClick={() => handleOpenEditCoverImageMenu()}>
+            {t('thumbnailEllipseMenu.uploadImageButton')}
+          </EllipseMenuButton>
+        </SEllipseMenu>
+      )}
+      {isMobile && showEllipseMenu ? (
+        <EllipseModal
+          zIndex={10}
+          show={showEllipseMenu}
+          onClose={handleCloseEllipseMenu}
+        >
+          <EllipseModalButton onClick={() => handleOpenEditThumbnailMenu()}>
+            {t('thumbnailEllipseMenu.selectSnippetButton')}
+          </EllipseModalButton>
+          <EllipseModalButton onClick={() => handleOpenEditCoverImageMenu()}>
+            {t('thumbnailEllipseMenu.uploadImageButton')}
+          </EllipseModalButton>
+        </EllipseModal>
+      ) : null}
       {/* Edit thumbnail */}
       <PostVideoThumbnailEdit
-        open={isEditThumbnailModalOpen}
+        open={showThumbnailEdit}
         value={announcement}
         thumbnails={thumbnails}
-        handleClose={() => setIsEditThumbnailModalOpen(false)}
+        handleClose={handleCloseThumbnailEditClick}
         handleSubmit={handleSubmitNewThumbnail}
-        customCoverImageUrl={coverImageInEdit}
-        handleSetCustomCoverImageUrl={handleSetCustomCoverImageUrl}
-        handleUnsetCustomCoverImageUrl={handleUnsetCustomCoverImageUrl}
       />
+      {/* Edit Cover Image */}
+      {coverImageModalOpen && (
+        <PostVideoCoverImageEdit
+          open={coverImageModalOpen}
+          postId={postId}
+          originalCoverUrl={currentCoverUrl}
+          handleClose={handleCloseCoverImageEditClick}
+          handleSubmit={handleSubmitNewCoverImage}
+        />
+      )}
     </>
   );
 };
@@ -630,4 +644,15 @@ const SReuploadButton = styled.button`
     right: 16px;
     top: 16px;
   }
+`;
+
+// Ellipse menu
+const SEllipseMenu = styled(EllipseMenu)`
+  max-width: 216px;
+  position: fixed !important;
+
+  background: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colorsThemed.background.secondary
+      : theme.colorsThemed.background.primary} !important;
 `;

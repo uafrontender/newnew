@@ -9,7 +9,10 @@ import Caption from '../../atoms/Caption';
 
 interface ICoverImageEdit {
   customCoverImageUrl?: string;
-  handleSetCustomCoverImageUrl: (objectUrl: string) => void;
+  handleSetCustomCoverImageUrl: (
+    newImageUrl: string,
+    originalImageWidth: number
+  ) => void;
   handleUnsetCustomCoverImageUrl: () => void;
 }
 
@@ -18,7 +21,7 @@ const CoverImageEdit: React.FunctionComponent<ICoverImageEdit> = ({
   handleSetCustomCoverImageUrl,
   handleUnsetCustomCoverImageUrl,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('modal-Post');
 
   const imageInputRef = useRef<HTMLInputElement>();
 
@@ -41,7 +44,10 @@ const CoverImageEdit: React.FunctionComponent<ICoverImageEdit> = ({
           const imageUrl = reader.result as string;
           const properlySizedImage = await resizeImage(imageUrl, 1000);
 
-          handleSetCustomCoverImageUrl(properlySizedImage.url);
+          handleSetCustomCoverImageUrl(
+            properlySizedImage.url,
+            properlySizedImage.width
+          );
         }
       });
     }
@@ -56,7 +62,7 @@ const CoverImageEdit: React.FunctionComponent<ICoverImageEdit> = ({
             view='transparent'
             onClick={() => handleUnsetCustomCoverImageUrl()}
           >
-            {t('PostVideoThumbnailEdit.uploadCoverImage.deleteBtn')}
+            {t('postVideoCoverImageEdit.uploadCoverImage.deleteBtn')}
           </SDeleteButton>
         </SSetCoverImageLabel>
       ) : (
@@ -77,13 +83,13 @@ const CoverImageEdit: React.FunctionComponent<ICoverImageEdit> = ({
             }}
           />
           <SCaption variant={2} weight={700}>
-            {t('PostVideoThumbnailEdit.uploadCoverImage.caption')}
+            {t('postVideoCoverImageEdit.uploadCoverImage.caption')}
           </SCaption>
           <SUploadButton
             view='secondary'
             onClick={() => imageInputRef.current?.click()}
           >
-            {t('PostVideoThumbnailEdit.uploadCoverImage.uploadBtn')}
+            {t('postVideoCoverImageEdit.uploadCoverImage.uploadBtn')}
           </SUploadButton>
         </SSetCoverImageLabel>
       )}
@@ -137,7 +143,6 @@ const SCoverPreview = styled.img`
 
   border-radius: 12px;
 
-  margin-left: auto;
   margin-right: auto;
 
   ${({ theme }) => theme.media.tablet} {

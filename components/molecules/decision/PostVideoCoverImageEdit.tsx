@@ -2,40 +2,40 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { Area, Point } from 'react-easy-crop';
+import { newnewapi } from 'newnew-api';
 
 import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import Headline from '../../atoms/Headline';
-import CoverImageUpload from './CoverImageUpload';
+import CoverImageEdit from './CoverImageEdit';
 import CoverImageZoomSlider from '../../atoms/profile/ProfileImageZoomSlider';
 
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import CoverImageCropper from './CoverImageCropper';
+import { useAppSelector } from '../../../redux-store/store';
+import CoverImageCropper from '../creation/CoverImageCropper';
 import getCroppedImg from '../../../utils/cropImage';
 
 // Icons
 import ZoomOutIcon from '../../../public/images/svg/icons/outlined/Minus.svg';
 import ZoomInIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
-import {
-  setCustomCoverImageUrl,
-  unsetCustomCoverImageUrl,
-} from '../../../redux-store/slices/creationStateSlice';
 
-interface ICoverImagePreviewEdit {
+import { setPostCoverImage } from '../../../api/endpoints/post';
+import { getCoverImageUploadUrl } from '../../../api/endpoints/upload';
+
+interface IPostVideoCoverImageEdit {
   open: boolean;
+  postId: string;
+  originalCoverUrl?: string;
   handleClose: () => void;
-  handleSubmit: () => void;
+  handleSubmit: (newCoverUrl: string | undefined) => void;
 }
 
-const CoverImagePreviewEdit: React.FunctionComponent<ICoverImagePreviewEdit> =
-  ({ open, handleClose, handleSubmit }) => {
+const PostVideoCoverImageEdit: React.FunctionComponent<IPostVideoCoverImageEdit> =
+  ({ open, postId, originalCoverUrl, handleClose, handleSubmit }) => {
     const theme = useTheme();
-    const { t } = useTranslation('page-Creation');
-    const dispatch = useAppDispatch();
-    const { customCoverImageUrl } = useAppSelector((state) => state.creation);
+    const { t } = useTranslation('modal-Post');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
@@ -46,7 +46,7 @@ const CoverImagePreviewEdit: React.FunctionComponent<ICoverImagePreviewEdit> =
 
     // Image to be saved
     const [coverImageToBeSaved, setCoverImageToBeSaved] = useState(
-      customCoverImageUrl ?? ''
+      originalCoverUrl ?? ''
     );
     const handleDeleteCoverImage = useCallback(() => {
       setCoverImageToBeSaved('');
@@ -65,8 +65,8 @@ const CoverImagePreviewEdit: React.FunctionComponent<ICoverImagePreviewEdit> =
       useState(false);
 
     const hasChanged = useMemo(
-      () => customCoverImageUrl !== coverImageToBeSaved,
-      [coverImageToBeSaved, customCoverImageUrl]
+      () => originalCoverUrl !== coverImageToBeSaved,
+      [coverImageToBeSaved, originalCoverUrl]
     );
 
     const onFileChange = useCallback(
@@ -102,40 +102,76 @@ const CoverImagePreviewEdit: React.FunctionComponent<ICoverImagePreviewEdit> =
       []
     );
 
-    const completeCoverImageCropAndSave = useCallback(async () => {
+    const handleSubmitNewCoverImage = async () => {
       setUpdateCoverImageLoading(true);
       try {
-        const croppedImage = await getCroppedImg(
-          coverImageInEdit,
-          croppedAreaCoverImage!!,
-          0,
-          'postCoverImage.jpeg'
-        );
+        if (coverImageToBeSaved) {
+          const coverImageFile = await getCroppedImg(
+            coverImageInEdit,
+            croppedAreaCoverImage!!,
+            0,
+            'postCoverImage.jpeg'
+          );
 
-        const newImageUrl = URL.createObjectURL(croppedImage);
+          const imageUrlPayload = new newnewapi.GetCoverImageUploadUrlRequest({
+            postUuid: postId,
+          });
 
-        dispatch(setCustomCoverImageUrl(newImageUrl));
-        setCoverImageInEdit('');
-      } catch (e) {
-        console.error(e);
+          const res = await getCoverImageUploadUrl(imageUrlPayload);
+
+          if (!res.data || res.error)
+            throw new Error(res.error?.message ?? 'An error occured');
+
+          const uploadResponse = await fetch(res.data.uploadUrl, {
+            method: 'PUT',
+            body: coverImageFile,
+            headers: {
+              'Content-Type': 'image/jpeg',
+            },
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error('Upload failed');
+          }
+
+          const updateCoverImagePayload =
+            new newnewapi.SetPostCoverImageRequest({
+              postUuid: postId,
+              action: newnewapi.SetPostCoverImageRequest.Action.COVER_UPLOADED,
+            });
+
+          const updateCoverImageRes = await setPostCoverImage(
+            updateCoverImagePayload
+          );
+
+          if (updateCoverImageRes.error) {
+            throw new Error('Could not update cover image');
+          }
+
+          handleSubmit(URL.createObjectURL(coverImageFile));
+        } else if (!coverImageToBeSaved) {
+          const updateCoverImagePayload =
+            new newnewapi.SetPostCoverImageRequest({
+              postUuid: postId,
+              action: newnewapi.SetPostCoverImageRequest.Action.DELETE_COVER,
+            });
+
+          const updateCoverImageRes = await setPostCoverImage(
+            updateCoverImagePayload
+          );
+
+          if (updateCoverImageRes.error) {
+            throw new Error('Could not delete cover image');
+          }
+
+          handleSubmit(undefined);
+        }
+      } catch (err) {
+        console.error(err);
       } finally {
         setUpdateCoverImageLoading(false);
       }
-    }, [coverImageInEdit, croppedAreaCoverImage, dispatch]);
-
-    const onSubmit = useCallback(async () => {
-      if (coverImageToBeSaved) {
-        await completeCoverImageCropAndSave();
-      } else {
-        dispatch(unsetCustomCoverImageUrl({}));
-      }
-      handleSubmit();
-    }, [
-      completeCoverImageCropAndSave,
-      coverImageToBeSaved,
-      dispatch,
-      handleSubmit,
-    ]);
+    };
 
     useEffect(() => {
       if (coverImageInEdit) {
@@ -160,11 +196,11 @@ const CoverImagePreviewEdit: React.FunctionComponent<ICoverImagePreviewEdit> =
               )}
               {isMobile ? (
                 <SModalTopLineTitle variant={3} weight={600}>
-                  {t('secondStep.video.coverImage.title')}
+                  {t('postVideoCoverImageEdit.title')}
                 </SModalTopLineTitle>
               ) : (
                 <SModalTopLineTitleTablet variant={6}>
-                  {t('secondStep.video.coverImage.title')}
+                  {t('postVideoCoverImageEdit.title')}
                 </SModalTopLineTitleTablet>
               )}
             </SModalTopLine>
@@ -221,30 +257,34 @@ const CoverImagePreviewEdit: React.FunctionComponent<ICoverImagePreviewEdit> =
                 </SSliderWrapper>
               </CoverImageContent>
             ) : (
-              <CoverImageUpload
-                coverImageToBeSaved={coverImageToBeSaved}
-                onFileChange={onFileChange}
-                handleDeleteFile={handleDeleteCoverImage}
+              <CoverImageEdit
+                customCoverImageUrl={coverImageToBeSaved}
+                handleSetCustomCoverImageUrl={onFileChange}
+                handleUnsetCustomCoverImageUrl={handleDeleteCoverImage}
               />
             )}
           </SModalTopContent>
           {isMobile ? (
             <SModalButtonContainer>
-              <Button view='primaryGrad' onClick={onSubmit}>
-                {t('secondStep.video.coverImage.submit')}
+              <Button
+                view='primaryGrad'
+                disabled={!hasChanged || updateCoverImageLoading}
+                onClick={handleSubmitNewCoverImage}
+              >
+                {t('postVideoCoverImageEdit.submit')}
               </Button>
             </SModalButtonContainer>
           ) : (
             <SButtonsWrapper>
               <Button view='secondary' onClick={handleClose}>
-                {t('secondStep.button.cancel')}
+                {t('postVideoCoverImageEdit.cancel')}
               </Button>
               <Button
                 view='primaryGrad'
-                disabled={!hasChanged}
-                onClick={onSubmit}
+                disabled={!hasChanged || updateCoverImageLoading}
+                onClick={handleSubmitNewCoverImage}
               >
-                {t('secondStep.video.coverImage.submit')}
+                {t('postVideoCoverImageEdit.submit')}
               </Button>
             </SButtonsWrapper>
           )}
@@ -253,7 +293,7 @@ const CoverImagePreviewEdit: React.FunctionComponent<ICoverImagePreviewEdit> =
     );
   };
 
-export default CoverImagePreviewEdit;
+export default PostVideoCoverImageEdit;
 
 const SContainer = styled.div`
   width: 100%;

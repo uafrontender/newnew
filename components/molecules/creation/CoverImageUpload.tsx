@@ -129,7 +129,6 @@ const SCoverPreview = styled.img`
 
   border-radius: 12px;
 
-  margin-left: auto;
   margin-right: auto;
 
   ${({ theme }) => theme.media.tablet} {
