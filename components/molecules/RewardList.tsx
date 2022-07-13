@@ -1,42 +1,122 @@
 /* eslint-disable no-nested-ternary */
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { getRewards } from '../../api/endpoints/reward';
 import assets from '../../constants/assets';
 import { formatNumber } from '../../utils/format';
 
-interface RewardListI {
-  rewards: newnewapi.Reward[];
-}
+interface RewardListI {}
 
-export const RewardList: React.FC<RewardListI> = ({ rewards }) => {
+export const RewardList: React.FC<RewardListI> = () => {
   const { t } = useTranslation('common');
+  const [receivedRewards, setReceivedRewards] = useState<newnewapi.Reward[]>(
+    []
+  );
+  // TODO: add loading state
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [receivedRewardsLoading, setReceivedRewardsLoading] = useState(false);
+
+  const [availableRewards, setAvailableRewards] = useState<newnewapi.Reward[]>(
+    []
+  );
+  // TODO: add loading state
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [availableRewardsLoading, setAvailableRewardsLoading] = useState(false);
+
+  const fetchReceivedRewards = useCallback(async () => {
+    try {
+      setReceivedRewardsLoading(true);
+      const receivedRewardsPayload = new newnewapi.GetRewardsRequest({
+        filter: newnewapi.GetRewardsRequest.Filter.RECEIVED,
+        paging: null,
+      });
+
+      const res = await getRewards(receivedRewardsPayload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+
+      setReceivedRewards(res.data.rewards as newnewapi.Reward[]);
+
+      // TODO: use pagination
+      /* res.data.paging?.total
+        ? setReceivedRewardsTotal(res.data.paging?.total)
+        : setReceivedRewardsTotal(0); */
+
+      setReceivedRewardsLoading(false);
+    } catch (err) {
+      console.error(err);
+      setReceivedRewardsLoading(false);
+    }
+  }, []);
+
+  const fetchAvailableRewards = useCallback(async () => {
+    try {
+      setAvailableRewardsLoading(true);
+      const availableRewardsPayload = new newnewapi.GetRewardsRequest({
+        filter: newnewapi.GetRewardsRequest.Filter.AVAILABLE,
+        paging: null,
+      });
+
+      const res = await getRewards(availableRewardsPayload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+
+      setAvailableRewards(res.data.rewards as newnewapi.Reward[]);
+
+      // TODO: use pagination
+      /* res.data.paging?.total
+        ? setAvailableRewardsTotal(res.data.paging?.total)
+        : setAvailableRewardsTotal(0); */
+
+      setAvailableRewardsLoading(false);
+    } catch (err) {
+      console.error(err);
+      setAvailableRewardsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchReceivedRewards();
+    fetchAvailableRewards();
+  }, [fetchReceivedRewards, fetchAvailableRewards]);
 
   return (
     <RewardsContainer>
-      {rewards.map((reward) => (
-        <RewardCard key={reward.type} received={!!reward.receivedAt}>
+      {receivedRewards.map((reward) => (
+        <RewardCard key={reward.type} received>
           <RewardImage>
-            <img
-              src={
-                reward.receivedAt ? assets.decision.gold : assets.decision.votes
-              }
-              alt=''
-            />
+            <img src={assets.decision.gold} alt='' />
           </RewardImage>
-          <RewardDescription received={!!reward.receivedAt}>
+          <RewardDescription received>
             {t(`rewards.itemDescription.${reward.type}`)}
           </RewardDescription>
-          <RewardAmount received={!!reward.receivedAt}>
+          <RewardAmount received>
             <RewardAmountText>
-              {reward.receivedAt
-                ? t('rewards.earned', {
-                    value: formatNumber(reward.amount!.usdCents! / 100),
-                  })
-                : t('rewards.earn', {
-                    value: formatNumber(reward.amount!.usdCents! / 100),
-                  })}
+              {t('rewards.earned', {
+                value: formatNumber(reward.amount!.usdCents! / 100),
+              })}
+            </RewardAmountText>
+          </RewardAmount>
+        </RewardCard>
+      ))}
+
+      {availableRewards.map((reward) => (
+        <RewardCard key={reward.type}>
+          <RewardImage>
+            <img src={assets.decision.votes} alt='' />
+          </RewardImage>
+          <RewardDescription>
+            {t(`rewards.itemDescription.${reward.type}`)}
+          </RewardDescription>
+          <RewardAmount>
+            <RewardAmountText>
+              {t('rewards.earn', {
+                value: formatNumber(reward.amount!.usdCents! / 100),
+              })}
             </RewardAmountText>
           </RewardAmount>
         </RewardCard>

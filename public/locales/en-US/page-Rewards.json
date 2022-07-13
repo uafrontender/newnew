@@ -28,5 +28,8 @@
       "signUp": "Sign up to spend your rewards!",
       "spend": "Spend my Rewards!"
     }
+  },
+  "rewards": {
+    "title": "My Milestones"
   }
 }

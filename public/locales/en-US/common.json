@@ -159,7 +159,6 @@
     "cancelled": "cancelled"
   },
   "rewards": {
-    "title": "My Milestones",
     "earned": "earned ${{value}}",
     "earn": "earn ${{value}}",
     "modalTitle": "You earned ${{amount}}!",

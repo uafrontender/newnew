@@ -162,6 +162,8 @@ const SContentContainer = styled.div<{
   showTocApply: boolean;
 }>`
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
 
@@ -217,6 +219,7 @@ const SCloseButton = styled.button`
 
 const SHeaderContainer = styled.div`
   margin-bottom: 16px;
+  flex-grow: 1;
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 24px;

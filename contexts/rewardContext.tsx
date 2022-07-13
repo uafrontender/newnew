@@ -36,7 +36,7 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
   const socketConnection = useContext(SocketContext);
 
   const [rewardBalance, setRewardBalance] =
-    useState<newnewapi.MoneyAmount | undefined>(undefined);
+    useState<newnewapi.MoneyAmount | undefined>();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSetRewardBalance = (newAmount: newnewapi.MoneyAmount) => {
@@ -137,22 +137,6 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, user.loggedIn]);
-
-  // TODO: Remove test data
-  /* useEffect(() => {
-    const i = setInterval(() => {
-      show({
-        titleKey: `rewards.modalTitle`,
-        titleProps: {
-          amount: 5,
-        },
-        descriptionKey: `rewards.modalDescription.${1}`,
-        buttonTextKey: `rewards.modalButton`,
-      });
-    }, 5000);
-
-    return () => clearInterval(i);
-  }, []); */
 
   return (
     <RewardContext.Provider value={contextValue}>

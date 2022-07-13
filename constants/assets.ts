@@ -132,6 +132,7 @@ const assets = {
     lightAnimatedLogo: `${APP_ASSETS_ORIGIN}/common/darkAnimatedLogo.webp`,
     darkAnimatedLogo: `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.webp`,
     darkAc: `${APP_ASSETS_ORIGIN}/common/dark-ac.png`,
+    goldBig: `${APP_ASSETS_ORIGIN}/common/gold-big.png`,
   },
 };
 

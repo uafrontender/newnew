@@ -6,7 +6,6 @@ import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
-import { newnewapi } from 'newnew-api';
 
 import { NextPageWithLayout } from './_app';
 
@@ -35,20 +34,6 @@ export const Rewards = () => {
 
   const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
   const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
-
-  // TODO: Use data from API
-  const rewards: newnewapi.Reward[] = [
-    {
-      type: 0,
-      receivedAt: new Date(Date.now() - 1000000),
-      amount: { usdCents: 500 },
-    } as any,
-    {
-      type: 1,
-      receivedAt: undefined,
-      amount: { usdCents: 500 },
-    } as any,
-  ];
 
   return (
     <>
@@ -152,7 +137,15 @@ export const Rewards = () => {
                 ? formatNumber(0)
                 : formatNumber(rewardBalance.usdCents! / 100 ?? 0)}
             </BalanceValue>
-            <SButton>
+            <SButton
+              onClick={() => {
+                if (user.loggedIn) {
+                  router.push('/');
+                } else {
+                  router.push('/sign-up');
+                }
+              }}
+            >
               {user.loggedIn
                 ? t('balance.button.spend')
                 : t('balance.button.signUp')}
@@ -161,7 +154,7 @@ export const Rewards = () => {
 
           <Section>
             <SectionTitle>{t('rewards.title')}</SectionTitle>
-            <RewardList rewards={rewards} />
+            <RewardList />
           </Section>
         </Content>
       </Container>

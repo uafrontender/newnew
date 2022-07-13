@@ -39,7 +39,7 @@ const ModalNotifications: React.FC = React.memo(() => {
         <Container>
           <Content>
             <DataContainer>
-              <NotificationImage src={assets.decision.gold} />
+              <NotificationImage src={assets.common.goldBig} />
               <Title>
                 {t(
                   currentNotification.titleKey,
