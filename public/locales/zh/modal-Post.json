@@ -479,6 +479,10 @@
       "choosePledgeButton": "支持這個Goal"
     }
   },
+  "thumbnailEllipseMenu_NEED_TRANSLATION": {
+    "selectSnippetButton": "Select a snippet",
+    "uploadImageButton": "Upload an image"
+  },
   "postVideoThumbnailEdit": {
     "title": "設置縮略圖",
     "description": "從視頻中選擇一個片段",
@@ -487,6 +491,16 @@
     "toast": {
       "success": "成功！縮略圖將在處理後更改",
       "error": "發生錯誤"
+    }
+  },
+  "postVideoCoverImageEdit_NEED_TRANSLATION": {
+    "title": "Upload an image",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "uploadCoverImage": {
+      "caption": "Select custom cover image",
+      "uploadBtn": "Select",
+      "deleteBtn": "Delete"
     }
   },
   "acPostModeration": {
