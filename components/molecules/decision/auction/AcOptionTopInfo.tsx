@@ -25,6 +25,7 @@ import SuggestionActionMobileModal from '../OptionActionMobileModal';
 
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
 import { formatNumber } from '../../../../utils/format';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IAcOptionTopInfo {
   creator: newnewapi.IUser;
@@ -308,6 +309,12 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
             disabled={
               !supportBidAmount ? true : parseInt(supportBidAmount) < minAmount
             }
+            onClickCapture={() => {
+              Mixpanel.track('Place Bid', {
+                _stage: 'Post',
+                _component: 'AcOptionTopInfo',
+              });
+            }}
             onClick={() => handleTogglePaymentModalOpen()}
           >
             {t('acPost.optionsTab.optionCard.placeABidButton')}
@@ -338,6 +345,12 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
               view='primaryGrad'
               size='sm'
               disabled={!supportBidAmount}
+              onClickCapture={() => {
+                Mixpanel.track('Place Bid', {
+                  _stage: 'Post',
+                  _component: 'AcOptionsTab',
+                });
+              }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
               {t('acPost.optionsTab.optionCard.placeABidButton')}

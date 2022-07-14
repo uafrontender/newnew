@@ -336,7 +336,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     }, [post.expiresAt]);
 
     const handleSubmit = useCallback(async () => {
-      Mixpanel.track('Creation Preview Button Click');
+      Mixpanel.track('Creation Preview Button Click', { _stage: 'Creation' });
 
       // Validate title as the previous validation might be outdated due to debounce,
       // or title input being focused
@@ -356,12 +356,12 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     }, [tab, router, post?.title, validateT]);
 
     const handleCloseClick = useCallback(() => {
-      Mixpanel.track('Creation Close');
+      Mixpanel.track('Creation Close', { _stage: 'Creation' });
       router?.push('/');
     }, [router]);
 
     const handleVideoDelete = useCallback(async () => {
-      Mixpanel.track('Video Deleting');
+      Mixpanel.track('Video Deleting', { _stage: 'Creation' });
       try {
         const payload = new newnewapi.RemoveUploadedFileRequest({
           publicUrl: post?.announcementVideoUrl,
@@ -398,6 +398,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     const handleVideoUpload = useCallback(
       async (value: File) => {
         Mixpanel.track('Video Uploading', {
+          _stage: 'Creation',
           _filename: value.name,
         });
         try {
@@ -518,6 +519,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       async (key: string, value: string) => {
         if (key === 'title' && value.length > 0) {
           Mixpanel.track('Title Text Change', {
+            _stage: 'Creation',
             _text: value,
           });
           setTitleError(
@@ -536,28 +538,52 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     const handleItemChange = useCallback(
       async (key: string, value: any) => {
         if (key === 'title') {
-          Mixpanel.track('Post Title Change', { _value: value });
+          Mixpanel.track('Post Title Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationTitle(value.trim() ? value : ''));
         } else if (key === 'minimalBid') {
-          Mixpanel.track('Minimal Big Change', { _value: value });
+          Mixpanel.track('Minimal Big Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationMinBid(value));
         } else if (key === 'comments') {
-          Mixpanel.track('Post Creation Comments Change', { _value: value });
+          Mixpanel.track('Post Creation Comments Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationComments(value));
         } else if (key === 'allowSuggestions') {
-          Mixpanel.track('Post Allow Suggestions Change', { _value: value });
+          Mixpanel.track('Post Allow Suggestions Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationAllowSuggestions(value));
         } else if (key === 'expiresAt') {
-          Mixpanel.track('Post expiresAt Change', { _value: value });
+          Mixpanel.track('Post expiresAt Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationExpireDate(value));
         } else if (key === 'startsAt') {
-          Mixpanel.track('Post startsAt Change', { _value: value });
+          Mixpanel.track('Post startsAt Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationStartDate(value));
         } else if (key === 'targetBackerCount') {
-          Mixpanel.track('Backer Count Change', { _value: value });
+          Mixpanel.track('Backer Count Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationTargetBackerCount(value));
         } else if (key === 'choices') {
-          Mixpanel.track('Post Creation Choices Change', { _value: value });
+          Mixpanel.track('Post Creation Choices Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationChoices(value));
         } else if (key === 'video') {
           if (value) {

@@ -21,6 +21,7 @@ import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import NoContentYetImg from '../../../../../public/images/decision/no-content-yet-mock.png';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import { selectWinningOption } from '../../../../../api/endpoints/auction';
+import { Mixpanel } from '../../../../../utils/mixpanel';
 
 interface IAcOptionsTabModeration {
   postId: string;
@@ -157,6 +158,13 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
               ) : pagingToken ? (
                 <SLoadMoreBtn
                   view='secondary'
+                  onClickCapture={() => {
+                    Mixpanel.track('Click Load More', {
+                      _stage: 'Post',
+                      _postUuid: postId,
+                      _component: 'AcOptionsTabModeration',
+                    });
+                  }}
                   onClick={() => handleLoadBids(pagingToken)}
                 >
                   {t('loadMoreButton')}

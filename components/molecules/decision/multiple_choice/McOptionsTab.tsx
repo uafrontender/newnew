@@ -54,6 +54,7 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import { formatNumber } from '../../../../utils/format';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -314,6 +315,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const handlePayWithCardStripeRedirect = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
+      Mixpanel.track('PayWithCardStripeRedirect', {
+        _stage: 'Post',
+        _postUuid: post.postUuid,
+        _component: 'McOptionsTab',
+      });
       const createPaymentSessionPayload =
         new newnewapi.CreatePaymentSessionRequest({
           successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
@@ -345,6 +351,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const handleVoteForFree = useCallback(async () => {
     setUseFreeVoteModalOpen(false);
     setLoadingModalOpen(true);
+    Mixpanel.track('Vote For Free', {
+      _stage: 'Post',
+      _postUuid: post.postUuid,
+      _component: 'McOptionsTab',
+    });
     try {
       const payload = new newnewapi.VoteOnPostRequest({
         votesCount: appConstants.mcFreeVoteCount,
@@ -509,13 +520,29 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
               }
-              handleRemoveOption={() => handleRemoveOption(option)}
+              handleRemoveOption={() => {
+                Mixpanel.track('Removed Option', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTab',
+                });
+                handleRemoveOption(option);
+              }}
             />
           ))}
           {!isMobile ? (
             <SLoaderDiv ref={loadingRef} />
           ) : pagingToken ? (
-            <SLoadMoreBtn onClick={() => handleLoadOptions(pagingToken)}>
+            <SLoadMoreBtn
+              onClick={() => {
+                Mixpanel.track('Click Load More', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTab',
+                });
+                handleLoadOptions(pagingToken);
+              }}
+            >
               {t('loadMoreButton')}
             </SLoadMoreBtn>
           ) : null}
@@ -547,7 +574,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
-              onClick={() => setUseFreeVoteModalOpen(true)}
+              onClick={() => {
+                Mixpanel.track('Click Add Free Option', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTab',
+                });
+                setUseFreeVoteModalOpen(true);
+              }}
             >
               {t('mcPost.optionsTab.actionSection.placeABidButton')}
             </SAddFreeVoteButton>
@@ -640,7 +674,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
-              onClick={() => setUseFreeVoteModalOpen(true)}
+              onClick={() => {
+                Mixpanel.track('Click Add Free Option', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTab',
+                });
+                setUseFreeVoteModalOpen(true);
+              }}
             >
               {t('mcPost.optionsTab.actionSection.placeABidButton')}
             </SAddFreeVoteButton>
@@ -752,6 +793,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             id='action-button-mobile'
             view='primaryGrad'
             onClick={() => setSuggestNewMobileOpen(true)}
+            onClickCapture={() =>
+              Mixpanel.track('SuggestNewMobile', {
+                _stage: 'Post',
+                _postUuid: post.postUuid,
+                _component: 'McOptionsTab',
+              })
+            }
           >
             {t('mcPost.floatingActionButton.suggestNewButton')}
           </SActionButton>

@@ -55,6 +55,7 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
 import OptionEllipseModal from '../OptionEllipseModal';
 import McConfirmDeleteOptionModal from './moderation/McConfirmDeleteOptionModal';
+import { Mixpanel } from '../../../../utils/mixpanel';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface IMcOptionCard {
@@ -562,6 +563,13 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 disabled={disabled}
                 isBlue={isBlue}
                 canVoteForFree={canVoteForFree}
+                onClickCapture={() => {
+                  Mixpanel.track('Vote Click', {
+                    _stage: 'Post',
+                    _postUuid: postId,
+                    _component: 'McOptionCard',
+                  });
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   if (canVoteForFree) {
@@ -606,6 +614,13 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 view='secondary'
                 disabled={disabled}
                 isBlue={isBlue}
+                onClickCapture={() => {
+                  Mixpanel.track('Vote Click', {
+                    _stage: 'Post',
+                    _postUuid: postId,
+                    _component: 'McOptionCard',
+                  });
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   if (!isSupportMenuOpen) {

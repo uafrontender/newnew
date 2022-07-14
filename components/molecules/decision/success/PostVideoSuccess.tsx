@@ -15,6 +15,7 @@ import VolumeOff from '../../../../public/images/svg/icons/filled/VolumeOFF1.svg
 import VolumeOn from '../../../../public/images/svg/icons/filled/VolumeON.svg';
 import isSafari from '../../../../utils/isSafari';
 import isBrowser from '../../../../utils/isBrowser';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 const PostBitmovinPlayer = dynamic(() => import('../PostBitmovinPlayer'), {
   ssr: false,
@@ -154,6 +155,10 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             iconOnly
             view='transparent'
             onClick={(e) => {
+              Mixpanel.track('Toggle Muted Mode', {
+                _stage: 'Post',
+                _postUuid: postId,
+              });
               e.stopPropagation();
               handleToggleMuted();
               if (isSafari()) {
@@ -193,6 +198,10 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             iconOnly
             view='transparent'
             onClick={(e) => {
+              Mixpanel.track('Toggle Muted Mode', {
+                _stage: 'Post',
+                _postUuid: postId,
+              });
               e.stopPropagation();
               handleToggleMuted();
               if (isSafari()) {
@@ -224,6 +233,13 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         <SWatchResponseWrapper>
           <SWatchResponseBtn
             shouldView={!responseViewed}
+            onClickCapture={() => {
+              Mixpanel.track('Set Opened Tab Response', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'PostVideoSuccess',
+              });
+            }}
             onClick={() => setOpenedTab('response')}
           >
             {t('postVideoSuccess.tabs.watchResponseFirstTime')}
@@ -234,12 +250,26 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         <SToggleVideoWidget>
           <SChangeTabBtn
             shouldView={openedTab === 'announcement'}
+            onClickCapture={() => {
+              Mixpanel.track('Set Opened Tab Announcement', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'PostVideoSuccess',
+              });
+            }}
             onClick={() => setOpenedTab('announcement')}
           >
             {t('postVideoSuccess.tabs.announcement')}
           </SChangeTabBtn>
           <SChangeTabBtn
             shouldView={openedTab === 'response'}
+            onClickCapture={() => {
+              Mixpanel.track('Set Opened Tab Response', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'PostVideoSuccess',
+              });
+            }}
             onClick={() => setOpenedTab('response')}
           >
             {t('postVideoSuccess.tabs.response')}

@@ -16,6 +16,7 @@ import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import AcOptionCard from '../AcOptionCard';
 import Button from '../../../../atoms/Button';
 import GradientMask from '../../../../atoms/GradientMask';
+import { Mixpanel } from '../../../../../utils/mixpanel';
 
 interface IAcSuccessOptionsTab {
   post: newnewapi.Auction;
@@ -239,6 +240,13 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
         ) : optionsNextPageToken ? (
           <SLoadMoreBtn
             view='secondary'
+            onClickCapture={() => {
+              Mixpanel.track('Click Load More', {
+                _stage: 'Post',
+                _postUuid: post.postUuid,
+                _component: 'AcSuccessOptionsTab',
+              });
+            }}
             onClick={() => fetchBids(optionsNextPageToken)}
           >
             {t('loadMoreButton')}

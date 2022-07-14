@@ -52,6 +52,7 @@ import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import { formatNumber } from '../../../../utils/format';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IAcOptionsTab {
   postId: string;
@@ -329,6 +330,11 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const handlePayWithCardStripeRedirect = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
+      Mixpanel.track('PayWithCardStripeRedirect', {
+        _stage: 'Post',
+        _postUuid: postId,
+        _component: 'AcOptionsTab',
+      });
       const createPaymentSessionPayload =
         new newnewapi.CreatePaymentSessionRequest({
           successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
@@ -473,7 +479,14 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
               }
-              handleRemoveOption={() => handleRemoveOption(option)}
+              handleRemoveOption={() => {
+                Mixpanel.track('Removed Option', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'AcOptionsTab',
+                });
+                handleRemoveOption(option);
+              }}
             />
           ))}
           {!isMobile ? (
@@ -481,7 +494,14 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           ) : pagingToken ? (
             <SLoadMoreBtn
               view='secondary'
-              onClick={() => handleLoadBids(pagingToken)}
+              onClick={() => {
+                Mixpanel.track('Click Load More', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'AcOptionsTab',
+                });
+                handleLoadBids(pagingToken);
+              }}
             >
               {t('loadMoreButton')}
             </SLoadMoreBtn>
@@ -528,6 +548,12 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               }
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+              }}
+              onClickCapture={() => {
+                Mixpanel.track('Place Bid', {
+                  _stage: 'Post',
+                  _component: 'AcOptionsTab',
+                });
               }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
@@ -616,6 +642,12 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               }
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+              }}
+              onClickCapture={() => {
+                Mixpanel.track('Place Bid', {
+                  _stage: 'Post',
+                  _component: 'AcOptionsTab',
+                });
               }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
@@ -708,6 +740,13 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             id='action-button-mobile'
             view='primaryGrad'
             onClick={() => setSuggestNewMobileOpen(true)}
+            onClickCapture={() =>
+              Mixpanel.track('SuggestNewMobile', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'AcOptionsTab',
+              })
+            }
           >
             {t('acPost.floatingActionButton.suggestNewButton')}
           </SActionButton>
