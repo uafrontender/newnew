@@ -5,6 +5,10 @@ function getChunks(text: string, ignoreStart: boolean): Chunk[] {
     return [];
   }
 
+  // TODO: enable fix when BE supports ’' symbols
+  /*const regexp = ignoreStart
+    ? /(\s)(#[a-zA-Z0-9_’']+)(\s|$)/
+    : /(^|\s)(#[a-zA-Z0-9_’']+)(\s|$)/;*/
   const regexp = ignoreStart
     ? /(\s)(#[a-zA-Z0-9_]+)(\s|$)/
     : /(^|\s)(#[a-zA-Z0-9_]+)(\s|$)/;
