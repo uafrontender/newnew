@@ -501,6 +501,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
           const payload = new newnewapi.FulfillPaymentPurposeRequest({
             paymentSuccessUrl: `session_id=${sessionId}`,
           });
+          resetSessionId();
 
           const res = await placeBidOnAuction(payload);
 
@@ -524,15 +525,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
           console.error(err);
           setLoadingModalOpen(false);
         }
-        resetSessionId();
       };
 
-      if (socketConnection?.connected && !loadingModalOpen) {
-        console.log(sessionId);
+      if (sessionId && !loadingModalOpen) {
         makeBidFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection?.connected, sessionId, loadingModalOpen]);
+    }, []);
 
     const goToNextStep = () => {
       if (

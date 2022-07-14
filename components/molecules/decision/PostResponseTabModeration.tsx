@@ -20,21 +20,6 @@ import { useAppSelector } from '../../../redux-store/store';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import PostResponseSuccessModal from './PostResponseSuccessModal';
 
-// postResponseTabModeration
-// awaiting
-// topHeader
-// postResponseBtn
-
-// succeeded
-// shareBtn
-// linkCopied
-
-// winner
-// mc
-// numBiddersChose
-// optionOwn
-// optionCreator
-
 interface IPostResponseTabModeration {
   postId: string;
   postType: TPostType;
@@ -529,9 +514,11 @@ const SCreatorLink = styled.a`
 `;
 
 const SContainer = styled.div`
-  display: grid;
-
   height: 100%;
+
+  ${({ theme }) => theme.media.tablet} {
+    display: grid;
+  }
 `;
 
 const SHeaderDiv = styled.div`
@@ -715,6 +702,8 @@ const SShareButton = styled(Button)`
   align-self: end;
   position: static;
   width: 100%;
+
+  margin-top: 16px;
 
   background-color: ${({ theme }) =>
     theme.name === 'light' ? theme.colors.dark : '#FFFFFF'};
