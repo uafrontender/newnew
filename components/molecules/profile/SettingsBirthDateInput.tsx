@@ -265,6 +265,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
               value={inputData}
               onChange={handleChange}
               onPaste={(e) => e.preventDefault()}
+              onFocus={() => (props.disabled ? () => {} : (props.onClick as any))}
             />
             <SPseudoPlaceholder
               dangerouslySetInnerHTML={{
