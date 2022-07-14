@@ -185,7 +185,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   const handleUpdateNewOptionText = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setNewOptionText(e.target.value);
+      setNewOptionText(e.target.value.trim() ? e.target.value : '');
 
       if (e.target.value.length > 0) {
         validateTextViaAPIDebounced(e.target.value);
