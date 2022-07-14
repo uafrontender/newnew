@@ -703,6 +703,8 @@ const SShareButton = styled(Button)`
   position: static;
   width: 100%;
 
+  margin-top: 16px;
+
   background-color: ${({ theme }) =>
     theme.name === 'light' ? theme.colors.dark : '#FFFFFF'};
   color: ${({ theme }) =>
