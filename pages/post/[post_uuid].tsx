@@ -97,7 +97,12 @@ const PostPage: NextPage<IPostPage> = ({
     if (isBrowser()) {
       const { idx } = window.history.state;
       if (idx < 2) {
-        router?.replace('/');
+        console.log(postParsed?.creator?.username);
+        if (postParsed?.creator?.username) {
+          router?.replace(`/${postParsed?.creator?.username}`);
+        } else {
+          router?.replace('/');
+        }
       }
     }
   };
@@ -113,13 +118,6 @@ const PostPage: NextPage<IPostPage> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (isMobile && !postModalOpen) {
-      router.push('/');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postModalOpen, isMobile]);
 
   return (
     <>
