@@ -194,7 +194,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   const handleUpdateNewOptionText = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setNewBidText(e.target.value);
+      setNewBidText(e.target.value.trim() ? e.target.value : '');
 
       if (e.target.value.length > 0) {
         validateTextViaAPIDebounced(e.target.value);

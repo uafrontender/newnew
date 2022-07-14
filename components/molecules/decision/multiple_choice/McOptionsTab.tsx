@@ -68,6 +68,7 @@ interface IMcOptionsTab {
   minAmount: number;
   votePrice: number;
   canVoteForFree: boolean;
+  hasVotedOptionId?: number;
   canSubscribe: boolean;
   handleResetFreeVote: () => void;
   handleLoadOptions: (token?: string) => void;
@@ -89,6 +90,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   minAmount,
   votePrice,
   canVoteForFree,
+  hasVotedOptionId,
   canSubscribe,
   handleLoadOptions,
   handleResetFreeVote,
@@ -114,13 +116,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   // const { walletBalance } = useContext(WalletContext);
   const { appConstants } = useGetAppConstants();
-
-  const hasVotedOptionId = useMemo(() => {
-    const supportedOption = options.find((o) => o.isSupportedByMe);
-
-    if (supportedOption) return supportedOption.id;
-    return undefined;
-  }, [options]);
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
@@ -191,7 +186,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   const handleUpdateNewOptionText = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setNewOptionText(e.target.value);
+      setNewOptionText(e.target.value.trim() ? e.target.value : '');
 
       if (e.target.value.length > 0) {
         validateTextViaAPIDebounced(e.target.value);

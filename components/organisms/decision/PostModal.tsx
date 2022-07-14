@@ -351,7 +351,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (currLocation === 'forced_redirect_to_home') {
       innerHistoryStack.current = [];
       handleClose();
-      router.push('/');
       return;
     }
 
@@ -362,7 +361,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     currLocation,
     handleClose,
     isConfirmToClosePost,
-    router,
     syncedHistoryPushState,
     t,
   ]);

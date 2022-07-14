@@ -38,6 +38,7 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import isBrowser from '../../../../utils/isBrowser';
 
 interface ICommentsBottomSection {
   postUuid: string;
@@ -399,7 +400,7 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
     );
 
     useEffect(() => {
-      const resizeObserver = new ResizeObserver((entry) => {
+      const resizeObserver = new ResizeObserver((entry: any) => {
         const size = entry[0]?.borderBoxSize
           ? entry[0]?.borderBoxSize[0]?.blockSize
           : entry[0]?.contentRect.height;
@@ -512,6 +513,30 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
       commentsNextPageToken,
       commentsLoading,
     ]);
+
+    useEffect(() => {
+      const handleScrollCommentsTab = () => {
+        const currScrollTop = scrollRef.current?.scrollTop;
+        if (currScrollTop && currScrollTop <= 0) {
+          document.getElementById('post-modal-container')?.scrollBy({
+            top: -30,
+          });
+        }
+      };
+
+      if (isMobile && isBrowser()) {
+        scrollRef.current?.addEventListener('scroll', handleScrollCommentsTab);
+      }
+
+      return () => {
+        if (isMobile && isBrowser()) {
+          scrollRef.current?.removeEventListener(
+            'scroll',
+            handleScrollCommentsTab
+          );
+        }
+      };
+    }, [isMobile]);
 
     return (
       <>

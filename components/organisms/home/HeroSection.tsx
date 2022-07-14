@@ -43,7 +43,7 @@ export const HeroSection = React.memo(() => {
         containerId: 'generalScrollContainer',
       });
     } else {
-      scroller.scrollTo('ac', {
+      scroller.scrollTo('mc', {
         offset: isMobile ? -20 : -100,
         smooth: 'ease',
         duration: SCROLL_EXPLORE,
