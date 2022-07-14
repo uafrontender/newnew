@@ -62,7 +62,7 @@
     "cf": "{{postCreator}}在獲得足夠的支持者后，就會完成這個Goal。"
   },
   "postFailedBoxModeration": {
-    "title": "{{postType}}}被取消",
+    "title": "{{postType}}被取消",
     "reason": {
       "no-response": "回應沒有上傳",
       "ac-no-winner": "贏家尚未被選出",
@@ -116,7 +116,7 @@
     }
   },
   "postSuccess": {
-    "title": "該{{postType}}}已完成",
+    "title": "該{{postType}}已完成",
     "body": "查看更多類似的。",
     "buttonText": "查看更多"
   },
