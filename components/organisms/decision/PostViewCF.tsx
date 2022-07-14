@@ -630,6 +630,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           const payload = new newnewapi.FulfillPaymentPurposeRequest({
             paymentSuccessUrl: `session_id=${sessionId}`,
           });
+          resetSessionId();
 
           const res = await doPledgeCrowdfunding(payload);
 
@@ -655,11 +656,11 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
         resetSessionId();
       };
 
-      if (socketConnection?.connected && !loadingModalOpen) {
+      if (sessionId && !loadingModalOpen) {
         makePledgeFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection?.connected, sessionId, loadingModalOpen]);
+    }, []);
 
     useEffect(() => {
       const workingAmount = pledges

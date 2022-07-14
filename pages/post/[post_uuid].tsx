@@ -97,7 +97,6 @@ const PostPage: NextPage<IPostPage> = ({
     if (isBrowser()) {
       const { idx } = window.history.state;
       if (idx < 2) {
-        console.log(postParsed?.creator?.username);
         if (postParsed?.creator?.username) {
           router?.replace(`/${postParsed?.creator?.username}`);
         } else {

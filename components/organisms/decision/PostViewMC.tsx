@@ -529,6 +529,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           const payload = new newnewapi.FulfillPaymentPurposeRequest({
             paymentSuccessUrl: `session_id=${sessionId}`,
           });
+          resetSessionId();
 
           const res = await voteOnPost(payload);
 
@@ -553,14 +554,13 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           console.error(err);
           setLoadingModalOpen(false);
         }
-        resetSessionId();
       };
 
-      if (socketConnection?.connected && !loadingModalOpen) {
+      if (sessionId && !loadingModalOpen) {
         makeVoteFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection?.connected, sessionId, loadingModalOpen]);
+    }, []);
 
     const goToNextStep = () => {
       if (
