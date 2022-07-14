@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled from 'styled-components';
@@ -23,7 +24,7 @@ const PostTitleContent: React.FC<PostTitleContentI> = ({
         if (chunk.type === 'hashtag') {
           if (target === 'router') {
             return (
-              <SHashtagInert
+              <SHashtag
                 onClick={() =>
                   router.push(
                     `/search?query=${chunk.text}&type=hashtags&tab=posts`
@@ -31,22 +32,17 @@ const PostTitleContent: React.FC<PostTitleContentI> = ({
                 }
               >
                 #{chunk.text}
-              </SHashtagInert>
+              </SHashtag>
             );
           }
 
           return (
-            <SHashtag
-              onClick={() =>
-                console.log(
-                  `/search?query=${chunk.text}&type=hashtags&tab=posts`
-                )
-              }
+            <Link
               href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
               target={target}
             >
-              #{chunk.text}
-            </SHashtag>
+              <SHashtag>{`#${chunk.text}`}</SHashtag>
+            </Link>
           );
         }
 
@@ -63,16 +59,7 @@ PostTitleContent.defaultProps = {
 
 export default PostTitleContent;
 
-const SHashtag = styled.a`
-  color: ${(props) => props.theme.colorsThemed.accent.blue};
-  font-weight: 600;
-
-  :hover {
-    filter: brightness(120%);
-  }
-`;
-
-const SHashtagInert = styled.span`
+const SHashtag = styled.span`
   color: ${(props) => props.theme.colorsThemed.accent.blue};
   font-weight: 600;
   cursor: pointer;
