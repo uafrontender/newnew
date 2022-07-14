@@ -118,19 +118,21 @@ const Comment: React.FC<IComment> = ({
             <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
           </Link>
         ) : (
-          <SUserAvatar avatarUrl='' onClick={() => {}} />
+          <SUserAvatar noHover avatarUrl='' onClick={() => {}} />
         )}
         <SCommentContent>
           <SCommentHeader>
-            <Link href={`/${comment.sender?.username}`}>
-              <SNickname>
-                {!comment.isDeleted
-                  ? comment.sender?.uuid === user.userData?.userUuid
+            {!comment.isDeleted ? (
+              <Link href={`/${comment.sender?.username}`}>
+                <SNickname>
+                  {comment.sender?.uuid === user.userData?.userUuid
                     ? t('comments.me')
-                    : comment.sender?.nickname ?? comment.sender?.username
-                  : t('comments.commentDeleted')}
-              </SNickname>
-            </Link>
+                    : comment.sender?.nickname ?? comment.sender?.username}
+                </SNickname>
+              </Link>
+            ) : (
+              <SNickname noHover>{t('comments.commentDeleted')}</SNickname>
+            )}
             <SBid> </SBid>
             <SDate>
               {/* &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')} */}
@@ -255,14 +257,16 @@ Comment.defaultProps = {
   onFormBlur: () => {},
 };
 
-const SUserAvatar = styled(UserAvatar)`
+const SUserAvatar = styled(UserAvatar)<{
+  noHover?: boolean;
+}>`
   width: 36px;
   height: 36px;
   min-width: 36px;
   min-height: 36px;
   flex-shrink: 0;
   margin-right: 12px;
-  cursor: pointer;
+  cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
 `;
 
 const OpenedFlash = keyframes`
@@ -331,15 +335,20 @@ const SMoreButton = styled(Button)`
   }
 `;
 
-const SNickname = styled.span`
+const SNickname = styled.span<{
+  noHover?: boolean;
+}>`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
-  cursor: pointer;
+  cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
   margin-right: 5px;
 
   transition: 0.2s linear;
 
   :hover {
-    color: ${(props) => props.theme.colorsThemed.text.primary};
+    color: ${(props) =>
+      !props.noHover
+        ? props.theme.colorsThemed.text.primary
+        : props.theme.colorsThemed.text.secondary};
   }
 `;
 
