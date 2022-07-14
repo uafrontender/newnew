@@ -261,7 +261,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
                     p.usdCents ? p.usdCents : 0
                   );
                 }}
-              >{`${(p.usdCents / 100).toFixed(0)}`}</EllipseModalButton>
+              >{`$${(p.usdCents / 100).toFixed(0)}`}</EllipseModalButton>
             ) : null
           )
           .concat(
