@@ -95,13 +95,11 @@ const PostPage: NextPage<IPostPage> = ({
     setDisplayedPost(undefined);
 
     if (isBrowser()) {
-      const { idx } = window.history.state;
-      if (idx < 2) {
-        if (postParsed?.creator?.username) {
-          router?.replace(`/${postParsed?.creator?.username}`);
-        } else {
-          router?.replace('/');
-        }
+      // const { idx } = window.history.state;
+      if (postParsed?.creator?.username) {
+        router?.push(`/${postParsed?.creator?.username}`);
+      } else {
+        router?.push('/');
       }
     }
   };
