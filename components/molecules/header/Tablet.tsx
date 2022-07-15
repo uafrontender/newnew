@@ -47,7 +47,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
             {user.userData?.options?.isCreator && (
               <Link href='/creator/dashboard'>
                 <a>
-                  <SDashboardButton view='transparent'>
+                  <SDashboardButton>
                     <SNavText variant={3} weight={600}>
                       {t('button.dashboard')}
                     </SNavText>
@@ -251,6 +251,13 @@ const SNavText = styled(Text)`
   cursor: pointer;
 `;
 
-const SDashboardButton = styled(Button)`
+const SDashboardButton = styled.button`
   padding: 8px 16px;
+  background: transparent;
+  border: 0;
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  &:focus {
+    outline: none;
+  }
 `;
