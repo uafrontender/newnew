@@ -110,18 +110,18 @@ const FileUpload: React.FC<IFileUpload> = ({
   const [showFullPreview, setShowFullPreview] = useState(false);
 
   const handleUploadButtonClick = useCallback(() => {
-    Mixpanel.track('Select File Clicked');
+    Mixpanel.track('Select File Clicked', { _stage: 'Creation' });
     inputRef.current?.click();
   }, []);
 
   const handleFullPreview = useCallback(() => {
-    Mixpanel.track('Open Full Preview');
+    Mixpanel.track('Open Full Preview', { _stage: 'Creation' });
     setShowFullPreview(true);
     playerRef.current.pause();
   }, []);
 
   const handleCloseFullPreviewClick = useCallback(() => {
-    Mixpanel.track('Close Full Preview');
+    Mixpanel.track('Close Full Preview', { _stage: 'Creation' });
     setShowFullPreview(false);
     playerRef.current.play();
   }, []);
@@ -134,45 +134,45 @@ const FileUpload: React.FC<IFileUpload> = ({
   );
 
   const handleOpenEditThumbnailMenu = useCallback(() => {
-    Mixpanel.track('Edit Thumbnail');
+    Mixpanel.track('Edit Thumbnail', { _stage: 'Creation' });
     setShowThumbnailEdit(true);
     setShowEllipseMenu(false);
     playerRef.current.pause();
   }, []);
 
   const handleCloseThumbnailEditClick = useCallback(() => {
-    Mixpanel.track('Close Thumbnail Edit Dialog');
+    Mixpanel.track('Close Thumbnail Edit Dialog', { _stage: 'Creation' });
     setShowThumbnailEdit(false);
     playerRef.current?.play();
   }, []);
 
   const handleOpenEditCoverImageMenu = useCallback(() => {
-    Mixpanel.track('Edit Cover Image');
+    Mixpanel.track('Edit Cover Image', { _stage: 'Creation' });
     setCoverImageModalOpen(true);
     setShowEllipseMenu(false);
     playerRef.current.pause();
   }, []);
 
   const handleCloseCoverImageEditClick = useCallback(() => {
-    Mixpanel.track('Close Cover Image Edit Dialog');
+    Mixpanel.track('Close Cover Image Edit Dialog', { _stage: 'Creation' });
     setCoverImageModalOpen(false);
     playerRef.current?.play();
   }, []);
 
   const handleDeleteVideoShow = useCallback(() => {
-    Mixpanel.track('Show Delete Video Dialog');
+    Mixpanel.track('Show Delete Video Dialog', { _stage: 'Creation' });
     setShowVideoDelete(true);
     playerRef.current?.pause();
   }, []);
 
   const handleCloseDeleteVideoClick = useCallback(() => {
-    Mixpanel.track('Close Delete Video Dialog');
+    Mixpanel.track('Close Delete Video Dialog', { _stage: 'Creation' });
     setShowVideoDelete(false);
     playerRef.current?.play();
   }, []);
 
   const handleDeleteVideo = useCallback(() => {
-    Mixpanel.track('Delete Video Clicked');
+    Mixpanel.track('Delete Video Clicked', { _stage: 'Creation' });
     handleCloseDeleteVideoClick();
     setLocalFile(null);
     onChange(id, null);
@@ -180,7 +180,7 @@ const FileUpload: React.FC<IFileUpload> = ({
 
   const handlePreviewEditSubmit = useCallback(
     (params: TThumbnailParameters) => {
-      Mixpanel.track('Preview Edit Submit');
+      Mixpanel.track('Preview Edit Submit', { _stage: 'Creation' });
       handleCloseThumbnailEditClick();
       onChange('thumbnailParameters', params);
     },
@@ -198,6 +198,7 @@ const FileUpload: React.FC<IFileUpload> = ({
       const file = files[0];
 
       Mixpanel.track('Video Selected', {
+        _stage: 'Creation',
         _file: {
           name: file.name,
           type: file.type,
@@ -209,7 +210,7 @@ const FileUpload: React.FC<IFileUpload> = ({
         toast.error(t('secondStep.video.error.maxSize'));
       } else {
         const media: any = await loadVideo(file);
-        Mixpanel.track('Video Loading');
+        Mixpanel.track('Video Loading', { _stage: 'Creation' });
 
         if (media.duration < MIN_VIDEO_DURATION) {
           toast.error(t('secondStep.video.error.minLength'));
@@ -226,6 +227,7 @@ const FileUpload: React.FC<IFileUpload> = ({
 
   const handleRetryVideoUpload = useCallback(() => {
     Mixpanel.track('Retry Video Upload', {
+      _stage: 'Creation',
       _video: localFile,
     });
     onChange(id, localFile);
@@ -233,6 +235,7 @@ const FileUpload: React.FC<IFileUpload> = ({
 
   const handleCancelVideoProcessing = useCallback(async () => {
     Mixpanel.track('Cancel Video Processing', {
+      _stage: 'Creation',
       _publicUrl: post?.announcementVideoUrl,
     });
     try {

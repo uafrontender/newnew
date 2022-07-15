@@ -10,6 +10,7 @@ import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
 
 import Text from '../../../atoms/Text';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IMcOptionCardSelectVotesMenu {
   isVisible: boolean;
@@ -107,6 +108,12 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVo
               {availableVotes.map((amount) => (
                 <SButton
                   key={amount}
+                  onClickCapture={() => {
+                    Mixpanel.track('Selected Votes Amount', {
+                      _stage: 'Post',
+                      _component: 'McOptionCardSelectVotesMenu',
+                    });
+                  }}
                   onClick={() => handleSetAmountAndOpenModal(amount.toString())}
                 >
                   <Text variant={3}>
@@ -126,7 +133,15 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVo
                   </Text>
                 </SButton>
               ))}
-              <SButton onClick={() => handleOpenCustomAmountModal()}>
+              <SButton
+                onClickCapture={() => {
+                  Mixpanel.track('Open Custom Votes Amount', {
+                    _stage: 'Post',
+                    _component: 'McOptionCardSelectVotesMenu',
+                  });
+                }}
+                onClick={() => handleOpenCustomAmountModal()}
+              >
                 <Text variant={3}>
                   {t('mcPost.optionsTab.optionCard.selectVotesMenu.custom')}
                 </Text>
