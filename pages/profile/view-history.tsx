@@ -11,7 +11,6 @@ import Head from 'next/head';
 
 import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
-import switchPostType from '../../utils/switchPostType';
 // import { TTokenCookie } from '../../api/apiConfigs';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';

@@ -8,7 +8,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
-import switchPostType from '../../utils/switchPostType';
 
 import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
