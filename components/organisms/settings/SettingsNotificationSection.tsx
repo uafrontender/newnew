@@ -120,13 +120,9 @@ const SWrapper = styled.div`
 
 const SSubsection = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
 
   padding-top: 16px;
   padding-bottom: 16px;
-
-  ${({ theme }) => theme.media.tablet} {
-    flex-direction: row;
-    justify-content: space-between;
-  }
 `;

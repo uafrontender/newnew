@@ -41,6 +41,9 @@ interface IMyProfilePurchases {
   handleUpdateCount: (value: number) => void;
   handleUpdateFilter: (value: newnewapi.Post.Filter) => void;
   handleSetPosts: React.Dispatch<React.SetStateAction<newnewapi.Post[]>>;
+  handleSetFavoritePosts: React.Dispatch<
+    React.SetStateAction<newnewapi.Post[]>
+  >;
 }
 
 const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({
@@ -55,11 +58,13 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({
   handleUpdateCount,
   handleUpdateFilter,
   handleSetPosts,
+  handleSetFavoritePosts,
 }) => {
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >();
 
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
@@ -148,6 +153,39 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
 
+  const handleRemovePostFromFavorites = (postUuid: string) => {
+    handleSetFavoritePosts((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+  };
+
+  const handleAddPostToFavorites = (postToAdd: newnewapi.Post) => {
+    handleSetFavoritePosts((curr) => {
+      // need for initial load favorites on favorites tab
+      if (curr.length === 0) {
+        return [];
+      }
+
+      const newArr = [...curr];
+
+      const alreadyAdded = curr.findIndex(
+        (p) =>
+          switchPostType(p)[0].postUuid ===
+          switchPostType(postToAdd)[0].postUuid
+      );
+
+      if (alreadyAdded !== -1) {
+        return newArr;
+      }
+
+      const updated = [postToAdd, ...newArr];
+      return updated;
+    });
+  };
+
   return (
     <div>
       <Head>
@@ -171,6 +209,8 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({
                 left: 0,
               }}
               handlePostClicked={handleOpenPostModal}
+              handleRemovePostFromState={handleRemovePostFromFavorites}
+              handleAddPostToState={handleAddPostToFavorites}
             />
           )}
           {posts && posts.length === 0 && !isLoading && (
