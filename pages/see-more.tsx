@@ -29,6 +29,7 @@ import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import switchPostType from '../utils/switchPostType';
 import assets from '../constants/assets';
+import { Mixpanel } from '../utils/mixpanel';
 
 const PostModal = dynamic(
   () => import('../components/organisms/decision/PostModal')
@@ -264,6 +265,10 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     useState<newnewapi.IPost | undefined>(undefined);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'See More Page',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(post);
     setPostModalOpen(true);
   };
@@ -273,6 +278,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
   }, []);
 
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'See More Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };
@@ -455,6 +463,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'component-PostCard',
     'modal-Post',
     'modal-PaymentModal',
+    'modal-ResponseSuccessModal',
   ]);
 
   const top10payload = new newnewapi.EmptyRequest({});

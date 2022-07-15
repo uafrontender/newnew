@@ -15,6 +15,7 @@ import PostScheduledSection from '../../molecules/decision/PostScheduledSection'
 // Utils
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import { TPostType } from '../../../utils/switchPostType';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const PostTopInfo = dynamic(
@@ -78,6 +79,10 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
         if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
           return;
         try {
+          Mixpanel.track('Favorite Post', {
+            _stage: 'Post',
+            _postUuid: post.postUuid,
+          });
           const markAsFavoritePayload = new newnewapi.MarkPostRequest({
             markAs: !isFollowing
               ? newnewapi.MarkPostRequest.Kind.FAVORITE

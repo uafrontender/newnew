@@ -33,10 +33,7 @@ export const YourToDos = () => {
       {
         id: 'complete-profile',
         title: t('dashboard.toDos.completeProfile'),
-        completed:
-          !!user.creatorData?.hasCreatorTags &&
-          !!user.userData?.bio &&
-          user.userData?.bio.length > 0,
+        completed: !!user.userData?.bio && user.userData?.bio.length > 0,
       },
       {
         id: 'add-cash-out-method',

@@ -73,13 +73,31 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
     setChunks(Array(separatorsCount).fill('_'));
     setVideoDuration(duration);
   }, []);
+
+  const progressIndicatorPositionMemo = useRef<number>();
+
   const setCurrentTime = useCallback((time: number) => {
     const percentage = ((time - videoThumbs.current.startTime) * 100) / 3;
     const position = (percentage * 70) / 100;
 
+    if (
+      progressIndicatorPositionMemo.current &&
+      progressIndicatorRef.current &&
+      progressIndicatorPositionMemo.current > position
+    ) {
+      progressIndicatorRef.current.style.transition = '';
+    } else if (
+      progressIndicatorPositionMemo.current &&
+      progressIndicatorRef.current &&
+      progressIndicatorPositionMemo.current < position
+    ) {
+      progressIndicatorRef.current.style.transition = 'all linear 0.3s';
+    }
+
     if (progressIndicatorRef.current) {
       progressIndicatorRef.current.style.transform = `translateX(${position}px)`;
     }
+    progressIndicatorPositionMemo.current = position;
   }, []);
 
   const getTime = useCallback((position: 'start' | 'end') => {
@@ -339,6 +357,14 @@ const SContainer = styled.div`
     background: ${(props) => props.theme.colorsThemed.background.secondary};
     border-radius: 16px;
 
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     border-radius: 16px;
   }
 
@@ -511,7 +537,7 @@ const SProgressSeparator = styled.div<ISProgressSeparator>`
 
 const SProgressIndicator = styled.div`
   top: 0;
-  left: calc(50% - 34px);
+  left: calc(50% - 40px);
   width: 4px;
   height: 100%;
   z-index: 2;
@@ -520,6 +546,4 @@ const SProgressIndicator = styled.div`
   background: ${(props) => props.theme.colorsThemed.accent.yellow};
   border-radius: 2px;
   pointer-events: none;
-
-  transition: all linear 0.3s;
 `;

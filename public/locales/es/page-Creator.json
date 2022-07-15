@@ -196,7 +196,8 @@
     "selectInput": {
       "perMonth": "/mes",
       "select": "Seleccionar",
-      "featured": "Popular"
+      "featured": "Popular",
+      "current": "Actual"
     },
     "button": {
       "enable": "Activar la suscripción",
@@ -242,7 +243,7 @@
     "members": "miembros"
   },
   "announcement": {
-    "title": "tiene un anuncio"
+    "title": "El anuncio de {{username}}"
   },
   "stripe": {
     "meta": {

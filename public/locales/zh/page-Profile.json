@@ -210,6 +210,20 @@
           }
         }
       },
+      "cards": {
+        "title_NEED_TRANSLATION": "My cards",
+        "myPaymentMethods_NEED_TRANSLATION": "My payment methods",
+        "hint_NEED_TRANSLATION": "You’ll need a card on file to participate in posts",
+        "button": {
+          "addNewCard_NEED_TRANSLATION": "Add a new card",
+          "addCard_NEED_TRANSLATION": "Add card"
+        },
+        "primary_NEED_TRANSLATION": "Primary",
+        "ellipse": {
+          "makePrimary_NEED_TRANSLATION": "Make it primary",
+          "removeCard_NEED_TRANSLATION": "Remove card"
+        }
+      },
       "personalInformation": {
         "title": "個人資訊",
         "emailInput": {
@@ -218,7 +232,11 @@
           "errors": {
             "invalidEmail": "請輸入有效的電子郵件地址",
             "emailTaken": "電子郵件已被佔用"
-          }
+          },
+          "whatsNew_NEED_TRANSLATION": "What’s your new email address?",
+          "confirmEmail_NEED_TRANSLATION": "Confirm new email",
+          "verifyNewEmail_NEED_TRANSLATION": "Verify your new email",
+          "edit_NEED_TRANSLATION": "Edit"
         },
         "birthDateInput": {
           "label": "出生日期",

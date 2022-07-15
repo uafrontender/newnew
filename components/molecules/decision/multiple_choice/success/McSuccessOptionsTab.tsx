@@ -16,6 +16,7 @@ import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import McOptionsCard from '../McOptionCard';
 import Button from '../../../../atoms/Button';
 import GradientMask from '../../../../atoms/GradientMask';
+import { Mixpanel } from '../../../../../utils/mixpanel';
 
 interface IMcSuccessOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -227,6 +228,13 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
         ) : optionsNextPageToken ? (
           <SLoadMoreBtn
             view='secondary'
+            onClickCapture={() => {
+              Mixpanel.track('Click Load More', {
+                _stage: 'Post',
+                _postUuid: post.postUuid,
+                _component: 'McSuccessOptionsTab',
+              });
+            }}
             onClick={() => fetchOptions(optionsNextPageToken)}
           >
             {t('loadMoreButton')}

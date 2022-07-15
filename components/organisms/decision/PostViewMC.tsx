@@ -1,7 +1,13 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -24,6 +30,9 @@ import {
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import Headline from '../../atoms/Headline';
+import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
+import PostVotingTab from '../../molecules/decision/PostVotingTab';
 
 // Utils
 import switchPostType from '../../../utils/switchPostType';
@@ -32,10 +41,8 @@ import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
-import Headline from '../../atoms/Headline';
-import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
-import PostVotingTab from '../../molecules/decision/PostVotingTab';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
@@ -148,6 +155,13 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       useState<string | undefined | null>('');
     const [optionsLoading, setOptionsLoading] = useState(false);
     const [loadingOptionsError, setLoadingOptionsError] = useState('');
+
+    const hasVotedOptionId = useMemo(() => {
+      const supportedOption = options.find((o) => o.isSupportedByMe);
+
+      if (supportedOption) return supportedOption.id;
+      return undefined;
+    }, [options]);
 
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
@@ -516,6 +530,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           const payload = new newnewapi.FulfillPaymentPurposeRequest({
             paymentSuccessUrl: `session_id=${sessionId}`,
           });
+          resetSessionId();
 
           const res = await voteOnPost(payload);
 
@@ -540,14 +555,13 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           console.error(err);
           setLoadingModalOpen(false);
         }
-        resetSessionId();
       };
 
-      if (socketConnection?.connected && !loadingModalOpen) {
+      if (sessionId && !loadingModalOpen) {
         makeVoteFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection?.connected, sessionId, loadingModalOpen]);
+    }, []);
 
     const goToNextStep = () => {
       if (
@@ -627,6 +641,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inView, post.postUuid, router.locale]);
+
     return (
       <>
         <SWrapper>
@@ -670,7 +685,15 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             handleRemovePostFromState={handleRemovePostFromState}
             handleAddPostToState={handleAddPostToState}
           />
-          <SActivitesContainer decisionFailed={postStatus === 'failed'}>
+          <SActivitesContainer
+            shorterSection={
+              postStatus === 'failed' ||
+              (post.isSuggestionsAllowed &&
+                !hasVotedOptionId &&
+                hasFreeVote &&
+                postStatus === 'voting')
+            }
+          >
             <PostVotingTab>
               {`${t('tabs.options')} ${
                 !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
@@ -699,6 +722,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
               }
               canSubscribe={!!canSubscribe}
               canVoteForFree={hasFreeVote}
+              hasVotedOptionId={(hasVotedOptionId as number) ?? undefined}
               handleLoadOptions={fetchOptions}
               handleResetFreeVote={handleResetFreeVote}
               handleAddOrUpdateOptionFromResponse={
@@ -716,7 +740,13 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             <PaymentSuccessModal
               postType='mc'
               isVisible={paymentSuccesModalOpen}
-              closeModal={() => setPaymentSuccesModalOpen(false)}
+              closeModal={() => {
+                Mixpanel.track('Close Payment Success Modal', {
+                  _stage: 'Post',
+                  _post: post.postUuid,
+                });
+                setPaymentSuccesModalOpen(false);
+              }}
             >
               {t('paymentSuccessModal.mc', {
                 postCreator:
@@ -818,7 +848,7 @@ const SGoBackButton = styled(GoBackButton)`
 `;
 
 const SActivitesContainer = styled.div<{
-  decisionFailed: boolean;
+  shorterSection: boolean;
 }>`
   grid-area: activities;
 
@@ -831,14 +861,14 @@ const SActivitesContainer = styled.div<{
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    max-height: calc(500px);
+    max-height: calc(452px);
   }
 
   ${({ theme }) => theme.media.laptop} {
-    ${({ decisionFailed }) =>
-      !decisionFailed
+    ${({ shorterSection }) =>
+      !shorterSection
         ? css`
-            max-height: 580px;
+            max-height: 500px;
           `
         : css`
             max-height: calc(580px - 120px);

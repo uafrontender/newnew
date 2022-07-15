@@ -23,6 +23,7 @@ import notificationsIconOutlined from '../../public/images/svg/icons/outlined/No
 import iconDirectMessages from '../../public/images/svg/icons/outlined/Comments.svg';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
+import { Mixpanel } from '../../utils/mixpanel';
 
 const icons: any = {
   outlined: {
@@ -65,12 +66,18 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
 
   const active = item.url === router.route;
 
-  const handleClick = () => {
+  const handleClick = (value: any) => {
     if (router.pathname === '/' && item.url === '/') {
       scroller.scrollTo('top-reload', {
         smooth: 'easeInOutQuart',
         duration: SCROLL_TO_TOP,
         containerId: 'generalScrollContainer',
+      });
+    }
+    if (value.key === 'add') {
+      Mixpanel.track('Navigation Item Clicked', {
+        _stage: 'Creation',
+        _button: 'New Post',
       });
     }
   };
@@ -100,7 +107,7 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
       </SCaption>
     </SContainer>
   ) : (
-    <SContainer width={item.width} onClick={handleClick}>
+    <SContainer width={item.width} onClick={() => handleClick(item)}>
       <Link href={item.url}>
         <a>
           <SSVGContainer>

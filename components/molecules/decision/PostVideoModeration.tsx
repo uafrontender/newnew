@@ -2,7 +2,6 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import React, {
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -14,6 +13,7 @@ import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
+import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppSelector } from '../../../redux-store/store';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
@@ -27,25 +27,15 @@ import ThumbnailIcon from '../../../public/images/svg/icons/filled/AddImage.svg'
 import PostVideoResponseUpload from './PostVideoResponseUpload';
 import ToggleVideoWidget from '../../atoms/moderation/ToggleVideoWidget';
 import {
-  getVideoUploadUrl,
-  removeUploadedFile,
-  startVideoProcessing,
-  stopVideoProcessing,
-} from '../../../api/endpoints/upload';
-import { SocketContext } from '../../../contexts/socketContext';
-import {
   TThumbnailParameters,
   TVideoProcessingData,
 } from '../../../redux-store/slices/creationStateSlice';
-import PostVideoResponsePreviewModal from './PostVideoResponsePreviewModal';
-import {
-  setPostThumbnail,
-  uploadPostResponse,
-} from '../../../api/endpoints/post';
+import { setPostThumbnail } from '../../../api/endpoints/post';
 import isSafari from '../../../utils/isSafari';
-import { usePostModalState } from '../../../contexts/postModalContext';
-import waitResourceIsAvailable from '../../../utils/checkResourceAvailable';
 import isBrowser from '../../../utils/isBrowser';
+import PostVideoCoverImageEdit from './PostVideoCoverImageEdit';
+import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
+import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
@@ -65,6 +55,24 @@ interface IPostVideoModeration {
   response?: newnewapi.IVideoUrls;
   thumbnails: any;
   isMuted: boolean;
+  openedTab: 'announcement' | 'response';
+  videoProcessing: TVideoProcessingData;
+  responseFileUploadETA: number;
+  responseFileUploadError: boolean;
+  responseFileUploadLoading: boolean;
+  responseFileUploadProgress: number;
+  responseFileProcessingETA: number;
+  responseFileProcessingError: boolean;
+  responseFileProcessingLoading: boolean;
+  responseFileProcessingProgress: number;
+  uploadedResponseVideoUrl: string;
+  handleItemChange: (id: string, value: File) => Promise<void>;
+  handleCancelVideoUpload: () => void | undefined;
+  handleResetVideoUploadAndProcessingState: () => void;
+  handleUploadVideoNotProcessed: () => Promise<void>;
+  handleVideoDelete: () => Promise<void>;
+  handleUploadVideoProcessed: () => Promise<void>;
+  handleChangeTab: (nevValue: 'announcement' | 'response') => void;
   handleToggleMuted: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleUpdateResponseVideo: (newResponse: newnewapi.IVideoUrls) => void;
@@ -77,15 +85,28 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   response,
   thumbnails,
   isMuted,
+  openedTab,
+  videoProcessing,
+  uploadedResponseVideoUrl,
+  responseFileUploadETA,
+  responseFileUploadError,
+  responseFileUploadLoading,
+  responseFileUploadProgress,
+  responseFileProcessingETA,
+  responseFileProcessingError,
+  responseFileProcessingLoading,
+  responseFileProcessingProgress,
+  handleItemChange,
+  handleCancelVideoUpload,
+  handleResetVideoUploadAndProcessingState,
+  handleUploadVideoNotProcessed,
+  handleVideoDelete,
+  handleUploadVideoProcessed,
+  handleChangeTab,
   handleToggleMuted,
-  handleUpdatePostStatus,
-  handleUpdateResponseVideo,
 }) => {
   const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -93,25 +114,63 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     'mobileL',
     'tablet',
   ].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const socketConnection = useContext(SocketContext);
+  const ellipseButtonRef = useRef<HTMLButtonElement>();
+  const [currentCoverUrl, setCurrentCoverUrl] = useState(
+    announcement.coverImageUrl ?? undefined
+  );
+  const [showEllipseMenu, setShowEllipseMenu] = useState(false);
+  const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
+  const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
+
+  const handleOpenEllipseMenu = useCallback(() => setShowEllipseMenu(true), []);
+
+  const handleCloseEllipseMenu = useCallback(
+    () => setShowEllipseMenu(false),
+    []
+  );
+
+  const handleOpenEditThumbnailMenu = useCallback(() => {
+    Mixpanel.track('Edit Thumbnail', { _stage: 'Creation' });
+    setShowThumbnailEdit(true);
+    setShowEllipseMenu(false);
+  }, []);
+
+  const handleCloseThumbnailEditClick = useCallback(() => {
+    Mixpanel.track('Close Thumbnail Edit Dialog', { _stage: 'Creation' });
+    setShowThumbnailEdit(false);
+  }, []);
+
+  const handleOpenEditCoverImageMenu = useCallback(() => {
+    Mixpanel.track('Edit Cover Image', { _stage: 'Creation' });
+    setCoverImageModalOpen(true);
+    setShowEllipseMenu(false);
+  }, []);
+
+  const handleCloseCoverImageEditClick = useCallback(() => {
+    Mixpanel.track('Close Cover Image Edit Dialog', { _stage: 'Creation' });
+    setCoverImageModalOpen(false);
+  }, []);
+
+  const handleSubmitNewCoverImage = useCallback(
+    (newCoverUrl: string | undefined) => {
+      Mixpanel.track('Submit New Cover Image', {
+        _stage: 'Post',
+        _postUuid: postId,
+        _component: 'PostVideoModeration',
+      });
+      setCurrentCoverUrl(newCoverUrl);
+      setCoverImageModalOpen(false);
+    },
+    [postId]
+  );
 
   // Show controls on shorter screens
   const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] =
     useState<number | undefined>(undefined);
-
-  // Tabs
-  const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
-    response ||
-      postStatus === 'waiting_for_response' ||
-      postStatus === 'processing_response'
-      ? 'response'
-      : 'announcement'
-  );
-
-  // Editing announcement video thumbnail
-  const [isEditThumbnailModalOpen, setIsEditThumbnailModalOpen] =
-    useState(false);
 
   const isSetThumbnailButtonIconOnly = useMemo(
     () =>
@@ -123,6 +182,11 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
   const handleSubmitNewThumbnail = async (params: TThumbnailParameters) => {
     try {
+      Mixpanel.track('Submit New Thumbnail', {
+        _stage: 'Post',
+        _postUuid: postId,
+        _component: 'PostVideoModeration',
+      });
       const payload = new newnewapi.SetPostThumbnailRequest({
         postUuid: postId,
         thumbnailParameters: {
@@ -139,354 +203,13 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
       if (res.error) throw new Error('Request failed');
 
-      setIsEditThumbnailModalOpen(false);
+      handleCloseThumbnailEditClick();
       toast.success(t('postVideoThumbnailEdit.toast.success'));
     } catch (err) {
       console.error(err);
       toast.error(t('postVideoThumbnailEdit.toast.error'));
     }
   };
-
-  // File upload
-  const xhrRef = useRef<XMLHttpRequest>();
-  const [uploadedResponseVideoUrl, setUploadedResponseVideoUrl] = useState('');
-
-  const [videoProcessing, setVideoProcessing] = useState<TVideoProcessingData>({
-    taskUuid: '',
-    targetUrls: {},
-  });
-  // File upload
-  const [responseFileUploadETA, setResponseFileUploadETA] = useState(0);
-  const [responseFileUploadProgress, setResponseFileUploadProgress] =
-    useState(0);
-  const [responseFileUploadLoading, setResponseFileUploadLoading] =
-    useState(false);
-  const [responseFileUploadError, setResponseFileUploadError] = useState(false);
-  // File processing
-  const [responseFileProcessingETA, setResponseFileProcessingETA] = useState(0);
-  const [responseFileProcessingProgress, setResponseFileProcessingProgress] =
-    useState(0);
-  const [responseFileProcessingLoading, setResponseFileProcessingLoading] =
-    useState(false);
-  const [responseFileProcessingError, setResponseFileProcessingError] =
-    useState(false);
-
-  const { handleSetIsConfirmToClosePost } = usePostModalState();
-
-  const cannotLeavePage = useMemo(() => {
-    if (
-      openedTab === 'response' &&
-      postStatus === 'waiting_for_response' &&
-      (responseFileUploadLoading || responseFileProcessingLoading)
-    ) {
-      return true;
-    }
-    return false;
-  }, [
-    openedTab,
-    postStatus,
-    responseFileProcessingLoading,
-    responseFileUploadLoading,
-  ]);
-
-  const handleVideoUpload = useCallback(async (value: File) => {
-    try {
-      setResponseFileUploadETA(100);
-      setResponseFileUploadProgress(1);
-      setResponseFileUploadLoading(true);
-      setResponseFileUploadError(false);
-
-      const payload = new newnewapi.GetVideoUploadUrlRequest({
-        filename: value.name,
-      });
-
-      const res = await getVideoUploadUrl(payload);
-
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'An error occurred');
-      }
-
-      const xhr = new XMLHttpRequest();
-      xhrRef.current = xhr;
-      let uploadStartTimestamp: number;
-      const uploadResponse = await new Promise((resolve, reject) => {
-        xhr.upload.addEventListener('progress', (event) => {
-          if (event.lengthComputable) {
-            const uploadProgress = Math.round(
-              (event.loaded / event.total) * 100
-            );
-            const percentageLeft = 100 - uploadProgress;
-            const secondsPassed = Math.round(
-              (event.timeStamp - uploadStartTimestamp) / 1000
-            );
-            const factor = secondsPassed / uploadProgress;
-            const eta = Math.round(factor * percentageLeft);
-            setResponseFileUploadProgress(uploadProgress);
-            setResponseFileUploadETA(eta);
-          }
-        });
-        xhr.addEventListener('loadstart', (event) => {
-          uploadStartTimestamp = event.timeStamp;
-        });
-        xhr.addEventListener('loadend', () => {
-          setResponseFileUploadProgress(100);
-          resolve(xhr.readyState === 4 && xhr.status === 200);
-        });
-        xhr.addEventListener('error', () => {
-          setResponseFileUploadProgress(0);
-          reject(new Error('Upload failed'));
-        });
-        xhr.addEventListener('abort', () => {
-          // console.log('Aborted');
-          setResponseFileUploadProgress(0);
-          reject(new Error('Upload aborted'));
-        });
-        xhr.open('PUT', res.data!.uploadUrl, true);
-        xhr.setRequestHeader('Content-Type', value.type);
-        xhr.send(value);
-      });
-
-      if (!uploadResponse) {
-        throw new Error('Upload failed');
-      }
-
-      const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
-        publicUrl: res.data.publicUrl,
-      });
-
-      const resProcessing = await startVideoProcessing(payloadProcessing);
-
-      if (!resProcessing.data || resProcessing.error) {
-        throw new Error(resProcessing.error?.message ?? 'An error occurred');
-      }
-
-      setVideoProcessing({
-        taskUuid: resProcessing.data.taskUuid,
-        targetUrls: {
-          thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
-          hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
-          dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
-          originalVideoUrl: resProcessing?.data?.targetUrls?.originalVideoUrl,
-          thumbnailImageUrl: resProcessing?.data?.targetUrls?.thumbnailImageUrl,
-        },
-      });
-
-      setResponseFileUploadLoading(false);
-
-      setResponseFileProcessingProgress(10);
-      setResponseFileProcessingETA(80);
-      setResponseFileProcessingLoading(true);
-      setResponseFileProcessingError(false);
-      setUploadedResponseVideoUrl(res.data.publicUrl ?? '');
-      xhrRef.current = undefined;
-    } catch (error: any) {
-      if (error.message === 'Upload failed') {
-        setResponseFileUploadError(true);
-        toast.error(error?.message);
-      } else {
-        console.log('Upload aborted');
-      }
-      xhrRef.current = undefined;
-      setResponseFileUploadLoading(false);
-    }
-  }, []);
-
-  const handleVideoDelete = useCallback(async () => {
-    try {
-      const payload = new newnewapi.RemoveUploadedFileRequest({
-        publicUrl: uploadedResponseVideoUrl,
-      });
-
-      const res = await removeUploadedFile(payload);
-
-      if (res?.error) {
-        throw new Error(res.error?.message ?? 'An error occurred');
-      }
-
-      const payloadProcessing = new newnewapi.StopVideoProcessingRequest({
-        taskUuid: videoProcessing?.taskUuid,
-      });
-
-      const resProcessing = await stopVideoProcessing(payloadProcessing);
-
-      if (!resProcessing.data || resProcessing.error) {
-        throw new Error(resProcessing.error?.message ?? 'An error occurred');
-      }
-
-      setUploadedResponseVideoUrl('');
-      setVideoProcessing({
-        taskUuid: '',
-        targetUrls: {},
-      });
-      setResponseFileUploadError(false);
-      setResponseFileUploadLoading(false);
-      setResponseFileUploadProgress(0);
-      setResponseFileProcessingError(false);
-      setResponseFileProcessingLoading(false);
-      setResponseFileProcessingProgress(0);
-    } catch (error: any) {
-      toast.error(error?.message);
-    }
-  }, [uploadedResponseVideoUrl, videoProcessing?.taskUuid]);
-
-  const handleItemChange = async (id: string, value: File) => {
-    if (value) {
-      await handleVideoUpload(value);
-    } else {
-      await handleVideoDelete();
-    }
-  };
-
-  const handleUploadVideoProcessed = useCallback(async () => {
-    try {
-      const payload = new newnewapi.UploadPostResponseRequest({
-        postUuid: postId,
-        responseVideoUrl: uploadedResponseVideoUrl,
-      });
-
-      const res = await uploadPostResponse(payload);
-
-      if (res.data) {
-        // @ts-ignore
-        let responseObj;
-        if (res.data.auction) responseObj = res.data.auction.response;
-        if (res.data.multipleChoice)
-          responseObj = res.data.multipleChoice.response;
-        if (res.data.crowdfunding) responseObj = res.data.crowdfunding.response;
-        // @ts-ignore
-        if (responseObj) handleUpdateResponseVideo(responseObj);
-        handleUpdatePostStatus('SUCCEEDED');
-        setUploadedResponseVideoUrl('');
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [
-    postId,
-    uploadedResponseVideoUrl,
-    handleUpdateResponseVideo,
-    handleUpdatePostStatus,
-  ]);
-
-  const handleUploadVideoNotProcessed = useCallback(async () => {
-    try {
-      const payload = new newnewapi.UploadPostResponseRequest({
-        postUuid: postId,
-        responseVideoUrl: uploadedResponseVideoUrl,
-      });
-
-      const res = await uploadPostResponse(payload);
-
-      if (res.data) {
-        toast.success(t('postVideo.responseUploadedNonProcessed'));
-        handleUpdatePostStatus('PROCESSING_RESPONSE');
-        setUploadedResponseVideoUrl('');
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [postId, uploadedResponseVideoUrl, t, handleUpdatePostStatus]);
-
-  const handlerSocketUpdated = useCallback(
-    async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.VideoProcessingProgress.decode(arr);
-
-      if (!decoded) return;
-
-      if (
-        decoded.taskUuid === videoProcessing?.taskUuid ||
-        decoded.postUuid === postId
-      ) {
-        setResponseFileProcessingETA(
-          decoded.estimatedTimeLeft?.seconds as number
-        );
-
-        if (decoded.fractionCompleted > responseFileProcessingProgress) {
-          setResponseFileProcessingProgress(decoded.fractionCompleted);
-        }
-
-        if (
-          decoded.fractionCompleted === 100 &&
-          decoded.status ===
-            newnewapi.VideoProcessingProgress.Status.SUCCEEDED &&
-          videoProcessing.targetUrls?.hlsStreamUrl
-        ) {
-          const available = await waitResourceIsAvailable(
-            videoProcessing.targetUrls?.hlsStreamUrl,
-            {
-              maxAttempts: 60,
-              retryTimeMs: 1000,
-            }
-          );
-
-          if (available) {
-            setResponseFileProcessingLoading(false);
-          } else {
-            setResponseFileUploadError(true);
-            toast.error('An error occurred');
-          }
-        } else if (
-          decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
-        ) {
-          setResponseFileUploadError(true);
-          toast.error('An error occurred');
-        }
-      }
-    },
-    [
-      postId,
-      videoProcessing?.taskUuid,
-      videoProcessing.targetUrls?.hlsStreamUrl,
-      responseFileProcessingProgress,
-    ]
-  );
-
-  useEffect(() => {
-    if (socketConnection) {
-      socketConnection?.on('VideoProcessingProgress', handlerSocketUpdated);
-    }
-
-    return () => {
-      if (socketConnection && socketConnection?.connected) {
-        socketConnection?.off('VideoProcessingProgress', handlerSocketUpdated);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, handlerSocketUpdated]);
-
-  // Video processing fallback
-  useEffect(() => {
-    async function videoProcessingFallback(hlsUrl: string) {
-      const available = await waitResourceIsAvailable(hlsUrl, {
-        maxAttempts: 720,
-        retryTimeMs: 5000,
-      });
-
-      if (available) {
-        setResponseFileProcessingLoading(false);
-      } else {
-        setResponseFileUploadError(true);
-        toast.error('An error occurred');
-      }
-    }
-
-    if (
-      responseFileProcessingLoading &&
-      videoProcessing?.targetUrls?.hlsStreamUrl
-    ) {
-      videoProcessingFallback(videoProcessing?.targetUrls?.hlsStreamUrl);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    responseFileProcessingLoading,
-    videoProcessing?.targetUrls?.hlsStreamUrl,
-  ]);
-
-  useEffect(() => {
-    handleSetIsConfirmToClosePost(cannotLeavePage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cannotLeavePage]);
 
   // Adjust sound button if needed
   useEffect(() => {
@@ -554,7 +277,15 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               <SSetThumbnailButtonIconOnly
                 iconOnly
                 view='transparent'
-                onClick={() => setIsEditThumbnailModalOpen(true)}
+                ref={ellipseButtonRef as any}
+                onClick={() => {
+                  Mixpanel.track('Open Ellipse Menu', {
+                    _stage: 'Post',
+                    _postUuid: postId,
+                    _component: 'PostVideoModeration',
+                  });
+                  handleOpenEllipseMenu();
+                }}
                 style={{
                   ...(soundBtnBottomOverriden
                     ? {
@@ -573,7 +304,15 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             ) : (
               <SSetThumbnailButton
                 view='transparent'
-                onClick={() => setIsEditThumbnailModalOpen(true)}
+                ref={ellipseButtonRef as any}
+                onClick={() => {
+                  Mixpanel.track('Open Ellipse Menu', {
+                    _stage: 'Post',
+                    _postUuid: postId,
+                    _component: 'PostVideoModeration',
+                  });
+                  handleOpenEllipseMenu();
+                }}
                 style={{
                   ...(soundBtnBottomOverriden
                     ? {
@@ -590,6 +329,10 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               iconOnly
               view='transparent'
               onClick={(e) => {
+                Mixpanel.track('Toggle Muted Mode', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                });
                 e.stopPropagation();
                 handleToggleMuted();
                 if (isSafari()) {
@@ -629,15 +372,54 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               iconOnly
               view='transparent'
               onClick={(e) => {
+                Mixpanel.track('Toggle Muted Mode', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                });
                 e.stopPropagation();
                 handleToggleMuted();
-                if (isSafari()) {
-                  (
-                    document?.getElementById(
-                      `bitmovinplayer-video-${postId}`
-                    ) as HTMLVideoElement
-                  )?.play();
-                }
+              }}
+              style={{
+                ...(soundBtnBottomOverriden
+                  ? {
+                      bottom: soundBtnBottomOverriden,
+                    }
+                  : {}),
+              }}
+            >
+              <InlineSvg
+                svg={isMuted ? VolumeOff : VolumeOn}
+                width={isMobileOrTablet ? '20px' : '24px'}
+                height={isMobileOrTablet ? '20px' : '24px'}
+                fill='#FFFFFF'
+              />
+            </SSoundButton>
+          </>
+        ) : uploadedResponseVideoUrl &&
+          videoProcessing.targetUrls &&
+          !responseFileUploadLoading &&
+          !responseFileProcessingLoading ? (
+          <>
+            <PostBitmovinPlayer
+              id={postId}
+              resources={videoProcessing.targetUrls}
+              muted={isMuted}
+              showPlayButton
+            />
+            <SReuploadButton onClick={() => handleVideoDelete()}>
+              {t('postVideo.reuploadButton')}
+            </SReuploadButton>
+            <SSoundButton
+              id='sound-button'
+              iconOnly
+              view='transparent'
+              onClick={(e) => {
+                Mixpanel.track('Toggle Muted Mode', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                });
+                e.stopPropagation();
+                handleToggleMuted();
               }}
               style={{
                 ...(soundBtnBottomOverriden
@@ -671,20 +453,10 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             loadingProcessing={responseFileProcessingLoading}
             progressProcessing={responseFileProcessingProgress}
             onChange={handleItemChange}
-            handleCancelVideoUpload={() => xhrRef.current?.abort()}
-            handleResetVideoUploadAndProcessingState={() => {
-              setUploadedResponseVideoUrl('');
-              setVideoProcessing({
-                taskUuid: '',
-                targetUrls: {},
-              });
-              setResponseFileUploadError(false);
-              setResponseFileUploadLoading(false);
-              setResponseFileUploadProgress(0);
-              setResponseFileProcessingError(false);
-              setResponseFileProcessingLoading(false);
-              setResponseFileProcessingProgress(0);
-            }}
+            handleCancelVideoUpload={handleCancelVideoUpload}
+            handleResetVideoUploadAndProcessingState={
+              handleResetVideoUploadAndProcessingState
+            }
             handleUploadVideoNotProcessed={handleUploadVideoNotProcessed}
           />
         )}
@@ -702,41 +474,98 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
                   }
                 : {}),
             }}
-            handleChangeTab={(newValue) => setOpenedTab(newValue)}
+            handleChangeTab={handleChangeTab}
           />
         ) : null}
-        {uploadedResponseVideoUrl &&
-          !responseFileUploadLoading &&
-          !responseFileProcessingLoading && (
-            <PostVideoResponsePreviewModal
-              value={videoProcessing.targetUrls!!}
-              open={uploadedResponseVideoUrl !== ''}
-              handleClose={() => handleVideoDelete()}
-              handleConfirm={() => handleUploadVideoProcessed()}
-            />
-          )}
       </SVideoWrapper>
-      {isMobile &&
-      postStatus === 'waiting_for_response' &&
-      !responseFileUploadLoading &&
-      !responseFileProcessingLoading ? (
-        <SUploadResponseButton
-          view='primaryGrad'
-          onClick={() => {
-            document.getElementById('upload-response-btn')?.click();
+      {/* Ellipse menu */}
+      {!isMobile && (
+        <SEllipseMenu
+          isOpen={showEllipseMenu}
+          onClose={handleCloseEllipseMenu}
+          anchorElement={ellipseButtonRef.current}
+          anchorOrigin={{
+            horizontal: 'right',
+            vertical: 'top',
           }}
+          offsetRight='200px'
         >
-          {t('postVideo.floatingUploadResponseButton')}
-        </SUploadResponseButton>
+          <EllipseMenuButton
+            onClick={() => {
+              Mixpanel.track('Open Edit Thumbnail Menu', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'PostVideoModaration',
+              });
+              handleOpenEditThumbnailMenu();
+            }}
+          >
+            {t('thumbnailEllipseMenu.selectSnippetButton')}
+          </EllipseMenuButton>
+          <EllipseMenuButton
+            onClick={() => {
+              Mixpanel.track('Open Edit Cover Image Menu', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'PostVideoModaration',
+              });
+              handleOpenEditCoverImageMenu();
+            }}
+          >
+            {t('thumbnailEllipseMenu.uploadImageButton')}
+          </EllipseMenuButton>
+        </SEllipseMenu>
+      )}
+      {isMobile && showEllipseMenu ? (
+        <EllipseModal
+          zIndex={10}
+          show={showEllipseMenu}
+          onClose={handleCloseEllipseMenu}
+        >
+          <EllipseModalButton
+            onClick={() => {
+              Mixpanel.track('Open Edit Thumbnail Menu', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'PostVideoModaration',
+              });
+              handleOpenEditThumbnailMenu();
+            }}
+          >
+            {t('thumbnailEllipseMenu.selectSnippetButton')}
+          </EllipseModalButton>
+          <EllipseModalButton
+            onClick={() => {
+              Mixpanel.track('Open Edit Cover Image Menu', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'PostVideoModaration',
+              });
+              handleOpenEditCoverImageMenu();
+            }}
+          >
+            {t('thumbnailEllipseMenu.uploadImageButton')}
+          </EllipseModalButton>
+        </EllipseModal>
       ) : null}
       {/* Edit thumbnail */}
       <PostVideoThumbnailEdit
-        open={isEditThumbnailModalOpen}
+        open={showThumbnailEdit}
         value={announcement}
         thumbnails={thumbnails}
-        handleClose={() => setIsEditThumbnailModalOpen(false)}
+        handleClose={handleCloseThumbnailEditClick}
         handleSubmit={handleSubmitNewThumbnail}
       />
+      {/* Edit Cover Image */}
+      {coverImageModalOpen && (
+        <PostVideoCoverImageEdit
+          open={coverImageModalOpen}
+          postId={postId}
+          originalCoverUrl={currentCoverUrl}
+          handleClose={handleCloseCoverImageEditClick}
+          handleSubmit={handleSubmitNewCoverImage}
+        />
+      )}
     </>
   );
 };
@@ -859,12 +688,43 @@ const SSetThumbnailButton = styled(Button)`
   }
 `;
 
-const SUploadResponseButton = styled(Button)`
-  position: fixed;
-  bottom: 16px;
+const SReuploadButton = styled.button`
+  position: absolute;
+  left: 16px;
+  top: 32px;
 
-  width: calc(100% - 32px);
-  height: 56px;
+  color: ${({ theme }) => theme.colors.dark};
+  background: #ffffff;
 
-  z-index: 10;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 24px;
+
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: transparent;
+
+  cursor: pointer;
+
+  &:active,
+  &:focus {
+    outline: none;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    left: initial;
+    right: 16px;
+    top: 16px;
+  }
+`;
+
+// Ellipse menu
+const SEllipseMenu = styled(EllipseMenu)`
+  max-width: 216px;
+  position: fixed !important;
+
+  background: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colorsThemed.background.secondary
+      : theme.colorsThemed.background.primary} !important;
 `;

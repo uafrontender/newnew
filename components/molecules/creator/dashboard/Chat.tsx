@@ -6,6 +6,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { toNumber } from 'lodash';
 import { useInView } from 'react-intersection-observer';
+import Link from 'next/link';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -362,10 +363,11 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         {chatRoom?.kind === 4 ? (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
-              {user.userData?.nickname
-                ? user.userData?.nickname
-                : user.userData?.username}{' '}
-              {t('announcement.title')}
+              {t('announcement.title', {
+                username: user.userData?.nickname
+                  ? user.userData?.nickname
+                  : user.userData?.username,
+              })}
             </SUserNickName>
             <SUserName variant={2} weight={600}>
               {`${
@@ -386,11 +388,15 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
                 ? chatRoom?.visavis?.nickname
                 : chatRoom?.visavis?.username}
             </SUserNickName>
-            <SUserName variant={2} weight={600}>
-              {chatRoom?.visavis?.username
-                ? `@${chatRoom?.visavis?.username}`
-                : chatRoom?.visavis?.nickname}
-            </SUserName>
+            <Link href={`/${chatRoom?.visavis?.username}`}>
+              <a>
+                <SUserName variant={2} weight={600}>
+                  {chatRoom?.visavis?.username
+                    ? `@${chatRoom?.visavis?.username}`
+                    : chatRoom?.visavis?.nickname}
+                </SUserName>
+              </a>
+            </Link>
           </SUserDescription>
         )}
       </STopPart>
@@ -601,7 +607,7 @@ const SMessageContent = styled.div<ISMessageContent>`
         }
 
         return css`
-          border-radius: 16px 16px 16px 8px;
+          border-radius: 16px 8px 16px 16px;
         `;
       }
     } else {
@@ -652,7 +658,7 @@ const SMessageContent = styled.div<ISMessageContent>`
     }
 
     return css`
-      border-radius: 16px 16px 16px 8px;
+      border-radius: 16px 16px 8px 16px;
     `;
   }}
 `;

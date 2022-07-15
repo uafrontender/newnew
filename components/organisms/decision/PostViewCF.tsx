@@ -39,6 +39,7 @@ import PostVotingTab from '../../molecules/decision/PostVotingTab';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import CfBackersStatsSectionFailed from '../../molecules/decision/crowdfunding/CfBackersStatsSectionFailed';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
@@ -413,6 +414,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
                   marginTop: '24px',
                 }}
                 handleButtonClick={() => {
+                  Mixpanel.track('Favorite Post in PostWaitingForResponseBox', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                  });
                   handleFollowDecision();
                 }}
               />
@@ -434,6 +439,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
                   marginTop: '24px',
                 }}
                 handleButtonClick={() => {
+                  Mixpanel.track('handleButtonClick in PostSuccessBox', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                  });
                   document.getElementById('post-modal-container')?.scrollTo({
                     top: document.getElementById(
                       'recommendations-section-heading'
@@ -630,6 +639,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           const payload = new newnewapi.FulfillPaymentPurposeRequest({
             paymentSuccessUrl: `session_id=${sessionId}`,
           });
+          resetSessionId();
 
           const res = await doPledgeCrowdfunding(payload);
 
@@ -655,11 +665,11 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
         resetSessionId();
       };
 
-      if (socketConnection?.connected && !loadingModalOpen) {
+      if (sessionId && !loadingModalOpen) {
         makePledgeFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection?.connected, sessionId, loadingModalOpen]);
+    }, []);
 
     useEffect(() => {
       const workingAmount = pledges

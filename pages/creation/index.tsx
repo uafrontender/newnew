@@ -64,5 +64,7 @@ export async function getServerSideProps(
 }
 
 const SWrapper = styled.div`
-  padding: 100px 0;
+  ${(props) => props.theme.media.tablet} {
+    padding: 100px 0;
+  }
 `;

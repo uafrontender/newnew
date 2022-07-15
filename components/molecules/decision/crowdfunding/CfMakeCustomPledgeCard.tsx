@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import Headline from '../../../atoms/Headline';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface ICfMakeCustomPledgeCard {
   handleOpenMakePledgeForm: () => void;
@@ -13,7 +14,15 @@ const CfMakeCustomPledgeCard: React.FunctionComponent<ICfMakeCustomPledgeCard> =
     const { t } = useTranslation('modal-Post');
 
     return (
-      <SStandardPledgeCard onClick={() => handleOpenMakePledgeForm()}>
+      <SStandardPledgeCard
+        onClickCapture={() => {
+          Mixpanel.track('Click Custom Pledge', {
+            _stage: 'Post',
+            _component: 'CfMakeCustomPledgeCard',
+          });
+        }}
+        onClick={() => handleOpenMakePledgeForm()}
+      >
         <SCardInfo>
           <SCardAmount>{t('cfPost.backersTab.custom')}</SCardAmount>
         </SCardInfo>

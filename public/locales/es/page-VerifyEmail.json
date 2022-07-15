@@ -12,7 +12,12 @@
     "resendButtonText": "Reenviar código"
   },
   "error": {
-    "invalidCode": "Código incorrecto. Inténtalo de nuevo..."
+    "invalidCode": "Código incorrecto. Inténtalo de nuevo...",
+    "emailTaken_NEED_TRANSLATION": "Email already taken",
+    "notConfirmedEmail_NEED_TRANSLATION": "Current email wasn't confirmed or time expired",
+    "noToken_NEED_TRANSLATION": "No token",
+    "invalidToken_NEED_TRANSLATION": "Invalid token"
   },
+  "verifying_NEED_TRANSLATION": "Verifying your email...",
   "backButton": "Regresar"
 }

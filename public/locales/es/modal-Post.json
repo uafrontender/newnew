@@ -127,6 +127,7 @@
       "backToOriginalVideo": "Volver al original",
       "backToResponse": "Ver respuesta"
     },
+    "reuploadButton_NEED_TRANSLATION": "re-upload",
     "cannotLeavePageMsg": "¿Estás seguro de que quieres cerrar esta página? El progreso de la carga se perderá",
     "floatingUploadResponseButton": "Hacer un video de respuesta",
     "setThumbnail": "Establecer una miniatura",
@@ -135,7 +136,7 @@
       "fileUpload": {
         "title_1": "¡Tu audiencia está esperando!",
         "title_2": "Sube tu respuesta en video ahora..",
-        "description": "El tamaño máximo del vídeo es de 10 GB",
+        "description": "El tamaño máximo del video es de 10 GB",
         "button": "Seleccionar archivo"
       },
       "button": {
@@ -185,7 +186,7 @@
         },
         "processing": {
           "title": "Procesando el video",
-          "description": "Puedes publicar la respuesta mientras se procesa el video",
+          "description__NEED_TRANSLATION": "Your video is being processed... hang tight!",
           "process": "{{progress}}% • Quedan {{time}}",
           "uploadNonProcessed": "Publicar"
         },
@@ -288,7 +289,7 @@
       "subtitle": "Tu oferta"
     },
     "paymentModalFooter": {
-      "body": "Se colocará una retención temporal en tu tarjeta. \nSolo se te cobrará si el {{creador}} elige tu oferta.",
+      "body": "Se colocará una retención temporal en tu tarjeta. \nSolo se te cobrará si el {{creator}} elige tu oferta.",
       "terms": "Términos",
       "apply": "aplicar"
     },
@@ -320,7 +321,7 @@
         "supportButton": "potenciar",
         "supportAgainButton": "potenciar \nde nuevo",
         "raiseBidButton": "potenciar oferta",
-        "placeABidButton": "colocar oferta",
+        "placeABidButton": "Realizar oferta",
         "cancelButton": "Cancelar",
         "moreButton": "Más"
       },
@@ -332,7 +333,7 @@
         "suggestionPlaceholderDesktop": "¿Qué debería hacer {{username}}?",
         "amountPlaceholderDesktop": "Oferta mínima ${{amount}}",
         "amountPlaceholderBoost": "Potenciar oferta ${{amount}}",
-        "placeABidButton": "Colocar oferta"
+        "placeABidButton": "Realizar oferta"
       }
     },
     "winnerTab": {
@@ -346,7 +347,7 @@
       }
     },
     "floatingActionButton": {
-      "suggestNewButton": "Colocar oferta"
+      "suggestNewButton": "Realizar oferta"
     }
   },
   "mcPost": {
@@ -359,7 +360,7 @@
       "subtitle": "La opción que has elegido"
     },
     "paymentModalFooter": {
-      "body": "Se colocará una retención temporal en tu tarjeta. \nSolo se te cobrará si el {{creador}} elige tu oferta.",
+      "body": "Se colocará una retención temporal en tu tarjeta. \nSolo se te cobrará si el {{creator}} elige tu oferta.",
       "terms": "Términos",
       "apply": "aplicar"
     },
@@ -425,6 +426,7 @@
         "subscribeToCreatorCaption": "¡Suscríbete a {{creator}} para agregar tus propias opciones a esta Superpoll!",
         "subscribeButton": "Subscribirme",
         "suggestionPlaceholder": "Agregar tu propia opción...",
+        "suggestionPlaceholderDesktop": "Agregar opción...",
         "placeABidButton": "Agregar mi opción"
       }
     },
@@ -457,7 +459,7 @@
         "cancelButton": "Cancelar"
       },
       "freeSub": "SUSCRIPCIÓN GRATIS",
-      "custom": "Personalizado",
+      "custom": "Introducir\ncantidad",
       "cancel": "Cancelar"
     },
     "winnerTab": {
@@ -470,7 +472,7 @@
       "title": "El Goal de {{creator}}"
     },
     "paymentModalFooter": {
-      "body": "Se colocará una retención temporal en tu tarjeta. \nSolo se te cobrará si el {{creador}} elige tu oferta.",
+      "body": "Se colocará una retención temporal en tu tarjeta. \nSolo se te cobrará si el {{creator}} elige tu oferta.",
       "terms": "Términos",
       "apply": "aplicar"
     },
@@ -479,14 +481,28 @@
       "choosePledgeButton": "Patrocinar este goal"
     }
   },
+  "thumbnailEllipseMenu_NEED_TRANSLATION": {
+    "selectSnippetButton": "Select a snippet",
+    "uploadImageButton": "Upload an image"
+  },
   "postVideoThumbnailEdit": {
     "title": "Establecer una miniatura",
-    "description": "Seleccionar un fragmento del vídeo",
+    "description": "Seleccionar un fragmento del video",
     "submit": "Guardar",
     "cancel": "Cancelar",
     "toast": {
       "success": "¡Éxito! La imagen en miniatura se cambiará una vez procesada",
       "error": "Ha ocurrido un error"
+    }
+  },
+  "postVideoCoverImageEdit_NEED_TRANSLATION": {
+    "title": "Upload an image",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "uploadCoverImage": {
+      "caption": "Select custom cover image",
+      "uploadBtn": "Select",
+      "deleteBtn": "Delete"
     }
   },
   "acPostModeration": {
@@ -510,7 +526,8 @@
         }
       },
       "optionCard": {
-        "pickButton": "Seleccionar"
+        "pickButton": "Seleccionar",
+        "pickedButton_NEED_TRANSLATION": "Chosen"
       }
     },
     "winnerTab": {
@@ -549,6 +566,7 @@
     }
   },
   "cfPostModeration": {
+    "moneyRaised_NEED_TRANSLATION": "Total raised",
     "winnerTab": {
       "winnerOptionCard": {
         "backersToldYou": "backers successfully funded",
@@ -678,7 +696,7 @@
     }
   },
   "heroPopupCommon": {
-    "heroButtonText": "Vamos",
+    "heroButtonText": "Va",
     "button": "Hecho"
   },
   "heroPopupAC": {
@@ -687,17 +705,44 @@
   },
   "heroPopupMC": {
     "title": "Superpolls",
-    "text": "El creador hace una encuesta en la que pagas por votar.\n ¡Cuando se acabe el tiempo, mira cómo el creador realiza la opción que ha obtenido la mayor cantidad de votos!"
+    "text": "El creador hace una encuesta en la que pagas por votar.\n ¡Cuando se acabe el tiempo, ve cómo el creador realiza la opción que ha obtenido la mayor cantidad de votos!"
   },
   "heroPopupCF": {
     "title": "Goals",
     "text": "Reúne dinero con otros para respaldar los objetivos de tus creadores favoritos. Si un número suficiente de personas respalda el objetivo, ¡verás cómo el creador lo realiza!"
   },
+  "postResponseTabModeration_NEED_TRANSLATION": {
+    "awaiting": {
+      "topHeader": "Time to post \nyour response!",
+      "postResponseBtn": "Post Response",
+      "youWillGet": "You'll get"
+    },
+    "succeeded": {
+      "topHeader": "Response \npublished!",
+      "youMade": "You made",
+      "shareBtn": "Share",
+      "linkCopied": "Link copied!"
+    },
+    "winner": {
+      "inResponseToYourPost": "In response to your post",
+      "ac": {
+        "numBiddersChoseSingular": "{{amount}} bidder chose",
+        "numBiddersChose": "{{amount}} bidders chose",
+        "optionCreator": "<0>{{nickname}}</0>'s bid"
+      },
+      "mc": {
+        "numBiddersChoseSingular": "{{amount}} voter chose",
+        "numBiddersChose": "{{amount}} voters chose",
+        "optionOwn": "the option",
+        "optionCreator": "<0>{{nickname}}</0>'s option"
+      }
+    }
+  },
   "tutorials": {
     "ac": {
       "timer": {
         "title": "Cuenta regresiva",
-        "text": "Cuando el tiempo se acaba, el creador elige su oferta favorita y publica un video realizando la oferta."
+        "text": "Cuando el tiempo se acabe, el creador eligirá su oferta favorita y publicará un video realizando la oferta."
       },
       "peopleBids": {
         "title": "Todas las ofertas",
@@ -715,7 +760,7 @@
     "mc": {
       "timer": {
         "title": "Cuenta regresiva",
-        "text": "Cuando el tiempo se acaba, el creador publica un video haciendo la opción más votada."
+        "text": "Cuando el tiempo se acabe, el creador publicará un video haciendo la opción más votada."
       },
       "peopleBids": {
         "title": "Todas las opciones",
@@ -733,11 +778,11 @@
     "cf": {
       "timer": {
         "title": "Cuenta regresiva",
-        "text": "Si se alcanza el Goal antes de que el tiempo se acabe, el creador publicará un vídeo cumpliendo el Goal."
+        "text": "Si se alcanza el Goal antes de que el tiempo se acabe, el creador publicará un video cumpliendo el Goal."
       },
       "peopleBids": {
         "title": "Progreso del Goal",
-        "text": "Vea lo cerca que está el creador de alcanzar su objetivo."
+        "text": "Ve lo cerca que está el creador de alcanzar su objetivo."
       },
       "createYourBid": {
         "title": "Patrocina el Goal",

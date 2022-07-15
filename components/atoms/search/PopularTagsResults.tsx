@@ -24,14 +24,14 @@ const PopularTagsResults: React.FC<IHashtagsResults> = ({ hashtags }) => {
           <a>
             <SPost>
               <SLeftSide>
-                <HashtagIcon>
+                <SHashtagIcon>
                   <InlineSvg
                     svg={hashtagIcon}
                     fill='#FFFFFF'
                     width='20px'
                     height='20px'
                   />
-                </HashtagIcon>
+                </SHashtagIcon>
                 <STagData>
                   <SCreatorUsername>#{hashtag.text}</SCreatorUsername>
                 </STagData>
@@ -83,7 +83,7 @@ const STagData = styled.div`
   justify-content: center;
 `;
 
-const HashtagIcon = styled.div`
+const SHashtagIcon = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;

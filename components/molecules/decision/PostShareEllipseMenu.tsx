@@ -1,21 +1,21 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
-
-import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
-import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
+import styled, { css } from 'styled-components';
 
 import InlineSvg from '../../atoms/InlineSVG';
+import EllipseMenu from '../../atoms/EllipseMenu';
+import Caption from '../../atoms/Caption';
+
+import isBrowser from '../../../utils/isBrowser';
 
 import copyIcon from '../../../public/images/svg/icons/outlined/Link.svg';
 import tiktokIcon from '../../../public/images/svg/icons/socials/TikTok.svg';
 import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
-import Caption from '../../atoms/Caption';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -29,15 +29,23 @@ interface IPostShareEllipseMenu {
   postId: string;
   isVisible: boolean;
   onClose: () => void;
+  anchorElement?: HTMLElement;
 }
 
 const PostShareEllipseMenu: React.FunctionComponent<IPostShareEllipseMenu> =
-  React.memo(({ postId, isVisible, onClose }) => {
+  React.memo(({ postId, isVisible, onClose, anchorElement }) => {
     const { t } = useTranslation('common');
-    const containerRef = useRef<HTMLDivElement>();
 
-    useOnClickEsc(containerRef, onClose);
-    useOnClickOutside(containerRef, onClose);
+    useEffect(() => {
+      if (isBrowser()) {
+        const postModal = document.getElementById('post-modal-container');
+        if (isVisible && postModal) {
+          postModal.style.overflow = 'hidden';
+        } else if (postModal) {
+          postModal.style.overflow = 'scroll';
+        }
+      }
+    }, [isVisible]);
 
     // const socialButtons = useMemo(
     //   () => [
@@ -84,7 +92,10 @@ const PostShareEllipseMenu: React.FunctionComponent<IPostShareEllipseMenu> =
     const handlerCopy = useCallback(() => {
       if (window) {
         const url = `${window.location.origin}/post/${postId}`;
-
+        Mixpanel.track('Copied Link Post', {
+          _stage: 'Post',
+          _postUuid: postId,
+        });
         copyPostUrlToClipboard(url)
           .then(() => {
             setIsCopiedUrl(true);
@@ -99,61 +110,46 @@ const PostShareEllipseMenu: React.FunctionComponent<IPostShareEllipseMenu> =
     }, [postId]);
 
     return (
-      <AnimatePresence>
-        {isVisible && (
-          <SContainer
-            ref={(el) => {
-              containerRef.current = el!!;
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            {/* <SSocials>
+      <SEllipseMenu
+        isOpen={isVisible}
+        onClose={onClose}
+        anchorElement={anchorElement}
+      >
+        {/* <SSocials>
             {socialButtons.map(renderItem)}
           </SSocials> */}
-            {/* <SSeparator /> */}
-            <SItem>
-              <SItemButtonWide
-                type='copy'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handlerCopy();
-                }}
-              >
-                <InlineSvg
-                  svg={SOCIAL_ICONS.copy as string}
-                  width='24px'
-                  height='24px'
-                />
-                {isCopiedUrl ? t('ellipse.linkCopied') : t('ellipse.copyLink')}
-              </SItemButtonWide>
-            </SItem>
-          </SContainer>
-        )}
-      </AnimatePresence>
+        {/* <SSeparator /> */}
+        <SItem>
+          <SItemButtonWide
+            type='copy'
+            onClick={(e) => {
+              e.stopPropagation();
+              handlerCopy();
+            }}
+          >
+            <InlineSvg
+              svg={SOCIAL_ICONS.copy as string}
+              width='24px'
+              height='24px'
+            />
+            {isCopiedUrl ? t('ellipse.linkCopied') : t('ellipse.copyLink')}
+          </SItemButtonWide>
+        </SItem>
+      </SEllipseMenu>
     );
   });
 
 export default PostShareEllipseMenu;
 
-const SContainer = styled(motion.div)`
-  position: absolute;
-  top: calc(100% - 10px);
-  z-index: 10;
-  right: 48px;
-  max-width: 260px;
-  min-width: 260px;
+const SEllipseMenu = styled(EllipseMenu)`
+  position: fixed;
+  width: 260px;
 
-  /* padding: 16px; */
-  padding: 12px;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-
-  ${({ theme }) => theme.media.laptop} {
-    right: 48px;
-  }
+  ${({ theme }) =>
+    theme.name === 'light' &&
+    css`
+      box-shadow: 0px 0px 35px 0px rgba(0, 0, 0, 0.25);
+    `}
 `;
 
 const SSocials = styled.div`
@@ -173,7 +169,7 @@ const SSeparator = styled.div`
 `;
 
 const SItem = styled.div`
-  flex: 1;
+  width: 100%;
   display: flex;
   align-items: center;
   flex-direction: column;
