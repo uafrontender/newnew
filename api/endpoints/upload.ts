@@ -23,7 +23,7 @@ export const getVideoUploadUrl = (
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.GetVideoUploadUrlRequest,
-    newnewapi.GetImageUploadUrlResponse
+    newnewapi.GetVideoUploadUrlResponse
   >(
     newnewapi.GetVideoUploadUrlRequest,
     newnewapi.GetVideoUploadUrlResponse,
@@ -76,4 +76,18 @@ export const stopVideoProcessing = (
     'post',
     payload,
     signal ?? undefined,
+  );
+
+export const getCoverImageUploadUrl = (
+  payload: newnewapi.GetCoverImageUploadUrlRequest
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.GetCoverImageUploadUrlRequest,
+    newnewapi.GetCoverImageUploadUrlResponse
+  >(
+    newnewapi.GetCoverImageUploadUrlRequest,
+    newnewapi.GetCoverImageUploadUrlResponse,
+    `${BASE_URL_UPLOAD}/get_cover_image_upload_url`,
+    'post',
+    payload
   );

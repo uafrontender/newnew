@@ -28,6 +28,7 @@ import {
 } from '../../../api/endpoints/upload';
 import { TVideoProcessingData } from '../../../redux-store/slices/creationStateSlice';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -79,6 +80,9 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   const [localFile, setLocalFile] = useState<File | null>(null);
 
   const handleButtonClick = useCallback(() => {
+    Mixpanel.track('Post Video Response Upload', {
+      _stage: 'Post',
+    });
     inputRef.current?.click();
   }, []);
   const handleDeleteVideoShow = useCallback(() => {
@@ -90,6 +94,9 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     playerRef.current.play();
   }, []);
   const handleDeleteVideo = useCallback(() => {
+    Mixpanel.track('Post Video Response Delete', {
+      _stage: 'Post',
+    });
     handleCloseDeleteVideoClick();
     setLocalFile(null);
     onChange(id, null);
@@ -302,7 +309,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
             >
               {t('postVideo.uploadResponseForm.button.cancel')}
             </SLoadingBottomBlockButton> */}
-            <SLoadingPublishButton
+            {/* <SLoadingPublishButton
               view='primary'
               onClick={() => {
                 handleUploadVideoNotProcessed();
@@ -311,7 +318,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
               {t(
                 'postVideo.uploadResponseForm.video.processing.uploadNonProcessed'
               )}
-            </SLoadingPublishButton>
+            </SLoadingPublishButton> */}
           </SLoadingBottomBlock>
           {/* <SSpinnerWrapper>
             <InlineSVG svg={spinnerIcon} width='16px' />
@@ -372,7 +379,6 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
     localFile,
-    handleUploadVideoNotProcessed,
     value,
     thumbnails,
     handleDeleteVideoShow,
@@ -585,11 +591,11 @@ const SLoadingBottomBlockButton = styled(Button)`
   }
 `;
 
-const SLoadingPublishButton = styled(Button)`
-  margin-left: auto;
+// const SLoadingPublishButton = styled(Button)`
+//   margin-left: auto;
 
-  padding: 10px;
-`;
+//   padding: 10px;
+// `;
 
 const SLoadingProgress = styled.div`
   width: 100%;

@@ -1,35 +1,70 @@
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React from 'react';
 import styled from 'styled-components';
 import getChunks from '../../utils/getChunks/getChunks';
 
 interface PostTitleContentI {
   children: string;
+  target?: '_blank' | '_parent' | '_self' | '+top' | 'router';
 }
 
-const PostTitleContent: React.FC<PostTitleContentI> = ({ children }) => (
-  <>
-    {getChunks(children).map((chunk) => {
-      if (chunk.type === 'text') {
-        return chunk.text;
-      }
+const PostTitleContent: React.FC<PostTitleContentI> = ({
+  children,
+  target,
+}) => {
+  const router = useRouter();
+  return (
+    <>
+      {getChunks(children).map((chunk) => {
+        if (chunk.type === 'text') {
+          return chunk.text;
+        }
 
-      if (chunk.type === 'hashtag') {
-        return (
-          <Hashtag href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}>
-            #{chunk.text}
-          </Hashtag>
-        );
-      }
+        if (chunk.type === 'hashtag') {
+          if (target === 'router') {
+            return (
+              <SHashtag
+                onClick={() =>
+                  router.push(
+                    `/search?query=${chunk.text}&type=hashtags&tab=posts`
+                  )
+                }
+              >
+                #{chunk.text}
+              </SHashtag>
+            );
+          }
 
-      // TODO: Add assertNever
-      throw new Error('Unexpected chunk');
-    })}
-  </>
-);
+          return (
+            <Link
+              href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
+              target={target}
+            >
+              <SHashtag>{`#${chunk.text}`}</SHashtag>
+            </Link>
+          );
+        }
+
+        // TODO: Add assertNever
+        throw new Error('Unexpected chunk');
+      })}
+    </>
+  );
+};
+
+PostTitleContent.defaultProps = {
+  target: '_self',
+};
 
 export default PostTitleContent;
 
-const Hashtag = styled.a`
+const SHashtag = styled.span`
   color: ${(props) => props.theme.colorsThemed.accent.blue};
   font-weight: 600;
+  cursor: pointer;
+
+  :hover {
+    filter: brightness(120%);
+  }
 `;

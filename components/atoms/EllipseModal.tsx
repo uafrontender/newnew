@@ -67,7 +67,7 @@ export default EllipseModal;
 interface IEllipseModalButton {
   tone?: 'neutral' | 'error';
   disabled?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
   children: string;
 }
 
@@ -83,20 +83,6 @@ export const EllipseModalButton: React.FC<IEllipseModalButton> = ({
     </Text>
   </SButton>
 );
-
-const SButton = styled.button`
-  padding: 18px;
-  background: none;
-  border: transparent;
-
-  text-align: center;
-
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-  }
-`;
 
 const SWrapper = styled.div`
   width: 100%;
@@ -120,11 +106,15 @@ const SContentContainer = styled.div`
 
   margin-bottom: 14px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.tertiary};
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   z-index: 1;
+  overflow: hidden;
 
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
@@ -136,10 +126,40 @@ const SContentContainer = styled.div`
 const CancelButton = styled(Button)`
   height: 56px;
   width: calc(100% - 32px);
+
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.tertiary};
 `;
 
 const SSeparator = styled.div`
   width: 100%;
   border-bottom: 1px solid
     ${({ theme }) => theme.colorsThemed.background.outlines1};
+`;
+
+const SButton = styled.button`
+  padding: 18px;
+  background: none;
+  border: transparent;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+
+  &:focus,
+  &:hover {
+    outline: none;
+  }
+
+  &:focus:enabled,
+  &:hover:enabled {
+    outline: none;
+    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 `;

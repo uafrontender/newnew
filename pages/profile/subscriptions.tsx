@@ -121,6 +121,7 @@ export async function getServerSideProps(
       'component-PostCard',
       'modal-Post',
       'modal-PaymentModal',
+      'modal-ResponseSuccessModal',
     ]);
 
     return {
@@ -152,5 +153,11 @@ const SCardsSection = styled.div`
 
   ${(props) => props.theme.media.tablet} {
     margin-right: -32px !important;
+    margin-left: -24px !important;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
   }
 `;

@@ -2,7 +2,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -33,6 +39,7 @@ import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
 import PostTitleContent from '../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -137,18 +144,47 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
-  const handleOpenShareMenu = () => setShareMenuOpen(true);
+  const handleOpenShareMenu = () => {
+    Mixpanel.track('Opened Share Menu', {
+      _stage: 'Post',
+      _postUuid: postId,
+      _component: 'PostTopInfo',
+    });
+    setShareMenuOpen(true);
+  };
   const handleCloseShareMenu = useCallback(() => {
+    Mixpanel.track('Close Share Menu', {
+      _stage: 'Post',
+      _postUuid: postId,
+      _component: 'PostTopInfo',
+    });
     setShareMenuOpen(false);
-  }, []);
+  }, [postId]);
 
-  const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
+  const handleOpenEllipseMenu = () => {
+    Mixpanel.track('Open Ellipse Menu', {
+      _stage: 'Post',
+      _postUuid: postId,
+      _component: 'PostTopInfo',
+    });
+    setEllipseMenuOpen(true);
+  };
   const handleCloseEllipseMenu = useCallback(() => {
+    Mixpanel.track('Close Ellipse Menu', {
+      _stage: 'Post',
+      _postUuid: postId,
+      _component: 'PostTopInfo',
+    });
     setEllipseMenuOpen(false);
-  }, []);
+  }, [postId]);
 
   const handleFollowDecision = useCallback(async () => {
     try {
+      Mixpanel.track('Favorite Post', {
+        _stage: 'Post',
+        _postUuid: postId,
+        _component: 'PostTopInfo',
+      });
       if (!user.loggedIn) {
         router.push(
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
@@ -189,6 +225,11 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   ]);
 
   const handleSeeNewFailedBox = useCallback(() => {
+    Mixpanel.track('See New Failde Box', {
+      _stage: 'Post',
+      _postUuid: postId,
+      _component: 'PostTopInfo',
+    });
     if (hasRecommendations) {
       document.getElementById('post-modal-container')?.scrollTo({
         top: document.getElementById('recommendations-section-heading')
@@ -198,7 +239,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     } else {
       router.push(`/see-more?category=${postType}`);
     }
-  }, [hasRecommendations, postType, router]);
+  }, [hasRecommendations, postType, router, postId]);
+
+  const moreButtonRef: any = useRef();
+  const shareButtonRef: any = useRef();
 
   return (
     <SContainer>
@@ -222,6 +266,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
               creator.username
             }`}
+            onClickCapture={() => {
+              Mixpanel.track('Click on creator avatar', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'PostTopInfo',
+              });
+            }}
           >
             <SAvatarArea>
               <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
@@ -231,6 +282,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
               creator.username
             }`}
+            onClickCapture={() => {
+              Mixpanel.track('Click on creator username', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'PostTopInfo',
+              });
+            }}
           >
             <SUsername className='username'>
               {creator.nickname ?? `@${creator.username}`}{' '}
@@ -254,6 +312,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               padding: '8px',
             }}
             onClick={() => handleOpenShareMenu()}
+            ref={shareButtonRef}
           >
             <InlineSvg
               svg={ShareIconFilled}
@@ -266,6 +325,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             view='transparent'
             iconOnly
             onClick={() => handleOpenEllipseMenu()}
+            ref={moreButtonRef}
           >
             <InlineSvg
               svg={MoreIconFilled}
@@ -280,6 +340,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               postId={postId}
               isVisible={shareMenuOpen}
               onClose={handleCloseShareMenu}
+              anchorElement={shareButtonRef.current}
             />
           )}
           {isMobile && shareMenuOpen ? (
@@ -299,6 +360,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               handleFollowDecision={handleFollowDecision}
               handleReportOpen={handleReportOpen}
               onClose={handleCloseEllipseMenu}
+              anchorElement={moreButtonRef.current}
             />
           )}
           {isMobile && ellipseMenuOpen ? (

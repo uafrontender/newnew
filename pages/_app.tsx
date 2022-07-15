@@ -18,6 +18,7 @@ import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
 import * as Sentry from '@sentry/browser';
 import { useRouter } from 'next/router';
+import moment from 'moment';
 
 // Custom error page
 import Error from './_error';
@@ -57,6 +58,7 @@ import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
+import { Mixpanel } from '../utils/mixpanel';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -100,9 +102,13 @@ const MyApp = (props: IMyApp): ReactElement => {
     if (locale === 'zh') {
       // eslint-disable-next-line global-require
       require('moment/locale/zh-tw');
+      moment.locale('zh-tw');
     } else if (locale === 'es') {
       // eslint-disable-next-line global-require
       require('moment/locale/es');
+      moment.locale('es');
+    } else if (locale === 'en-US') {
+      moment.locale('en-US');
     }
   });
 
@@ -122,6 +128,19 @@ const MyApp = (props: IMyApp): ReactElement => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (user.loggedIn && user.userData?.username) {
+      Mixpanel.identify(user.userData.username);
+      Mixpanel.people.set({
+        $name: user.userData.username,
+        $email: user.userData.email,
+        newnewId: user.userData.userUuid,
+      });
+      Mixpanel.track('Session started!');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.loggedIn]);
 
   useEffect(() => {
     let newResizeMode = 'mobile';

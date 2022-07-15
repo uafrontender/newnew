@@ -10,7 +10,6 @@ import React, {
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import { useInView } from 'react-intersection-observer';
 import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
@@ -55,6 +54,9 @@ import getDisplayname from '../../utils/getDisplayname';
 import ReportModal, { ReportData } from './chat/ReportModal';
 import { reportPost } from '../../api/endpoints/report';
 import PostCardEllipseModal from './PostCardEllipseModal';
+import useOnTouchStartOutside from '../../utils/hooks/useOnTouchStartOutside';
+import getChunks from '../../utils/getChunks/getChunks';
+import { Mixpanel } from '../../utils/mixpanel';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -92,6 +94,7 @@ interface ICard {
   maxWidthTablet?: string;
   shouldStop?: boolean;
   handleRemovePostFromState?: () => void;
+  handleAddPostToState?: () => void;
 }
 
 export const PostCard: React.FC<ICard> = React.memo(
@@ -104,6 +107,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     maxWidthTablet,
     shouldStop,
     handleRemovePostFromState,
+    handleAddPostToState,
   }) => {
     const { t } = useTranslation('component-PostCard');
     const theme = useTheme();
@@ -114,17 +118,31 @@ export const PostCard: React.FC<ICard> = React.memo(
       resizeMode
     );
 
+    const wrapperRef = useRef<HTMLDivElement>();
+
     // Check if video is ready to avoid errors
+    const videoRef = useRef<HTMLVideoElement>();
+
+    // Hovered state
+    const [hovered, setHovered] = useState(false);
     const [videoReady, setVideoReady] = useState(false);
+
+    const handleSetHovered = () => setHovered(true);
+    const handleSetUnhovered = () => {
+      setHovered(false);
+    };
+
+    const handleClickOutsideMobile = () => {
+      if (isMobile) {
+        handleSetUnhovered();
+      }
+    };
+
+    useOnTouchStartOutside(wrapperRef, handleClickOutsideMobile);
 
     // Socket
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
-
-    const { ref: cardRef, inView } = useInView({
-      threshold: 0.55,
-    });
-    const videoRef = useRef<HTMLVideoElement>();
 
     const [postParsed, typeOfPost] = switchPostType(item);
     // Live updates stored in local state
@@ -164,7 +182,15 @@ export const PostCard: React.FC<ICard> = React.memo(
       postParsed.announcement?.thumbnailUrl ?? ''
     );
 
+    const [coverImageUrl, setCoverImageUrl] = useState<
+      string | undefined | null
+    >(postParsed.announcement?.coverImageUrl ?? undefined);
+
     const handleUserClick = (username: string) => {
+      Mixpanel.track('Go To Creator Profile', {
+        _stage: 'Post Card',
+        _postUuid: switchPostType(item)[0].postUuid,
+      });
       router.push(`/${username}`);
     };
 
@@ -176,11 +202,20 @@ export const PostCard: React.FC<ICard> = React.memo(
     ) => {
       e.preventDefault();
       e.stopPropagation();
-
+      Mixpanel.track('Open Ellipse Menu Post Card', {
+        _stage: 'Post Card',
+        _postUuid: switchPostType(item)[0].postUuid,
+      });
       setIsEllipseMenuOpen(true);
     };
 
-    const handleEllipseMenuClose = () => setIsEllipseMenuOpen(false);
+    const handleEllipseMenuClose = () => {
+      Mixpanel.track('Closed Ellipse Menu Post Card', {
+        _stage: 'Post Card',
+        _postUuid: switchPostType(item)[0].postUuid,
+      });
+      setIsEllipseMenuOpen(false);
+    };
 
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
@@ -212,38 +247,6 @@ export const PostCard: React.FC<ICard> = React.memo(
     );
 
     const handleBidClick = () => {};
-
-    useEffect(() => {
-      const handleCanplay = () => {
-        setVideoReady(true);
-      };
-
-      videoRef.current?.addEventListener('canplay', handleCanplay);
-      videoRef.current?.addEventListener('loadedmetadata', handleCanplay);
-
-      return () => {
-        videoRef.current?.removeEventListener('canplay', handleCanplay);
-        videoRef.current?.removeEventListener('loadedmetadata', handleCanplay);
-      };
-    }, [inView, thumbnailUrl]);
-
-    useEffect(() => {
-      try {
-        if (videoReady) {
-          if (inView && !shouldStop) {
-            videoRef.current?.play().catch((e) => {
-              // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission .
-              // Many browsers prevent autoplay
-              console.log(e);
-            });
-          } else {
-            videoRef.current?.pause();
-          }
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }, [inView, videoReady, shouldStop, thumbnailUrl]);
 
     // Increment channel subs after mounting
     // Decrement when unmounting
@@ -336,11 +339,65 @@ export const PostCard: React.FC<ICard> = React.memo(
         }, 5000);
       };
 
+      const handlerSocketPostCoverImageUpdated = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostCoverImageUpdated.decode(arr);
+
+        if (decoded.postUuid !== postParsed.postUuid) return;
+
+        if (decoded.action === newnewapi.PostCoverImageUpdated.Action.UPDATED) {
+          // Wait to make sure that cloudfare cache has been invalidated
+          setTimeout(() => {
+            fetch(decoded.coverImageUrl as string)
+              .then((res) => res.blob())
+              .then((blobFromFetch) => {
+                const reader = new FileReader();
+
+                reader.onloadend = () => {
+                  if (!reader.result) return;
+
+                  const byteCharacters = atob(
+                    reader.result.slice(
+                      (reader.result as string).indexOf(',') + 1
+                    ) as string
+                  );
+
+                  const byteNumbers = new Array(byteCharacters.length);
+
+                  // eslint-disable-next-line no-plusplus
+                  for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                  }
+
+                  const byteArray = new Uint8Array(byteNumbers);
+                  const blob = new Blob([byteArray], { type: 'video/mp4' });
+                  const url = URL.createObjectURL(blob);
+
+                  setCoverImageUrl(url);
+                };
+
+                reader.readAsDataURL(blobFromFetch);
+              })
+              .catch((err) => {
+                console.error(err);
+              });
+          }, 5000);
+        } else if (
+          decoded.action === newnewapi.PostCoverImageUpdated.Action.DELETED
+        ) {
+          setCoverImageUrl(undefined);
+        }
+      };
+
       if (socketConnection) {
         socketConnection?.on('PostUpdated', handlerSocketPostUpdated);
         socketConnection?.on(
           'PostThumbnailUpdated',
           handlerSocketThumbnailUpdated
+        );
+        socketConnection.on(
+          'PostCoverImageUpdated',
+          handlerSocketPostCoverImageUpdated
         );
       }
 
@@ -351,14 +408,66 @@ export const PostCard: React.FC<ICard> = React.memo(
             'PostThumbnailUpdated',
             handlerSocketThumbnailUpdated
           );
+          socketConnection.off(
+            'PostCoverImageUpdated',
+            handlerSocketPostCoverImageUpdated
+          );
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socketConnection]);
 
+    useEffect(() => {
+      if (hovered) {
+        videoRef.current?.play();
+      } else {
+        videoRef.current?.pause();
+      }
+
+      return () => {};
+    }, [hovered]);
+
+    useEffect(() => {
+      const handleCanPlay = () => {
+        setVideoReady(true);
+      };
+
+      videoRef.current?.addEventListener('canplay', handleCanPlay);
+
+      return () => {
+        videoRef.current?.removeEventListener('canplay', handleCanPlay);
+      };
+    }, []);
+
+    const moreButtonInsideRef: any = useRef();
+    const moreButtonRef: any = useRef();
+
+    function getTitleContent(title: string) {
+      return (
+        <>
+          {getChunks(title).map((chunk) => {
+            if (chunk.type === 'hashtag') {
+              return <SHashtag>#{chunk.text}</SHashtag>;
+            }
+
+            return chunk.text;
+          })}
+        </>
+      );
+    }
+
     if (type === 'inside') {
       return (
-        <SWrapper ref={cardRef} index={index} width={width}>
+        <SWrapper
+          ref={(el) => {
+            wrapperRef.current = el!!;
+          }}
+          onMouseEnter={() => handleSetHovered()}
+          onTouchStart={() => handleSetHovered()}
+          onMouseLeave={() => handleSetUnhovered()}
+          index={index}
+          width={width}
+        >
           <SContent>
             {!isMobile && (
               <SNumberImageHolder index={index}>
@@ -370,10 +479,16 @@ export const PostCard: React.FC<ICard> = React.memo(
               </SNumberImageHolder>
             )}
             <SImageHolder index={index}>
-              <img
+              <SThumnailHolder
                 className='thumnailHolder'
-                src={postParsed.announcement?.thumbnailImageUrl ?? ''}
+                src={
+                  (coverImageUrl ||
+                    postParsed.announcement?.thumbnailImageUrl) ??
+                  ''
+                }
                 alt='Post'
+                draggable={false}
+                hovered={hovered && videoReady}
               />
               <video
                 ref={(el) => {
@@ -396,6 +511,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   iconOnly
                   id='showMore'
                   view='transparent'
+                  ref={moreButtonInsideRef}
                   onClick={handleMoreClick}
                 >
                   <InlineSVG
@@ -413,6 +529,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                     postCreator={postParsed.creator as newnewapi.User}
                     handleReportOpen={handleReportOpen}
                     onClose={handleEllipseMenuClose}
+                    anchorElement={moreButtonInsideRef.current}
                   />
                 )}
               </STopContent>
@@ -430,7 +547,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   }}
                 />
                 <SText variant={3} weight={600}>
-                  {postParsed.title}
+                  {getTitleContent(postParsed.title)}
                 </SText>
               </SBottomContent>
             </SImageHolder>
@@ -460,16 +577,26 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     return (
       <SWrapperOutside
-        ref={cardRef}
+        ref={(el) => {
+          wrapperRef.current = el!!;
+        }}
+        onMouseEnter={() => handleSetHovered()}
+        onTouchStart={() => handleSetHovered()}
+        onMouseLeave={() => handleSetUnhovered()}
         width={width}
         maxWidthTablet={maxWidthTablet ?? undefined}
       >
         <SImageBG id='backgroundPart' height={height}>
           <SImageHolderOutside id='animatedPart'>
-            <img
+            <SThumnailHolder
               className='thumnailHolder'
-              src={postParsed.announcement?.thumbnailImageUrl ?? ''}
+              src={
+                (coverImageUrl || postParsed.announcement?.thumbnailImageUrl) ??
+                ''
+              }
               alt='Post'
+              draggable={false}
+              hovered={hovered && videoReady}
             />
             <video
               ref={(el) => {
@@ -488,6 +615,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 id='showMore'
                 view='transparent'
                 onClick={handleMoreClick}
+                ref={moreButtonRef}
               >
                 <InlineSVG
                   svg={moreIcon}
@@ -506,7 +634,9 @@ export const PostCard: React.FC<ICard> = React.memo(
                   handleRemovePostFromState={
                     handleRemovePostFromState ?? undefined
                   }
+                  handleAddPostToState={handleAddPostToState ?? undefined}
                   onClose={handleEllipseMenuClose}
+                  anchorElement={moreButtonRef.current}
                 />
               )}
             </STopContent>
@@ -559,7 +689,7 @@ export const PostCard: React.FC<ICard> = React.memo(
             <CardTimer startsAt={startsAtTime} endsAt={endsAtTime} />
           </SBottomStart>
           <STextOutside variant={3} weight={600}>
-            {postParsed.title}
+            {getTitleContent(postParsed.title)}
           </STextOutside>
           <SBottomEnd type={typeOfPost}>
             {totalVotes > 0 || totalAmount > 0 || currentBackerCount > 0 ? (
@@ -639,6 +769,8 @@ export const PostCard: React.FC<ICard> = React.memo(
             postCreator={postParsed.creator as newnewapi.User}
             handleReportOpen={handleReportOpen}
             onClose={handleEllipseMenuClose}
+            handleRemovePostFromState={handleRemovePostFromState ?? undefined}
+            handleAddPostToState={handleAddPostToState ?? undefined}
           />
         )}
       </SWrapperOutside>
@@ -797,7 +929,7 @@ const SImageHolder = styled.div<ISWrapper>`
     object-fit: cover;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    /* z-index: -1; */
   }
 
   ${(props) => props.theme.media.tablet} {
@@ -856,6 +988,13 @@ const SImageHolder = styled.div<ISWrapper>`
   }
 `;
 
+const SThumnailHolder = styled.img<{
+  hovered: boolean;
+}>`
+  opacity: ${({ hovered }) => (hovered ? 0 : 1)};
+  transition: linear 0.3s;
+`;
+
 const SImageMask = styled.div`
   width: 100%;
 
@@ -885,6 +1024,11 @@ const STopContent = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  padding-right: 8px;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding-right: initial;
+  }
 `;
 
 const SBottomContent = styled.div`
@@ -1001,7 +1145,7 @@ const SImageHolderOutside = styled.div`
     object-fit: cover;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    /* z-index: -1; */
   }
 `;
 
@@ -1031,6 +1175,10 @@ const STextOutside = styled(Text)`
   margin-bottom: 10px;
 
   height: 40px;
+`;
+
+const SHashtag = styled.span`
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
 `;
 
 const SBottomStart = styled.div<{

@@ -62,7 +62,7 @@
     "cf": "{{postCreator}}在獲得足夠的支持者后，就會完成這個Goal。"
   },
   "postFailedBoxModeration": {
-    "title": "{{postType}}}被取消",
+    "title": "{{postType}}被取消",
     "reason": {
       "no-response": "回應沒有上傳",
       "ac-no-winner": "贏家尚未被選出",
@@ -116,7 +116,7 @@
     }
   },
   "postSuccess": {
-    "title": "該{{postType}}}已完成",
+    "title": "該{{postType}}已完成",
     "body": "查看更多類似的。",
     "buttonText": "查看更多"
   },
@@ -127,6 +127,7 @@
       "backToOriginalVideo": "回到原帖",
       "backToResponse": "觀看回應"
     },
+    "reuploadButton_NEED_TRANSLATION": "re-upload",
     "cannotLeavePageMsg": "你確定要關閉這個頁面嗎？上傳進度會丟失",
     "floatingUploadResponseButton": "製作回應視頻",
     "setThumbnail": "設置縮略圖",
@@ -185,7 +186,7 @@
         },
         "processing": {
           "title": "處理視頻",
-          "description": "你可以在視頻處理過程中發佈回復",
+          "description__NEED_TRANSLATION": "Your video is being processed... hang tight!",
           "process": "{{progress}}% • 還需{{time}}",
           "uploadNonProcessed": "發佈"
         },
@@ -423,6 +424,7 @@
         "subscribeToCreatorCaption": "訂閱{{creator}}，為本次Superpoll添加你自己的選項！",
         "subscribeButton": "訂閱",
         "suggestionPlaceholder": "添加你自己的選項……",
+        "suggestionPlaceholderDesktop": "添加選……",
         "placeABidButton": "添加我的選項"
       }
     },
@@ -477,6 +479,10 @@
       "choosePledgeButton": "支持這個Goal"
     }
   },
+  "thumbnailEllipseMenu_NEED_TRANSLATION": {
+    "selectSnippetButton": "Select a snippet",
+    "uploadImageButton": "Upload an image"
+  },
   "postVideoThumbnailEdit": {
     "title": "設置縮略圖",
     "description": "從視頻中選擇一個片段",
@@ -485,6 +491,16 @@
     "toast": {
       "success": "成功！縮略圖將在處理後更改",
       "error": "發生錯誤"
+    }
+  },
+  "postVideoCoverImageEdit_NEED_TRANSLATION": {
+    "title": "Upload an image",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "uploadCoverImage": {
+      "caption": "Select custom cover image",
+      "uploadBtn": "Select",
+      "deleteBtn": "Delete"
     }
   },
   "acPostModeration": {
@@ -508,7 +524,8 @@
         }
       },
       "optionCard": {
-        "pickButton": "選擇"
+        "pickButton": "選擇",
+        "pickedButton_NEED_TRANSLATION": "Chosen"
       }
     },
     "winnerTab": {
@@ -547,6 +564,7 @@
     }
   },
   "cfPostModeration": {
+    "moneyRaised_NEED_TRANSLATION": "Total raised",
     "winnerTab": {
       "winnerOptionCard": {
         "backersToldYou": "支持者注資成功",
@@ -690,6 +708,33 @@
   "heroPopupCF": {
     "title": "Goal",
     "text": "與其他人集資，支持你喜歡的創作者的Goal。如果支援這個Goal的人足夠多，你就會看著創作者照做！"
+  },
+  "postResponseTabModeration_NEED_TRANSLATION": {
+    "awaiting": {
+      "topHeader": "Time to post \nyour response!",
+      "postResponseBtn": "Post Response",
+      "youWillGet": "You'll get"
+    },
+    "succeeded": {
+      "topHeader": "Response \npublished!",
+      "youMade": "You made",
+      "shareBtn": "Share",
+      "linkCopied": "Link copied!"
+    },
+    "winner": {
+      "inResponseToYourPost": "In response to your post",
+      "ac": {
+        "numBiddersChoseSingular": "{{amount}} bidder chose",
+        "numBiddersChose": "{{amount}} bidders chose",
+        "optionCreator": "<0>{{nickname}}</0>'s bid"
+      },
+      "mc": {
+        "numBiddersChoseSingular": "{{amount}} voter chose",
+        "numBiddersChose": "{{amount}} voters chose",
+        "optionOwn": "the option",
+        "optionCreator": "<0>{{nickname}}</0>'s option"
+      }
+    }
   },
   "tutorials": {
     "ac": {

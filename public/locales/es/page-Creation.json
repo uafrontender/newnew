@@ -47,7 +47,7 @@
       },
       "subTitle": {
         "votesInfo": "Las personas gastarán un mínimo de 2 dólares para votar",
-        "floating": "Sube tu vídeo para verlo aquí",
+        "floating": "Sube tu video para verlo aquí",
         "floatingProcessing": "La vista previa estará disponible después de que tu video sea procesado"
       }
     },
@@ -152,20 +152,33 @@
     },
     "video": {
       "error": {
-        "minLength": "La duración del vídeo es demasiado corta, elija a partir de 10 segundos",
-        "maxLength": "La duración del vídeo es demasiado larga, elija hasta 10 minutoss",
+        "minLength": "La duración del video es demasiado corta, elija a partir de 10 segundos",
+        "maxLength": "La duración del video es demasiado larga, elija hasta 10 minutoss",
         "maxSize": "El tamaño del video es demasiado grande, elija hasta 10gb",
         "title": "Ups...",
         "description": "Hubo un error y tu archivo no pudo ser cargado. ¿Quieres volver a intentarlo?."
       },
       "setThumbnail": "Establece una imagen de miniatura",
+      "thumbnailEllipseMenu_NEED_TRANSLATION": {
+        "selectSnippetButton": "Select a snippet",
+        "uploadImageButton": "Upload an image"
+      },
       "deleteFile": "Borrar archivo",
       "previewFull": "Vista previa",
       "thumbnail": {
         "info": "Más información",
-        "title": "Establecer vista previa",
-        "submit": "Guardar cambios",
-        "description": "Selecciona un fragmento de 3 segundos como portada de la vista previa. Una buena vista previa atrae la atención del espectador."
+        "title_NEED_TRANSLATION": "Set a thumbnail from the video",
+        "submit_NEED_TRANSLATION": "Save",
+        "description_NEED_TRANSLATION": "Select a snippet for your thumbnail. \nA good thumbnail gets viewers excited..."
+      },
+      "coverImage_NEED_TRANSLATION": {
+        "title": "Upload an image",
+        "submit": "Save",
+        "uploadCoverImage": {
+          "caption": "Select custom cover image",
+          "uploadBtn": "Select",
+          "deleteBtn": "Delete"
+        }
       },
       "full": {
         "title": "Vista previa de video"
@@ -176,7 +189,7 @@
         "process": "{{progress}}% • Quedan {{time}}"
       },
       "processing": {
-        "title": "Todavía puedes rellenar los datos de abajo y publicar tu publicación mientras se procesa el vídeo.",
+        "title_NEED_TRANSLATION": "Your file is processing. It won’t take long...",
         "description": "Tu video se está procesando",
         "process": "{{progress}}% • Quedan {{time}}"
       }
@@ -239,17 +252,17 @@
   },
   "tutorials": {
     "heroPopupCommon": {
-      "heroButtonText": "Vamos"
+      "heroButtonText": "Va"
     },
     "heroPopupAC": {
       "title": "Events",
       "line1": "1. ¿Estás abierto a ideas? Publica un video y haz que el\n público te envíe ofertas sobre lo que deberías hacer",
       "line2": "2. La gente te envía ofertas con sus ideas y\n cuánto pagarán para que lo hagas",
-      "line3": "3. Elige tu oferta favorita, ¡y\n sube un vídeo tuyo haciéndola!"
+      "line3": "3. Elige tu oferta favorita, ¡y\n sube un video tuyo haciéndola!"
     },
     "heroPopupMC": {
       "title": "Superpolls",
-      "line1": "1. Publica una encuesta en vídeo con algunas opciones\n para que el público elija una",
+      "line1": "1. Publica una encuesta en video con algunas opciones\n para que el público elija una",
       "line2": "2. La gente paga para votar por su opción favorita",
       "line3": "3. Sube un video de respuesta haciendo\n la opción más votada."
     },

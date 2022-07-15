@@ -118,7 +118,6 @@
       "back": "Cerrar"
     },
     "heading": "Esto es lo que ven tus fans",
-
     "bio": {
       "title": "Bio",
       "placeholder": "Cuéntanos un poco sobre ti...",
@@ -129,9 +128,6 @@
         "inappropriate": "Las palabras ofensivas están prohibidas",
         "linksForbidden": "Los enlaces no están permitidos"
       }
-    },
-    "tags": {
-      "title": "¿Sobre qué vas a publicar más? Selecciona al menos tres"
     }
   },
   "stripeSection": {

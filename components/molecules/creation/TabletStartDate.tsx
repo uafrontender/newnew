@@ -80,6 +80,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
             <TimePicker
               time={value?.time}
               format={value?.['hours-format']}
+              currValue={value}
               onChange={handleTimeChange}
             />
           </STimeInput>

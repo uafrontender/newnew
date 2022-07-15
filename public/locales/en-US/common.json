@@ -141,6 +141,7 @@
     "copied": "Link Copied!"
   },
   "search": {
+    "placeholder": "Search",
     "topPosts": "Top Posts",
     "popularCreators": "Popular Creators",
     "creatorSubtitle": "See posts",

@@ -16,12 +16,14 @@ import { TMcOptionWithHighestField } from '../../../../organisms/decision/PostVi
 import Button from '../../../../atoms/Button';
 import GradientMask from '../../../../atoms/GradientMask';
 import McOptionCardModeration from './McOptionCardModeration';
+import { Mixpanel } from '../../../../../utils/mixpanel';
 
 interface IMcOptionsTabModeration {
   post: newnewapi.MultipleChoice;
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
+  winningOptionId?: number;
   handleLoadOptions: (token?: string) => void;
   handleRemoveOption: (optionToRemove: newnewapi.MultipleChoice.Option) => void;
 }
@@ -32,6 +34,7 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
     options,
     optionsLoading,
     pagingToken,
+    winningOptionId,
     handleLoadOptions,
     handleRemoveOption,
   }) => {
@@ -91,6 +94,7 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
                 option={option as TMcOptionWithHighestField}
                 creator={option.creator ?? post.creator!!}
                 canBeDeleted={options.length > 2}
+                isWinner={winningOptionId?.toString() === option.id.toString()}
                 isCreatorsBid={
                   !option.creator || option.creator?.uuid === post.creator?.uuid
                 }
@@ -100,7 +104,16 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
             {!isMobile ? (
               <SLoaderDiv ref={loadingRef} />
             ) : pagingToken ? (
-              <SLoadMoreBtn onClick={() => handleLoadOptions(pagingToken)}>
+              <SLoadMoreBtn
+                onClickCapture={() => {
+                  Mixpanel.track('Click Load More', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'McOptionsTabModeration',
+                  });
+                }}
+                onClick={() => handleLoadOptions(pagingToken)}
+              >
                 {t('loadMoreButton')}
               </SLoadMoreBtn>
             ) : null}
@@ -117,7 +130,7 @@ export default McOptionsTabModeration;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  /* height: calc(100% - 56px); */
+  height: calc(100% - 56px);
 `;
 
 const SBidsContainer = styled.div`

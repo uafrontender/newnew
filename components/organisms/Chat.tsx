@@ -44,9 +44,17 @@ export const Chat: React.FC<IChat> = ({ username }) => {
   const [newMessage, setNewMessage] =
     useState<newnewapi.IChatMessage | null | undefined>();
   const [searchText, setSearchText] = useState<string>('');
+  const [newLastMessage, setNewLastMessage] =
+    useState<{
+      chatId: number | Long.Long | null | undefined;
+    } | null>(null);
 
   const showChatList = () => {
     setChatListHidden(false);
+  };
+
+  const updateLastMessage = (data: any) => {
+    setNewLastMessage(data);
   };
 
   const openChat = useCallback(
@@ -62,7 +70,6 @@ export const Chat: React.FC<IChat> = ({ username }) => {
           ? (route = `${user.userData?.username}-announcement`)
           : '';
       }
-
       router.push(`/direct-messages/${route}`);
 
       setChatData({ chatRoom, showChatList });
@@ -110,6 +117,7 @@ export const Chat: React.FC<IChat> = ({ username }) => {
           openChat={openChat}
           username={username}
           switchedTab={() => setChatListHidden(false)}
+          newLastMessage={newLastMessage}
         />
       </SSidebar>
       <SContent>
@@ -117,6 +125,7 @@ export const Chat: React.FC<IChat> = ({ username }) => {
           key={chatData.chatRoom?.id?.toString()}
           {...chatData}
           showChatList={showChatList}
+          updateLastMessage={updateLastMessage}
         />
       </SContent>
     </SContainer>

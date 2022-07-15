@@ -5,6 +5,7 @@ import styled, { keyframes } from 'styled-components';
 import Indicator from '../atoms/Indicator';
 
 import isBrowser from '../../utils/isBrowser';
+import { Mixpanel } from '../../utils/mixpanel';
 
 interface ITabs {
   t: any;
@@ -209,6 +210,10 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
       return;
     }
     setMouseInitial(undefined);
+    Mixpanel.track('Tab Clicked', {
+      tabName: tab.nameToken,
+      tabUrl: tab.url,
+    });
     handleChangeRoute(tab.url);
   };
 

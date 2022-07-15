@@ -8,6 +8,7 @@ import React, {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -97,6 +98,10 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     'mobileL',
     'tablet',
   ].includes(resizeMode);
+
+  const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
+    resizeMode
+  );
 
   // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
@@ -400,7 +405,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       currentUser.loggedIn &&
       currentUser.userData?.userUuid?.toString() === user.uuid.toString()
     ) {
-      router.push(
+      router.replace(
         currentUser.userData?.options?.isCreator
           ? '/profile/my-posts'
           : '/profile'
@@ -448,6 +453,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     // isSub ? setIsSubscribed(true) : setIsSubscribed(false);
   }, [creatorsImSubscribedTo, user.uuid]);
 
+  const moreButtonRef = useRef() as any;
+
   return (
     <ErrorBoundary>
       <SGeneral restrictMaxWidth>
@@ -484,10 +491,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             </SSVGContainer>
             {t('profileLayout.buttons.favorites')}
           </SFavoritesButton> */}
+
           <SMoreButton
             view='transparent'
             iconOnly
             onClick={() => setIsEllipseMenuOpen(true)}
+            ref={moreButtonRef}
           >
             <SSVGContainer active={ellipseMenuOpen}>
               <InlineSvg
@@ -517,6 +526,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               handleClickUnsubscribe={() => {
                 setUnsubscribeModalOpen(true);
               }}
+              anchorElement={moreButtonRef.current}
+              offsetTop={isDesktop ? '-25px' : '0'}
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
@@ -594,7 +605,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 )}
               </SShareButton>
             </SShareDiv>
-            {user.options?.isOfferingSubscription ? (
+            {user.options?.isOfferingSubscription &&
+            user.uuid !== currentUser.userData?.userUuid ? (
               <CustomLink
                 href={
                   !isSubscribed && !wasSubscribed

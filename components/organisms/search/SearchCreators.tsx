@@ -45,7 +45,6 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
           throw new Error(res.error?.message ?? 'Request failed');
 
         if (!initialLoad) setInitialLoad(true);
-
         if (res.data.creators && res.data.creators.length > 0) {
           if (hasNoResults) setHasNoResults(false);
           if (!initialLoad) setInitialLoad(true);
@@ -54,7 +53,7 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
             return arr;
           });
           setCreatorsRoomsNextPageToken(res.data.paging?.nextPageToken);
-        } else {
+        } else if (!creatorsNextPageToken) {
           setHasNoResults(true);
         }
 
@@ -68,7 +67,7 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loadingCreators, query]
+    [loadingCreators, query, creatorsNextPageToken]
   );
 
   useEffect(() => {
@@ -92,7 +91,11 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
         <>
           <SCardsSection>
             {initialLoad && (
-              <CreatorsList loading={loadingCreators} collection={creators} />
+              <CreatorsList
+                loading={loadingCreators}
+                collection={creators}
+                withEllipseMenu
+              />
             )}
           </SCardsSection>
           {creatorsNextPageToken && !loadingCreators && (
