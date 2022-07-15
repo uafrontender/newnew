@@ -195,15 +195,8 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
       }
     },
 
-    [
-      postSorting,
-      query,
-      type,
-      initialLoad,
-      activeTabs,
-      hasNoResults,
-      postsNextPageToken,
-    ]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [postSorting, query, type, initialLoad, activeTabs, hasNoResults]
   );
 
   const handleRemovePostFromState = (postUuid: string) => {

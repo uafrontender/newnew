@@ -67,7 +67,7 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loadingCreators, query, creatorsNextPageToken]
+    [loadingCreators, query]
   );
 
   useEffect(() => {
