@@ -1115,12 +1115,23 @@ const STextInputsWrapper = styled.div`
 const ProfilePictureContent = styled.div`
   overflow-y: auto;
   padding: 0 20px;
+  height: 100%;
 `;
 
 const SSliderWrapper = styled.div`
   display: none;
 
   ${({ theme }) => theme.media.tablet} {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 107px;
+    z-index: 1;
+    background-color: ${({ theme }) =>
+      theme.name === 'light'
+        ? 'rgba(255, 255, 255, 0.5)'
+        : 'rgba(11, 10, 19, 0.5)'};
+
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -1163,7 +1174,10 @@ const SControlsWrapper = styled.div`
 const SEditProfilePicture = styled(motion.div)`
   display: flex;
   flex-direction: column;
-  height: 100%;
+
+  ${({ theme }) => theme.media.tablet} {
+    height: 100%;
+  }
 `;
 
 const SControlsWrapperPicture = styled.div`
@@ -1171,6 +1185,7 @@ const SControlsWrapperPicture = styled.div`
   justify-content: space-between;
   align-items: center;
 
+  margin-top: auto;
   padding: 16px;
 
   ${({ theme }) => theme.media.tablet} {

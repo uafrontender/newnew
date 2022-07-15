@@ -414,7 +414,7 @@ const ChatArea: React.FC<IChatData> = ({
           </React.Fragment>
         );
       }
-      if (!messages[index + 2]) {
+      if (!nextElement) {
         const date = moment((item.createdAt?.seconds as number) * 1000).format(
           'MMM DD'
         );
