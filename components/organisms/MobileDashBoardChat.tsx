@@ -68,7 +68,9 @@ const MobileDashBoardChat: React.FC<IMobileDashBoardChat> = ({ closeChat }) => {
           />
           <NewMessage openChat={openChat} />
         </SToolbar>
-        <MobileChatList searchText={searchText} openChat={openChat} />
+        {!chatListHidden && (
+          <MobileChatList searchText={searchText} openChat={openChat} />
+        )}
       </SSidebar>
       <SContent>
         <MobileChatArea {...chatData} showChatList={showChatList} />
