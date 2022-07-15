@@ -42,6 +42,7 @@ import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateS
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
@@ -739,7 +740,13 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             <PaymentSuccessModal
               postType='mc'
               isVisible={paymentSuccesModalOpen}
-              closeModal={() => setPaymentSuccesModalOpen(false)}
+              closeModal={() => {
+                Mixpanel.track('Close Payment Success Modal', {
+                  _stage: 'Post',
+                  _post: post.postUuid,
+                });
+                setPaymentSuccesModalOpen(false);
+              }}
             >
               {t('paymentSuccessModal.mc', {
                 postCreator:

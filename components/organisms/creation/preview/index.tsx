@@ -180,7 +180,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   );
 
   const handleClose = useCallback(() => {
-    Mixpanel.track('Post Edit');
+    Mixpanel.track('Post Edit', { _stage: 'Creation' });
     router.back();
   }, [router]);
 
@@ -192,7 +192,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
   const handleSubmit = useCallback(async () => {
     if (loading) return;
-    Mixpanel.track('Publish Post');
+    Mixpanel.track('Publish Post', { _stage: 'Creation' });
     setLoading(true);
     try {
       let hasCoverImage = false;

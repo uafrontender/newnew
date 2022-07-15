@@ -28,6 +28,7 @@ import {
 } from '../../../api/endpoints/upload';
 import { TVideoProcessingData } from '../../../redux-store/slices/creationStateSlice';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -79,6 +80,9 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   const [localFile, setLocalFile] = useState<File | null>(null);
 
   const handleButtonClick = useCallback(() => {
+    Mixpanel.track('Post Video Response Upload', {
+      _stage: 'Post',
+    });
     inputRef.current?.click();
   }, []);
   const handleDeleteVideoShow = useCallback(() => {
@@ -90,6 +94,9 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     playerRef.current.play();
   }, []);
   const handleDeleteVideo = useCallback(() => {
+    Mixpanel.track('Post Video Response Delete', {
+      _stage: 'Post',
+    });
     handleCloseDeleteVideoClick();
     setLocalFile(null);
     onChange(id, null);

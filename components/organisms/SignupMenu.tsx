@@ -44,6 +44,7 @@ import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.
 import isBrowser from '../../utils/isBrowser';
 import { AuthLayoutContext } from '../templates/AuthLayout';
 import isSafari from '../../utils/isSafari';
+import { Mixpanel } from '../../utils/mixpanel';
 
 export interface ISignupMenu {
   goal?: string;
@@ -148,7 +149,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
       <SMenuWrapper>
         <SSignInBackButton
           defer={isMobile ? 250 : undefined}
-          onClick={() => router.back()}
+          onClick={() => {
+            Mixpanel.track('Back Button Clicked', {
+              _stage: 'Sign Up',
+            });
+            router.back();
+          }}
         >
           <span>{t('button.back')}</span>
         </SSignInBackButton>
@@ -187,11 +193,14 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverBgColor='#000'
               hoverContentColor='#FFF'
               pressedBgColor={theme.colorsThemed.social.apple.pressed}
-              onClick={() =>
+              onClick={() => {
+                Mixpanel.track('Sign In With Apple Clicked', {
+                  _stage: 'Sign Up',
+                });
                 handleSignupRedirect(
                   `${BASE_URL_AUTH}/apple${redirectUrlParam}`
-                )
-              }
+                );
+              }}
             >
               {t('signUpOptions.apple')}
             </SignInButton>
@@ -203,9 +212,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverSvg={FacebookIconLight}
               hoverBgColor={theme.colorsThemed.social.facebook.hover}
               pressedBgColor={theme.colorsThemed.social.facebook.pressed}
-              onClick={() =>
-                handleSignupRedirect(`${BASE_URL_AUTH}/fb${redirectUrlParam}`)
-              }
+              onClick={() => {
+                Mixpanel.track('Sign In With Facebook Clicked', {
+                  _stage: 'Sign Up',
+                });
+                handleSignupRedirect(`${BASE_URL_AUTH}/fb${redirectUrlParam}`);
+              }}
             >
               {t('signUpOptions.facebook')}
             </SignInButton>
@@ -216,11 +228,14 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               svg={TwitterIcon}
               hoverBgColor={theme.colorsThemed.social.twitter.hover}
               pressedBgColor={theme.colorsThemed.social.twitter.pressed}
-              onClick={() =>
+              onClick={() => {
+                Mixpanel.track('Sign In With Twitter Clicked', {
+                  _stage: 'Sign Up',
+                });
                 handleSignupRedirect(
                   `${BASE_URL_AUTH}/twitter${redirectUrlParam}`
-                )
-              }
+                );
+              }}
             >
               {t('signUpOptions.twitter')}
             </SignInButton>
@@ -277,7 +292,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 disabled={
                   !emailInputValid || isSubmitLoading || emailInput.length === 0
                 }
-                onClick={() => {}}
+                onClick={() => {
+                  Mixpanel.track('Sign In With Email Clicked', {
+                    _stage: 'Sign Up',
+                    _email: emailInput,
+                  });
+                }}
               >
                 <span>
                   {goal !== 'log-in'
@@ -297,18 +317,42 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
             {t('legalDisclaimer.mainText')}
             <br />
             <Link href='https://privacy.newnew.co'>
-              <a href='https://privacy.newnew.co' target='_blank'>
+              <a
+                href='https://privacy.newnew.co'
+                target='_blank'
+                onClickCapture={() =>
+                  Mixpanel.track('Privacy Link Clicked', {
+                    _stage: 'Sign Up',
+                  })
+                }
+              >
                 {t('legalDisclaimer.privacyPolicy')}
               </a>
             </Link>
             <Link href='https://terms.newnew.co'>
-              <a href='https://terms.newnew.co' target='_blank'>
+              <a
+                href='https://terms.newnew.co'
+                target='_blank'
+                onClickCapture={() =>
+                  Mixpanel.track('Terms Link Clicked', {
+                    _stage: 'Sign Up',
+                  })
+                }
+              >
                 {t('legalDisclaimer.terms')}
               </a>
             </Link>{' '}
             {t('legalDisclaimer.and')}{' '}
             <Link href='https://communityguidelines.newnew.co'>
-              <a href='https://communityguidelines.newnew.co' target='_blank'>
+              <a
+                href='https://communityguidelines.newnew.co'
+                target='_blank'
+                onClickCapture={() =>
+                  Mixpanel.track('Community Guidelines Link Clicked', {
+                    _stage: 'Sign Up',
+                  })
+                }
+              >
                 {t('legalDisclaimer.communityGuidelines')}
               </a>
             </Link>

@@ -37,6 +37,7 @@ import MakeFirstBidArrow from '../../../../public/images/svg/icons/filled/MakeFi
 import InlineSvg from '../../../atoms/InlineSVG';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
+import { Mixpanel } from '../../../../utils/mixpanel';
 import isBrowser from '../../../../utils/isBrowser';
 
 interface ICommentsBottomSection {
@@ -181,6 +182,10 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
     const handleAddComment = useCallback(
       async (content: string, parentMsgId?: number) => {
         try {
+          Mixpanel.track('Added Comment', {
+            _stage: 'Post',
+            _postId: postUuid,
+          });
           const payload = new newnewapi.SendMessageRequest({
             roomId: commentsRoomId,
             content: {
@@ -232,7 +237,7 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
           console.error(err);
         }
       },
-      [commentsRoomId]
+      [commentsRoomId, postUuid]
     );
 
     const markCommentAsDeleted = useCallback(
@@ -272,6 +277,11 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
     const handleDeleteComment = useCallback(
       async (comment: TCommentWithReplies) => {
         try {
+          Mixpanel.track('Deleted Comment', {
+            _stage: 'Post',
+            _postId: postUuid,
+            _messageId: comment.id,
+          });
           const payload = new newnewapi.DeleteMessageRequest({
             messageId: comment.id,
           });
@@ -285,7 +295,7 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
           console.error(err);
         }
       },
-      [markCommentAsDeleted]
+      [markCommentAsDeleted, postUuid]
     );
 
     useEffect(() => {
@@ -390,7 +400,7 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
     );
 
     useEffect(() => {
-      const resizeObserver = new ResizeObserver((entry) => {
+      const resizeObserver = new ResizeObserver((entry: any) => {
         const size = entry[0]?.borderBoxSize
           ? entry[0]?.borderBoxSize[0]?.blockSize
           : entry[0]?.contentRect.height;
@@ -605,7 +615,13 @@ const CommentsBottomSection: React.FunctionComponent<ICommentsBottomSection> =
                 <SLoadMoreButton
                   view='secondary'
                   disabled={commentsLoading}
-                  onClick={() => fetchComments(commentsNextPageToken)}
+                  onClick={() => {
+                    Mixpanel.track('Click Load More Comments', {
+                      _stage: 'Post',
+                      _postId: postUuid,
+                    });
+                    fetchComments(commentsNextPageToken);
+                  }}
                 >
                   {t('comments.seeMore')}
                 </SLoadMoreButton>

@@ -25,6 +25,7 @@ import HomeLayout from '../../components/templates/HomeLayout';
 import switchPostType from '../../utils/switchPostType';
 import { toggleMutedMode } from '../../redux-store/slices/uiStateSlice';
 import isBrowser from '../../utils/isBrowser';
+import { Mixpanel } from '../../utils/mixpanel';
 
 const PostModal = dynamic(
   () => import('../../components/organisms/decision/PostModal')
@@ -82,6 +83,10 @@ const PostPage: NextPage<IPostPage> = ({
   >(post ?? undefined);
 
   const handleOpenPostModal = (postToOpen: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'Post',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(postToOpen);
     setPostModalOpen(true);
   };
@@ -91,6 +96,9 @@ const PostPage: NextPage<IPostPage> = ({
   }, []);
 
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Post',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
 
