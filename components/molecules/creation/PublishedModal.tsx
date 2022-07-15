@@ -53,10 +53,11 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-  const preventCLick = (e: any) => {
+  const preventClick = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
   };
+
   const socialButtons = useMemo(
     () => [
       // {
@@ -88,7 +89,10 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
   }, [postData]);
 
   async function copyPostUrlToClipboard(url: string) {
-    Mixpanel.track('Copy Post Url to Clipboard', { _url: url });
+    Mixpanel.track('Copy Post Url to Clipboard', {
+      _stage: 'Creation',
+      _url: url,
+    });
     if ('clipboard' in navigator) {
       await navigator.clipboard.writeText(url);
     } else {
@@ -212,7 +216,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
 
   return (
     <Modal show={open} onClose={handleClose}>
-      <SMobileContainer onClick={preventCLick}>
+      <SMobileContainer onClick={preventClick}>
         <SContent>
           <SPlayerWrapper>
             {open ? (
@@ -245,7 +249,8 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             </SCaption>
           </SUserBlock>
           <SPostTitleText variant={3} weight={600}>
-            <PostTitleContent>{post.title}</PostTitleContent>
+            {/* Navigation here only works when done through the router */}
+            <PostTitleContent target='router'>{post.title}</PostTitleContent>
           </SPostTitleText>
           <STitle variant={6}>
             {t(

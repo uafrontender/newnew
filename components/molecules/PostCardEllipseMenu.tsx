@@ -16,6 +16,7 @@ import isBrowser from '../../utils/isBrowser';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
 import switchPostType from '../../utils/switchPostType';
 import { useAppSelector } from '../../redux-store/store';
+import { Mixpanel } from '../../utils/mixpanel';
 
 interface IPostCardEllipseMenu {
   postUuid: string;
@@ -72,7 +73,10 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       const handleCopyLink = useCallback(() => {
         if (window) {
           const url = `${window.location.origin}/post/${postUuid}`;
-
+          Mixpanel.track('Copied Link Post Modal', {
+            _stage: 'Post',
+            _postUuid: postUuid,
+          });
           copyPostUrlToClipboard(url)
             .then(() => {
               setIsCopiedUrl(true);
@@ -93,6 +97,10 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
 
       const handleFollowDecision = useCallback(async () => {
         try {
+          Mixpanel.track('Favorite Post', {
+            _stage: 'Post',
+            _postUuid: postUuid,
+          });
           if (!user.loggedIn) {
             router.push(
               `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
@@ -200,6 +208,10 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
                 variant={3}
                 tone='error'
                 onClick={() => {
+                  Mixpanel.track('Report Open Post Modal', {
+                    _stage: 'Post',
+                    _postUuid: postUuid,
+                  });
                   handleReportOpen();
                   onClose();
                 }}

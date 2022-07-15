@@ -30,6 +30,7 @@ import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmail
 import secondsToString from '../../utils/secondsToHMS';
 import isBrowser from '../../utils/isBrowser';
 import AnimatedPresence from '../atoms/AnimatedPresence';
+import { Mixpanel } from '../../utils/mixpanel';
 
 export interface ICodeVerificationMenu {
   expirationTime: number;
@@ -80,6 +81,11 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     async (completeCode: string) => {
       if (!signupEmailInput) return;
       try {
+        Mixpanel.track('Verify email submitted', {
+          _stage: 'Sign Up',
+          email: signupEmailInput,
+          verificationCode: completeCode,
+        });
         setSubmitError('');
         setTimerHidden(true);
         setIsSignInWithEmailLoading(true);
@@ -170,6 +176,10 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     setIsResendCodeLoading(true);
     setSubmitError('');
     try {
+      Mixpanel.track('Resend code', {
+        _stage: 'Sign Up',
+        email: signupEmailInput,
+      });
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: signupEmailInput,
         useCase:
@@ -226,7 +236,12 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       {!isMobileOrTablet && (
         <SBackButtonDesktop
           longArrow={!isMobileOrTablet}
-          onClick={() => router.back()}
+          onClick={() => {
+            Mixpanel.track('Go Back Clicked', {
+              _stage: 'Sign Up',
+            });
+            router.back();
+          }}
         >
           {!isMobileOrTablet ? t('backButton') : ''}
         </SBackButtonDesktop>
@@ -240,7 +255,12 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       >
         <SBackButton
           defer={isMobileOrTablet ? 250 : undefined}
-          onClick={() => router.back()}
+          onClick={() => {
+            Mixpanel.track('Go Back Clicked', {
+              _stage: 'Sign Up',
+            });
+            router.back();
+          }}
         />
         <AnimatedLogoEmailVerification
           isLoading={isSignInWithEmailLoading || isResendCodeLoading}

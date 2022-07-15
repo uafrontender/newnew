@@ -56,6 +56,7 @@ import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
 import PostEllipseMenuModeration from '../../molecules/decision/PostEllipseMenuModeration';
 import PostEllipseModalModeration from '../../molecules/decision/PostEllipseModalModeration';
 import PostConfirmDeleteModal from '../../molecules/decision/PostConfirmDeleteModal';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
 // Posts views
@@ -202,6 +203,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const handleFollowDecision = useCallback(async () => {
     try {
+      Mixpanel.track('Favorite Post', {
+        _stage: 'Post',
+        _postUuid: postParsed?.postUuid,
+      });
       if (!user.loggedIn) {
         router.push(
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
@@ -346,7 +351,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (currLocation === 'forced_redirect_to_home') {
       innerHistoryStack.current = [];
       handleClose();
-      router.push('/');
       return;
     }
 
@@ -357,12 +361,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     currLocation,
     handleClose,
     isConfirmToClosePost,
-    router,
     syncedHistoryPushState,
     t,
   ]);
 
   const handleGoBackInsidePost = useCallback(() => {
+    Mixpanel.track('Go Back Inside Post', {
+      _stage: 'Post Modal',
+    });
     if (
       isConfirmToClosePost &&
       !window.confirm(t('postVideo.cannotLeavePageMsg'))
@@ -386,6 +392,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   ]);
 
   const handleSeeNewDeletedBox = useCallback(() => {
+    Mixpanel.track('Post Failed Button Click', {
+      _stage: 'Post',
+    });
     if (recommendedPosts.length > 0) {
       document.getElementById('post-modal-container')?.scrollTo({
         top: document.getElementById('recommendations-section-heading')
@@ -400,6 +409,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const handleOpenRecommendedPost = useCallback(
     (newPost: newnewapi.Post) => {
       const newPostParsed = switchPostType(newPost)[0];
+      Mixpanel.track('Open Another Post', {
+        _stage: 'Post',
+        _postUuid: newPostParsed.postUuid,
+      });
       handleOpenAnotherPost?.(newPost);
       if (post !== undefined)
         innerHistoryStack.current.push(post as newnewapi.Post);
@@ -1263,6 +1276,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                   }
                   buttonCaption={t('postDeletedByMe.buttonText')}
                   handleButtonClick={() => {
+                    Mixpanel.track('Post Failed Redirect to Creation', {
+                      _stage: 'Post',
+                    });
                     router.push('/creation');
                   }}
                 />

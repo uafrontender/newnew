@@ -405,7 +405,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       currentUser.loggedIn &&
       currentUser.userData?.userUuid?.toString() === user.uuid.toString()
     ) {
-      router.push(
+      router.replace(
         currentUser.userData?.options?.isCreator
           ? '/profile/my-posts'
           : '/profile'

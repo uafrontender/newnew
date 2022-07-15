@@ -13,6 +13,7 @@ import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
 import EllipseModal from '../../atoms/EllipseModal';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -78,7 +79,10 @@ const PostShareEllipseModal: React.FunctionComponent<IPostShareEllipseModal> =
     const handlerCopy = useCallback(() => {
       if (window) {
         const url = `${window.location.origin}/post/${postId}`;
-
+        Mixpanel.track('Copied Link Post', {
+          _stage: 'Post',
+          _postUuid: postId,
+        });
         copyPostUrlToClipboard(url)
           .then(() => {
             setIsCopiedUrl(true);

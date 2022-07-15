@@ -116,7 +116,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                         view='primaryGrad'
                         withShadow={!globalSearchActive}
                         onClick={() => {
-                          Mixpanel.track('Navigation Item Clicked ', {
+                          Mixpanel.track('Navigation Item Clicked', {
                             _button: 'New Post',
                           });
                         }}
@@ -185,7 +185,16 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
             <SItemWithMargin>
               <Link href='/sign-up?to=log-in'>
                 <a>
-                  <Button view='quaternary'>{t('button.loginIn')}</Button>
+                  <Button
+                    view='quaternary'
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Log in',
+                      });
+                    }}
+                  >
+                    {t('button.loginIn')}
+                  </Button>
                 </a>
               </Link>
             </SItemWithMargin>
@@ -197,6 +206,11 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                     withShrink
                     view='primaryGrad'
                     withShadow={!globalSearchActive}
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Sign up',
+                      });
+                    }}
                   >
                     {t('button.signUp')}
                   </Button>

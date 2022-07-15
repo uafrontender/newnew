@@ -75,7 +75,8 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
       });
     }
     if (value.key === 'add') {
-      Mixpanel.track('Navigation Item Clicked ', {
+      Mixpanel.track('Navigation Item Clicked', {
+        _stage: 'Creation',
         _button: 'New Post',
       });
     }

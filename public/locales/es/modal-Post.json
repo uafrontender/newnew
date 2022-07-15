@@ -459,7 +459,7 @@
         "cancelButton": "Cancelar"
       },
       "freeSub": "SUSCRIPCIÓN GRATIS",
-      "custom": "Personalizado",
+      "custom": "Introducir\ncantidad",
       "cancel": "Cancelar"
     },
     "winnerTab": {
@@ -481,6 +481,10 @@
       "choosePledgeButton": "Patrocinar este goal"
     }
   },
+  "thumbnailEllipseMenu_NEED_TRANSLATION": {
+    "selectSnippetButton": "Select a snippet",
+    "uploadImageButton": "Upload an image"
+  },
   "postVideoThumbnailEdit": {
     "title": "Establecer una miniatura",
     "description": "Seleccionar un fragmento del video",
@@ -489,6 +493,16 @@
     "toast": {
       "success": "¡Éxito! La imagen en miniatura se cambiará una vez procesada",
       "error": "Ha ocurrido un error"
+    }
+  },
+  "postVideoCoverImageEdit_NEED_TRANSLATION": {
+    "title": "Upload an image",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "uploadCoverImage": {
+      "caption": "Select custom cover image",
+      "uploadBtn": "Select",
+      "deleteBtn": "Delete"
     }
   },
   "acPostModeration": {

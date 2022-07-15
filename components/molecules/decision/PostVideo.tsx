@@ -14,6 +14,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
 import isBrowser from '../../../utils/isBrowser';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
@@ -150,6 +151,10 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             iconOnly
             view='transparent'
             onClick={(e) => {
+              Mixpanel.track('Toggle Muted Mode', {
+                _stage: 'Post',
+                _postUuid: postId,
+              });
               e.stopPropagation();
               handleToggleMuted();
             }}
@@ -182,6 +187,10 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
             iconOnly
             view='transparent'
             onClick={(e) => {
+              Mixpanel.track('Toggle Muted Mode', {
+                _stage: 'Post',
+                _postUuid: postId,
+              });
               e.stopPropagation();
               handleToggleMuted();
             }}
