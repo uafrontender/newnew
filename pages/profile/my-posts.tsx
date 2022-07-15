@@ -18,6 +18,7 @@ import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
 import switchPostType from '../../utils/switchPostType';
 import assets from '../../constants/assets';
+import { Mixpanel } from '../../utils/mixpanel';
 
 const PostModal = dynamic(
   () => import('../../components/organisms/decision/PostModal')
@@ -68,6 +69,10 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'Profile Page',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(post);
     setPostModalOpen(true);
   };
@@ -77,6 +82,9 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
   }, []);
 
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Profile Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };

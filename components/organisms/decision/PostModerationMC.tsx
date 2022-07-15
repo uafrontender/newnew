@@ -35,6 +35,7 @@ import PostVotingTab from '../../molecules/decision/PostVotingTab';
 
 import useResponseUpload from '../../../utils/hooks/useResponseUpload';
 import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
@@ -282,6 +283,11 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
 
     const handleRemoveOption = useCallback(
       (optionToRemove: newnewapi.MultipleChoice.Option) => {
+        Mixpanel.track('Removed Option', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostModerationMC',
+        });
         setOptions((curr) => {
           const workingArr = [...curr];
           const workingArrUnsorted = [
@@ -290,7 +296,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           return sortOptions(workingArrUnsorted);
         });
       },
-      [setOptions, sortOptions]
+      [setOptions, sortOptions, post.postUuid]
     );
 
     const fetchPostLatestData = useCallback(async () => {

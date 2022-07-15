@@ -89,7 +89,10 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
   }, [postData]);
 
   async function copyPostUrlToClipboard(url: string) {
-    Mixpanel.track('Copy Post Url to Clipboard', { _url: url });
+    Mixpanel.track('Copy Post Url to Clipboard', {
+      _stage: 'Creation',
+      _url: url,
+    });
     if ('clipboard' in navigator) {
       await navigator.clipboard.writeText(url);
     } else {

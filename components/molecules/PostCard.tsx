@@ -56,6 +56,7 @@ import { reportPost } from '../../api/endpoints/report';
 import PostCardEllipseModal from './PostCardEllipseModal';
 import useOnTouchStartOutside from '../../utils/hooks/useOnTouchStartOutside';
 import getChunks from '../../utils/getChunks/getChunks';
+import { Mixpanel } from '../../utils/mixpanel';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -184,6 +185,10 @@ export const PostCard: React.FC<ICard> = React.memo(
     >(postParsed.announcement?.coverImageUrl ?? undefined);
 
     const handleUserClick = (username: string) => {
+      Mixpanel.track('Go To Creator Profile', {
+        _stage: 'Post Card',
+        _postUuid: switchPostType(item)[0].postUuid,
+      });
       router.push(`/${username}`);
     };
 
@@ -195,11 +200,20 @@ export const PostCard: React.FC<ICard> = React.memo(
     ) => {
       e.preventDefault();
       e.stopPropagation();
-
+      Mixpanel.track('Open Ellipse Menu Post Card', {
+        _stage: 'Post Card',
+        _postUuid: switchPostType(item)[0].postUuid,
+      });
       setIsEllipseMenuOpen(true);
     };
 
-    const handleEllipseMenuClose = () => setIsEllipseMenuOpen(false);
+    const handleEllipseMenuClose = () => {
+      Mixpanel.track('Closed Ellipse Menu Post Card', {
+        _stage: 'Post Card',
+        _postUuid: switchPostType(item)[0].postUuid,
+      });
+      setIsEllipseMenuOpen(false);
+    };
 
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 

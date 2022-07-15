@@ -16,6 +16,7 @@ import { TMcOptionWithHighestField } from '../../../../organisms/decision/PostVi
 import Button from '../../../../atoms/Button';
 import GradientMask from '../../../../atoms/GradientMask';
 import McOptionCardModeration from './McOptionCardModeration';
+import { Mixpanel } from '../../../../../utils/mixpanel';
 
 interface IMcOptionsTabModeration {
   post: newnewapi.MultipleChoice;
@@ -103,7 +104,16 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
             {!isMobile ? (
               <SLoaderDiv ref={loadingRef} />
             ) : pagingToken ? (
-              <SLoadMoreBtn onClick={() => handleLoadOptions(pagingToken)}>
+              <SLoadMoreBtn
+                onClickCapture={() => {
+                  Mixpanel.track('Click Load More', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'McOptionsTabModeration',
+                  });
+                }}
+                onClick={() => handleLoadOptions(pagingToken)}
+              >
                 {t('loadMoreButton')}
               </SLoadMoreBtn>
             ) : null}
