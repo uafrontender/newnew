@@ -103,6 +103,7 @@
     "jest": "^28.1.1",
     "jest-environment-jsdom": "^28.1.1",
     "pre-commit": "1.2.2",
+    "prettier": "2.7.1",
     "raw-loader": "4.0.2",
     "typescript": "4.7.3"
   },
