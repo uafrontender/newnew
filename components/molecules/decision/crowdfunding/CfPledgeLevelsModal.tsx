@@ -261,7 +261,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
                     p.usdCents ? p.usdCents : 0
                   );
                 }}
-              >{`${(p.usdCents / 100).toFixed(0)}`}</EllipseModalButton>
+              >{`$${(p.usdCents / 100).toFixed(0)}`}</EllipseModalButton>
             ) : null
           )
           .concat(
@@ -497,5 +497,5 @@ const SPaymentTerms = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap;
 `;
