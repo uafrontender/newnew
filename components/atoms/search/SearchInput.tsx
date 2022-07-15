@@ -101,11 +101,9 @@ const SearchInput: React.FC = React.memo(() => {
 
   const handleSubmit = () => {};
   const handleCloseIconClick = () => {
-    if (searchValue) {
-      setSearchValue('');
-    } else {
-      handleSearchClose();
-    }
+    setSearchValue('');
+    handleSearchClose();
+    setIsResultsDropVisible(false);
   };
 
   useOnClickEsc(inputContainerRef, () => {
