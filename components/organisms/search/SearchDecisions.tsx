@@ -171,7 +171,7 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
             return arr;
           });
           setPostsRoomsNextPageToken(res.data.paging?.nextPageToken);
-        } else {
+        } else if (!postsNextPageToken) {
           setResultsPosts([]);
           setHasNoResults(true);
         }
@@ -187,7 +187,15 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
       }
     },
 
-    [postSorting, query, type, initialLoad, activeTabs, hasNoResults]
+    [
+      postSorting,
+      query,
+      type,
+      initialLoad,
+      activeTabs,
+      hasNoResults,
+      postsNextPageToken,
+    ]
   );
 
   const handleRemovePostFromState = (postUuid: string) => {
