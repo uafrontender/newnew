@@ -40,6 +40,7 @@ import CommentsBottomSection from '../../molecules/decision/success/CommentsBott
 import Headline from '../../atoms/Headline';
 import PostVotingTab from '../../molecules/decision/PostVotingTab';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -702,7 +703,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             <PaymentSuccessModal
               postType='ac'
               isVisible={paymentSuccesModalOpen}
-              closeModal={() => setPaymentSuccesModalOpen(false)}
+              closeModal={() => {
+                Mixpanel.track('Close Payment Success Modal', {
+                  _stage: 'Post',
+                  _post: post.postUuid,
+                });
+                setPaymentSuccesModalOpen(false);
+              }}
             >
               {t('paymentSuccessModal.ac', {
                 postCreator:

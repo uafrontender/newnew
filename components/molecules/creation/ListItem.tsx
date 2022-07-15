@@ -75,6 +75,7 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
         }}
         onClick={() => {
           Mixpanel.track('Post Type Selected', {
+            _stage: 'Creation',
             _postType: itemKey,
           });
           dispatch(clearCreation({}));

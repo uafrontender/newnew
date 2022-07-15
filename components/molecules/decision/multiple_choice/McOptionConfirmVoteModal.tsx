@@ -17,6 +17,7 @@ import VotesAmountInputModal from '../../../atoms/decision/VotesAmountInputModal
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import assets from '../../../../constants/assets';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IMcConfirmVoteModal {
   isOpen: boolean;
@@ -61,7 +62,17 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
               e.stopPropagation();
             }}
           >
-            <SCloseButton iconOnly view='transparent' onClick={onClose}>
+            <SCloseButton
+              iconOnly
+              view='transparent'
+              onClick={onClose}
+              onClickCapture={() => {
+                Mixpanel.track('Close McConfirmVoteModal', {
+                  _stage: 'Post',
+                  _component: 'McConfirmVoteModal',
+                });
+              }}
+            >
               <InlineSvg
                 svg={CancelIcon}
                 fill={theme.colorsThemed.text.primary}
@@ -95,6 +106,12 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
             <SOptionText variant={2}>{optionText}</SOptionText>
             <SVoteButton
               view='primary'
+              onClickCapture={() => {
+                Mixpanel.track('Submit Votes Amount and Open Payment Modal', {
+                  _stage: 'Post',
+                  _component: 'McConfirmVoteModal',
+                });
+              }}
               onClick={() => handleOpenPaymentModal()}
             >
               {t('mcPost.optionsTab.optionCard.confirmVoteModal.voteButton')}
@@ -113,7 +130,17 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
             e.stopPropagation();
           }}
         >
-          <SCloseButton iconOnly view='transparent' onClick={onClose}>
+          <SCloseButton
+            iconOnly
+            view='transparent'
+            onClick={onClose}
+            onClickCapture={() => {
+              Mixpanel.track('Close McConfirmVoteModal', {
+                _stage: 'Post',
+                _component: 'McConfirmVoteModal',
+              });
+            }}
+          >
             <InlineSvg
               svg={CancelIcon}
               fill={theme.colorsThemed.text.primary}
@@ -176,6 +203,12 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
             disabled={
               !supportVotesAmount || parseInt(supportVotesAmount) < minAmount
             }
+            onClickCapture={() => {
+              Mixpanel.track('Submit Votes Amount and Open Payment Modal', {
+                _stage: 'Post',
+                _component: 'McConfirmVoteModal',
+              });
+            }}
             onClick={() => handleOpenPaymentModal()}
           >
             {t('mcPost.optionsTab.optionCard.confirmVoteModal.voteButton')}

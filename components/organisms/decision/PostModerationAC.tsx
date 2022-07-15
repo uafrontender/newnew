@@ -41,6 +41,7 @@ import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
 import useResponseUpload from '../../../utils/hooks/useResponseUpload';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
@@ -344,6 +345,11 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
 
     const handleRemoveOption = useCallback(
       (optionToRemove: newnewapi.Auction.Option) => {
+        Mixpanel.track('Removed Option', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostModerationAC',
+        });
         setOptions((curr) => {
           const workingArr = [...curr];
           const workingArrUnsorted = [
@@ -352,7 +358,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           return sortOptions(workingArrUnsorted);
         });
       },
-      [setOptions, sortOptions]
+      [setOptions, sortOptions, post.postUuid]
     );
 
     // Increment channel subs after mounting

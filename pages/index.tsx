@@ -26,6 +26,7 @@ import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import switchPostType from '../utils/switchPostType';
 import isBrowser from '../utils/isBrowser';
 import assets from '../constants/assets';
+import { Mixpanel } from '../utils/mixpanel';
 
 const TopSection = dynamic(
   () => import('../components/organisms/home/TopSection')
@@ -103,6 +104,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
 
   const handleOpenPostModal = useCallback(
     (post: newnewapi.IPost) => {
+      Mixpanel.track('Open Post Modal', {
+        _stage: 'Home Page',
+        _postUuid: switchPostType(post)[0].postUuid,
+      });
       setDisplayedPost(post);
       setPostModalOpen(true);
     },
@@ -114,6 +119,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   }, []);
 
   const handleClosePostModal = useCallback(() => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Home Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   }, []);
