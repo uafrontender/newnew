@@ -396,6 +396,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     let pageToken;
     let handleSetPosts;
     let totalCount;
+    let handleSetFavoritePosts;
 
     switch (renderedPage) {
       case 'activelyBidding': {
@@ -404,6 +405,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         pageToken = activelyBiddingPageToken;
         totalCount = activelyBiddingCount;
         handleSetPosts = handleSetPostsActivelyBiddingOn;
+        handleSetFavoritePosts = handleSetPostsFavorites;
         break;
       }
       case 'purchases': {
@@ -412,6 +414,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         pageToken = myPurchasesPageToken;
         totalCount = myPurchasesCount;
         handleSetPosts = handleSetPostsMyPurchases;
+        handleSetFavoritePosts = handleSetPostsFavorites;
         break;
       }
       case 'viewHistory': {
@@ -420,6 +423,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         pageToken = viewHistoryPageToken;
         totalCount = viewHistoryCount;
         handleSetPosts = handleSetPostsViewHistory;
+        handleSetFavoritePosts = handleSetPostsFavorites;
         break;
       }
       case 'subscriptions': {
@@ -460,6 +464,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       handleUpdatePageToken,
       handleUpdateCount,
       handleUpdateFilter,
+      handleSetFavoritePosts,
     });
   };
 
@@ -775,13 +780,18 @@ const SGeneral = styled(General)`
 
   @media (max-width: 768px) {
     main {
-      div:first-child {
+      > div:first-child {
         padding-left: 0;
         padding-right: 0;
 
-        div:first-child {
-          margin-left: 0;
-          margin-right: 0;
+        > div:first-child {
+          padding-left: 0;
+          padding-right: 0;
+
+          > div:first-child {
+            padding-left: 0;
+            padding-right: 0;
+          }
         }
       }
     }
