@@ -210,6 +210,20 @@
           }
         }
       },
+      "cards": {
+        "title": "My cards",
+        "myPaymentMethods": "My payment methods",
+        "hint": "You’ll need a card on file to participate in posts",
+        "button": {
+          "addNewCard": "Add a new card",
+          "addCard": "Add card"
+        },
+        "primary": "Primary",
+        "ellipse": {
+          "makePrimary": "Make it primary",
+          "removeCard": "Remove card"
+        }
+      },
       "personalInformation": {
         "title": "Personal information",
         "emailInput": {
@@ -218,7 +232,11 @@
           "errors": {
             "invalidEmail": "Please enter a valid email address",
             "emailTaken": "Email taken"
-          }
+          },
+          "whatsNew": "What’s your new email address?",
+          "confirmEmail": "Confirm new email",
+          "verifyNewEmail": "Verify your new email",
+          "edit": "Edit"
         },
         "birthDateInput": {
           "label": "Date of birth",
