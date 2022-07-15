@@ -661,5 +661,5 @@ const SPaymentTerms = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap;
 `;
