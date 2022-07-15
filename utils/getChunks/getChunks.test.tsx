@@ -50,8 +50,7 @@ describe('parses hashtags', () => {
     expect(chunks[0].text).toBe('another_hashtag');
   });
 
-  // TODO: Enable tests when BE supports these cases
-  /* it('with apostrophe', () => {
+  it('with apostrophe', () => {
     const input = '#CharliD’amelio';
     const chunks = getChunks(input);
 
@@ -69,7 +68,7 @@ describe('parses hashtags', () => {
 
     expect(chunks[0].type).toBe('hashtag');
     expect(chunks[0].text).toBe("CharliD'amelio");
-  }); */
+  });
 
   it('with capital letter', () => {
     const input = '#HaShTaG';
