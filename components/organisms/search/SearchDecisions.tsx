@@ -179,7 +179,7 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
             return arr;
           });
           setPostsRoomsNextPageToken(res.data.paging?.nextPageToken);
-        } else if (!postsNextPageToken) {
+        } else if (!pageToken) {
           setResultsPosts([]);
           setHasNoResults(true);
         }
@@ -195,7 +195,6 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
       }
     },
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [postSorting, query, type, initialLoad, activeTabs, hasNoResults]
   );
 

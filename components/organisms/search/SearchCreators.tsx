@@ -53,7 +53,7 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
             return arr;
           });
           setCreatorsRoomsNextPageToken(res.data.paging?.nextPageToken);
-        } else if (!creatorsNextPageToken) {
+        } else if (!pageToken) {
           setHasNoResults(true);
         }
 
