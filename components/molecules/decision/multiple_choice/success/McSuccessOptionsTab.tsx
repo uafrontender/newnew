@@ -212,6 +212,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
               !option.creator || option.creator?.uuid === post.creator?.uuid
             }
             postCreator=''
+            postCreatorUuid={post.creator?.uuid ?? ''}
             postText=''
             index={i}
             minAmount={0}
