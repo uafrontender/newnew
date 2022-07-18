@@ -424,8 +424,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         $isDisabled={disabled && votingAllowed}
         $isBlue={isBlue}
         onClick={(e) => {
-          if (!isMobile && !disabled && !isEllipseMenuOpen) {
-            console.log(isMyBid);
+          if (!isMobile && !isEllipseMenuOpen) {
             setIsEllipseMenuOpen(true);
 
             setOptionMenuXY({

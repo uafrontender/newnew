@@ -207,7 +207,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
               <McOptionCardModerationEllipseMenu
                 isVisible={isEllipseMenuOpen}
                 isBySubscriber={!isCreatorsBid}
-                canBeDeleted={canBeDeleted}
+                canBeDeleted={canBeDeleted && !isWinner}
                 handleClose={() => setIsEllipseMenuOpen(false)}
                 handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
                 handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
@@ -231,7 +231,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
             zIndex={16}
             onClose={() => setIsEllipseMenuOpen(false)}
             isBySubscriber={!isCreatorsBid}
-            canBeDeleted={canBeDeleted}
+            canBeDeleted={canBeDeleted && !isWinner}
             handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
             handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
             handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
