@@ -28,6 +28,7 @@ import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import EllipseModal, { EllipseModalButton } from '../../../atoms/EllipseModal';
 import { formatNumber } from '../../../../utils/format';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsModal {
@@ -384,7 +385,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalOptionText variant={5}>
-              {post.title}
+              <PostTitleContent>{post.title}</PostTitleContent>
             </SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>

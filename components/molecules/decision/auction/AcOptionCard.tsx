@@ -57,6 +57,7 @@ import { reportEventOption } from '../../../../api/endpoints/report';
 import { deleteAcOption } from '../../../../api/endpoints/auction';
 import AcConfirmDeleteOptionModal from './moderation/AcConfirmDeleteOptionModal';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -769,7 +770,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
-              {postText}
+              <PostTitleContent>{postText}</PostTitleContent>
             </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
               {t('acPost.paymentModalHeader.subtitle')}
