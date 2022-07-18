@@ -106,7 +106,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           res = await fetchForYouPosts(fyPayload);
 
-          if (res.data && (res.data as newnewapi.PagedPostsResponse).posts) {
+          if (res.data && (res.data as newnewapi.PagedPostsResponse)?.posts) {
             setCollectionLoaded((curr) => [
               ...curr,
               ...((res.data as newnewapi.PagedPostsResponse)
@@ -139,7 +139,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           if (
             res.data &&
-            (res.data as newnewapi.PagedAuctionsResponse).auctions
+            (res.data as newnewapi.PagedAuctionsResponse)?.auctions
           ) {
             setCollectionLoaded((curr) => [
               ...curr,
@@ -173,7 +173,8 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           if (
             res.data &&
-            (res.data as newnewapi.PagedMultipleChoicesResponse).multipleChoices
+            (res.data as newnewapi.PagedMultipleChoicesResponse)
+              ?.multipleChoices
           ) {
             setCollectionLoaded((curr) => [
               ...curr,
@@ -207,7 +208,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           if (
             res.data &&
-            (res.data as newnewapi.PagedCrowdfundingsResponse).crowdfundings
+            (res.data as newnewapi.PagedCrowdfundingsResponse)?.crowdfundings
           ) {
             setCollectionLoaded((curr) => [
               ...curr,
@@ -239,7 +240,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           res = await fetchBiggestPosts(biggestPayload);
 
-          if (res.data && (res.data as newnewapi.PagedPostsResponse).posts) {
+          if (res.data && (res.data as newnewapi.PagedPostsResponse)?.posts) {
             setCollectionLoaded((curr) => [
               ...curr,
               ...((res.data as newnewapi.PagedPostsResponse)
@@ -413,7 +414,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      {topSectionCollection.length > 0 && (
+      {topSectionCollection?.length > 0 && (
         <TopSection
           collection={topSectionCollection}
           handlePostClicked={handleOpenPostModal}
