@@ -6,13 +6,14 @@ import InlineSvg from '../../atoms/InlineSVG';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 
-type TOnboardingSectionUsernameInput =
-  React.ComponentPropsWithoutRef<'input'> & {
-    isValid?: boolean;
-    popupCaption: ReactElement;
-    frequencyCaption: string;
-    errorCaption: string;
-  };
+interface TOnboardingSectionUsernameInput
+  extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange'> {
+  isValid?: boolean;
+  popupCaption: ReactElement;
+  frequencyCaption: string;
+  errorCaption: string;
+  onChange: (value: string) => void;
+}
 
 const OnboardingSectionUsernameInput: React.FunctionComponent<TOnboardingSectionUsernameInput> =
   ({
@@ -34,14 +35,7 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<TOnboardingSection
       const newValue =
         (value as string).length > 0 ? e.target.value.slice(1) : e.target.value;
 
-      const pseudoEvent = {
-        target: {
-          value: newValue,
-        },
-      };
-
-      // @ts-ignore
-      onChange(pseudoEvent || '');
+      onChange(newValue);
     };
 
     useEffect(() => {
