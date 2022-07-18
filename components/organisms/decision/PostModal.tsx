@@ -10,7 +10,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -1475,14 +1475,6 @@ const SPostModalContainer = styled.div<{
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     width: 100%;
     height: calc(100% - 64px);
-
-    ${({ isMyPost }) =>
-      isMyPost
-        ? css`
-            height: initial;
-            max-height: 100%;
-          `
-        : null}
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -1496,14 +1488,6 @@ const SPostModalContainer = styled.div<{
 
     padding: 24px;
     padding-bottom: 24px;
-
-    ${({ isMyPost }) =>
-      isMyPost
-        ? css`
-            height: initial;
-            max-height: 100%;
-          `
-        : null}
   }
 `;
 
