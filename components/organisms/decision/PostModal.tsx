@@ -862,6 +862,15 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     return (
       <SPostSuccessWaitingControlsDiv
         variant='moderation'
+        style={{
+          ...(isMobile &&
+          (postStatus === 'deleted_by_admin' ||
+            postStatus === 'deleted_by_creator')
+            ? {
+                marginTop: 64,
+              }
+            : {}),
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <SWaitingSuccessControlsBtn
@@ -878,36 +887,45 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             height='24px'
           />
         </SWaitingSuccessControlsBtn>
-        <SWaitingSuccessControlsBtn
-          view='secondary'
-          iconOnly
-          onClick={() => setShareMenuOpen(true)}
-          ref={shareButtonRef}
-        >
-          <InlineSvg
-            svg={ShareIcon}
-            fill={
-              theme.name === 'light' ? theme.colors.dark : theme.colors.white
-            }
-            width='24px'
-            height='24px'
-          />
-        </SWaitingSuccessControlsBtn>
-        <SWaitingSuccessControlsBtn
-          view='secondary'
-          iconOnly
-          onClick={() => setEllipseMenuOpen(true)}
-          ref={moreButtonRef}
-        >
-          <InlineSvg
-            svg={MoreIcon}
-            fill={
-              theme.name === 'light' ? theme.colors.dark : theme.colors.white
-            }
-            width='24px'
-            height='24px'
-          />
-        </SWaitingSuccessControlsBtn>
+        {postStatus !== 'deleted_by_admin' &&
+          postStatus !== 'deleted_by_creator' && (
+            <>
+              <SWaitingSuccessControlsBtn
+                view='secondary'
+                iconOnly
+                onClick={() => setShareMenuOpen(true)}
+                ref={shareButtonRef}
+              >
+                <InlineSvg
+                  svg={ShareIcon}
+                  fill={
+                    theme.name === 'light'
+                      ? theme.colors.dark
+                      : theme.colors.white
+                  }
+                  width='24px'
+                  height='24px'
+                />
+              </SWaitingSuccessControlsBtn>
+              <SWaitingSuccessControlsBtn
+                view='secondary'
+                iconOnly
+                onClick={() => setEllipseMenuOpen(true)}
+                ref={moreButtonRef}
+              >
+                <InlineSvg
+                  svg={MoreIcon}
+                  fill={
+                    theme.name === 'light'
+                      ? theme.colors.dark
+                      : theme.colors.white
+                  }
+                  width='24px'
+                  height='24px'
+                />
+              </SWaitingSuccessControlsBtn>
+            </>
+          )}
         {/* Share menu */}
         {!isMobile && postParsed?.postUuid && (
           <PostShareEllipseMenu
@@ -965,6 +983,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     handleShareClose,
     isMobile,
     postParsed?.postUuid,
+    postStatus,
     shareMenuOpen,
     theme.colors.dark,
     theme.colors.white,
