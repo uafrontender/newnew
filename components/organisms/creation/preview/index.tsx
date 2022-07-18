@@ -411,6 +411,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   if (isMobile) {
     return (
       <>
+        <PublishedModal open={showModal} handleClose={handleCloseModal} />
         <SContent>
           <STopLine>
             <SInlineSVG
