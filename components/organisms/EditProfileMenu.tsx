@@ -716,6 +716,20 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     }
   }, [formErrors, dataInEdit]);
 
+  useEffect(() => {
+    if (dataInEdit.bio.length > 0) {
+      const workingData: ModalMenuUserData = { ...dataInEdit };
+      workingData.bio = dataInEdit.bio.trimStart();
+      if (
+        dataInEdit.bio.length > 1 &&
+        dataInEdit.bio[dataInEdit.bio.length - 2] === ' '
+      ) {
+        workingData.bio = dataInEdit.bio.trimEnd();
+      }
+      setDataInEdit({ ...workingData });
+    }
+  }, [dataInEdit]);
+
   // Gender Pronouns
   const genderOptions: TDropdownSelectItem<number>[] = useMemo(
     () =>
@@ -829,7 +843,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   )}
                   placeholder={t('editProfileMenu.inputs.username.placeholder')}
                   isValid={!formErrors.usernameError}
-                  onChange={(value) => {
+                  onChange={(value: any) => {
                     handleUpdateDataInEdit('username', value as string);
                   }}
                 />
@@ -1120,7 +1134,6 @@ const ProfilePictureContent = styled.div`
 
 const SSliderWrapper = styled.div`
   display: none;
-
   ${({ theme }) => theme.media.tablet} {
     position: absolute;
     left: 20px;
@@ -1131,17 +1144,13 @@ const SSliderWrapper = styled.div`
       theme.name === 'light'
         ? 'rgba(255, 255, 255, 0.5)'
         : 'rgba(11, 10, 19, 0.5)'};
-
     display: flex;
     flex-direction: row;
     justify-content: center;
-
     margin-top: 24px;
-    padding: 0px 24px;
-
+    padding: 0 24px;
     button {
       background: transparent;
-
       &:hover:enabled {
         background: transparent;
         cursor: pointer;
@@ -1212,37 +1221,30 @@ const UsernamePopupList = ({
   </SUsernamePopupList>
 );
 
-const SUsernamePopupListItem = styled.div<{
-  isValid: boolean;
-}>`
+const SUsernamePopupListItem = styled.div<{ isValid: boolean }>`
   display: flex;
   justify-content: flex-start;
   align-items: center;
 
   &:before {
     content: '✓';
-    color: ${({ isValid }) => (isValid ? '#FFFFFF' : 'transparent')};
+    color: ${({ isValid }) => (isValid ? '#fff' : 'transparent')};
     font-size: 8px;
     text-align: center;
     line-height: 13px;
     display: block;
-
     position: relative;
     top: -1px;
-
     width: 13px;
     height: 13px;
     margin-right: 4px;
-
     border-radius: 50%;
     border-width: 1.5px;
     border-style: solid;
     border-color: ${({ theme, isValid }) =>
       isValid ? 'transparent' : theme.colorsThemed.text.secondary};
-
     background-color: ${({ theme, isValid }) =>
       isValid ? theme.colorsThemed.accent.success : 'transparent'};
-
     transition: 0.2s ease-in-out;
   }
 `;
@@ -1251,36 +1253,14 @@ const SUsernamePopupList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-
   font-weight: 600;
   font-size: 12px;
   line-height: 16px;
-
-  color: #ffffff;
+  color: #fff;
 `;
 
 const SDropdownSelectWrapper = styled.div`
   margin-bottom: 16px;
-`;
-
-const SPreviewDiv = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-
-  margin-top: 6px;
-  margin-bottom: 16px;
-
-  text-align: center;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  & > div {
-    margin-right: 4px;
-  }
 `;
 
 const SDropdownSelect = styled(DropdownSelect)`
