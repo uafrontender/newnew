@@ -29,9 +29,9 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   // const category = router.query.category as string;
   const { sort } = router.query;
 
-  const sorts: Record<string, string> | '' = sort
+  const sorts: Record<string, string> = sort
     ? JSON.parse(sort as string) || {}
-    : '';
+    : undefined;
 
   const sortOptions: any = useMemo(
     () => [
