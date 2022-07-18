@@ -227,8 +227,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
       renderedPage={renderedPage}
       user={page.props.user}
       {...{
-        ...// @ts-ignore
-        (renderedPage !== 'activityHidden'
+        ...(renderedPage !== 'activityHidden'
           ? {
               postsCachedActivity: page.props.pagedPosts.posts,
               postsCachedActivityFilter: newnewapi.Post.Filter.ALL,

@@ -230,6 +230,7 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
                     <Trans
                       i18nKey='postResponseTabModeration.winner.ac.optionCreator'
                       t={t}
+                      // Can it be reworked wso it uses t inside the Link element (without Trans element)?
                       // @ts-ignore
                       components={[
                         <SCreatorLink
@@ -272,6 +273,7 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
                         src={winningOptionMc?.creator?.avatarUrl!!}
                       />
                       <SSpan>
+                        {/* Can it be reworked wso it uses t inside the Link element (without Trans element)? */}
                         <Trans
                           i18nKey='postResponseTabModeration.winner.mc.optionCreator'
                           t={t}
