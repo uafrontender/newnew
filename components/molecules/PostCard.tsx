@@ -1320,7 +1320,8 @@ const SButtonFirst = styled(Button)`
   }
 
   &:hover,
-  &:active {
+  &:active,
+  &:focus {
     span {
       color: #ffffff;
     }
