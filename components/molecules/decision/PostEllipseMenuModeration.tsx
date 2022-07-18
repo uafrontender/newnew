@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 
@@ -62,6 +62,13 @@ export default PostEllipseMenuModeration;
 const SEllipseMenu = styled(EllipseMenu)`
   position: fixed;
   min-width: max-content;
+
+  ${({ theme }) =>
+    theme.name === 'light'
+      ? css`
+          background: ${() => theme.colorsThemed.background.quaternary};
+        `
+      : null}
 `;
 
 const SEllipseMenuButton = styled(EllipseMenuButton)`
