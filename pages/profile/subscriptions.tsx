@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { ReactElement } from 'react';
 import styled from 'styled-components';
-import type { GetServerSidePropsContext, NextPage } from 'next';
+import type { GetServerSidePropsContext } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -23,33 +23,21 @@ const CreatorsList = dynamic(
   () => import('../../components/organisms/search/CreatorsList')
 );
 
-interface IMyProfileSubscriptions {
-  user: Omit<newnewapi.User, 'toJSON'>;
-  pagedPosts?: newnewapi.PagedPostsResponse;
-  posts?: newnewapi.Post[];
-  postsFilter: newnewapi.Post.Filter;
-  nextPageTokenFromServer?: string;
-  pageToken: string | null | undefined;
-  totalCount: number;
-  handleUpdatePageToken: (value: string | null | undefined) => void;
-  handleUpdateCount: (value: number) => void;
-  handleUpdateFilter: (value: newnewapi.Post.Filter) => void;
-  handleSetPosts: React.Dispatch<React.SetStateAction<newnewapi.Post[]>>;
-}
+// interface IMyProfileSubscriptions {
+//   user: Omit<newnewapi.User, 'toJSON'>;
+//   pagedPosts?: newnewapi.PagedPostsResponse;
+//   posts?: newnewapi.Post[];
+//   postsFilter: newnewapi.Post.Filter;
+//   nextPageTokenFromServer?: string;
+//   pageToken: string | null | undefined;
+//   totalCount: number;
+//   handleUpdatePageToken: (value: string | null | undefined) => void;
+//   handleUpdateCount: (value: number) => void;
+//   handleUpdateFilter: (value: newnewapi.Post.Filter) => void;
+//   handleSetPosts: React.Dispatch<React.SetStateAction<newnewapi.Post[]>>;
+// }
 
-const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
-  user,
-  pagedPosts,
-  nextPageTokenFromServer,
-  posts,
-  postsFilter,
-  pageToken,
-  totalCount,
-  handleUpdatePageToken,
-  handleUpdateCount,
-  handleUpdateFilter,
-  handleSetPosts,
-}) => {
+const MyProfileSubscriptions = () => {
   const { isCreatorsImSubscribedToLoading, creatorsImSubscribedTo } =
     useGetSubscriptions();
   const { t } = useTranslation('page-Profile');

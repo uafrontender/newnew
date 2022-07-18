@@ -20,7 +20,6 @@ import BlockUserModalProfile from '../profile/BlockUserModalProfile';
 import UnsubscribeModal from '../profile/UnsubscribeModal';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-
 import { formatNumber } from '../../../utils/format';
 import { useAppSelector } from '../../../redux-store/store';
 import { reportUser } from '../../../api/endpoints/report';

@@ -119,6 +119,15 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
     const handleUpdateBioInEdit = (
       e: React.ChangeEvent<HTMLTextAreaElement>
     ) => {
+      if (e.target.value.length > 0) {
+        e.target.value = e.target.value.trimStart();
+        if (
+          e.target.value.length > 1 &&
+          e.target.value[e.target.value.length - 2] === ' '
+        ) {
+          e.target.value = e.target.value.trimEnd();
+        }
+      }
       setBioInEdit(e.target.value);
 
       validateBioViaApiDebounced(e.target.value);
