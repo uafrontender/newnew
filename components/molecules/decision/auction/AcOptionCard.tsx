@@ -494,6 +494,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                               ? theme.colorsThemed.accent.yellow
                               : theme.colors.dark,
                         }
+                      : isMyBid && option.isCreatedBySubscriber
+                      ? {
+                          color: theme.colorsThemed.accent.yellow,
+                        }
                       : {}),
                     ...(!isMyBid
                       ? {
@@ -522,6 +526,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                           theme.name === 'dark'
                             ? theme.colorsThemed.accent.yellow
                             : theme.colors.dark,
+                      }
+                    : isMyBid && option.isCreatedBySubscriber
+                    ? {
+                        color: theme.colorsThemed.accent.yellow,
                       }
                     : {}),
                 }}
