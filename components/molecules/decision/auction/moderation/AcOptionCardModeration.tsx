@@ -627,7 +627,10 @@ const SDropdownButton = styled.button`
   justify-content: center;
   align-items: center;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.primary
+      : theme.colorsThemed.background.quaternary};
 
   border: transparent;
 
