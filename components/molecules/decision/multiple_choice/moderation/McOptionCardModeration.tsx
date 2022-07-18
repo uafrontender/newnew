@@ -83,8 +83,6 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
 
         const res = await deleteMcOption(payload);
 
-        console.log(res);
-
         if (!res.error) {
           setIsDeleteModalOpen(false);
           handleRemoveOption?.();

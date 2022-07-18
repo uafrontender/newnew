@@ -80,8 +80,6 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
           }
         }
 
-        console.log(canDelete);
-
         setCanDeleteOption(canDelete);
       } catch (err) {
         console.error(err);
