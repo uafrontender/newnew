@@ -19,6 +19,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import { useAppSelector } from '../../../redux-store/store';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import PostResponseSuccessModal from './PostResponseSuccessModal';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 interface IPostResponseTabModeration {
   postId: string;
@@ -303,7 +304,9 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
                 {t('postResponseTabModeration.winner.inResponseToYourPost')}
               </SSpan>
             </SText>
-            <SHeadline variant={5}>{postTitle}</SHeadline>
+            <SHeadline variant={5}>
+              <PostTitleContent>{postTitle}</PostTitleContent>
+            </SHeadline>
           </STextContentWrapper>
           <SShareButton onClick={handleCopyLink}>
             {isCopiedUrl
@@ -485,7 +488,9 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
               {t('postResponseTabModeration.winner.inResponseToYourPost')}
             </SSpan>
           </SText>
-          <SHeadline variant={5}>{postTitle}</SHeadline>
+          <SHeadline variant={5}>
+            <PostTitleContent>{postTitle}</PostTitleContent>
+          </SHeadline>
         </STextContentWrapper>
         <SUploadButton
           disabled={responseUploading || !responseReadyToBeUploaded}
