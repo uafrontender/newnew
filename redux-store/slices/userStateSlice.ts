@@ -14,7 +14,6 @@ export type TUserData = Omit<
 
 interface ICreatorData {
   isLoaded: boolean;
-  hasCreatorTags: boolean;
   options: newnewapi.IGetMyOnboardingStateResponse;
 }
 
@@ -104,7 +103,6 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
       };
       state.creatorData = {
         isLoaded: false,
-        hasCreatorTags: false,
         options: {
           creatorStatus: null,
           isCustomAvatar: null,

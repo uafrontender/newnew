@@ -109,7 +109,7 @@ export const TopSection: React.FC<ITopSection> = React.memo(
       }
     };
 
-    const renderItem = (item: any, index: number) => {
+    const renderItem = (item: newnewapi.Post, index: number) => {
       const handleItemClick = () => {
         if (!isDragging) {
           handlePostClicked(item);

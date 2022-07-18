@@ -73,7 +73,7 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
     <SContainer>
       {isMobile && <SGoBackButton onClick={() => router.back()} />}
       <SHeadline variant={5}>
-        <span>{t('stripeSection.stripeSection')}</span>
+        <span>{t('stripeSection.titleSetUpStripe')}</span>
         <InlineSvg svg={StripeLogo} width='80px' />
       </SHeadline>
       <SUl>

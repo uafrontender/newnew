@@ -40,6 +40,7 @@ import CommentsBottomSection from '../../molecules/decision/success/CommentsBott
 import Headline from '../../atoms/Headline';
 import PostVotingTab from '../../molecules/decision/PostVotingTab';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -501,6 +502,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
           const payload = new newnewapi.FulfillPaymentPurposeRequest({
             paymentSuccessUrl: `session_id=${sessionId}`,
           });
+          resetSessionId();
 
           const res = await placeBidOnAuction(payload);
 
@@ -524,15 +526,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
           console.error(err);
           setLoadingModalOpen(false);
         }
-        resetSessionId();
       };
 
-      if (socketConnection?.connected && !loadingModalOpen) {
-        console.log(sessionId);
+      if (sessionId && !loadingModalOpen) {
         makeBidFromSessionId();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection?.connected, sessionId, loadingModalOpen]);
+    }, []);
 
     const goToNextStep = () => {
       if (
@@ -564,7 +564,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     useEffect(() => {
       if (
-        options.length > 0 &&
         user.userTutorialsProgressSynced &&
         user.userTutorialsProgress.remainingAcSteps &&
         user.userTutorialsProgress.remainingAcSteps[0] ===
@@ -574,7 +573,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       } else {
         setIsPopupVisible(false);
       }
-    }, [options, user]);
+    }, [user]);
 
     // Scroll to comments if hash is present
     useEffect(() => {
@@ -631,7 +630,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
                 (post.expiresAt?.seconds as number) * 1000
               ).getTime()}
               postType='ac'
-              isTutorialVisible={options.length > 0}
             />
           </SExpiresSection>
           <PostVideo
@@ -705,7 +703,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             <PaymentSuccessModal
               postType='ac'
               isVisible={paymentSuccesModalOpen}
-              closeModal={() => setPaymentSuccesModalOpen(false)}
+              closeModal={() => {
+                Mixpanel.track('Close Payment Success Modal', {
+                  _stage: 'Post',
+                  _post: post.postUuid,
+                });
+                setPaymentSuccesModalOpen(false);
+              }}
             >
               {t('paymentSuccessModal.ac', {
                 postCreator:

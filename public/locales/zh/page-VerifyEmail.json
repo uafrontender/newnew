@@ -12,7 +12,12 @@
     "resendButtonText": "再次發送"
   },
   "error": {
-    "invalidCode": "代碼錯誤。再試一次......"
+    "invalidCode": "代碼錯誤。再試一次......",
+    "emailTaken_NEED_TRANSLATION": "Email already taken",
+    "notConfirmedEmail_NEED_TRANSLATION": "Current email wasn't confirmed or time expired",
+    "noToken_NEED_TRANSLATION": "No token",
+    "invalidToken_NEED_TRANSLATION": "Invalid token"
   },
+  "verifying_NEED_TRANSLATION": "Verifying your email...",
   "backButton": "返回"
 }

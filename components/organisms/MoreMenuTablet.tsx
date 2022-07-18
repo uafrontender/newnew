@@ -1,11 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useRef } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import Link from 'next/link';
 
 import Text from '../atoms/Text';
-// import InlineSvg from '../atoms/InlineSVG';
+import InlineSvg from '../atoms/InlineSVG';
 
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
@@ -15,6 +15,7 @@ import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 import { useAppSelector } from '../../redux-store/store';
 // import { WalletContext } from '../../contexts/walletContext';
 // import { formatNumber } from '../../utils/format';
+import copyIcon from '../../public/images/svg/icons/outlined/Link.svg';
 
 interface IMoreMenuTablet {
   isVisible: boolean;
@@ -34,6 +35,34 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
+
+  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
+
+  const handlerCopy = useCallback(() => {
+    if (window) {
+      const url = `${window.location.origin}/${user.userData?.username}`;
+
+      copyPostUrlToClipboard(url)
+        .then(() => {
+          setIsCopiedUrl(true);
+          setTimeout(() => {
+            setIsCopiedUrl(false);
+          }, 1500);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <AnimatePresence>
@@ -66,6 +95,12 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
               </SButton>
             </SLink>
           </Link>
+          {user.userData?.options?.isOfferingSubscription && (
+            <SMyLinkButton onClick={handlerCopy}>
+              <InlineSvg svg={copyIcon} width='24px' height='24px' />
+              {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}
+            </SMyLinkButton>
+          )}
           {/* <SButton
             onClick={() =>
               router.route.includes('/profile/settings')
@@ -181,4 +216,24 @@ const SAvatar = styled.div`
     width: 24px;
     height: 24px;
   }
+`;
+
+const SMyLinkButton = styled.div`
+  margin-top: 8px;
+  width: 100%;
+  height: 36px;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 12px;
+  background: ${(props) => props.theme.colorsThemed.social.copy.main};
+
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 24px;
+
+  color: #ffffff;
+  cursor: pointer;
 `;

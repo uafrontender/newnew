@@ -118,7 +118,6 @@
       "back": "關閉"
     },
     "heading": "這是你的粉絲看到的",
-
     "bio": {
       "title": "個人簡介",
       "placeholder": "簡單介紹一下你自己...",
@@ -129,9 +128,6 @@
         "inappropriate": "禁止使用攻擊性詞語",
         "linksForbidden": "不允許插入連結"
       }
-    },
-    "tags": {
-      "title": "你最想發表的內容是什麼？至少選擇三個"
     }
   },
   "stripeSection": {

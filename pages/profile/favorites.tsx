@@ -19,6 +19,7 @@ import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
 import switchPostType from '../../utils/switchPostType';
 import assets from '../../constants/assets';
+import { Mixpanel } from '../../utils/mixpanel';
 
 const PostModal = dynamic(
   () => import('../../components/organisms/decision/PostModal')
@@ -66,6 +67,10 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'Profile Page',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(post);
     setPostModalOpen(true);
   };
@@ -75,6 +80,9 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
   }, []);
 
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Profile Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };
@@ -253,6 +261,7 @@ export async function getServerSideProps(
       'component-PostCard',
       'modal-Post',
       'modal-PaymentModal',
+      'modal-ResponseSuccessModal',
     ]);
 
     // const { req } = context;

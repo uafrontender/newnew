@@ -36,6 +36,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'page-SeeMore',
     'modal-PaymentModal',
     'modal-Post',
+    'modal-ResponseSuccessModal',
   ]);
 
   return {

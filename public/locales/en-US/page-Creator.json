@@ -46,8 +46,8 @@
       },
       "list": {
         "ac": "Events",
-        "cf": "Superpolls",
-        "mc": "Goals",
+        "cf": "Goals",
+        "mc": "Superpolls",
         "subscriptions": "Subscriptions"
       },
       "filter": {

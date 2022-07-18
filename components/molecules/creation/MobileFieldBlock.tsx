@@ -1,4 +1,10 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -48,6 +54,24 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Creation');
   const [focused, setFocused] = useState(false);
+
+  const isDaySame = useMemo(() => {
+    const selectedDate = moment(value?.date).startOf('D');
+    if (selectedDate) {
+      return selectedDate?.isSame(moment().startOf('day'));
+    }
+
+    return false;
+  }, [value?.date]);
+
+  const { isTimeOfTheDaySame, localTimeOfTheDay } = useMemo(() => {
+    const h = moment().hour();
+    const ltd = h >= 12 ? 'pm' : 'am';
+    return {
+      isTimeOfTheDaySame: ltd === value?.['hours-format'],
+      localTimeOfTheDay: ltd,
+    };
+  }, [value]);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,11 +232,17 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                   <TimePicker
                     disabled={value?.type === 'right-away'}
                     value={value?.time}
+                    isDaySame={isDaySame}
+                    isTimeOfTheDaySame={isTimeOfTheDaySame}
+                    localTimeOfTheDay={localTimeOfTheDay as any}
                     onChange={handleTimeChange}
                   />
                 </STimePickerWrapper>
                 <CustomToggle
-                  disabled={value?.type === 'right-away'}
+                  disabled={
+                    value?.type === 'right-away' ||
+                    (isDaySame && localTimeOfTheDay === 'pm')
+                  }
                   options={formatOptions}
                   selected={value?.['hours-format']}
                   onChange={handleFormatChange}
@@ -229,16 +259,19 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
 
     return false;
   }, [
-    t,
-    id,
     type,
-    value,
     focused,
-    options,
-    onChange,
     handleBlur,
+    options,
     renderItem,
+    t,
     theme.colorsThemed.text.primary,
+    value,
+    isDaySame,
+    isTimeOfTheDaySame,
+    localTimeOfTheDay,
+    onChange,
+    id,
   ]);
 
   useEffect(() => {

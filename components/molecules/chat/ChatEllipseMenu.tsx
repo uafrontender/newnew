@@ -85,4 +85,8 @@ export default ChatEllipseMenu;
 
 const SEllipseMenu = styled(EllipseMenu)`
   width: 216px;
+  background: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colors.white
+      : theme.colorsThemed.background.tertiary};
 `;
