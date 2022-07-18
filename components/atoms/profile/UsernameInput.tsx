@@ -40,8 +40,7 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
     const newValue =
       (value as string).length > 0 ? e.target.value.slice(1) : e.target.value;
 
-    // @ts-ignore
-    onChange(newValue || '');
+    onChange(newValue);
   };
 
   useEffect(() => {
