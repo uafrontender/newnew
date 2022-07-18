@@ -127,6 +127,7 @@
       "backToOriginalVideo": "Back to original",
       "backToResponse": "Watch response"
     },
+    "reuploadButton": "re-upload",
     "cannotLeavePageMsg": "Are you sure you want to close this page? Upload progress will be lost",
     "floatingUploadResponseButton": "Make a response video",
     "setThumbnail": "Set a thumbnail",
@@ -185,7 +186,7 @@
         },
         "processing": {
           "title": "Processing the video",
-          "description": "You can publish the response while the video is being processed",
+          "description": "Your video is being processed... hang tight!",
           "process": "{{progress}}% • {{time}} left",
           "uploadNonProcessed": "Publish"
         },
@@ -478,6 +479,10 @@
       "choosePledgeButton": "Back this goal"
     }
   },
+  "thumbnailEllipseMenu": {
+    "selectSnippetButton": "Select a snippet",
+    "uploadImageButton": "Upload an image"
+  },
   "postVideoThumbnailEdit": {
     "title": "Set a thumbnail",
     "description": "Select a snippet from the video",
@@ -486,6 +491,16 @@
     "toast": {
       "success": "Success! Thumbnail will be changed once processed",
       "error": "An error occurred"
+    }
+  },
+  "postVideoCoverImageEdit": {
+    "title": "Upload an image",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "uploadCoverImage": {
+      "caption": "Select custom cover image",
+      "uploadBtn": "Select",
+      "deleteBtn": "Delete"
     }
   },
   "acPostModeration": {
@@ -509,7 +524,8 @@
         }
       },
       "optionCard": {
-        "pickButton": "Select"
+        "pickButton": "Select",
+        "pickedButton": "Chosen"
       }
     },
     "winnerTab": {
@@ -548,6 +564,7 @@
     }
   },
   "cfPostModeration": {
+    "moneyRaised": "Total raised",
     "winnerTab": {
       "winnerOptionCard": {
         "backersToldYou": "backers successfully funded",
@@ -691,6 +708,33 @@
   "heroPopupCF": {
     "title": "Goals",
     "text": "Pool money with others to back goals made by your favorite creators. If enough people back the goal, you’ll watch the creator do it!"
+  },
+  "postResponseTabModeration": {
+    "awaiting": {
+      "topHeader": "Time to post \nyour response!",
+      "postResponseBtn": "Post Response",
+      "youWillGet": "You'll get"
+    },
+    "succeeded": {
+      "topHeader": "Response \npublished!",
+      "youMade": "You made",
+      "shareBtn": "Share",
+      "linkCopied": "Link copied!"
+    },
+    "winner": {
+      "inResponseToYourPost": "In response to your post",
+      "ac": {
+        "numBiddersChoseSingular": "{{amount}} bidder chose",
+        "numBiddersChose": "{{amount}} bidders chose",
+        "optionCreator": "<0>{{nickname}}</0>'s bid"
+      },
+      "mc": {
+        "numBiddersChoseSingular": "{{amount}} voter chose",
+        "numBiddersChose": "{{amount}} voters chose",
+        "optionOwn": "the option",
+        "optionCreator": "<0>{{nickname}}</0>'s option"
+      }
+    }
   },
   "tutorials": {
     "ac": {

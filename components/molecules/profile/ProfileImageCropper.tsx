@@ -101,6 +101,8 @@ const SCropperWrapper = styled.div<{
   ${({ theme }) => theme.media.tablet} {
     height: 420px;
     min-height: 280px;
+    max-height: calc(100% - 72px);
+    z-index: 0;
   }
 
   .cropper-container {

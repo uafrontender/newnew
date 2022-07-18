@@ -14,6 +14,7 @@ import { TCfPledgeWithHighestField } from '../../../organisms/decision/PostViewC
 
 import Button from '../../../atoms/Button';
 import CfPledgeCard from './CfPledgeCard';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface ICfPledgesSection {
   post: newnewapi.Crowdfunding;
@@ -70,7 +71,16 @@ const CfPledgesSection: React.FunctionComponent<ICfPledgesSection> = ({
       {!isMobile ? (
         <SLoaderDiv ref={loadingRef} />
       ) : pagingToken ? (
-        <SLoadMoreBtn onClick={() => handleLoadPledges(pagingToken)}>
+        <SLoadMoreBtn
+          onClickCapture={() => {
+            Mixpanel.track('Click Load More', {
+              _stage: 'Post',
+              _postUuid: post.postUuid,
+              _component: 'CfPledgesSection',
+            });
+          }}
+          onClick={() => handleLoadPledges(pagingToken)}
+        >
           {t('loadMoreButton')}
         </SLoadMoreBtn>
       ) : null}

@@ -26,6 +26,7 @@ import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import switchPostType from '../utils/switchPostType';
 import isBrowser from '../utils/isBrowser';
 import assets from '../constants/assets';
+import { Mixpanel } from '../utils/mixpanel';
 
 const TopSection = dynamic(
   () => import('../components/organisms/home/TopSection')
@@ -103,6 +104,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
 
   const handleOpenPostModal = useCallback(
     (post: newnewapi.IPost) => {
+      Mixpanel.track('Open Post Modal', {
+        _stage: 'Home Page',
+        _postUuid: switchPostType(post)[0].postUuid,
+      });
       setDisplayedPost(post);
       setPostModalOpen(true);
     },
@@ -114,6 +119,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   }, []);
 
   const handleClosePostModal = useCallback(() => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Home Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   }, []);
@@ -350,7 +358,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       {!user.loggedIn && <HeroSection />}
-      {topSectionCollection.length > 0 && (
+      {topSectionCollection?.length > 0 && (
         <TopSection
           collection={topSectionCollection}
           handlePostClicked={handleOpenPostModal}
@@ -358,7 +366,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       )}
       {user.loggedIn &&
         !collectionFYError &&
-        (collectionFYInitialLoading || collectionFY.length > 0) && (
+        (collectionFYInitialLoading || collectionFY?.length > 0) && (
           <CardsSection
             title={t('cardsSection.title.for-you')}
             category='for-you'
@@ -375,7 +383,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionMCInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn || collectionMC.length === 0 ? (
+            !user.loggedIn || collectionMC?.length === 0 ? (
               <TutorialCard
                 image={
                   theme.name === 'light'
@@ -397,7 +405,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionACInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn || collectionAC.length === 0 ? (
+            !user.loggedIn || collectionAC?.length === 0 ? (
               <TutorialCard
                 image={
                   theme.name === 'light'
@@ -424,7 +432,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionCFInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn || collectionCF.length === 0 ? (
+            !user.loggedIn || collectionCF?.length === 0 ? (
               <TutorialCard
                 image={
                   theme.name === 'light'
@@ -502,6 +510,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'component-PostCard',
     'modal-Post',
     'modal-PaymentModal',
+    'modal-ResponseSuccessModal',
     'page-Chat',
   ]);
 

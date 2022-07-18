@@ -67,6 +67,8 @@ import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
+import getChunks from '../../../../utils/getChunks/getChunks';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -334,14 +336,32 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     }, [post.expiresAt]);
 
     const handleSubmit = useCallback(async () => {
+      Mixpanel.track('Creation Preview Button Click', { _stage: 'Creation' });
+
+      // Validate title as the previous validation might be outdated due to debounce,
+      // or title input being focused
+      const errorText = await validateT(
+        post?.title,
+        CREATION_TITLE_MIN,
+        CREATION_TITLE_MAX,
+        newnewapi.ValidateTextRequest.Kind.POST_TITLE
+      );
+
+      if (errorText) {
+        setTitleError(errorText);
+        return;
+      }
+
       router.push(`/creation/${tab}/preview`);
-    }, [tab, router]);
+    }, [tab, router, post?.title, validateT]);
 
     const handleCloseClick = useCallback(() => {
+      Mixpanel.track('Creation Close', { _stage: 'Creation' });
       router?.push('/');
     }, [router]);
 
     const handleVideoDelete = useCallback(async () => {
+      Mixpanel.track('Video Deleting', { _stage: 'Creation' });
       try {
         const payload = new newnewapi.RemoveUploadedFileRequest({
           publicUrl: post?.announcementVideoUrl,
@@ -377,6 +397,10 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     }, [dispatch, post?.announcementVideoUrl, videoProcessing?.taskUuid]);
     const handleVideoUpload = useCallback(
       async (value: File) => {
+        Mixpanel.track('Video Uploading', {
+          _stage: 'Creation',
+          _filename: value.name,
+        });
         try {
           dispatch(setCreationFileUploadETA(100));
           dispatch(setCreationFileUploadProgress(1));
@@ -490,9 +514,14 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
         setTitleError('');
       }
     }, []);
+
     const handleItemBlur = useCallback(
       async (key: string, value: string) => {
         if (key === 'title' && value.length > 0) {
+          Mixpanel.track('Title Text Change', {
+            _stage: 'Creation',
+            _text: value,
+          });
           setTitleError(
             await validateT(
               value,
@@ -505,23 +534,56 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       },
       [validateT]
     );
+
     const handleItemChange = useCallback(
       async (key: string, value: any) => {
         if (key === 'title') {
+          Mixpanel.track('Post Title Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationTitle(value.trim() ? value : ''));
         } else if (key === 'minimalBid') {
+          Mixpanel.track('Minimal Big Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationMinBid(value));
         } else if (key === 'comments') {
+          Mixpanel.track('Post Creation Comments Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationComments(value));
         } else if (key === 'allowSuggestions') {
+          Mixpanel.track('Post Allow Suggestions Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationAllowSuggestions(value));
         } else if (key === 'expiresAt') {
+          Mixpanel.track('Post expiresAt Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationExpireDate(value));
         } else if (key === 'startsAt') {
+          Mixpanel.track('Post startsAt Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationStartDate(value));
         } else if (key === 'targetBackerCount') {
+          Mixpanel.track('Backer Count Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationTargetBackerCount(value));
         } else if (key === 'choices') {
+          Mixpanel.track('Post Creation Choices Change', {
+            _stage: 'Creation',
+            _value: value,
+          });
           dispatch(setCreationChoices(value));
         } else if (key === 'video') {
           if (value) {
@@ -1182,7 +1244,17 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                         </SFloatingSubSectionUser>
                         <SBottomEnd>
                           <SBottomEndPostTitle variant={3} weight={600}>
-                            {post.title}
+                            {getChunks(post.title).map((chunk) => {
+                              if (chunk.type === 'hashtag') {
+                                return (
+                                  <SBottomEndPostTitleHashtag>
+                                    #{chunk.text}
+                                  </SBottomEndPostTitleHashtag>
+                                );
+                              }
+
+                              return chunk.text;
+                            })}
                           </SBottomEndPostTitle>
                         </SBottomEnd>
                       </SFloatingSubSectionWithPlayer>
@@ -1465,8 +1537,14 @@ const SBottomEnd = styled.div`
 `;
 
 const SBottomEndPostTitle = styled(Text)`
+  display: inline;
   max-width: 100%;
   line-break: loose;
+  white-space: pre-wrap;
+`;
+
+const SBottomEndPostTitleHashtag = styled.span`
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
 `;
 
 const SCaption = styled(Caption)`

@@ -41,6 +41,7 @@ import getDisplayname from '../../../../utils/getDisplayname';
 import assets from '../../../../constants/assets';
 import Headline from '../../../atoms/Headline';
 import { formatNumber } from '../../../../utils/format';
+import { Mixpanel } from '../../../../utils/mixpanel';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsSection {
@@ -224,6 +225,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
     const handlePayWithCardStripeRedirect = useCallback(async () => {
       setLoadingModalOpen(true);
       try {
+        Mixpanel.track('PayWithCardStripeRedirect', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'CfPledgeLevelsSection',
+        });
         const createPaymentSessionPayload =
           new newnewapi.CreatePaymentSessionRequest({
             successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
@@ -320,6 +326,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                   parseInt(customPledgeAmount) <
                     Math.round(appConstants.minCfPledge / 100)
                 }
+                onClickCapture={() => {
+                  Mixpanel.track('Submit Custom Pledge', {
+                    _stage: 'Post',
+                  });
+                }}
                 onClick={() => handleCustomPledgePaymentModal()}
               >
                 {t('cfPost.backersTab.customPledge.pledgeButton')}
@@ -327,6 +338,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
               <SCancelButton
                 view='transparent'
                 iconOnly
+                onClickCapture={() => {
+                  Mixpanel.track('Cancel Custom Pledge', {
+                    _stage: 'Post',
+                  });
+                }}
                 onClick={() => handleCloseCustomPledgeForm()}
               >
                 <InlineSvg
@@ -633,7 +649,7 @@ const SPaymentSign = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap; ;
 `;
 
 const SPaymentTermsLink = styled.a`
@@ -645,5 +661,5 @@ const SPaymentTerms = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap;
 `;

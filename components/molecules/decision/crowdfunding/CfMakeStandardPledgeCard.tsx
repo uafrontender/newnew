@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import Headline from '../../../atoms/Headline';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface ICfMakeStandardPledgeCard {
   amount: newnewapi.IMoneyAmount;
@@ -15,7 +16,15 @@ interface ICfMakeStandardPledgeCard {
 const CfMakeStandardPledgeCard: React.FunctionComponent<ICfMakeStandardPledgeCard> =
   ({ amount, grandsVipStatus, handleOpenMakePledgeForm }) => {
     return (
-      <SStandardPledgeCard onClick={() => handleOpenMakePledgeForm()}>
+      <SStandardPledgeCard
+        onClickCapture={() => {
+          Mixpanel.track('Select Standard Pledge', {
+            _stage: 'Post',
+            _component: 'CfMakeStandardPledgeCard',
+          });
+        }}
+        onClick={() => handleOpenMakePledgeForm()}
+      >
         {/* {grandsVipStatus ? (
         <SAdditionalLabel>
           { t('cfPost.backersTab.freeSub') }

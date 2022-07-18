@@ -25,6 +25,7 @@ interface IList {
   skeletonsHighlightColor?: string;
   handlePostClicked: (post: newnewapi.Post) => void;
   handleRemovePostFromState?: (uuid: string) => void;
+  handleAddPostToState?: (post: newnewapi.Post) => void;
 }
 
 export const PostList: React.FC<IList> = ({
@@ -36,6 +37,7 @@ export const PostList: React.FC<IList> = ({
   skeletonsHighlightColor,
   handlePostClicked,
   handleRemovePostFromState,
+  handleAddPostToState,
 }) => {
   const { postOverlayOpen } = usePostModalState();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -61,6 +63,9 @@ export const PostList: React.FC<IList> = ({
           shouldStop={postOverlayOpen}
           handleRemovePostFromState={() =>
             handleRemovePostFromState?.(switchPostType(item)[0].postUuid)
+          }
+          handleAddPostToState={() =>
+            handleAddPostToState?.(switchPostType(item)[0])
           }
         />
       </SItemWrapper>

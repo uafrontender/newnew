@@ -31,7 +31,12 @@ const Modal: React.FC<IModal> = React.memo((props) => {
 
   useEffect(() => {
     dispatch(setOverlay(show));
+
+    return () => {
+      dispatch(setOverlay(false));
+    };
   }, [show, dispatch]);
+
   useEffect(() => {
     const blurredBody = document.getElementById('__next');
 

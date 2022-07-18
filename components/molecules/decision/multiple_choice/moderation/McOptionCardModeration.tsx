@@ -6,7 +6,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -41,6 +41,7 @@ interface IMcOptionCardModeration {
   index: number;
   canBeDeleted: boolean;
   isCreatorsBid: boolean;
+  isWinner?: boolean;
   handleRemoveOption?: () => void;
 }
 
@@ -51,6 +52,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
     index,
     canBeDeleted,
     isCreatorsBid,
+    isWinner,
     handleRemoveOption,
   }) => {
     const theme = useTheme();
@@ -80,8 +82,6 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
         });
 
         const res = await deleteMcOption(payload);
-
-        console.log(res);
 
         if (!res.error) {
           setIsDeleteModalOpen(false);
@@ -129,9 +129,10 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
               damping: 20,
               stiffness: 300,
             }}
+            $isBlue={!!isWinner}
           >
-            <SBidDetails>
-              <SBidAmount>
+            <SBidDetails isBlue={!!isWinner}>
+              <SBidAmount isWhite={!!isWinner}>
                 <OptionActionIcon
                   src={
                     theme.name === 'light'
@@ -149,7 +150,9 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                     : t('mcPost.optionsTab.optionCard.noVotes')}
                 </div>
               </SBidAmount>
-              <SOptionInfo variant={3}>{option.text}</SOptionInfo>
+              <SOptionInfo isWhite={!!isWinner} variant={3}>
+                {option.text}
+              </SOptionInfo>
               <SBiddersInfo variant={3}>
                 <RenderSupportersInfo
                   isCreatorsBid
@@ -202,7 +205,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
               <McOptionCardModerationEllipseMenu
                 isVisible={isEllipseMenuOpen}
                 isBySubscriber={!isCreatorsBid}
-                canBeDeleted={canBeDeleted}
+                canBeDeleted={canBeDeleted && !isWinner}
                 handleClose={() => setIsEllipseMenuOpen(false)}
                 handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
                 handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
@@ -226,7 +229,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
             zIndex={16}
             onClose={() => setIsEllipseMenuOpen(false)}
             isBySubscriber={!isCreatorsBid}
-            canBeDeleted={canBeDeleted}
+            canBeDeleted={canBeDeleted && !isWinner}
             handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
             handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
             handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
@@ -257,7 +260,9 @@ McOptionCardModeration.defaultProps = {};
 
 export default McOptionCardModeration;
 
-const SContainer = styled(motion.div)`
+const SContainer = styled(motion.div)<{
+  $isBlue: boolean;
+}>`
   position: relative;
 
   display: flex;
@@ -268,7 +273,10 @@ const SContainer = styled(motion.div)`
 
   padding: 16px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  background-color: ${({ theme, $isBlue }) =>
+    $isBlue
+      ? theme.colorsThemed.accent.blue
+      : theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   ${({ theme }) => theme.media.tablet} {
@@ -283,7 +291,9 @@ const SContainer = styled(motion.div)`
   }
 `;
 
-const SBidDetails = styled.div`
+const SBidDetails = styled.div<{
+  isBlue: boolean;
+}>`
   position: relative;
 
   display: grid;
@@ -295,20 +305,38 @@ const SBidDetails = styled.div`
 
   width: 100%;
 
+  ${({ isBlue }) =>
+    isBlue
+      ? css`
+          .spanRegular {
+            color: #ffffff;
+            opacity: 0.6;
+          }
+          .spanHighlighted {
+            color: #ffffff;
+          }
+        `
+      : null}
+
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
       'amount bidders'
       'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
 
-    background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+    background-color: ${({ theme, isBlue }) =>
+      isBlue
+        ? theme.colorsThemed.accent.blue
+        : theme.colorsThemed.background.tertiary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 14px;
   }
 `;
 
-const SBidAmount = styled.div`
+const SBidAmount = styled.div<{
+  isWhite?: boolean;
+}>`
   grid-area: amount;
 
   display: flex;
@@ -316,6 +344,12 @@ const SBidAmount = styled.div`
   justify-content: flex-start;
   gap: 8px;
 
+  ${({ isWhite }) =>
+    isWhite
+      ? css`
+          color: #ffffff;
+        `
+      : null};
   font-weight: 700;
   font-size: 16px;
   line-height: 24px;
@@ -328,10 +362,19 @@ const OptionActionIcon = styled.img`
   width: 24px;
 `;
 
-const SOptionInfo = styled(Text)`
+const SOptionInfo = styled(Text)<{
+  isWhite?: boolean;
+}>`
   grid-area: optionInfo;
 
   margin-bottom: 8px;
+
+  ${({ isWhite }) =>
+    isWhite
+      ? css`
+          color: #ffffff;
+        `
+      : null};
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: initial;

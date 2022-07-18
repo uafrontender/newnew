@@ -22,6 +22,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import PostTitleContent from '../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../molecules/decision/waiting/WaitingForResponseBox')
@@ -286,6 +287,13 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                           {t('mcPostSuccess.optionChosen')}
                         </SWinningOptionDetailsBidChosen>
                         <SWinningOptionDetailsSeeAll
+                          onClickCapture={() => {
+                            Mixpanel.track('Winning Option Details See All', {
+                              _stage: 'Post',
+                              _postUuid: post.postUuid,
+                              _component: 'PostAwaitingResponseMC',
+                            });
+                          }}
                           onClick={() => setOpenedMainSection('options')}
                         >
                           {t('mcPostSuccess.seeAll')}
@@ -301,7 +309,14 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
             ) : (
               <McSuccessOptionsTab
                 post={post}
-                handleGoBack={() => setOpenedMainSection('main')}
+                handleGoBack={() => {
+                  Mixpanel.track('Go Back', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'PostAwaitingResponseMC',
+                  });
+                  setOpenedMainSection('main');
+                }}
               />
             )}
           </SActivitesContainer>

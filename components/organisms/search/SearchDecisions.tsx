@@ -13,6 +13,7 @@ import Sorting from '../Sorting';
 import { searchPosts } from '../../../api/endpoints/search';
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const PostList = dynamic(() => import('./PostList'));
 const PostModal = dynamic(() => import('../decision/PostModal'));
@@ -93,10 +94,17 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
     useState<newnewapi.IPost | undefined>();
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'Search Page',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(post);
     setPostModalOpen(true);
   };
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Search Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };
@@ -171,7 +179,7 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
             return arr;
           });
           setPostsRoomsNextPageToken(res.data.paging?.nextPageToken);
-        } else {
+        } else if (!pageToken) {
           setResultsPosts([]);
           setHasNoResults(true);
         }

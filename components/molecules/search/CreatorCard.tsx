@@ -1,13 +1,18 @@
 import { newnewapi } from 'newnew-api';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 
 import UserAvatar from '../UserAvatar';
-import InlineSVG from '../../atoms/InlineSVG';
+import InlineSvg from '../../atoms/InlineSVG';
 import Button from '../../atoms/Button';
 import UserEllipseMenu from '../profile/UserEllipseMenu';
 import ReportModal, { ReportData } from '../chat/ReportModal';
@@ -15,7 +20,6 @@ import BlockUserModalProfile from '../profile/BlockUserModalProfile';
 import UnsubscribeModal from '../profile/UnsubscribeModal';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { formatNumber } from '../../../utils/format';
 import { useAppSelector } from '../../../redux-store/store';
 import { reportUser } from '../../../api/endpoints/report';
@@ -24,6 +28,7 @@ import { markUser } from '../../../api/endpoints/user';
 import UserEllipseModal from '../profile/UserEllipseModal';
 import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
@@ -138,6 +143,8 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
     // isSub ? setIsSubscribed(true) : setIsSubscribed(false);
   }, [creatorsImSubscribedTo, creator.uuid]);
 
+  const moreButtonRef: any = useRef();
+
   return (
     <SCard showSubscriptionPrice={subscriptionPrice !== undefined}>
       {withEllipseMenu && (
@@ -148,8 +155,9 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
             e.stopPropagation();
             handleOpenEllipseMenu();
           }}
+          ref={moreButtonRef}
         >
-          <InlineSVG
+          <InlineSvg
             svg={MoreIconFilled}
             fill='#FFFFFF'
             width='20px'
@@ -177,44 +185,33 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
           handleClickUnsubscribe={() => {
             setUnsubscribeModalOpen(true);
           }}
+          anchorElement={moreButtonRef.current}
         />
       )}
-      <SLink>
-        <Link href={`/${creator.username}`}>
-          <a>
-            <SUserAvatarContainer>
-              <SUserAvatar>
-                <UserAvatar avatarUrl={creator.avatarUrl ?? ''} />
-              </SUserAvatar>
-              {sign && isSubscribed && <AvatarSign>{sign}</AvatarSign>}
-              {wasSubscribed && (
-                <AvatarSign>{t('creatorCard.cancelled')}</AvatarSign>
-              )}
-            </SUserAvatarContainer>
-            <SDisplayName>
-              {creator.nickname}
-              {creator.options?.isVerified && (
-                <SInlineSVG
-                  svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
-                />
-              )}
-            </SDisplayName>
-            <SUserName>@{creator.username}</SUserName>
-            {subscriptionPrice !== undefined && subscriptionPrice > 0 && (
-              <SSubscriptionPrice>
-                {t('creatorCard.subscriptionCost', {
-                  amount: formatNumber(subscriptionPrice / 100, false),
-                })}
-              </SSubscriptionPrice>
-            )}
-            <SBackground>
-              <Image src={creator.coverUrl ?? ''} layout='fill' />
-            </SBackground>
-          </a>
-        </Link>
-      </SLink>
+      <SUserAvatarContainer>
+        <SUserAvatar>
+          <UserAvatar avatarUrl={creator.avatarUrl ?? ''} />
+        </SUserAvatar>
+        {sign && isSubscribed && <AvatarSign>{sign}</AvatarSign>}
+        {wasSubscribed && <AvatarSign>{t('creatorCard.cancelled')}</AvatarSign>}
+      </SUserAvatarContainer>
+      <SDisplayNameContainer isVerified={!!creator.options?.isVerified}>
+        <SDisplayName>{creator.nickname}</SDisplayName>
+        {creator.options?.isVerified && (
+          <SInlineSVG svg={VerificationCheckmark} width='16px' height='16px' />
+        )}
+      </SDisplayNameContainer>
+      <SUserName>@{creator.username}</SUserName>
+      {subscriptionPrice !== undefined && subscriptionPrice > 0 && (
+        <SSubscriptionPrice>
+          {t('creatorCard.subscriptionCost', {
+            amount: formatNumber(subscriptionPrice / 100, false),
+          })}
+        </SSubscriptionPrice>
+      )}
+      <SBackground>
+        <Image src={creator.coverUrl ?? ''} layout='fill' />
+      </SBackground>
       {/* Modals */}
       {isMobile && (
         <UserEllipseModal
@@ -346,15 +343,26 @@ const AvatarSign = styled.div`
   z-index: 2;
 `;
 
+const SDisplayNameContainer = styled.div<{ isVerified?: boolean }>`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow: hidden;
+  margin: 0 0 5px;
+  padding-left: ${({ isVerified }) => (isVerified ? '24px' : '0px')};
+`;
+
 const SDisplayName = styled.p`
   text-align: center;
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  margin: 0 0 5px;
-  display: flex;
-  align-items: center;
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  min-width: 24px;
+  min-height: 24px;
 `;
 
 const SUserName = styled.p`
@@ -394,18 +402,4 @@ const SMoreButton = styled(Button)`
     align-items: center;
     justify-content: center;
   }
-`;
-
-const SLink = styled.div`
-  width: 100%;
-  a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-`;
-
-const SInlineSVG = styled(InlineSVG)`
-  min-width: 24px;
-  min-height: 24px;
 `;
