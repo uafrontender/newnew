@@ -10,7 +10,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -181,6 +181,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     [postStatus]
   );
 
+  const postStatusesToUseHideInsteadOfDelete = useMemo(
+    () => ['succeeded', 'failed', 'deleted_by_creator', 'deleted_by_admin'],
+    []
+  );
+
   const shouldRenderVotingFinishedModal = useMemo(
     () =>
       postStatus === 'succeeded' ||
@@ -293,22 +298,43 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const handleDeletePost = useCallback(async () => {
     try {
-      const payload = new newnewapi.DeleteMyPostRequest({
-        postUuid: postParsed?.postUuid,
-      });
+      // "Hide" Post instead of deleting it
+      if (postStatusesToUseHideInsteadOfDelete.includes(postStatus)) {
+        const payload = new newnewapi.MarkPostRequest({
+          postUuid: postParsed?.postUuid,
+          markAs: newnewapi.MarkPostRequest.Kind.HIDDEN,
+        });
 
-      const res = await deleteMyPost(payload);
+        const res = await markPost(payload);
 
-      if (!res.error) {
-        console.log('Post deleted/cancelled');
-        handleUpdatePostStatus('DELETED_BY_CREATOR');
-        handleRemovePostFromState?.();
-        handleCloseDeletePostModal();
+        if (!res.error) {
+          handleUpdatePostStatus('DELETED_BY_CREATOR');
+          handleRemovePostFromState?.();
+          handleCloseDeletePostModal();
+        }
+      } else {
+        const payload = new newnewapi.DeleteMyPostRequest({
+          postUuid: postParsed?.postUuid,
+        });
+
+        const res = await deleteMyPost(payload);
+
+        if (!res.error) {
+          handleUpdatePostStatus('DELETED_BY_CREATOR');
+          handleRemovePostFromState?.();
+          handleCloseDeletePostModal();
+        }
       }
     } catch (err) {
       console.error(err);
     }
-  }, [handleRemovePostFromState, handleUpdatePostStatus, postParsed?.postUuid]);
+  }, [
+    handleRemovePostFromState,
+    handleUpdatePostStatus,
+    postParsed?.postUuid,
+    postStatus,
+    postStatusesToUseHideInsteadOfDelete,
+  ]);
 
   useEffect(() => {
     if (commentIdFromUrl) {
@@ -836,6 +862,15 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     return (
       <SPostSuccessWaitingControlsDiv
         variant='moderation'
+        style={{
+          ...(isMobile &&
+          (postStatus === 'deleted_by_admin' ||
+            postStatus === 'deleted_by_creator')
+            ? {
+                marginTop: 64,
+              }
+            : {}),
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <SWaitingSuccessControlsBtn
@@ -852,36 +887,45 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             height='24px'
           />
         </SWaitingSuccessControlsBtn>
-        <SWaitingSuccessControlsBtn
-          view='secondary'
-          iconOnly
-          onClick={() => setShareMenuOpen(true)}
-          ref={shareButtonRef}
-        >
-          <InlineSvg
-            svg={ShareIcon}
-            fill={
-              theme.name === 'light' ? theme.colors.dark : theme.colors.white
-            }
-            width='24px'
-            height='24px'
-          />
-        </SWaitingSuccessControlsBtn>
-        <SWaitingSuccessControlsBtn
-          view='secondary'
-          iconOnly
-          onClick={() => setEllipseMenuOpen(true)}
-          ref={moreButtonRef}
-        >
-          <InlineSvg
-            svg={MoreIcon}
-            fill={
-              theme.name === 'light' ? theme.colors.dark : theme.colors.white
-            }
-            width='24px'
-            height='24px'
-          />
-        </SWaitingSuccessControlsBtn>
+        {postStatus !== 'deleted_by_admin' &&
+          postStatus !== 'deleted_by_creator' && (
+            <>
+              <SWaitingSuccessControlsBtn
+                view='secondary'
+                iconOnly
+                onClick={() => setShareMenuOpen(true)}
+                ref={shareButtonRef}
+              >
+                <InlineSvg
+                  svg={ShareIcon}
+                  fill={
+                    theme.name === 'light'
+                      ? theme.colors.dark
+                      : theme.colors.white
+                  }
+                  width='24px'
+                  height='24px'
+                />
+              </SWaitingSuccessControlsBtn>
+              <SWaitingSuccessControlsBtn
+                view='secondary'
+                iconOnly
+                onClick={() => setEllipseMenuOpen(true)}
+                ref={moreButtonRef}
+              >
+                <InlineSvg
+                  svg={MoreIcon}
+                  fill={
+                    theme.name === 'light'
+                      ? theme.colors.dark
+                      : theme.colors.white
+                  }
+                  width='24px'
+                  height='24px'
+                />
+              </SWaitingSuccessControlsBtn>
+            </>
+          )}
         {/* Share menu */}
         {!isMobile && postParsed?.postUuid && (
           <PostShareEllipseMenu
@@ -904,7 +948,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           <PostEllipseMenuModeration
             postType={typeOfPost as string}
             isVisible={ellipseMenuOpen}
-            canDeletePost={postStatus !== 'failed'}
+            canDeletePost
             handleClose={handleEllipseMenuClose}
             handleOpenDeletePostModal={handleOpenDeletePostModal}
             anchorElement={moreButtonRef.current}
@@ -914,7 +958,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           <PostEllipseModalModeration
             postType={typeOfPost as string}
             zIndex={11}
-            canDeletePost={postStatus !== 'failed'}
+            canDeletePost
             isOpen={ellipseMenuOpen}
             onClose={handleEllipseMenuClose}
             handleOpenDeletePostModal={handleOpenDeletePostModal}
@@ -1475,14 +1519,6 @@ const SPostModalContainer = styled.div<{
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     width: 100%;
     height: calc(100% - 64px);
-
-    ${({ isMyPost }) =>
-      isMyPost
-        ? css`
-            height: initial;
-            max-height: 100%;
-          `
-        : null}
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -1496,14 +1532,6 @@ const SPostModalContainer = styled.div<{
 
     padding: 24px;
     padding-bottom: 24px;
-
-    ${({ isMyPost }) =>
-      isMyPost
-        ? css`
-            height: initial;
-            max-height: 100%;
-          `
-        : null}
   }
 `;
 

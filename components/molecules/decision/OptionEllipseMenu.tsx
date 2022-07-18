@@ -3,7 +3,7 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import EllipseMenu, {EllipseMenuButton} from '../../atoms/EllipseMenu';
+import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 
 import isBrowser from '../../../utils/isBrowser';
 import { checkCanDeleteMcOption } from '../../../api/endpoints/multiple_choice';
@@ -94,42 +94,42 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
 
   if (!isVisible) return null;
 
-    return (
-      <SEllipseMenu
-        isOpen={isVisible}
-        onClose={handleClose}
-        style={{
-          left: `${xy.x}px`,
-          top: `${xy.y}px`,
-        }}
-      >
-        {isMyOption && (
-          <SEllipseMenuButton
-            variant={3}
-            tone='error'
-            onClick={() => {
-              handleOpenRemoveOptionModal?.();
-              handleClose();
-            }}
-            disabled={!canDeleteOption || isCanDeleteOptionLoading}
-          >
-            {t('ellipse.delete')}
-          </SEllipseMenuButton>
-        )}
-        {!isMyOption && (
-          <SEllipseMenuButton
-            variant={3}
-            tone='error'
-            onClick={() => {
-              handleOpenReportOptionModal();
-              handleClose();
-            }}
-          >
-            {t('ellipse.report')}
-          </SEllipseMenuButton>
-        )}
+  return (
+    <SEllipseMenu
+      isOpen={isVisible}
+      onClose={handleClose}
+      style={{
+        left: `${xy.x}px`,
+        top: `${xy.y}px`,
+      }}
+    >
+      {isMyOption && (
+        <SEllipseMenuButton
+          variant={3}
+          tone='error'
+          onClick={() => {
+            handleOpenRemoveOptionModal?.();
+            handleClose();
+          }}
+          disabled={!canDeleteOption || isCanDeleteOptionLoading}
+        >
+          {t('ellipse.delete')}
+        </SEllipseMenuButton>
+      )}
+      {!isMyOption && (
+        <SEllipseMenuButton
+          variant={3}
+          tone='error'
+          onClick={() => {
+            handleOpenReportOptionModal();
+            handleClose();
+          }}
+        >
+          {t('ellipse.report')}
+        </SEllipseMenuButton>
+      )}
     </SEllipseMenu>
-  )
+  );
 };
 
 export default OptionEllipseMenu;

@@ -425,8 +425,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         $isDisabled={disabled && votingAllowed}
         $isBlue={isBlue}
         onClick={(e) => {
-          if (!isMobile && !disabled && !isEllipseMenuOpen) {
-            console.log(isMyBid);
+          if (!isMobile && !isEllipseMenuOpen) {
             setIsEllipseMenuOpen(true);
 
             setOptionMenuXY({
@@ -496,6 +495,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                               ? theme.colorsThemed.accent.yellow
                               : theme.colors.dark,
                         }
+                      : isMyBid && option.isCreatedBySubscriber
+                      ? {
+                          color: theme.colorsThemed.accent.yellow,
+                        }
                       : {}),
                     ...(!isMyBid
                       ? {
@@ -524,6 +527,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                           theme.name === 'dark'
                             ? theme.colorsThemed.accent.yellow
                             : theme.colors.dark,
+                      }
+                    : isMyBid && option.isCreatedBySubscriber
+                    ? {
+                        color: theme.colorsThemed.accent.yellow,
                       }
                     : {}),
                 }}

@@ -490,6 +490,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               option={option as TMcOptionWithHighestField}
               creator={option.creator ?? post.creator!!}
               postCreator={postCreator}
+              postCreatorUuid={post.creator?.uuid ?? ''}
               postText={post.title}
               postId={post.postUuid}
               index={i}
