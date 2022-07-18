@@ -271,7 +271,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
             {!isMobile && (
               <AcOptionCardModerationEllipseMenu
                 isVisible={isEllipseMenuOpen}
-                canDeleteOption={postStatus === 'voting'}
+                canDeleteOption={!isWinner}
                 handleClose={() => setIsEllipseMenuOpen(false)}
                 handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
                 handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
@@ -375,7 +375,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
           <AcOptionCardModerationEllipseModal
             isOpen={isEllipseMenuOpen}
             zIndex={16}
-            canDeleteOption={postStatus === 'voting'}
+            canDeleteOption={!isWinner}
             onClose={() => setIsEllipseMenuOpen(false)}
             handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
             handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
@@ -627,7 +627,10 @@ const SDropdownButton = styled.button`
   justify-content: center;
   align-items: center;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.primary
+      : theme.colorsThemed.background.quaternary};
 
   border: transparent;
 
