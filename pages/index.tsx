@@ -358,7 +358,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       {!user.loggedIn && <HeroSection />}
-      {topSectionCollection.length > 0 && (
+      {topSectionCollection?.length > 0 && (
         <TopSection
           collection={topSectionCollection}
           handlePostClicked={handleOpenPostModal}
@@ -366,7 +366,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       )}
       {user.loggedIn &&
         !collectionFYError &&
-        (collectionFYInitialLoading || collectionFY.length > 0) && (
+        (collectionFYInitialLoading || collectionFY?.length > 0) && (
           <CardsSection
             title={t('cardsSection.title.for-you')}
             category='for-you'
@@ -383,7 +383,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionMCInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn || collectionMC.length === 0 ? (
+            !user.loggedIn || collectionMC?.length === 0 ? (
               <TutorialCard
                 image={
                   theme.name === 'light'
@@ -405,7 +405,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionACInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn || collectionAC.length === 0 ? (
+            !user.loggedIn || collectionAC?.length === 0 ? (
               <TutorialCard
                 image={
                   theme.name === 'light'
@@ -432,7 +432,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionCFInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn || collectionCF.length === 0 ? (
+            !user.loggedIn || collectionCF?.length === 0 ? (
               <TutorialCard
                 image={
                   theme.name === 'light'
