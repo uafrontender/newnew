@@ -1,5 +1,7 @@
+import enterVerificationCode from './utils/enterVerificationCode';
+
 context('Creator', () => {
-  const CREATOR_EMAIL = 'biba@newnew.co';
+  const CREATOR_EMAIL = 'test-creator@newnew.co';
 
   Cypress.on('uncaught:exception', (err, runnable) => {
     // Do nothing
@@ -13,12 +15,15 @@ context('Creator', () => {
   it('can enter application', () => {
     cy.get('#log-in-button').trigger('click');
     cy.url().should('include', '/sign-up');
+
     cy.get('#authenticate-input').type(CREATOR_EMAIL);
     cy.get('#authenticate-form').submit();
     cy.url().should('include', 'verify-email');
     cy.contains(CREATOR_EMAIL);
-    // Enter code (how to get it?)
-    // Verify that creator is on the dashboard
+
+    enterVerificationCode();
+
+    cy.url().should('include', '/creator/dashboard');
   });
 
   // Creator creates an event
