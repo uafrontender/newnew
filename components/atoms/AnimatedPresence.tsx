@@ -2,12 +2,10 @@ import React, { useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { motion, AnimatePresence as FMAnimatedPresence } from 'framer-motion';
 
-export type TAnimation =
+export type TElementAnimations =
   | 't-01'
   | 't-01-reverse'
   | 't-02'
-  // Can only be applied to text
-  | 't-08'
   | 't-09'
   | 't-10'
   | 'trans-06'
@@ -22,17 +20,19 @@ interface IAnimatedElements {
   start?: boolean;
   delay?: number;
   duration?: number;
-  animation: Exclude<TAnimation, 't-08'>;
+  animation: TElementAnimations;
   onAnimationEnd?: () => void;
   animateWhenInView?: boolean;
   children: React.ReactNode;
 }
 
+export type TWordsAnimation = TElementAnimations | 't-08';
+
 interface IAnimatedWords {
   start?: boolean;
   delay?: number;
   duration?: number;
-  animation: 't-08';
+  animation: TWordsAnimation;
   onAnimationEnd?: () => void;
   animateWhenInView?: boolean;
   children: string;

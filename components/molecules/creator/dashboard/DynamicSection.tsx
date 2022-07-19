@@ -13,7 +13,9 @@ import dynamic from 'next/dynamic';
 
 import Button from '../../../atoms/Button';
 import { Tab } from '../../Tabs';
-import AnimatedPresence, { TAnimation } from '../../../atoms/AnimatedPresence';
+import AnimatedPresence, {
+  TElementAnimations,
+} from '../../../atoms/AnimatedPresence';
 import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
 import { setOverlay } from '../../../../redux-store/slices/uiStateSlice';
 import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
@@ -43,7 +45,7 @@ export const DynamicSection = () => {
   const user = useAppSelector((state) => state.user);
   const containerRef: any = useRef(null);
   const [animate, setAnimate] = useState(false);
-  const [animation, setAnimation] = useState('o-12');
+  const [animation, setAnimation] = useState<TElementAnimations>('o-12');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const { unreadCountForCreator } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
@@ -185,7 +187,7 @@ export const DynamicSection = () => {
       )}
       <AnimatedPresence
         start={animate}
-        animation={animation as Exclude<TAnimation, 't-08'>}
+        animation={animation}
         onAnimationEnd={handleAnimationEnd}
         animateWhenInView={false}
         delay={0}

@@ -6,7 +6,9 @@ import { useTranslation } from 'next-i18next';
 import CheckBox from '../CheckBox';
 import TimePicker from '../../atoms/creation/TimePicker';
 import CalendarSimple from '../../atoms/creation/calendar/CalendarSimple';
-import AnimatedPresence, { TAnimation } from '../../atoms/AnimatedPresence';
+import AnimatedPresence, {
+  TElementAnimations,
+} from '../../atoms/AnimatedPresence';
 
 interface ITabletStartDate {
   id: string;
@@ -18,7 +20,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
   const { id, value, onChange } = props;
   const { t } = useTranslation('page-Creation');
   const [animate, setAnimate] = useState(value.type === 'schedule');
-  const [animation, setAnimation] = useState('o-12');
+  const [animation, setAnimation] = useState<TElementAnimations>('o-12');
 
   const handleAnimationEnd = useCallback(() => {
     setAnimate(false);
@@ -69,7 +71,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
       />
       <AnimatedPresence
         start={animate}
-        animation={animation as Exclude<TAnimation, 't-08'>}
+        animation={animation}
         onAnimationEnd={handleAnimationEnd}
       >
         <SCalendarWrapper>
