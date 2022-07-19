@@ -212,6 +212,7 @@ export const Desktop: React.FC = React.memo(() => {
               <Link href='/sign-up?to=log-in'>
                 <a>
                   <Button
+                    id='log-in-button'
                     view='quaternary'
                     onClick={() => {
                       Mixpanel.track('Navigation Item Clicked', {

@@ -251,6 +251,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
             />
           </motion.div>
           <SEmailSignInForm
+            id='authenticate-form'
             onSubmit={(e) => {
               e.preventDefault();
               if (
@@ -264,6 +265,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
           >
             <motion.div variants={item}>
               <SignInTextInput
+                id='authenticate-input'
                 name='email'
                 type='email'
                 autoComplete='true'
