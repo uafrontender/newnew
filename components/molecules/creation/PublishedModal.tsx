@@ -81,11 +81,11 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
 
   const postTypeText = useCallback(() => {
     if (postData) {
-      if (postData.auction) return 'Event';
+      if (postData.auction) return 'Bid';
       if (postData.crowdfunding) return 'Goal';
       return 'Superpoll';
     }
-    return 'Event';
+    return 'Bid';
   }, [postData]);
 
   async function copyPostUrlToClipboard(url: string) {
