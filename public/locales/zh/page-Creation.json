@@ -159,25 +159,25 @@
         "description": "發生錯誤，檔案無法上傳，想再試一次嗎？"
       },
       "setThumbnail": "設置縮略圖",
-      "thumbnailEllipseMenu_NEED_TRANSLATION": {
-        "selectSnippetButton": "Select a snippet",
-        "uploadImageButton": "Upload an image"
+      "thumbnailEllipseMenu": {
+        "selectSnippetButton": "選擇一個片段",
+        "uploadImageButton": "上傳圖片"
       },
       "deleteFile": "刪除檔案",
       "previewFull": "預覽",
       "thumbnail": {
         "info": "瞭解更多",
-        "title_NEED_TRANSLATION": "Set a thumbnail from the video",
-        "submit_NEED_TRANSLATION": "Save",
-        "description_NEED_TRANSLATION": "Select a snippet for your thumbnail. \nA good thumbnail gets viewers excited..."
+        "title": "從視頻中設定一個縮略圖",
+        "submit": "保存",
+        "description": "為縮略圖選擇一個片段。\\n一個好的縮略圖能吸引觀眾......"
       },
-      "coverImage_NEED_TRANSLATION": {
-        "title": "Upload an image",
-        "submit": "Save",
+      "coverImage": {
+        "title": "上傳圖片",
+        "submit": "保存",
         "uploadCoverImage": {
-          "caption": "Select custom cover image",
-          "uploadBtn": "Select",
-          "deleteBtn": "Delete"
+          "caption": "選擇自定義封面圖片",
+          "uploadBtn": "選擇",
+          "deleteBtn": "刪除"
         }
       },
       "full": {
@@ -189,7 +189,7 @@
         "process": "{{progress}}% • 還需{{time}}"
       },
       "processing": {
-        "title_NEED_TRANSLATION": "Your file is processing. It won’t take long...",
+        "title": "文檔正在處理中，不會需要很長時間......",
         "description": "視頻處理中",
         "process": "{{progress}}% • 還需{{time}}"
       }

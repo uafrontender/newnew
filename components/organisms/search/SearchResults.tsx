@@ -74,7 +74,6 @@ export const SearchResults = () => {
             }}
           >
             <InlineSvg
-              // @ts-ignore
               svg={tab.id === activeTab ? StatisticsIconFilled : StatisticsIcon}
               fill={
                 tab.id === activeTab

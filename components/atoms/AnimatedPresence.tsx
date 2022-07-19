@@ -2,11 +2,10 @@ import React, { useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { motion, AnimatePresence as FMAnimatedPresence } from 'framer-motion';
 
-export type TAnimation =
+export type TElementAnimations =
   | 't-01'
   | 't-01-reverse'
   | 't-02'
-  | 't-08'
   | 't-09'
   | 't-10'
   | 'trans-06'
@@ -17,33 +16,39 @@ export type TAnimation =
   | 'o-12'
   | 'o-12-reverse';
 
-interface IAnimatedWords {
+interface IAnimatedElements {
   start?: boolean;
   delay?: number;
   duration?: number;
-  animation: TAnimation;
+  animation: TElementAnimations;
   onAnimationEnd?: () => void;
   animateWhenInView?: boolean;
   children: React.ReactNode;
 }
 
-export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
+export type TWordsAnimation = TElementAnimations | 't-08';
+
+interface IAnimatedWords {
+  start?: boolean;
+  delay?: number;
+  duration?: number;
+  animation: TWordsAnimation;
+  onAnimationEnd?: () => void;
+  animateWhenInView?: boolean;
+  children: string;
+}
+
+type IAnimatedPresence = IAnimatedElements | IAnimatedWords;
+
+export const AnimatedPresence: React.FC<IAnimatedPresence> = React.memo(
   (props) => {
-    const {
-      start,
-      delay,
-      duration,
-      animation,
-      animateWhenInView,
-      onAnimationEnd,
-    } = props;
     let { children } = props;
     const { ref, inView } = useInView();
 
-    let startAnimation = start;
+    let startAnimation = props.start;
 
-    if (animateWhenInView) {
-      startAnimation = start && inView;
+    if (props.animateWhenInView) {
+      startAnimation = props.start && inView;
     }
 
     const variants: any = useMemo(
@@ -51,8 +56,8 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
         't-01': {
           opacity: 1,
           transition: {
-            delay: delay ?? 0.5,
-            duration: duration ?? 1,
+            delay: props.delay ?? 0.5,
+            duration: props.duration ?? 1,
           },
         },
         't-01_initial': {
@@ -64,8 +69,8 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
         't-01-reverse': {
           opacity: 0,
           transition: {
-            delay: delay ?? 0.5,
-            duration: duration ?? 1,
+            delay: props.delay ?? 0.5,
+            duration: props.duration ?? 1,
           },
         },
         't-01_initial-reverse': {
@@ -80,7 +85,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
           transition: {
             ease: 'easeInOut',
             type: 'spring',
-            delay: delay ?? 0.5,
+            delay: props.delay ?? 0.5,
             bounce: 0,
           },
         },
@@ -95,7 +100,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
         't-08': {
           opacity: 1,
           transition: {
-            staggerChildren: delay ?? 0.5,
+            staggerChildren: props.delay ?? 0.5,
           },
         },
         't-08_initial': {
@@ -124,7 +129,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
         't-10': {
           x: 5,
           transition: {
-            delay: delay ?? 0.5,
+            delay: props.delay ?? 0.5,
             repeat: Infinity,
             bounce: 0,
             duration: 0.5,
@@ -143,7 +148,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
           opacity: 1,
           transition: {
             type: 'spring',
-            delay: delay ?? 0.5,
+            delay: props.delay ?? 0.5,
             bounce: 0.5,
           },
         },
@@ -172,9 +177,9 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
           x: 0,
           opacity: 1,
           transition: {
-            delay: delay ?? 0.1,
+            delay: props.delay ?? 0.1,
             bounce: 0,
-            duration: duration ?? 1,
+            duration: props.duration ?? 1,
           },
         },
         'o-02_initial': {
@@ -189,7 +194,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
           y: -5,
           opacity: 1,
           transition: {
-            delay: delay ?? 0.1,
+            delay: props.delay ?? 0.1,
             bounce: 0,
           },
         },
@@ -205,7 +210,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
           y: 0,
           opacity: 1,
           transition: {
-            delay: delay ?? 0.1,
+            delay: props.delay ?? 0.1,
             bounce: 0,
           },
         },
@@ -222,9 +227,9 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
           visibility: 'visible',
           opacity: 1,
           transition: {
-            delay: delay ?? 0.1,
+            delay: props.delay ?? 0.1,
             bounce: 0,
-            duration: duration ?? 0.3,
+            duration: props.duration ?? 0.3,
           },
         },
         'o-12_initial': {
@@ -262,7 +267,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
           visibility: 'visible',
           opacity: 1,
           transition: {
-            delay: delay ?? 0.1,
+            delay: props.delay ?? 0.1,
             bounce: 0,
           },
         },
@@ -277,10 +282,10 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
           },
         },
       }),
-      [delay, duration]
+      [props.delay, props.duration]
     );
 
-    if (animation === 't-08') {
+    if (props.animation === 't-08') {
       const variantsChild = {
         't-08': {
           opacity: 1,
@@ -293,8 +298,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
         },
       };
 
-      // @ts-ignore
-      children = children.split(' ').map((word: string) => (
+      children = props.children.split(' ').map((word: string) => (
         <motion.span key={`${children}-${word}`} variants={variantsChild}>
           {`${word} `}
         </motion.span>
@@ -305,11 +309,11 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = React.memo(
       <FMAnimatedPresence>
         <motion.div
           ref={ref}
-          exit={`${animation}_exit`}
-          animate={startAnimation && animation}
-          initial={`${animation}_initial`}
+          exit={`${props.animation}_exit`}
+          animate={startAnimation && props.animation}
+          initial={`${props.animation}_initial`}
           variants={variants}
-          onAnimationComplete={onAnimationEnd}
+          onAnimationComplete={props.onAnimationEnd}
         >
           {children}
         </motion.div>

@@ -28,6 +28,10 @@ const SCreatorOnboardingLayout = styled.div`
   max-width: 100%;
   height: 100vh;
   width: 100vw;
+
+  @supports (-webkit-touch-callout: none) {
+    height: -webkit-fill-available;
+  }
 `;
 
 const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout> =
