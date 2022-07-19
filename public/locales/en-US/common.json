@@ -157,5 +157,24 @@
     "subscriptionCost": "${{amount}} Monthly",
     "subscribed": "subscribed",
     "cancelled": "cancelled"
+  },
+  "sortingOption": {
+    "sortingtype": "Order",
+    "sortingtype-all": "All",
+    "sortingtype-num_bids": "Participants",
+    "sortingtype-num_bids-ac": "Number of bids",
+    "sortingtype-num_bids-mc": "Number of votes",
+    "sortingtype-num_bids-cf": "Number of backers",
+    "sortingtype-newest": "Newest",
+    "bid": "Bid",
+    "bid-lowest": "Lowest",
+    "bid-highest": "Highest",
+    "time": "Time",
+    "time-ending-soon": "Ending soonest",
+    "time-newest": "Newest",
+    "time-oldest": "Oldest",
+    "numbers-of-bids": "Numbers of bids",
+    "numbers-of-bids-fewest": "Fewest",
+    "numbers-of-bids-most-first": "Most first"
   }
 }

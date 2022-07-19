@@ -26,6 +26,7 @@ import SuggestionActionMobileModal from '../OptionActionMobileModal';
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
 import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 interface IAcOptionTopInfo {
   creator: newnewapi.IUser;
@@ -373,7 +374,9 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
             <SPaymentModalTitle variant={3}>
               {t('acPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
-            <SPaymentModalOptionText>{option.title}</SPaymentModalOptionText>
+            <SPaymentModalOptionText>
+              <PostTitleContent>{option.title}</PostTitleContent>
+            </SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>
       ) : null}

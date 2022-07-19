@@ -14,6 +14,8 @@ import { searchPosts } from '../../../api/endpoints/search';
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppSelector } from '../../../redux-store/store';
+import SortOption from '../../atoms/SortOption';
 
 const PostList = dynamic(() => import('./PostList'));
 const PostModal = dynamic(() => import('../decision/PostModal'));
@@ -87,6 +89,11 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
 }) => {
   const { t: tCommon } = useTranslation('common');
   const router = useRouter();
+
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
@@ -289,6 +296,10 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
     [loadingPosts]
   );
 
+  const clearSorting = useCallback(() => {
+    setPostSorting('all');
+  }, []);
+
   const Tabs = useCallback(
     () => (
       <STabs>
@@ -303,9 +314,25 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
             {tab.title}
           </STab>
         ))}
+        {selectedSorting &&
+          selectedSorting.sortingtype !== 'all' &&
+          !isMobile && (
+            <SortOption
+              sorts={selectedSorting}
+              category=''
+              onClick={clearSorting}
+            />
+          )}
       </STabs>
     ),
-    [activeTabs, tabTypes, updateActiveTabs]
+    [
+      activeTabs,
+      tabTypes,
+      selectedSorting,
+      isMobile,
+      clearSorting,
+      updateActiveTabs,
+    ]
   );
 
   const handleTypeChange = useCallback(

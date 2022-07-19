@@ -104,7 +104,7 @@ export const HeroSection = React.memo(() => {
               delay={0.4}
               onAnimationEnd={handleTitleAnimationEnd}
             >
-              {t('heroSection.title')}
+              {t('heroSection.title') as string}
             </AnimatedPresence>
           </SHeadline>
           <SSubTitle weight={600}>
