@@ -98,6 +98,7 @@
         "description": "{{value}}",
         "options": {
           "1-hour": "1 hour",
+          "3-hours": "3 hours",
           "6-hours": "6 hours",
           "12-hours": "12 hours",
           "1-day": "1 day",
