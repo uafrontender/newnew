@@ -28,10 +28,10 @@ const Headline: React.FC<IHeadline> = (props) => {
     return (
       <Component {...rest}>
         <AnimatedPresence
-          animation={animation}
+          animation='t-08'
           animateWhenInView={animateWhenInView}
         >
-          {children}
+          {children as string}
         </AnimatedPresence>
       </Component>
     );

@@ -52,7 +52,7 @@ const Cookie = React.memo(() => {
   return (
     <AnimatedPresence
       start={animateCookie}
-      animation={animation as TAnimation}
+      animation={animation as Exclude<TAnimation, 't-08'>}
       onAnimationEnd={handleAnimationEnd}
       animateWhenInView={false}
     >

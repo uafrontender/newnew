@@ -185,7 +185,7 @@ export const DynamicSection = () => {
       )}
       <AnimatedPresence
         start={animate}
-        animation={animation as TAnimation}
+        animation={animation as Exclude<TAnimation, 't-08'>}
         onAnimationEnd={handleAnimationEnd}
         animateWhenInView={false}
         delay={0}

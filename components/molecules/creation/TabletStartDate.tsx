@@ -69,7 +69,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
       />
       <AnimatedPresence
         start={animate}
-        animation={animation as TAnimation}
+        animation={animation as Exclude<TAnimation, 't-08'>}
         onAnimationEnd={handleAnimationEnd}
       >
         <SCalendarWrapper>
