@@ -154,5 +154,6 @@
   },
   "creatorCard": {
     "subscriptionCost": "${{amount}} Mensual"
-  }
+  },
+  "gotIt": "Aceptar"
 }

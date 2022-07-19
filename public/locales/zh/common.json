@@ -154,5 +154,6 @@
   },
   "creatorCard": {
     "subscriptionCost": "${{amount}} 每月"
-  }
+  },
+  "gotIt": "知道了"
 }

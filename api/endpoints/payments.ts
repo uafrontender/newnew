@@ -24,6 +24,38 @@ export const getSupportedCreatorCountries = (payload: newnewapi.EmptyRequest, si
     signal ?? undefined,
   );
 
+export const getStripeCustomer = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobuf<newnewapi.EmptyRequest, newnewapi.GetStripeCustomerResponse>(
+    newnewapi.EmptyRequest,
+    newnewapi.GetStripeCustomerResponse,
+    `${BASE_URL_PAYMENTS}/get_stripe_customer`,
+    'post',
+    payload,
+    {},
+    'cors',
+    'same-origin',
+    signal ?? undefined
+  );
+
+export const createStripeSetupIntent = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.CreateStripeSetupIntentResponse
+  >(
+    newnewapi.EmptyRequest,
+    newnewapi.CreateStripeSetupIntentResponse,
+    `${BASE_URL_PAYMENTS}/create_stripe_setup_intent`,
+    'post',
+    payload,
+    signal ?? undefined
+  );
+
 // Payments for bids/pledges/votes via Stripe redirect
 export const createPaymentSession = (
   payload: newnewapi.CreatePaymentSessionRequest, signal?: RequestInit['signal']

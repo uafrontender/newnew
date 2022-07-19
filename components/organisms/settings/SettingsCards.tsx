@@ -1,12 +1,16 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
 
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import Card from '../../molecules/settings/Card';
+import AddCardModal from '../../molecules/settings/AddCardModal';
+
+import { getCards } from '../../../api/endpoints/cards';
 
 import addIconFilled from '../../../public/images/svg/icons/filled/Create.svg';
 
@@ -39,6 +43,23 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   const { t } = useTranslation('page-Profile');
   const theme = useTheme();
 
+  const [isAddCardModal, setIsAddCardModal] = useState(false);
+
+  useEffect(() => {
+    const fetchCard = async () => {
+      try {
+        const payload = new newnewapi.EmptyRequest();
+        const response = await getCards(payload);
+
+        console.log(response, 'response');
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchCard();
+  }, []);
+
   return (
     <SSettingsContainer>
       <SCardsContainer $isNoCards={CARDS.length === 0}>
@@ -47,10 +68,17 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
         </STitle>
         {!!CARDS.length && (
           <>
-            <SButtonSecondaryDesktop view='secondary'>
+            <SButtonSecondaryDesktop
+              view='secondary'
+              onClick={() => setIsAddCardModal(true)}
+            >
               {t('Settings.sections.cards.button.addCard')}
             </SButtonSecondaryDesktop>
-            <SButtonSecondaryMobile view='secondary' iconOnly>
+            <SButtonSecondaryMobile
+              view='secondary'
+              iconOnly
+              onClick={() => setIsAddCardModal(true)}
+            >
               <InlineSVG
                 svg={addIconFilled}
                 fill={
@@ -87,6 +115,10 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
           ))}
         </SCardList>
       </SCardsContainer>
+      <AddCardModal
+        show={isAddCardModal}
+        closeModal={() => setIsAddCardModal(false)}
+      />
     </SSettingsContainer>
   );
 };

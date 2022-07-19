@@ -106,7 +106,8 @@ const SCard = styled.div`
 const SLabel = styled.div`
   ${({ theme }) => theme.media.tablet} {
     padding: 0 16px;
-    background-color: #0b0a1333;
+    background-color: ${({ theme }) =>
+      theme.name === 'light' ? 'rgba(255, 255, 255, 0.2)' : '#0b0a1333'};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
 `;
@@ -155,7 +156,10 @@ const SCardMainInfo = styled.div`
 
 const SMoreButton = styled(Button)`
   margin-left: auto;
-  background-color: rgba(11, 10, 19, 0.2);
+  background-color: ${({ theme }) =>
+    theme.name === 'light'
+      ? 'rgba(255, 255, 255, 0.2)'
+      : 'rgba(11, 10, 19, 0.2)'};
   width: 24px;
   height: 24px;
   border-radius: 50%;
