@@ -53,6 +53,7 @@ import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 interface IAcOptionsTab {
   postId: string;
@@ -709,7 +710,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
-              {postText}
+              <PostTitleContent>{postText}</PostTitleContent>
             </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
               {t('acPost.paymentModalHeader.subtitle')}

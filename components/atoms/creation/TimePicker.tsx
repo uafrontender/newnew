@@ -4,7 +4,7 @@ import moment from 'moment';
 
 import Text from '../Text';
 import InlineSVG from '../InlineSVG';
-import AnimatedPresence, { TAnimation } from '../AnimatedPresence';
+import AnimatedPresence, { TElementAnimations } from '../AnimatedPresence';
 
 import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
@@ -27,7 +27,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
   const wrapperRef: any = useRef();
   const [open, setOpen] = useState(false);
   const [animate, setAnimate] = useState(false);
-  const [animation, setAnimation] = useState('o-12');
+  const [animation, setAnimation] = useState<TElementAnimations>('o-12');
   const direction = useDropDownDirection(wrapperRef, 340);
 
   const isDaySame = useMemo(() => {
@@ -163,7 +163,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
     setOpen(true);
   }, []);
   const handleClose = useCallback(() => {
-    setAnimation('o-12-reversed');
+    setAnimation('o-12-reverse');
     setAnimate(true);
     setOpen(false);
   }, []);
@@ -273,7 +273,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
       </SContainer>
       <AnimatedPresence
         start={animate}
-        animation={animation as TAnimation}
+        animation={animation}
         onAnimationEnd={handleAnimationEnd}
         animateWhenInView={false}
       >
