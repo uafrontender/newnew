@@ -360,8 +360,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [recommendedPosts, setRecommendedPosts] = useState<newnewapi.Post[]>(
     []
   );
-  const [nextPageToken, setNextPageToken] =
-    useState<string | null | undefined>('');
+  const [nextPageToken, setNextPageToken] = useState<string | null | undefined>(
+    ''
+  );
   const [recommendedPostsLoading, setRecommendedPostsLoading] = useState(false);
   const [triedLoading, setTriedLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
