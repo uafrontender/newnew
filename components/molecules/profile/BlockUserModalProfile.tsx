@@ -44,8 +44,8 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
   };
   return (
     <Modal show={confirmBlockUser} onClose={closeModal}>
-      <SContainer>
-        <SModal onClick={preventParentClick()}>
+      <SContainer onClick={preventParentClick()}>
+        <SModal>
           <SModalTitle>{t('modal.blockUser.title')}</SModalTitle>
           <SModalMessage>
             {t('modal.blockUser.messageFirstPart')} {getDisplayname(user)}{' '}

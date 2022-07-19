@@ -4,6 +4,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import router from 'next/router';
 import dynamic from 'next/dynamic';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
@@ -30,16 +31,22 @@ export const CreatorsList: React.FC<IList> = ({
   showSubscriptionPrice = false,
   withEllipseMenu = false,
 }) => {
-  const renderItem = (item: newnewapi.IUser) => (
-    <SItemWrapper key={item.uuid}>
-      <CreatorCardWithSubscriptionPrice
-        subscribedTo={subscribedTo}
-        showSubscriptionPrice={showSubscriptionPrice}
-        item={item}
-        withEllipseMenu={withEllipseMenu ?? false}
-      />
-    </SItemWrapper>
-  );
+  const renderItem = (item: newnewapi.IUser) => {
+    const handleItemClick = () => {
+      router.push(`/${item.username}`);
+    };
+
+    return (
+      <SItemWrapper key={item.uuid} onClick={handleItemClick}>
+        <CreatorCardWithSubscriptionPrice
+          subscribedTo={subscribedTo}
+          showSubscriptionPrice={showSubscriptionPrice}
+          item={item}
+          withEllipseMenu={withEllipseMenu ?? false}
+        />
+      </SItemWrapper>
+    );
+  };
 
   return (
     <SListWrapper>
