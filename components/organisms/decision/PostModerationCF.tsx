@@ -96,6 +96,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
 
+    // Announcement
+    const [announcement, setAnnouncement] = useState(post.announcement);
+
     // Comments
     const { ref: commentsSectionRef, inView } = useInView({
       threshold: 0.8,
@@ -126,14 +129,16 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
 
     // Pledges
     const [pledges, setPledges] = useState<TCfPledgeWithHighestField[]>([]);
-    const [pledgesNextPageToken, setPledgesNextPageToken] =
-      useState<string | undefined | null>('');
+    const [pledgesNextPageToken, setPledgesNextPageToken] = useState<
+      string | undefined | null
+    >('');
     const [pledgesLoading, setPledgesLoading] = useState(false);
     const [loadingPledgesError, setLoadingPledgesError] = useState('');
 
     // Response upload
-    const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
-      useState<newnewapi.IVideoUrls | undefined>(undefined);
+    const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<
+      newnewapi.IVideoUrls | undefined
+    >(undefined);
 
     // Tabs
     const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
@@ -305,6 +310,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
           if (!responseFreshlyUploaded && res.data.crowdfunding?.response) {
             setResponseFreshlyUploaded(res.data.crowdfunding.response);
           }
+          setAnnouncement(res.data.crowdfunding?.announcement);
         }
       } catch (err) {
         console.error(err);
@@ -529,8 +535,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
             )}
           </SExpiresSection>
           <PostVideoModeration
+            key={`key_${announcement?.coverImageUrl}`}
             postId={post.postUuid}
-            announcement={post.announcement!!}
+            announcement={announcement!!}
             response={(post.response || responseFreshlyUploaded) ?? undefined}
             thumbnails={{
               startTime: 1,
