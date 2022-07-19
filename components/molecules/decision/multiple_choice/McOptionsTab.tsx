@@ -55,6 +55,7 @@ import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -753,7 +754,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
-              {post.title}
+              <PostTitleContent>{post.title}</PostTitleContent>
             </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
               {t('mcPost.paymentModalHeader.subtitle')}

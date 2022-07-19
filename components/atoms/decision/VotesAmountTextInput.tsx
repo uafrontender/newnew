@@ -45,8 +45,7 @@ const VotesAmountTextInput: React.FunctionComponent<IVotesAmountTextInput> = ({
 
     if (newValue.length > 5) return;
 
-    // @ts-ignore
-    onChange(newValue ? (newValue as number) : '');
+    onChange(newValue);
   };
 
   useEffect(() => {

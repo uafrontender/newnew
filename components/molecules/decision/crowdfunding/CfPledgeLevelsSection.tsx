@@ -42,6 +42,7 @@ import assets from '../../../../constants/assets';
 import Headline from '../../../atoms/Headline';
 import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsSection {
@@ -476,7 +477,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                 </SPaymentModalHeadingPostCreator>
               </SPaymentModalHeading>
               <SPaymentModalOptionText variant={5}>
-                {post.title}
+                <PostTitleContent>{post.title}</PostTitleContent>
               </SPaymentModalOptionText>
             </SPaymentModalHeader>
           </PaymentModal>

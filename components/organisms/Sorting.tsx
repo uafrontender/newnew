@@ -20,8 +20,8 @@ import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 
 interface ISorting {
   category: string;
-  options: any;
-  selected: any;
+  options: Record<string, string>[];
+  selected?: Record<string, string>;
   onChange: (selected: any) => void;
 }
 
@@ -37,7 +37,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
     resizeMode
   );
 
-  const selectedCount = Object.keys(selected).length;
+  const selectedCount = selected ? Object.keys(selected).length : 0;
 
   const handleToggleSortingClick = useCallback(() => {
     setFocused(!focused);

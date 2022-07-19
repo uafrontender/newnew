@@ -229,7 +229,7 @@ export default OnboardingSectionAbout;
 const SContainer = styled.div`
   padding: 0 20px 20px;
   z-index: 2;
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   ${({ theme }) => theme.media.tablet} {

@@ -90,8 +90,7 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
 
   useEffect(() => {
     const handler = (e: Event) => {
-      // @ts-ignore
-      const currScroll = e?.currentTarget?.scrollTop!!;
+      const currScroll = (e?.currentTarget as HTMLDivElement)?.scrollTop!!;
       const targetScroll =
         (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
 
