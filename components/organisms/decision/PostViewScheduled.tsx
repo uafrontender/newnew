@@ -221,7 +221,8 @@ const SWrapper = styled.div`
   grid-template-areas:
     'expires'
     'video'
-    'title';
+    'title'
+    'activities';
 
   margin-bottom: 32px;
 

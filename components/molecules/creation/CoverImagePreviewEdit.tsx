@@ -30,228 +30,230 @@ interface ICoverImagePreviewEdit {
   handleSubmit: () => void;
 }
 
-const CoverImagePreviewEdit: React.FunctionComponent<ICoverImagePreviewEdit> =
-  ({ open, handleClose, handleSubmit }) => {
-    const theme = useTheme();
-    const { t } = useTranslation('page-Creation');
-    const dispatch = useAppDispatch();
-    const { customCoverImageUrl } = useAppSelector((state) => state.creation);
-    const { resizeMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
+const CoverImagePreviewEdit: React.FunctionComponent<
+  ICoverImagePreviewEdit
+> = ({ open, handleClose, handleSubmit }) => {
+  const theme = useTheme();
+  const { t } = useTranslation('page-Creation');
+  const dispatch = useAppDispatch();
+  const { customCoverImageUrl } = useAppSelector((state) => state.creation);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
-    const preventCLick = useCallback((e: any) => {
-      e.preventDefault();
-      e.stopPropagation();
-    }, []);
+  const preventCLick = useCallback((e: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
 
-    // Image to be saved
-    const [coverImageToBeSaved, setCoverImageToBeSaved] = useState(
-      customCoverImageUrl ?? ''
-    );
-    const handleDeleteCoverImage = useCallback(() => {
-      setCoverImageToBeSaved('');
-    }, []);
+  // Image to be saved
+  const [coverImageToBeSaved, setCoverImageToBeSaved] = useState(
+    customCoverImageUrl ?? ''
+  );
+  const [wasDeleted, setWasDeleted] = useState(false);
+  const handleDeleteCoverImage = useCallback(() => {
+    setCoverImageToBeSaved('');
+    setWasDeleted(true);
+  }, []);
 
-    // Edit picture
-    const [coverImageInEdit, setCoverImageInEdit] = useState('');
-    const [originalCoverImageWidth, setOriginalCoverImageWidth] = useState(0);
-    const [cropCoverImage, setCropCoverImage] = useState<Point>({
-      x: 0,
-      y: 0,
+  // Edit picture
+  const [coverImageInEdit, setCoverImageInEdit] = useState('');
+  const [originalCoverImageWidth, setOriginalCoverImageWidth] = useState(0);
+  const [cropCoverImage, setCropCoverImage] = useState<Point>({
+    x: 0,
+    y: 0,
+  });
+  const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
+  const [zoomCoverImage, setZoomCoverImage] = useState(1);
+  const [updateCoverImageLoading, setUpdateCoverImageLoading] = useState(false);
+
+  const hasChanged = useMemo(
+    () => customCoverImageUrl !== coverImageToBeSaved,
+    [coverImageToBeSaved, customCoverImageUrl]
+  );
+
+  const onFileChange = useCallback(
+    (newImageUrl: string, originalImageWidth: number) => {
+      setCoverImageInEdit(newImageUrl);
+      setOriginalCoverImageWidth(originalImageWidth);
+    },
+    []
+  );
+
+  const handleZoomOutCoverImage = () => {
+    if (zoomCoverImage <= 1) return;
+
+    setZoomCoverImage((z) => {
+      if (zoomCoverImage - 0.2 <= 1) return 1;
+      return z - 0.2;
     });
-    const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
-    const [zoomCoverImage, setZoomCoverImage] = useState(1);
-    const [updateCoverImageLoading, setUpdateCoverImageLoading] =
-      useState(false);
+  };
 
-    const hasChanged = useMemo(
-      () => customCoverImageUrl !== coverImageToBeSaved,
-      [coverImageToBeSaved, customCoverImageUrl]
-    );
+  const handleZoomInCoverImage = () => {
+    if (zoomCoverImage >= 3) return;
 
-    const onFileChange = useCallback(
-      (newImageUrl: string, originalImageWidth: number) => {
-        setCoverImageInEdit(newImageUrl);
-        setOriginalCoverImageWidth(originalImageWidth);
-      },
-      []
-    );
+    setZoomCoverImage((z) => {
+      if (zoomCoverImage + 0.2 >= 3) return 3;
+      return z + 0.2;
+    });
+  };
 
-    const handleZoomOutCoverImage = () => {
-      if (zoomCoverImage <= 1) return;
+  const onCropCompleteCoverImage = useCallback(
+    (_: any, croppedAreaPixels: Area) => {
+      setCroppedAreaCoverImage(croppedAreaPixels);
+    },
+    []
+  );
 
-      setZoomCoverImage((z) => {
-        if (zoomCoverImage - 0.2 <= 1) return 1;
-        return z - 0.2;
-      });
-    };
+  const completeCoverImageCropAndSave = useCallback(async () => {
+    setUpdateCoverImageLoading(true);
+    try {
+      const croppedImage = await getCroppedImg(
+        coverImageInEdit,
+        croppedAreaCoverImage!!,
+        0,
+        'postCoverImage.jpeg'
+      );
 
-    const handleZoomInCoverImage = () => {
-      if (zoomCoverImage >= 3) return;
+      const newImageUrl = URL.createObjectURL(croppedImage);
 
-      setZoomCoverImage((z) => {
-        if (zoomCoverImage + 0.2 >= 3) return 3;
-        return z + 0.2;
-      });
-    };
+      dispatch(setCustomCoverImageUrl(newImageUrl));
+      setCoverImageInEdit('');
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setUpdateCoverImageLoading(false);
+    }
+  }, [coverImageInEdit, croppedAreaCoverImage, dispatch]);
 
-    const onCropCompleteCoverImage = useCallback(
-      (_: any, croppedAreaPixels: Area) => {
-        setCroppedAreaCoverImage(croppedAreaPixels);
-      },
-      []
-    );
+  const onSubmit = useCallback(async () => {
+    if (coverImageToBeSaved) {
+      await completeCoverImageCropAndSave();
+    } else {
+      dispatch(unsetCustomCoverImageUrl({}));
+    }
+    handleSubmit();
+  }, [
+    completeCoverImageCropAndSave,
+    coverImageToBeSaved,
+    dispatch,
+    handleSubmit,
+  ]);
 
-    const completeCoverImageCropAndSave = useCallback(async () => {
-      setUpdateCoverImageLoading(true);
-      try {
-        const croppedImage = await getCroppedImg(
-          coverImageInEdit,
-          croppedAreaCoverImage!!,
-          0,
-          'postCoverImage.jpeg'
-        );
+  useEffect(() => {
+    if (coverImageInEdit) {
+      setCoverImageToBeSaved(coverImageInEdit);
+    }
+  }, [coverImageInEdit]);
 
-        const newImageUrl = URL.createObjectURL(croppedImage);
-
-        dispatch(setCustomCoverImageUrl(newImageUrl));
-        setCoverImageInEdit('');
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setUpdateCoverImageLoading(false);
-      }
-    }, [coverImageInEdit, croppedAreaCoverImage, dispatch]);
-
-    const onSubmit = useCallback(async () => {
-      if (coverImageToBeSaved) {
-        await completeCoverImageCropAndSave();
-      } else {
-        dispatch(unsetCustomCoverImageUrl({}));
-      }
-      handleSubmit();
-    }, [
-      completeCoverImageCropAndSave,
-      coverImageToBeSaved,
-      dispatch,
-      handleSubmit,
-    ]);
-
-    useEffect(() => {
-      if (coverImageInEdit) {
-        setCoverImageToBeSaved(coverImageInEdit);
-      }
-    }, [coverImageInEdit]);
-
-    return (
-      <Modal show={open} onClose={handleClose}>
-        <SContainer onClick={preventCLick}>
-          <SModalTopContent>
-            <SModalTopLine>
-              {isMobile && (
-                <InlineSVG
-                  clickable
-                  svg={chevronLeft}
-                  fill={theme.colorsThemed.text.primary}
-                  width='20px'
-                  height='20px'
-                  onClick={handleClose}
-                />
-              )}
-              {isMobile ? (
-                <SModalTopLineTitle variant={3} weight={600}>
-                  {t('secondStep.video.coverImage.title')}
-                </SModalTopLineTitle>
-              ) : (
-                <SModalTopLineTitleTablet variant={6}>
-                  {t('secondStep.video.coverImage.title')}
-                </SModalTopLineTitleTablet>
-              )}
-            </SModalTopLine>
-            {coverImageInEdit ? (
-              <CoverImageContent>
-                <CoverImageCropper
-                  crop={cropCoverImage}
-                  zoom={zoomCoverImage}
-                  coverImageInEdit={coverImageInEdit}
-                  originalImageWidth={originalCoverImageWidth}
-                  disabled={updateCoverImageLoading}
-                  onCropChange={setCropCoverImage}
-                  onCropComplete={onCropCompleteCoverImage}
-                  onZoomChange={setZoomCoverImage}
-                />
-                <SSliderWrapper>
-                  <Button
-                    iconOnly
-                    size='sm'
-                    view='transparent'
-                    disabled={zoomCoverImage <= 1 || updateCoverImageLoading}
-                    onClick={handleZoomOutCoverImage}
-                  >
-                    <InlineSVG
-                      svg={ZoomOutIcon}
-                      fill={theme.colorsThemed.text.primary}
-                      width='24px'
-                      height='24px'
-                    />
-                  </Button>
-                  <CoverImageZoomSlider
-                    value={zoomCoverImage}
-                    min={1}
-                    max={3}
-                    step={0.1}
-                    ariaLabel='Zoom'
-                    disabled={updateCoverImageLoading}
-                    onChange={(e) => setZoomCoverImage(Number(e.target.value))}
-                  />
-                  <Button
-                    iconOnly
-                    size='sm'
-                    view='transparent'
-                    disabled={zoomCoverImage >= 3 || updateCoverImageLoading}
-                    onClick={handleZoomInCoverImage}
-                  >
-                    <InlineSVG
-                      svg={ZoomInIcon}
-                      fill={theme.colorsThemed.text.primary}
-                      width='24px'
-                      height='24px'
-                    />
-                  </Button>
-                </SSliderWrapper>
-              </CoverImageContent>
-            ) : (
-              <CoverImageUpload
-                coverImageToBeSaved={coverImageToBeSaved}
-                onFileChange={onFileChange}
-                handleDeleteFile={handleDeleteCoverImage}
+  return (
+    <Modal show={open} onClose={handleClose}>
+      <SContainer onClick={preventCLick}>
+        <SModalTopContent>
+          <SModalTopLine>
+            {isMobile && (
+              <InlineSVG
+                clickable
+                svg={chevronLeft}
+                fill={theme.colorsThemed.text.primary}
+                width='20px'
+                height='20px'
+                onClick={handleClose}
               />
             )}
-          </SModalTopContent>
-          {isMobile ? (
-            <SModalButtonContainer>
-              <Button view='primaryGrad' onClick={onSubmit}>
-                {t('secondStep.video.coverImage.submit')}
-              </Button>
-            </SModalButtonContainer>
+            {isMobile ? (
+              <SModalTopLineTitle variant={3} weight={600}>
+                {t('secondStep.video.coverImage.title')}
+              </SModalTopLineTitle>
+            ) : (
+              <SModalTopLineTitleTablet variant={6}>
+                {t('secondStep.video.coverImage.title')}
+              </SModalTopLineTitleTablet>
+            )}
+          </SModalTopLine>
+          {coverImageInEdit ? (
+            <CoverImageContent>
+              <CoverImageCropper
+                crop={cropCoverImage}
+                zoom={zoomCoverImage}
+                coverImageInEdit={coverImageInEdit}
+                originalImageWidth={originalCoverImageWidth}
+                disabled={updateCoverImageLoading}
+                onCropChange={setCropCoverImage}
+                onCropComplete={onCropCompleteCoverImage}
+                onZoomChange={setZoomCoverImage}
+              />
+              <SSliderWrapper>
+                <Button
+                  iconOnly
+                  size='sm'
+                  view='transparent'
+                  disabled={zoomCoverImage <= 1 || updateCoverImageLoading}
+                  onClick={handleZoomOutCoverImage}
+                >
+                  <InlineSVG
+                    svg={ZoomOutIcon}
+                    fill={theme.colorsThemed.text.primary}
+                    width='24px'
+                    height='24px'
+                  />
+                </Button>
+                <CoverImageZoomSlider
+                  value={zoomCoverImage}
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  ariaLabel='Zoom'
+                  disabled={updateCoverImageLoading}
+                  onChange={(e) => setZoomCoverImage(Number(e.target.value))}
+                />
+                <Button
+                  iconOnly
+                  size='sm'
+                  view='transparent'
+                  disabled={zoomCoverImage >= 3 || updateCoverImageLoading}
+                  onClick={handleZoomInCoverImage}
+                >
+                  <InlineSVG
+                    svg={ZoomInIcon}
+                    fill={theme.colorsThemed.text.primary}
+                    width='24px'
+                    height='24px'
+                  />
+                </Button>
+              </SSliderWrapper>
+            </CoverImageContent>
           ) : (
-            <SButtonsWrapper>
-              <Button view='secondary' onClick={handleClose}>
-                {t('secondStep.button.cancel')}
-              </Button>
-              <Button
-                view='primaryGrad'
-                disabled={!hasChanged}
-                onClick={onSubmit}
-              >
-                {t('secondStep.video.coverImage.submit')}
-              </Button>
-            </SButtonsWrapper>
+            <CoverImageUpload
+              coverImageToBeSaved={coverImageToBeSaved}
+              onFileChange={onFileChange}
+              handleDeleteFile={handleDeleteCoverImage}
+            />
           )}
-        </SContainer>
-      </Modal>
-    );
-  };
+        </SModalTopContent>
+        {isMobile ? (
+          <SModalButtonContainer>
+            <Button view='primaryGrad' onClick={onSubmit}>
+              {t('secondStep.video.coverImage.submit')}
+            </Button>
+          </SModalButtonContainer>
+        ) : (
+          <SButtonsWrapper>
+            <Button view='secondary' onClick={handleClose}>
+              {t('secondStep.button.cancel')}
+            </Button>
+            <Button
+              view='primaryGrad'
+              disabled={!hasChanged || (!wasDeleted && !coverImageToBeSaved)}
+              onClick={onSubmit}
+            >
+              {t('secondStep.video.coverImage.submit')}
+            </Button>
+          </SButtonsWrapper>
+        )}
+      </SContainer>
+    </Modal>
+  );
+};
 
 export default CoverImagePreviewEdit;
 
