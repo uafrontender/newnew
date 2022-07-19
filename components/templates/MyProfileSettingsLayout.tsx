@@ -8,19 +8,18 @@ interface IMyProfileSettingsLayout {
   children: React.ReactNode;
 }
 
-const MyProfileSettingsLayout: React.FunctionComponent<
-  IMyProfileSettingsLayout
-> = (props) => {
-  const { children } = props;
+const MyProfileSettingsLayout: React.FunctionComponent<IMyProfileSettingsLayout> =
+  (props) => {
+    const { children } = props;
 
-  return (
-    <ErrorBoundary>
-      <SGeneral>
-        <SSettingsLayout>{children}</SSettingsLayout>
-      </SGeneral>
-    </ErrorBoundary>
-  );
-};
+    return (
+      <ErrorBoundary>
+        <SGeneral>
+          <SSettingsLayout>{children}</SSettingsLayout>
+        </SGeneral>
+      </ErrorBoundary>
+    );
+  };
 
 export default MyProfileSettingsLayout;
 
@@ -31,24 +30,15 @@ const SGeneral = styled(General)`
     z-index: 6;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 767px) {
     main {
-      > div:first-child {
+      div:first-child {
         padding-left: 0;
         padding-right: 0;
 
-        > div:first-child {
+        div:first-child {
           margin-left: 0;
           margin-right: 0;
-          padding-left: 0;
-          padding-right: 0;
-
-          > div:first-child {
-            margin-left: 0;
-            margin-right: 0;
-            padding-left: 0;
-            padding-right: 0;
-          }
         }
       }
     }

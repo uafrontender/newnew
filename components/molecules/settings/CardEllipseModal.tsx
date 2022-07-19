@@ -30,11 +30,11 @@ const CardEllipseModal: React.FunctionComponent<ICardEllipseModal> = ({
             e.stopPropagation();
           }}
         >
-          <Button view="danger" style={{ marginBottom: '16px'}}>
+          <Button view='danger' style={{ marginBottom: '16px' }}>
             {t('Settings.sections.cards.ellipse.removeCard')}
           </Button>
           {!isPrimary && (
-            <Button view="primary">
+            <Button view='primary'>
               {t('Settings.sections.cards.ellipse.makePrimary')}
             </Button>
           )}

@@ -31,6 +31,8 @@ const CARDS = [
   },
 ];
 
+// const CARDS = [];
+
 interface ISettingsCards {}
 
 const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
@@ -40,30 +42,35 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   return (
     <SSettingsContainer>
       <SCardsContainer $isNoCards={CARDS.length === 0}>
-        <Text variant={1} weight={600}>
+        <STitle variant={1} weight={600} $isNoCards={CARDS.length === 0}>
           {t('Settings.sections.cards.myPaymentMethods')}
-        </Text>
+        </STitle>
         {!!CARDS.length && (
-          <SButtonSecondaryDesktop view='secondary'>
-            {t('Settings.sections.cards.button.addCard')}
-          </SButtonSecondaryDesktop>
+          <>
+            <SButtonSecondaryDesktop view='secondary'>
+              {t('Settings.sections.cards.button.addCard')}
+            </SButtonSecondaryDesktop>
+            <SButtonSecondaryMobile view='secondary' iconOnly>
+              <InlineSVG
+                svg={addIconFilled}
+                fill={
+                  theme.name === 'light'
+                    ? theme.colors.darkGray
+                    : theme.colors.white
+                }
+                width='24px'
+                height='24px'
+              />
+            </SButtonSecondaryMobile>
+          </>
         )}
-
-        <SButtonSecondaryMobile view='secondary' iconOnly>
-          <InlineSVG
-            svg={addIconFilled}
-            fill={theme.name === 'light' ?  theme.colors.darkGray : theme.colors.white }
-            width='24px'
-            height='24px'
-          />
-        </SButtonSecondaryMobile>
 
         {!CARDS.length && (
           <>
-            <SSubText variant={3}>
+            <SSubText variant={3} weight={600}>
               {t('Settings.sections.cards.hint')}
             </SSubText>
-            <SButton size="sm">
+            <SButton size='sm'>
               {t('Settings.sections.cards.button.addNewCard')}
             </SButton>
           </>
@@ -90,29 +97,55 @@ const SSettingsContainer = styled.div`
   padding-bottom: 24px;
 `;
 
+const STitle = styled(Text)<{
+  $isNoCards: boolean;
+}>`
+  ${({ $isNoCards }) =>
+    $isNoCards
+      ? css`
+          font-size: 24px;
+          line-height: 32px;
+          font-weight: 700;
+          text-align: center;
+
+          ${({ theme }) => theme.media.tablet} {
+            font-weight: 600;
+          }
+        `
+      : css`
+          margin-bottom: 24px;
+
+          ${({ theme }) => theme.media.tablet} {
+            margin-bottom: 32px;
+
+            font-size: 24px;
+            line-height: 32px;
+          }
+        `}
+`;
+
 const SCardsContainer = styled.div<{
   $isNoCards: boolean;
 }>`
   position: relative;
-  padding: ${({ $isNoCards }) => $isNoCards ? '30px 16px' : '16px'};
+  padding: ${({ $isNoCards }) =>
+    $isNoCards ? '30px 16px 32px' : '16px !important'};
   min-height: 243px;
   overflow: hidden;
 
   border-radius: ${({ theme }) => theme.borderRadius.large};
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
-  ${({ $isNoCards }) => 
-    $isNoCards ?
-      css`
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      `
-      :
-      css`
-        display: block;
-      `
-  }
+  ${({ $isNoCards }) =>
+    $isNoCards
+      ? css`
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        `
+      : css`
+          display: block;
+        `}
 
   /* No select */
   -webkit-touch-callout: none;
@@ -123,7 +156,8 @@ const SCardsContainer = styled.div<{
   user-select: none;
 
   ${({ theme }) => theme.media.tablet} {
-    padding: ${({ $isNoCards }) => $isNoCards ? '30px 24px' : '24px'};
+    padding: ${({ $isNoCards }) =>
+      $isNoCards ? '30px 24px 31px' : '24px !important'};
   }
 `;
 
@@ -132,6 +166,7 @@ const SSubText = styled(Text)`
   margin-bottom: 32px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-weight: 400;
+  text-align: center;
 
   ${({ theme }) => theme.media.tablet} {
     font-weight: 600;
@@ -147,27 +182,26 @@ const SButton = styled(Button)`
   }
 `;
 
-const SButtonSecondary = styled(Button)`
+const SButtonSecondaryDesktop = styled(Button)`
+  display: none;
   position: absolute;
   right: 12px;
   top: 16px;
-`;
-
-const SButtonSecondaryDesktop = styled(SButtonSecondary)`
-  display: none;
-  padding: 12px;
+  padding: 6px 12px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
   ${({ theme }) => theme.media.tablet} {
     display: block;
+    top: 23px;
   }
 `;
 
 const SButtonSecondaryMobile = styled(Button)`
   position: absolute;
-  right: 8px;
-  top: 10px;
-  padding: 6px;
+  right: 10px;
+  top: 11px;
+  padding: 5px;
+  border-radius: 12px;
   border-radius: ${({ theme }) => theme.borderRadius.smallLg};
 
   ${({ theme }) => theme.media.tablet} {
@@ -175,7 +209,8 @@ const SButtonSecondaryMobile = styled(Button)`
   }
 
   & path {
-    fill: ${({ theme }) => theme.name === 'light' ? theme.colors.white: theme.colors.darkGray};
+    fill: ${({ theme }) =>
+      theme.name === 'light' ? theme.colors.white : theme.colors.darkGray};
   }
 `;
 
@@ -183,11 +218,11 @@ const SCardList = styled.ul`
   display: flex;
   flex-direction: column;
   list-style: none;
-  margin-top: 24px;
+  /* margin-top: 24px; */
 
   ${({ theme }) => theme.media.mobileL} {
     flex-direction: row;
-    margin: 24px -24px 0;
+    margin: 0 -24px 0;
 
     overflow-y: scroll;
 
@@ -209,7 +244,7 @@ const SCardListItem = styled.li`
   }
 
   ${({ theme }) => theme.media.mobileL} {
-    margin-right: 16px;
+    margin-right: 8px;
     margin-bottom: 0;
     max-width: 320px;
 

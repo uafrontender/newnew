@@ -42,7 +42,7 @@ const Card: React.FunctionComponent<ICard> = ({
       <STopLine>
         {isPrimary && (
           <SLabel>
-            <SCardPrimaryText variant={3} weight={700}>
+            <SCardPrimaryText variant={5} weight={700}>
               {t('Settings.sections.cards.primary')}
             </SCardPrimaryText>
           </SLabel>
@@ -53,11 +53,7 @@ const Card: React.FunctionComponent<ICard> = ({
           onClick={() => setIsEllipseMenuOpen(true)}
           ref={moreButtonRef}
         >
-          <InlineSvg
-            svg={MoreIconFilled}
-            width="14px"
-            height="14px"
-          />
+          <InlineSvg svg={MoreIconFilled} width='14px' height='14px' />
         </SMoreButton>
         {!isMobile && (
           <CardEllipseMenu
@@ -77,9 +73,9 @@ const Card: React.FunctionComponent<ICard> = ({
         )}
       </STopLine>
       <SCardMainInfo>
-        <SCardPrimaryText variant={2} weight={700}>
+        <SCardName variant={5} weight={700}>
           {name}
-        </SCardPrimaryText>
+        </SCardName>
         <SCardNumber variant={5} weight={700}>
           **** {lastFourDigits}
         </SCardNumber>
@@ -97,21 +93,23 @@ const SCard = styled.div`
   width: 100%;
   height: 190px;
   flex-shrink: 0;
-  padding: 8px;
+  padding: 16px !important;
 
-  border-radius: ${({ theme }) => theme.borderRadius.smallLg};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
   background: url('https://d3hqmhx7uxxlrw.cloudfront.net/assets/default-avatars-and-covers/cover_1.png');
 
   ${({ theme }) => theme.media.mobileM} {
-    min-width: 311px;
+    min-width: 320px;
   }
 `;
 
 const SLabel = styled.div`
-  padding: 2px 16px;
-  background-color: #0B0A1333;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-`
+  ${({ theme }) => theme.media.tablet} {
+    padding: 0 16px;
+    background-color: #0b0a1333;
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+`;
 
 const STopLine = styled.div`
   display: flex;
@@ -120,27 +118,47 @@ const STopLine = styled.div`
 
 const SCardPrimaryText = styled(Text)`
   color: ${({ theme }) => theme.colors.white};
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 14px;
+    line-height: 24px;
+  }
+`;
+
+const SCardName = styled(Text)`
+  color: ${({ theme }) => theme.colors.white};
+  opacity: 0.6;
+
+  ${({ theme }) => theme.media.laptop} {
+    font-size: 16px;
+    line-height: 24px;
+  }
 `;
 
 const SCardNumber = styled(Text)`
   color: ${({ theme }) => theme.colors.white};
-`
+  font-size: 20px;
+  line-height: 28px;
+`;
 
 const SCardMainInfo = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   margin-top: auto;
-  padding: 16px;
+  padding: 8px;
 
-  & > div:first-child {
-    opacity: 0.6;
+  ${({ theme }) => theme.media.tablet} {
+    padding: 9px 8px;
   }
 `;
 
 const SMoreButton = styled(Button)`
   margin-left: auto;
   background-color: rgba(11, 10, 19, 0.2);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
   &:active:enabled,
@@ -149,7 +167,13 @@ const SMoreButton = styled(Button)`
     background-color: ${({ theme }) => theme.colors.white};
 
     svg {
-      fill: #2C2C33;
+      fill: #2c2c33;
     }
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    position: relative;
+    top: -8px;
+    right: -8px;
   }
 `;

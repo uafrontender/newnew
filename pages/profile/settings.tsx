@@ -415,7 +415,7 @@ const MyProfileSettingsIndex = () => {
 
 export default MyProfileSettingsIndex;
 
-const SMain = styled.div`
+const SMain = styled.main`
   position: relative;
 
   padding: 0px 16px;
