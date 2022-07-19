@@ -86,6 +86,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
 
+    // Announcement
+    const [announcement, setAnnouncement] = useState(post.announcement);
+
     // Comments
     const { ref: commentsSectionRef, inView } = useInView({
       threshold: 0.8,
@@ -105,8 +108,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     };
 
     // Response upload
-    const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
-      useState<newnewapi.IVideoUrls | undefined>(undefined);
+    const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<
+      newnewapi.IVideoUrls | undefined
+    >(undefined);
 
     // Tabs
     const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
@@ -156,14 +160,16 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
       post.optionCount ?? ''
     );
-    const [optionsNextPageToken, setOptionsNextPageToken] =
-      useState<string | undefined | null>('');
+    const [optionsNextPageToken, setOptionsNextPageToken] = useState<
+      string | undefined | null
+    >('');
     const [optionsLoading, setOptionsLoading] = useState(false);
     const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
     // Winning option
-    const [winningOption, setWinningOption] =
-      useState<newnewapi.MultipleChoice.Option | undefined>();
+    const [winningOption, setWinningOption] = useState<
+      newnewapi.MultipleChoice.Option | undefined
+    >();
 
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
@@ -319,6 +325,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           if (!responseFreshlyUploaded && res.data.multipleChoice?.response) {
             setResponseFreshlyUploaded(res.data.multipleChoice.response);
           }
+          setAnnouncement(res.data.multipleChoice?.announcement);
         }
       } catch (err) {
         console.error(err);
@@ -593,8 +600,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             )}
           </SExpiresSection>
           <PostVideoModeration
+            key={`key_${announcement?.coverImageUrl}`}
             postId={post.postUuid}
-            announcement={post.announcement!!}
+            announcement={announcement!!}
             response={(post.response || responseFreshlyUploaded) ?? undefined}
             thumbnails={{
               startTime: 1,

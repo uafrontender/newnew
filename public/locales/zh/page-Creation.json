@@ -98,6 +98,7 @@
         "description": "{{value}}",
         "options": {
           "1-hour": "1小時後",
+          "3-hours": "3小時後",
           "6-hours": "6小時後",
           "12-hours": "12小時後",
           "1-day": "1天後",
