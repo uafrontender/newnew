@@ -169,8 +169,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   );
 
   // Show controls on shorter screens
-  const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] =
-    useState<number | undefined>(undefined);
+  const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] = useState<
+    number | undefined
+  >(undefined);
 
   const isSetThumbnailButtonIconOnly = useMemo(
     () =>
