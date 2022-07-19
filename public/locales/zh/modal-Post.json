@@ -127,7 +127,7 @@
       "backToOriginalVideo": "回到原帖",
       "backToResponse": "觀看回應"
     },
-    "reuploadButton_NEED_TRANSLATION": "re-upload",
+    "reuploadButton": "重新上傳",
     "cannotLeavePageMsg": "你確定要關閉這個頁面嗎？上傳進度會丟失",
     "floatingUploadResponseButton": "製作回應視頻",
     "setThumbnail": "設置縮略圖",
@@ -186,7 +186,7 @@
         },
         "processing": {
           "title": "處理視頻",
-          "description__NEED_TRANSLATION": "Your video is being processed... hang tight!",
+          "description": "視頻正在處理中……稍等！",
           "process": "{{progress}}% • 還需{{time}}",
           "uploadNonProcessed": "發佈"
         },
@@ -479,9 +479,9 @@
       "choosePledgeButton": "支持這個Goal"
     }
   },
-  "thumbnailEllipseMenu_NEED_TRANSLATION": {
-    "selectSnippetButton": "Select a snippet",
-    "uploadImageButton": "Upload an image"
+  "thumbnailEllipseMenu": {
+    "selectSnippetButton": "選擇一個片段",
+    "uploadImageButton": "上傳圖片"
   },
   "postVideoThumbnailEdit": {
     "title": "設置縮略圖",
@@ -493,14 +493,14 @@
       "error": "發生錯誤"
     }
   },
-  "postVideoCoverImageEdit_NEED_TRANSLATION": {
-    "title": "Upload an image",
-    "submit": "Save",
-    "cancel": "Cancel",
+  "postVideoCoverImageEdit": {
+    "title": "上傳圖片",
+    "submit": "保存",
+    "cancel": "取消",
     "uploadCoverImage": {
-      "caption": "Select custom cover image",
-      "uploadBtn": "Select",
-      "deleteBtn": "Delete"
+      "caption": "選擇自訂封面圖片",
+      "uploadBtn": "選擇",
+      "deleteBtn": "刪除"
     }
   },
   "acPostModeration": {
@@ -525,7 +525,7 @@
       },
       "optionCard": {
         "pickButton": "選擇",
-        "pickedButton_NEED_TRANSLATION": "Chosen"
+        "pickedButton": "已選擇"
       }
     },
     "winnerTab": {
@@ -564,7 +564,7 @@
     }
   },
   "cfPostModeration": {
-    "moneyRaised_NEED_TRANSLATION": "Total raised",
+    "moneyRaised": "總共籌到",
     "winnerTab": {
       "winnerOptionCard": {
         "backersToldYou": "支持者注資成功",
@@ -709,30 +709,30 @@
     "title": "Goal",
     "text": "與其他人集資，支持你喜歡的創作者的Goal。如果支援這個Goal的人足夠多，你就會看著創作者照做！"
   },
-  "postResponseTabModeration_NEED_TRANSLATION": {
+  "postResponseTabModeration": {
     "awaiting": {
-      "topHeader": "Time to post \nyour response!",
-      "postResponseBtn": "Post Response",
-      "youWillGet": "You'll get"
+      "topHeader": "是發布回應\n的時候了！",
+      "postResponseBtn": "發布回應",
+      "youWillGet": "你會得到"
     },
     "succeeded": {
-      "topHeader": "Response \npublished!",
-      "youMade": "You made",
-      "shareBtn": "Share",
-      "linkCopied": "Link copied!"
+      "topHeader": "回應\n已發布！",
+      "youMade": "你做了",
+      "shareBtn": "分享",
+      "linkCopied": "鏈接已複製！"
     },
     "winner": {
-      "inResponseToYourPost": "In response to your post",
+      "inResponseToYourPost": "回應了你的帖子",
       "ac": {
-        "numBiddersChoseSingular": "{{amount}} bidder chose",
-        "numBiddersChose": "{{amount}} bidders chose",
-        "optionCreator": "<0>{{nickname}}</0>'s bid"
+        "numBiddersChoseSingular": "{{amount}} 位出價者選擇了",
+        "numBiddersChose": "{{amount}} 位出價者選擇了",
+        "optionCreator": "<0>{{nickname}}</0> 的出價"
       },
       "mc": {
-        "numBiddersChoseSingular": "{{amount}} voter chose",
-        "numBiddersChose": "{{amount}} voters chose",
-        "optionOwn": "the option",
-        "optionCreator": "<0>{{nickname}}</0>'s option"
+        "numBiddersChoseSingular": "{{amount}} 位投票者選擇了",
+        "numBiddersChose": "{{amount}} 位投票者選擇了",
+        "optionOwn": "選項",
+        "optionCreator": "<0>{{nickname}}</0> 的選擇"
       }
     }
   },

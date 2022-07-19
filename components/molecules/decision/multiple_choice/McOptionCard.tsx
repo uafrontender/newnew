@@ -56,6 +56,7 @@ import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
 import OptionEllipseModal from '../OptionEllipseModal';
 import McConfirmDeleteOptionModal from './moderation/McConfirmDeleteOptionModal';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
@@ -777,7 +778,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 </SPaymentModalHeadingPostCreator>
               </SPaymentModalHeading>
               <SPaymentModalPostText variant={2}>
-                {postText}
+                <PostTitleContent>{postText}</PostTitleContent>
               </SPaymentModalPostText>
               <SPaymentModalTitle variant={3}>
                 {t('mcPost.paymentModalHeader.subtitle')}

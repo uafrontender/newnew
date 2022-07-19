@@ -169,8 +169,8 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
       user.userData?.username ?? ''
     );
     const [usernameError, setUsernameError] = useState('');
-    const handleUpdateUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = e.target.value.replace('@', '');
+    const handleUpdateUsername = (value: string) => {
+      const newValue = value.replace('@', '');
       setUsernameInEdit(newValue);
 
       validateUsernameViaAPIDebounced(newValue);

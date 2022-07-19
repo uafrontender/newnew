@@ -18,8 +18,7 @@ const TopUpWalletInput: React.FunctionComponent<ITopUpWalletInput> = ({
     const newValue = e.target.value.slice(1);
     if (/[^0-9]/.test(newValue)) return;
 
-    // @ts-ignore
-    onChange(newValue ? (newValue as number) : '');
+    onChange(parseInt(newValue));
   };
 
   useEffect(() => {
