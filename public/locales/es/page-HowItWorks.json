@@ -1,15 +1,15 @@
 {
   "meta": {
     "title": "¿Cómo funciona NewNew?",
-    "description": "Más información sobre Events, Superpolls y Goals iniciados por Creadores en NewNew"
+    "description": "Más información sobre Bids, Superpolls y Goals iniciados por Creadores en NewNew"
   },
   "intro": {
     "title": "¿Cómo funciona NewNew?",
     "text": "¿Esta es la primera vez que nos visitas? Aquí tienes un corto resumen de las cosas que puedes hacer en NewNew..."
   },
   "events": {
-    "title": "Events",
-    "text": "Envía ofertas a los creadores con lo que quieres que hagan y la cantidad que gastarías para verlos haciéndolo. Cuando se acabe el tiempo del Event, el creador eligirá su oferta favorita y subirá un video de sí mismo realizándola. Puedes proponer tu propia idea de oferta o respaldar la oferta de otra persona para asegurarte de que sea elegida."
+    "title": "Bids",
+    "text": "Envía ofertas a los creadores con lo que quieres que hagan y la cantidad que gastarías para verlos haciéndolo. Cuando se acabe el tiempo del Bid, el creador eligirá su oferta favorita y subirá un video de sí mismo realizándola. Puedes proponer tu propia idea de oferta o respaldar la oferta de otra persona para asegurarte de que sea elegida."
   },
   "superpolls": {
     "title": "Superpolls",
