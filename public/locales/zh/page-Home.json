@@ -7,7 +7,7 @@
     "title": {
       "biggest": "史上最棒",
       "for-you": "為你而設",
-      "ac": "超大Event",
+      "ac": "超大Bid",
       "mc": "熱門Superpoll",
       "cf": "熱門Goal"
     },
@@ -19,7 +19,7 @@
   },
   "tutorial": {
     "ac": {
-      "title": "Event",
+      "title": "Bid",
       "caption": "給創作者發送出價，說明你想讓他們做什麼，你願意花多少錢，看他們是否願意接受你的出價。"
     },
     "mc": {
