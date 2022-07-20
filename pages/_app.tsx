@@ -27,8 +27,6 @@ import Error from './_error';
 import ResizeMode from '../HOC/ResizeMode';
 import GlobalTheme from '../styles/ThemeProvider';
 
-import StripeElements from '../HOC/StripeElements';
-
 // Redux store and provider
 import { setResizeMode } from '../redux-store/slices/uiStateSlice';
 import { useAppSelector, wrapper } from '../redux-store/store';
@@ -189,7 +187,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                             <ResizeMode>
                               <PostModalContextProvider>
                                 <GlobalTheme initialTheme={colorMode}>
-                                  <StripeElements>
+                                  <>
                                     <ToastContainer />
                                     <VideoProcessingWrapper>
                                       {!pageProps.error ? (
@@ -203,7 +201,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                                         />
                                       )}
                                     </VideoProcessingWrapper>
-                                  </StripeElements>
+                                  </>
                                 </GlobalTheme>
                               </PostModalContextProvider>
                             </ResizeMode>

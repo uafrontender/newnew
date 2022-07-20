@@ -9,6 +9,7 @@ import {
 import { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
+import { useAppSelector } from '../redux-store/store';
 import { createStripeSetupIntent } from '../api/endpoints/payments';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY!);
@@ -20,6 +21,7 @@ interface IStripeElements {
 export const StripeElements: React.FC<IStripeElements> = (props) => {
   const { children } = props;
   const theme = useTheme();
+  const { loggedIn } = useAppSelector((state) => state.user);
 
   const { locale } = useRouter();
 
@@ -43,8 +45,10 @@ export const StripeElements: React.FC<IStripeElements> = (props) => {
       }
     };
 
-    getStripeClientSecret();
-  }, []);
+    if (loggedIn) {
+      getStripeClientSecret();
+    }
+  }, [loggedIn]);
 
   const stripeOptions: StripeElementsOptions = useMemo(
     () => ({
@@ -108,7 +112,11 @@ export const StripeElements: React.FC<IStripeElements> = (props) => {
   }
 
   return (
-    <Elements stripe={stripePromise} options={stripeOptions} key={stipeSecret}>
+    <Elements
+      stripe={stripePromise}
+      options={stipeSecret ? stripeOptions : undefined}
+      key={stipeSecret}
+    >
       {children}
     </Elements>
   );

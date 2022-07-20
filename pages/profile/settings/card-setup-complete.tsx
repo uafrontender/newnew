@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 
 import MyProfileSettingsLayout from '../../../components/templates/MyProfileSettingsLayout';
 import { NextPageWithLayout } from '../../_app';
+import StripeElements from '../../../HOC/StripeElements';
 
 import assets from '../../../constants/assets';
 
@@ -39,7 +40,9 @@ const CardSetupComplete: NextPage = () => {
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      <CardSetupCompleteModal show closeModal={closeModal} />
+      <StripeElements>
+        <CardSetupCompleteModal show closeModal={closeModal} />
+      </StripeElements>
     </>
   );
 };
