@@ -1,7 +1,7 @@
 {
   "meta": {
     "ac": {
-      "title": "NewNew Event",
+      "title": "NewNew Bid",
       "description": "Make money, bid in auctions with friends and support creators on NewNew"
     },
     "mc": {
@@ -17,11 +17,11 @@
   "me": "me",
   "I": "I",
   "postType": {
-    "ac": "Event",
+    "ac": "Bid",
     "mc": "Superpoll",
     "cf": "Goal",
     "multiple": {
-      "ac": "Events",
+      "ac": "Bids",
       "mc": "Superpolls",
       "cf": "Goals"
     }
@@ -57,7 +57,7 @@
       "cf": "You’re backing this goal!"
     },
     "doneButton": "Sounds good!",
-    "ac": "{{postCreator}} will pick their favorite bid once the event is over.",
+    "ac": "{{postCreator}} will pick their favorite bid once time is up.",
     "mc": "{{postCreator}} will do the option with the most amount of votes when the superpoll is over.",
     "cf": "{{postCreator}} will do the goal once it gets enough backers."
   },
@@ -242,7 +242,7 @@
   },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
-      "ac": "This Event will begin once the video \nhas been processed",
+      "ac": "This Bid will begin once the video \nhas been processed",
       "mc": "This Superpoll will begin once the video \nhas been processed",
       "cf": "This Goal will begin once the video \nhas been processed"
     },
@@ -285,7 +285,7 @@
   },
   "acPost": {
     "paymentModalHeader": {
-      "title": "{{creator}}'s Event",
+      "title": "{{creator}}'s Bid",
       "subtitle": "Your bid"
     },
     "paymentModalFooter": {
@@ -574,7 +574,7 @@
     }
   },
   "acPostSuccess": {
-    "heroText": "This Event has ended!",
+    "heroText": "This Bid has ended!",
     "wantsToKnow": "{{creator}} wants to know...",
     "inTotalBids": "in total bids",
     "others": "others",
@@ -698,7 +698,7 @@
     "button": "Got it"
   },
   "heroPopupAC": {
-    "title": "Events",
+    "title": "Bids",
     "text": "Control the outcome...\n Send the creator a bid with what you want them to do, how much you’d spend, then watch them do the bid!"
   },
   "heroPopupMC": {

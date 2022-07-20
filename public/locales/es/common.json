@@ -37,7 +37,7 @@
     "cancel": "Cancelar"
   },
   "postType": {
-    "ac": "Event",
+    "ac": "Bid",
     "mc": "Superpoll",
     "cf": "Goal"
   },

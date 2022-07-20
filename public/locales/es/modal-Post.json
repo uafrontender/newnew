@@ -1,7 +1,7 @@
 {
   "meta": {
     "ac": {
-      "title": "Event NewNew",
+      "title": "Bid NewNew",
       "description": "Gana dinero, haz ofertas en subastas con amigos y apoya creadores en NewNew"
     },
     "mc": {
@@ -17,11 +17,11 @@
   "me": "mí",
   "I": "yo",
   "postType": {
-    "ac": "Event",
+    "ac": "Bid",
     "mc": "Superpoll",
     "cf": "Goal",
     "multiple": {
-      "ac": "Events",
+      "ac": "Bids",
       "mc": "Superpolls",
       "cf": "Goals"
     }
@@ -58,6 +58,7 @@
     },
     "doneButton": "¡Suena bien!",
     "ac": "{{postCreator}} elegirá su oferta favorita una vez finalizado el evento.",
+    "ac_NEED_TRANSLATION": "{{postCreator}} will pick their favorite bid once time is up.",
     "mc": "{{postCreator}} hará la opción con la mayor cantidad de votos cuando termine la Superpoll.",
     "cf": "{{postCreator}} hará el objetivo una vez que consiga suficientes patrocinadores."
   },
@@ -242,7 +243,7 @@
   },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
-      "ac": "Este Event comenzará una vez que el \nvideo haya sido procesado",
+      "ac": "Este Bid comenzará una vez que el \nvideo haya sido procesado",
       "mc": "Esta Superpoll comenzará una vez que \nel video haya sido procesado",
       "cf": "Este Goal comenzará una vez que \nel video haya sido procesado"
     },
@@ -285,7 +286,7 @@
   },
   "acPost": {
     "paymentModalHeader": {
-      "title": "El Event de {{creator}}",
+      "title": "El Bid de {{creator}}",
       "subtitle": "Tu oferta"
     },
     "paymentModalFooter": {
@@ -576,7 +577,7 @@
     }
   },
   "acPostSuccess": {
-    "heroText": "¡Este Event ha terminado!",
+    "heroText": "¡Este Bid ha terminado!",
     "wantsToKnow": "{{creator}} quiere saber...",
     "inTotalBids": "ofertas en total",
     "others": "otros",
@@ -700,7 +701,7 @@
     "button": "Hecho"
   },
   "heroPopupAC": {
-    "title": "Events",
+    "title": "Bids",
     "text": "Controla el resultado...\n Envía al creador una oferta con lo que quieres que haga, cuánto gastarías por verlo realizar tu oferta y observa cómo la realiza."
   },
   "heroPopupMC": {

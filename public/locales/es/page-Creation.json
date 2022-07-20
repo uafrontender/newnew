@@ -1,30 +1,30 @@
 {
   "back": "Regresar",
   "first-step-title": "¿Qué publicarás?",
-  "first-step-auction-title": "Event",
+  "first-step-auction-title": "Bid",
   "first-step-auction-sub-title": "Las personas te envía ofertas para que hagas cosas que ellos quieren verte hacer",
   "first-step-multiple-choice-title": "Superpoll",
   "first-step-multiple-choice-sub-title": "Las personas te pagan por votar por su opción favorita y tú realizas la opción más votada",
   "first-step-crowdfunding-title": "Goal",
   "first-step-crowdfunding-sub-title": "Las personan reúnen dinero para respaldar tu objetivo",
-  "second-step-auction-title": "Event",
+  "second-step-auction-title": "Bid",
   "second-step-multiple-choice-title": "Superpoll",
   "second-step-crowdfunding-title": "Goal",
   "videoBeingProcessedCaption": "Tu video estará disponible una vez procesado",
   "tabs": {
-    "auction": "Event",
+    "auction": "Bid",
     "multiple-choice": "Superpoll",
     "crowdfunding": "Goal"
   },
   "firstStep": {
     "meta": {
       "title": "Crea una publicación en NewNew",
-      "description": "Crea un Event, una Superpoll o un Goal en NewNew en unos pocos clics y gana dinero"
+      "description": "Crea un Bid, una Superpoll o un Goal en NewNew en unos pocos clics y gana dinero"
     }
   },
   "secondStep": {
     "meta": {
-      "title-auction": "Publica un Event en Newnew",
+      "title-auction": "Publica un Bid en Newnew",
       "title-multiple-choice": "Publica un Superpoll en NewNew",
       "title-crowdfunding": "Publica un Goal en NewNew",
       "description-auction": "Los fans hacen ofertas en tus subastas y tú ganas dinero",
@@ -83,7 +83,8 @@
         "value": "${{value}}",
         "label": "$",
         "placeholder": "1",
-        "description": "la oferta mínima que una persona puede hacer en tu evento"
+        "description": "la oferta mínima que una persona puede hacer en tu evento",
+        "description_NEED_TRANSLATION": "the minimum bid a person can place"
       },
       "targetBackerCount": {
         "title": "Patrocinadores mínimos",
@@ -198,11 +199,11 @@
   },
   "preview": {
     "meta": {
-      "title-auction": "Creación | Event | Vista previa",
+      "title-auction": "Creación | Bid | Vista previa",
       "title-multiple-choice": "Creación | Superpoll | Vista previa",
       "title-crowdfunding": "Creación | Goal | Vista previa"
     },
-    "title-auction": "Revisar mi Event",
+    "title-auction": "Revisar mi Bid",
     "title-multiple-choice": "Revisar mi Superpoll",
     "title-crowdfunding": "Revisar mi Goal",
     "button": {
@@ -227,10 +228,10 @@
   },
   "published": {
     "meta": {
-      "title-auction-published": "Creación | Event | Publicado",
+      "title-auction-published": "Creación | Bid | Publicado",
       "title-multiple-choice-published": "Creación | Superpoll | Publicado",
       "title-crowdfunding-published": "Creación | Goal | Publicado",
-      "title-auction-scheduled": "Creación | Event | Programado",
+      "title-auction-scheduled": "Creación | Bid | Programado",
       "title-multiple-choice-scheduled": "Creación | Superpoll | Programado",
       "title-crowdfunding-scheduled": "Creación | Goal | Programado"
     },
@@ -256,7 +257,7 @@
       "heroButtonText": "Va"
     },
     "heroPopupAC": {
-      "title": "Events",
+      "title": "Bids",
       "line1": "1. ¿Estás abierto a ideas? Publica un video y haz que el\n público te envíe ofertas sobre lo que deberías hacer",
       "line2": "2. La gente te envía ofertas con sus ideas y\n cuánto pagarán para que lo hagas",
       "line3": "3. Elige tu oferta favorita, ¡y\n sube un video tuyo haciéndola!"
