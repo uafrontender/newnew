@@ -84,6 +84,7 @@ export const RichTextArea: React.FC<IRichTextArea> = React.memo((props) => {
     <SWrapper>
       <SContent error={!!error} showPlaceholder={showPlaceholder}>
         <ContentEditable
+          id={id}
           className='div-input'
           onBlur={handleBlur}
           onFocus={handleFocus}

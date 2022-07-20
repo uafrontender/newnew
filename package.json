@@ -91,6 +91,7 @@
     "babel-loader": "8.2.3",
     "babel-plugin-styled-components": "2.0.7",
     "cypress": "9.1.1",
+    "cypress-file-upload": "^5.0.8",
     "dotenv": "10.0.0",
     "eslint": "8.17.0",
     "eslint-config-airbnb": "19.0.2",

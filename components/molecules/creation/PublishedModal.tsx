@@ -260,7 +260,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             )}
           </STitle>
           <SSocials>{socialButtons.map(renderItem)}</SSocials>
-          <SButtonWrapper onClick={handleViewMyPost}>
+          <SButtonWrapper id='see-post' onClick={handleViewMyPost}>
             <SButtonTitle>
               {t(
                 `published.button.submit-${

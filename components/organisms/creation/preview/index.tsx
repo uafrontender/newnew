@@ -494,6 +494,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               {t('preview.button.edit')}
             </Button>
             <Button
+              id='publish'
               view='primaryGrad'
               loading={loading}
               onClick={handleSubmit}
