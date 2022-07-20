@@ -6,6 +6,7 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -45,6 +46,24 @@ const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
     resizeMode
   );
 
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
+  const handlePayWithCaptchaProtection = async () => {
+    try {
+      if (!executeRecaptcha) {
+        throw new Error('executeRecaptcha not available');
+      }
+
+      const captchaResponse = await executeRecaptcha();
+
+      console.log(captchaResponse);
+
+      // handlePayWithCardStripeRedirect?.();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
@@ -69,9 +88,7 @@ const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
           <SPayButtonDiv>
             <SPayButton
               view='primaryGrad'
-              onClick={() => {
-                handlePayWithCardStripeRedirect?.();
-              }}
+              onClick={() => handlePayWithCaptchaProtection()}
             >
               {t('payButton')}
               {amount && ` ${amount}`}
