@@ -11,7 +11,7 @@ import { newnewapi } from 'newnew-api';
 
 import { createStripeSetupIntent } from '../api/endpoints/payments';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY!!);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY!);
 
 interface IStripeElements {
   children: React.ReactNode;

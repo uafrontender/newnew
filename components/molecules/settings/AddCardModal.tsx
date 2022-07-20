@@ -44,8 +44,7 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
     const { error } = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        return_url:
-          'http://localhost:4000/profile/settings/card-setup-complete',
+        return_url: `${process.env.NEXT_PUBLIC_APP_URL}/profile/settings/card-setup-complete`,
       },
     });
 
