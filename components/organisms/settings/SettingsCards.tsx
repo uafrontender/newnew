@@ -1,5 +1,5 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -9,33 +9,13 @@ import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import Card from '../../molecules/settings/Card';
 import AddCardModal from '../../molecules/settings/AddCardModal';
+import Lottie from '../../atoms/Lottie';
 
-import { getCards } from '../../../api/endpoints/cards';
+import { getCards } from '../../../api/endpoints/card';
 
 import addIconFilled from '../../../public/images/svg/icons/filled/Create.svg';
-
-const CARDS = [
-  {
-    id: 1,
-    isPrimary: true,
-    name: 'Debit Mastercard',
-    lastFourDigits: '9005',
-  },
-  {
-    id: 2,
-    isPrimary: false,
-    name: 'Debit Mastercard',
-    lastFourDigits: '4003',
-  },
-  {
-    id: 3,
-    isPrimary: false,
-    name: 'Debit Mastercard',
-    lastFourDigits: '9905',
-  },
-];
-
-// const CARDS = [];
+import logoAnimation from '../../../public/animations/mobile_logo.json';
+import assets from '../../../constants/assets';
 
 interface ISettingsCards {}
 
@@ -45,28 +25,38 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
 
   const [isAddCardModal, setIsAddCardModal] = useState(false);
 
-  useEffect(() => {
-    const fetchCard = async () => {
-      try {
-        const payload = new newnewapi.EmptyRequest();
-        const response = await getCards(payload);
+  const [cards, setCards] = useState<newnewapi.Card[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-        console.log(response, 'response');
-      } catch (error) {
-        console.error(error);
+  const fetchCard = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const payload = new newnewapi.EmptyRequest();
+      const response = await getCards(payload);
+
+      if (!response.data || response.error) {
+        throw new Error(response.error?.message || 'Some error occurred');
       }
-    };
 
-    fetchCard();
+      setCards(response.data.cards as newnewapi.Card[]);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchCard();
+  }, [fetchCard]);
 
   return (
     <SSettingsContainer>
-      <SCardsContainer $isNoCards={CARDS.length === 0}>
-        <STitle variant={1} weight={600} $isNoCards={CARDS.length === 0}>
+      <SCardsContainer $isNoCards={cards.length === 0}>
+        <STitle variant={1} weight={600} $isNoCards={cards.length === 0}>
           {t('Settings.sections.cards.myPaymentMethods')}
         </STitle>
-        {!!CARDS.length && (
+        {!!cards.length && (
           <>
             <SButtonSecondaryDesktop
               view='secondary'
@@ -93,27 +83,55 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
           </>
         )}
 
-        {!CARDS.length && (
+        {/* Empty cards view */}
+        {!cards.length && !isLoading && (
           <>
             <SSubText variant={3} weight={600}>
               {t('Settings.sections.cards.hint')}
             </SSubText>
-            <SButton size='sm'>
+
+            <SButton size='sm' onClick={() => setIsAddCardModal(true)}>
               {t('Settings.sections.cards.button.addNewCard')}
             </SButton>
           </>
         )}
-        <SCardList>
-          {CARDS.map((card) => (
-            <SCardListItem key={card.id}>
-              <Card
-                isPrimary={card.isPrimary}
-                name={card.name}
-                lastFourDigits={card.lastFourDigits}
-              />
-            </SCardListItem>
-          ))}
-        </SCardList>
+
+        {!cards.length && isLoading && (
+          <SLoader>
+            <Lottie
+              width={75}
+              height={75}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: logoAnimation,
+              }}
+            />
+          </SLoader>
+        )}
+
+        {!!cards.length && (
+          <SCardList>
+            {cards.map((card, index) => (
+              <SCardListItem key={card.cardUuid}>
+                <Card
+                  cardId={card.cardUuid}
+                  isPrimary={card.isPrimary}
+                  brand={card.brand}
+                  funding={card.funding}
+                  lastFourDigits={card.last4}
+                  bg={
+                    assets.cards.background[
+                      index % assets.cards.background.length
+                    ]
+                  }
+                  updateCards={setCards}
+                  onCardDelete={fetchCard}
+                />
+              </SCardListItem>
+            ))}
+          </SCardList>
+        )}
       </SCardsContainer>
       <AddCardModal
         show={isAddCardModal}
@@ -250,7 +268,6 @@ const SCardList = styled.ul`
   display: flex;
   flex-direction: column;
   list-style: none;
-  /* margin-top: 24px; */
 
   ${({ theme }) => theme.media.mobileL} {
     flex-direction: row;
@@ -288,4 +305,12 @@ const SCardListItem = styled.li`
       margin-left: 24px;
     }
   }
+`;
+
+const SLoader = styled.div`
+  top: 50%;
+  left: 50%;
+  z-index: 20;
+  position: absolute;
+  transform: translate(-50%, -50%);
 `;

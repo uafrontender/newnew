@@ -3,12 +3,14 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useStripe } from '@stripe/react-stripe-js';
+// import { newnewapi } from 'newnew-api';
+
+// import { checkCardStatus } from '../../../api/endpoints/card';
+import { useOnClickOutside } from '../../../utils/hooks/useOnClickOutside';
 
 import Modal from '../Modal';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
-
-import { useOnClickOutside } from '../../../utils/hooks/useOnClickOutside';
 
 interface ICardSetupCompleteModal {
   show: boolean;
@@ -35,31 +37,49 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
       return;
     }
 
-    const clientSecret = router.query.setup_intent_client_secret as string;
+    const handleCheckCardStatus = async () => {
+      const clientSecret = router.query.setup_intent_client_secret as string;
+      // const setupIntent = router.query.setup_intent as string;
 
-    stripe.retrieveSetupIntent(clientSecret).then(({ setupIntent }) => {
-      switch (setupIntent?.status) {
-        case 'succeeded':
-          setMessage('Success! Your payment method has been saved.');
-          break;
+      try {
+        // const payload = new newnewapi.CheckCardStatusRequest({
+        //   stripeSetupIntentId: setupIntent,
+        //   stripeSetupIntentClientSecret: clientSecret,
+        // });
+        // const response = await checkCardStatus(payload);
 
-        case 'processing':
-          setMessage(
-            "Processing payment details. We'll update you when processing is complete."
-          );
-          break;
+        // console.log(payload, 'payload');
+        // console.log(response, 'response CheckCardStatusRequest');
 
-        case 'requires_payment_method':
-          // Redirect your user back to your payment page to attempt collecting
-          // payment again
-          setMessage(
-            'Failed to process payment details. Please try another payment method.'
-          );
-          break;
-        default:
-          setMessage('Unknown');
+        stripe.retrieveSetupIntent(clientSecret).then(({ setupIntent }) => {
+          switch (setupIntent?.status) {
+            case 'succeeded':
+              setMessage('Success! Your payment method has been saved.');
+              break;
+
+            case 'processing':
+              setMessage(
+                "Processing payment details. We'll update you when processing is complete."
+              );
+              break;
+
+            case 'requires_payment_method':
+              // Redirect your user back to your payment page to attempt collecting
+              // payment again
+              setMessage(
+                'Failed to process payment details. Please try another payment method.'
+              );
+              break;
+            default:
+              setMessage('Unknown');
+          }
+        });
+      } catch (err) {
+        console.error(err);
       }
-    });
+    };
+
+    handleCheckCardStatus();
   }, [stripe, router]);
 
   return (

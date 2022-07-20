@@ -11,6 +11,8 @@ interface ICardEllipseMenu {
   isPrimary: boolean;
   handleClose: () => void;
   anchorElement?: HTMLElement;
+  onSetPrimaryCard: () => void;
+  onDeleteCard: () => void;
 }
 
 const CardEllipseMenu: React.FC<ICardEllipseMenu> = ({
@@ -18,6 +20,8 @@ const CardEllipseMenu: React.FC<ICardEllipseMenu> = ({
   isPrimary,
   anchorElement,
   handleClose,
+  onSetPrimaryCard,
+  onDeleteCard,
 }) => {
   const { t } = useTranslation('page-Profile');
   const containerRef = useRef<HTMLDivElement>();
@@ -25,18 +29,28 @@ const CardEllipseMenu: React.FC<ICardEllipseMenu> = ({
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
 
+  const handleSetPrimaryCard = () => {
+    onSetPrimaryCard();
+    handleClose();
+  };
+
+  const handleDeleteCard = () => {
+    onDeleteCard();
+    handleClose();
+  };
+
   return (
     <EllipseMenu
       isOpen={isVisible}
       onClose={handleClose}
       anchorElement={anchorElement}
-    > 
+    >
       {!isPrimary && (
-        <EllipseMenuButton>
+        <EllipseMenuButton onClick={handleSetPrimaryCard}>
           {t('Settings.sections.cards.ellipse.makePrimary')}
         </EllipseMenuButton>
       )}
-      <EllipseMenuButton tone='error'>
+      <EllipseMenuButton tone='error' onClick={handleDeleteCard}>
         {t('Settings.sections.cards.ellipse.removeCard')}
       </EllipseMenuButton>
     </EllipseMenu>
@@ -44,4 +58,3 @@ const CardEllipseMenu: React.FC<ICardEllipseMenu> = ({
 };
 
 export default CardEllipseMenu;
-

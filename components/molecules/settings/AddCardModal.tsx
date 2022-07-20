@@ -134,7 +134,6 @@ const SModal = styled.div`
 
 const SModalTitle = styled.strong`
   font-size: 20px;
-  margin-bottom: 16px;
 `;
 
 const SModalButtons = styled.div`

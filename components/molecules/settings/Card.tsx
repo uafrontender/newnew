@@ -1,8 +1,11 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../redux-store/store';
+import { setPrimaryCard, deleteCard } from '../../../api/endpoints/card';
 
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
@@ -14,16 +17,62 @@ import CardEllipseModal from './CardEllipseModal';
 // Icons
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 
+const getCardBrandName = (cardBrand: newnewapi.Card.CardBrand) => {
+  switch (cardBrand) {
+    case newnewapi.Card.CardBrand.VISA:
+      return 'Visa';
+    case newnewapi.Card.CardBrand.MASTERCARD:
+      return 'Mastercard';
+    case newnewapi.Card.CardBrand.AMEX:
+      return 'American Express';
+    case newnewapi.Card.CardBrand.DISCOVER:
+      return 'Discover';
+    case newnewapi.Card.CardBrand.JCB:
+      return 'JCB';
+    case newnewapi.Card.CardBrand.DINERS_CLUB:
+      return 'Diners Club';
+    case newnewapi.Card.CardBrand.UNIONPAY:
+      return 'UnionPay';
+    case newnewapi.Card.CardBrand.CARTES_BANCAIRES:
+      return 'CB';
+    default:
+      return '';
+  }
+};
+
+const getCardFunding = (cardFunding: newnewapi.Card.CardFunding) => {
+  switch (cardFunding) {
+    case newnewapi.Card.CardFunding.CREDIT:
+      return 'Credit';
+    case newnewapi.Card.CardFunding.DEBIT:
+      return 'Debit';
+    case newnewapi.Card.CardFunding.PREPAID:
+      return 'Prepaid';
+    default:
+      return '';
+  }
+};
+
 interface ICard {
   isPrimary: boolean;
-  name: string;
+  brand: newnewapi.Card.CardBrand;
+  funding: newnewapi.Card.CardFunding;
   lastFourDigits: string;
+  bg: string;
+  cardId: string;
+  updateCards: React.Dispatch<React.SetStateAction<newnewapi.Card[]>>;
+  onCardDelete: () => void;
 }
 
 const Card: React.FunctionComponent<ICard> = ({
   isPrimary,
-  name,
+  brand,
+  funding,
   lastFourDigits,
+  cardId,
+  bg,
+  updateCards,
+  onCardDelete,
 }) => {
   const { t } = useTranslation('page-Profile');
 
@@ -37,8 +86,57 @@ const Card: React.FunctionComponent<ICard> = ({
 
   const moreButtonRef: any = useRef();
 
+  const handelSetPrimaryCard = async () => {
+    try {
+      const payload = new newnewapi.SetPrimaryCardRequest({
+        cardUuid: cardId,
+      });
+      const response = await setPrimaryCard(payload);
+
+      if (!response.data || response.error) {
+        throw new Error(response.error?.message || 'An error occurred');
+      }
+
+      updateCards((currentCards) => {
+        const currentCard = currentCards.find(
+          (cardEl) => cardEl.cardUuid === cardId
+        );
+
+        return [
+          ...currentCards
+            .filter((cardEl) => cardEl.cardUuid !== cardId)
+            .map((cardEl) => ({
+              ...cardEl,
+              isPrimary: false,
+            })),
+          { ...currentCard, isPrimary: true },
+        ] as newnewapi.Card[];
+      });
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message);
+    }
+  };
+
+  const handleDeleteCard = async () => {
+    try {
+      const payload = new newnewapi.DeleteCardRequest({
+        cardUuid: cardId,
+      });
+      const response = await deleteCard(payload);
+
+      if (!response.data || response.error) {
+        throw new Error(response.error?.message || 'An error occurred');
+      }
+      onCardDelete();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message);
+    }
+  };
+
   return (
-    <SCard>
+    <SCard $bg={bg}>
       <STopLine>
         {isPrimary && (
           <SLabel>
@@ -61,6 +159,8 @@ const Card: React.FunctionComponent<ICard> = ({
             isPrimary={isPrimary}
             handleClose={() => setIsEllipseMenuOpen(false)}
             anchorElement={moreButtonRef.current}
+            onSetPrimaryCard={handelSetPrimaryCard}
+            onDeleteCard={handleDeleteCard}
           />
         )}
         {isMobile && (
@@ -74,7 +174,7 @@ const Card: React.FunctionComponent<ICard> = ({
       </STopLine>
       <SCardMainInfo>
         <SCardName variant={5} weight={700}>
-          {name}
+          {`${getCardFunding(funding)} ${getCardBrandName(brand)}`}
         </SCardName>
         <SCardNumber variant={5} weight={700}>
           **** {lastFourDigits}
@@ -86,7 +186,9 @@ const Card: React.FunctionComponent<ICard> = ({
 
 export default Card;
 
-const SCard = styled.div`
+const SCard = styled.div<{
+  $bg: string;
+}>`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -96,7 +198,9 @@ const SCard = styled.div`
   padding: 16px !important;
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
-  background: url('https://d3hqmhx7uxxlrw.cloudfront.net/assets/default-avatars-and-covers/cover_1.png');
+  background: ${({ $bg }) => `url(${$bg})`};
+  background-repeat: no-repeat;
+  background-size: cover;
 
   ${({ theme }) => theme.media.mobileM} {
     min-width: 320px;
