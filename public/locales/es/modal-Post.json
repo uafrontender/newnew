@@ -58,6 +58,7 @@
     },
     "doneButton": "¡Suena bien!",
     "ac": "{{postCreator}} elegirá su oferta favorita una vez finalizado el evento.",
+    "ac_NEED_TRANSLATION": "{{postCreator}} will pick their favorite bid once time is up.",
     "mc": "{{postCreator}} hará la opción con la mayor cantidad de votos cuando termine la Superpoll.",
     "cf": "{{postCreator}} hará el objetivo una vez que consiga suficientes patrocinadores."
   },
