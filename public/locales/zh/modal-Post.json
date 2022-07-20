@@ -58,6 +58,7 @@
     },
     "doneButton": "聽起來不錯！",
     "ac": "{{postCreator}}將在Bid結束後挑選他們最喜歡的出價。",
+    "ac_NEED_TRANSLATION": "{{postCreator}} will pick their favorite bid once time is up.",
     "mc": "{{postCreator}}將在Superpoll結束後完成得票數最多的選項。",
     "cf": "{{postCreator}}在獲得足夠的支持者后，就會完成這個Goal。"
   },
