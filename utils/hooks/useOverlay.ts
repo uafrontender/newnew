@@ -24,6 +24,7 @@ export const useOverlay = (ref: any) => {
       ref.current.style.cssText = `
         overflow: auto;
       `;
+      console.log(scrollPosition.current)
       window?.scroll(0, scrollPosition.current);
       scrollPosition.current = 0;
     }
