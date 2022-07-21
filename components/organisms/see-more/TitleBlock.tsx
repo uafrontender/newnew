@@ -75,10 +75,18 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   );
 
   const handleCollectionTypeChange = (newCategory: string) => {
-    const newQuery = {
+    const newQuery: {
+      category?: string;
+      sort?: string;
+    } = {
       ...router.query,
       category: newCategory,
     };
+
+    if (newCategory === 'for-you' && newQuery.sort) {
+      delete newQuery.sort;
+    }
+
     router.push({
       query: newQuery,
       pathname: router.pathname,
