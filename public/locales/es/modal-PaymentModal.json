@@ -13,5 +13,12 @@
   },
   "payButton": "Pagar",
   "tocApplyLink": "Términos",
-  "tocApplyText": "Aplicar"
+  "tocApplyText": "Aplicar",
+  "reCaptchaTos_NEED_TRANSLATION": {
+    "siteProtectedBy": "This site is protected by reCAPTCHA and the Google",
+    "privacyPolicy": "Privacy Policy",
+    "and": "and",
+    "tos": "Terms of Service",
+    "apply": "apply."
+  }
 }
