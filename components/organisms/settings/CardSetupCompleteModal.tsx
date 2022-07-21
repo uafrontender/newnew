@@ -54,6 +54,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
     'Processing payment details. Please wait'
   );
   const [isProcessing, setIsProcessing] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     if (!clientSecret) {
@@ -68,15 +69,19 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
         });
         const response = await checkCardStatus(payload);
 
-        console.log(payload, 'payload');
-        console.log(response, 'response');
-
         if (!response.data || response.error) {
           throw new Error(response.error?.message || 'An error occurred');
         }
 
         if (response.data.cardStatus !== newnewapi.CardStatus.IN_PROGRESS) {
           setIsProcessing(false);
+        }
+
+        if (
+          response.data.cardStatus !== newnewapi.CardStatus.IN_PROGRESS &&
+          response.data.cardStatus !== newnewapi.CardStatus.ADDED
+        ) {
+          setIsError(true);
         }
 
         setMessage(getCardStatusMessage(response.data.cardStatus));
@@ -102,6 +107,13 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
       if (decoded.cardStatus !== newnewapi.CardStatus.IN_PROGRESS) {
         setIsProcessing(false);
       }
+
+      if (
+        decoded.cardStatus !== newnewapi.CardStatus.IN_PROGRESS &&
+        decoded.cardStatus !== newnewapi.CardStatus.ADDED
+      ) {
+        setIsError(true);
+      }
     };
 
     if (socketConnection) {
@@ -123,7 +135,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           <SModalTitle>
             {t('Settings.sections.cards.button.addNewCard')}
           </SModalTitle>
-          <SText variant={2} weight={600}>
+          <SText variant={2} weight={600} $isError={isError}>
             {message}
           </SText>
           {isProcessing && (
@@ -189,8 +201,13 @@ const SModalTitle = styled.strong`
   margin-bottom: 16px;
 `;
 
-const SText = styled(Text)`
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+const SText = styled(Text)<{
+  $isError: boolean;
+}>`
+  color: ${({ theme, $isError }) =>
+    !$isError
+      ? theme.colorsThemed.text.secondary
+      : theme.colorsThemed.accent.error};
 `;
 
 const SButton = styled(Button)`

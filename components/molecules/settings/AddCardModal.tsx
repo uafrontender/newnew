@@ -48,17 +48,10 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
       },
     });
 
-    console.log(error, 'error');
-
     setIsLoading(false);
 
     if (error) {
-      // This point will only be reached if there is an immediate error when
-      // confirming the payment. Show error to your customer (for example, payment
-      // details incomplete)
-      if (error.message) {
-        setErrorMessage(error.message);
-      }
+      setErrorMessage(error.message || 'An error occurred');
     }
   };
 
