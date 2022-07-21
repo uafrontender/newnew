@@ -24,7 +24,7 @@ const getCardStatusMessage = (cardStatus: newnewapi.CardStatus) => {
     case newnewapi.CardStatus.DUPLICATE:
       return 'This card has been already saved in your profile';
     case newnewapi.CardStatus.IN_PROGRESS:
-      return 'This card has been already saved in your profile';
+      return 'Saving your card. Please wait';
     default:
       return 'Something went wrong';
   }
@@ -50,9 +50,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
 
   useOnClickOutside(ref, closeModal);
 
-  const [message, setMessage] = useState(
-    'Processing payment details. Please wait'
-  );
+  const [message, setMessage] = useState('Saving your card. Please wait');
   const [isProcessing, setIsProcessing] = useState(true);
   const [isError, setIsError] = useState(false);
 
