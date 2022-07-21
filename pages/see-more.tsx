@@ -382,21 +382,6 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     loggedIn,
   ]);
 
-  // Clear sorting
-  useEffect(() => {
-    const category = router.query.category?.toString() ?? 'ac';
-    if (category === 'for-you') {
-      const newQuery = { ...router.query };
-
-      delete newQuery.sort;
-
-      router?.push({
-        query: newQuery,
-        pathname: router.pathname,
-      });
-    }
-  }, [router]);
-
   return (
     <>
       <Head>
