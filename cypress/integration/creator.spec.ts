@@ -52,7 +52,15 @@ context('Creator', () => {
 
     cy.get('#title').type(`CI post ${Date.now()}`);
     cy.get('#minimalBid').clear().type('10');
+
+    // IDEA: change duration
+    // IDEA: change to scheduled
+    // IDEA: change scheduled at time
+    // IDEA: toggle comments
+
+    // Needed to apply a value, make review button available
     cy.focused().blur();
+
     cy.fixture('test.mp4', 'binary')
       .then(Cypress.Blob.binaryStringToBlob)
       .then((fileContent) => {
@@ -79,7 +87,87 @@ context('Creator', () => {
     cy.wait(4000);
   });
 
-  // can create a superpoll
+  it('can create a superpoll', () => {
+    cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creation`);
 
-  // can create a goal
+    // Waiting for an element to be attached to the DOM
+    cy.wait(2000);
+    cy.get('#multiple-choice').click();
+    cy.url().should('include', '/creation/multiple-choice');
+
+    cy.get('#title').type(`CI post ${Date.now()}`);
+
+    cy.get('#option-0').type(`first option`);
+    cy.get('#option-1').type(`second option`);
+
+    cy.get('#add-option').click();
+    cy.get('#option-2').type(`third option`);
+
+    // IDEA: move option around?
+
+    cy.fixture('test.mp4', 'binary')
+      .then(Cypress.Blob.binaryStringToBlob)
+      .then((fileContent) => {
+        cy.get('#file').attachFile({
+          fileContent,
+          fileName: 'test.mp4',
+          mimeType: 'video/mp4',
+          encoding: 'utf8',
+        });
+      });
+
+    cy.get('#bitmovinplayer-video-floating-preview', { timeout: 20000 }).should(
+      'be.visible'
+    );
+
+    cy.get('#review').should('be.enabled').click();
+    cy.url().should('include', '/creation/multiple-choice/preview');
+
+    cy.get('#publish').click();
+
+    cy.get('#see-post').click();
+    cy.url().should('include', '/post');
+
+    cy.wait(4000);
+  });
+
+  it('can create a superpoll', () => {
+    cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creation`);
+
+    // Waiting for an element to be attached to the DOM
+    cy.wait(2000);
+    cy.get('#crowdfunding').click();
+    cy.url().should('include', '/creation/crowdfunding');
+
+    cy.get('#title').type(`CI post ${Date.now()}`);
+    cy.get('#targetBackerCount').clear().type('1');
+
+    // Needed to apply a value, make review button available
+    cy.focused().blur();
+
+    cy.fixture('test.mp4', 'binary')
+      .then(Cypress.Blob.binaryStringToBlob)
+      .then((fileContent) => {
+        cy.get('#file').attachFile({
+          fileContent,
+          fileName: 'test.mp4',
+          mimeType: 'video/mp4',
+          encoding: 'utf8',
+        });
+      });
+
+    cy.get('#bitmovinplayer-video-floating-preview', { timeout: 20000 }).should(
+      'be.visible'
+    );
+
+    cy.get('#review').should('be.enabled').click();
+    cy.url().should('include', '/creation/crowdfunding/preview');
+
+    cy.get('#publish').click();
+
+    cy.get('#see-post').click();
+    cy.url().should('include', '/post');
+
+    cy.wait(4000);
+  });
 });
