@@ -5,11 +5,13 @@ export const useScrollDirection = (ref: any) => {
 
   useEffect(() => {
     const threshold = 10;
-    let lastScrollY = ref.current?.scrollTop;
+    let lastScrollY = window?.scrollY;
     let ticking = false;
 
     const updateScrollDir = () => {
-      const scrollY = ref.current?.scrollTop;
+      const scrollY = window?.scrollY;
+
+      console.log(scrollY)
 
       if (Math.abs(scrollY - lastScrollY) < threshold) {
         ticking = false;
@@ -28,7 +30,14 @@ export const useScrollDirection = (ref: any) => {
       }
     };
 
-    ref.current?.addEventListener('scroll', onScroll);
+    // ref.current?.addEventListener('scroll', onScroll);
+    document?.addEventListener('scroll', onScroll);
+
+    return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      // ref.current?.removeEventListener('scroll', onScroll);
+      document?.removeEventListener('scroll', onScroll);
+    }
   }, [ref, scrollDirection]);
 
   return {

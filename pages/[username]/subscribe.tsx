@@ -60,8 +60,9 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   const [isScrolledDown, setIsScrolledDown] = useState(false);
   const topSectionRef = useRef<HTMLDivElement>();
 
-  const [subscriptionPrice, setSubscriptionPrice] =
-    useState<number | undefined>(undefined);
+  const [subscriptionPrice, setSubscriptionPrice] = useState<
+    number | undefined
+  >(undefined);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   // const predefinedOption = useMemo(() => {
@@ -148,8 +149,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
   useEffect(() => {
     const handler = (e: Event) => {
-      // @ts-ignore
-      const currScroll = e?.currentTarget?.scrollTop!!;
+      const currScroll = window?.scrollY;
       const targetScroll = topSectionRef.current?.scrollHeight;
 
       if (currScroll >= targetScroll!!) {
@@ -160,16 +160,12 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
     };
 
     if (isBrowser()) {
-      document
-        ?.getElementById('generalScrollContainer')
-        ?.addEventListener('scroll', handler);
+      document?.addEventListener('scroll', handler);
     }
 
     return () => {
       if (isBrowser()) {
-        document
-          ?.getElementById('generalScrollContainer')
-          ?.removeEventListener('scroll', handler);
+        document?.removeEventListener('scroll', handler);
       }
     };
   }, [isMobile]);
