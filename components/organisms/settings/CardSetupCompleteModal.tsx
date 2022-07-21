@@ -1,17 +1,34 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useContext } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
-import { useStripe } from '@stripe/react-stripe-js';
-// import { newnewapi } from 'newnew-api';
+import { newnewapi } from 'newnew-api';
 
-// import { checkCardStatus } from '../../../api/endpoints/card';
+import { SocketContext } from '../../../contexts/socketContext';
+import { checkCardStatus } from '../../../api/endpoints/card';
 import { useOnClickOutside } from '../../../utils/hooks/useOnClickOutside';
 
 import Modal from '../Modal';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
+import Lottie from '../../atoms/Lottie';
 
+import logoAnimation from '../../../public/animations/mobile_logo.json';
+
+const getCardStatusMessage = (cardStatus: newnewapi.CardStatus) => {
+  switch (cardStatus) {
+    case newnewapi.CardStatus.ADDED:
+      return 'Success! Your card has been saved';
+    case newnewapi.CardStatus.CANNOT_BE_ADDED:
+      return 'Failure! Your card cannot be saved';
+    case newnewapi.CardStatus.DUPLICATE:
+      return 'This card has been already saved in your profile';
+    case newnewapi.CardStatus.IN_PROGRESS:
+      return 'This card has been already saved in your profile';
+    default:
+      return 'Something went wrong';
+  }
+};
 interface ICardSetupCompleteModal {
   show: boolean;
   closeModal: () => void;
@@ -24,63 +41,80 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
   const router = useRouter();
-  const stripe = useStripe();
+  const socketConnection = useContext(SocketContext);
+
+  const clientSecret = router.query.setup_intent_client_secret as string;
+  const setupIntentId = router.query.setup_intent as string;
 
   const ref = useRef(null);
 
   useOnClickOutside(ref, closeModal);
 
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState(
+    'Processing payment details. Please wait'
+  );
+  const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
-    if (!stripe) {
+    if (!clientSecret) {
       return;
     }
 
     const handleCheckCardStatus = async () => {
-      const clientSecret = router.query.setup_intent_client_secret as string;
-      // const setupIntent = router.query.setup_intent as string;
-
       try {
-        // const payload = new newnewapi.CheckCardStatusRequest({
-        //   stripeSetupIntentId: setupIntent,
-        //   stripeSetupIntentClientSecret: clientSecret,
-        // });
-        // const response = await checkCardStatus(payload);
-
-        // console.log(payload, 'payload');
-        // console.log(response, 'response CheckCardStatusRequest');
-
-        stripe.retrieveSetupIntent(clientSecret).then(({ setupIntent }) => {
-          switch (setupIntent?.status) {
-            case 'succeeded':
-              setMessage('Success! Your payment method has been saved.');
-              break;
-
-            case 'processing':
-              setMessage(
-                "Processing payment details. We'll update you when processing is complete."
-              );
-              break;
-
-            case 'requires_payment_method':
-              // Redirect your user back to your payment page to attempt collecting
-              // payment again
-              setMessage(
-                'Failed to process payment details. Please try another payment method.'
-              );
-              break;
-            default:
-              setMessage('Unknown');
-          }
+        const payload = new newnewapi.CheckCardStatusRequest({
+          stripeSetupIntentId: setupIntentId,
+          stripeSetupIntentClientSecret: clientSecret,
         });
+        const response = await checkCardStatus(payload);
+
+        console.log(payload, 'payload');
+        console.log(response, 'response');
+
+        if (!response.data || response.error) {
+          throw new Error(response.error?.message || 'An error occurred');
+        }
+
+        if (response.data.cardStatus !== newnewapi.CardStatus.IN_PROGRESS) {
+          setIsProcessing(false);
+        }
+
+        setMessage(getCardStatusMessage(response.data.cardStatus));
       } catch (err) {
         console.error(err);
+        setMessage('Something went wrong');
+        setIsProcessing(false);
       }
     };
 
     handleCheckCardStatus();
-  }, [stripe, router]);
+  }, [clientSecret, setupIntentId]);
+
+  useEffect(() => {
+    const handleCardAdded = (data: any) => {
+      console.log(data, 'SOCKET');
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.CardStatusChanged.decode(arr);
+      if (!decoded) return;
+
+      setMessage(getCardStatusMessage(decoded.cardStatus));
+
+      if (decoded.cardStatus !== newnewapi.CardStatus.IN_PROGRESS) {
+        setIsProcessing(false);
+      }
+    };
+
+    if (socketConnection) {
+      socketConnection?.on('CardStatusChanged', handleCardAdded);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('CardStatusChanged', handleCardAdded);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection?.connected]);
 
   return (
     <Modal show={show} onClose={closeModal} overlaydim>
@@ -92,9 +126,24 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           <SText variant={2} weight={600}>
             {message}
           </SText>
-          <SButton view='primary' onClick={closeModal}>
-            {tCommon('gotIt')}
-          </SButton>
+          {isProcessing && (
+            <SLoader>
+              <Lottie
+                width={50}
+                height={50}
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: logoAnimation,
+                }}
+              />
+            </SLoader>
+          )}
+          {!isProcessing && (
+            <SButton view='primary' onClick={closeModal}>
+              {tCommon('gotIt')}
+            </SButton>
+          )}
         </SModal>
       </SContainer>
     </Modal>
@@ -146,4 +195,8 @@ const SText = styled(Text)`
 
 const SButton = styled(Button)`
   margin-top: auto;
+`;
+
+const SLoader = styled.div`
+  margin-top: 20px;
 `;

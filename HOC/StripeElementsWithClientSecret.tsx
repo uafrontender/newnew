@@ -1,18 +1,15 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { Elements } from '@stripe/react-stripe-js';
-import {
-  loadStripe,
-  StripeElementLocale,
-  StripeElementsOptions,
-} from '@stripe/stripe-js';
+import { StripeElementLocale, StripeElementsOptions } from '@stripe/stripe-js';
 import { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../redux-store/store';
 import { createStripeSetupIntent } from '../api/endpoints/payments';
+import getStripe from '../utils/geStripejs';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY!);
+const stripePromise = getStripe();
 
 interface IStripeElements {
   children: React.ReactNode;

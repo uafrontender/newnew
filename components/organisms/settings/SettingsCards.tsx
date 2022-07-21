@@ -10,7 +10,7 @@ import InlineSVG from '../../atoms/InlineSVG';
 import Card from '../../molecules/settings/Card';
 import AddCardModal from '../../molecules/settings/AddCardModal';
 import Lottie from '../../atoms/Lottie';
-import StripeElements from '../../../HOC/StripeElements';
+import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
 
 import { getCards } from '../../../api/endpoints/card';
 

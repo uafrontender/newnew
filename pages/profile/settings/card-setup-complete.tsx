@@ -8,9 +8,9 @@ import { useRouter } from 'next/router';
 
 import MyProfileSettingsLayout from '../../../components/templates/MyProfileSettingsLayout';
 import { NextPageWithLayout } from '../../_app';
-import StripeElements from '../../../HOC/StripeElements';
 
 import assets from '../../../constants/assets';
+import isBrowser from '../../../utils/isBrowser';
 
 const CardSetupCompleteModal = dynamic(
   () => import('../../../components/organisms/settings/CardSetupCompleteModal')
@@ -40,9 +40,7 @@ const CardSetupComplete: NextPage = () => {
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      <StripeElements>
-        <CardSetupCompleteModal show closeModal={closeModal} />
-      </StripeElements>
+      {isBrowser() && <CardSetupCompleteModal show closeModal={closeModal} />}
     </>
   );
 };
