@@ -18,7 +18,6 @@ import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import LoadingModal from '../../LoadingModal';
 import InlineSvg from '../../../atoms/InlineSVG';
-import PaymentModal from '../../checkout/PaymentModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 
@@ -29,6 +28,7 @@ import assets from '../../../../constants/assets';
 import EllipseModal, { EllipseModalButton } from '../../../atoms/EllipseModal';
 import { formatNumber } from '../../../../utils/format';
 import PostTitleContent from '../../../atoms/PostTitleContent';
+import PaymentModalRedirectOnly from '../../checkout/PaymentModalRedirectOnly';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsModal {
@@ -59,8 +59,9 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 
   // const { walletBalance } = useContext(WalletContext);
 
-  const [pledgeAmount, setPledgeAmount] =
-    useState<number | undefined>(undefined);
+  const [pledgeAmount, setPledgeAmount] = useState<number | undefined>(
+    undefined
+  );
 
   const [customPledgeAmount, setCustomPledgeAmount] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -321,7 +322,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
       </OptionActionMobileModal>
       {/* Payment Modal */}
       {paymentModalOpen ? (
-        <PaymentModal
+        <PaymentModalRedirectOnly
           isOpen={paymentModalOpen}
           zIndex={14}
           amount={
@@ -388,7 +389,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
               <PostTitleContent>{post.title}</PostTitleContent>
             </SPaymentModalOptionText>
           </SPaymentModalHeader>
-        </PaymentModal>
+        </PaymentModalRedirectOnly>
       ) : null}
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={15} />
