@@ -96,9 +96,9 @@ export const StripeElements: React.FC<IStripeElements> = (props) => {
       fonts: [
         {
           family: 'Gilroy',
-          src: `url(${encodeURI(
-            `${process.env.NEXT_PUBLIC_APP_URL}/fonts/Radomir Tinkov - Gilroy-Regular.otf`
-          )}) format("otf")`,
+          src: `url(
+            ${process.env.NEXT_PUBLIC_APP_URL}/fonts/Radomir-Tinkov-Gilroy-Regular.otf
+          ) format("opentype")`,
           weight: '400',
         },
       ],
