@@ -191,6 +191,7 @@ const MyApp = (props: IMyApp): ReactElement => {
       <CookiesProvider cookies={cookiesInstance}>
         <GoogleReCaptchaProvider
           reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ''}
+          language={locale}
           scriptProps={{
             async: false,
             defer: false,
