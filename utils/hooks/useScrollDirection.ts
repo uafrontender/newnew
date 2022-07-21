@@ -11,8 +11,6 @@ export const useScrollDirection = (ref: any) => {
     const updateScrollDir = () => {
       const scrollY = window?.scrollY;
 
-      console.log(scrollY)
-
       if (Math.abs(scrollY - lastScrollY) < threshold) {
         ticking = false;
         return;

@@ -382,6 +382,13 @@ const SButton = styled.button<ISButton>`
         opacity: 0.5;
       }
     `}
+
+  ${({ theme, withProgress }) =>
+    withProgress && theme.name === 'dark'
+      ? css`
+          background: ${() => theme.colorsThemed.background.tertiary};
+        `
+      : null}
 `;
 
 interface ISLoader {
