@@ -63,8 +63,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
   const [collectionLoaded, setCollectionLoaded] = useState<newnewapi.Post[]>(
     []
   );
-  const [nextPageToken, setNextPageToken] =
-    useState<string | null | undefined>('');
+  const [nextPageToken, setNextPageToken] = useState<string | null | undefined>(
+    ''
+  );
   const [isCollectionLoading, setIsCollectionLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
 
@@ -262,8 +263,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>(undefined);
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >(undefined);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
     Mixpanel.track('Open Post Modal', {
@@ -309,7 +311,6 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     scroller.scrollTo(category, {
       smooth: true,
       offset: -100,
-      containerId: 'generalScrollContainer',
     });
   }, [router.query.category, router.query.sort]);
 

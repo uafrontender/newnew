@@ -35,7 +35,6 @@ export const Logo: React.FunctionComponent<{
       scroller.scrollTo('top-reload', {
         smooth: 'easeInOutQuart',
         duration: SCROLL_TO_TOP,
-        containerId: 'generalScrollContainer',
       });
     }
   };
