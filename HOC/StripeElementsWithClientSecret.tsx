@@ -101,6 +101,13 @@ export const StripeElements: React.FC<IStripeElements> = (props) => {
           ) format("opentype")`,
           weight: '400',
         },
+        {
+          family: 'Gilroy',
+          src: `url(${encodeURI(
+            `${process.env.NEXT_PUBLIC_APP_URL}/fonts/Radomir Tinkov - Gilroy-SemiBold.otf`
+          )}) format("opentype")`,
+          weight: '600',
+        },
       ],
     }),
     [stipeSecret, theme, locale]
