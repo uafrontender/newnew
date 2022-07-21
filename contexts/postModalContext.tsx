@@ -9,6 +9,8 @@ import React, {
   useRef,
 } from 'react';
 
+import { useAppSelector } from '../redux-store/store';
+
 export const PostModalContext = createContext<{
   postOverlayOpen: boolean;
   handleSetPostOverlayOpen: (newState: boolean) => void;
@@ -28,36 +30,37 @@ interface IPostModalContextProvider {
 const PostModalContextProvider: React.FC<IPostModalContextProvider> = ({
   children,
 }) => {
+  const { resizeMode } = useAppSelector((state) => state.ui);
+
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+
   const [modalOpen, setModalOpen] = useState(false);
   const [isConfirmToClosePost, setIsConfirmToClosePost] = useState(false);
 
   const scrollPosition = useRef(0);
 
   useEffect(() => {
-    if (modalOpen) {
-      scrollPosition.current = window ? window.scrollY : 0;
+    if (!isMobile) {
+      if (modalOpen) {
+        scrollPosition.current = window ? window.scrollY : 0;
 
-      document.body.style.cssText = `
-      top: -${scrollPosition.current}px;
-      left: 0px;
-      right: 0px;
-      overflow: hidden;
-      position: fixed;
-   `;
-
-      document.documentElement.style.cssText = `
-      top: -${scrollPosition.current}px;
-      left: 0px;
-      right: 0px;
-      overflow: hidden;
-      position: fixed;
-   `;
-    } else {
-      document.body.style.cssText = '';
-      document.documentElement.style.cssText = '';
-      window?.scroll(0, scrollPosition.current);
+        document.body.style.cssText = `
+        top: -${scrollPosition.current}px;
+        left: 0px;
+        right: 0px;
+        overflow: hidden;
+        position: fixed;
+     `;
+      } else {
+        document.body.style.cssText = '';
+        document.documentElement.style.cssText = '';
+        console.log(scrollPosition.current);
+        window?.scroll(0, scrollPosition.current);
+      }
     }
-  }, [modalOpen]);
+  }, [modalOpen, isMobile]);
 
   const contextValue = useMemo(
     () => ({
