@@ -136,6 +136,17 @@ const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
                 {t('tocApplyText')}
               </STocApply>
             )}
+            <STocApplyReCaptcha>
+              {t('reCaptchaTos.siteProtectedBy')}{' '}
+              <a target='_blank' href='https://policies.google.com/privacy'>
+                {t('reCaptchaTos.privacyPolicy')}
+              </a>{' '}
+              {t('reCaptchaTos.and')}{' '}
+              <a target='_blank' href='https://policies.google.com/terms'>
+                {t('reCaptchaTos.tos')}
+              </a>{' '}
+              {t('reCaptchaTos.apply')}
+            </STocApplyReCaptcha>
           </SPayButtonDiv>
         </SContentContainer>
       </SWrapper>
@@ -283,6 +294,37 @@ const STocApply = styled.div`
   ${({ theme }) => theme.media.tablet} {
     font-size: 14px;
     line-height: 20px;
+  }
+`;
+
+const STocApplyReCaptcha = styled.div`
+  margin-top: 4px;
+
+  text-align: center;
+
+  font-weight: 600;
+  font-size: 8px;
+  line-height: 10px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  a {
+    font-weight: 600;
+
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+    &:hover,
+    &:focus {
+      outline: none;
+      color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+      transition: 0.2s ease;
+    }
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 8px;
+    line-height: 12px;
   }
 `;
 
