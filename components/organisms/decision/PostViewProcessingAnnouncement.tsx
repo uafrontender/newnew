@@ -50,141 +50,142 @@ interface IPostViewProcessingAnnouncement {
 }
 
 // TODO: memorize
-const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessingAnnouncement> =
-  ({
-    post,
-    postStatus,
-    postType,
-    variant,
-    isFollowingDecision,
-    hasRecommendations,
-    handleSetIsFollowingDecision,
-    handleGoBack,
-    handleUpdatePostStatus,
-    handleRemovePostFromState,
-    handleAddPostToState,
-    handleReportOpen,
-  }) => {
-    const { t } = useTranslation('modal-Post');
-    const theme = useTheme();
-    const { user } = useAppSelector((state) => state);
-    const { resizeMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
+const PostViewProcessingAnnouncement: React.FunctionComponent<
+  IPostViewProcessingAnnouncement
+> = ({
+  post,
+  postStatus,
+  postType,
+  variant,
+  isFollowingDecision,
+  hasRecommendations,
+  handleSetIsFollowingDecision,
+  handleGoBack,
+  handleUpdatePostStatus,
+  handleRemovePostFromState,
+  handleAddPostToState,
+  handleReportOpen,
+}) => {
+  const { t } = useTranslation('modal-Post');
+  const theme = useTheme();
+  const { user } = useAppSelector((state) => state);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-    // Socket
-    const socketConnection = useContext(SocketContext);
-    const { addChannel, removeChannel } = useContext(ChannelsContext);
+  // Socket
+  const socketConnection = useContext(SocketContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-    // Increment channel subs after mounting
-    // Decrement when unmounting
-    useEffect(() => {
-      addChannel(post.postUuid, {
-        postUpdates: {
-          postUuid: post.postUuid,
-        },
-      });
+  // Increment channel subs after mounting
+  // Decrement when unmounting
+  useEffect(() => {
+    addChannel(post.postUuid, {
+      postUpdates: {
+        postUuid: post.postUuid,
+      },
+    });
 
-      return () => {
-        removeChannel(post.postUuid);
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    return () => {
+      removeChannel(post.postUuid);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    useEffect(() => {
-      const socketHandlerPostStatus = (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostStatusUpdated.decode(arr);
+  useEffect(() => {
+    const socketHandlerPostStatus = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
-        if (!decoded) return;
-        if (decoded.postUuid === post.postUuid) {
-          if (decoded.auction) {
-            handleUpdatePostStatus(decoded.auction);
-          } else if (decoded.multipleChoice) {
-            handleUpdatePostStatus(decoded.multipleChoice);
-          } else {
-            if (decoded.crowdfunding)
-              handleUpdatePostStatus(decoded.crowdfunding);
-          }
+      if (!decoded) return;
+      if (decoded.postUuid === post.postUuid) {
+        if (decoded.auction) {
+          handleUpdatePostStatus(decoded.auction);
+        } else if (decoded.multipleChoice) {
+          handleUpdatePostStatus(decoded.multipleChoice);
+        } else {
+          if (decoded.crowdfunding)
+            handleUpdatePostStatus(decoded.crowdfunding);
         }
-      };
-
-      if (socketConnection) {
-        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
+    };
 
-      return () => {
-        if (socketConnection && socketConnection?.connected) {
-          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
-        }
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection, post, user.userData?.userUuid]);
+    if (socketConnection) {
+      socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
+    }
 
-    return (
-      <SWrapper>
-        <SExpiresSection>
-          {isMobile && (
-            <GoBackButton
-              style={{
-                gridArea: 'closeBtnMobile',
-              }}
-              onClick={handleGoBack}
-            />
-          )}
-        </SExpiresSection>
-        <PostVideoProcessingHolder
-          holderText={
-            user.loggedIn && user.userData?.userUuid === post.postUuid
-              ? 'moderation'
-              : 'decision'
-          }
-        />
-        {variant === 'decision' ? (
-          <PostTopInfo
-            title={post.title}
-            postId={post.postUuid}
-            postStatus={postStatus}
-            postType={postType as TPostType}
-            creator={post.creator!!}
-            hasWinner={false}
-            isFollowingDecision={isFollowingDecision}
-            hasRecommendations={hasRecommendations}
-            handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-            handleReportOpen={handleReportOpen}
-            handleRemovePostFromState={handleRemovePostFromState}
-            handleAddPostToState={handleAddPostToState}
-          />
-        ) : (
-          <PostTopInfoModeration
-            title={post.title}
-            postId={post.postUuid}
-            postStatus={postStatus}
-            postType={postType as TPostType}
-            hasWinner={false}
-            hasResponse={false}
-            handleUpdatePostStatus={handleUpdatePostStatus}
-            handleRemovePostFromState={handleRemovePostFromState}
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection, post, user.userData?.userUuid]);
+
+  return (
+    <SWrapper>
+      <SExpiresSection>
+        {isMobile && (
+          <GoBackButton
+            style={{
+              gridArea: 'closeBtnMobile',
+            }}
+            onClick={handleGoBack}
           />
         )}
-        <SActivitesContainer>
-          <SDecisionImage
-            src={
-              theme.name === 'light'
-                ? /* @ts-ignore */
-                  LIGHT_IMAGES[postType]
-                : /* @ts-ignore */
-                  DARK_IMAGES[postType]
-            }
-          />
-          <SText variant={2} weight={600}>
-            {t(`postViewProcessingAnnouncement.stayTuned.${postType}`)}
-          </SText>
-        </SActivitesContainer>
-      </SWrapper>
-    );
-  };
+      </SExpiresSection>
+      <PostVideoProcessingHolder
+        holderText={
+          user.loggedIn && user.userData?.userUuid === post.postUuid
+            ? 'moderation'
+            : 'decision'
+        }
+      />
+      {variant === 'decision' ? (
+        <PostTopInfo
+          title={post.title}
+          postId={post.postUuid}
+          postStatus={postStatus}
+          postType={postType as TPostType}
+          creator={post.creator!!}
+          hasWinner={false}
+          isFollowingDecision={isFollowingDecision}
+          hasRecommendations={hasRecommendations}
+          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
+          handleReportOpen={handleReportOpen}
+          handleRemovePostFromState={handleRemovePostFromState}
+          handleAddPostToState={handleAddPostToState}
+        />
+      ) : (
+        <PostTopInfoModeration
+          title={post.title}
+          postId={post.postUuid}
+          postStatus={postStatus}
+          postType={postType as TPostType}
+          hasWinner={false}
+          hasResponse={false}
+          handleUpdatePostStatus={handleUpdatePostStatus}
+          handleRemovePostFromState={handleRemovePostFromState}
+        />
+      )}
+      <SActivitiesContainer>
+        <SDecisionImage
+          src={
+            theme.name === 'light'
+              ? /* @ts-ignore */
+                LIGHT_IMAGES[postType]
+              : /* @ts-ignore */
+                DARK_IMAGES[postType]
+          }
+        />
+        <SText variant={2} weight={600}>
+          {t(`postViewProcessingAnnouncement.stayTuned.${postType}`)}
+        </SText>
+      </SActivitiesContainer>
+    </SWrapper>
+  );
+};
 
 export default PostViewProcessingAnnouncement;
 
@@ -236,7 +237,7 @@ const SExpiresSection = styled.div`
   }
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitiesContainer = styled.div`
   grid-area: activities;
 
   display: flex;

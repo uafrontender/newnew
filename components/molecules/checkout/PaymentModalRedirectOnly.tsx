@@ -68,6 +68,7 @@ const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
           <SHeaderContainer>{children}</SHeaderContainer>
           <SPayButtonDiv>
             <SPayButton
+              id='pay'
               view='primaryGrad'
               onClick={() => {
                 handlePayWithCardStripeRedirect?.();

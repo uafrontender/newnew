@@ -515,6 +515,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             }}
           >
             <SuggestionTextArea
+              id='text-input'
               value={newBidText}
               disabled={optionBeingSupported !== ''}
               placeholder={t(
@@ -524,6 +525,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               onChange={handleUpdateNewOptionText}
             />
             <BidAmountTextInput
+              id='bid-input'
               value={newBidAmount}
               inputAlign='center'
               disabled={optionBeingSupported !== ''}
@@ -538,6 +540,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               }}
             />
             <Button
+              id='submit'
               view='primaryGrad'
               size='sm'
               disabled={

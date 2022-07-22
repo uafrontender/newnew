@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { formatNumber } from '../../../utils/format';
 
 interface IBidAmountTextInput {
+  id?: string;
   value: string;
   minAmount: number;
   disabled?: boolean;
@@ -15,6 +16,7 @@ interface IBidAmountTextInput {
 }
 
 const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
+  id,
   value,
   minAmount,
   disabled,
@@ -64,6 +66,7 @@ const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
   return (
     <SWrapper>
       <SInput
+        id={id}
         ref={(el) => {
           inputRef.current = el!!;
         }}
