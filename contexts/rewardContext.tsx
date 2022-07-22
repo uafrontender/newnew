@@ -35,8 +35,9 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
   // Socket
   const socketConnection = useContext(SocketContext);
 
-  const [rewardBalance, setRewardBalance] =
-    useState<newnewapi.MoneyAmount | undefined>();
+  const [rewardBalance, setRewardBalance] = useState<
+    newnewapi.MoneyAmount | undefined
+  >();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSetRewardBalance = (newAmount: newnewapi.MoneyAmount) => {
@@ -106,7 +107,7 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
         return;
       }
 
-      const MAX_SUPPORTED_REWARDS_TYPE = 15;
+      const MAX_SUPPORTED_REWARDS_TYPE = 13;
       const type: number = decoded.reward.type!;
 
       if (type < 0 || type > MAX_SUPPORTED_REWARDS_TYPE) {
@@ -120,6 +121,8 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
           amount: Math.floor(decoded.reward.amount!.usdCents! / 100),
         },
         descriptionKey: `rewards.modalDescription.${type}`,
+        // TODO: Check Struct type, fix it
+        descriptionProps: (decoded.reward.extra as any) ?? undefined,
         buttonTextKey: `rewards.modalButton`,
       });
     };

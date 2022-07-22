@@ -92,7 +92,10 @@ export const RewardList: React.FC<RewardListI> = () => {
             <img src={assets.decision.gold} alt='received reward' />
           </RewardImage>
           <RewardDescription received>
-            {t(`rewards.itemDescription.${reward.type}`)}
+            {t(
+              `rewards.receivedItemDescription.${reward.type}`,
+              reward.extra ? reward.extra : undefined
+            )}
           </RewardDescription>
           <RewardAmount received>
             <RewardAmountText>
@@ -110,7 +113,10 @@ export const RewardList: React.FC<RewardListI> = () => {
             <img src={assets.decision.votes} alt='available reward' />
           </RewardImage>
           <RewardDescription>
-            {t(`rewards.itemDescription.${reward.type}`)}
+            {t(
+              `rewards.availableItemDescription.${reward.type}`,
+              reward.extra ? reward.extra : undefined
+            )}
           </RewardDescription>
           <RewardAmount>
             <RewardAmountText>
