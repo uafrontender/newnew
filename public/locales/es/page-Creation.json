@@ -83,7 +83,6 @@
         "value": "${{value}}",
         "label": "$",
         "placeholder": "1",
-        "description": "la oferta mínima que una persona puede hacer en tu evento",
         "description_NEED_TRANSLATION": "the minimum bid a person can place"
       },
       "targetBackerCount": {
@@ -161,25 +160,25 @@
         "description": "Hubo un error y tu archivo no pudo ser cargado. ¿Quieres volver a intentarlo?."
       },
       "setThumbnail": "Establece una imagen de miniatura",
-      "thumbnailEllipseMenu_NEED_TRANSLATION": {
-        "selectSnippetButton": "Select a snippet",
-        "uploadImageButton": "Upload an image"
+      "thumbnailEllipseMenu": {
+        "selectSnippetButton": "Selecciona un fragmento",
+        "uploadImageButton": "Subir una imagen"
       },
       "deleteFile": "Borrar archivo",
       "previewFull": "Vista previa",
       "thumbnail": {
         "info": "Más información",
-        "title_NEED_TRANSLATION": "Set a thumbnail from the video",
-        "submit_NEED_TRANSLATION": "Save",
-        "description_NEED_TRANSLATION": "Select a snippet for your thumbnail. \nA good thumbnail gets viewers excited..."
+        "title": "Establecer una imagen miniatura del video",
+        "submit": "Guardar",
+        "description": "Selecciona un fragmento para tu miniatura. \nUna buena miniatura entusiasma a los espectadores..."
       },
-      "coverImage_NEED_TRANSLATION": {
-        "title": "Upload an image",
-        "submit": "Save",
+      "coverImage": {
+        "title": "Subir una imagen",
+        "submit": "Guardar",
         "uploadCoverImage": {
-          "caption": "Select custom cover image",
-          "uploadBtn": "Select",
-          "deleteBtn": "Delete"
+          "caption": "Seleccionar una imagen de portada personalizada",
+          "uploadBtn": "Seleccionar",
+          "deleteBtn": "Borrar"
         }
       },
       "full": {
@@ -191,7 +190,7 @@
         "process": "{{progress}}% • Quedan {{time}}"
       },
       "processing": {
-        "title_NEED_TRANSLATION": "Your file is processing. It won’t take long...",
+        "title": "Tu archivo se está procesando. No tardará mucho...",
         "description": "Tu video se está procesando",
         "process": "{{progress}}% • Quedan {{time}}"
       }
