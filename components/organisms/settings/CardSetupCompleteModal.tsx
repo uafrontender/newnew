@@ -1,19 +1,28 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
-import { SocketContext } from '../../../contexts/socketContext';
-import { checkCardStatus } from '../../../api/endpoints/card';
-import { useOnClickOutside } from '../../../utils/hooks/useOnClickOutside';
+// Redux
+import { useAppSelector } from '../../../redux-store/store';
 
+// Components
 import Modal from '../Modal';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import Lottie from '../../atoms/Lottie';
+import InlineSvg from '../../atoms/InlineSVG';
+import GoBackButton from '../../molecules/GoBackButton';
 
+// Assets
 import logoAnimation from '../../../public/animations/mobile_logo.json';
+import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+
+// Utils
+import { SocketContext } from '../../../contexts/socketContext';
+import { useOnClickOutside } from '../../../utils/hooks/useOnClickOutside';
+import { checkCardStatus } from '../../../api/endpoints/card';
 
 const getCardStatusMessage = (cardStatus: newnewapi.CardStatus) => {
   switch (cardStatus) {
@@ -43,6 +52,12 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
   const router = useRouter();
   const socketConnection = useContext(SocketContext);
 
+  const theme = useTheme();
+  const { ui } = useAppSelector((state) => state);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    ui.resizeMode
+  );
+
   const clientSecret = router.query.setup_intent_client_secret as string;
   const setupIntentId = router.query.setup_intent as string;
 
@@ -65,7 +80,11 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           stripeSetupIntentId: setupIntentId,
           stripeSetupIntentClientSecret: clientSecret,
         });
+
+        console.log(payload, 'payload');
         const response = await checkCardStatus(payload);
+
+        console.log(response, 'response checkCardStatus');
 
         if (!response.data || response.error) {
           throw new Error(response.error?.message || 'An error occurred');
@@ -130,30 +149,44 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
     <Modal show={show} onClose={closeModal} overlaydim>
       <SContainer>
         <SModal ref={ref}>
-          <SModalTitle>
-            {t('Settings.sections.cards.button.addNewCard')}
-          </SModalTitle>
-          <SText variant={2} weight={600} $isError={isError}>
-            {message}
-          </SText>
-          {isProcessing && (
-            <SLoader>
-              <Lottie
-                width={50}
-                height={50}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: logoAnimation,
-                }}
+          {isMobile ? (
+            <SGoBackButtonMobile onClick={closeModal}>
+              {t('Settings.sections.cards.button.addNewCard')}
+            </SGoBackButtonMobile>
+          ) : (
+            <SGoBackButtonDesktop onClick={closeModal}>
+              <div> {t('Settings.sections.cards.button.addNewCard')}</div>
+              <InlineSvg
+                svg={CancelIcon}
+                fill={theme.colorsThemed.text.primary}
+                width='24px'
+                height='24px'
               />
-            </SLoader>
+            </SGoBackButtonDesktop>
           )}
-          {!isProcessing && (
-            <SButton view='primary' onClick={closeModal}>
-              {tCommon('gotIt')}
-            </SButton>
-          )}
+          <SModalContent>
+            <SText variant={2} weight={600} $isError={isError}>
+              {message}
+            </SText>
+            {isProcessing && (
+              <SLoader>
+                <Lottie
+                  width={50}
+                  height={50}
+                  options={{
+                    loop: true,
+                    autoplay: true,
+                    animationData: logoAnimation,
+                  }}
+                />
+              </SLoader>
+            )}
+            {!isProcessing && (
+              <SButton view='primary' onClick={closeModal}>
+                {tCommon('gotIt')}
+              </SButton>
+            )}
+          </SModalContent>
         </SModal>
       </SContainer>
     </Modal>
@@ -174,29 +207,62 @@ const SContainer = styled.div`
 `;
 
 const SModal = styled.div`
-  max-width: 480px;
-  height: 200px;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
   width: 100%;
+  height: 100%;
+
   background: ${(props) =>
     props.theme.name === 'light'
       ? props.theme.colors.white
       : props.theme.colorsThemed.background.secondary};
-  border-radius: ${(props) => props.theme.borderRadius.medium};
-  color: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
-  padding: 24px;
-  box-sizing: border-box;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 464px;
+    height: 250px;
+    max-height: 250px;
+    min-height: 250px;
+
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+
+  ${({ theme }) => theme.media.desktop} {
+    width: 480px;
+  }
+`;
+
+const SModalContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  line-height: 24px;
+  padding: 16px 24px 32px;
+  flex: 1;
 `;
 
-const SModalTitle = styled.strong`
+const SGoBackButtonMobile = styled(GoBackButton)`
+  width: 100%;
+  padding: 18px 16px;
+`;
+
+const SGoBackButtonDesktop = styled.button`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 100%;
+  border: transparent;
+  background: transparent;
+  padding: 24px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
   font-size: 20px;
-  margin-bottom: 16px;
+  line-height: 28px;
+  font-weight: bold;
+
+  cursor: pointer;
 `;
 
 const SText = styled(Text)<{
@@ -209,7 +275,11 @@ const SText = styled(Text)<{
 `;
 
 const SButton = styled(Button)`
-  margin-top: auto;
+  margin-top: 40px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: auto;
+  }
 `;
 
 const SLoader = styled.div`

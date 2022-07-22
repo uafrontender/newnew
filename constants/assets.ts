@@ -137,6 +137,11 @@ const assets = {
       `${APP_ASSETS_ORIGIN}/cards/background-4.png`,
     ],
   },
+  gilroyFont: {
+    regular: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-Regular.otf`,
+    medium: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-Medium.otf`,
+    semiBold: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-SemiBold.otf`,
+  },
 };
 
 export default assets;

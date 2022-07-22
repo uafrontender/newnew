@@ -8,7 +8,7 @@ import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
 import { createStripeSetupIntent } from '../api/endpoints/payments';
 import getStripe from '../utils/geStripejs';
-import isBrowser from '../utils/isBrowser';
+import assets from '../constants/assets';
 
 const stripePromise = getStripe();
 
@@ -48,14 +48,8 @@ export const StripeElements: React.FC<IStripeElements> = (props) => {
     }
   }, [loggedIn]);
 
-  const isBrowserBool = isBrowser();
-
-  const stripeOptions: StripeElementsOptions | null = useMemo(() => {
-    if (!isBrowserBool) {
-      return null;
-    }
-
-    return {
+  const stripeOptions: StripeElementsOptions | null = useMemo(
+    () => ({
       clientSecret: stipeSecret,
       appearance: {
         theme: 'none',
@@ -78,6 +72,7 @@ export const StripeElements: React.FC<IStripeElements> = (props) => {
             padding: '12px 20px',
             lineHeight: '24px',
             border: `1.5px solid ${theme.colorsThemed.background.outlines1}`,
+            fontWeight: '500',
           },
           '.Input:focus': {
             borderColor: `${theme.colorsThemed.background.outlines2}`,
@@ -93,7 +88,7 @@ export const StripeElements: React.FC<IStripeElements> = (props) => {
           },
           '.TermsText': {
             color: `${theme.colorsThemed.text.tertiary}`,
-            fontSize: '14px',
+            fontSize: '13px',
             lineHeight: '20px',
             fontWeight: '600',
           },
@@ -103,23 +98,25 @@ export const StripeElements: React.FC<IStripeElements> = (props) => {
       fonts: [
         {
           family: 'Gilroy',
-          src: `url(
-            ${window?.location?.origin}/fonts/Radomir-Tinkov-Gilroy-Regular.otf
-          ) format("opentype")`,
+          src: `url(${assets.gilroyFont.regular})`,
           weight: '400',
         },
         {
           family: 'Gilroy',
-          src: `url(${encodeURI(
-            `${window?.location?.origin}/fonts/Radomir-Tinkov-Gilroy-SemiBold.otf`
-          )}) format("opentype")`,
+          src: `url(${assets.gilroyFont.medium})`,
+          weight: '500',
+        },
+        {
+          family: 'Gilroy',
+          src: `url(${assets.gilroyFont.semiBold})`,
           weight: '600',
         },
       ],
-    };
-  }, [stipeSecret, theme, locale, isBrowserBool]);
+    }),
+    [stipeSecret, theme, locale]
+  );
 
-  if (!stipeSecret || !stripeOptions) {
+  if (!stipeSecret) {
     return null;
   }
 
