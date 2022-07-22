@@ -91,12 +91,12 @@ context('Main flow', () => {
       cy.get('#publish').click();
 
       cy.get('#see-post').click();
-      cy.url().should('include', '/post');
-
-      cy.url().then((urlstring) => {
-        const chunks = urlstring.split('/');
-        eventId = chunks[chunks.length - 1];
-      });
+      cy.url()
+        .should('include', '/post')
+        .then((urlstring) => {
+          const chunks = urlstring.split('/');
+          eventId = chunks[chunks.length - 1];
+        });
     });
 
     it('can create a superpoll', () => {
@@ -138,12 +138,12 @@ context('Main flow', () => {
       cy.get('#publish').click();
 
       cy.get('#see-post').click();
-      cy.url().should('include', '/post');
-
-      cy.url().then((urlstring) => {
-        const chunks = urlstring.split('/');
-        superpollId = chunks[chunks.length - 1];
-      });
+      cy.url()
+        .should('include', '/post')
+        .then((urlstring) => {
+          const chunks = urlstring.split('/');
+          superpollId = chunks[chunks.length - 1];
+        });
     });
 
     it('can create a crowdfunding', () => {
@@ -181,12 +181,12 @@ context('Main flow', () => {
       cy.get('#publish').click();
 
       cy.get('#see-post').click();
-      cy.url().should('include', '/post');
-    });
-
-    cy.url().then((urlstring) => {
-      const chunks = urlstring.split('/');
-      crowdfundingId = chunks[chunks.length - 1];
+      cy.url()
+        .should('include', '/post')
+        .then((urlstring) => {
+          const chunks = urlstring.split('/');
+          crowdfundingId = chunks[chunks.length - 1];
+        });
     });
   });
 
