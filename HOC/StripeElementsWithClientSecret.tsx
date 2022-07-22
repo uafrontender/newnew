@@ -36,8 +36,6 @@ export const StripeElements: React.FC<IStripeElements> = (props) => {
         }
 
         setStripeSecret(response.data.stripeSetupIntentClientSecret);
-
-        console.log(response, 'response');
       } catch (err) {
         console.error(err);
       }

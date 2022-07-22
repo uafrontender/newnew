@@ -12,6 +12,8 @@ interface ICardEllipseModal {
   top?: string;
   right?: string;
   onClose: () => void;
+  onSetPrimaryCard: () => void;
+  onDeleteCard: () => void;
 }
 
 const CardEllipseModal: React.FunctionComponent<ICardEllipseModal> = ({
@@ -19,8 +21,20 @@ const CardEllipseModal: React.FunctionComponent<ICardEllipseModal> = ({
   zIndex,
   isPrimary,
   onClose,
+  onSetPrimaryCard,
+  onDeleteCard,
 }) => {
   const { t } = useTranslation('page-Profile');
+
+  const handleSetPrimaryCard = () => {
+    onSetPrimaryCard();
+    onClose();
+  };
+
+  const handleDeleteCard = () => {
+    onDeleteCard();
+    onClose();
+  };
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
@@ -30,11 +44,15 @@ const CardEllipseModal: React.FunctionComponent<ICardEllipseModal> = ({
             e.stopPropagation();
           }}
         >
-          <Button view='danger' style={{ marginBottom: '16px' }}>
+          <Button
+            view='danger'
+            style={{ marginBottom: '16px' }}
+            onClick={handleDeleteCard}
+          >
             {t('Settings.sections.cards.ellipse.removeCard')}
           </Button>
           {!isPrimary && (
-            <Button view='primary'>
+            <Button view='primary' onClick={handleSetPrimaryCard}>
               {t('Settings.sections.cards.ellipse.makePrimary')}
             </Button>
           )}

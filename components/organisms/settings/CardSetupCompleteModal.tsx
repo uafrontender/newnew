@@ -80,11 +80,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           stripeSetupIntentId: setupIntentId,
           stripeSetupIntentClientSecret: clientSecret,
         });
-
-        console.log(payload, 'payload');
         const response = await checkCardStatus(payload);
-
-        console.log(response, 'response checkCardStatus');
 
         if (!response.data || response.error) {
           throw new Error(response.error?.message || 'An error occurred');

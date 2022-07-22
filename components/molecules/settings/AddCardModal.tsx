@@ -6,6 +6,7 @@ import {
   useElements,
   PaymentElement,
 } from '@stripe/react-stripe-js';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 // Redux
 import { useAppSelector } from '../../../redux-store/store';
@@ -24,6 +25,14 @@ import logoAnimation from '../../../public/animations/mobile_logo.json';
 
 // Utils
 import { useOnClickOutside } from '../../../utils/hooks/useOnClickOutside';
+
+interface IReCaptchaRes {
+  success?: boolean;
+  challenge_ts?: string;
+  hostname?: string;
+  score?: number;
+  errors?: Array<string> | string;
+}
 
 interface IAddCardModal {
   show: boolean;
@@ -51,26 +60,67 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isStripeReady, setIsStripeReady] = useState(false);
 
-  const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const handleConfirmSetup = async () => {
     if (!stripe || !elements) {
       return;
     }
 
-    setIsLoading(true);
-
     const { error } = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        return_url: `${process.env.NEXT_PUBLIC_APP_URL}/profile/settings/card-setup-complete`,
+        // TODO: change to env
+        return_url: `${window?.location?.origin}/profile/settings/card-setup-complete`,
       },
     });
 
-    setIsLoading(false);
-
     if (error) {
-      setErrorMessage(error.message || 'An error occurred');
+      throw new Error(error.message);
+    }
+  };
+
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
+  const handleSubmitWithCaptchaProtection = async (
+    e: React.ChangeEvent<HTMLFormElement>
+  ) => {
+    try {
+      e.preventDefault();
+
+      if (!executeRecaptcha) {
+        throw new Error('executeRecaptcha not available');
+      }
+
+      setIsLoading(true);
+
+      const recaptchaToken = await executeRecaptcha();
+
+      if (recaptchaToken) {
+        const res = await fetch('/api/post_recaptcha_query', {
+          method: 'POST',
+          body: JSON.stringify({
+            recaptchaToken,
+          }),
+        });
+
+        const jsonRes: IReCaptchaRes = await res.json();
+
+        if (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5) {
+          handleConfirmSetup();
+        } else {
+          if (!jsonRes?.errors) {
+            throw new Error('ReCaptcha failed');
+          }
+
+          if (Array.isArray(jsonRes?.errors)) {
+            throw new Error(jsonRes.errors[0]?.toString());
+          }
+
+          throw new Error(jsonRes.errors?.toString());
+        }
+      }
+    } catch (err: any) {
+      console.error(err);
+      setErrorMessage(err?.message || 'An error occurred');
     }
   };
 
@@ -113,7 +163,7 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
               />
             </SLoader>
           )}
-          <SForm onSubmit={handleSubmit}>
+          <SForm onSubmit={handleSubmitWithCaptchaProtection}>
             <PaymentElement
               onReady={() => {
                 setIsStripeReady(true);

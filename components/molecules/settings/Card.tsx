@@ -102,15 +102,16 @@ const Card: React.FunctionComponent<ICard> = ({
           (cardEl) => cardEl.cardUuid === cardId
         );
 
-        return [
-          ...currentCards
-            .filter((cardEl) => cardEl.cardUuid !== cardId)
-            .map((cardEl) => ({
-              ...cardEl,
-              isPrimary: false,
-            })),
-          { ...currentCard, isPrimary: true },
-        ] as newnewapi.Card[];
+        return currentCards.map((cardEl) => {
+          if (cardEl.cardUuid === currentCard?.cardUuid) {
+            return { ...cardEl, isPrimary: true };
+          }
+
+          return {
+            ...cardEl,
+            isPrimary: false,
+          };
+        }) as newnewapi.Card[];
       });
     } catch (err: any) {
       console.error(err);
@@ -169,6 +170,8 @@ const Card: React.FunctionComponent<ICard> = ({
             zIndex={10}
             isPrimary={isPrimary}
             onClose={() => setIsEllipseMenuOpen(false)}
+            onSetPrimaryCard={handelSetPrimaryCard}
+            onDeleteCard={handleDeleteCard}
           />
         )}
       </STopLine>
