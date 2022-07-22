@@ -99,7 +99,7 @@ context('Main flow', () => {
       });
     });
 
-    /*it('can create a superpoll', () => {
+    it('can create a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creation`);
 
       // Waiting for an element to be attached to the DOM
@@ -187,7 +187,7 @@ context('Main flow', () => {
     cy.url().then((urlstring) => {
       const chunks = urlstring.split('/');
       crowdfundingId = chunks[chunks.length - 1];
-    });*/
+    });
   });
 
   describe('User', () => {
@@ -236,13 +236,13 @@ context('Main flow', () => {
 
       cy.url().should('include', 'checkout.stripe.com/pay');
 
-      // TODO: enable Stripe testing
-      cy.get('#email', { timeout: 10000 }).type(USER_EMAIL);
+      // TODO: enable Stripe testing (or test card adding flow)
+      /* cy.get('#email', { timeout: 10000 }).type(USER_EMAIL);
       cy.get('#cardNumber').type('4242424242424242');
       cy.get('#cardExpiry').type('1230');
       cy.get('#cardCvc').type('123');
       cy.get('#billingName').type('user');
-      cy.get('form').submit();
+      cy.get('form').submit(); */
 
       // TODO: test authentication
       // TODO: test that contribution is visible on the post page
