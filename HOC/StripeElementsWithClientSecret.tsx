@@ -8,6 +8,7 @@ import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
 import { createStripeSetupIntent } from '../api/endpoints/payments';
 import getStripe from '../utils/geStripejs';
+import isBrowser from '../utils/isBrowser';
 
 const stripePromise = getStripe();
 
@@ -47,8 +48,14 @@ export const StripeElements: React.FC<IStripeElements> = (props) => {
     }
   }, [loggedIn]);
 
-  const stripeOptions: StripeElementsOptions = useMemo(
-    () => ({
+  const isBrowserBool = isBrowser();
+
+  const stripeOptions: StripeElementsOptions | null = useMemo(() => {
+    if (!isBrowserBool) {
+      return null;
+    }
+
+    return {
       clientSecret: stipeSecret,
       appearance: {
         theme: 'none',
@@ -97,23 +104,22 @@ export const StripeElements: React.FC<IStripeElements> = (props) => {
         {
           family: 'Gilroy',
           src: `url(
-            ${process.env.NEXT_PUBLIC_APP_URL}/fonts/Radomir-Tinkov-Gilroy-Regular.otf
+            ${window?.location?.origin}/fonts/Radomir-Tinkov-Gilroy-Regular.otf
           ) format("opentype")`,
           weight: '400',
         },
         {
           family: 'Gilroy',
           src: `url(${encodeURI(
-            `${process.env.NEXT_PUBLIC_APP_URL}/fonts/Radomir-Tinkov-Gilroy-SemiBold.otf`
+            `${window?.location?.origin}/fonts/Radomir-Tinkov-Gilroy-SemiBold.otf`
           )}) format("opentype")`,
           weight: '600',
         },
       ],
-    }),
-    [stipeSecret, theme, locale]
-  );
+    };
+  }, [stipeSecret, theme, locale, isBrowserBool]);
 
-  if (!stipeSecret) {
+  if (!stipeSecret || !stripeOptions) {
     return null;
   }
 
