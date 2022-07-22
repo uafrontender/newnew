@@ -1,5 +1,11 @@
 import { newnewapi } from 'newnew-api';
-import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
@@ -14,7 +20,6 @@ import BlockUserModalProfile from '../profile/BlockUserModalProfile';
 import UnsubscribeModal from '../profile/UnsubscribeModal';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-
 import { formatNumber } from '../../../utils/format';
 import { useAppSelector } from '../../../redux-store/store';
 import { reportUser } from '../../../api/endpoints/report';
@@ -23,6 +28,7 @@ import { markUser } from '../../../api/endpoints/user';
 import UserEllipseModal from '../profile/UserEllipseModal';
 import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
@@ -189,7 +195,12 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         {sign && isSubscribed && <AvatarSign>{sign}</AvatarSign>}
         {wasSubscribed && <AvatarSign>{t('creatorCard.cancelled')}</AvatarSign>}
       </SUserAvatarContainer>
-      <SDisplayName>{creator.nickname}</SDisplayName>
+      <SDisplayNameContainer isVerified={!!creator.options?.isVerified}>
+        <SDisplayName>{creator.nickname}</SDisplayName>
+        {creator.options?.isVerified && (
+          <SInlineSVG svg={VerificationCheckmark} width='16px' height='16px' />
+        )}
+      </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>
       {subscriptionPrice !== undefined && subscriptionPrice > 0 && (
         <SSubscriptionPrice>
@@ -332,13 +343,26 @@ const AvatarSign = styled.div`
   z-index: 2;
 `;
 
+const SDisplayNameContainer = styled.div<{ isVerified?: boolean }>`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow: hidden;
+  margin: 0 0 5px;
+  padding-left: ${({ isVerified }) => (isVerified ? '24px' : '0px')};
+`;
+
 const SDisplayName = styled.p`
   text-align: center;
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  margin: 0 0 5px;
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  min-width: 24px;
+  min-height: 24px;
 `;
 
 const SUserName = styled.p`

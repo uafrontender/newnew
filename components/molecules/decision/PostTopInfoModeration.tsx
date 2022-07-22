@@ -15,6 +15,7 @@ import Headline from '../../atoms/Headline';
 
 import assets from '../../../constants/assets';
 import PostTitleContent from '../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -158,6 +159,12 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
               postType: t(`postType.${postType}`),
             })}
             handleButtonClick={() => {
+              Mixpanel.track('PostFailedBox Button Click', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'PostTopInfoModeration',
+                _postType: postType,
+              });
               if (postType === 'ac') {
                 router.push('/creation/auction');
               } else if (postType === 'mc') {

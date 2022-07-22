@@ -26,6 +26,7 @@ import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import PostTitleContent from '../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const McSuccessOptionsTab = dynamic(
   () =>
@@ -169,8 +170,6 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
         }
       }
 
-      console.log(post.winningOptionId);
-
       if (post.winningOptionId) {
         fetchAndSetWinningOption(post.winningOptionId as number);
       }
@@ -296,6 +295,13 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                           {t('mcPostSuccess.optionChosen')}
                         </SWinningOptionDetailsBidChosen>
                         <SWinningOptionDetailsSeeAll
+                          onClickCapture={() => {
+                            Mixpanel.track('Winning Option Details See All', {
+                              _stage: 'Post',
+                              _postUuid: post.postUuid,
+                              _component: 'PostSuccessMC',
+                            });
+                          }}
                           onClick={() => setOpenedMainSection('options')}
                         >
                           {t('mcPostSuccess.seeAll')}
@@ -313,6 +319,13 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                       <SWatchResponseWrapper>
                         <SWatchResponseBtn
                           shouldView={!responseViewed}
+                          onClickCapture={() => {
+                            Mixpanel.track('Watch Response', {
+                              _stage: 'Post',
+                              _postUuid: post.postUuid,
+                              _component: 'PostSuccessMC',
+                            });
+                          }}
                           onClick={() => setVideoTab('response')}
                         >
                           {t('postVideoSuccess.tabs.watchResponseFirstTime')}
@@ -323,12 +336,26 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                       <SToggleVideoWidget>
                         <SChangeTabBtn
                           shouldView={videoTab === 'announcement'}
+                          onClickCapture={() => {
+                            Mixpanel.track('Set Tab Announcement', {
+                              _stage: 'Post',
+                              _postUuid: post.postUuid,
+                              _component: 'PostSuccessMC',
+                            });
+                          }}
                           onClick={() => setVideoTab('announcement')}
                         >
                           {t('postVideoSuccess.tabs.watchOriginal')}
                         </SChangeTabBtn>
                         <SChangeTabBtn
                           shouldView={videoTab === 'response'}
+                          onClickCapture={() => {
+                            Mixpanel.track('Set Tab Response', {
+                              _stage: 'Post',
+                              _postUuid: post.postUuid,
+                              _component: 'PostSuccessMC',
+                            });
+                          }}
                           onClick={() => setVideoTab('response')}
                         >
                           {t('postVideoSuccess.tabs.watchResponse')}
@@ -341,7 +368,14 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
             ) : (
               <McSuccessOptionsTab
                 post={post}
-                handleGoBack={() => setOpenedMainSection('main')}
+                handleGoBack={() => {
+                  Mixpanel.track('Go Back', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'PostSuccessMC',
+                  });
+                  setOpenedMainSection('main');
+                }}
               />
             )}
           </SActivitesContainer>

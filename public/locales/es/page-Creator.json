@@ -45,7 +45,7 @@
         "button": "Haz una publicación"
       },
       "list": {
-        "ac": "Events",
+        "ac": "Bids",
         "cf": "Superpolls",
         "mc": "Goals",
         "subscriptions": "Suscripciones"
@@ -74,7 +74,7 @@
         }
       },
       "postTypes": {
-        "auction": "Event",
+        "auction": "Bid",
         "multipleChoice": "Superpoll",
         "crowdfunding": "Goal"
       },
@@ -211,7 +211,7 @@
     "firstFeature": "Mandarte mensajes directos",
     "secondFeature": "Obtener un voto gratis en tus Superpolls",
     "thirdFeature": "Añadir sugerencias personalizadas a tus Superpolls",
-    "note": "No te preocupes: la activación de las suscripciones no limitará la participación de los usuarios en tus Events, Superpolls o Goals."
+    "note": "No te preocupes: la activación de las suscripciones no limitará la participación de los usuarios en tus Bids, Superpolls o Goals."
   },
   "enableSubModal": {
     "title": "Activar la suscripción",

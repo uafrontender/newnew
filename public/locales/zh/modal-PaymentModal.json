@@ -14,5 +14,12 @@
   "rewardsText_NEED_TRANSLATION": "Use my rewards",
   "payButton": "支付",
   "tocApplyLink": "條款",
-  "tocApplyText": "適用"
+  "tocApplyText": "適用",
+  "reCaptchaTos_NEED_TRANSLATION": {
+    "siteProtectedBy": "This site is protected by reCAPTCHA and the Google",
+    "privacyPolicy": "Privacy Policy",
+    "and": "and",
+    "tos": "Terms of Service",
+    "apply": "apply."
+  }
 }

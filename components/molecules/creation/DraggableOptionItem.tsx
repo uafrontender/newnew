@@ -55,7 +55,10 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
     });
   };
   const handleInputBlur = async (e: any) => {
-    Mixpanel.track('Superpoll Option Text Change', { _text: e.target.value });
+    Mixpanel.track('Superpoll Option Text Change', {
+      _stage: 'Creation',
+      _text: e.target.value,
+    });
     if (e.target.value.length < 1 && index > 1) {
       handleChange(index, null);
       return;
@@ -75,16 +78,16 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
     setError('');
   };
   const handleDelete = () => {
-    Mixpanel.track('Superpoll Delete Option');
+    Mixpanel.track('Superpoll Delete Option', { _stage: 'Creation' });
     handleChange(index, null);
   };
   const handlePointerDown = (event: any) => {
-    Mixpanel.track('Superpoll Dragging Option Start');
+    Mixpanel.track('Superpoll Dragging Option Start', { _stage: 'Creation' });
     dragControls.start(event);
     setIsDragging(true);
   };
   const handlePointerUp = () => {
-    Mixpanel.track('Superpoll Dragging Option End');
+    Mixpanel.track('Superpoll Dragging Option End', { _stage: 'Creation' });
     setIsDragging(false);
   };
 

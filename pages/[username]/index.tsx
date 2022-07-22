@@ -27,6 +27,8 @@ import {
 } from '../../components/atoms/profile/NoContentCommon';
 import getDisplayname from '../../utils/getDisplayname';
 import Button from '../../components/atoms/Button';
+import switchPostType from '../../utils/switchPostType';
+import { Mixpanel } from '../../utils/mixpanel';
 
 interface IUserPageIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -68,6 +70,10 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'Profile Page',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(post);
     setPostModalOpen(true);
   };
@@ -77,6 +83,9 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   }, []);
 
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Profile Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };

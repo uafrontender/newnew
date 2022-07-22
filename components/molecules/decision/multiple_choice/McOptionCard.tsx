@@ -4,7 +4,7 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
@@ -55,6 +55,9 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
 import OptionEllipseModal from '../OptionEllipseModal';
 import McConfirmDeleteOptionModal from './moderation/McConfirmDeleteOptionModal';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
+import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface IMcOptionCard {
@@ -62,6 +65,7 @@ interface IMcOptionCard {
   creator: newnewapi.IUser;
   postId: string;
   postCreator: string;
+  postCreatorUuid: string;
   postText: string;
   index: number;
   minAmount: number;
@@ -85,6 +89,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   creator,
   postId,
   postCreator,
+  postCreatorUuid,
   postText,
   index,
   minAmount,
@@ -112,6 +117,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   const { appConstants } = useGetAppConstants();
   // const { walletBalance } = useContext(WalletContext);
+
+  const [amISubscribed, setAmISubscribed] = useState(false);
 
   const isSuggestedByMe = useMemo(
     () =>
@@ -468,6 +475,33 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     }
   };
 
+  // Check if the user is subscribed
+  useEffect(() => {
+    async function checkAmISubscribed() {
+      try {
+        const payload = new newnewapi.SubscriptionStatusRequest({
+          creatorUuid: postCreatorUuid,
+        });
+
+        const res = await getSubscriptionStatus(payload);
+
+        if (
+          res.data &&
+          (res.data?.status?.activeRenewsAt ||
+            res.data?.status?.activeCancelsAt)
+        ) {
+          setAmISubscribed(true);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (option.isSupportedByMe) {
+      checkAmISubscribed();
+    }
+  }, [option.isSupportedByMe, postCreatorUuid]);
+
   return (
     <>
       <motion.div
@@ -558,6 +592,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 }
                 supporterCount={option.supporterCount}
                 supporterCountSubstracted={supporterCountSubstracted}
+                amISubscribed={amISubscribed}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -568,6 +603,13 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 disabled={disabled}
                 isBlue={isBlue}
                 canVoteForFree={canVoteForFree}
+                onClickCapture={() => {
+                  Mixpanel.track('Vote Click', {
+                    _stage: 'Post',
+                    _postUuid: postId,
+                    _component: 'McOptionCard',
+                  });
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   if (canVoteForFree) {
@@ -612,6 +654,13 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 view='secondary'
                 disabled={disabled}
                 isBlue={isBlue}
+                onClickCapture={() => {
+                  Mixpanel.track('Vote Click', {
+                    _stage: 'Post',
+                    _postUuid: postId,
+                    _component: 'McOptionCard',
+                  });
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   if (!isSupportMenuOpen) {
@@ -732,7 +781,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 </SPaymentModalHeadingPostCreator>
               </SPaymentModalHeading>
               <SPaymentModalPostText variant={2}>
-                {postText}
+                <PostTitleContent>{postText}</PostTitleContent>
               </SPaymentModalPostText>
               <SPaymentModalTitle variant={3}>
                 {t('mcPost.paymentModalHeader.subtitle')}
@@ -801,6 +850,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   }
                   supporterCount={option.supporterCount}
                   supporterCountSubstracted={supporterCountSubstracted}
+                  amISubscribed={amISubscribed}
                 />
               </SBiddersInfo>
             </SBidDetails>
@@ -885,6 +935,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   optionCreatorUsername?: string;
   firstVoter?: string;
   firstVoterUsername?: string;
+  amISubscribed?: boolean;
 }> = ({
   isCreatorsBid,
   isSupportedByMe,
@@ -895,6 +946,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   optionCreatorUsername,
   firstVoter,
   firstVoterUsername,
+  amISubscribed,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
@@ -939,7 +991,16 @@ export const RenderSupportersInfo: React.FunctionComponent<{
       <>
         {supporterCount > 0 ? (
           <>
-            <SSpanBiddersHighlighted className='spanHighlighted'>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              style={{
+                ...(isSuggestedByMe || amISubscribed
+                  ? {
+                      color: theme.colorsThemed.accent.yellow,
+                    }
+                  : {}),
+              }}
+            >
               {supporterCount > 1 ? t('me') : t('I')}
             </SSpanBiddersHighlighted>
             <SSpanBiddersRegular className='spanRegular'>
@@ -1440,7 +1501,7 @@ const SPaymentTerms = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap;
 `;
 
 const SEllipseButtonMobile = styled(Button)`

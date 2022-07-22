@@ -4,6 +4,7 @@ import React, { ReactElement, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/router';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
@@ -17,8 +18,10 @@ import { useAppSelector } from '../redux-store/store';
 
 const VerifyEmail = () => {
   const { t } = useTranslation('page-VerifyEmail');
+  const router = useRouter();
   const authLayoutContext = useContext(AuthLayoutContext);
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const { signupEmailInput } = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -26,6 +29,12 @@ const VerifyEmail = () => {
   // useEffect(() => {
   //   if (loggedIn) router.push('/');
   // }, [loggedIn, router]);
+
+  useEffect(() => {
+    if (!signupEmailInput) {
+      router.push('/');
+    }
+  }, [router, signupEmailInput]);
 
   useEffect(() => {
     authLayoutContext.setShouldHeroUnmount(false);

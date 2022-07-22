@@ -33,6 +33,8 @@ import {
 
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
+import urltoFile from '../../../../utils/urlToFile';
+import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 
@@ -61,6 +63,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     multiplechoice,
     videoProcessing,
     fileProcessing,
+    customCoverImageUrl,
   } = useAppSelector((state) => state.creation);
   const { userData } = useAppSelector((state) => state.user);
   const validateText = useCallback(
@@ -113,11 +116,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     CREATION_TITLE_MIN,
     CREATION_TITLE_MAX
   );
+
   const optionsAreValid =
     tab !== 'multiple-choice' ||
     multiplechoice.choices.findIndex((item) =>
       validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)
     ) === -1;
+
   const disabled =
     loading ||
     !titleIsValid ||
@@ -149,6 +154,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       if (post.expiresAt === '1-hour') {
         dateValue.add(1, 'h');
         seconds = 3600;
+      } else if (post.expiresAt === '3-hours') {
+        dateValue.add(3, 'h');
+        seconds = 10800;
       } else if (post.expiresAt === '6-hours') {
         seconds = 21600;
         dateValue.add(6, 'h');
@@ -173,20 +181,60 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     },
     [post.expiresAt, post.startsAt]
   );
+
   const handleClose = useCallback(() => {
-    Mixpanel.track('Post Edit');
+    Mixpanel.track('Post Edit', { _stage: 'Creation' });
     router.back();
   }, [router]);
+
   const handleCloseModal = useCallback(() => {
     setShowModal(false);
     router.push('/');
     dispatch(clearCreation({}));
   }, [dispatch, router]);
+
   const handleSubmit = useCallback(async () => {
     if (loading) return;
-    Mixpanel.track('Publish Post');
+    Mixpanel.track('Publish Post', { _stage: 'Creation' });
     setLoading(true);
     try {
+      let hasCoverImage = false;
+
+      if (customCoverImageUrl) {
+        const coverImageFile = await urltoFile(
+          customCoverImageUrl,
+          'coverImage',
+          'image/jpeg'
+        );
+        const videoFileSubdirectory = post.announcementVideoUrl
+          .split('/')
+          .slice(-2, -1)
+          .join('');
+
+        const imageUrlPayload = new newnewapi.GetCoverImageUploadUrlRequest({
+          videoFileSubdirectory,
+        });
+
+        const res = await getCoverImageUploadUrl(imageUrlPayload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'An error occured');
+
+        const uploadResponse = await fetch(res.data.uploadUrl, {
+          method: 'PUT',
+          body: coverImageFile,
+          headers: {
+            'Content-Type': 'image/jpeg',
+          },
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Upload failed');
+        }
+
+        hasCoverImage = true;
+      }
+
       const body: Omit<newnewapi.CreatePostRequest, 'toJSON'> = {
         post: {
           title: post.title,
@@ -209,6 +257,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             },
           },
           announcementVideoUrl: post.announcementVideoUrl,
+          hasCoverImage,
         },
       };
 
@@ -253,9 +302,15 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       setLoading(false);
     }
   }, [
+    customCoverImageUrl,
+    post.title,
+    post.options,
+    post.startsAt.type,
+    post.thumbnailParameters.startTime,
+    post.thumbnailParameters.endTime,
+    post.announcementVideoUrl,
     loading,
     tab,
-    post,
     router,
     auction,
     isMobile,
@@ -359,6 +414,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   if (isMobile) {
     return (
       <>
+        <PublishedModal open={showModal} handleClose={handleCloseModal} />
         <SContent>
           <STopLine>
             <SInlineSVG

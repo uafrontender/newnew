@@ -6,6 +6,11 @@ import React, { useContext, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
+import {
+  useGoogleReCaptcha,
+  IGoogleRecaptchaProps,
+  IGoogleReCaptchaConsumerProps,
+} from 'react-google-recaptcha-v3';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -19,6 +24,14 @@ import assets from '../../../constants/assets';
 import Toggle from '../../atoms/Toggle';
 import { RewardContext } from '../../../contexts/rewardContext';
 import { formatNumber } from '../../../utils/format';
+
+interface IReCaptchaRes {
+  success?: boolean;
+  challenge_ts?: string;
+  hostname?: string;
+  score?: number;
+  errors?: Array<string> | string;
+}
 
 interface IPaymentModal {
   isOpen: boolean;
@@ -57,6 +70,43 @@ const PaymentModal: React.FC<IPaymentModal> = ({
     useRewards && rewardBalance?.usdCents && amount
       ? Math.min(rewardBalance.usdCents, amount)
       : 0;
+
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
+  const handlePayWithCaptchaProtection = async () => {
+    try {
+      if (!executeRecaptcha) {
+        throw new Error('executeRecaptcha not available');
+      }
+
+      const recaptchaToken = await executeRecaptcha();
+
+      if (recaptchaToken) {
+        const res = await fetch('/api/post_recaptcha_query', {
+          method: 'POST',
+          body: JSON.stringify({
+            recaptchaToken,
+          }),
+        });
+
+        const jsonRes: IReCaptchaRes = await res.json();
+
+        if (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5) {
+          handlePayWithCardStripeRedirect?.(rewardUsed);
+        } else {
+          throw new Error(
+            jsonRes?.errors
+              ? Array.isArray(jsonRes?.errors)
+                ? jsonRes.errors[0]?.toString()
+                : jsonRes.errors?.toString()
+              : 'ReCaptcha failed'
+          );
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
@@ -101,9 +151,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
           <SPayButtonDiv>
             <SPayButton
               view='primaryGrad'
-              onClick={() => {
-                handlePayWithCardStripeRedirect?.(rewardUsed);
-              }}
+              onClick={() => handlePayWithCaptchaProtection()}
             >
               {t('payButton')}
               {amount &&
@@ -124,6 +172,17 @@ const PaymentModal: React.FC<IPaymentModal> = ({
                 {t('tocApplyText')}
               </STocApply>
             )}
+            <STocApplyReCaptcha>
+              {t('reCaptchaTos.siteProtectedBy')}{' '}
+              <a target='_blank' href='https://policies.google.com/privacy'>
+                {t('reCaptchaTos.privacyPolicy')}
+              </a>{' '}
+              {t('reCaptchaTos.and')}{' '}
+              <a target='_blank' href='https://policies.google.com/terms'>
+                {t('reCaptchaTos.tos')}
+              </a>{' '}
+              {t('reCaptchaTos.apply')}
+            </STocApplyReCaptcha>
           </SPayButtonDiv>
         </SContentContainer>
       </SWrapper>
@@ -317,4 +376,33 @@ const STocApply = styled.div`
   }
 `;
 
-const SOptionsContainer = styled.div``;
+const STocApplyReCaptcha = styled.div`
+  margin-top: 4px;
+
+  text-align: center;
+
+  font-weight: 600;
+  font-size: 8px;
+  line-height: 10px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  a {
+    font-weight: 600;
+
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+    &:hover,
+    &:focus {
+      outline: none;
+      color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+      transition: 0.2s ease;
+    }
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 8px;
+    line-height: 12px;
+  }
+`;

@@ -62,11 +62,11 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
 
   const postTypeText = useCallback(() => {
     if (postData) {
-      if (postData.auction) return 'Event';
+      if (postData.auction) return 'Bid';
       if (postData.crowdfunding) return 'Goal';
       return 'Superpoll';
     }
-    return 'Event';
+    return 'Bid';
   }, [postData]);
 
   interface IItemButtonAttrs extends NamedNodeMap {
@@ -164,6 +164,8 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
 
     if (post.expiresAt === '1-hour') {
       dateValue.add(1, 'h');
+    } else if (post.expiresAt === '3-hours') {
+      dateValue.add(3, 'h');
     } else if (post.expiresAt === '6-hours') {
       dateValue.add(6, 'h');
     } else if (post.expiresAt === '12-hours') {

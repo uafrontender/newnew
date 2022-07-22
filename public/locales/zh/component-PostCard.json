@@ -4,7 +4,7 @@
       "ac": "已出價{{amount}}",
       "mc": "{{votes}} 票",
       "mcSingular": "{{votes}} 票",
-      "cf": "{{backed}} 人已支持，共需 {{total}} 位支持者"
+      "cf": "支持者數: {{backed}}/{{total}}"
     },
     "withoutActivity": {
       "ac": "現在出價",
@@ -12,7 +12,7 @@
       "cf": "支持該Goal"
     },
     "seeResults": {
-      "ac": "查看Event",
+      "ac": "查看Bid",
       "mc": "查看Superpoll",
       "cf": "查看Goal"
     }

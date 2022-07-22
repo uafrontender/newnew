@@ -56,6 +56,8 @@ import ReportModal, { ReportData } from '../../chat/ReportModal';
 import { reportEventOption } from '../../../../api/endpoints/report';
 import { deleteAcOption } from '../../../../api/endpoints/auction';
 import AcConfirmDeleteOptionModal from './moderation/AcConfirmDeleteOptionModal';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -429,8 +431,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         $isDisabled={disabled && votingAllowed}
         $isBlue={isBlue}
         onClick={(e) => {
-          if (!isMobile && !disabled && !isEllipseMenuOpen) {
-            console.log(isMyBid);
+          if (!isMobile && !isEllipseMenuOpen) {
             setIsEllipseMenuOpen(true);
 
             setOptionMenuXY({
@@ -500,6 +501,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                               ? theme.colorsThemed.accent.yellow
                               : theme.colors.dark,
                         }
+                      : isMyBid && option.isCreatedBySubscriber
+                      ? {
+                          color: theme.colorsThemed.accent.yellow,
+                        }
                       : {}),
                     ...(!isMyBid
                       ? {
@@ -528,6 +533,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                           theme.name === 'dark'
                             ? theme.colorsThemed.accent.yellow
                             : theme.colors.dark,
+                      }
+                    : isMyBid && option.isCreatedBySubscriber
+                    ? {
+                        color: theme.colorsThemed.accent.yellow,
                       }
                     : {}),
                 }}
@@ -568,6 +577,13 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             view='quaternary'
             disabled={disabled}
             isBlue={isBlue}
+            onClickCapture={() => {
+              Mixpanel.track('Boost Click', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'AcOptionCard',
+              });
+            }}
             onClick={(e) => {
               e.stopPropagation();
               handleOpenSupportForm();
@@ -584,6 +600,13 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             view='secondary'
             disabled={disabled}
             isBlue={isBlue}
+            onClickCapture={() => {
+              Mixpanel.track('Boost Click', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'AcOptionCard',
+              });
+            }}
             onClick={(e) => {
               e.stopPropagation();
               handleOpenSupportForm();
@@ -646,6 +669,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                   ? true
                   : parseInt(supportBidAmount) < minAmount
               }
+              onClickCapture={() => {
+                Mixpanel.track('Submit Boost', {
+                  _stage: 'Post',
+                  _component: 'AcOptionCard',
+                });
+              }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
               {t('acPost.optionsTab.optionCard.raiseBidButton')}
@@ -653,6 +682,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             <SCancelButton
               view='transparent'
               iconOnly
+              onClickCapture={() => {
+                Mixpanel.track('Cancel Boost', {
+                  _stage: 'Post',
+                  _component: 'AcOptionCard',
+                });
+              }}
               onClick={() => handleCloseSupportForm()}
             >
               <InlineSvg
@@ -748,7 +783,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
-              {postText}
+              <PostTitleContent>{postText}</PostTitleContent>
             </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
               {t('acPost.paymentModalHeader.subtitle')}
@@ -1201,7 +1236,7 @@ const SPaymentTerms = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap;
 `;
 
 const SEllipseButtonMobile = styled(Button)`

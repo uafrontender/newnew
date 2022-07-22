@@ -17,6 +17,7 @@ import { SCROLL_EXPLORE } from '../../../constants/timings';
 
 import assets from '../../../constants/assets';
 import AnimationChain from '../../atoms/AnimationChain';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 export const HeroSection = React.memo(() => {
   const theme = useTheme();
@@ -31,19 +32,20 @@ export const HeroSection = React.memo(() => {
     resizeMode
   );
   const handleExploreClick = () => {
+    Mixpanel.track('Explore Now Clicked', {
+      _stage: 'Hero Section',
+    });
     if (document.getElementsByName('topSection').length > 0) {
       scroller.scrollTo('topSection', {
         offset: isMobile ? -20 : -100,
         smooth: 'ease',
         duration: SCROLL_EXPLORE,
-        containerId: 'generalScrollContainer',
       });
     } else {
-      scroller.scrollTo('ac', {
+      scroller.scrollTo('mc', {
         offset: isMobile ? -20 : -100,
         smooth: 'ease',
         duration: SCROLL_EXPLORE,
-        containerId: 'generalScrollContainer',
       });
     }
   };
@@ -100,7 +102,7 @@ export const HeroSection = React.memo(() => {
               delay={0.4}
               onAnimationEnd={handleTitleAnimationEnd}
             >
-              {t('heroSection.title')}
+              {t('heroSection.title') as string}
             </AnimatedPresence>
           </SHeadline>
           <SSubTitle weight={600}>
@@ -118,7 +120,16 @@ export const HeroSection = React.memo(() => {
                 <>
                   <Link href='/sign-up?to=log-in'>
                     <a>
-                      <SButton withDim withShrink view='secondary'>
+                      <SButton
+                        withDim
+                        withShrink
+                        view='secondary'
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _button: 'Sign in',
+                          });
+                        }}
+                      >
                         {t('heroSection.signIn')}
                       </SButton>
                     </a>

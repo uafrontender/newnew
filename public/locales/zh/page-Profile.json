@@ -210,6 +210,20 @@
           }
         }
       },
+      "cards": {
+        "title": "我的銀行卡",
+        "myPaymentMethods": "我的付款方式",
+        "hint": "你的檔案中須有銀行卡才能參加帖子",
+        "button": {
+          "addNewCard": "添加一張新卡",
+          "addCard": "添加銀行卡"
+        },
+        "primary": "主卡",
+        "ellipse": {
+          "makePrimary": "設為主卡",
+          "removeCard": "刪除卡"
+        }
+      },
       "personalInformation": {
         "title": "個人資訊",
         "emailInput": {
@@ -218,7 +232,11 @@
           "errors": {
             "invalidEmail": "請輸入有效的電子郵件地址",
             "emailTaken": "電子郵件已被佔用"
-          }
+          },
+          "whatsNew": "你的新電子郵件地址是什麼？",
+          "confirmEmail": "確認新電子郵件",
+          "verifyNewEmail": "驗證新電子郵件",
+          "edit": "編輯"
         },
         "birthDateInput": {
           "label": "出生日期",
@@ -244,7 +262,7 @@
         "title": "交易",
         "you": "你",
         "type": {
-          "1": "Event",
+          "1": "Bid",
           "2": "Superpoll",
           "3": "Goal"
         },
@@ -262,11 +280,11 @@
         "privacySubsections": {
           "spendings": {
             "title": "不讓別人查看我的消費",
-            "caption": "別人將無法看到你在Event、Superpoll和Goal上的花費"
+            "caption": "別人將無法看到你在Bid、Superpoll和Goal上的花費"
           },
           "private": {
             "title": "將我的活動設為隱秘",
-            "caption": "人們將無法看到你在Event、Superpoll和Goal上的任何活動"
+            "caption": "人們將無法看到你在Bid、Superpoll和Goal上的任何活動"
           }
         },
         "blockedUsers": {

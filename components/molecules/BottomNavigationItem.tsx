@@ -1,5 +1,5 @@
 import React from 'react';
-import { scroller } from 'react-scroll';
+import { animateScroll } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -68,14 +68,14 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
 
   const handleClick = (value: any) => {
     if (router.pathname === '/' && item.url === '/') {
-      scroller.scrollTo('top-reload', {
+      animateScroll.scrollToTop({
         smooth: 'easeInOutQuart',
         duration: SCROLL_TO_TOP,
-        containerId: 'generalScrollContainer',
       });
     }
     if (value.key === 'add') {
-      Mixpanel.track('Navigation Item Clicked ', {
+      Mixpanel.track('Navigation Item Clicked', {
+        _stage: 'Creation',
         _button: 'New Post',
       });
     }

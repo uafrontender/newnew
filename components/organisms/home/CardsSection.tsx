@@ -22,6 +22,7 @@ import switchPostType from '../../../utils/switchPostType';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 import TutorialCard from '../../molecules/TutorialCard';
 import { usePostModalState } from '../../../contexts/postModalContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const SCROLL_STEP = {
   tablet: 3,
@@ -212,6 +213,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     };
 
     const handleSeeMoreClick = () => {
+      Mixpanel.track('See More in Category Clicked');
       if (type === 'default') {
         router.push(`/see-more?category=${category}`);
       }

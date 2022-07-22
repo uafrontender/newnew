@@ -10,7 +10,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -56,6 +56,7 @@ import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
 import PostEllipseMenuModeration from '../../molecules/decision/PostEllipseMenuModeration';
 import PostEllipseModalModeration from '../../molecules/decision/PostEllipseModalModeration';
 import PostConfirmDeleteModal from '../../molecules/decision/PostConfirmDeleteModal';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
 // Posts views
@@ -180,6 +181,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     [postStatus]
   );
 
+  const postStatusesToUseHideInsteadOfDelete = useMemo(
+    () => ['succeeded', 'failed', 'deleted_by_creator', 'deleted_by_admin'],
+    []
+  );
+
   const shouldRenderVotingFinishedModal = useMemo(
     () =>
       postStatus === 'succeeded' ||
@@ -202,6 +208,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const handleFollowDecision = useCallback(async () => {
     try {
+      Mixpanel.track('Favorite Post', {
+        _stage: 'Post',
+        _postUuid: postParsed?.postUuid,
+      });
       if (!user.loggedIn) {
         router.push(
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
@@ -288,22 +298,43 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const handleDeletePost = useCallback(async () => {
     try {
-      const payload = new newnewapi.DeleteMyPostRequest({
-        postUuid: postParsed?.postUuid,
-      });
+      // "Hide" Post instead of deleting it
+      if (postStatusesToUseHideInsteadOfDelete.includes(postStatus)) {
+        const payload = new newnewapi.MarkPostRequest({
+          postUuid: postParsed?.postUuid,
+          markAs: newnewapi.MarkPostRequest.Kind.HIDDEN,
+        });
 
-      const res = await deleteMyPost(payload);
+        const res = await markPost(payload);
 
-      if (!res.error) {
-        console.log('Post deleted/cancelled');
-        handleUpdatePostStatus('DELETED_BY_CREATOR');
-        handleRemovePostFromState?.();
-        handleCloseDeletePostModal();
+        if (!res.error) {
+          handleUpdatePostStatus('DELETED_BY_CREATOR');
+          handleRemovePostFromState?.();
+          handleCloseDeletePostModal();
+        }
+      } else {
+        const payload = new newnewapi.DeleteMyPostRequest({
+          postUuid: postParsed?.postUuid,
+        });
+
+        const res = await deleteMyPost(payload);
+
+        if (!res.error) {
+          handleUpdatePostStatus('DELETED_BY_CREATOR');
+          handleRemovePostFromState?.();
+          handleCloseDeletePostModal();
+        }
       }
     } catch (err) {
       console.error(err);
     }
-  }, [handleRemovePostFromState, handleUpdatePostStatus, postParsed?.postUuid]);
+  }, [
+    handleRemovePostFromState,
+    handleUpdatePostStatus,
+    postParsed?.postUuid,
+    postStatus,
+    postStatusesToUseHideInsteadOfDelete,
+  ]);
 
   useEffect(() => {
     if (commentIdFromUrl) {
@@ -329,8 +360,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [recommendedPosts, setRecommendedPosts] = useState<newnewapi.Post[]>(
     []
   );
-  const [nextPageToken, setNextPageToken] =
-    useState<string | null | undefined>('');
+  const [nextPageToken, setNextPageToken] = useState<string | null | undefined>(
+    ''
+  );
   const [recommendedPostsLoading, setRecommendedPostsLoading] = useState(false);
   const [triedLoading, setTriedLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
@@ -346,7 +378,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (currLocation === 'forced_redirect_to_home') {
       innerHistoryStack.current = [];
       handleClose();
-      router.push('/');
       return;
     }
 
@@ -357,12 +388,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     currLocation,
     handleClose,
     isConfirmToClosePost,
-    router,
     syncedHistoryPushState,
     t,
   ]);
 
   const handleGoBackInsidePost = useCallback(() => {
+    Mixpanel.track('Go Back Inside Post', {
+      _stage: 'Post Modal',
+    });
     if (
       isConfirmToClosePost &&
       !window.confirm(t('postVideo.cannotLeavePageMsg'))
@@ -386,6 +419,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   ]);
 
   const handleSeeNewDeletedBox = useCallback(() => {
+    Mixpanel.track('Post Failed Button Click', {
+      _stage: 'Post',
+    });
     if (recommendedPosts.length > 0) {
       document.getElementById('post-modal-container')?.scrollTo({
         top: document.getElementById('recommendations-section-heading')
@@ -400,6 +436,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const handleOpenRecommendedPost = useCallback(
     (newPost: newnewapi.Post) => {
       const newPostParsed = switchPostType(newPost)[0];
+      Mixpanel.track('Open Another Post', {
+        _stage: 'Post',
+        _postUuid: newPostParsed.postUuid,
+      });
       handleOpenAnotherPost?.(newPost);
       if (post !== undefined)
         innerHistoryStack.current.push(post as newnewapi.Post);
@@ -823,6 +863,15 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     return (
       <SPostSuccessWaitingControlsDiv
         variant='moderation'
+        style={{
+          ...(isMobile &&
+          (postStatus === 'deleted_by_admin' ||
+            postStatus === 'deleted_by_creator')
+            ? {
+                marginTop: 64,
+              }
+            : {}),
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <SWaitingSuccessControlsBtn
@@ -839,36 +888,45 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             height='24px'
           />
         </SWaitingSuccessControlsBtn>
-        <SWaitingSuccessControlsBtn
-          view='secondary'
-          iconOnly
-          onClick={() => setShareMenuOpen(true)}
-          ref={shareButtonRef}
-        >
-          <InlineSvg
-            svg={ShareIcon}
-            fill={
-              theme.name === 'light' ? theme.colors.dark : theme.colors.white
-            }
-            width='24px'
-            height='24px'
-          />
-        </SWaitingSuccessControlsBtn>
-        <SWaitingSuccessControlsBtn
-          view='secondary'
-          iconOnly
-          onClick={() => setEllipseMenuOpen(true)}
-          ref={moreButtonRef}
-        >
-          <InlineSvg
-            svg={MoreIcon}
-            fill={
-              theme.name === 'light' ? theme.colors.dark : theme.colors.white
-            }
-            width='24px'
-            height='24px'
-          />
-        </SWaitingSuccessControlsBtn>
+        {postStatus !== 'deleted_by_admin' &&
+          postStatus !== 'deleted_by_creator' && (
+            <>
+              <SWaitingSuccessControlsBtn
+                view='secondary'
+                iconOnly
+                onClick={() => setShareMenuOpen(true)}
+                ref={shareButtonRef}
+              >
+                <InlineSvg
+                  svg={ShareIcon}
+                  fill={
+                    theme.name === 'light'
+                      ? theme.colors.dark
+                      : theme.colors.white
+                  }
+                  width='24px'
+                  height='24px'
+                />
+              </SWaitingSuccessControlsBtn>
+              <SWaitingSuccessControlsBtn
+                view='secondary'
+                iconOnly
+                onClick={() => setEllipseMenuOpen(true)}
+                ref={moreButtonRef}
+              >
+                <InlineSvg
+                  svg={MoreIcon}
+                  fill={
+                    theme.name === 'light'
+                      ? theme.colors.dark
+                      : theme.colors.white
+                  }
+                  width='24px'
+                  height='24px'
+                />
+              </SWaitingSuccessControlsBtn>
+            </>
+          )}
         {/* Share menu */}
         {!isMobile && postParsed?.postUuid && (
           <PostShareEllipseMenu
@@ -891,7 +949,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           <PostEllipseMenuModeration
             postType={typeOfPost as string}
             isVisible={ellipseMenuOpen}
-            canDeletePost={postStatus !== 'failed'}
+            canDeletePost
             handleClose={handleEllipseMenuClose}
             handleOpenDeletePostModal={handleOpenDeletePostModal}
             anchorElement={moreButtonRef.current}
@@ -901,7 +959,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           <PostEllipseModalModeration
             postType={typeOfPost as string}
             zIndex={11}
-            canDeletePost={postStatus !== 'failed'}
+            canDeletePost
             isOpen={ellipseMenuOpen}
             onClose={handleEllipseMenuClose}
             handleOpenDeletePostModal={handleOpenDeletePostModal}
@@ -1151,7 +1209,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   if (shouldRenderVotingFinishedModal && !isMyPost) {
     return (
       <>
-        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
+        <Modal
+          withoutOverlay
+          show={open}
+          overlaydim
+          onClose={() => handleCloseAndGoBack()}
+        >
           {postStatus === 'succeeded' && !isMobile && (
             <PostSuccessAnimationBackground />
           )}
@@ -1212,7 +1275,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   if (isMyPost) {
     return (
       <>
-        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
+        <Modal
+          withoutOverlay
+          show={open}
+          overlaydim
+          onClose={() => handleCloseAndGoBack()}
+        >
           {(postStatus === 'succeeded' ||
             postStatus === 'waiting_for_response') &&
             !isMobile && <PostSuccessAnimationBackground />}
@@ -1263,6 +1331,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                   }
                   buttonCaption={t('postDeletedByMe.buttonText')}
                   handleButtonClick={() => {
+                    Mixpanel.track('Post Failed Redirect to Creation', {
+                      _stage: 'Post',
+                    });
                     router.push('/creation');
                   }}
                 />
@@ -1278,7 +1349,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   // Render regular Decision view
   return (
     <>
-      <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
+      <Modal
+        withoutOverlay
+        show={open}
+        overlaydim
+        onClose={() => handleCloseAndGoBack()}
+      >
         <Head>
           <title>{t(`meta.${typeOfPost}.title`)}</title>
           <meta
@@ -1459,35 +1535,19 @@ const SPostModalContainer = styled.div<{
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     width: 100%;
     height: calc(100% - 64px);
-
-    ${({ isMyPost }) =>
-      isMyPost
-        ? css`
-            height: initial;
-            max-height: 100%;
-          `
-        : null}
   }
 
   ${({ theme }) => theme.media.laptop} {
     top: 32px;
     left: calc(50% - 496px);
     width: 992px;
-    height: calc(100% - 32px);
+    height: calc(100% - 64px);
     max-height: ${({ loaded }) => (loaded ? 'unset' : '840px')};
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 24px;
     padding-bottom: 24px;
-
-    ${({ isMyPost }) =>
-      isMyPost
-        ? css`
-            height: initial;
-            max-height: 100%;
-          `
-        : null}
   }
 `;
 

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import InlineSvg from '../../atoms/InlineSVG';
 import EllipseMenu from '../../atoms/EllipseMenu';
@@ -15,6 +15,7 @@ import tiktokIcon from '../../../public/images/svg/icons/socials/TikTok.svg';
 import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -91,7 +92,10 @@ const PostShareEllipseMenu: React.FunctionComponent<IPostShareEllipseMenu> =
     const handlerCopy = useCallback(() => {
       if (window) {
         const url = `${window.location.origin}/post/${postId}`;
-
+        Mixpanel.track('Copied Link Post', {
+          _stage: 'Post',
+          _postUuid: postId,
+        });
         copyPostUrlToClipboard(url)
           .then(() => {
             setIsCopiedUrl(true);
@@ -140,6 +144,12 @@ export default PostShareEllipseMenu;
 const SEllipseMenu = styled(EllipseMenu)`
   position: fixed;
   width: 260px;
+
+  ${({ theme }) =>
+    theme.name === 'light' &&
+    css`
+      box-shadow: 0px 0px 35px 0px rgba(0, 0, 0, 0.25);
+    `}
 `;
 
 const SSocials = styled.div`

@@ -24,6 +24,8 @@ import PaymentModal from '../../checkout/PaymentModal';
 import SuggestionActionMobileModal from '../OptionActionMobileModal';
 
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 interface IAcOptionTopInfo {
   creator: newnewapi.IUser;
@@ -313,6 +315,12 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
             disabled={
               !supportBidAmount ? true : parseInt(supportBidAmount) < minAmount
             }
+            onClickCapture={() => {
+              Mixpanel.track('Place Bid', {
+                _stage: 'Post',
+                _component: 'AcOptionTopInfo',
+              });
+            }}
             onClick={() => handleTogglePaymentModalOpen()}
           >
             {t('acPost.optionsTab.optionCard.placeABidButton')}
@@ -343,6 +351,12 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
               view='primaryGrad'
               size='sm'
               disabled={!supportBidAmount}
+              onClickCapture={() => {
+                Mixpanel.track('Place Bid', {
+                  _stage: 'Post',
+                  _component: 'AcOptionsTab',
+                });
+              }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
               {t('acPost.optionsTab.optionCard.placeABidButton')}
@@ -365,7 +379,9 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
             <SPaymentModalTitle variant={3}>
               {t('acPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
-            <SPaymentModalOptionText>{option.title}</SPaymentModalOptionText>
+            <SPaymentModalOptionText>
+              <PostTitleContent>{option.title}</PostTitleContent>
+            </SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>
       ) : null}

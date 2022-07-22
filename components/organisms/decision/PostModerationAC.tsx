@@ -41,6 +41,7 @@ import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
 import useResponseUpload from '../../../utils/hooks/useResponseUpload';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
@@ -97,6 +98,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       post.winningOptionId ?? undefined
     );
 
+    // Announcement
+    const [announcement, setAnnouncement] = useState(post.announcement);
+
     // Comments
     const { ref: commentsSectionRef, inView } = useInView({
       threshold: 0.8,
@@ -115,8 +119,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     };
 
     // Response upload
-    const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
-      useState<newnewapi.IVideoUrls | undefined>(undefined);
+    const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<
+      newnewapi.IVideoUrls | undefined
+    >(undefined);
 
     // Tabs
     const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
@@ -166,14 +171,16 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
       post.optionCount ?? ''
     );
-    const [optionsNextPageToken, setOptionsNextPageToken] =
-      useState<string | undefined | null>('');
+    const [optionsNextPageToken, setOptionsNextPageToken] = useState<
+      string | undefined | null
+    >('');
     const [optionsLoading, setOptionsLoading] = useState(false);
     const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
     // Winning option
-    const [winningOption, setWinningOption] =
-      useState<newnewapi.Auction.Option | undefined>();
+    const [winningOption, setWinningOption] = useState<
+      newnewapi.Auction.Option | undefined
+    >();
 
     const handleUpdateWinningOption = (
       selectedOption: newnewapi.Auction.Option
@@ -335,6 +342,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           if (!responseFreshlyUploaded && res.data.auction?.response) {
             setResponseFreshlyUploaded(res.data.auction.response);
           }
+          setAnnouncement(res.data.auction?.announcement);
         }
       } catch (err) {
         console.error(err);
@@ -344,6 +352,11 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
 
     const handleRemoveOption = useCallback(
       (optionToRemove: newnewapi.Auction.Option) => {
+        Mixpanel.track('Removed Option', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostModerationAC',
+        });
         setOptions((curr) => {
           const workingArr = [...curr];
           const workingArrUnsorted = [
@@ -352,7 +365,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           return sortOptions(workingArrUnsorted);
         });
       },
-      [setOptions, sortOptions]
+      [setOptions, sortOptions, post.postUuid]
     );
 
     // Increment channel subs after mounting
@@ -391,7 +404,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             setWinningOption(res.data.option as newnewapi.Auction.Option);
           }
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       }
 
@@ -623,8 +636,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             )}
           </SExpiresSection>
           <PostVideoModeration
+            key={`key_${announcement?.coverImageUrl}`}
             postId={post.postUuid}
-            announcement={post.announcement!!}
+            announcement={announcement!!}
             response={(post.response || responseFreshlyUploaded) ?? undefined}
             thumbnails={{
               startTime: 1,

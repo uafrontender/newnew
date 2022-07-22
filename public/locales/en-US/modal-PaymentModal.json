@@ -14,5 +14,12 @@
   "rewardsText": "Use my rewards",
   "payButton": "Pay",
   "tocApplyLink": "Terms",
-  "tocApplyText": "apply"
+  "tocApplyText": "apply",
+  "reCaptchaTos": {
+    "siteProtectedBy": "This site is protected by reCAPTCHA and the Google",
+    "privacyPolicy": "Privacy Policy",
+    "and": "and",
+    "tos": "Terms of Service",
+    "apply": "apply."
+  }
 }

@@ -19,21 +19,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import { useAppSelector } from '../../../redux-store/store';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import PostResponseSuccessModal from './PostResponseSuccessModal';
-
-// postResponseTabModeration
-// awaiting
-// topHeader
-// postResponseBtn
-
-// succeeded
-// shareBtn
-// linkCopied
-
-// winner
-// mc
-// numBiddersChose
-// optionOwn
-// optionCreator
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 interface IPostResponseTabModeration {
   postId: string;
@@ -244,6 +230,7 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
                     <Trans
                       i18nKey='postResponseTabModeration.winner.ac.optionCreator'
                       t={t}
+                      // Can it be reworked wso it uses t inside the Link element (without Trans element)?
                       // @ts-ignore
                       components={[
                         <SCreatorLink
@@ -286,6 +273,7 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
                         src={winningOptionMc?.creator?.avatarUrl!!}
                       />
                       <SSpan>
+                        {/* Can it be reworked wso it uses t inside the Link element (without Trans element)? */}
                         <Trans
                           i18nKey='postResponseTabModeration.winner.mc.optionCreator'
                           t={t}
@@ -318,7 +306,9 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
                 {t('postResponseTabModeration.winner.inResponseToYourPost')}
               </SSpan>
             </SText>
-            <SHeadline variant={5}>{postTitle}</SHeadline>
+            <SHeadline variant={5}>
+              <PostTitleContent>{postTitle}</PostTitleContent>
+            </SHeadline>
           </STextContentWrapper>
           <SShareButton onClick={handleCopyLink}>
             {isCopiedUrl
@@ -500,7 +490,9 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
               {t('postResponseTabModeration.winner.inResponseToYourPost')}
             </SSpan>
           </SText>
-          <SHeadline variant={5}>{postTitle}</SHeadline>
+          <SHeadline variant={5}>
+            <PostTitleContent>{postTitle}</PostTitleContent>
+          </SHeadline>
         </STextContentWrapper>
         <SUploadButton
           disabled={responseUploading || !responseReadyToBeUploaded}
@@ -529,9 +521,11 @@ const SCreatorLink = styled.a`
 `;
 
 const SContainer = styled.div`
-  display: grid;
-
   height: 100%;
+
+  ${({ theme }) => theme.media.tablet} {
+    display: grid;
+  }
 `;
 
 const SHeaderDiv = styled.div`
@@ -715,6 +709,8 @@ const SShareButton = styled(Button)`
   align-self: end;
   position: static;
   width: 100%;
+
+  margin-top: 16px;
 
   background-color: ${({ theme }) =>
     theme.name === 'light' ? theme.colors.dark : '#FFFFFF'};

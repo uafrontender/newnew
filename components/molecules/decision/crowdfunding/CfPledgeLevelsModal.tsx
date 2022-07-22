@@ -18,7 +18,6 @@ import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import LoadingModal from '../../LoadingModal';
 import InlineSvg from '../../../atoms/InlineSVG';
-import PaymentModal from '../../checkout/PaymentModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 
@@ -27,6 +26,8 @@ import getDisplayname from '../../../../utils/getDisplayname';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import EllipseModal, { EllipseModalButton } from '../../../atoms/EllipseModal';
+import PostTitleContent from '../../../atoms/PostTitleContent';
+import PaymentModal from '../../checkout/PaymentModal';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsModal {
@@ -57,8 +58,9 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 
   // const { walletBalance } = useContext(WalletContext);
 
-  const [pledgeAmount, setPledgeAmount] =
-    useState<number | undefined>(undefined);
+  const [pledgeAmount, setPledgeAmount] = useState<number | undefined>(
+    undefined
+  );
 
   const [customPledgeAmount, setCustomPledgeAmount] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -268,7 +270,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
                     p.usdCents ? p.usdCents : 0
                   );
                 }}
-              >{`${(p.usdCents / 100).toFixed(0)}`}</EllipseModalButton>
+              >{`$${(p.usdCents / 100).toFixed(0)}`}</EllipseModalButton>
             ) : null
           )
           .concat(
@@ -387,7 +389,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalOptionText variant={5}>
-              {post.title}
+              <PostTitleContent>{post.title}</PostTitleContent>
             </SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>
@@ -500,5 +502,5 @@ const SPaymentTerms = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap;
 `;

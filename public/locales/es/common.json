@@ -37,7 +37,7 @@
     "cancel": "Cancelar"
   },
   "postType": {
-    "ac": "Event",
+    "ac": "Bid",
     "mc": "Superpoll",
     "cf": "Goal"
   },
@@ -154,6 +154,25 @@
   },
   "creatorCard": {
     "subscriptionCost": "${{amount}} Mensual"
+  },
+  "sortingOption": {
+    "sortingtype": "Ordenar",
+    "sortingtype-all": "Todos",
+    "sortingtype-num_bids": "Participantes",
+    "sortingtype-num_bids-ac": "Número de ofertas",
+    "sortingtype-num_bids-mc": "Número de votos",
+    "sortingtype-num_bids-cf": "Número de patrocinadores",
+    "sortingtype-newest": "Más reciente",
+    "bid": "Oferta",
+    "bid-lowest": "Más baja",
+    "bid-highest": "Más alta",
+    "time": "Tiempo",
+    "time-ending-soon": "Terminando pronto",
+    "time-newest": "Más reciente",
+    "time-oldest": "Más antigüa",
+    "numbers-of-bids": "Número de ofertas",
+    "numbers-of-bids-fewest": "El menor número de ofertas primero",
+    "numbers-of-bids-most-first": "El mayor número de ofertas primero"
   },
   "rewards": {
     "earned_NEED_TRANSLATION": "earned ${{value}}",

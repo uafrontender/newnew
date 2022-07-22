@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import Link from 'next/link';
@@ -43,46 +43,22 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
 
   const handleMenuClick = () => setMoreMenuOpen(!moreMenuOpen);
 
-  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
-
-  async function copyPostUrlToClipboard(url: string) {
-    if ('clipboard' in navigator) {
-      await navigator.clipboard.writeText(url);
-    } else {
-      document.execCommand('copy', true, url);
-    }
-  }
-
-  const handlerCopy = useCallback(() => {
-    if (window) {
-      const url = `${window.location.origin}/${user.userData?.username}`;
-
-      copyPostUrlToClipboard(url)
-        .then(() => {
-          setIsCopiedUrl(true);
-          setTimeout(() => {
-            setIsCopiedUrl(false);
-          }, 1500);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <SContainer>
       <Logo />
       <SRightBlock>
         {user.loggedIn && (
           <>
-            {user.userData?.options?.isOfferingSubscription && (
-              <SItemWithMargin>
-                <SNavText variant={3} weight={600} onClick={handlerCopy}>
-                  {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}
-                </SNavText>
-              </SItemWithMargin>
+            {user.userData?.options?.isCreator && (
+              <Link href='/creator/dashboard'>
+                <a>
+                  <SDashboardButton>
+                    <SNavText variant={3} weight={600}>
+                      {t('button.dashboard')}
+                    </SNavText>
+                  </SDashboardButton>
+                </a>
+              </Link>
             )}
             {((user.userData?.options?.isOfferingSubscription &&
               mySubscribersTotal > 0) ||
@@ -145,7 +121,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                         view='primaryGrad'
                         withShadow={!globalSearchActive}
                         onClick={() => {
-                          Mixpanel.track('Navigation Item Clicked ', {
+                          Mixpanel.track('Navigation Item Clicked', {
                             _button: 'New Post',
                           });
                         }}
@@ -223,7 +199,16 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
             <SItemWithMargin>
               <Link href='/sign-up?to=log-in'>
                 <a>
-                  <Button view='quaternary'>{t('button.loginIn')}</Button>
+                  <Button
+                    view='quaternary'
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Log in',
+                      });
+                    }}
+                  >
+                    {t('button.loginIn')}
+                  </Button>
                 </a>
               </Link>
             </SItemWithMargin>
@@ -235,6 +220,11 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                     withShrink
                     view='primaryGrad'
                     withShadow={!globalSearchActive}
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Sign up',
+                      });
+                    }}
                   >
                     {t('button.signUp')}
                   </Button>
@@ -278,4 +268,15 @@ const SNavText = styled(Text)`
   opacity: 0.5;
   transition: opacity ease 0.5s;
   cursor: pointer;
+`;
+
+const SDashboardButton = styled.button`
+  padding: 8px 16px;
+  background: transparent;
+  border: 0;
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  &:focus {
+    outline: none;
+  }
 `;

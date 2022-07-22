@@ -210,6 +210,20 @@
           }
         }
       },
+      "cards": {
+        "title_NEED_TRANSLATION": "My cards",
+        "myPaymentMethods_NEED_TRANSLATION": "My payment methods",
+        "hint_NEED_TRANSLATION": "You’ll need a card on file to participate in posts",
+        "button": {
+          "addNewCard_NEED_TRANSLATION": "Add a new card",
+          "addCard_NEED_TRANSLATION": "Add card"
+        },
+        "primary_NEED_TRANSLATION": "Primary",
+        "ellipse": {
+          "makePrimary_NEED_TRANSLATION": "Make it primary",
+          "removeCard_NEED_TRANSLATION": "Remove card"
+        }
+      },
       "personalInformation": {
         "title": "Información personal",
         "emailInput": {
@@ -218,7 +232,11 @@
           "errors": {
             "invalidEmail": "Por favor, introduce un correo electrónico válido",
             "emailTaken": "Alguien ya registró ese correo electrónico"
-          }
+          },
+          "whatsNew_NEED_TRANSLATION": "What’s your new email address?",
+          "confirmEmail_NEED_TRANSLATION": "Confirm new email",
+          "verifyNewEmail_NEED_TRANSLATION": "Verify your new email",
+          "edit_NEED_TRANSLATION": "Edit"
         },
         "birthDateInput": {
           "label": "Fecha de nacimiento",
@@ -244,7 +262,7 @@
         "title": "Transacciones",
         "you": "Tú",
         "type": {
-          "1": "event",
+          "1": "bid",
           "2": "superpoll",
           "3": "goal"
         },
@@ -262,11 +280,11 @@
         "privacySubsections": {
           "spendings": {
             "title": "Ocultar mis gastos a los demás",
-            "caption": "Las personas no podrán ver cuánto has gastado en Events, Supergoals ni en Goals."
+            "caption": "Las personas no podrán ver cuánto has gastado en Bids, Supergoals ni en Goals."
           },
           "private": {
             "title": "Hacer mi actividad privada",
-            "caption": "Las personas no podran ver tu actividad en Events, Supergoals ni en Goals."
+            "caption": "Las personas no podran ver tu actividad en Bids, Supergoals ni en Goals."
           }
         },
         "blockedUsers": {
