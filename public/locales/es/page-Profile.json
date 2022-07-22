@@ -211,17 +211,17 @@
         }
       },
       "cards": {
-        "title_NEED_TRANSLATION": "My cards",
-        "myPaymentMethods_NEED_TRANSLATION": "My payment methods",
-        "hint_NEED_TRANSLATION": "You’ll need a card on file to participate in posts",
+        "title": "Mis tarjetas",
+        "myPaymentMethods": "Mis métodos de pago",
+        "hint": "Necesitarás tener una tarjeta guardada para participar en las publicaciones",
         "button": {
-          "addNewCard_NEED_TRANSLATION": "Add a new card",
-          "addCard_NEED_TRANSLATION": "Add card"
+          "addNewCard": "Agregar nueva tarjeta",
+          "addCard": "Agregar tarjeta"
         },
-        "primary_NEED_TRANSLATION": "Primary",
+        "primary": "Primaria",
         "ellipse": {
-          "makePrimary_NEED_TRANSLATION": "Make it primary",
-          "removeCard_NEED_TRANSLATION": "Remove card"
+          "makePrimary": "Convertir en primaria",
+          "removeCard": "Remover tarjeta"
         }
       },
       "personalInformation": {
@@ -233,10 +233,10 @@
             "invalidEmail": "Por favor, introduce un correo electrónico válido",
             "emailTaken": "Alguien ya registró ese correo electrónico"
           },
-          "whatsNew_NEED_TRANSLATION": "What’s your new email address?",
-          "confirmEmail_NEED_TRANSLATION": "Confirm new email",
-          "verifyNewEmail_NEED_TRANSLATION": "Verify your new email",
-          "edit_NEED_TRANSLATION": "Edit"
+          "whatsNew": "¿Cuál es tu correo electrónico nuevo?",
+          "confirmEmail": "Confirma el nuevo correo electrónico",
+          "verifyNewEmail": "Verifica tu nuevo correo electrónico",
+          "edit": "Editar"
         },
         "birthDateInput": {
           "label": "Fecha de nacimiento",
