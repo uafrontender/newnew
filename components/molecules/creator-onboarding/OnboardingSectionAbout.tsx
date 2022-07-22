@@ -14,12 +14,10 @@ import GoBackButton from '../GoBackButton';
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import OnboardingBioTextarea from './OnboardingBioTextarea';
-import OnboardingTagsSelection from './OnboardingTagsSelection';
-import { setMyCreatorTags, updateMe } from '../../../api/endpoints/user';
+import { updateMe } from '../../../api/endpoints/user';
 import {
   logoutUserClearCookiesAndRedirect,
   setUserData,
-  setCreatorData,
 } from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
 
@@ -51,13 +49,10 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   return errorMsg;
 };
 
-interface IOnboardingSectionAbout {
-  availableTags: newnewapi.ICreatorTag[];
-  currentTags: newnewapi.ICreatorTag[];
-}
+interface IOnboardingSectionAbout {}
 
 const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
-  ({ availableTags, currentTags }) => {
+  () => {
     const router = useRouter();
     const { t } = useTranslation('page-CreatorOnboarding');
     const dispatch = useAppDispatch();
@@ -124,24 +119,18 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
     const handleUpdateBioInEdit = (
       e: React.ChangeEvent<HTMLTextAreaElement>
     ) => {
+      if (e.target.value.length > 0) {
+        e.target.value = e.target.value.trimStart();
+        if (
+          e.target.value.length > 1 &&
+          e.target.value[e.target.value.length - 2] === ' '
+        ) {
+          e.target.value = e.target.value.trimEnd();
+        }
+      }
       setBioInEdit(e.target.value);
 
       validateBioViaApiDebounced(e.target.value);
-    };
-
-    // Tags
-    const [selectedTags, setSelectedTags] = useState(currentTags);
-
-    const handleAddTag = (tag: newnewapi.ICreatorTag) => {
-      if (selectedTags.find((i) => i.id?.toString() === tag.id?.toString()))
-        return;
-      setSelectedTags((tags) => [...tags, tag]);
-    };
-
-    const handleRemoveTag = (tag: newnewapi.ICreatorTag) => {
-      setSelectedTags((tags) =>
-        tags.filter((i) => i.id?.toString() !== tag.id?.toString())
-      );
     };
 
     // Is form valid
@@ -166,21 +155,6 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
           })
         );
 
-        const updateTagsPayload = new newnewapi.SetMyCreatorTagsRequest({
-          tagIds: selectedTags.map((i) => i.id) as number[],
-        });
-
-        const updateTagsRes = await setMyCreatorTags(updateTagsPayload);
-
-        if (!updateTagsRes.data || updateTagsRes.error)
-          throw new Error(updateTagsRes.error?.message ?? 'Request failed');
-
-        dispatch(
-          setCreatorData({
-            hasCreatorTags: true,
-          })
-        );
-
         router.push('/creator-onboarding-stripe');
 
         setLoadingModalOpen(false);
@@ -198,15 +172,15 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
           );
         }
       }
-    }, [bioInEdit, dispatch, selectedTags, router]);
+    }, [bioInEdit, dispatch, router]);
 
     useEffect(() => {
-      if (selectedTags.length >= 3 && bioInEdit.length > 0 && bioError === '') {
+      if (bioInEdit.length > 0 && bioError === '') {
         setIsFormValid(true);
       } else {
         setIsFormValid(false);
       }
-    }, [selectedTags, bioError, bioInEdit]);
+    }, [bioError, bioInEdit]);
 
     return (
       <>
@@ -222,15 +196,6 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
                 placeholder={t('aboutSection.bio.placeholder')}
                 maxChars={150}
                 onChange={handleUpdateBioInEdit}
-              />
-            </SFormItemContainer>
-            <SSeparator />
-            <SFormItemContainer>
-              <OnboardingTagsSelection
-                availableTags={availableTags}
-                selectedTags={selectedTags}
-                handleAddTag={handleAddTag}
-                handleRemoveTag={handleRemoveTag}
               />
             </SFormItemContainer>
           </STopContainer>
@@ -264,7 +229,7 @@ export default OnboardingSectionAbout;
 const SContainer = styled.div`
   padding: 0 20px 20px;
   z-index: 2;
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   ${({ theme }) => theme.media.tablet} {
@@ -322,12 +287,6 @@ const SFormItemContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     /* width: 296px; */
   }
-`;
-
-const SSeparator = styled.div`
-  border-bottom: 1px solid
-    ${({ theme }) => theme.colorsThemed.background.outlines1};
-  margin-bottom: 16px;
 `;
 
 const SControlsDiv = styled.div`

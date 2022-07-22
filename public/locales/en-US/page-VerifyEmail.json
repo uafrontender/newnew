@@ -12,7 +12,12 @@
     "resendButtonText": "Resend it"
   },
   "error": {
-    "invalidCode": "Wrong code. Try again..."
+    "invalidCode": "Wrong code. Try again...",
+    "emailTaken": "Email already taken",
+    "notConfirmedEmail": "Current email wasn't confirmed or time expired",
+    "noToken": "No token",
+    "invalidToken": "Invalid token"
   },
+  "verifying": "Verifying your email...",
   "backButton": "Back"
 }

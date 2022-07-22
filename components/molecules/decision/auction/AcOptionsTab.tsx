@@ -52,6 +52,8 @@ import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import { formatNumber } from '../../../../utils/format';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 interface IAcOptionsTab {
   postId: string;
@@ -133,14 +135,11 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
 
-  const goToNextStep = () => {
-    if (
-      user.userTutorialsProgress.remainingAcSteps &&
-      user.userTutorialsProgress.remainingAcSteps[0]
-    ) {
+  const goToNextStep = (currentStep: newnewapi.AcTutorialStep) => {
+    if (user.userTutorialsProgress.remainingAcSteps && currentStep) {
       if (user.loggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-          acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
+          acCurrentStep: currentStep,
         });
         markTutorialStepAsCompleted(payload);
       }
@@ -148,7 +147,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         setUserTutorialsProgress({
           remainingAcSteps: [
             ...user.userTutorialsProgress.remainingAcSteps,
-          ].slice(1),
+          ].filter((el) => el !== currentStep),
         })
       );
     }
@@ -196,7 +195,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   const handleUpdateNewOptionText = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setNewBidText(e.target.value);
+      setNewBidText(e.target.value.trim() ? e.target.value : '');
 
       if (e.target.value.length > 0) {
         validateTextViaAPIDebounced(e.target.value);
@@ -332,6 +331,11 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const handlePayWithCardStripeRedirect = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
+      Mixpanel.track('PayWithCardStripeRedirect', {
+        _stage: 'Post',
+        _postUuid: postId,
+        _component: 'AcOptionsTab',
+      });
       const createPaymentSessionPayload =
         new newnewapi.CreatePaymentSessionRequest({
           successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
@@ -476,7 +480,14 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
               }
-              handleRemoveOption={() => handleRemoveOption(option)}
+              handleRemoveOption={() => {
+                Mixpanel.track('Removed Option', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'AcOptionsTab',
+                });
+                handleRemoveOption(option);
+              }}
             />
           ))}
           {!isMobile ? (
@@ -484,7 +495,14 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           ) : pagingToken ? (
             <SLoadMoreBtn
               view='secondary'
-              onClick={() => handleLoadBids(pagingToken)}
+              onClick={() => {
+                Mixpanel.track('Click Load More', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'AcOptionsTab',
+                });
+                handleLoadBids(pagingToken);
+              }}
             >
               {t('loadMoreButton')}
             </SLoadMoreBtn>
@@ -532,6 +550,12 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
+              onClickCapture={() => {
+                Mixpanel.track('Place Bid', {
+                  _stage: 'Post',
+                  _component: 'AcOptionsTab',
+                });
+              }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
               {t('acPost.optionsTab.actionSection.placeABidButton')}
@@ -540,11 +564,19 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               <STutorialTooltipTextAreaHolder>
                 <TutorialTooltip
                   isTooltipVisible={
-                    options.length > 0 &&
-                    user.userTutorialsProgress.remainingAcSteps[0] ===
-                      newnewapi.AcTutorialStep.AC_TEXT_FIELD
+                    options.length > 0
+                      ? user.userTutorialsProgress.remainingAcSteps[0] ===
+                        newnewapi.AcTutorialStep.AC_TEXT_FIELD
+                      : user.userTutorialsProgress.remainingAcSteps.includes(
+                          newnewapi.AcTutorialStep.AC_TEXT_FIELD
+                        ) &&
+                        !user.userTutorialsProgress.remainingAcSteps.includes(
+                          newnewapi.AcTutorialStep.AC_TIMER
+                        )
                   }
-                  closeTooltip={goToNextStep}
+                  closeTooltip={() =>
+                    goToNextStep(newnewapi.AcTutorialStep.AC_TEXT_FIELD)
+                  }
                   title={t('tutorials.ac.createYourBid.title')}
                   text={t('tutorials.ac.createYourBid.text')}
                   dotPosition={DotPositionEnum.BottomRight}
@@ -561,7 +593,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
                 user.userTutorialsProgress.remainingAcSteps[0] ===
                   newnewapi.AcTutorialStep.AC_ALL_BIDS
               }
-              closeTooltip={goToNextStep}
+              closeTooltip={() =>
+                goToNextStep(newnewapi.AcTutorialStep.AC_ALL_BIDS)
+              }
               title={t('tutorials.ac.peopleBids.title')}
               text={t('tutorials.ac.peopleBids.text')}
               dotPosition={DotPositionEnum.BottomLeft}
@@ -609,6 +643,12 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               }
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+              }}
+              onClickCapture={() => {
+                Mixpanel.track('Place Bid', {
+                  _stage: 'Post',
+                  _component: 'AcOptionsTab',
+                });
               }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
@@ -670,7 +710,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
-              {postText}
+              <PostTitleContent>{postText}</PostTitleContent>
             </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
               {t('acPost.paymentModalHeader.subtitle')}
@@ -701,6 +741,13 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             id='action-button-mobile'
             view='primaryGrad'
             onClick={() => setSuggestNewMobileOpen(true)}
+            onClickCapture={() =>
+              Mixpanel.track('SuggestNewMobile', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'AcOptionsTab',
+              })
+            }
           >
             {t('acPost.floatingActionButton.suggestNewButton')}
           </SActionButton>
@@ -712,7 +759,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
                   user.userTutorialsProgress.remainingAcSteps[0] ===
                     newnewapi.AcTutorialStep.AC_TEXT_FIELD
                 }
-                closeTooltip={goToNextStep}
+                closeTooltip={() =>
+                  goToNextStep(newnewapi.AcTutorialStep.AC_TEXT_FIELD)
+                }
                 title={t('tutorials.ac.createYourBid.title')}
                 text={t('tutorials.ac.createYourBid.text')}
                 dotPosition={DotPositionEnum.BottomRight}
@@ -1011,7 +1060,7 @@ const SPaymentSign = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap; ;
 `;
 
 const SPaymentTermsLink = styled.a`
@@ -1023,5 +1072,5 @@ const SPaymentTerms = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap;
 `;

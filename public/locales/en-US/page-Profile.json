@@ -232,7 +232,11 @@
           "errors": {
             "invalidEmail": "Please enter a valid email address",
             "emailTaken": "Email taken"
-          }
+          },
+          "whatsNew": "What’s your new email address?",
+          "confirmEmail": "Confirm new email",
+          "verifyNewEmail": "Verify your new email",
+          "edit": "Edit"
         },
         "birthDateInput": {
           "label": "Date of birth",
@@ -258,7 +262,7 @@
         "title": "Transactions",
         "you": "You",
         "type": {
-          "1": "event",
+          "1": "bid",
           "2": "superpoll",
           "3": "goal"
         },
@@ -276,11 +280,11 @@
         "privacySubsections": {
           "spendings": {
             "title": "Hide my spending from others",
-            "caption": "People will not be able to see how much you spent on events, superpolls and goals"
+            "caption": "People will not be able to see how much you spent on bids, superpolls and goals"
           },
           "private": {
             "title": "Make my activity private",
-            "caption": "People will not be able to see any of your activity on events, superpolls and goals"
+            "caption": "People will not be able to see any of your activity on bids, superpolls and goals"
           }
         },
         "blockedUsers": {

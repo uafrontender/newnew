@@ -117,8 +117,7 @@
       "submit": "Save changes",
       "back": "Close"
     },
-    "heading": "This what your fans see",
-
+    "heading": "This is what your fans see",
     "bio": {
       "title": "Bio",
       "placeholder": "Tell a few words about yourself...",
@@ -129,9 +128,6 @@
         "inappropriate": "Offensive words are forbidden",
         "linksForbidden": "Links not allowed"
       }
-    },
-    "tags": {
-      "title": "What will you post about the most? Select at least three"
     }
   },
   "stripeSection": {

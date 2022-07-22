@@ -29,6 +29,7 @@ import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import switchPostType from '../utils/switchPostType';
 import assets from '../constants/assets';
+import { Mixpanel } from '../utils/mixpanel';
 
 const PostModal = dynamic(
   () => import('../components/organisms/decision/PostModal')
@@ -62,8 +63,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
   const [collectionLoaded, setCollectionLoaded] = useState<newnewapi.Post[]>(
     []
   );
-  const [nextPageToken, setNextPageToken] =
-    useState<string | null | undefined>('');
+  const [nextPageToken, setNextPageToken] = useState<string | null | undefined>(
+    ''
+  );
   const [isCollectionLoading, setIsCollectionLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
 
@@ -105,7 +107,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           res = await fetchForYouPosts(fyPayload);
 
-          if (res.data && (res.data as newnewapi.PagedPostsResponse).posts) {
+          if (res.data && (res.data as newnewapi.PagedPostsResponse)?.posts) {
             setCollectionLoaded((curr) => [
               ...curr,
               ...((res.data as newnewapi.PagedPostsResponse)
@@ -138,7 +140,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           if (
             res.data &&
-            (res.data as newnewapi.PagedAuctionsResponse).auctions
+            (res.data as newnewapi.PagedAuctionsResponse)?.auctions
           ) {
             setCollectionLoaded((curr) => [
               ...curr,
@@ -172,7 +174,8 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           if (
             res.data &&
-            (res.data as newnewapi.PagedMultipleChoicesResponse).multipleChoices
+            (res.data as newnewapi.PagedMultipleChoicesResponse)
+              ?.multipleChoices
           ) {
             setCollectionLoaded((curr) => [
               ...curr,
@@ -206,7 +209,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           if (
             res.data &&
-            (res.data as newnewapi.PagedCrowdfundingsResponse).crowdfundings
+            (res.data as newnewapi.PagedCrowdfundingsResponse)?.crowdfundings
           ) {
             setCollectionLoaded((curr) => [
               ...curr,
@@ -238,7 +241,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           res = await fetchBiggestPosts(biggestPayload);
 
-          if (res.data && (res.data as newnewapi.PagedPostsResponse).posts) {
+          if (res.data && (res.data as newnewapi.PagedPostsResponse)?.posts) {
             setCollectionLoaded((curr) => [
               ...curr,
               ...((res.data as newnewapi.PagedPostsResponse)
@@ -260,10 +263,15 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>(undefined);
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >(undefined);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'See More Page',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(post);
     setPostModalOpen(true);
   };
@@ -273,6 +281,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
   }, []);
 
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'See More Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };
@@ -300,7 +311,6 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     scroller.scrollTo(category, {
       smooth: true,
       offset: -100,
-      containerId: 'generalScrollContainer',
     });
   }, [router.query.category, router.query.sort]);
 
@@ -372,21 +382,6 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     loggedIn,
   ]);
 
-  // Clear sorting
-  useEffect(() => {
-    const category = router.query.category?.toString() ?? 'ac';
-    if (category === 'for-you') {
-      const newQuery = { ...router.query };
-
-      delete newQuery.sort;
-
-      router?.push({
-        query: newQuery,
-        pathname: router.pathname,
-      });
-    }
-  }, [router]);
-
   return (
     <>
       <Head>
@@ -405,7 +400,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      {topSectionCollection.length > 0 && (
+      {topSectionCollection?.length > 0 && (
         <TopSection
           collection={topSectionCollection}
           handlePostClicked={handleOpenPostModal}
@@ -455,6 +450,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'component-PostCard',
     'modal-Post',
     'modal-PaymentModal',
+    'modal-ResponseSuccessModal',
   ]);
 
   const top10payload = new newnewapi.EmptyRequest({});

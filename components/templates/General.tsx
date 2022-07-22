@@ -167,7 +167,7 @@ export const General: React.FC<IGeneral> = (props) => {
         highlightColor={theme.colorsThemed.background.tertiary}
       >
         <SWrapper
-          id='generalScrollContainer'
+          id='generalContainer'
           ref={wrapperRef}
           withBanner={!!banner?.show}
           {...props}
@@ -261,7 +261,10 @@ interface ISWrapper {
 
 const SWrapper = styled.div<ISWrapper>`
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: -moz-available;
+  min-height: -webkit-fill-available;
+  min-height: fill-available;
   display: flex;
   overflow-y: auto;
   transition: padding ease 0.5s;

@@ -31,6 +31,7 @@ interface JsonConvertible {
  * All the protobufjs-generated class **objects** conform to this interface.
  */
 interface EncDec<T = keyof NewnewapiType> {
+  name: string;
   encode(message: T, writer?: $protobuf.Writer): $protobuf.Writer;
   decode(
     reader: $protobuf.Reader | Uint8Array,
@@ -114,14 +115,10 @@ export async function fetchProtobuf<
     const data = resT.decode(new Uint8Array(buff));
 
     if (logsOn) {
-      // @ts-ignore
       console.groupCollapsed(`Success: ${reqT?.name} -> ${resT?.name}`);
       console.debug(
         `
-      %c Payload Type: %c ${
-        // @ts-ignore
-        reqT?.name
-      }
+      %c Payload Type: %c ${reqT?.name}
       %c Payload: %c ${JSON.stringify(payload, null, 2)}
       `,
         'font-size: 14px; color: blue;',
@@ -131,10 +128,7 @@ export async function fetchProtobuf<
       );
       console.debug(
         `
-      %c Response Type: %c ${
-        // @ts-ignore
-        resT?.name
-      }
+      %c Response Type: %c ${resT?.name}
       %c Response: %c ${JSON.stringify(data, null, 2)}
       `,
         'font-size: 14px; color: blue;',
@@ -150,14 +144,10 @@ export async function fetchProtobuf<
     };
   } catch (err) {
     if (logsOn) {
-      // @ts-ignore
       console.groupCollapsed(`Error: ${reqT?.name} -> ${resT?.name}`);
       console.debug(
         `
-      %c Payload Type: %c ${
-        // @ts-ignore
-        reqT?.name
-      }
+      %c Payload Type: %c ${reqT?.name}
       %c Payload: %c ${JSON.stringify(payload, null, 2)}
       `,
         'font-size: 14px; color: blue;',
@@ -167,10 +157,7 @@ export async function fetchProtobuf<
       );
       console.debug(
         `
-      %c Response Type: %c ${
-        // @ts-ignore
-        resT?.name
-      }
+      %c Response Type: %c ${resT?.name}
       %c Error: %c ${err}
       `,
         'font-size: 14px; color: blue;',
@@ -287,7 +274,7 @@ export async function fetchProtobufProtectedIntercepted<
         if (!resRefresh.data || resRefresh.error)
           throw new Error('Refresh token invalid');
 
-        // Refreshed succeded, re-set access and refresh tokens
+        // Refreshed succeeded, re-set access and refresh tokens
         // Client side
         if (!serverSideTokens) {
           if (resRefresh.data.credential?.expiresAt?.seconds)

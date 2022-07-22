@@ -24,6 +24,10 @@ const SCreatorStripeLayout = styled.div`
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+
+  @supports (-webkit-touch-callout: none) {
+    height: -webkit-fill-available;
+  }
 `;
 
 const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({

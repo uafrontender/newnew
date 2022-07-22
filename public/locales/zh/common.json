@@ -37,7 +37,7 @@
     "cancel": "取消"
   },
   "postType": {
-    "ac": "Event",
+    "ac": "Bid",
     "mc": "Superpoll",
     "cf": "Goal"
   },
@@ -155,5 +155,24 @@
   "creatorCard": {
     "subscriptionCost": "${{amount}} 每月"
   },
-  "gotIt": "知道了"
+  "gotIt": "知道了",
+  "sortingOption": {
+    "sortingtype": "順序",
+    "sortingtype-all": "所有",
+    "sortingtype-num_bids": "參與者",
+    "sortingtype-num_bids-ac": "出價數量",
+    "sortingtype-num_bids-mc": "投票數量",
+    "sortingtype-num_bids-cf": "支持者人數",
+    "sortingtype-newest": "最新",
+    "bid": "出價",
+    "bid-lowest": "最低",
+    "bid-highest": "最高",
+    "time": "時間",
+    "time-ending-soon": "最快結束",
+    "time-newest": "最新",
+    "time-oldest": "最舊",
+    "numbers-of-bids": "出價數量",
+    "numbers-of-bids-fewest": "最少",
+    "numbers-of-bids-most-first": "最先"
+  }
 }

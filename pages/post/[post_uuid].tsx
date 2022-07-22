@@ -25,6 +25,7 @@ import HomeLayout from '../../components/templates/HomeLayout';
 import switchPostType from '../../utils/switchPostType';
 import { toggleMutedMode } from '../../redux-store/slices/uiStateSlice';
 import isBrowser from '../../utils/isBrowser';
+import { Mixpanel } from '../../utils/mixpanel';
 
 const PostModal = dynamic(
   () => import('../../components/organisms/decision/PostModal')
@@ -82,6 +83,10 @@ const PostPage: NextPage<IPostPage> = ({
   >(post ?? undefined);
 
   const handleOpenPostModal = (postToOpen: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'Post',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(postToOpen);
     setPostModalOpen(true);
   };
@@ -91,13 +96,18 @@ const PostPage: NextPage<IPostPage> = ({
   }, []);
 
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Post',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
 
     if (isBrowser()) {
-      const { idx } = window.history.state;
-      if (idx < 2) {
-        router?.replace('/');
+      // const { idx } = window.history.state;
+      if (postParsed?.creator?.username) {
+        router?.push(`/${postParsed?.creator?.username}`);
+      } else {
+        router?.push('/');
       }
     }
   };
@@ -113,13 +123,6 @@ const PostPage: NextPage<IPostPage> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (isMobile && !postModalOpen) {
-      router.push('/');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postModalOpen, isMobile]);
 
   return (
     <>
@@ -173,6 +176,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'modal-Post',
+    'modal-ResponseSuccessModal',
     'component-PostCard',
     'modal-PaymentModal',
   ]);

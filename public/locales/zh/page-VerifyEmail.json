@@ -12,7 +12,12 @@
     "resendButtonText": "再次發送"
   },
   "error": {
-    "invalidCode": "代碼錯誤。再試一次......"
+    "invalidCode": "代碼錯誤。再試一次......",
+    "emailTaken": "電子郵件地址已被佔用",
+    "notConfirmedEmail": "當前的電子郵件沒有被確認或時間過期",
+    "noToken": "沒有令牌",
+    "invalidToken": "无效的令牌"
   },
+  "verifying": "正在驗證新電子郵件......",
   "backButton": "返回"
 }

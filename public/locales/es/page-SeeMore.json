@@ -1,8 +1,8 @@
 {
   "meta": {
     "ac": {
-      "title": "Ve más Events en NewNew",
-      "description": "Ver más Events de creadores publicados en la empresa emergente de economía de creadores NewNew"
+      "title": "Ve más Bids en NewNew",
+      "description": "Ver más Bids de creadores publicados en la empresa emergente de economía de creadores NewNew"
     },
     "mc": {
       "title": "Ver más Superpolls en NewNew",
@@ -48,7 +48,7 @@
   },
   "collection": {
     "title": {
-      "ac": "Events",
+      "ac": "Bids",
       "mc": "Superpolls",
       "cf": "Goals",
       "biggest": "Lo mejor de todos los tiempos",

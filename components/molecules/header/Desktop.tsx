@@ -15,6 +15,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -116,7 +117,16 @@ export const Desktop: React.FC = React.memo(() => {
                 <SItemWithMargin>
                   <Link href='/creator/dashboard'>
                     <a>
-                      <Button view='quaternary'>{t('button.dashboard')}</Button>
+                      <Button
+                        view='quaternary'
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _button: 'Dashboard',
+                          });
+                        }}
+                      >
+                        {t('button.dashboard')}
+                      </Button>
                     </a>
                   </Link>
                 </SItemWithMargin>
@@ -129,7 +139,15 @@ export const Desktop: React.FC = React.memo(() => {
                     }
                   >
                     <a>
-                      <Button withShadow view='primaryGrad'>
+                      <Button
+                        withShadow
+                        view='primaryGrad'
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _button: 'New Post',
+                          });
+                        }}
+                      >
                         {t('button.createDecision')}
                       </Button>
                     </a>
@@ -193,14 +211,33 @@ export const Desktop: React.FC = React.memo(() => {
             <SItemWithMargin>
               <Link href='/sign-up?to=log-in'>
                 <a>
-                  <Button view='quaternary'>{t('button.loginIn')}</Button>
+                  <Button
+                    view='quaternary'
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Log in',
+                      });
+                    }}
+                  >
+                    {t('button.loginIn')}
+                  </Button>
                 </a>
               </Link>
             </SItemWithMargin>
             <SItemWithMargin>
               <Link href='/sign-up'>
                 <a>
-                  <Button withDim withShrink withShadow view='primaryGrad'>
+                  <Button
+                    withDim
+                    withShrink
+                    withShadow
+                    view='primaryGrad'
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Sign up',
+                      });
+                    }}
+                  >
                     {t('button.signUp')}
                   </Button>
                 </a>

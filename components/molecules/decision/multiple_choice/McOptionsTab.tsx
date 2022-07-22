@@ -54,6 +54,8 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import { formatNumber } from '../../../../utils/format';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -67,6 +69,7 @@ interface IMcOptionsTab {
   minAmount: number;
   votePrice: number;
   canVoteForFree: boolean;
+  hasVotedOptionId?: number;
   canSubscribe: boolean;
   handleResetFreeVote: () => void;
   handleLoadOptions: (token?: string) => void;
@@ -88,6 +91,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   minAmount,
   votePrice,
   canVoteForFree,
+  hasVotedOptionId,
   canSubscribe,
   handleLoadOptions,
   handleResetFreeVote,
@@ -113,13 +117,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   // const { walletBalance } = useContext(WalletContext);
   const { appConstants } = useGetAppConstants();
-
-  const hasVotedOptionId = useMemo(() => {
-    const supportedOption = options.find((o) => o.isSupportedByMe);
-
-    if (supportedOption) return supportedOption.id;
-    return undefined;
-  }, [options]);
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
@@ -190,7 +187,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   const handleUpdateNewOptionText = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setNewOptionText(e.target.value);
+      setNewOptionText(e.target.value.trim() ? e.target.value : '');
 
       if (e.target.value.length > 0) {
         validateTextViaAPIDebounced(e.target.value);
@@ -314,6 +311,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const handlePayWithCardStripeRedirect = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
+      Mixpanel.track('PayWithCardStripeRedirect', {
+        _stage: 'Post',
+        _postUuid: post.postUuid,
+        _component: 'McOptionsTab',
+      });
       const createPaymentSessionPayload =
         new newnewapi.CreatePaymentSessionRequest({
           successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
@@ -345,6 +347,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const handleVoteForFree = useCallback(async () => {
     setUseFreeVoteModalOpen(false);
     setLoadingModalOpen(true);
+    Mixpanel.track('Vote For Free', {
+      _stage: 'Post',
+      _postUuid: post.postUuid,
+      _component: 'McOptionsTab',
+    });
     try {
       const payload = new newnewapi.VoteOnPostRequest({
         votesCount: appConstants.mcFreeVoteCount,
@@ -483,6 +490,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               option={option as TMcOptionWithHighestField}
               creator={option.creator ?? post.creator!!}
               postCreator={postCreator}
+              postCreatorUuid={post.creator?.uuid ?? ''}
               postText={post.title}
               postId={post.postUuid}
               index={i}
@@ -509,13 +517,29 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
               }
-              handleRemoveOption={() => handleRemoveOption(option)}
+              handleRemoveOption={() => {
+                Mixpanel.track('Removed Option', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTab',
+                });
+                handleRemoveOption(option);
+              }}
             />
           ))}
           {!isMobile ? (
             <SLoaderDiv ref={loadingRef} />
           ) : pagingToken ? (
-            <SLoadMoreBtn onClick={() => handleLoadOptions(pagingToken)}>
+            <SLoadMoreBtn
+              onClick={() => {
+                Mixpanel.track('Click Load More', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTab',
+                });
+                handleLoadOptions(pagingToken);
+              }}
+            >
               {t('loadMoreButton')}
             </SLoadMoreBtn>
           ) : null}
@@ -547,7 +571,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
-              onClick={() => setUseFreeVoteModalOpen(true)}
+              onClick={() => {
+                Mixpanel.track('Click Add Free Option', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTab',
+                });
+                setUseFreeVoteModalOpen(true);
+              }}
             >
               {t('mcPost.optionsTab.actionSection.placeABidButton')}
             </SAddFreeVoteButton>
@@ -640,7 +671,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
-              onClick={() => setUseFreeVoteModalOpen(true)}
+              onClick={() => {
+                Mixpanel.track('Click Add Free Option', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTab',
+                });
+                setUseFreeVoteModalOpen(true);
+              }}
             >
               {t('mcPost.optionsTab.actionSection.placeABidButton')}
             </SAddFreeVoteButton>
@@ -716,7 +754,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
-              {post.title}
+              <PostTitleContent>{post.title}</PostTitleContent>
             </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
               {t('mcPost.paymentModalHeader.subtitle')}
@@ -752,6 +790,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             id='action-button-mobile'
             view='primaryGrad'
             onClick={() => setSuggestNewMobileOpen(true)}
+            onClickCapture={() =>
+              Mixpanel.track('SuggestNewMobile', {
+                _stage: 'Post',
+                _postUuid: post.postUuid,
+                _component: 'McOptionsTab',
+              })
+            }
           >
             {t('mcPost.floatingActionButton.suggestNewButton')}
           </SActionButton>
@@ -1100,7 +1145,7 @@ const SPaymentSign = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap; ;
 `;
 
 const SPaymentTermsLink = styled.a`
@@ -1112,5 +1157,5 @@ const SPaymentTerms = styled(Text)`
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap;
 `;

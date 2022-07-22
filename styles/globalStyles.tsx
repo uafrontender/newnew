@@ -36,6 +36,13 @@ const GlobalStyle = createGlobalStyle`
   body {
     color: ${({ theme }) => theme.colorsThemed.text.primary};
     background: ${({ theme }) => theme.colorsThemed.background.primary};
+
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
   body.blurred {

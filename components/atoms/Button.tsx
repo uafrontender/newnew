@@ -52,7 +52,7 @@ const Button = React.memo(
         onClick,
         ...rest
       } = props;
-      const { ref, inView }: { ref: any; inView: boolean } = useInView();
+      const { ref, inView } = useInView();
 
       // Progress effect
       const [progress, setProgress] = useState(0);
@@ -120,7 +120,7 @@ const Button = React.memo(
       return (
         <SButton
           ref={(el) => {
-            ref.current = el;
+            ref(el);
 
             if (parentRef) {
               // eslint-disable-next-line no-param-reassign
@@ -382,6 +382,13 @@ const SButton = styled.button<ISButton>`
         opacity: 0.5;
       }
     `}
+
+  ${({ theme, withProgress }) =>
+    withProgress && theme.name === 'dark'
+      ? css`
+          background: ${() => theme.colorsThemed.background.tertiary};
+        `
+      : null}
 `;
 
 interface ISLoader {

@@ -1,9 +1,10 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
+import moment from 'moment';
 
 import Text from '../Text';
 import InlineSVG from '../InlineSVG';
-import AnimatedPresence, { TAnimation } from '../AnimatedPresence';
+import AnimatedPresence, { TElementAnimations } from '../AnimatedPresence';
 
 import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
@@ -16,17 +17,57 @@ import { HOURS, MINUTES, FORMAT } from '../../../constants/general';
 interface ITimePicker {
   time: any;
   format: 'pm' | 'am';
+  currValue: any;
   onChange: (key: string, value: any) => void;
 }
 
 export const TimePicker: React.FC<ITimePicker> = (props) => {
-  const { time, format, onChange } = props;
+  const { time, format, currValue, onChange } = props;
   const theme = useTheme();
   const wrapperRef: any = useRef();
   const [open, setOpen] = useState(false);
   const [animate, setAnimate] = useState(false);
-  const [animation, setAnimation] = useState('o-12');
+  const [animation, setAnimation] = useState<TElementAnimations>('o-12');
   const direction = useDropDownDirection(wrapperRef, 340);
+
+  const isDaySame = useMemo(() => {
+    const selectedDate = moment(currValue?.date).startOf('D');
+    if (selectedDate) {
+      return selectedDate?.isSame(moment().startOf('day'));
+    }
+
+    return false;
+  }, [currValue.date]);
+
+  const { isTimeOfTheDaySame, localTimeOfTheDay } = useMemo(() => {
+    const h = moment().hour();
+    const ltd = h >= 12 ? 'pm' : 'am';
+    return {
+      isTimeOfTheDaySame: ltd === currValue?.['hours-format'],
+      localTimeOfTheDay: ltd,
+    };
+  }, [currValue]);
+
+  const hours = useMemo(() => {
+    let offset;
+    if (isDaySame) {
+      const h = moment().hour();
+
+      if (isTimeOfTheDaySame && localTimeOfTheDay === 'pm') {
+        const hCorrected = h - 11;
+
+        offset = 12 - hCorrected;
+      } else if (isTimeOfTheDaySame && localTimeOfTheDay === 'am') {
+        offset = h - 1;
+      }
+    }
+
+    if (offset) {
+      return HOURS.slice(offset);
+    }
+
+    return HOURS;
+  }, [isDaySame, isTimeOfTheDaySame, localTimeOfTheDay]);
 
   // Dragging state hours
   const [clientY, setClientY] = useState<number>(0);
@@ -122,7 +163,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
     setOpen(true);
   }, []);
   const handleClose = useCallback(() => {
-    setAnimation('o-12-reversed');
+    setAnimation('o-12-reverse');
     setAnimate(true);
     setOpen(false);
   }, []);
@@ -194,6 +235,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
     (item: any) => {
       const selected = format === item.value;
       const handleItemClick = () => {
+        if (isDaySame && localTimeOfTheDay === 'pm') return;
         handleFormatChange(item.value);
       };
 
@@ -210,7 +252,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
         </SItem>
       );
     },
-    [format, handleFormatChange]
+    [format, handleFormatChange, isDaySame, localTimeOfTheDay]
   );
 
   useOnClickEsc(wrapperRef, handleClose);
@@ -231,7 +273,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
       </SContainer>
       <AnimatedPresence
         start={animate}
-        animation={animation as TAnimation}
+        animation={animation}
         onAnimationEnd={handleAnimationEnd}
         animateWhenInView={false}
       >
@@ -245,7 +287,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
               onMouseMove={mouseMoveHandler}
               onMouseLeave={mouseUpHandler}
             >
-              {HOURS.map(renderHourItem)}
+              {hours.map(renderHourItem)}
             </SScrollList>
           </SScrollListWrapper>
           <SScrollListWrapper>

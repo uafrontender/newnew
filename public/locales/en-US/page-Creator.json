@@ -45,9 +45,9 @@
         "button": "Make a post"
       },
       "list": {
-        "ac": "Events",
-        "cf": "Superpolls",
-        "mc": "Goals",
+        "ac": "Bids",
+        "cf": "Goals",
+        "mc": "Superpolls",
         "subscriptions": "Subscriptions"
       },
       "filter": {
@@ -74,7 +74,7 @@
         }
       },
       "postTypes": {
-        "auction": "Event",
+        "auction": "Bid",
         "multipleChoice": "Superpoll",
         "crowdfunding": "Goal"
       },
@@ -211,7 +211,7 @@
     "firstFeature": "Direct message you",
     "secondFeature": "Get a free vote on your Superpolls",
     "thirdFeature": "Add custom suggestions to your Superpolls",
-    "note": "Don’t worry–turning on subscriptions won’t limit people from participating in your Events, Superpolls or Goals"
+    "note": "Don’t worry–turning on subscriptions won’t limit people from participating in your Bids, Superpolls or Goals"
   },
   "enableSubModal": {
     "title": "Turn on subscription",

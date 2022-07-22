@@ -7,7 +7,7 @@
     "title": {
       "biggest": "Lo mejor de todos los tiempos",
       "for-you": "Para ti",
-      "ac": "Los Events más grandes",
+      "ac": "Los Bids más grandes",
       "mc": "Superpolls populares",
       "cf": "Goals populares"
     },
@@ -19,7 +19,7 @@
   },
   "tutorial": {
     "ac": {
-      "title": "Event",
+      "title": "Bid",
       "caption": "Envía al creador una oferta con lo que quieres que haga, cuánto estás dispuesto a gastar y ve si acepta tu oferta."
     },
     "mc": {

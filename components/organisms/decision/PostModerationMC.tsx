@@ -1,19 +1,14 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
+import { useInView } from 'react-intersection-observer';
+import { useTranslation } from 'next-i18next';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -21,7 +16,6 @@ import {
   fetchCurrentOptionsForMCPost,
   getMcOption,
 } from '../../../api/endpoints/multiple_choice';
-import isBrowser from '../../../utils/isBrowser';
 import switchPostStatus, {
   TPostStatusStringified,
 } from '../../../utils/switchPostStatus';
@@ -31,11 +25,17 @@ import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
-import Lottie from '../../atoms/Lottie';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
-import DecisionTabs from '../../molecules/decision/PostTabs';
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import Headline from '../../atoms/Headline';
+import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
+import PostVotingTab from '../../molecules/decision/PostVotingTab';
+
+import useResponseUpload from '../../../utils/hooks/useResponseUpload';
+import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
@@ -44,19 +44,10 @@ const ResponseTimer = dynamic(
   () => import('../../molecules/decision/ResponseTimer')
 );
 const PostTimer = dynamic(() => import('../../molecules/decision/PostTimer'));
-const CommentsTab = dynamic(
-  () => import('../../molecules/decision/CommentsTab')
-);
 const McOptionsTabModeration = dynamic(
   () =>
     import(
       '../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration'
-    )
-);
-const McWinnerTabModeration = dynamic(
-  () =>
-    import(
-      '../../molecules/decision/multiple_choice/moderation/McWinnerTabModeration'
     )
 );
 
@@ -80,6 +71,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     handleGoBack,
     handleRemovePostFromState,
   }) => {
+    const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -88,117 +80,75 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     );
     const router = useRouter();
 
+    const { syncedHistoryReplaceState } = useSynchronizedHistory();
+
     // Socket
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-    // Tabs
-    const tabs = useMemo(() => {
-      if (post.winningOptionId) {
-        return [
-          {
-            label: 'winner',
-            value: 'winner',
-          },
-          {
-            label: 'options',
-            value: 'options',
-          },
-          ...(post.isCommentsAllowed
-            ? [
-                {
-                  label: 'comments',
-                  value: 'comments',
-                },
-              ]
-            : []),
-        ];
-      }
-      return [
-        {
-          label: 'options',
-          value: 'options',
-        },
-        ...(post.isCommentsAllowed
-          ? [
-              {
-                label: 'comments',
-                value: 'comments',
-              },
-            ]
-          : []),
-      ];
-    }, [post.isCommentsAllowed, post.winningOptionId]);
+    // Announcement
+    const [announcement, setAnnouncement] = useState(post.announcement);
 
-    const [currentTab, setCurrentTab] = useState<
-      'options' | 'comments' | 'winner'
-    >(() => {
-      if (!isBrowser()) {
-        return 'options';
-      }
-      const { hash } = window.location;
-      if (
-        hash &&
-        (hash === '#options' || hash === '#comments' || hash === '#winner')
-      ) {
-        return hash.substring(1) as 'options' | 'comments';
-      }
-      if (post.winningOptionId) return 'winner';
-      return 'options';
+    // Comments
+    const { ref: commentsSectionRef, inView } = useInView({
+      threshold: 0.8,
     });
 
-    const handleChangeTab = (tab: string) => {
-      if (tab === 'comments' && isMobile) {
-        window.history.pushState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#${tab}`
-        );
-      } else {
-        window.history.replaceState(
-          {
-            postId: post.postUuid,
-          },
-          'Post',
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#${tab}`
-        );
+    const handleCommentFocus = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display =
+          'none';
       }
-      window.dispatchEvent(new HashChangeEvent('hashchange'));
     };
 
-    useEffect(() => {
-      const handleHashChange = () => {
-        const { hash } = window.location;
-        if (!hash) {
-          setCurrentTab('options');
-          return;
-        }
-        const parsedHash = hash.substring(1);
-        if (
-          parsedHash === 'options' ||
-          parsedHash === 'comments' ||
-          parsedHash === 'winner'
-        ) {
-          setCurrentTab(parsedHash);
-        }
-      };
+    const handleCommentBlur = () => {
+      if (isMobile && !!document.getElementById('action-button-mobile')) {
+        document.getElementById('action-button-mobile')!!.style.display = '';
+      }
+    };
 
-      window.addEventListener('hashchange', handleHashChange, false);
+    // Response upload
+    const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<
+      newnewapi.IVideoUrls | undefined
+    >(undefined);
 
-      return () => {
-        window.removeEventListener('hashchange', handleHashChange, false);
-      };
-    }, []);
+    // Tabs
+    const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
+      post.response ||
+        responseFreshlyUploaded ||
+        postStatus === 'waiting_for_response' ||
+        postStatus === 'processing_response'
+        ? 'response'
+        : 'announcement'
+    );
 
-    // Respone upload
-    const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
-      useState<newnewapi.IVideoUrls | undefined>(undefined);
+    const {
+      handleCancelVideoUpload,
+      handleItemChange,
+      handleResetVideoUploadAndProcessingState,
+      handleUploadVideoNotProcessed,
+      handleUploadVideoProcessed,
+      handleVideoDelete,
+      responseFileProcessingETA,
+      responseFileProcessingError,
+      responseFileProcessingLoading,
+      responseFileProcessingProgress,
+      responseFileUploadETA,
+      responseFileUploadError,
+      responseFileUploadLoading,
+      responseFileUploadProgress,
+      uploadedResponseVideoUrl,
+      videoProcessing,
+      responseUploading,
+      responseUploadSuccess,
+    } = useResponseUpload({
+      postId: post.postUuid,
+      postStatus,
+      openedTab,
+      handleUpdatePostStatus,
+      handleUpdateResponseVideo: (newValue) =>
+        setResponseFreshlyUploaded(newValue),
+    });
 
     const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
@@ -210,14 +160,16 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
       post.optionCount ?? ''
     );
-    const [optionsNextPageToken, setOptionsNextPageToken] =
-      useState<string | undefined | null>('');
+    const [optionsNextPageToken, setOptionsNextPageToken] = useState<
+      string | undefined | null
+    >('');
     const [optionsLoading, setOptionsLoading] = useState(false);
     const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
     // Winning option
-    const [winningOption, setWinningOption] =
-      useState<newnewapi.MultipleChoice.Option | undefined>();
+    const [winningOption, setWinningOption] = useState<
+      newnewapi.MultipleChoice.Option | undefined
+    >();
 
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
@@ -337,6 +289,11 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
 
     const handleRemoveOption = useCallback(
       (optionToRemove: newnewapi.MultipleChoice.Option) => {
+        Mixpanel.track('Removed Option', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostModerationMC',
+        });
         setOptions((curr) => {
           const workingArr = [...curr];
           const workingArrUnsorted = [
@@ -345,7 +302,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           return sortOptions(workingArrUnsorted);
         });
       },
-      [setOptions, sortOptions]
+      [setOptions, sortOptions, post.postUuid]
     );
 
     const fetchPostLatestData = useCallback(async () => {
@@ -364,6 +321,11 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           setNumberOfOptions(res.data.multipleChoice.optionCount as number);
           if (res.data.multipleChoice.status)
             handleUpdatePostStatus(res.data.multipleChoice.status);
+
+          if (!responseFreshlyUploaded && res.data.multipleChoice?.response) {
+            setResponseFreshlyUploaded(res.data.multipleChoice.response);
+          }
+          setAnnouncement(res.data.multipleChoice?.announcement);
         }
       } catch (err) {
         console.error(err);
@@ -572,115 +534,185 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       }
     }, [user]);
 
-    return (
-      <SWrapper>
-        <SExpiresSection>
-          {isMobile && (
-            <SGoBackButton
-              style={{
-                gridArea: 'closeBtnMobile',
-              }}
-              onClick={handleGoBack}
-            />
-          )}
-          {postStatus === 'waiting_for_response' ? (
-            <ResponseTimer
-              timestampSeconds={new Date(
-                (post.responseUploadDeadline?.seconds as number) * 1000
-              ).getTime()}
-            />
-          ) : (
-            <PostTimer
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='mc'
-            />
-          )}
-        </SExpiresSection>
-        <PostVideoModeration
-          postId={post.postUuid}
-          announcement={post.announcement!!}
-          response={(post.response || responseFreshlyUploaded) ?? undefined}
-          thumbnails={{
-            startTime: 1,
-            endTime: 3,
-          }}
-          postStatus={postStatus}
-          isMuted={mutedMode}
-          handleToggleMuted={() => handleToggleMutedMode()}
-          handleUpdateResponseVideo={(newValue) =>
-            setResponseFreshlyUploaded(newValue)
-          }
-          handleUpdatePostStatus={handleUpdatePostStatus}
-        />
-        <PostTopInfoModeration
-          postType='mc'
-          postStatus={postStatus}
-          title={post.title}
-          postId={post.postUuid}
-          totalVotes={totalVotes}
-          hasWinner={false}
-          hasResponse={!!post.response}
-          handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState}
-        />
-        <SActivitesContainer decisionFailed={postStatus === 'failed'}>
-          <DecisionTabs
-            tabs={tabs}
-            activeTab={currentTab}
-            handleChangeTab={handleChangeTab}
-          />
-          {currentTab === 'options' ? (
-            <McOptionsTabModeration
-              post={post}
-              options={options}
-              optionsLoading={optionsLoading}
-              pagingToken={optionsNextPageToken}
-              handleLoadOptions={fetchOptions}
-              handleRemoveOption={handleRemoveOption}
-            />
-          ) : currentTab === 'comments' && post.isCommentsAllowed ? (
-            <CommentsTab
-              postUuid={post.postUuid}
-              canDeleteComments={post.creator?.uuid === user.userData?.userUuid}
-              commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => handleChangeTab('options')}
-            />
-          ) : winningOption ? (
-            <McWinnerTabModeration
-              postId={post.postUuid}
-              postCreator={post.creator as newnewapi.User}
-              option={winningOption}
-              postStatus={postStatus}
-            />
-          ) : (
-            <SAnimationContainer>
-              <Lottie
-                width={64}
-                height={64}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: loadingAnimation,
-                }}
-              />
-            </SAnimationContainer>
-          )}
-        </SActivitesContainer>
-        {/* Loading Modal */}
-        {loadingModalOpen && (
-          <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
-        )}
+    // Scroll to comments if hash is present
+    useEffect(() => {
+      const handleCommentsInitialHash = () => {
+        const { hash } = window.location;
+        if (!hash) {
+          return;
+        }
 
-        {isPopupVisible && (
-          <HeroPopup
-            isPopupVisible={isPopupVisible}
-            postType='MC'
-            closeModal={goToNextStep}
+        const parsedHash = hash.substring(1);
+
+        if (parsedHash === 'comments') {
+          document.getElementById('comments')?.scrollIntoView();
+        }
+      };
+
+      handleCommentsInitialHash();
+    }, []);
+
+    // Replace hash once scrolled to comments
+    useEffect(() => {
+      if (inView) {
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }#comments`
+        );
+      } else {
+        syncedHistoryReplaceState(
+          {},
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+            post.postUuid
+          }`
+        );
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inView, post.postUuid, router.locale]);
+
+    return (
+      <>
+        <SWrapper>
+          <SExpiresSection>
+            {isMobile && (
+              <SGoBackButton
+                style={{
+                  gridArea: 'closeBtnMobile',
+                }}
+                onClick={handleGoBack}
+              />
+            )}
+            {postStatus === 'waiting_for_response' ? (
+              <ResponseTimer
+                timestampSeconds={new Date(
+                  (post.responseUploadDeadline?.seconds as number) * 1000
+                ).getTime()}
+              />
+            ) : (
+              <PostTimer
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='mc'
+              />
+            )}
+          </SExpiresSection>
+          <PostVideoModeration
+            key={`key_${announcement?.coverImageUrl}`}
+            postId={post.postUuid}
+            announcement={announcement!!}
+            response={(post.response || responseFreshlyUploaded) ?? undefined}
+            thumbnails={{
+              startTime: 1,
+              endTime: 3,
+            }}
+            postStatus={postStatus}
+            isMuted={mutedMode}
+            openedTab={openedTab}
+            responseFileProcessingETA={responseFileProcessingETA}
+            responseFileProcessingError={responseFileProcessingError}
+            responseFileProcessingLoading={responseFileProcessingLoading}
+            responseFileProcessingProgress={responseFileProcessingProgress}
+            responseFileUploadETA={responseFileUploadETA}
+            responseFileUploadError={responseFileUploadError}
+            responseFileUploadLoading={responseFileUploadLoading}
+            responseFileUploadProgress={responseFileUploadProgress}
+            uploadedResponseVideoUrl={uploadedResponseVideoUrl}
+            videoProcessing={videoProcessing}
+            handleChangeTab={(newValue) => setOpenedTab(newValue)}
+            handleToggleMuted={() => handleToggleMutedMode()}
+            handleUpdateResponseVideo={(newValue) =>
+              setResponseFreshlyUploaded(newValue)
+            }
+            handleUpdatePostStatus={handleUpdatePostStatus}
+            handleCancelVideoUpload={handleCancelVideoUpload}
+            handleItemChange={handleItemChange}
+            handleResetVideoUploadAndProcessingState={
+              handleResetVideoUploadAndProcessingState
+            }
+            handleUploadVideoNotProcessed={handleUploadVideoNotProcessed}
+            handleUploadVideoProcessed={handleUploadVideoProcessed}
+            handleVideoDelete={handleVideoDelete}
           />
+          <PostTopInfoModeration
+            postType='mc'
+            postStatus={postStatus}
+            title={post.title}
+            postId={post.postUuid}
+            totalVotes={totalVotes}
+            hasWinner={false}
+            hasResponse={!!post.response}
+            hidden={openedTab === 'response'}
+            handleUpdatePostStatus={handleUpdatePostStatus}
+            handleRemovePostFromState={handleRemovePostFromState}
+          />
+          <SActivitesContainer decisionFailed={postStatus === 'failed'}>
+            {openedTab === 'announcement' ? (
+              <>
+                <PostVotingTab>
+                  {`${t('tabs.options')} ${
+                    !!numberOfOptions && numberOfOptions > 0
+                      ? numberOfOptions
+                      : ''
+                  }`}
+                </PostVotingTab>
+                <McOptionsTabModeration
+                  post={post}
+                  options={options}
+                  optionsLoading={optionsLoading}
+                  pagingToken={optionsNextPageToken}
+                  winningOptionId={(winningOption?.id as number) ?? undefined}
+                  handleLoadOptions={fetchOptions}
+                  handleRemoveOption={handleRemoveOption}
+                />
+              </>
+            ) : (
+              <PostResponseTabModeration
+                postId={post.postUuid}
+                postType='mc'
+                postStatus={postStatus}
+                postTitle={post.title}
+                responseUploading={responseUploading}
+                responseReadyToBeUploaded={
+                  !!uploadedResponseVideoUrl &&
+                  !responseFileUploadLoading &&
+                  !responseFileProcessingLoading
+                }
+                responseUploadSuccess={responseUploadSuccess}
+                winningOptionMc={winningOption}
+                handleUploadResponse={handleUploadVideoProcessed}
+              />
+            )}
+          </SActivitesContainer>
+          {/* Loading Modal */}
+          {loadingModalOpen && (
+            <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+          )}
+
+          {isPopupVisible && (
+            <HeroPopup
+              isPopupVisible={isPopupVisible}
+              postType='MC'
+              closeModal={goToNextStep}
+            />
+          )}
+        </SWrapper>
+        {post.isCommentsAllowed && (
+          <SCommentsSection id='comments' ref={commentsSectionRef}>
+            <SCommentsHeadline variant={4}>
+              {t('successCommon.comments.heading')}
+            </SCommentsHeadline>
+            <CommentsBottomSection
+              postUuid={post.postUuid}
+              commentsRoomId={post.commentsRoomId as number}
+              onFormBlur={handleCommentBlur}
+              onFormFocus={handleCommentFocus}
+            />
+          </SCommentsSection>
         )}
-      </SWrapper>
+      </>
     );
   }
 );
@@ -695,8 +727,6 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 648px;
-
     display: grid;
     grid-template-areas:
       'expires expires'
@@ -759,14 +789,21 @@ const SActivitesContainer = styled.div<{
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    max-height: calc(500px);
+    ${({ decisionFailed }) =>
+      !decisionFailed
+        ? css`
+            max-height: 500px;
+          `
+        : css`
+            max-height: 500px;
+          `}
   }
 
   ${({ theme }) => theme.media.laptop} {
     ${({ decisionFailed }) =>
       !decisionFailed
         ? css`
-            max-height: 580px;
+            max-height: unset;
           `
         : css`
             max-height: calc(580px - 120px);
@@ -774,11 +811,13 @@ const SActivitesContainer = styled.div<{
   }
 `;
 
-const SAnimationContainer = styled.div`
-  width: 100%;
-  height: 100%;
+// Comments
+const SCommentsHeadline = styled(Headline)`
+  margin-bottom: 8px;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 16px;
+  }
 `;
+
+const SCommentsSection = styled.div``;

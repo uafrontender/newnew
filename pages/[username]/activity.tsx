@@ -20,6 +20,8 @@ import InlineSvg from '../../components/atoms/InlineSVG';
 import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
+import switchPostType from '../../utils/switchPostType';
+import { Mixpanel } from '../../utils/mixpanel';
 
 interface IUserPageActivity {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -62,6 +64,10 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'Profile Page',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(post);
     setPostModalOpen(true);
   };
@@ -71,6 +77,9 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
   }, []);
 
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Profile Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };
@@ -218,8 +227,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
       renderedPage={renderedPage}
       user={page.props.user}
       {...{
-        ...// @ts-ignore
-        (renderedPage !== 'activityHidden'
+        ...(renderedPage !== 'activityHidden'
           ? {
               postsCachedActivity: page.props.pagedPosts.posts,
               postsCachedActivityFilter: newnewapi.Post.Filter.ALL,
@@ -249,6 +257,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'component-PostCard',
     'modal-Post',
     'modal-PaymentModal',
+    'modal-ResponseSuccessModal',
   ]);
 
   if (!username || Array.isArray(username)) {

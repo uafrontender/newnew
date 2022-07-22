@@ -68,7 +68,6 @@ export const Dashboard: React.FC = React.memo(() => {
 
   useEffect(() => {
     if (user.creatorData?.isLoaded) {
-      user.creatorData?.hasCreatorTags &&
       user.userData?.bio &&
       user.userData?.bio.length > 0 &&
       user.creatorData?.options?.isCreatorConnectedToStripe
