@@ -141,6 +141,91 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, user.loggedIn]);
 
+  // TODO: remove test data
+  /* useEffect(() => {
+    const rewards = [
+      new newnewapi.Reward({
+        type: newnewapi.Reward.RewardType.SIGN_UP,
+        amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      }),
+      new newnewapi.Reward({
+        type: newnewapi.Reward.RewardType.BID,
+        amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      }),
+      new newnewapi.Reward({
+        type: newnewapi.Reward.RewardType.VOTE,
+        amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      }),
+      new newnewapi.Reward({
+        type: newnewapi.Reward.RewardType.BACK,
+        amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      }),
+      new newnewapi.Reward({
+        type: newnewapi.Reward.RewardType.SUBSCRIBE,
+        amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      }),
+      new newnewapi.Reward({
+        type: newnewapi.Reward.RewardType.SUBSCRIBE_X_CREATORS_LEVEL_1,
+        amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+        extra: { amount: 2 },
+      }),
+      new newnewapi.Reward({
+        type: newnewapi.Reward.RewardType.BID_SAME_CREATOR_X_TIMES_LEVEL_1,
+        amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+        extra: { amount: 2 },
+      }),
+      new newnewapi.Reward({
+        type: newnewapi.Reward.RewardType.VOTE_SAME_CREATOR_X_TIMES_LEVEL_1,
+        amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+        extra: { amount: 2 },
+      }),
+      new newnewapi.Reward({
+        type: newnewapi.Reward.RewardType.BACK_SAME_CREATOR_X_TIMES_LEVEL_1,
+        amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+        extra: { amount: 2 },
+      }),
+      new newnewapi.Reward({
+        type: newnewapi.Reward.RewardType.BID_IN_A_WEEK_X_TIMES_LEVEL_1,
+        amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+        extra: { amount: 2 },
+      }),
+      new newnewapi.Reward({
+        type: newnewapi.Reward.RewardType.VOTE_IN_A_WEEK_X_TIMES_LEVEL_1,
+        amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+        extra: { amount: 2 },
+      }),
+      new newnewapi.Reward({
+        type: newnewapi.Reward.RewardType.BACK_IN_A_WEEK_X_TIMES_LEVEL_1,
+        amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+        extra: { amount: 2 },
+      }),
+      new newnewapi.Reward({
+        type: newnewapi.Reward.RewardType.INVITE_X_FRIENDS_LEVEL_1,
+        amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+        extra: { amount: 3 },
+      }),
+    ];
+    let i = 0;
+
+    const timer = setInterval(() => {
+      show({
+        titleKey: `rewards.modalTitle`,
+        titleProps: {
+          amount: Math.floor(rewards[i].amount!.usdCents! / 100),
+        },
+        descriptionKey: `rewards.modalDescription.${rewards[i].type}`,
+        descriptionProps: rewards[i].extra,
+        buttonTextKey: `rewards.modalButton`,
+      });
+
+      i = i < rewards.length - 1 ? i + 1 : 0;
+    }, 5000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, []); */
+
   return (
     <RewardContext.Provider value={contextValue}>
       {children}

@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { newnewapi } from 'newnew-api';
+import { google, newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -11,16 +11,83 @@ interface RewardListI {}
 
 export const RewardList: React.FC<RewardListI> = () => {
   const { t } = useTranslation('common');
-  const [receivedRewards, setReceivedRewards] = useState<newnewapi.Reward[]>(
-    []
-  );
+  // TODO: remove test data
+  const [receivedRewards, setReceivedRewards] = useState<newnewapi.Reward[]>([
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.SIGN_UP,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      receivedAt: new google.protobuf.Timestamp({
+        seconds: Date.now(),
+      }),
+    }),
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.BID,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      receivedAt: new google.protobuf.Timestamp({
+        seconds: Date.now(),
+      }),
+    }),
+  ]);
+
   // TODO: add loading state
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [receivedRewardsLoading, setReceivedRewardsLoading] = useState(false);
+  // TODO: remove test data
+  const [availableRewards, setAvailableRewards] = useState<newnewapi.Reward[]>([
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.VOTE,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+    }),
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.BACK,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+    }),
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.SUBSCRIBE,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+    }),
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.SUBSCRIBE_X_CREATORS_LEVEL_1,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      extra: { amount: 2 },
+    }),
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.BID_SAME_CREATOR_X_TIMES_LEVEL_1,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      extra: { amount: 2 },
+    }),
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.VOTE_SAME_CREATOR_X_TIMES_LEVEL_1,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      extra: { amount: 2 },
+    }),
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.BACK_SAME_CREATOR_X_TIMES_LEVEL_1,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      extra: { amount: 2 },
+    }),
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.BID_IN_A_WEEK_X_TIMES_LEVEL_1,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      extra: { amount: 2 },
+    }),
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.VOTE_IN_A_WEEK_X_TIMES_LEVEL_1,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      extra: { amount: 2 },
+    }),
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.BACK_IN_A_WEEK_X_TIMES_LEVEL_1,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      extra: { amount: 2 },
+    }),
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.INVITE_X_FRIENDS_LEVEL_1,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      extra: { amount: 3 },
+    }),
+  ]);
 
-  const [availableRewards, setAvailableRewards] = useState<newnewapi.Reward[]>(
-    []
-  );
   // TODO: add loading state
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [availableRewardsLoading, setAvailableRewardsLoading] = useState(false);
@@ -92,10 +159,7 @@ export const RewardList: React.FC<RewardListI> = () => {
             <img src={assets.decision.gold} alt='received reward' />
           </RewardImage>
           <RewardDescription received>
-            {t(
-              `rewards.receivedItemDescription.${reward.type}`,
-              reward.extra ? reward.extra : undefined
-            )}
+            {t(`rewards.receivedItemDescription.${reward.type}`, reward.extra)}
           </RewardDescription>
           <RewardAmount received>
             <RewardAmountText>
@@ -113,10 +177,7 @@ export const RewardList: React.FC<RewardListI> = () => {
             <img src={assets.decision.votes} alt='available reward' />
           </RewardImage>
           <RewardDescription>
-            {t(
-              `rewards.availableItemDescription.${reward.type}`,
-              reward.extra ? reward.extra : undefined
-            )}
+            {t(`rewards.availableItemDescription.${reward.type}`, reward.extra)}
           </RewardDescription>
           <RewardAmount>
             <RewardAmountText>

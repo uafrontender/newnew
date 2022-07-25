@@ -48,7 +48,12 @@ const ModalNotifications: React.FC = React.memo(() => {
                   currentNotification.titleProps
                 )}
               </Title>
-              <Description>{t(currentNotification.descriptionKey)}</Description>
+              <Description>
+                {t(
+                  currentNotification.descriptionKey,
+                  currentNotification.descriptionProps
+                )}
+              </Description>
             </DataContainer>
             <SButton onClick={handleClose}>
               {t(currentNotification.buttonTextKey)}
