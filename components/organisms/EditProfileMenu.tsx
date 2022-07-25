@@ -716,19 +716,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     }
   }, [formErrors, dataInEdit]);
 
-  useEffect(() => {
-    if (dataInEdit.bio.length > 0) {
-      const workingData: ModalMenuUserData = { ...dataInEdit };
-      workingData.bio = dataInEdit.bio.trimStart();
-      if (
-        dataInEdit.bio.length > 1 &&
-        dataInEdit.bio[dataInEdit.bio.length - 2] === ' '
-      ) {
-        workingData.bio = dataInEdit.bio.trimEnd();
-      }
-      setDataInEdit({ ...workingData });
+  const handleLocalValidation = (value: string) => {
+    let bio = value.trimStart();
+    if (bio.length > 1 && bio[bio.length - 2] === ' ') {
+      bio = bio.trimEnd();
     }
-  }, [dataInEdit]);
+    handleUpdateDataInEdit('bio', bio);
+  };
 
   // Gender Pronouns
   const genderOptions: TDropdownSelectItem<number>[] = useMemo(
@@ -878,9 +872,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     `editProfileMenu.inputs.bio.errors.${formErrors.bioError}`
                   )}
                   isValid={!formErrors.bioError}
-                  onChange={(e) =>
-                    handleUpdateDataInEdit('bio', e.target.value)
-                  }
+                  onChange={(e) => handleLocalValidation(e.target.value)}
                 />
               </STextInputsWrapper>
             </ProfileGeneralContent>
