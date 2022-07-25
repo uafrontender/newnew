@@ -112,6 +112,7 @@ export default Signup;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { to, reason, redirect } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
+    'common',
     'page-SignUp',
     'page-VerifyEmail',
   ]);

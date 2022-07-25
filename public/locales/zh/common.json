@@ -173,5 +173,8 @@
     "numbers-of-bids": "出價數量",
     "numbers-of-bids-fewest": "最少",
     "numbers-of-bids-most-first": "最先"
+  },
+  "toastErrors_NEED_TRANSLATION": {
+    "generic": "An error occurred, please try again later"
   }
 }

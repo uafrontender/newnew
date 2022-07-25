@@ -176,5 +176,8 @@
     "numbers-of-bids": "Numbers of bids",
     "numbers-of-bids-fewest": "Fewest",
     "numbers-of-bids-most-first": "Most first"
+  },
+  "toastErrors": {
+    "generic": "An error occurred, please try again later"
   }
 }

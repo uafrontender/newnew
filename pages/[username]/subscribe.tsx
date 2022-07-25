@@ -9,6 +9,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import styled, { useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../redux-store/store';
 // import { WalletContext } from '../../contexts/walletContext';
@@ -118,6 +119,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       if (url) window.location.href = url;
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 
@@ -141,6 +143,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         }
       } catch (err) {
         console.log(err);
+        toast.error('toastErrors.generic');
       }
     }
 

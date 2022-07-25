@@ -6,6 +6,7 @@ import { useTranslation } from 'next-i18next';
 import React, { useCallback, useState } from 'react';
 import { useRouter } from 'next/router';
 import styled, { useTheme } from 'styled-components';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
@@ -240,6 +241,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [user.loggedIn, supportBidAmount, option.id, postId, router.locale]);
 

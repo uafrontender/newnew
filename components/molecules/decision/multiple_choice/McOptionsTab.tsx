@@ -16,6 +16,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { validateText } from '../../../../api/endpoints/infrastructure';
@@ -341,6 +342,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [newBidAmount, newOptionText, post.postUuid, router.locale]);
 
@@ -383,6 +385,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
+      toast.error('toastErrors.generic');
     }
   }, [
     newOptionText,

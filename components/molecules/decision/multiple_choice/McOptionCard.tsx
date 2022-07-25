@@ -11,6 +11,7 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import {
@@ -193,6 +194,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       }
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [handleRemoveOption, option.id]);
 
@@ -205,8 +207,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   }, []);
 
   const [isSupportMenuOpen, setIsSupportMenuOpen] = useState(false);
-  const [selectVotesMenuTop, setSelectVotesMenuTop] =
-    useState<number | undefined>(undefined);
+  const [selectVotesMenuTop, setSelectVotesMenuTop] = useState<
+    number | undefined
+  >(undefined);
 
   const [isConfirmVoteModalOpen, setIsConfirmVoteModalOpen] = useState(false);
   const [isAmountPredefined, setIsAmountPredefined] = useState(false);
@@ -406,6 +409,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [option.id, postId, supportBidAmount, user.loggedIn, router.locale]);
 
@@ -439,6 +443,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
+      toast.error('toastErrors.generic');
     }
   }, [
     postId,
