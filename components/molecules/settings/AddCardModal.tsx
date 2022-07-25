@@ -105,7 +105,7 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
         const jsonRes: IReCaptchaRes = await res.json();
 
         if (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5) {
-          handleConfirmSetup();
+          await handleConfirmSetup();
         } else {
           if (!jsonRes?.errors) {
             throw new Error('ReCaptcha failed');
@@ -121,6 +121,8 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
     } catch (err: any) {
       console.error(err);
       setErrorMessage(err?.message || 'An error occurred');
+    } finally {
+      setIsLoading(false);
     }
   };
 
