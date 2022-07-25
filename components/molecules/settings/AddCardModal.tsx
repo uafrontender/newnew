@@ -181,7 +181,7 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
                 </SCancelButton>
                 <SAddButton
                   view='primary'
-                  disabled={!stripe}
+                  disabled={!stripe || isLoading}
                   type='submit'
                   style={{
                     ...(isLoading ? { cursor: 'wait' } : {}),
