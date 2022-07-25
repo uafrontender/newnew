@@ -80,8 +80,9 @@ const ChatArea: React.FC<IChatData> = ({
   //   useState<boolean>(false);
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const [newMessage, setNewMessage] =
-    useState<newnewapi.IChatMessage | null | undefined>();
+  const [newMessage, setNewMessage] = useState<
+    newnewapi.IChatMessage | null | undefined
+  >();
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
@@ -98,8 +99,9 @@ const ChatArea: React.FC<IChatData> = ({
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
-  const [messagesNextPageToken, setMessagesNextPageToken] =
-    useState<string | undefined | null>('');
+  const [messagesNextPageToken, setMessagesNextPageToken] = useState<
+    string | undefined | null
+  >('');
   const [messagesLoading, setMessagesLoading] = useState(false);
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
@@ -281,7 +283,11 @@ const ChatArea: React.FC<IChatData> = ({
   };
 
   const handleChange = useCallback((id: string, value: string) => {
-    setMessageText(value);
+    let msgText = value.trimStart();
+    if (msgText.length > 1 && msgText[msgText.length - 2] === ' ') {
+      msgText = msgText.trimEnd();
+    }
+    setMessageText(msgText);
   }, []);
 
   const submitMessage = useCallback(async () => {
@@ -393,6 +399,7 @@ const ChatArea: React.FC<IChatData> = ({
         let date = moment((item.createdAt?.seconds as number) * 1000).format(
           'MMM DD'
         );
+
         if (date === moment().format('MMM DD')) {
           date = t('chat.today');
         }
@@ -415,9 +422,12 @@ const ChatArea: React.FC<IChatData> = ({
         );
       }
       if (!nextElement) {
-        const date = moment((item.createdAt?.seconds as number) * 1000).format(
+        let date = moment((item.createdAt?.seconds as number) * 1000).format(
           'MMM DD'
         );
+        if (date === moment().format('MMM DD')) {
+          date = t('chat.today');
+        }
         return (
           <React.Fragment key={item.id?.toString()}>
             {content}
