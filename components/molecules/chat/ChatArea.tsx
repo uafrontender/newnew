@@ -399,6 +399,7 @@ const ChatArea: React.FC<IChatData> = ({
         let date = moment((item.createdAt?.seconds as number) * 1000).format(
           'MMM DD'
         );
+
         if (date === moment().format('MMM DD')) {
           date = t('chat.today');
         }
@@ -421,9 +422,12 @@ const ChatArea: React.FC<IChatData> = ({
         );
       }
       if (!nextElement) {
-        const date = moment((item.createdAt?.seconds as number) * 1000).format(
+        let date = moment((item.createdAt?.seconds as number) * 1000).format(
           'MMM DD'
         );
+        if (date === moment().format('MMM DD')) {
+          date = t('chat.today');
+        }
         return (
           <React.Fragment key={item.id?.toString()}>
             {content}
