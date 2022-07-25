@@ -97,8 +97,9 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >();
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
     Mixpanel.track('Open Post Modal', {
@@ -144,8 +145,9 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
   const [initialLoad, setInitialLoad] = useState(false);
   const [loadingPosts, setLoadingPosts] = useState(false);
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
-  const [postsNextPageToken, setPostsRoomsNextPageToken] =
-    useState<string | undefined | null>('');
+  const [postsNextPageToken, setPostsRoomsNextPageToken] = useState<
+    string | undefined | null
+  >('');
 
   const getSearchResult = useCallback(
     async (pageToken?: string) => {
@@ -227,6 +229,10 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
   }, [inView, loadingPosts, postsNextPageToken]);
 
   useEffect(() => {
+    if (router.query.tab !== 'posts') {
+      return;
+    }
+
     const routerArr: string[] = [];
     activeTabs.forEach((filterValue) => {
       switch (filterValue) {
