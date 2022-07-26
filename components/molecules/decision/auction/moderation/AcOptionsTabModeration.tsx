@@ -6,6 +6,7 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 
@@ -36,146 +37,140 @@ interface IAcOptionsTabModeration {
   handleUpdateWinningOption: (winningOption: newnewapi.Auction.Option) => void;
 }
 
-const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
-  ({
-    postId,
-    postStatus,
-    options,
-    optionsLoading,
-    pagingToken,
-    winningOptionId,
-    handleLoadBids,
-    handleRemoveOption,
-    handleUpdatePostStatus,
-    handleUpdateWinningOption,
-  }) => {
-    const theme = useTheme();
-    const { t } = useTranslation('modal-Post');
-    const { resizeMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
-    // Infinite load
-    const { ref: loadingRef, inView } = useInView();
+const AcOptionsTabModeration: React.FunctionComponent<
+  IAcOptionsTabModeration
+> = ({
+  postId,
+  postStatus,
+  options,
+  optionsLoading,
+  pagingToken,
+  winningOptionId,
+  handleLoadBids,
+  handleRemoveOption,
+  handleUpdatePostStatus,
+  handleUpdateWinningOption,
+}) => {
+  const theme = useTheme();
+  const { t } = useTranslation('modal-Post');
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  // Infinite load
+  const { ref: loadingRef, inView } = useInView();
 
-    const containerRef = useRef<HTMLDivElement>();
-    const { showTopGradient, showBottomGradient } =
-      useScrollGradients(containerRef);
+  const containerRef = useRef<HTMLDivElement>();
+  const { showTopGradient, showBottomGradient } =
+    useScrollGradients(containerRef);
 
-    const mainContainer = useRef<HTMLDivElement>();
+  const mainContainer = useRef<HTMLDivElement>();
 
-    const handleConfirmWinningOption = async (
-      winningOption: newnewapi.Auction.Option
-    ) => {
-      try {
-        const payload = new newnewapi.SelectWinningOptionRequest({
-          postUuid: postId,
-          winningOptionId: winningOption.id,
-        });
+  const handleConfirmWinningOption = async (
+    winningOption: newnewapi.Auction.Option
+  ) => {
+    try {
+      const payload = new newnewapi.SelectWinningOptionRequest({
+        postUuid: postId,
+        winningOptionId: winningOption.id,
+      });
 
-        const res = await selectWinningOption(payload);
+      const res = await selectWinningOption(payload);
 
-        if (res.data) {
-          handleUpdatePostStatus(newnewapi.Auction.Status.WAITING_FOR_RESPONSE);
-          handleUpdateWinningOption(winningOption);
-        }
-      } catch (err) {
-        console.error(err);
+      if (res.data) {
+        handleUpdatePostStatus(newnewapi.Auction.Status.WAITING_FOR_RESPONSE);
+        handleUpdateWinningOption(winningOption);
       }
-    };
-
-    useEffect(() => {
-      if (inView && !optionsLoading && pagingToken) {
-        handleLoadBids(pagingToken);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, pagingToken, optionsLoading]);
-
-    return (
-      <>
-        <STabContainer
-          key='bids'
-          ref={(el) => {
-            mainContainer.current = el!!;
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {options.length === 0 &&
-          !optionsLoading &&
-          postStatus !== 'failed' ? (
-            <SNoOptionsYet>
-              <SNoOptionsImgContainer>
-                <img src={NoContentYetImg.src} alt='No content yet' />
-              </SNoOptionsImgContainer>
-              <SNoOptionsCaption variant={3}>
-                {t('acPostModeration.optionsTab.noOptions.caption_1')}
-              </SNoOptionsCaption>
-            </SNoOptionsYet>
-          ) : (
-            <SBidsContainer
-              id='acOptionsTabModeration__bidsContainer'
-              ref={(el) => {
-                containerRef.current = el!!;
-              }}
-            >
-              {!isMobile ? (
-                <>
-                  <GradientMask
-                    gradientType={
-                      theme.name === 'dark' ? 'secondary' : 'primary'
-                    }
-                    positionTop
-                    active={showTopGradient}
-                  />
-                  <GradientMask
-                    gradientType={
-                      theme.name === 'dark' ? 'secondary' : 'primary'
-                    }
-                    positionBottom={0}
-                    active={showBottomGradient}
-                  />
-                </>
-              ) : null}
-              {options.map((option, i) => (
-                <AcOptionCardModeration
-                  index={i}
-                  key={option.id.toString()}
-                  postStatus={postStatus}
-                  option={option as TAcOptionWithHighestField}
-                  isWinner={
-                    winningOptionId?.toString() === option.id.toString()
-                  }
-                  handleRemoveOption={handleRemoveOption}
-                  handleConfirmWinningOption={() =>
-                    handleConfirmWinningOption(option)
-                  }
-                />
-              ))}
-              {!isMobile ? (
-                <SLoaderDiv ref={loadingRef} />
-              ) : pagingToken ? (
-                <SLoadMoreBtn
-                  view='secondary'
-                  onClickCapture={() => {
-                    Mixpanel.track('Click Load More', {
-                      _stage: 'Post',
-                      _postUuid: postId,
-                      _component: 'AcOptionsTabModeration',
-                    });
-                  }}
-                  onClick={() => handleLoadBids(pagingToken)}
-                >
-                  {t('loadMoreButton')}
-                </SLoadMoreBtn>
-              ) : null}
-            </SBidsContainer>
-          )}
-        </STabContainer>
-      </>
-    );
+    } catch (err) {
+      console.error(err);
+      toast.error('toastErrors.generic');
+    }
   };
+
+  useEffect(() => {
+    if (inView && !optionsLoading && pagingToken) {
+      handleLoadBids(pagingToken);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, pagingToken, optionsLoading]);
+
+  return (
+    <>
+      <STabContainer
+        key='bids'
+        ref={(el) => {
+          mainContainer.current = el!!;
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        {options.length === 0 && !optionsLoading && postStatus !== 'failed' ? (
+          <SNoOptionsYet>
+            <SNoOptionsImgContainer>
+              <img src={NoContentYetImg.src} alt='No content yet' />
+            </SNoOptionsImgContainer>
+            <SNoOptionsCaption variant={3}>
+              {t('acPostModeration.optionsTab.noOptions.caption_1')}
+            </SNoOptionsCaption>
+          </SNoOptionsYet>
+        ) : (
+          <SBidsContainer
+            id='acOptionsTabModeration__bidsContainer'
+            ref={(el) => {
+              containerRef.current = el!!;
+            }}
+          >
+            {!isMobile ? (
+              <>
+                <GradientMask
+                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+                  positionTop
+                  active={showTopGradient}
+                />
+                <GradientMask
+                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+                  positionBottom={0}
+                  active={showBottomGradient}
+                />
+              </>
+            ) : null}
+            {options.map((option, i) => (
+              <AcOptionCardModeration
+                index={i}
+                key={option.id.toString()}
+                postStatus={postStatus}
+                option={option as TAcOptionWithHighestField}
+                isWinner={winningOptionId?.toString() === option.id.toString()}
+                handleRemoveOption={handleRemoveOption}
+                handleConfirmWinningOption={() =>
+                  handleConfirmWinningOption(option)
+                }
+              />
+            ))}
+            {!isMobile ? (
+              <SLoaderDiv ref={loadingRef} />
+            ) : pagingToken ? (
+              <SLoadMoreBtn
+                view='secondary'
+                onClickCapture={() => {
+                  Mixpanel.track('Click Load More', {
+                    _stage: 'Post',
+                    _postUuid: postId,
+                    _component: 'AcOptionsTabModeration',
+                  });
+                }}
+                onClick={() => handleLoadBids(pagingToken)}
+              >
+                {t('loadMoreButton')}
+              </SLoadMoreBtn>
+            ) : null}
+          </SBidsContainer>
+        )}
+      </STabContainer>
+    </>
+  );
+};
 
 AcOptionsTabModeration.defaultProps = {};
 

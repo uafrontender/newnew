@@ -10,7 +10,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/PostViewMC';
@@ -90,6 +90,7 @@ const McOptionCardModeration: React.FunctionComponent<
       }
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 

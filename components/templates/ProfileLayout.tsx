@@ -15,6 +15,7 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -159,6 +160,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       unblockUser(uuid);
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 
@@ -440,6 +442,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         }
       } catch (err) {
         console.error(err);
+        toast.error('toastErrors.generic');
       }
     }
 

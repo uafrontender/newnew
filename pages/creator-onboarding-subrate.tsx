@@ -34,8 +34,9 @@ const CreatorOnboardingSubrate = () => {
     newnewapi.ISubscriptionProduct[]
   >([]);
   const [featuredProductsIds, setFeaturedProductsIds] = useState<string[]>([]);
-  const [currentProduct, setCurrentProduct] =
-    useState<newnewapi.ISubscriptionProduct | undefined>(undefined);
+  const [currentProduct, setCurrentProduct] = useState<
+    newnewapi.ISubscriptionProduct | undefined
+  >(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -132,6 +133,7 @@ export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
+    'common',
     'page-CreatorOnboarding',
   ]);
 

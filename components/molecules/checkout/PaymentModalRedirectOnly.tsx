@@ -12,12 +12,12 @@ import { toast } from 'react-toastify';
 import { useAppSelector } from '../../../redux-store/store';
 
 import Button from '../../atoms/Button';
+import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
 import InlineSvg from '../../atoms/InlineSVG';
 import GoBackButton from '../GoBackButton';
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import { formatNumber } from '../../../utils/format';
 
 interface IReCaptchaRes {
   success?: boolean;
@@ -27,26 +27,26 @@ interface IReCaptchaRes {
   errors?: Array<string> | string;
 }
 
-interface IPaymentModal {
+interface IPaymentModalRedirectOnly {
   isOpen: boolean;
   zIndex: number;
-  amount?: number;
+  amount?: string;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
+  children: React.ReactNode;
   onClose: () => void;
   handlePayWithCardStripeRedirect?: () => void;
-  children: React.ReactNode;
 }
 
-const PaymentModal: React.FC<IPaymentModal> = ({
+const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
   isOpen,
   zIndex,
   amount,
   showTocApply,
   bottomCaption,
+  children,
   onClose,
   handlePayWithCardStripeRedirect,
-  children,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
@@ -120,11 +120,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
               onClick={() => handlePayWithCaptchaProtection()}
             >
               {t('payButton')}
-              {amount &&
-                ` $${formatNumber(
-                  Math.max(amount, 0) / 100,
-                  amount % 1 === 0
-                )}`}
+              {amount && ` ${amount}`}
             </SPayButton>
             {bottomCaption || null}
             {showTocApply && (
@@ -138,9 +134,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
                 {t('tocApplyText')}
               </STocApply>
             )}
-            {
-              // TODO: re-enable / move / make final decision
-              /* <STocApplyReCaptcha>
+            <STocApplyReCaptcha>
               {t('reCaptchaTos.siteProtectedBy')}{' '}
               <a target='_blank' href='https://policies.google.com/privacy'>
                 {t('reCaptchaTos.privacyPolicy')}
@@ -150,8 +144,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
                 {t('reCaptchaTos.tos')}
               </a>{' '}
               {t('reCaptchaTos.apply')}
-            </STocApplyReCaptcha> */
-            }
+            </STocApplyReCaptcha>
           </SPayButtonDiv>
         </SContentContainer>
       </SWrapper>
@@ -159,14 +152,14 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   );
 };
 
-PaymentModal.defaultProps = {
+PaymentModalRedirectOnly.defaultProps = {
   amount: undefined,
   showTocApply: undefined,
   bottomCaption: null,
   handlePayWithCardStripeRedirect: () => {},
 };
 
-export default PaymentModal;
+export default PaymentModalRedirectOnly;
 
 const SWrapper = styled.div`
   width: 100%;
@@ -189,8 +182,6 @@ const SContentContainer = styled.div<{
   showTocApply: boolean;
 }>`
   position: relative;
-  display: flex;
-  flex-direction: column;
   width: 100%;
   height: 100%;
 
@@ -246,11 +237,14 @@ const SCloseButton = styled.button`
 
 const SHeaderContainer = styled.div`
   margin-bottom: 16px;
-  flex-grow: 1;
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 24px;
   }
+`;
+
+const SPaymentMethodTitle = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SPayButtonDiv = styled.div`
@@ -331,3 +325,5 @@ const STocApplyReCaptcha = styled.div`
     line-height: 12px;
   }
 `;
+
+const SOptionsContainer = styled.div``;

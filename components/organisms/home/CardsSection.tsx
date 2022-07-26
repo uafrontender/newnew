@@ -319,7 +319,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             {!loading ? (
               collectionToRender?.map(renderItem)
             ) : (
-              <CardSkeletonSection count={5} />
+              <CardSkeletonSection count={!isMobile ? 5 : 1} />
             )}
             {(!loading && collection?.length === 0) || !collection ? (
               <SItemWrapper

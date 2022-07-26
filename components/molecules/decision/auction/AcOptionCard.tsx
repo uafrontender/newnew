@@ -16,6 +16,7 @@ import React, {
 } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
@@ -175,6 +176,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       }
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [handleRemoveOption, option.id]);
 
@@ -375,6 +377,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [router.locale, user.loggedIn, supportBidAmount, option.id, postId]);
 
