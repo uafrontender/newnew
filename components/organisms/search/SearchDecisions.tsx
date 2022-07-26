@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { toast } from 'react-toastify';
 
 import Button from '../../atoms/Button';
 import Sorting from '../Sorting';
@@ -97,8 +98,9 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >();
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
     Mixpanel.track('Open Post Modal', {
@@ -144,8 +146,9 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
   const [initialLoad, setInitialLoad] = useState(false);
   const [loadingPosts, setLoadingPosts] = useState(false);
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
-  const [postsNextPageToken, setPostsRoomsNextPageToken] =
-    useState<string | undefined | null>('');
+  const [postsNextPageToken, setPostsRoomsNextPageToken] = useState<
+    string | undefined | null
+  >('');
 
   const getSearchResult = useCallback(
     async (pageToken?: string) => {
@@ -198,6 +201,7 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
         setLoadingPosts(false);
       } catch (err) {
         setLoadingPosts(false);
+        toast.error('toastErrors.generic');
         console.error(err);
       }
     },

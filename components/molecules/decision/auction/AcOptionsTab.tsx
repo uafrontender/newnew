@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { debounce } from 'lodash';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
@@ -367,6 +368,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [user.loggedIn, router.locale, newBidAmount, newBidText, postId]);
 
