@@ -16,6 +16,7 @@ import React, {
 } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
@@ -31,7 +32,7 @@ import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
-import PaymentModalRedirectOnly from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import PaymentSuccessModal from '../PaymentSuccessModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import TutorialTooltip, {
@@ -175,6 +176,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       }
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [handleRemoveOption, option.id]);
 
@@ -205,7 +207,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
   // Handlers
   const handleTogglePaymentModalOpen = () => {
@@ -375,6 +377,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [router.locale, user.loggedIn, supportBidAmount, option.id, postId]);
 
@@ -726,10 +729,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       </SSupportBidForm>
       {/* Payment Modal */}
       {paymentModalOpen && (
-        <PaymentModalRedirectOnly
+        <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${formatNumber(parseInt(supportBidAmount) ?? 0, true)}`}
+          amount={parseInt(supportBidAmount) * 100 || 0}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(supportBidAmount) * 100
           //   ? {}
@@ -786,13 +789,13 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               {option.title}
             </SPaymentModalOptionText>
           </SPaymentModalHeader>
-        </PaymentModalRedirectOnly>
+        </PaymentModal>
       )}
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='ac'
-        isVisible={paymentSuccesModalOpen}
-        closeModal={() => setPaymentSuccesModalOpen(false)}
+        isVisible={paymentSuccessModalOpen}
+        closeModal={() => setPaymentSuccessModalOpen(false)}
       >
         {t('paymentSuccessModal.ac', {
           postCreator,

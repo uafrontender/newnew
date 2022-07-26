@@ -21,7 +21,7 @@ export const Dashboard = () => {
 
   useUpdateEffect(() => {
     if (!user.loggedIn) {
-      router?.push('/sign-up?to=log-in');
+      router?.push('/sign-up');
     }
   }, [router, user.loggedIn]);
 

@@ -217,20 +217,35 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
         );
       }
-      const markAsViewedPayload = new newnewapi.MarkPostRequest({
-        markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
+      const markAsFavoritePayload = new newnewapi.MarkPostRequest({
+        markAs: !isFollowingDecision
+          ? newnewapi.MarkPostRequest.Kind.FAVORITE
+          : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
         postUuid: postParsed?.postUuid,
       });
 
-      const res = await markPost(markAsViewedPayload);
+      const res = await markPost(markAsFavoritePayload);
 
       if (!res.error) {
         setIsFollowingDecision((currentValue) => !currentValue);
+        // TODO: separate onDelete and onUnsubscribe callbacks to prevent possible bugs
+        if (isFollowingDecision) {
+          handleRemovePostFromState?.();
+        } else {
+          handleAddPostToState?.();
+        }
       }
     } catch (err) {
       console.error(err);
     }
-  }, [postParsed, router, user.loggedIn]);
+  }, [
+    postParsed,
+    router,
+    isFollowingDecision,
+    user.loggedIn,
+    handleRemovePostFromState,
+    handleAddPostToState,
+  ]);
 
   const handleUpdatePostStatus = useCallback(
     (newStatus: number | string) => {
@@ -360,8 +375,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [recommendedPosts, setRecommendedPosts] = useState<newnewapi.Post[]>(
     []
   );
-  const [nextPageToken, setNextPageToken] =
-    useState<string | null | undefined>('');
+  const [nextPageToken, setNextPageToken] = useState<string | null | undefined>(
+    ''
+  );
   const [recommendedPostsLoading, setRecommendedPostsLoading] = useState(false);
   const [triedLoading, setTriedLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
@@ -1208,7 +1224,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   if (shouldRenderVotingFinishedModal && !isMyPost) {
     return (
       <>
-        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
+        <Modal
+          withoutOverlay
+          show={open}
+          overlaydim
+          onClose={() => handleCloseAndGoBack()}
+        >
           {postStatus === 'succeeded' && !isMobile && (
             <PostSuccessAnimationBackground />
           )}
@@ -1269,7 +1290,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   if (isMyPost) {
     return (
       <>
-        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
+        <Modal
+          withoutOverlay
+          show={open}
+          overlaydim
+          onClose={() => handleCloseAndGoBack()}
+        >
           {(postStatus === 'succeeded' ||
             postStatus === 'waiting_for_response') &&
             !isMobile && <PostSuccessAnimationBackground />}
@@ -1338,7 +1364,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   // Render regular Decision view
   return (
     <>
-      <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
+      <Modal
+        withoutOverlay
+        show={open}
+        overlaydim
+        onClose={() => handleCloseAndGoBack()}
+      >
         <Head>
           <title>{t(`meta.${typeOfPost}.title`)}</title>
           <meta

@@ -35,7 +35,6 @@ export const Logo: React.FunctionComponent<{
       scroller.scrollTo('top-reload', {
         smooth: 'easeInOutQuart',
         duration: SCROLL_TO_TOP,
-        containerId: 'generalScrollContainer',
       });
     }
   };
@@ -74,12 +73,14 @@ export const Logo: React.FunctionComponent<{
             isStopped={!loading}
           />
         </SAnimationWrapper>
-        <SInlineSVG
-          svg={logoText}
-          fill={theme.colorsThemed.text.primary}
-          width={isMobile ? '81px' : '94px'}
-          height={isMobile ? '21px' : '21px'}
-        />
+        {!isMobile && (
+          <SInlineSVG
+            svg={logoText}
+            fill={theme.colorsThemed.text.primary}
+            width={isMobile ? '81px' : '94px'}
+            height={isMobile ? '21px' : '21px'}
+          />
+        )}
       </SWrapper>
     </Link>
   );

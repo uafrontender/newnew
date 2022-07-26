@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { toast } from 'react-toastify';
 
 import EllipseMenu from '../EllipseMenu';
 import Button from '../Button';
@@ -48,6 +49,7 @@ const RemoveSubscriptionEllipseMenu: React.FC<
       );
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
       setConfirmSubEnable(false);
     }
   };

@@ -40,7 +40,9 @@ interface IGeneral {
 export const General: React.FC<IGeneral> = (props) => {
   const { withChat, specialStatusBarColor, restrictMaxWidth, children } = props;
   const user = useAppSelector((state) => state.user);
-  const { banner, resizeMode } = useAppSelector((state) => state.ui);
+  const { banner, resizeMode, globalSearchActive } = useAppSelector(
+    (state) => state.ui
+  );
   const theme = useTheme();
   const [cookies] = useCookies();
   const { unreadNotificationCount } = useNotifications();
@@ -167,7 +169,7 @@ export const General: React.FC<IGeneral> = (props) => {
         highlightColor={theme.colorsThemed.background.tertiary}
       >
         <SWrapper
-          id='generalScrollContainer'
+          id='generalContainer'
           ref={wrapperRef}
           withBanner={!!banner?.show}
           {...props}
@@ -182,7 +184,9 @@ export const General: React.FC<IGeneral> = (props) => {
               }
             />
           </Head>
-          <Header visible={!isMobile || mobileNavigationVisible} />
+          <Header
+            visible={!isMobile || mobileNavigationVisible || globalSearchActive}
+          />
           <SContent>
             <Container
               {...(restrictMaxWidth
@@ -203,7 +207,7 @@ export const General: React.FC<IGeneral> = (props) => {
                 collection={bottomNavigation}
                 moreMenuMobileOpen={moreMenuMobileOpen}
                 handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-                visible={mobileNavigationVisible}
+                visible={mobileNavigationVisible && !globalSearchActive}
               />
               <SortingContainer
                 id='sorting-container'
@@ -261,7 +265,10 @@ interface ISWrapper {
 
 const SWrapper = styled.div<ISWrapper>`
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: -moz-available;
+  min-height: -webkit-fill-available;
+  min-height: fill-available;
   display: flex;
   overflow-y: auto;
   transition: padding ease 0.5s;

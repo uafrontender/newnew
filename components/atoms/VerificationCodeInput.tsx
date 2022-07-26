@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
-interface IVerficationInput {
+interface IVerificationInput {
   id?: string;
   length: number;
   initialValue?: string[];
@@ -11,7 +11,7 @@ interface IVerficationInput {
   onComplete: (completeCode: string) => void;
 }
 
-const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
+const VerificationCodeInput: React.FunctionComponent<IVerificationInput> = ({
   id,
   length,
   initialValue,
@@ -167,12 +167,12 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
   );
 };
 
-VerficationCodeInput.defaultProps = {
+VerificationCodeInput.defaultProps = {
   initialValue: undefined,
   error: undefined,
 };
 
-export default VerficationCodeInput;
+export default VerificationCodeInput;
 
 interface ISVerficationInput {
   errorBordersShown?: boolean;

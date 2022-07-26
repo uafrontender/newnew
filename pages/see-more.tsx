@@ -11,6 +11,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { toast } from 'react-toastify';
 
 import { NextPageWithLayout } from './_app';
 import PostList from '../components/organisms/see-more/PostList';
@@ -63,8 +64,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
   const [collectionLoaded, setCollectionLoaded] = useState<newnewapi.Post[]>(
     []
   );
-  const [nextPageToken, setNextPageToken] =
-    useState<string | null | undefined>('');
+  const [nextPageToken, setNextPageToken] = useState<string | null | undefined>(
+    ''
+  );
   const [isCollectionLoading, setIsCollectionLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
 
@@ -253,8 +255,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
           throw new Error('Request failed');
         }
       } catch (err) {
-        setIsCollectionLoading(false);
         console.error(err);
+        setIsCollectionLoading(false);
+        toast.error('toastErrors.generic');
       }
     },
     [setCollectionLoaded, loggedIn, isCollectionLoading]
@@ -262,8 +265,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>(undefined);
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >(undefined);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
     Mixpanel.track('Open Post Modal', {
@@ -309,7 +313,6 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     scroller.scrollTo(category, {
       smooth: true,
       offset: -100,
-      containerId: 'generalScrollContainer',
     });
   }, [router.query.category, router.query.sort]);
 
@@ -380,21 +383,6 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     router.query.sort,
     loggedIn,
   ]);
-
-  // Clear sorting
-  useEffect(() => {
-    const category = router.query.category?.toString() ?? 'ac';
-    if (category === 'for-you') {
-      const newQuery = { ...router.query };
-
-      delete newQuery.sort;
-
-      router?.push({
-        query: newQuery,
-        pathname: router.pathname,
-      });
-    }
-  }, [router]);
 
   return (
     <>

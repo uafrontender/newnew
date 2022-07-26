@@ -5,6 +5,7 @@ import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { toast } from 'react-toastify';
 
 import UserAvatar from '../../molecules/UserAvatar';
 import Button from '../Button';
@@ -76,6 +77,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
       if (subscriber.user?.uuid) unblockUser(subscriber.user.uuid);
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }
 

@@ -40,6 +40,8 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   );
   const isPageVisible = usePageVisibility();
 
+  const [isScrolledDown, setIsScrolledDown] = useState(false);
+
   // Timer
   const parsed = (timestampSeconds - Date.now()) / 1000;
   const hasEnded = Date.now() > timestampSeconds;
@@ -64,8 +66,43 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     setParsedSeconds(secondsToDHMS(seconds, 'noTrim'));
   }, [seconds]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = document?.getElementById(
+        'post-modal-container'
+      )?.scrollTop;
+      if (scrollTop && scrollTop > 200) {
+        setIsScrolledDown(true);
+      } else {
+        setIsScrolledDown(false);
+      }
+    };
+
+    if (isBrowser()) {
+      document
+        ?.getElementById('post-modal-container')
+        ?.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (isBrowser()) {
+        document
+          ?.getElementById('post-modal-container')
+          ?.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
+
   return (
-    <SContainer>
+    <SContainer
+      style={{
+        ...(isMobile && !isScrolledDown
+          ? {
+              position: 'fixed',
+            }
+          : {}),
+      }}
+    >
       <SHeadingContainer>
         <SImgContainer>
           <img
@@ -138,7 +175,6 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
 export default PostScheduledSection;
 
 const SContainer = styled.div`
-  position: fixed;
   left: 16px;
   bottom: 16px;
 
@@ -152,7 +188,6 @@ const SContainer = styled.div`
   z-index: 9;
 
   ${({ theme }) => theme.media.tablet} {
-    position: initial;
     background-color: transparent;
   }
 `;
@@ -166,6 +201,10 @@ const SHeadingContainer = styled.div`
 
   grid-template-columns: 60px 1fr;
 
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
       'hourglass'
@@ -178,6 +217,10 @@ const SHeadingContainer = styled.div`
     justify-content: center;
 
     text-align: center;
+
+    width: initial;
+    margin-left: initial;
+    margin-right: initial;
   }
 
   ${({ theme }) => theme.media.laptop} {

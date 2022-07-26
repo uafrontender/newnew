@@ -59,8 +59,9 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
 }) => {
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >();
 
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
@@ -284,7 +285,6 @@ export async function getServerSideProps(
       },
     };
   } catch (err) {
-    console.log(err);
     return {
       props: {
         error: {

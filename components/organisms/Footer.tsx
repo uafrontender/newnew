@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-target-blank */
 import React from 'react';
 import Link from 'next/link';
-import { scroller } from 'react-scroll';
+import { animateScroll } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -83,10 +83,9 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
 
   const handleLogoClick = () => {
     if (router.pathname === '/') {
-      scroller.scrollTo('top-reload', {
+      animateScroll.scrollToTop({
         smooth: 'easeInOutQuart',
         duration: SCROLL_TO_TOP,
-        containerId: 'generalScrollContainer',
       });
     } else {
       router.push('/', '/');

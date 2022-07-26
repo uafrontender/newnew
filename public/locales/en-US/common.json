@@ -37,7 +37,7 @@
     "cancel": "Cancel"
   },
   "postType": {
-    "ac": "Event",
+    "ac": "Bid",
     "mc": "Superpoll",
     "cf": "Goal"
   },
@@ -58,8 +58,7 @@
   "button": {
     "createDecision": "New post",
     "create": "Create",
-    "loginIn": "Log in",
-    "signUp": "Sign up",
+    "signIn": "Sign in",
     "dashboard": "Dashboard",
     "createOnNewnew": "Create now",
     "cancel": "Cancel"
@@ -176,5 +175,59 @@
     "numbers-of-bids": "Numbers of bids",
     "numbers-of-bids-fewest": "Fewest",
     "numbers-of-bids-most-first": "Most first"
+  },
+  "toastErrors": {
+    "generic": "An error occurred, please try again later"
+  },
+  "rewards": {
+    "earned": "earned ${{value}}",
+    "earn": "earn ${{value}}",
+    "modalTitle": "You earned ${{amount}}!",
+    "modalButton": "Great",
+    "modalDescription": {
+      "1": "...for signing up",
+      "2": "...for placing a bid",
+      "3": "...for voting on a post",
+      "4": "...for backing a goal",
+      "5": "...for subscribing to a creator",
+      "6": "...for subscribing to {{amount}} creators",
+      "7": "...for bidding twice on the same creator",
+      "8": "...for voting twice on the same creator",
+      "9": "...for backing the same creator twice",
+      "10": "...for bidding twice in one week",
+      "11": "...for voting twice in one week",
+      "12": "...for backing goals twice in one week",
+      "13": "...for inviting {{amount}} friends to NewNew"
+    },
+    "receivedItemDescription": {
+      "1": "Signed up",
+      "2": "Placed a bid",
+      "3": "Voted on a post",
+      "4": "Backed a goal",
+      "5": "Subscribed to a creator",
+      "6": "Subscribed to {{amount}} creators",
+      "7": "Bid twice on the same creator",
+      "8": "Voted twice on the same creator",
+      "9": "Backed the same creator twice",
+      "10": "Placed bids twice in one week",
+      "11": "Voted twice in one week",
+      "12": "Backed goals twice in one week",
+      "13": "Invited {{amount}} friends"
+    },
+    "availableItemDescription": {
+      "1": "Sign up",
+      "2": "Place a bid",
+      "3": "Vote on a post",
+      "4": "Back a Goal",
+      "5": "Subscribe to a creator",
+      "6": "Subscribe to {{amount}} creators",
+      "7": "Bid twice on the same creator",
+      "8": "Vote twice on the same creator",
+      "9": "Back the same Creator twice",
+      "10": "Bid twice in one week",
+      "11": "Vote twice in one week",
+      "12": "Back goals twice in one week",
+      "13": "Invite {{amount}} friends to NewNew"
+    }
   }
 }

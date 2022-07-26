@@ -1,13 +1,12 @@
 {
   "meta": {
-    "title": "Regístrate a NewNew",
-    "description": "Registrarte a NewNew es rápido y sencillo. Únete ahora para ser un creador o espectador",
-    "title-log-in": "Inicia sesión en NewNew",
-    "description-log-in": "Iniciar sesión en NewNew es rápido y sencillo"
+    "title_NEED_TRANSLATION": "Sign in to NewNew",
+    "description_NEED_TRANSLATION": "Signing in to NewNew is fast and easy.",
+    "title-create_NEED_TRANSLATION": "Sign in to NewNew",
+    "description-create_NEED_TRANSLATION": "Signing up to NewNew is fast and easy. Join now to be a Creator"
   },
   "heading": {
-    "sign-in": "Registrarse",
-    "log-in": "Iniciar sesión",
+    "sign-in_NEED_TRANSLATION": "Sign in",
     "sign-in-to": "Registrarse para",
     "reason": {
       "comment": "comentar",
@@ -28,7 +27,7 @@
     "twitter": "Continuar con Twitter",
     "orContinueWith": "o continuar con",
     "email": "Correo electrónico",
-    "signInButton": "Registrarse",
+    "signInButton_NEED_TRANSLATION": "Sign in",
     "logInButton": "Iniciar sesión"
   },
   "error": {

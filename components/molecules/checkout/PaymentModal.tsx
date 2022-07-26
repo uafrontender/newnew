@@ -2,36 +2,40 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect, ReactElement } from 'react';
+import React from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../redux-store/store';
 
 import Button from '../../atoms/Button';
-import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
 import InlineSvg from '../../atoms/InlineSVG';
 import GoBackButton from '../GoBackButton';
-import OptionCard from './OptionCard';
-// import OptionWallet from './OptionWallet';
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import { formatNumber } from '../../../utils/format';
+
+interface IReCaptchaRes {
+  success?: boolean;
+  challenge_ts?: string;
+  hostname?: string;
+  score?: number;
+  errors?: Array<string> | string;
+}
 
 interface IPaymentModal {
   isOpen: boolean;
   zIndex: number;
-  amount?: string;
+  amount?: number;
   showTocApply?: boolean;
-  // predefinedOption?: 'wallet' | 'card';
-  predefinedOption?: 'card';
   bottomCaption?: React.ReactNode;
-  payButtonCaptionKey?: string;
-  children: React.ReactNode;
   onClose: () => void;
-  // handlePayWithWallet?: () => void;
   handlePayWithCardStripeRedirect?: () => void;
+  children: React.ReactNode;
 }
 
 const PaymentModal: React.FC<IPaymentModal> = ({
@@ -39,13 +43,10 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   zIndex,
   amount,
   showTocApply,
-  predefinedOption,
   bottomCaption,
-  payButtonCaptionKey,
-  children,
   onClose,
-  // handlePayWithWallet,
   handlePayWithCardStripeRedirect,
+  children,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
@@ -54,17 +55,43 @@ const PaymentModal: React.FC<IPaymentModal> = ({
     resizeMode
   );
 
-  // const [selectedOption, setSelectedOption] = useState<'wallet' | 'card'>(
-  //   predefinedOption ?? 'wallet'
-  // );
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
-  const [selectedOption, setSelectedOption] = useState('card');
+  const handlePayWithCaptchaProtection = async () => {
+    try {
+      if (!executeRecaptcha) {
+        throw new Error('executeRecaptcha not available');
+      }
 
-  useEffect(() => {
-    if (predefinedOption) {
-      setSelectedOption(predefinedOption);
+      const recaptchaToken = await executeRecaptcha();
+
+      if (recaptchaToken) {
+        const res = await fetch('/api/post_recaptcha_query', {
+          method: 'POST',
+          body: JSON.stringify({
+            recaptchaToken,
+          }),
+        });
+
+        const jsonRes: IReCaptchaRes = await res.json();
+
+        if (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5) {
+          handlePayWithCardStripeRedirect?.();
+        } else {
+          throw new Error(
+            jsonRes?.errors
+              ? Array.isArray(jsonRes?.errors)
+                ? jsonRes.errors[0]?.toString()
+                : jsonRes.errors?.toString()
+              : 'ReCaptcha failed'
+          );
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('toastErrors.generic');
     }
-  }, [predefinedOption]);
+  };
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
@@ -87,62 +114,17 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             </SCloseButton>
           )}
           <SHeaderContainer>{children}</SHeaderContainer>
-          <SPaymentMethodTitle variant={3}>
-            {t('paymentMethodTitle')}
-          </SPaymentMethodTitle>
-          <SOptionsContainer>
-            {/* {!predefinedOption ? (
-              <>
-                <OptionWallet
-                  selected={selectedOption === 'wallet'}
-                  handleClick={() => setSelectedOption('wallet')}
-                />
-                <OptionCard
-                  selected={selectedOption === 'card'}
-                  handleClick={() => setSelectedOption('card')}
-                />
-              </>
-            ) : selectedOption === 'card' ? (
-              <OptionCard
-                selected={selectedOption === 'card'}
-                handleClick={() => setSelectedOption('card')}
-              />
-            ) : (
-              <OptionWallet
-                selected={selectedOption === 'wallet'}
-                handleClick={() => setSelectedOption('wallet')}
-              />
-            )} */}
-            {!predefinedOption ? (
-              <>
-                <OptionCard
-                  selected={selectedOption === 'card'}
-                  handleClick={() => setSelectedOption('card')}
-                />
-              </>
-            ) : (
-              <OptionCard
-                selected={selectedOption === 'card'}
-                handleClick={() => setSelectedOption('card')}
-              />
-            )}
-          </SOptionsContainer>
           <SPayButtonDiv>
             <SPayButton
               view='primaryGrad'
-              // onClick={() => {
-              //   if (selectedOption === 'card') {
-              //     handlePayWithCardStripeRedirect?.();
-              //   } else {
-              //     handlePayWithWallet?.();
-              //   }
-              // }}
-              onClick={() => {
-                handlePayWithCardStripeRedirect?.();
-              }}
+              onClick={() => handlePayWithCaptchaProtection()}
             >
-              {payButtonCaptionKey ?? t('payButton')}
-              {amount && ` ${amount}`}
+              {t('payButton')}
+              {amount &&
+                ` $${formatNumber(
+                  Math.max(amount, 0) / 100,
+                  amount % 1 === 0
+                )}`}
             </SPayButton>
             {bottomCaption || null}
             {showTocApply && (
@@ -156,6 +138,20 @@ const PaymentModal: React.FC<IPaymentModal> = ({
                 {t('tocApplyText')}
               </STocApply>
             )}
+            {
+              // TODO: re-enable / move / make final decision
+              /* <STocApplyReCaptcha>
+              {t('reCaptchaTos.siteProtectedBy')}{' '}
+              <a target='_blank' href='https://policies.google.com/privacy'>
+                {t('reCaptchaTos.privacyPolicy')}
+              </a>{' '}
+              {t('reCaptchaTos.and')}{' '}
+              <a target='_blank' href='https://policies.google.com/terms'>
+                {t('reCaptchaTos.tos')}
+              </a>{' '}
+              {t('reCaptchaTos.apply')}
+            </STocApplyReCaptcha> */
+            }
           </SPayButtonDiv>
         </SContentContainer>
       </SWrapper>
@@ -166,10 +162,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
 PaymentModal.defaultProps = {
   amount: undefined,
   showTocApply: undefined,
-  predefinedOption: undefined,
   bottomCaption: null,
-  payButtonCaptionKey: undefined,
-  // handlePayWithWallet: () => {},
   handlePayWithCardStripeRedirect: () => {},
 };
 
@@ -196,6 +189,8 @@ const SContentContainer = styled.div<{
   showTocApply: boolean;
 }>`
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
 
@@ -235,6 +230,11 @@ const SCloseButton = styled.button`
   border: transparent;
   background: transparent;
 
+  background: ${({ theme }) =>
+    theme.name === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'};
+  padding: 8px;
+  border-radius: 11px;
+
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   font-size: 20px;
   line-height: 28px;
@@ -245,19 +245,12 @@ const SCloseButton = styled.button`
 `;
 
 const SHeaderContainer = styled.div`
-  padding-bottom: 16px;
   margin-bottom: 16px;
-  border-bottom: 1px solid
-    ${({ theme }) => theme.colorsThemed.background.outlines1};
+  flex-grow: 1;
 
   ${({ theme }) => theme.media.tablet} {
-    padding-bottom: 24px;
     margin-bottom: 24px;
   }
-`;
-
-const SPaymentMethodTitle = styled(Text)`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SPayButtonDiv = styled.div`
@@ -308,4 +301,33 @@ const STocApply = styled.div`
   }
 `;
 
-const SOptionsContainer = styled.div``;
+const STocApplyReCaptcha = styled.div`
+  margin-top: 4px;
+
+  text-align: center;
+
+  font-weight: 600;
+  font-size: 8px;
+  line-height: 10px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  a {
+    font-weight: 600;
+
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+    &:hover,
+    &:focus {
+      outline: none;
+      color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+      transition: 0.2s ease;
+    }
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 8px;
+    line-height: 12px;
+  }
+`;
