@@ -7,6 +7,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import { toast } from 'react-toastify';
 
 import InlineSVG from '../InlineSVG';
 
@@ -167,8 +168,9 @@ const SearchInput: React.FC = React.memo(() => {
       if (res.data.hashtags) setResultsHashtags(res.data.hashtags);
       setIsLoading(false);
     } catch (err) {
-      setIsLoading(false);
       console.error(err);
+      setIsLoading(false);
+      toast.error('toastErrors.generic');
     }
   }
 
@@ -400,7 +402,7 @@ const SResultsDrop = styled.div`
 const SCloseButtonMobile = styled(Button)`
   position: absolute;
   left: 0;
-  top: 10px;
+  top: 8px;
   z-index: 1;
 
   padding: 8px;

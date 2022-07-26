@@ -106,12 +106,16 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
       authLayoutContext.setShouldHeroUnmount(true);
 
+      const verificationPath = `/verify-email${
+        goal === 'create' ? '?to=create' : ''
+      }`;
+
       if (!isSafari()) {
         setTimeout(() => {
-          router.push('/verify-email');
+          router.push(verificationPath);
         }, 1000);
       } else {
-        router.push('/verify-email');
+        router.push(verificationPath);
       }
     } catch (err: any) {
       setIsSubmitLoading(false);
@@ -134,6 +138,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
   const redirectUrlParam = redirectURL
     ? `?redirect_url=${encodeURIComponent(redirectURL)}`
+    : goal === 'create'
+    ? `?redirect_url=${process.env.NEXT_PUBLIC_APP_URL}/creator-onboarding`
     : '';
 
   return (
@@ -161,8 +167,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
         <SHeadline variant={3}>
           {reason && reason !== 'session_expired'
             ? `${t('heading.sign-in-to')} ${t(`heading.reason.${reason}`)}`
-            : goal
-            ? t(`heading.${goal}`)
             : t('heading.sign-in')}
         </SHeadline>
         <SSubheading variant={2} weight={600}>
@@ -299,11 +303,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                   });
                 }}
               >
-                <span>
-                  {goal !== 'log-in'
-                    ? t('signUpOptions.signInButton')
-                    : t('signUpOptions.logInButton')}
-                </span>
+                <span>{t('signUpOptions.signInButton')}</span>
               </EmailSignInButton>
             </motion.div>
           </SEmailSignInForm>
