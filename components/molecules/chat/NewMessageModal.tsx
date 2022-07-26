@@ -24,6 +24,7 @@ import InlineSVG from '../../atoms/InlineSVG';
 import { getMyRooms } from '../../../api/endpoints/chat';
 
 import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { IChatData } from '../../interfaces/ichat';
 
 const CloseModalButton = dynamic(
@@ -72,8 +73,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   >([]);
 
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
-  const [chatRooms, setChatRooms] =
-    useState<IChatRoomUserNameWithoutEmoji[] | null>(null);
+  const [chatRooms, setChatRooms] = useState<
+    IChatRoomUserNameWithoutEmoji[] | null
+  >(null);
   const [myAnnouncement, setMyAnnouncement] =
     useState<newnewapi.IChatRoom | null>(null);
 
@@ -205,6 +207,13 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
                 {chat.visavis?.nickname}
+                {chat.visavis?.options && chat.visavis?.options.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                  />
+                )}
               </SChatItemText>
               <SUserAlias>@{chat.visavis?.username}</SUserAlias>
             </SChatItemCenter>
@@ -383,4 +392,6 @@ const SInlineSVG = styled(InlineSVG)`
 
 const SBackButton = styled(SInlineSVG)`
   margin-right: 20px;
+  position: relative;
+  z-index: 1;
 `;
