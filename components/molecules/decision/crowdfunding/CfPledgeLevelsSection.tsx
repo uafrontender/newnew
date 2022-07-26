@@ -11,6 +11,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
@@ -263,6 +264,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
       console.error(err);
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
+      toast.error('toastErrors.generic');
     }
   }, [router.locale, post.postUuid, user.loggedIn, pledgeAmount]);
 

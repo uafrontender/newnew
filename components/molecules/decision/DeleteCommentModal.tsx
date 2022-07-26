@@ -6,12 +6,14 @@ import Button from '../../atoms/Button';
 
 interface IDeleteCommentModal {
   isVisible: boolean;
+  isDeletingComment: boolean;
   closeModal: () => void;
   handleConfirmDelete: () => void;
 }
 
 const DeleteCommentModal: React.FC<IDeleteCommentModal> = ({
   isVisible,
+  isDeletingComment,
   closeModal,
   handleConfirmDelete,
 }) => {
@@ -28,10 +30,16 @@ const DeleteCommentModal: React.FC<IDeleteCommentModal> = ({
           <SModalTitle>{t('deleteCommentModal.title')}</SModalTitle>
           <SModalMessage>{t('deleteCommentModal.body')}</SModalMessage>
           <SModalButtons>
-            <SCancelButton onClick={() => closeModal()}>
+            <SCancelButton
+              disabled={isDeletingComment}
+              onClick={() => closeModal()}
+            >
               {t('deleteCommentModal.button.cancel')}
             </SCancelButton>
-            <SConfirmButton onClick={handleConfirmDelete}>
+            <SConfirmButton
+              disabled={isDeletingComment}
+              onClick={handleConfirmDelete}
+            >
               {t('deleteCommentModal.button.confirm')}
             </SConfirmButton>
           </SModalButtons>

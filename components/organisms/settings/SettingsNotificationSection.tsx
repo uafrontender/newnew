@@ -2,6 +2,8 @@ import { newnewapi } from 'newnew-api';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { toast } from 'react-toastify';
+
 import {
   getMyNotificationsState,
   updateMyNotificationsState,
@@ -14,8 +16,9 @@ import Toggle from '../../atoms/Toggle';
 const SettingsNotificationsSection = () => {
   const { t } = useTranslation('page-Profile');
   const [isLoading, setLoading] = useState<boolean | null>(null);
-  const [myNotificationState, setMyNotificationState] =
-    useState<newnewapi.INotificationState[] | null>(null);
+  const [myNotificationState, setMyNotificationState] = useState<
+    newnewapi.INotificationState[] | null
+  >(null);
 
   const fetchMyNotificationState = async () => {
     if (isLoading) return;
@@ -47,6 +50,7 @@ const SettingsNotificationsSection = () => {
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 
