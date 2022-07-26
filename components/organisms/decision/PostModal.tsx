@@ -217,20 +217,35 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
         );
       }
-      const markAsViewedPayload = new newnewapi.MarkPostRequest({
-        markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
+      const markAsFavoritePayload = new newnewapi.MarkPostRequest({
+        markAs: !isFollowingDecision
+          ? newnewapi.MarkPostRequest.Kind.FAVORITE
+          : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
         postUuid: postParsed?.postUuid,
       });
 
-      const res = await markPost(markAsViewedPayload);
+      const res = await markPost(markAsFavoritePayload);
 
       if (!res.error) {
         setIsFollowingDecision((currentValue) => !currentValue);
+        // TODO: separate onDelete and onUnsubscribe callbacks to prevent possible bugs
+        if (isFollowingDecision) {
+          handleRemovePostFromState?.();
+        } else {
+          handleAddPostToState?.();
+        }
       }
     } catch (err) {
       console.error(err);
     }
-  }, [postParsed, router, user.loggedIn]);
+  }, [
+    postParsed,
+    router,
+    isFollowingDecision,
+    user.loggedIn,
+    handleRemovePostFromState,
+    handleAddPostToState,
+  ]);
 
   const handleUpdatePostStatus = useCallback(
     (newStatus: number | string) => {

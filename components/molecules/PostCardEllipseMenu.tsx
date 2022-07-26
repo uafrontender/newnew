@@ -184,10 +184,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           {postCreator.uuid !== user.userData?.userUuid && (
             <>
               {!isFollowingLoading ? (
-                <SEllipseMenuButton
-                  variant={3}
-                  onClick={() => handleFollowDecision()}
-                >
+                <SEllipseMenuButton variant={3} onClick={handleFollowDecision}>
                   {!isFollowingDecision
                     ? t('ellipse.followDecision', {
                         postType: t(`postType.${postType}`),
