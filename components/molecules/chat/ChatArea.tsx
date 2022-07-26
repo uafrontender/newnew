@@ -1,6 +1,12 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-lonely-if */
-import React, { useState, useCallback, useContext, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  useRef,
+} from 'react';
 import dynamic from 'next/dynamic';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
@@ -8,7 +14,6 @@ import { newnewapi } from 'newnew-api';
 import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import Link from 'next/link';
-import { useUpdateEffect } from 'react-use';
 
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import Text from '../../atoms/Text';
@@ -67,11 +72,12 @@ const ChatArea: React.FC<IChatData> = ({
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+  const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
   const [messageText, setMessageText] = useState<string>('');
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
   const [isVisavisBlocked, setIsVisavisBlocked] = useState<boolean>(false);
-
+  // const [isMessagingDisabled, setIsMessagingDisabled] =
+  //   useState<boolean>(false);
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
   const [newMessage, setNewMessage] = useState<
@@ -83,6 +89,7 @@ const ChatArea: React.FC<IChatData> = ({
     blockedUser: false,
     isAnnouncement: false,
     subscriptionExpired: false,
+    // messagingDisabled: false,
     accountDeleted: false,
   });
 
@@ -139,7 +146,7 @@ const ChatArea: React.FC<IChatData> = ({
     [messagesLoading, chatRoom, localUserData]
   );
 
-  useUpdateEffect(() => {
+  useEffect(() => {
     if (chatRoom) {
       setLocalUserData((data) => ({ ...data, ...chatRoom.visavis }));
 
@@ -153,8 +160,8 @@ const ChatArea: React.FC<IChatData> = ({
           ? setIsMyAnnouncement(true)
           : setIsMyAnnouncement(false);
       } else {
-        if (isAnnouncement) setIsAnnouncement(false);
-        if (isMyAnnouncement) setIsMyAnnouncement(false);
+        setIsAnnouncement(false);
+        setIsMyAnnouncement(false);
       }
       if (chatRoom.id) {
         addChannel(`chat_${chatRoom.id.toString()}`, {
@@ -170,7 +177,7 @@ const ChatArea: React.FC<IChatData> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatRoom]);
 
-  useUpdateEffect(() => {
+  useEffect(() => {
     const socketHandlerMessageCreated = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
@@ -195,13 +202,13 @@ const ChatArea: React.FC<IChatData> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
 
-  useUpdateEffect(() => {
+  useEffect(() => {
     if (inView && !messagesLoading && messagesNextPageToken) {
       getChatMessages(messagesNextPageToken);
     }
   }, [inView, messagesLoading, messagesNextPageToken, getChatMessages]);
 
-  useUpdateEffect(() => {
+  useEffect(() => {
     if (usersIBlocked.length > 0 && chatRoom) {
       const isBlocked = usersIBlocked.find(
         (i) => i === chatRoom?.visavis?.uuid
@@ -217,21 +224,23 @@ const ChatArea: React.FC<IChatData> = ({
     }
   }, [usersIBlocked, chatRoom, isVisavisBlocked]);
 
-  // useEffect(() => {
-  //   if (usersBlockedMe.length > 0 && chatRoom) {
-  //     const isBlocked = usersBlockedMe.find(
-  //       (i) => i === chatRoom?.visavis?.uuid
-  //     );
-  //     if (isBlocked) {
-  //       // setIsMessagingDisabled(true);
-  //     }
-  //   }
-  // }, [
-  //   usersBlockedMe,
-  //   chatRoom,
-  // ]);
+  useEffect(() => {
+    if (usersBlockedMe.length > 0 && chatRoom) {
+      const isBlocked = usersBlockedMe.find(
+        (i) => i === chatRoom?.visavis?.uuid
+      );
+      if (isBlocked) {
+        // setIsMessagingDisabled(true);
+      }
+    }
+    // if (isMessagingDisabled) setIsMessagingDisabled(false);
+  }, [
+    usersBlockedMe,
+    chatRoom,
+    // isMessagingDisabled
+  ]);
 
-  useUpdateEffect(() => {
+  useEffect(() => {
     if (newMessage && newMessage.roomId === chatRoom?.id) {
       setMessages((curr) => {
         if (curr.length === 0) {
