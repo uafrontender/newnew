@@ -640,6 +640,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                     svg={VerificationCheckmark}
                     width='32px'
                     height='32px'
+                    fill='none'
                   />
                 )}
               </SUsername>

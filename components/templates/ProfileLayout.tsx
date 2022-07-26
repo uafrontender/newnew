@@ -551,6 +551,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                     svg={VerificationCheckmark}
                     width='32px'
                     height='32px'
+                    fill='none'
                   />
                 )}
               </SUsername>

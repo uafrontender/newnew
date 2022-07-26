@@ -557,6 +557,7 @@ const ChatList: React.FC<IFunctionProps> = ({
                       svg={VerificationCheckmark}
                       width='16px'
                       height='16px'
+                      fill='none'
                     />
                   )}
                 </SChatItemText>
