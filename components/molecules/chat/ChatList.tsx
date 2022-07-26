@@ -251,7 +251,8 @@ const ChatList: React.FC<IFunctionProps> = ({
       if (res.data && res.data.rooms.length > 0) {
         if (res.data.rooms[0].myRole === 1) {
           setActiveTab('chatRoomsCreators');
-          if (isMobileOrTablet && switchedTab !== undefined) switchedTab();
+        } else {
+          setActiveTab('chatRoomsSubs');
         }
         openRoom(res.data.rooms[0]);
         setUpdatedChat(res.data.rooms[0]);
@@ -261,24 +262,38 @@ const ChatList: React.FC<IFunctionProps> = ({
     }
   };
 
+  const getRoomByUserName = useCallback(
+    (uname: string) => {
+      const isAnnouncementRequested = uname.split('-');
+      if (
+        isAnnouncementRequested.length > 0 &&
+        isAnnouncementRequested[isAnnouncementRequested.length - 1] ===
+          'announcement'
+      ) {
+        fetchRoomByUsername(isAnnouncementRequested[0], 4);
+      } else {
+        fetchRoomByUsername(uname, 1);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   useEffectOnce(() => {
     (async () => {
       await fetchMyRooms();
       if (username) {
-        const isAnnouncementRequested = username.split('-');
-        if (
-          isAnnouncementRequested.length > 0 &&
-          isAnnouncementRequested[isAnnouncementRequested.length - 1] ===
-            'announcement'
-        ) {
-          fetchRoomByUsername(isAnnouncementRequested[0], 4);
-        } else {
-          fetchRoomByUsername(username, 1);
-        }
+        getRoomByUserName(username);
       }
       setIsInitialLoaded(true);
     })();
   });
+
+  useUpdateEffect(() => {
+    if (username && isInitialLoaded) {
+      getRoomByUserName(username);
+    }
+  }, [username]);
 
   useUpdateEffect(() => {
     if (newLastMessage) {
@@ -569,7 +584,9 @@ const ChatList: React.FC<IFunctionProps> = ({
               </SChatItemContentWrapper>
               <SChatItemContentWrapper>
                 <SChatItemLastMessage variant={3} weight={600}>
-                  {textTrim(lastMsg as string, 28)}
+                  {chat.lastMessage?.content?.text
+                    ? textTrim(lastMsg as string, 28)
+                    : lastMsg}
                 </SChatItemLastMessage>
                 <SChatItemRight>
                   {unreadMessageCount > 0 && (
