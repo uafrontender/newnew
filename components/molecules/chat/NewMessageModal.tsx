@@ -72,8 +72,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   >([]);
 
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
-  const [chatRooms, setChatRooms] =
-    useState<IChatRoomUserNameWithoutEmoji[] | null>(null);
+  const [chatRooms, setChatRooms] = useState<
+    IChatRoomUserNameWithoutEmoji[] | null
+  >(null);
   const [myAnnouncement, setMyAnnouncement] =
     useState<newnewapi.IChatRoom | null>(null);
 
@@ -383,4 +384,6 @@ const SInlineSVG = styled(InlineSVG)`
 
 const SBackButton = styled(SInlineSVG)`
   margin-right: 20px;
+  position: relative;
+  z-index: 1;
 `;
