@@ -177,7 +177,7 @@ const McOptionCardModeration: React.FunctionComponent<
                     : undefined
                 }
                 supporterCount={option.supporterCount}
-                supporterCountSubstracted={supporterCountSubstracted}
+                supporterCountSubtracted={supporterCountSubstracted}
               />
             </SBiddersInfo>
           </SBidDetails>

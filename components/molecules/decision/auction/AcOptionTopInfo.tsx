@@ -21,11 +21,10 @@ import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import SuggestionActionMobileModal from '../OptionActionMobileModal';
 
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
-import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 
@@ -366,7 +365,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${formatNumber(parseInt(supportBidAmount) ?? 0, true)}`}
+          amount={parseInt(supportBidAmount) * 100 || 0}
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}

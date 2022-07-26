@@ -27,13 +27,13 @@ export const signupReasons = [
 ] as const;
 export type SignupReason = typeof signupReasons[number];
 
-interface ISignup {
+interface ISignUp {
   reason?: SignupReason;
   redirectURL?: string;
   goal?: string;
 }
 
-const Signup: NextPage<ISignup> = ({ reason, goal, redirectURL }) => {
+const Signup: NextPage<ISignUp> = ({ reason, goal, redirectURL }) => {
   const { t } = useTranslation('page-SignUp');
 
   const router = useRouter();

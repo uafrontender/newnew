@@ -1,13 +1,12 @@
 {
   "meta": {
-    "title": "Sign up to NewNew",
-    "description": "Signing up to NewNew is fast and easy. Join now to be a Creator or watch people",
-    "title-log-in": "Log in to NewNew",
-    "description-log-in": "Logging in to NewNew is fast and easy"
+    "title": "Sign in to NewNew",
+    "description": "Signing in to NewNew is fast and easy.",
+    "title-create": "Sign in to NewNew",
+    "description-create": "Signing up to NewNew is fast and easy. Join now to be a Creator"
   },
   "heading": {
-    "sign-in": "Sign up",
-    "log-in": "Log in",
+    "sign-in": "Sign in",
     "sign-in-to": "Sign up to",
     "reason": {
       "comment": "comment",
@@ -28,7 +27,7 @@
     "twitter": "Continue with Twitter",
     "orContinueWith": "or continue with",
     "email": "Email",
-    "signInButton": "Sign up",
+    "signInButton": "Sign in",
     "logInButton": "Log in"
   },
   "error": {

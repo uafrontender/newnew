@@ -118,7 +118,7 @@ export const HeroSection = React.memo(() => {
             <SButtonsHolder>
               {isMobile ? (
                 <>
-                  <Link href='/sign-up?to=log-in'>
+                  <Link href='/sign-up'>
                     <a>
                       <SButton
                         withDim

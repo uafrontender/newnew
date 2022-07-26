@@ -27,9 +27,8 @@ import getDisplayname from '../../../../utils/getDisplayname';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import EllipseModal, { EllipseModalButton } from '../../../atoms/EllipseModal';
-import { formatNumber } from '../../../../utils/format';
 import PostTitleContent from '../../../atoms/PostTitleContent';
-import PaymentModalRedirectOnly from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsModal {
@@ -38,7 +37,7 @@ interface ICfPledgeLevelsModal {
   post: newnewapi.Crowdfunding;
   pledgeLevels: newnewapi.IMoneyAmount[];
   onClose: () => void;
-  handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
+  handleSetPaymentSuccessModalOpen: (newValue: boolean) => void;
   handleAddPledgeFromResponse: (
     newPledge: newnewapi.Crowdfunding.Pledge
   ) => void;
@@ -50,7 +49,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   isOpen,
   pledgeLevels,
   onClose,
-  handleSetPaymentSuccesModalOpen,
+  handleSetPaymentSuccessModalOpen,
   handleAddPledgeFromResponse,
 }) => {
   const theme = useTheme();
@@ -192,7 +191,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   //       setIsFormOpen(false);
   //       setPaymentModalOpen(false);
   //       setLoadingModalOpen(false);
-  //       handleSetPaymentSuccesModalOpen(true);
+  //       handleSetPaymentSuccessModalOpen(true);
   //       onClose();
   //     }
   //   } catch (err) {
@@ -206,7 +205,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   //   user.loggedIn,
   //   router.locale,
   //   handleAddPledgeFromResponse,
-  //   handleSetPaymentSuccesModalOpen,
+  //   handleSetPaymentSuccessModalOpen,
   //   onClose,
   // ]);
 
@@ -324,14 +323,10 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
       </OptionActionMobileModal>
       {/* Payment Modal */}
       {paymentModalOpen ? (
-        <PaymentModalRedirectOnly
+        <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={14}
-          amount={
-            pledgeAmount
-              ? `$${formatNumber(pledgeAmount / 100 ?? 0, true)}`
-              : '0'
-          }
+          amount={pledgeAmount || 0}
           // {...(walletBalance?.usdCents &&
           // pledgeAmount &&
           // walletBalance.usdCents >= pledgeAmount
@@ -391,7 +386,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
               <PostTitleContent>{post.title}</PostTitleContent>
             </SPaymentModalOptionText>
           </SPaymentModalHeader>
-        </PaymentModalRedirectOnly>
+        </PaymentModal>
       ) : null}
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={15} />

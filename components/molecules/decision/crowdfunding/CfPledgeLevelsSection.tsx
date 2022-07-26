@@ -25,7 +25,7 @@ import Button from '../../../atoms/Button';
 import CfMakeCustomPledgeCard from './CfMakeCustomPledgeCard';
 import CfMakeStandardPledgeCard from './CfMakeStandardPledgeCard';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import useScrollGradientsHorizontal from '../../../../utils/hooks/useScrollGradientsHorizontal';
 import GradientMaskHorizontal from '../../../atoms/GradientMaskHorizontal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
@@ -41,7 +41,6 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import getDisplayname from '../../../../utils/getDisplayname';
 import assets from '../../../../constants/assets';
 import Headline from '../../../atoms/Headline';
-import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 // import { WalletContext } from '../../../../contexts/walletContext';
@@ -49,7 +48,7 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 interface ICfPledgeLevelsSection {
   pledgeLevels: newnewapi.IMoneyAmount[];
   post: newnewapi.Crowdfunding;
-  handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
+  handleSetPaymentSuccessModalOpen: (newValue: boolean) => void;
   handleAddPledgeFromResponse: (
     newPledge: newnewapi.Crowdfunding.Pledge
   ) => void;
@@ -60,7 +59,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
 > = ({
   pledgeLevels,
   post,
-  handleSetPaymentSuccesModalOpen,
+  handleSetPaymentSuccessModalOpen,
   handleAddPledgeFromResponse,
 }) => {
   const router = useRouter();
@@ -210,7 +209,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   //       setIsFormOpen(false);
   //       setPaymentModalOpen(false);
   //       setLoadingModalOpen(false);
-  //       handleSetPaymentSuccesModalOpen(true);
+  //       handleSetPaymentSuccessModalOpen(true);
   //     }
   //   } catch (err) {
   //     console.error(err);
@@ -223,7 +222,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   //   post.postUuid,
   //   pledgeAmount,
   //   handleAddPledgeFromResponse,
-  //   handleSetPaymentSuccesModalOpen,
+  //   handleSetPaymentSuccessModalOpen,
   // ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
@@ -418,11 +417,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={
-            pledgeAmount
-              ? `$${formatNumber(pledgeAmount / 100 ?? 0, true)}`
-              : '0'
-          }
+          amount={pledgeAmount || 0}
           // {...(walletBalance?.usdCents &&
           // pledgeAmount &&
           // walletBalance.usdCents >= pledgeAmount

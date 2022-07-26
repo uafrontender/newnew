@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
@@ -16,7 +17,11 @@ import CodeVerificationMenu from '../components/organisms/CodeVerificationMenu';
 import assets from '../constants/assets';
 import { useAppSelector } from '../redux-store/store';
 
-const VerifyEmail = () => {
+interface IVerifyEmail {
+  goal?: string;
+}
+
+const VerifyEmail: React.FC<IVerifyEmail> = ({ goal }) => {
   const { t } = useTranslation('page-VerifyEmail');
   const router = useRouter();
   const authLayoutContext = useContext(AuthLayoutContext);
@@ -65,7 +70,10 @@ const VerifyEmail = () => {
           },
         }}
       >
-        <CodeVerificationMenu expirationTime={60} />
+        <CodeVerificationMenu
+          expirationTime={60}
+          redirectUserTo={goal === 'create' ? '/creator-onboarding' : undefined}
+        />
       </motion.div>
     </>
   );
@@ -79,17 +87,23 @@ const VerifyEmail = () => {
 
 export default VerifyEmail;
 
-export async function getStaticProps(context: {
-  locale: string;
-}): Promise<any> {
-  const translationContext = await serverSideTranslations(context.locale, [
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { to } = context.query;
+  const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'page-VerifyEmail',
   ]);
 
+  const goal = to && !Array.isArray(to) ? to : '';
+
   return {
     props: {
+      ...(goal
+        ? {
+            goal,
+          }
+        : {}),
       ...translationContext,
     },
   };
-}
+};

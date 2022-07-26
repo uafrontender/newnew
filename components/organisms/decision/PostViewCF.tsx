@@ -178,10 +178,12 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
 
     // Pledges
     const [pledges, setPledges] = useState<TCfPledgeWithHighestField[]>([]);
-    const [myPledgeAmount, setMyPledgeAmount] =
-      useState<newnewapi.MoneyAmount | undefined>(undefined);
-    const [pledgesNextPageToken, setPledgesNextPageToken] =
-      useState<string | undefined | null>('');
+    const [myPledgeAmount, setMyPledgeAmount] = useState<
+      newnewapi.MoneyAmount | undefined
+    >(undefined);
+    const [pledgesNextPageToken, setPledgesNextPageToken] = useState<
+      string | undefined | null
+    >('');
     const [pledgesLoading, setPledgesLoading] = useState(false);
     const [loadingPledgesError, setLoadingPledgesError] = useState('');
 
@@ -347,17 +349,19 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           return;
         }
         const markAsFavoritePayload = new newnewapi.MarkPostRequest({
-          markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
+          markAs: !isFollowingDecision
+            ? newnewapi.MarkPostRequest.Kind.FAVORITE
+            : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
           postUuid: post.postUuid,
         });
 
         const res = await markPost(markAsFavoritePayload);
 
-        if (res.error) throw new Error('Failed to mark post as favorited');
+        if (res.error) throw new Error('Failed to mark post as favorite');
       } catch (err) {
         console.error(err);
       }
-    }, [post.postUuid, router, user.loggedIn]);
+    }, [post.postUuid, isFollowingDecision, router, user.loggedIn]);
 
     // Render functions
     const renderBackersSection = useCallback(() => {
@@ -375,7 +379,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
                   post={post}
                   pledgeLevels={pledgeLevels}
                   handleAddPledgeFromResponse={handleAddPledgeFromResponse}
-                  handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
+                  handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
                     setPaymentSuccesModalOpen(newValue)
                   }
                 />
@@ -818,7 +822,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
               isOpen={choosePledgeModalOpen}
               onClose={() => setChoosePledgeModalOpen(false)}
               handleAddPledgeFromResponse={handleAddPledgeFromResponse}
-              handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
+              handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
                 setPaymentSuccesModalOpen(newValue)
               }
             />

@@ -58,8 +58,7 @@
   "button": {
     "createDecision": "New post",
     "create": "Create",
-    "loginIn": "Log in",
-    "signUp": "Sign up",
+    "signIn": "Sign in",
     "dashboard": "Dashboard",
     "createOnNewnew": "Create now",
     "cancel": "Cancel"
