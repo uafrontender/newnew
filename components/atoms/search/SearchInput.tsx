@@ -93,9 +93,8 @@ const SearchInput: React.FC = React.memo(() => {
     }
 
     if (e.keyCode === 13 && searchValue) {
-      setIsResultsDropVisible(false);
       handleSeeResults(searchValue);
-      setSearchValue('');
+      closeSearch();
     }
   };
 
