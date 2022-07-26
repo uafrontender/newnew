@@ -58,8 +58,7 @@
   "button": {
     "createDecision": "Nueva publicación",
     "create": "Crear",
-    "loginIn": "Iniciar sesión",
-    "signUp": "Registrarse",
+    "signIn_NEED_TRANSLATION": "Sign in",
     "dashboard": "Panel",
     "createOnNewnew": "Crear ahora",
     "cancel": "Cancelar"
@@ -173,5 +172,8 @@
     "numbers-of-bids": "Número de ofertas",
     "numbers-of-bids-fewest": "El menor número de ofertas primero",
     "numbers-of-bids-most-first": "El mayor número de ofertas primero"
+  },
+  "toastErrors": {
+    "generic_NEED_TRANSLATION": "An error occurred, please try again later"
   }
 }

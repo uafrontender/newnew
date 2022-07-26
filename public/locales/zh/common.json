@@ -58,8 +58,7 @@
   "button": {
     "createDecision": "新帖子",
     "create": "創建",
-    "loginIn": "登錄",
-    "signUp": "註冊",
+    "signIn_NEED_TRANSLATION": "Sign in",
     "dashboard": "儀錶板",
     "createOnNewnew": "開始創建",
     "cancel": "取消"
@@ -173,5 +172,8 @@
     "numbers-of-bids": "出價數量",
     "numbers-of-bids-fewest": "最少",
     "numbers-of-bids-most-first": "最先"
+  },
+  "toastErrors": {
+    "generic_NEED_TRANSLATION": "An error occurred, please try again later"
   }
 }
