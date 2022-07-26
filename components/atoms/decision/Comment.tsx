@@ -176,6 +176,7 @@ const Comment: React.FC<IComment> = ({
           </SCommentHeader>
           <SText>{comment.content?.text}</SText>
           {!comment.parentId &&
+            !comment.isDeleted &&
             (!isReplyFormOpen ? (
               <SReply onClick={replyHandler}>{t('comments.sendReply')}</SReply>
             ) : (
@@ -192,15 +193,20 @@ const Comment: React.FC<IComment> = ({
                 />
               </>
             ))}
-          {!comment.parentId && replies && replies.length > 0 && (
-            <SReply onClick={replyHandler}>
-              {isReplyFormOpen
-                ? t('comments.hideReplies')
-                : t('comments.viewReplies')}{' '}
-              {replies.length}{' '}
-              {replies.length > 1 ? t('comments.replies') : t('comments.reply')}
-            </SReply>
-          )}
+          {!comment.parentId &&
+            !comment.isDeleted &&
+            replies &&
+            replies.length > 0 && (
+              <SReply onClick={replyHandler}>
+                {isReplyFormOpen
+                  ? t('comments.hideReplies')
+                  : t('comments.viewReplies')}{' '}
+                {replies.length}{' '}
+                {replies.length > 1
+                  ? t('comments.replies')
+                  : t('comments.reply')}
+              </SReply>
+            )}
           {isReplyFormOpen &&
             replies &&
             replies.map((item) => (
