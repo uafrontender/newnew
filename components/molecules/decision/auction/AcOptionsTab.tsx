@@ -37,7 +37,7 @@ import AcOptionCard from './AcOptionCard';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 
@@ -51,7 +51,6 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
-import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 
@@ -662,7 +661,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${formatNumber(parseInt(newBidAmount) ?? 0, true)}`}
+          amount={parseInt(newBidAmount) * 100 || 0}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * 100
           //   ? {}

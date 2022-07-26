@@ -28,7 +28,7 @@ import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewM
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import McOptionConfirmVoteModal from './McOptionConfirmVoteModal';
 
 import { formatNumber } from '../../../../utils/format';
@@ -77,7 +77,7 @@ interface IMcOptionCard {
   optionBeingSupported?: string;
   handleResetFreeVote: () => void;
   handleSetSupportedBid: (id: string) => void;
-  handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
+  handleSetPaymentSuccessModalOpen: (newValue: boolean) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
   ) => void;
@@ -102,7 +102,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   handleResetFreeVote,
   handleSetSupportedBid,
   handleRemoveOption,
-  handleSetPaymentSuccesModalOpen,
+  handleSetPaymentSuccessModalOpen,
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
@@ -133,7 +133,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     [option.isSupportedByMe, isSuggestedByMe]
   );
 
-  const supporterCountSubstracted = useMemo(() => {
+  const supporterCountSubtracted = useMemo(() => {
     // if (option.supporterCount) return option.supporterCount;
     if (option.supporterCount > 0) {
       return option.supporterCount - 1;
@@ -205,8 +205,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   }, []);
 
   const [isSupportMenuOpen, setIsSupportMenuOpen] = useState(false);
-  const [selectVotesMenuTop, setSelectVotesMenuTop] =
-    useState<number | undefined>(undefined);
+  const [selectVotesMenuTop, setSelectVotesMenuTop] = useState<
+    number | undefined
+  >(undefined);
 
   const [isConfirmVoteModalOpen, setIsConfirmVoteModalOpen] = useState(false);
   const [isAmountPredefined, setIsAmountPredefined] = useState(false);
@@ -350,7 +351,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   //       setIsSupportMenuOpen(false);
   //       setPaymentModalOpen(false);
   //       setLoadingModalOpen(false);
-  //       handleSetPaymentSuccesModalOpen(true);
+  //       handleSetPaymentSuccessModalOpen(true);
   //     }
   //   } catch (err) {
   //     setPaymentModalOpen(false);
@@ -363,7 +364,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   //   setIsSupportMenuOpen,
   //   setSupportBidAmount,
   //   handleSetSupportedBid,
-  //   handleSetPaymentSuccesModalOpen,
+  //   handleSetPaymentSuccessModalOpen,
   //   handleAddOrUpdateOptionFromResponse,
   //   supportBidAmount,
   //   option.id,
@@ -435,7 +436,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
       setLoadingModalOpen(false);
       handleResetFreeVote();
-      handleSetPaymentSuccesModalOpen(true);
+      handleSetPaymentSuccessModalOpen(true);
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
@@ -445,7 +446,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     option.id,
     appConstants.mcFreeVoteCount,
     handleAddOrUpdateOptionFromResponse,
-    handleSetPaymentSuccesModalOpen,
+    handleSetPaymentSuccessModalOpen,
     handleResetFreeVote,
   ]);
   const goToNextStep = () => {
@@ -585,7 +586,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                     : undefined
                 }
                 supporterCount={option.supporterCount}
-                supporterCountSubstracted={supporterCountSubstracted}
+                supporterCountSubtracted={supporterCountSubtracted}
                 amISubscribed={amISubscribed}
               />
             </SBiddersInfo>
@@ -726,10 +727,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <PaymentModal
             zIndex={12}
             isOpen={paymentModalOpen}
-            amount={`$${formatNumber(
-              parseInt(supportBidAmount) * votePrice ?? 0,
-              true
-            )}`}
+            amount={(parseInt(supportBidAmount) * 100 || 0) * votePrice}
             // {...(walletBalance?.usdCents &&
             // walletBalance.usdCents >=
             //   parseInt(supportBidAmount) * votePrice * 100
@@ -846,7 +844,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                       : undefined
                   }
                   supporterCount={option.supporterCount}
-                  supporterCountSubstracted={supporterCountSubstracted}
+                  supporterCountSubtracted={supporterCountSubtracted}
                   amISubscribed={amISubscribed}
                 />
               </SBiddersInfo>
@@ -927,7 +925,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   isSuggestedByMe: boolean;
   isSupportedByMe: boolean;
   supporterCount: number;
-  supporterCountSubstracted: number;
+  supporterCountSubtracted: number;
   optionCreator?: string;
   optionCreatorUsername?: string;
   firstVoter?: string;
@@ -938,7 +936,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   isSupportedByMe,
   isSuggestedByMe,
   supporterCount,
-  supporterCountSubstracted,
+  supporterCountSubtracted,
   optionCreator,
   optionCreatorUsername,
   firstVoter,
@@ -967,11 +965,11 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               </Link>
             )}
             <SSpanBiddersRegular className='spanRegular'>
-              {supporterCountSubstracted > 0 ? ` & ` : ''}
+              {supporterCountSubtracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>
-            {supporterCountSubstracted > 0 ? (
+            {supporterCountSubtracted > 0 ? (
               <SSpanBiddersHighlighted className='spanHighlighted'>
-                {formatNumber(supporterCountSubstracted, true)}{' '}
+                {formatNumber(supporterCountSubtracted, true)}{' '}
                 {t('mcPost.optionsTab.optionCard.others')}
               </SSpanBiddersHighlighted>
             ) : null}{' '}
@@ -1001,11 +999,11 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               {supporterCount > 1 ? t('me') : t('I')}
             </SSpanBiddersHighlighted>
             <SSpanBiddersRegular className='spanRegular'>
-              {supporterCountSubstracted > 0 ? ` & ` : ''}
+              {supporterCountSubtracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>
-            {supporterCountSubstracted > 0 ? (
+            {supporterCountSubtracted > 0 ? (
               <SSpanBiddersHighlighted className='spanHighlighted'>
-                {formatNumber(supporterCountSubstracted, true)}{' '}
+                {formatNumber(supporterCountSubtracted, true)}{' '}
                 {t('mcPost.optionsTab.optionCard.others')}
               </SSpanBiddersHighlighted>
             ) : null}{' '}
@@ -1039,12 +1037,12 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           </SSpanBiddersHighlighted>
         </Link>
         <SSpanBiddersRegular className='spanRegular'>
-          {supporterCountSubstracted > 0 ? ` & ` : ''}
+          {supporterCountSubtracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
-        {supporterCountSubstracted > 0 ? (
+        {supporterCountSubtracted > 0 ? (
           <>
             <SSpanBiddersHighlighted className='spanHighlighted'>
-              {formatNumber(supporterCountSubstracted, true)}{' '}
+              {formatNumber(supporterCountSubtracted, true)}{' '}
               {t('mcPost.optionsTab.optionCard.others')}
             </SSpanBiddersHighlighted>
           </>
@@ -1078,12 +1076,12 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           {`${t('me')}`}
         </SSpanBiddersHighlighted>
         <SSpanBiddersRegular className='spanRegular'>
-          {supporterCountSubstracted - 1 > 0 ? ` & ` : ''}
+          {supporterCountSubtracted - 1 > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
-        {supporterCountSubstracted - 1 > 0 ? (
+        {supporterCountSubtracted - 1 > 0 ? (
           <>
             <SSpanBiddersHighlighted className='spanHighlighted'>
-              {formatNumber(supporterCountSubstracted - 1, true)}{' '}
+              {formatNumber(supporterCountSubtracted - 1, true)}{' '}
               {t('mcPost.optionsTab.optionCard.others')}
             </SSpanBiddersHighlighted>
           </>
@@ -1113,12 +1111,12 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           </SSpanBiddersHighlighted>
         </Link>
         <SSpanBiddersRegular className='spanRegular'>
-          {supporterCountSubstracted > 0 ? ` & ` : ''}
+          {supporterCountSubtracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
-        {supporterCountSubstracted > 0 ? (
+        {supporterCountSubtracted > 0 ? (
           <>
             <SSpanBiddersHighlighted className='spanHighlighted'>
-              {formatNumber(supporterCountSubstracted, true)}{' '}
+              {formatNumber(supporterCountSubtracted, true)}{' '}
               {t('mcPost.optionsTab.optionCard.others')}
             </SSpanBiddersHighlighted>
           </>

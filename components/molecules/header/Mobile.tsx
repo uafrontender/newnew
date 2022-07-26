@@ -2,14 +2,18 @@
 import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
+import { useTranslation } from 'next-i18next';
 
 import Logo from '../Logo';
 import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/search/SearchInput';
 import { useAppSelector } from '../../../redux-store/store';
+import { Mixpanel } from '../../../utils/mixpanel';
+import Button from '../../atoms/Button';
 
 export const Mobile: React.FC = React.memo(() => {
   const user = useAppSelector((state) => state.user);
+  const { t } = useTranslation();
 
   return (
     <SContainer>
@@ -33,6 +37,61 @@ export const Mobile: React.FC = React.memo(() => {
             </a>
           </Link>
         </SItemWithMargin>
+        {user.loggedIn ? (
+          <>
+            {user.userData?.options?.isCreator ? (
+              <SItemWithMargin>
+                <Link href='/creation'>
+                  <a>
+                    <SButton
+                      view='primaryGrad'
+                      withDim
+                      withShrink
+                      withShadow
+                      onClick={() => {
+                        Mixpanel.track('Navigation Item Clicked', {
+                          _button: 'New Post',
+                        });
+                      }}
+                    >
+                      {t('button.createDecision')}
+                    </SButton>
+                  </a>
+                </Link>
+              </SItemWithMargin>
+            ) : (
+              <SItemWithMargin>
+                <Link href='/creator-onboarding'>
+                  <a>
+                    <SButton view='primaryGrad' withDim withShrink withShadow>
+                      {t('button.createOnNewnew')}
+                    </SButton>
+                  </a>
+                </Link>
+              </SItemWithMargin>
+            )}
+          </>
+        ) : (
+          <SItemWithMargin>
+            <Link href='/sign-up?to=create'>
+              <a>
+                <SButton
+                  view='primaryGrad'
+                  withDim
+                  withShrink
+                  withShadow
+                  onClick={() => {
+                    Mixpanel.track('Navigation Item Clicked', {
+                      _button: 'Create now',
+                    });
+                  }}
+                >
+                  {t('button.createOnNewnew')}
+                </SButton>
+              </a>
+            </Link>
+          </SItemWithMargin>
+        )}
       </SRightBlock>
     </SContainer>
   );
@@ -64,4 +123,10 @@ const SItemWithMargin = styled.div`
   ${(props) => props.theme.media.laptop} {
     margin-left: 16px;
   }
+`;
+
+// Not perfect but should work. Include into brand book later
+const SButton = styled(Button)`
+  padding: 12px;
+  height: 36px;
 `;
