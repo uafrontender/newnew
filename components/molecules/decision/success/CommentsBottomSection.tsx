@@ -241,6 +241,8 @@ const CommentsBottomSection: React.FunctionComponent<
     [commentsRoomId, postUuid]
   );
 
+  const [isDeletingComment, setIsDeletingComment] = useState(false);
+
   const markCommentAsDeleted = useCallback(
     (comment: TCommentWithReplies) => {
       setComments((curr) => {
@@ -277,6 +279,7 @@ const CommentsBottomSection: React.FunctionComponent<
 
   const handleDeleteComment = useCallback(
     async (comment: TCommentWithReplies) => {
+      setIsDeletingComment(true);
       try {
         Mixpanel.track('Deleted Comment', {
           _stage: 'Post',
@@ -295,6 +298,8 @@ const CommentsBottomSection: React.FunctionComponent<
       } catch (err) {
         console.error(err);
         toast.error('toastErrors.generic');
+      } finally {
+        setIsDeletingComment(false);
       }
     },
     [markCommentAsDeleted, postUuid]
@@ -591,6 +596,7 @@ const CommentsBottomSection: React.FunctionComponent<
                       index === comments.length - 1 || (isMobile && index === 2)
                     }
                     comment={item}
+                    isDeletingComment={isDeletingComment}
                     handleAddComment={(newMsg: string) =>
                       handleAddComment(newMsg, item.id as number)
                     }

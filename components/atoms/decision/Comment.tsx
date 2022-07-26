@@ -38,6 +38,7 @@ const DeleteCommentModal = dynamic(
 interface IComment {
   lastChild?: boolean;
   comment: TCommentWithReplies;
+  isDeletingComment: boolean;
   canDeleteComment?: boolean;
   handleAddComment: (newMsg: string) => void;
   handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
@@ -49,6 +50,7 @@ const Comment: React.FC<IComment> = ({
   comment,
   lastChild,
   canDeleteComment,
+  isDeletingComment,
   handleAddComment,
   handleDeleteComment,
   onFormFocus,
@@ -212,6 +214,7 @@ const Comment: React.FC<IComment> = ({
             replies.map((item) => (
               <Comment
                 key={item.id.toString()}
+                isDeletingComment={isDeletingComment}
                 canDeleteComment={canDeleteComment}
                 comment={item}
                 handleAddComment={(newMsg: string) => handleAddComment(newMsg)}
@@ -222,6 +225,7 @@ const Comment: React.FC<IComment> = ({
         </SCommentContent>
         <DeleteCommentModal
           isVisible={confirmDeleteComment}
+          isDeletingComment={isDeletingComment}
           closeModal={() => setConfirmDeleteComment(false)}
           handleConfirmDelete={async () => {
             await handleDeleteComment(comment);
