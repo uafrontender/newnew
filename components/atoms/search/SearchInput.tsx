@@ -403,7 +403,7 @@ const SResultsDrop = styled.div`
 const SCloseButtonMobile = styled(Button)`
   position: absolute;
   left: 0;
-  top: 10px;
+  top: 8px;
   z-index: 1;
 
   padding: 8px;
