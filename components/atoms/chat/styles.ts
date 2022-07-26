@@ -101,6 +101,20 @@ export const SChatItemCenter = styled.div`
   overflow: hidden;
 `;
 
+export const SChatItemContent = styled.div`
+  width: 100%;
+  display: flex;
+  padding: 2px 0 2px 12px;
+  flex-direction: column;
+  overflow: hidden;
+`;
+
+export const SChatItemContentWrapper = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+`;
+
 export const SChatItemText = styled(Text)`
   margin-bottom: 4px;
   max-width: 228px;
@@ -126,7 +140,6 @@ export const SChatItemRight = styled.div`
 export const SChatItemTime = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   white-space: nowrap;
-  margin-bottom: 4px;
 `;
 
 export const SChatSeparator = styled.div`

@@ -6,11 +6,7 @@ import React, { useContext, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
-import {
-  useGoogleReCaptcha,
-  IGoogleRecaptchaProps,
-  IGoogleReCaptchaConsumerProps,
-} from 'react-google-recaptcha-v3';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -157,7 +153,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
               {amount &&
                 ` $${formatNumber(
                   Math.max(amount - rewardUsed, 0) / 100,
-                  false
+                  amount % 1 === 0
                 )}`}
             </SPayButton>
             {bottomCaption || null}
@@ -172,7 +168,9 @@ const PaymentModal: React.FC<IPaymentModal> = ({
                 {t('tocApplyText')}
               </STocApply>
             )}
-            <STocApplyReCaptcha>
+            {
+              // TODO: re-enable / move / make final decision
+              /* <STocApplyReCaptcha>
               {t('reCaptchaTos.siteProtectedBy')}{' '}
               <a target='_blank' href='https://policies.google.com/privacy'>
                 {t('reCaptchaTos.privacyPolicy')}
@@ -182,7 +180,8 @@ const PaymentModal: React.FC<IPaymentModal> = ({
                 {t('reCaptchaTos.tos')}
               </a>{' '}
               {t('reCaptchaTos.apply')}
-            </STocApplyReCaptcha>
+            </STocApplyReCaptcha> */
+            }
           </SPayButtonDiv>
         </SContentContainer>
       </SWrapper>

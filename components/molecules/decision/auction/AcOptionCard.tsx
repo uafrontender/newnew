@@ -205,7 +205,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
   // Handlers
   const handleTogglePaymentModalOpen = () => {
@@ -797,8 +797,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='ac'
-        isVisible={paymentSuccesModalOpen}
-        closeModal={() => setPaymentSuccesModalOpen(false)}
+        isVisible={paymentSuccessModalOpen}
+        closeModal={() => setPaymentSuccessModalOpen(false)}
       >
         {t('paymentSuccessModal.ac', {
           postCreator,

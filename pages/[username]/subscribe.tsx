@@ -336,7 +336,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         zIndex={10}
         // predefinedOption={predefinedOption}
         isOpen={isPaymentModalOpen}
-        amount={subscriptionPrice ? subscriptionPrice / 100 : 0}
+        amount={subscriptionPrice || 0}
         onClose={() => setIsPaymentModalOpen(false)}
         handlePayWithCardStripeRedirect={handlePayRegistered}
         showTocApply

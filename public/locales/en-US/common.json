@@ -58,8 +58,7 @@
   "button": {
     "createDecision": "New post",
     "create": "Create",
-    "loginIn": "Log in",
-    "signUp": "Sign up",
+    "signIn": "Sign in",
     "dashboard": "Dashboard",
     "createOnNewnew": "Create now",
     "cancel": "Cancel"
@@ -176,6 +175,9 @@
     "numbers-of-bids": "Numbers of bids",
     "numbers-of-bids-fewest": "Fewest",
     "numbers-of-bids-most-first": "Most first"
+  },
+  "toastErrors": {
+    "generic": "An error occurred, please try again later"
   },
   "rewards": {
     "earned": "earned ${{value}}",

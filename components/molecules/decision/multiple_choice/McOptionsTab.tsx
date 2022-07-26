@@ -701,7 +701,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={(parseInt(newBidAmount) || 0) * votePrice}
+          amount={(parseInt(newBidAmount) * 100 || 0) * votePrice}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * votePrice * 100
           //   ? {}
