@@ -38,6 +38,7 @@ const DeleteCommentModal = dynamic(
 interface IComment {
   lastChild?: boolean;
   comment: TCommentWithReplies;
+  isDeletingComment: boolean;
   canDeleteComment?: boolean;
   handleAddComment: (newMsg: string) => void;
   handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
@@ -49,6 +50,7 @@ const Comment: React.FC<IComment> = ({
   comment,
   lastChild,
   canDeleteComment,
+  isDeletingComment,
   handleAddComment,
   handleDeleteComment,
   onFormFocus,
@@ -176,6 +178,7 @@ const Comment: React.FC<IComment> = ({
           </SCommentHeader>
           <SText>{comment.content?.text}</SText>
           {!comment.parentId &&
+            !comment.isDeleted &&
             (!isReplyFormOpen ? (
               <SReply onClick={replyHandler}>{t('comments.sendReply')}</SReply>
             ) : (
@@ -192,20 +195,26 @@ const Comment: React.FC<IComment> = ({
                 />
               </>
             ))}
-          {!comment.parentId && replies && replies.length > 0 && (
-            <SReply onClick={replyHandler}>
-              {isReplyFormOpen
-                ? t('comments.hideReplies')
-                : t('comments.viewReplies')}{' '}
-              {replies.length}{' '}
-              {replies.length > 1 ? t('comments.replies') : t('comments.reply')}
-            </SReply>
-          )}
+          {!comment.parentId &&
+            !comment.isDeleted &&
+            replies &&
+            replies.length > 0 && (
+              <SReply onClick={replyHandler}>
+                {isReplyFormOpen
+                  ? t('comments.hideReplies')
+                  : t('comments.viewReplies')}{' '}
+                {replies.length}{' '}
+                {replies.length > 1
+                  ? t('comments.replies')
+                  : t('comments.reply')}
+              </SReply>
+            )}
           {isReplyFormOpen &&
             replies &&
             replies.map((item) => (
               <Comment
                 key={item.id.toString()}
+                isDeletingComment={isDeletingComment}
                 canDeleteComment={canDeleteComment}
                 comment={item}
                 handleAddComment={(newMsg: string) => handleAddComment(newMsg)}
@@ -216,6 +225,7 @@ const Comment: React.FC<IComment> = ({
         </SCommentContent>
         <DeleteCommentModal
           isVisible={confirmDeleteComment}
+          isDeletingComment={isDeletingComment}
           closeModal={() => setConfirmDeleteComment(false)}
           handleConfirmDelete={async () => {
             await handleDeleteComment(comment);

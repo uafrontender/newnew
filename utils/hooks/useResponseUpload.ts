@@ -250,6 +250,7 @@ const useResponseUpload = ({
       }
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     } finally {
       setResponseUploading(false);
     }
@@ -276,6 +277,7 @@ const useResponseUpload = ({
       }
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [postId, uploadedResponseVideoUrl, t, handleUpdatePostStatus]);
 

@@ -308,7 +308,6 @@ export async function getServerSideProps(
       },
     };
   } catch (err) {
-    console.log(err);
     return {
       props: {
         error: {

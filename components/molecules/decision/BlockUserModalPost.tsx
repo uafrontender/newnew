@@ -2,6 +2,8 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
+import { toast } from 'react-toastify';
+
 import { markUser } from '../../../api/endpoints/user';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
@@ -36,6 +38,7 @@ const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
       closeModal();
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }
   const handleConfirmClick = () => {
