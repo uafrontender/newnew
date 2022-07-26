@@ -15,5 +15,6 @@ test:
   stage: test
   script:
     - npm ci --include=dev
+    - npm install Xvfb
     - npm run test
     - npm run lint
