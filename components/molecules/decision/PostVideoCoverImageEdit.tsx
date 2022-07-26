@@ -52,7 +52,10 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
   );
   const handleDeleteCoverImage = useCallback(() => {
     setCoverImageToBeSaved('');
+    setWasDeleted(true);
   }, []);
+
+  const [wasDeleted, setWasDeleted] = useState(false);
 
   // Edit picture
   const [coverImageInEdit, setCoverImageInEdit] = useState('');
@@ -268,7 +271,12 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
           <SModalButtonContainer>
             <Button
               view='primaryGrad'
-              disabled={!hasChanged || updateCoverImageLoading}
+              loading={updateCoverImageLoading}
+              disabled={
+                !hasChanged ||
+                updateCoverImageLoading ||
+                (!wasDeleted && !coverImageToBeSaved)
+              }
               onClick={handleSubmitNewCoverImage}
             >
               {t('postVideoCoverImageEdit.submit')}
@@ -276,12 +284,21 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
           </SModalButtonContainer>
         ) : (
           <SButtonsWrapper>
-            <Button view='secondary' onClick={handleClose}>
+            <Button
+              view='secondary'
+              disabled={updateCoverImageLoading}
+              onClick={handleClose}
+            >
               {t('postVideoCoverImageEdit.cancel')}
             </Button>
             <Button
               view='primaryGrad'
-              disabled={!hasChanged || updateCoverImageLoading}
+              loading={updateCoverImageLoading}
+              disabled={
+                !hasChanged ||
+                updateCoverImageLoading ||
+                (!wasDeleted && !coverImageToBeSaved)
+              }
               onClick={handleSubmitNewCoverImage}
             >
               {t('postVideoCoverImageEdit.submit')}
