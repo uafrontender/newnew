@@ -383,7 +383,7 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
           manualCurrLocation={isBrowser() ? window.location.href : ''}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemovePostFromState={() =>
+          handleRemoveFromStateDeleted={() =>
             handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
           }
         />

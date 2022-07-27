@@ -68,8 +68,8 @@ interface IPostTopInfo {
   hasWinner: boolean;
   hasRecommendations: boolean;
   handleReportOpen: () => void;
-  handleRemovePostFromState?: () => void;
-  handleAddPostToState?: () => void;
+  handleRemoveFromStateUnfavorited?: () => void;
+  handleAddPostToStateFavorited?: () => void;
 }
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
@@ -87,8 +87,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   hasWinner,
   hasRecommendations,
   handleReportOpen,
-  handleRemovePostFromState,
-  handleAddPostToState,
+  handleRemoveFromStateUnfavorited,
+  handleAddPostToStateFavorited,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -206,17 +206,17 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         handleSetIsFollowingDecision(!isFollowingDecision);
 
         if (isFollowingDecision) {
-          handleRemovePostFromState?.();
+          handleRemoveFromStateUnfavorited?.();
         } else {
-          handleAddPostToState?.();
+          handleAddPostToStateFavorited?.();
         }
       }
     } catch (err) {
       console.error(err);
     }
   }, [
-    handleAddPostToState,
-    handleRemovePostFromState,
+    handleAddPostToStateFavorited,
+    handleRemoveFromStateUnfavorited,
     handleSetIsFollowingDecision,
     isFollowingDecision,
     postId,
@@ -423,8 +423,8 @@ PostTopInfo.defaultProps = {
   totalVotes: undefined,
   totalPledges: undefined,
   targetPledges: undefined,
-  handleRemovePostFromState: undefined,
-  handleAddPostToState: undefined,
+  handleRemoveFromStateUnfavorited: undefined,
+  handleAddPostToStateFavorited: undefined,
 };
 
 export default PostTopInfo;
