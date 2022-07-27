@@ -51,7 +51,7 @@ context('Main flow', () => {
       cy.url().should('include', '/creation');
     });
 
-    /*it('can create an event', () => {
+    it('can create an event', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creation`);
 
       // Waiting for an element to be attached to the DOM
@@ -250,7 +250,7 @@ context('Main flow', () => {
 
     // TODO: can contribute to superpoll
 
-    // TODO: can contribute to goal*/
+    // TODO: can contribute to goal
   });
 
   // TODO: cover creator and successful post case
