@@ -1,7 +1,6 @@
 image: node:latest
 
 stages:
-  - build
   - test
 
 # Cache using branch name
@@ -10,8 +9,11 @@ cache:
   paths:
     - node_modules
     - .next
+    - /root/.cache/Cypress
 
-build:
+# Tests for gitlab
+test:
+  stage: test
   script:
     - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
     - sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
@@ -21,11 +23,5 @@ build:
     - npm run dev &
     - sleep 60
     - curl http://localhost:4000
-
-# Tests for gitlab
-test:
-  stage: test
-  needs: [build]
-  script:
     - npm run test
     - npm run lint
