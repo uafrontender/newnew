@@ -123,8 +123,9 @@ interface IPostModal {
   commentContentFromUrl?: string;
   handleClose: () => void;
   handleOpenAnotherPost?: (post: newnewapi.Post) => void;
-  handleRemovePostFromState?: () => void;
-  handleAddPostToState?: () => void;
+  handleRemoveFromStateDeleted?: () => void;
+  handleRemoveFromStateUnfavorited?: () => void;
+  handleAddPostToStateFavorited?: () => void;
 }
 
 // Memorization does not work
@@ -137,8 +138,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   commentContentFromUrl,
   handleClose,
   handleOpenAnotherPost,
-  handleRemovePostFromState,
-  handleAddPostToState,
+  handleRemoveFromStateDeleted,
+  handleRemoveFromStateUnfavorited,
+  handleAddPostToStateFavorited,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -230,21 +232,21 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         setIsFollowingDecision((currentValue) => !currentValue);
         // TODO: separate onDelete and onUnsubscribe callbacks to prevent possible bugs
         if (isFollowingDecision) {
-          handleRemovePostFromState?.();
+          handleRemoveFromStateUnfavorited?.();
         } else {
-          handleAddPostToState?.();
+          handleAddPostToStateFavorited?.();
         }
       }
     } catch (err) {
       console.error(err);
     }
   }, [
-    postParsed,
-    router,
-    isFollowingDecision,
+    postParsed?.postUuid,
     user.loggedIn,
-    handleRemovePostFromState,
-    handleAddPostToState,
+    isFollowingDecision,
+    router,
+    handleRemoveFromStateUnfavorited,
+    handleAddPostToStateFavorited,
   ]);
 
   const handleUpdatePostStatus = useCallback(
@@ -324,7 +326,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
         if (!res.error) {
           handleUpdatePostStatus('DELETED_BY_CREATOR');
-          handleRemovePostFromState?.();
+          handleRemoveFromStateDeleted?.();
           handleCloseDeletePostModal();
         }
       } else {
@@ -336,7 +338,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
         if (!res.error) {
           handleUpdatePostStatus('DELETED_BY_CREATOR');
-          handleRemovePostFromState?.();
+          handleRemoveFromStateDeleted?.();
           handleCloseDeletePostModal();
         }
       }
@@ -344,7 +346,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       console.error(err);
     }
   }, [
-    handleRemovePostFromState,
+    handleRemoveFromStateDeleted,
     handleUpdatePostStatus,
     postParsed?.postUuid,
     postStatus,
@@ -540,8 +542,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -560,8 +562,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -581,8 +583,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
         />
       );
     }
@@ -600,8 +602,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
         />
       );
     }
@@ -619,8 +621,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
         />
       );
     }
@@ -697,8 +699,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -717,8 +719,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -731,7 +733,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           post={postParsed as newnewapi.MultipleChoice}
           handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState!!}
           handleGoBack={handleGoBackInsidePost}
         />
       );
@@ -743,7 +744,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.Auction}
           postStatus={postStatus}
           handleGoBack={handleGoBackInsidePost}
-          handleRemovePostFromState={handleRemovePostFromState!!}
           handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
@@ -755,7 +755,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           post={postParsed as newnewapi.Crowdfunding}
           handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState!!}
           handleGoBack={handleGoBackInsidePost}
         />
       );
@@ -1491,11 +1490,12 @@ PostModal.defaultProps = {
   post: undefined,
   manualCurrLocation: undefined,
   handleOpenAnotherPost: () => {},
-  handleRemovePostFromState: () => {},
-  handleAddPostToState: () => {},
+  handleRemoveFromStateDeleted: () => {},
+  handleRemoveFromStateUnfavorited: () => {},
+  handleAddPostToStateFavorited: () => {},
 };
 
-export default (props: any) => (
+export default (props: IPostModal) => (
   <CommentFromUrlContextProvider>
     <PostModal {...props} />
   </CommentFromUrlContextProvider>

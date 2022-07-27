@@ -63,17 +63,10 @@ interface IPostModerationAC {
   postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleRemovePostFromState: () => void;
 }
 
 const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
-  ({
-    post,
-    postStatus,
-    handleUpdatePostStatus,
-    handleGoBack,
-    handleRemovePostFromState,
-  }) => {
+  ({ post, postStatus, handleUpdatePostStatus, handleGoBack }) => {
     const dispatch = useAppDispatch();
     const { t } = useTranslation('modal-Post');
     const { user } = useAppSelector((state) => state);
@@ -682,7 +675,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             hasResponse={!!post.response}
             hidden={openedTab === 'response'}
             handleUpdatePostStatus={handleUpdatePostStatus}
-            handleRemovePostFromState={handleRemovePostFromState}
           />
           <SActivitesContainer
             decisionFailed={postStatus === 'failed'}
