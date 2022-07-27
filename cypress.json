@@ -10,5 +10,6 @@
     "openMode": 1
   },
   "testFiles": "**/*.spec.ts",
-  "chromeWebSecurity": false
+  "chromeWebSecurity": false,
+  "defaultCommandTimeout": 8000
 }
