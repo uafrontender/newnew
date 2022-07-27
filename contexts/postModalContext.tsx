@@ -42,25 +42,18 @@ const PostModalContextProvider: React.FC<IPostModalContextProvider> = ({
   const scrollPosition = useRef(0);
 
   useEffect(() => {
-    if (!isMobile) {
-      if (modalOpen) {
-        scrollPosition.current = window ? window.scrollY : 0;
+    if (modalOpen) {
+      scrollPosition.current = window ? window.scrollY : 0;
 
-        document.body.style.cssText = `
-        top: -${scrollPosition.current}px;
-        left: 0px;
-        right: 0px;
+      document.body.style.cssText = `
         overflow: hidden;
-        position: fixed;
-     `;
-      } else {
-        document.body.style.cssText = '';
-        document.documentElement.style.cssText = '';
-        console.log(scrollPosition.current);
-        window?.scroll(0, scrollPosition.current);
-      }
+      `;
+    } else {
+      document.body.style.cssText = '';
+      document.documentElement.style.cssText = '';
+      window?.scroll(0, scrollPosition.current);
     }
-  }, [modalOpen, isMobile]);
+  }, [modalOpen]);
 
   const contextValue = useMemo(
     () => ({
