@@ -156,7 +156,7 @@ const PostPage: NextPage<IPostPage> = ({
           sessionIdFromRedirect={session_id}
           commentIdFromUrl={comment_id}
           commentContentFromUrl={comment_content}
-          // Required to avoid wierd cases when navigating back to the post using browser back button
+          // Required to avoid weird cases when navigating back to the post using browser back button
           manualCurrLocation='forced_redirect_to_home'
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}

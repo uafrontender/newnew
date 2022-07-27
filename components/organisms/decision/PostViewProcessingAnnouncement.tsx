@@ -44,8 +44,8 @@ interface IPostViewProcessingAnnouncement {
   handleSetIsFollowingDecision: (newValue: boolean) => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleRemovePostFromState: () => void;
-  handleAddPostToState: () => void;
+  handleRemoveFromStateUnfavorited: () => void;
+  handleAddPostToStateFavorited: () => void;
   handleReportOpen: () => void;
 }
 
@@ -62,8 +62,8 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
   handleSetIsFollowingDecision,
   handleGoBack,
   handleUpdatePostStatus,
-  handleRemovePostFromState,
-  handleAddPostToState,
+  handleRemoveFromStateUnfavorited,
+  handleAddPostToStateFavorited,
   handleReportOpen,
 }) => {
   const { t } = useTranslation('modal-Post');
@@ -154,8 +154,8 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
           hasRecommendations={hasRecommendations}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleReportOpen={handleReportOpen}
-          handleRemovePostFromState={handleRemovePostFromState}
-          handleAddPostToState={handleAddPostToState}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited}
         />
       ) : (
         <PostTopInfoModeration
@@ -166,7 +166,6 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
           hasWinner={false}
           hasResponse={false}
           handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState}
         />
       )}
       <SActivitiesContainer>

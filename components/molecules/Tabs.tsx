@@ -59,14 +59,14 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
   // Route change
   const handleChangeRoute = useCallback(
     (path: string) => {
-      router.replace(path);
+      router.replace(path, undefined, { scroll: false });
     },
     [router]
   );
 
   // Scrolling the tabs with mouse & touch
   const extractPositionDelta = (e: any) => {
-    const left = e.clientX;
+    const left = e.clientX || e.deltaX;
 
     const delta = {
       left: left - prevLeft,
@@ -184,6 +184,39 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
     }
   };
 
+  // Wheel event
+  // Tries to prevent back navigation gesture on MacOS
+  const preventBackNavigationOnScroll = () => {
+    if (window?.innerWidth >= tabsWidth) return;
+    if (isBrowser()) {
+      document.documentElement.style.overscrollBehaviorX = 'contain';
+      document.documentElement.style.overflowX = 'hidden';
+    }
+  };
+
+  const resumeBackNavigationOnScroll = () => {
+    if (window?.innerWidth >= tabsWidth) return;
+    if (isBrowser()) {
+      document.documentElement.style.overscrollBehaviorX = 'auto';
+      document.documentElement.style.overflowX = '';
+    }
+  };
+
+  const handleOnWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (window?.innerWidth >= tabsWidth || isDragging) return;
+
+    const newLeft = posLeft - e.deltaX;
+
+    // Too far to the right
+    if (newLeft <= 0 && newLeft + tabsWidth!! < containerWidth) return;
+
+    // Too far to the left
+    if (newLeft >= 0 && containerWidth - newLeft < tabsWidth!!) return;
+
+    setPosLeft(newLeft);
+  };
+
   // Button-specific handlers to prevent unwanted cliks on Mouse event
   const handleButtonMouseDownCapture = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -296,6 +329,9 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onWheel={handleOnWheel}
+      onMouseOver={preventBackNavigationOnScroll}
+      onMouseOut={resumeBackNavigationOnScroll}
     >
       <STabsContainer
         ref={(el) => {
