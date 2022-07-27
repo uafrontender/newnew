@@ -8,7 +8,10 @@ import {
 
 const BASE_URL_PAYMENTS = `${BASE_URL}/payments`;
 
-export const getSupportedCreatorCountries = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
+export const getSupportedCreatorCountries = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<
     newnewapi.EmptyRequest,
     newnewapi.GetSupportedCreatorCountriesResponse
@@ -21,7 +24,7 @@ export const getSupportedCreatorCountries = (payload: newnewapi.EmptyRequest, si
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 export const getStripeCustomer = (
@@ -57,8 +60,10 @@ export const createStripeSetupIntent = (
   );
 
 // Payments for bids/pledges/votes via Stripe redirect
+// TODO: remove
 export const createPaymentSession = (
-  payload: newnewapi.CreatePaymentSessionRequest, signal?: RequestInit['signal']
+  payload: newnewapi.CreatePaymentSessionRequest,
+  signal?: RequestInit['signal']
 ) =>
   fetchProtobuf<
     newnewapi.CreatePaymentSessionRequest,
@@ -75,14 +80,31 @@ export const createPaymentSession = (
           'x-auth-token': cookiesInstance.get('accessToken'),
         }
       : {},
-      'cors',
-      'same-origin',
-      signal ?? undefined,
+    'cors',
+    'same-origin',
+    signal ?? undefined
   );
+
+// export const createStripePaymentIntent = (
+//   payload: newnewapi.CreateStripePaymentIntentRequest,
+//   signal?: RequestInit['signal']
+// ) =>
+//   fetchProtobufProtectedIntercepted<
+//     newnewapi.CreateStripePaymentIntentRequest,
+//     newnewapi.CreateStripePaymentIntentResponse
+//   >(
+//     newnewapi.CreateStripePaymentIntentRequest,
+//     newnewapi.CreateStripePaymentIntentResponse,
+//     `${BASE_URL_PAYMENTS}/create_stripe_payment_intent`,
+//     'post',
+//     payload,
+//     signal ?? undefined
+//   );
 
 // Set up Stripe creator account
 export const fetchSetStripeLinkCreator = (
-  payload: newnewapi.SetupStripeCreatorAccountRequest, signal?: RequestInit['signal']
+  payload: newnewapi.SetupStripeCreatorAccountRequest,
+  signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.SetupStripeCreatorAccountRequest,
@@ -93,11 +115,14 @@ export const fetchSetStripeLinkCreator = (
     `${BASE_URL_PAYMENTS}/setup_stripe_creator_account`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 // Wallet
-export const getWalletBalance = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
+export const getWalletBalance = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
     newnewapi.GetWalletBalanceResponse
@@ -107,11 +132,12 @@ export const getWalletBalance = (payload: newnewapi.EmptyRequest, signal?: Reque
     `${BASE_URL_PAYMENTS}/get_wallet_balance`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 export const getTopUpWalletSessionUrl = (
-  payload: newnewapi.TopUpWalletRequest, signal?: RequestInit['signal']
+  payload: newnewapi.TopUpWalletRequest,
+  signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.TopUpWalletRequest,
@@ -122,11 +148,12 @@ export const getTopUpWalletSessionUrl = (
     `${BASE_URL_PAYMENTS}/top_up_wallet`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 export const getTopUpWalletWithPaymentPurposeUrl = (
-  payload: newnewapi.TopUpWalletWithPurposeRequest, signal?: RequestInit['signal']
+  payload: newnewapi.TopUpWalletWithPurposeRequest,
+  signal?: RequestInit['signal']
 ) =>
   fetchProtobuf<
     newnewapi.TopUpWalletWithPurposeRequest,
@@ -145,10 +172,13 @@ export const getTopUpWalletWithPaymentPurposeUrl = (
       : {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const getMyEarnings = (payload: newnewapi.GetMyEarningsRequest, signal?: RequestInit['signal']) =>
+export const getMyEarnings = (
+  payload: newnewapi.GetMyEarningsRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.GetMyEarningsRequest,
     newnewapi.GetMyEarningsResponse
@@ -158,11 +188,12 @@ export const getMyEarnings = (payload: newnewapi.GetMyEarningsRequest, signal?: 
     `${BASE_URL_PAYMENTS}/get_my_earnings`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 export const getMyTransactions = (
-  payload: newnewapi.GetMyTransactionsRequest, signal?: RequestInit['signal']
+  payload: newnewapi.GetMyTransactionsRequest,
+  signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.GetMyTransactionsRequest,
@@ -173,11 +204,12 @@ export const getMyTransactions = (
     `${BASE_URL_PAYMENTS}/get_my_transactions`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 export const getMyEarningsByPosts = (
-  payload: newnewapi.GetMyEarningsByPostsRequest, signal?: RequestInit['signal']
+  payload: newnewapi.GetMyEarningsByPostsRequest,
+  signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.GetMyEarningsByPostsRequest,
@@ -188,5 +220,5 @@ export const getMyEarningsByPosts = (
     `${BASE_URL_PAYMENTS}/get_my_earnings_by_posts`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
