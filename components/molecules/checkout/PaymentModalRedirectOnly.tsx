@@ -6,6 +6,8 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -16,6 +18,14 @@ import InlineSvg from '../../atoms/InlineSVG';
 import GoBackButton from '../GoBackButton';
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+
+interface IReCaptchaRes {
+  success?: boolean;
+  challenge_ts?: string;
+  hostname?: string;
+  score?: number;
+  errors?: Array<string> | string;
+}
 
 interface IPaymentModalRedirectOnly {
   isOpen: boolean;
@@ -45,6 +55,44 @@ const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
     resizeMode
   );
 
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
+  const handlePayWithCaptchaProtection = async () => {
+    try {
+      if (!executeRecaptcha) {
+        throw new Error('executeRecaptcha not available');
+      }
+
+      const recaptchaToken = await executeRecaptcha();
+
+      if (recaptchaToken) {
+        const res = await fetch('/api/post_recaptcha_query', {
+          method: 'POST',
+          body: JSON.stringify({
+            recaptchaToken,
+          }),
+        });
+
+        const jsonRes: IReCaptchaRes = await res.json();
+
+        if (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5) {
+          handlePayWithCardStripeRedirect?.();
+        } else {
+          throw new Error(
+            jsonRes?.errors
+              ? Array.isArray(jsonRes?.errors)
+                ? jsonRes.errors[0]?.toString()
+                : jsonRes.errors?.toString()
+              : 'ReCaptcha failed'
+          );
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('toastErrors.generic');
+    }
+  };
+
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
       <SWrapper>
@@ -69,9 +117,7 @@ const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
           <SPayButtonDiv>
             <SPayButton
               view='primaryGrad'
-              onClick={() => {
-                handlePayWithCardStripeRedirect?.();
-              }}
+              onClick={() => handlePayWithCaptchaProtection()}
             >
               {t('payButton')}
               {amount && ` ${amount}`}
@@ -88,6 +134,17 @@ const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
                 {t('tocApplyText')}
               </STocApply>
             )}
+            <STocApplyReCaptcha>
+              {t('reCaptchaTos.siteProtectedBy')}{' '}
+              <a target='_blank' href='https://policies.google.com/privacy'>
+                {t('reCaptchaTos.privacyPolicy')}
+              </a>{' '}
+              {t('reCaptchaTos.and')}{' '}
+              <a target='_blank' href='https://policies.google.com/terms'>
+                {t('reCaptchaTos.tos')}
+              </a>{' '}
+              {t('reCaptchaTos.apply')}
+            </STocApplyReCaptcha>
           </SPayButtonDiv>
         </SContentContainer>
       </SWrapper>
@@ -235,6 +292,37 @@ const STocApply = styled.div`
   ${({ theme }) => theme.media.tablet} {
     font-size: 14px;
     line-height: 20px;
+  }
+`;
+
+const STocApplyReCaptcha = styled.div`
+  margin-top: 4px;
+
+  text-align: center;
+
+  font-weight: 600;
+  font-size: 8px;
+  line-height: 10px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  a {
+    font-weight: 600;
+
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+    &:hover,
+    &:focus {
+      outline: none;
+      color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+      transition: 0.2s ease;
+    }
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 8px;
+    line-height: 12px;
   }
 `;
 

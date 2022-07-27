@@ -16,6 +16,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { validateText } from '../../../../api/endpoints/infrastructure';
@@ -37,7 +38,7 @@ import Button from '../../../atoms/Button';
 import McOptionCard from './McOptionCard';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 // import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
-import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import LoadingModal from '../../LoadingModal';
 import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
@@ -53,8 +54,8 @@ import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
-import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -340,6 +341,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [newBidAmount, newOptionText, post.postUuid, router.locale]);
 
@@ -382,6 +384,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
+      toast.error('toastErrors.generic');
     }
   }, [
     newOptionText,
@@ -510,7 +513,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               handleSetSupportedBid={(id: string) =>
                 setOptionBeingSupported(id)
               }
-              handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
+              handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
                 setPaymentSuccessModalOpen(newValue)
               }
               handleAddOrUpdateOptionFromResponse={
@@ -695,10 +698,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${formatNumber(
-            parseInt(newBidAmount) * votePrice ?? 0,
-            true
-          )}`}
+          amount={(parseInt(newBidAmount) * 100 || 0) * votePrice}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * votePrice * 100
           //   ? {}
@@ -753,7 +753,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
-              {post.title}
+              <PostTitleContent>{post.title}</PostTitleContent>
             </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
               {t('mcPost.paymentModalHeader.subtitle')}

@@ -7,7 +7,7 @@ import styled, { css, useTheme } from 'styled-components';
 import Text from '../../Text';
 import InlineSVG from '../../InlineSVG';
 import { RenderDays } from './CalendarScrollableVertically';
-import AnimatedPresence, { TAnimation } from '../../AnimatedPresence';
+import AnimatedPresence, { TElementAnimations } from '../../AnimatedPresence';
 
 import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
@@ -36,7 +36,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
   const wrapperRef: any = useRef();
   const [open, setOpen] = useState(false);
   const [animate, setAnimate] = useState(false);
-  const [animation, setAnimation] = useState('o-12');
+  const [animation, setAnimation] = useState<TElementAnimations>('o-12');
   const [visibleMonth, setVisibleMonth] = useState(
     monthsToRender.findIndex((m) => m.format('M') === moment(date).format('M'))
   );
@@ -51,7 +51,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
     setOpen(true);
   }, []);
   const handleClose = useCallback(() => {
-    setAnimation('o-12-reversed');
+    setAnimation('o-12-reverse');
     setAnimate(true);
     setOpen(false);
   }, []);
@@ -135,7 +135,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
       </SContainer>
       <AnimatedPresence
         start={animate}
-        animation={animation as TAnimation}
+        animation={animation}
         onAnimationEnd={handleAnimationEnd}
         animateWhenInView={false}
       >

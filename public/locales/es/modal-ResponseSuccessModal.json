@@ -1,6 +1,6 @@
 {
-  "header_NEDD_TRANSLATION": "Congrats!",
-  "youMade_NEDD_TRANSLATION": "You made",
-  "makeNewPostButton_NEDD_TRANSLATION": "Make another post",
+  "header": "¡Felicidades!",
+  "youMade": "Ganaste",
+  "makeNewPostButton": "Hacer otra publicación",
   "subtitle": ""
 }

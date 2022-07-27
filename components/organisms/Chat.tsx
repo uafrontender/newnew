@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
+import { useEffectOnce, useUpdateEffect } from 'react-use';
 import dynamic from 'next/dynamic';
 
 import ChatList from '../molecules/chat/ChatList';
@@ -24,15 +25,15 @@ interface IChat {
 export const Chat: React.FC<IChat> = ({ username }) => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  const [isInitialLoaded, setIsInitialLoaded] = useState<boolean>(false);
   const [chatData, setChatData] = useState<IChatData>({
     chatRoom: null,
     showChatList: null,
   });
 
   const { t } = useTranslation('page-Chat');
-  const [chatListHidden, setChatListHidden] =
-    useState<boolean | undefined>(undefined);
+  const [chatListHidden, setChatListHidden] = useState<boolean | undefined>(
+    undefined
+  );
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
     'mobile',
@@ -41,13 +42,13 @@ export const Chat: React.FC<IChat> = ({ username }) => {
     'mobileL',
     'tablet',
   ].includes(resizeMode);
-  const [newMessage, setNewMessage] =
-    useState<newnewapi.IChatMessage | null | undefined>();
+  const [newMessage, setNewMessage] = useState<
+    newnewapi.IChatMessage | null | undefined
+  >();
   const [searchText, setSearchText] = useState<string>('');
-  const [newLastMessage, setNewLastMessage] =
-    useState<{
-      chatId: number | Long.Long | null | undefined;
-    } | null>(null);
+  const [newLastMessage, setNewLastMessage] = useState<{
+    chatId: number | Long.Long | null | undefined;
+  } | null>(null);
 
   const showChatList = () => {
     setChatListHidden(false);
@@ -73,19 +74,23 @@ export const Chat: React.FC<IChat> = ({ username }) => {
       router.push(`/direct-messages/${route}`);
 
       setChatData({ chatRoom, showChatList });
-      if (isMobileOrTablet) {
-        isInitialLoaded ? setChatListHidden(true) : setIsInitialLoaded(true);
-      }
+      if (isMobileOrTablet) setChatListHidden(true);
     },
-    [isInitialLoaded, router, isMobileOrTablet, user.userData?.username]
+    [router, user.userData?.username, isMobileOrTablet]
   );
 
-  useEffect(() => {
+  useEffectOnce(() => {
+    if (isMobileOrTablet) {
+      setChatListHidden(true);
+    }
+  });
+
+  useUpdateEffect(() => {
     /* eslint-disable no-unused-expressions */
     isMobileOrTablet ? setChatListHidden(false) : setChatListHidden(undefined);
   }, [isMobileOrTablet]);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (newMessage) {
       setNewMessage(null);
     }

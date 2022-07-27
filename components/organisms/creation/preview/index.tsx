@@ -154,6 +154,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       if (post.expiresAt === '1-hour') {
         dateValue.add(1, 'h');
         seconds = 3600;
+      } else if (post.expiresAt === '3-hours') {
+        dateValue.add(3, 'h');
+        seconds = 10800;
       } else if (post.expiresAt === '6-hours') {
         seconds = 21600;
         dateValue.add(6, 'h');

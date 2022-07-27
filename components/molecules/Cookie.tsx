@@ -5,7 +5,9 @@ import styled, { useTheme } from 'styled-components';
 import Link from 'next/link';
 
 import InlineSVG from '../atoms/InlineSVG';
-import AnimatedPresence, { TAnimation } from '../atoms/AnimatedPresence';
+import AnimatedPresence, {
+  TElementAnimations,
+} from '../atoms/AnimatedPresence';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import cookieIcon from '../../public/images/svg/icons/filled/Cookie.svg';
@@ -14,7 +16,7 @@ const Cookie = React.memo(() => {
   const theme = useTheme();
   const { t } = useTranslation();
   const [cookies, setCookie] = useCookies();
-  const [animation, setAnimation] = useState('trans-06');
+  const [animation, setAnimation] = useState<TElementAnimations>('trans-06');
   const [animateCookie, setAnimateCookie] = useState(false);
 
   const handleClose = () => {
@@ -52,7 +54,7 @@ const Cookie = React.memo(() => {
   return (
     <AnimatedPresence
       start={animateCookie}
-      animation={animation as TAnimation}
+      animation={animation}
       onAnimationEnd={handleAnimationEnd}
       animateWhenInView={false}
     >

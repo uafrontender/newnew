@@ -58,6 +58,10 @@ const SAuthLayout = styled.div`
 
   height: 100vh;
   width: 100vw;
+
+  @supports (-webkit-touch-callout: none) {
+    height: -webkit-fill-available;
+  }
 `;
 
 const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {

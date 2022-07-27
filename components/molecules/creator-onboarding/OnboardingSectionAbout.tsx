@@ -51,107 +51,47 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
 
 interface IOnboardingSectionAbout {}
 
-const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
-  () => {
-    const router = useRouter();
-    const { t } = useTranslation('page-CreatorOnboarding');
-    const dispatch = useAppDispatch();
-    const user = useAppSelector((state) => state.user);
-    const { resizeMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
+const OnboardingSectionAbout: React.FunctionComponent<
+  IOnboardingSectionAbout
+> = () => {
+  const router = useRouter();
+  const { t } = useTranslation('page-CreatorOnboarding');
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-    const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
-    // Bio
-    const [bioInEdit, setBioInEdit] = useState(user.userData?.bio ?? '');
-    const [bioError, setBioError] = useState('');
-    const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
-    const validateBioViaApi = useCallback(
-      async (text: string) => {
-        setIsAPIValidateLoading(true);
-        try {
-          const payload = new newnewapi.ValidateTextRequest({
-            kind: newnewapi.ValidateTextRequest.Kind.CREATOR_BIO,
-            text,
-          });
-
-          const res = await validateText(payload);
-
-          if (!res.data?.status) throw new Error('An error occurred');
-
-          if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-            setBioError(errorSwitch(res.data?.status));
-          } else {
-            setBioError('');
-          }
-
-          setIsAPIValidateLoading(false);
-        } catch (err) {
-          console.error(err);
-          setIsAPIValidateLoading(false);
-          if ((err as Error).message === 'No token') {
-            dispatch(logoutUserClearCookiesAndRedirect());
-          }
-          // Refresh token was present, session probably expired
-          // Redirect to sign up page
-          if ((err as Error).message === 'Refresh token invalid') {
-            dispatch(
-              logoutUserClearCookiesAndRedirect(
-                '/sign-up?reason=session_expired'
-              )
-            );
-          }
-        }
-      },
-      [setBioError, dispatch]
-    );
-
-    const validateBioViaApiDebounced = useMemo(
-      () =>
-        debounce((text: string) => {
-          validateBioViaApi(text);
-        }, 250),
-      [validateBioViaApi]
-    );
-
-    const handleUpdateBioInEdit = (
-      e: React.ChangeEvent<HTMLTextAreaElement>
-    ) => {
-      setBioInEdit(e.target.value);
-
-      validateBioViaApiDebounced(e.target.value);
-    };
-
-    // Is form valid
-    const [isFormValid, setIsFormValid] = useState(false);
-
-    const handleSubmit = useCallback(async () => {
+  // Bio
+  const [bioInEdit, setBioInEdit] = useState(user.userData?.bio ?? '');
+  const [bioError, setBioError] = useState('');
+  const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+  const validateBioViaApi = useCallback(
+    async (text: string) => {
+      setIsAPIValidateLoading(true);
       try {
-        setLoadingModalOpen(true);
-
-        const updateBioPayload = new newnewapi.UpdateMeRequest({
-          bio: bioInEdit,
+        const payload = new newnewapi.ValidateTextRequest({
+          kind: newnewapi.ValidateTextRequest.Kind.CREATOR_BIO,
+          text,
         });
 
-        const updateMeRes = await updateMe(updateBioPayload);
+        const res = await validateText(payload);
 
-        if (!updateMeRes.data || updateMeRes.error)
-          throw new Error(updateMeRes.error?.message ?? 'Request failed');
+        if (!res.data?.status) throw new Error('An error occurred');
 
-        dispatch(
-          setUserData({
-            bio: updateMeRes.data.me?.bio,
-          })
-        );
+        if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+          setBioError(errorSwitch(res.data?.status));
+        } else {
+          setBioError('');
+        }
 
-        router.push('/creator-onboarding-stripe');
-
-        setLoadingModalOpen(false);
+        setIsAPIValidateLoading(false);
       } catch (err) {
-        console.log(err);
-        setLoadingModalOpen(false);
+        console.error(err);
+        setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
           dispatch(logoutUserClearCookiesAndRedirect());
         }
@@ -163,64 +103,131 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
           );
         }
       }
-    }, [bioInEdit, dispatch, router]);
+    },
+    [setBioError, dispatch]
+  );
 
-    useEffect(() => {
-      if (bioInEdit.length > 0 && bioError === '') {
-        setIsFormValid(true);
-      } else {
-        setIsFormValid(false);
-      }
-    }, [bioError, bioInEdit]);
+  const validateBioViaApiDebounced = useMemo(
+    () =>
+      debounce((text: string) => {
+        validateBioViaApi(text);
+      }, 250),
+    [validateBioViaApi]
+  );
 
-    return (
-      <>
-        <SContainer>
-          {isMobile && <SGoBackButton onClick={() => router.back()} />}
-          <SHeading variant={5}>{t('aboutSection.heading')}</SHeading>
-          <STopContainer>
-            <SFormItemContainer>
-              <OnboardingBioTextarea
-                value={bioInEdit}
-                isValid={bioError === ''}
-                errorCaption={t(`aboutSection.bio.errors.${bioError}`)}
-                placeholder={t('aboutSection.bio.placeholder')}
-                maxChars={150}
-                onChange={handleUpdateBioInEdit}
-              />
-            </SFormItemContainer>
-          </STopContainer>
-          <SControlsDiv>
-            {!isMobile && (
-              <GoBackButton noArrow onClick={() => router.back()}>
-                {t('aboutSection.button.back')}
-              </GoBackButton>
-            )}
-            <Button
-              view='primaryGrad'
-              disabled={!isFormValid}
-              style={{
-                width: isMobile ? '100%' : 'initial',
-                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-              }}
-              onClick={() => handleSubmit()}
-            >
-              {t('aboutSection.button.submit')}
-            </Button>
-          </SControlsDiv>
-        </SContainer>
-        {/* Loading Modal */}
-        <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
-      </>
-    );
+  const handleUpdateBioInEdit = (value: string) => {
+    setBioInEdit(value);
+    validateBioViaApiDebounced(value);
   };
+
+  const handleLocalValidation = (value: string) => {
+    let bio = value;
+    if (bio.length > 0) {
+      bio = bio.trimStart();
+      if (bio.length > 1 && bio[bio.length - 2] === ' ') {
+        bio = bio.trimEnd();
+      }
+    }
+    handleUpdateBioInEdit(bio);
+  };
+
+  // Is form valid
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  const handleSubmit = useCallback(async () => {
+    try {
+      setLoadingModalOpen(true);
+
+      const updateBioPayload = new newnewapi.UpdateMeRequest({
+        bio: bioInEdit,
+      });
+
+      const updateMeRes = await updateMe(updateBioPayload);
+
+      if (!updateMeRes.data || updateMeRes.error)
+        throw new Error(updateMeRes.error?.message ?? 'Request failed');
+
+      dispatch(
+        setUserData({
+          bio: updateMeRes.data.me?.bio,
+        })
+      );
+
+      router.push('/creator-onboarding-stripe');
+
+      setLoadingModalOpen(false);
+    } catch (err) {
+      console.log(err);
+      setLoadingModalOpen(false);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(
+          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
+        );
+      }
+    }
+  }, [bioInEdit, dispatch, router]);
+
+  useEffect(() => {
+    if (bioInEdit.length > 0 && bioError === '') {
+      setIsFormValid(true);
+    } else {
+      setIsFormValid(false);
+    }
+  }, [bioError, bioInEdit]);
+
+  return (
+    <>
+      <SContainer>
+        {isMobile && <SGoBackButton onClick={() => router.back()} />}
+        <SHeading variant={5}>{t('aboutSection.heading')}</SHeading>
+        <STopContainer>
+          <SFormItemContainer>
+            <OnboardingBioTextarea
+              value={bioInEdit}
+              isValid={bioError === ''}
+              errorCaption={t(`aboutSection.bio.errors.${bioError}`)}
+              placeholder={t('aboutSection.bio.placeholder')}
+              maxChars={150}
+              onChange={(e) => handleLocalValidation(e.target.value)}
+            />
+          </SFormItemContainer>
+        </STopContainer>
+        <SControlsDiv>
+          {!isMobile && (
+            <GoBackButton noArrow onClick={() => router.back()}>
+              {t('aboutSection.button.back')}
+            </GoBackButton>
+          )}
+          <Button
+            view='primaryGrad'
+            disabled={!isFormValid}
+            style={{
+              width: isMobile ? '100%' : 'initial',
+              ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+            }}
+            onClick={() => handleSubmit()}
+          >
+            {t('aboutSection.button.submit')}
+          </Button>
+        </SControlsDiv>
+      </SContainer>
+      {/* Loading Modal */}
+      <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+    </>
+  );
+};
 
 export default OnboardingSectionAbout;
 
 const SContainer = styled.div`
   padding: 0 20px 20px;
   z-index: 2;
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   ${({ theme }) => theme.media.tablet} {

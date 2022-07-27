@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import { toast } from 'react-toastify';
 
 import Lottie from '../components/atoms/Lottie';
 
@@ -62,9 +63,9 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
         setIsLoading(false);
         router.push('/verify-email');
       } catch (err) {
-        // NB! Might need an error toast
         setIsLoading(false);
         setSignInError(true);
+        toast.error('toastErrors.generic');
         // router.push('/');
       }
     }

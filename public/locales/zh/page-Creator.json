@@ -45,7 +45,7 @@
         "button": "發佈一個帖子"
       },
       "list": {
-        "ac": "Event",
+        "ac": "Bid",
         "cf": "Superpoll",
         "mc": "Goal",
         "subscriptions": "訂閱"
@@ -74,7 +74,7 @@
         }
       },
       "postTypes": {
-        "auction": "Event",
+        "auction": "Bid",
         "multipleChoice": "Superpoll",
         "crowdfunding": "Goal"
       },
@@ -211,7 +211,7 @@
     "firstFeature": "直接給你發私訊",
     "secondFeature": "在你的Superpoll中獲得免費投票",
     "thirdFeature": "向你的Superpoll添加自訂建議",
-    "note": "不用擔心--開啟訂閱不會限制大家參與你的Event、Superpoll或Goal"
+    "note": "不用擔心--開啟訂閱不會限制大家參與你的Bid、Superpoll或Goal"
   },
   "enableSubModal": {
     "title": "開啓訂閱",
