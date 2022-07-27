@@ -84,8 +84,8 @@ interface IPostViewCF {
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
-  handleRemovePostFromState: () => void;
-  handleAddPostToState: () => void;
+  handleRemoveFromStateUnfavorited: () => void;
+  handleAddPostToStateFavorited: () => void;
 }
 
 const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
@@ -100,8 +100,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
     handleGoBack,
     handleUpdatePostStatus,
     handleReportOpen,
-    handleRemovePostFromState,
-    handleAddPostToState,
+    handleRemoveFromStateUnfavorited,
+    handleAddPostToStateFavorited,
   }) => {
     const router = useRouter();
     const { t } = useTranslation('modal-Post');
@@ -786,8 +786,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
             hasRecommendations={hasRecommendations}
             handleSetIsFollowingDecision={handleSetIsFollowingDecision}
             handleReportOpen={handleReportOpen}
-            handleRemovePostFromState={handleRemovePostFromState}
-            handleAddPostToState={handleAddPostToState}
+            handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited}
+            handleAddPostToStateFavorited={handleAddPostToStateFavorited}
           />
           <SActivitesContainer>
             <PostVotingTab>{t('tabs.backers')}</PostVotingTab>

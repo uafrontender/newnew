@@ -253,6 +253,14 @@ const CommentsBottomSection: React.FunctionComponent<
           if (commentIdx === -1) return workingArr;
           workingArr[commentIdx].isDeleted = true;
           workingArr[commentIdx].content!!.text = '';
+
+          if (
+            workingArr[commentIdx].replies &&
+            workingArr[commentIdx].replies!!.length > 0
+          ) {
+            workingArr[commentIdx].replies = [];
+          }
+
           return workingArr;
         }
 

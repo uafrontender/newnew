@@ -430,7 +430,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
           post={displayedPost}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemovePostFromState={() =>
+          handleRemoveFromStateDeleted={() =>
             handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
           }
         />
