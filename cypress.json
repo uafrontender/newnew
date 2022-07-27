@@ -11,5 +11,5 @@
   },
   "testFiles": "**/*.spec.ts",
   "chromeWebSecurity": false,
-  "defaultCommandTimeout": 8000
+  "defaultCommandTimeout": 30000
 }
