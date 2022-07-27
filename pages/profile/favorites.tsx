@@ -97,7 +97,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
     });
   };
 
-  const handleAddPostToState = (postToAdd: newnewapi.Post) => {
+  const handleAddPostToStateFavorited = (postToAdd: newnewapi.Post) => {
     handleSetPosts((curr) => {
       const newArr = [...curr];
 
@@ -222,11 +222,11 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
           post={displayedPost}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemovePostFromState={() =>
+          handleRemoveFromStateUnfavorited={() =>
             handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
           }
-          handleAddPostToState={() =>
-            handleAddPostToState(displayedPost as newnewapi.Post)
+          handleAddPostToStateFavorited={() =>
+            handleAddPostToStateFavorited(displayedPost as newnewapi.Post)
           }
         />
       )}

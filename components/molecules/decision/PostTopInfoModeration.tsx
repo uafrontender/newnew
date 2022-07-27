@@ -42,142 +42,139 @@ interface IPostTopInfoModeration {
   hasWinner: boolean;
   hidden?: boolean;
   handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleRemovePostFromState: () => void;
 }
 
-const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
-  ({
-    title,
-    postId,
-    postType,
+const PostTopInfoModeration: React.FunctionComponent<
+  IPostTopInfoModeration
+> = ({
+  title,
+  postId,
+  postType,
+  postStatus,
+  totalVotes,
+  amountInBids,
+  totalPledges,
+  targetPledges,
+  hasResponse,
+  hasWinner,
+  hidden,
+  handleUpdatePostStatus,
+}) => {
+  const theme = useTheme();
+  const router = useRouter();
+  const { t } = useTranslation('modal-Post');
+
+  const failureReason = useMemo(() => {
+    if (postStatus !== 'failed') return '';
+
+    if (postType === 'ac') {
+      if (!hasWinner) {
+        return 'ac-no-winner';
+      }
+      if (amountInBids === 0 || !amountInBids) {
+        return 'ac';
+      }
+    }
+
+    if (postType === 'mc') {
+      if (totalVotes === 0 || !totalVotes) {
+        return 'mc';
+      }
+    }
+
+    if (postType === 'cf') {
+      if (!totalPledges || (targetPledges && totalPledges < targetPledges)) {
+        return 'cf';
+      }
+    }
+
+    return 'no-response';
+  }, [
     postStatus,
-    totalVotes,
+    postType,
+    hasWinner,
     amountInBids,
+    totalVotes,
     totalPledges,
     targetPledges,
-    hasResponse,
-    hasWinner,
-    hidden,
-    handleUpdatePostStatus,
-    handleRemovePostFromState,
-  }) => {
-    const theme = useTheme();
-    const router = useRouter();
-    const { t } = useTranslation('modal-Post');
+  ]);
 
-    const failureReason = useMemo(() => {
-      if (postStatus !== 'failed') return '';
+  const showWinnerOption = useMemo(
+    () => postType === 'ac' && postStatus === 'waiting_for_decision',
+    [postType, postStatus]
+  );
 
-      if (postType === 'ac') {
-        if (!hasWinner) {
-          return 'ac-no-winner';
-        }
-        if (amountInBids === 0 || !amountInBids) {
-          return 'ac';
-        }
-      }
+  if (hidden) return null;
 
-      if (postType === 'mc') {
-        if (totalVotes === 0 || !totalVotes) {
-          return 'mc';
-        }
-      }
-
-      if (postType === 'cf') {
-        if (!totalPledges || (targetPledges && totalPledges < targetPledges)) {
-          return 'cf';
-        }
-      }
-
-      return 'no-response';
-    }, [
-      postStatus,
-      postType,
-      hasWinner,
-      amountInBids,
-      totalVotes,
-      totalPledges,
-      targetPledges,
-    ]);
-
-    const showWinnerOption = useMemo(
-      () => postType === 'ac' && postStatus === 'waiting_for_decision',
-      [postType, postStatus]
-    );
-
-    if (hidden) return null;
-
-    return (
-      <SContainer>
-        <SWrapper showWinnerOption={showWinnerOption}>
-          {postType === 'ac' && amountInBids ? (
-            <SBidsAmount>
-              <span>${formatNumber(amountInBids / 100 ?? 0, true)}</span>{' '}
-              {t('acPost.postTopInfo.inBids')}
-            </SBidsAmount>
-          ) : null}
-          {postType === 'mc' && totalVotes ? (
-            <SBidsAmount>
-              <span>
-                {formatNumber(totalVotes, true).replaceAll(/,/g, ' ')}
-              </span>{' '}
-              {totalVotes > 1
-                ? t('mcPost.postTopInfo.votes')
-                : t('mcPost.postTopInfo.vote')}
-            </SBidsAmount>
-          ) : null}
-          <SActionsDiv />
-          <SPostTitle variant={5}>
-            <PostTitleContent>{title}</PostTitleContent>
-          </SPostTitle>
-          {showWinnerOption ? (
-            <SSelectWinnerOption>
-              <SHeadline variant={4}>
-                {t('acPostModeration.postTopInfo.selectWinner.title')}
-              </SHeadline>
-              <SText variant={3}>
-                {t('acPostModeration.postTopInfo.selectWinner.body')}
-              </SText>
-              <STrophyImg src={assets.decision.trophy} />
-            </SSelectWinnerOption>
-          ) : null}
-        </SWrapper>
-        {postStatus === 'failed' && (
-          <PostFailedBox
-            title={t('postFailedBoxModeration.title', {
-              postType: t(`postType.${postType}`),
-            })}
-            body={t(`postFailedBoxModeration.reason.${failureReason}`)}
-            imageSrc={
-              postType
-                ? theme.name === 'light'
-                  ? LIGHT_IMAGES[postType]
-                  : DARK_IMAGES[postType]
-                : undefined
+  return (
+    <SContainer>
+      <SWrapper showWinnerOption={showWinnerOption}>
+        {postType === 'ac' && amountInBids ? (
+          <SBidsAmount>
+            <span>${formatNumber(amountInBids / 100 ?? 0, true)}</span>{' '}
+            {t('acPost.postTopInfo.inBids')}
+          </SBidsAmount>
+        ) : null}
+        {postType === 'mc' && totalVotes ? (
+          <SBidsAmount>
+            <span>{formatNumber(totalVotes, true).replaceAll(/,/g, ' ')}</span>{' '}
+            {totalVotes > 1
+              ? t('mcPost.postTopInfo.votes')
+              : t('mcPost.postTopInfo.vote')}
+          </SBidsAmount>
+        ) : null}
+        <SActionsDiv />
+        <SPostTitle variant={5}>
+          <PostTitleContent>{title}</PostTitleContent>
+        </SPostTitle>
+        {showWinnerOption ? (
+          <SSelectWinnerOption>
+            <SHeadline variant={4}>
+              {t('acPostModeration.postTopInfo.selectWinner.title')}
+            </SHeadline>
+            <SText variant={3}>
+              {t('acPostModeration.postTopInfo.selectWinner.body')}
+            </SText>
+            <STrophyImg src={assets.decision.trophy} />
+          </SSelectWinnerOption>
+        ) : null}
+      </SWrapper>
+      {postStatus === 'failed' && (
+        <PostFailedBox
+          title={t('postFailedBoxModeration.title', {
+            postType: t(`postType.${postType}`),
+          })}
+          body={t(`postFailedBoxModeration.reason.${failureReason}`)}
+          imageSrc={
+            postType
+              ? theme.name === 'light'
+                ? LIGHT_IMAGES[postType]
+                : DARK_IMAGES[postType]
+              : undefined
+          }
+          buttonCaption={t('postFailedBoxModeration.buttonText', {
+            postType: t(`postType.${postType}`),
+          })}
+          handleButtonClick={() => {
+            Mixpanel.track('PostFailedBox Button Click', {
+              _stage: 'Post',
+              _postUuid: postId,
+              _component: 'PostTopInfoModeration',
+              _postType: postType,
+            });
+            if (postType === 'ac') {
+              router.push('/creation/auction');
+            } else if (postType === 'mc') {
+              router.push('/creation/multiple-choice');
+            } else {
+              router.push('/creation/crowdfunding');
             }
-            buttonCaption={t('postFailedBoxModeration.buttonText', {
-              postType: t(`postType.${postType}`),
-            })}
-            handleButtonClick={() => {
-              Mixpanel.track('PostFailedBox Button Click', {
-                _stage: 'Post',
-                _postUuid: postId,
-                _component: 'PostTopInfoModeration',
-                _postType: postType,
-              });
-              if (postType === 'ac') {
-                router.push('/creation/auction');
-              } else if (postType === 'mc') {
-                router.push('/creation/multiple-choice');
-              } else {
-                router.push('/creation/crowdfunding');
-              }
-            }}
-          />
-        )}
-      </SContainer>
-    );
-  };
+          }}
+        />
+      )}
+    </SContainer>
+  );
+};
 
 PostTopInfoModeration.defaultProps = {
   postType: undefined,

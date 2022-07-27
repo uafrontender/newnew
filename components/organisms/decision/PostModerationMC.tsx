@@ -59,18 +59,11 @@ interface IPostModerationMC {
   post: newnewapi.MultipleChoice;
   postStatus: TPostStatusStringified;
   handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleRemovePostFromState: () => void;
   handleGoBack: () => void;
 }
 
 const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
-  ({
-    post,
-    postStatus,
-    handleUpdatePostStatus,
-    handleGoBack,
-    handleRemovePostFromState,
-  }) => {
+  ({ post, postStatus, handleUpdatePostStatus, handleGoBack }) => {
     const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
@@ -646,7 +639,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             hasResponse={!!post.response}
             hidden={openedTab === 'response'}
             handleUpdatePostStatus={handleUpdatePostStatus}
-            handleRemovePostFromState={handleRemovePostFromState}
           />
           <SActivitesContainer decisionFailed={postStatus === 'failed'}>
             {openedTab === 'announcement' ? (
