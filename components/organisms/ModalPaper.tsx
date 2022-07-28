@@ -58,7 +58,7 @@ const ModalPaper: React.FC<IModalPaper> = React.memo(
               <InlineSvg svg={CloseIcon} />
             </SCloseButton>
           )}
-          {children}
+          <SContent>{children}</SContent>
         </SModal>
       </SModalWrapper>
     );
@@ -88,7 +88,6 @@ const SModal = styled.div<{
 
   padding: 0 16px 16px;
   box-sizing: border-box;
-  overflow: auto;
   z-index: 1;
   width: 100%;
 
@@ -118,14 +117,25 @@ const SModal = styled.div<{
     padding: 24px;
     max-width: 480px;
     border-radius: ${(props) => props.theme.borderRadius.medium};
+    max-height: 90vh;
   }
+`;
+
+const SContent = styled.div`
+  overflow: auto;
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 `;
 
 const SFullScreenHeader = styled.div`
   display: flex;
-  height: 58px;
+  height: 60px;
   align-items: center;
-  margin-bottom: 16px;
   flex-shrink: 0;
 `;
 
