@@ -683,6 +683,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   svg={VerificationCheckmark}
                   width='16px'
                   height='16px'
+                  fill='none'
                 />
               )}
             </SUsername>
