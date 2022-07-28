@@ -35,300 +35,126 @@ interface IPostResponseTabModeration {
   handleUploadResponse: () => void;
 }
 
-const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModeration> =
-  ({
-    postId,
-    postType,
-    postStatus,
-    postTitle,
-    responseUploading,
-    responseReadyToBeUploaded,
-    responseUploadSuccess,
-    winningOptionAc,
-    winningOptionMc,
-    moneyBacked,
-    handleUploadResponse,
-  }) => {
-    const { t } = useTranslation('modal-Post');
-    const user = useAppSelector((state) => state.user);
-    const { appConstants } = useGetAppConstants();
+const PostResponseTabModeration: React.FunctionComponent<
+  IPostResponseTabModeration
+> = ({
+  postId,
+  postType,
+  postStatus,
+  postTitle,
+  responseUploading,
+  responseReadyToBeUploaded,
+  responseUploadSuccess,
+  winningOptionAc,
+  winningOptionMc,
+  moneyBacked,
+  handleUploadResponse,
+}) => {
+  const { t } = useTranslation('modal-Post');
+  const user = useAppSelector((state) => state.user);
+  const { appConstants } = useGetAppConstants();
 
-    // Earned amount
-    const [earnedAmount, setEarnedAmount] =
-      useState<newnewapi.MoneyAmount | undefined>(undefined);
-    const [earnedAmountLoading, setEarnedAmountLoading] = useState(false);
+  // Earned amount
+  const [earnedAmount, setEarnedAmount] = useState<
+    newnewapi.MoneyAmount | undefined
+  >(undefined);
+  const [earnedAmountLoading, setEarnedAmountLoading] = useState(false);
 
-    const amountSwitch = useCallback(() => {
-      if (earnedAmount && !earnedAmountLoading) {
-        return `$${formatNumber(earnedAmount.usdCents / 100 ?? 0, false)}`;
-      }
-
-      if (postType === 'ac' && winningOptionAc?.totalAmount?.usdCents) {
-        return `$${formatNumber(
-          winningOptionAc.totalAmount.usdCents / 100 ?? 0,
-          true
-        )}`;
-      }
-      if (postType === 'mc' && winningOptionMc?.voteCount) {
-        return `$${formatNumber(
-          winningOptionMc.voteCount *
-            Math.round(appConstants.mcVotePrice / 100),
-          true
-        )}`;
-      }
-
-      if (postType === 'mc' && moneyBacked?.usdCents) {
-        return `$${formatNumber(moneyBacked.usdCents / 100 ?? 0, true)}`;
-      }
-
-      return '';
-    }, [
-      appConstants.mcVotePrice,
-      earnedAmount,
-      earnedAmountLoading,
-      moneyBacked,
-      postType,
-      winningOptionAc?.totalAmount?.usdCents,
-      winningOptionMc?.voteCount,
-    ]);
-
-    // Share
-    const [isCopiedUrl, setIsCopiedUrl] = useState(false);
-
-    async function copyPostUrlToClipboard(url: string) {
-      if ('clipboard' in navigator) {
-        await navigator.clipboard.writeText(url);
-      } else {
-        document.execCommand('copy', true, url);
-      }
+  const amountSwitch = useCallback(() => {
+    if (earnedAmount && !earnedAmountLoading) {
+      return `$${formatNumber(earnedAmount.usdCents / 100 ?? 0, false)}`;
     }
 
-    const handleCopyLink = useCallback(() => {
-      if (window) {
-        const url = `${window.location.origin}/post/${postId}`;
+    if (postType === 'ac' && winningOptionAc?.totalAmount?.usdCents) {
+      return `$${formatNumber(
+        winningOptionAc.totalAmount.usdCents / 100 ?? 0,
+        true
+      )}`;
+    }
+    if (postType === 'mc' && winningOptionMc?.voteCount) {
+      return `$${formatNumber(
+        winningOptionMc.voteCount * Math.round(appConstants.mcVotePrice / 100),
+        true
+      )}`;
+    }
 
-        copyPostUrlToClipboard(url)
-          .then(() => {
-            setIsCopiedUrl(true);
-            setTimeout(() => {
-              setIsCopiedUrl(false);
-            }, 1500);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+    if (postType === 'mc' && moneyBacked?.usdCents) {
+      return `$${formatNumber(moneyBacked.usdCents / 100 ?? 0, true)}`;
+    }
+
+    return '';
+  }, [
+    appConstants.mcVotePrice,
+    earnedAmount,
+    earnedAmountLoading,
+    moneyBacked,
+    postType,
+    winningOptionAc?.totalAmount?.usdCents,
+    winningOptionMc?.voteCount,
+  ]);
+
+  // Share
+  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
+
+  const handleCopyLink = useCallback(() => {
+    if (window) {
+      const url = `${window.location.origin}/post/${postId}`;
+
+      copyPostUrlToClipboard(url)
+        .then(() => {
+          setIsCopiedUrl(true);
+          setTimeout(() => {
+            setIsCopiedUrl(false);
+          }, 1500);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [postId]);
+
+  useEffect(() => {
+    async function loadEarnedAmount() {
+      setEarnedAmountLoading(true);
+      try {
+        const payload = new newnewapi.GetMyEarningsByPostsRequest({
+          postUuids: [postId],
+        });
+
+        const res = await getMyEarningsByPosts(payload);
+
+        if (!res.data || !res.data?.earningsByPosts[0]?.earnings || res.error)
+          throw new Error('Request failed');
+
+        setEarnedAmount(
+          res.data.earningsByPosts[0].earnings as newnewapi.MoneyAmount
+        );
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setEarnedAmountLoading(false);
       }
-    }, [postId]);
-
-    useEffect(() => {
-      async function loadEarnedAmount() {
-        setEarnedAmountLoading(true);
-        try {
-          const payload = new newnewapi.GetMyEarningsByPostsRequest({
-            postUuids: [postId],
-          });
-
-          const res = await getMyEarningsByPosts(payload);
-
-          if (!res.data || !res.data?.earningsByPosts[0]?.earnings || res.error)
-            throw new Error('Request failed');
-
-          setEarnedAmount(
-            res.data.earningsByPosts[0].earnings as newnewapi.MoneyAmount
-          );
-        } catch (err) {
-          console.error(err);
-        } finally {
-          setEarnedAmountLoading(false);
-        }
-      }
-
-      if (postStatus === 'succeeded') {
-        loadEarnedAmount();
-      }
-    }, [postId, postStatus]);
+    }
 
     if (postStatus === 'succeeded') {
-      return (
-        <SContainer>
-          <SHeaderDiv>
-            <SHeaderHeadline variant={3}>
-              {t('postResponseTabModeration.succeeded.topHeader')}
-            </SHeaderHeadline>
-            <SCoin_1
-              className='headerDiv__coinImage'
-              src={assets.decision.gold}
-              alt='coin'
-              draggable={false}
-            />
-            <SCoin_2
-              className='headerDiv__coinImage'
-              src={assets.decision.gold}
-              alt='coin'
-              draggable={false}
-            />
-            <SCoin_3
-              className='headerDiv__coinImage'
-              src={assets.decision.gold}
-              alt='coin'
-              draggable={false}
-            />
-            <SCoin_4
-              className='headerDiv__coinImage'
-              src={assets.decision.gold}
-              alt='coin'
-              draggable={false}
-            />
-            <SCoin_5
-              className='headerDiv__coinImage'
-              src={assets.decision.gold}
-              alt='coin'
-              draggable={false}
-            />
-            <SCoin_6
-              className='headerDiv__coinImage'
-              src={assets.decision.gold}
-              alt='coin'
-              draggable={false}
-            />
-          </SHeaderDiv>
-          <STextContentWrapper>
-            <Text variant={2} weight={600}>
-              {t('postResponseTabModeration.succeeded.youMade')}
-            </Text>
-            {earnedAmount?.usdCents && !earnedAmountLoading && (
-              <SAmountHeadline variant={1}>
-                ${formatNumber(earnedAmount.usdCents / 100 ?? 0, false)}
-              </SAmountHeadline>
-            )}
-            {postType === 'ac' && winningOptionAc && (
-              <>
-                <SText variant={2} weight={600}>
-                  <SSpan>
-                    {winningOptionAc.supporterCount === 1
-                      ? t(
-                          'postResponseTabModeration.winner.ac.numBiddersChoseSingular',
-                          {
-                            amount: 1,
-                          }
-                        )
-                      : t(
-                          'postResponseTabModeration.winner.ac.numBiddersChose',
-                          {
-                            amount: formatNumber(
-                              winningOptionAc.supporterCount ?? 0,
-                              true
-                            ),
-                          }
-                        )}
-                  </SSpan>
-                  <SUserAvatar
-                    draggable={false}
-                    src={winningOptionAc?.creator?.avatarUrl!!}
-                  />
-                  <SSpan>
-                    <Trans
-                      i18nKey='postResponseTabModeration.winner.ac.optionCreator'
-                      t={t}
-                      // Can it be reworked wso it uses t inside the Link element (without Trans element)?
-                      // @ts-ignore
-                      components={[
-                        <SCreatorLink
-                          href={`/${winningOptionAc.creator?.username}`}
-                        />,
-                        { nickname: getDisplayname(winningOptionAc.creator!!) },
-                      ]}
-                    />
-                  </SSpan>
-                </SText>
-                <SHeadline variant={5}>{winningOptionAc.title}</SHeadline>
-              </>
-            )}
-            {postType === 'mc' && winningOptionMc && (
-              <>
-                <SText variant={2} weight={600}>
-                  <SSpan>
-                    {winningOptionMc.supporterCount === 1
-                      ? t(
-                          'postResponseTabModeration.winner.mc.numBiddersChoseSingular',
-                          {
-                            amount: 1,
-                          }
-                        )
-                      : t(
-                          'postResponseTabModeration.winner.mc.numBiddersChose',
-                          {
-                            amount: formatNumber(
-                              winningOptionMc.supporterCount ?? 0,
-                              true
-                            ),
-                          }
-                        )}
-                  </SSpan>
-                  {winningOptionMc.creator &&
-                  winningOptionMc?.creator?.uuid !== user.userData?.userUuid ? (
-                    <>
-                      <SUserAvatar
-                        draggable={false}
-                        src={winningOptionMc?.creator?.avatarUrl!!}
-                      />
-                      <SSpan>
-                        {/* Can it be reworked wso it uses t inside the Link element (without Trans element)? */}
-                        <Trans
-                          i18nKey='postResponseTabModeration.winner.mc.optionCreator'
-                          t={t}
-                          // @ts-ignore
-                          components={[
-                            <SCreatorLink
-                              href={`/${winningOptionMc.creator?.username}`}
-                            />,
-                            {
-                              nickname: getDisplayname(
-                                winningOptionMc.creator!!
-                              ),
-                            },
-                          ]}
-                        />
-                      </SSpan>
-                    </>
-                  ) : (
-                    <SSpan>
-                      {` `}
-                      {t('postResponseTabModeration.winner.mc.optionOwn')}
-                    </SSpan>
-                  )}
-                </SText>
-                <SHeadline variant={5}>{winningOptionMc.text}</SHeadline>
-              </>
-            )}
-            <SText variant={2} weight={600}>
-              <SSpan>
-                {t('postResponseTabModeration.winner.inResponseToYourPost')}
-              </SSpan>
-            </SText>
-            <SHeadline variant={5}>
-              <PostTitleContent>{postTitle}</PostTitleContent>
-            </SHeadline>
-          </STextContentWrapper>
-          <SShareButton onClick={handleCopyLink}>
-            {isCopiedUrl
-              ? t('postResponseTabModeration.succeeded.linkCopied')
-              : t('postResponseTabModeration.succeeded.shareBtn')}
-          </SShareButton>
-          {/* Success modal */}
-          <PostResponseSuccessModal
-            amount={amountSwitch()}
-            isOpen={responseUploadSuccess}
-            zIndex={20}
-          />
-        </SContainer>
-      );
+      loadEarnedAmount();
     }
+  }, [postId, postStatus]);
+
+  if (postStatus === 'succeeded') {
     return (
       <SContainer>
         <SHeaderDiv>
           <SHeaderHeadline variant={3}>
-            {t('postResponseTabModeration.awaiting.topHeader')}
+            {t('postResponseTabModeration.succeeded.topHeader')}
           </SHeaderHeadline>
           <SCoin_1
             className='headerDiv__coinImage'
@@ -369,30 +195,11 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
         </SHeaderDiv>
         <STextContentWrapper>
           <Text variant={2} weight={600}>
-            {t('postResponseTabModeration.awaiting.youWillGet')}
+            {t('postResponseTabModeration.succeeded.youMade')}
           </Text>
-          {postType === 'ac' && winningOptionAc?.totalAmount?.usdCents && (
+          {earnedAmount?.usdCents && !earnedAmountLoading && (
             <SAmountHeadline variant={1}>
-              $
-              {formatNumber(
-                winningOptionAc.totalAmount.usdCents / 100 ?? 0,
-                true
-              )}
-            </SAmountHeadline>
-          )}
-          {postType === 'mc' && winningOptionMc?.voteCount && (
-            <SAmountHeadline variant={1}>
-              $
-              {formatNumber(
-                winningOptionMc.voteCount *
-                  Math.round(appConstants.mcVotePrice / 100),
-                true
-              )}
-            </SAmountHeadline>
-          )}
-          {postType === 'cf' && moneyBacked?.usdCents && (
-            <SAmountHeadline variant={1}>
-              ${formatNumber(moneyBacked.usdCents / 100 ?? 0, true)}
+              ${formatNumber(earnedAmount.usdCents / 100 ?? 0, false)}
             </SAmountHeadline>
           )}
           {postType === 'ac' && winningOptionAc && (
@@ -421,6 +228,7 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
                   <Trans
                     i18nKey='postResponseTabModeration.winner.ac.optionCreator'
                     t={t}
+                    // Can it be reworked wso it uses t inside the Link element (without Trans element)?
                     // @ts-ignore
                     components={[
                       <SCreatorLink
@@ -460,6 +268,7 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
                       src={winningOptionMc?.creator?.avatarUrl!!}
                     />
                     <SSpan>
+                      {/* Can it be reworked wso it uses t inside the Link element (without Trans element)? */}
                       <Trans
                         i18nKey='postResponseTabModeration.winner.mc.optionCreator'
                         t={t}
@@ -494,12 +303,11 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
             <PostTitleContent>{postTitle}</PostTitleContent>
           </SHeadline>
         </STextContentWrapper>
-        <SUploadButton
-          disabled={responseUploading || !responseReadyToBeUploaded}
-          onClick={handleUploadResponse}
-        >
-          {t('postResponseTabModeration.awaiting.postResponseBtn')}
-        </SUploadButton>
+        <SShareButton onClick={handleCopyLink}>
+          {isCopiedUrl
+            ? t('postResponseTabModeration.succeeded.linkCopied')
+            : t('postResponseTabModeration.succeeded.shareBtn')}
+        </SShareButton>
         {/* Success modal */}
         <PostResponseSuccessModal
           amount={amountSwitch()}
@@ -508,7 +316,192 @@ const PostResponseTabModeration: React.FunctionComponent<IPostResponseTabModerat
         />
       </SContainer>
     );
-  };
+  }
+  return (
+    <SContainer>
+      <SHeaderDiv>
+        <SHeaderHeadline variant={3}>
+          {t('postResponseTabModeration.awaiting.topHeader')}
+        </SHeaderHeadline>
+        <SCoin_1
+          className='headerDiv__coinImage'
+          src={assets.decision.gold}
+          alt='coin'
+          draggable={false}
+        />
+        <SCoin_2
+          className='headerDiv__coinImage'
+          src={assets.decision.gold}
+          alt='coin'
+          draggable={false}
+        />
+        <SCoin_3
+          className='headerDiv__coinImage'
+          src={assets.decision.gold}
+          alt='coin'
+          draggable={false}
+        />
+        <SCoin_4
+          className='headerDiv__coinImage'
+          src={assets.decision.gold}
+          alt='coin'
+          draggable={false}
+        />
+        <SCoin_5
+          className='headerDiv__coinImage'
+          src={assets.decision.gold}
+          alt='coin'
+          draggable={false}
+        />
+        <SCoin_6
+          className='headerDiv__coinImage'
+          src={assets.decision.gold}
+          alt='coin'
+          draggable={false}
+        />
+      </SHeaderDiv>
+      <STextContentWrapper>
+        <Text variant={2} weight={600}>
+          {t('postResponseTabModeration.awaiting.youWillGet')}
+        </Text>
+        {postType === 'ac' && winningOptionAc?.totalAmount?.usdCents && (
+          <SAmountHeadline variant={1}>
+            $
+            {formatNumber(
+              winningOptionAc.totalAmount.usdCents / 100 ?? 0,
+              true
+            )}
+          </SAmountHeadline>
+        )}
+        {postType === 'mc' && winningOptionMc?.voteCount && (
+          <SAmountHeadline variant={1}>
+            $
+            {formatNumber(
+              winningOptionMc.voteCount *
+                Math.round(appConstants.mcVotePrice / 100),
+              true
+            )}
+          </SAmountHeadline>
+        )}
+        {postType === 'cf' && moneyBacked?.usdCents && (
+          <SAmountHeadline variant={1}>
+            ${formatNumber(moneyBacked.usdCents / 100 ?? 0, true)}
+          </SAmountHeadline>
+        )}
+        {postType === 'ac' && winningOptionAc && (
+          <>
+            <SText variant={2} weight={600}>
+              <SSpan>
+                {winningOptionAc.supporterCount === 1
+                  ? t(
+                      'postResponseTabModeration.winner.ac.numBiddersChoseSingular',
+                      {
+                        amount: 1,
+                      }
+                    )
+                  : t('postResponseTabModeration.winner.ac.numBiddersChose', {
+                      amount: formatNumber(
+                        winningOptionAc.supporterCount ?? 0,
+                        true
+                      ),
+                    })}
+              </SSpan>
+              <SUserAvatar
+                draggable={false}
+                src={winningOptionAc?.creator?.avatarUrl!!}
+              />
+              <SSpan>
+                <Trans
+                  i18nKey='postResponseTabModeration.winner.ac.optionCreator'
+                  t={t}
+                  // @ts-ignore
+                  components={[
+                    <SCreatorLink
+                      href={`/${winningOptionAc.creator?.username}`}
+                    />,
+                    { nickname: getDisplayname(winningOptionAc.creator!!) },
+                  ]}
+                />
+              </SSpan>
+            </SText>
+            <SHeadline variant={5}>{winningOptionAc.title}</SHeadline>
+          </>
+        )}
+        {postType === 'mc' && winningOptionMc && (
+          <>
+            <SText variant={2} weight={600}>
+              <SSpan>
+                {winningOptionMc.supporterCount === 1
+                  ? t(
+                      'postResponseTabModeration.winner.mc.numBiddersChoseSingular',
+                      {
+                        amount: 1,
+                      }
+                    )
+                  : t('postResponseTabModeration.winner.mc.numBiddersChose', {
+                      amount: formatNumber(
+                        winningOptionMc.supporterCount ?? 0,
+                        true
+                      ),
+                    })}
+              </SSpan>
+              {winningOptionMc.creator &&
+              winningOptionMc?.creator?.uuid !== user.userData?.userUuid ? (
+                <>
+                  <SUserAvatar
+                    draggable={false}
+                    src={winningOptionMc?.creator?.avatarUrl!!}
+                  />
+                  <SSpan>
+                    <Trans
+                      i18nKey='postResponseTabModeration.winner.mc.optionCreator'
+                      t={t}
+                      // @ts-ignore
+                      components={[
+                        <SCreatorLink
+                          href={`/${winningOptionMc.creator?.username}`}
+                        />,
+                        {
+                          nickname: getDisplayname(winningOptionMc.creator!!),
+                        },
+                      ]}
+                    />
+                  </SSpan>
+                </>
+              ) : (
+                <SSpan>
+                  {` `}
+                  {t('postResponseTabModeration.winner.mc.optionOwn')}
+                </SSpan>
+              )}
+            </SText>
+            <SHeadline variant={5}>{winningOptionMc.text}</SHeadline>
+          </>
+        )}
+        <SText variant={2} weight={600}>
+          <SSpan>
+            {t('postResponseTabModeration.winner.inResponseToYourPost')}
+          </SSpan>
+        </SText>
+        <SHeadline variant={5}>
+          <PostTitleContent>{postTitle}</PostTitleContent>
+        </SHeadline>
+      </STextContentWrapper>
+      <SUploadButton
+        disabled={responseUploading || !responseReadyToBeUploaded}
+        onClick={handleUploadResponse}
+      >
+        {t('postResponseTabModeration.awaiting.postResponseBtn')}
+      </SUploadButton>
+      {/* Success modal */}
+      <PostResponseSuccessModal
+        amount={amountSwitch()}
+        isOpen={responseUploadSuccess}
+        zIndex={20}
+      />
+    </SContainer>
+  );
+};
 
 export default PostResponseTabModeration;
 

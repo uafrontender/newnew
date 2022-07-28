@@ -47,10 +47,15 @@ const TutorialCard = dynamic(
 interface IHome {
   top10posts: newnewapi.NonPagedPostsResponse;
   postFromQuery?: newnewapi.Post;
+  assumeLoggedIn?: boolean;
 }
 
 // No sense to memorize
-const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
+const Home: NextPage<IHome> = ({
+  top10posts,
+  postFromQuery,
+  assumeLoggedIn,
+}) => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
@@ -68,17 +73,17 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   // Auctions
   const [collectionAC, setCollectionAC] = useState<newnewapi.Post[]>([]);
   const [collectionACInitialLoading, setCollectionACInitialLoading] =
-    useState(false);
+    useState(true);
   const [collectionACError, setCollectionACError] = useState(false);
   // Multiple choice
   const [collectionMC, setCollectionMC] = useState<newnewapi.Post[]>([]);
   const [collectionMCInitialLoading, setCollectionMCInitialLoading] =
-    useState(false);
+    useState(true);
   const [collectionMCError, setCollectionMCError] = useState(false);
   // Crowdfunding
   const [collectionCF, setCollectionCF] = useState<newnewapi.Post[]>([]);
   const [collectionCFInitialLoading, setCollectionCFInitialLoading] =
-    useState(false);
+    useState(true);
   const [collectionCFError, setCollectionCFError] = useState(false);
   // Biggest of all time
   const [collectionBiggest, setCollectionBiggest] = useState<newnewapi.Post[]>(
@@ -357,7 +362,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
         <meta property='og:description' content={t('meta.description')} />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      {!user.loggedIn && <HeroSection />}
+      {(!user.loggedIn || !assumeLoggedIn) && <HeroSection />}
       {topSectionCollection?.length > 0 && (
         <TopSection
           collection={topSectionCollection}
@@ -383,7 +388,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionMCInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn || collectionMC?.length === 0 ? (
+            !collectionMCInitialLoading &&
+            (!user.loggedIn ||
+              !assumeLoggedIn ||
+              collectionMC?.length === 0) ? (
               <TutorialCard
                 image={
                   theme.name === 'light'
@@ -405,7 +413,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionACInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn || collectionAC?.length === 0 ? (
+            !collectionACInitialLoading &&
+            (!user.loggedIn ||
+              !assumeLoggedIn ||
+              collectionAC?.length === 0) ? (
               <TutorialCard
                 image={
                   theme.name === 'light'
@@ -432,7 +443,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionCFInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn || collectionCF?.length === 0 ? (
+            !collectionCFInitialLoading &&
+            (!user.loggedIn ||
+              !assumeLoggedIn ||
+              collectionCF?.length === 0) ? (
               <TutorialCard
                 image={
                   theme.name === 'light'
@@ -484,7 +498,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           manualCurrLocation={isBrowser() ? window.location.pathname : ''}
           handleClose={handleClosePostModal}
           handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemovePostFromState={() =>
+          handleRemoveFromStateDeleted={() =>
             handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
           }
         />
@@ -501,8 +515,10 @@ export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { post } = context.query;
+  const { req } = context;
+  const accessToken = req.cookies?.accessToken;
 
-  // console.log(context.query['?session_id']);
+  const assumeLoggedIn = !!accessToken && !Array.isArray(accessToken);
 
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
@@ -536,6 +552,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
               }
             : {}),
           postFromQuery: res.data.toJSON(),
+          assumeLoggedIn,
           ...translationContext,
         },
       };
@@ -549,6 +566,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             top10posts: resTop10.data.toJSON(),
           }
         : {}),
+      assumeLoggedIn,
       ...translationContext,
     },
   };

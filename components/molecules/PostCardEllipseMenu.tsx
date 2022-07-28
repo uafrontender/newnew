@@ -9,6 +9,7 @@ import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { toast } from 'react-toastify';
 
 import EllipseMenu, { EllipseMenuButton } from '../atoms/EllipseMenu';
 
@@ -129,6 +130,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           }
         } catch (err) {
           console.error(err);
+          toast.error('toastErrors.generic');
         }
       }, [
         handleAddPostToState,
@@ -184,10 +186,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           {postCreator.uuid !== user.userData?.userUuid && (
             <>
               {!isFollowingLoading ? (
-                <SEllipseMenuButton
-                  variant={3}
-                  onClick={() => handleFollowDecision()}
-                >
+                <SEllipseMenuButton variant={3} onClick={handleFollowDecision}>
                   {!isFollowingDecision
                     ? t('ellipse.followDecision', {
                         postType: t(`postType.${postType}`),

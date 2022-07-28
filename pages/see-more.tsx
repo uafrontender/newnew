@@ -11,6 +11,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { toast } from 'react-toastify';
 
 import { NextPageWithLayout } from './_app';
 import PostList from '../components/organisms/see-more/PostList';
@@ -254,8 +255,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
           throw new Error('Request failed');
         }
       } catch (err) {
-        setIsCollectionLoading(false);
         console.error(err);
+        setIsCollectionLoading(false);
+        toast.error('toastErrors.generic');
       }
     },
     [setCollectionLoaded, loggedIn, isCollectionLoading]
@@ -428,7 +430,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
           post={displayedPost}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemovePostFromState={() =>
+          handleRemoveFromStateDeleted={() =>
             handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
           }
         />

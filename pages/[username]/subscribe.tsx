@@ -9,6 +9,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import styled, { useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../redux-store/store';
 // import { WalletContext } from '../../contexts/walletContext';
@@ -24,7 +25,7 @@ import Button from '../../components/atoms/Button';
 import Headline from '../../components/atoms/Headline';
 import GoBackButton from '../../components/molecules/GoBackButton';
 import FaqSection from '../../components/molecules/subscribe/FaqSection';
-import PaymentModal from '../../components/molecules/checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../components/molecules/checkout/PaymentModal';
 
 import isBrowser from '../../utils/isBrowser';
 import { formatNumber } from '../../utils/format';
@@ -118,6 +119,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       if (url) window.location.href = url;
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 
@@ -141,6 +143,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         }
       } catch (err) {
         console.log(err);
+        toast.error('toastErrors.generic');
       }
     }
 
@@ -336,7 +339,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         zIndex={10}
         // predefinedOption={predefinedOption}
         isOpen={isPaymentModalOpen}
-        amount={`$${subPriceFormatted}`}
+        amount={subscriptionPrice || 0}
         onClose={() => setIsPaymentModalOpen(false)}
         handlePayWithCardStripeRedirect={handlePayRegistered}
         showTocApply

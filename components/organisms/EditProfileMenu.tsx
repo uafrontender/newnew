@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { debounce, isEqual } from 'lodash';
 import validator from 'validator';
 import { Area, Point } from 'react-easy-crop/types';
+import { toast } from 'react-toastify';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
@@ -503,13 +504,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setIsLoading(false);
       if ((err as Error).message === 'No token') {
         dispatch(logoutUserClearCookiesAndRedirect());
-      }
-      // Refresh token was present, session probably expired
-      // Redirect to sign up page
-      if ((err as Error).message === 'Refresh token invalid') {
+      } else if ((err as Error).message === 'Refresh token invalid') {
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
+      } else {
+        toast.error('toastErrors.generic');
       }
     }
   }, [
@@ -716,19 +716,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     }
   }, [formErrors, dataInEdit]);
 
-  useEffect(() => {
-    if (dataInEdit.bio.length > 0) {
-      const workingData: ModalMenuUserData = { ...dataInEdit };
-      workingData.bio = dataInEdit.bio.trimStart();
-      if (
-        dataInEdit.bio.length > 1 &&
-        dataInEdit.bio[dataInEdit.bio.length - 2] === ' '
-      ) {
-        workingData.bio = dataInEdit.bio.trimEnd();
-      }
-      setDataInEdit({ ...workingData });
+  const handleLocalValidation = (value: string) => {
+    let bio = value.trimStart();
+    if (bio.length > 1 && bio[bio.length - 2] === ' ') {
+      bio = bio.trimEnd();
     }
-  }, [dataInEdit]);
+    handleUpdateDataInEdit('bio', bio);
+  };
 
   // Gender Pronouns
   const genderOptions: TDropdownSelectItem<number>[] = useMemo(
@@ -878,9 +872,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     `editProfileMenu.inputs.bio.errors.${formErrors.bioError}`
                   )}
                   isValid={!formErrors.bioError}
-                  onChange={(e) =>
-                    handleUpdateDataInEdit('bio', e.target.value)
-                  }
+                  onChange={(e) => handleLocalValidation(e.target.value)}
                 />
               </STextInputsWrapper>
             </ProfileGeneralContent>

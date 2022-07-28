@@ -67,8 +67,8 @@ interface IPostViewAC {
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
-  handleRemovePostFromState: () => void;
-  handleAddPostToState: () => void;
+  handleRemoveFromStateUnfavorited: () => void;
+  handleAddPostToStateFavorited: () => void;
 }
 
 const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
@@ -83,8 +83,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     handleGoBack,
     handleUpdatePostStatus,
     handleReportOpen,
-    handleRemovePostFromState,
-    handleAddPostToState,
+    handleRemoveFromStateUnfavorited,
+    handleAddPostToStateFavorited,
   }) => {
     const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
@@ -142,8 +142,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
       post.optionCount ?? ''
     );
-    const [optionsNextPageToken, setOptionsNextPageToken] =
-      useState<string | undefined | null>('');
+    const [optionsNextPageToken, setOptionsNextPageToken] = useState<
+      string | undefined | null
+    >('');
     const [optionsLoading, setOptionsLoading] = useState(false);
     const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
@@ -653,8 +654,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             hasRecommendations={hasRecommendations}
             handleSetIsFollowingDecision={handleSetIsFollowingDecision}
             handleReportOpen={handleReportOpen}
-            handleRemovePostFromState={handleRemovePostFromState}
-            handleAddPostToState={handleAddPostToState}
+            handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited}
+            handleAddPostToStateFavorited={handleAddPostToStateFavorited}
           />
           <SActivitesContainer
             decisionFailed={postStatus === 'failed'}

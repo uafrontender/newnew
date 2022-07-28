@@ -6,7 +6,9 @@ import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
+import { useUpdateEffect } from 'react-use';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 import ChatList from '../molecules/chat/ChatList';
 import ChatArea from '../molecules/chat/ChatArea';
@@ -24,15 +26,15 @@ interface IChat {
 export const Chat: React.FC<IChat> = ({ username }) => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  const [isInitialLoaded, setIsInitialLoaded] = useState<boolean>(false);
   const [chatData, setChatData] = useState<IChatData>({
     chatRoom: null,
     showChatList: null,
   });
 
   const { t } = useTranslation('page-Chat');
-  const [chatListHidden, setChatListHidden] =
-    useState<boolean | undefined>(undefined);
+  const [chatListHidden, setChatListHidden] = useState<boolean | undefined>(
+    undefined
+  );
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
     'mobile',
@@ -41,13 +43,13 @@ export const Chat: React.FC<IChat> = ({ username }) => {
     'mobileL',
     'tablet',
   ].includes(resizeMode);
-  const [newMessage, setNewMessage] =
-    useState<newnewapi.IChatMessage | null | undefined>();
+  const [newMessage, setNewMessage] = useState<
+    newnewapi.IChatMessage | null | undefined
+  >();
   const [searchText, setSearchText] = useState<string>('');
-  const [newLastMessage, setNewLastMessage] =
-    useState<{
-      chatId: number | Long.Long | null | undefined;
-    } | null>(null);
+  const [newLastMessage, setNewLastMessage] = useState<{
+    chatId: number | Long.Long | null | undefined;
+  } | null>(null);
 
   const showChatList = () => {
     setChatListHidden(false);
@@ -60,7 +62,6 @@ export const Chat: React.FC<IChat> = ({ username }) => {
   const openChat = useCallback(
     ({ chatRoom }: IChatData) => {
       let route = '';
-
       if (chatRoom?.visavis?.username) {
         chatRoom.kind === 1
           ? (route = chatRoom?.visavis?.username)
@@ -71,21 +72,22 @@ export const Chat: React.FC<IChat> = ({ username }) => {
           : '';
       }
       router.push(`/direct-messages/${route}`);
-
       setChatData({ chatRoom, showChatList });
-      if (isMobileOrTablet) {
-        isInitialLoaded ? setChatListHidden(true) : setIsInitialLoaded(true);
-      }
+      if (isMobileOrTablet) setChatListHidden(true);
     },
-    [isInitialLoaded, router, isMobileOrTablet, user.userData?.username]
+    [router, user.userData?.username, isMobileOrTablet]
   );
 
   useEffect(() => {
-    /* eslint-disable no-unused-expressions */
-    isMobileOrTablet ? setChatListHidden(false) : setChatListHidden(undefined);
+    if (isMobileOrTablet && username && username !== '-mobile') {
+      setChatListHidden(true);
+    } else {
+      setChatListHidden(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobileOrTablet]);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (newMessage) {
       setNewMessage(null);
     }
@@ -99,11 +101,11 @@ export const Chat: React.FC<IChat> = ({ username }) => {
       <SSidebar hidden={chatListHidden !== undefined && chatListHidden}>
         <SToolbar isMobile={isMobileOrTablet}>
           {isMobileOrTablet && (
-            <GoBackButton
-              onClick={() => {
-                setChatListHidden(true);
-              }}
-            />
+            <Link href='/'>
+              <a>
+                <GoBackButton onClick={() => {}} />
+              </a>
+            </Link>
           )}
           <SearchInput
             placeholderText={t('toolbar.searchPlaceholder')}

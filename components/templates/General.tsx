@@ -40,7 +40,9 @@ interface IGeneral {
 export const General: React.FC<IGeneral> = (props) => {
   const { withChat, specialStatusBarColor, restrictMaxWidth, children } = props;
   const user = useAppSelector((state) => state.user);
-  const { banner, resizeMode } = useAppSelector((state) => state.ui);
+  const { banner, resizeMode, globalSearchActive } = useAppSelector(
+    (state) => state.ui
+  );
   const theme = useTheme();
   const [cookies] = useCookies();
   const { unreadNotificationCount } = useNotifications();
@@ -182,7 +184,9 @@ export const General: React.FC<IGeneral> = (props) => {
               }
             />
           </Head>
-          <Header visible={!isMobile || mobileNavigationVisible} />
+          <Header
+            visible={!isMobile || mobileNavigationVisible || globalSearchActive}
+          />
           <SContent>
             <Container
               {...(restrictMaxWidth
@@ -203,7 +207,7 @@ export const General: React.FC<IGeneral> = (props) => {
                 collection={bottomNavigation}
                 moreMenuMobileOpen={moreMenuMobileOpen}
                 handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-                visible={mobileNavigationVisible}
+                visible={mobileNavigationVisible && !globalSearchActive}
               />
               <SortingContainer
                 id='sorting-container'

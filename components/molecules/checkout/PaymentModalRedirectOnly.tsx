@@ -6,11 +6,8 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
-import {
-  useGoogleReCaptcha,
-  IGoogleRecaptchaProps,
-  IGoogleReCaptchaConsumerProps,
-} from 'react-google-recaptcha-v3';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -92,6 +89,7 @@ const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
       }
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 

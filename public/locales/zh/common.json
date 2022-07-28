@@ -58,8 +58,7 @@
   "button": {
     "createDecision": "新帖子",
     "create": "創建",
-    "loginIn": "登錄",
-    "signUp": "註冊",
+    "signIn_NEED_TRANSLATION": "Sign in",
     "dashboard": "儀錶板",
     "createOnNewnew": "開始創建",
     "cancel": "取消"
@@ -123,7 +122,8 @@
         "placeholder": "請再提供更多詳情......"
       },
       "button": {
-        "cancel": "取消"
+        "cancel": "取消",
+        "report": "舉報"
       }
     },
     "reportSent": {
@@ -174,5 +174,50 @@
     "numbers-of-bids": "出價數量",
     "numbers-of-bids-fewest": "最少",
     "numbers-of-bids-most-first": "最先"
+  },
+  "toastErrors": {
+    "generic_NEED_TRANSLATION": "An error occurred, please try again later"
+  },
+  "rewards": {
+    "earned_NEED_TRANSLATION": "earned ${{value}}",
+    "earn_NEED_TRANSLATION": "earn ${{value}}",
+    "modalTitle_NEED_TRANSLATION": "You earned ${{amount}}!",
+    "modalButton_NEED_TRANSLATION": "Great",
+    "modalDescription_NEED_TRANSLATION": {
+      "0": "...for signing up",
+      "1": "...for placing a bid of $4",
+      "2": "...for voting for $4",
+      "3": "...for backing a goal for $4",
+      "4": "...for subscribing to a creator",
+      "5": "...for subscribing to 3 creators",
+      "6": "...for bidding on the same creator twice",
+      "7": "...for voting on the same creator twice",
+      "8": "...for backing the same creator twice",
+      "9": "...for placing a bid 2 days in a row",
+      "10": "...for voting 2 days in a row",
+      "11": "...for backing goals 2 days in a row",
+      "12": "...for bidding on a winning option",
+      "13": "...for voting for a winning option",
+      "14": "...for inviting 5 friends",
+      "15": "...for getting a vote on your post"
+    },
+    "itemDescription_NEED_TRANSLATION": {
+      "0": "Signed up",
+      "1": "Place a bid of $4",
+      "2": "Vote for $4",
+      "3": "Back a goal for $4",
+      "4": "Subscribe to a creator",
+      "5": "Subscribe to 3 creators",
+      "6": "Bid on the same creator twice",
+      "7": "Vote on the same creator twice",
+      "8": "Back the same creator twice",
+      "9": "Placing a bid 2 days in a row",
+      "10": "Vote 2 days in a row",
+      "11": "Back goals 2 days in a row",
+      "12": "Bid on a winning option",
+      "13": "Vote for a winning option",
+      "14": "Invite 5 friends",
+      "15": "Get a vote on your post"
+    }
   }
 }

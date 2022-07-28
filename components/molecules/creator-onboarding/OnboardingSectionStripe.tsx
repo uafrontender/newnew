@@ -5,6 +5,7 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -66,6 +67,7 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
       window.location.href = url;
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 

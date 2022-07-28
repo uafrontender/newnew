@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import { toast } from 'react-toastify';
 
 import switchPostType from '../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
@@ -106,6 +107,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
       }
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [
     handleAddPostToState,
