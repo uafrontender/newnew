@@ -570,7 +570,7 @@ const ChatList: React.FC<IFunctionProps> = ({
               </SChatItemContentWrapper>
               <SChatItemContentWrapper>
                 <SChatItemLastMessage variant={3} weight={600}>
-                  {textTrim(lastMsg as string, 28)}
+                  {textTrim((lastMsg as string) ?? '', 28)}
                 </SChatItemLastMessage>
                 <SChatItemRight>
                   {unreadMessageCount > 0 && (
