@@ -6,8 +6,9 @@ import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
-import { useEffectOnce, useUpdateEffect } from 'react-use';
+import { useUpdateEffect } from 'react-use';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 import ChatList from '../molecules/chat/ChatList';
 import ChatArea from '../molecules/chat/ChatArea';
@@ -61,7 +62,6 @@ export const Chat: React.FC<IChat> = ({ username }) => {
   const openChat = useCallback(
     ({ chatRoom }: IChatData) => {
       let route = '';
-
       if (chatRoom?.visavis?.username) {
         chatRoom.kind === 1
           ? (route = chatRoom?.visavis?.username)
@@ -72,22 +72,19 @@ export const Chat: React.FC<IChat> = ({ username }) => {
           : '';
       }
       router.push(`/direct-messages/${route}`);
-
       setChatData({ chatRoom, showChatList });
       if (isMobileOrTablet) setChatListHidden(true);
     },
     [router, user.userData?.username, isMobileOrTablet]
   );
 
-  useEffectOnce(() => {
-    if (isMobileOrTablet) {
+  useEffect(() => {
+    if (isMobileOrTablet && username && username !== '-mobile') {
       setChatListHidden(true);
+    } else {
+      setChatListHidden(false);
     }
-  });
-
-  useUpdateEffect(() => {
-    /* eslint-disable no-unused-expressions */
-    isMobileOrTablet ? setChatListHidden(false) : setChatListHidden(undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobileOrTablet]);
 
   useUpdateEffect(() => {
@@ -104,11 +101,11 @@ export const Chat: React.FC<IChat> = ({ username }) => {
       <SSidebar hidden={chatListHidden !== undefined && chatListHidden}>
         <SToolbar isMobile={isMobileOrTablet}>
           {isMobileOrTablet && (
-            <GoBackButton
-              onClick={() => {
-                setChatListHidden(true);
-              }}
-            />
+            <Link href='/'>
+              <a>
+                <GoBackButton onClick={() => {}} />
+              </a>
+            </Link>
           )}
           <SearchInput
             placeholderText={t('toolbar.searchPlaceholder')}

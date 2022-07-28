@@ -297,6 +297,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
                   svg={VerificationCheckmark}
                   width='16px'
                   height='16px'
+                  fill='none'
                 />
               )}
             </SUsername>
