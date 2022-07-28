@@ -122,7 +122,8 @@
         "placeholder": "請再提供更多詳情......"
       },
       "button": {
-        "cancel": "取消"
+        "cancel": "取消",
+        "report": "舉報"
       }
     },
     "reportSent": {
