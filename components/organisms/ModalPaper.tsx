@@ -40,15 +40,20 @@ const ModalPaper: React.FC<IModalPaper> = React.memo(
           {...otherProps}
           $isMobileFullScreen={isMobileFullScreen}
         >
-          {(title || (isMobileFullScreen && isMobile)) && (
-            <SModalHeader>
+          {isMobileFullScreen && isMobile && (
+            <SFullScreenHeader>
               {isMobile && isMobileFullScreen && (
                 <GoBackButton onClick={onClose} />
               )}
               {title && <SModalTitle>{title}</SModalTitle>}
-            </SModalHeader>
+            </SFullScreenHeader>
           )}
-          {isCloseButton && (
+          {title && (!isMobile || !isMobileFullScreen) && (
+            <SHeader>
+              <SModalTitle>{title}</SModalTitle>
+            </SHeader>
+          )}
+          {isCloseButton && !isMobileFullScreen && (
             <SCloseButton onClick={onClose}>
               <InlineSvg svg={CloseIcon} />
             </SCloseButton>
@@ -105,6 +110,7 @@ const SModal = styled.div<{
       : css`
           height: auto;
           max-width: 480px;
+          border-radius: ${(props) => props.theme.borderRadius.medium};
         `}
 
   ${(props) => props.theme.media.tablet} {
@@ -115,17 +121,18 @@ const SModal = styled.div<{
   }
 `;
 
-const SModalHeader = styled.div`
+const SFullScreenHeader = styled.div`
   display: flex;
   height: 58px;
   align-items: center;
   margin-bottom: 16px;
   flex-shrink: 0;
-  ${(props) => props.theme.media.tablet} {
-    display: block;
-    height: auto;
-    margin: 0 0 24px;
-  }
+`;
+
+const SHeader = styled.div`
+  display: block;
+  height: auto;
+  margin: 0 0 24px;
 `;
 
 const SCloseButton = styled.div`
@@ -140,6 +147,7 @@ const SModalTitle = styled.strong`
   font-size: 14px;
   margin: 0;
   font-weight: 600;
+
   ${(props) => props.theme.media.tablet} {
     font-size: 20px;
     margin-bottom: 16px;
