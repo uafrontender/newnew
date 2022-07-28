@@ -227,6 +227,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
               muted={false}
               resources={videoProcessing?.targetUrls}
               thumbnails={post.thumbnailParameters}
+              showPlayButton
             />
           ) : (
             <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
