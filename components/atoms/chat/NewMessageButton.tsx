@@ -52,6 +52,11 @@ const SButton = styled(Button)`
   align-items: center;
   justify-content: center;
   border-radius: ${(props) => props.theme.borderRadius.medium};
+  background: none;
+
+  ${({ theme }) => theme.media.laptop} {
+    background: ${(props) => props.theme.colorsThemed.background.secondary};
+  }
 `;
 
 export default NewMessageButton;
