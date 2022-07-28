@@ -99,6 +99,7 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
                 loading={loadingCreators}
                 collection={creators}
                 withEllipseMenu
+                subscribedTo
               />
             )}
           </SCardsSection>
