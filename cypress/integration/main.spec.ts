@@ -203,7 +203,7 @@ context('Main flow', () => {
     // TODO: remove
     before(() => {
       // Let all posts finish processing
-      cy.wait(60000);
+      cy.wait(30000);
     });
 
     beforeEach(() => {
@@ -221,10 +221,6 @@ context('Main flow', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${eventId}`);
       cy.url().should('include', '/post');
 
-      // TODO: address an issue with post being scrolled to the center when page visited
-      cy.wait(1000);
-      cy.get('#post-modal-container').scrollTo('top', { duration: 1000 });
-
       cy.get('#text-input').type('something');
       cy.get('#bid-input').type('10');
       cy.get('#submit')
@@ -234,9 +230,8 @@ context('Main flow', () => {
 
       cy.get('#pay').click();
 
-      cy.url().should('include', 'checkout.stripe.com/pay');
-
       // TODO: enable Stripe testing (or test card adding flow)
+      // cy.url().should('include', 'checkout.stripe.com/pay');
       // cy.get('#email', { timeout: 10000 }).type(USER_EMAIL);
       // cy.get('#cardNumber').type('4242424242424242');
       // cy.get('#cardExpiry').type('1230');
@@ -244,7 +239,8 @@ context('Main flow', () => {
       // cy.get('#billingName').type('user');
       // cy.get('form').submit();
 
-      // TODO: test authentication
+      // TODO: test authentication after payment
+
       // TODO: test that contribution is visible on the post page
     });
 
