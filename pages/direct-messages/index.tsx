@@ -22,6 +22,15 @@ export const Chat = () => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const fetchLastActiveRoom = async () => {
@@ -70,7 +79,11 @@ export const Chat = () => {
   }, [router, user.loggedIn]);
 
   useEffectOnce(() => {
-    fetchLastActiveRoom();
+    if (!isMobileOrTablet) {
+      fetchLastActiveRoom();
+    } else {
+      router?.push(`/direct-messages/-mobile`);
+    }
   });
 
   return (

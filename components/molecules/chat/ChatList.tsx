@@ -249,17 +249,25 @@ const ChatList: React.FC<IFunctionProps> = ({
         throw new Error(res.error?.message ?? 'Request failed');
       }
       if (res.data && res.data.rooms.length > 0) {
-        if (res.data.rooms[0].myRole === 1) {
+        const room = res.data.rooms[0];
+        if (room.myRole === 1) {
           setActiveTab('chatRoomsCreators');
         } else {
           setActiveTab('chatRoomsSubs');
         }
-        openRoom(res.data.rooms[0]);
-        setUpdatedChat(res.data.rooms[0]);
+
+        if (room.id) {
+          if (activeChatIndex !== room.id.toString()) {
+            setActiveChatIndex(room.id.toString());
+          }
+        }
+        setUpdatedChat(room);
+        return room;
       }
     } catch (err) {
       console.error(err);
     }
+    return null;
   };
 
   const getRoomByUserName = useCallback(
@@ -270,10 +278,9 @@ const ChatList: React.FC<IFunctionProps> = ({
         isAnnouncementRequested[isAnnouncementRequested.length - 1] ===
           'announcement'
       ) {
-        fetchRoomByUsername(isAnnouncementRequested[0], 4);
-      } else {
-        fetchRoomByUsername(uname, 1);
+        return fetchRoomByUsername(isAnnouncementRequested[0], 4);
       }
+      return fetchRoomByUsername(uname, 1);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -281,10 +288,13 @@ const ChatList: React.FC<IFunctionProps> = ({
 
   useEffectOnce(() => {
     (async () => {
-      await fetchMyRooms();
-      if (username) {
-        getRoomByUserName(username);
+      if (username && username !== '-mobile') {
+        const room = await getRoomByUserName(username);
+        if (room) {
+          openChat({ chatRoom: room, showChatList: null });
+        }
       }
+      await fetchMyRooms();
       setIsInitialLoaded(true);
     })();
   });
@@ -413,16 +423,18 @@ const ChatList: React.FC<IFunctionProps> = ({
   const handlerActiveTabSwitch = useCallback(
     (tabName: string) => {
       if (activeTab === tabName) return;
-      if (tabName === 'chatRoomsSubs') {
-        openChat({ chatRoom: chatRoomsSubs[0], showChatList: null });
-        setActiveChatIndex(
-          chatRoomsSubs[0].id ? chatRoomsSubs[0].id.toString() : null
-        );
-      } else {
-        openChat({ chatRoom: chatRoomsCreators[0], showChatList: null });
-        setActiveChatIndex(
-          chatRoomsCreators[0].id ? chatRoomsCreators[0].id.toString() : null
-        );
+      if (!isMobileOrTablet) {
+        if (tabName === 'chatRoomsSubs') {
+          openChat({ chatRoom: chatRoomsSubs[0], showChatList: null });
+          setActiveChatIndex(
+            chatRoomsSubs[0].id ? chatRoomsSubs[0].id.toString() : null
+          );
+        } else {
+          openChat({ chatRoom: chatRoomsCreators[0], showChatList: null });
+          setActiveChatIndex(
+            chatRoomsCreators[0].id ? chatRoomsCreators[0].id.toString() : null
+          );
+        }
       }
       setActiveTab(tabName);
       if (isMobileOrTablet && switchedTab !== undefined) switchedTab();
