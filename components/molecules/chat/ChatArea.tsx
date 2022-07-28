@@ -517,6 +517,7 @@ const ChatArea: React.FC<IChatData> = ({
                   svg={VerificationCheckmark}
                   width='16px'
                   height='16px'
+                  fill='none'
                 />
               )}
             </SUserName>

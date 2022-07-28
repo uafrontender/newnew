@@ -34,6 +34,7 @@ const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
                         svg={VerificationCheckmark}
                         width='16px'
                         height='16px'
+                        fill='none'
                       />
                     )}
                   </CreatorData>
