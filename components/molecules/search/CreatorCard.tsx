@@ -198,7 +198,12 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       <SDisplayNameContainer isVerified={!!creator.options?.isVerified}>
         <SDisplayName>{creator.nickname}</SDisplayName>
         {creator.options?.isVerified && (
-          <SInlineSVG svg={VerificationCheckmark} width='16px' height='16px' />
+          <SInlineSVG
+            svg={VerificationCheckmark}
+            width='16px'
+            height='16px'
+            fill='none'
+          />
         )}
       </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>

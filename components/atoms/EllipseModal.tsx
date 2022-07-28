@@ -158,6 +158,10 @@ const SButton = styled.button`
     background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
   }
 
+  &:focus:enabled:not(:focus-visible):not(:hover) {
+    background-color: initial;
+  }
+
   &:disabled {
     opacity: 0.5;
     cursor: default;

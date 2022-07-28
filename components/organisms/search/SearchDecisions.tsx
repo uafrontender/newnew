@@ -231,6 +231,10 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
   }, [inView, loadingPosts, postsNextPageToken]);
 
   useEffect(() => {
+    if (router.query.tab !== 'posts') {
+      return;
+    }
+
     const routerArr: string[] = [];
     activeTabs.forEach((filterValue) => {
       switch (filterValue) {
