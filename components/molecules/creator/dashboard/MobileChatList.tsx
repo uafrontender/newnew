@@ -19,6 +19,7 @@ import textTrim from '../../../../utils/textTrim';
 import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
 import { IChatData } from '../../../interfaces/ichat';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 
 interface IFunctionProps {
   openChat: (arg: IChatData) => void;
@@ -33,14 +34,18 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
   const { ref: scrollRef, inView } = useInView();
 
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
-  const [chatRooms, setChatRooms] =
-    useState<newnewapi.IChatRoom[] | null>(null);
-  const [chatRoomsNextPageToken, setChatRoomsNextPageToken] =
-    useState<string | undefined | null>('');
-  const [searchedRooms, setSearchedRooms] =
-    useState<newnewapi.IChatRoom[] | null>(null);
-  const [updatedChat, setUpdatedChat] =
-    useState<newnewapi.IChatRoom | null>(null);
+  const [chatRooms, setChatRooms] = useState<newnewapi.IChatRoom[] | null>(
+    null
+  );
+  const [chatRoomsNextPageToken, setChatRoomsNextPageToken] = useState<
+    string | undefined | null
+  >('');
+  const [searchedRooms, setSearchedRooms] = useState<
+    newnewapi.IChatRoom[] | null
+  >(null);
+  const [updatedChat, setUpdatedChat] = useState<newnewapi.IChatRoom | null>(
+    null
+  );
   const [prevSearchText, setPrevSearchText] = useState<string>('');
   const [searchedRoomsLoading, setSearchedRoomsLoading] =
     useState<boolean>(false);
@@ -245,6 +250,13 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
                 {chatName}
+                {chat.visavis?.options?.isVerified && chat.kind !== 4 && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                  />
+                )}
               </SChatItemText>
               <SChatItemLastMessage variant={3} weight={600}>
                 {lastMsg}
@@ -310,6 +322,8 @@ const SChatItemCenter = styled.div`
 
 const SChatItemText = styled(Text)`
   margin-bottom: 4px;
+  display: inline-flex;
+  align-items: center;
 `;
 
 const SChatItemLastMessage = styled(Text)`

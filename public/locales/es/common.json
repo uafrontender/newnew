@@ -122,7 +122,8 @@
         "placeholder": "Por favor, cuéntanos un poco más..."
       },
       "button": {
-        "cancel": "Cancelar"
+        "cancel": "Cancelar",
+        "report": "Reportar"
       }
     },
     "reportSent": {
