@@ -14,8 +14,10 @@ quick-test:
     - npm ci --include=dev
     - npm run lint
     - npm run jest
-  only:
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE != 'merge_request_event'
+      when: never
+    - when: always
 
 # A set of longer tests
 long-test:
@@ -33,8 +35,8 @@ long-test:
     - curl http://localhost:4000
     - npm run npm run cypress:ci
   rules:
-    only:
-      - merge_requests
-      - if: $CI_MERGE_REQUEST_TITLE =~ /^Draft:/
-        when: never
-      - when: always
+    - if: $CI_PIPELINE_SOURCE != 'merge_request_event'
+      when: never
+    - if: $CI_MERGE_REQUEST_TITLE =~ /^Draft:/
+      when: never
+    - when: always
