@@ -119,6 +119,8 @@ const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
       ? 'transparent'
       : theme.colorsThemed.background.backgroundT};
 
+  overscroll-behavior: 'none';
+
   ::before {
     top: 0;
     left: 0;
