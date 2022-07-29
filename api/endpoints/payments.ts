@@ -44,14 +44,14 @@ export const getStripeCustomer = (
   );
 
 export const createStripeSetupIntent = (
-  payload: newnewapi.EmptyRequest,
+  payload: newnewapi.CreateStripeSetupIntentRequest,
   signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
-    newnewapi.EmptyRequest,
+    newnewapi.CreateStripeSetupIntentRequest,
     newnewapi.CreateStripeSetupIntentResponse
   >(
-    newnewapi.EmptyRequest,
+    newnewapi.CreateStripeSetupIntentRequest,
     newnewapi.CreateStripeSetupIntentResponse,
     `${BASE_URL_PAYMENTS}/create_stripe_setup_intent`,
     'post',

@@ -1,5 +1,5 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -50,6 +50,13 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   useEffect(() => {
     fetchCard();
   }, [fetchCard]);
+
+  const propose = useMemo(
+    () => ({
+      saveCardRequest: new newnewapi.SaveCardRequest(),
+    }),
+    []
+  );
 
   return (
     <SSettingsContainer>
@@ -134,7 +141,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
           </SCardList>
         )}
       </SCardsContainer>
-      <StripeElements>
+      <StripeElements propose={propose}>
         <AddCardModal
           show={isAddCardModal}
           closeModal={() => setIsAddCardModal(false)}

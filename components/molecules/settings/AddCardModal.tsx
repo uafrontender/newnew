@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import {
   useStripe,
   useElements,
@@ -8,23 +8,11 @@ import {
 } from '@stripe/react-stripe-js';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
-// Redux
-import { useAppSelector } from '../../../redux-store/store';
-
 // Components
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
-import InlineSvg from '../../atoms/InlineSVG';
-import GoBackButton from '../GoBackButton';
-import Lottie from '../../atoms/Lottie';
-
-// Assets
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import logoAnimation from '../../../public/animations/mobile_logo.json';
-
-// Utils
-import { useOnClickOutside } from '../../../utils/hooks/useOnClickOutside';
+import ModalPaper from '../../organisms/ModalPaper';
 
 interface IReCaptchaRes {
   success?: boolean;
@@ -42,16 +30,6 @@ interface IAddCardModal {
 const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
-
-  const theme = useTheme();
-  const { ui } = useAppSelector((state) => state);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    ui.resizeMode
-  );
-
-  const ref = useRef(null);
-
-  useOnClickOutside(ref, closeModal);
 
   const stripe = useStripe();
   const elements = useElements();
@@ -85,7 +63,7 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
   ) => {
     try {
       e.preventDefault();
-
+      console.log('here');
       if (!executeRecaptcha) {
         throw new Error('executeRecaptcha not available');
       }
@@ -133,69 +111,46 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
     }
   }, [show]);
 
+  console.log(isLoading, 'isLoading');
+
   return (
     <Modal show={show} onClose={closeModal} overlaydim>
-      <SContainer>
-        <SModal ref={ref}>
-          {isMobile ? (
-            <SGoBackButtonMobile onClick={closeModal}>
-              {t('Settings.sections.cards.button.addNewCard')}
-            </SGoBackButtonMobile>
-          ) : (
-            <SGoBackButtonDesktop onClick={closeModal}>
-              <div> {t('Settings.sections.cards.button.addNewCard')}</div>
-              <InlineSvg
-                svg={CancelIcon}
-                fill={theme.colorsThemed.text.primary}
-                width='24px'
-                height='24px'
-              />
-            </SGoBackButtonDesktop>
+      <ModalPaper
+        title={t('Settings.sections.cards.button.addNewCard')}
+        onClose={closeModal}
+        isCloseButton
+        isMobileFullScreen
+      >
+        <form onSubmit={handleSubmitWithCaptchaProtection}>
+          <PaymentElement
+            onReady={() => {
+              setIsStripeReady(true);
+            }}
+          />
+          {errorMessage && (
+            <SErrorText variant={3} tone='error'>
+              {errorMessage}
+            </SErrorText>
           )}
-          {!isStripeReady && (
-            <SLoader>
-              <Lottie
-                width={50}
-                height={50}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: logoAnimation,
+          {isStripeReady && (
+            <SModalButtons>
+              <SCancelButton onClick={closeModal} view='secondary'>
+                {tCommon('button.cancel')}
+              </SCancelButton>
+              <SAddButton
+                view='primary'
+                // disabled={!stripe || isLoading}
+                type='submit'
+                style={{
+                  ...(isLoading ? { cursor: 'wait' } : {}),
                 }}
-              />
-            </SLoader>
+              >
+                {t('Settings.sections.cards.button.addCard')}
+              </SAddButton>
+            </SModalButtons>
           )}
-          <SForm onSubmit={handleSubmitWithCaptchaProtection}>
-            <PaymentElement
-              onReady={() => {
-                setIsStripeReady(true);
-              }}
-            />
-            {errorMessage && (
-              <SErrorText variant={3} tone='error'>
-                {errorMessage}
-              </SErrorText>
-            )}
-            {isStripeReady && (
-              <SModalButtons>
-                <SCancelButton onClick={closeModal} view='secondary'>
-                  {tCommon('button.cancel')}
-                </SCancelButton>
-                <SAddButton
-                  view='primary'
-                  disabled={!stripe || isLoading}
-                  type='submit'
-                  style={{
-                    ...(isLoading ? { cursor: 'wait' } : {}),
-                  }}
-                >
-                  {t('Settings.sections.cards.button.addCard')}
-                </SAddButton>
-              </SModalButtons>
-            )}
-          </SForm>
-        </SModal>
-      </SContainer>
+        </form>
+      </ModalPaper>
     </Modal>
   );
 };
@@ -203,80 +158,6 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
 export default AddCardModal;
 
 AddCardModal.defaultProps = {};
-
-const SContainer = styled.div`
-  display: flex;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  justify-content: center;
-  align-items: center;
-`;
-
-const SModal = styled.div`
-  position: relative;
-  overflow-y: auto;
-
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-  height: 100%;
-
-  /* Hide scrollbar */
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colors.white
-      : props.theme.colorsThemed.background.secondary};
-
-  ${({ theme }) => theme.media.tablet} {
-    width: 464px;
-    height: auto;
-    max-height: 75vh;
-    min-height: 445px;
-
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
-  }
-
-  ${({ theme }) => theme.media.desktop} {
-    width: 480px;
-  }
-`;
-
-const SGoBackButtonMobile = styled(GoBackButton)`
-  width: 100%;
-  padding: 18px 16px 6px;
-`;
-
-const SGoBackButtonDesktop = styled.button`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  width: 100%;
-  border: transparent;
-  background: transparent;
-  padding: 24px;
-  padding-bottom: 4px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  font-size: 20px;
-  line-height: 28px;
-  font-weight: bold;
-
-  cursor: pointer;
-`;
-
-const SForm = styled.form`
-  padding: 24px;
-  padding-top: 0;
-`;
 
 const SModalButtons = styled.div`
   display: flex;
@@ -307,12 +188,4 @@ const SAddButton = styled(Button)`
 const SErrorText = styled(Text)`
   text-align: center;
   margin-top: 8px;
-`;
-
-const SLoader = styled.div`
-  top: 50%;
-  left: 50%;
-  z-index: 20;
-  position: absolute;
-  transform: translate(-50%, -50%);
 `;

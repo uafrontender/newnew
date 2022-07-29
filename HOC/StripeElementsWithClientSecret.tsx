@@ -14,10 +14,15 @@ const stripePromise = getStripe();
 
 interface IStripeElements {
   children: React.ReactNode;
+  propose: {
+    saveCardRequest: newnewapi.SaveCardRequest;
+  };
 }
 
-export const StripeElements: React.FC<IStripeElements> = (props) => {
-  const { children } = props;
+export const StripeElements: React.FC<IStripeElements> = ({
+  children,
+  propose,
+}) => {
   const theme = useTheme();
   const { loggedIn } = useAppSelector((state) => state.user);
 
@@ -28,7 +33,9 @@ export const StripeElements: React.FC<IStripeElements> = (props) => {
   useEffect(() => {
     const getStripeClientSecret = async () => {
       try {
-        const payload = new newnewapi.EmptyRequest({});
+        const payload = new newnewapi.CreateStripeSetupIntentRequest({
+          ...propose,
+        });
         const response = await createStripeSetupIntent(payload);
 
         if (!response.data || response.error) {
@@ -44,7 +51,9 @@ export const StripeElements: React.FC<IStripeElements> = (props) => {
     if (loggedIn) {
       getStripeClientSecret();
     }
-  }, [loggedIn]);
+  }, [loggedIn, propose]);
+
+  console.log(stipeSecret, 'stipeSecret');
 
   const stripeOptions: StripeElementsOptions | null = useMemo(
     () => ({
