@@ -14,6 +14,8 @@ quick-test:
     - npm ci --include=dev
     - npm run lint
     - npm run jest
+    only:
+  - merge_requests
 
 # A set of longer tests
 long-test:
@@ -30,6 +32,8 @@ long-test:
     - sleep 30
     - curl http://localhost:4000
     - npm run npm run cypress:ci
+    only:
+  - merge_requests
   rules:
     - if: $CI_MERGE_REQUEST_TITLE =~ /^Draft:/
       when: never
