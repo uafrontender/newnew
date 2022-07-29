@@ -174,7 +174,6 @@ const SSidebar = styled.div<ISSidebar>`
           bottom: 0;
           right: 0;
           position: fixed;
-          /* height: 100vh; */
           padding: 0 15px;
         }
       `;
@@ -214,14 +213,25 @@ const SToolbar = styled.div<ISToolbar>`
 `;
 
 const SContent = styled.div`
-  position: relative;
+  /* position: relative;
   height: 100%;
   background: ${(props) => props.theme.colorsThemed.background.secondary};
   padding: 0 0 24px;
+  width: 100vw; */
+  background: ${(props) => props.theme.colorsThemed.background.secondary};
+  z-index: 18;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  position: fixed;
+  padding: 0 0 20px;
   width: 100vw;
   ${(props) => props.theme.media.laptop} {
     width: calc(100% - 384px);
     margin-left: auto;
     border-radius: ${(props) => props.theme.borderRadius.large};
+    position: static;
+    padding: 0 15px;
   }
 `;
