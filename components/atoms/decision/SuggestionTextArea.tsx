@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 interface ISuggestionTextArea {
+  id?: string;
   value: string;
   placeholder: string;
   disabled?: boolean;
@@ -10,6 +11,7 @@ interface ISuggestionTextArea {
 }
 
 const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
+  id,
   value,
   placeholder,
   disabled,
@@ -30,6 +32,7 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
 
   return (
     <STextarea
+      id={id}
       ref={(el) => {
         textareaRef.current = el!!;
       }}
