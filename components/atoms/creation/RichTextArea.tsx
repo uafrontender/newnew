@@ -34,11 +34,19 @@ export const RichTextArea: React.FC<IRichTextArea> = React.memo((props) => {
   const inputRef = useRef<HTMLDivElement>();
   const [focused, setFocused] = useState(false);
 
-  const clearValue = (rawValue: string) =>
-    rawValue
+  const clearValue = (rawValue: string) => {
+    // Removes spans used to highlight chunks
+    const clearedValue = rawValue
       .replaceAll(/<\/?span.*?>/g, '')
-      .replaceAll('<br>', '')
-      .replaceAll('&nbsp;', ' ');
+      .replaceAll('<br>', '');
+
+    // Decodes all html entities
+    const txt = document.createElement('textarea');
+    txt.innerHTML = clearedValue;
+    const decodedValue = txt.value;
+
+    return decodedValue;
+  };
 
   // TODO: improve control over chariot. Manually control. Old position +- length diff
 

@@ -237,10 +237,12 @@ export const General: React.FC<IGeneral> = (props) => {
           <ReportBugButton
             bottom={
               (isMobile ? 24 : 16) +
-              (isMobile && (mobileNavigationVisible || postOverlayOpen)
+              (isMobile &&
+              (mobileNavigationVisible || postOverlayOpen) &&
+              !mobileChatOpened
                 ? 56
                 : 0) +
-              (chatButtonVisible ? 72 : 0)
+              (chatButtonVisible && !mobileChatOpened ? 72 : 0)
             }
             right={4}
             zIndex={moreMenuMobileOpen ? 9 : undefined}

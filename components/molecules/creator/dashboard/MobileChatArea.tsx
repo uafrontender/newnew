@@ -19,6 +19,7 @@ import Text from '../../../atoms/Text';
 import TextArea from '../../../atoms/chat/TextArea';
 import Button from '../../../atoms/Button';
 import UserAvatar from '../../UserAvatar';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 
 const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
@@ -32,8 +33,9 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
   const [messageText, setMessageText] = useState<string>('');
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
-  const [newMessage, setNewMessage] =
-    useState<newnewapi.IChatMessage | null | undefined>();
+  const [newMessage, setNewMessage] = useState<
+    newnewapi.IChatMessage | null | undefined
+  >();
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
@@ -49,8 +51,9 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
 
-  const [messagesNextPageToken, setMessagesNextPageToken] =
-    useState<string | undefined | null>('');
+  const [messagesNextPageToken, setMessagesNextPageToken] = useState<
+    string | undefined | null
+  >('');
   const [messagesLoading, setMessagesLoading] = useState(false);
 
   const getChatMessages = useCallback(
@@ -343,6 +346,13 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                   ? user.userData?.nickname
                   : chatRoom.visavis?.nickname
               }
+              {chatRoom.visavis?.options?.isVerified && !isAnnouncement && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                />
+              )}
             </SUserName>
             <SUserAlias>
               {!isAnnouncement
@@ -428,6 +438,8 @@ const SUserName = styled.strong`
   font-weight: 600;
   font-size: 16px;
   padding-bottom: 4px;
+  display: flex;
+  align-items: center;
 `;
 
 const SCenterPart = styled.div`
