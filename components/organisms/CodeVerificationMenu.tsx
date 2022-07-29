@@ -284,6 +284,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           ) : null}
         </SSubheading>
         <VerificationCodeInput
+          id='verification-input'
           initialValue={codeInitial}
           length={6}
           disabled={

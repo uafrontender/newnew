@@ -140,6 +140,7 @@ export const Desktop: React.FC = React.memo(() => {
                   >
                     <a>
                       <Button
+                        id='create'
                         withShadow
                         view='primaryGrad'
                         onClick={() => {
@@ -212,6 +213,7 @@ export const Desktop: React.FC = React.memo(() => {
               <Link href='/sign-up'>
                 <a>
                   <Button
+                    id='log-in'
                     view='quaternary'
                     onClick={() => {
                       Mixpanel.track('Navigation Item Clicked', {
