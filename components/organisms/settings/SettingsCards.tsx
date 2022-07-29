@@ -1,5 +1,4 @@
-/* eslint-disable no-unsafe-optional-chaining */
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -10,7 +9,6 @@ import InlineSVG from '../../atoms/InlineSVG';
 import Card from '../../molecules/settings/Card';
 import AddCardModal from '../../molecules/settings/AddCardModal';
 import Lottie from '../../atoms/Lottie';
-import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
 
 import { getCards } from '../../../api/endpoints/card';
 
@@ -50,13 +48,6 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   useEffect(() => {
     fetchCard();
   }, [fetchCard]);
-
-  const propose = useMemo(
-    () => ({
-      saveCardRequest: new newnewapi.SaveCardRequest(),
-    }),
-    []
-  );
 
   return (
     <SSettingsContainer>
@@ -141,12 +132,11 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
           </SCardList>
         )}
       </SCardsContainer>
-      <StripeElements propose={propose}>
-        <AddCardModal
-          show={isAddCardModal}
-          closeModal={() => setIsAddCardModal(false)}
-        />
-      </StripeElements>
+
+      <AddCardModal
+        show={isAddCardModal}
+        closeModal={() => setIsAddCardModal(false)}
+      />
     </SSettingsContainer>
   );
 };

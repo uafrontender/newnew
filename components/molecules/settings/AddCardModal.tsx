@@ -7,12 +7,20 @@ import {
   PaymentElement,
 } from '@stripe/react-stripe-js';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { newnewapi } from 'newnew-api';
+
+import { createStripeSetupIntent } from '../../../api/endpoints/payments';
+import { useAppSelector } from '../../../redux-store/store';
+import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
 
 // Components
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 import ModalPaper from '../../organisms/ModalPaper';
+import Lottie from '../../atoms/Lottie';
+
+import logoAnimation from '../../../public/animations/mobile_logo.json';
 
 interface IReCaptchaRes {
   success?: boolean;
@@ -22,12 +30,11 @@ interface IReCaptchaRes {
   errors?: Array<string> | string;
 }
 
-interface IAddCardModal {
-  show: boolean;
-  closeModal: () => void;
+interface IAddCardForm {
+  onCancel: () => void;
 }
 
-const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
+const AddCardForm: React.FC<IAddCardForm> = ({ onCancel }) => {
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
 
@@ -63,7 +70,6 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
   ) => {
     try {
       e.preventDefault();
-      console.log('here');
       if (!executeRecaptcha) {
         throw new Error('executeRecaptcha not available');
       }
@@ -104,53 +110,115 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
     }
   };
 
-  useEffect(() => {
-    if (!show) {
+  useEffect(
+    () => () => {
       setErrorMessage('');
       setIsStripeReady(false);
-    }
-  }, [show]);
+    },
+    []
+  );
 
-  console.log(isLoading, 'isLoading');
+  return (
+    <form onSubmit={handleSubmitWithCaptchaProtection}>
+      <PaymentElement
+        onReady={() => {
+          setIsStripeReady(true);
+        }}
+      />
+      {errorMessage && (
+        <SErrorText variant={3} tone='error'>
+          {errorMessage}
+        </SErrorText>
+      )}
+      {isStripeReady && (
+        <SModalButtons>
+          <SCancelButton onClick={onCancel} view='secondary'>
+            {tCommon('button.cancel')}
+          </SCancelButton>
+          <SAddButton
+            view='primary'
+            disabled={!stripe || isLoading}
+            type='submit'
+            style={{
+              ...(isLoading ? { cursor: 'wait' } : {}),
+            }}
+          >
+            {t('Settings.sections.cards.button.addCard')}
+          </SAddButton>
+        </SModalButtons>
+      )}
+    </form>
+  );
+};
+
+interface IAddCardModal {
+  show: boolean;
+  closeModal: () => void;
+}
+
+const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
+  const { t } = useTranslation('page-Profile');
+
+  const [stipeSecret, setStripeSecret] = useState('');
+  const [isStripeSecretLoading, setIsStripeSecretLoading] = useState(false);
+
+  const { loggedIn } = useAppSelector((state) => state.user);
+
+  useEffect(() => {
+    const creteSetupIntent = async () => {
+      try {
+        setIsStripeSecretLoading(true);
+        const payload = new newnewapi.CreateStripeSetupIntentRequest({
+          saveCardRequest: new newnewapi.SaveCardRequest(),
+        });
+        const response = await createStripeSetupIntent(payload);
+
+        if (!response.data || response.error) {
+          throw new Error(response.error?.message || 'Some error occurred');
+        }
+
+        setStripeSecret(response.data.stripeSetupIntentClientSecret);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsStripeSecretLoading(false);
+      }
+    };
+
+    if (loggedIn && show) {
+      creteSetupIntent();
+    }
+  }, [loggedIn, show]);
+
+  if (!loggedIn) {
+    return null;
+  }
 
   return (
     <Modal show={show} onClose={closeModal} overlaydim>
-      <ModalPaper
+      <SModalPaper
         title={t('Settings.sections.cards.button.addNewCard')}
         onClose={closeModal}
         isCloseButton
         isMobileFullScreen
       >
-        <form onSubmit={handleSubmitWithCaptchaProtection}>
-          <PaymentElement
-            onReady={() => {
-              setIsStripeReady(true);
-            }}
-          />
-          {errorMessage && (
-            <SErrorText variant={3} tone='error'>
-              {errorMessage}
-            </SErrorText>
-          )}
-          {isStripeReady && (
-            <SModalButtons>
-              <SCancelButton onClick={closeModal} view='secondary'>
-                {tCommon('button.cancel')}
-              </SCancelButton>
-              <SAddButton
-                view='primary'
-                disabled={!stripe || isLoading}
-                type='submit'
-                style={{
-                  ...(isLoading ? { cursor: 'wait' } : {}),
-                }}
-              >
-                {t('Settings.sections.cards.button.addCard')}
-              </SAddButton>
-            </SModalButtons>
-          )}
-        </form>
-      </ModalPaper>
+        {isStripeSecretLoading && (
+          <SLoader>
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: logoAnimation,
+              }}
+            />
+          </SLoader>
+        )}
+        <StripeElements stipeSecret={stipeSecret}>
+          <AddCardForm onCancel={closeModal} />
+        </StripeElements>
+      </SModalPaper>
     </Modal>
   );
 };
@@ -158,6 +226,10 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
 export default AddCardModal;
 
 AddCardModal.defaultProps = {};
+
+const SModalPaper = styled(ModalPaper)`
+  min-height: 200px;
+`;
 
 const SModalButtons = styled.div`
   display: flex;
@@ -188,4 +260,12 @@ const SAddButton = styled(Button)`
 const SErrorText = styled(Text)`
   text-align: center;
   margin-top: 8px;
+`;
+
+const SLoader = styled.div`
+  top: 50%;
+  left: 50%;
+  z-index: 20;
+  position: absolute;
+  transform: translate(-50%, -50%);
 `;

@@ -131,6 +131,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
         title={t('Settings.sections.cards.button.addNewCard')}
         onClose={closeModal}
         isCloseButton
+        isMobileFullScreen
       >
         <SModalContent>
           <SText variant={2} weight={600} $isError={isError}>
@@ -168,13 +169,14 @@ const SModalContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px 24px 32px;
   flex: 1;
+  min-height: 100px;
 `;
 
 const SText = styled(Text)<{
   $isError: boolean;
 }>`
+  margin-bottom: 10px;
   color: ${({ theme, $isError }) =>
     !$isError
       ? theme.colorsThemed.text.secondary
@@ -182,7 +184,7 @@ const SText = styled(Text)<{
 `;
 
 const SButton = styled(Button)`
-  margin-top: 40px;
+  margin-top: 30px;
 
   ${({ theme }) => theme.media.tablet} {
     margin-top: auto;

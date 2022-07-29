@@ -5,8 +5,6 @@ import { StripeElementLocale, StripeElementsOptions } from '@stripe/stripe-js';
 import { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../redux-store/store';
-import { createStripeSetupIntent } from '../api/endpoints/payments';
 import getStripe from '../utils/geStripejs';
 import assets from '../constants/assets';
 
@@ -14,46 +12,16 @@ const stripePromise = getStripe();
 
 interface IStripeElements {
   children: React.ReactNode;
-  propose: {
-    saveCardRequest: newnewapi.SaveCardRequest;
-  };
+  stipeSecret: string;
 }
 
 export const StripeElements: React.FC<IStripeElements> = ({
   children,
-  propose,
+  stipeSecret,
 }) => {
   const theme = useTheme();
-  const { loggedIn } = useAppSelector((state) => state.user);
 
   const { locale } = useRouter();
-
-  const [stipeSecret, setStripeSecret] = useState('');
-
-  useEffect(() => {
-    const getStripeClientSecret = async () => {
-      try {
-        const payload = new newnewapi.CreateStripeSetupIntentRequest({
-          ...propose,
-        });
-        const response = await createStripeSetupIntent(payload);
-
-        if (!response.data || response.error) {
-          throw new Error(response.error?.message || 'Some error occurred');
-        }
-
-        setStripeSecret(response.data.stripeSetupIntentClientSecret);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    if (loggedIn) {
-      getStripeClientSecret();
-    }
-  }, [loggedIn, propose]);
-
-  console.log(stipeSecret, 'stipeSecret');
 
   const stripeOptions: StripeElementsOptions | null = useMemo(
     () => ({
