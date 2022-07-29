@@ -129,12 +129,14 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             <SModalMessage>{t('modal.reportUser.subtitle')}</SModalMessage>
             <SCheckBoxList>
               {reportTypes.map((item) => (
-                <SCheckBoxWrapper key={item.id}>
-                  <CheckMark
+                <SCheckBoxWrapper
+                  key={item.id}
+                  onClick={() => handleTypeChange(item.id)}
+                >
+                  <SCheckMark
                     id={item.id.toString()}
                     label={item.title}
                     selected={reasons.includes(item.id)}
-                    handleChange={() => handleTypeChange(item.id)}
                   />
                 </SCheckBoxWrapper>
               ))}
@@ -268,7 +270,14 @@ const SCheckBoxList = styled.div`
 `;
 
 const SCheckBoxWrapper = styled.div`
-  margin-bottom: 22px;
+  margin-top: 10px;
+  padding: 5px;
+  margin-bottom: 10px;
+  overflow: hidden;
+`;
+
+const SCheckMark = styled(CheckMark)`
+  pointer-events: none;
 `;
 
 const STextAreaWrapper = styled.div`

@@ -8,26 +8,29 @@ import CheckmarkIcon from '../../public/images/svg/icons/filled/Checkmark.svg';
 
 interface ICheckMark {
   id?: string;
+  className?: string;
   label: string;
   selected?: boolean;
   disabled?: boolean;
-  handleChange: (e: any, id?: string) => void;
+  handleChange?: (e: any, id?: string) => void;
 }
 
 const CheckMark: React.FC<ICheckMark> = (props) => {
-  const { id, label, selected, disabled, handleChange, ...rest } = props;
+  const { id, className, label, selected, disabled, handleChange, ...rest } =
+    props;
   const theme = useTheme();
 
   const onClick = useCallback(
     (e: React.MouseEvent) => {
       if (disabled) return;
-      handleChange(e, id);
+      handleChange?.(e, id);
     },
     [id, handleChange, disabled]
   );
 
   return (
     <SWrapper
+      className={className}
       onClick={onClick}
       style={{
         ...(disabled
@@ -67,8 +70,10 @@ export default CheckMark;
 
 CheckMark.defaultProps = {
   id: '',
+  className: undefined,
   selected: false,
   disabled: false,
+  handleChange: undefined,
 };
 
 const SWrapper = styled.div`
