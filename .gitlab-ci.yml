@@ -10,7 +10,6 @@ cache:
 
 # A set of simple tests
 quick-test:
-  stage: quick-test
   script:
     - npm ci --include=dev
     - npm run lint
@@ -18,7 +17,6 @@ quick-test:
 
 # A set of longer tests
 long-test:
-  stage: long-test
   script:
     - echo $CI_MERGE_REQUEST_TITLE
     - echo '$CI_MERGE_REQUEST_TITLE =~ /^Draft:/'
