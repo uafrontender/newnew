@@ -239,7 +239,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
 
     const fetchOptions = useCallback(
       async (pageToken?: string) => {
-        if (optionsLoading) return;
+        if (optionsLoading || loadingModalOpen) return;
         try {
           setOptionsLoading(true);
           setLoadingOptionsError('');
@@ -281,7 +281,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           console.error(err);
         }
       },
-      [optionsLoading, setOptions, sortOptions, post]
+      [optionsLoading, loadingModalOpen, post.postUuid, sortOptions]
     );
 
     const handleAddOrUpdateOptionFromResponse = useCallback(
