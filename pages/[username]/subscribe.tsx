@@ -235,7 +235,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
               )}
             </AnimatePresence>
             {isTablet && (
-              <SGoBackButtonTablet defer={500} onClick={() => router.back()} />
+              <SGoBackButtonTablet
+                defer={500}
+                onClick={() => router.push(`/${user.username}`)}
+              />
             )}
             <STopSection
               ref={(el) => {
@@ -243,7 +246,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
               }}
             >
               {!isTablet && (
-                <SBackButton defer={500} onClick={() => router.back()}>
+                <SBackButton
+                  defer={500}
+                  onClick={() => router.push(`/${user.username}`)}
+                >
                   {!isMobileOrTablet && t('button.back')}
                 </SBackButton>
               )}
