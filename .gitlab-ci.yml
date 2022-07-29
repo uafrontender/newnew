@@ -1,9 +1,5 @@
 image: node:latest
 
-stages:
-  - quick-test
-  - long-test
-
 # Cache using branch name
 cache:
   key: ${CI_COMMIT_REF_SLUG}
