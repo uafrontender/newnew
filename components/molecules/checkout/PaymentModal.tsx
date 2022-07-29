@@ -116,6 +116,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
           <SHeaderContainer>{children}</SHeaderContainer>
           <SPayButtonDiv>
             <SPayButton
+              id='pay'
               view='primaryGrad'
               onClick={() => handlePayWithCaptchaProtection()}
             >
