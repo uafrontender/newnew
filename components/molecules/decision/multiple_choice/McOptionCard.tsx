@@ -1470,6 +1470,7 @@ const SPaymentModalOptionText = styled(Headline)`
 
 const STutorialTooltipHolder = styled.div`
   position: absolute;
+  z-index: 1;
 
   text-align: left;
   div {
