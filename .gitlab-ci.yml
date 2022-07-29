@@ -8,7 +8,7 @@ cache:
     - .next
     - /root/.cache/Cypress
 
-# A set of simple tests
+# A set of quick tests
 quick-test:
   script:
     - npm ci --include=dev
