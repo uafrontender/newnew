@@ -238,7 +238,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
 
     const fetchBids = useCallback(
       async (pageToken?: string) => {
-        if (optionsLoading) return;
+        if (optionsLoading || loadingModalOpen) return;
         try {
           setOptionsLoading(true);
           setLoadingOptionsError('');
@@ -278,7 +278,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
           console.error(err);
         }
       },
-      [post, setOptions, sortOptions, optionsLoading]
+      [optionsLoading, loadingModalOpen, post.postUuid, sortOptions]
     );
 
     const handleRemoveOption = useCallback(
