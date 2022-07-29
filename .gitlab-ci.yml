@@ -1,7 +1,6 @@
 image: node:latest
 
 stages:
-  - trigger
   - test
 
 # Cache using branch name
