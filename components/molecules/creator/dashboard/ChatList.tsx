@@ -1,5 +1,5 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
@@ -18,7 +18,11 @@ import textTrim from '../../../../utils/textTrim';
 import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
 
-export const ChatList = () => {
+interface IChatList {
+  searchText: string;
+}
+
+export const ChatList: React.FC<IChatList> = ({ searchText }) => {
   const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const router = useRouter();
@@ -26,15 +30,21 @@ export const ChatList = () => {
   const { unreadCountForCreator } = useGetChats();
   const { ref: scrollRef, inView } = useInView();
 
+  const prevSearchText = useRef('');
+
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
-  const [chatRooms, setChatRooms] =
-    useState<newnewapi.IChatRoom[] | null>(null);
-  const [chatRoomsNextPageToken, setChatRoomsNextPageToken] =
-    useState<string | undefined | null>('');
-  const [searchedRooms, setSearchedRooms] =
-    useState<newnewapi.IChatRoom[] | null>(null);
-  const [updatedChat, setUpdatedChat] =
-    useState<newnewapi.IChatRoom | null>(null);
+  const [chatRooms, setChatRooms] = useState<newnewapi.IChatRoom[] | null>(
+    null
+  );
+  const [chatRoomsNextPageToken, setChatRoomsNextPageToken] = useState<
+    string | undefined | null
+  >('');
+  const [searchedRooms, setSearchedRooms] = useState<
+    newnewapi.IChatRoom[] | null
+  >(null);
+  const [updatedChat, setUpdatedChat] = useState<newnewapi.IChatRoom | null>(
+    null
+  );
 
   const fetchMyRooms = useCallback(
     async (pageToken?: string) => {
@@ -70,7 +80,7 @@ export const ChatList = () => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loadingRooms]
+    [loadingRooms, searchText]
   );
 
   const fetchLastActiveRoom = async () => {
@@ -130,22 +140,26 @@ export const ChatList = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, loadingRooms, chatRoomsNextPageToken]);
 
-  // useEffect(() => {
-  //   if (searchText) {
-  //     if (chatRooms) {
-  //       setSearchedRooms(null);
-  //       const arr = [] as newnewapi.IChatRoom[];
-  //       chatRooms.forEach((chat) => {
-  //         if (chat.visavis?.nickname?.startsWith(searchText) || chat.visavis?.username?.startsWith(searchText)) {
-  //           arr.push(chat);
-  //         }
-  //       });
-  //       setSearchedRooms(arr);
-  //     }
-  //   } else {
-  //     setSearchedRooms(null);
-  //   }
-  // }, [searchText, chatRooms, searchedRooms]);
+  useEffect(() => {
+    if (searchText && searchText !== prevSearchText.current && chatRooms) {
+      prevSearchText.current = searchText;
+
+      if (chatRooms) {
+        setSearchedRooms(null);
+        const arr = chatRooms.filter(
+          (chat) =>
+            chat.visavis?.nickname?.startsWith(searchText) ||
+            chat.visavis?.username?.startsWith(searchText)
+        );
+        setSearchedRooms(arr);
+      }
+    }
+
+    if (searchedRooms && !searchText) {
+      setSearchedRooms(null);
+      prevSearchText.current = '';
+    }
+  }, [searchText, chatRooms, searchedRooms]);
 
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom) => {
@@ -241,11 +255,15 @@ export const ChatList = () => {
 
   // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
+  const displayedRooms = searchText ? searchedRooms : chatRooms;
+
   return (
     <>
       {chatRooms && (
         <>
-          <SSectionContent>{chatRooms.map(renderChatItem)}</SSectionContent>
+          <SSectionContent>
+            {(displayedRooms || []).map(renderChatItem)}
+          </SSectionContent>
           {chatRoomsNextPageToken && !searchedRooms && (
             <SRef ref={scrollRef}>Loading...</SRef>
           )}
