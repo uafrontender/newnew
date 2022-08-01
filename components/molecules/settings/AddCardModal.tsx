@@ -139,6 +139,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel }) => {
             view='primary'
             disabled={!stripe || isLoading}
             type='submit'
+            loading={isLoading}
             style={{
               ...(isLoading ? { cursor: 'wait' } : {}),
             }}
