@@ -23,6 +23,7 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { placeBidWithWallet } from '../../../../api/endpoints/auction';
 import {
   createPaymentSession,
+  // createStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
@@ -409,6 +410,32 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       setSupportBidAmount('');
     }
   }, [isSupportFormOpen]);
+
+  // const pay = useCallback(async () => {
+  //   try {
+  //     // setIsStripeSecretLoading(true);
+  //     const payload = new newnewapi.CreateStripeSetupIntentRequest({
+  //       saveCardRequest: new newnewapi.PlaceBidRequest({
+  //         postUuid: postId,
+  //         amount: new newnewapi.MoneyAmount({
+  //           usdCents: parseInt(supportBidAmount) * 100,
+  //         }),
+  //         optionId: option.id,
+  //       }),
+  //     });
+  //     const response = await createStripeSetupIntent(payload);
+
+  //     if (!response.data || response.error) {
+  //       throw new Error(response.error?.message || 'Some error occurred');
+  //     }
+
+  //     // setStripeSecret(response.data.stripeSetupIntentClientSecret);
+  //   } catch (err) {
+  //     console.error(err);
+  //   } finally {
+  //     // setIsStripeSecretLoading(false);
+  //   }
+  // }, [postId, supportBidAmount, option.id]);
 
   return (
     <div

@@ -20,6 +20,9 @@ const CardSetupComplete: NextPage = () => {
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
 
+  const clientSecret = router.query.setup_intent_client_secret as string;
+  const setupIntentId = router.query.setup_intent as string;
+
   useEffect(() => {
     router.prefetch('/profile/settings');
   }, [router]);
@@ -40,7 +43,14 @@ const CardSetupComplete: NextPage = () => {
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      {isBrowser() && <CardSetupCompleteModal show closeModal={closeModal} />}
+      {isBrowser() && (
+        <CardSetupCompleteModal
+          show
+          closeModal={closeModal}
+          clientSecret={clientSecret}
+          setupIntentId={setupIntentId}
+        />
+      )}
     </>
   );
 };

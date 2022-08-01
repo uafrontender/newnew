@@ -6,6 +6,7 @@ import {
   useElements,
   PaymentElement,
 } from '@stripe/react-stripe-js';
+import { SetupIntent } from '@stripe/stripe-js';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { newnewapi } from 'newnew-api';
 
@@ -19,6 +20,7 @@ import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 import ModalPaper from '../../organisms/ModalPaper';
 import Lottie from '../../atoms/Lottie';
+import CardSetupCompleteModal from '../../organisms/settings/CardSetupCompleteModal';
 
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 
@@ -32,9 +34,10 @@ interface IReCaptchaRes {
 
 interface IAddCardForm {
   onCancel: () => void;
+  onSuccess: (setupIntent: SetupIntent) => void;
 }
 
-const AddCardForm: React.FC<IAddCardForm> = ({ onCancel }) => {
+const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
 
@@ -50,17 +53,19 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel }) => {
       return;
     }
 
-    const { error } = await stripe.confirmSetup({
+    const { setupIntent, error } = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        // TODO: change to env
-        return_url: `${window?.location?.origin}/profile/settings/card-setup-complete`,
+        return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/profile/settings/card-setup-complete`,
       },
+      redirect: 'if_required',
     });
 
     if (error) {
       throw new Error(error.message);
     }
+
+    onSuccess(setupIntent);
   };
 
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -191,36 +196,65 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
     }
   }, [loggedIn, show]);
 
+  const handleClose = () => {
+    setStripeSecret('');
+    closeModal();
+  };
+
+  const [isCardSetupCompleted, setIsCardSetupCompleted] = useState(false);
+  const [stripeSetupIntent, setStripeSetupIntent] =
+    useState<SetupIntent | null>(null);
+
+  const handleCloseCardSetupCompleteModal = () => {
+    setIsCardSetupCompleted(false);
+    handleClose();
+  };
+
+  const onCardSuccess = (setupIntentValue: SetupIntent) => {
+    setIsCardSetupCompleted(true);
+    setStripeSetupIntent(setupIntentValue);
+  };
+
   if (!loggedIn) {
     return null;
   }
 
   return (
-    <Modal show={show} onClose={closeModal} overlaydim>
-      <SModalPaper
-        title={t('Settings.sections.cards.button.addNewCard')}
-        onClose={closeModal}
-        isCloseButton
-        isMobileFullScreen
-      >
-        {isStripeSecretLoading && (
-          <SLoader>
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: logoAnimation,
-              }}
-            />
-          </SLoader>
-        )}
-        <StripeElements stipeSecret={stipeSecret}>
-          <AddCardForm onCancel={closeModal} />
-        </StripeElements>
-      </SModalPaper>
-    </Modal>
+    <>
+      <Modal show={show} onClose={handleClose} overlaydim>
+        <SModalPaper
+          title={t('Settings.sections.cards.button.addNewCard')}
+          onClose={handleClose}
+          isCloseButton
+          isMobileFullScreen
+        >
+          {isStripeSecretLoading && (
+            <SLoader>
+              <Lottie
+                width={64}
+                height={64}
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: logoAnimation,
+                }}
+              />
+            </SLoader>
+          )}
+          <StripeElements stipeSecret={stipeSecret}>
+            <AddCardForm onCancel={closeModal} onSuccess={onCardSuccess} />
+          </StripeElements>
+        </SModalPaper>
+      </Modal>
+      {isCardSetupCompleted && stripeSetupIntent && (
+        <CardSetupCompleteModal
+          show={isCardSetupCompleted}
+          closeModal={handleCloseCardSetupCompleteModal}
+          clientSecret={stripeSetupIntent.client_secret}
+          setupIntentId={stripeSetupIntent.id}
+        />
+      )}
+    </>
   );
 };
 

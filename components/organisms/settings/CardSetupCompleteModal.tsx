@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 // Components
@@ -35,19 +34,19 @@ const getCardStatusMessage = (cardStatus: newnewapi.CardStatus) => {
 interface ICardSetupCompleteModal {
   show: boolean;
   closeModal: () => void;
+  clientSecret: string | null;
+  setupIntentId: string | null;
 }
 
 const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
   show,
   closeModal,
+  clientSecret,
+  setupIntentId,
 }) => {
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
-  const router = useRouter();
   const socketConnection = useContext(SocketContext);
-
-  const clientSecret = router.query.setup_intent_client_secret as string;
-  const setupIntentId = router.query.setup_intent as string;
 
   const [message, setMessage] = useState('Saving your card. Please wait');
   const [isProcessing, setIsProcessing] = useState(true);
@@ -60,6 +59,10 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
 
     const handleCheckCardStatus = async () => {
       try {
+        if (!clientSecret || !setupIntentId) {
+          throw new Error('Something went wrong');
+        }
+
         const payload = new newnewapi.CheckCardStatusRequest({
           stripeSetupIntentId: setupIntentId,
           stripeSetupIntentClientSecret: clientSecret,
