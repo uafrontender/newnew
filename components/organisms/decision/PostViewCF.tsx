@@ -255,7 +255,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
 
     const fetchPledgesForPost = useCallback(
       async (pageToken?: string) => {
-        if (pledgesLoading) return;
+        if (pledgesLoading || loadingModalOpen) return;
         try {
           setPledgesLoading(true);
           setLoadingPledgesError('');
@@ -296,7 +296,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           console.error(err);
         }
       },
-      [pledgesLoading, setPledges, sortPleges, post]
+      [pledgesLoading, loadingModalOpen, post.postUuid, sortPleges]
     );
 
     const handleAddPledgeFromResponse = useCallback(

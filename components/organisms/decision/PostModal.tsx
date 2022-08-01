@@ -1552,7 +1552,7 @@ const SPostModalContainer = styled.div<{
     height: calc(100% - 64px);
   }
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.laptopM} {
     top: 32px;
     left: calc(50% - 496px);
     width: 992px;
@@ -1591,7 +1591,7 @@ const SGoBackButtonDesktop = styled(Button)`
 
   cursor: pointer;
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.laptopM} {
     right: 24px;
     top: 32px;
   }
@@ -1629,7 +1629,7 @@ const SPostSuccessWaitingControlsDiv = styled.div<{
     gap: 16px;
   }
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.laptopM} {
     flex-direction: column;
     gap: 8px;
     right: 24px;

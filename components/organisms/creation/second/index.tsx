@@ -1199,6 +1199,7 @@ export const CreationSecondStepContent: React.FC<
                   </div>
                   <div>
                     <SButton
+                      id='review'
                       view='primaryGrad'
                       onClick={handleSubmit}
                       disabled={disabled}
