@@ -33,6 +33,7 @@ import { ChannelsContext } from '../../../contexts/channelsContext';
 import { SocketContext } from '../../../contexts/socketContext';
 import { reportUser } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
+import isBrowser from '../../../utils/isBrowser';
 
 const UserAvatar = dynamic(() => import('../UserAvatar'));
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
@@ -393,7 +394,7 @@ const ChatArea: React.FC<IChatData> = ({
             nextSameDay={nextSameDay}
           >
             <SMessageText mine={isMine} weight={600} variant={3}>
-              <pre>{item.content?.text}</pre>
+              {item.content?.text}
             </SMessageText>
           </SMessageContent>
           {index === messages.length - 2 && (
@@ -508,6 +509,19 @@ const ChatArea: React.FC<IChatData> = ({
 
   const moreButtonRef: any = useRef();
 
+  const messagesScrollContainerRef = useRef<HTMLDivElement>();
+
+  useEffect(() => {
+    if (newMessage && isBrowser()) {
+      setTimeout(() => {
+        messagesScrollContainerRef.current?.scrollBy({
+          top: messagesScrollContainerRef.current?.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 100);
+    }
+  }, [newMessage]);
+
   return (
     <SContainer>
       {chatRoom && (
@@ -611,7 +625,12 @@ const ChatArea: React.FC<IChatData> = ({
           </SAnnouncementText>
         </SAnnouncementHeader>
       )}
-      <SCenterPart id='messagesScrollContainer'>
+      <SCenterPart
+        id='messagesScrollContainer'
+        ref={(el) => {
+          messagesScrollContainerRef.current = el!!;
+        }}
+      >
         {localUserData?.justSubscribed &&
           chatRoom &&
           messages.length === 0 &&
@@ -1018,7 +1037,9 @@ interface ISMessageText {
 
 const SMessageText = styled(Text)<ISMessageText>`
   line-height: 20px;
-  max-width: 412px;
+  max-width: 80vw;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
   color: ${(props) => {
     if (props.type === 'info') {
       return props.theme.colorsThemed.text.tertiary;
@@ -1030,6 +1051,10 @@ const SMessageText = styled(Text)<ISMessageText>`
 
     return props.theme.colorsThemed.text.primary;
   }};
+
+  ${({ theme }) => theme.media.tablet} {
+    max-width: 412px;
+  }
 `;
 
 const SAnnouncementHeader = styled.div`
