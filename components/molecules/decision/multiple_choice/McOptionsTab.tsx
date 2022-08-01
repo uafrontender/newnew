@@ -615,11 +615,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 creator: post.creator?.nickname,
               })}
             </SText>
-            <Link href={`/${post.creator?.username}/subscribe`}>
+            <a href={`/${post.creator?.username}/subscribe`}>
               <SSubscribeButton>
                 {t('mcPost.optionsTab.actionSection.subscribeButton')}
               </SSubscribeButton>
-            </Link>
+            </a>
           </SActionSectionSubscribe>
         ) : (
           <div

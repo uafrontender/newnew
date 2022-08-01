@@ -484,10 +484,6 @@ const SScrolledDownTopSection = styled(motion.div)<{ pushDown: boolean }>`
 
   z-index: 100;
 
-  ${({ theme }) => theme.media.tablet} {
-    margin: 16px;
-  }
-
   ${({ theme }) => theme.media.laptop} {
     top: ${({ pushDown }) => (pushDown ? '120px' : '80px')};
     padding: 0px calc(50% - 368px);

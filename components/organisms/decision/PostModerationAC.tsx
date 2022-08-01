@@ -30,6 +30,8 @@ import PostVotingTab from '../../molecules/decision/PostVotingTab';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
+import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
+import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
 
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
@@ -39,7 +41,6 @@ import switchPostStatus, {
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
 import useResponseUpload from '../../../utils/hooks/useResponseUpload';
 import { Mixpanel } from '../../../utils/mixpanel';
 
@@ -361,6 +362,18 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       [setOptions, sortOptions, post.postUuid]
     );
 
+    const handleOnResponseTimeExpired = () => {
+      handleUpdatePostStatus('FAILED');
+    };
+
+    const handleOnVotingTimeExpired = () => {
+      if (options && options.some((o) => o.supporterCount > 0)) {
+        handleUpdatePostStatus('WAITING_FOR_DECISION');
+      } else {
+        handleUpdatePostStatus('FAILED');
+      }
+    };
+
     // Increment channel subs after mounting
     // Decrement when unmounting
     useEffect(() => {
@@ -617,6 +630,14 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                 timestampSeconds={new Date(
                   (post.responseUploadDeadline?.seconds as number) * 1000
                 ).getTime()}
+                onTimeExpired={handleOnResponseTimeExpired}
+              />
+            ) : Date.now() > (post.expiresAt?.seconds as number) * 1000 ? (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='ac'
               />
             ) : (
               <PostTimer
@@ -625,6 +646,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                 ).getTime()}
                 postType='ac'
                 isTutorialVisible={options.length > 0}
+                onTimeExpired={handleOnVotingTimeExpired}
               />
             )}
           </SExpiresSection>
