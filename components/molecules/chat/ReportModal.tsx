@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../redux-store/store';
+import preventParentClick from '../../../utils/preventParentClick';
 
 import Modal from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
@@ -125,6 +126,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             title={`${t('modal.reportUser.title')} ${reportedDisplayname}`}
             onClose={handleClose}
             isMobileFullScreen
+            onClick={() => preventParentClick()}
           >
             <SModalMessage>{t('modal.reportUser.subtitle')}</SModalMessage>
             <SCheckBoxList>
