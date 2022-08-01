@@ -230,7 +230,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
   return (
-    <Modal show={showModal}>
+    <Modal show={showModal} additionalz={21}>
       <SContainer>
         <SModal>
           <SModalHeader>
