@@ -14,7 +14,6 @@ const NewMessage: React.FC<IFunctionProps> = ({ openChat }) => {
 
   const openModal = () => {
     setShowModal(true);
-    console.log('1');
   };
   const closeModal = () => {
     setShowModal(false);
