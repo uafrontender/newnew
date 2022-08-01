@@ -37,8 +37,6 @@ const Notification: React.FC<newnewapi.INotification> = ({
   const user = useAppSelector((state) => state.user);
   const [url, setUrl] = useState('');
 
-  console.log(content, target);
-
   useEffect(() => {
     if (url.length < 1 && target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 2)
