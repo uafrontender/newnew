@@ -10,6 +10,7 @@ import { SUserAvatar } from '../../../atoms/chat/styles';
 
 import Text from '../../../atoms/Text';
 import UserAvatar from '../../UserAvatar';
+import Lottie from '../../../atoms/Lottie';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import { getMyRooms } from '../../../../api/endpoints/chat';
@@ -17,6 +18,7 @@ import { useGetChats } from '../../../../contexts/chatContext';
 import textTrim from '../../../../utils/textTrim';
 import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
+import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 
 interface IChatList {
   searchText: string;
@@ -80,7 +82,7 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loadingRooms, searchText]
+    [loadingRooms]
   );
 
   const fetchLastActiveRoom = async () => {
@@ -259,6 +261,19 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
 
   return (
     <>
+      {loadingRooms && (
+        <SLoader>
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        </SLoader>
+      )}
       {chatRooms && (
         <>
           <SSectionContent>
@@ -310,6 +325,13 @@ const SSectionContent = styled.div`
       background: ${({ theme }) => theme.colorsThemed.background.outlines2};
     }
   }
+`;
+
+const SLoader = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 `;
 
 const SChatItem = styled.div`
