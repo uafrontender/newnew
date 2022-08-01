@@ -1231,6 +1231,7 @@ export const CreationSecondStepContent: React.FC<
                           resources={videoProcessing?.targetUrls}
                           borderRadius='16px'
                           mutePosition='left'
+                          showPlayButton
                         />
                       </SFloatingSubSectionPlayer>
                       <SFloatingSubSectionUser>
