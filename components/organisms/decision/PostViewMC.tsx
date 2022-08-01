@@ -33,6 +33,7 @@ import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import Headline from '../../atoms/Headline';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import PostVotingTab from '../../molecules/decision/PostVotingTab';
+import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
 
 // Utils
 import switchPostType from '../../../utils/switchPostType';
@@ -368,6 +369,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const handleOnVotingTimeExpired = () => {
+      if (options.some((o) => o.supporterCount > 0)) {
+        handleUpdatePostStatus('WAITING_FOR_RESPONSE');
+      } else {
+        handleUpdatePostStatus('FAILED');
+      }
+    };
+
     // Increment channel subs after mounting
     // Decrement when unmounting
     useEffect(() => {
@@ -655,12 +664,22 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
                 onClick={handleGoBack}
               />
             )}
-            <PostTimer
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='mc'
-            />
+            {postStatus === 'voting' ? (
+              <PostTimer
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='mc'
+                onTimeExpired={handleOnVotingTimeExpired}
+              />
+            ) : (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='mc'
+              />
+            )}
           </SExpiresSection>
           <PostVideo
             postId={post.postUuid}

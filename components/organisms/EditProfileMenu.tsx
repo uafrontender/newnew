@@ -1,6 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme, css } from 'styled-components';
@@ -657,8 +663,22 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     handleSetStageToEditingGeneral,
     dispatch,
   ]);
+  const scrollPosition = useRef(0);
 
   // Effects
+  useEffect(() => {
+    scrollPosition.current = window ? window.scrollY : 0;
+
+    document.body.style.cssText = `
+      overflow: hidden;
+    `;
+
+    return () => {
+      document.body.style.cssText = '';
+      window?.scroll(0, scrollPosition.current);
+    };
+  }, []);
+
   useEffect(() => {
     const verify = () => {
       if (!isBrowser()) return;
