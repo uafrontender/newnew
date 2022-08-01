@@ -96,6 +96,21 @@ export const Chat: React.FC<IChat> = ({ username }) => {
 
   const passInputValue = useCallback((str: string) => setSearchText(str), []);
 
+  useEffect(() => {
+    if (isMobileOrTablet) {
+      document.body.style.cssText = `
+        overflow: hidden;
+        position: fixed;
+      `;
+    } else {
+      document.body.style.cssText = '';
+    }
+
+    return () => {
+      document.body.style.cssText = '';
+    };
+  }, [isMobileOrTablet]);
+
   return (
     <SContainer>
       <SSidebar hidden={chatListHidden !== undefined && chatListHidden}>
@@ -143,12 +158,13 @@ Chat.defaultProps = {
 const SContainer = styled.div`
   position: relative;
   min-height: 700px;
-  height: calc(100vh - 500px);
+  height: 100%;
   margin: -20px -16px;
   display: flex;
 
   ${(props) => props.theme.media.laptop} {
     margin: -20px 0;
+    height: calc(100vh - 500px);
   }
 `;
 
@@ -213,7 +229,7 @@ const SToolbar = styled.div<ISToolbar>`
 `;
 
 const SContent = styled.div`
-  /* position: relative;
+  /*
   height: 100%;
   background: ${(props) => props.theme.colorsThemed.background.secondary};
   padding: 0 0 24px;
@@ -231,7 +247,8 @@ const SContent = styled.div`
     width: calc(100% - 384px);
     margin-left: auto;
     border-radius: ${(props) => props.theme.borderRadius.large};
-    position: static;
-    padding: 0 15px;
+    position: relative;
+    padding: 0 0 24px;
+    z-index: initial;
   }
 `;
