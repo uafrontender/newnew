@@ -33,7 +33,7 @@ import { ChannelsContext } from '../../../contexts/channelsContext';
 import { SocketContext } from '../../../contexts/socketContext';
 import { reportUser } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
-import isSafari from '../../../utils/isSafari';
+import isBrowser from '../../../utils/isBrowser';
 
 const UserAvatar = dynamic(() => import('../UserAvatar'));
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
@@ -282,14 +282,6 @@ const ChatArea: React.FC<IChatData> = ({
     setConfirmReportUser(true);
   };
 
-  const handleChange = useCallback((id: string, value: string) => {
-    let msgText = value.trimStart();
-    if (msgText.length > 1 && msgText[msgText.length - 2] === ' ') {
-      msgText = msgText.trimEnd();
-    }
-    setMessageText(msgText);
-  }, []);
-
   const submitMessage = useCallback(async () => {
     if (chatRoom && messageText.length > 0) {
       try {
@@ -304,7 +296,9 @@ const ChatArea: React.FC<IChatData> = ({
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
 
-        if (res.data.message) setMessages([res.data.message].concat(messages));
+        if (res.data.message) {
+          setMessages([res.data.message].concat(messages));
+        }
 
         setMessageText('');
         setSendingMessage(false);
@@ -320,7 +314,29 @@ const ChatArea: React.FC<IChatData> = ({
   const handleSubmit = useCallback(() => {
     if (!sendingMessage) submitMessage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageText]);
+  }, [sendingMessage, submitMessage, messageText]);
+
+  const handleChange = useCallback(
+    (id: string, value: string, isShiftEnter: boolean) => {
+      if (
+        value.charCodeAt(value.length - 1) === 10 &&
+        !isShiftEnter &&
+        !isMobileOrTablet
+      ) {
+        setMessageText(value.slice(0, -1));
+        handleSubmit();
+        return;
+      }
+
+      let msgText = value.trimStart();
+      if (msgText.length > 1 && msgText[msgText.length - 2] === ' ') {
+        msgText = msgText.trimEnd();
+      }
+      setMessageText(msgText);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [messageText, isMobileOrTablet, handleSubmit]
+  );
 
   const renderMessage = useCallback(
     (item: newnewapi.IChatMessage, index: number) => {
@@ -493,6 +509,19 @@ const ChatArea: React.FC<IChatData> = ({
 
   const moreButtonRef: any = useRef();
 
+  const messagesScrollContainerRef = useRef<HTMLDivElement>();
+
+  useEffect(() => {
+    if (newMessage && isBrowser()) {
+      setTimeout(() => {
+        messagesScrollContainerRef.current?.scrollBy({
+          top: messagesScrollContainerRef.current?.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 100);
+    }
+  }, [newMessage]);
+
   return (
     <SContainer>
       {chatRoom && (
@@ -575,7 +604,7 @@ const ChatArea: React.FC<IChatData> = ({
             {isMobile && ellipseMenuOpen ? (
               <ChatEllipseModal
                 isOpen={ellipseMenuOpen}
-                zIndex={11}
+                zIndex={21}
                 onClose={handleCloseEllipseMenu}
                 userBlocked={isVisavisBlocked}
                 onUserBlock={onUserBlock}
@@ -596,7 +625,12 @@ const ChatArea: React.FC<IChatData> = ({
           </SAnnouncementText>
         </SAnnouncementHeader>
       )}
-      <SCenterPart id='messagesScrollContainer'>
+      <SCenterPart
+        id='messagesScrollContainer'
+        ref={(el) => {
+          messagesScrollContainerRef.current = el!!;
+        }}
+      >
         {localUserData?.justSubscribed &&
           chatRoom &&
           messages.length === 0 &&
@@ -614,12 +648,6 @@ const ChatArea: React.FC<IChatData> = ({
           messages.map((item, index) => {
             if (index < messages.length) {
               return renderMessage(item, index);
-            }
-            if (document && isSafari() && isMobile && messages[0].id) {
-              const element = document.getElementById(
-                messages[0].id.toString()
-              );
-              if (element) element.scrollIntoView({ block: 'center' });
             }
             return null;
           })}
@@ -1009,7 +1037,9 @@ interface ISMessageText {
 
 const SMessageText = styled(Text)<ISMessageText>`
   line-height: 20px;
-  max-width: 412px;
+  max-width: 80vw;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
   color: ${(props) => {
     if (props.type === 'info') {
       return props.theme.colorsThemed.text.tertiary;
@@ -1021,6 +1051,10 @@ const SMessageText = styled(Text)<ISMessageText>`
 
     return props.theme.colorsThemed.text.primary;
   }};
+
+  ${({ theme }) => theme.media.tablet} {
+    max-width: 412px;
+  }
 `;
 
 const SAnnouncementHeader = styled.div`
