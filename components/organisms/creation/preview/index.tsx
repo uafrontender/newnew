@@ -479,6 +479,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
                 resources={videoProcessing?.targetUrls}
                 mutePosition='left'
                 borderRadius='16px'
+                showPlayButton
               />
             ) : (
               <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
