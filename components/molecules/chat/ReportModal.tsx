@@ -126,7 +126,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             title={`${t('modal.reportUser.title')} ${reportedDisplayname}`}
             onClose={handleClose}
             isMobileFullScreen
-            onClick={() => preventParentClick()}
+            onClick={preventParentClick()}
           >
             <SModalMessage>{t('modal.reportUser.subtitle')}</SModalMessage>
             <SCheckBoxList>
@@ -176,10 +176,10 @@ const ReportModal: React.FC<IReportModal> = React.memo(
           </ModalPaper>
         </Modal>
         <Modal show={reportSent} onClose={handleClose}>
-          <ConformationContainer onClose={handleClose} isCloseButton>
-            <CloseButton onClick={handleClose}>
+          <SConformationModal onClose={handleClose} isCloseButton>
+            <SCloseButton onClick={handleClose}>
               <InlineSvg svg={CloseIcon} />
-            </CloseButton>
+            </SCloseButton>
             <SConformationTitle>
               {t('modal.reportSent.title')}
             </SConformationTitle>
@@ -189,7 +189,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             <SAcknowledgementButton view='primaryGrad' onClick={handleClose}>
               {t('modal.reportSent.button')}
             </SAcknowledgementButton>
-          </ConformationContainer>
+          </SConformationModal>
         </Modal>
       </>
     );
@@ -327,23 +327,27 @@ const STextArea = styled.textarea`
   }
 `;
 
-const ConformationContainer = styled(ModalPaper)`
+const SConformationModal = styled(ModalPaper)`
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   padding: 72px 40px 40px 40px;
   margin: auto 16px;
   height: auto;
   max-width: 350px;
+  width: 100%;
 
-  ${(props) => props.theme.media.tablet} {
-    font-size: 16px;
-    max-width: 480px;
+  & > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    ${(props) => props.theme.media.tablet} {
+      font-size: 16px;
+      max-width: 480px;
+    }
   }
 `;
 
-const CloseButton = styled.div`
+const SCloseButton = styled.div`
   position: absolute;
   top: 24px;
   right: 24px;

@@ -16,7 +16,7 @@ interface IModalPaper {
   children: React.ReactNode;
   isMobileFullScreen?: boolean;
   isCloseButton?: boolean;
-  onClick?: () => void;
+  onClick?: (...params: any) => void;
 }
 
 const ModalPaper: React.FC<IModalPaper> = React.memo(
