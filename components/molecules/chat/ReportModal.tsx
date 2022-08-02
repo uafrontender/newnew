@@ -37,6 +37,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     const [reasons, setReasons] = useState<newnewapi.ReportingReason[]>([]);
     const [message, setMessage] = useState('');
     const [reportSent, setReportSent] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const disabled = reasons.length === 0 || message.length < 15;
 
@@ -78,11 +79,13 @@ const ReportModal: React.FC<IReportModal> = React.memo(
 
     const submitReport = async () => {
       if (reasons.length > 0 && message.length >= 15) {
+        setIsSubmitting(true);
         await onSubmit({
           reasons,
           message,
         });
         setReportSent(true);
+        setIsSubmitting(false);
       }
     };
 
@@ -169,6 +172,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
                 view='primaryGrad'
                 disabled={disabled}
                 onClick={submitReport}
+                loading={isSubmitting}
               >
                 {t('modal.reportUser.button.report')}
               </SConfirmButton>
@@ -342,8 +346,11 @@ const SConformationModal = styled(ModalPaper)`
 
     ${(props) => props.theme.media.tablet} {
       font-size: 16px;
-      max-width: 480px;
     }
+  }
+
+  ${(props) => props.theme.media.tablet} {
+    max-width: 480px;
   }
 `;
 
