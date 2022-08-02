@@ -202,7 +202,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
             }}
           >
             <AnimatePresence>
-              {isScrolledDown && !isMobile && (
+              {isScrolledDown && !isMobile && !isPaymentModalOpen && (
                 <SScrolledDownTopSection
                   initial={{
                     opacity: 0,
