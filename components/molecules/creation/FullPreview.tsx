@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -35,6 +35,21 @@ const FullPreview: React.FC<IFullPreview> = (props) => {
     e.preventDefault();
     e.stopPropagation();
   };
+
+  useEffect(() => {
+    if (open) {
+      document.body.style.cssText = `
+        overflow: hidden;
+        position: fixed;
+      `;
+    } else {
+      document.body.style.cssText = '';
+    }
+
+    return () => {
+      document.body.style.cssText = '';
+    };
+  }, [open]);
 
   return (
     <Modal show={open} onClose={handleClose}>
@@ -88,7 +103,6 @@ const SMobileContainer = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
-  min-height: 100vh;
 
   ${({ theme }) => theme.media.mobileL} {
     top: 50%;
@@ -141,12 +155,12 @@ const SModalCloseIcon = styled.div`
 
 const SModalTopLine = styled.div`
   display: flex;
-  padding: 18px 0;
+  padding: 18px 12px;
   align-items: center;
   margin-bottom: 16px;
 
   ${({ theme }) => theme.media.mobileL} {
-    padding: 10px 0;
+    padding: 10px 12px;
     margin-bottom: 24px;
     justify-content: space-between;
   }
