@@ -1199,6 +1199,7 @@ export const CreationSecondStepContent: React.FC<
                   </div>
                   <div>
                     <SButton
+                      id='review'
                       view='primaryGrad'
                       onClick={handleSubmit}
                       disabled={disabled}
@@ -1230,6 +1231,7 @@ export const CreationSecondStepContent: React.FC<
                           resources={videoProcessing?.targetUrls}
                           borderRadius='16px'
                           mutePosition='left'
+                          showPlayButton
                         />
                       </SFloatingSubSectionPlayer>
                       <SFloatingSubSectionUser>

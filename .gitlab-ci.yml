@@ -9,11 +9,37 @@ cache:
   paths:
     - node_modules
     - .next
+    - /root/.cache/Cypress
 
-# Tests for gitlab
-test:
+# A set of quick tests
+quick-test:
   stage: test
   script:
     - npm ci --include=dev
-    - npm run test
     - npm run lint
+    - npm run jest
+  rules:
+    - if: $CI_PIPELINE_SOURCE != 'merge_request_event'
+      when: never
+    - when: always
+
+# A set of longer tests
+long-test:
+  stage: test
+  script:
+    - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+    - sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+    - apt-get update
+    - apt-get -y install libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb google-chrome-stable
+    - npm ci --include=dev
+    - npm run build
+    - npm run start &
+    - sleep 30
+    - curl http://localhost:4000
+    - npm run cypress:ci
+  rules:
+    - if: $CI_PIPELINE_SOURCE != 'merge_request_event'
+      when: never
+    - if: $CI_MERGE_REQUEST_TITLE =~ /^Draft:/
+      when: never
+    - when: always

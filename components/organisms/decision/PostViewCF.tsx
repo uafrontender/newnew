@@ -26,6 +26,11 @@ import Button from '../../atoms/Button';
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
+import Headline from '../../atoms/Headline';
+import PostVotingTab from '../../molecules/decision/PostVotingTab';
+import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
+import CfBackersStatsSectionFailed from '../../molecules/decision/crowdfunding/CfBackersStatsSectionFailed';
 
 // Utils
 import switchPostType from '../../../utils/switchPostType';
@@ -34,11 +39,7 @@ import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateS
 import { DotPositionEnum } from '../../atoms/decision/TutorialTooltip';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
-import Headline from '../../atoms/Headline';
-import PostVotingTab from '../../molecules/decision/PostVotingTab';
-import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import CfBackersStatsSectionFailed from '../../molecules/decision/crowdfunding/CfBackersStatsSectionFailed';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
@@ -255,7 +256,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
 
     const fetchPledgesForPost = useCallback(
       async (pageToken?: string) => {
-        if (pledgesLoading) return;
+        if (pledgesLoading || loadingModalOpen) return;
         try {
           setPledgesLoading(true);
           setLoadingPledgesError('');
@@ -296,7 +297,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           console.error(err);
         }
       },
-      [pledgesLoading, setPledges, sortPleges, post]
+      [pledgesLoading, loadingModalOpen, post.postUuid, sortPleges]
     );
 
     const handleAddPledgeFromResponse = useCallback(
@@ -496,6 +497,14 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
       handleAddPledgeFromResponse,
       user,
     ]);
+
+    const handleOnVotingTimeExpired = () => {
+      if (currentBackers >= post.targetBackerCount) {
+        handleUpdatePostStatus('WAITING_FOR_RESPONSE');
+      } else {
+        handleUpdatePostStatus('FAILED');
+      }
+    };
 
     // Increment channel subs after mounting
     // Decrement when unmounting
@@ -757,12 +766,22 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
                 onClick={handleGoBack}
               />
             )}
-            <PostTimer
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='cf'
-            />
+            {postStatus === 'voting' ? (
+              <PostTimer
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='cf'
+                onTimeExpired={handleOnVotingTimeExpired}
+              />
+            ) : (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='cf'
+              />
+            )}
           </SExpiresSection>
           <PostVideo
             postId={post.postUuid}

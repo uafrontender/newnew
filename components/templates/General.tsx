@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { useTheme } from 'styled-components';
+import { useRouter } from 'next/router';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -45,6 +46,7 @@ export const General: React.FC<IGeneral> = (props) => {
   );
   const theme = useTheme();
   const [cookies] = useCookies();
+  const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
   const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
   const { postOverlayOpen } = usePostModalState();
@@ -149,6 +151,14 @@ export const General: React.FC<IGeneral> = (props) => {
     resizeMode
   );
 
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
   const openChat = () => {
     setMobileChatOpened(true);
   };
@@ -234,17 +244,21 @@ export const General: React.FC<IGeneral> = (props) => {
               )}
             </ChatContainer>
           )}
-          <ReportBugButton
-            bottom={
-              (isMobile ? 24 : 16) +
-              (isMobile && (mobileNavigationVisible || postOverlayOpen)
-                ? 56
-                : 0) +
-              (chatButtonVisible ? 72 : 0)
-            }
-            right={4}
-            zIndex={moreMenuMobileOpen ? 9 : undefined}
-          />
+          {!isMobileOrTablet && !router.route.includes('direct-messages') && (
+            <ReportBugButton
+              bottom={
+                (isMobile ? 24 : 16) +
+                (isMobile &&
+                (mobileNavigationVisible || postOverlayOpen) &&
+                !mobileChatOpened
+                  ? 56
+                  : 0) +
+                (chatButtonVisible && !mobileChatOpened ? 72 : 0)
+              }
+              right={4}
+              zIndex={moreMenuMobileOpen ? 9 : undefined}
+            />
+          )}
         </SWrapper>
       </SkeletonTheme>
     </ErrorBoundary>

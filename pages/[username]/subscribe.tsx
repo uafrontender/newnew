@@ -235,7 +235,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
               )}
             </AnimatePresence>
             {isTablet && (
-              <SGoBackButtonTablet defer={500} onClick={() => router.back()} />
+              <SGoBackButtonTablet
+                defer={500}
+                onClick={() => router.push(`/${user.username}`)}
+              />
             )}
             <STopSection
               ref={(el) => {
@@ -243,7 +246,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
               }}
             >
               {!isTablet && (
-                <SBackButton defer={500} onClick={() => router.back()}>
+                <SBackButton
+                  defer={500}
+                  onClick={() => router.push(`/${user.username}`)}
+                >
                   {!isMobileOrTablet && t('button.back')}
                 </SBackButton>
               )}
@@ -477,10 +483,6 @@ const SScrolledDownTopSection = styled(motion.div)<{ pushDown: boolean }>`
   padding: 0px 48px;
 
   z-index: 100;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin: 16px;
-  }
 
   ${({ theme }) => theme.media.laptop} {
     top: ${({ pushDown }) => (pushDown ? '120px' : '80px')};

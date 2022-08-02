@@ -1,5 +1,11 @@
 /* eslint-disable consistent-return */
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  useRef,
+} from 'react';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -19,6 +25,8 @@ import Text from '../../../atoms/Text';
 import TextArea from '../../../atoms/chat/TextArea';
 import Button from '../../../atoms/Button';
 import UserAvatar from '../../UserAvatar';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import isBrowser from '../../../../utils/isBrowser';
 
 const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
@@ -32,8 +40,9 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
   const [messageText, setMessageText] = useState<string>('');
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
-  const [newMessage, setNewMessage] =
-    useState<newnewapi.IChatMessage | null | undefined>();
+  const [newMessage, setNewMessage] = useState<
+    newnewapi.IChatMessage | null | undefined
+  >();
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
@@ -49,8 +58,9 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
 
-  const [messagesNextPageToken, setMessagesNextPageToken] =
-    useState<string | undefined | null>('');
+  const [messagesNextPageToken, setMessagesNextPageToken] = useState<
+    string | undefined | null
+  >('');
   const [messagesLoading, setMessagesLoading] = useState(false);
 
   const getChatMessages = useCallback(
@@ -324,6 +334,34 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     return true;
   }, [isAnnouncement, isMyAnnouncement, chatRoom]);
 
+  useEffect(() => {
+    if (isBrowser()) {
+      document.body.style.cssText = `
+        overflow: hidden;
+        position: fixed;
+      `;
+    } else {
+      document.body.style.cssText = '';
+    }
+
+    return () => {
+      document.body.style.cssText = '';
+    };
+  }, []);
+
+  const messagesScrollContainerRef = useRef<HTMLDivElement>();
+
+  useEffect(() => {
+    if (newMessage && isBrowser()) {
+      setTimeout(() => {
+        messagesScrollContainerRef.current?.scrollBy({
+          top: messagesScrollContainerRef.current?.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 100);
+    }
+  }, [newMessage]);
+
   return (
     <SContainer>
       {chatRoom && (
@@ -343,6 +381,13 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                   ? user.userData?.nickname
                   : chatRoom.visavis?.nickname
               }
+              {chatRoom.visavis?.options?.isVerified && !isAnnouncement && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                />
+              )}
             </SUserName>
             <SUserAlias>
               {!isAnnouncement
@@ -360,7 +405,12 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           </SUserData>
         </STopPart>
       )}
-      <SCenterPart id='messagesScrollContainer'>
+      <SCenterPart
+        id='messagesScrollContainer'
+        ref={(el) => {
+          messagesScrollContainerRef.current = el!!;
+        }}
+      >
         {messages.length > 0 && messages.map(renderMessage)}
       </SCenterPart>
       <SBottomPart>
@@ -428,6 +478,8 @@ const SUserName = styled.strong`
   font-weight: 600;
   font-size: 16px;
   padding-bottom: 4px;
+  display: flex;
+  align-items: center;
 `;
 
 const SCenterPart = styled.div`
@@ -668,7 +720,9 @@ interface ISMessageText {
 
 const SMessageText = styled(Text)<ISMessageText>`
   line-height: 20px;
-  max-width: 412px;
+  max-width: 80vw;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
   color: ${(props) => {
     if (props.type === 'info') {
       return props.theme.colorsThemed.text.tertiary;
@@ -680,6 +734,10 @@ const SMessageText = styled(Text)<ISMessageText>`
 
     return props.theme.colorsThemed.text.primary;
   }};
+
+  ${({ theme }) => theme.media.tablet} {
+    max-width: 412px;
+  }
 `;
 const SRef = styled.span`
   text-indent: -9999px;

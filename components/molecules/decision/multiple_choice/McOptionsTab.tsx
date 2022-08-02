@@ -615,11 +615,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 creator: post.creator?.nickname,
               })}
             </SText>
-            <Link href={`/${post.creator?.username}/subscribe`}>
+            <a href={`/${post.creator?.username}/subscribe`}>
               <SSubscribeButton>
                 {t('mcPost.optionsTab.actionSection.subscribeButton')}
               </SSubscribeButton>
-            </Link>
+            </a>
           </SActionSectionSubscribe>
         ) : (
           <div
@@ -974,7 +974,6 @@ const SActionSectionSubscribe = styled.div`
 
   min-height: 50px;
   width: 100%;
-  z-index: 5;
 
   padding-top: 24px;
 
@@ -991,6 +990,7 @@ const SActionSectionSubscribe = styled.div`
   button {
     width: 100%;
   }
+
   ${({ theme }) => theme.media.tablet} {
     order: unset;
 
@@ -998,6 +998,8 @@ const SActionSectionSubscribe = styled.div`
 
     border-top: 1.5px solid
       ${({ theme }) => theme.colorsThemed.background.outlines1};
+
+    z-index: 5;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -1023,15 +1025,28 @@ const SText = styled(Text)`
   line-height: 24px;
 `;
 
-const SSubscribeButton = styled(Button)`
+const SSubscribeButton = styled.button`
+  display: block;
+
   background: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
   color: ${({ theme }) => theme.colors.dark};
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: bold;
+
+  padding: 16px 24px;
+  border-radius: ${(props) => props.theme.borderRadius.medium};
+  border: transparent;
+  outline: none;
+
+  cursor: pointer;
 
   :active:enabled,
   :focus:enabled,
   :hover:enabled {
     background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+    outline: none;
   }
 `;
 

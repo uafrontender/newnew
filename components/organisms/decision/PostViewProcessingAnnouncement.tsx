@@ -168,7 +168,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
           handleUpdatePostStatus={handleUpdatePostStatus}
         />
       )}
-      <SActivitesContainer>
+      <SActivitiesContainer>
         <SDecisionImage
           src={
             theme.name === 'light'
@@ -181,7 +181,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
         <SText variant={2} weight={600}>
           {t(`postViewProcessingAnnouncement.stayTuned.${postType}`)}
         </SText>
-      </SActivitesContainer>
+      </SActivitiesContainer>
     </SWrapper>
   );
 };
@@ -236,7 +236,7 @@ const SExpiresSection = styled.div`
   }
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitiesContainer = styled.div`
   grid-area: activities;
 
   display: flex;
