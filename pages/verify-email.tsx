@@ -37,9 +37,10 @@ const VerifyEmail: React.FC<IVerifyEmail> = ({ goal }) => {
 
   useEffect(() => {
     if (!signupEmailInput) {
-      router.push('/');
+      router?.push('/');
     }
-  }, [router, signupEmailInput]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     authLayoutContext.setShouldHeroUnmount(false);
