@@ -8,7 +8,7 @@ import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../redux-store/store';
-import { getCards } from '../../../api/endpoints/card';
+import { useCards } from '../../../contexts/cardsContext';
 import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
 
 import Modal from '../../organisms/Modal';
@@ -58,36 +58,13 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   createStripeSetupIntent,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-PaymentModal');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { isCardsLoading } = useCards();
 
   const [isLoadingCards, setIsLoadingCards] = useState(false);
-  const [cards, setCards] = useState<newnewapi.ICard[]>([]);
-
-  useEffect(() => {
-    const getMyCards = async () => {
-      try {
-        setIsLoadingCards(true);
-        const payload = new newnewapi.EmptyRequest({});
-        const response = await getCards(payload);
-
-        if (!response.data || response.error) {
-          throw new Error(response?.error?.message || 'An error occurred');
-        }
-
-        setCards(response.data.cards);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsLoadingCards(false);
-      }
-    };
-
-    getMyCards();
-  }, []);
 
   const [stripeSetupIntent, setStripeSetupIntent] =
     useState<newnewapi.CreateStripeSetupIntentResponse>();
@@ -130,7 +107,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             </SCloseButton>
           )}
           <SHeaderContainer>{children}</SHeaderContainer>
-          {(isLoadingSetupIntent || isLoadingCards) && (
+          {(isLoadingSetupIntent || isCardsLoading) && (
             <Lottie
               width={55}
               height={55}
@@ -145,7 +122,6 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             stipeSecret={stripeSetupIntent?.stripeSetupIntentClientSecret}
           >
             <CheckoutForm
-              cards={cards}
               bottomCaption={bottomCaption}
               amount={amount}
               handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}

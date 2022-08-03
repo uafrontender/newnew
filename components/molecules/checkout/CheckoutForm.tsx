@@ -16,6 +16,7 @@ import OptionCard from './OptionCard';
 
 import { formatNumber } from '../../../utils/format';
 import { checkCardStatus } from '../../../api/endpoints/card';
+import { useCards } from '../../../contexts/cardsContext';
 
 interface IReCaptchaRes {
   success?: boolean;
@@ -40,7 +41,6 @@ interface ICheckoutForm {
     stripeSetupIntentClientSecret: string;
     saveCard: boolean;
   }) => void;
-  cards: newnewapi.ICard[];
   stipeSecret: string;
 }
 
@@ -49,7 +49,6 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   amount,
   showTocApply,
   bottomCaption,
-  cards,
   stipeSecret,
 }) => {
   const { t } = useTranslation('modal-PaymentModal');
@@ -60,8 +59,10 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     PaymentMethodTypes | undefined
   >();
 
+  const { cards } = useCards();
+
   const primaryCard = useMemo(
-    () => cards.find((card) => card.isPrimary),
+    () => cards?.find((card) => card.isPrimary),
     [cards]
   );
 
