@@ -23,10 +23,11 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
 // import { placeBidWithWallet } from '../../../../api/endpoints/auction';
 import {
-  createPaymentSession,
+  createStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 import { validateText } from '../../../../api/endpoints/infrastructure';
+import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
 import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
@@ -89,6 +90,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   handleRemoveOption,
 }) => {
   const theme = useTheme();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
@@ -328,49 +330,90 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   //   handleAddOrUpdateOptionFromResponse,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(async () => {
-    setLoadingModalOpen(true);
-    try {
-      Mixpanel.track('PayWithCardStripeRedirect', {
-        _stage: 'Post',
-        _postUuid: postId,
-        _component: 'AcOptionsTab',
-      });
-      const createPaymentSessionPayload =
-        new newnewapi.CreatePaymentSessionRequest({
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${postId}`,
-          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${postId}`,
-          ...(!user.loggedIn
-            ? {
-                nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-              }
-            : {}),
-          acBidRequest: {
-            amount: new newnewapi.MoneyAmount({
-              usdCents: parseInt(newBidAmount) * 100,
-            }),
-            optionTitle: newBidText,
-            postUuid: postId,
-          },
+  const placeBidRequest = useMemo(
+    () =>
+      new newnewapi.PlaceBidRequest({
+        postUuid: postId,
+        amount: new newnewapi.MoneyAmount({
+          usdCents: parseInt(newBidAmount) * 100,
+        }),
+        optionTitle: newBidText,
+      }),
+    [newBidText, postId, newBidAmount]
+  );
+
+  const handlePayWithCardStripeRedirect = useCallback(
+    async ({
+      cardUuid,
+      stripeSetupIntentClientSecret,
+      saveCard,
+    }: {
+      cardUuid: string;
+      stripeSetupIntentClientSecret: string;
+      saveCard: boolean;
+    }) => {
+      setLoadingModalOpen(true);
+      try {
+        Mixpanel.track('PayWithCardStripeRedirect', {
+          _stage: 'Post',
+          _postUuid: postId,
+          _component: 'AcOptionsTab',
+        });
+        // const createPaymentSessionPayload =
+        //   new newnewapi.CreatePaymentSessionRequest({
+        //     successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+        //       router.locale !== 'en-US' ? `${router.locale}/` : ''
+        //     }post/${postId}`,
+        //     cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+        //       router.locale !== 'en-US' ? `${router.locale}/` : ''
+        //     }post/${postId}`,
+        //     ...(!user.loggedIn
+        //       ? {
+        //           nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+        //         }
+        //       : {}),
+        //     acBidRequest: {
+        //       amount: new newnewapi.MoneyAmount({
+        //         usdCents: parseInt(newBidAmount) * 100,
+        //       }),
+        //       optionTitle: newBidText,
+        //       postUuid: postId,
+        //     },
+        //   });
+
+        // const res = await createPaymentSession(createPaymentSessionPayload);
+
+        const stripeContributionRequest =
+          new newnewapi.StripeContributionRequest({
+            cardUuid,
+            stripeSetupIntentClientSecret,
+            ...(saveCard !== undefined
+              ? {
+                  saveCard,
+                }
+              : {}),
+          });
+
+        const completeBidRequest = new newnewapi.CompleteBidRequest({
+          bidRequest: placeBidRequest,
+          stripeContributionRequest,
         });
 
-      const res = await createPaymentSession(createPaymentSessionPayload);
+        const res = await placeBidOnAuction(completeBidRequest);
 
-      if (!res.data || !res.data.sessionUrl || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
-      window.location.href = res.data.sessionUrl;
-    } catch (err) {
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-      console.error(err);
-      toast.error('toastErrors.generic');
-    }
-  }, [user.loggedIn, router.locale, newBidAmount, newBidText, postId]);
+        // window.location.href = res.data.sessionUrl;
+      } catch (err) {
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+        console.error(err);
+        toast.error('toastErrors.generic');
+      }
+    },
+    [placeBidRequest, postId]
+  );
 
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
@@ -417,6 +460,24 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const createSetupIntent = useCallback(async () => {
+    try {
+      const payload = new newnewapi.CreateStripeSetupIntentRequest({
+        acBidRequest: placeBidRequest,
+      });
+      const response = await createStripeSetupIntent(payload);
+
+      if (!response.data || response.error) {
+        throw new Error(response.error?.message || 'Some error occurred');
+      }
+
+      return response.data;
+    } catch (err) {
+      console.error(err);
+      return undefined;
+    }
+  }, [placeBidRequest]);
 
   return (
     <>
@@ -676,6 +737,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          createStripeSetupIntent={createSetupIntent}
           // handlePayWithWallet={handleSubmitNewOptionWallet}
           bottomCaption={
             <>

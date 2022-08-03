@@ -1,9 +1,8 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { Elements } from '@stripe/react-stripe-js';
 import { StripeElementLocale, StripeElementsOptions } from '@stripe/stripe-js';
 import { useTheme } from 'styled-components';
-import { newnewapi } from 'newnew-api';
 
 import getStripe from '../utils/geStripejs';
 import assets from '../constants/assets';
@@ -12,7 +11,7 @@ const stripePromise = getStripe();
 
 interface IStripeElements {
   children: React.ReactNode;
-  stipeSecret: string;
+  stipeSecret: string | undefined;
 }
 
 export const StripeElements: React.FC<IStripeElements> = ({

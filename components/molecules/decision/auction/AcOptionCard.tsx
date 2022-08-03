@@ -22,8 +22,8 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
 // import { placeBidWithWallet } from '../../../../api/endpoints/auction';
 import {
-  createPaymentSession,
-  // createStripeSetupIntent,
+  // createPaymentSession,
+  createStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
@@ -39,8 +39,25 @@ import OptionActionMobileModal from '../OptionActionMobileModal';
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../atoms/decision/TutorialTooltip';
+import Headline from '../../../atoms/Headline';
+import OptionEllipseModal from '../OptionEllipseModal';
+import OptionEllipseMenu from '../OptionEllipseMenu';
+import ReportModal, { ReportData } from '../../chat/ReportModal';
+import PostTitleContent from '../../../atoms/PostTitleContent';
+import AcConfirmDeleteOptionModal from './moderation/AcConfirmDeleteOptionModal';
 
+// Utils
 import { formatNumber } from '../../../../utils/format';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import getDisplayname from '../../../../utils/getDisplayname';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+
+import { reportEventOption } from '../../../../api/endpoints/report';
+import {
+  deleteAcOption,
+  placeBidOnAuction,
+} from '../../../../api/endpoints/auction';
 
 // Icons
 import assets from '../../../../constants/assets';
@@ -48,18 +65,6 @@ import BidIconLight from '../../../../public/images/decision/bid-icon-light.png'
 import BidIconDark from '../../../../public/images/decision/bid-icon-dark.png';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
-import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
-import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
-import getDisplayname from '../../../../utils/getDisplayname';
-import Headline from '../../../atoms/Headline';
-import OptionEllipseModal from '../OptionEllipseModal';
-import OptionEllipseMenu from '../OptionEllipseMenu';
-import ReportModal, { ReportData } from '../../chat/ReportModal';
-import { reportEventOption } from '../../../../api/endpoints/report';
-import { deleteAcOption } from '../../../../api/endpoints/auction';
-import AcConfirmDeleteOptionModal from './moderation/AcConfirmDeleteOptionModal';
-import { Mixpanel } from '../../../../utils/mixpanel';
-import PostTitleContent from '../../../atoms/PostTitleContent';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -343,44 +348,85 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   //   router.locale,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(async () => {
-    setLoadingModalOpen(true);
-    try {
-      const createPaymentSessionPayload =
-        new newnewapi.CreatePaymentSessionRequest({
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${postId}`,
-          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${postId}`,
-          ...(!user.loggedIn
-            ? {
-                nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-              }
-            : {}),
-          acBidRequest: {
-            amount: new newnewapi.MoneyAmount({
-              usdCents: parseInt(supportBidAmount) * 100,
-            }),
-            optionId: option.id,
-            postUuid: postId,
-          },
+  const placeBidRequest = useMemo(
+    () =>
+      new newnewapi.PlaceBidRequest({
+        postUuid: postId,
+        amount: new newnewapi.MoneyAmount({
+          usdCents: parseInt(supportBidAmount) * 100,
+        }),
+        optionId: option.id,
+      }),
+    [option.id, postId, supportBidAmount]
+  );
+
+  const handlePayWithCardStripeRedirect = useCallback(
+    async ({
+      cardUuid,
+      stripeSetupIntentClientSecret,
+      saveCard,
+    }: {
+      cardUuid: string;
+      stripeSetupIntentClientSecret: string;
+      saveCard: boolean;
+    }) => {
+      setLoadingModalOpen(true);
+      try {
+        // const createPaymentSessionPayload =
+        //   new newnewapi.CreatePaymentSessionRequest({
+        //     successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+        //       router.locale !== 'en-US' ? `${router.locale}/` : ''
+        //     }post/${postId}`,
+        //     cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+        //       router.locale !== 'en-US' ? `${router.locale}/` : ''
+        //     }post/${postId}`,
+        //     ...(!user.loggedIn
+        //       ? {
+        //           nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+        //         }
+        //       : {}),
+        //     acBidRequest: {
+        //       amount: new newnewapi.MoneyAmount({
+        //         usdCents: parseInt(supportBidAmount) * 100,
+        //       }),
+        //       optionId: option.id,
+        //       postUuid: postId,
+        //     },
+        //   });
+
+        // const res = await createPaymentSession(createPaymentSessionPayload);
+
+        const stripeContributionRequest =
+          new newnewapi.StripeContributionRequest({
+            cardUuid,
+            stripeSetupIntentClientSecret,
+            ...(saveCard !== undefined
+              ? {
+                  saveCard,
+                }
+              : {}),
+          });
+
+        const completeBidRequest = new newnewapi.CompleteBidRequest({
+          bidRequest: placeBidRequest,
+          stripeContributionRequest,
         });
 
-      const res = await createPaymentSession(createPaymentSessionPayload);
+        const res = await placeBidOnAuction(completeBidRequest);
 
-      if (!res.data || !res.data.sessionUrl || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
-      window.location.href = res.data.sessionUrl;
-    } catch (err) {
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-      console.error(err);
-      toast.error('toastErrors.generic');
-    }
-  }, [router.locale, user.loggedIn, supportBidAmount, option.id, postId]);
+        // window.location.href = res.data.sessionUrl;
+      } catch (err) {
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+        console.error(err);
+        toast.error('toastErrors.generic');
+      }
+    },
+    [placeBidRequest]
+  );
 
   // eslint-disable-next-line consistent-return
   const goToNextStep = () => {
@@ -411,31 +457,23 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     }
   }, [isSupportFormOpen]);
 
-  // const pay = useCallback(async () => {
-  //   try {
-  //     // setIsStripeSecretLoading(true);
-  //     const payload = new newnewapi.CreateStripeSetupIntentRequest({
-  //       saveCardRequest: new newnewapi.PlaceBidRequest({
-  //         postUuid: postId,
-  //         amount: new newnewapi.MoneyAmount({
-  //           usdCents: parseInt(supportBidAmount) * 100,
-  //         }),
-  //         optionId: option.id,
-  //       }),
-  //     });
-  //     const response = await createStripeSetupIntent(payload);
+  const createSetupIntent = useCallback(async () => {
+    try {
+      const payload = new newnewapi.CreateStripeSetupIntentRequest({
+        acBidRequest: placeBidRequest,
+      });
+      const response = await createStripeSetupIntent(payload);
 
-  //     if (!response.data || response.error) {
-  //       throw new Error(response.error?.message || 'Some error occurred');
-  //     }
+      if (!response.data || response.error) {
+        throw new Error(response.error?.message || 'Some error occurred');
+      }
 
-  //     // setStripeSecret(response.data.stripeSetupIntentClientSecret);
-  //   } catch (err) {
-  //     console.error(err);
-  //   } finally {
-  //     // setIsStripeSecretLoading(false);
-  //   }
-  // }, [postId, supportBidAmount, option.id]);
+      return response.data;
+    } catch (err) {
+      console.error(err);
+      return undefined;
+    }
+  }, [placeBidRequest]);
 
   return (
     <div
@@ -760,6 +798,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={parseInt(supportBidAmount) * 100 || 0}
+          createStripeSetupIntent={createSetupIntent}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(supportBidAmount) * 100
           //   ? {}

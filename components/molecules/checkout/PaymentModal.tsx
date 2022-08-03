@@ -2,22 +2,23 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
-import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
-import { toast } from 'react-toastify';
+import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../redux-store/store';
+import { getCards } from '../../../api/endpoints/card';
+import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
 
-import Button from '../../atoms/Button';
 import Modal from '../../organisms/Modal';
 import InlineSvg from '../../atoms/InlineSVG';
 import GoBackButton from '../GoBackButton';
+import CheckoutForm from './CheckoutForm';
+import Lottie from '../../atoms/Lottie';
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import { formatNumber } from '../../../utils/format';
+import logoAnimation from '../../../public/animations/mobile_logo.json';
 
 interface IReCaptchaRes {
   success?: boolean;
@@ -34,8 +35,15 @@ interface IPaymentModal {
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
   onClose: () => void;
-  handlePayWithCardStripeRedirect?: () => void;
+  handlePayWithCardStripeRedirect?: (params: {
+    cardUuid: string;
+    stripeSetupIntentClientSecret: string;
+    saveCard: boolean;
+  }) => void;
   children: React.ReactNode;
+  createStripeSetupIntent?: () => Promise<
+    newnewapi.CreateStripeSetupIntentResponse | undefined
+  >;
 }
 
 const PaymentModal: React.FC<IPaymentModal> = ({
@@ -47,6 +55,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   onClose,
   handlePayWithCardStripeRedirect,
   children,
+  createStripeSetupIntent,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
@@ -55,43 +64,50 @@ const PaymentModal: React.FC<IPaymentModal> = ({
     resizeMode
   );
 
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  const [isLoadingCards, setIsLoadingCards] = useState(false);
+  const [cards, setCards] = useState<newnewapi.ICard[]>([]);
 
-  const handlePayWithCaptchaProtection = async () => {
-    try {
-      if (!executeRecaptcha) {
-        throw new Error('executeRecaptcha not available');
-      }
+  useEffect(() => {
+    const getMyCards = async () => {
+      try {
+        setIsLoadingCards(true);
+        const payload = new newnewapi.EmptyRequest({});
+        const response = await getCards(payload);
 
-      const recaptchaToken = await executeRecaptcha();
-
-      if (recaptchaToken) {
-        const res = await fetch('/api/post_recaptcha_query', {
-          method: 'POST',
-          body: JSON.stringify({
-            recaptchaToken,
-          }),
-        });
-
-        const jsonRes: IReCaptchaRes = await res.json();
-
-        if (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5) {
-          handlePayWithCardStripeRedirect?.();
-        } else {
-          throw new Error(
-            jsonRes?.errors
-              ? Array.isArray(jsonRes?.errors)
-                ? jsonRes.errors[0]?.toString()
-                : jsonRes.errors?.toString()
-              : 'ReCaptcha failed'
-          );
+        if (!response.data || response.error) {
+          throw new Error(response?.error?.message || 'An error occurred');
         }
+
+        setCards(response.data.cards);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoadingCards(false);
       }
-    } catch (err) {
-      console.error(err);
-      toast.error('toastErrors.generic');
+    };
+
+    getMyCards();
+  }, []);
+
+  const [stripeSetupIntent, setStripeSetupIntent] =
+    useState<newnewapi.CreateStripeSetupIntentResponse>();
+
+  const [isLoadingSetupIntent, setIsLoadingSetupIntent] = useState(false);
+
+  useEffect(() => {
+    const getSetupIntent = async () => {
+      setIsLoadingSetupIntent(true);
+
+      const setupIntent = await createStripeSetupIntent?.();
+
+      setStripeSetupIntent(setupIntent);
+      setIsLoadingSetupIntent(false);
+    };
+
+    if (!stripeSetupIntent) {
+      getSetupIntent();
     }
-  };
+  }, [createStripeSetupIntent, stripeSetupIntent]);
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
@@ -114,46 +130,28 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             </SCloseButton>
           )}
           <SHeaderContainer>{children}</SHeaderContainer>
-          <SPayButtonDiv>
-            <SPayButton
-              id='pay'
-              view='primaryGrad'
-              onClick={() => handlePayWithCaptchaProtection()}
-            >
-              {t('payButton')}
-              {amount &&
-                ` $${formatNumber(
-                  Math.max(amount, 0) / 100,
-                  amount % 1 === 0
-                )}`}
-            </SPayButton>
-            {bottomCaption || null}
-            {showTocApply && (
-              <STocApply>
-                *{' '}
-                <Link href='https://terms.newnew.co'>
-                  <a href='https://terms.newnew.co' target='_blank'>
-                    {t('tocApplyLink')}
-                  </a>
-                </Link>{' '}
-                {t('tocApplyText')}
-              </STocApply>
-            )}
-            {
-              // TODO: re-enable / move / make final decision
-              /* <STocApplyReCaptcha>
-              {t('reCaptchaTos.siteProtectedBy')}{' '}
-              <a target='_blank' href='https://policies.google.com/privacy'>
-                {t('reCaptchaTos.privacyPolicy')}
-              </a>{' '}
-              {t('reCaptchaTos.and')}{' '}
-              <a target='_blank' href='https://policies.google.com/terms'>
-                {t('reCaptchaTos.tos')}
-              </a>{' '}
-              {t('reCaptchaTos.apply')}
-            </STocApplyReCaptcha> */
-            }
-          </SPayButtonDiv>
+          {(isLoadingSetupIntent || isLoadingCards) && (
+            <Lottie
+              width={55}
+              height={55}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: logoAnimation,
+              }}
+            />
+          )}
+          <StripeElements
+            stipeSecret={stripeSetupIntent?.stripeSetupIntentClientSecret}
+          >
+            <CheckoutForm
+              cards={cards}
+              bottomCaption={bottomCaption}
+              amount={amount}
+              handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+              stipeSecret={stripeSetupIntent?.stripeSetupIntentClientSecret!}
+            />
+          </StripeElements>
         </SContentContainer>
       </SWrapper>
     </Modal>
@@ -194,6 +192,15 @@ const SContentContainer = styled.div<{
   flex-direction: column;
   width: 100%;
   height: 100%;
+  max-height: 90vh;
+  overflow-y: scroll;
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
@@ -251,84 +258,5 @@ const SHeaderContainer = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 24px;
-  }
-`;
-
-const SPayButtonDiv = styled.div`
-  /* position: absolute;
-  bottom: 16px;
-  width: calc(100% - 32px);
-
-  ${({ theme }) => theme.media.tablet} {
-    width: calc(100% - 48px);
-  } */
-
-  width: 100%;
-`;
-
-const SPayButton = styled(Button)`
-  width: 100%;
-`;
-
-const STocApply = styled.div`
-  margin-top: 16px;
-  /* padding-bottom: 16px; */
-
-  text-align: center;
-
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  a {
-    font-weight: 600;
-
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-    &:hover,
-    &:focus {
-      outline: none;
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-      transition: 0.2s ease;
-    }
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 14px;
-    line-height: 20px;
-  }
-`;
-
-const STocApplyReCaptcha = styled.div`
-  margin-top: 4px;
-
-  text-align: center;
-
-  font-weight: 600;
-  font-size: 8px;
-  line-height: 10px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  a {
-    font-weight: 600;
-
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-    &:hover,
-    &:focus {
-      outline: none;
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-      transition: 0.2s ease;
-    }
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 8px;
-    line-height: 12px;
   }
 `;
