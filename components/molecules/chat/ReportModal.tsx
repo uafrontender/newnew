@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../redux-store/store';
+import preventParentClick from '../../../utils/preventParentClick';
 
 import Modal from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
@@ -36,6 +37,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     const [reasons, setReasons] = useState<newnewapi.ReportingReason[]>([]);
     const [message, setMessage] = useState('');
     const [reportSent, setReportSent] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const disabled = reasons.length === 0 || message.length < 15;
 
@@ -77,11 +79,13 @@ const ReportModal: React.FC<IReportModal> = React.memo(
 
     const submitReport = async () => {
       if (reasons.length > 0 && message.length >= 15) {
+        setIsSubmitting(true);
         await onSubmit({
           reasons,
           message,
         });
         setReportSent(true);
+        setIsSubmitting(false);
       }
     };
 
@@ -125,6 +129,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             title={`${t('modal.reportUser.title')} ${reportedDisplayname}`}
             onClose={handleClose}
             isMobileFullScreen
+            onClick={preventParentClick()}
           >
             <SModalMessage>{t('modal.reportUser.subtitle')}</SModalMessage>
             <SCheckBoxList>
@@ -167,6 +172,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
                 view='primaryGrad'
                 disabled={disabled}
                 onClick={submitReport}
+                loading={isSubmitting}
               >
                 {t('modal.reportUser.button.report')}
               </SConfirmButton>
@@ -174,10 +180,14 @@ const ReportModal: React.FC<IReportModal> = React.memo(
           </ModalPaper>
         </Modal>
         <Modal show={reportSent} onClose={handleClose}>
-          <ConformationContainer onClose={handleClose} isCloseButton>
-            <CloseButton onClick={handleClose}>
+          <SConformationModal
+            onClose={handleClose}
+            isCloseButton
+            onClick={preventParentClick()}
+          >
+            <SCloseButton onClick={handleClose}>
               <InlineSvg svg={CloseIcon} />
-            </CloseButton>
+            </SCloseButton>
             <SConformationTitle>
               {t('modal.reportSent.title')}
             </SConformationTitle>
@@ -187,7 +197,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             <SAcknowledgementButton view='primaryGrad' onClick={handleClose}>
               {t('modal.reportSent.button')}
             </SAcknowledgementButton>
-          </ConformationContainer>
+          </SConformationModal>
         </Modal>
       </>
     );
@@ -325,23 +335,30 @@ const STextArea = styled.textarea`
   }
 `;
 
-const ConformationContainer = styled(ModalPaper)`
+const SConformationModal = styled(ModalPaper)`
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   padding: 72px 40px 40px 40px;
   margin: auto 16px;
   height: auto;
   max-width: 350px;
+  width: 100%;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    ${(props) => props.theme.media.tablet} {
+      font-size: 16px;
+    }
+  }
 
   ${(props) => props.theme.media.tablet} {
-    font-size: 16px;
     max-width: 480px;
   }
 `;
 
-const CloseButton = styled.div`
+const SCloseButton = styled.div`
   position: absolute;
   top: 24px;
   right: 24px;
