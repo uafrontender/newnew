@@ -225,7 +225,7 @@ const SContainer = styled(motion.div)<{
   $transformY?: string;
   $withoutContainer?: boolean;
 }>`
-  position: absolute;
+  position: fixed;
   top: ${({ top }) => top};
   right: ${({ right }) => right};
   z-index: ${({ $zIndex }) => $zIndex || 10};
