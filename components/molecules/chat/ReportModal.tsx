@@ -180,7 +180,11 @@ const ReportModal: React.FC<IReportModal> = React.memo(
           </ModalPaper>
         </Modal>
         <Modal show={reportSent} onClose={handleClose}>
-          <SConformationModal onClose={handleClose} isCloseButton>
+          <SConformationModal
+            onClose={handleClose}
+            isCloseButton
+            onClick={preventParentClick()}
+          >
             <SCloseButton onClick={handleClose}>
               <InlineSvg svg={CloseIcon} />
             </SCloseButton>
