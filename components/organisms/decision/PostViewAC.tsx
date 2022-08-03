@@ -30,6 +30,7 @@ import {
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
 
 // Utils
 import switchPostType from '../../../utils/switchPostType';
@@ -67,8 +68,8 @@ interface IPostViewAC {
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
-  handleRemovePostFromState: () => void;
-  handleAddPostToState: () => void;
+  handleRemoveFromStateUnfavorited: () => void;
+  handleAddPostToStateFavorited: () => void;
 }
 
 const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
@@ -83,8 +84,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     handleGoBack,
     handleUpdatePostStatus,
     handleReportOpen,
-    handleRemovePostFromState,
-    handleAddPostToState,
+    handleRemoveFromStateUnfavorited,
+    handleAddPostToStateFavorited,
   }) => {
     const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
@@ -142,8 +143,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
       post.optionCount ?? ''
     );
-    const [optionsNextPageToken, setOptionsNextPageToken] =
-      useState<string | undefined | null>('');
+    const [optionsNextPageToken, setOptionsNextPageToken] = useState<
+      string | undefined | null
+    >('');
     const [optionsLoading, setOptionsLoading] = useState(false);
     const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
@@ -237,7 +239,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
 
     const fetchBids = useCallback(
       async (pageToken?: string) => {
-        if (optionsLoading) return;
+        if (optionsLoading || loadingModalOpen) return;
         try {
           setOptionsLoading(true);
           setLoadingOptionsError('');
@@ -277,7 +279,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
           console.error(err);
         }
       },
-      [post, setOptions, sortOptions, optionsLoading]
+      [optionsLoading, loadingModalOpen, post.postUuid, sortOptions]
     );
 
     const handleRemoveOption = useCallback(
@@ -340,6 +342,15 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       },
       [setOptions, sortOptions]
     );
+
+    const handleOnVotingTimeExpired = () => {
+      if (options && options.some((o) => o.supporterCount > 0)) {
+        handleUpdatePostStatus('WAITING_FOR_DECISION');
+      } else {
+        handleUpdatePostStatus('FAILED');
+      }
+    };
+
     // Increment channel subs after mounting
     // Decrement when unmounting
     useEffect(() => {
@@ -625,12 +636,22 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
                 onClick={handleGoBack}
               />
             )}
-            <PostTimer
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='ac'
-            />
+            {postStatus === 'voting' ? (
+              <PostTimer
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='ac'
+                onTimeExpired={handleOnVotingTimeExpired}
+              />
+            ) : (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='ac'
+              />
+            )}
           </SExpiresSection>
           <PostVideo
             postId={post.postUuid}
@@ -653,8 +674,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             hasRecommendations={hasRecommendations}
             handleSetIsFollowingDecision={handleSetIsFollowingDecision}
             handleReportOpen={handleReportOpen}
-            handleRemovePostFromState={handleRemovePostFromState}
-            handleAddPostToState={handleAddPostToState}
+            handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited}
+            handleAddPostToStateFavorited={handleAddPostToStateFavorited}
           />
           <SActivitesContainer
             decisionFailed={postStatus === 'failed'}

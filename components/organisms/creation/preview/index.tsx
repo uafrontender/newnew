@@ -154,6 +154,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       if (post.expiresAt === '1-hour') {
         dateValue.add(1, 'h');
         seconds = 3600;
+      } else if (post.expiresAt === '3-hours') {
+        dateValue.add(3, 'h');
+        seconds = 10800;
       } else if (post.expiresAt === '6-hours') {
         seconds = 21600;
         dateValue.add(6, 'h');
@@ -411,6 +414,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   if (isMobile) {
     return (
       <>
+        <PublishedModal open={showModal} handleClose={handleCloseModal} />
         <SContent>
           <STopLine>
             <SInlineSVG
@@ -435,6 +439,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
                 id='preview-mobile'
                 muted={false}
                 resources={videoProcessing?.targetUrls}
+                showPlayButton
               />
             ) : (
               <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
@@ -474,6 +479,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
                 resources={videoProcessing?.targetUrls}
                 mutePosition='left'
                 borderRadius='16px'
+                showPlayButton
               />
             ) : (
               <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
@@ -493,6 +499,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               {t('preview.button.edit')}
             </Button>
             <Button
+              id='publish'
               view='primaryGrad'
               loading={loading}
               onClick={handleSubmit}

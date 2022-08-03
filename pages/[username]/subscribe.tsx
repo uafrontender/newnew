@@ -9,6 +9,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import styled, { useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../redux-store/store';
 // import { WalletContext } from '../../contexts/walletContext';
@@ -24,7 +25,7 @@ import Button from '../../components/atoms/Button';
 import Headline from '../../components/atoms/Headline';
 import GoBackButton from '../../components/molecules/GoBackButton';
 import FaqSection from '../../components/molecules/subscribe/FaqSection';
-import PaymentModal from '../../components/molecules/checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../components/molecules/checkout/PaymentModal';
 
 import isBrowser from '../../utils/isBrowser';
 import { formatNumber } from '../../utils/format';
@@ -60,8 +61,9 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   const [isScrolledDown, setIsScrolledDown] = useState(false);
   const topSectionRef = useRef<HTMLDivElement>();
 
-  const [subscriptionPrice, setSubscriptionPrice] =
-    useState<number | undefined>(undefined);
+  const [subscriptionPrice, setSubscriptionPrice] = useState<
+    number | undefined
+  >(undefined);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   // const predefinedOption = useMemo(() => {
@@ -117,6 +119,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       if (url) window.location.href = url;
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 
@@ -140,6 +143,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         }
       } catch (err) {
         console.log(err);
+        toast.error('toastErrors.generic');
       }
     }
 
@@ -148,8 +152,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
   useEffect(() => {
     const handler = (e: Event) => {
-      // @ts-ignore
-      const currScroll = e?.currentTarget?.scrollTop!!;
+      const currScroll = window?.scrollY;
       const targetScroll = topSectionRef.current?.scrollHeight;
 
       if (currScroll >= targetScroll!!) {
@@ -160,16 +163,12 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
     };
 
     if (isBrowser()) {
-      document
-        ?.getElementById('generalScrollContainer')
-        ?.addEventListener('scroll', handler);
+      document?.addEventListener('scroll', handler);
     }
 
     return () => {
       if (isBrowser()) {
-        document
-          ?.getElementById('generalScrollContainer')
-          ?.removeEventListener('scroll', handler);
+        document?.removeEventListener('scroll', handler);
       }
     };
   }, [isMobile]);
@@ -203,7 +202,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
             }}
           >
             <AnimatePresence>
-              {isScrolledDown && !isMobile && (
+              {isScrolledDown && !isMobile && !isPaymentModalOpen && (
                 <SScrolledDownTopSection
                   initial={{
                     opacity: 0,
@@ -236,7 +235,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
               )}
             </AnimatePresence>
             {isTablet && (
-              <SGoBackButtonTablet defer={500} onClick={() => router.back()} />
+              <SGoBackButtonTablet
+                defer={500}
+                onClick={() => router.push(`/${user.username}`)}
+              />
             )}
             <STopSection
               ref={(el) => {
@@ -244,7 +246,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
               }}
             >
               {!isTablet && (
-                <SBackButton defer={500} onClick={() => router.back()}>
+                <SBackButton
+                  defer={500}
+                  onClick={() => router.push(`/${user.username}`)}
+                >
                   {!isMobileOrTablet && t('button.back')}
                 </SBackButton>
               )}
@@ -340,7 +345,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         zIndex={10}
         // predefinedOption={predefinedOption}
         isOpen={isPaymentModalOpen}
-        amount={`$${subPriceFormatted}`}
+        amount={subscriptionPrice || 0}
         onClose={() => setIsPaymentModalOpen(false)}
         handlePayWithCardStripeRedirect={handlePayRegistered}
         showTocApply
@@ -478,10 +483,6 @@ const SScrolledDownTopSection = styled(motion.div)<{ pushDown: boolean }>`
   padding: 0px 48px;
 
   z-index: 100;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin: 16px;
-  }
 
   ${({ theme }) => theme.media.laptop} {
     top: ${({ pushDown }) => (pushDown ? '120px' : '80px')};

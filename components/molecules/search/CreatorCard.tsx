@@ -20,7 +20,6 @@ import BlockUserModalProfile from '../profile/BlockUserModalProfile';
 import UnsubscribeModal from '../profile/UnsubscribeModal';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-
 import { formatNumber } from '../../../utils/format';
 import { useAppSelector } from '../../../redux-store/store';
 import { reportUser } from '../../../api/endpoints/report';
@@ -199,7 +198,12 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       <SDisplayNameContainer isVerified={!!creator.options?.isVerified}>
         <SDisplayName>{creator.nickname}</SDisplayName>
         {creator.options?.isVerified && (
-          <SInlineSVG svg={VerificationCheckmark} width='16px' height='16px' />
+          <SInlineSVG
+            svg={VerificationCheckmark}
+            width='16px'
+            height='16px'
+            fill='none'
+          />
         )}
       </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>

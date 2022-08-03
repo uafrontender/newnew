@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -6,7 +6,7 @@ import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { useUpdateEffect } from 'react-use';
+import { useEffectOnce, useUpdateEffect } from 'react-use';
 
 import General from '../../components/templates/General';
 
@@ -21,6 +21,15 @@ export const Chat = () => {
   const { t } = useTranslation('page-Chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
+
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
@@ -65,14 +74,17 @@ export const Chat = () => {
 
   useUpdateEffect(() => {
     if (!user.loggedIn) {
-      router?.push('/sign-up?to=log-in');
+      router?.push('/sign-up');
     }
   }, [router, user.loggedIn]);
 
-  useEffect(() => {
-    fetchLastActiveRoom();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffectOnce(() => {
+    if (!isMobileOrTablet) {
+      fetchLastActiveRoom();
+    } else {
+      router?.push(`/direct-messages/-mobile`);
+    }
+  });
 
   return (
     <>

@@ -18,11 +18,14 @@ import { fetchPledges } from '../../../api/endpoints/crowdfunding';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
+import Text from '../../atoms/Text';
 import Headline from '../../atoms/Headline';
 import PostVotingTab from '../../molecules/decision/PostVotingTab';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
+import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
+import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
 
 import switchPostStatus, {
   TPostStatusStringified,
@@ -32,9 +35,7 @@ import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateS
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import useResponseUpload from '../../../utils/hooks/useResponseUpload';
-import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
 import { formatNumber } from '../../../utils/format';
-import Text from '../../atoms/Text';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
@@ -69,18 +70,11 @@ interface IPostModerationCF {
   post: newnewapi.Crowdfunding;
   postStatus: TPostStatusStringified;
   handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleRemovePostFromState: () => void;
   handleGoBack: () => void;
 }
 
 const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
-  ({
-    post,
-    postStatus,
-    handleUpdatePostStatus,
-    handleGoBack,
-    handleRemovePostFromState,
-  }) => {
+  ({ post, postStatus, handleUpdatePostStatus, handleGoBack }) => {
     const router = useRouter();
     const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
@@ -95,6 +89,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
     // Socket
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
+
+    // Announcement
+    const [announcement, setAnnouncement] = useState(post.announcement);
 
     // Comments
     const { ref: commentsSectionRef, inView } = useInView({
@@ -126,14 +123,16 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
 
     // Pledges
     const [pledges, setPledges] = useState<TCfPledgeWithHighestField[]>([]);
-    const [pledgesNextPageToken, setPledgesNextPageToken] =
-      useState<string | undefined | null>('');
+    const [pledgesNextPageToken, setPledgesNextPageToken] = useState<
+      string | undefined | null
+    >('');
     const [pledgesLoading, setPledgesLoading] = useState(false);
     const [loadingPledgesError, setLoadingPledgesError] = useState('');
 
     // Response upload
-    const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
-      useState<newnewapi.IVideoUrls | undefined>(undefined);
+    const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<
+      newnewapi.IVideoUrls | undefined
+    >(undefined);
 
     // Tabs
     const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
@@ -305,12 +304,25 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
           if (!responseFreshlyUploaded && res.data.crowdfunding?.response) {
             setResponseFreshlyUploaded(res.data.crowdfunding.response);
           }
+          setAnnouncement(res.data.crowdfunding?.announcement);
         }
       } catch (err) {
         console.error(err);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const handleOnResponseTimeExpired = () => {
+      handleUpdatePostStatus('FAILED');
+    };
+
+    const handleOnVotingTimeExpired = () => {
+      if (currentBackers >= post.targetBackerCount) {
+        handleUpdatePostStatus('WAITING_FOR_RESPONSE');
+      } else {
+        handleUpdatePostStatus('FAILED');
+      }
+    };
 
     // Increment channel subs after mounting
     // Decrement when unmounting
@@ -518,6 +530,14 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
                 timestampSeconds={new Date(
                   (post.responseUploadDeadline?.seconds as number) * 1000
                 ).getTime()}
+                onTimeExpired={handleOnResponseTimeExpired}
+              />
+            ) : Date.now() > (post.expiresAt?.seconds as number) * 1000 ? (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='cf'
               />
             ) : (
               <PostTimer
@@ -525,12 +545,14 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
                   (post.expiresAt?.seconds as number) * 1000
                 ).getTime()}
                 postType='cf'
+                onTimeExpired={handleOnVotingTimeExpired}
               />
             )}
           </SExpiresSection>
           <PostVideoModeration
+            key={`key_${announcement?.coverImageUrl}`}
             postId={post.postUuid}
-            announcement={post.announcement!!}
+            announcement={announcement!!}
             response={(post.response || responseFreshlyUploaded) ?? undefined}
             thumbnails={{
               startTime: 1,
@@ -575,7 +597,6 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
             targetPledges={post.targetBackerCount}
             hidden={openedTab === 'response'}
             handleUpdatePostStatus={handleUpdatePostStatus}
-            handleRemovePostFromState={handleRemovePostFromState}
           />
           <SActivitesContainer>
             {openedTab === 'announcement' ? (

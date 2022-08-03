@@ -8,6 +8,7 @@ import Lottie from './Lottie';
 import RippleAnimation from './RippleAnimation';
 
 import logoAnimation from '../../public/animations/mobile_logo.json';
+import logoAnimationWhite from '../../public/animations/mobile_logo_white.json';
 
 type TButton = React.ComponentPropsWithoutRef<'button'>;
 export type TView =
@@ -143,7 +144,17 @@ const Button = React.memo(
           onTouchEndCapture={handleRestoreRippling}
           {...rest}
         >
-          <span>{children}</span>
+          <span
+            style={{
+              ...(loading
+                ? {
+                    color: 'transparent',
+                  }
+                : {}),
+            }}
+          >
+            {children}
+          </span>
           {withProgress && <SProgress view={rest.view} progress={progress} />}
           {loading && (
             <SLoader size={rest.size}>
@@ -153,7 +164,10 @@ const Button = React.memo(
                 options={{
                   loop: true,
                   autoplay: true,
-                  animationData: logoAnimation,
+                  animationData:
+                    props.view === 'primary' || props.view === 'primaryGrad'
+                      ? logoAnimationWhite
+                      : logoAnimation,
                 }}
               />
             </SLoader>
@@ -323,8 +337,19 @@ const SButton = styled.button<ISButton>`
 
   &:disabled {
     cursor: default;
-    opacity: 0.5;
     outline: none;
+
+    :after {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      content: '';
+      opacity: 1;
+      z-index: 6;
+      position: absolute;
+      background: ${(props) => props.theme.colorsThemed.button.disabled};
+    }
   }
 
   span {
@@ -382,6 +407,13 @@ const SButton = styled.button<ISButton>`
         opacity: 0.5;
       }
     `}
+
+  ${({ theme, withProgress }) =>
+    withProgress && theme.name === 'dark'
+      ? css`
+          background: ${() => theme.colorsThemed.background.tertiary};
+        `
+      : null}
 `;
 
 interface ISLoader {
@@ -390,8 +422,8 @@ interface ISLoader {
 
 const SLoader = styled.div<ISLoader>`
   top: 50%;
-  right: ${(props) => (props.size === 'sm' ? '0px' : '16px')};
   z-index: 20;
   position: absolute;
   transform: translateY(-50%);
+  opacity: 1 !important;
 `;

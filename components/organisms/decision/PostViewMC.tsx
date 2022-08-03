@@ -33,6 +33,7 @@ import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import Headline from '../../atoms/Headline';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import PostVotingTab from '../../molecules/decision/PostVotingTab';
+import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
 
 // Utils
 import switchPostType from '../../../utils/switchPostType';
@@ -69,8 +70,8 @@ interface IPostViewMC {
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
-  handleRemovePostFromState: () => void;
-  handleAddPostToState: () => void;
+  handleRemoveFromStateUnfavorited: () => void;
+  handleAddPostToStateFavorited: () => void;
 }
 
 const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
@@ -85,8 +86,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     handleGoBack,
     handleUpdatePostStatus,
     handleReportOpen,
-    handleRemovePostFromState,
-    handleAddPostToState,
+    handleRemoveFromStateUnfavorited,
+    handleAddPostToStateFavorited,
   }) => {
     const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
@@ -151,8 +152,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
       post.optionCount ?? ''
     );
-    const [optionsNextPageToken, setOptionsNextPageToken] =
-      useState<string | undefined | null>('');
+    const [optionsNextPageToken, setOptionsNextPageToken] = useState<
+      string | undefined | null
+    >('');
     const [optionsLoading, setOptionsLoading] = useState(false);
     const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
@@ -238,7 +240,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
 
     const fetchOptions = useCallback(
       async (pageToken?: string) => {
-        if (optionsLoading) return;
+        if (optionsLoading || loadingModalOpen) return;
         try {
           setOptionsLoading(true);
           setLoadingOptionsError('');
@@ -280,7 +282,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           console.error(err);
         }
       },
-      [optionsLoading, setOptions, sortOptions, post]
+      [optionsLoading, loadingModalOpen, post.postUuid, sortOptions]
     );
 
     const handleAddOrUpdateOptionFromResponse = useCallback(
@@ -366,6 +368,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const handleOnVotingTimeExpired = () => {
+      if (options.some((o) => o.supporterCount > 0)) {
+        handleUpdatePostStatus('WAITING_FOR_RESPONSE');
+      } else {
+        handleUpdatePostStatus('FAILED');
+      }
+    };
 
     // Increment channel subs after mounting
     // Decrement when unmounting
@@ -654,12 +664,22 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
                 onClick={handleGoBack}
               />
             )}
-            <PostTimer
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='mc'
-            />
+            {postStatus === 'voting' ? (
+              <PostTimer
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='mc'
+                onTimeExpired={handleOnVotingTimeExpired}
+              />
+            ) : (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='mc'
+              />
+            )}
           </SExpiresSection>
           <PostVideo
             postId={post.postUuid}
@@ -682,8 +702,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             hasRecommendations={hasRecommendations}
             handleSetIsFollowingDecision={handleSetIsFollowingDecision}
             handleReportOpen={handleReportOpen}
-            handleRemovePostFromState={handleRemovePostFromState}
-            handleAddPostToState={handleAddPostToState}
+            handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited}
+            handleAddPostToStateFavorited={handleAddPostToStateFavorited}
           />
           <SActivitesContainer
             shorterSection={

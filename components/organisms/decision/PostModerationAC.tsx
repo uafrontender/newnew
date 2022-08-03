@@ -30,6 +30,8 @@ import PostVotingTab from '../../molecules/decision/PostVotingTab';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
+import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
+import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
 
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
@@ -39,7 +41,6 @@ import switchPostStatus, {
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
 import useResponseUpload from '../../../utils/hooks/useResponseUpload';
 import { Mixpanel } from '../../../utils/mixpanel';
 
@@ -63,17 +64,10 @@ interface IPostModerationAC {
   postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleRemovePostFromState: () => void;
 }
 
 const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
-  ({
-    post,
-    postStatus,
-    handleUpdatePostStatus,
-    handleGoBack,
-    handleRemovePostFromState,
-  }) => {
+  ({ post, postStatus, handleUpdatePostStatus, handleGoBack }) => {
     const dispatch = useAppDispatch();
     const { t } = useTranslation('modal-Post');
     const { user } = useAppSelector((state) => state);
@@ -98,6 +92,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       post.winningOptionId ?? undefined
     );
 
+    // Announcement
+    const [announcement, setAnnouncement] = useState(post.announcement);
+
     // Comments
     const { ref: commentsSectionRef, inView } = useInView({
       threshold: 0.8,
@@ -116,8 +113,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     };
 
     // Response upload
-    const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
-      useState<newnewapi.IVideoUrls | undefined>(undefined);
+    const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<
+      newnewapi.IVideoUrls | undefined
+    >(undefined);
 
     // Tabs
     const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
@@ -167,14 +165,16 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
       post.optionCount ?? ''
     );
-    const [optionsNextPageToken, setOptionsNextPageToken] =
-      useState<string | undefined | null>('');
+    const [optionsNextPageToken, setOptionsNextPageToken] = useState<
+      string | undefined | null
+    >('');
     const [optionsLoading, setOptionsLoading] = useState(false);
     const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
     // Winning option
-    const [winningOption, setWinningOption] =
-      useState<newnewapi.Auction.Option | undefined>();
+    const [winningOption, setWinningOption] = useState<
+      newnewapi.Auction.Option | undefined
+    >();
 
     const handleUpdateWinningOption = (
       selectedOption: newnewapi.Auction.Option
@@ -336,6 +336,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           if (!responseFreshlyUploaded && res.data.auction?.response) {
             setResponseFreshlyUploaded(res.data.auction.response);
           }
+          setAnnouncement(res.data.auction?.announcement);
         }
       } catch (err) {
         console.error(err);
@@ -360,6 +361,18 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       },
       [setOptions, sortOptions, post.postUuid]
     );
+
+    const handleOnResponseTimeExpired = () => {
+      handleUpdatePostStatus('FAILED');
+    };
+
+    const handleOnVotingTimeExpired = () => {
+      if (options && options.some((o) => o.supporterCount > 0)) {
+        handleUpdatePostStatus('WAITING_FOR_DECISION');
+      } else {
+        handleUpdatePostStatus('FAILED');
+      }
+    };
 
     // Increment channel subs after mounting
     // Decrement when unmounting
@@ -397,7 +410,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             setWinningOption(res.data.option as newnewapi.Auction.Option);
           }
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       }
 
@@ -617,6 +630,14 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                 timestampSeconds={new Date(
                   (post.responseUploadDeadline?.seconds as number) * 1000
                 ).getTime()}
+                onTimeExpired={handleOnResponseTimeExpired}
+              />
+            ) : Date.now() > (post.expiresAt?.seconds as number) * 1000 ? (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='ac'
               />
             ) : (
               <PostTimer
@@ -625,12 +646,14 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                 ).getTime()}
                 postType='ac'
                 isTutorialVisible={options.length > 0}
+                onTimeExpired={handleOnVotingTimeExpired}
               />
             )}
           </SExpiresSection>
           <PostVideoModeration
+            key={`key_${announcement?.coverImageUrl}`}
             postId={post.postUuid}
-            announcement={post.announcement!!}
+            announcement={announcement!!}
             response={(post.response || responseFreshlyUploaded) ?? undefined}
             thumbnails={{
               startTime: 1,
@@ -674,7 +697,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             hasResponse={!!post.response}
             hidden={openedTab === 'response'}
             handleUpdatePostStatus={handleUpdatePostStatus}
-            handleRemovePostFromState={handleRemovePostFromState}
           />
           <SActivitesContainer
             decisionFailed={postStatus === 'failed'}

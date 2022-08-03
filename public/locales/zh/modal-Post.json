@@ -1,7 +1,7 @@
 {
   "meta": {
     "ac": {
-      "title": "NewNew Event",
+      "title": "NewNew Bid",
       "description": "賺錢，與朋友一起出價競拍，支持NewNew上的創作者"
     },
     "mc": {
@@ -17,11 +17,11 @@
   "me": "我",
   "I": "我",
   "postType": {
-    "ac": "Event",
+    "ac": "Bid",
     "mc": "Superpoll",
     "cf": "Goal",
     "multiple": {
-      "ac": "Event",
+      "ac": "Bid",
       "mc": "Superpoll",
       "cf": "Goal"
     }
@@ -57,7 +57,8 @@
       "cf": "你選擇支持這個Goal！"
     },
     "doneButton": "聽起來不錯！",
-    "ac": "{{postCreator}}將在Event結束後挑選他們最喜歡的出價。",
+    "ac": "{{postCreator}}將在Bid結束後挑選他們最喜歡的出價。",
+    "ac_NEED_TRANSLATION": "{{postCreator}} will pick their favorite bid once time is up.",
     "mc": "{{postCreator}}將在Superpoll結束後完成得票數最多的選項。",
     "cf": "{{postCreator}}在獲得足夠的支持者后，就會完成這個Goal。"
   },
@@ -127,7 +128,7 @@
       "backToOriginalVideo": "回到原帖",
       "backToResponse": "觀看回應"
     },
-    "reuploadButton_NEED_TRANSLATION": "re-upload",
+    "reuploadButton": "重新上傳",
     "cannotLeavePageMsg": "你確定要關閉這個頁面嗎？上傳進度會丟失",
     "floatingUploadResponseButton": "製作回應視頻",
     "setThumbnail": "設置縮略圖",
@@ -186,7 +187,7 @@
         },
         "processing": {
           "title": "處理視頻",
-          "description__NEED_TRANSLATION": "Your video is being processed... hang tight!",
+          "description": "視頻正在處理中……稍等！",
           "process": "{{progress}}% • 還需{{time}}",
           "uploadNonProcessed": "發佈"
         },
@@ -242,7 +243,7 @@
   },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
-      "ac": "這個 Event 將在\n視頻處理完成後開始",
+      "ac": "這個 Bid 將在\n視頻處理完成後開始",
       "mc": "這個Superpoll將在\n視頻處理後開始",
       "cf": "這個Goal將在\n視頻處理後開始"
     },
@@ -285,7 +286,7 @@
   },
   "acPost": {
     "paymentModalHeader": {
-      "title": "{{creator}}的Event",
+      "title": "{{creator}}的Bid",
       "subtitle": "你的出價"
     },
     "paymentModalFooter": {
@@ -479,9 +480,9 @@
       "choosePledgeButton": "支持這個Goal"
     }
   },
-  "thumbnailEllipseMenu_NEED_TRANSLATION": {
-    "selectSnippetButton": "Select a snippet",
-    "uploadImageButton": "Upload an image"
+  "thumbnailEllipseMenu": {
+    "selectSnippetButton": "選擇一個片段",
+    "uploadImageButton": "上傳圖片"
   },
   "postVideoThumbnailEdit": {
     "title": "設置縮略圖",
@@ -493,14 +494,14 @@
       "error": "發生錯誤"
     }
   },
-  "postVideoCoverImageEdit_NEED_TRANSLATION": {
-    "title": "Upload an image",
-    "submit": "Save",
-    "cancel": "Cancel",
+  "postVideoCoverImageEdit": {
+    "title": "上傳圖片",
+    "submit": "保存",
+    "cancel": "取消",
     "uploadCoverImage": {
-      "caption": "Select custom cover image",
-      "uploadBtn": "Select",
-      "deleteBtn": "Delete"
+      "caption": "選擇自訂封面圖片",
+      "uploadBtn": "選擇",
+      "deleteBtn": "刪除"
     }
   },
   "acPostModeration": {
@@ -525,7 +526,7 @@
       },
       "optionCard": {
         "pickButton": "選擇",
-        "pickedButton_NEED_TRANSLATION": "Chosen"
+        "pickedButton": "已選擇"
       }
     },
     "winnerTab": {
@@ -564,7 +565,7 @@
     }
   },
   "cfPostModeration": {
-    "moneyRaised_NEED_TRANSLATION": "Total raised",
+    "moneyRaised": "總共籌到",
     "winnerTab": {
       "winnerOptionCard": {
         "backersToldYou": "支持者注資成功",
@@ -574,7 +575,7 @@
     }
   },
   "acPostSuccess": {
-    "heroText": "本次Event已結束！",
+    "heroText": "本次Bid已結束！",
     "wantsToKnow": "{{creator}}想知道......",
     "inTotalBids": "在總的出價中",
     "others": "其他",
@@ -698,7 +699,7 @@
     "button": "知道了"
   },
   "heroPopupAC": {
-    "title": "Event",
+    "title": "Bid",
     "text": "控制結果......\n給創作者發送出價，說明你想讓他們做什麼，你願意花多少錢，然後看他們完成！"
   },
   "heroPopupMC": {
@@ -709,30 +710,30 @@
     "title": "Goal",
     "text": "與其他人集資，支持你喜歡的創作者的Goal。如果支援這個Goal的人足夠多，你就會看著創作者照做！"
   },
-  "postResponseTabModeration_NEED_TRANSLATION": {
+  "postResponseTabModeration": {
     "awaiting": {
-      "topHeader": "Time to post \nyour response!",
-      "postResponseBtn": "Post Response",
-      "youWillGet": "You'll get"
+      "topHeader": "是發布回應\n的時候了！",
+      "postResponseBtn": "發布回應",
+      "youWillGet": "你會得到"
     },
     "succeeded": {
-      "topHeader": "Response \npublished!",
-      "youMade": "You made",
-      "shareBtn": "Share",
-      "linkCopied": "Link copied!"
+      "topHeader": "回應\n已發布！",
+      "youMade": "你做了",
+      "shareBtn": "分享",
+      "linkCopied": "鏈接已複製！"
     },
     "winner": {
-      "inResponseToYourPost": "In response to your post",
+      "inResponseToYourPost": "回應了你的帖子",
       "ac": {
-        "numBiddersChoseSingular": "{{amount}} bidder chose",
-        "numBiddersChose": "{{amount}} bidders chose",
-        "optionCreator": "<0>{{nickname}}</0>'s bid"
+        "numBiddersChoseSingular": "{{amount}} 位出價者選擇了",
+        "numBiddersChose": "{{amount}} 位出價者選擇了",
+        "optionCreator": "<0>{{nickname}}</0> 的出價"
       },
       "mc": {
-        "numBiddersChoseSingular": "{{amount}} voter chose",
-        "numBiddersChose": "{{amount}} voters chose",
-        "optionOwn": "the option",
-        "optionCreator": "<0>{{nickname}}</0>'s option"
+        "numBiddersChoseSingular": "{{amount}} 位投票者選擇了",
+        "numBiddersChose": "{{amount}} 位投票者選擇了",
+        "optionOwn": "選項",
+        "optionCreator": "<0>{{nickname}}</0> 的選擇"
       }
     }
   },

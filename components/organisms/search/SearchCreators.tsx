@@ -5,6 +5,8 @@ import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
+import { toast } from 'react-toastify';
+
 import { searchCreators } from '../../../api/endpoints/search';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
@@ -24,8 +26,9 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
   const [initialLoad, setInitialLoad] = useState(false);
   const [loadingCreators, setLoadingCreators] = useState(false);
   const [creators, setCreators] = useState<newnewapi.IUser[]>([]);
-  const [creatorsNextPageToken, setCreatorsRoomsNextPageToken] =
-    useState<string | undefined | null>('');
+  const [creatorsNextPageToken, setCreatorsRoomsNextPageToken] = useState<
+    string | undefined | null
+  >('');
 
   const getSearchResult = useCallback(
     async (pageToken?: string) => {
@@ -63,6 +66,7 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
         setLoadingCreators(false);
       } catch (err) {
         setLoadingCreators(false);
+        toast.error('toastErrors.generic');
         console.error(err);
       }
     },
@@ -95,6 +99,7 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
                 loading={loadingCreators}
                 collection={creators}
                 withEllipseMenu
+                subscribedTo
               />
             )}
           </SCardsSection>

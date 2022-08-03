@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { toast } from 'react-toastify';
 
 import Button from '../../atoms/Button';
 import Sorting from '../Sorting';
@@ -14,6 +15,8 @@ import { searchPosts } from '../../../api/endpoints/search';
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppSelector } from '../../../redux-store/store';
+import SortOption from '../../atoms/SortOption';
 
 const PostList = dynamic(() => import('./PostList'));
 const PostModal = dynamic(() => import('../decision/PostModal'));
@@ -88,10 +91,16 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
   const { t: tCommon } = useTranslation('common');
   const router = useRouter();
 
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >();
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
     Mixpanel.track('Open Post Modal', {
@@ -137,8 +146,9 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
   const [initialLoad, setInitialLoad] = useState(false);
   const [loadingPosts, setLoadingPosts] = useState(false);
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
-  const [postsNextPageToken, setPostsRoomsNextPageToken] =
-    useState<string | undefined | null>('');
+  const [postsNextPageToken, setPostsRoomsNextPageToken] = useState<
+    string | undefined | null
+  >('');
 
   const getSearchResult = useCallback(
     async (pageToken?: string) => {
@@ -191,6 +201,7 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
         setLoadingPosts(false);
       } catch (err) {
         setLoadingPosts(false);
+        toast.error('toastErrors.generic');
         console.error(err);
       }
     },
@@ -220,6 +231,10 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
   }, [inView, loadingPosts, postsNextPageToken]);
 
   useEffect(() => {
+    if (router.query.tab !== 'posts') {
+      return;
+    }
+
     const routerArr: string[] = [];
     activeTabs.forEach((filterValue) => {
       switch (filterValue) {
@@ -289,6 +304,10 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
     [loadingPosts]
   );
 
+  const clearSorting = useCallback(() => {
+    setPostSorting('all');
+  }, []);
+
   const Tabs = useCallback(
     () => (
       <STabs>
@@ -303,9 +322,25 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
             {tab.title}
           </STab>
         ))}
+        {selectedSorting &&
+          selectedSorting.sortingtype !== 'all' &&
+          !isMobile && (
+            <SortOption
+              sorts={selectedSorting}
+              category=''
+              onClick={clearSorting}
+            />
+          )}
       </STabs>
     ),
-    [activeTabs, tabTypes, updateActiveTabs]
+    [
+      activeTabs,
+      tabTypes,
+      selectedSorting,
+      isMobile,
+      clearSorting,
+      updateActiveTabs,
+    ]
   );
 
   const handleTypeChange = useCallback(
@@ -352,7 +387,7 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
           manualCurrLocation={isBrowser() ? window.location.href : ''}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemovePostFromState={() =>
+          handleRemoveFromStateDeleted={() =>
             handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
           }
         />

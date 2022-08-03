@@ -81,11 +81,11 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
 
   const postTypeText = useCallback(() => {
     if (postData) {
-      if (postData.auction) return 'Event';
+      if (postData.auction) return 'Bid';
       if (postData.crowdfunding) return 'Goal';
       return 'Superpoll';
     }
-    return 'Event';
+    return 'Bid';
   }, [postData]);
 
   async function copyPostUrlToClipboard(url: string) {
@@ -175,6 +175,8 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
 
     if (post.expiresAt === '1-hour') {
       dateValue.add(1, 'h');
+    } else if (post.expiresAt === '3-hours') {
+      dateValue.add(3, 'h');
     } else if (post.expiresAt === '6-hours') {
       dateValue.add(6, 'h');
     } else if (post.expiresAt === '12-hours') {
@@ -227,6 +229,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
                   resources={videoProcessing?.targetUrls}
                   thumbnails={post.thumbnailParameters}
                   borderRadius='16px'
+                  showPlayButton
                 />
               ) : (
                 <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
@@ -260,7 +263,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             )}
           </STitle>
           <SSocials>{socialButtons.map(renderItem)}</SSocials>
-          <SButtonWrapper onClick={handleViewMyPost}>
+          <SButtonWrapper id='see-post' onClick={handleViewMyPost}>
             <SButtonTitle>
               {t(
                 `published.button.submit-${

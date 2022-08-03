@@ -10,7 +10,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -123,8 +123,9 @@ interface IPostModal {
   commentContentFromUrl?: string;
   handleClose: () => void;
   handleOpenAnotherPost?: (post: newnewapi.Post) => void;
-  handleRemovePostFromState?: () => void;
-  handleAddPostToState?: () => void;
+  handleRemoveFromStateDeleted?: () => void;
+  handleRemoveFromStateUnfavorited?: () => void;
+  handleAddPostToStateFavorited?: () => void;
 }
 
 // Memorization does not work
@@ -137,8 +138,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   commentContentFromUrl,
   handleClose,
   handleOpenAnotherPost,
-  handleRemovePostFromState,
-  handleAddPostToState,
+  handleRemoveFromStateDeleted,
+  handleRemoveFromStateUnfavorited,
+  handleAddPostToStateFavorited,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -181,6 +183,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     [postStatus]
   );
 
+  const postStatusesToUseHideInsteadOfDelete = useMemo(
+    () => ['succeeded', 'failed', 'deleted_by_creator', 'deleted_by_admin'],
+    []
+  );
+
   const shouldRenderVotingFinishedModal = useMemo(
     () =>
       postStatus === 'succeeded' ||
@@ -212,20 +219,35 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
         );
       }
-      const markAsViewedPayload = new newnewapi.MarkPostRequest({
-        markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
+      const markAsFavoritePayload = new newnewapi.MarkPostRequest({
+        markAs: !isFollowingDecision
+          ? newnewapi.MarkPostRequest.Kind.FAVORITE
+          : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
         postUuid: postParsed?.postUuid,
       });
 
-      const res = await markPost(markAsViewedPayload);
+      const res = await markPost(markAsFavoritePayload);
 
       if (!res.error) {
         setIsFollowingDecision((currentValue) => !currentValue);
+        // TODO: separate onDelete and onUnsubscribe callbacks to prevent possible bugs
+        if (isFollowingDecision) {
+          handleRemoveFromStateUnfavorited?.();
+        } else {
+          handleAddPostToStateFavorited?.();
+        }
       }
     } catch (err) {
       console.error(err);
     }
-  }, [postParsed, router, user.loggedIn]);
+  }, [
+    postParsed?.postUuid,
+    user.loggedIn,
+    isFollowingDecision,
+    router,
+    handleRemoveFromStateUnfavorited,
+    handleAddPostToStateFavorited,
+  ]);
 
   const handleUpdatePostStatus = useCallback(
     (newStatus: number | string) => {
@@ -293,22 +315,43 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const handleDeletePost = useCallback(async () => {
     try {
-      const payload = new newnewapi.DeleteMyPostRequest({
-        postUuid: postParsed?.postUuid,
-      });
+      // "Hide" Post instead of deleting it
+      if (postStatusesToUseHideInsteadOfDelete.includes(postStatus)) {
+        const payload = new newnewapi.MarkPostRequest({
+          postUuid: postParsed?.postUuid,
+          markAs: newnewapi.MarkPostRequest.Kind.HIDDEN,
+        });
 
-      const res = await deleteMyPost(payload);
+        const res = await markPost(payload);
 
-      if (!res.error) {
-        console.log('Post deleted/cancelled');
-        handleUpdatePostStatus('DELETED_BY_CREATOR');
-        handleRemovePostFromState?.();
-        handleCloseDeletePostModal();
+        if (!res.error) {
+          handleUpdatePostStatus('DELETED_BY_CREATOR');
+          handleRemoveFromStateDeleted?.();
+          handleCloseDeletePostModal();
+        }
+      } else {
+        const payload = new newnewapi.DeleteMyPostRequest({
+          postUuid: postParsed?.postUuid,
+        });
+
+        const res = await deleteMyPost(payload);
+
+        if (!res.error) {
+          handleUpdatePostStatus('DELETED_BY_CREATOR');
+          handleRemoveFromStateDeleted?.();
+          handleCloseDeletePostModal();
+        }
       }
     } catch (err) {
       console.error(err);
     }
-  }, [handleRemovePostFromState, handleUpdatePostStatus, postParsed?.postUuid]);
+  }, [
+    handleRemoveFromStateDeleted,
+    handleUpdatePostStatus,
+    postParsed?.postUuid,
+    postStatus,
+    postStatusesToUseHideInsteadOfDelete,
+  ]);
 
   useEffect(() => {
     if (commentIdFromUrl) {
@@ -334,8 +377,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [recommendedPosts, setRecommendedPosts] = useState<newnewapi.Post[]>(
     []
   );
-  const [nextPageToken, setNextPageToken] =
-    useState<string | null | undefined>('');
+  const [nextPageToken, setNextPageToken] = useState<string | null | undefined>(
+    ''
+  );
   const [recommendedPostsLoading, setRecommendedPostsLoading] = useState(false);
   const [triedLoading, setTriedLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
@@ -498,8 +542,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -518,8 +562,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -539,8 +583,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
         />
       );
     }
@@ -558,8 +602,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
         />
       );
     }
@@ -577,8 +621,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
         />
       );
     }
@@ -655,8 +699,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -675,8 +719,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState!!}
-          handleAddPostToState={handleAddPostToState!!}
+          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
+          handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -689,7 +733,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           post={postParsed as newnewapi.MultipleChoice}
           handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState!!}
           handleGoBack={handleGoBackInsidePost}
         />
       );
@@ -701,7 +744,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.Auction}
           postStatus={postStatus}
           handleGoBack={handleGoBackInsidePost}
-          handleRemovePostFromState={handleRemovePostFromState!!}
           handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
@@ -713,7 +755,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           post={postParsed as newnewapi.Crowdfunding}
           handleUpdatePostStatus={handleUpdatePostStatus}
-          handleRemovePostFromState={handleRemovePostFromState!!}
           handleGoBack={handleGoBackInsidePost}
         />
       );
@@ -836,6 +877,15 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     return (
       <SPostSuccessWaitingControlsDiv
         variant='moderation'
+        style={{
+          ...(isMobile &&
+          (postStatus === 'deleted_by_admin' ||
+            postStatus === 'deleted_by_creator')
+            ? {
+                marginTop: 64,
+              }
+            : {}),
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <SWaitingSuccessControlsBtn
@@ -852,36 +902,45 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             height='24px'
           />
         </SWaitingSuccessControlsBtn>
-        <SWaitingSuccessControlsBtn
-          view='secondary'
-          iconOnly
-          onClick={() => setShareMenuOpen(true)}
-          ref={shareButtonRef}
-        >
-          <InlineSvg
-            svg={ShareIcon}
-            fill={
-              theme.name === 'light' ? theme.colors.dark : theme.colors.white
-            }
-            width='24px'
-            height='24px'
-          />
-        </SWaitingSuccessControlsBtn>
-        <SWaitingSuccessControlsBtn
-          view='secondary'
-          iconOnly
-          onClick={() => setEllipseMenuOpen(true)}
-          ref={moreButtonRef}
-        >
-          <InlineSvg
-            svg={MoreIcon}
-            fill={
-              theme.name === 'light' ? theme.colors.dark : theme.colors.white
-            }
-            width='24px'
-            height='24px'
-          />
-        </SWaitingSuccessControlsBtn>
+        {postStatus !== 'deleted_by_admin' &&
+          postStatus !== 'deleted_by_creator' && (
+            <>
+              <SWaitingSuccessControlsBtn
+                view='secondary'
+                iconOnly
+                onClick={() => setShareMenuOpen(true)}
+                ref={shareButtonRef}
+              >
+                <InlineSvg
+                  svg={ShareIcon}
+                  fill={
+                    theme.name === 'light'
+                      ? theme.colors.dark
+                      : theme.colors.white
+                  }
+                  width='24px'
+                  height='24px'
+                />
+              </SWaitingSuccessControlsBtn>
+              <SWaitingSuccessControlsBtn
+                view='secondary'
+                iconOnly
+                onClick={() => setEllipseMenuOpen(true)}
+                ref={moreButtonRef}
+              >
+                <InlineSvg
+                  svg={MoreIcon}
+                  fill={
+                    theme.name === 'light'
+                      ? theme.colors.dark
+                      : theme.colors.white
+                  }
+                  width='24px'
+                  height='24px'
+                />
+              </SWaitingSuccessControlsBtn>
+            </>
+          )}
         {/* Share menu */}
         {!isMobile && postParsed?.postUuid && (
           <PostShareEllipseMenu
@@ -904,7 +963,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           <PostEllipseMenuModeration
             postType={typeOfPost as string}
             isVisible={ellipseMenuOpen}
-            canDeletePost={postStatus !== 'failed'}
+            canDeletePost
             handleClose={handleEllipseMenuClose}
             handleOpenDeletePostModal={handleOpenDeletePostModal}
             anchorElement={moreButtonRef.current}
@@ -914,7 +973,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           <PostEllipseModalModeration
             postType={typeOfPost as string}
             zIndex={11}
-            canDeletePost={postStatus !== 'failed'}
+            canDeletePost
             isOpen={ellipseMenuOpen}
             onClose={handleEllipseMenuClose}
             handleOpenDeletePostModal={handleOpenDeletePostModal}
@@ -1164,7 +1223,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   if (shouldRenderVotingFinishedModal && !isMyPost) {
     return (
       <>
-        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
+        <Modal
+          withoutOverlay
+          show={open}
+          overlaydim
+          onClose={() => handleCloseAndGoBack()}
+        >
           {postStatus === 'succeeded' && !isMobile && (
             <PostSuccessAnimationBackground />
           )}
@@ -1225,7 +1289,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   if (isMyPost) {
     return (
       <>
-        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
+        <Modal
+          withoutOverlay
+          show={open}
+          overlaydim
+          onClose={() => handleCloseAndGoBack()}
+        >
           {(postStatus === 'succeeded' ||
             postStatus === 'waiting_for_response') &&
             !isMobile && <PostSuccessAnimationBackground />}
@@ -1294,7 +1363,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   // Render regular Decision view
   return (
     <>
-      <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
+      <Modal
+        withoutOverlay
+        show={open}
+        overlaydim
+        onClose={() => handleCloseAndGoBack()}
+      >
         <Head>
           <title>{t(`meta.${typeOfPost}.title`)}</title>
           <meta
@@ -1416,11 +1490,12 @@ PostModal.defaultProps = {
   post: undefined,
   manualCurrLocation: undefined,
   handleOpenAnotherPost: () => {},
-  handleRemovePostFromState: () => {},
-  handleAddPostToState: () => {},
+  handleRemoveFromStateDeleted: () => {},
+  handleRemoveFromStateUnfavorited: () => {},
+  handleAddPostToStateFavorited: () => {},
 };
 
-export default (props: any) => (
+export default (props: IPostModal) => (
   <CommentFromUrlContextProvider>
     <PostModal {...props} />
   </CommentFromUrlContextProvider>
@@ -1475,17 +1550,9 @@ const SPostModalContainer = styled.div<{
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     width: 100%;
     height: calc(100% - 64px);
-
-    ${({ isMyPost }) =>
-      isMyPost
-        ? css`
-            height: initial;
-            max-height: 100%;
-          `
-        : null}
   }
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.laptopM} {
     top: 32px;
     left: calc(50% - 496px);
     width: 992px;
@@ -1496,14 +1563,6 @@ const SPostModalContainer = styled.div<{
 
     padding: 24px;
     padding-bottom: 24px;
-
-    ${({ isMyPost }) =>
-      isMyPost
-        ? css`
-            height: initial;
-            max-height: 100%;
-          `
-        : null}
   }
 `;
 
@@ -1532,7 +1591,7 @@ const SGoBackButtonDesktop = styled(Button)`
 
   cursor: pointer;
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.laptopM} {
     right: 24px;
     top: 32px;
   }
@@ -1570,7 +1629,7 @@ const SPostSuccessWaitingControlsDiv = styled.div<{
     gap: 16px;
   }
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.laptopM} {
     flex-direction: column;
     gap: 8px;
     right: 24px;

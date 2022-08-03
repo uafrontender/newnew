@@ -57,8 +57,9 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
 }) => {
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >();
 
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
@@ -96,7 +97,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
     });
   };
 
-  const handleAddPostToState = (postToAdd: newnewapi.Post) => {
+  const handleAddPostToStateFavorited = (postToAdd: newnewapi.Post) => {
     handleSetPosts((curr) => {
       const newArr = [...curr];
 
@@ -221,11 +222,11 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
           post={displayedPost}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemovePostFromState={() =>
+          handleRemoveFromStateUnfavorited={() =>
             handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
           }
-          handleAddPostToState={() =>
-            handleAddPostToState(displayedPost as newnewapi.Post)
+          handleAddPostToStateFavorited={() =>
+            handleAddPostToStateFavorited(displayedPost as newnewapi.Post)
           }
         />
       )}
@@ -307,7 +308,6 @@ export async function getServerSideProps(
       },
     };
   } catch (err) {
-    console.log(err);
     return {
       props: {
         error: {

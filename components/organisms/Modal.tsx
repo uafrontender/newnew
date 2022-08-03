@@ -13,6 +13,7 @@ interface IModal {
   overlaydim?: boolean;
   additionalz?: number;
   custombackdropfiltervalue?: number;
+  withoutOverlay?: boolean;
   children: ReactNode;
   onClose?: () => void;
 }
@@ -24,18 +25,23 @@ const Modal: React.FC<IModal> = React.memo((props) => {
     overlaydim,
     additionalz,
     custombackdropfiltervalue,
+    withoutOverlay,
     children,
     onClose,
   } = props;
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(setOverlay(show));
+    if (!withoutOverlay) {
+      dispatch(setOverlay(show));
+    }
 
     return () => {
-      dispatch(setOverlay(false));
+      if (!withoutOverlay) {
+        dispatch(setOverlay(false));
+      }
     };
-  }, [show, dispatch]);
+  }, [withoutOverlay, show, dispatch]);
 
   useEffect(() => {
     const blurredBody = document.getElementById('__next');
@@ -112,6 +118,8 @@ const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
     overlaydim === 'true'
       ? 'transparent'
       : theme.colorsThemed.background.backgroundT};
+
+  overscroll-behavior: 'none';
 
   ::before {
     top: 0;

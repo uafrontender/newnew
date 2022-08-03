@@ -6,6 +6,7 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dist/shared/lib/dynamic';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useUpdateEffect } from 'react-use';
 import styled, { css } from 'styled-components';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
@@ -24,12 +25,14 @@ interface IPostTimer {
   timestampSeconds: number;
   postType: TPostType;
   isTutorialVisible?: boolean | undefined;
+  onTimeExpired: () => void;
 }
 
 const PostTimer: React.FunctionComponent<IPostTimer> = ({
   timestampSeconds,
   postType,
   isTutorialVisible,
+  onTimeExpired,
 }) => {
   const { t } = useTranslation('modal-Post');
   const { user } = useAppSelector((state) => state);
@@ -178,6 +181,13 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
 
   useEffect(() => {
     setParsedSeconds(secondsToDHMS(seconds));
+  }, [seconds]);
+
+  useUpdateEffect(() => {
+    if (seconds <= 0) {
+      clearInterval(interval.current);
+      onTimeExpired();
+    }
   }, [seconds]);
 
   return (

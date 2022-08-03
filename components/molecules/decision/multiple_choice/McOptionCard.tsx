@@ -4,13 +4,14 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import {
@@ -28,7 +29,7 @@ import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewM
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import McOptionConfirmVoteModal from './McOptionConfirmVoteModal';
 
 import { formatNumber } from '../../../../utils/format';
@@ -56,6 +57,8 @@ import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
 import OptionEllipseModal from '../OptionEllipseModal';
 import McConfirmDeleteOptionModal from './moderation/McConfirmDeleteOptionModal';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
+import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface IMcOptionCard {
@@ -63,6 +66,7 @@ interface IMcOptionCard {
   creator: newnewapi.IUser;
   postId: string;
   postCreator: string;
+  postCreatorUuid: string;
   postText: string;
   index: number;
   minAmount: number;
@@ -74,7 +78,7 @@ interface IMcOptionCard {
   optionBeingSupported?: string;
   handleResetFreeVote: () => void;
   handleSetSupportedBid: (id: string) => void;
-  handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
+  handleSetPaymentSuccessModalOpen: (newValue: boolean) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
   ) => void;
@@ -86,6 +90,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   creator,
   postId,
   postCreator,
+  postCreatorUuid,
   postText,
   index,
   minAmount,
@@ -98,7 +103,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   handleResetFreeVote,
   handleSetSupportedBid,
   handleRemoveOption,
-  handleSetPaymentSuccesModalOpen,
+  handleSetPaymentSuccessModalOpen,
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
@@ -114,6 +119,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const { appConstants } = useGetAppConstants();
   // const { walletBalance } = useContext(WalletContext);
 
+  const [amISubscribed, setAmISubscribed] = useState(false);
+
   const isSuggestedByMe = useMemo(
     () =>
       !isCreatorsBid &&
@@ -127,7 +134,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     [option.isSupportedByMe, isSuggestedByMe]
   );
 
-  const supporterCountSubstracted = useMemo(() => {
+  const supporterCountSubtracted = useMemo(() => {
     // if (option.supporterCount) return option.supporterCount;
     if (option.supporterCount > 0) {
       return option.supporterCount - 1;
@@ -187,6 +194,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       }
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [handleRemoveOption, option.id]);
 
@@ -199,8 +207,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   }, []);
 
   const [isSupportMenuOpen, setIsSupportMenuOpen] = useState(false);
-  const [selectVotesMenuTop, setSelectVotesMenuTop] =
-    useState<number | undefined>(undefined);
+  const [selectVotesMenuTop, setSelectVotesMenuTop] = useState<
+    number | undefined
+  >(undefined);
 
   const [isConfirmVoteModalOpen, setIsConfirmVoteModalOpen] = useState(false);
   const [isAmountPredefined, setIsAmountPredefined] = useState(false);
@@ -344,7 +353,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   //       setIsSupportMenuOpen(false);
   //       setPaymentModalOpen(false);
   //       setLoadingModalOpen(false);
-  //       handleSetPaymentSuccesModalOpen(true);
+  //       handleSetPaymentSuccessModalOpen(true);
   //     }
   //   } catch (err) {
   //     setPaymentModalOpen(false);
@@ -357,7 +366,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   //   setIsSupportMenuOpen,
   //   setSupportBidAmount,
   //   handleSetSupportedBid,
-  //   handleSetPaymentSuccesModalOpen,
+  //   handleSetPaymentSuccessModalOpen,
   //   handleAddOrUpdateOptionFromResponse,
   //   supportBidAmount,
   //   option.id,
@@ -400,6 +409,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [option.id, postId, supportBidAmount, user.loggedIn, router.locale]);
 
@@ -429,17 +439,18 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
       setLoadingModalOpen(false);
       handleResetFreeVote();
-      handleSetPaymentSuccesModalOpen(true);
+      handleSetPaymentSuccessModalOpen(true);
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
+      toast.error('toastErrors.generic');
     }
   }, [
     postId,
     option.id,
     appConstants.mcFreeVoteCount,
     handleAddOrUpdateOptionFromResponse,
-    handleSetPaymentSuccesModalOpen,
+    handleSetPaymentSuccessModalOpen,
     handleResetFreeVote,
   ]);
   const goToNextStep = () => {
@@ -462,6 +473,33 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       );
     }
   };
+
+  // Check if the user is subscribed
+  useEffect(() => {
+    async function checkAmISubscribed() {
+      try {
+        const payload = new newnewapi.SubscriptionStatusRequest({
+          creatorUuid: postCreatorUuid,
+        });
+
+        const res = await getSubscriptionStatus(payload);
+
+        if (
+          res.data &&
+          (res.data?.status?.activeRenewsAt ||
+            res.data?.status?.activeCancelsAt)
+        ) {
+          setAmISubscribed(true);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (option.isSupportedByMe) {
+      checkAmISubscribed();
+    }
+  }, [option.isSupportedByMe, postCreatorUuid]);
 
   return (
     <>
@@ -552,7 +590,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                     : undefined
                 }
                 supporterCount={option.supporterCount}
-                supporterCountSubstracted={supporterCountSubstracted}
+                supporterCountSubtracted={supporterCountSubtracted}
+                amISubscribed={amISubscribed}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -692,10 +731,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <PaymentModal
             zIndex={12}
             isOpen={paymentModalOpen}
-            amount={`$${formatNumber(
-              parseInt(supportBidAmount) * votePrice ?? 0,
-              true
-            )}`}
+            amount={(parseInt(supportBidAmount) * 100 || 0) * votePrice}
             // {...(walletBalance?.usdCents &&
             // walletBalance.usdCents >=
             //   parseInt(supportBidAmount) * votePrice * 100
@@ -744,7 +780,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 </SPaymentModalHeadingPostCreator>
               </SPaymentModalHeading>
               <SPaymentModalPostText variant={2}>
-                {postText}
+                <PostTitleContent>{postText}</PostTitleContent>
               </SPaymentModalPostText>
               <SPaymentModalTitle variant={3}>
                 {t('mcPost.paymentModalHeader.subtitle')}
@@ -812,7 +848,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                       : undefined
                   }
                   supporterCount={option.supporterCount}
-                  supporterCountSubstracted={supporterCountSubstracted}
+                  supporterCountSubtracted={supporterCountSubtracted}
+                  amISubscribed={amISubscribed}
                 />
               </SBiddersInfo>
             </SBidDetails>
@@ -892,21 +929,23 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   isSuggestedByMe: boolean;
   isSupportedByMe: boolean;
   supporterCount: number;
-  supporterCountSubstracted: number;
+  supporterCountSubtracted: number;
   optionCreator?: string;
   optionCreatorUsername?: string;
   firstVoter?: string;
   firstVoterUsername?: string;
+  amISubscribed?: boolean;
 }> = ({
   isCreatorsBid,
   isSupportedByMe,
   isSuggestedByMe,
   supporterCount,
-  supporterCountSubstracted,
+  supporterCountSubtracted,
   optionCreator,
   optionCreatorUsername,
   firstVoter,
   firstVoterUsername,
+  amISubscribed,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
@@ -930,11 +969,11 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               </Link>
             )}
             <SSpanBiddersRegular className='spanRegular'>
-              {supporterCountSubstracted > 0 ? ` & ` : ''}
+              {supporterCountSubtracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>
-            {supporterCountSubstracted > 0 ? (
+            {supporterCountSubtracted > 0 ? (
               <SSpanBiddersHighlighted className='spanHighlighted'>
-                {formatNumber(supporterCountSubstracted, true)}{' '}
+                {formatNumber(supporterCountSubtracted, true)}{' '}
                 {t('mcPost.optionsTab.optionCard.others')}
               </SSpanBiddersHighlighted>
             ) : null}{' '}
@@ -951,15 +990,24 @@ export const RenderSupportersInfo: React.FunctionComponent<{
       <>
         {supporterCount > 0 ? (
           <>
-            <SSpanBiddersHighlighted className='spanHighlighted'>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              style={{
+                ...(isSuggestedByMe || amISubscribed
+                  ? {
+                      color: theme.colorsThemed.accent.yellow,
+                    }
+                  : {}),
+              }}
+            >
               {supporterCount > 1 ? t('me') : t('I')}
             </SSpanBiddersHighlighted>
             <SSpanBiddersRegular className='spanRegular'>
-              {supporterCountSubstracted > 0 ? ` & ` : ''}
+              {supporterCountSubtracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>
-            {supporterCountSubstracted > 0 ? (
+            {supporterCountSubtracted > 0 ? (
               <SSpanBiddersHighlighted className='spanHighlighted'>
-                {formatNumber(supporterCountSubstracted, true)}{' '}
+                {formatNumber(supporterCountSubtracted, true)}{' '}
                 {t('mcPost.optionsTab.optionCard.others')}
               </SSpanBiddersHighlighted>
             ) : null}{' '}
@@ -993,12 +1041,12 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           </SSpanBiddersHighlighted>
         </Link>
         <SSpanBiddersRegular className='spanRegular'>
-          {supporterCountSubstracted > 0 ? ` & ` : ''}
+          {supporterCountSubtracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
-        {supporterCountSubstracted > 0 ? (
+        {supporterCountSubtracted > 0 ? (
           <>
             <SSpanBiddersHighlighted className='spanHighlighted'>
-              {formatNumber(supporterCountSubstracted, true)}{' '}
+              {formatNumber(supporterCountSubtracted, true)}{' '}
               {t('mcPost.optionsTab.optionCard.others')}
             </SSpanBiddersHighlighted>
           </>
@@ -1032,12 +1080,12 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           {`${t('me')}`}
         </SSpanBiddersHighlighted>
         <SSpanBiddersRegular className='spanRegular'>
-          {supporterCountSubstracted - 1 > 0 ? ` & ` : ''}
+          {supporterCountSubtracted - 1 > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
-        {supporterCountSubstracted - 1 > 0 ? (
+        {supporterCountSubtracted - 1 > 0 ? (
           <>
             <SSpanBiddersHighlighted className='spanHighlighted'>
-              {formatNumber(supporterCountSubstracted - 1, true)}{' '}
+              {formatNumber(supporterCountSubtracted - 1, true)}{' '}
               {t('mcPost.optionsTab.optionCard.others')}
             </SSpanBiddersHighlighted>
           </>
@@ -1067,12 +1115,12 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           </SSpanBiddersHighlighted>
         </Link>
         <SSpanBiddersRegular className='spanRegular'>
-          {supporterCountSubstracted > 0 ? ` & ` : ''}
+          {supporterCountSubtracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
-        {supporterCountSubstracted > 0 ? (
+        {supporterCountSubtracted > 0 ? (
           <>
             <SSpanBiddersHighlighted className='spanHighlighted'>
-              {formatNumber(supporterCountSubstracted, true)}{' '}
+              {formatNumber(supporterCountSubtracted, true)}{' '}
               {t('mcPost.optionsTab.optionCard.others')}
             </SSpanBiddersHighlighted>
           </>

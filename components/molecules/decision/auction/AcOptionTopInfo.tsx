@@ -6,6 +6,7 @@ import { useTranslation } from 'next-i18next';
 import React, { useCallback, useState } from 'react';
 import { useRouter } from 'next/router';
 import styled, { useTheme } from 'styled-components';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
@@ -20,12 +21,12 @@ import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import SuggestionActionMobileModal from '../OptionActionMobileModal';
 
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
-import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 interface IAcOptionTopInfo {
   creator: newnewapi.IUser;
@@ -239,6 +240,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [user.loggedIn, supportBidAmount, option.id, postId, router.locale]);
 
@@ -363,7 +365,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${formatNumber(parseInt(supportBidAmount) ?? 0, true)}`}
+          amount={parseInt(supportBidAmount) * 100 || 0}
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
@@ -373,7 +375,9 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
             <SPaymentModalTitle variant={3}>
               {t('acPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
-            <SPaymentModalOptionText>{option.title}</SPaymentModalOptionText>
+            <SPaymentModalOptionText>
+              <PostTitleContent>{option.title}</PostTitleContent>
+            </SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>
       ) : null}

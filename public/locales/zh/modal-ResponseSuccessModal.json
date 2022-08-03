@@ -1,6 +1,6 @@
 {
-  "header_NEED_TRANSLATION": "Congrats!",
-  "youMade_NEED_TRANSLATION": "You made",
-  "makeNewPostButton_NEED_TRANSLATION": "Make another post",
+  "header": "恭喜！",
+  "youMade": "你做了",
+  "makeNewPostButton": "再發一個帖子",
   "subtitle": ""
 }

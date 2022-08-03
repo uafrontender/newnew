@@ -37,8 +37,9 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
 
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
-  const [optionsNextPageToken, setOptionsNextPageToken] =
-    useState<string | undefined | null>('');
+  const [optionsNextPageToken, setOptionsNextPageToken] = useState<
+    string | undefined | null
+  >('');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
@@ -212,6 +213,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
               !option.creator || option.creator?.uuid === post.creator?.uuid
             }
             postCreator=''
+            postCreatorUuid={post.creator?.uuid ?? ''}
             postText=''
             index={i}
             minAmount={0}
@@ -219,7 +221,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
             noAction
             handleResetFreeVote={() => {}}
             handleSetSupportedBid={() => {}}
-            handleSetPaymentSuccesModalOpen={() => {}}
+            handleSetPaymentSuccessModalOpen={() => {}}
             handleAddOrUpdateOptionFromResponse={() => {}}
           />
         ))}

@@ -140,6 +140,7 @@ export const Desktop: React.FC = React.memo(() => {
                   >
                     <a>
                       <Button
+                        id='create'
                         withShadow
                         view='primaryGrad'
                         onClick={() => {
@@ -209,23 +210,24 @@ export const Desktop: React.FC = React.memo(() => {
         ) : (
           <>
             <SItemWithMargin>
-              <Link href='/sign-up?to=log-in'>
+              <Link href='/sign-up'>
                 <a>
                   <Button
+                    id='log-in'
                     view='quaternary'
                     onClick={() => {
                       Mixpanel.track('Navigation Item Clicked', {
-                        _button: 'Log in',
+                        _button: 'Sign in',
                       });
                     }}
                   >
-                    {t('button.loginIn')}
+                    {t('button.signIn')}
                   </Button>
                 </a>
               </Link>
             </SItemWithMargin>
             <SItemWithMargin>
-              <Link href='/sign-up'>
+              <Link href='/sign-up?to=create'>
                 <a>
                   <Button
                     withDim
@@ -234,11 +236,11 @@ export const Desktop: React.FC = React.memo(() => {
                     view='primaryGrad'
                     onClick={() => {
                       Mixpanel.track('Navigation Item Clicked', {
-                        _button: 'Sign up',
+                        _button: 'Create now',
                       });
                     }}
                   >
-                    {t('button.signUp')}
+                    {t('button.createOnNewnew')}
                   </Button>
                 </a>
               </Link>

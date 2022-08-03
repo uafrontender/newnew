@@ -1,30 +1,30 @@
 {
   "back": "Back",
   "first-step-title": "What will you post?",
-  "first-step-auction-title": "Event",
+  "first-step-auction-title": "Bid",
   "first-step-auction-sub-title": "People send bids for things they want you to do",
   "first-step-multiple-choice-title": "Superpoll",
   "first-step-multiple-choice-sub-title": "People pay to vote and you do the option with the most votes",
   "first-step-crowdfunding-title": "Goal",
   "first-step-crowdfunding-sub-title": "People pool money together to back your goal",
-  "second-step-auction-title": "Event",
+  "second-step-auction-title": "Bid",
   "second-step-multiple-choice-title": "Superpoll",
   "second-step-crowdfunding-title": "Goal",
   "videoBeingProcessedCaption": "Your video will be available once processed",
   "tabs": {
-    "auction": "Event",
+    "auction": "Bid",
     "multiple-choice": "Superpoll",
     "crowdfunding": "Goal"
   },
   "firstStep": {
     "meta": {
       "title": "Create a post on NewNew",
-      "description": "Create an Event, a Superpoll or a Goal on NewNew in a few simple clicks and earn money"
+      "description": "Create an Bid, a Superpoll or a Goal on NewNew in a few simple clicks and earn money"
     }
   },
   "secondStep": {
     "meta": {
-      "title-auction": "Post an Event on NewNew",
+      "title-auction": "Post an Bid on NewNew",
       "title-multiple-choice": "Post a Superpoll on NewNew",
       "title-crowdfunding": "Post a Goal on NewNew",
       "description-auction": "Fans bid on your auctions and you earn cash",
@@ -83,7 +83,7 @@
         "value": "${{value}}",
         "label": "$",
         "placeholder": "1",
-        "description": "the minimum bid a person can place on your event"
+        "description": "the minimum bid a person can place"
       },
       "targetBackerCount": {
         "title": "Minimum backers",
@@ -98,6 +98,7 @@
         "description": "{{value}}",
         "options": {
           "1-hour": "1 hour",
+          "3-hours": "3 hours",
           "6-hours": "6 hours",
           "12-hours": "12 hours",
           "1-day": "1 day",
@@ -197,11 +198,11 @@
   },
   "preview": {
     "meta": {
-      "title-auction": "Creation | Event | Preview",
+      "title-auction": "Creation | Bid | Preview",
       "title-multiple-choice": "Creation | Superpoll | Preview",
       "title-crowdfunding": "Creation | Goal | Preview"
     },
-    "title-auction": "Review my Event",
+    "title-auction": "Review my Bid",
     "title-multiple-choice": "Review my Superpoll",
     "title-crowdfunding": "Review my Goal",
     "button": {
@@ -226,10 +227,10 @@
   },
   "published": {
     "meta": {
-      "title-auction-published": "Creation | Event | Published",
+      "title-auction-published": "Creation | Bid | Published",
       "title-multiple-choice-published": "Creation | Superpoll | Published",
       "title-crowdfunding-published": "Creation | Goal | Published",
-      "title-auction-scheduled": "Creation | Event | Scheduled",
+      "title-auction-scheduled": "Creation | Bid | Scheduled",
       "title-multiple-choice-scheduled": "Creation | Superpoll | Scheduled",
       "title-crowdfunding-scheduled": "Creation | Goal | Scheduled"
     },
@@ -255,7 +256,7 @@
       "heroButtonText": "Let's go"
     },
     "heroPopupAC": {
-      "title": "Events",
+      "title": "Bids",
       "line1": "1. Open to ideas? Post a video and have the\n audience send you bids on what you should do",
       "line2": "2. People send bids with their ideas, and\n how much they’ll pay to see you do it",
       "line3": "3. Choose your favorite bid, then\n upload a video of yourself doing it!"

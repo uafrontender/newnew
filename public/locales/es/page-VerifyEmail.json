@@ -13,11 +13,11 @@
   },
   "error": {
     "invalidCode": "Código incorrecto. Inténtalo de nuevo...",
-    "emailTaken_NEED_TRANSLATION": "Email already taken",
-    "notConfirmedEmail_NEED_TRANSLATION": "Current email wasn't confirmed or time expired",
-    "noToken_NEED_TRANSLATION": "No token",
-    "invalidToken_NEED_TRANSLATION": "Invalid token"
+    "emailTaken": "Este correo electrónico ya está en uso",
+    "notConfirmedEmail": "Este correo electrónico no fue confirmado o el tiempo expiró",
+    "noToken": "No hay ningún token",
+    "invalidToken": "El token no es válido"
   },
-  "verifying_NEED_TRANSLATION": "Verifying your email...",
+  "verifying": "Verificando tu correo electrónico...",
   "backButton": "Regresar"
 }
