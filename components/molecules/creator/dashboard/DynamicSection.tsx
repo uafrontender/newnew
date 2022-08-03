@@ -16,13 +16,14 @@ import { Tab } from '../../Tabs';
 import AnimatedPresence, {
   TElementAnimations,
 } from '../../../atoms/AnimatedPresence';
+import SearchInput from './SearchInput';
+
 import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
 import { setOverlay } from '../../../../redux-store/slices/uiStateSlice';
 import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 
 import chatIcon from '../../../../public/images/svg/icons/filled/Chat.svg';
-import searchIcon from '../../../../public/images/svg/icons/outlined/Search.svg';
 import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessage.svg';
 import notificationsIcon from '../../../../public/images/svg/icons/filled/Notifications.svg';
 import { useGetChats } from '../../../../contexts/chatContext';
@@ -114,9 +115,7 @@ export const DynamicSection = () => {
       setMarkReadNotifications(false);
     }, 1500);
   }, []);
-  const handleSearchClick = useCallback(() => {
-    console.log('search');
-  }, []);
+
   const handleBulkMessageClick = useCallback(() => {
     setShowNewMessageModal(true);
   }, []);
@@ -136,6 +135,12 @@ export const DynamicSection = () => {
     setAnimate(true);
     setAnimation(tab ? 'o-12' : 'o-12-reverse');
   }, [tab, dispatch, isDesktop]);
+
+  const [searchText, setSearchText] = useState('');
+
+  const handleSetSearchText = useCallback((searchStr: string) => {
+    setSearchText(searchStr);
+  }, []);
 
   return (
     <STopButtons>
@@ -246,14 +251,7 @@ export const DynamicSection = () => {
                     </>
                   ) : (
                     <>
-                      <SChatButton view='secondary' onClick={handleSearchClick}>
-                        <SChatInlineSVG
-                          svg={searchIcon}
-                          fill={theme.colorsThemed.text.primary}
-                          width='20px'
-                          height='20px'
-                        />
-                      </SChatButton>
+                      <SearchInput passInputValue={handleSetSearchText} />
                       <SChatButton
                         view='secondary'
                         onClick={handleBulkMessageClick}
@@ -278,7 +276,7 @@ export const DynamicSection = () => {
                   markReadNotifications={markReadNotifications}
                 />
               ) : (
-                <ChatList />
+                <ChatList searchText={searchText} />
               )}
             </>
           )}
