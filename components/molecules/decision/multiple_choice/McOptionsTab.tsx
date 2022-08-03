@@ -615,11 +615,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 creator: post.creator?.nickname,
               })}
             </SText>
-            <a href={`/${post.creator?.username}/subscribe`}>
+            <SSubscribeLink href={`/${post.creator?.username}/subscribe`}>
               <SSubscribeButton>
                 {t('mcPost.optionsTab.actionSection.subscribeButton')}
               </SSubscribeButton>
-            </a>
+            </SSubscribeLink>
           </SActionSectionSubscribe>
         ) : (
           <div
@@ -987,10 +987,6 @@ const SActionSectionSubscribe = styled.div`
     text-align: center;
   }
 
-  button {
-    width: 100%;
-  }
-
   ${({ theme }) => theme.media.tablet} {
     order: unset;
 
@@ -1025,8 +1021,19 @@ const SText = styled(Text)`
   line-height: 24px;
 `;
 
+const SSubscribeLink = styled.a`
+  display: block;
+
+  width: 100%;
+
+  ${({ theme }) => theme.media.laptop} {
+    max-width: 130px;
+  }
+`;
+
 const SSubscribeButton = styled.button`
   display: block;
+  width: 100%;
 
   background: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
