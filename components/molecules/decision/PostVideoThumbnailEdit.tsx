@@ -262,6 +262,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
                 setDuration={setDuration}
                 borderRadius='16px'
                 setCurrentTime={setCurrentTime}
+                showPlayButton
               />
             )}
           </SPlayerWrapper>

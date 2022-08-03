@@ -44,7 +44,7 @@ const CoverImageCropper: React.FunctionComponent<TCoverImageCropper> = ({
       {coverImageInEdit && (
         <Cropper
           image={coverImageInEdit}
-          objectFit={isMobile ? 'horizontal-cover' : 'vertical-cover'}
+          objectFit='vertical-cover'
           crop={crop}
           cropSize={{
             height: isMobile ? 448 : 498,
