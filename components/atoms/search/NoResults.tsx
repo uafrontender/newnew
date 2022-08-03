@@ -2,7 +2,7 @@
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { scroller } from 'react-scroll';
+import { animateScroll } from 'react-scroll';
 import styled from 'styled-components';
 import { SCROLL_EXPLORE } from '../../../constants/timings';
 import { useAppSelector } from '../../../redux-store/store';
@@ -24,20 +24,17 @@ const NoResults: React.FC<IFunctionProps> = ({ closeDrop }) => {
       router.push('/');
     } else {
       if (closeDrop) closeDrop();
-      scroller.scrollTo('topSection', {
+      animateScroll.scrollToTop({
         offset: isMobile ? -20 : -100,
         smooth: 'ease',
         duration: SCROLL_EXPLORE,
-        containerId: 'generalScrollContainer',
       });
     }
   };
   return (
     <SNoResults>
       <SEmptyInboxTitle>{t('search.noResults.title')}</SEmptyInboxTitle>
-      <SEmptyInboxText>
-      {t('search.noResults.description')}
-      </SEmptyInboxText>
+      <SEmptyInboxText>{t('search.noResults.description')}</SEmptyInboxText>
       <Button onClick={exploreHandler}>{t('search.noResults.action')}</Button>
     </SNoResults>
   );

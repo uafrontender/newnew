@@ -7,7 +7,7 @@
     "title": {
       "biggest": "Greatest of all Time",
       "for-you": "For you",
-      "ac": "Biggest Events",
+      "ac": "Biggest Bids",
       "mc": "Top Superpolls",
       "cf": "Popular Goals"
     },
@@ -19,7 +19,7 @@
   },
   "tutorial": {
     "ac": {
-      "title": "Event",
+      "title": "Bid",
       "caption": "Send the creator a bid with what you want them to do, how much you're willing to spend, and see if they do your bid."
     },
     "mc": {

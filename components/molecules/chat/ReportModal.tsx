@@ -2,16 +2,17 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import dynamic from 'next/dynamic';
-import preventParentClick from '../../../utils/preventParentClick';
-import Modal from '../../organisms/Modal';
-import Button from '../../atoms/Button';
+
 import { useAppSelector } from '../../../redux-store/store';
+import preventParentClick from '../../../utils/preventParentClick';
+
+import Modal from '../../organisms/Modal';
+import ModalPaper from '../../organisms/ModalPaper';
+import Button from '../../atoms/Button';
 import CheckMark from '../CheckMark';
 import InlineSvg from '../../atoms/InlineSVG';
-import CloseIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
-const GoBackButton = dynamic(() => import('../GoBackButton'));
+import CloseIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
 export interface ReportData {
   reasons: newnewapi.ReportingReason[];
@@ -36,6 +37,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     const [reasons, setReasons] = useState<newnewapi.ReportingReason[]>([]);
     const [message, setMessage] = useState('');
     const [reportSent, setReportSent] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const disabled = reasons.length === 0 || message.length < 15;
 
@@ -77,11 +79,13 @@ const ReportModal: React.FC<IReportModal> = React.memo(
 
     const submitReport = async () => {
       if (reasons.length > 0 && message.length >= 15) {
+        setIsSubmitting(true);
         await onSubmit({
           reasons,
           message,
         });
         setReportSent(true);
+        setIsSubmitting(false);
       }
     };
 
@@ -121,77 +125,79 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     return (
       <>
         <Modal show={show} onClose={handleClose}>
-          <SContainer onClick={preventParentClick()}>
-            <SModal>
-              <SModalHeader>
-                {isMobile && <GoBackButton onClick={handleClose} />}
-                <SModalTitle>
-                  {t('modal.reportUser.title')} {reportedDisplayname}
-                </SModalTitle>
-              </SModalHeader>
-              <SModalMessage>{t('modal.reportUser.subtitle')}</SModalMessage>
-              <SCheckBoxList>
-                {reportTypes.map((item) => (
-                  <SCheckBoxWrapper key={item.id}>
-                    <CheckMark
-                      id={item.id.toString()}
-                      label={item.title}
-                      selected={reasons.includes(item.id)}
-                      handleChange={() => handleTypeChange(item.id)}
-                    />
-                  </SCheckBoxWrapper>
-                ))}
-              </SCheckBoxList>
-              <STextAreaWrapper>
-                <STextAreaTitle>
-                  <span>
-                    {message ? message.length : 0}/{reportMaxLength}
-                  </span>
-                </STextAreaTitle>
-                <STextArea
-                  id='report-additional-info'
-                  maxLength={reportMaxLength}
-                  value={message}
-                  onChange={handleMessageChange}
-                  placeholder={`${t(
-                    'modal.reportUser.additionalInfo.placeholder'
-                  )}`}
-                />
-              </STextAreaWrapper>
-              <SModalButtons>
-                {!isMobile && (
-                  <SCancelButton onClick={handleClose}>
-                    {t('modal.reportUser.button.cancel')}
-                  </SCancelButton>
-                )}
-                <SConfirmButton
-                  view='primaryGrad'
-                  disabled={disabled}
-                  onClick={submitReport}
+          <ModalPaper
+            title={`${t('modal.reportUser.title')} ${reportedDisplayname}`}
+            onClose={handleClose}
+            isMobileFullScreen
+            onClick={preventParentClick()}
+          >
+            <SModalMessage>{t('modal.reportUser.subtitle')}</SModalMessage>
+            <SCheckBoxList>
+              {reportTypes.map((item) => (
+                <SCheckBoxWrapper
+                  key={item.id}
+                  onClick={() => handleTypeChange(item.id)}
                 >
-                  Report
-                </SConfirmButton>
-              </SModalButtons>
-            </SModal>
-          </SContainer>
+                  <SCheckMark
+                    id={item.id.toString()}
+                    label={item.title}
+                    selected={reasons.includes(item.id)}
+                  />
+                </SCheckBoxWrapper>
+              ))}
+            </SCheckBoxList>
+            <STextAreaWrapper>
+              <STextAreaTitle>
+                <span>
+                  {message ? message.length : 0}/{reportMaxLength}
+                </span>
+              </STextAreaTitle>
+              <STextArea
+                id='report-additional-info'
+                maxLength={reportMaxLength}
+                value={message}
+                onChange={handleMessageChange}
+                placeholder={`${t(
+                  'modal.reportUser.additionalInfo.placeholder'
+                )}`}
+              />
+            </STextAreaWrapper>
+            <SModalButtons>
+              {!isMobile && (
+                <SCancelButton onClick={handleClose}>
+                  {t('modal.reportUser.button.cancel')}
+                </SCancelButton>
+              )}
+              <SConfirmButton
+                view='primaryGrad'
+                disabled={disabled}
+                onClick={submitReport}
+                loading={isSubmitting}
+              >
+                {t('modal.reportUser.button.report')}
+              </SConfirmButton>
+            </SModalButtons>
+          </ModalPaper>
         </Modal>
         <Modal show={reportSent} onClose={handleClose}>
-          <SContainer onClick={preventParentClick()}>
-            <ConformationContainer>
-              <CloseButton onClick={handleClose}>
-                <InlineSvg svg={CloseIcon} />
-              </CloseButton>
-              <SConformationTitle>
-                {t('modal.reportSent.title')}
-              </SConformationTitle>
-              <SConformationText>
-                {t('modal.reportSent.subtitle')}
-              </SConformationText>
-              <SAcknowledgementButton view='primaryGrad' onClick={handleClose}>
-                {t('modal.reportSent.button')}
-              </SAcknowledgementButton>
-            </ConformationContainer>
-          </SContainer>
+          <SConformationModal
+            onClose={handleClose}
+            isCloseButton
+            onClick={preventParentClick()}
+          >
+            <SCloseButton onClick={handleClose}>
+              <InlineSvg svg={CloseIcon} />
+            </SCloseButton>
+            <SConformationTitle>
+              {t('modal.reportSent.title')}
+            </SConformationTitle>
+            <SConformationText>
+              {t('modal.reportSent.subtitle')}
+            </SConformationText>
+            <SAcknowledgementButton view='primaryGrad' onClick={handleClose}>
+              {t('modal.reportSent.button')}
+            </SAcknowledgementButton>
+          </SConformationModal>
         </Modal>
       </>
     );
@@ -199,63 +205,6 @@ const ReportModal: React.FC<IReportModal> = React.memo(
 );
 
 export default ReportModal;
-
-const SContainer = styled.div`
-  display: flex;
-  height: 100%;
-  justify-content: center;
-  align-items: center;
-`;
-
-const SModal = styled.div`
-  width: 100%;
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colors.white
-      : props.theme.colorsThemed.background.secondary};
-  color: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
-  padding: 0 16px 16px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  line-height: 24px;
-  height: 100%;
-  overflow: auto;
-  z-index: 1;
-
-  ${(props) => props.theme.media.tablet} {
-    height: auto;
-    padding: 24px;
-    max-width: 480px;
-    border-radius: ${(props) => props.theme.borderRadius.medium};
-  }
-`;
-
-const SModalHeader = styled.div`
-  display: flex;
-  height: 58px;
-  align-items: center;
-  margin-bottom: 16px;
-  flex-shrink: 0;
-  ${(props) => props.theme.media.tablet} {
-    display: block;
-    height: auto;
-    margin: 0 0 24px;
-  }
-`;
-
-const SModalTitle = styled.strong`
-  font-size: 14px;
-  margin: 0;
-  font-weight: 600;
-  ${(props) => props.theme.media.tablet} {
-    font-size: 20px;
-    margin-bottom: 16px;
-  }
-`;
 
 const SModalMessage = styled.p`
   font-size: 14px;
@@ -331,7 +280,14 @@ const SCheckBoxList = styled.div`
 `;
 
 const SCheckBoxWrapper = styled.div`
-  margin-bottom: 22px;
+  margin-top: 10px;
+  padding: 5px;
+  margin-bottom: 10px;
+  overflow: hidden;
+`;
+
+const SCheckMark = styled(CheckMark)`
+  pointer-events: none;
 `;
 
 const STextAreaWrapper = styled.div`
@@ -379,23 +335,30 @@ const STextArea = styled.textarea`
   }
 `;
 
-const ConformationContainer = styled(SModal)`
+const SConformationModal = styled(ModalPaper)`
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   padding: 72px 40px 40px 40px;
   margin: auto 16px;
   height: auto;
   max-width: 350px;
+  width: 100%;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    ${(props) => props.theme.media.tablet} {
+      font-size: 16px;
+    }
+  }
 
   ${(props) => props.theme.media.tablet} {
-    font-size: 16px;
     max-width: 480px;
   }
 `;
 
-const CloseButton = styled.div`
+const SCloseButton = styled.div`
   position: absolute;
   top: 24px;
   right: 24px;

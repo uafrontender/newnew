@@ -59,8 +59,9 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
 }) => {
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >();
 
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
@@ -201,7 +202,7 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
           post={displayedPost}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemovePostFromState={() =>
+          handleRemoveFromStateDeleted={() =>
             handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
           }
         />
@@ -284,7 +285,6 @@ export async function getServerSideProps(
       },
     };
   } catch (err) {
-    console.log(err);
     return {
       props: {
         error: {

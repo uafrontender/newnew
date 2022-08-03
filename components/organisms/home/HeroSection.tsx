@@ -40,14 +40,12 @@ export const HeroSection = React.memo(() => {
         offset: isMobile ? -20 : -100,
         smooth: 'ease',
         duration: SCROLL_EXPLORE,
-        containerId: 'generalScrollContainer',
       });
     } else {
       scroller.scrollTo('mc', {
         offset: isMobile ? -20 : -100,
         smooth: 'ease',
         duration: SCROLL_EXPLORE,
-        containerId: 'generalScrollContainer',
       });
     }
   };
@@ -104,7 +102,7 @@ export const HeroSection = React.memo(() => {
               delay={0.4}
               onAnimationEnd={handleTitleAnimationEnd}
             >
-              {t('heroSection.title')}
+              {t('heroSection.title') as string}
             </AnimatedPresence>
           </SHeadline>
           <SSubTitle weight={600}>
@@ -120,7 +118,7 @@ export const HeroSection = React.memo(() => {
             <SButtonsHolder>
               {isMobile ? (
                 <>
-                  <Link href='/sign-up?to=log-in'>
+                  <Link href='/sign-up'>
                     <a>
                       <SButton
                         withDim

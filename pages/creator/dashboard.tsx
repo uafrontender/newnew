@@ -1,29 +1,18 @@
 import React, { ReactElement } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { GetServerSideProps } from 'next';
-import { useUpdateEffect } from 'react-use';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import General from '../../components/templates/General';
 import Content from '../../components/organisms/creator/Dashboard';
 
 import { NextPageWithLayout } from '../_app';
-import { useAppSelector } from '../../redux-store/store';
 import assets from '../../constants/assets';
 
 export const Dashboard = () => {
   const { t } = useTranslation('page-Creator');
-  const router = useRouter();
-  const user = useAppSelector((state) => state.user);
-
-  useUpdateEffect(() => {
-    if (!user.loggedIn) {
-      router?.push('/sign-up?to=log-in');
-    }
-  }, [router, user.loggedIn]);
 
   return (
     <>

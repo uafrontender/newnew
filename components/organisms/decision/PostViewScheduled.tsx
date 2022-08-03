@@ -35,8 +35,8 @@ interface IPostViewScheduled {
   handleSetIsFollowingDecision: (newValue: boolean) => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleRemovePostFromState: () => void;
-  handleAddPostToState: () => void;
+  handleRemoveFromStateUnfavorited: () => void;
+  handleAddPostToStateFavorited: () => void;
   handleReportOpen: () => void;
 }
 
@@ -53,8 +53,8 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
       handleGoBack,
       handleUpdatePostStatus,
       handleReportOpen,
-      handleRemovePostFromState,
-      handleAddPostToState,
+      handleRemoveFromStateUnfavorited,
+      handleAddPostToStateFavorited,
     }) => {
       const dispatch = useAppDispatch();
       const { user } = useAppSelector((state) => state);
@@ -96,7 +96,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
             setIsFollowing(!isFollowing);
 
             if (isFollowing) {
-              handleRemovePostFromState?.();
+              handleRemoveFromStateUnfavorited?.();
             }
           }
         } catch (err) {
@@ -182,8 +182,10 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
               hasRecommendations={hasRecommendations}
               handleSetIsFollowingDecision={handleSetIsFollowingDecision}
               handleReportOpen={handleReportOpen}
-              handleRemovePostFromState={handleRemovePostFromState}
-              handleAddPostToState={handleAddPostToState}
+              handleRemoveFromStateUnfavorited={
+                handleRemoveFromStateUnfavorited
+              }
+              handleAddPostToStateFavorited={handleAddPostToStateFavorited}
             />
           ) : (
             <PostTopInfoModeration
@@ -194,7 +196,6 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
               hasWinner={false}
               hasResponse={false}
               handleUpdatePostStatus={handleUpdatePostStatus}
-              handleRemovePostFromState={handleRemovePostFromState}
             />
           )}
           <SActivitesContainer>
@@ -221,7 +222,8 @@ const SWrapper = styled.div`
   grid-template-areas:
     'expires'
     'video'
-    'title';
+    'title'
+    'activities';
 
   margin-bottom: 32px;
 

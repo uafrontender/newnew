@@ -16,6 +16,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { validateText } from '../../../../api/endpoints/infrastructure';
@@ -37,7 +38,7 @@ import Button from '../../../atoms/Button';
 import McOptionCard from './McOptionCard';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 // import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
-import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
+import PaymentModal from '../../checkout/PaymentModal';
 import LoadingModal from '../../LoadingModal';
 import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
@@ -53,8 +54,8 @@ import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
-import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -340,6 +341,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [newBidAmount, newOptionText, post.postUuid, router.locale]);
 
@@ -382,6 +384,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
+      toast.error('toastErrors.generic');
     }
   }, [
     newOptionText,
@@ -489,6 +492,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               option={option as TMcOptionWithHighestField}
               creator={option.creator ?? post.creator!!}
               postCreator={postCreator}
+              postCreatorUuid={post.creator?.uuid ?? ''}
               postText={post.title}
               postId={post.postUuid}
               index={i}
@@ -509,7 +513,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               handleSetSupportedBid={(id: string) =>
                 setOptionBeingSupported(id)
               }
-              handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
+              handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
                 setPaymentSuccessModalOpen(newValue)
               }
               handleAddOrUpdateOptionFromResponse={
@@ -611,11 +615,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 creator: post.creator?.nickname,
               })}
             </SText>
-            <Link href={`/${post.creator?.username}/subscribe`}>
+            <a href={`/${post.creator?.username}/subscribe`}>
               <SSubscribeButton>
                 {t('mcPost.optionsTab.actionSection.subscribeButton')}
               </SSubscribeButton>
-            </Link>
+            </a>
           </SActionSectionSubscribe>
         ) : (
           <div
@@ -694,10 +698,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${formatNumber(
-            parseInt(newBidAmount) * votePrice ?? 0,
-            true
-          )}`}
+          amount={(parseInt(newBidAmount) * 100 || 0) * votePrice}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * votePrice * 100
           //   ? {}
@@ -752,7 +753,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
-              {post.title}
+              <PostTitleContent>{post.title}</PostTitleContent>
             </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
               {t('mcPost.paymentModalHeader.subtitle')}
@@ -973,7 +974,6 @@ const SActionSectionSubscribe = styled.div`
 
   min-height: 50px;
   width: 100%;
-  z-index: 5;
 
   padding-top: 24px;
 
@@ -990,6 +990,7 @@ const SActionSectionSubscribe = styled.div`
   button {
     width: 100%;
   }
+
   ${({ theme }) => theme.media.tablet} {
     order: unset;
 
@@ -997,6 +998,8 @@ const SActionSectionSubscribe = styled.div`
 
     border-top: 1.5px solid
       ${({ theme }) => theme.colorsThemed.background.outlines1};
+
+    z-index: 5;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -1022,15 +1025,28 @@ const SText = styled(Text)`
   line-height: 24px;
 `;
 
-const SSubscribeButton = styled(Button)`
+const SSubscribeButton = styled.button`
+  display: block;
+
   background: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
   color: ${({ theme }) => theme.colors.dark};
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: bold;
+
+  padding: 16px 24px;
+  border-radius: ${(props) => props.theme.borderRadius.medium};
+  border: transparent;
+  outline: none;
+
+  cursor: pointer;
 
   :active:enabled,
   :focus:enabled,
   :hover:enabled {
     background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+    outline: none;
   }
 `;
 

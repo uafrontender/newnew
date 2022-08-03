@@ -1,30 +1,30 @@
 {
   "back": "返回",
   "first-step-title": "想發佈什麼？",
-  "first-step-auction-title": "Event",
+  "first-step-auction-title": "Bid",
   "first-step-auction-sub-title": "大家為他們想讓你做的事出價",
   "first-step-multiple-choice-title": "Superpoll",
   "first-step-multiple-choice-sub-title": "大家付費投票，你完成得票最多的選項",
   "first-step-crowdfunding-title": "Goal",
   "first-step-crowdfunding-sub-title": "大家把錢彙集起來支持你的Goal",
-  "second-step-auction-title": "Event",
+  "second-step-auction-title": "Bid",
   "second-step-multiple-choice-title": "Superpoll",
   "second-step-crowdfunding-title": "Goal",
   "videoBeingProcessedCaption": "你的視頻處理完畢即可發佈",
   "tabs": {
-    "auction": "Event",
+    "auction": "Bid",
     "multiple-choice": "Superpoll",
     "crowdfunding": "Goal"
   },
   "firstStep": {
     "meta": {
       "title": "在NewNew上創建帖子",
-      "description": "在NewNew上創建Event、Superpoll或Goal，只需點擊幾下，就能賺取收入"
+      "description": "在NewNew上創建Bid、Superpoll或Goal，只需點擊幾下，就能賺取收入"
     }
   },
   "secondStep": {
     "meta": {
-      "title-auction": "在NewNew上發佈Event",
+      "title-auction": "在NewNew上發佈Bid",
       "title-multiple-choice": "在NewNew上發佈Superpoll",
       "title-crowdfunding": "在NewNew上發佈Goal",
       "description-auction": "粉絲為你的拍賣出價，你可以賺取收入",
@@ -83,7 +83,7 @@
         "value": "${{value}}",
         "label": "$",
         "placeholder": "1",
-        "description": "某人為你的Event可以出的最低價"
+        "description": "某人為你的Bid可以出的最低價"
       },
       "targetBackerCount": {
         "title": "最低支持人數",
@@ -98,6 +98,7 @@
         "description": "{{value}}",
         "options": {
           "1-hour": "1小時後",
+          "3-hours": "3小時後",
           "6-hours": "6小時後",
           "12-hours": "12小時後",
           "1-day": "1天後",
@@ -159,25 +160,25 @@
         "description": "發生錯誤，檔案無法上傳，想再試一次嗎？"
       },
       "setThumbnail": "設置縮略圖",
-      "thumbnailEllipseMenu_NEED_TRANSLATION": {
-        "selectSnippetButton": "Select a snippet",
-        "uploadImageButton": "Upload an image"
+      "thumbnailEllipseMenu": {
+        "selectSnippetButton": "選擇一個片段",
+        "uploadImageButton": "上傳圖片"
       },
       "deleteFile": "刪除檔案",
       "previewFull": "預覽",
       "thumbnail": {
         "info": "瞭解更多",
-        "title_NEED_TRANSLATION": "Set a thumbnail from the video",
-        "submit_NEED_TRANSLATION": "Save",
-        "description_NEED_TRANSLATION": "Select a snippet for your thumbnail. \nA good thumbnail gets viewers excited..."
+        "title": "從視頻中設定一個縮略圖",
+        "submit": "保存",
+        "description": "為縮略圖選擇一個片段。\\n一個好的縮略圖能吸引觀眾......"
       },
-      "coverImage_NEED_TRANSLATION": {
-        "title": "Upload an image",
-        "submit": "Save",
+      "coverImage": {
+        "title": "上傳圖片",
+        "submit": "保存",
         "uploadCoverImage": {
-          "caption": "Select custom cover image",
-          "uploadBtn": "Select",
-          "deleteBtn": "Delete"
+          "caption": "選擇自定義封面圖片",
+          "uploadBtn": "選擇",
+          "deleteBtn": "刪除"
         }
       },
       "full": {
@@ -189,7 +190,7 @@
         "process": "{{progress}}% • 還需{{time}}"
       },
       "processing": {
-        "title_NEED_TRANSLATION": "Your file is processing. It won’t take long...",
+        "title": "文檔正在處理中，不會需要很長時間......",
         "description": "視頻處理中",
         "process": "{{progress}}% • 還需{{time}}"
       }
@@ -197,11 +198,11 @@
   },
   "preview": {
     "meta": {
-      "title-auction": "創作 | Event | 預覽",
+      "title-auction": "創作 | Bid | 預覽",
       "title-multiple-choice": "創作 | Superpoll | 預覽",
       "title-crowdfunding": "創作 | Goal | 預覽"
     },
-    "title-auction": "審核我的Event",
+    "title-auction": "審核我的Bid",
     "title-multiple-choice": "審核我的Superpoll",
     "title-crowdfunding": "審核我的Goal",
     "button": {
@@ -226,10 +227,10 @@
   },
   "published": {
     "meta": {
-      "title-auction-published": "創建 | Event | 已發佈",
+      "title-auction-published": "創建 | Bid | 已發佈",
       "title-multiple-choice-published": "創建 | Superpoll | 已發佈",
       "title-crowdfunding-published": "創建 | Goal | 已發佈",
-      "title-auction-scheduled": "創建 | Event | 已計畫",
+      "title-auction-scheduled": "創建 | Bid | 已計畫",
       "title-multiple-choice-scheduled": "創建 | Superpoll | 已計畫",
       "title-crowdfunding-scheduled": "創建 | Goal | 已計畫"
     },
@@ -255,7 +256,7 @@
       "heroButtonText": "我們開始吧"
     },
     "heroPopupAC": {
-      "title": "Event",
+      "title": "Bid",
       "line1": "1.願意接受意見嗎？發佈一個視頻，讓觀眾給你\n出價，告訴你想讓你做什麼",
       "line2": "2.人們告訴你他們的想法，然後出價，\n說明他們願意出多少錢看你照做",
       "line3": "3.選擇你最喜歡的出價，然後\n上傳你自己做這件事的視頻！"

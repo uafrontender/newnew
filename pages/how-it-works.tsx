@@ -62,7 +62,7 @@ export const HowItWorks = () => {
                   ? assets.creation.lightAcAnimated
                   : assets.creation.darkAcAnimated
               }
-              alt='events'
+              alt='bids'
               // Quick fix for animated image alignment
               style={
                 // eslint-disable-next-line no-nested-ternary

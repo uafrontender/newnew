@@ -99,6 +99,7 @@ export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
+    'common',
     'page-CreatorOnboarding',
   ]);
 

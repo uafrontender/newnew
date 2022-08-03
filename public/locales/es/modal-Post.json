@@ -1,7 +1,7 @@
 {
   "meta": {
     "ac": {
-      "title": "Event NewNew",
+      "title": "Bid NewNew",
       "description": "Gana dinero, haz ofertas en subastas con amigos y apoya creadores en NewNew"
     },
     "mc": {
@@ -17,11 +17,11 @@
   "me": "mí",
   "I": "yo",
   "postType": {
-    "ac": "Event",
+    "ac": "Bid",
     "mc": "Superpoll",
     "cf": "Goal",
     "multiple": {
-      "ac": "Events",
+      "ac": "Bids",
       "mc": "Superpolls",
       "cf": "Goals"
     }
@@ -57,7 +57,7 @@
       "cf": "¡Estás patrocinando este Goal!"
     },
     "doneButton": "¡Suena bien!",
-    "ac": "{{postCreator}} elegirá su oferta favorita una vez finalizado el evento.",
+    "ac_NEED_TRANSLATION": "{{postCreator}} will pick their favorite bid once time is up.",
     "mc": "{{postCreator}} hará la opción con la mayor cantidad de votos cuando termine la Superpoll.",
     "cf": "{{postCreator}} hará el objetivo una vez que consiga suficientes patrocinadores."
   },
@@ -127,7 +127,7 @@
       "backToOriginalVideo": "Volver al original",
       "backToResponse": "Ver respuesta"
     },
-    "reuploadButton_NEED_TRANSLATION": "re-upload",
+    "reuploadButton": "volver a subir",
     "cannotLeavePageMsg": "¿Estás seguro de que quieres cerrar esta página? El progreso de la carga se perderá",
     "floatingUploadResponseButton": "Hacer un video de respuesta",
     "setThumbnail": "Establecer una miniatura",
@@ -186,7 +186,7 @@
         },
         "processing": {
           "title": "Procesando el video",
-          "description__NEED_TRANSLATION": "Your video is being processed... hang tight!",
+          "description": "Tu video está siendo procesado, ¡espera un momento!",
           "process": "{{progress}}% • Quedan {{time}}",
           "uploadNonProcessed": "Publicar"
         },
@@ -242,7 +242,7 @@
   },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
-      "ac": "Este Event comenzará una vez que el \nvideo haya sido procesado",
+      "ac": "Este Bid comenzará una vez que el \nvideo haya sido procesado",
       "mc": "Esta Superpoll comenzará una vez que \nel video haya sido procesado",
       "cf": "Este Goal comenzará una vez que \nel video haya sido procesado"
     },
@@ -285,7 +285,7 @@
   },
   "acPost": {
     "paymentModalHeader": {
-      "title": "El Event de {{creator}}",
+      "title": "El Bid de {{creator}}",
       "subtitle": "Tu oferta"
     },
     "paymentModalFooter": {
@@ -481,9 +481,9 @@
       "choosePledgeButton": "Patrocinar este goal"
     }
   },
-  "thumbnailEllipseMenu_NEED_TRANSLATION": {
-    "selectSnippetButton": "Select a snippet",
-    "uploadImageButton": "Upload an image"
+  "thumbnailEllipseMenu": {
+    "selectSnippetButton": "Selecciona un fragmento",
+    "uploadImageButton": "Subir una imagen"
   },
   "postVideoThumbnailEdit": {
     "title": "Establecer una miniatura",
@@ -495,14 +495,14 @@
       "error": "Ha ocurrido un error"
     }
   },
-  "postVideoCoverImageEdit_NEED_TRANSLATION": {
-    "title": "Upload an image",
-    "submit": "Save",
-    "cancel": "Cancel",
+  "postVideoCoverImageEdit": {
+    "title": "Subir una imagen",
+    "submit": "Guardar",
+    "cancel": "Cancelar",
     "uploadCoverImage": {
-      "caption": "Select custom cover image",
-      "uploadBtn": "Select",
-      "deleteBtn": "Delete"
+      "caption": "Seleccionar una imagen de portada personalizada",
+      "uploadBtn": "Seleccionar",
+      "deleteBtn": "Borrar"
     }
   },
   "acPostModeration": {
@@ -527,7 +527,7 @@
       },
       "optionCard": {
         "pickButton": "Seleccionar",
-        "pickedButton_NEED_TRANSLATION": "Chosen"
+        "pickedButton": "Seleccionado"
       }
     },
     "winnerTab": {
@@ -566,17 +566,17 @@
     }
   },
   "cfPostModeration": {
-    "moneyRaised_NEED_TRANSLATION": "Total raised",
+    "moneyRaised": "Total recaudado",
     "winnerTab": {
       "winnerOptionCard": {
-        "backersToldYou": "backers successfully funded",
-        "backerToldYou": "backer successfully funded",
+        "backersToldYou": "patrocinadores financiaron con éxito",
+        "backerToldYou": "patrocinador financió con éxito",
         "youMade": "Ganaste"
       }
     }
   },
   "acPostSuccess": {
-    "heroText": "¡Este Event ha terminado!",
+    "heroText": "¡Este Bid ha terminado!",
     "wantsToKnow": "{{creator}} quiere saber...",
     "inTotalBids": "ofertas en total",
     "others": "otros",
@@ -700,7 +700,7 @@
     "button": "Hecho"
   },
   "heroPopupAC": {
-    "title": "Events",
+    "title": "Bids",
     "text": "Controla el resultado...\n Envía al creador una oferta con lo que quieres que haga, cuánto gastarías por verlo realizar tu oferta y observa cómo la realiza."
   },
   "heroPopupMC": {
@@ -711,30 +711,30 @@
     "title": "Goals",
     "text": "Reúne dinero con otros para respaldar los objetivos de tus creadores favoritos. Si un número suficiente de personas respalda el objetivo, ¡verás cómo el creador lo realiza!"
   },
-  "postResponseTabModeration_NEED_TRANSLATION": {
+  "postResponseTabModeration": {
     "awaiting": {
-      "topHeader": "Time to post \nyour response!",
-      "postResponseBtn": "Post Response",
-      "youWillGet": "You'll get"
+      "topHeader": "¡Es hora de \npublicar tu respuesta!",
+      "postResponseBtn": "Publicar respuesta",
+      "youWillGet": "Obtendrás"
     },
     "succeeded": {
-      "topHeader": "Response \npublished!",
-      "youMade": "You made",
-      "shareBtn": "Share",
-      "linkCopied": "Link copied!"
+      "topHeader": "¡Respuesta \npublicada!",
+      "youMade": "Ganaste",
+      "shareBtn": "Compartir",
+      "linkCopied": "¡Enlace copiado!"
     },
     "winner": {
-      "inResponseToYourPost": "In response to your post",
+      "inResponseToYourPost": "En respuesta a tu publicación",
       "ac": {
-        "numBiddersChoseSingular": "{{amount}} bidder chose",
-        "numBiddersChose": "{{amount}} bidders chose",
-        "optionCreator": "<0>{{nickname}}</0>'s bid"
+        "numBiddersChoseSingular": "{{amount}} patrocinador escogió",
+        "numBiddersChose": "{{amount}} patrocinadores escogieron",
+        "optionCreator": "la oferta de <0>{{nickname}}</0>"
       },
       "mc": {
-        "numBiddersChoseSingular": "{{amount}} voter chose",
-        "numBiddersChose": "{{amount}} voters chose",
-        "optionOwn": "the option",
-        "optionCreator": "<0>{{nickname}}</0>'s option"
+        "numBiddersChoseSingular": "{{amount}} votante escogió",
+        "numBiddersChose": "{{amount}} votantes escogieron",
+        "optionOwn": "la opción",
+        "optionCreator": "la opción de <0>{{nickname}}</0>"
       }
     }
   },

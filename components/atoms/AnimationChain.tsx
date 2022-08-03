@@ -120,6 +120,7 @@ const Video = styled.video<{ visibility?: 'play' | 'hold' }>`
 
   // Chrome can't show white background, needs brightness fix
   @media screen and (-webkit-min-device-pixel-ratio: 0) {
-    -webkit-filter: brightness(101%);
+    -webkit-filter: ${({ theme }) =>
+      theme.name === 'light' ? 'brightness(101%)' : undefined};
   }
 `;

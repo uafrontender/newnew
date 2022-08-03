@@ -248,6 +248,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
                 setDuration={setDuration}
                 borderRadius='16px'
                 setCurrentTime={setCurrentTime}
+                showPlayButton
               />
             )}
           </SPlayerWrapper>

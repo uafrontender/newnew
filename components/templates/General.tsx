@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { useTheme } from 'styled-components';
+import { useRouter } from 'next/router';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -40,9 +41,12 @@ interface IGeneral {
 export const General: React.FC<IGeneral> = (props) => {
   const { withChat, specialStatusBarColor, restrictMaxWidth, children } = props;
   const user = useAppSelector((state) => state.user);
-  const { banner, resizeMode } = useAppSelector((state) => state.ui);
+  const { banner, resizeMode, globalSearchActive } = useAppSelector(
+    (state) => state.ui
+  );
   const theme = useTheme();
   const [cookies] = useCookies();
+  const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
   const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
   const { postOverlayOpen } = usePostModalState();
@@ -147,6 +151,14 @@ export const General: React.FC<IGeneral> = (props) => {
     resizeMode
   );
 
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
   const openChat = () => {
     setMobileChatOpened(true);
   };
@@ -167,7 +179,7 @@ export const General: React.FC<IGeneral> = (props) => {
         highlightColor={theme.colorsThemed.background.tertiary}
       >
         <SWrapper
-          id='generalScrollContainer'
+          id='generalContainer'
           ref={wrapperRef}
           withBanner={!!banner?.show}
           {...props}
@@ -182,7 +194,9 @@ export const General: React.FC<IGeneral> = (props) => {
               }
             />
           </Head>
-          <Header visible={!isMobile || mobileNavigationVisible} />
+          <Header
+            visible={!isMobile || mobileNavigationVisible || globalSearchActive}
+          />
           <SContent>
             <Container
               {...(restrictMaxWidth
@@ -203,7 +217,7 @@ export const General: React.FC<IGeneral> = (props) => {
                 collection={bottomNavigation}
                 moreMenuMobileOpen={moreMenuMobileOpen}
                 handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-                visible={mobileNavigationVisible}
+                visible={mobileNavigationVisible && !globalSearchActive}
               />
               <SortingContainer
                 id='sorting-container'
@@ -230,17 +244,21 @@ export const General: React.FC<IGeneral> = (props) => {
               )}
             </ChatContainer>
           )}
-          <ReportBugButton
-            bottom={
-              (isMobile ? 24 : 16) +
-              (isMobile && (mobileNavigationVisible || postOverlayOpen)
-                ? 56
-                : 0) +
-              (chatButtonVisible ? 72 : 0)
-            }
-            right={4}
-            zIndex={moreMenuMobileOpen ? 9 : undefined}
-          />
+          {!isMobileOrTablet && !router.route.includes('direct-messages') && (
+            <ReportBugButton
+              bottom={
+                (isMobile ? 24 : 16) +
+                (isMobile &&
+                (mobileNavigationVisible || postOverlayOpen) &&
+                !mobileChatOpened
+                  ? 56
+                  : 0) +
+                (chatButtonVisible && !mobileChatOpened ? 72 : 0)
+              }
+              right={4}
+              zIndex={moreMenuMobileOpen ? 9 : undefined}
+            />
+          )}
         </SWrapper>
       </SkeletonTheme>
     </ErrorBoundary>
@@ -261,7 +279,10 @@ interface ISWrapper {
 
 const SWrapper = styled.div<ISWrapper>`
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: -moz-available;
+  min-height: -webkit-fill-available;
+  min-height: fill-available;
   display: flex;
   overflow-y: auto;
   transition: padding ease 0.5s;

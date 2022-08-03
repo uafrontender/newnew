@@ -21,6 +21,7 @@ import {
 import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IOptionItem {
+  id?: string;
   item: {
     id: number;
     text: string;
@@ -38,7 +39,7 @@ interface IOptionItem {
 }
 
 const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
-  const { item, index, withDelete, validation, handleChange } = props;
+  const { id, item, index, withDelete, validation, handleChange } = props;
   const [value, setValue] = useState(item.text);
   const [error, setError] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -124,6 +125,7 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
       <STextAreaWrapper>
         <SLeftPart error={!!error} isDragging={isDragging}>
           <STextArea
+            id={id}
             value={item.text}
             onBlur={handleInputBlur}
             onFocus={handleInputFocus}

@@ -34,10 +34,12 @@ import { Mixpanel } from '../../utils/mixpanel';
 
 export interface ICodeVerificationMenu {
   expirationTime: number;
+  redirectUserTo?: string;
 }
 
 const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   expirationTime,
+  redirectUserTo,
 }) => {
   const router = useRouter();
   const { t } = useTranslation('page-VerifyEmail');
@@ -123,14 +125,17 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
             },
           })
         );
+
         // Set credential cookies
-        if (data.credential?.expiresAt?.seconds)
+        if (data.credential?.expiresAt?.seconds) {
           setCookie('accessToken', data.credential?.accessToken, {
             expires: new Date(
               (data.credential.expiresAt.seconds as number) * 1000
             ),
             path: '/',
           });
+        }
+
         setCookie('refreshToken', data.credential?.refreshToken, {
           // Expire in 10 years
           maxAge: 10 * 365 * 24 * 60 * 60,
@@ -151,6 +156,8 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           router.push(data.redirectUrl);
         } else if (data.me?.options?.isCreator) {
           router.push('/creator/dashboard');
+        } else if (redirectUserTo) {
+          router.push(redirectUserTo);
         } else {
           router.push('/');
         }
@@ -169,6 +176,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       signupEmailInput,
       dispatch,
       router,
+      redirectUserTo,
     ]
   );
 
@@ -276,6 +284,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           ) : null}
         </SSubheading>
         <VerificationCodeInput
+          id='verification-input'
           initialValue={codeInitial}
           length={6}
           disabled={

@@ -104,13 +104,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
             {user.userData?.options?.isCreator ? (
               <>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      !user.userData?.options?.isCreator
-                        ? '/creator-onboarding'
-                        : '/creation'
-                    }
-                  >
+                  <Link href='/creation'>
                     <a>
                       <Button
                         view='primaryGrad'
@@ -144,13 +138,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
             ) : (
               <>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      !user.userData?.options?.isCreator
-                        ? '/creator-onboarding'
-                        : '/creation'
-                    }
-                  >
+                  <Link href='/creator-onboarding'>
                     <a>
                       <Button
                         view='primaryGrad'
@@ -183,23 +171,23 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
         ) : (
           <>
             <SItemWithMargin>
-              <Link href='/sign-up?to=log-in'>
+              <Link href='/sign-up'>
                 <a>
                   <Button
                     view='quaternary'
                     onClick={() => {
                       Mixpanel.track('Navigation Item Clicked', {
-                        _button: 'Log in',
+                        _button: 'Sign in',
                       });
                     }}
                   >
-                    {t('button.loginIn')}
+                    {t('button.signIn')}
                   </Button>
                 </a>
               </Link>
             </SItemWithMargin>
             <SItemWithMargin>
-              <Link href='/sign-up'>
+              <Link href='/sign-up?to=create'>
                 <a>
                   <Button
                     withDim
@@ -208,11 +196,11 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                     withShadow={!globalSearchActive}
                     onClick={() => {
                       Mixpanel.track('Navigation Item Clicked', {
-                        _button: 'Sign up',
+                        _button: 'Create now',
                       });
                     }}
                   >
-                    {t('button.signUp')}
+                    {t('button.createOnNewnew')}
                   </Button>
                 </a>
               </Link>

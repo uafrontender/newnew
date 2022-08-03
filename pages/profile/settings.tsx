@@ -14,6 +14,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useUpdateEffect } from 'react-use';
+import { toast } from 'react-toastify';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
@@ -100,6 +101,7 @@ const MyProfileSettingsIndex = () => {
       unblockUser(uuid);
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 
@@ -176,6 +178,7 @@ const MyProfileSettingsIndex = () => {
       );
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 
@@ -320,6 +323,7 @@ const MyProfileSettingsIndex = () => {
         setBlockedUsers(() => users);
       } catch (err) {
         console.error(err);
+        toast.error('toastErrors.generic');
       }
     }
 

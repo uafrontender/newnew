@@ -12,18 +12,16 @@ export const useOverlay = (ref: any) => {
 
       // eslint-disable-next-line no-param-reassign
       ref.current.style.cssText = `
-        top: -${scrollPosition.current}px;
-        left: 0px;
-        right: 0px;
         overflow: hidden;
-        position: fixed;
      `;
+      document.body.style.cssText = `
+        overflow: hidden;
+      `;
 
     } else {
       // eslint-disable-next-line no-param-reassign
-      ref.current.style.cssText = `
-        overflow: auto;
-      `;
+      ref.current.style.cssText = ``;
+      document.body.style.cssText = '';
       window?.scroll(0, scrollPosition.current);
       scrollPosition.current = 0;
     }
