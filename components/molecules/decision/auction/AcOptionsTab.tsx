@@ -135,7 +135,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   // Payment modal
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
   const goToNextStep = (currentStep: newnewapi.AcTutorialStep) => {
     if (user.userTutorialsProgress.remainingAcSteps && currentStep) {
@@ -348,9 +348,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       stripeSetupIntentClientSecret,
       saveCard,
     }: {
-      cardUuid: string;
+      cardUuid?: string;
       stripeSetupIntentClientSecret: string;
-      saveCard: boolean;
+      saveCard?: boolean;
     }) => {
       setLoadingModalOpen(true);
       try {
@@ -359,29 +359,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           _postUuid: postId,
           _component: 'AcOptionsTab',
         });
-        // const createPaymentSessionPayload =
-        //   new newnewapi.CreatePaymentSessionRequest({
-        //     successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-        //       router.locale !== 'en-US' ? `${router.locale}/` : ''
-        //     }post/${postId}`,
-        //     cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-        //       router.locale !== 'en-US' ? `${router.locale}/` : ''
-        //     }post/${postId}`,
-        //     ...(!user.loggedIn
-        //       ? {
-        //           nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-        //         }
-        //       : {}),
-        //     acBidRequest: {
-        //       amount: new newnewapi.MoneyAmount({
-        //         usdCents: parseInt(newBidAmount) * 100,
-        //       }),
-        //       optionTitle: newBidText,
-        //       postUuid: postId,
-        //     },
-        //   });
-
-        // const res = await createPaymentSession(createPaymentSessionPayload);
 
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
@@ -401,18 +378,30 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
         const res = await placeBidOnAuction(completeBidRequest);
 
-        if (!res.data || res.error)
+        if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
+        }
 
-        // window.location.href = res.data.sessionUrl;
+        if (res.data.status === newnewapi.PlaceBidResponse.Status.SUCCESS) {
+          setPaymentSuccessModalOpen(true);
+          setPaymentModalOpen(false);
+          setNewBidAmount('');
+          setNewBidText('');
+          setSuggestNewMobileOpen(false);
+
+          const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
+          optionFromResponse.isSupportedByMe = true;
+          handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        }
+
       } catch (err) {
-        setPaymentModalOpen(false);
-        setLoadingModalOpen(false);
         console.error(err);
         toast.error('toastErrors.generic');
+      } finally {
+        setLoadingModalOpen(false);
       }
     },
-    [placeBidRequest, postId]
+    [placeBidRequest, postId, handleAddOrUpdateOptionFromResponse]
   );
 
   useEffect(() => {
@@ -792,8 +781,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='ac'
-        isVisible={paymentSuccesModalOpen}
-        closeModal={() => setPaymentSuccesModalOpen(false)}
+        isVisible={paymentSuccessModalOpen}
+        closeModal={() => setPaymentSuccessModalOpen(false)}
       >
         {t('paymentSuccessModal.ac', {
           postCreator,

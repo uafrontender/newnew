@@ -4,7 +4,6 @@ import Link from 'next/link';
 import styled from 'styled-components';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { toast } from 'react-toastify';
-import { newnewapi } from 'newnew-api';
 import {
   PaymentElement,
   useElements,
@@ -12,10 +11,11 @@ import {
 } from '@stripe/react-stripe-js';
 
 import Button from '../../atoms/Button';
+import Text from '../../atoms/Text';
+import Toggle from '../../atoms/Toggle';
 import OptionCard from './OptionCard';
 
 import { formatNumber } from '../../../utils/format';
-import { checkCardStatus } from '../../../api/endpoints/card';
 import { useCards } from '../../../contexts/cardsContext';
 
 interface IReCaptchaRes {
@@ -37,9 +37,9 @@ interface ICheckoutForm {
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
   handlePayWithCardStripeRedirect?: (params: {
-    cardUuid: string;
+    cardUuid?: string;
     stripeSetupIntentClientSecret: string;
-    saveCard: boolean;
+    saveCard?: boolean;
   }) => void;
   stipeSecret: string;
 }
@@ -55,9 +55,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const elements = useElements();
   const stripe = useStripe();
 
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
-    PaymentMethodTypes | undefined
-  >();
+  const [isStripeReady, setIsStripeReady] = useState(false);
 
   const { cards } = useCards();
 
@@ -65,6 +63,12 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     () => cards?.find((card) => card.isPrimary),
     [cards]
   );
+
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    PaymentMethodTypes | undefined
+  >();
+
+  const [saveCard, setSaveCard] = useState(false);
 
   const { executeRecaptcha } = useGoogleReCaptcha();
 
@@ -99,10 +103,9 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             handlePayWithCardStripeRedirect?.({
               cardUuid: primaryCard.cardUuid as string,
               stripeSetupIntentClientSecret: stipeSecret,
-              saveCard: false,
             });
           } else if (selectedPaymentMethod === PaymentMethodTypes.NewCard) {
-            const { setupIntent, error } = await stripe.confirmSetup({
+            const { error } = await stripe.confirmSetup({
               elements,
               confirmParams: {
                 return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/profile/settings/card-setup-complete`,
@@ -111,18 +114,15 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             });
 
             if (error) {
+              toast.error(error.message);
+
               throw new Error(error.message);
             }
 
-            const payload = new newnewapi.CheckCardStatusRequest({
-              stripeSetupIntentId: setupIntent.id,
-              stripeSetupIntentClientSecret: setupIntent.client_secret,
+            handlePayWithCardStripeRedirect?.({
+              stripeSetupIntentClientSecret: stipeSecret,
+              saveCard,
             });
-            const response = await checkCardStatus(payload);
-
-            // TODO: add card status handle
-
-            console.log(response, 'response');
           }
         } else {
           throw new Error(
@@ -135,9 +135,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           );
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error('toastErrors.generic');
     }
   };
 
@@ -160,7 +159,18 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       />
       {selectedPaymentMethod === PaymentMethodTypes.NewCard && (
         <SPaymentFormWrapper>
-          <PaymentElement />
+          <PaymentElement onReady={() => setIsStripeReady(true)} />
+          {isStripeReady && (
+            <SSaveCard>
+              <Toggle
+                checked={saveCard}
+                onChange={() => setSaveCard((prevState) => !prevState)}
+              />
+              <SSaveCardText variant={3}>
+                Save card for future use
+              </SSaveCardText>
+            </SSaveCard>
+          )}
         </SPaymentFormWrapper>
       )}
       <SPayButtonDiv>
@@ -213,6 +223,16 @@ export default CheckoutForm;
 
 const SPaymentFormWrapper = styled.div`
   margin-bottom: 16px;
+`;
+
+const SSaveCard = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+`;
+
+const SSaveCardText = styled(Text)`
+  margin-left: 8px;
 `;
 
 const SPayButtonDiv = styled.div`

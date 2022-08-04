@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable arrow-body-style */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/click-events-have-key-events */

@@ -1,9 +1,4 @@
-/* eslint-disable react/jsx-no-target-blank */
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
@@ -20,14 +15,6 @@ import Lottie from '../../atoms/Lottie';
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 
-interface IReCaptchaRes {
-  success?: boolean;
-  challenge_ts?: string;
-  hostname?: string;
-  score?: number;
-  errors?: Array<string> | string;
-}
-
 interface IPaymentModal {
   isOpen: boolean;
   zIndex: number;
@@ -36,9 +23,9 @@ interface IPaymentModal {
   bottomCaption?: React.ReactNode;
   onClose: () => void;
   handlePayWithCardStripeRedirect?: (params: {
-    cardUuid: string;
+    cardUuid?: string;
     stripeSetupIntentClientSecret: string;
-    saveCard: boolean;
+    saveCard?: boolean;
   }) => void;
   children: React.ReactNode;
   createStripeSetupIntent?: () => Promise<
@@ -63,8 +50,6 @@ const PaymentModal: React.FC<IPaymentModal> = ({
     resizeMode
   );
   const { isCardsLoading } = useCards();
-
-  const [isLoadingCards, setIsLoadingCards] = useState(false);
 
   const [stripeSetupIntent, setStripeSetupIntent] =
     useState<newnewapi.CreateStripeSetupIntentResponse>();

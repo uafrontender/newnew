@@ -182,9 +182,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      toast.error(t('toastErrors.generic'));
     }
-  }, [handleRemoveOption, option.id]);
+  }, [handleRemoveOption, option.id, t]);
 
   const handleOpenRemoveForm = useCallback(() => {
     setIsRemoveModalOpen(true);
@@ -366,36 +366,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       stripeSetupIntentClientSecret,
       saveCard,
     }: {
-      cardUuid: string;
+      cardUuid?: string;
       stripeSetupIntentClientSecret: string;
-      saveCard: boolean;
+      saveCard?: boolean;
     }) => {
       setLoadingModalOpen(true);
       try {
-        // const createPaymentSessionPayload =
-        //   new newnewapi.CreatePaymentSessionRequest({
-        //     successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-        //       router.locale !== 'en-US' ? `${router.locale}/` : ''
-        //     }post/${postId}`,
-        //     cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-        //       router.locale !== 'en-US' ? `${router.locale}/` : ''
-        //     }post/${postId}`,
-        //     ...(!user.loggedIn
-        //       ? {
-        //           nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-        //         }
-        //       : {}),
-        //     acBidRequest: {
-        //       amount: new newnewapi.MoneyAmount({
-        //         usdCents: parseInt(supportBidAmount) * 100,
-        //       }),
-        //       optionId: option.id,
-        //       postUuid: postId,
-        //     },
-        //   });
-
-        // const res = await createPaymentSession(createPaymentSessionPayload);
-
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             cardUuid,
@@ -414,18 +390,26 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
         const res = await placeBidOnAuction(completeBidRequest);
 
-        if (!res.data || res.error)
+        if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
+        }
 
-        // window.location.href = res.data.sessionUrl;
+        if (res.data.status === newnewapi.PlaceBidResponse.Status.SUCCESS) {
+          setPaymentSuccessModalOpen(true);
+          setPaymentModalOpen(false);
+
+          handleSetSupportedBid('');
+          setSupportBidAmount('');
+          setIsSupportFormOpen(false);
+        }
       } catch (err) {
-        setPaymentModalOpen(false);
-        setLoadingModalOpen(false);
         console.error(err);
-        toast.error('toastErrors.generic');
+        toast.error(t('toastErrors.generic'));
+      } finally {
+        setLoadingModalOpen(false);
       }
     },
-    [placeBidRequest]
+    [placeBidRequest, handleSetSupportedBid, t]
   );
 
   // eslint-disable-next-line consistent-return
@@ -463,6 +447,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         acBidRequest: placeBidRequest,
       });
       const response = await createStripeSetupIntent(payload);
+
+      console.log(response, 'createStripeSetupIntent');
 
       if (!response.data || response.error) {
         throw new Error(response.error?.message || 'Some error occurred');
