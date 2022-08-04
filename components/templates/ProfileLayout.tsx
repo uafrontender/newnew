@@ -133,7 +133,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           }, 1500);
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
     }
   }, [user.username]);
