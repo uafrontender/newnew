@@ -82,6 +82,7 @@
   },
   "accountPrivate": "{{username}}'s activity is private",
   "subscribed-tag": "SUBSCRIBED",
+  "subscriptionCancelled-tag": "CANCELLED",
   "modal": {
     "blockUser": {
       "title": "Block user",

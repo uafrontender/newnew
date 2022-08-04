@@ -82,6 +82,7 @@
   },
   "accountPrivate": "{{username}}的活動設為隱秘",
   "subscribed-tag": "已訂閱",
+  "subscriptionCancelled-tag_NEED_TRANSLATION": "CANCELLED",
   "modal": {
     "blockUser": {
       "title": "屏蔽用戶",
