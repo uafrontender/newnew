@@ -133,7 +133,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           }, 1500);
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
     }
   }, [user.username]);
@@ -535,6 +535,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
           {isSubscribed && <SSubcribedTag>{t('subscribed-tag')}</SSubcribedTag>}
+          {wasSubscribed && (
+            <SSubcribedTag>{t('subscriptionCancelled-tag')}</SSubcribedTag>
+          )}
           <div
             style={{
               position: 'relative',
