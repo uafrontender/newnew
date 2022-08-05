@@ -5,18 +5,20 @@ import React, {
   useEffect,
   useRef,
   useState,
+  useMemo,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
+// import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-// import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
+import { doPledgeCrowdfunding } from '../../../../api/endpoints/crowdfunding';
 import {
-  createPaymentSession,
+  createStripeSetupIntent,
+  // createPaymentSession,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 
@@ -62,7 +64,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   handleSetPaymentSuccessModalOpen,
   handleAddPledgeFromResponse,
 }) => {
-  const router = useRouter();
+  // const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
   const dispatch = useAppDispatch();
@@ -225,52 +227,96 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   //   handleSetPaymentSuccessModalOpen,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(async () => {
-    setLoadingModalOpen(true);
-    try {
-      Mixpanel.track('PayWithCardStripeRedirect', {
-        _stage: 'Post',
-        _postUuid: post.postUuid,
-        _component: 'CfPledgeLevelsSection',
-      });
-      const createPaymentSessionPayload =
-        new newnewapi.CreatePaymentSessionRequest({
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${post.postUuid}`,
-          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${post.postUuid}`,
-          ...(!user.loggedIn
-            ? {
-                nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-              }
-            : {}),
-          cfPledgeRequest: {
-            amount: new newnewapi.MoneyAmount({
-              usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
-            }),
-            postUuid: post.postUuid,
-          },
+  const doPledgeRequest = useMemo(
+    () =>
+      new newnewapi.DoPledgeRequest({
+        postUuid: post.postUuid,
+        amount: new newnewapi.MoneyAmount({
+          usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
+        }),
+      }),
+    [post.postUuid, pledgeAmount]
+  );
+
+  const handlePayWithCardStripeRedirect = useCallback(
+    async ({
+      cardUuid,
+      stripeSetupIntentClientSecret,
+      saveCard,
+    }: {
+      cardUuid?: string;
+      stripeSetupIntentClientSecret: string;
+      saveCard?: boolean;
+    }) => {
+      setLoadingModalOpen(true);
+      try {
+        Mixpanel.track('PayWithCardStripeRedirect', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'CfPledgeLevelsSection',
+        });
+        const stripeContributionRequest =
+          new newnewapi.StripeContributionRequest({
+            cardUuid,
+            stripeSetupIntentClientSecret,
+            ...(saveCard !== undefined
+              ? {
+                  saveCard,
+                }
+              : {}),
+          });
+
+        const completeDoPledgeRequest = new newnewapi.CompleteDoPledgeRequest({
+          pledgeRequest: doPledgeRequest,
+          stripeContributionRequest,
         });
 
-      const res = await createPaymentSession(createPaymentSessionPayload);
+        const res = await doPledgeCrowdfunding(completeDoPledgeRequest);
 
-      if (!res.data || !res.data.sessionUrl || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error) {
+          throw new Error(res.error?.message ?? 'Request failed');
+        }
 
-      window.location.href = res.data.sessionUrl;
-    } catch (err) {
-      console.error(err);
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-      toast.error('toastErrors.generic');
-    }
-  }, [router.locale, post.postUuid, user.loggedIn, pledgeAmount]);
+        if (res.data.status === newnewapi.DoPledgeResponse.Status.SUCCESS) {
+          handleSetPaymentSuccessModalOpen(true);
+          setPaymentModalOpen(false);
+
+          setCustomPledgeAmount('');
+          setIsFormOpen(false);
+        }
+      } catch (err) {
+        console.error(err);
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+        toast.error('toastErrors.generic');
+      }
+    },
+    [doPledgeRequest, handleSetPaymentSuccessModalOpen, post.postUuid]
+  );
 
   useEffect(() => {
     if (!paymentModalOpen) setPledgeAmount(undefined);
   }, [paymentModalOpen]);
+
+  const createSetupIntent = useCallback(async () => {
+    try {
+      const payload = new newnewapi.CreateStripeSetupIntentRequest({
+        cfPledgeRequest: doPledgeRequest,
+      });
+      const response = await createStripeSetupIntent(payload);
+
+      console.log(response, 'createStripeSetupIntent');
+
+      if (!response.data || response.error) {
+        throw new Error(response.error?.message || 'Some error occurred');
+      }
+
+      return response.data;
+    } catch (err) {
+      console.error(err);
+      return undefined;
+    }
+  }, [doPledgeRequest]);
 
   const goToNextStep = () => {
     if (
@@ -418,6 +464,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={pledgeAmount || 0}
+          createStripeSetupIntent={createSetupIntent}
           // {...(walletBalance?.usdCents &&
           // pledgeAmount &&
           // walletBalance.usdCents >= pledgeAmount
