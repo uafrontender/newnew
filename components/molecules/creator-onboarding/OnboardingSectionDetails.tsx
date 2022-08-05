@@ -383,12 +383,13 @@ const OnboardingSectionDetails: React.FunctionComponent<
       reader.addEventListener('load', async () => {
         if (reader.result) {
           const imageUrl = reader.result as string;
-          setAvatarUrlInEdit(imageUrl as string);
 
           const properlySizedImage = await resizeImage(imageUrl, 1000);
 
           // eslint-disable-next-line react/no-this-in-sfc
           setOriginalProfileImageWidth(properlySizedImage.width);
+
+          setAvatarUrlInEdit(properlySizedImage.url as string);
           setCropMenuOpen(true);
           if (isBrowser()) {
             window.history.pushState(

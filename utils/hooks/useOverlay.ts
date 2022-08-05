@@ -14,10 +14,13 @@ export const useOverlay = (ref: any) => {
       ref.current.style.cssText = `
         overflow: hidden;
      `;
-
+      document.body.style.cssText = `
+        overflow: hidden;
+      `;
     } else {
       // eslint-disable-next-line no-param-reassign
       ref.current.style.cssText = ``;
+      document.body.style.cssText = '';
       window?.scroll(0, scrollPosition.current);
       scrollPosition.current = 0;
     }

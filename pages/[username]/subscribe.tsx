@@ -59,6 +59,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   // const { walletBalance } = useContext(WalletContext);
 
   const [isScrolledDown, setIsScrolledDown] = useState(false);
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
   const topSectionRef = useRef<HTMLDivElement>();
 
   const [subscriptionPrice, setSubscriptionPrice] = useState<
@@ -160,6 +161,17 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       } else {
         setIsScrolledDown(false);
       }
+
+      if (isMobile) {
+        if (
+          window?.innerHeight + window?.scrollY >=
+          document?.body?.offsetHeight
+        ) {
+          setIsScrolledToBottom(true);
+        } else {
+          setIsScrolledToBottom(false);
+        }
+      }
     };
 
     if (isBrowser()) {
@@ -202,7 +214,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
             }}
           >
             <AnimatePresence>
-              {isScrolledDown && !isMobile && (
+              {isScrolledDown && !isMobile && !isPaymentModalOpen && (
                 <SScrolledDownTopSection
                   initial={{
                     opacity: 0,
@@ -334,7 +346,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
           </main>
         </div>
       </SGeneral>
-      {isMobile && (
+      {isMobile && !isScrolledToBottom && (
         <SSubscribeButtonMobileContainer>
           <SSubscribeButtonMobile onClick={() => handleOpenPaymentModal()}>
             {t('button.subscribe', { amount: subPriceFormatted })}

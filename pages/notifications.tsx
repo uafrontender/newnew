@@ -29,12 +29,15 @@ const Notification = dynamic(
 export const Notifications = () => {
   const { t } = useTranslation('page-Notifications');
   const { ref: scrollRef, inView } = useInView();
-  const [notifications, setNotifications] =
-    useState<newnewapi.INotification[] | null>(null);
-  const [unreadNotifications, setUnreadNotifications] =
-    useState<number[] | null>(null);
-  const [notificationsNextPageToken, setNotificationsNextPageToken] =
-    useState<string | undefined | null>('');
+  const [notifications, setNotifications] = useState<
+    newnewapi.INotification[] | null
+  >(null);
+  const [unreadNotifications, setUnreadNotifications] = useState<
+    number[] | null
+  >(null);
+  const [notificationsNextPageToken, setNotificationsNextPageToken] = useState<
+    string | undefined | null
+  >('');
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [defaultLimit, setDefaultLimit] = useState<number>(6);
@@ -241,10 +244,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const SGeneral = styled(General)`
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.background.secondary
-      : props.theme.colorsThemed.background.primary};
+  background: ${(props) => props.theme.colorsThemed.background.primary};
 
   ${({ theme }) => theme.media.laptop} {
     background: ${(props) =>
