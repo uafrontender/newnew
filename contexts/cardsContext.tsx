@@ -100,7 +100,9 @@ export default CardsContextProvider;
 export function useCards() {
   const context = useContext(CardsContext);
 
-  if (!context)
+  if (!context) {
     throw new Error('useCards must be used inside a `CardsContextProvider`');
+  }
+
   return context;
 }

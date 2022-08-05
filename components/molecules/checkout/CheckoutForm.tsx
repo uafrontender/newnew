@@ -4,6 +4,7 @@ import Link from 'next/link';
 import styled from 'styled-components';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/router';
 import {
   PaymentElement,
   useElements,
@@ -14,9 +15,11 @@ import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 import Toggle from '../../atoms/Toggle';
 import OptionCard from './OptionCard';
+import Input from '../../atoms/Input';
 
 import { formatNumber } from '../../../utils/format';
 import { useCards } from '../../../contexts/cardsContext';
+import { useAppSelector } from '../../../redux-store/store';
 
 interface IReCaptchaRes {
   success?: boolean;
@@ -54,6 +57,9 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const { t } = useTranslation('modal-PaymentModal');
   const elements = useElements();
   const stripe = useStripe();
+  const router = useRouter();
+
+  const { loggedIn } = useAppSelector((state) => state.user);
 
   const [isStripeReady, setIsStripeReady] = useState(false);
 
@@ -68,7 +74,16 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     PaymentMethodTypes | undefined
   >();
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [saveCard, setSaveCard] = useState(false);
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+
+  const handleSetEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    setEmailError('');
+  };
 
   const { executeRecaptcha } = useGoogleReCaptcha();
 
@@ -79,9 +94,16 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         throw new Error('Stripe initialization error');
       }
 
+      if (!loggedIn && !email) {
+        setEmailError('Email is required');
+        return;
+      }
+
       if (!executeRecaptcha) {
         throw new Error('executeRecaptcha not available');
       }
+
+      setIsSubmitting(true);
 
       const recaptchaToken = await executeRecaptcha();
 
@@ -108,7 +130,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             const { error } = await stripe.confirmSetup({
               elements,
               confirmParams: {
-                return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/profile/settings/card-setup-complete`,
+                return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/${router.asPath}`,
               },
               redirect: 'if_required',
             });
@@ -137,6 +159,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       }
     } catch (err: any) {
       console.error(err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -159,6 +183,16 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       />
       {selectedPaymentMethod === PaymentMethodTypes.NewCard && (
         <SPaymentFormWrapper>
+          {!loggedIn && isStripeReady && (
+            <Input
+              value={email}
+              isValid={email.length > 0 && !emailError}
+              onChange={handleSetEmail}
+              placeholder={t('email')}
+              type='email'
+              errorCaption={emailError}
+            />
+          )}
           <PaymentElement onReady={() => setIsStripeReady(true)} />
           {isStripeReady && (
             <SSaveCard>
@@ -179,6 +213,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           id='pay'
           view='primaryGrad'
           disabled={!selectedPaymentMethod}
+          loading={isSubmitting}
         >
           {t('payButton')}
           {amount &&

@@ -47,7 +47,7 @@ export const createStripeSetupIntent = (
   payload: newnewapi.CreateStripeSetupIntentRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.CreateStripeSetupIntentRequest,
     newnewapi.CreateStripeSetupIntentResponse
   >(
@@ -56,6 +56,14 @@ export const createStripeSetupIntent = (
     `${BASE_URL_PAYMENTS}/create_stripe_setup_intent`,
     'post',
     payload,
+    // Optional authentication
+    cookiesInstance.get('accessToken')
+      ? {
+          'x-auth-token': cookiesInstance.get('accessToken'),
+        }
+      : {},
+    'cors',
+    'same-origin',
     signal ?? undefined
   );
 
