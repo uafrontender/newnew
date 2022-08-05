@@ -210,7 +210,6 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
     handleClose();
   };
 
-  // TODO: add card to context;
   const onCardSuccess = (setupIntentValue: SetupIntent) => {
     setIsCardSetupCompleted(true);
     setStripeSetupIntent(setupIntentValue);

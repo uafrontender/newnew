@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -10,52 +10,80 @@ import Card from '../../molecules/settings/Card';
 import AddCardModal from '../../molecules/settings/AddCardModal';
 import Lottie from '../../atoms/Lottie';
 
-import { getCards } from '../../../api/endpoints/card';
-
 import addIconFilled from '../../../public/images/svg/icons/filled/Create.svg';
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 import assets from '../../../constants/assets';
+import { useCards } from '../../../contexts/cardsContext';
 
 interface ISettingsCards {}
 
 const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   const { t } = useTranslation('page-Profile');
   const theme = useTheme();
+  const { cards, isCardsLoading, handleSetCards, fetchCards } = useCards();
 
   const [isAddCardModal, setIsAddCardModal] = useState(false);
 
-  const [cards, setCards] = useState<newnewapi.Card[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const fetchCard = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const payload = new newnewapi.EmptyRequest();
-      const response = await getCards(payload);
-
-      if (!response.data || response.error) {
-        throw new Error(response.error?.message || 'Some error occurred');
-      }
-
-      setCards(response.data.cards as newnewapi.Card[]);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    fetchCard();
-  }, [fetchCard]);
+    fetchCards();
+  }, [fetchCards]);
+
+  const changePrimaryCard = (cardUuid: string) => {
+    if (cards) {
+      let newCardsList = cards;
+      const newPrimaryCard = cards.find(
+        (cardEl) => cardEl.cardUuid === cardUuid
+      );
+
+      newCardsList = cards.map((cardEl) => {
+        if (cardEl.cardUuid === newPrimaryCard?.cardUuid) {
+          return { ...cardEl, isPrimary: true };
+        }
+
+        return {
+          ...cardEl,
+          isPrimary: false,
+        };
+      }) as newnewapi.Card[];
+
+      handleSetCards(newCardsList);
+    }
+  };
+
+  const cardsWithFirstPrimary = useMemo(
+    () =>
+      cards?.sort((cardA, cardB) => {
+        if (cardA.isPrimary) {
+          return -1;
+        }
+
+        if (cardB.isPrimary) {
+          return 1;
+        }
+
+        return 0;
+      }),
+    [cards]
+  );
+
+  const backgroundsByCardUuid = useMemo(() => {
+    const obj: { [key: string]: string } = {};
+    cards?.forEach((card, index) => {
+      obj[card.cardUuid! as string] =
+        assets.cards.background[index % assets.cards.background.length];
+    });
+
+    return obj;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cards?.length]);
 
   return (
     <SSettingsContainer>
-      <SCardsContainer $isNoCards={cards.length === 0}>
-        <STitle variant={1} weight={600} $isNoCards={cards.length === 0}>
+      <SCardsContainer $isNoCards={cards?.length === 0}>
+        <STitle variant={1} weight={600} $isNoCards={cards?.length === 0}>
           {t('Settings.sections.cards.myPaymentMethods')}
         </STitle>
-        {!!cards.length && (
+        {!!cards?.length && (
           <>
             <SButtonSecondaryDesktop
               view='secondary'
@@ -83,7 +111,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
         )}
 
         {/* Empty cards view */}
-        {!cards.length && !isLoading && (
+        {!cards?.length && !isCardsLoading && (
           <>
             <SSubText variant={3} weight={600}>
               {t('Settings.sections.cards.hint')}
@@ -95,7 +123,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
           </>
         )}
 
-        {!cards.length && isLoading && (
+        {!cards?.length && isCardsLoading && (
           <SLoader>
             <Lottie
               width={75}
@@ -109,23 +137,25 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
           </SLoader>
         )}
 
-        {!!cards.length && (
+        {!!cards?.length && (
           <SCardList>
-            {cards.map((card, index) => (
+            {cardsWithFirstPrimary?.map((card, index) => (
               <SCardListItem key={card.cardUuid}>
                 <Card
-                  cardId={card.cardUuid}
-                  isPrimary={card.isPrimary}
-                  brand={card.brand}
-                  funding={card.funding}
-                  lastFourDigits={card.last4}
+                  cardId={card.cardUuid as string}
+                  isPrimary={!!card.isPrimary}
+                  brand={card.brand as newnewapi.Card.CardBrand}
+                  funding={card.funding as newnewapi.Card.CardFunding}
+                  lastFourDigits={card.last4 as string}
                   bg={
-                    assets.cards.background[
-                      index % assets.cards.background.length
-                    ]
+                    backgroundsByCardUuid
+                      ? backgroundsByCardUuid[card.cardUuid! as string]
+                      : assets.cards.background[
+                          index % assets.cards.background.length
+                        ]
                   }
-                  updateCards={setCards}
-                  onCardDelete={fetchCard}
+                  onChangePrimaryCard={changePrimaryCard}
+                  onCardDelete={fetchCards}
                 />
               </SCardListItem>
             ))}

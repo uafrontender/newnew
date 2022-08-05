@@ -14,10 +14,14 @@ export const CardsContext = createContext<{
   cards?: newnewapi.ICard[];
   isCardsLoading: boolean;
   handleSetCards: (cards: newnewapi.ICard[]) => void;
+  handleSetCard: (card: newnewapi.ICard) => void;
+  fetchCards: () => void;
 }>({
   cards: undefined,
   isCardsLoading: false,
   handleSetCards: (cards: newnewapi.ICard[]) => {},
+  handleSetCard: (card: newnewapi.ICard) => {},
+  fetchCards: () => {},
 });
 
 interface ICardsContextProvider {
@@ -33,60 +37,66 @@ const CardsContextProvider: React.FC<ICardsContextProvider> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSetCards = useCallback((newCards: newnewapi.ICard[]) => {
+    setCards(newCards);
+  }, []);
+
+  const handleSetCard = useCallback((newCard: newnewapi.ICard) => {
     setCards((prevState) => {
       if (prevState) {
-        return [
-          ...prevState,
-          ...newCards.filter(
-            (card) =>
-              !prevState.find(
-                (prevStateCard) => prevStateCard.cardUuid === card.cardUuid
-              )
-          ),
-        ];
+        if (
+          prevState.find(
+            (prevStateCard) => prevStateCard.cardUuid === newCard.cardUuid
+          )
+        ) {
+          return [...prevState, newCard];
+        }
+
+        return prevState;
       }
 
-      return newCards;
+      return [newCard];
     });
   }, []);
+
+  const fetchCards = useCallback(async () => {
+    if (!user.loggedIn) {
+      setCards(undefined);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const payload = new newnewapi.EmptyRequest({});
+
+      const res = await getCards(payload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+
+      setCards(res.data.cards);
+
+      setIsLoading(false);
+    } catch (err) {
+      console.error(err);
+      setIsLoading(false);
+    }
+  }, [user.loggedIn]);
+
+  useEffect(() => {
+    fetchCards();
+  }, [fetchCards]);
 
   const contextValue = useMemo(
     () => ({
       cards,
       isCardsLoading: isLoading,
       handleSetCards,
+      handleSetCard,
+      fetchCards,
     }),
-    [cards, isLoading, handleSetCards]
+    [cards, isLoading, handleSetCards, handleSetCard, fetchCards]
   );
-
-  useEffect(() => {
-    async function fetchIds() {
-      if (!user.loggedIn) {
-        setCards(undefined);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-
-        const payload = new newnewapi.EmptyRequest({});
-
-        const res = await getCards(payload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        setCards(res.data.cards);
-
-        setIsLoading(false);
-      } catch (err) {
-        console.error(err);
-        setIsLoading(false);
-      }
-    }
-
-    fetchIds();
-  }, [user.loggedIn]);
 
   return (
     <CardsContext.Provider value={contextValue}>

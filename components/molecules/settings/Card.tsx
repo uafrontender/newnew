@@ -60,7 +60,7 @@ interface ICard {
   lastFourDigits: string;
   bg: string;
   cardId: string;
-  updateCards: React.Dispatch<React.SetStateAction<newnewapi.Card[]>>;
+  onChangePrimaryCard: (cardUuid: string) => void;
   onCardDelete: () => void;
 }
 
@@ -71,7 +71,7 @@ const Card: React.FunctionComponent<ICard> = ({
   lastFourDigits,
   cardId,
   bg,
-  updateCards,
+  onChangePrimaryCard,
   onCardDelete,
 }) => {
   const { t } = useTranslation('page-Profile');
@@ -97,22 +97,7 @@ const Card: React.FunctionComponent<ICard> = ({
         throw new Error(response.error?.message || 'An error occurred');
       }
 
-      updateCards((currentCards) => {
-        const currentCard = currentCards.find(
-          (cardEl) => cardEl.cardUuid === cardId
-        );
-
-        return currentCards.map((cardEl) => {
-          if (cardEl.cardUuid === currentCard?.cardUuid) {
-            return { ...cardEl, isPrimary: true };
-          }
-
-          return {
-            ...cardEl,
-            isPrimary: false,
-          };
-        }) as newnewapi.Card[];
-      });
+      onChangePrimaryCard(cardId);
     } catch (err: any) {
       console.error(err);
       toast.error(err.message);

@@ -16,6 +16,7 @@ import logoAnimation from '../../../public/animations/mobile_logo.json';
 // Utils
 import { SocketContext } from '../../../contexts/socketContext';
 import { checkCardStatus } from '../../../api/endpoints/card';
+import { useCards } from '../../../contexts/cardsContext';
 
 const getCardStatusMessage = (cardStatus: newnewapi.CardStatus) => {
   switch (cardStatus) {
@@ -47,6 +48,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
   const socketConnection = useContext(SocketContext);
+  const { handleSetCard } = useCards();
 
   const [message, setMessage] = useState('Saving your card. Please wait');
   const [isProcessing, setIsProcessing] = useState(true);
@@ -82,6 +84,9 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           response.data.cardStatus !== newnewapi.CardStatus.ADDED
         ) {
           setIsError(true);
+          if (response.data.card) {
+            handleSetCard(response.data.card);
+          }
         }
 
         setMessage(getCardStatusMessage(response.data.cardStatus));
@@ -93,7 +98,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
     };
 
     handleCheckCardStatus();
-  }, [clientSecret, setupIntentId]);
+  }, [clientSecret, setupIntentId, handleSetCard]);
 
   useEffect(() => {
     const handleCardAdded = (data: any) => {
