@@ -49,14 +49,14 @@ export const fetchPledges = (
   );
 
 export const doPledgeCrowdfunding = (
-  payload: newnewapi.CompleteDoPledgeRequest,
+  payload: newnewapi.StripeContributionRequest,
   signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
-    newnewapi.CompleteDoPledgeRequest,
+    newnewapi.StripeContributionRequest,
     newnewapi.DoPledgeResponse
   >(
-    newnewapi.CompleteDoPledgeRequest,
+    newnewapi.StripeContributionRequest,
     newnewapi.DoPledgeResponse,
     `${BASE_URL_CROWDFUNDING}/do_pledge`,
     'post',

@@ -5,7 +5,6 @@ import React, {
   useEffect,
   useRef,
   useState,
-  useMemo,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -227,17 +226,6 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   //   handleSetPaymentSuccessModalOpen,
   // ]);
 
-  const doPledgeRequest = useMemo(
-    () =>
-      new newnewapi.DoPledgeRequest({
-        postUuid: post.postUuid,
-        amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
-        }),
-      }),
-    [post.postUuid, pledgeAmount]
-  );
-
   const handlePayWithCardStripeRedirect = useCallback(
     async ({
       cardUuid,
@@ -266,12 +254,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
               : {}),
           });
 
-        const completeDoPledgeRequest = new newnewapi.CompleteDoPledgeRequest({
-          pledgeRequest: doPledgeRequest,
-          stripeContributionRequest,
-        });
-
-        const res = await doPledgeCrowdfunding(completeDoPledgeRequest);
+        const res = await doPledgeCrowdfunding(stripeContributionRequest);
 
         if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
@@ -291,7 +274,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
         toast.error('toastErrors.generic');
       }
     },
-    [doPledgeRequest, handleSetPaymentSuccessModalOpen, post.postUuid]
+    [handleSetPaymentSuccessModalOpen, post.postUuid]
   );
 
   useEffect(() => {
@@ -300,6 +283,13 @@ const CfPledgeLevelsSection: React.FunctionComponent<
 
   const createSetupIntent = useCallback(async () => {
     try {
+      const doPledgeRequest = new newnewapi.DoPledgeRequest({
+        postUuid: post.postUuid,
+        amount: new newnewapi.MoneyAmount({
+          usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
+        }),
+      });
+
       const payload = new newnewapi.CreateStripeSetupIntentRequest({
         cfPledgeRequest: doPledgeRequest,
       });
@@ -316,7 +306,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
       console.error(err);
       return undefined;
     }
-  }, [doPledgeRequest]);
+  }, [post.postUuid, pledgeAmount]);
 
   const goToNextStep = () => {
     if (

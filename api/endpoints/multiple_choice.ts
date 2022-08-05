@@ -70,14 +70,14 @@ export const getMcOption = (
   );
 
 export const voteOnPost = (
-  payload: newnewapi.CompleteVoteOnPostRequest,
+  payload: newnewapi.StripeContributionRequest,
   signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
-    newnewapi.CompleteVoteOnPostRequest,
+    newnewapi.StripeContributionRequest,
     newnewapi.VoteOnPostResponse
   >(
-    newnewapi.CompleteVoteOnPostRequest,
+    newnewapi.StripeContributionRequest,
     newnewapi.VoteOnPostResponse,
     `${BASE_URL_MULTICHOICE}/vote_on_post`,
     'post',

@@ -348,18 +348,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   //   router.locale,
   // ]);
 
-  const placeBidRequest = useMemo(
-    () =>
-      new newnewapi.PlaceBidRequest({
-        postUuid: postId,
-        amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(supportBidAmount) * 100,
-        }),
-        optionId: option.id,
-      }),
-    [option.id, postId, supportBidAmount]
-  );
-
   const handlePayWithCardStripeRedirect = useCallback(
     async ({
       cardUuid,
@@ -383,12 +371,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               : {}),
           });
 
-        const completeBidRequest = new newnewapi.CompleteBidRequest({
-          bidRequest: placeBidRequest,
-          stripeContributionRequest,
-        });
-
-        const res = await placeBidOnAuction(completeBidRequest);
+        const res = await placeBidOnAuction(stripeContributionRequest);
 
         if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
@@ -409,7 +392,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         setLoadingModalOpen(false);
       }
     },
-    [placeBidRequest, handleSetSupportedBid, t]
+    [handleSetSupportedBid, t]
   );
 
   // eslint-disable-next-line consistent-return
@@ -443,6 +426,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
   const createSetupIntent = useCallback(async () => {
     try {
+      const placeBidRequest = new newnewapi.PlaceBidRequest({
+        postUuid: postId,
+        amount: new newnewapi.MoneyAmount({
+          usdCents: parseInt(supportBidAmount) * 100,
+        }),
+        optionId: option.id,
+      });
+
       const payload = new newnewapi.CreateStripeSetupIntentRequest({
         acBidRequest: placeBidRequest,
       });
@@ -459,7 +450,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       console.error(err);
       return undefined;
     }
-  }, [placeBidRequest]);
+  }, [postId, option.id, supportBidAmount]);
 
   return (
     <div

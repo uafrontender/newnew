@@ -1,6 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -210,17 +210,6 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   //   onClose,
   // ]);
 
-  const doPledgeRequest = useMemo(
-    () =>
-      new newnewapi.DoPledgeRequest({
-        postUuid: post.postUuid,
-        amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
-        }),
-      }),
-    [post.postUuid, pledgeAmount]
-  );
-
   const handlePayWithCardStripeRedirect = useCallback(
     async ({
       cardUuid,
@@ -244,12 +233,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
               : {}),
           });
 
-        const completeDoPledgeRequest = new newnewapi.CompleteDoPledgeRequest({
-          pledgeRequest: doPledgeRequest,
-          stripeContributionRequest,
-        });
-
-        const res = await doPledgeCrowdfunding(completeDoPledgeRequest);
+        const res = await doPledgeCrowdfunding(stripeContributionRequest);
 
         if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
@@ -271,7 +255,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         setLoadingModalOpen(false);
       }
     },
-    [doPledgeRequest, handleSetPaymentSuccessModalOpen, onClose]
+    [handleSetPaymentSuccessModalOpen, onClose]
   );
 
   useEffect(() => {
@@ -280,6 +264,13 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 
   const createSetupIntent = useCallback(async () => {
     try {
+      const doPledgeRequest = new newnewapi.DoPledgeRequest({
+        postUuid: post.postUuid,
+        amount: new newnewapi.MoneyAmount({
+          usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
+        }),
+      });
+
       const payload = new newnewapi.CreateStripeSetupIntentRequest({
         cfPledgeRequest: doPledgeRequest,
       });
@@ -296,7 +287,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
       console.error(err);
       return undefined;
     }
-  }, [doPledgeRequest]);
+  }, [post.postUuid, pledgeAmount]);
 
   return (
     <>

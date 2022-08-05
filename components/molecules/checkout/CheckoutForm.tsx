@@ -10,6 +10,7 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
+import { newnewapi } from 'newnew-api';
 
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
@@ -20,6 +21,7 @@ import Input from '../../atoms/Input';
 import { formatNumber } from '../../../utils/format';
 import { useCards } from '../../../contexts/cardsContext';
 import { useAppSelector } from '../../../redux-store/store';
+import { updateStripeSetupIntent } from '../../../api/endpoints/payments';
 
 interface IReCaptchaRes {
   success?: boolean;
@@ -127,6 +129,18 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
               stripeSetupIntentClientSecret: stipeSecret,
             });
           } else if (selectedPaymentMethod === PaymentMethodTypes.NewCard) {
+            const updateStripeSetupIntentRequest =
+              new newnewapi.UpdateStripeSetupIntentRequest({
+                stripeSetupIntentClientSecret: stipeSecret,
+                guestEmail: email,
+              });
+
+            const updateSetupIntentResponse = await updateStripeSetupIntent(
+              updateStripeSetupIntentRequest
+            );
+
+            console.log(updateSetupIntentResponse, 'updateSetupIntentResponse');
+
             const { error } = await stripe.confirmSetup({
               elements,
               confirmParams: {

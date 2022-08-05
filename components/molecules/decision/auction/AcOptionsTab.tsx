@@ -330,18 +330,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   //   handleAddOrUpdateOptionFromResponse,
   // ]);
 
-  const placeBidRequest = useMemo(
-    () =>
-      new newnewapi.PlaceBidRequest({
-        postUuid: postId,
-        amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(newBidAmount) * 100,
-        }),
-        optionTitle: newBidText,
-      }),
-    [newBidText, postId, newBidAmount]
-  );
-
   const handlePayWithCardStripeRedirect = useCallback(
     async ({
       cardUuid,
@@ -371,12 +359,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               : {}),
           });
 
-        const completeBidRequest = new newnewapi.CompleteBidRequest({
-          bidRequest: placeBidRequest,
-          stripeContributionRequest,
-        });
-
-        const res = await placeBidOnAuction(completeBidRequest);
+        const res = await placeBidOnAuction(stripeContributionRequest);
 
         if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
@@ -389,11 +372,11 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           setNewBidText('');
           setSuggestNewMobileOpen(false);
 
-          const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
+          const optionFromResponse = (res.data
+            .option as newnewapi.Auction.Option)!!;
           optionFromResponse.isSupportedByMe = true;
           handleAddOrUpdateOptionFromResponse(optionFromResponse);
         }
-
       } catch (err) {
         console.error(err);
         toast.error('toastErrors.generic');
@@ -401,7 +384,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         setLoadingModalOpen(false);
       }
     },
-    [placeBidRequest, postId, handleAddOrUpdateOptionFromResponse]
+    [postId, handleAddOrUpdateOptionFromResponse]
   );
 
   useEffect(() => {
@@ -452,6 +435,14 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   const createSetupIntent = useCallback(async () => {
     try {
+      const placeBidRequest = new newnewapi.PlaceBidRequest({
+        postUuid: postId,
+        amount: new newnewapi.MoneyAmount({
+          usdCents: parseInt(newBidAmount) * 100,
+        }),
+        optionTitle: newBidText,
+      });
+
       const payload = new newnewapi.CreateStripeSetupIntentRequest({
         acBidRequest: placeBidRequest,
       });
@@ -466,7 +457,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       console.error(err);
       return undefined;
     }
-  }, [placeBidRequest]);
+  }, [postId, newBidAmount, newBidText]);
 
   return (
     <>

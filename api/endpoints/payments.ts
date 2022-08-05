@@ -67,6 +67,30 @@ export const createStripeSetupIntent = (
     signal ?? undefined
   );
 
+export const updateStripeSetupIntent = (
+  payload: newnewapi.UpdateStripeSetupIntentRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobuf<
+    newnewapi.UpdateStripeSetupIntentRequest,
+    newnewapi.UpdateStripeSetupIntentResponse
+  >(
+    newnewapi.UpdateStripeSetupIntentRequest,
+    newnewapi.UpdateStripeSetupIntentResponse,
+    `${BASE_URL_PAYMENTS}/update_stripe_setup_intent`,
+    'post',
+    payload,
+    // Optional authentication
+    cookiesInstance.get('accessToken')
+      ? {
+          'x-auth-token': cookiesInstance.get('accessToken'),
+        }
+      : {},
+    'cors',
+    'same-origin',
+    signal ?? undefined
+  );
+
 // Payments for bids/pledges/votes via Stripe redirect
 // TODO: remove
 export const createPaymentSession = (

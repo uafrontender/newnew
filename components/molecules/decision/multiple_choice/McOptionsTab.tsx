@@ -310,18 +310,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   //   handleAddOrUpdateOptionFromResponse,
   // ]);
 
-  const voteOnPostRequest = useMemo(
-    () =>
-      new newnewapi.VoteOnPostRequest({
+  const createSetupIntent = useCallback(async () => {
+    try {
+      const voteOnPostRequest = new newnewapi.VoteOnPostRequest({
         postUuid: post.postUuid,
         votesCount: parseInt(newBidAmount),
         optionText: newOptionText,
-      }),
-    [newOptionText, post.postUuid, newBidAmount]
-  );
+      });
 
-  const createSetupIntent = useCallback(async () => {
-    try {
       const payload = new newnewapi.CreateStripeSetupIntentRequest({
         mcVoteRequest: voteOnPostRequest,
       });
@@ -338,7 +334,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       console.error(err);
       return undefined;
     }
-  }, [voteOnPostRequest]);
+  }, [newOptionText, post.postUuid, newBidAmount]);
 
   const handlePayWithCardStripeRedirect = useCallback(
     async ({
@@ -368,13 +364,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               : {}),
           });
 
-        const completeVoteOnPostRequest =
-          new newnewapi.CompleteVoteOnPostRequest({
-            voteRequest: voteOnPostRequest,
-            stripeContributionRequest,
-          });
-
-        const res = await voteOnPost(completeVoteOnPostRequest);
+        const res = await voteOnPost(stripeContributionRequest);
 
         if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
@@ -396,7 +386,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         setLoadingModalOpen(false);
       }
     },
-    [voteOnPostRequest, post.postUuid]
+    [post.postUuid]
   );
 
   const handleVoteForFree = useCallback(async () => {

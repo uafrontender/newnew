@@ -377,16 +377,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   //   router.locale,
   // ]);
 
-  const voteOnPostRequest = useMemo(
-    () =>
-      new newnewapi.VoteOnPostRequest({
-        postUuid: postId,
-        votesCount: parseInt(supportBidAmount),
-        optionId: option.id,
-      }),
-    [option.id, postId, supportBidAmount]
-  );
-
   const handlePayWithCardStripeRedirect = useCallback(
     async ({
       cardUuid,
@@ -411,13 +401,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
               : {}),
           });
 
-        const completeVoteOnPostRequest =
-          new newnewapi.CompleteVoteOnPostRequest({
-            voteRequest: voteOnPostRequest,
-            stripeContributionRequest,
-          });
-
-        const res = await voteOnPost(completeVoteOnPostRequest);
+        const res = await voteOnPost(stripeContributionRequest);
 
         if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
@@ -440,7 +424,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         setLoadingModalOpen(false);
       }
     },
-    [voteOnPostRequest, handleSetPaymentSuccessModalOpen, handleSetSupportedBid]
+    [handleSetPaymentSuccessModalOpen, handleSetSupportedBid]
   );
 
   const handleVoteForFree = useCallback(async () => {
@@ -486,6 +470,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   const createSetupIntent = useCallback(async () => {
     try {
+      const voteOnPostRequest = new newnewapi.VoteOnPostRequest({
+        postUuid: postId,
+        votesCount: parseInt(supportBidAmount),
+        optionId: option.id,
+      });
+
       const payload = new newnewapi.CreateStripeSetupIntentRequest({
         mcVoteRequest: voteOnPostRequest,
       });
@@ -502,7 +492,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       console.error(err);
       return undefined;
     }
-  }, [voteOnPostRequest]);
+  }, [postId, supportBidAmount, option.id]);
 
   const goToNextStep = () => {
     if (

@@ -86,14 +86,14 @@ export const fetchAcOptionById = (
   );
 
 export const placeBidOnAuction = (
-  payload: newnewapi.CompleteBidRequest,
+  payload: newnewapi.StripeContributionRequest,
   signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
-    newnewapi.CompleteBidRequest,
+    newnewapi.StripeContributionRequest,
     newnewapi.PlaceBidResponse
   >(
-    newnewapi.CompleteBidRequest,
+    newnewapi.StripeContributionRequest,
     newnewapi.PlaceBidResponse,
     `${BASE_URL_AUCTION}/place_bid`,
     'post',
