@@ -418,13 +418,23 @@ export const PostCard: React.FC<ICard> = React.memo(
     }, [socketConnection]);
 
     useEffect(() => {
-      if (hovered) {
+      const handleLoop = () => {
+        videoRef.current!!.currentTime = 0;
         videoRef.current?.play();
+      };
+
+      if (hovered && videoRef.current) {
+        videoRef.current?.play();
+
+        videoRef.current.addEventListener('ended', handleLoop);
       } else {
         videoRef.current?.pause();
+        videoRef.current?.removeEventListener('ended', handleLoop);
       }
 
-      return () => {};
+      return () => {
+        videoRef.current?.removeEventListener('ended', handleLoop);
+      };
     }, [hovered]);
 
     useEffect(() => {
@@ -495,7 +505,6 @@ export const PostCard: React.FC<ICard> = React.memo(
                   videoRef.current = el!!;
                 }}
                 key={thumbnailUrl}
-                loop
                 muted
                 playsInline
               >
@@ -603,7 +612,6 @@ export const PostCard: React.FC<ICard> = React.memo(
                 videoRef.current = el!!;
               }}
               key={thumbnailUrl}
-              loop
               muted
               playsInline
             >
