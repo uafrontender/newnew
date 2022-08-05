@@ -79,8 +79,12 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
 
   return (
     <SSettingsContainer>
-      <SCardsContainer $isNoCards={cards?.length === 0}>
-        <STitle variant={1} weight={600} $isNoCards={cards?.length === 0}>
+      <SCardsContainer $isNoCards={!cards || cards?.length === 0}>
+        <STitle
+          variant={1}
+          weight={600}
+          $isNoCards={!cards || cards?.length === 0}
+        >
           {t('Settings.sections.cards.myPaymentMethods')}
         </STitle>
         {!!cards?.length && (
