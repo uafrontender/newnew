@@ -11,6 +11,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
@@ -424,6 +425,7 @@ export const PostCard: React.FC<ICard> = React.memo(
       };
 
       if (hovered && videoRef.current) {
+        videoRef.current!!.currentTime = 0;
         videoRef.current?.play();
 
         videoRef.current.addEventListener('ended', handleLoop);
@@ -442,12 +444,12 @@ export const PostCard: React.FC<ICard> = React.memo(
         setVideoReady(true);
       };
 
-      videoRef.current?.addEventListener('canplay', handleCanPlay);
+      videoRef.current?.addEventListener('playing', handleCanPlay);
 
       return () => {
-        videoRef.current?.removeEventListener('canplay', handleCanPlay);
+        videoRef.current?.removeEventListener('playing', handleCanPlay);
       };
-    }, []);
+    }, [hovered]);
 
     const moreButtonInsideRef: any = useRef();
     const moreButtonRef: any = useRef();
@@ -498,22 +500,25 @@ export const PostCard: React.FC<ICard> = React.memo(
                 }
                 alt='Post'
                 draggable={false}
-                hovered={hovered && videoReady}
+                $hovered={hovered && videoReady}
               />
-              <video
-                ref={(el) => {
-                  videoRef.current = el!!;
-                }}
-                key={thumbnailUrl}
-                muted
-                playsInline
-              >
-                <source
+              {hovered && (
+                <video
+                  ref={(el) => {
+                    videoRef.current = el!!;
+                  }}
                   key={thumbnailUrl}
-                  src={thumbnailUrl}
-                  type='video/mp4'
-                />
-              </video>
+                  muted
+                  playsInline
+                  loop
+                >
+                  <source
+                    key={thumbnailUrl}
+                    src={thumbnailUrl}
+                    type='video/mp4'
+                  />
+                </video>
+              )}
               <SImageMask />
               <STopContent>
                 <SButtonIcon
@@ -605,18 +610,42 @@ export const PostCard: React.FC<ICard> = React.memo(
               }
               alt='Post'
               draggable={false}
-              hovered={hovered && videoReady}
+              $hovered={hovered && videoReady}
             />
-            <video
-              ref={(el) => {
-                videoRef.current = el!!;
-              }}
-              key={thumbnailUrl}
-              muted
-              playsInline
-            >
-              <source key={thumbnailUrl} src={thumbnailUrl} type='video/mp4' />
-            </video>
+            <AnimatePresence>
+              {hovered ? (
+                <motion.video
+                  className='motionVideoOutside'
+                  ref={(el) => {
+                    videoRef.current = el!!;
+                  }}
+                  key={thumbnailUrl}
+                  muted
+                  playsInline
+                  initial={{
+                    opacity: 0,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    transition: {
+                      duration: 1,
+                    },
+                  }}
+                  exit={{
+                    opacity: 0,
+                    transition: {
+                      duration: 0.4,
+                    },
+                  }}
+                >
+                  <source
+                    key={thumbnailUrl}
+                    src={thumbnailUrl}
+                    type='video/mp4'
+                  />
+                </motion.video>
+              ) : null}
+            </AnimatePresence>
             <STopContent>
               <SButtonIcon
                 iconOnly
@@ -997,10 +1026,10 @@ const SImageHolder = styled.div<ISWrapper>`
   }
 `;
 
-const SThumnailHolder = styled.img<{
-  hovered: boolean;
+const SThumnailHolder = styled(motion.img)<{
+  $hovered: boolean;
 }>`
-  opacity: ${({ hovered }) => (hovered ? 0 : 1)};
+  opacity: ${({ $hovered }) => ($hovered ? 0 : 1)};
   transition: linear 0.3s;
 `;
 
@@ -1137,7 +1166,8 @@ const SImageHolderOutside = styled.div`
     border-radius: 10px;
   }
 
-  video {
+  .motionVideoOutside {
+    background: white;
     position: absolute;
     top: 0;
     left: 0;
@@ -1145,6 +1175,8 @@ const SImageHolderOutside = styled.div`
     width: 100%;
     height: 100%;
     z-index: -1;
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
   }
 
   .thumnailHolder {
