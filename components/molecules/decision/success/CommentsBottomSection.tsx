@@ -600,9 +600,7 @@ const CommentsBottomSection: React.FunctionComponent<
                   <Comment
                     key={item.id.toString()}
                     canDeleteComment={canDeleteComments}
-                    lastChild={
-                      index === comments.length - 1 || (isMobile && index === 2)
-                    }
+                    lastChild={index === comments.length - 1}
                     comment={item}
                     isDeletingComment={isDeletingComment}
                     handleAddComment={(newMsg: string) =>

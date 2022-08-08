@@ -193,7 +193,7 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
           ref={playerRef}
         />
         {showPlayButton && isPaused && (
-          <SPlayPsuedoButton
+          <SPlayPseudoButton
             onClick={() => {
               if (loaded) {
                 if (player.current?.isPlaying()) {
@@ -210,7 +210,7 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
               height='32px'
               fill='#FFFFFF'
             />
-          </SPlayPsuedoButton>
+          </SPlayPseudoButton>
         )}
       </SVideoWrapper>
       {isLoading && (
@@ -307,7 +307,7 @@ const SLoader = styled.div`
   z-index: 1;
 `;
 
-const SPlayPsuedoButton = styled.button`
+const SPlayPseudoButton = styled.button`
   position: absolute;
   top: calc(50% - 32px);
   left: calc(50% - 32px);

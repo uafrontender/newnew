@@ -64,7 +64,10 @@ export const Chat: React.FC<IChat> = ({ username }) => {
       let route = '';
       if (chatRoom?.visavis?.username) {
         chatRoom.kind === 1
-          ? (route = chatRoom?.visavis?.username)
+          ? (route =
+              chatRoom.myRole === 2
+                ? chatRoom?.visavis?.username
+                : `${chatRoom?.visavis?.username}-cr`)
           : (route = `${chatRoom?.visavis?.username}-announcement`);
       } else {
         chatRoom && chatRoom.kind === 4 && chatRoom.myRole === 2

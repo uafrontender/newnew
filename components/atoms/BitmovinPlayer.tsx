@@ -224,7 +224,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
           }}
         />
         {showPlayButton && isPaused && (
-          <SPlayPsuedoButton
+          <SPlayPseudoButton
             onClick={() => {
               if (loaded) {
                 if (player.current?.isPlaying()) {
@@ -241,7 +241,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
               height='32px'
               fill='#FFFFFF'
             />
-          </SPlayPsuedoButton>
+          </SPlayPseudoButton>
         )}
       </SVideoWrapper>
       {withMuteControl && (
@@ -364,7 +364,7 @@ const SModalSoundIcon = styled.div<ISModalSoundIcon>`
   }
 `;
 
-const SPlayPsuedoButton = styled.button`
+const SPlayPseudoButton = styled.button`
   position: absolute;
   top: calc(50% - 32px);
   left: calc(50% - 32px);
