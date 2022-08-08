@@ -61,8 +61,9 @@ export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
 
 interface IPostViewMC {
   post: newnewapi.MultipleChoice;
-  sessionId?: string;
-  resetSessionId: () => void;
+  stripeSetupIntentClientSecret?: string;
+  saveCard?: boolean;
+  resetSetupIntentClientSecret: () => void;
   postStatus: TPostStatusStringified;
   isFollowingDecision: boolean;
   hasRecommendations: boolean;
@@ -78,11 +79,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
   ({
     post,
     postStatus,
-    sessionId,
+    stripeSetupIntentClientSecret,
+    saveCard,
     isFollowingDecision,
     hasRecommendations,
     handleSetIsFollowingDecision,
-    resetSessionId,
+    resetSetupIntentClientSecret,
     handleGoBack,
     handleUpdatePostStatus,
     handleReportOpen,
@@ -130,9 +132,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     // Post loading state
     const [postLoading, setPostLoading] = useState(false);
 
-    // Vote from sessionId
+    // Vote after stripe redirect
     const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-    const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+    const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] =
+      useState(false);
 
     // Total votes
     const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
@@ -533,16 +536,24 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     ]);
 
     useEffect(() => {
-      const makeVoteFromSessionId = async () => {
-        if (!sessionId) return;
+      const makeVoteAfterStripeRedirect = async () => {
+        if (!stripeSetupIntentClientSecret) return;
         try {
           setLoadingModalOpen(true);
-          const payload = new newnewapi.FulfillPaymentPurposeRequest({
-            paymentSuccessUrl: `session_id=${sessionId}`,
-          });
-          resetSessionId();
 
-          const res = await voteOnPost(payload);
+          const stripeContributionRequest =
+            new newnewapi.StripeContributionRequest({
+              stripeSetupIntentClientSecret,
+              ...(saveCard !== undefined
+                ? {
+                    saveCard,
+                  }
+                : {}),
+            });
+
+          resetSetupIntentClientSecret();
+
+          const res = await voteOnPost(stripeContributionRequest);
 
           if (
             !res.data ||
@@ -560,15 +571,15 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
 
           setLoadingModalOpen(false);
           handleResetFreeVote();
-          setPaymentSuccesModalOpen(true);
+          setPaymentSuccessModalOpen(true);
         } catch (err) {
           console.error(err);
           setLoadingModalOpen(false);
         }
       };
 
-      if (sessionId && !loadingModalOpen) {
-        makeVoteFromSessionId();
+      if (stripeSetupIntentClientSecret && !loadingModalOpen) {
+        makeVoteAfterStripeRedirect();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -756,16 +767,16 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
           )}
           {/* Payment success Modal */}
-          {paymentSuccesModalOpen && (
+          {paymentSuccessModalOpen && (
             <PaymentSuccessModal
               postType='mc'
-              isVisible={paymentSuccesModalOpen}
+              isVisible={paymentSuccessModalOpen}
               closeModal={() => {
                 Mixpanel.track('Close Payment Success Modal', {
                   _stage: 'Post',
                   _post: post.postUuid,
                 });
-                setPaymentSuccesModalOpen(false);
+                setPaymentSuccessModalOpen(false);
               }}
             >
               {t('paymentSuccessModal.mc', {
@@ -806,7 +817,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
 );
 
 PostViewMC.defaultProps = {
-  sessionId: undefined,
+  stripeSetupIntentClientSecret: undefined,
 };
 
 export default PostViewMC;

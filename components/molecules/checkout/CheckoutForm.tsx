@@ -149,7 +149,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             const { error } = await stripe.confirmSetup({
               elements,
               confirmParams: {
-                return_url: `${process.env.NEXT_PUBLIC_APP_URL}${router.asPath}`,
+                return_url: `${process.env.NEXT_PUBLIC_APP_URL}${router.asPath}?save_card=${saveCard}`,
               },
               redirect: 'if_required',
             });

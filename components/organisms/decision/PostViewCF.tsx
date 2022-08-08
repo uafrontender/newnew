@@ -77,11 +77,12 @@ export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
 interface IPostViewCF {
   post: newnewapi.Crowdfunding;
   postStatus: TPostStatusStringified;
-  sessionId?: string;
+  stripeSetupIntentClientSecret?: string;
+  saveCard?: boolean;
   isFollowingDecision: boolean;
   hasRecommendations: boolean;
   handleSetIsFollowingDecision: (newValue: boolean) => void;
-  resetSessionId: () => void;
+  resetSetupIntentClientSecret: () => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
@@ -93,11 +94,12 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
   ({
     post,
     postStatus,
-    sessionId,
+    stripeSetupIntentClientSecret,
+    saveCard,
     isFollowingDecision,
     hasRecommendations,
     handleSetIsFollowingDecision,
-    resetSessionId,
+    resetSetupIntentClientSecret,
     handleGoBack,
     handleUpdatePostStatus,
     handleReportOpen,
@@ -162,9 +164,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
       }
     };
 
-    // Vote from sessionId
+    // Do pledge after stripe redirect
     const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-    const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+    const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] =
+      useState(false);
 
     // Current backers
     const [currentBackers, setCurrentBackers] = useState(
@@ -381,7 +384,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
                   pledgeLevels={pledgeLevels}
                   handleAddPledgeFromResponse={handleAddPledgeFromResponse}
                   handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
-                    setPaymentSuccesModalOpen(newValue)
+                    setPaymentSuccessModalOpen(newValue)
                   }
                 />
               ) : null}
@@ -645,16 +648,24 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
     }, [socketConnection, post, setPledges, sortPleges]);
 
     useEffect(() => {
-      const makePledgeFromSessionId = async () => {
-        if (!sessionId) return;
+      const makePledgeAfterStripeRedirect = async () => {
+        if (!stripeSetupIntentClientSecret) return;
         try {
           setLoadingModalOpen(true);
-          const payload = new newnewapi.FulfillPaymentPurposeRequest({
-            paymentSuccessUrl: `session_id=${sessionId}`,
-          });
-          resetSessionId();
 
-          const res = await doPledgeCrowdfunding(payload);
+          const stripeContributionRequest =
+            new newnewapi.StripeContributionRequest({
+              stripeSetupIntentClientSecret,
+              ...(saveCard !== undefined
+                ? {
+                    saveCard,
+                  }
+                : {}),
+            });
+
+          resetSetupIntentClientSecret();
+
+          const res = await doPledgeCrowdfunding(stripeContributionRequest);
 
           if (
             !res.data ||
@@ -670,16 +681,16 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           await fetchPostLatestData();
 
           setLoadingModalOpen(false);
-          setPaymentSuccesModalOpen(true);
+          setPaymentSuccessModalOpen(true);
         } catch (err) {
           console.error(err);
           setLoadingModalOpen(false);
         }
-        resetSessionId();
+        resetSetupIntentClientSecret();
       };
 
-      if (sessionId && !loadingModalOpen) {
-        makePledgeFromSessionId();
+      if (stripeSetupIntentClientSecret && !loadingModalOpen) {
+        makePledgeAfterStripeRedirect();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -819,8 +830,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           {/* Payment success Modal */}
           <PaymentSuccessModal
             postType='cf'
-            isVisible={paymentSuccesModalOpen}
-            closeModal={() => setPaymentSuccesModalOpen(false)}
+            isVisible={paymentSuccessModalOpen}
+            closeModal={() => setPaymentSuccessModalOpen(false)}
           >
             {t('paymentSuccessModal.cf', {
               postCreator:
@@ -842,7 +853,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
               onClose={() => setChoosePledgeModalOpen(false)}
               handleAddPledgeFromResponse={handleAddPledgeFromResponse}
               handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
-                setPaymentSuccesModalOpen(newValue)
+                setPaymentSuccessModalOpen(newValue)
               }
             />
           ) : null}
@@ -900,7 +911,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
 );
 
 PostViewCF.defaultProps = {
-  sessionId: undefined,
+  stripeSetupIntentClientSecret: undefined,
 };
 
 export default PostViewCF;
