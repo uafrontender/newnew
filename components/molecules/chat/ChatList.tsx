@@ -345,19 +345,12 @@ const ChatList: React.FC<IFunctionProps> = ({
           ? chatRoomsSubs
           : chatRoomsCreators;
 
-        // if (arr) {
-        //   arr[isAlreadyAdded] = updatedChat;
-        // }
-        // arr?.splice(isAlreadyAdded, 1);
-
         if (
           arr &&
           updatedChat.id &&
           updatedChat.id.toString() === activeChatIndex
         ) {
           arr[isAlreadyAdded] = updatedChat;
-          // arr.splice(0, 0, updatedChat);
-          // arr[isAlreadyAdded] = updatedChat;
           if (
             updatedChat.unreadMessageCount !== undefined &&
             updatedChat.unreadMessageCount !== null &&
@@ -367,7 +360,6 @@ const ChatList: React.FC<IFunctionProps> = ({
           }
         } else {
           arr[isAlreadyAdded] = updatedChat;
-          // arr.splice(1, 0, updatedChat);
         }
         if (displayAllRooms) {
           setChatRooms(arr);
