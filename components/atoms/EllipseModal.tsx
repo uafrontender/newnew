@@ -166,4 +166,10 @@ const SButton = styled.button`
     opacity: 0.5;
     cursor: default;
   }
+
+  @media (hover: none) {
+    &:hover:enabled {
+      background-color: initial;
+    }
+  }
 `;
