@@ -531,7 +531,6 @@ const ChatList: React.FC<IFunctionProps> = ({
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom, index: number) => {
       const handleItemClick = async () => {
-        // sortChats();
         if (searchedRooms) setSearchedRooms(null);
         setActiveChatIndex(chat.id ? chat.id.toString() : null);
         openChat({ chatRoom: chat, showChatList: null });
