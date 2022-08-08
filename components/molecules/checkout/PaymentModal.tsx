@@ -22,7 +22,7 @@ interface IPaymentModal {
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
   onClose: () => void;
-  handlePayWithCardStripeRedirect?: (params: {
+  handlePayWithCard?: (params: {
     cardUuid?: string;
     stripeSetupIntentClientSecret: string;
     saveCard?: boolean;
@@ -40,7 +40,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   showTocApply,
   bottomCaption,
   onClose,
-  handlePayWithCardStripeRedirect,
+  handlePayWithCard,
   children,
   createStripeSetupIntent,
 }) => {
@@ -109,7 +109,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             <CheckoutForm
               bottomCaption={bottomCaption}
               amount={amount}
-              handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+              handlePayWithCard={handlePayWithCard}
               stipeSecret={stripeSetupIntent?.stripeSetupIntentClientSecret!}
             />
           </StripeElements>
@@ -123,7 +123,7 @@ PaymentModal.defaultProps = {
   amount: undefined,
   showTocApply: undefined,
   bottomCaption: null,
-  handlePayWithCardStripeRedirect: () => {},
+  handlePayWithCard: () => {},
 };
 
 export default PaymentModal;

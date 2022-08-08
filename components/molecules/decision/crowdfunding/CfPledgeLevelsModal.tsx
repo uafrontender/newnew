@@ -11,7 +11,6 @@ import { toast } from 'react-toastify';
 // import { useAppSelector } from '../../../../redux-store/store';
 import { doPledgeCrowdfunding } from '../../../../api/endpoints/crowdfunding';
 import {
-  // createPaymentSession,
   // getTopUpWalletWithPaymentPurposeUrl,
   createStripeSetupIntent,
 } from '../../../../api/endpoints/payments';
@@ -210,7 +209,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   //   onClose,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(
+  const handlePayWithCard = useCallback(
     async ({
       cardUuid,
       stripeSetupIntentClientSecret,
@@ -379,7 +378,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
           // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
           createStripeSetupIntent={createSetupIntent}
-          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithCard={handlePayWithCard}
           // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
             <>

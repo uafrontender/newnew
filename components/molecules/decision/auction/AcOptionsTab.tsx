@@ -330,7 +330,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   //   handleAddOrUpdateOptionFromResponse,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(
+  const handlePayWithCard = useCallback(
     async ({
       cardUuid,
       stripeSetupIntentClientSecret,
@@ -716,7 +716,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           //     })}
           // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
-          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithCard={handlePayWithCard}
           createStripeSetupIntent={createSetupIntent}
           // handlePayWithWallet={handleSubmitNewOptionWallet}
           bottomCaption={

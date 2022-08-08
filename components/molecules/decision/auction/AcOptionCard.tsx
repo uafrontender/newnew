@@ -22,7 +22,6 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
 // import { placeBidWithWallet } from '../../../../api/endpoints/auction';
 import {
-  // createPaymentSession,
   createStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
@@ -348,7 +347,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   //   router.locale,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(
+  const handlePayWithCard = useCallback(
     async ({
       cardUuid,
       stripeSetupIntentClientSecret,
@@ -784,7 +783,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           //     })}
           // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
-          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithCard={handlePayWithCard}
           // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
             <>

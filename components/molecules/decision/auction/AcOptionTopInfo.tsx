@@ -4,17 +4,15 @@ import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import React, { useCallback, useState } from 'react';
-import { useRouter } from 'next/router';
+// import { useRouter } from 'next/router';
 import styled, { useTheme } from 'styled-components';
 import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
 // import { placeBidWithWallet } from '../../../../api/endpoints/auction';
-import {
-  createPaymentSession,
-  // getTopUpWalletWithPaymentPurposeUrl,
-} from '../../../../api/endpoints/payments';
+import // getTopUpWalletWithPaymentPurposeUrl,
+'../../../../api/endpoints/payments';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -50,7 +48,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
-  const router = useRouter();
+  // const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const createdAtParsed = new Date(createdAtSeconds * 1000);
   const user = useAppSelector((state) => state.user);
@@ -208,41 +206,14 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   const handlePayWithCardStripeRedirect = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
-      const createPaymentSessionPayload =
-        new newnewapi.CreatePaymentSessionRequest({
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${postId}`,
-          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${postId}`,
-          ...(!user.loggedIn
-            ? {
-                nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-              }
-            : {}),
-          acBidRequest: {
-            amount: new newnewapi.MoneyAmount({
-              usdCents: parseInt(supportBidAmount) * 100,
-            }),
-            optionId: option.id,
-            postUuid: postId,
-          },
-        });
-
-      const res = await createPaymentSession(createPaymentSessionPayload);
-
-      if (!res.data || !res.data.sessionUrl || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-
-      window.location.href = res.data.sessionUrl;
+      // TODO: handle pay; createPaymentSession
     } catch (err) {
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
       console.error(err);
       toast.error('toastErrors.generic');
     }
-  }, [user.loggedIn, supportBidAmount, option.id, postId, router.locale]);
+  }, []);
 
   return (
     <SWrapper>
@@ -368,7 +339,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
           amount={parseInt(supportBidAmount) * 100 || 0}
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
-          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithCard={handlePayWithCardStripeRedirect}
           // handlePayWithWallet={handlePayWithWallet}
         >
           <SPaymentModalHeader>

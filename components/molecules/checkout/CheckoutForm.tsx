@@ -41,7 +41,7 @@ interface ICheckoutForm {
   amount?: number;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
-  handlePayWithCardStripeRedirect?: (params: {
+  handlePayWithCard?: (params: {
     cardUuid?: string;
     stripeSetupIntentClientSecret: string;
     saveCard?: boolean;
@@ -50,7 +50,7 @@ interface ICheckoutForm {
 }
 
 const CheckoutForm: React.FC<ICheckoutForm> = ({
-  handlePayWithCardStripeRedirect,
+  handlePayWithCard,
   amount,
   showTocApply,
   bottomCaption,
@@ -124,7 +124,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             selectedPaymentMethod === PaymentMethodTypes.PrimaryCard &&
             primaryCard
           ) {
-            handlePayWithCardStripeRedirect?.({
+            handlePayWithCard?.({
               cardUuid: primaryCard.cardUuid as string,
               stripeSetupIntentClientSecret: stipeSecret,
             });
@@ -160,7 +160,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
               throw new Error(error.message);
             }
 
-            handlePayWithCardStripeRedirect?.({
+            handlePayWithCard?.({
               stripeSetupIntentClientSecret: stipeSecret,
               saveCard,
               ...(!loggedIn ? { email } : {}),

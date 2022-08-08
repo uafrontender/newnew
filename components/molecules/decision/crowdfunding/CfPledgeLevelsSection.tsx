@@ -17,7 +17,6 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { doPledgeCrowdfunding } from '../../../../api/endpoints/crowdfunding';
 import {
   createStripeSetupIntent,
-  // createPaymentSession,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 
@@ -226,7 +225,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   //   handleSetPaymentSuccessModalOpen,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(
+  const handlePayWithCard = useCallback(
     async ({
       cardUuid,
       stripeSetupIntentClientSecret,
@@ -475,7 +474,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
           //     })}
           // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
-          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithCard={handlePayWithCard}
           // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
             <>

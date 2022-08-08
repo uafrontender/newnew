@@ -21,7 +21,6 @@ import {
   // voteOnPostWithWallet,
 } from '../../../../api/endpoints/multiple_choice';
 import {
-  // createPaymentSession,
   createStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
@@ -377,7 +376,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   //   router.locale,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(
+  const handlePayWithCard = useCallback(
     async ({
       cardUuid,
       stripeSetupIntentClientSecret,
@@ -793,7 +792,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             //     })}
             // predefinedOption='card'
             onClose={() => setPaymentModalOpen(false)}
-            handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+            handlePayWithCard={handlePayWithCard}
             // handlePayWithWallet={handlePayWithWallet}
             bottomCaption={
               <>
