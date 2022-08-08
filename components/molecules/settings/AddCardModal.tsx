@@ -56,7 +56,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     const { setupIntent, error } = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/profile/settings/card-setup-complete`,
+        return_url: `${process.env.NEXT_PUBLIC_APP_URL}/profile/settings/card-setup-complete`,
       },
       redirect: 'if_required',
     });

@@ -371,6 +371,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         }
 
         if (res.data.status === newnewapi.VoteOnPostResponse.Status.SUCCESS) {
+          const optionFromResponse = (res.data
+            .option as newnewapi.MultipleChoice.Option)!!;
+          optionFromResponse.isSupportedByMe = true;
+
+          handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
           setPaymentSuccessModalOpen(true);
           setPaymentModalOpen(false);
           setSuggestNewMobileOpen(false);
@@ -386,7 +392,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         setLoadingModalOpen(false);
       }
     },
-    [post.postUuid]
+    [post.postUuid, handleAddOrUpdateOptionFromResponse]
   );
 
   const handleVoteForFree = useCallback(async () => {

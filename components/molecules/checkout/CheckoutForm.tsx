@@ -129,22 +129,27 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
               stripeSetupIntentClientSecret: stipeSecret,
             });
           } else if (selectedPaymentMethod === PaymentMethodTypes.NewCard) {
-            const updateStripeSetupIntentRequest =
-              new newnewapi.UpdateStripeSetupIntentRequest({
-                stripeSetupIntentClientSecret: stipeSecret,
-                guestEmail: email,
-              });
+            if (!loggedIn) {
+              const updateStripeSetupIntentRequest =
+                new newnewapi.UpdateStripeSetupIntentRequest({
+                  stripeSetupIntentClientSecret: stipeSecret,
+                  guestEmail: email,
+                });
 
-            const updateSetupIntentResponse = await updateStripeSetupIntent(
-              updateStripeSetupIntentRequest
-            );
+              const updateSetupIntentResponse = await updateStripeSetupIntent(
+                updateStripeSetupIntentRequest
+              );
 
-            console.log(updateSetupIntentResponse, 'updateSetupIntentResponse');
+              console.log(
+                updateSetupIntentResponse,
+                'updateSetupIntentResponse'
+              );
+            }
 
             const { error } = await stripe.confirmSetup({
               elements,
               confirmParams: {
-                return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/${router.asPath}`,
+                return_url: `${process.env.NEXT_PUBLIC_APP_URL}${router.asPath}`,
               },
               redirect: 'if_required',
             });
@@ -158,6 +163,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             handlePayWithCardStripeRedirect?.({
               stripeSetupIntentClientSecret: stipeSecret,
               saveCard,
+              ...(!loggedIn ? { email } : {}),
             });
           }
         } else {

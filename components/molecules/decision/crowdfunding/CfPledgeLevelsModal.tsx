@@ -240,11 +240,15 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         }
 
         if (res.data.status === newnewapi.DoPledgeResponse.Status.SUCCESS) {
+          setIsFormOpen(false);
+          setCustomPledgeAmount('');
+          handleAddPledgeFromResponse(
+            res.data.pledge as newnewapi.Crowdfunding.Pledge
+          );
+
           handleSetPaymentSuccessModalOpen(true);
           setPaymentModalOpen(false);
 
-          setCustomPledgeAmount('');
-          setIsFormOpen(false);
           onClose();
         }
       } catch (err) {
@@ -255,7 +259,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         setLoadingModalOpen(false);
       }
     },
-    [handleSetPaymentSuccessModalOpen, onClose]
+    [handleSetPaymentSuccessModalOpen, onClose, handleAddPledgeFromResponse]
   );
 
   useEffect(() => {

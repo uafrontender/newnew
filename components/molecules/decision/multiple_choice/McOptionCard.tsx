@@ -408,6 +408,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         }
 
         if (res.data.status === newnewapi.VoteOnPostResponse.Status.SUCCESS) {
+          const optionFromResponse = (res.data
+            .option as newnewapi.MultipleChoice.Option)!!;
+          optionFromResponse.isSupportedByMe = true;
+
+          handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
           handleSetPaymentSuccessModalOpen(true);
           setPaymentModalOpen(false);
 
@@ -424,7 +430,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         setLoadingModalOpen(false);
       }
     },
-    [handleSetPaymentSuccessModalOpen, handleSetSupportedBid]
+    [
+      handleSetPaymentSuccessModalOpen,
+      handleSetSupportedBid,
+      handleAddOrUpdateOptionFromResponse,
+    ]
   );
 
   const handleVoteForFree = useCallback(async () => {

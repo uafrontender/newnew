@@ -261,20 +261,31 @@ const CfPledgeLevelsSection: React.FunctionComponent<
         }
 
         if (res.data.status === newnewapi.DoPledgeResponse.Status.SUCCESS) {
+          setIsFormOpen(false);
+          setCustomPledgeAmount('');
+          handleAddPledgeFromResponse(
+            res.data.pledge as newnewapi.Crowdfunding.Pledge
+          );
+
           handleSetPaymentSuccessModalOpen(true);
           setPaymentModalOpen(false);
 
-          setCustomPledgeAmount('');
           setIsFormOpen(false);
         }
       } catch (err) {
         console.error(err);
         setPaymentModalOpen(false);
-        setLoadingModalOpen(false);
+
         toast.error('toastErrors.generic');
+      } finally {
+        setLoadingModalOpen(false);
       }
     },
-    [handleSetPaymentSuccessModalOpen, post.postUuid]
+    [
+      handleSetPaymentSuccessModalOpen,
+      post.postUuid,
+      handleAddPledgeFromResponse,
+    ]
   );
 
   useEffect(() => {
