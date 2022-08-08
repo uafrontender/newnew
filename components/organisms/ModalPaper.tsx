@@ -3,7 +3,6 @@ import styled, { css } from 'styled-components';
 import dynamic from 'next/dynamic';
 
 import { useAppSelector } from '../../redux-store/store';
-import preventParentClick from '../../utils/preventParentClick';
 
 import InlineSvg from '../atoms/InlineSVG';
 
@@ -17,6 +16,7 @@ interface IModalPaper {
   children: React.ReactNode;
   isMobileFullScreen?: boolean;
   isCloseButton?: boolean;
+  onClick?: (...params: any) => void;
 }
 
 const ModalPaper: React.FC<IModalPaper> = React.memo(
@@ -35,17 +35,13 @@ const ModalPaper: React.FC<IModalPaper> = React.memo(
 
     return (
       <SModalWrapper>
-        <SModal
-          onClick={preventParentClick()}
-          {...otherProps}
-          $isMobileFullScreen={isMobileFullScreen}
-        >
+        <SModal {...otherProps} $isMobileFullScreen={isMobileFullScreen}>
           {isMobileFullScreen && isMobile && (
             <SFullScreenHeader>
               {isMobile && isMobileFullScreen && (
                 <GoBackButton onClick={onClose} />
               )}
-              {title && <SModalTitle>{title}</SModalTitle>}
+              {title && <SModalTitleFullScreen>{title}</SModalTitleFullScreen>}
             </SFullScreenHeader>
           )}
           {title && (!isMobile || !isMobileFullScreen) && (
@@ -85,8 +81,6 @@ const SModal = styled.div<{
   position: relative;
   display: flex;
   flex-direction: column;
-
-  padding: 0 16px 16px;
   box-sizing: border-box;
   z-index: 1;
   width: 100%;
@@ -105,8 +99,10 @@ const SModal = styled.div<{
     $isMobileFullScreen
       ? css`
           height: 100%;
+          padding: 0 16px 16px;
         `
       : css`
+          padding: 16px;
           height: auto;
           max-width: 480px;
           border-radius: ${(props) => props.theme.borderRadius.medium};
@@ -153,13 +149,13 @@ const SCloseButton = styled.div`
   cursor: pointer;
 `;
 
-const SModalTitle = styled.strong`
+const SModalTitleFullScreen = styled.strong`
   font-size: 14px;
   margin: 0;
   font-weight: 600;
+`;
 
-  ${(props) => props.theme.media.tablet} {
-    font-size: 20px;
-    margin-bottom: 16px;
-  }
+const SModalTitle = styled.strong`
+  font-size: 20px;
+  margin-bottom: 16px;
 `;

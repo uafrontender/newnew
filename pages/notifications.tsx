@@ -244,10 +244,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const SGeneral = styled(General)`
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.background.secondary
-      : props.theme.colorsThemed.background.primary};
+  background: ${(props) => props.theme.colorsThemed.background.primary};
 
   ${({ theme }) => theme.media.laptop} {
     background: ${(props) =>
