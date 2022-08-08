@@ -14,19 +14,10 @@ interface ITextArea {
   maxlength?: number;
   onChange: (key: string, value: string, isShiftEnter: boolean) => void;
   placeholder: string;
-  // onKeydown?: (e: React.KeyboardEvent) => void;
 }
 
 export const TextArea: React.FC<ITextArea> = (props) => {
-  const {
-    id = '',
-    maxlength,
-    value,
-    error,
-    onChange,
-    placeholder,
-    // onKeydown,
-  } = props;
+  const { id = '', maxlength, value, error, onChange, placeholder } = props;
 
   const [isShiftEnter, setisShiftEnter] = useState<boolean>(false);
 
@@ -73,7 +64,6 @@ TextArea.defaultProps = {
   id: '',
   error: '',
   maxlength: 524288,
-  // onKeydown: (e: React.KeyboardEvent) => {},
 };
 
 const SWrapper = styled.div`

@@ -615,7 +615,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 href={
                   !isSubscribed && !wasSubscribed
                     ? `/${user.username}/subscribe`
-                    : `/direct-messages/${user.username}`
+                    : `/direct-messages/${user.username}-cr`
                 }
                 disabled={isSubscribed === null || wasSubscribed === null}
               >

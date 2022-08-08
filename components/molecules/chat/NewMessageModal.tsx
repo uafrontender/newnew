@@ -3,6 +3,7 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useUpdateEffect } from 'react-use';
 import Modal from '../../organisms/Modal';
 import SearchInput from '../../atoms/chat/SearchInput';
 import {
@@ -68,6 +69,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
     IChatroomsSorted[]
   >([]);
   const [searchValue, setSearchValue] = useState('');
+  const [chatRoomsNextPageToken, setChatRoomsNextPageToken] = useState<
+    string | undefined | null
+  >('');
   const [filteredChatrooms, setFilteredChatrooms] = useState<
     IChatRoomUserNameWithoutEmoji[]
   >([]);
@@ -83,39 +87,75 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
     setSearchValue(str);
   };
 
-  useEffect(() => {
-    async function fetchMyRooms() {
+  const fetchMyRooms = useCallback(
+    async (pageToken?: string) => {
+      if (loadingRooms) return;
       try {
+        if (!pageToken) setChatRooms([]);
         setLoadingRooms(true);
         const payload = new newnewapi.GetMyRoomsRequest({
           myRole: user.userData?.options?.isOfferingSubscription ? null : 1,
-          paging: { limit: 50 },
+          paging: {
+            limit: 50,
+            pageToken,
+          },
         });
         const res = await getMyRooms(payload);
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        const arr = [] as IChatRoomUserNameWithoutEmoji[];
-        res.data.rooms.forEach((chat) => {
-          if (chat.kind === 4) {
-            if (chat.myRole === 2) {
-              setMyAnnouncement(chat);
-            }
-          } else {
-            arr.push(chat);
-          }
-        });
-        setChatRooms(arr);
+
+        if (res.data && res.data.rooms.length > 0) {
+          setChatRooms((curr) => {
+            const arr = curr ? [...curr] : [];
+            res?.data?.rooms.forEach((chat) => {
+              if (chat.kind === 4) {
+                if (chat.myRole === 2) {
+                  setMyAnnouncement(chat);
+                }
+              } else {
+                const isAlreadyAdded = arr.findIndex(
+                  (currChat) =>
+                    currChat.visavis?.username === chat.visavis?.username
+                );
+                if (isAlreadyAdded < 0) {
+                  arr.push(chat);
+                } else {
+                  // eslint-disable-next-line no-lonely-if
+                  if (chat.myRole === 2) {
+                    arr.splice(isAlreadyAdded, 1, chat);
+                  }
+                }
+              }
+            });
+            return arr;
+          });
+          setChatRoomsNextPageToken(res.data.paging?.nextPageToken);
+        }
+        if (!res.data.paging?.nextPageToken && chatRoomsNextPageToken)
+          setChatRoomsNextPageToken(null);
         setLoadingRooms(false);
       } catch (err) {
         console.error(err);
         setLoadingRooms(false);
       }
-    }
-    if (!chatRooms && !loadingRooms) {
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [loadingRooms, chatRoomsNextPageToken, chatRooms]
+  );
+
+  useEffect(() => {
+    if (!chatRooms && !loadingRooms && showModal) {
       fetchMyRooms();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [showModal]);
+
+  useUpdateEffect(() => {
+    if (!loadingRooms && chatRoomsNextPageToken) {
+      fetchMyRooms(chatRoomsNextPageToken);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingRooms, chatRoomsNextPageToken, fetchMyRooms]);
 
   useEffect(() => {
     if (chatRooms) {
@@ -162,7 +202,12 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             ).toLowerCase();
         } else {
           // eslint-disable-next-line no-lonely-if
-          if (chat.userNameWithoutEmoji.startsWith(searchValue)) arr.push(chat);
+          if (
+            chat.userNameWithoutEmoji.includes(searchValue) ||
+            (chat.visavis?.nickname &&
+              chat.visavis?.nickname.includes(searchValue))
+          )
+            arr.push(chat);
         }
       });
 
