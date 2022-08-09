@@ -176,7 +176,7 @@ const Comment: React.FC<IComment> = ({
               )}
             </SActionsDiv>
           </SCommentHeader>
-          <SText>{comment.content?.text}</SText>
+          {!comment.isDeleted && <SText>{comment.content?.text}</SText>}
           {!comment.parentId &&
             !comment.isDeleted &&
             (!isReplyFormOpen ? (
@@ -211,17 +211,17 @@ const Comment: React.FC<IComment> = ({
             )}
           {isReplyFormOpen &&
             replies &&
-            replies.map((item) => (
+            replies.map((item, index) => (
               <Comment
                 key={item.id.toString()}
                 isDeletingComment={isDeletingComment}
                 canDeleteComment={canDeleteComment}
+                lastChild={index === replies.length - 1}
                 comment={item}
                 handleAddComment={(newMsg: string) => handleAddComment(newMsg)}
                 handleDeleteComment={handleDeleteComment}
               />
             ))}
-          {!lastChild && <SSeparator />}
         </SCommentContent>
         <DeleteCommentModal
           isVisible={confirmDeleteComment}
@@ -233,6 +233,7 @@ const Comment: React.FC<IComment> = ({
           }}
         />
       </SComment>
+      {!lastChild && <SSeparator />}
       {isMobile ? (
         <CommentEllipseModal
           isOpen={ellipseMenuOpen}
@@ -276,6 +277,7 @@ const SUserAvatar = styled(UserAvatar)<{
   min-height: 36px;
   flex-shrink: 0;
   margin-right: 12px;
+  margin-bottom: 14px;
   cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
 `;
 
