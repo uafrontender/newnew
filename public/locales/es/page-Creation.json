@@ -83,7 +83,7 @@
         "value": "${{value}}",
         "label": "$",
         "placeholder": "1",
-        "description_NEED_TRANSLATION": "the minimum bid a person can place"
+        "description": "la oferta mínima que una persona puede hacer"
       },
       "targetBackerCount": {
         "title": "Patrocinadores mínimos",

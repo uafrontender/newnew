@@ -60,6 +60,9 @@ PostTitleContent.defaultProps = {
 export default PostTitleContent;
 
 const SHashtag = styled.span`
+  display: inline;
+  word-spacing: normal;
+  overflow-wrap: break-word;
   color: ${(props) => props.theme.colorsThemed.accent.blue};
   font-weight: 600;
   cursor: pointer;
