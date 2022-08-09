@@ -35,13 +35,10 @@ const Notification: React.FC<newnewapi.INotification> = ({
     resizeMode
   );
   const user = useAppSelector((state) => state.user);
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState('/direct-messages');
 
   useEffect(() => {
-    if (url.length < 1 && target) {
-      if (target.creatorDashboard && target?.creatorDashboard.section === 2)
-        setUrl('/direct-messages');
-
+    if (url === '/direct-messages' && target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 1)
         setUrl('/creator/subscribers');
 

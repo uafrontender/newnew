@@ -1,5 +1,6 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-lonely-if */
+/* eslint-disable no-unused-expressions */
 import React, {
   useState,
   useEffect,
@@ -34,6 +35,8 @@ import { SocketContext } from '../../../contexts/socketContext';
 import { reportUser } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
 import isBrowser from '../../../utils/isBrowser';
+import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
+import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 
 const UserAvatar = dynamic(() => import('../UserAvatar'));
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
@@ -76,13 +79,16 @@ const ChatArea: React.FC<IChatData> = ({
   const [messageText, setMessageText] = useState<string>('');
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
   const [isVisavisBlocked, setIsVisavisBlocked] = useState<boolean>(false);
-  // const [isMessagingDisabled, setIsMessagingDisabled] =
-  //   useState<boolean>(false);
+  const [isMessagingDisabled, setIsMessagingDisabled] =
+    useState<boolean>(false);
+  const [isSubscriptionExpired, setIsSubscriptionExpired] =
+    useState<boolean>(false);
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
   const [newMessage, setNewMessage] = useState<
     newnewapi.IChatMessage | null | undefined
   >();
+  const { mySubscribers } = useGetSubscriptions();
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
@@ -105,6 +111,40 @@ const ChatArea: React.FC<IChatData> = ({
   const [messagesLoading, setMessagesLoading] = useState(false);
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
+
+  useEffect(() => {
+    async function fetchIsSubscribed() {
+      try {
+        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
+          creatorUuid:
+            chatRoom && chatRoom.visavis ? chatRoom.visavis.uuid : null,
+        });
+
+        const res = await getSubscriptionStatus(getStatusPayload);
+
+        if (res.data?.status?.notSubscribed) {
+          chatRoom!!.visavis?.options?.isOfferingSubscription
+            ? setIsSubscriptionExpired(true)
+            : setIsMessagingDisabled(true);
+        } else {
+          setIsSubscriptionExpired(false);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    if (chatRoom) {
+      if (chatRoom.myRole === 1) {
+        fetchIsSubscribed();
+      } else {
+        const isMyActive = mySubscribers.find(
+          (sub) => sub.user?.uuid === chatRoom.visavis?.uuid
+        );
+        if (!isMyActive) setIsMessagingDisabled(true);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatRoom]);
 
   const getChatMessages = useCallback(
     async (pageToken?: string) => {
@@ -225,12 +265,13 @@ const ChatArea: React.FC<IChatData> = ({
   }, [usersIBlocked, chatRoom, isVisavisBlocked]);
 
   useEffect(() => {
+    // console.log(usersBlockedMe, chatRoom);
     if (usersBlockedMe.length > 0 && chatRoom) {
       const isBlocked = usersBlockedMe.find(
         (i) => i === chatRoom?.visavis?.uuid
       );
       if (isBlocked) {
-        // setIsMessagingDisabled(true);
+        setIsMessagingDisabled(true);
       }
     }
     // if (isMessagingDisabled) setIsMessagingDisabled(false);
@@ -483,11 +524,9 @@ const ChatArea: React.FC<IChatData> = ({
 
   const isTextareaHidden = useCallback(() => {
     if (
+      isMessagingDisabled ||
       isVisavisBlocked ||
-      localUserData.subscriptionExpired ||
-      (chatRoom &&
-        chatRoom.myRole === 1 &&
-        !chatRoom?.visavis?.options?.isOfferingSubscription) ||
+      isSubscriptionExpired ||
       localUserData.accountDeleted ||
       !chatRoom
     ) {
@@ -499,8 +538,8 @@ const ChatArea: React.FC<IChatData> = ({
     return true;
   }, [
     isVisavisBlocked,
-    localUserData.subscriptionExpired,
-    // isMessagingDisabled,
+    isSubscriptionExpired,
+    isMessagingDisabled,
     localUserData.accountDeleted,
     isAnnouncement,
     isMyAnnouncement,
@@ -665,19 +704,13 @@ const ChatArea: React.FC<IChatData> = ({
               // isAnnouncement={isAnnouncement}
             />
           )}
-        {localUserData.subscriptionExpired &&
-          chatRoom &&
-          chatRoom.visavis?.uuid && (
-            <SubscriptionExpired user={chatRoom.visavis} />
-          )}
+        {isSubscriptionExpired && chatRoom && chatRoom.visavis?.uuid && (
+          <SubscriptionExpired user={chatRoom.visavis} />
+        )}
         {localUserData.accountDeleted && <AccountDeleted />}
-        {chatRoom &&
-          chatRoom.visavis &&
-          chatRoom.myRole === 1 &&
-          !chatRoom.visavis.options?.isOfferingSubscription && (
-            <MessagingDisabled user={chatRoom.visavis} />
-          )}
-
+        {isMessagingDisabled && chatRoom && chatRoom.visavis && (
+          <MessagingDisabled user={chatRoom.visavis} />
+        )}
         {isTextareaHidden() && (
           <SBottomTextarea>
             <STextArea>
