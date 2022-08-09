@@ -11,15 +11,15 @@
       "fees": "費率最高3%"
     }
   },
-  "rewardsText_NEED_TRANSLATION": "Use my rewards",
+  "rewardsText": "使用我的奖励",
   "payButton": "支付",
   "tocApplyLink": "條款",
   "tocApplyText": "適用",
-  "reCaptchaTos_NEED_TRANSLATION": {
-    "siteProtectedBy": "This site is protected by reCAPTCHA and the Google",
-    "privacyPolicy": "Privacy Policy",
-    "and": "and",
-    "tos": "Terms of Service",
-    "apply": "apply."
+  "reCaptchaTos": {
+    "siteProtectedBy": "本網站受reCAPTCHA和Google保護。",
+    "privacyPolicy": "隱私政策",
+    "and": "和",
+    "tos": "服務條款",
+    "apply": "適用。"
   }
 }

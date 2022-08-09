@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  Reducer,
+  useCallback,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -34,12 +40,46 @@ const ReportModal: React.FC<IReportModal> = React.memo(
       resizeMode
     );
 
-    const [reasons, setReasons] = useState<newnewapi.ReportingReason[]>([]);
     const [message, setMessage] = useState('');
     const [reportSent, setReportSent] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const disabled = reasons.length === 0 || message.length < 15;
+    type ReportAction =
+      | { type: 'clear' }
+      | {
+          type: 'add' | 'remove';
+          value: newnewapi.ReportingReason;
+        };
+
+    // This is not a pretties but the most stable state management I can think of
+    function reasonsReducer(
+      state: Map<newnewapi.ReportingReason, boolean>,
+      action: ReportAction
+    ) {
+      if (action.type === 'clear') {
+        return new Map();
+      }
+
+      const newState = new Map(state);
+
+      if (action.type === 'add') {
+        newState.set(action.value, true);
+      }
+
+      if (action.type === 'remove') {
+        newState.set(action.value, false);
+      }
+
+      return newState;
+    }
+
+    const [reasons, dispatch] = useReducer<
+      Reducer<Map<newnewapi.ReportingReason, boolean>, ReportAction>
+    >(reasonsReducer, new Map());
+
+    const disabled =
+      Array.from(reasons.entries()).filter(([key, value]) => value).length ===
+        0 || message.length < 15;
 
     const reportTypes = useMemo(
       () => [
@@ -78,10 +118,14 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     const reportMaxLength = 150;
 
     const submitReport = async () => {
-      if (reasons.length > 0 && message.length >= 15) {
+      const reasonsList = Array.from(reasons.entries())
+        .filter(([key, value]) => value)
+        .map(([key, value]) => key);
+
+      if (reasonsList.length > 0 && message.length >= 15) {
         setIsSubmitting(true);
         await onSubmit({
-          reasons,
+          reasons: reasonsList,
           message,
         });
         setReportSent(true);
@@ -90,7 +134,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     };
 
     const handleClose = () => {
-      setReasons([]);
+      dispatch({ type: 'clear' });
       setMessage('');
       setReportSent(false);
       onClose();
@@ -99,25 +143,6 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     const handleMessageChange = useCallback(
       (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setMessage(e.target.value);
-      },
-      []
-    );
-
-    const handleTypeChange = useCallback(
-      (id: newnewapi.ReportingReason | undefined) => {
-        if (id) {
-          setReasons((current) => {
-            const alreadySelectedIndex = current.indexOf(id);
-
-            if (alreadySelectedIndex > -1) {
-              const newReasons = current.slice();
-              newReasons.splice(alreadySelectedIndex, 1);
-              return newReasons;
-            }
-
-            return [...current, id];
-          });
-        }
       },
       []
     );
@@ -136,12 +161,18 @@ const ReportModal: React.FC<IReportModal> = React.memo(
               {reportTypes.map((item) => (
                 <SCheckBoxWrapper
                   key={item.id}
-                  onClick={() => handleTypeChange(item.id)}
+                  onClick={() => {
+                    if (reasons.get(item.id)) {
+                      dispatch({ type: 'remove', value: item.id });
+                    } else {
+                      dispatch({ type: 'add', value: item.id });
+                    }
+                  }}
                 >
                   <SCheckMark
                     id={item.id.toString()}
                     label={item.title}
-                    selected={reasons.includes(item.id)}
+                    selected={reasons.get(item.id)}
                   />
                 </SCheckBoxWrapper>
               ))}

@@ -175,8 +175,9 @@ const SContent = styled.div<ISContent>`
     }
 
     span {
-      display: inline-block;
-      white-space: nowrap;
+      display: inline;
+      word-spacing: normal;
+      overflow-wrap: break-word;
     }
 
     .hashtag {

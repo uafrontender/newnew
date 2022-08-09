@@ -3,7 +3,10 @@ import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 
 const BASE_URL_CHAT = `${BASE_URL}/reporting`;
 
-const reportContent = (payload: newnewapi.ReportContentRequest, signal?: RequestInit['signal']) =>
+const reportContent = (
+  payload: newnewapi.ReportContentRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.ReportContentRequest,
     newnewapi.EmptyResponse
@@ -13,7 +16,7 @@ const reportContent = (payload: newnewapi.ReportContentRequest, signal?: Request
     `${BASE_URL_CHAT}/report_content`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 export const reportUser = (
