@@ -417,6 +417,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     }) => {
       setLoadingModalOpen(true);
       handleCloseConfirmVoteModal();
+      Mixpanel.track('PayWithCard', {
+        _stage: 'Post',
+        _postUuid: postId,
+        _component: 'McOptionCard',
+      });
       try {
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
@@ -463,6 +468,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       handleSetPaymentSuccessModalOpen,
       handleSetSupportedBid,
       handleAddOrUpdateOptionFromResponse,
+      postId,
     ]
   );
 

@@ -379,6 +379,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       saveCard?: boolean;
     }) => {
       setLoadingModalOpen(true);
+      Mixpanel.track('PayWithCard', {
+        _stage: 'Post',
+        _postUuid: postId,
+        _component: 'AcOptionsCard',
+      });
       try {
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
@@ -415,7 +420,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         setPaymentModalOpen(false);
       }
     },
-    [handleSetSupportedBid]
+    [handleSetSupportedBid, postId]
   );
 
   // eslint-disable-next-line consistent-return

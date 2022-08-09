@@ -29,6 +29,7 @@ import assets from '../../../../constants/assets';
 import EllipseModal, { EllipseModalButton } from '../../../atoms/EllipseModal';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import PaymentModal from '../../checkout/PaymentModal';
+import { Mixpanel } from '../../../../utils/mixpanel';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 const getPayWithCardErrorMessage = (
@@ -243,6 +244,11 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
       saveCard?: boolean;
     }) => {
       setLoadingModalOpen(true);
+      Mixpanel.track('PayWithCard', {
+        _stage: 'Post',
+        _postUuid: post.postUuid,
+        _component: 'CfPledgeLevelsModal',
+      });
       try {
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
@@ -284,7 +290,12 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         setPaymentModalOpen(false);
       }
     },
-    [handleSetPaymentSuccessModalOpen, onClose, handleAddPledgeFromResponse]
+    [
+      handleSetPaymentSuccessModalOpen,
+      onClose,
+      handleAddPledgeFromResponse,
+      post.postUuid,
+    ]
   );
 
   useEffect(() => {

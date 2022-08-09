@@ -260,7 +260,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
     }) => {
       setLoadingModalOpen(true);
       try {
-        Mixpanel.track('PayWithCardStripeRedirect', {
+        Mixpanel.track('PayWithCard', {
           _stage: 'Post',
           _postUuid: post.postUuid,
           _component: 'CfPledgeLevelsSection',

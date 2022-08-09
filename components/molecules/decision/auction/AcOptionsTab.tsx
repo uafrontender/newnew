@@ -363,7 +363,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     }) => {
       setLoadingModalOpen(true);
       try {
-        Mixpanel.track('PayWithCardStripeRedirect', {
+        Mixpanel.track('PayWithCard', {
           _stage: 'Post',
           _postUuid: postId,
           _component: 'AcOptionsTab',
