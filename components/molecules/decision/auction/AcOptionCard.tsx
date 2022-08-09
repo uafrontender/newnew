@@ -65,6 +65,27 @@ import BidIconDark from '../../../../public/images/decision/bid-icon-dark.png';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
 
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.PlaceBidResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.PlaceBidResponse.Status.NOT_ENOUGH_MONEY:
+      return 'Not enough money';
+    case newnewapi.PlaceBidResponse.Status.CARD_NOT_FOUND:
+      return 'Card not found';
+    case newnewapi.PlaceBidResponse.Status.CARD_CANNOT_BE_USED:
+      return 'This card can not be used';
+    case newnewapi.PlaceBidResponse.Status.BLOCKED_BY_CREATOR:
+      return 'Blocked by creator';
+    case newnewapi.PlaceBidResponse.Status.BIDDING_NOT_STARTED:
+      return 'Bidding is not started yet';
+    case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
+      return 'Bidding is ended already';
+    default:
+      return 'Request failed';
+  }
+};
+
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
   // shouldAnimate: boolean;
@@ -372,26 +393,29 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
         const res = await placeBidOnAuction(stripeContributionRequest);
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+        if (
+          !res.data ||
+          res.error ||
+          res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
+        ) {
+          throw new Error(
+            res.error?.message ?? getPayWithCardErrorMessage(res.data?.status)
+          );
         }
 
-        if (res.data.status === newnewapi.PlaceBidResponse.Status.SUCCESS) {
-          setPaymentSuccessModalOpen(true);
-          setPaymentModalOpen(false);
-
-          handleSetSupportedBid('');
-          setSupportBidAmount('');
-          setIsSupportFormOpen(false);
-        }
-      } catch (err) {
+        setPaymentSuccessModalOpen(true);
+        handleSetSupportedBid('');
+        setSupportBidAmount('');
+        setIsSupportFormOpen(false);
+      } catch (err: any) {
         console.error(err);
-        toast.error(t('toastErrors.generic'));
+        toast.error(err.message);
       } finally {
         setLoadingModalOpen(false);
+        setPaymentModalOpen(false);
       }
     },
-    [handleSetSupportedBid, t]
+    [handleSetSupportedBid]
   );
 
   // eslint-disable-next-line consistent-return

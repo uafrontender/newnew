@@ -31,6 +31,29 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 import PaymentModal from '../../checkout/PaymentModal';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.DoPledgeResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.DoPledgeResponse.Status.NOT_ENOUGH_FUNDS:
+      return 'Not enough money';
+    case newnewapi.DoPledgeResponse.Status.CARD_NOT_FOUND:
+      return 'Card not found';
+    case newnewapi.DoPledgeResponse.Status.CARD_CANNOT_BE_USED:
+      return 'This card can not be used';
+    case newnewapi.DoPledgeResponse.Status.BLOCKED_BY_CREATOR:
+      return 'Blocked by creator';
+    case newnewapi.DoPledgeResponse.Status.CF_CANCELLED:
+      return 'Goal is cancelled';
+    case newnewapi.DoPledgeResponse.Status.CF_FINISHED:
+      return 'Goal is finished already';
+    case newnewapi.DoPledgeResponse.Status.CF_NOT_STARTED:
+      return 'Goal is not started yet';
+    default:
+      return 'Request failed';
+  }
+};
+
 interface ICfPledgeLevelsModal {
   zIndex: number;
   isOpen: boolean;
@@ -234,28 +257,31 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 
         const res = await doPledgeCrowdfunding(stripeContributionRequest);
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
-        }
-
-        if (res.data.status === newnewapi.DoPledgeResponse.Status.SUCCESS) {
-          setIsFormOpen(false);
-          setCustomPledgeAmount('');
-          handleAddPledgeFromResponse(
-            res.data.pledge as newnewapi.Crowdfunding.Pledge
+        if (
+          !res.data ||
+          res.error ||
+          res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS
+        ) {
+          throw new Error(
+            res.error?.message ?? getPayWithCardErrorMessage(res.data?.status)
           );
-
-          handleSetPaymentSuccessModalOpen(true);
-          setPaymentModalOpen(false);
-
-          onClose();
         }
-      } catch (err) {
+
+        setIsFormOpen(false);
+        setCustomPledgeAmount('');
+        handleAddPledgeFromResponse(
+          res.data.pledge as newnewapi.Crowdfunding.Pledge
+        );
+
+        handleSetPaymentSuccessModalOpen(true);
+
+        onClose();
+      } catch (err: any) {
         console.error(err);
-        setPaymentModalOpen(false);
-        toast.error('toastErrors.generic');
+        toast.error(err.message);
       } finally {
         setLoadingModalOpen(false);
+        setPaymentModalOpen(false);
       }
     },
     [handleSetPaymentSuccessModalOpen, onClose, handleAddPledgeFromResponse]

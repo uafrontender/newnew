@@ -62,6 +62,35 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.VoteOnPostResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.VoteOnPostResponse.Status.NOT_ENOUGH_FUNDS:
+      return 'Not enough money';
+    case newnewapi.VoteOnPostResponse.Status.CARD_NOT_FOUND:
+      return 'Card not found';
+    case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
+      return 'This card can not be used';
+    case newnewapi.VoteOnPostResponse.Status.BLOCKED_BY_CREATOR:
+      return 'Blocked by creator';
+    case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
+      return 'Goal is cancelled';
+    case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:
+      return 'Goal is finished already';
+    case newnewapi.VoteOnPostResponse.Status.MC_NOT_STARTED:
+      return 'Goal is not started yet';
+    case newnewapi.VoteOnPostResponse.Status.ALREADY_VOTED:
+      return 'You are already voted';
+    case newnewapi.VoteOnPostResponse.Status.MC_VOTE_COUNT_TOO_SMALL:
+      return 'Vote count is too small';
+    case newnewapi.VoteOnPostResponse.Status.NOT_ALLOWED_TO_CREATE_NEW_OPTION:
+      return 'New option is not allowed';
+    default:
+      return 'Request failed';
+  }
+};
+
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
   creator: newnewapi.IUser;
@@ -402,31 +431,32 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
         const res = await voteOnPost(stripeContributionRequest);
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+        if (
+          !res.data ||
+          res.error ||
+          res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
+        ) {
+          throw new Error(
+            res.error?.message ?? getPayWithCardErrorMessage(res.data?.status)
+          );
         }
 
-        if (res.data.status === newnewapi.VoteOnPostResponse.Status.SUCCESS) {
-          const optionFromResponse = (res.data
-            .option as newnewapi.MultipleChoice.Option)!!;
-          optionFromResponse.isSupportedByMe = true;
+        const optionFromResponse = (res.data
+          .option as newnewapi.MultipleChoice.Option)!!;
+        optionFromResponse.isSupportedByMe = true;
 
-          handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-          handleSetPaymentSuccessModalOpen(true);
-          setPaymentModalOpen(false);
-
-          handleSetSupportedBid('');
-          setSupportBidAmount('');
-
-          setIsSupportMenuOpen(false);
-        }
-      } catch (err) {
-        setPaymentModalOpen(false);
+        handleSetPaymentSuccessModalOpen(true);
+        handleSetSupportedBid('');
+        setSupportBidAmount('');
+        setIsSupportMenuOpen(false);
+      } catch (err: any) {
         console.error(err);
-        toast.error('toastErrors.generic');
+        toast.error(err.message);
       } finally {
         setLoadingModalOpen(false);
+        setPaymentModalOpen(false);
       }
     },
     [
