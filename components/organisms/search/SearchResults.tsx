@@ -154,6 +154,9 @@ const SPageTitle = styled.h1`
 `;
 
 const SHashtag = styled.span`
+  display: inline;
+  word-spacing: normal;
+  overflow-wrap: break-word;
   color: ${(props) => props.theme.colorsThemed.accent.blue};
 `;
 
