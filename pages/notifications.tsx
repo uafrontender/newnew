@@ -51,8 +51,12 @@ export const Notifications = () => {
       if (loading) return;
       const limit: number = args && args.limit ? args.limit : defaultLimit;
       const pageToken: string = args && args.pageToken ? args.pageToken : null;
+
       try {
-        if (!pageToken && limit === defaultLimit) setNotifications([]);
+        if (!pageToken && limit === defaultLimit) {
+          setNotifications([]);
+        }
+
         setLoading(true);
         const payload = new newnewapi.GetMyNotificationsRequest({
           paging: {
@@ -65,6 +69,7 @@ export const Notifications = () => {
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
+
         if (res.data.notifications.length > 0) {
           if (limit === defaultLimit) {
             setNotifications((curr) => {
@@ -97,9 +102,14 @@ export const Notifications = () => {
                 arr.push(res.data.notifications[0].id as number);
               return arr;
             });
+            // We don`t update token since we only loaded the new first items
           }
+        } else {
+          // If there is no results then there is no more pages to load
+          setNotificationsNextPageToken(null);
         }
-        if (!res.data.paging?.nextPageToken && notificationsNextPageToken)
+
+        if (!res.data.paging?.nextPageToken)
           setNotificationsNextPageToken(null);
         setLoading(false);
       } catch (err) {
@@ -107,8 +117,7 @@ export const Notifications = () => {
         setLoading(false);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loading]
+    [loading, defaultLimit]
   );
 
   const readNotification = useCallback(

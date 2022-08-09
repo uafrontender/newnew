@@ -1547,6 +1547,9 @@ const SBottomEndPostTitle = styled(Text)`
 `;
 
 const SBottomEndPostTitleHashtag = styled.span`
+  display: inline;
+  word-spacing: normal;
+  overflow-wrap: break-word;
   color: ${(props) => props.theme.colorsThemed.accent.blue};
 `;
 

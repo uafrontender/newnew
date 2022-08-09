@@ -1,35 +1,35 @@
 {
   "meta": {
-    "title_NEED_TRANSLATION": "NewNew Rewards",
-    "description_NEED_TRANSLATION": "NewNew Rewards"
+    "title": "Recompensas NewNew",
+    "description": "Recompensas NewNew"
   },
-  "title_NEED_TRANSLATION": "NewNew Rewards",
+  "title": "Recompensas NewNew",
   "button": {
     "back": "Regresar"
   },
   "instruction": {
-    "title_NEED_TRANSLATION": "How to Earn Free Credits",
+    "title": "Cómo ganar créditos gratis",
     "bid": {
       "title": "Hacer oferta",
-      "description_NEED_TRANSLATION": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
     },
     "earn": {
-      "title_NEED_TRANSLATION": "Earn credits on your bid",
-      "description_NEED_TRANSLATION": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      "title": "Gane créditos con tu oferta",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
     },
     "spend": {
-      "title_NEED_TRANSLATION": "Spend your rewards",
-      "description_NEED_TRANSLATION": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      "title": "Gasta tus recompensas",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
     }
   },
   "balance": {
-    "title_NEED_TRANSLATION": "Rewards towards your next purchase",
+    "title": "Recompensas para tu próxima compra",
     "button": {
-      "signUp_NEED_TRANSLATION": "Sign up to spend your rewards!",
-      "spend_NEED_TRANSLATION": "Spend my Rewards!"
+      "signUp": "¡Inscríbete para gastar tus recompensas!",
+      "spend": "¡Gastar mis recompensas!"
     }
   },
   "rewards": {
-    "title_NEED_TRANSLATION": "My Milestones"
+    "title": "Mis logros"
   }
 }
