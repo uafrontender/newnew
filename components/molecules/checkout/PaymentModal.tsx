@@ -31,6 +31,7 @@ interface IPaymentModal {
   createStripeSetupIntent?: () => Promise<
     newnewapi.CreateStripeSetupIntentResponse | undefined
   >;
+  redirectUrl: string;
 }
 
 const PaymentModal: React.FC<IPaymentModal> = ({
@@ -43,6 +44,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   handlePayWithCard,
   children,
   createStripeSetupIntent,
+  redirectUrl,
 }) => {
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -104,13 +106,16 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             />
           )}
           <StripeElements
-            stipeSecret={stripeSetupIntent?.stripeSetupIntentClientSecret}
+            stipeSecret={
+              stripeSetupIntent?.stripeSetupIntentClientSecret || undefined
+            }
           >
             <CheckoutForm
               bottomCaption={bottomCaption}
               amount={amount}
               handlePayWithCard={handlePayWithCard}
               stipeSecret={stripeSetupIntent?.stripeSetupIntentClientSecret!}
+              redirectUrl={redirectUrl}
             />
           </StripeElements>
         </SContentContainer>

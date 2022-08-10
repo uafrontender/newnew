@@ -55,6 +55,35 @@ const PaymentSuccessModal = dynamic(
   () => import('../../molecules/decision/PaymentSuccessModal')
 );
 
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.VoteOnPostResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.VoteOnPostResponse.Status.NOT_ENOUGH_FUNDS:
+      return 'Not enough money';
+    case newnewapi.VoteOnPostResponse.Status.CARD_NOT_FOUND:
+      return 'Card not found';
+    case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
+      return 'This card can not be used';
+    case newnewapi.VoteOnPostResponse.Status.BLOCKED_BY_CREATOR:
+      return 'Blocked by creator';
+    case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
+      return 'Goal is cancelled';
+    case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:
+      return 'Goal is finished already';
+    case newnewapi.VoteOnPostResponse.Status.MC_NOT_STARTED:
+      return 'Goal is not started yet';
+    case newnewapi.VoteOnPostResponse.Status.ALREADY_VOTED:
+      return 'You are already voted';
+    case newnewapi.VoteOnPostResponse.Status.MC_VOTE_COUNT_TOO_SMALL:
+      return 'Vote count is too small';
+    case newnewapi.VoteOnPostResponse.Status.NOT_ALLOWED_TO_CREATE_NEW_OPTION:
+      return 'New option is not allowed';
+    default:
+      return 'Request failed';
+  }
+};
+
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
 };
@@ -538,6 +567,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     useEffect(() => {
       const makeVoteAfterStripeRedirect = async () => {
         if (!stripeSetupIntentClientSecret) return;
+
+        if (!user.loggedIn) {
+          router.push(
+            `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+          );
+          return;
+        }
+
         try {
           setLoadingModalOpen(true);
 
@@ -557,10 +594,13 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
 
           if (
             !res.data ||
-            res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
-            res.error
-          )
-            throw new Error(res.error?.message ?? 'Request failed');
+            res.error ||
+            res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
+          ) {
+            throw new Error(
+              res.error?.message ?? getPayWithCardErrorMessage(res.data?.status)
+            );
+          }
 
           const optionFromResponse = res.data
             .option as newnewapi.MultipleChoice.Option;

@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-// import { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
@@ -130,7 +130,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
-  // const router = useRouter();
+  const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const dispatch = useAppDispatch();
@@ -351,8 +351,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       });
       const response = await createStripeSetupIntent(payload);
 
-      console.log(response, 'createStripeSetupIntent');
-
       if (!response.data || response.error) {
         throw new Error(response.error?.message || 'Some error occurred');
       }
@@ -375,6 +373,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       saveCard?: boolean;
     }) => {
       setLoadingModalOpen(true);
+
+      if (!user.loggedIn) {
+        router.push(
+          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+        );
+        return;
+      }
+
       try {
         Mixpanel.track('PayWithCard', {
           _stage: 'Post',
@@ -422,7 +428,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         setPaymentModalOpen(false);
       }
     },
-    [post.postUuid, handleAddOrUpdateOptionFromResponse]
+    [post.postUuid, handleAddOrUpdateOptionFromResponse, user.loggedIn, router]
   );
 
   const handleVoteForFree = useCallback(async () => {
@@ -798,6 +804,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
+          redirectUrl={`post/${post.postUuid}`}
           // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
             <>

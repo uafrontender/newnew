@@ -53,6 +53,27 @@ const PaymentSuccessModal = dynamic(
 );
 const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
 
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.PlaceBidResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.PlaceBidResponse.Status.NOT_ENOUGH_MONEY:
+      return 'Not enough money';
+    case newnewapi.PlaceBidResponse.Status.CARD_NOT_FOUND:
+      return 'Card not found';
+    case newnewapi.PlaceBidResponse.Status.CARD_CANNOT_BE_USED:
+      return 'This card can not be used';
+    case newnewapi.PlaceBidResponse.Status.BLOCKED_BY_CREATOR:
+      return 'Blocked by creator';
+    case newnewapi.PlaceBidResponse.Status.BIDDING_NOT_STARTED:
+      return 'Bidding is not started yet';
+    case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
+      return 'Bidding is ended already';
+    default:
+      return 'Request failed';
+  }
+};
+
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
 };
@@ -511,6 +532,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     useEffect(() => {
       const makeBidAfterStripeRedirect = async () => {
         if (!stripeSetupIntentClientSecret || loadingModalOpen) return;
+
+        if (!user.loggedIn) {
+          router.push(
+            `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+          );
+          return;
+        }
+
         try {
           setLoadingModalOpen(true);
 
@@ -526,14 +555,19 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
 
           resetSetupIntentClientSecret();
 
+          console.log(stripeContributionRequest, 'stripeContributionRequest');
+
           const res = await placeBidOnAuction(stripeContributionRequest);
 
           if (
             !res.data ||
-            res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS ||
-            res.error
-          )
-            throw new Error(res.error?.message ?? 'Request failed');
+            res.error ||
+            res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
+          ) {
+            throw new Error(
+              res.error?.message ?? getPayWithCardErrorMessage(res.data?.status)
+            );
+          }
 
           const optionFromResponse = res.data
             .option as newnewapi.Auction.Option;
@@ -544,8 +578,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
 
           setLoadingModalOpen(false);
           setPaymentSuccessModalOpen(true);
-        } catch (err) {
+        } catch (err: any) {
           console.error(err);
+          toast.error(err.message);
+
           setLoadingModalOpen(false);
         }
       };

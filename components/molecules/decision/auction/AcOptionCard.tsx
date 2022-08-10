@@ -368,6 +368,40 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   //   router.locale,
   // ]);
 
+  const createSetupIntent = useCallback(async () => {
+    try {
+      const placeBidRequest = new newnewapi.PlaceBidRequest({
+        postUuid: postId,
+        amount: new newnewapi.MoneyAmount({
+          usdCents: parseInt(supportBidAmount) * 100,
+        }),
+        optionId: option.id,
+      });
+
+      const payload = new newnewapi.CreateStripeSetupIntentRequest({
+        acBidRequest: placeBidRequest,
+        ...(!user.loggedIn ? { guestEmail: '' } : {}),
+        ...(!user.loggedIn
+          ? { successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${postId}` }
+          : {}),
+      });
+      const response = await createStripeSetupIntent(payload);
+
+      if (
+        !response.data ||
+        response.error ||
+        !response.data?.stripeSetupIntentClientSecret
+      ) {
+        throw new Error(response.error?.message || 'Some error occurred');
+      }
+
+      return response.data;
+    } catch (err) {
+      console.error(err);
+      return undefined;
+    }
+  }, [postId, option.id, supportBidAmount, user.loggedIn]);
+
   const handlePayWithCard = useCallback(
     async ({
       cardUuid,
@@ -379,6 +413,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       saveCard?: boolean;
     }) => {
       setLoadingModalOpen(true);
+
+      if (!user.loggedIn) {
+        router.push(
+          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+        );
+        return;
+      }
+
       Mixpanel.track('PayWithCard', {
         _stage: 'Post',
         _postUuid: postId,
@@ -420,7 +462,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         setPaymentModalOpen(false);
       }
     },
-    [handleSetSupportedBid, postId]
+    [handleSetSupportedBid, postId, user.loggedIn, router]
   );
 
   // eslint-disable-next-line consistent-return
@@ -451,34 +493,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       setSupportBidAmount('');
     }
   }, [isSupportFormOpen]);
-
-  const createSetupIntent = useCallback(async () => {
-    try {
-      const placeBidRequest = new newnewapi.PlaceBidRequest({
-        postUuid: postId,
-        amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(supportBidAmount) * 100,
-        }),
-        optionId: option.id,
-      });
-
-      const payload = new newnewapi.CreateStripeSetupIntentRequest({
-        acBidRequest: placeBidRequest,
-      });
-      const response = await createStripeSetupIntent(payload);
-
-      console.log(response, 'createStripeSetupIntent');
-
-      if (!response.data || response.error) {
-        throw new Error(response.error?.message || 'Some error occurred');
-      }
-
-      return response.data;
-    } catch (err) {
-      console.error(err);
-      return undefined;
-    }
-  }, [postId, option.id, supportBidAmount]);
 
   return (
     <div
@@ -804,6 +818,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           zIndex={12}
           amount={parseInt(supportBidAmount) * 100 || 0}
           createStripeSetupIntent={createSetupIntent}
+          redirectUrl={`post/${postId}`}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(supportBidAmount) * 100
           //   ? {}

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import styled from 'styled-components';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { toast } from 'react-toastify';
-import { useRouter } from 'next/router';
 import {
   PaymentElement,
   useElements,
@@ -47,6 +46,7 @@ interface ICheckoutForm {
     saveCard?: boolean;
   }) => void;
   stipeSecret: string;
+  redirectUrl: string;
 }
 
 const CheckoutForm: React.FC<ICheckoutForm> = ({
@@ -55,11 +55,11 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   showTocApply,
   bottomCaption,
   stipeSecret,
+  redirectUrl,
 }) => {
   const { t } = useTranslation('modal-PaymentModal');
   const elements = useElements();
   const stripe = useStripe();
-  const router = useRouter();
 
   const { loggedIn } = useAppSelector((state) => state.user);
 
@@ -128,28 +128,25 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
               cardUuid: primaryCard.cardUuid as string,
               stripeSetupIntentClientSecret: stipeSecret,
             });
-          } else if (selectedPaymentMethod === PaymentMethodTypes.NewCard) {
+          } else if (
+            selectedPaymentMethod === PaymentMethodTypes.NewCard ||
+            !primaryCard
+          ) {
             if (!loggedIn) {
               const updateStripeSetupIntentRequest =
                 new newnewapi.UpdateStripeSetupIntentRequest({
                   stripeSetupIntentClientSecret: stipeSecret,
                   guestEmail: email,
+                  saveCard,
                 });
 
-              const updateSetupIntentResponse = await updateStripeSetupIntent(
-                updateStripeSetupIntentRequest
-              );
-
-              console.log(
-                updateSetupIntentResponse,
-                'updateSetupIntentResponse'
-              );
+              await updateStripeSetupIntent(updateStripeSetupIntentRequest);
             }
 
             const { error } = await stripe.confirmSetup({
               elements,
               confirmParams: {
-                return_url: `${process.env.NEXT_PUBLIC_APP_URL}${router.asPath}?save_card=${saveCard}`,
+                return_url: `${process.env.NEXT_PUBLIC_APP_URL}/${redirectUrl}?save_card=${saveCard}`,
               },
               redirect: 'if_required',
             });
@@ -187,21 +184,26 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   return (
     <form onSubmit={handleSubmit}>
       {primaryCard && (
-        <OptionCard
-          handleClick={() =>
-            setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard)
-          }
-          selected={selectedPaymentMethod === PaymentMethodTypes.PrimaryCard}
-          label={`Primary card **** ${primaryCard.last4}`}
-        />
+        <>
+          <OptionCard
+            handleClick={() =>
+              setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard)
+            }
+            selected={selectedPaymentMethod === PaymentMethodTypes.PrimaryCard}
+            label={`Primary card **** ${primaryCard.last4}`}
+          />
+          <OptionCard
+            handleClick={() =>
+              setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
+            }
+            selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
+            label='New card'
+          />
+        </>
       )}
 
-      <OptionCard
-        handleClick={() => setSelectedPaymentMethod(PaymentMethodTypes.NewCard)}
-        selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
-        label='New card'
-      />
-      {selectedPaymentMethod === PaymentMethodTypes.NewCard && (
+      {(selectedPaymentMethod === PaymentMethodTypes.NewCard ||
+        !primaryCard) && (
         <SPaymentFormWrapper>
           {!loggedIn && isStripeReady && (
             <Input
@@ -232,7 +234,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           type='submit'
           id='pay'
           view='primaryGrad'
-          disabled={!selectedPaymentMethod}
+          disabled={primaryCard ? !selectedPaymentMethod : false}
           loading={isSubmitting}
         >
           {t('payButton')}

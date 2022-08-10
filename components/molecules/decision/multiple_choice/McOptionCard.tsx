@@ -417,6 +417,14 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     }) => {
       setLoadingModalOpen(true);
       handleCloseConfirmVoteModal();
+
+      if (!user.loggedIn) {
+        router.push(
+          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+        );
+        return;
+      }
+
       Mixpanel.track('PayWithCard', {
         _stage: 'Post',
         _postUuid: postId,
@@ -469,6 +477,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       handleSetSupportedBid,
       handleAddOrUpdateOptionFromResponse,
       postId,
+      user.loggedIn,
+      router,
     ]
   );
 
@@ -525,8 +535,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         mcVoteRequest: voteOnPostRequest,
       });
       const response = await createStripeSetupIntent(payload);
-
-      console.log(response, 'createStripeSetupIntent');
 
       if (!response.data || response.error) {
         throw new Error(response.error?.message || 'Some error occurred');
@@ -829,6 +837,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             // predefinedOption='card'
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCard={handlePayWithCard}
+            redirectUrl={`post/${postId}`}
             // handlePayWithWallet={handlePayWithWallet}
             bottomCaption={
               <>

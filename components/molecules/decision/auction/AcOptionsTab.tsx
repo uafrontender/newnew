@@ -362,6 +362,14 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       saveCard?: boolean;
     }) => {
       setLoadingModalOpen(true);
+
+      if (!user.loggedIn) {
+        router.push(
+          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+        );
+        return;
+      }
+
       try {
         Mixpanel.track('PayWithCard', {
           _stage: 'Post',
@@ -409,7 +417,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         setPaymentModalOpen(false);
       }
     },
-    [postId, handleAddOrUpdateOptionFromResponse]
+    [postId, handleAddOrUpdateOptionFromResponse, user.loggedIn, router]
   );
 
   useEffect(() => {
@@ -733,6 +741,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={parseInt(newBidAmount) * 100 || 0}
+          redirectUrl={`post/${postId}`}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * 100
           //   ? {}

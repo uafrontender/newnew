@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-// import { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
@@ -85,7 +85,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   handleSetPaymentSuccessModalOpen,
   handleAddPledgeFromResponse,
 }) => {
-  // const router = useRouter();
+  const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
   const dispatch = useAppDispatch();
@@ -259,6 +259,14 @@ const CfPledgeLevelsSection: React.FunctionComponent<
       saveCard?: boolean;
     }) => {
       setLoadingModalOpen(true);
+
+      if (!user.loggedIn) {
+        router.push(
+          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+        );
+        return;
+      }
+
       try {
         Mixpanel.track('PayWithCard', {
           _stage: 'Post',
@@ -308,6 +316,8 @@ const CfPledgeLevelsSection: React.FunctionComponent<
       handleSetPaymentSuccessModalOpen,
       post.postUuid,
       handleAddPledgeFromResponse,
+      user.loggedIn,
+      router,
     ]
   );
 
@@ -328,8 +338,6 @@ const CfPledgeLevelsSection: React.FunctionComponent<
         cfPledgeRequest: doPledgeRequest,
       });
       const response = await createStripeSetupIntent(payload);
-
-      console.log(response, 'createStripeSetupIntent');
 
       if (!response.data || response.error) {
         throw new Error(response.error?.message || 'Some error occurred');
@@ -499,6 +507,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
           // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
+          redirectUrl={`post/${post.postUuid}`}
           // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
             <>

@@ -4,11 +4,11 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-// import { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
 
-// import { useAppSelector } from '../../../../redux-store/store';
+import { useAppSelector } from '../../../../redux-store/store';
 import { doPledgeCrowdfunding } from '../../../../api/endpoints/crowdfunding';
 import {
   // getTopUpWalletWithPaymentPurposeUrl,
@@ -77,9 +77,9 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   handleAddPledgeFromResponse,
 }) => {
   const theme = useTheme();
-  // const router = useRouter();
+  const router = useRouter();
   const { t } = useTranslation('modal-Post');
-  // const user = useAppSelector((state) => state.user);
+  const user = useAppSelector((state) => state.user);
 
   // const { walletBalance } = useContext(WalletContext);
 
@@ -244,6 +244,14 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
       saveCard?: boolean;
     }) => {
       setLoadingModalOpen(true);
+
+      if (!user.loggedIn) {
+        router.push(
+          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+        );
+        return;
+      }
+
       Mixpanel.track('PayWithCard', {
         _stage: 'Post',
         _postUuid: post.postUuid,
@@ -295,6 +303,8 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
       onClose,
       handleAddPledgeFromResponse,
       post.postUuid,
+      user.loggedIn,
+      router,
     ]
   );
 
@@ -315,8 +325,6 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         cfPledgeRequest: doPledgeRequest,
       });
       const response = await createStripeSetupIntent(payload);
-
-      console.log(response, 'createStripeSetupIntent');
 
       if (!response.data || response.error) {
         throw new Error(response.error?.message || 'Some error occurred');
@@ -416,6 +424,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
           onClose={() => setPaymentModalOpen(false)}
           createStripeSetupIntent={createSetupIntent}
           handlePayWithCard={handlePayWithCard}
+          redirectUrl={`post/${post.postUuid}`}
           // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
             <>

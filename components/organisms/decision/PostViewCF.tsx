@@ -74,6 +74,29 @@ export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
 };
 
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.DoPledgeResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.DoPledgeResponse.Status.NOT_ENOUGH_FUNDS:
+      return 'Not enough money';
+    case newnewapi.DoPledgeResponse.Status.CARD_NOT_FOUND:
+      return 'Card not found';
+    case newnewapi.DoPledgeResponse.Status.CARD_CANNOT_BE_USED:
+      return 'This card can not be used';
+    case newnewapi.DoPledgeResponse.Status.BLOCKED_BY_CREATOR:
+      return 'Blocked by creator';
+    case newnewapi.DoPledgeResponse.Status.CF_CANCELLED:
+      return 'Goal is cancelled';
+    case newnewapi.DoPledgeResponse.Status.CF_FINISHED:
+      return 'Goal is finished already';
+    case newnewapi.DoPledgeResponse.Status.CF_NOT_STARTED:
+      return 'Goal is not started yet';
+    default:
+      return 'Request failed';
+  }
+};
+
 interface IPostViewCF {
   post: newnewapi.Crowdfunding;
   postStatus: TPostStatusStringified;
@@ -650,6 +673,14 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
     useEffect(() => {
       const makePledgeAfterStripeRedirect = async () => {
         if (!stripeSetupIntentClientSecret) return;
+
+        if (!user.loggedIn) {
+          router.push(
+            `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+          );
+          return;
+        }
+
         try {
           setLoadingModalOpen(true);
 
@@ -669,10 +700,13 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
 
           if (
             !res.data ||
-            res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS ||
-            res.error
-          )
-            throw new Error(res.error?.message ?? 'Request failed');
+            res.error ||
+            res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS
+          ) {
+            throw new Error(
+              res.error?.message ?? getPayWithCardErrorMessage(res.data?.status)
+            );
+          }
 
           handleAddPledgeFromResponse(
             res.data.pledge as newnewapi.Crowdfunding.Pledge

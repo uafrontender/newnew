@@ -340,6 +340,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCardStripeRedirect}
+          redirectUrl={`post/${postId}`}
           // handlePayWithWallet={handlePayWithWallet}
         >
           <SPaymentModalHeader>
