@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import { toast } from 'react-toastify';
+
 import {
   SBottomAction,
   SBottomActionButton,
@@ -13,17 +16,29 @@ import {
   SBottomActionTitle,
 } from '../../atoms/chat/styles';
 import Text from '../../atoms/Text';
+
 import { useAppSelector } from '../../../redux-store/store';
 import { subscribeToCreator } from '../../../api/endpoints/subscription';
+import { createStripeSetupIntent } from '../../../api/endpoints/payments';
 
 const PaymentModal = dynamic(() => import('../checkout/PaymentModal'));
+const LoadingModal = dynamic(() => import('../LoadingModal'));
 
 interface ISubscriptionExpired {
   user: newnewapi.IUser;
+  saveCardFromRedirect?: boolean;
+  setupIntentClientSecretFromRedirect?: string;
+  resetSetSetupIntent: () => void;
 }
 
 const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
-  ({ user }) => {
+  ({
+    user,
+    saveCardFromRedirect,
+    setupIntentClientSecretFromRedirect,
+    resetSetSetupIntent,
+  }) => {
+    const router = useRouter();
     const { t } = useTranslation('page-Chat');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -31,28 +46,129 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
     );
     const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
-    const handlePayWithCard = async () => {
+    const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+
+    useEffect(() => {
+      const subscribeToCreatorAfterStripeRedirect = async () => {
+        if (!setupIntentClientSecretFromRedirect || loadingModalOpen) return;
+
+        try {
+          setLoadingModalOpen(true);
+
+          const stripeContributionRequest =
+            new newnewapi.StripeContributionRequest({
+              stripeSetupIntentClientSecret:
+                setupIntentClientSecretFromRedirect,
+              ...(saveCardFromRedirect !== undefined
+                ? {
+                    saveCard: saveCardFromRedirect,
+                  }
+                : {}),
+            });
+
+          resetSetSetupIntent();
+
+          const res = await subscribeToCreator(stripeContributionRequest);
+
+          if (!res.data || res.error) {
+            throw new Error(res.error?.message ?? 'Request failed');
+          }
+
+          if (
+            res.data?.status ===
+            newnewapi.SubscribeToCreatorResponse.Status.ALREADY_SUBSCRIBED
+          ) {
+            router.push(`/direct-messages/${user.username}`);
+          }
+
+          if (
+            res.data.status ===
+            newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
+          ) {
+            router.push(
+              `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`
+            );
+          }
+
+          setLoadingModalOpen(false);
+        } catch (err: any) {
+          console.error(err);
+          toast.error(err.message);
+
+          setLoadingModalOpen(false);
+        }
+      };
+
+      if (setupIntentClientSecretFromRedirect && !loadingModalOpen) {
+        subscribeToCreatorAfterStripeRedirect();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const createSetupIntent = useCallback(async () => {
       try {
-        const payload = new newnewapi.SubscribeToCreatorRequest({
-          creatorUuid: user.uuid,
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&`,
-          cancelUrl: window.location.href,
+        const payload = new newnewapi.CreateStripeSetupIntentRequest({
+          subscribeToCreatorUuid: user.uuid,
         });
+        const response = await createStripeSetupIntent(payload);
 
-        const res = await subscribeToCreator(payload);
+        if (
+          !response.data ||
+          response.error ||
+          !response.data?.stripeSetupIntentClientSecret
+        ) {
+          throw new Error(response.error?.message || 'Some error occurred');
+        }
 
-        if (!res.data?.checkoutUrl || res.error)
+        return response.data;
+      } catch (err) {
+        console.error(err);
+        return undefined;
+      }
+    }, [user.uuid]);
+
+    const handlePayWithCard = async ({
+      stripeSetupIntentClientSecret,
+      cardUuid,
+      saveCard,
+    }: {
+      cardUuid?: string;
+      stripeSetupIntentClientSecret: string;
+      saveCard?: boolean;
+    }) => {
+      try {
+        const stripeContributionRequest =
+          new newnewapi.StripeContributionRequest({
+            cardUuid,
+            stripeSetupIntentClientSecret,
+            ...(saveCard !== undefined
+              ? {
+                  saveCard,
+                }
+              : {}),
+          });
+
+        const res = await subscribeToCreator(stripeContributionRequest);
+
+        if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
+        }
 
-        const url = res.data.checkoutUrl;
-        if (url) window.location.href = url;
+        if (
+          res.data.status ===
+          newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
+        ) {
+          router.push(
+            `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`
+          );
+        }
       } catch (err) {
         console.error(err);
       }
     };
 
     return (
-      <SBottomAction>
+      <SBottomActionContainer>
         <SBottomActionLeft>
           <SBottomActionIcon>🙊</SBottomActionIcon>
           <SBottomActionText>
@@ -82,6 +198,8 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
           showTocApply
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
+          redirectUrl={`/direct-messages/${user.username}`}
+          createStripeSetupIntent={createSetupIntent}
         >
           <div>
             <SPaymentModalTitle variant={3}>
@@ -104,12 +222,20 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
             </SPaymentModalCreatorInfo>
           </div>
         </PaymentModal>
-      </SBottomAction>
+        {/* Loading Modal */}
+        {loadingModalOpen && (
+          <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+        )}
+      </SBottomActionContainer>
     );
   }
 );
 
 export default SubscriptionExpired;
+
+const SBottomActionContainer = styled(SBottomAction)`
+  margin-bottom: 16px;
+`;
 
 const SPaymentModalTitle = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
