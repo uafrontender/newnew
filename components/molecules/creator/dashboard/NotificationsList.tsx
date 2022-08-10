@@ -105,8 +105,9 @@ export const NotificationsList: React.FC<IFunction> = ({
           setNotificationsNextPageToken(null);
         }
 
-        if (!res.data.paging?.nextPageToken)
+        if (!res.data.paging?.nextPageToken) {
           setNotificationsNextPageToken(null);
+        }
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -368,4 +369,5 @@ const SNotificationItemIndicator = styled(Indicator)`
 const SRef = styled.span`
   overflow: hidden;
   text-align: center;
+  flex-shrink: 0;
 `;
