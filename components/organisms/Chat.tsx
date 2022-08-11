@@ -74,6 +74,7 @@ export const Chat: React.FC<IChat> = ({ username }) => {
           ? (route = `${user.userData?.username}-announcement`)
           : '';
       }
+
       router.push(`/direct-messages/${route}`);
       setChatData({ chatRoom, showChatList });
       if (isMobileOrTablet) setChatListHidden(true);
