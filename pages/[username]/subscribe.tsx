@@ -111,7 +111,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       const res = await subscribeToCreator(payload);
 
       if (res.data?.status === 3)
-        router.push(`/direct-messages/${user.username}`);
+        router.push(`/direct-messages/${user.username}-cr`);
 
       if (!res.data?.checkoutUrl || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
