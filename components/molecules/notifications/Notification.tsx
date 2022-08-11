@@ -28,6 +28,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
   content,
   createdAt,
   target,
+  isRead,
 }) => {
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -91,7 +92,10 @@ const Notification: React.FC<newnewapi.INotification> = ({
             </SAvatarHolder>
           )}
           <SText>
-            <STitle>{content?.relatedUser?.nicknameOrUsername}</STitle>
+            <STitle>
+              {content?.relatedUser?.nicknameOrUsername}{' '}
+              {!isRead && <SBullet />}
+            </STitle>
             <p>{content?.message}</p>
             <SDate>
               {moment((createdAt?.seconds as number) * 1000).fromNow()}
@@ -141,6 +145,14 @@ const SUserAvatar = styled(UserAvatar)`
   }
 `;
 
+const SBullet = styled.div`
+  width: 8px;
+  height: 8px;
+  background: #e8354d;
+  border-radius: 50%;
+  margin-left: 8px;
+`;
+
 const SAvatarHolder = styled.div`
   flex-shrink: 0;
   margin-right: 12px;
@@ -153,6 +165,8 @@ const SAvatarHolder = styled.div`
 const STitle = styled.div`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   margin-bottom: 0;
+  display: flex;
+  align-items: center;
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 12px;
   }
