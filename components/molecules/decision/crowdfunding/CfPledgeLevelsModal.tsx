@@ -322,6 +322,12 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
       });
 
       const payload = new newnewapi.CreateStripeSetupIntentRequest({
+        ...(!user.loggedIn ? { guestEmail: '' } : {}),
+        ...(!user.loggedIn
+          ? {
+              successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${post.postUuid}`,
+            }
+          : {}),
         cfPledgeRequest: doPledgeRequest,
       });
       const response = await createStripeSetupIntent(payload);
@@ -335,7 +341,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
       console.error(err);
       return undefined;
     }
-  }, [post.postUuid, pledgeAmount]);
+  }, [post.postUuid, pledgeAmount, user.loggedIn]);
 
   return (
     <>

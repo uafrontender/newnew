@@ -222,7 +222,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
       const stripeContributionRequest = new newnewapi.StripeContributionRequest(
         {
           cardUuid,
-          stripeSetupIntentClientSecret,
+          ...(!cardUuid ? { stripeSetupIntentClientSecret } : {}),
           ...(saveCard !== undefined
             ? {
                 saveCard,

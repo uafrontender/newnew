@@ -450,6 +450,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           );
         }
 
+        const optionFromResponse = (res.data
+          .option as newnewapi.Auction.Option)!!;
+        optionFromResponse.isSupportedByMe = true;
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
         setPaymentSuccessModalOpen(true);
         handleSetSupportedBid('');
         setSupportBidAmount('');
@@ -462,7 +467,13 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         setPaymentModalOpen(false);
       }
     },
-    [handleSetSupportedBid, postId, user.loggedIn, router]
+    [
+      handleSetSupportedBid,
+      postId,
+      user.loggedIn,
+      router,
+      handleAddOrUpdateOptionFromResponse,
+    ]
   );
 
   // eslint-disable-next-line consistent-return

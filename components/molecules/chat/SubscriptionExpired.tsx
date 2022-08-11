@@ -140,7 +140,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             cardUuid,
-            stripeSetupIntentClientSecret,
+            ...(!cardUuid ? { stripeSetupIntentClientSecret } : {}),
             ...(saveCard !== undefined
               ? {
                   saveCard,

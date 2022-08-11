@@ -532,6 +532,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       });
 
       const payload = new newnewapi.CreateStripeSetupIntentRequest({
+        ...(!user.loggedIn ? { guestEmail: '' } : {}),
+        ...(!user.loggedIn
+          ? { successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${postId}` }
+          : {}),
         mcVoteRequest: voteOnPostRequest,
       });
       const response = await createStripeSetupIntent(payload);
@@ -545,7 +549,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       console.error(err);
       return undefined;
     }
-  }, [postId, supportBidAmount, option.id]);
+  }, [postId, supportBidAmount, option.id, user.loggedIn]);
 
   const goToNextStep = () => {
     if (

@@ -400,15 +400,15 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           );
         }
 
-        setPaymentSuccessModalOpen(true);
-        setNewBidAmount('');
-        setNewBidText('');
-        setSuggestNewMobileOpen(false);
-
         const optionFromResponse = (res.data
           .option as newnewapi.Auction.Option)!!;
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+        setPaymentSuccessModalOpen(true);
+        setNewBidAmount('');
+        setNewBidText('');
+        setSuggestNewMobileOpen(false);
       } catch (err: any) {
         console.error(err);
         toast.error(err.message);
@@ -477,6 +477,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       });
 
       const payload = new newnewapi.CreateStripeSetupIntentRequest({
+        ...(!user.loggedIn ? { guestEmail: '' } : {}),
+        ...(!user.loggedIn
+          ? { successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${postId}` }
+          : {}),
         acBidRequest: placeBidRequest,
       });
       const response = await createStripeSetupIntent(payload);
@@ -490,7 +494,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       console.error(err);
       return undefined;
     }
-  }, [postId, newBidAmount, newBidText]);
+  }, [postId, newBidAmount, newBidText, user.loggedIn]);
 
   return (
     <>

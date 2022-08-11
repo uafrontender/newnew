@@ -347,6 +347,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       });
 
       const payload = new newnewapi.CreateStripeSetupIntentRequest({
+        ...(!user.loggedIn ? { guestEmail: '' } : {}),
+        ...(!user.loggedIn
+          ? {
+              successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${post.postUuid}`,
+            }
+          : {}),
         mcVoteRequest: voteOnPostRequest,
       });
       const response = await createStripeSetupIntent(payload);
@@ -360,7 +366,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       console.error(err);
       return undefined;
     }
-  }, [newOptionText, post.postUuid, newBidAmount]);
+  }, [newOptionText, post.postUuid, newBidAmount, user.loggedIn]);
 
   const handlePayWithCard = useCallback(
     async ({

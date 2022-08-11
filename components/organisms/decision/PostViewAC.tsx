@@ -555,8 +555,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
 
           resetSetupIntentClientSecret();
 
-          console.log(stripeContributionRequest, 'stripeContributionRequest');
-
           const res = await placeBidOnAuction(stripeContributionRequest);
 
           if (

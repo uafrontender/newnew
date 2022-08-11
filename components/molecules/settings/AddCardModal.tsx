@@ -179,7 +179,11 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
         });
         const response = await createStripeSetupIntent(payload);
 
-        if (!response.data || response.error) {
+        if (
+          !response.data ||
+          response.error ||
+          !response.data.stripeSetupIntentClientSecret
+        ) {
           throw new Error(response.error?.message || 'Some error occurred');
         }
 

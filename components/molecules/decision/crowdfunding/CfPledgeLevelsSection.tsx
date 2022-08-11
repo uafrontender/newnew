@@ -335,6 +335,12 @@ const CfPledgeLevelsSection: React.FunctionComponent<
       });
 
       const payload = new newnewapi.CreateStripeSetupIntentRequest({
+        ...(!user.loggedIn ? { guestEmail: '' } : {}),
+        ...(!user.loggedIn
+          ? {
+              successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${post.postUuid}`,
+            }
+          : {}),
         cfPledgeRequest: doPledgeRequest,
       });
       const response = await createStripeSetupIntent(payload);
@@ -348,7 +354,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
       console.error(err);
       return undefined;
     }
-  }, [post.postUuid, pledgeAmount]);
+  }, [post.postUuid, pledgeAmount, user.loggedIn]);
 
   const goToNextStep = () => {
     if (
