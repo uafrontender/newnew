@@ -236,7 +236,7 @@ const ChatList: React.FC<IFunctionProps> = ({
       const payload = new newnewapi.GetMyRoomsRequest({
         searchQuery: name,
         roomKind,
-        myRole: myRole !== undefined ? myRole : 2,
+        myRole,
       });
       const res = await getMyRooms(payload);
 

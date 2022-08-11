@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { ReactElement, useState } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
@@ -54,7 +55,9 @@ export const Chat = () => {
         if (chatRoom?.visavis?.username) {
           route =
             chatRoom.kind === 1
-              ? chatRoom.visavis.username
+              ? chatRoom.myRole === 1
+                ? `${chatRoom.visavis.username}-cr`
+                : chatRoom.visavis.username
               : `${chatRoom.visavis.username}-announcement`;
         } else {
           route =

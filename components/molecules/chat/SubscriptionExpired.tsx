@@ -35,7 +35,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
       try {
         const payload = new newnewapi.SubscribeToCreatorRequest({
           creatorUuid: user.uuid,
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&`,
+          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`,
           cancelUrl: window.location.href,
         });
 
