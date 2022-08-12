@@ -68,7 +68,9 @@ const MyProfileSettingsIndex = () => {
   const socketConnection = useContext(SocketContext);
   // Redux
   const dispatch = useAppDispatch();
-  const { userData, loggedIn } = useAppSelector((state: any) => state.user);
+  const { userData, loggedIn, _persist } = useAppSelector(
+    (state: any) => state.user
+  );
   const { resizeMode, colorMode } = useAppSelector((state: any) => state.ui);
   // Measurements
   const isMobileOrTablet = [
@@ -267,9 +269,12 @@ const MyProfileSettingsIndex = () => {
   ];
 
   useUpdateEffect(() => {
-    if (!loggedIn) router.push('/');
+    // Redirect only after the persist data is pulled
+    if (!loggedIn && _persist?.rehydrated) {
+      router.push('/');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loggedIn, router]);
+  }, [loggedIn, _persist?.rehydrated, router]);
 
   useEffect(() => {
     fetchMyTransactions();

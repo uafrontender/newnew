@@ -336,7 +336,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
 
     const handleFollowDecision = useCallback(async () => {
       try {
-        if (!user.loggedIn) {
+        // Redirect only after the persist data is pulled
+        if (!user.loggedIn && user._persist?.rehydrated) {
           window?.history.replaceState(
             {
               fromPost: true,
@@ -362,7 +363,13 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
       } catch (err) {
         console.error(err);
       }
-    }, [post.postUuid, isFollowingDecision, router, user.loggedIn]);
+    }, [
+      post.postUuid,
+      isFollowingDecision,
+      router,
+      user.loggedIn,
+      user._persist?.rehydrated,
+    ]);
 
     // Render functions
     const renderBackersSection = useCallback(() => {

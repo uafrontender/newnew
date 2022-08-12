@@ -544,7 +544,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   // Redirect to / if user is not logged in
   useUpdateEffect(() => {
-    if (!user.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router.push('/');
     }
   }, [router, user]);

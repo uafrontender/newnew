@@ -79,7 +79,9 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
         _stage: 'Post',
         _postUuid: postUuid,
       });
-      if (!user.loggedIn) {
+
+      // Redirect only after the persist data is pulled
+      if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
             `${process.env.NEXT_PUBLIC_APP_URL}/post/${postUuid}`
@@ -116,6 +118,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
     postUuid,
     router,
     user.loggedIn,
+    user._persist?.rehydrated,
   ]);
 
   useEffect(() => {
