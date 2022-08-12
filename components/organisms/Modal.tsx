@@ -4,8 +4,7 @@ import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import isBrowser from '../../utils/isBrowser';
-import { setOverlay } from '../../redux-store/slices/uiStateSlice';
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 interface IModal {
   show: boolean;
@@ -29,24 +28,17 @@ const Modal: React.FC<IModal> = React.memo((props) => {
     children,
     onClose,
   } = props;
-  const dispatch = useAppDispatch();
-  const { overlay } = useAppSelector((state) => state.ui);
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
   useEffect(() => {
-    if (!withoutOverlay && !overlay && show) {
-      dispatch(setOverlay(true));
+    if (!withoutOverlay && show) {
+      enableOverlayMode();
     }
-  }, [withoutOverlay, show, dispatch, overlay]);
 
-  // Cleanup function which does not depend on overlay
-  useEffect(
-    () => () => {
-      if (!withoutOverlay) {
-        dispatch(setOverlay(false));
-      }
-    },
-    [withoutOverlay, show, dispatch]
-  );
+    return () => {
+      disableOverlayMode();
+    };
+  }, [withoutOverlay, show, enableOverlayMode, disableOverlayMode]);
 
   useEffect(() => {
     const blurredBody = document.getElementById('__next');

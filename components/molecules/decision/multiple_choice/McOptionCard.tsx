@@ -257,6 +257,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   };
 
   // const handlePayWithWallet = useCallback(async () => {
+  //  if (!user._persist?.rehydrated) {
+  //    return;
+  //  }
   //   setLoadingModalOpen(true);
   //   handleCloseConfirmVoteModal();
   //   try {
@@ -372,10 +375,15 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   //   option.id,
   //   postId,
   //   user.loggedIn,
+  //   user._persist?.rehydrated,
   //   router.locale,
   // ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
+    if (!user._persist?.rehydrated) {
+      return;
+    }
+
     setLoadingModalOpen(true);
     handleCloseConfirmVoteModal();
     try {
@@ -411,7 +419,14 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       console.error(err);
       toast.error('toastErrors.generic');
     }
-  }, [option.id, postId, supportBidAmount, user.loggedIn, router.locale]);
+  }, [
+    option.id,
+    postId,
+    supportBidAmount,
+    user.loggedIn,
+    user._persist?.rehydrated,
+    router.locale,
+  ]);
 
   const handleVoteForFree = useCallback(async () => {
     setUseFreeVoteModalOpen(false);

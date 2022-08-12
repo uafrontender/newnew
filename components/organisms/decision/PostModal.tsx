@@ -24,8 +24,7 @@ import {
   fetchPostByUUID,
   markPost,
 } from '../../../api/endpoints/post';
-import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+import { useAppSelector } from '../../../redux-store/store';
 
 import Modal from '../Modal';
 import Button from '../../atoms/Button';
@@ -145,7 +144,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
-  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -214,7 +212,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         _stage: 'Post',
         _postUuid: postParsed?.postUuid,
       });
-      if (!user.loggedIn) {
+      // Redirect only after the persist data is pulled
+      if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
         );
@@ -243,6 +242,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   }, [
     postParsed?.postUuid,
     user.loggedIn,
+    user._persist?.rehydrated,
     isFollowingDecision,
     router,
     handleRemoveFromStateUnfavorited,
@@ -265,7 +265,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   );
 
   const handleReportOpen = useCallback(() => {
-    if (!user.loggedIn) {
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -1048,7 +1048,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       setOpen(false);
       handleSetPostOverlayOpen(false);
       innerHistoryStack.current = [];
-      dispatch(setOverlay(false));
       // eslint-disable-next-line no-useless-return
       return;
     };
@@ -1575,6 +1574,8 @@ const SGoBackButtonDesktop = styled(Button)`
   text-transform: capitalize;
 
   cursor: pointer;
+
+  z-index: 2;
 
   ${({ theme }) => theme.media.laptopM} {
     right: 24px;
