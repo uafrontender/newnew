@@ -15,7 +15,6 @@ import { AppThunk } from '../store';
 // maybe we could use something similar for the user "tutorials"?
 // NB!
 
-export type TOverlay = true | false;
 export type TColorMode = 'light' | 'dark' | 'auto';
 export type TGlobalSearchActive = true | false;
 export type TResizeMode =
@@ -34,7 +33,6 @@ export type TBanner = {
 
 export interface UIStateInterface {
   banner: TBanner;
-  overlay: TOverlay;
   colorMode: TColorMode;
   resizeMode: TResizeMode;
   mutedMode: boolean;
@@ -48,7 +46,6 @@ export const defaultUIState: UIStateInterface = {
     title:
       'Few minutes left to find out who will be new Iron Man. Hurry up and make your choice.',
   },
-  overlay: false,
   colorMode: 'auto',
   // colorMode: 'dark',
   resizeMode: 'laptop',
@@ -72,9 +69,6 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
     ) {
       state.globalSearchActive = payload;
     },
-    setOverlay(state, { payload }: PayloadAction<TOverlay>) {
-      state.overlay = payload;
-    },
     setBanner(state, { payload }: PayloadAction<TBanner>) {
       state.banner = payload;
     },
@@ -86,22 +80,22 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
 
 export const {
   setBanner,
-  setOverlay,
   _setColorMode,
   setResizeMode,
   toggleMutedMode,
   setGlobalSearchActive,
 } = uiSlice.actions;
 
-export const setColorMode = (payload: any): AppThunk =>
-(dispatch) => {
-  dispatch(_setColorMode(payload));
+export const setColorMode =
+  (payload: any): AppThunk =>
+  (dispatch) => {
+    dispatch(_setColorMode(payload));
 
-  cookiesInstance.set('colorMode', payload, {
-    // Expire in 10 years
-    maxAge: 10 * 365 * 24 * 60 * 60,
-    path: '/',
-  });
-};
+    cookiesInstance.set('colorMode', payload, {
+      // Expire in 10 years
+      maxAge: 10 * 365 * 24 * 60 * 60,
+      path: '/',
+    });
+  };
 
 export default uiSlice.reducer;

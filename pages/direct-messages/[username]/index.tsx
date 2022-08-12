@@ -23,10 +23,11 @@ const Chat: NextPage<IChat> = ({ username }) => {
   const user = useAppSelector((state) => state.user);
 
   useUpdateEffect(() => {
-    if (!user.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router?.push('/sign-up');
     }
-  }, [user.loggedIn, router]);
+  }, [user.loggedIn, user._persist?.rehydrated, router]);
 
   return (
     <>

@@ -48,7 +48,7 @@ interface ISearch {
 
 const Search: NextPage<ISearch> = ({ top10posts }) => {
   const { t } = useTranslation('page-SeeMore');
-  const { loggedIn } = useAppSelector((state) => state.user);
+  const { loggedIn, _persist } = useAppSelector((state) => state.user);
 
   const router = useRouter();
   const categoryRef = useRef(router.query.category?.toString() ?? 'ac');
@@ -332,7 +332,8 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
       }
     }
 
-    if (category === 'for-you' && !loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (category === 'for-you' && _persist?.rehydrated && !loggedIn) {
       router?.push('/sign-up');
       return;
     }
@@ -381,6 +382,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     isCollectionLoading,
     router.query.category,
     router.query.sort,
+    _persist?.rehydrated,
     loggedIn,
   ]);
 

@@ -84,7 +84,8 @@ const Comment: React.FC<IComment> = ({
   const replies = useMemo(() => comment.replies ?? [], [comment.replies]);
 
   const onUserReport = useCallback(() => {
-    if (!user.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href

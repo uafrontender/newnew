@@ -143,7 +143,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   );
 
   const handleOpenReportForm = useCallback(() => {
-    if (!user.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -215,11 +216,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   };
 
   // const handlePayWithWallet = useCallback(async () => {
+  //  if (!user._persist?.rehydrated) {
+  //    return;
+  //  }
+  //
   //   setLoadingModalOpen(true);
   //   try {
   //     // Check if user is logged and if the wallet balance is sufficient
-  //     if (
-  //       !user.loggedIn ||
+  //     if (!user.loggedIn ||
   //       (walletBalance &&
   //         walletBalance?.usdCents < parseInt(supportBidAmount) * 100)
   //     ) {
@@ -338,11 +342,16 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   //   option.id,
   //   postId,
   //   user.loggedIn,
+  //  user._persist?.rehydrated,
   //   walletBalance,
   //   router.locale,
   // ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
+    if (!user._persist?.rehydrated) {
+      return;
+    }
+
     setLoadingModalOpen(true);
     try {
       const createPaymentSessionPayload =
@@ -379,7 +388,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       console.error(err);
       toast.error('toastErrors.generic');
     }
-  }, [router.locale, user.loggedIn, supportBidAmount, option.id, postId]);
+  }, [
+    router.locale,
+    user.loggedIn,
+    user._persist?.rehydrated,
+    supportBidAmount,
+    option.id,
+    postId,
+  ]);
 
   // eslint-disable-next-line consistent-return
   const goToNextStep = () => {
