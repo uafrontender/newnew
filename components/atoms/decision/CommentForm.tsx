@@ -126,7 +126,8 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         e.preventDefault();
         if (isAPIValidateLoading) return;
 
-        if (!user.loggedIn) {
+        // Redirect only after the persist data is pulled
+        if (!user.loggedIn && user._persist?.rehydrated) {
           if (!isRoot) {
             router.push(
               `/sign-up?reason=comment&redirect=${encodeURIComponent(
@@ -150,7 +151,14 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         setCommentText('');
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [commentText, user.loggedIn, isAPIValidateLoading, onSubmit, isRoot]
+      [
+        commentText,
+        user.loggedIn,
+        user._persist?.rehydrated,
+        isAPIValidateLoading,
+        onSubmit,
+        isRoot,
+      ]
     );
 
     const handleBlur = useCallback(() => {

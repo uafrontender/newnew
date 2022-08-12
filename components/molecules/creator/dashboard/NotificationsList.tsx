@@ -17,7 +17,7 @@ import NoResults from './notifications/NoResults';
 import { useAppSelector } from '../../../../redux-store/store';
 import {
   getMyNotifications,
-  markAsRead,
+  markAllAsRead,
 } from '../../../../api/endpoints/notification';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import { useNotifications } from '../../../../contexts/notificationsContext';
@@ -118,23 +118,17 @@ export const NotificationsList: React.FC<IFunction> = ({
     [loading]
   );
 
-  const readNotification = useCallback(
-    async () => {
-      try {
-        const payload = new newnewapi.MarkAsReadRequest({
-          notificationIds: unreadNotifications,
-        });
-        const res = await markAsRead(payload);
+  const markAllNotifications = useCallback(async () => {
+    try {
+      const payload = new newnewapi.EmptyRequest();
+      const res = await markAllAsRead(payload);
 
-        if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-        setUnreadNotifications(null);
-      } catch (err) {
-        console.error(err);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [unreadNotifications, markReadNotifications]
-  );
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+      setUnreadNotifications(null);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
 
   useEffect(() => {
     if (!notifications) {
@@ -143,15 +137,10 @@ export const NotificationsList: React.FC<IFunction> = ({
   }, [notifications, fetchNotification]);
 
   useEffect(() => {
-    if (
-      markReadNotifications &&
-      unreadNotifications &&
-      unreadNotifications.length > 0
-    ) {
-      readNotification();
+    if (markReadNotifications) {
+      markAllNotifications();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [markReadNotifications]);
+  }, [markReadNotifications, markAllNotifications]);
 
   useEffect(() => {
     if (inView && !loading && notificationsNextPageToken) {

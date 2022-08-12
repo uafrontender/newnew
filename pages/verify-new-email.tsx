@@ -34,8 +34,11 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
   // Redirect if the user is not logged in
   useEffect(() => {
-    if (!user.loggedIn) router.push('/');
-  }, [user.loggedIn, router]);
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
+      router.push('/');
+    }
+  }, [user.loggedIn, user._persist?.rehydrated, router]);
 
   // Listen to Me update event
   useEffect(() => {

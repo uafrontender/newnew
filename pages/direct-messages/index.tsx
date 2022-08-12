@@ -76,10 +76,11 @@ export const Chat = () => {
   };
 
   useUpdateEffect(() => {
-    if (!user.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router?.push('/sign-up');
     }
-  }, [router, user.loggedIn]);
+  }, [router, user.loggedIn, user._persist?.rehydrated]);
 
   useEffectOnce(() => {
     if (!isMobileOrTablet) {

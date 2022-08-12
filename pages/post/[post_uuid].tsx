@@ -142,7 +142,7 @@ const PostPage: NextPage<IPostPage> = ({
           content={postParsed?.announcement?.thumbnailImageUrl ?? ''}
         />
       </Head>
-      {!user.loggedIn && <HeroSection />}
+      {!user.loggedIn && user._persist?.rehydrated && <HeroSection />}
       {!isMobile && topSectionCollection.length > 0 && (
         <TopSection
           collection={topSectionCollection}

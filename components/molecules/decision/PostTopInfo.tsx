@@ -185,7 +185,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         _postUuid: postId,
         _component: 'PostTopInfo',
       });
-      if (!user.loggedIn) {
+
+      // Redirect only after the persist data is pulled
+      if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
             window.location.href
@@ -222,6 +224,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     postId,
     router,
     user.loggedIn,
+    user._persist?.rehydrated,
   ]);
 
   const handleSeeNewFailedBox = useCallback(() => {

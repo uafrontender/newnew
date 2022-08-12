@@ -205,6 +205,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   );
 
   // const handleSubmitNewOptionWallet = useCallback(async () => {
+  //  if (!user._persist?.rehydrated) {
+  //    return;
+  //  }
   //   setLoadingModalOpen(true);
   //   try {
   //     // Check if user is logged and if the wallet balance is sufficient
@@ -329,6 +332,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   // ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
+    if (!user._persist?.rehydrated) {
+      return;
+    }
+
     setLoadingModalOpen(true);
     try {
       Mixpanel.track('PayWithCardStripeRedirect', {
@@ -370,7 +377,14 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       console.error(err);
       toast.error('toastErrors.generic');
     }
-  }, [user.loggedIn, router.locale, newBidAmount, newBidText, postId]);
+  }, [
+    user.loggedIn,
+    user._persist?.rehydrated,
+    router.locale,
+    newBidAmount,
+    newBidText,
+    postId,
+  ]);
 
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {

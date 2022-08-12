@@ -111,6 +111,10 @@ const CfPledgeLevelsSection: React.FunctionComponent<
 
   // Make a pledge and close all forms and modals
   // const handlePayWithWallet = useCallback(async () => {
+  //  if (!user._persist?.rehydrated) {
+  //    return;
+  //  }
+  //
   //   setLoadingModalOpen(true);
   //   try {
   //     // Check if user is logged in
@@ -218,6 +222,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   //   }
   // }, [
   //   user.loggedIn,
+  //   user._persist?.rehydrated,
   //   router.locale,
   //   post.postUuid,
   //   pledgeAmount,
@@ -226,6 +231,10 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   // ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
+    if (!user._persist?.rehydrated) {
+      return;
+    }
+
     setLoadingModalOpen(true);
     try {
       Mixpanel.track('PayWithCardStripeRedirect', {
@@ -266,7 +275,13 @@ const CfPledgeLevelsSection: React.FunctionComponent<
       setLoadingModalOpen(false);
       toast.error('toastErrors.generic');
     }
-  }, [router.locale, post.postUuid, user.loggedIn, pledgeAmount]);
+  }, [
+    router.locale,
+    post.postUuid,
+    user.loggedIn,
+    user._persist?.rehydrated,
+    pledgeAmount,
+  ]);
 
   useEffect(() => {
     if (!paymentModalOpen) setPledgeAmount(undefined);

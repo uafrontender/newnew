@@ -81,6 +81,9 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   };
 
   // const handlePayWithWallet = useCallback(async () => {
+  //  if (!user._persist?.rehydrated) {
+  //    return;
+  //  }
   //   setLoadingModalOpen(true);
   //   try {
   //     // Check if user is logged and if the wallet balance is sufficient
@@ -201,12 +204,18 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   //   option.id,
   //   postId,
   //   user.loggedIn,
+  //   user._persist?.rehydrated,
   //   walletBalance,
   //   router.locale,
   // ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
+    if (!user._persist?.rehydrated) {
+      return;
+    }
+
     setLoadingModalOpen(true);
+
     try {
       const createPaymentSessionPayload =
         new newnewapi.CreatePaymentSessionRequest({
@@ -242,7 +251,14 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
       console.error(err);
       toast.error('toastErrors.generic');
     }
-  }, [user.loggedIn, supportBidAmount, option.id, postId, router.locale]);
+  }, [
+    user.loggedIn,
+    user._persist?.rehydrated,
+    supportBidAmount,
+    option.id,
+    postId,
+    router.locale,
+  ]);
 
   return (
     <SWrapper>
