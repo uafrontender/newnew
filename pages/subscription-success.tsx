@@ -42,7 +42,7 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
           // I think we should not check is room created or not at this point
           // we can do this on chat page and if not try to create again
           // if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-          router.push(`/direct-messages/${username}`);
+          router.push(`/direct-messages/${username}-cr`);
         }
       } catch (err) {
         console.error(err);

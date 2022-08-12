@@ -1238,12 +1238,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   if (shouldRenderVotingFinishedModal && !isMyPost) {
     return (
       <>
-        <Modal
-          withoutOverlay
-          show={open}
-          overlaydim
-          onClose={() => handleCloseAndGoBack()}
-        >
+        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
           {postStatus === 'succeeded' && !isMobile && (
             <PostSuccessAnimationBackground />
           )}
@@ -1304,12 +1299,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   if (isMyPost) {
     return (
       <>
-        <Modal
-          withoutOverlay
-          show={open}
-          overlaydim
-          onClose={() => handleCloseAndGoBack()}
-        >
+        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
           {(postStatus === 'succeeded' ||
             postStatus === 'waiting_for_response') &&
             !isMobile && <PostSuccessAnimationBackground />}
@@ -1378,12 +1368,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   // Render regular Decision view
   return (
     <>
-      <Modal
-        withoutOverlay
-        show={open}
-        overlaydim
-        onClose={() => handleCloseAndGoBack()}
-      >
+      <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
         <Head>
           <title>{t(`meta.${typeOfPost}.title`)}</title>
           <meta

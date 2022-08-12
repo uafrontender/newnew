@@ -34,12 +34,15 @@ export const NotificationsList: React.FC<IFunction> = ({
   const scrollRef: any = useRef();
   const { ref: scrollRefNotifications, inView } = useInView();
   const user = useAppSelector((state) => state.user);
-  const [notifications, setNotifications] =
-    useState<newnewapi.INotification[] | null>(null);
-  const [unreadNotifications, setUnreadNotifications] =
-    useState<number[] | null>(null);
-  const [notificationsNextPageToken, setNotificationsNextPageToken] =
-    useState<string | undefined | null>('');
+  const [notifications, setNotifications] = useState<
+    newnewapi.INotification[] | null
+  >(null);
+  const [unreadNotifications, setUnreadNotifications] = useState<
+    number[] | null
+  >(null);
+  const [notificationsNextPageToken, setNotificationsNextPageToken] = useState<
+    string | undefined | null
+  >('');
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [defaultLimit, setDefaultLimit] = useState<number>(11);
@@ -95,10 +98,16 @@ export const NotificationsList: React.FC<IFunction> = ({
               if (res.data) arr.push(res.data.notifications[0].id as number);
               return arr;
             });
+            // We don`t update token since we only loaded the new first items
           }
-        }
-        if (!res.data.paging?.nextPageToken && notificationsNextPageToken)
+        } else {
+          // If there is no results then there is no more pages to load
           setNotificationsNextPageToken(null);
+        }
+
+        if (!res.data.paging?.nextPageToken) {
+          setNotificationsNextPageToken(null);
+        }
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -360,4 +369,5 @@ const SNotificationItemIndicator = styled(Indicator)`
 const SRef = styled.span`
   overflow: hidden;
   text-align: center;
+  flex-shrink: 0;
 `;

@@ -88,7 +88,12 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
 
           const res = await subscribeToCreator(stripeContributionRequest);
 
-          if (!res.data || res.error) {
+          if (
+            !res.data ||
+            res.error ||
+            res.data.status !==
+              newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
+          ) {
             throw new Error(
               res.error?.message ??
                 tSubscribe(getPayWithCardErrorMessage(res.data?.status))
@@ -96,20 +101,11 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
           }
 
           if (
-            res.data?.status ===
-            newnewapi.SubscribeToCreatorResponse.Status.ALREADY_SUBSCRIBED
-          ) {
-            router.push(`/direct-messages/${user.username}`);
-          } else if (
             res.data.status ===
             newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
           ) {
             router.push(
               `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`
-            );
-          } else {
-            throw new Error(
-              tSubscribe(getPayWithCardErrorMessage(res.data?.status))
             );
           }
 

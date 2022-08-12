@@ -541,10 +541,10 @@ export const CreationSecondStepContent: React.FC<
   const handleItemChange = useCallback(
     async (key: string, value: any) => {
       if (key === 'title') {
-        Mixpanel.track('Post Title Change', {
-          _stage: 'Creation',
-          _value: value,
-        });
+        // Mixpanel.track('Post Title Change', {
+        //   _stage: 'Creation',
+        //   _value: value,
+        // });
         dispatch(setCreationTitle(value.trim() ? value : ''));
       } else if (key === 'minimalBid') {
         Mixpanel.track('Minimal Big Change', {
@@ -1547,6 +1547,9 @@ const SBottomEndPostTitle = styled(Text)`
 `;
 
 const SBottomEndPostTitleHashtag = styled.span`
+  display: inline;
+  word-spacing: normal;
+  overflow-wrap: break-word;
   color: ${(props) => props.theme.colorsThemed.accent.blue};
 `;
 

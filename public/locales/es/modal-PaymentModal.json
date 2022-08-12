@@ -11,16 +11,16 @@
       "fees": "hasta un 3% de comisiones"
     }
   },
-  "rewardsText_NEED_TRANSLATION": "Use my rewards",
+  "rewardsText": "Utilizar mis recompensas",
   "payButton": "Pagar",
   "tocApplyLink": "Términos",
   "tocApplyText": "Aplicar",
-  "reCaptchaTos_NEED_TRANSLATION": {
-    "siteProtectedBy": "This site is protected by reCAPTCHA and the Google",
-    "privacyPolicy": "Privacy Policy",
-    "and": "and",
-    "tos": "Terms of Service",
-    "apply": "apply."
+  "reCaptchaTos": {
+    "siteProtectedBy": "Este sitio está protegido por reCAPTCHA y se aplican la",
+    "privacyPolicy": "política de privacidad",
+    "and": "y las",
+    "tos": "condiciones de servicio",
+    "apply": "de Google."
   },
   "email": "Correo electrónico"
 }

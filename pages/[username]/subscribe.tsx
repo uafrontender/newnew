@@ -284,7 +284,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
         res.data?.status ===
         newnewapi.SubscribeToCreatorResponse.Status.ALREADY_SUBSCRIBED
       ) {
-        router.push(`/direct-messages/${user.username}`);
+        router.push(`/direct-messages/${user.username}-cr`);
       } else if (
         res.data.status === newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
       ) {
