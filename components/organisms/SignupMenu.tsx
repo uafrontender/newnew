@@ -98,8 +98,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
           : {}),
       });
 
-      console.log(payload, 'payload');
-
       const { data, error } = await sendVerificationEmail(payload);
 
       if (!data || error) throw new Error(error?.message ?? 'Request failed');

@@ -70,19 +70,19 @@ const getPayWithCardErrorMessage = (
 ) => {
   switch (status) {
     case newnewapi.PlaceBidResponse.Status.NOT_ENOUGH_MONEY:
-      return 'Not enough money';
+      return 'errors.notEnoughMoney';
     case newnewapi.PlaceBidResponse.Status.CARD_NOT_FOUND:
-      return 'Card not found';
+      return 'errors.cardNotFound';
     case newnewapi.PlaceBidResponse.Status.CARD_CANNOT_BE_USED:
-      return 'This card can not be used';
+      return 'errors.cardCannotBeUsed';
     case newnewapi.PlaceBidResponse.Status.BLOCKED_BY_CREATOR:
-      return 'Blocked by creator';
+      return 'errors.blockedByCreator';
     case newnewapi.PlaceBidResponse.Status.BIDDING_NOT_STARTED:
-      return 'Bidding is not started yet';
+      return 'errors.biddingNotStarted';
     case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
-      return 'Bidding is ended already';
+      return 'errors.biddingIsEnded';
     default:
-      return 'Request failed';
+      return 'errors.requestFailed';
   }
 };
 
@@ -446,7 +446,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
         ) {
           throw new Error(
-            res.error?.message ?? getPayWithCardErrorMessage(res.data?.status)
+            res.error?.message ??
+              t(getPayWithCardErrorMessage(res.data?.status))
           );
         }
 
@@ -473,6 +474,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       user.loggedIn,
       router,
       handleAddOrUpdateOptionFromResponse,
+      t,
     ]
   );
 

@@ -24,6 +24,23 @@ import { createStripeSetupIntent } from '../../../api/endpoints/payments';
 const PaymentModal = dynamic(() => import('../checkout/PaymentModal'));
 const LoadingModal = dynamic(() => import('../LoadingModal'));
 
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.SubscribeToCreatorResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.SubscribeToCreatorResponse.Status.CARD_NOT_FOUND:
+      return 'errors.cardNotFound';
+    case newnewapi.SubscribeToCreatorResponse.Status.CARD_CANNOT_BE_USED:
+      return 'errors.cardCannotBeUsed';
+    case newnewapi.SubscribeToCreatorResponse.Status.BLOCKED_BY_CREATOR:
+      return 'errors.blockedByCreator';
+    case newnewapi.SubscribeToCreatorResponse.Status.SUBSCRIPTION_UNAVAILABLE:
+      return 'errors.subscriptionUnavailable';
+    default:
+      return 'errors.requestFailed';
+  }
+};
+
 interface ISubscriptionExpired {
   user: newnewapi.IUser;
   saveCardFromRedirect?: boolean;
@@ -40,6 +57,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
   }) => {
     const router = useRouter();
     const { t } = useTranslation('page-Chat');
+    const { t: tSubscribe } = useTranslation('page-SubscribeToUser');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -71,7 +89,10 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
           const res = await subscribeToCreator(stripeContributionRequest);
 
           if (!res.data || res.error) {
-            throw new Error(res.error?.message ?? 'Request failed');
+            throw new Error(
+              res.error?.message ??
+                tSubscribe(getPayWithCardErrorMessage(res.data?.status))
+            );
           }
 
           if (
@@ -79,14 +100,16 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
             newnewapi.SubscribeToCreatorResponse.Status.ALREADY_SUBSCRIBED
           ) {
             router.push(`/direct-messages/${user.username}`);
-          }
-
-          if (
+          } else if (
             res.data.status ===
             newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
           ) {
             router.push(
               `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`
+            );
+          } else {
+            throw new Error(
+              tSubscribe(getPayWithCardErrorMessage(res.data?.status))
             );
           }
 
@@ -140,7 +163,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             cardUuid,
-            ...(!cardUuid ? { stripeSetupIntentClientSecret } : {}),
+            stripeSetupIntentClientSecret,
             ...(saveCard !== undefined
               ? {
                   saveCard,
@@ -150,8 +173,16 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
 
         const res = await subscribeToCreator(stripeContributionRequest);
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+        if (
+          !res.data ||
+          res.error ||
+          res.data.status !==
+            newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
+        ) {
+          throw new Error(
+            res.error?.message ??
+              tSubscribe(getPayWithCardErrorMessage(res.data?.status))
+          );
         }
 
         if (

@@ -60,27 +60,27 @@ const getPayWithCardErrorMessage = (
 ) => {
   switch (status) {
     case newnewapi.VoteOnPostResponse.Status.NOT_ENOUGH_FUNDS:
-      return 'Not enough money';
+      return 'errors.notEnoughMoney';
     case newnewapi.VoteOnPostResponse.Status.CARD_NOT_FOUND:
-      return 'Card not found';
+      return 'errors.cardNotFound';
     case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
-      return 'This card can not be used';
+      return 'errors.cardCannotBeUsed';
     case newnewapi.VoteOnPostResponse.Status.BLOCKED_BY_CREATOR:
-      return 'Blocked by creator';
+      return 'errors.blockedByCreator';
     case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
-      return 'Goal is cancelled';
+      return 'errors.mcCancelled';
     case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:
-      return 'Goal is finished already';
+      return 'errors.mcFinished';
     case newnewapi.VoteOnPostResponse.Status.MC_NOT_STARTED:
-      return 'Goal is not started yet';
+      return 'errors.mcNotStarted';
     case newnewapi.VoteOnPostResponse.Status.ALREADY_VOTED:
-      return 'You are already voted';
+      return 'errors.alreadyVoted';
     case newnewapi.VoteOnPostResponse.Status.MC_VOTE_COUNT_TOO_SMALL:
-      return 'Vote count is too small';
+      return 'errors.mcVoteCountTooSmall';
     case newnewapi.VoteOnPostResponse.Status.NOT_ALLOWED_TO_CREATE_NEW_OPTION:
-      return 'New option is not allowed';
+      return 'errors.notAllowedToCreateNewOption';
     default:
-      return 'Request failed';
+      return 'errors.requestFailed';
   }
 };
 
@@ -575,6 +575,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           return;
         }
 
+        Mixpanel.track('MakeVoteAfterStripeRedirect', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostViewMC',
+        });
+
         try {
           setLoadingModalOpen(true);
 
@@ -598,7 +604,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
           ) {
             throw new Error(
-              res.error?.message ?? getPayWithCardErrorMessage(res.data?.status)
+              res.error?.message ??
+                t(getPayWithCardErrorMessage(res.data?.status))
             );
           }
 
@@ -612,8 +619,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           setLoadingModalOpen(false);
           handleResetFreeVote();
           setPaymentSuccessModalOpen(true);
-        } catch (err) {
+        } catch (err: any) {
           console.error(err);
+          toast.error(err.message);
           setLoadingModalOpen(false);
         }
       };

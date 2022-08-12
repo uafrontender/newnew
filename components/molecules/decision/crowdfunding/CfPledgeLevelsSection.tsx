@@ -50,21 +50,21 @@ const getPayWithCardErrorMessage = (
 ) => {
   switch (status) {
     case newnewapi.DoPledgeResponse.Status.NOT_ENOUGH_FUNDS:
-      return 'Not enough money';
+      return 'errors.notEnoughMoney';
     case newnewapi.DoPledgeResponse.Status.CARD_NOT_FOUND:
-      return 'Card not found';
+      return 'errors.cardNotFound';
     case newnewapi.DoPledgeResponse.Status.CARD_CANNOT_BE_USED:
-      return 'This card can not be used';
+      return 'errors.cardCannotBeUsed';
     case newnewapi.DoPledgeResponse.Status.BLOCKED_BY_CREATOR:
-      return 'Blocked by creator';
+      return 'errors.blockedByCreator';
     case newnewapi.DoPledgeResponse.Status.CF_CANCELLED:
-      return 'Goal is cancelled';
+      return 'errors.cfCancelled';
     case newnewapi.DoPledgeResponse.Status.CF_FINISHED:
-      return 'Goal is finished already';
+      return 'errors.cfFinished';
     case newnewapi.DoPledgeResponse.Status.CF_NOT_STARTED:
-      return 'Goal is not started yet';
+      return 'errors.cfNotStarted';
     default:
-      return 'Request failed';
+      return 'errors.requestFailed';
   }
 };
 
@@ -292,7 +292,8 @@ const CfPledgeLevelsSection: React.FunctionComponent<
           res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS
         ) {
           throw new Error(
-            res.error?.message ?? getPayWithCardErrorMessage(res.data?.status)
+            res.error?.message ??
+              t(getPayWithCardErrorMessage(res.data?.status))
           );
         }
 
@@ -318,6 +319,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
       handleAddPledgeFromResponse,
       user.loggedIn,
       router,
+      t,
     ]
   );
 

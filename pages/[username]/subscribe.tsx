@@ -39,10 +39,28 @@ import PaymentModal from '../../components/molecules/checkout/PaymentModal';
 import isBrowser from '../../utils/isBrowser';
 import { formatNumber } from '../../utils/format';
 import assets from '../../constants/assets';
+import useSynchronizedHistory from '../../utils/hooks/useSynchronizedHistory';
 
 const LoadingModal = dynamic(
   () => import('../../components/molecules/LoadingModal')
 );
+
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.SubscribeToCreatorResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.SubscribeToCreatorResponse.Status.CARD_NOT_FOUND:
+      return 'errors.cardNotFound';
+    case newnewapi.SubscribeToCreatorResponse.Status.CARD_CANNOT_BE_USED:
+      return 'errors.cardCannotBeUsed';
+    case newnewapi.SubscribeToCreatorResponse.Status.BLOCKED_BY_CREATOR:
+      return 'errors.blockedByCreator';
+    case newnewapi.SubscribeToCreatorResponse.Status.SUBSCRIPTION_UNAVAILABLE:
+      return 'errors.subscriptionUnavailable';
+    default:
+      return 'errors.requestFailed';
+  }
+};
 
 interface ISubscribeToUserPage {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -58,6 +76,8 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('page-SubscribeToUser');
+  const { syncedHistoryReplaceState } = useSynchronizedHistory();
+
   const { loggedIn, userData: currentUserData } = useAppSelector(
     (state) => state.user
   );
@@ -83,6 +103,24 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
   const [saveCardFromRedirect, setSaveCardFromRedirect] = useState(save_card);
 
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (setup_intent_client_secret) {
+      syncedHistoryReplaceState(
+        {
+          username: user.username,
+        },
+        `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
+          user.username
+        }/subscribe`
+      );
+    }
+  }, [
+    router.locale,
+    setup_intent_client_secret,
+    syncedHistoryReplaceState,
+    user.username,
+  ]);
 
   // const { walletBalance } = useContext(WalletContext);
 
@@ -153,7 +191,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
         const res = await subscribeToCreator(stripeContributionRequest);
 
         if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+          throw new Error(
+            res.error?.message ??
+              t(getPayWithCardErrorMessage(res.data?.status))
+          );
         }
 
         if (
@@ -161,15 +202,15 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
           newnewapi.SubscribeToCreatorResponse.Status.ALREADY_SUBSCRIBED
         ) {
           router.push(`/direct-messages/${user.username}`);
-        }
-
-        if (
+        } else if (
           res.data.status ===
           newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
         ) {
           router.push(
             `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`
           );
+        } else {
+          throw new Error(t(getPayWithCardErrorMessage(res.data?.status)));
         }
 
         setLoadingModalOpen(false);
@@ -222,7 +263,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
       const stripeContributionRequest = new newnewapi.StripeContributionRequest(
         {
           cardUuid,
-          ...(!cardUuid ? { stripeSetupIntentClientSecret } : {}),
+          stripeSetupIntentClientSecret,
           ...(saveCard !== undefined
             ? {
                 saveCard,
@@ -234,7 +275,9 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
       const res = await subscribeToCreator(stripeContributionRequest);
 
       if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+        throw new Error(
+          res.error?.message ?? t(getPayWithCardErrorMessage(res.data?.status))
+        );
       }
 
       if (
@@ -242,14 +285,14 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
         newnewapi.SubscribeToCreatorResponse.Status.ALREADY_SUBSCRIBED
       ) {
         router.push(`/direct-messages/${user.username}`);
-      }
-
-      if (
+      } else if (
         res.data.status === newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
       ) {
         router.push(
           `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`
         );
+      } else {
+        throw new Error(t(getPayWithCardErrorMessage(res.data?.status)));
       }
     } catch (err: any) {
       console.error(err);

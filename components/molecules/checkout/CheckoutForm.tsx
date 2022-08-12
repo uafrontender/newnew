@@ -148,7 +148,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
               confirmParams: {
                 return_url: `${process.env.NEXT_PUBLIC_APP_URL}/${redirectUrl}?save_card=${saveCard}`,
               },
-              redirect: 'if_required',
+              redirect: 'always',
             });
 
             if (error) {
