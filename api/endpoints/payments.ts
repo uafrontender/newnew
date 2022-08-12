@@ -91,22 +91,6 @@ export const updateStripeSetupIntent = (
     signal ?? undefined
   );
 
-// export const createStripePaymentIntent = (
-//   payload: newnewapi.CreateStripePaymentIntentRequest,
-//   signal?: RequestInit['signal']
-// ) =>
-//   fetchProtobufProtectedIntercepted<
-//     newnewapi.CreateStripePaymentIntentRequest,
-//     newnewapi.CreateStripePaymentIntentResponse
-//   >(
-//     newnewapi.CreateStripePaymentIntentRequest,
-//     newnewapi.CreateStripePaymentIntentResponse,
-//     `${BASE_URL_PAYMENTS}/create_stripe_payment_intent`,
-//     'post',
-//     payload,
-//     signal ?? undefined
-//   );
-
 // Set up Stripe creator account
 export const fetchSetStripeLinkCreator = (
   payload: newnewapi.SetupStripeCreatorAccountRequest,
