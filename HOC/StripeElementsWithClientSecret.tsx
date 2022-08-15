@@ -95,11 +95,7 @@ export const StripeElements: React.FC<IStripeElements> = ({
   }
 
   return (
-    <Elements
-      stripe={stripePromise}
-      options={stipeSecret ? stripeOptions : undefined}
-      key={stipeSecret}
-    >
+    <Elements stripe={stripePromise} options={stripeOptions} key={stipeSecret}>
       {children}
     </Elements>
   );
