@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
 interface IVerificationInput {
+  id?: string;
   length: number;
   initialValue?: string[];
   error?: boolean;
@@ -11,6 +12,7 @@ interface IVerificationInput {
 }
 
 const VerificationCodeInput: React.FunctionComponent<IVerificationInput> = ({
+  id,
   length,
   initialValue,
   error,
@@ -111,6 +113,7 @@ const VerificationCodeInput: React.FunctionComponent<IVerificationInput> = ({
         }}
       />
       <SVerficationInput
+        id={id}
         errorBordersShown={error}
         role='textbox'
         ref={(el) => {

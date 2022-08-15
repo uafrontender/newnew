@@ -140,6 +140,7 @@ export const SChatItemRight = styled.div`
 export const SChatItemTime = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   white-space: nowrap;
+  padding-left: 5px;
 `;
 
 export const SChatSeparator = styled.div`

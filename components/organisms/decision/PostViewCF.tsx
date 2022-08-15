@@ -26,6 +26,11 @@ import Button from '../../atoms/Button';
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
+import Headline from '../../atoms/Headline';
+import PostVotingTab from '../../molecules/decision/PostVotingTab';
+import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
+import CfBackersStatsSectionFailed from '../../molecules/decision/crowdfunding/CfBackersStatsSectionFailed';
 
 // Utils
 import switchPostType from '../../../utils/switchPostType';
@@ -34,11 +39,7 @@ import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateS
 import { DotPositionEnum } from '../../atoms/decision/TutorialTooltip';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
-import Headline from '../../atoms/Headline';
-import PostVotingTab from '../../molecules/decision/PostVotingTab';
-import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import CfBackersStatsSectionFailed from '../../molecules/decision/crowdfunding/CfBackersStatsSectionFailed';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
@@ -84,8 +85,8 @@ interface IPostViewCF {
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
-  handleRemovePostFromState: () => void;
-  handleAddPostToState: () => void;
+  handleRemoveFromStateUnfavorited: () => void;
+  handleAddPostToStateFavorited: () => void;
 }
 
 const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
@@ -100,8 +101,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
     handleGoBack,
     handleUpdatePostStatus,
     handleReportOpen,
-    handleRemovePostFromState,
-    handleAddPostToState,
+    handleRemoveFromStateUnfavorited,
+    handleAddPostToStateFavorited,
   }) => {
     const router = useRouter();
     const { t } = useTranslation('modal-Post');
@@ -255,7 +256,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
 
     const fetchPledgesForPost = useCallback(
       async (pageToken?: string) => {
-        if (pledgesLoading) return;
+        if (pledgesLoading || loadingModalOpen) return;
         try {
           setPledgesLoading(true);
           setLoadingPledgesError('');
@@ -296,7 +297,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           console.error(err);
         }
       },
-      [pledgesLoading, setPledges, sortPleges, post]
+      [pledgesLoading, loadingModalOpen, post.postUuid, sortPleges]
     );
 
     const handleAddPledgeFromResponse = useCallback(
@@ -335,7 +336,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
 
     const handleFollowDecision = useCallback(async () => {
       try {
-        if (!user.loggedIn) {
+        // Redirect only after the persist data is pulled
+        if (!user.loggedIn && user._persist?.rehydrated) {
           window?.history.replaceState(
             {
               fromPost: true,
@@ -361,7 +363,13 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
       } catch (err) {
         console.error(err);
       }
-    }, [post.postUuid, isFollowingDecision, router, user.loggedIn]);
+    }, [
+      post.postUuid,
+      isFollowingDecision,
+      router,
+      user.loggedIn,
+      user._persist?.rehydrated,
+    ]);
 
     // Render functions
     const renderBackersSection = useCallback(() => {
@@ -496,6 +504,14 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
       handleAddPledgeFromResponse,
       user,
     ]);
+
+    const handleOnVotingTimeExpired = () => {
+      if (currentBackers >= post.targetBackerCount) {
+        handleUpdatePostStatus('WAITING_FOR_RESPONSE');
+      } else {
+        handleUpdatePostStatus('FAILED');
+      }
+    };
 
     // Increment channel subs after mounting
     // Decrement when unmounting
@@ -757,12 +773,22 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
                 onClick={handleGoBack}
               />
             )}
-            <PostTimer
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='cf'
-            />
+            {postStatus === 'voting' ? (
+              <PostTimer
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='cf'
+                onTimeExpired={handleOnVotingTimeExpired}
+              />
+            ) : (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='cf'
+              />
+            )}
           </SExpiresSection>
           <PostVideo
             postId={post.postUuid}
@@ -786,8 +812,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
             hasRecommendations={hasRecommendations}
             handleSetIsFollowingDecision={handleSetIsFollowingDecision}
             handleReportOpen={handleReportOpen}
-            handleRemovePostFromState={handleRemovePostFromState}
-            handleAddPostToState={handleAddPostToState}
+            handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited}
+            handleAddPostToStateFavorited={handleAddPostToStateFavorited}
           />
           <SActivitesContainer>
             <PostVotingTab>{t('tabs.backers')}</PostVotingTab>

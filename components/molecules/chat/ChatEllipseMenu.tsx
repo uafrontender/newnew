@@ -52,6 +52,7 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
       isOpen={isVisible}
       onClose={handleClose}
       anchorElement={anchorElement}
+      zIndex={21}
     >
       {myRole === 2 && !isAnnouncement && (
         <EllipseMenuButton onClick={viewUserProfile}>

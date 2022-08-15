@@ -20,7 +20,9 @@ export const SearchResults = () => {
   const theme = useTheme();
   const [searchValue, setSearchValue] = useState(router.query.query as string);
   const [searchType, setSearchType] = useState(router.query.type as string);
-  const [activeTab, setActiveTab] = useState<string>('posts');
+  const [activeTab, setActiveTab] = useState<string>(
+    (router.query.tab as string) || 'posts'
+  );
 
   useEffect(() => {
     if (router) {
@@ -152,6 +154,9 @@ const SPageTitle = styled.h1`
 `;
 
 const SHashtag = styled.span`
+  display: inline;
+  word-spacing: normal;
+  overflow-wrap: break-word;
   color: ${(props) => props.theme.colorsThemed.accent.blue};
 `;
 

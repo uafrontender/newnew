@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import { toast } from 'react-toastify';
 
 import switchPostType from '../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
@@ -78,7 +79,9 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
         _stage: 'Post',
         _postUuid: postUuid,
       });
-      if (!user.loggedIn) {
+
+      // Redirect only after the persist data is pulled
+      if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
             `${process.env.NEXT_PUBLIC_APP_URL}/post/${postUuid}`
@@ -106,6 +109,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
       }
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [
     handleAddPostToState,
@@ -114,6 +118,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
     postUuid,
     router,
     user.loggedIn,
+    user._persist?.rehydrated,
   ]);
 
   useEffect(() => {

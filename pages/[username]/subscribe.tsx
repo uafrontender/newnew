@@ -9,6 +9,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import styled, { useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../redux-store/store';
 // import { WalletContext } from '../../contexts/walletContext';
@@ -58,6 +59,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   // const { walletBalance } = useContext(WalletContext);
 
   const [isScrolledDown, setIsScrolledDown] = useState(false);
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
   const topSectionRef = useRef<HTMLDivElement>();
 
   const [subscriptionPrice, setSubscriptionPrice] = useState<
@@ -109,7 +111,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       const res = await subscribeToCreator(payload);
 
       if (res.data?.status === 3)
-        router.push(`/direct-messages/${user.username}`);
+        router.push(`/direct-messages/${user.username}-cr`);
 
       if (!res.data?.checkoutUrl || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
@@ -118,6 +120,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       if (url) window.location.href = url;
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 
@@ -141,6 +144,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         }
       } catch (err) {
         console.log(err);
+        toast.error('toastErrors.generic');
       }
     }
 
@@ -156,6 +160,17 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         setIsScrolledDown(true);
       } else {
         setIsScrolledDown(false);
+      }
+
+      if (isMobile) {
+        if (
+          window?.innerHeight + window?.scrollY >=
+          document?.body?.offsetHeight
+        ) {
+          setIsScrolledToBottom(true);
+        } else {
+          setIsScrolledToBottom(false);
+        }
       }
     };
 
@@ -199,7 +214,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
             }}
           >
             <AnimatePresence>
-              {isScrolledDown && !isMobile && (
+              {isScrolledDown && !isMobile && !isPaymentModalOpen && (
                 <SScrolledDownTopSection
                   initial={{
                     opacity: 0,
@@ -232,7 +247,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
               )}
             </AnimatePresence>
             {isTablet && (
-              <SGoBackButtonTablet defer={500} onClick={() => router.back()} />
+              <SGoBackButtonTablet
+                defer={500}
+                onClick={() => router.push(`/${user.username}`)}
+              />
             )}
             <STopSection
               ref={(el) => {
@@ -240,7 +258,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
               }}
             >
               {!isTablet && (
-                <SBackButton defer={500} onClick={() => router.back()}>
+                <SBackButton
+                  defer={500}
+                  onClick={() => router.push(`/${user.username}`)}
+                >
                   {!isMobileOrTablet && t('button.back')}
                 </SBackButton>
               )}
@@ -325,7 +346,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
           </main>
         </div>
       </SGeneral>
-      {isMobile && (
+      {isMobile && !isScrolledToBottom && (
         <SSubscribeButtonMobileContainer>
           <SSubscribeButtonMobile onClick={() => handleOpenPaymentModal()}>
             {t('button.subscribe', { amount: subPriceFormatted })}
@@ -475,10 +496,6 @@ const SScrolledDownTopSection = styled(motion.div)<{ pushDown: boolean }>`
   padding: 0px 48px;
 
   z-index: 100;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin: 16px;
-  }
 
   ${({ theme }) => theme.media.laptop} {
     top: ${({ pushDown }) => (pushDown ? '120px' : '80px')};

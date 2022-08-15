@@ -8,5 +8,9 @@
   "retries": {
     "runMode": 2,
     "openMode": 1
-  }
+  },
+  "testFiles": "**/*.spec.ts",
+  "chromeWebSecurity": false,
+  "defaultCommandTimeout": 30000,
+  "video": false
 }

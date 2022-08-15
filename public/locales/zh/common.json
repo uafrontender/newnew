@@ -52,13 +52,13 @@
     "notifications": "通知"
   },
   "mobileTopNavigation": {
-    "myBalance": "我的餘額：${{value}}",
+    "myBalance": "我的餘額以${{value}}",
     "profile": "個人資料"
   },
   "button": {
     "createDecision": "新帖子",
     "create": "創建",
-    "signIn_NEED_TRANSLATION": "Sign in",
+    "signIn": "登入",
     "dashboard": "儀錶板",
     "createOnNewnew": "開始創建",
     "cancel": "取消"
@@ -122,7 +122,8 @@
         "placeholder": "請再提供更多詳情......"
       },
       "button": {
-        "cancel": "取消"
+        "cancel": "取消",
+        "report": "舉報"
       }
     },
     "reportSent": {
@@ -174,48 +175,48 @@
     "numbers-of-bids-most-first": "最先"
   },
   "toastErrors": {
-    "generic_NEED_TRANSLATION": "An error occurred, please try again later"
+    "generic": "发生错误，请稍后再试"
   },
   "rewards": {
-    "earned_NEED_TRANSLATION": "earned ${{value}}",
-    "earn_NEED_TRANSLATION": "earn ${{value}}",
-    "modalTitle_NEED_TRANSLATION": "You earned ${{amount}}!",
-    "modalButton_NEED_TRANSLATION": "Great",
-    "modalDescription_NEED_TRANSLATION": {
-      "0": "...for signing up",
-      "1": "...for placing a bid of $4",
-      "2": "...for voting for $4",
-      "3": "...for backing a goal for $4",
-      "4": "...for subscribing to a creator",
-      "5": "...for subscribing to 3 creators",
-      "6": "...for bidding on the same creator twice",
-      "7": "...for voting on the same creator twice",
-      "8": "...for backing the same creator twice",
-      "9": "...for placing a bid 2 days in a row",
-      "10": "...for voting 2 days in a row",
-      "11": "...for backing goals 2 days in a row",
-      "12": "...for bidding on a winning option",
-      "13": "...for voting for a winning option",
-      "14": "...for inviting 5 friends",
-      "15": "...for getting a vote on your post"
+    "earned": "已賺取${{value}}",
+    "earn": "賺取${{value}}",
+    "modalTitle": "你賺到了${{amount}}！",
+    "modalButton": "很棒",
+    "modalDescription": {
+      "0": "註冊",
+      "1": "4美元競投Bid",
+      "2": "4美元投票",
+      "3": "4美元支持一個Goal",
+      "4": "訂閱一位創作者",
+      "5": "訂閱三位創作者",
+      "6": "對同一創作者兩次競投Bid",
+      "7": "對同一創作者投票兩次",
+      "8": "兩次支持同一創作者",
+      "9": "連續2天競投Bid",
+      "10": "連續2天投票",
+      "11": "連續2天支持Goal",
+      "12": "為獲勝的選項競投Bid",
+      "13": "為獲勝的選項投票",
+      "14": "邀請5位朋友",
+      "15": "為你的帖子獲得投票"
     },
-    "itemDescription_NEED_TRANSLATION": {
-      "0": "Signed up",
-      "1": "Place a bid of $4",
-      "2": "Vote for $4",
-      "3": "Back a goal for $4",
-      "4": "Subscribe to a creator",
-      "5": "Subscribe to 3 creators",
-      "6": "Bid on the same creator twice",
-      "7": "Vote on the same creator twice",
-      "8": "Back the same creator twice",
-      "9": "Placing a bid 2 days in a row",
-      "10": "Vote 2 days in a row",
-      "11": "Back goals 2 days in a row",
-      "12": "Bid on a winning option",
-      "13": "Vote for a winning option",
-      "14": "Invite 5 friends",
-      "15": "Get a vote on your post"
+    "itemDescription": {
+      "0": "註冊",
+      "1": "4美元競投Bid",
+      "2": "4美元投票",
+      "3": "4美元支持一個goal",
+      "4": "訂閱一位創作者",
+      "5": "訂閱三位創作者",
+      "6": "對同一創作者兩次競投Bid",
+      "7": "對同一創作者投票兩次",
+      "8": "兩次支持同一創作者",
+      "9": "連續2天競投Bid",
+      "10": "連續2天投票",
+      "11": "連續2天支持Goal",
+      "12": "為獲勝的選項競投Bid",
+      "13": "為獲勝的選項投票",
+      "14": "邀請5位朋友",
+      "15": "為你的帖子獲得投票"
     }
   }
 }

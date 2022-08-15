@@ -63,6 +63,7 @@ import RewardContextProvider from '../contexts/rewardContext';
 import ModalNotificationsContextProvider from '../contexts/modalNotificationsContext';
 import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
+import { OverlayModeProvider } from '../contexts/overlayModeContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -221,31 +222,35 @@ const MyApp = (props: IMyApp): ReactElement => {
                             <RewardContextProvider>
                               <SubscriptionsProvider>
                                 <ChatsProvider>
-                                  <ResizeMode>
-                                    <PostModalContextProvider>
-                                      <GlobalTheme initialTheme={colorMode}>
-                                        <>
-                                          <ToastContainer />
-                                          <VideoProcessingWrapper>
-                                            {!pageProps.error ? (
-                                              getLayout(
-                                                <Component {...pageProps} />
-                                              )
-                                            ) : (
-                                              <Error
-                                                title={pageProps.error?.message}
-                                                statusCode={
-                                                  pageProps.error?.statusCode ??
-                                                  500
-                                                }
-                                              />
-                                            )}
-                                          </VideoProcessingWrapper>
-                                          <ReCaptchaBadgeModal />
-                                        </>
-                                      </GlobalTheme>
-                                    </PostModalContextProvider>
-                                  </ResizeMode>
+                                  <OverlayModeProvider>
+                                    <ResizeMode>
+                                      <PostModalContextProvider>
+                                        <GlobalTheme initialTheme={colorMode}>
+                                          <>
+                                            <ToastContainer />
+                                            <VideoProcessingWrapper>
+                                              {!pageProps.error ? (
+                                                getLayout(
+                                                  <Component {...pageProps} />
+                                                )
+                                              ) : (
+                                                <Error
+                                                  title={
+                                                    pageProps.error?.message
+                                                  }
+                                                  statusCode={
+                                                    pageProps.error
+                                                      ?.statusCode ?? 500
+                                                  }
+                                                />
+                                              )}
+                                            </VideoProcessingWrapper>
+                                            <ReCaptchaBadgeModal />
+                                          </>
+                                        </GlobalTheme>
+                                      </PostModalContextProvider>
+                                    </ResizeMode>
+                                  </OverlayModeProvider>
                                 </ChatsProvider>
                               </SubscriptionsProvider>
                             </RewardContextProvider>

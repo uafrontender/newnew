@@ -7,6 +7,7 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -101,6 +102,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
       }
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 
@@ -146,6 +148,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
           )}
           <SPayButtonDiv>
             <SPayButton
+              id='pay'
               view='primaryGrad'
               onClick={() => handlePayWithCaptchaProtection()}
             >

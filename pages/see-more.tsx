@@ -11,6 +11,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { toast } from 'react-toastify';
 
 import { NextPageWithLayout } from './_app';
 import PostList from '../components/organisms/see-more/PostList';
@@ -47,7 +48,7 @@ interface ISearch {
 
 const Search: NextPage<ISearch> = ({ top10posts }) => {
   const { t } = useTranslation('page-SeeMore');
-  const { loggedIn } = useAppSelector((state) => state.user);
+  const { loggedIn, _persist } = useAppSelector((state) => state.user);
 
   const router = useRouter();
   const categoryRef = useRef(router.query.category?.toString() ?? 'ac');
@@ -254,8 +255,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
           throw new Error('Request failed');
         }
       } catch (err) {
-        setIsCollectionLoading(false);
         console.error(err);
+        setIsCollectionLoading(false);
+        toast.error('toastErrors.generic');
       }
     },
     [setCollectionLoaded, loggedIn, isCollectionLoading]
@@ -330,7 +332,8 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
       }
     }
 
-    if (category === 'for-you' && !loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (category === 'for-you' && _persist?.rehydrated && !loggedIn) {
       router?.push('/sign-up');
       return;
     }
@@ -379,6 +382,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     isCollectionLoading,
     router.query.category,
     router.query.sort,
+    _persist?.rehydrated,
     loggedIn,
   ]);
 
@@ -428,7 +432,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
           post={displayedPost}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemovePostFromState={() =>
+          handleRemoveFromStateDeleted={() =>
             handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
           }
         />

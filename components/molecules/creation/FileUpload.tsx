@@ -271,6 +271,7 @@ const FileUpload: React.FC<IFileUpload> = ({
       dispatch(setCreationFileProcessingProgress(0));
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [
     dispatch,

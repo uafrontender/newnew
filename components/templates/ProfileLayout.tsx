@@ -15,6 +15,7 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -132,7 +133,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           }, 1500);
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
     }
   }, [user.username]);
@@ -159,6 +160,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       unblockUser(uuid);
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 
@@ -286,7 +288,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   );
 
   const handleClickReport = useCallback(() => {
-    if (!currentUser.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!currentUser.loggedIn && currentUser._persist?.rehydrated) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -440,6 +443,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         }
       } catch (err) {
         console.error(err);
+        toast.error('toastErrors.generic');
       }
     }
 
@@ -465,7 +469,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           {/* Favorites and more options buttons */}
           <SBackButton
             onClick={() => {
-              router.back();
+              router.push('/');
             }}
           />
           {/* <SFavoritesButton
@@ -532,6 +536,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
           {isSubscribed && <SSubcribedTag>{t('subscribed-tag')}</SSubcribedTag>}
+          {wasSubscribed && (
+            <SSubcribedTag>{t('subscriptionCancelled-tag')}</SSubcribedTag>
+          )}
           <div
             style={{
               position: 'relative',
@@ -548,6 +555,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                     svg={VerificationCheckmark}
                     width='32px'
                     height='32px'
+                    fill='none'
                   />
                 )}
               </SUsername>
@@ -611,7 +619,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 href={
                   !isSubscribed && !wasSubscribed
                     ? `/${user.username}/subscribe`
-                    : `/direct-messages/${user.username}`
+                    : `/direct-messages/${user.username}-cr`
                 }
                 disabled={isSubscribed === null || wasSubscribed === null}
               >

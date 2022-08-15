@@ -38,6 +38,7 @@ const DeleteCommentModal = dynamic(
 interface IComment {
   lastChild?: boolean;
   comment: TCommentWithReplies;
+  isDeletingComment: boolean;
   canDeleteComment?: boolean;
   handleAddComment: (newMsg: string) => void;
   handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
@@ -49,6 +50,7 @@ const Comment: React.FC<IComment> = ({
   comment,
   lastChild,
   canDeleteComment,
+  isDeletingComment,
   handleAddComment,
   handleDeleteComment,
   onFormFocus,
@@ -82,7 +84,8 @@ const Comment: React.FC<IComment> = ({
   const replies = useMemo(() => comment.replies ?? [], [comment.replies]);
 
   const onUserReport = useCallback(() => {
-    if (!user.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -174,8 +177,9 @@ const Comment: React.FC<IComment> = ({
               )}
             </SActionsDiv>
           </SCommentHeader>
-          <SText>{comment.content?.text}</SText>
+          {!comment.isDeleted && <SText>{comment.content?.text}</SText>}
           {!comment.parentId &&
+            !comment.isDeleted &&
             (!isReplyFormOpen ? (
               <SReply onClick={replyHandler}>{t('comments.sendReply')}</SReply>
             ) : (
@@ -192,30 +196,37 @@ const Comment: React.FC<IComment> = ({
                 />
               </>
             ))}
-          {!comment.parentId && replies && replies.length > 0 && (
-            <SReply onClick={replyHandler}>
-              {isReplyFormOpen
-                ? t('comments.hideReplies')
-                : t('comments.viewReplies')}{' '}
-              {replies.length}{' '}
-              {replies.length > 1 ? t('comments.replies') : t('comments.reply')}
-            </SReply>
-          )}
+          {!comment.parentId &&
+            !comment.isDeleted &&
+            replies &&
+            replies.length > 0 && (
+              <SReply onClick={replyHandler}>
+                {isReplyFormOpen
+                  ? t('comments.hideReplies')
+                  : t('comments.viewReplies')}{' '}
+                {replies.length}{' '}
+                {replies.length > 1
+                  ? t('comments.replies')
+                  : t('comments.reply')}
+              </SReply>
+            )}
           {isReplyFormOpen &&
             replies &&
-            replies.map((item) => (
+            replies.map((item, index) => (
               <Comment
                 key={item.id.toString()}
+                isDeletingComment={isDeletingComment}
                 canDeleteComment={canDeleteComment}
+                lastChild={index === replies.length - 1}
                 comment={item}
                 handleAddComment={(newMsg: string) => handleAddComment(newMsg)}
                 handleDeleteComment={handleDeleteComment}
               />
             ))}
-          {!lastChild && <SSeparator />}
         </SCommentContent>
         <DeleteCommentModal
           isVisible={confirmDeleteComment}
+          isDeletingComment={isDeletingComment}
           closeModal={() => setConfirmDeleteComment(false)}
           handleConfirmDelete={async () => {
             await handleDeleteComment(comment);
@@ -223,6 +234,7 @@ const Comment: React.FC<IComment> = ({
           }}
         />
       </SComment>
+      {!lastChild && <SSeparator />}
       {isMobile ? (
         <CommentEllipseModal
           isOpen={ellipseMenuOpen}
@@ -266,6 +278,7 @@ const SUserAvatar = styled(UserAvatar)<{
   min-height: 36px;
   flex-shrink: 0;
   margin-right: 12px;
+  margin-bottom: 14px;
   cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
 `;
 

@@ -3,6 +3,7 @@
 import { useTranslation } from 'next-i18next';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { useUpdateEffect } from 'react-use';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -18,10 +19,12 @@ import usePageVisibility from '../../../utils/hooks/usePageVisibility';
 
 interface IResponseTimer {
   timestampSeconds: number;
+  onTimeExpired: () => void;
 }
 
 const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
   timestampSeconds,
+  onTimeExpired,
 }) => {
   const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -49,6 +52,13 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
 
   useEffect(() => {
     setParsedSeconds(secondsToDHMS(seconds));
+  }, [seconds]);
+
+  useUpdateEffect(() => {
+    if (seconds <= 0) {
+      clearInterval(interval.current);
+      onTimeExpired();
+    }
   }, [seconds]);
 
   return (

@@ -32,9 +32,10 @@ import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeratio
 import Headline from '../../atoms/Headline';
 import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
 import PostVotingTab from '../../molecules/decision/PostVotingTab';
+import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
+import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
 
 import useResponseUpload from '../../../utils/hooks/useResponseUpload';
-import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
@@ -59,18 +60,11 @@ interface IPostModerationMC {
   post: newnewapi.MultipleChoice;
   postStatus: TPostStatusStringified;
   handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleRemovePostFromState: () => void;
   handleGoBack: () => void;
 }
 
 const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
-  ({
-    post,
-    postStatus,
-    handleUpdatePostStatus,
-    handleGoBack,
-    handleRemovePostFromState,
-  }) => {
+  ({ post, postStatus, handleUpdatePostStatus, handleGoBack }) => {
     const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
@@ -326,12 +320,33 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             setResponseFreshlyUploaded(res.data.multipleChoice.response);
           }
           setAnnouncement(res.data.multipleChoice?.announcement);
+          if (res.data.multipleChoice?.winningOptionId && !winningOption) {
+            const winner = options.find(
+              (o) => o.id === res!!.data!!.multipleChoice!!.winningOptionId
+            );
+            if (winner) {
+              setWinningOption(winner);
+            }
+          }
         }
       } catch (err) {
         console.error(err);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const handleOnResponseTimeExpired = () => {
+      handleUpdatePostStatus('FAILED');
+    };
+
+    const handleOnVotingTimeExpired = async () => {
+      if (options.some((o) => o.supporterCount > 0)) {
+        handleUpdatePostStatus('WAITING_FOR_RESPONSE');
+        await fetchPostLatestData();
+      } else {
+        handleUpdatePostStatus('FAILED');
+      }
+    };
 
     // Increment channel subs after mounting
     // Decrement when unmounting
@@ -589,6 +604,14 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
                 timestampSeconds={new Date(
                   (post.responseUploadDeadline?.seconds as number) * 1000
                 ).getTime()}
+                onTimeExpired={handleOnResponseTimeExpired}
+              />
+            ) : Date.now() > (post.expiresAt?.seconds as number) * 1000 ? (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='mc'
               />
             ) : (
               <PostTimer
@@ -596,6 +619,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
                   (post.expiresAt?.seconds as number) * 1000
                 ).getTime()}
                 postType='mc'
+                onTimeExpired={handleOnVotingTimeExpired}
               />
             )}
           </SExpiresSection>
@@ -646,7 +670,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             hasResponse={!!post.response}
             hidden={openedTab === 'response'}
             handleUpdatePostStatus={handleUpdatePostStatus}
-            handleRemovePostFromState={handleRemovePostFromState}
           />
           <SActivitesContainer decisionFailed={postStatus === 'failed'}>
             {openedTab === 'announcement' ? (

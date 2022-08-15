@@ -82,6 +82,7 @@
   },
   "accountPrivate": "La actividad de {{username}} es privada",
   "subscribed-tag": "SUSCRITO",
+  "subscriptionCancelled-tag_NEED_TRANSLATION": "CANCELLED",
   "modal": {
     "blockUser": {
       "title": "Bloquear usuario",

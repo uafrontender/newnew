@@ -9,15 +9,22 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { NextPageWithLayout } from './_app';
 import Lottie from '../components/atoms/Lottie';
 import General from '../components/templates/General';
-import { getMyNotifications, markAsRead } from '../api/endpoints/notification';
+import {
+  getMyNotifications,
+  markAllAsRead,
+  markAsRead,
+} from '../api/endpoints/notification';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import { useNotifications } from '../contexts/notificationsContext';
 import assets from '../constants/assets';
+import { useAppSelector } from '../redux-store/store';
+import Button from '../components/atoms/Button';
 
 const NoResults = dynamic(
   () => import('../components/molecules/notifications/NoResults')
@@ -29,12 +36,17 @@ const Notification = dynamic(
 export const Notifications = () => {
   const { t } = useTranslation('page-Notifications');
   const { ref: scrollRef, inView } = useInView();
-  const [notifications, setNotifications] =
-    useState<newnewapi.INotification[] | null>(null);
-  const [unreadNotifications, setUnreadNotifications] =
-    useState<number[] | null>(null);
-  const [notificationsNextPageToken, setNotificationsNextPageToken] =
-    useState<string | undefined | null>('');
+  const router = useRouter();
+  const user = useAppSelector((state) => state.user);
+  const [notifications, setNotifications] = useState<
+    newnewapi.INotification[] | null
+  >(null);
+  const [unreadNotifications, setUnreadNotifications] = useState<
+    number[] | null
+  >(null);
+  const [notificationsNextPageToken, setNotificationsNextPageToken] = useState<
+    string | undefined | null
+  >('');
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [defaultLimit, setDefaultLimit] = useState<number>(6);
@@ -48,8 +60,12 @@ export const Notifications = () => {
       if (loading) return;
       const limit: number = args && args.limit ? args.limit : defaultLimit;
       const pageToken: string = args && args.pageToken ? args.pageToken : null;
+
       try {
-        if (!pageToken && limit === defaultLimit) setNotifications([]);
+        if (!pageToken && limit === defaultLimit) {
+          setNotifications([]);
+        }
+
         setLoading(true);
         const payload = new newnewapi.GetMyNotificationsRequest({
           paging: {
@@ -62,6 +78,7 @@ export const Notifications = () => {
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
+
         if (res.data.notifications.length > 0) {
           if (limit === defaultLimit) {
             setNotifications((curr) => {
@@ -94,9 +111,14 @@ export const Notifications = () => {
                 arr.push(res.data.notifications[0].id as number);
               return arr;
             });
+            // We don`t update token since we only loaded the new first items
           }
+        } else {
+          // If there is no results then there is no more pages to load
+          setNotificationsNextPageToken(null);
         }
-        if (!res.data.paging?.nextPageToken && notificationsNextPageToken)
+
+        if (!res.data.paging?.nextPageToken)
           setNotificationsNextPageToken(null);
         setLoading(false);
       } catch (err) {
@@ -104,8 +126,7 @@ export const Notifications = () => {
         setLoading(false);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loading]
+    [loading, defaultLimit]
   );
 
   const readNotification = useCallback(
@@ -115,6 +136,18 @@ export const Notifications = () => {
           notificationIds: unreadNotifications,
         });
         const res = await markAsRead(payload);
+        if (unreadNotifications && notifications) {
+          const arr = notifications;
+          unreadNotifications.forEach((unreadItem) => {
+            const index = arr.findIndex(
+              (item) => (item.id as number) === unreadItem
+            );
+            if (index > -1) {
+              arr[index].isRead = true;
+            }
+          });
+          setNotifications(arr);
+        }
         if (res.error) throw new Error(res.error?.message ?? 'Request failed');
         fetchNotificationCount();
         setUnreadNotifications(null);
@@ -123,8 +156,19 @@ export const Notifications = () => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [unreadNotifications]
+    [unreadNotifications, notifications]
   );
+
+  const handleMarkAllAsRead = useCallback(async () => {
+    try {
+      const payload = new newnewapi.EmptyRequest({});
+      await markAllAsRead(payload);
+      fetchNotificationCount();
+      setUnreadNotifications(null);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [fetchNotificationCount]);
 
   useEffect(() => {
     if (!notifications) {
@@ -136,8 +180,7 @@ export const Notifications = () => {
     if (unreadNotifications && unreadNotifications.length > 0) {
       readNotification();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unreadNotifications]);
+  }, [unreadNotifications, readNotification]);
 
   useEffect(() => {
     if (initialLoad) {
@@ -160,6 +203,12 @@ export const Notifications = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, loading, notificationsNextPageToken]);
 
+  useEffect(() => {
+    if (!user.loggedIn) {
+      router?.push('/sign-up');
+    }
+  }, [user.loggedIn, router]);
+
   const renderNotification = useCallback(
     (item: newnewapi.INotification) => (
       <Notification key={item.id as any} {...item} />
@@ -177,7 +226,14 @@ export const Notifications = () => {
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <SContent>
-        <SHeading>{t('meta.title')}</SHeading>
+        <SHeadingWrapper>
+          <SHeading>{t('meta.title')}</SHeading>
+          {unreadNotificationCount > 0 && (
+            <SButton onClick={handleMarkAllAsRead} view='secondary'>
+              {t('button.markAllAsRead')}
+            </SButton>
+          )}
+        </SHeadingWrapper>
         {loading === undefined ? (
           <Lottie
             width={64}
@@ -241,10 +297,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const SGeneral = styled(General)`
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.background.secondary
-      : props.theme.colorsThemed.background.primary};
+  background: ${(props) => props.theme.colorsThemed.background.primary};
 
   ${({ theme }) => theme.media.laptop} {
     background: ${(props) =>
@@ -259,20 +312,30 @@ const SContent = styled.div`
   margin: 0 auto;
 `;
 
+const SHeadingWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  ${({ theme }) => theme.media.tablet} {
+    padding-bottom: 20px;
+  }
+`;
+
 const SHeading = styled.h2`
   font-weight: 600;
   font-size: 22px;
-  line-height: 30px;
-  margin-bottom: 14px;
   ${({ theme }) => theme.media.tablet} {
     font-size: 28px;
-    line-height: 36px;
-    margin-bottom: 20px;
   }
   ${({ theme }) => theme.media.desktop} {
     font-size: 32px;
     line-height: 40px;
   }
+`;
+
+const SButton = styled(Button)`
+  padding: 8px 16px;
 `;
 
 const SRef = styled.span`

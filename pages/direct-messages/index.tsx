@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { ReactElement, useState } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
@@ -22,6 +23,15 @@ export const Chat = () => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const fetchLastActiveRoom = async () => {
@@ -45,7 +55,9 @@ export const Chat = () => {
         if (chatRoom?.visavis?.username) {
           route =
             chatRoom.kind === 1
-              ? chatRoom.visavis.username
+              ? chatRoom.myRole === 1
+                ? `${chatRoom.visavis.username}-cr`
+                : chatRoom.visavis.username
               : `${chatRoom.visavis.username}-announcement`;
         } else {
           route =
@@ -64,13 +76,18 @@ export const Chat = () => {
   };
 
   useUpdateEffect(() => {
-    if (!user.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router?.push('/sign-up');
     }
-  }, [router, user.loggedIn]);
+  }, [router, user.loggedIn, user._persist?.rehydrated]);
 
   useEffectOnce(() => {
-    fetchLastActiveRoom();
+    if (!isMobileOrTablet) {
+      fetchLastActiveRoom();
+    } else {
+      router?.push(`/direct-messages/-mobile`);
+    }
   });
 
   return (

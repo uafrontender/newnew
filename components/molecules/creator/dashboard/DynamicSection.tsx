@@ -16,18 +16,19 @@ import { Tab } from '../../Tabs';
 import AnimatedPresence, {
   TElementAnimations,
 } from '../../../atoms/AnimatedPresence';
+import SearchInput from './SearchInput';
+
 import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
-import { setOverlay } from '../../../../redux-store/slices/uiStateSlice';
 import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { useAppSelector } from '../../../../redux-store/store';
 
 import chatIcon from '../../../../public/images/svg/icons/filled/Chat.svg';
-import searchIcon from '../../../../public/images/svg/icons/outlined/Search.svg';
 import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessage.svg';
 import notificationsIcon from '../../../../public/images/svg/icons/filled/Notifications.svg';
 import { useGetChats } from '../../../../contexts/chatContext';
 import { useNotifications } from '../../../../contexts/notificationsContext';
 import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
+import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 
 const NewMessageModal = dynamic(() => import('./NewMessageModal'));
 const NotificationsList = dynamic(() => import('./NotificationsList'));
@@ -41,7 +42,6 @@ export const DynamicSection = () => {
   const theme = useTheme();
   const { t } = useTranslation('page-Creator');
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const containerRef: any = useRef(null);
   const [animate, setAnimate] = useState(false);
@@ -49,6 +49,7 @@ export const DynamicSection = () => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const { unreadCountForCreator } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
   const [markReadNotifications, setMarkReadNotifications] = useState(false);
   const { mySubscribersTotal } = useGetSubscriptions();
 
@@ -114,9 +115,7 @@ export const DynamicSection = () => {
       setMarkReadNotifications(false);
     }, 1500);
   }, []);
-  const handleSearchClick = useCallback(() => {
-    console.log('search');
-  }, []);
+
   const handleBulkMessageClick = useCallback(() => {
     setShowNewMessageModal(true);
   }, []);
@@ -132,10 +131,22 @@ export const DynamicSection = () => {
     }
   });
   useEffect(() => {
-    dispatch(setOverlay(isDesktop ? false : !!tab));
+    if (!isDesktop && tab) {
+      enableOverlayMode();
+    }
     setAnimate(true);
     setAnimation(tab ? 'o-12' : 'o-12-reverse');
-  }, [tab, dispatch, isDesktop]);
+
+    return () => {
+      disableOverlayMode();
+    };
+  }, [tab, isDesktop, enableOverlayMode, disableOverlayMode]);
+
+  const [searchText, setSearchText] = useState('');
+
+  const handleSetSearchText = useCallback((searchStr: string) => {
+    setSearchText(searchStr);
+  }, []);
 
   return (
     <STopButtons>
@@ -246,14 +257,7 @@ export const DynamicSection = () => {
                     </>
                   ) : (
                     <>
-                      <SChatButton view='secondary' onClick={handleSearchClick}>
-                        <SChatInlineSVG
-                          svg={searchIcon}
-                          fill={theme.colorsThemed.text.primary}
-                          width='20px'
-                          height='20px'
-                        />
-                      </SChatButton>
+                      <SearchInput passInputValue={handleSetSearchText} />
                       <SChatButton
                         view='secondary'
                         onClick={handleBulkMessageClick}
@@ -278,7 +282,7 @@ export const DynamicSection = () => {
                   markReadNotifications={markReadNotifications}
                 />
               ) : (
-                <ChatList />
+                <ChatList searchText={searchText} />
               )}
             </>
           )}

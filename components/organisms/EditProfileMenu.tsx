@@ -1,6 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme, css } from 'styled-components';
@@ -8,6 +14,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { debounce, isEqual } from 'lodash';
 import validator from 'validator';
 import { Area, Point } from 'react-easy-crop/types';
+import { toast } from 'react-toastify';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
@@ -503,13 +510,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setIsLoading(false);
       if ((err as Error).message === 'No token') {
         dispatch(logoutUserClearCookiesAndRedirect());
-      }
-      // Refresh token was present, session probably expired
-      // Redirect to sign up page
-      if ((err as Error).message === 'Refresh token invalid') {
+      } else if ((err as Error).message === 'Refresh token invalid') {
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
+      } else {
+        toast.error('toastErrors.generic');
       }
     }
   }, [
@@ -657,8 +663,22 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     handleSetStageToEditingGeneral,
     dispatch,
   ]);
+  const scrollPosition = useRef(0);
 
   // Effects
+  useEffect(() => {
+    scrollPosition.current = window ? window.scrollY : 0;
+
+    document.body.style.cssText = `
+      overflow: hidden;
+    `;
+
+    return () => {
+      document.body.style.cssText = '';
+      window?.scroll(0, scrollPosition.current);
+    };
+  }, []);
+
   useEffect(() => {
     const verify = () => {
       if (!isBrowser()) return;

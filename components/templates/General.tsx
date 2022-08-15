@@ -1,9 +1,10 @@
 /* eslint-disable no-unneeded-ternary */
-import React, { useRef, useMemo, useState } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { useTheme } from 'styled-components';
+import { useRouter } from 'next/router';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -15,7 +16,6 @@ import ErrorBoundary from '../organisms/ErrorBoundary';
 import BottomNavigation from '../organisms/BottomNavigation';
 import FloatingMessages from '../molecules/creator/dashboard/FloatingMessages';
 
-import useOverlay from '../../utils/hooks/useOverlay';
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
 import { useAppSelector } from '../../redux-store/store';
 import useScrollDirection from '../../utils/hooks/useScrollDirection';
@@ -30,6 +30,7 @@ import { usePostModalState } from '../../contexts/postModalContext';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 import ModalNotifications from '../molecules/ModalNotifications';
+import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 interface IGeneral {
   withChat?: boolean;
@@ -41,10 +42,14 @@ interface IGeneral {
 export const General: React.FC<IGeneral> = (props) => {
   const { withChat, specialStatusBarColor, restrictMaxWidth, children } = props;
   const user = useAppSelector((state) => state.user);
-  const { banner, resizeMode } = useAppSelector((state) => state.ui);
+  const { banner, resizeMode, globalSearchActive } = useAppSelector(
+    (state) => state.ui
+  );
   const theme = useTheme();
   const [cookies] = useCookies();
+  const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
+  const { overlayModeEnabled } = useOverlayMode();
   const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
   const { postOverlayOpen } = usePostModalState();
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
@@ -140,13 +145,41 @@ export const General: React.FC<IGeneral> = (props) => {
     mySubscribersTotal,
   ]);
 
-  useOverlay(wrapperRef);
+  const savedScrollPosition = useRef(0);
+  useEffect(() => {
+    if (overlayModeEnabled) {
+      savedScrollPosition.current = window ? window.scrollY : 0;
+
+      // eslint-disable-next-line no-param-reassign
+      wrapperRef.current.style.cssText = `
+        overflow: hidden;
+     `;
+      document.body.style.cssText = `
+        overflow: hidden;
+      `;
+    } else {
+      // eslint-disable-next-line no-param-reassign
+      wrapperRef.current.style.cssText = ``;
+      document.body.style.cssText = '';
+      window?.scroll(0, savedScrollPosition.current);
+      savedScrollPosition.current = 0;
+    }
+  }, [wrapperRef, overlayModeEnabled]);
+
   useScrollPosition(wrapperRef);
   // useRefreshOnScrollTop();
   const { scrollDirection } = useScrollDirection(wrapperRef);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   const openChat = () => {
     setMobileChatOpened(true);
@@ -183,7 +216,9 @@ export const General: React.FC<IGeneral> = (props) => {
               }
             />
           </Head>
-          <Header visible={!isMobile || mobileNavigationVisible} />
+          <Header
+            visible={!isMobile || mobileNavigationVisible || globalSearchActive}
+          />
           <SContent>
             <Container
               {...(restrictMaxWidth
@@ -204,7 +239,7 @@ export const General: React.FC<IGeneral> = (props) => {
                 collection={bottomNavigation}
                 moreMenuMobileOpen={moreMenuMobileOpen}
                 handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-                visible={mobileNavigationVisible}
+                visible={mobileNavigationVisible && !globalSearchActive}
               />
               <SortingContainer
                 id='sorting-container'
@@ -231,17 +266,21 @@ export const General: React.FC<IGeneral> = (props) => {
               )}
             </ChatContainer>
           )}
-          <ReportBugButton
-            bottom={
-              (isMobile ? 24 : 16) +
-              (isMobile && (mobileNavigationVisible || postOverlayOpen)
-                ? 56
-                : 0) +
-              (chatButtonVisible ? 72 : 0)
-            }
-            right={4}
-            zIndex={moreMenuMobileOpen ? 9 : undefined}
-          />
+          {!isMobileOrTablet && !router.route.includes('direct-messages') && (
+            <ReportBugButton
+              bottom={
+                (isMobile ? 24 : 16) +
+                (isMobile &&
+                (mobileNavigationVisible || postOverlayOpen) &&
+                !mobileChatOpened
+                  ? 56
+                  : 0) +
+                (chatButtonVisible && !mobileChatOpened ? 72 : 0)
+              }
+              right={4}
+              zIndex={moreMenuMobileOpen ? 9 : undefined}
+            />
+          )}
         </SWrapper>
         <ModalNotifications />
       </SkeletonTheme>

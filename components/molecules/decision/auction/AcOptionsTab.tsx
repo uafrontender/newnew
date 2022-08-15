@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { debounce } from 'lodash';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
@@ -204,6 +205,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   );
 
   // const handleSubmitNewOptionWallet = useCallback(async () => {
+  //  if (!user._persist?.rehydrated) {
+  //    return;
+  //  }
   //   setLoadingModalOpen(true);
   //   try {
   //     // Check if user is logged and if the wallet balance is sufficient
@@ -329,6 +333,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   const handlePayWithCardStripeRedirect = useCallback(
     async (rewardAmount: number) => {
+      if (!user._persist?.rehydrated) {
+        return;
+      }
+
       setLoadingModalOpen(true);
       try {
         Mixpanel.track('PayWithCardStripeRedirect', {
@@ -371,9 +379,17 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
         console.error(err);
+        toast.error('toastErrors.generic');
       }
     },
-    [user.loggedIn, router.locale, newBidAmount, newBidText, postId]
+    [
+      user.loggedIn,
+      user._persist?.rehydrated,
+      router.locale,
+      newBidAmount,
+      newBidText,
+      postId,
+    ]
   );
 
   useEffect(() => {
@@ -520,6 +536,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             }}
           >
             <SuggestionTextArea
+              id='text-input'
               value={newBidText}
               disabled={optionBeingSupported !== ''}
               placeholder={t(
@@ -529,6 +546,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               onChange={handleUpdateNewOptionText}
             />
             <BidAmountTextInput
+              id='bid-input'
               value={newBidAmount}
               inputAlign='center'
               disabled={optionBeingSupported !== ''}
@@ -543,6 +561,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               }}
             />
             <Button
+              id='submit'
               view='primaryGrad'
               size='sm'
               disabled={

@@ -4,13 +4,11 @@ import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { debounce } from 'lodash';
 
-import { setOverlay } from '../../redux-store/slices/uiStateSlice';
-import { useAppDispatch } from '../../redux-store/store';
-
 import isBrowser from '../../utils/isBrowser';
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 import Text from './Text';
+import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 const getTopPosition = (
   verticalOrigin: 'top' | 'center' | 'bottom',
@@ -86,18 +84,20 @@ const EllipseMenu: React.FunctionComponent<IEllipseMenu> = ({
   ...rest
 }) => {
   const containerRef = useRef<HTMLDivElement>();
-  const dispatch = useAppDispatch();
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
   useOnClickEsc(containerRef, onClose);
   useOnClickOutside(containerRef, onClose);
 
   useEffect(() => {
-    dispatch(setOverlay(isOpen));
+    if (isOpen) {
+      enableOverlayMode();
+    }
 
     return () => {
-      dispatch(setOverlay(false));
+      disableOverlayMode();
     };
-  }, [isOpen, dispatch]);
+  }, [isOpen, enableOverlayMode, disableOverlayMode]);
 
   const [position, setPosition] = useState(() => ({
     top: getTopPosition(
@@ -225,7 +225,7 @@ const SContainer = styled(motion.div)<{
   $transformY?: string;
   $withoutContainer?: boolean;
 }>`
-  position: absolute;
+  position: fixed;
   top: ${({ top }) => top};
   right: ${({ right }) => right};
   z-index: ${({ $zIndex }) => $zIndex || 10};

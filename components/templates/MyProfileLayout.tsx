@@ -544,7 +544,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   // Redirect to / if user is not logged in
   useUpdateEffect(() => {
-    if (!user.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router.push('/');
     }
   }, [router, user]);
@@ -640,6 +641,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                     svg={VerificationCheckmark}
                     width='32px'
                     height='32px'
+                    fill='none'
                   />
                 )}
               </SUsername>

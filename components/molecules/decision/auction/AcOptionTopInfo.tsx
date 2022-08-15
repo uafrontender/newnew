@@ -6,6 +6,7 @@ import { useTranslation } from 'next-i18next';
 import React, { useCallback, useState } from 'react';
 import { useRouter } from 'next/router';
 import styled, { useTheme } from 'styled-components';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
@@ -80,6 +81,9 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   };
 
   // const handlePayWithWallet = useCallback(async () => {
+  //  if (!user._persist?.rehydrated) {
+  //    return;
+  //  }
   //   setLoadingModalOpen(true);
   //   try {
   //     // Check if user is logged and if the wallet balance is sufficient
@@ -200,13 +204,19 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   //   option.id,
   //   postId,
   //   user.loggedIn,
+  //   user._persist?.rehydrated,
   //   walletBalance,
   //   router.locale,
   // ]);
 
   const handlePayWithCardStripeRedirect = useCallback(
     async (rewardAmount: number) => {
+      if (!user._persist?.rehydrated) {
+        return;
+      }
+
       setLoadingModalOpen(true);
+
       try {
         const createPaymentSessionPayload =
           new newnewapi.CreatePaymentSessionRequest({
@@ -243,9 +253,17 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
         console.error(err);
+        toast.error('toastErrors.generic');
       }
     },
-    [user.loggedIn, supportBidAmount, option.id, postId, router.locale]
+    [
+      user.loggedIn,
+      user._persist?.rehydrated,
+      supportBidAmount,
+      option.id,
+      postId,
+      router.locale,
+    ]
   );
 
   return (

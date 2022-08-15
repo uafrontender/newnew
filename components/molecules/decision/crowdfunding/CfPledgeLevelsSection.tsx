@@ -11,6 +11,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
@@ -110,6 +111,10 @@ const CfPledgeLevelsSection: React.FunctionComponent<
 
   // Make a pledge and close all forms and modals
   // const handlePayWithWallet = useCallback(async () => {
+  //  if (!user._persist?.rehydrated) {
+  //    return;
+  //  }
+  //
   //   setLoadingModalOpen(true);
   //   try {
   //     // Check if user is logged in
@@ -217,6 +222,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   //   }
   // }, [
   //   user.loggedIn,
+  //   user._persist?.rehydrated,
   //   router.locale,
   //   post.postUuid,
   //   pledgeAmount,
@@ -226,6 +232,10 @@ const CfPledgeLevelsSection: React.FunctionComponent<
 
   const handlePayWithCardStripeRedirect = useCallback(
     async (rewardAmount: number) => {
+      if (!user._persist?.rehydrated) {
+        return;
+      }
+
       setLoadingModalOpen(true);
       try {
         Mixpanel.track('PayWithCardStripeRedirect', {
@@ -269,9 +279,16 @@ const CfPledgeLevelsSection: React.FunctionComponent<
         console.error(err);
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
+        toast.error('toastErrors.generic');
       }
     },
-    [router.locale, post.postUuid, user.loggedIn, pledgeAmount]
+    [
+      router.locale,
+      post.postUuid,
+      user.loggedIn,
+      user._persist?.rehydrated,
+      pledgeAmount,
+    ]
   );
 
   useEffect(() => {

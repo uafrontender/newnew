@@ -58,7 +58,7 @@
   "button": {
     "createDecision": "Nueva publicación",
     "create": "Crear",
-    "signIn_NEED_TRANSLATION": "Sign in",
+    "signIn": "Iniciar sesión",
     "dashboard": "Panel",
     "createOnNewnew": "Crear ahora",
     "cancel": "Cancelar"
@@ -122,7 +122,8 @@
         "placeholder": "Por favor, cuéntanos un poco más..."
       },
       "button": {
-        "cancel": "Cancelar"
+        "cancel": "Cancelar",
+        "report": "Reportar"
       }
     },
     "reportSent": {
@@ -174,45 +175,45 @@
     "numbers-of-bids-most-first": "El mayor número de ofertas primero"
   },
   "toastErrors": {
-    "generic_NEED_TRANSLATION": "An error occurred, please try again later"
+    "generic": "Se ha producido un error, inténtalo de nuevo más tarde"
   },
   "rewards": {
-    "earned_NEED_TRANSLATION": "earned ${{value}}",
-    "earn_NEED_TRANSLATION": "earn ${{value}}",
-    "modalTitle_NEED_TRANSLATION": "You earned ${{amount}}!",
-    "modalButton_NEED_TRANSLATION": "Great",
-    "modalDescription_NEED_TRANSLATION": {
-      "1": "...for signing up",
-      "2": "...for placing a bid",
-      "3": "...for voting on a post",
-      "4": "...for backing a goal",
-      "5": "...for subscribing to a creator",
-      "6": "...for subscribing to {{amount}} creators",
-      "7": "...for bidding twice on the same creator",
-      "8": "...for voting twice on the same creator",
-      "9": "...for backing the same creator twice",
-      "10": "...for bidding twice in one week",
-      "11": "...for voting twice in one week",
-      "12": "...for backing 2 goals in one week",
-      "13": "...for inviting {{amount}} friends to NewNew"
+    "earned": "ganaste ${{value}}",
+    "earn": "gana ${{value}}",
+    "modalTitle": "¡Ganaste ${{amount}}!",
+    "modalButton": "Genial",
+    "modalDescription": {
+      "1": "...por registrarte",
+      "2": "...por hacer una oferta",
+      "3": "...por votar en una publicación",
+      "4": "...por patrocinar un Goal",
+      "5": "...por suscribirte a un creador",
+      "6": "...por suscribirte a {{amount}} creadores",
+      "7": "...por ofertar dos veces con el mismo creador",
+      "8": "...por votar dos veces con el mismo creador",
+      "9": "...por patrocinar al mismo creador dos veces",
+      "10": "...por ofertas dos veces en una semana",
+      "11": "...por votar dos veces en una semana",
+      "12": "...por patrocinar dos Goals en una semana",
+      "13": "...por invitar a {{amount}} amigos a NewNew"
     },
-    "itemDescription_NEED_TRANSLATION": {
-      "0": "Signed up",
-      "1": "Place a bid of $4",
-      "2": "Vote for $4",
-      "3": "Back a goal for $4",
-      "4": "Subscribe to a creator",
-      "5": "Subscribe to 3 creators",
-      "6": "Bid on the same creator twice",
-      "7": "Vote on the same creator twice",
-      "8": "Back the same creator twice",
-      "9": "Placing a bid 2 days in a row",
-      "10": "Vote 2 days in a row",
-      "11": "Back goals 2 days in a row",
-      "12": "Bid on a winning option",
-      "13": "Vote for a winning option",
-      "14": "Invite 5 friends",
-      "15": "Get a vote on your post"
+    "itemDescription": {
+      "0": "Registrarte",
+      "1": "Hacer una oferta de $4",
+      "2": "Votar por $4",
+      "3": "Patrocinar un Goal por $4",
+      "4": "Suscribirte a un creador",
+      "5": "Subscribirte a tres creadores",
+      "6": "Ofertar en el mismo creador dos veces",
+      "7": "Votar en el mismo creador dos veces",
+      "8": "Patrocinar al mismo creador dos veces",
+      "9": "Hacer una oferta 2 días seguidos",
+      "10": "Votar 2 días seguidos",
+      "11": "Patrocinar Goals 2 días seguidos",
+      "12": "Ofertar en una opción ganadora",
+      "13": "Votar por una opción ganadora",
+      "14": "Invitar 5 amigos",
+      "15": "Obtener un voto en una publicación tuya"
     }
   }
 }

@@ -69,6 +69,7 @@ import { setUserTutorialsProgress } from '../../../../redux-store/slices/userSta
 import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 import getChunks from '../../../../utils/getChunks/getChunks';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -113,7 +114,8 @@ export const CreationSecondStepContent: React.FC<
     videoProcessing,
   } = useAppSelector((state) => state.creation);
   const user = useAppSelector((state) => state.user);
-  const { resizeMode, overlay } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { overlayModeEnabled } = useOverlayMode();
 
   const { appConstants } = useGetAppConstants();
 
@@ -541,10 +543,10 @@ export const CreationSecondStepContent: React.FC<
   const handleItemChange = useCallback(
     async (key: string, value: any) => {
       if (key === 'title') {
-        Mixpanel.track('Post Title Change', {
-          _stage: 'Creation',
-          _value: value,
-        });
+        // Mixpanel.track('Post Title Change', {
+        //   _stage: 'Creation',
+        //   _value: value,
+        // });
         dispatch(setCreationTitle(value.trim() ? value : ''));
       } else if (key === 'minimalBid') {
         Mixpanel.track('Minimal Big Change', {
@@ -958,13 +960,13 @@ export const CreationSecondStepContent: React.FC<
 
   useEffect(() => {
     if (playerRef.current && isDesktop) {
-      if (overlay) {
+      if (overlayModeEnabled) {
         playerRef.current.pause();
       } else {
         playerRef.current.play();
       }
     }
-  }, [overlay, isDesktop]);
+  }, [overlayModeEnabled, isDesktop]);
 
   useEffect(() => {
     switch (activeTabIndex) {
@@ -1199,6 +1201,7 @@ export const CreationSecondStepContent: React.FC<
                   </div>
                   <div>
                     <SButton
+                      id='review'
                       view='primaryGrad'
                       onClick={handleSubmit}
                       disabled={disabled}
@@ -1230,6 +1233,7 @@ export const CreationSecondStepContent: React.FC<
                           resources={videoProcessing?.targetUrls}
                           borderRadius='16px'
                           mutePosition='left'
+                          showPlayButton
                         />
                       </SFloatingSubSectionPlayer>
                       <SFloatingSubSectionUser>
@@ -1545,6 +1549,9 @@ const SBottomEndPostTitle = styled(Text)`
 `;
 
 const SBottomEndPostTitleHashtag = styled.span`
+  display: inline;
+  word-spacing: normal;
+  overflow-wrap: break-word;
   color: ${(props) => props.theme.colorsThemed.accent.blue};
 `;
 

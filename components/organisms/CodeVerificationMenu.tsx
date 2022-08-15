@@ -85,8 +85,8 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       try {
         Mixpanel.track('Verify email submitted', {
           _stage: 'Sign Up',
-          email: signupEmailInput,
-          verificationCode: completeCode,
+          _email: signupEmailInput,
+          _verificationCode: completeCode,
         });
         setSubmitError('');
         setTimerHidden(true);
@@ -284,6 +284,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           ) : null}
         </SSubheading>
         <VerificationCodeInput
+          id='verification-input'
           initialValue={codeInitial}
           length={6}
           disabled={

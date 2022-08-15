@@ -16,6 +16,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { validateText } from '../../../../api/endpoints/infrastructure';
@@ -316,7 +317,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           _postUuid: post.postUuid,
           _component: 'McOptionsTab',
         });
+
         const createPaymentSessionPayload =
+          // TODO: fix
           new newnewapi.CreatePaymentSessionRequest({
             successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
               router.locale !== 'en-US' ? `${router.locale}/` : ''
@@ -344,6 +347,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
         console.error(err);
+        toast.error('toastErrors.generic');
       }
     },
     [newBidAmount, newOptionText, post.postUuid, router.locale]
@@ -388,6 +392,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
+      toast.error('toastErrors.generic');
     }
   }, [
     newOptionText,
@@ -618,11 +623,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 creator: post.creator?.nickname,
               })}
             </SText>
-            <Link href={`/${post.creator?.username}/subscribe`}>
+            <SSubscribeLink href={`/${post.creator?.username}/subscribe`}>
               <SSubscribeButton>
                 {t('mcPost.optionsTab.actionSection.subscribeButton')}
               </SSubscribeButton>
-            </Link>
+            </SSubscribeLink>
           </SActionSectionSubscribe>
         ) : (
           <div
@@ -977,7 +982,6 @@ const SActionSectionSubscribe = styled.div`
 
   min-height: 50px;
   width: 100%;
-  z-index: 5;
 
   padding-top: 24px;
 
@@ -991,9 +995,6 @@ const SActionSectionSubscribe = styled.div`
     text-align: center;
   }
 
-  button {
-    width: 100%;
-  }
   ${({ theme }) => theme.media.tablet} {
     order: unset;
 
@@ -1001,6 +1002,8 @@ const SActionSectionSubscribe = styled.div`
 
     border-top: 1.5px solid
       ${({ theme }) => theme.colorsThemed.background.outlines1};
+
+    z-index: 5;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -1026,15 +1029,39 @@ const SText = styled(Text)`
   line-height: 24px;
 `;
 
-const SSubscribeButton = styled(Button)`
+const SSubscribeLink = styled.a`
+  display: block;
+
+  width: 100%;
+
+  ${({ theme }) => theme.media.laptop} {
+    max-width: 130px;
+  }
+`;
+
+const SSubscribeButton = styled.button`
+  display: block;
+  width: 100%;
+
   background: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
   color: ${({ theme }) => theme.colors.dark};
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: bold;
+
+  padding: 16px 24px;
+  border-radius: ${(props) => props.theme.borderRadius.medium};
+  border: transparent;
+  outline: none;
+
+  cursor: pointer;
 
   :active:enabled,
   :focus:enabled,
   :hover:enabled {
     background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+    outline: none;
   }
 `;
 

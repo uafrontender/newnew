@@ -14,6 +14,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useUpdateEffect } from 'react-use';
+import { toast } from 'react-toastify';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
@@ -67,7 +68,9 @@ const MyProfileSettingsIndex = () => {
   const socketConnection = useContext(SocketContext);
   // Redux
   const dispatch = useAppDispatch();
-  const { userData, loggedIn } = useAppSelector((state: any) => state.user);
+  const { userData, loggedIn, _persist } = useAppSelector(
+    (state: any) => state.user
+  );
   const { resizeMode, colorMode } = useAppSelector((state: any) => state.ui);
   // Measurements
   const isMobileOrTablet = [
@@ -100,6 +103,7 @@ const MyProfileSettingsIndex = () => {
       unblockUser(uuid);
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 
@@ -176,6 +180,7 @@ const MyProfileSettingsIndex = () => {
       );
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 
@@ -264,9 +269,12 @@ const MyProfileSettingsIndex = () => {
   ];
 
   useUpdateEffect(() => {
-    if (!loggedIn) router.push('/');
+    // Redirect only after the persist data is pulled
+    if (!loggedIn && _persist?.rehydrated) {
+      router.push('/');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loggedIn, router]);
+  }, [loggedIn, _persist?.rehydrated, router]);
 
   useEffect(() => {
     fetchMyTransactions();
@@ -320,6 +328,7 @@ const MyProfileSettingsIndex = () => {
         setBlockedUsers(() => users);
       } catch (err) {
         console.error(err);
+        toast.error('toastErrors.generic');
       }
     }
 

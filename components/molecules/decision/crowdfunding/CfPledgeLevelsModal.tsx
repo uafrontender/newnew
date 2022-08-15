@@ -6,6 +6,7 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../redux-store/store';
 // import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
@@ -92,6 +93,10 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 
   // Make a pledge and close all forms and modals
   // const handlePayWithWallet = useCallback(async () => {
+  //  if (!user._persist?.rehydrated) {
+  //    return;
+  //  }
+  //
   //   setLoadingModalOpen(true);
   //   try {
   //     // Check if user is logged in
@@ -202,6 +207,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   //   pledgeAmount,
   //   post.postUuid,
   //   user.loggedIn,
+  //   user._persist?.rehydrated
   //   router.locale,
   //   handleAddPledgeFromResponse,
   //   handleSetPaymentSuccessModalOpen,
@@ -210,6 +216,10 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 
   const handlePayWithCardStripeRedirect = useCallback(
     async (rewardAmount: number) => {
+      if (!user._persist?.rehydrated) {
+        return;
+      }
+
       setLoadingModalOpen(true);
       try {
         const createPaymentSessionPayload =
@@ -248,9 +258,16 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         console.error(err);
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
+        toast.error('toastErrors.generic');
       }
     },
-    [user.loggedIn, pledgeAmount, post.postUuid, router.locale]
+    [
+      user.loggedIn,
+      user._persist?.rehydrated,
+      pledgeAmount,
+      post.postUuid,
+      router.locale,
+    ]
   );
 
   useEffect(() => {

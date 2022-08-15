@@ -68,8 +68,8 @@ interface IPostTopInfo {
   hasWinner: boolean;
   hasRecommendations: boolean;
   handleReportOpen: () => void;
-  handleRemovePostFromState?: () => void;
-  handleAddPostToState?: () => void;
+  handleRemoveFromStateUnfavorited?: () => void;
+  handleAddPostToStateFavorited?: () => void;
 }
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
@@ -87,8 +87,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   hasWinner,
   hasRecommendations,
   handleReportOpen,
-  handleRemovePostFromState,
-  handleAddPostToState,
+  handleRemoveFromStateUnfavorited,
+  handleAddPostToStateFavorited,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -185,7 +185,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         _postUuid: postId,
         _component: 'PostTopInfo',
       });
-      if (!user.loggedIn) {
+
+      // Redirect only after the persist data is pulled
+      if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
             window.location.href
@@ -206,22 +208,23 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         handleSetIsFollowingDecision(!isFollowingDecision);
 
         if (isFollowingDecision) {
-          handleRemovePostFromState?.();
+          handleRemoveFromStateUnfavorited?.();
         } else {
-          handleAddPostToState?.();
+          handleAddPostToStateFavorited?.();
         }
       }
     } catch (err) {
       console.error(err);
     }
   }, [
-    handleAddPostToState,
-    handleRemovePostFromState,
+    handleAddPostToStateFavorited,
+    handleRemoveFromStateUnfavorited,
     handleSetIsFollowingDecision,
     isFollowingDecision,
     postId,
     router,
     user.loggedIn,
+    user._persist?.rehydrated,
   ]);
 
   const handleSeeNewFailedBox = useCallback(() => {
@@ -297,6 +300,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
                   svg={VerificationCheckmark}
                   width='16px'
                   height='16px'
+                  fill='none'
                 />
               )}
             </SUsername>
@@ -423,8 +427,8 @@ PostTopInfo.defaultProps = {
   totalVotes: undefined,
   totalPledges: undefined,
   targetPledges: undefined,
-  handleRemovePostFromState: undefined,
-  handleAddPostToState: undefined,
+  handleRemoveFromStateUnfavorited: undefined,
+  handleAddPostToStateFavorited: undefined,
 };
 
 export default PostTopInfo;

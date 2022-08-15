@@ -11,6 +11,7 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import {
@@ -193,6 +194,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       }
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }, [handleRemoveOption, option.id]);
 
@@ -255,6 +257,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   };
 
   // const handlePayWithWallet = useCallback(async () => {
+  //  if (!user._persist?.rehydrated) {
+  //    return;
+  //  }
   //   setLoadingModalOpen(true);
   //   handleCloseConfirmVoteModal();
   //   try {
@@ -370,11 +375,16 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   //   option.id,
   //   postId,
   //   user.loggedIn,
+  //   user._persist?.rehydrated,
   //   router.locale,
   // ]);
 
   const handlePayWithCardStripeRedirect = useCallback(
     async (rewardAmount: number) => {
+      if (!user._persist?.rehydrated) {
+        return;
+      }
+
       setLoadingModalOpen(true);
       handleCloseConfirmVoteModal();
       try {
@@ -411,9 +421,17 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
         console.error(err);
+        toast.error('toastErrors.generic');
       }
     },
-    [option.id, postId, supportBidAmount, user.loggedIn, router.locale]
+    [
+      option.id,
+      postId,
+      supportBidAmount,
+      user.loggedIn,
+      user._persist?.rehydrated,
+      router.locale,
+    ]
   );
 
   const handleVoteForFree = useCallback(async () => {
@@ -446,6 +464,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
+      toast.error('toastErrors.generic');
     }
   }, [
     postId,

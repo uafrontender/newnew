@@ -87,7 +87,8 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   };
 
   const handleClickReport = useCallback(() => {
-    if (!currentUser.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!currentUser.loggedIn && currentUser._persist?.rehydrated) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -198,7 +199,12 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       <SDisplayNameContainer isVerified={!!creator.options?.isVerified}>
         <SDisplayName>{creator.nickname}</SDisplayName>
         {creator.options?.isVerified && (
-          <SInlineSVG svg={VerificationCheckmark} width='16px' height='16px' />
+          <SInlineSVG
+            svg={VerificationCheckmark}
+            width='16px'
+            height='16px'
+            fill='none'
+          />
         )}
       </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>

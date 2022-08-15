@@ -229,6 +229,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
                   resources={videoProcessing?.targetUrls}
                   thumbnails={post.thumbnailParameters}
                   borderRadius='16px'
+                  showPlayButton
                 />
               ) : (
                 <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
@@ -262,7 +263,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             )}
           </STitle>
           <SSocials>{socialButtons.map(renderItem)}</SSocials>
-          <SButtonWrapper onClick={handleViewMyPost}>
+          <SButtonWrapper id='see-post' onClick={handleViewMyPost}>
             <SButtonTitle>
               {t(
                 `published.button.submit-${

@@ -3,5 +3,8 @@
     "title": "Notificaciones en NewNew",
     "description": "Las notificaciones NewNew mantienen a los creadores al día con su audiencia"
   },
-  "noNotifications": "Las nuevas notificaciones que recibas\naparecerán aquí"
+  "noNotifications": "Las nuevas notificaciones que recibas\naparecerán aquí",
+  "button": {
+    "markAllAsRead": "Marcar todos como leídos"
+  }
 }

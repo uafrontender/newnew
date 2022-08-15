@@ -4,8 +4,7 @@ import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import isBrowser from '../../utils/isBrowser';
-import { setOverlay } from '../../redux-store/slices/uiStateSlice';
-import { useAppDispatch } from '../../redux-store/store';
+import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 interface IModal {
   show: boolean;
@@ -29,19 +28,17 @@ const Modal: React.FC<IModal> = React.memo((props) => {
     children,
     onClose,
   } = props;
-  const dispatch = useAppDispatch();
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
   useEffect(() => {
-    if (!withoutOverlay) {
-      dispatch(setOverlay(show));
+    if (!withoutOverlay && show) {
+      enableOverlayMode();
     }
 
     return () => {
-      if (!withoutOverlay) {
-        dispatch(setOverlay(false));
-      }
+      disableOverlayMode();
     };
-  }, [withoutOverlay, show, dispatch]);
+  }, [withoutOverlay, show, enableOverlayMode, disableOverlayMode]);
 
   useEffect(() => {
     const blurredBody = document.getElementById('__next');
@@ -118,6 +115,8 @@ const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
     overlaydim === 'true'
       ? 'transparent'
       : theme.colorsThemed.background.backgroundT};
+
+  overscroll-behavior: 'none';
 
   ::before {
     top: 0;

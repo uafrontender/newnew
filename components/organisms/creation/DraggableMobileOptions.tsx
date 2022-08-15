@@ -48,6 +48,7 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (
 
   const renderItem = (item: any, index: number) => (
     <DraggableOptionItem
+      id={`option-${index}`}
       key={`draggable-option-${item.id}`}
       item={item}
       index={index}
@@ -73,7 +74,7 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (
         {options.map(renderItem)}
       </SList>
       {options.length < 4 && (
-        <SNewOption onClick={handleAddNewOption}>
+        <SNewOption id='add-option' onClick={handleAddNewOption}>
           <InlineSVG
             svg={plusIcon}
             fill={theme.colorsThemed.text.secondary}
