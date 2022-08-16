@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable arrow-body-style */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
@@ -117,7 +118,8 @@ interface IPostModal {
   isOpen: boolean;
   post?: newnewapi.IPost;
   manualCurrLocation?: string;
-  sessionIdFromRedirect?: string;
+  stripeSetupIntentClientSecretFromRedirect?: string;
+  saveCardFromRedirect?: boolean;
   commentIdFromUrl?: string;
   commentContentFromUrl?: string;
   handleClose: () => void;
@@ -132,7 +134,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   isOpen,
   post,
   manualCurrLocation,
-  sessionIdFromRedirect,
+  stripeSetupIntentClientSecretFromRedirect,
+  saveCardFromRedirect,
   commentIdFromUrl,
   commentContentFromUrl,
   handleClose,
@@ -298,8 +301,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     manualCurrLocation ?? (isBrowser() ? window.location.href : '')
   );
 
-  const [sessionId, setSessionId] = useState(
-    () => sessionIdFromRedirect ?? undefined
+  const [stripeSetupIntentClientSecret, setStripeSetupIntentClientSecret] =
+    useState(() => stripeSetupIntentClientSecretFromRedirect ?? undefined);
+
+  const [saveCard, setSaveCard] = useState(
+    () => saveCardFromRedirect ?? undefined
   );
 
   const { handleSetCommentIdFromUrl, handleSetNewCommentContentFromUrl } =
@@ -363,10 +369,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, commentContentFromUrl]);
 
-  const resetSessionId = useCallback(
-    () => setSessionId(undefined),
-    [setSessionId]
-  );
+  const resetSetupIntentClientSecret = useCallback(() => {
+    setStripeSetupIntentClientSecret(undefined);
+    setSaveCard(false);
+  }, []);
 
   const [open, setOpen] = useState(false);
 
@@ -575,11 +581,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed.postUuid}
           post={postParsed as newnewapi.MultipleChoice}
           postStatus={postStatus}
-          sessionId={sessionId ?? undefined}
+          stripeSetupIntentClientSecret={
+            stripeSetupIntentClientSecret ?? undefined
+          }
+          saveCard={saveCard}
           isFollowingDecision={isFollowingDecision}
           hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-          resetSessionId={resetSessionId}
+          resetSetupIntentClientSecret={resetSetupIntentClientSecret}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
@@ -594,11 +603,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed.postUuid}
           post={postParsed as newnewapi.Auction}
           postStatus={postStatus}
-          sessionId={sessionId ?? undefined}
+          stripeSetupIntentClientSecret={
+            stripeSetupIntentClientSecret ?? undefined
+          }
+          saveCard={saveCard}
           isFollowingDecision={isFollowingDecision}
           hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-          resetSessionId={resetSessionId}
+          resetSetupIntentClientSecret={resetSetupIntentClientSecret}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
@@ -613,11 +625,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed.postUuid}
           post={postParsed as newnewapi.Crowdfunding}
           postStatus={postStatus}
-          sessionId={sessionId ?? undefined}
+          stripeSetupIntentClientSecret={
+            stripeSetupIntentClientSecret ?? undefined
+          }
+          saveCard={saveCard}
           isFollowingDecision={isFollowingDecision}
           hasRecommendations={recommendedPosts.length > 0}
           handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-          resetSessionId={resetSessionId}
+          resetSetupIntentClientSecret={resetSetupIntentClientSecret}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}

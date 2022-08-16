@@ -158,6 +158,7 @@
     "subscribed": "subscribed",
     "cancelled": "cancelled"
   },
+  "gotIt": "Got it",
   "sortingOption": {
     "sortingtype": "Order",
     "sortingtype-all": "All",

@@ -50,10 +50,19 @@ const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const ReportModal = dynamic(() => import('./ReportModal'));
 const GoBackButton = dynamic(() => import('../GoBackButton'));
 
-const ChatArea: React.FC<IChatData> = ({
+interface IChatArea extends IChatData {
+  setupIntentClientSecretFromRedirect?: string;
+  saveCardFromRedirect?: boolean;
+  resetStripeSetupIntent: () => void;
+}
+
+const ChatArea: React.FC<IChatArea> = ({
   chatRoom,
   showChatList,
   updateLastMessage,
+  setupIntentClientSecretFromRedirect,
+  saveCardFromRedirect,
+  resetStripeSetupIntent,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Chat');
@@ -705,7 +714,14 @@ const ChatArea: React.FC<IChatData> = ({
             />
           )}
         {isSubscriptionExpired && chatRoom && chatRoom.visavis?.uuid && (
-          <SubscriptionExpired user={chatRoom.visavis} />
+          <SubscriptionExpired
+            user={chatRoom.visavis}
+            setupIntentClientSecretFromRedirect={
+              setupIntentClientSecretFromRedirect
+            }
+            saveCardFromRedirect={saveCardFromRedirect}
+            resetStripeSetupIntent={resetStripeSetupIntent}
+          />
         )}
         {localUserData.accountDeleted && <AccountDeleted />}
         {isMessagingDisabled && chatRoom && chatRoom.visavis && (

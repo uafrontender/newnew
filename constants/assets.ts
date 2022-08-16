@@ -128,6 +128,20 @@ const assets = {
   openGraphImage: {
     common: `${APP_ASSETS_ORIGIN}/open-graph-image/common.png`,
   },
+  cards: {
+    background: [
+      `${APP_ASSETS_ORIGIN}/cards/background-1.png`,
+      `${APP_ASSETS_ORIGIN}/cards/background-3.png`,
+      `${APP_ASSETS_ORIGIN}/cards/background-5.png`,
+      `${APP_ASSETS_ORIGIN}/cards/background-2.png`,
+      `${APP_ASSETS_ORIGIN}/cards/background-4.png`,
+    ],
+  },
+  gilroyFont: {
+    regular: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-Regular.otf`,
+    medium: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-Medium.otf`,
+    semiBold: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-SemiBold.otf`,
+  },
 };
 
 export default assets;
