@@ -284,6 +284,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
       try {
         const updateStripeSetupIntentRequest =
           new newnewapi.UpdateStripeSetupIntentRequest({
+            stripeSetupIntentClientSecret,
             rewardAmount: new newnewapi.MoneyAmount({
               usdCents: rewardAmount,
             }),

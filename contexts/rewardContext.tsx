@@ -37,7 +37,8 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
 
   const [rewardBalance, setRewardBalance] = useState<
     newnewapi.MoneyAmount | undefined
-  >();
+    // TODO: remove test data
+  >(new newnewapi.MoneyAmount({ usdCents: 700 }));
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSetRewardBalance = (newAmount: newnewapi.MoneyAmount) => {

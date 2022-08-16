@@ -400,6 +400,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       try {
         const updateStripeSetupIntentRequest =
           new newnewapi.UpdateStripeSetupIntentRequest({
+            stripeSetupIntentClientSecret,
             rewardAmount: new newnewapi.MoneyAmount({
               usdCents: rewardAmount,
             }),

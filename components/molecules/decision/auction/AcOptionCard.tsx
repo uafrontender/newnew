@@ -438,6 +438,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       try {
         const updateStripeSetupIntentRequest =
           new newnewapi.UpdateStripeSetupIntentRequest({
+            stripeSetupIntentClientSecret,
             rewardAmount: new newnewapi.MoneyAmount({
               usdCents: rewardAmount,
             }),

@@ -385,6 +385,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       try {
         const updateStripeSetupIntentRequest =
           new newnewapi.UpdateStripeSetupIntentRequest({
+            stripeSetupIntentClientSecret,
             rewardAmount: new newnewapi.MoneyAmount({
               usdCents: rewardAmount,
             }),

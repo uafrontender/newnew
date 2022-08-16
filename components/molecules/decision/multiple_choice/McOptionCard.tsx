@@ -441,6 +441,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       try {
         const updateStripeSetupIntentRequest =
           new newnewapi.UpdateStripeSetupIntentRequest({
+            stripeSetupIntentClientSecret,
             rewardAmount: new newnewapi.MoneyAmount({
               usdCents: rewardAmount,
             }),
