@@ -1,7 +1,15 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  useCallback,
+} from 'react';
+import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import { useTranslation, Trans } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -18,6 +26,7 @@ import {
   getSubscriptionStatus,
   subscribeToCreator,
 } from '../../api/endpoints/subscription';
+import { createStripeSetupIntent } from '../../api/endpoints/payments';
 
 import General from '../../components/templates/General';
 import Text from '../../components/atoms/Text';
@@ -30,15 +39,45 @@ import PaymentModal from '../../components/molecules/checkout/PaymentModal';
 import isBrowser from '../../utils/isBrowser';
 import { formatNumber } from '../../utils/format';
 import assets from '../../constants/assets';
+import useSynchronizedHistory from '../../utils/hooks/useSynchronizedHistory';
+
+const LoadingModal = dynamic(
+  () => import('../../components/molecules/LoadingModal')
+);
+
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.SubscribeToCreatorResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.SubscribeToCreatorResponse.Status.CARD_NOT_FOUND:
+      return 'errors.cardNotFound';
+    case newnewapi.SubscribeToCreatorResponse.Status.CARD_CANNOT_BE_USED:
+      return 'errors.cardCannotBeUsed';
+    case newnewapi.SubscribeToCreatorResponse.Status.BLOCKED_BY_CREATOR:
+      return 'errors.blockedByCreator';
+    case newnewapi.SubscribeToCreatorResponse.Status.SUBSCRIPTION_UNAVAILABLE:
+      return 'errors.subscriptionUnavailable';
+    default:
+      return 'errors.requestFailed';
+  }
+};
 
 interface ISubscribeToUserPage {
   user: Omit<newnewapi.User, 'toJSON'>;
+  setup_intent_client_secret?: string;
+  save_card?: boolean;
 }
 
-const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
+const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
+  user,
+  setup_intent_client_secret,
+  save_card,
+}) => {
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('page-SubscribeToUser');
+  const { syncedHistoryReplaceState } = useSynchronizedHistory();
+
   const { loggedIn, userData: currentUserData } = useAppSelector(
     (state) => state.user
   );
@@ -55,6 +94,33 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
     'mobileL',
     'tablet',
   ].includes(resizeMode);
+
+  const [
+    stripeSetupIntentClientSecretFromRedirect,
+    setStripeSetupIntentClientSecretFromRedirect,
+  ] = useState(setup_intent_client_secret);
+
+  const [saveCardFromRedirect, setSaveCardFromRedirect] = useState(save_card);
+
+  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (setup_intent_client_secret) {
+      syncedHistoryReplaceState(
+        {
+          username: user.username,
+        },
+        `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
+          user.username
+        }/subscribe`
+      );
+    }
+  }, [
+    router.locale,
+    setup_intent_client_secret,
+    syncedHistoryReplaceState,
+    user.username,
+  ]);
 
   // const { walletBalance } = useContext(WalletContext);
 
@@ -100,27 +166,133 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
     setIsPaymentModalOpen(true);
   };
 
-  const handlePayRegistered = async () => {
+  useEffect(() => {
+    const subscribeToCreatorAfterStripeRedirect = async () => {
+      if (!stripeSetupIntentClientSecretFromRedirect || loadingModalOpen)
+        return;
+
+      try {
+        setLoadingModalOpen(true);
+
+        const stripeContributionRequest =
+          new newnewapi.StripeContributionRequest({
+            stripeSetupIntentClientSecret:
+              stripeSetupIntentClientSecretFromRedirect,
+            saveCard: saveCardFromRedirect ?? false,
+          });
+
+        setStripeSetupIntentClientSecretFromRedirect('');
+        setSaveCardFromRedirect(false);
+
+        const res = await subscribeToCreator(stripeContributionRequest);
+
+        if (!res.data || res.error) {
+          throw new Error(
+            res.error?.message ??
+              t(getPayWithCardErrorMessage(res.data?.status))
+          );
+        }
+
+        if (
+          res.data?.status ===
+          newnewapi.SubscribeToCreatorResponse.Status.ALREADY_SUBSCRIBED
+        ) {
+          router.push(`/direct-messages/${user.username}`);
+        } else if (
+          res.data.status ===
+          newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
+        ) {
+          router.push(
+            `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`
+          );
+        } else {
+          throw new Error(t(getPayWithCardErrorMessage(res.data?.status)));
+        }
+
+        setLoadingModalOpen(false);
+      } catch (err: any) {
+        console.error(err);
+        toast.error(err.message);
+
+        setLoadingModalOpen(false);
+      }
+    };
+
+    if (stripeSetupIntentClientSecretFromRedirect && !loadingModalOpen) {
+      subscribeToCreatorAfterStripeRedirect();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const createSetupIntent = useCallback(async () => {
     try {
-      const payload = new newnewapi.SubscribeToCreatorRequest({
-        creatorUuid: user.uuid,
-        successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`,
-        cancelUrl: window.location.href,
+      const payload = new newnewapi.CreateStripeSetupIntentRequest({
+        subscribeToCreatorUuid: user.uuid,
       });
+      const response = await createStripeSetupIntent(payload);
 
-      const res = await subscribeToCreator(payload);
+      if (
+        !response.data ||
+        response.error ||
+        !response.data?.stripeSetupIntentClientSecret
+      ) {
+        throw new Error(response.error?.message || 'Some error occurred');
+      }
 
-      if (res.data?.status === 3)
-        router.push(`/direct-messages/${user.username}-cr`);
-
-      if (!res.data?.checkoutUrl || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-
-      const url = res.data.checkoutUrl;
-      if (url) window.location.href = url;
+      return response.data;
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      return undefined;
+    }
+  }, [user.uuid]);
+
+  const handleSubscribeWithCard = async ({
+    stripeSetupIntentClientSecret,
+    cardUuid,
+    saveCard,
+  }: {
+    cardUuid?: string;
+    stripeSetupIntentClientSecret: string;
+    saveCard?: boolean;
+  }) => {
+    try {
+      const stripeContributionRequest = new newnewapi.StripeContributionRequest(
+        {
+          cardUuid,
+          stripeSetupIntentClientSecret,
+          ...(saveCard !== undefined
+            ? {
+                saveCard,
+              }
+            : {}),
+        }
+      );
+
+      const res = await subscribeToCreator(stripeContributionRequest);
+
+      if (!res.data || res.error) {
+        throw new Error(
+          res.error?.message ?? t(getPayWithCardErrorMessage(res.data?.status))
+        );
+      }
+
+      if (
+        res.data?.status ===
+        newnewapi.SubscribeToCreatorResponse.Status.ALREADY_SUBSCRIBED
+      ) {
+        router.push(`/direct-messages/${user.username}-cr`);
+      } else if (
+        res.data.status === newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
+      ) {
+        router.push(
+          `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`
+        );
+      } else {
+        throw new Error(t(getPayWithCardErrorMessage(res.data?.status)));
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message);
     }
   };
 
@@ -359,8 +531,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         isOpen={isPaymentModalOpen}
         amount={subscriptionPrice || 0}
         onClose={() => setIsPaymentModalOpen(false)}
-        handlePayWithCardStripeRedirect={handlePayRegistered}
+        handlePayWithCard={handleSubscribeWithCard}
         showTocApply
+        createStripeSetupIntent={createSetupIntent}
+        redirectUrl={`${user.username}/subscribe`}
         // handlePayWithWallet={handlePayRegistered}
         // payButtonCaptionKey={t('paymentModal.payButton')}
       >
@@ -380,6 +554,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
           </SPaymentModalCreatorInfo>
         </SPaymentModalHeader>
       </PaymentModal>
+      {/* Loading Modal */}
+      {loadingModalOpen && (
+        <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+      )}
     </>
   );
 };
@@ -397,7 +575,7 @@ const BoldSpan: React.FC<IBoldSpan> = ({ children }) => (
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { username } = context.query;
+  const { username, setup_intent_client_secret, save_card } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'page-SubscribeToUser',
@@ -431,6 +609,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       user: res.data.toJSON(),
+      ...(setup_intent_client_secret
+        ? {
+            setup_intent_client_secret,
+          }
+        : {}),
+      ...(save_card
+        ? {
+            save_card: save_card === 'true',
+          }
+        : {}),
       ...translationContext,
     },
   };

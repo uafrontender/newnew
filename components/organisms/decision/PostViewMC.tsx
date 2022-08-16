@@ -55,14 +55,44 @@ const PaymentSuccessModal = dynamic(
   () => import('../../molecules/decision/PaymentSuccessModal')
 );
 
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.VoteOnPostResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.VoteOnPostResponse.Status.NOT_ENOUGH_FUNDS:
+      return 'errors.notEnoughMoney';
+    case newnewapi.VoteOnPostResponse.Status.CARD_NOT_FOUND:
+      return 'errors.cardNotFound';
+    case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
+      return 'errors.cardCannotBeUsed';
+    case newnewapi.VoteOnPostResponse.Status.BLOCKED_BY_CREATOR:
+      return 'errors.blockedByCreator';
+    case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
+      return 'errors.mcCancelled';
+    case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:
+      return 'errors.mcFinished';
+    case newnewapi.VoteOnPostResponse.Status.MC_NOT_STARTED:
+      return 'errors.mcNotStarted';
+    case newnewapi.VoteOnPostResponse.Status.ALREADY_VOTED:
+      return 'errors.alreadyVoted';
+    case newnewapi.VoteOnPostResponse.Status.MC_VOTE_COUNT_TOO_SMALL:
+      return 'errors.mcVoteCountTooSmall';
+    case newnewapi.VoteOnPostResponse.Status.NOT_ALLOWED_TO_CREATE_NEW_OPTION:
+      return 'errors.notAllowedToCreateNewOption';
+    default:
+      return 'errors.requestFailed';
+  }
+};
+
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
 };
 
 interface IPostViewMC {
   post: newnewapi.MultipleChoice;
-  sessionId?: string;
-  resetSessionId: () => void;
+  stripeSetupIntentClientSecret?: string;
+  saveCard?: boolean;
+  resetSetupIntentClientSecret: () => void;
   postStatus: TPostStatusStringified;
   isFollowingDecision: boolean;
   hasRecommendations: boolean;
@@ -78,11 +108,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
   ({
     post,
     postStatus,
-    sessionId,
+    stripeSetupIntentClientSecret,
+    saveCard,
     isFollowingDecision,
     hasRecommendations,
     handleSetIsFollowingDecision,
-    resetSessionId,
+    resetSetupIntentClientSecret,
     handleGoBack,
     handleUpdatePostStatus,
     handleReportOpen,
@@ -130,9 +161,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     // Post loading state
     const [postLoading, setPostLoading] = useState(false);
 
-    // Vote from sessionId
+    // Vote after stripe redirect
     const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-    const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+    const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] =
+      useState(false);
 
     // Total votes
     const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
@@ -533,23 +565,53 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     ]);
 
     useEffect(() => {
-      const makeVoteFromSessionId = async () => {
-        if (!sessionId) return;
+      const makeVoteAfterStripeRedirect = async () => {
+        if (!stripeSetupIntentClientSecret) return;
+
+        if (!user._persist?.rehydrated) {
+          return;
+        }
+
+        if (!user.loggedIn) {
+          router.push(
+            `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+          );
+          return;
+        }
+
+        Mixpanel.track('MakeVoteAfterStripeRedirect', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostViewMC',
+        });
+
         try {
           setLoadingModalOpen(true);
-          const payload = new newnewapi.FulfillPaymentPurposeRequest({
-            paymentSuccessUrl: `session_id=${sessionId}`,
-          });
-          resetSessionId();
 
-          const res = await voteOnPost(payload);
+          const stripeContributionRequest =
+            new newnewapi.StripeContributionRequest({
+              stripeSetupIntentClientSecret,
+              ...(saveCard !== undefined
+                ? {
+                    saveCard,
+                  }
+                : {}),
+            });
+
+          resetSetupIntentClientSecret();
+
+          const res = await voteOnPost(stripeContributionRequest);
 
           if (
             !res.data ||
-            res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
-            res.error
-          )
-            throw new Error(res.error?.message ?? 'Request failed');
+            res.error ||
+            res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
+          ) {
+            throw new Error(
+              res.error?.message ??
+                t(getPayWithCardErrorMessage(res.data?.status))
+            );
+          }
 
           const optionFromResponse = res.data
             .option as newnewapi.MultipleChoice.Option;
@@ -560,18 +622,19 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
 
           setLoadingModalOpen(false);
           handleResetFreeVote();
-          setPaymentSuccesModalOpen(true);
-        } catch (err) {
+          setPaymentSuccessModalOpen(true);
+        } catch (err: any) {
           console.error(err);
+          toast.error(err.message);
           setLoadingModalOpen(false);
         }
       };
 
-      if (sessionId && !loadingModalOpen) {
-        makeVoteFromSessionId();
+      if (stripeSetupIntentClientSecret && !loadingModalOpen) {
+        makeVoteAfterStripeRedirect();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [user._persist?.rehydrated]);
 
     const goToNextStep = () => {
       if (
@@ -756,16 +819,16 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
           )}
           {/* Payment success Modal */}
-          {paymentSuccesModalOpen && (
+          {paymentSuccessModalOpen && (
             <PaymentSuccessModal
               postType='mc'
-              isVisible={paymentSuccesModalOpen}
+              isVisible={paymentSuccessModalOpen}
               closeModal={() => {
                 Mixpanel.track('Close Payment Success Modal', {
                   _stage: 'Post',
                   _post: post.postUuid,
                 });
-                setPaymentSuccesModalOpen(false);
+                setPaymentSuccessModalOpen(false);
               }}
             >
               {t('paymentSuccessModal.mc', {
@@ -806,7 +869,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
 );
 
 PostViewMC.defaultProps = {
-  sessionId: undefined,
+  stripeSetupIntentClientSecret: undefined,
 };
 
 export default PostViewMC;
