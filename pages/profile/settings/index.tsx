@@ -17,16 +17,16 @@ import { useUpdateEffect } from 'react-use';
 import { toast } from 'react-toastify';
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import {
   setColorMode,
   TColorMode,
-} from '../../redux-store/slices/uiStateSlice';
+} from '../../../redux-store/slices/uiStateSlice';
 import {
   logoutUser,
   logoutUserClearCookiesAndRedirect,
   setUserData,
-} from '../../redux-store/slices/userStateSlice';
+} from '../../../redux-store/slices/userStateSlice';
 
 // API
 import {
@@ -34,26 +34,27 @@ import {
   logout,
   markUser,
   updateMe,
-} from '../../api/endpoints/user';
+} from '../../../api/endpoints/user';
 
-import { NextPageWithLayout } from '../_app';
-import MyProfileSettingsLayout from '../../components/templates/MyProfileSettingsLayout';
+import { NextPageWithLayout } from '../../_app';
+import MyProfileSettingsLayout from '../../../components/templates/MyProfileSettingsLayout';
 
-import Headline from '../../components/atoms/Headline';
-import GoBackButton from '../../components/molecules/GoBackButton';
-import SettingsColorModeSwitch from '../../components/molecules/profile/SettingsColorModeSwitch';
+import Headline from '../../../components/atoms/Headline';
+import GoBackButton from '../../../components/molecules/GoBackButton';
+import SettingsColorModeSwitch from '../../../components/molecules/profile/SettingsColorModeSwitch';
 // import SettingsWallet from '../../components/organisms/settings/SettingsWallet';
 import SettingsAccordion, {
   AccordionSection,
-} from '../../components/organisms/settings/SettingsAccordion';
-import SettingsPersonalInformationSection from '../../components/organisms/settings/SettingsPersonalInformationSection';
-import SettingsNotificationsSection from '../../components/organisms/settings/SettingsNotificationSection';
-import TransactionsSection from '../../components/organisms/settings/TransactionsSection';
-import PrivacySection from '../../components/organisms/settings/PrivacySection';
-import { SocketContext } from '../../contexts/socketContext';
-import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
-import { getMyTransactions } from '../../api/endpoints/payments';
-import assets from '../../constants/assets';
+} from '../../../components/organisms/settings/SettingsAccordion';
+import SettingsPersonalInformationSection from '../../../components/organisms/settings/SettingsPersonalInformationSection';
+import SettingsNotificationsSection from '../../../components/organisms/settings/SettingsNotificationSection';
+import SettingsCardsSection from '../../../components/organisms/settings/SettingsCards';
+import TransactionsSection from '../../../components/organisms/settings/TransactionsSection';
+import PrivacySection from '../../../components/organisms/settings/PrivacySection';
+import { SocketContext } from '../../../contexts/socketContext';
+import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
+import { getMyTransactions } from '../../../api/endpoints/payments';
+import assets from '../../../constants/assets';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
@@ -68,9 +69,11 @@ const MyProfileSettingsIndex = () => {
   const socketConnection = useContext(SocketContext);
   // Redux
   const dispatch = useAppDispatch();
+
   const { userData, loggedIn, _persist } = useAppSelector(
     (state: any) => state.user
   );
+
   const { resizeMode, colorMode } = useAppSelector((state: any) => state.ui);
   // Measurements
   const isMobileOrTablet = [
@@ -207,6 +210,10 @@ const MyProfileSettingsIndex = () => {
   }, []);
 
   const accordionSections: AccordionSection[] = [
+    {
+      title: t('Settings.sections.cards.title'),
+      content: <SettingsCardsSection />,
+    },
     {
       title: t('Settings.sections.personalInformation.title'),
       content: (

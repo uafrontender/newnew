@@ -50,6 +50,7 @@ import { ChatsProvider } from '../contexts/chatContext';
 import SyncUserWrapper from '../contexts/syncUserWrapper';
 import AppConstantsContextProvider from '../contexts/appConstantsContext';
 import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
+import CardsContextProvider from '../contexts/cardsContext';
 
 // Images to be prefetched
 import assets from '../constants/assets';
@@ -220,39 +221,41 @@ const MyApp = (props: IMyApp): ReactElement => {
                           <FollowingsContextProvider>
                             {/* <WalletContextProvider> */}
                             <RewardContextProvider>
-                              <SubscriptionsProvider>
-                                <ChatsProvider>
-                                  <OverlayModeProvider>
-                                    <ResizeMode>
-                                      <PostModalContextProvider>
-                                        <GlobalTheme initialTheme={colorMode}>
-                                          <>
-                                            <ToastContainer />
-                                            <VideoProcessingWrapper>
-                                              {!pageProps.error ? (
-                                                getLayout(
-                                                  <Component {...pageProps} />
-                                                )
-                                              ) : (
-                                                <Error
-                                                  title={
-                                                    pageProps.error?.message
-                                                  }
-                                                  statusCode={
-                                                    pageProps.error
-                                                      ?.statusCode ?? 500
-                                                  }
-                                                />
-                                              )}
-                                            </VideoProcessingWrapper>
-                                            <ReCaptchaBadgeModal />
-                                          </>
-                                        </GlobalTheme>
-                                      </PostModalContextProvider>
-                                    </ResizeMode>
-                                  </OverlayModeProvider>
-                                </ChatsProvider>
-                              </SubscriptionsProvider>
+                              <CardsContextProvider>
+                                <SubscriptionsProvider>
+                                  <ChatsProvider>
+                                    <OverlayModeProvider>
+                                      <ResizeMode>
+                                        <PostModalContextProvider>
+                                          <GlobalTheme initialTheme={colorMode}>
+                                            <>
+                                              <ToastContainer />
+                                              <VideoProcessingWrapper>
+                                                {!pageProps.error ? (
+                                                  getLayout(
+                                                    <Component {...pageProps} />
+                                                  )
+                                                ) : (
+                                                  <Error
+                                                    title={
+                                                      pageProps.error?.message
+                                                    }
+                                                    statusCode={
+                                                      pageProps.error
+                                                        ?.statusCode ?? 500
+                                                    }
+                                                  />
+                                                )}
+                                              </VideoProcessingWrapper>
+                                              <ReCaptchaBadgeModal />
+                                            </>
+                                          </GlobalTheme>
+                                        </PostModalContextProvider>
+                                      </ResizeMode>
+                                    </OverlayModeProvider>
+                                  </ChatsProvider>
+                                </SubscriptionsProvider>
+                              </CardsContextProvider>
                             </RewardContextProvider>
                             {/* </WalletContextProvider> */}
                           </FollowingsContextProvider>

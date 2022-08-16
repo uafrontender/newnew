@@ -27,18 +27,57 @@ export const getSupportedCreatorCountries = (
     signal ?? undefined
   );
 
-// Payments for bids/pledges/votes via Stripe redirect
-export const createPaymentSession = (
-  payload: newnewapi.CreatePaymentSessionRequest,
+export const getStripeCustomer = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobuf<newnewapi.EmptyRequest, newnewapi.GetStripeCustomerResponse>(
+    newnewapi.EmptyRequest,
+    newnewapi.GetStripeCustomerResponse,
+    `${BASE_URL_PAYMENTS}/get_stripe_customer`,
+    'post',
+    payload,
+    {},
+    'cors',
+    'same-origin',
+    signal ?? undefined
+  );
+
+export const createStripeSetupIntent = (
+  payload: newnewapi.CreateStripeSetupIntentRequest,
   signal?: RequestInit['signal']
 ) =>
   fetchProtobuf<
-    newnewapi.CreatePaymentSessionRequest,
-    newnewapi.CreatePaymentSessionResponse
+    newnewapi.CreateStripeSetupIntentRequest,
+    newnewapi.CreateStripeSetupIntentResponse
   >(
-    newnewapi.CreatePaymentSessionRequest,
-    newnewapi.CreatePaymentSessionResponse,
-    `${BASE_URL_PAYMENTS}/create_payment_session`,
+    newnewapi.CreateStripeSetupIntentRequest,
+    newnewapi.CreateStripeSetupIntentResponse,
+    `${BASE_URL_PAYMENTS}/create_stripe_setup_intent`,
+    'post',
+    payload,
+    // Optional authentication
+    cookiesInstance.get('accessToken')
+      ? {
+          'x-auth-token': cookiesInstance.get('accessToken'),
+        }
+      : {},
+    'cors',
+    'same-origin',
+    signal ?? undefined
+  );
+
+export const updateStripeSetupIntent = (
+  payload: newnewapi.UpdateStripeSetupIntentRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobuf<
+    newnewapi.UpdateStripeSetupIntentRequest,
+    newnewapi.UpdateStripeSetupIntentResponse
+  >(
+    newnewapi.UpdateStripeSetupIntentRequest,
+    newnewapi.UpdateStripeSetupIntentResponse,
+    `${BASE_URL_PAYMENTS}/update_stripe_setup_intent`,
     'post',
     payload,
     // Optional authentication

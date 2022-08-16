@@ -16,6 +16,7 @@ const basicTheme: Omit<
     black: '#000000',
     blue: '#2955EC',
     dark: '#0B0A13',
+    darkGray: '#2C2C33', 
   },
   borderRadius: {
     small: '8px',

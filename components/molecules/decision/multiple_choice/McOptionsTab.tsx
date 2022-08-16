@@ -23,10 +23,11 @@ import { validateText } from '../../../../api/endpoints/infrastructure';
 // import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 import {
   doFreeVote,
+  voteOnPost,
   // voteOnPostWithWallet,
 } from '../../../../api/endpoints/multiple_choice';
 import {
-  createPaymentSession,
+  createStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 
@@ -56,6 +57,35 @@ import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import PostTitleContent from '../../../atoms/PostTitleContent';
+
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.VoteOnPostResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.VoteOnPostResponse.Status.NOT_ENOUGH_FUNDS:
+      return 'errors.notEnoughMoney';
+    case newnewapi.VoteOnPostResponse.Status.CARD_NOT_FOUND:
+      return 'errors.cardNotFound';
+    case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
+      return 'errors.cardCannotBeUsed';
+    case newnewapi.VoteOnPostResponse.Status.BLOCKED_BY_CREATOR:
+      return 'errors.blockedByCreator';
+    case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
+      return 'errors.mcCancelled';
+    case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:
+      return 'errors.mcFinished';
+    case newnewapi.VoteOnPostResponse.Status.MC_NOT_STARTED:
+      return 'errors.mcNotStarted';
+    case newnewapi.VoteOnPostResponse.Status.ALREADY_VOTED:
+      return 'errors.alreadyVoted';
+    case newnewapi.VoteOnPostResponse.Status.MC_VOTE_COUNT_TOO_SMALL:
+      return 'errors.mcVoteCountTooSmall';
+    case newnewapi.VoteOnPostResponse.Status.NOT_ALLOWED_TO_CREATE_NEW_OPTION:
+      return 'errors.notAllowedToCreateNewOption';
+    default:
+      return 'errors.requestFailed';
+  }
+};
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -308,49 +338,118 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   //   handleAddOrUpdateOptionFromResponse,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(
-    async (rewardAmount: number) => {
-      setLoadingModalOpen(true);
-      try {
-        Mixpanel.track('PayWithCardStripeRedirect', {
-          _stage: 'Post',
-          _postUuid: post.postUuid,
-          _component: 'McOptionsTab',
-        });
+  const createSetupIntent = useCallback(async () => {
+    try {
+      const voteOnPostRequest = new newnewapi.VoteOnPostRequest({
+        postUuid: post.postUuid,
+        votesCount: parseInt(newBidAmount),
+        optionText: newOptionText,
+      });
 
-        const createPaymentSessionPayload =
-          // TODO: fix
-          new newnewapi.CreatePaymentSessionRequest({
-            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-              router.locale !== 'en-US' ? `${router.locale}/` : ''
-            }post/${post.postUuid}`,
-            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-              router.locale !== 'en-US' ? `${router.locale}/` : ''
-            }post/${post.postUuid}`,
-            mcVoteRequest: {
-              votesCount: parseInt(newBidAmount),
-              rewardAmount: new newnewapi.MoneyAmount({
-                usdCents: rewardAmount,
-              }),
-              optionText: newOptionText,
-              postUuid: post.postUuid,
-            },
+      const payload = new newnewapi.CreateStripeSetupIntentRequest({
+        ...(!user.loggedIn ? { guestEmail: '' } : {}),
+        ...(!user.loggedIn
+          ? {
+              successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${post.postUuid}`,
+            }
+          : {}),
+
+        mcVoteRequest: voteOnPostRequest,
+      });
+      const response = await createStripeSetupIntent(payload);
+
+      if (!response.data || response.error) {
+        throw new Error(response.error?.message || 'Some error occurred');
+      }
+
+      return response.data;
+    } catch (err) {
+      console.error(err);
+      return undefined;
+    }
+  }, [newOptionText, post.postUuid, newBidAmount, user.loggedIn]);
+
+  const handlePayWithCard = useCallback(
+    async ({
+      rewardAmount,
+      cardUuid,
+      stripeSetupIntentClientSecret,
+      saveCard,
+    }: {
+      rewardAmount: number;
+      cardUuid?: string;
+      stripeSetupIntentClientSecret: string;
+      saveCard?: boolean;
+    }) => {
+      setLoadingModalOpen(true);
+
+      if (!user.loggedIn) {
+        router.push(
+          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+        );
+        return;
+      }
+
+      Mixpanel.track('PayWithCard', {
+        _stage: 'Post',
+        _postUuid: post.postUuid,
+        _component: 'McOptionsTab',
+      });
+
+      try {
+        const stripeContributionRequest =
+          new newnewapi.StripeContributionRequest({
+            cardUuid,
+            stripeSetupIntentClientSecret,
+            // TODO: apply
+            /* rewardAmount: new newnewapi.MoneyAmount({
+              usdCents: rewardAmount,
+            }), */
+            ...(saveCard !== undefined
+              ? {
+                  saveCard,
+                }
+              : {}),
           });
 
-        const res = await createPaymentSession(createPaymentSessionPayload);
+        const res = await voteOnPost(stripeContributionRequest);
 
-        if (!res.data || !res.data.sessionUrl || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
+        if (
+          !res.data ||
+          res.error ||
+          res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
+        ) {
+          throw new Error(
+            res.error?.message ??
+              t(getPayWithCardErrorMessage(res.data?.status))
+          );
+        }
 
-        window.location.href = res.data.sessionUrl;
-      } catch (err) {
-        setPaymentModalOpen(false);
-        setLoadingModalOpen(false);
+        const optionFromResponse = (res.data
+          .option as newnewapi.MultipleChoice.Option)!!;
+        optionFromResponse.isSupportedByMe = true;
+
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+        setPaymentSuccessModalOpen(true);
+        setSuggestNewMobileOpen(false);
+        setNewBidAmount('');
+        setNewOptionText('');
+      } catch (err: any) {
         console.error(err);
-        toast.error('toastErrors.generic');
+        toast.error(err.message);
+      } finally {
+        setLoadingModalOpen(false);
+        setPaymentModalOpen(false);
       }
     },
-    [newBidAmount, newOptionText, post.postUuid, router.locale]
+    [
+      post.postUuid,
+      handleAddOrUpdateOptionFromResponse,
+      user.loggedIn,
+      router,
+      t,
+    ]
   );
 
   const handleVoteForFree = useCallback(async () => {
@@ -707,6 +806,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={(parseInt(newBidAmount) * 100 || 0) * votePrice}
+          createStripeSetupIntent={createSetupIntent}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * votePrice * 100
           //   ? {}
@@ -724,7 +824,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           // }}
           // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
-          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithCard={handlePayWithCard}
+          redirectUrl={`post/${post.postUuid}`}
           // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
             <>
