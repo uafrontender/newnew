@@ -23,10 +23,11 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
 // import { placeBidWithWallet } from '../../../../api/endpoints/auction';
 import {
-  createPaymentSession,
+  createStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 import { validateText } from '../../../../api/endpoints/infrastructure';
+import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
 import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
@@ -54,6 +55,27 @@ import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import PostTitleContent from '../../../atoms/PostTitleContent';
+
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.PlaceBidResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.PlaceBidResponse.Status.NOT_ENOUGH_MONEY:
+      return 'errors.notEnoughMoney';
+    case newnewapi.PlaceBidResponse.Status.CARD_NOT_FOUND:
+      return 'errors.cardNotFound';
+    case newnewapi.PlaceBidResponse.Status.CARD_CANNOT_BE_USED:
+      return 'errors.cardCannotBeUsed';
+    case newnewapi.PlaceBidResponse.Status.BLOCKED_BY_CREATOR:
+      return 'errors.blockedByCreator';
+    case newnewapi.PlaceBidResponse.Status.BIDDING_NOT_STARTED:
+      return 'errors.biddingNotStarted';
+    case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
+      return 'errors.biddingIsEnded';
+    default:
+      return 'errors.requestFailed';
+  }
+};
 
 interface IAcOptionsTab {
   postId: string;
@@ -133,7 +155,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   // Payment modal
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
   const goToNextStep = (currentStep: newnewapi.AcTutorialStep) => {
     if (user.userTutorialsProgress.remainingAcSteps && currentStep) {
@@ -331,60 +353,75 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   //   handleAddOrUpdateOptionFromResponse,
   // ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(async () => {
-    if (!user._persist?.rehydrated) {
-      return;
-    }
+  const handlePayWithCard = useCallback(
+    async ({
+      cardUuid,
+      stripeSetupIntentClientSecret,
+      saveCard,
+    }: {
+      cardUuid?: string;
+      stripeSetupIntentClientSecret: string;
+      saveCard?: boolean;
+    }) => {
+      setLoadingModalOpen(true);
 
-    setLoadingModalOpen(true);
-    try {
-      Mixpanel.track('PayWithCardStripeRedirect', {
-        _stage: 'Post',
-        _postUuid: postId,
-        _component: 'AcOptionsTab',
-      });
-      const createPaymentSessionPayload =
-        new newnewapi.CreatePaymentSessionRequest({
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${postId}`,
-          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-            router.locale !== 'en-US' ? `${router.locale}/` : ''
-          }post/${postId}`,
-          ...(!user.loggedIn
-            ? {
-                nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-              }
-            : {}),
-          acBidRequest: {
-            amount: new newnewapi.MoneyAmount({
-              usdCents: parseInt(newBidAmount) * 100,
-            }),
-            optionTitle: newBidText,
-            postUuid: postId,
-          },
+      if (!user.loggedIn) {
+        router.push(
+          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+        );
+        return;
+      }
+
+      try {
+        Mixpanel.track('PayWithCard', {
+          _stage: 'Post',
+          _postUuid: postId,
+          _component: 'AcOptionsTab',
         });
 
-      const res = await createPaymentSession(createPaymentSessionPayload);
+        const stripeContributionRequest =
+          new newnewapi.StripeContributionRequest({
+            cardUuid,
+            stripeSetupIntentClientSecret,
+            ...(saveCard !== undefined
+              ? {
+                  saveCard,
+                }
+              : {}),
+          });
 
-      if (!res.data || !res.data.sessionUrl || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
+        const res = await placeBidOnAuction(stripeContributionRequest);
 
-      window.location.href = res.data.sessionUrl;
-    } catch (err) {
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-      console.error(err);
-      toast.error('toastErrors.generic');
-    }
-  }, [
-    user.loggedIn,
-    user._persist?.rehydrated,
-    router.locale,
-    newBidAmount,
-    newBidText,
-    postId,
-  ]);
+        if (
+          !res.data ||
+          res.error ||
+          res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
+        ) {
+          throw new Error(
+            res.error?.message ??
+              t(getPayWithCardErrorMessage(res.data?.status))
+          );
+        }
+
+        const optionFromResponse = (res.data
+          .option as newnewapi.Auction.Option)!!;
+        optionFromResponse.isSupportedByMe = true;
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+        setPaymentSuccessModalOpen(true);
+        setNewBidAmount('');
+        setNewBidText('');
+        setSuggestNewMobileOpen(false);
+      } catch (err: any) {
+        console.error(err);
+        toast.error(err.message);
+      } finally {
+        setLoadingModalOpen(false);
+        setPaymentModalOpen(false);
+      }
+    },
+    [postId, handleAddOrUpdateOptionFromResponse, user.loggedIn, router, t]
+  );
 
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
@@ -431,6 +468,36 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const createSetupIntent = useCallback(async () => {
+    try {
+      const placeBidRequest = new newnewapi.PlaceBidRequest({
+        postUuid: postId,
+        amount: new newnewapi.MoneyAmount({
+          usdCents: parseInt(newBidAmount) * 100,
+        }),
+        optionTitle: newBidText,
+      });
+
+      const payload = new newnewapi.CreateStripeSetupIntentRequest({
+        ...(!user.loggedIn ? { guestEmail: '' } : {}),
+        ...(!user.loggedIn
+          ? { successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${postId}` }
+          : {}),
+        acBidRequest: placeBidRequest,
+      });
+      const response = await createStripeSetupIntent(payload);
+
+      if (!response.data || response.error) {
+        throw new Error(response.error?.message || 'Some error occurred');
+      }
+
+      return response.data;
+    } catch (err) {
+      console.error(err);
+      return undefined;
+    }
+  }, [postId, newBidAmount, newBidText, user.loggedIn]);
 
   return (
     <>
@@ -681,6 +748,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={parseInt(newBidAmount) * 100 || 0}
+          redirectUrl={`post/${postId}`}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * 100
           //   ? {}
@@ -689,7 +757,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           //     })}
           // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
-          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithCard={handlePayWithCard}
+          createStripeSetupIntent={createSetupIntent}
           // handlePayWithWallet={handleSubmitNewOptionWallet}
           bottomCaption={
             <>
@@ -744,8 +813,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='ac'
-        isVisible={paymentSuccesModalOpen}
-        closeModal={() => setPaymentSuccesModalOpen(false)}
+        isVisible={paymentSuccessModalOpen}
+        closeModal={() => setPaymentSuccessModalOpen(false)}
       >
         {t('paymentSuccessModal.ac', {
           postCreator,
