@@ -53,6 +53,27 @@ const PaymentSuccessModal = dynamic(
 );
 const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
 
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.PlaceBidResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.PlaceBidResponse.Status.NOT_ENOUGH_MONEY:
+      return 'errors.notEnoughMoney';
+    case newnewapi.PlaceBidResponse.Status.CARD_NOT_FOUND:
+      return 'errors.cardNotFound';
+    case newnewapi.PlaceBidResponse.Status.CARD_CANNOT_BE_USED:
+      return 'errors.cardCannotBeUsed';
+    case newnewapi.PlaceBidResponse.Status.BLOCKED_BY_CREATOR:
+      return 'errors.blockedByCreator';
+    case newnewapi.PlaceBidResponse.Status.BIDDING_NOT_STARTED:
+      return 'errors.biddingNotStarted';
+    case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
+      return 'errors.biddingIsEnded';
+    default:
+      return 'errors.requestFailed';
+  }
+};
+
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
 };
@@ -60,11 +81,12 @@ export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
 interface IPostViewAC {
   post: newnewapi.Auction;
   postStatus: TPostStatusStringified;
-  sessionId?: string;
+  stripeSetupIntentClientSecret?: string;
+  saveCard?: boolean;
   isFollowingDecision: boolean;
   hasRecommendations: boolean;
   handleSetIsFollowingDecision: (newValue: boolean) => void;
-  resetSessionId: () => void;
+  resetSetupIntentClientSecret: () => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
@@ -75,8 +97,9 @@ interface IPostViewAC {
 const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
   ({
     post,
-    sessionId,
-    resetSessionId,
+    stripeSetupIntentClientSecret,
+    saveCard,
+    resetSetupIntentClientSecret,
     postStatus,
     isFollowingDecision,
     hasRecommendations,
@@ -129,9 +152,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       }
     };
 
-    // Vote from sessionId
+    // Vote after stripe redirect
     const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-    const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+    const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] =
+      useState(false);
 
     // Total amount
     const [totalAmount, setTotalAmount] = useState(
@@ -506,23 +530,53 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     ]);
 
     useEffect(() => {
-      const makeBidFromSessionId = async () => {
-        if (!sessionId || loadingModalOpen) return;
+      const makeBidAfterStripeRedirect = async () => {
+        if (!stripeSetupIntentClientSecret || loadingModalOpen) return;
+
+        if (!user._persist?.rehydrated) {
+          return;
+        }
+
+        if (!user.loggedIn) {
+          router.push(
+            `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+          );
+          return;
+        }
+
+        Mixpanel.track('MakeBidAfterStripeRedirect', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostViewAC',
+        });
+
         try {
           setLoadingModalOpen(true);
-          const payload = new newnewapi.FulfillPaymentPurposeRequest({
-            paymentSuccessUrl: `session_id=${sessionId}`,
-          });
-          resetSessionId();
 
-          const res = await placeBidOnAuction(payload);
+          const stripeContributionRequest =
+            new newnewapi.StripeContributionRequest({
+              stripeSetupIntentClientSecret,
+              ...(saveCard !== undefined
+                ? {
+                    saveCard,
+                  }
+                : {}),
+            });
+
+          resetSetupIntentClientSecret();
+
+          const res = await placeBidOnAuction(stripeContributionRequest);
 
           if (
             !res.data ||
-            res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS ||
-            res.error
-          )
-            throw new Error(res.error?.message ?? 'Request failed');
+            res.error ||
+            res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
+          ) {
+            throw new Error(
+              res.error?.message ??
+                t(getPayWithCardErrorMessage(res.data?.status))
+            );
+          }
 
           const optionFromResponse = res.data
             .option as newnewapi.Auction.Option;
@@ -532,18 +586,20 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
           await fetchPostLatestData();
 
           setLoadingModalOpen(false);
-          setPaymentSuccesModalOpen(true);
-        } catch (err) {
+          setPaymentSuccessModalOpen(true);
+        } catch (err: any) {
           console.error(err);
+          toast.error(err.message);
+
           setLoadingModalOpen(false);
         }
       };
 
-      if (sessionId && !loadingModalOpen) {
-        makeBidFromSessionId();
+      if (stripeSetupIntentClientSecret && !loadingModalOpen) {
+        makeBidAfterStripeRedirect();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [user._persist?.rehydrated]);
 
     const goToNextStep = () => {
       if (
@@ -720,16 +776,16 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
           )}
           {/* Payment success Modal */}
-          {paymentSuccesModalOpen && (
+          {paymentSuccessModalOpen && (
             <PaymentSuccessModal
               postType='ac'
-              isVisible={paymentSuccesModalOpen}
+              isVisible={paymentSuccessModalOpen}
               closeModal={() => {
                 Mixpanel.track('Close Payment Success Modal', {
                   _stage: 'Post',
                   _post: post.postUuid,
                 });
-                setPaymentSuccesModalOpen(false);
+                setPaymentSuccessModalOpen(false);
               }}
             >
               {t('paymentSuccessModal.ac', {
@@ -770,7 +826,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
 );
 
 PostViewAC.defaultProps = {
-  sessionId: undefined,
+  stripeSetupIntentClientSecret: undefined,
 };
 
 export default PostViewAC;

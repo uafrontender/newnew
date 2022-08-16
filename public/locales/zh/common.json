@@ -155,6 +155,7 @@
   "creatorCard": {
     "subscriptionCost": "${{amount}} 每月"
   },
+  "gotIt": "知道了",
   "sortingOption": {
     "sortingtype": "順序",
     "sortingtype-all": "所有",

@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useRef } from 'react';
-import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
 import Lottie from '../../atoms/Lottie';
@@ -12,13 +11,14 @@ import checkBoxAnim from '../../../public/animations/checkbox.json';
 interface IOptionCard {
   selected?: boolean;
   handleClick: () => void;
+  label: string;
 }
 
 const OptionCard: React.FunctionComponent<IOptionCard> = ({
   selected,
   handleClick,
+  label,
 }) => {
-  const { t } = useTranslation('modal-PaymentModal');
   const ref: any = useRef();
 
   useEffect(() => {
@@ -33,7 +33,11 @@ const OptionCard: React.FunctionComponent<IOptionCard> = ({
   }, [ref, selected]);
 
   return (
-    <SOptionCard selected={selected ?? false} onClick={handleClick}>
+    <SOptionCard
+      selected={selected ?? false}
+      onClick={handleClick}
+      type='button'
+    >
       <SAnimation>
         <Lottie
           ref={ref}
@@ -47,7 +51,7 @@ const OptionCard: React.FunctionComponent<IOptionCard> = ({
         />
       </SAnimation>
       <SLabelContent>
-        <Text variant={2}>{t('options.card.name')}</Text>
+        <Text variant={2}>{label}</Text>
         {/* <SFeesText
           variant={2}
         >

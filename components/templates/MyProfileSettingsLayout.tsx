@@ -30,7 +30,7 @@ const SGeneral = styled(General)`
     z-index: 6;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 767px) {
     main {
       div:first-child {
         padding-left: 0;

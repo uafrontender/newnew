@@ -21,9 +21,17 @@ const GoBackButton = dynamic(() => import('../molecules/GoBackButton'));
 
 interface IChat {
   username?: string;
+  setupIntentClientSecretFromRedirect?: string;
+  saveCardFromRedirect?: boolean;
+  resetStripeSetupIntent: () => void;
 }
 
-export const Chat: React.FC<IChat> = ({ username }) => {
+export const Chat: React.FC<IChat> = ({
+  username,
+  setupIntentClientSecretFromRedirect,
+  saveCardFromRedirect,
+  resetStripeSetupIntent,
+}) => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const [chatData, setChatData] = useState<IChatData>({
@@ -147,6 +155,11 @@ export const Chat: React.FC<IChat> = ({ username }) => {
           {...chatData}
           showChatList={showChatList}
           updateLastMessage={updateLastMessage}
+          setupIntentClientSecretFromRedirect={
+            setupIntentClientSecretFromRedirect
+          }
+          saveCardFromRedirect={saveCardFromRedirect}
+          resetStripeSetupIntent={resetStripeSetupIntent}
         />
       </SContent>
     </SContainer>

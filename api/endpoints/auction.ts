@@ -8,7 +8,10 @@ import {
 
 const BASE_URL_AUCTION = `${BASE_URL}/auction`;
 
-export const fetchLiveAuctions = (payload: newnewapi.PagedAuctionsRequest, signal?: RequestInit['signal']) =>
+export const fetchLiveAuctions = (
+  payload: newnewapi.PagedAuctionsRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<
     newnewapi.PagedAuctionsRequest,
     newnewapi.PagedAuctionsResponse
@@ -21,11 +24,12 @@ export const fetchLiveAuctions = (payload: newnewapi.PagedAuctionsRequest, signa
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 export const fetchCurrentBidsForPost = (
-  payload: newnewapi.GetAcOptionsRequest, signal?: RequestInit['signal']
+  payload: newnewapi.GetAcOptionsRequest,
+  signal?: RequestInit['signal']
 ) =>
   fetchProtobuf<newnewapi.GetAcOptionsRequest, newnewapi.GetAcOptionsResponse>(
     newnewapi.GetAcOptionsRequest,
@@ -39,12 +43,15 @@ export const fetchCurrentBidsForPost = (
           'x-auth-token': cookiesInstance.get('accessToken'),
         }
       : {},
-      'cors',
-      'same-origin',
-      signal ?? undefined,
+    'cors',
+    'same-origin',
+    signal ?? undefined
   );
 
-export const fetchBidsForOption = (payload: newnewapi.GetAcBidsRequest, signal?: RequestInit['signal']) =>
+export const fetchBidsForOption = (
+  payload: newnewapi.GetAcBidsRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.GetAcBidsRequest, newnewapi.GetAcBidsResponse>(
     newnewapi.GetAcBidsRequest,
     newnewapi.GetAcBidsResponse,
@@ -54,10 +61,13 @@ export const fetchBidsForOption = (payload: newnewapi.GetAcBidsRequest, signal?:
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const fetchAcOptionById = (payload: newnewapi.GetAcOptionRequest, signal?: RequestInit['signal']) =>
+export const fetchAcOptionById = (
+  payload: newnewapi.GetAcOptionRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.GetAcOptionRequest, newnewapi.GetAcOptionResponse>(
     newnewapi.GetAcOptionRequest,
     newnewapi.GetAcOptionResponse,
@@ -72,25 +82,29 @@ export const fetchAcOptionById = (payload: newnewapi.GetAcOptionRequest, signal?
       : {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 export const placeBidOnAuction = (
-  payload: newnewapi.FulfillPaymentPurposeRequest, signal?: RequestInit['signal']
+  payload: newnewapi.StripeContributionRequest,
+  signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
-    newnewapi.FulfillPaymentPurposeRequest,
+    newnewapi.StripeContributionRequest,
     newnewapi.PlaceBidResponse
   >(
-    newnewapi.FulfillPaymentPurposeRequest,
+    newnewapi.StripeContributionRequest,
     newnewapi.PlaceBidResponse,
     `${BASE_URL_AUCTION}/place_bid`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const placeBidWithWallet = (payload: newnewapi.PlaceBidRequest, signal?: RequestInit['signal']) =>
+export const placeBidWithWallet = (
+  payload: newnewapi.PlaceBidRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.PlaceBidRequest,
     newnewapi.PlaceBidResponse
@@ -100,11 +114,12 @@ export const placeBidWithWallet = (payload: newnewapi.PlaceBidRequest, signal?: 
     `${BASE_URL_AUCTION}/place_bid_with_wallet`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 export const selectWinningOption = (
-  payload: newnewapi.SelectWinningOptionRequest, signal?: RequestInit['signal']
+  payload: newnewapi.SelectWinningOptionRequest,
+  signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.SelectWinningOptionRequest,
@@ -115,10 +130,13 @@ export const selectWinningOption = (
     `${BASE_URL_AUCTION}/select_winning_option`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const deleteAcOption = (payload: newnewapi.DeleteAcOptionRequest, signal?: RequestInit['signal']) =>
+export const deleteAcOption = (
+  payload: newnewapi.DeleteAcOptionRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.DeleteAcOptionRequest,
     newnewapi.EmptyResponse
@@ -128,10 +146,13 @@ export const deleteAcOption = (payload: newnewapi.DeleteAcOptionRequest, signal?
     `${BASE_URL_AUCTION}/delete_ac_option`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-  export const checkCanDeleteAcOption = (payload: newnewapi.CanDeleteAcOptionRequest, signal?: RequestInit['signal']) =>
+export const checkCanDeleteAcOption = (
+  payload: newnewapi.CanDeleteAcOptionRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.CanDeleteAcOptionRequest,
     newnewapi.CanDeleteAcOptionResponse
@@ -141,5 +162,5 @@ export const deleteAcOption = (payload: newnewapi.DeleteAcOptionRequest, signal?
     `${BASE_URL_AUCTION}/can_delete_ac_option`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
