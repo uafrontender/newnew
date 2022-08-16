@@ -272,7 +272,10 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         >
           {t('payButton')}
           {amount &&
-            ` $${formatNumber(Math.max(amount, 0) / 100, amount % 1 === 0)}`}
+            ` $${formatNumber(
+              Math.max(amount - rewardUsed, 0) / 100,
+              amount % 1 === 0
+            )}`}
         </SPayButton>
         {bottomCaption || null}
         {showTocApply && (

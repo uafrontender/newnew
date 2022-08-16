@@ -23,6 +23,7 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { placeBidWithWallet } from '../../../../api/endpoints/auction';
 import {
   createStripeSetupIntent,
+  updateStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
@@ -433,15 +434,22 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         _postUuid: postId,
         _component: 'AcOptionsCard',
       });
+
       try {
+        const updateStripeSetupIntentRequest =
+          new newnewapi.UpdateStripeSetupIntentRequest({
+            rewardAmount: new newnewapi.MoneyAmount({
+              usdCents: rewardAmount,
+            }),
+          });
+
+        await updateStripeSetupIntent(updateStripeSetupIntentRequest);
+
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             cardUuid,
             stripeSetupIntentClientSecret,
-            // TODO: apply
-            /* rewardAmount: new newnewapi.MoneyAmount({
-              usdCents: rewardAmount,
-            }), */
+
             ...(saveCard !== undefined
               ? {
                   saveCard,

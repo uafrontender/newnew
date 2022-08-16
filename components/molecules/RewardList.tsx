@@ -39,52 +39,52 @@ export const RewardList: React.FC<RewardListI> = () => {
       amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
     }),
     new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.BACK,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-    }),
-    new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.SUBSCRIBE,
+      type: newnewapi.Reward.RewardType.PLEDGE,
       amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
     }),
     new newnewapi.Reward({
       type: newnewapi.Reward.RewardType.SUBSCRIBE_X_CREATORS_LEVEL_1,
       amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: 2 },
+    }),
+    new newnewapi.Reward({
+      type: newnewapi.Reward.RewardType.SUBSCRIBE_X_CREATORS_LEVEL_2,
+      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
+      extra: { amount: '2' },
     }),
     new newnewapi.Reward({
       type: newnewapi.Reward.RewardType.BID_SAME_CREATOR_X_TIMES_LEVEL_1,
       amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: 2 },
+      extra: { amount: '2' },
     }),
     new newnewapi.Reward({
       type: newnewapi.Reward.RewardType.VOTE_SAME_CREATOR_X_TIMES_LEVEL_1,
       amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: 2 },
+      extra: { amount: '2' },
     }),
     new newnewapi.Reward({
       type: newnewapi.Reward.RewardType.BACK_SAME_CREATOR_X_TIMES_LEVEL_1,
       amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: 2 },
+      extra: { amount: '2' },
     }),
     new newnewapi.Reward({
       type: newnewapi.Reward.RewardType.BID_IN_A_WEEK_X_TIMES_LEVEL_1,
       amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: 2 },
+      extra: { amount: '2' },
     }),
     new newnewapi.Reward({
       type: newnewapi.Reward.RewardType.VOTE_IN_A_WEEK_X_TIMES_LEVEL_1,
       amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: 2 },
+      extra: { amount: '2' },
     }),
     new newnewapi.Reward({
       type: newnewapi.Reward.RewardType.BACK_IN_A_WEEK_X_TIMES_LEVEL_1,
       amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: 2 },
+      extra: { amount: '2' },
     }),
     new newnewapi.Reward({
       type: newnewapi.Reward.RewardType.INVITE_X_FRIENDS_LEVEL_1,
       amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: 3 },
+      extra: { amount: '3' },
     }),
   ]);
 

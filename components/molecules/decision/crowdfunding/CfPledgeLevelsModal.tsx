@@ -13,6 +13,7 @@ import { doPledgeCrowdfunding } from '../../../../api/endpoints/crowdfunding';
 import {
   // getTopUpWalletWithPaymentPurposeUrl,
   createStripeSetupIntent,
+  updateStripeSetupIntent,
 } from '../../../../api/endpoints/payments';
 
 import Text from '../../../atoms/Text';
@@ -264,15 +265,21 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         _postUuid: post.postUuid,
         _component: 'CfPledgeLevelsModal',
       });
+
       try {
+        const updateStripeSetupIntentRequest =
+          new newnewapi.UpdateStripeSetupIntentRequest({
+            rewardAmount: new newnewapi.MoneyAmount({
+              usdCents: rewardAmount,
+            }),
+          });
+
+        await updateStripeSetupIntent(updateStripeSetupIntentRequest);
+
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             cardUuid,
             stripeSetupIntentClientSecret,
-            // TODO: apply
-            /* rewardAmount: new newnewapi.MoneyAmount({
-              usdCents: rewardAmount,
-            }), */
             ...(saveCard !== undefined
               ? {
                   saveCard,

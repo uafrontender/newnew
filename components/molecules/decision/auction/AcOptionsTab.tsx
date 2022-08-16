@@ -24,6 +24,7 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { placeBidWithWallet } from '../../../../api/endpoints/auction';
 import {
   createStripeSetupIntent,
+  updateStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 import { validateText } from '../../../../api/endpoints/infrastructure';
@@ -375,21 +376,26 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         return;
       }
 
+      Mixpanel.track('PayWithCard', {
+        _stage: 'Post',
+        _postUuid: postId,
+        _component: 'AcOptionsTab',
+      });
+
       try {
-        Mixpanel.track('PayWithCard', {
-          _stage: 'Post',
-          _postUuid: postId,
-          _component: 'AcOptionsTab',
-        });
+        const updateStripeSetupIntentRequest =
+          new newnewapi.UpdateStripeSetupIntentRequest({
+            rewardAmount: new newnewapi.MoneyAmount({
+              usdCents: rewardAmount,
+            }),
+          });
+
+        await updateStripeSetupIntent(updateStripeSetupIntentRequest);
 
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             cardUuid,
             stripeSetupIntentClientSecret,
-            // TODO: apply
-            /* rewardAmount: new newnewapi.MoneyAmount({
-              usdCents: rewardAmount,
-            }), */
             ...(saveCard !== undefined
               ? {
                   saveCard,

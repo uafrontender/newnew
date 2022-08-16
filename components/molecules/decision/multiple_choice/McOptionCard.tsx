@@ -22,6 +22,7 @@ import {
 } from '../../../../api/endpoints/multiple_choice';
 import {
   createStripeSetupIntent,
+  updateStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 
@@ -436,15 +437,21 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         _postUuid: postId,
         _component: 'McOptionCard',
       });
+
       try {
+        const updateStripeSetupIntentRequest =
+          new newnewapi.UpdateStripeSetupIntentRequest({
+            rewardAmount: new newnewapi.MoneyAmount({
+              usdCents: rewardAmount,
+            }),
+          });
+
+        await updateStripeSetupIntent(updateStripeSetupIntentRequest);
+
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             cardUuid,
             stripeSetupIntentClientSecret,
-            // TODO: apply
-            /* rewardAmount: new newnewapi.MoneyAmount({
-              usdCents: rewardAmount,
-            }), */
             ...(saveCard !== undefined
               ? {
                   saveCard,
