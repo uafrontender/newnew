@@ -81,11 +81,11 @@ context('Main flow', () => {
           });
         });
 
-      cy.get('#bitmovinplayer-video-floating-preview', {
+      cy.get('#review', {
         timeout: 20000,
-      }).should('be.visible');
-
-      cy.get('#review').should('be.enabled').click();
+      })
+        .should('be.enabled')
+        .click();
       cy.url().should('include', '/creation/auction/preview');
 
       cy.get('#publish').click();
@@ -128,11 +128,11 @@ context('Main flow', () => {
           });
         });
 
-      cy.get('#bitmovinplayer-video-floating-preview', {
+      cy.get('#review', {
         timeout: 20000,
-      }).should('be.visible');
-
-      cy.get('#review').should('be.enabled').click();
+      })
+        .should('be.enabled')
+        .click();
       cy.url().should('include', '/creation/multiple-choice/preview');
 
       cy.get('#publish').click();
@@ -171,11 +171,11 @@ context('Main flow', () => {
           });
         });
 
-      cy.get('#bitmovinplayer-video-floating-preview', {
+      cy.get('#review', {
         timeout: 20000,
-      }).should('be.visible');
-
-      cy.get('#review').should('be.enabled').click();
+      })
+        .should('be.enabled')
+        .click();
       cy.url().should('include', '/creation/crowdfunding/preview');
 
       cy.get('#publish').click();
