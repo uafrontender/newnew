@@ -209,7 +209,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             />
           )}
           <PaymentElement onReady={() => setIsStripeReady(true)} />
-          {isStripeReady && (
+          {/* Show save toggle only if user already has primary card otherwise card will be saved in any case */}
+          {isStripeReady && primaryCard && (
             <SSaveCard>
               <Toggle
                 checked={saveCard}
