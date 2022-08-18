@@ -47,22 +47,25 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
 }) => {
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
-  const socketConnection = useContext(SocketContext);
   const { handleSetCard } = useCards();
+  const socketConnection = useContext(SocketContext);
 
   const [message, setMessage] = useState('Saving your card. Please wait');
   const [isProcessing, setIsProcessing] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [isCardAdded, setIsCardAdded] = useState(false);
 
   useEffect(() => {
-    if (!clientSecret) {
-      return;
-    }
+    const controller = new AbortController();
 
     const handleCheckCardStatus = async () => {
       try {
         if (!clientSecret || !setupIntentId) {
           throw new Error('Something went wrong');
+        }
+
+        if (isCardAdded) {
+          return;
         }
 
         const payload = new newnewapi.CheckCardStatusRequest({
@@ -101,8 +104,14 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
       }
     };
 
-    handleCheckCardStatus();
-  }, [clientSecret, setupIntentId, handleSetCard]);
+    if (clientSecret) {
+      handleCheckCardStatus();
+    }
+
+    return () => {
+      controller.abort();
+    };
+  }, [clientSecret, setupIntentId, handleSetCard, isCardAdded]);
 
   useEffect(() => {
     const handleCardAdded = (data: any) => {
@@ -124,6 +133,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
       }
       if (decoded.cardStatus === newnewapi.CardStatus.ADDED && decoded.card) {
         handleSetCard(decoded.card);
+        setIsCardAdded(true);
       }
     };
 
