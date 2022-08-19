@@ -24,14 +24,6 @@ import { RewardContext } from '../../../contexts/rewardContext';
 import { formatNumber } from '../../../utils/format';
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 
-interface IReCaptchaRes {
-  success?: boolean;
-  challenge_ts?: string;
-  hostname?: string;
-  score?: number;
-  errors?: Array<string> | string;
-}
-
 interface IPaymentModal {
   isOpen: boolean;
   zIndex: number;
@@ -42,8 +34,8 @@ interface IPaymentModal {
   onClose: () => void;
   handlePayWithCard?: (params: {
     rewardAmount: number;
-    stripeSetupIntentClientSecret: string;
     cardUuid?: string;
+    stripeSetupIntentClientSecret: string;
     saveCard?: boolean;
   }) => void;
   children: React.ReactNode;
@@ -114,7 +106,6 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             </SCloseButton>
           )}
           <SHeaderContainer>{children}</SHeaderContainer>
-
           {(isLoadingSetupIntent || isCardsLoading) && (
             <Lottie
               width={55}
@@ -132,12 +123,11 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             }
           >
             <CheckoutForm
-              amount={amount}
               bottomCaption={bottomCaption}
+              amount={amount}
+              handlePayWithCard={handlePayWithCard}
               stipeSecret={stripeSetupIntent?.stripeSetupIntentClientSecret!}
               redirectUrl={redirectUrl}
-              noRewards={noRewards}
-              handlePayWithCard={handlePayWithCard}
             />
           </StripeElements>
         </SContentContainer>

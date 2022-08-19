@@ -58,7 +58,7 @@ interface ICard {
   brand: newnewapi.Card.CardBrand;
   funding: newnewapi.Card.CardFunding;
   lastFourDigits: string;
-  bg: string;
+  backgroundImg: string;
   cardId: string;
   onChangePrimaryCard: (cardUuid: string) => void;
   onCardDelete: () => void;
@@ -70,7 +70,7 @@ const Card: React.FunctionComponent<ICard> = ({
   funding,
   lastFourDigits,
   cardId,
-  bg,
+  backgroundImg,
   onChangePrimaryCard,
   onCardDelete,
 }) => {
@@ -84,7 +84,7 @@ const Card: React.FunctionComponent<ICard> = ({
     resizeMode
   );
 
-  const moreButtonRef: any = useRef();
+  const moreButtonRef = useRef<HTMLButtonElement>();
 
   const handelSetPrimaryCard = async () => {
     try {
@@ -122,7 +122,7 @@ const Card: React.FunctionComponent<ICard> = ({
   };
 
   return (
-    <SCard $bg={bg}>
+    <SCard background={backgroundImg}>
       <STopLine>
         {isPrimary && (
           <SLabel>
@@ -135,7 +135,7 @@ const Card: React.FunctionComponent<ICard> = ({
           view='quaternary'
           iconOnly
           onClick={() => setIsEllipseMenuOpen(true)}
-          ref={moreButtonRef}
+          ref={moreButtonRef as any}
         >
           <InlineSvg svg={MoreIconFilled} width='14px' height='14px' />
         </SMoreButton>
@@ -175,7 +175,7 @@ const Card: React.FunctionComponent<ICard> = ({
 export default Card;
 
 const SCard = styled.div<{
-  $bg: string;
+  background: string;
 }>`
   position: relative;
   display: flex;
@@ -186,7 +186,7 @@ const SCard = styled.div<{
   padding: 16px !important;
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
-  background: ${({ $bg }) => `url(${$bg})`};
+  background: ${({ background }) => `url(${background})`};
   background-repeat: no-repeat;
   background-size: cover;
 
@@ -263,7 +263,7 @@ const SMoreButton = styled(Button)`
     background-color: ${({ theme }) => theme.colors.white};
 
     svg {
-      fill: #2c2c33;
+      fill: ${({ theme }) => theme.colors.darkGray};
     }
   }
 

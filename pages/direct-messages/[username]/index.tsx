@@ -43,7 +43,7 @@ const Chat: NextPage<IChat> = ({
 
   const [saveCardFromRedirect, setCardFromRedirect] = useState(save_card);
 
-  const resetSetSetupIntent = useCallback(() => {
+  const resetStripeSetupIntent = useCallback(() => {
     setSetupIntentClientSecretFromRedirect('');
     setCardFromRedirect(false);
   }, []);
@@ -59,7 +59,7 @@ const Chat: NextPage<IChat> = ({
           setupIntentClientSecretFromRedirect
         }
         saveCardFromRedirect={saveCardFromRedirect}
-        resetSetSetupIntent={resetSetSetupIntent}
+        resetStripeSetupIntent={resetStripeSetupIntent}
       />
     </>
   );

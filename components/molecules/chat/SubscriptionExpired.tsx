@@ -45,7 +45,7 @@ interface ISubscriptionExpired {
   user: newnewapi.IUser;
   saveCardFromRedirect?: boolean;
   setupIntentClientSecretFromRedirect?: string;
-  resetSetSetupIntent: () => void;
+  resetStripeSetupIntent: () => void;
 }
 
 const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
@@ -53,7 +53,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
     user,
     saveCardFromRedirect,
     setupIntentClientSecretFromRedirect,
-    resetSetSetupIntent,
+    resetStripeSetupIntent,
   }) => {
     const router = useRouter();
     const { t } = useTranslation('page-Chat');
@@ -77,14 +77,11 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
             new newnewapi.StripeContributionRequest({
               stripeSetupIntentClientSecret:
                 setupIntentClientSecretFromRedirect,
-              ...(saveCardFromRedirect !== undefined
-                ? {
-                    saveCard: saveCardFromRedirect,
-                  }
-                : {}),
+
+              saveCard: saveCardFromRedirect ?? false,
             });
 
-          resetSetSetupIntent();
+          resetStripeSetupIntent();
 
           const res = await subscribeToCreator(stripeContributionRequest);
 
@@ -146,53 +143,56 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
       }
     }, [user.uuid]);
 
-    const handlePayWithCard = async ({
-      stripeSetupIntentClientSecret,
-      cardUuid,
-      saveCard,
-    }: {
-      cardUuid?: string;
-      stripeSetupIntentClientSecret: string;
-      saveCard?: boolean;
-    }) => {
-      try {
-        const stripeContributionRequest =
-          new newnewapi.StripeContributionRequest({
-            cardUuid,
-            stripeSetupIntentClientSecret,
-            ...(saveCard !== undefined
-              ? {
-                  saveCard,
-                }
-              : {}),
-          });
+    const handlePayWithCard = useCallback(
+      async ({
+        stripeSetupIntentClientSecret,
+        cardUuid,
+        saveCard,
+      }: {
+        cardUuid?: string;
+        stripeSetupIntentClientSecret: string;
+        saveCard?: boolean;
+      }) => {
+        try {
+          const stripeContributionRequest =
+            new newnewapi.StripeContributionRequest({
+              cardUuid,
+              stripeSetupIntentClientSecret,
+              ...(saveCard !== undefined
+                ? {
+                    saveCard,
+                  }
+                : {}),
+            });
 
-        const res = await subscribeToCreator(stripeContributionRequest);
+          const res = await subscribeToCreator(stripeContributionRequest);
 
-        if (
-          !res.data ||
-          res.error ||
-          res.data.status !==
+          if (
+            !res.data ||
+            res.error ||
+            res.data.status !==
+              newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
+          ) {
+            throw new Error(
+              res.error?.message ??
+                tSubscribe(getPayWithCardErrorMessage(res.data?.status))
+            );
+          }
+
+          if (
+            res.data.status ===
             newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
-        ) {
-          throw new Error(
-            res.error?.message ??
-              tSubscribe(getPayWithCardErrorMessage(res.data?.status))
-          );
+          ) {
+            router.push(
+              `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`
+            );
+          }
+        } catch (err) {
+          console.error(err);
         }
-
-        if (
-          res.data.status ===
-          newnewapi.SubscribeToCreatorResponse.Status.SUCCESS
-        ) {
-          router.push(
-            `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`
-          );
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
+      },
+      [router, tSubscribe, user.username, user.uuid]
+    );
 
     return (
       <SBottomActionContainer>

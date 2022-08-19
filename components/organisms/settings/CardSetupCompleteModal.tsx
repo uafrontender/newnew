@@ -47,22 +47,25 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
 }) => {
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
-  const socketConnection = useContext(SocketContext);
   const { handleSetCard } = useCards();
+  const socketConnection = useContext(SocketContext);
 
   const [message, setMessage] = useState('Saving your card. Please wait');
   const [isProcessing, setIsProcessing] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [isCardAdded, setIsCardAdded] = useState(false);
 
   useEffect(() => {
-    if (!clientSecret) {
-      return;
-    }
+    const controller = new AbortController();
 
     const handleCheckCardStatus = async () => {
       try {
         if (!clientSecret || !setupIntentId) {
           throw new Error('Something went wrong');
+        }
+
+        if (isCardAdded) {
+          return;
         }
 
         const payload = new newnewapi.CheckCardStatusRequest({
@@ -84,9 +87,13 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           response.data.cardStatus !== newnewapi.CardStatus.ADDED
         ) {
           setIsError(true);
-          if (response.data.card) {
-            handleSetCard(response.data.card);
-          }
+        }
+
+        if (
+          response.data.cardStatus === newnewapi.CardStatus.ADDED &&
+          response.data.card
+        ) {
+          handleSetCard(response.data.card);
         }
 
         setMessage(getCardStatusMessage(response.data.cardStatus));
@@ -97,12 +104,17 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
       }
     };
 
-    handleCheckCardStatus();
-  }, [clientSecret, setupIntentId, handleSetCard]);
+    if (clientSecret) {
+      handleCheckCardStatus();
+    }
+
+    return () => {
+      controller.abort();
+    };
+  }, [clientSecret, setupIntentId, handleSetCard, isCardAdded]);
 
   useEffect(() => {
     const handleCardAdded = (data: any) => {
-      console.log(data, 'SOCKET');
       const arr = new Uint8Array(data);
       const decoded = newnewapi.CardStatusChanged.decode(arr);
       if (!decoded) return;
@@ -118,6 +130,10 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
         decoded.cardStatus !== newnewapi.CardStatus.ADDED
       ) {
         setIsError(true);
+      }
+      if (decoded.cardStatus === newnewapi.CardStatus.ADDED && decoded.card) {
+        handleSetCard(decoded.card);
+        setIsCardAdded(true);
       }
     };
 

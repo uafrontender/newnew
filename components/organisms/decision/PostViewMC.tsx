@@ -568,6 +568,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
       const makeVoteAfterStripeRedirect = async () => {
         if (!stripeSetupIntentClientSecret) return;
 
+        if (!user._persist?.rehydrated) {
+          return;
+        }
+
         if (!user.loggedIn) {
           router.push(
             `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
@@ -630,7 +634,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
         makeVoteAfterStripeRedirect();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [user._persist?.rehydrated]);
 
     const goToNextStep = () => {
       if (

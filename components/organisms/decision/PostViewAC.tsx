@@ -533,6 +533,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       const makeBidAfterStripeRedirect = async () => {
         if (!stripeSetupIntentClientSecret || loadingModalOpen) return;
 
+        if (!user._persist?.rehydrated) {
+          return;
+        }
+
         if (!user.loggedIn) {
           router.push(
             `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
@@ -595,7 +599,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
         makeBidAfterStripeRedirect();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [user._persist?.rehydrated]);
 
     const goToNextStep = () => {
       if (

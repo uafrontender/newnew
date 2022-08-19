@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { debounce } from 'lodash';
-import { useInView } from 'react-intersection-observer';
 import styled, { css } from 'styled-components';
 
 import Lottie from './Lottie';
@@ -53,7 +52,21 @@ const Button = React.memo(
         onClick,
         ...rest
       } = props;
-      const { ref, inView } = useInView();
+
+      const ref = useRef();
+      const [inView, setInView] = useState(false);
+
+      useEffect(() => {
+        if (withProgress) {
+          const obs = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry) => {
+              setInView(entry.isIntersecting);
+            });
+          });
+
+          obs.observe(ref.current);
+        }
+      }, [withProgress]);
 
       // Progress effect
       const [progress, setProgress] = useState(0);
@@ -121,7 +134,7 @@ const Button = React.memo(
       return (
         <SButton
           ref={(el) => {
-            ref(el);
+            ref.current = el;
 
             if (parentRef) {
               // eslint-disable-next-line no-param-reassign

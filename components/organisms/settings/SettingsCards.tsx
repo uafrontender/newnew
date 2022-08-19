@@ -151,7 +151,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
                   brand={card.brand as newnewapi.Card.CardBrand}
                   funding={card.funding as newnewapi.Card.CardFunding}
                   lastFourDigits={card.last4 as string}
-                  bg={
+                  backgroundImg={
                     backgroundsByCardUuid
                       ? backgroundsByCardUuid[card.cardUuid! as string]
                       : assets.cards.background[

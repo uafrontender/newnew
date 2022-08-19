@@ -23,14 +23,14 @@ interface IChat {
   username?: string;
   setupIntentClientSecretFromRedirect?: string;
   saveCardFromRedirect?: boolean;
-  resetSetSetupIntent: () => void;
+  resetStripeSetupIntent: () => void;
 }
 
 export const Chat: React.FC<IChat> = ({
   username,
   setupIntentClientSecretFromRedirect,
   saveCardFromRedirect,
-  resetSetSetupIntent,
+  resetStripeSetupIntent,
 }) => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
@@ -159,7 +159,7 @@ export const Chat: React.FC<IChat> = ({
             setupIntentClientSecretFromRedirect
           }
           saveCardFromRedirect={saveCardFromRedirect}
-          resetSetSetupIntent={resetSetSetupIntent}
+          resetStripeSetupIntent={resetStripeSetupIntent}
         />
       </SContent>
     </SContainer>

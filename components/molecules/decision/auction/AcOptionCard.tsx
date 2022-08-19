@@ -450,7 +450,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           new newnewapi.StripeContributionRequest({
             cardUuid,
             stripeSetupIntentClientSecret,
-
             ...(saveCard !== undefined
               ? {
                   saveCard,

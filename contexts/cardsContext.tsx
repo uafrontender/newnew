@@ -7,8 +7,10 @@ import React, {
   useCallback,
   useContext,
 } from 'react';
+
 import { getCards } from '../api/endpoints/card';
 import { useAppSelector } from '../redux-store/store';
+import { SocketContext } from './socketContext';
 
 export const CardsContext = createContext<{
   cards?: newnewapi.ICard[];
@@ -31,6 +33,8 @@ interface ICardsContextProvider {
 const CardsContextProvider: React.FC<ICardsContextProvider> = ({
   children,
 }) => {
+  const socketConnection = useContext(SocketContext);
+
   const user = useAppSelector((state) => state.user);
 
   const [cards, setCards] = useState<newnewapi.ICard[] | undefined>(undefined);
@@ -44,7 +48,7 @@ const CardsContextProvider: React.FC<ICardsContextProvider> = ({
     setCards((prevState) => {
       if (prevState) {
         if (
-          prevState.find(
+          !prevState.find(
             (prevStateCard) => prevStateCard.cardUuid === newCard.cardUuid
           )
         ) {
@@ -86,6 +90,28 @@ const CardsContextProvider: React.FC<ICardsContextProvider> = ({
   useEffect(() => {
     fetchCards();
   }, [fetchCards]);
+
+  useEffect(() => {
+    const handleCardAdded = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.CardStatusChanged.decode(arr);
+      if (!decoded) return;
+
+      if (decoded.cardStatus === newnewapi.CardStatus.ADDED && decoded.card) {
+        handleSetCard(decoded.card);
+      }
+    };
+
+    if (socketConnection) {
+      socketConnection?.on('CardStatusChanged', handleCardAdded);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('CardStatusChanged', handleCardAdded);
+      }
+    };
+  }, [socketConnection?.connected, handleSetCard, socketConnection]);
 
   const contextValue = useMemo(
     () => ({

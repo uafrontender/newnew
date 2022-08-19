@@ -178,11 +178,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
           new newnewapi.StripeContributionRequest({
             stripeSetupIntentClientSecret:
               stripeSetupIntentClientSecretFromRedirect,
-            ...(saveCardFromRedirect !== undefined
-              ? {
-                  saveCard: saveCardFromRedirect,
-                }
-              : {}),
+            saveCard: saveCardFromRedirect ?? false,
           });
 
         setStripeSetupIntentClientSecretFromRedirect('');

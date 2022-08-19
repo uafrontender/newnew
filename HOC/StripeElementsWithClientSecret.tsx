@@ -4,7 +4,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import { StripeElementLocale, StripeElementsOptions } from '@stripe/stripe-js';
 import { useTheme } from 'styled-components';
 
-import getStripe from '../utils/geStripejs';
+import getStripe from '../utils/getStripejs';
 import assets from '../constants/assets';
 
 const stripePromise = getStripe();

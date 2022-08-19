@@ -682,6 +682,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
       const makePledgeAfterStripeRedirect = async () => {
         if (!stripeSetupIntentClientSecret) return;
 
+        if (!user._persist?.rehydrated) {
+          return;
+        }
+
         if (!user.loggedIn) {
           router.push(
             `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
@@ -743,7 +747,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
         makePledgeAfterStripeRedirect();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [user._persist?.rehydrated]);
 
     useEffect(() => {
       const workingAmount = pledges

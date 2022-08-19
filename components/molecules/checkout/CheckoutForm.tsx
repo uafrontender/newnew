@@ -23,14 +23,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { updateStripeSetupIntent } from '../../../api/endpoints/payments';
 import { RewardContext } from '../../../contexts/rewardContext';
 import assets from '../../../constants/assets';
-
-interface IReCaptchaRes {
-  success?: boolean;
-  challenge_ts?: string;
-  hostname?: string;
-  score?: number;
-  errors?: Array<string> | string;
-}
+import { IReCaptchaRes } from '../../interfaces/reCaptcha';
 
 // eslint-disable-next-line no-shadow
 enum PaymentMethodTypes {
@@ -44,8 +37,8 @@ interface ICheckoutForm {
   bottomCaption?: React.ReactNode;
   handlePayWithCard?: (params: {
     rewardAmount: number;
-    stripeSetupIntentClientSecret: string;
     cardUuid?: string;
+    stripeSetupIntentClientSecret: string;
     saveCard?: boolean;
   }) => void;
   stipeSecret: string;
@@ -230,7 +223,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             />
           )}
           <PaymentElement onReady={() => setIsStripeReady(true)} />
-          {isStripeReady && (
+          {/* Show save toggle only if user already has primary card otherwise card will be saved in any case */}
+          {isStripeReady && primaryCard && (
             <SSaveCard>
               <Toggle
                 checked={saveCard}

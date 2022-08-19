@@ -13,6 +13,7 @@ import { newnewapi } from 'newnew-api';
 import { createStripeSetupIntent } from '../../../api/endpoints/payments';
 import { useAppSelector } from '../../../redux-store/store';
 import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
+import { IReCaptchaRes } from '../../interfaces/reCaptcha';
 
 // Components
 import Modal from '../../organisms/Modal';
@@ -23,14 +24,6 @@ import Lottie from '../../atoms/Lottie';
 import CardSetupCompleteModal from '../../organisms/settings/CardSetupCompleteModal';
 
 import logoAnimation from '../../../public/animations/mobile_logo.json';
-
-interface IReCaptchaRes {
-  success?: boolean;
-  challenge_ts?: string;
-  hostname?: string;
-  score?: number;
-  errors?: Array<string> | string;
-}
 
 interface IAddCardForm {
   onCancel: () => void;
