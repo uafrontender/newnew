@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { google, newnewapi } from 'newnew-api';
+import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -13,7 +13,7 @@ export const RewardList: React.FC<RewardListI> = () => {
   const { t } = useTranslation('common');
   // TODO: remove test data
   const [receivedRewards, setReceivedRewards] = useState<newnewapi.Reward[]>([
-    new newnewapi.Reward({
+    /* new newnewapi.Reward({
       type: newnewapi.Reward.RewardType.SIGN_UP,
       amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
       receivedAt: new google.protobuf.Timestamp({
@@ -26,7 +26,7 @@ export const RewardList: React.FC<RewardListI> = () => {
       receivedAt: new google.protobuf.Timestamp({
         seconds: Date.now(),
       }),
-    }),
+    }), */
   ]);
 
   // TODO: add loading state
@@ -34,6 +34,7 @@ export const RewardList: React.FC<RewardListI> = () => {
   const [receivedRewardsLoading, setReceivedRewardsLoading] = useState(false);
   // TODO: remove test data
   const [availableRewards, setAvailableRewards] = useState<newnewapi.Reward[]>([
+    /*
     new newnewapi.Reward({
       type: newnewapi.Reward.RewardType.VOTE,
       amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
@@ -85,7 +86,7 @@ export const RewardList: React.FC<RewardListI> = () => {
       type: newnewapi.Reward.RewardType.INVITE_X_FRIENDS_LEVEL_1,
       amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
       extra: { amount: '3' },
-    }),
+    }), */
   ]);
 
   // TODO: add loading state
@@ -100,8 +101,9 @@ export const RewardList: React.FC<RewardListI> = () => {
         paging: null,
       });
 
+      console.log('LOAD RECEIVED');
       const res = await getRewards(receivedRewardsPayload);
-
+      console.log(res);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
@@ -127,8 +129,9 @@ export const RewardList: React.FC<RewardListI> = () => {
         paging: null,
       });
 
+      console.log('LOAD REWARDS');
       const res = await getRewards(availableRewardsPayload);
-
+      console.log(res);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 

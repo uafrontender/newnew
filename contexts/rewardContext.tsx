@@ -7,6 +7,7 @@ import React, {
   useMemo,
   useEffect,
   useContext,
+  useCallback,
 } from 'react';
 import { getRewardBalance } from '../api/endpoints/payments';
 import { useAppSelector } from '../redux-store/store';
@@ -41,9 +42,12 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
   >(new newnewapi.MoneyAmount({ usdCents: 700 }));
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSetRewardBalance = (newAmount: newnewapi.MoneyAmount) => {
-    setRewardBalance(newAmount);
-  };
+  const handleSetRewardBalance = useCallback(
+    (newAmount: newnewapi.MoneyAmount) => {
+      setRewardBalance(newAmount);
+    },
+    []
+  );
 
   const contextValue = useMemo(
     () => ({
@@ -66,10 +70,12 @@ const RewardContextProvider: React.FC<IRewardContextProvider> = ({
       try {
         setIsLoading(true);
 
+        // TODO: REWARD BALANCE DOES NOT WORK
         const payload = new newnewapi.EmptyRequest({});
-
+        console.log('LOAD BALANCE');
         const res = await getRewardBalance(payload);
 
+        console.log(res);
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
 
