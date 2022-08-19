@@ -58,11 +58,10 @@ import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import PostTitleContent from '../../../atoms/PostTitleContent';
+import getRewardErrorStatusTextKey from '../../../../utils/getRewardErrorStatusTextKey';
 
 const getPayWithCardErrorMessage = (
-  status?:
-    | newnewapi.VoteOnPostResponse.Status
-    | newnewapi.UpdateStripeSetupIntentResponse.Status
+  status?: newnewapi.VoteOnPostResponse.Status
 ) => {
   switch (status) {
     case newnewapi.VoteOnPostResponse.Status.NOT_ENOUGH_FUNDS:
@@ -85,13 +84,6 @@ const getPayWithCardErrorMessage = (
       return 'errors.mcVoteCountTooSmall';
     case newnewapi.VoteOnPostResponse.Status.NOT_ALLOWED_TO_CREATE_NEW_OPTION:
       return 'errors.notAllowedToCreateNewOption';
-    case newnewapi.UpdateStripeSetupIntentResponse.Status.EMAIL_CANNOT_BE_USED:
-      return 'errors.rewardWrongEmail';
-    case newnewapi.UpdateStripeSetupIntentResponse.Status.INSUFFICIENT_REWARDS:
-      return 'errors.rewardNotEnough';
-    case newnewapi.UpdateStripeSetupIntentResponse.Status
-      .SETUP_INTENT_IS_INVALID:
-      return 'errors.rewardInvalidIntent';
     default:
       return 'errors.requestFailed';
   }
@@ -426,7 +418,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         ) {
           throw new Error(
             updateRes.error?.message ??
-              t(getPayWithCardErrorMessage(updateRes.data?.status))
+              t(getRewardErrorStatusTextKey(updateRes.data?.status))
           );
         }
 

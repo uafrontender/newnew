@@ -65,11 +65,10 @@ import BidIconLight from '../../../../public/images/decision/bid-icon-light.png'
 import BidIconDark from '../../../../public/images/decision/bid-icon-dark.png';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
+import getRewardErrorStatusTextKey from '../../../../utils/getRewardErrorStatusTextKey';
 
 const getPayWithCardErrorMessage = (
-  status?:
-    | newnewapi.PlaceBidResponse.Status
-    | newnewapi.UpdateStripeSetupIntentResponse.Status
+  status?: newnewapi.PlaceBidResponse.Status
 ) => {
   switch (status) {
     case newnewapi.PlaceBidResponse.Status.NOT_ENOUGH_MONEY:
@@ -84,13 +83,6 @@ const getPayWithCardErrorMessage = (
       return 'errors.biddingNotStarted';
     case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
       return 'errors.biddingIsEnded';
-    case newnewapi.UpdateStripeSetupIntentResponse.Status.EMAIL_CANNOT_BE_USED:
-      return 'errors.rewardWrongEmail';
-    case newnewapi.UpdateStripeSetupIntentResponse.Status.INSUFFICIENT_REWARDS:
-      return 'errors.rewardNotEnough';
-    case newnewapi.UpdateStripeSetupIntentResponse.Status
-      .SETUP_INTENT_IS_INVALID:
-      return 'errors.rewardInvalidIntent';
     default:
       return 'errors.requestFailed';
   }
@@ -465,7 +457,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         ) {
           throw new Error(
             updateRes.error?.message ??
-              t(getPayWithCardErrorMessage(updateRes.data?.status))
+              t(getRewardErrorStatusTextKey(updateRes.data?.status))
           );
         }
 
