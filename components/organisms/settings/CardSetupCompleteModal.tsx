@@ -53,7 +53,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
   const [message, setMessage] = useState('Saving your card. Please wait');
   const [isProcessing, setIsProcessing] = useState(true);
   const [isError, setIsError] = useState(false);
-  const [isCardAdded, setIsCardAdded] = useState(false);
+  const [isStatusChecked, setIsStatusChecked] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -64,7 +64,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           throw new Error('Something went wrong');
         }
 
-        if (isCardAdded) {
+        if (isStatusChecked) {
           return;
         }
 
@@ -72,7 +72,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           stripeSetupIntentId: setupIntentId,
           stripeSetupIntentClientSecret: clientSecret,
         });
-        const response = await checkCardStatus(payload);
+        const response = await checkCardStatus(payload, controller.signal);
 
         if (!response.data || response.error) {
           throw new Error(response.error?.message || 'An error occurred');
@@ -80,6 +80,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
 
         if (response.data.cardStatus !== newnewapi.CardStatus.IN_PROGRESS) {
           setIsProcessing(false);
+          setIsStatusChecked(true);
         }
 
         if (
@@ -99,7 +100,6 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
         setMessage(getCardStatusMessage(response.data.cardStatus));
       } catch (err) {
         console.error(err);
-        setMessage('Something went wrong');
         setIsProcessing(false);
       }
     };
@@ -111,7 +111,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
     return () => {
       controller.abort();
     };
-  }, [clientSecret, setupIntentId, handleSetCard, isCardAdded]);
+  }, [clientSecret, setupIntentId, handleSetCard, isStatusChecked]);
 
   useEffect(() => {
     const handleCardAdded = (data: any) => {
@@ -123,6 +123,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
 
       if (decoded.cardStatus !== newnewapi.CardStatus.IN_PROGRESS) {
         setIsProcessing(false);
+        setIsStatusChecked(true);
       }
 
       if (
@@ -133,7 +134,6 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
       }
       if (decoded.cardStatus === newnewapi.CardStatus.ADDED && decoded.card) {
         handleSetCard(decoded.card);
-        setIsCardAdded(true);
       }
     };
 
