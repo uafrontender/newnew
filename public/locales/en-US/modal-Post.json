@@ -804,6 +804,9 @@
     "cfCancelled": "Goal is cancelled",
     "cfFinished": "Goal is finished already",
     "cfNotStarted": "Goal is not started yet",
+    "rewardWrongEmail": "Reward can't be used by this account",
+    "rewardNotEnough": "Rewards balance is insufficient",
+    "rewardInvalidIntent": "Payment failed",
     "requestFailed": "Request failed"
   }
 }

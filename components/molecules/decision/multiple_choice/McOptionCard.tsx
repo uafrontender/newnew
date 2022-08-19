@@ -64,7 +64,9 @@ import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 const getPayWithCardErrorMessage = (
-  status?: newnewapi.VoteOnPostResponse.Status
+  status?:
+    | newnewapi.VoteOnPostResponse.Status
+    | newnewapi.UpdateStripeSetupIntentResponse.Status
 ) => {
   switch (status) {
     case newnewapi.VoteOnPostResponse.Status.NOT_ENOUGH_FUNDS:
@@ -87,6 +89,13 @@ const getPayWithCardErrorMessage = (
       return 'errors.mcVoteCountTooSmall';
     case newnewapi.VoteOnPostResponse.Status.NOT_ALLOWED_TO_CREATE_NEW_OPTION:
       return 'errors.notAllowedToCreateNewOption';
+    case newnewapi.UpdateStripeSetupIntentResponse.Status.EMAIL_CANNOT_BE_USED:
+      return 'errors.rewardWrongEmail';
+    case newnewapi.UpdateStripeSetupIntentResponse.Status.INSUFFICIENT_REWARDS:
+      return 'errors.rewardNotEnough';
+    case newnewapi.UpdateStripeSetupIntentResponse.Status
+      .SETUP_INTENT_IS_INVALID:
+      return 'errors.rewardInvalidIntent';
     default:
       return 'errors.requestFailed';
   }
@@ -447,7 +456,21 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             }),
           });
 
-        await updateStripeSetupIntent(updateStripeSetupIntentRequest);
+        const updateRes = await updateStripeSetupIntent(
+          updateStripeSetupIntentRequest
+        );
+
+        if (
+          !updateRes.data ||
+          updateRes.error ||
+          updateRes.data.status !==
+            newnewapi.UpdateStripeSetupIntentResponse.Status.SUCCESS
+        ) {
+          throw new Error(
+            updateRes.error?.message ??
+              t(getPayWithCardErrorMessage(updateRes.data?.status))
+          );
+        }
 
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
@@ -849,7 +872,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <PaymentModal
             zIndex={12}
             isOpen={paymentModalOpen}
-            amount={(parseInt(supportBidAmount) * 100 || 0) * votePrice}
+            amount={(parseInt(supportBidAmount) || 0) * votePrice}
             createStripeSetupIntent={createSetupIntent}
             // {...(walletBalance?.usdCents &&
             // walletBalance.usdCents >=

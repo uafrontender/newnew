@@ -85,7 +85,7 @@ const Container = styled.div`
   }
 
   ${(props) => props.theme.media.tablet} {
-    min-width: 104px;
+    min-width: 96px;
     padding: 0px 16px;
   }
 
