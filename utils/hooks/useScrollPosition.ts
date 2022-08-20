@@ -1,25 +1,37 @@
-import { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 
-export const useScrollPosition = (ref: any) => {
-  const setScrollPosition = useCallback(() => {
-    localStorage.setItem('scrollPosition', ref.current?.scrollTop);
-  }, [ref]);
+export const useScrollPosition = (
+  ref: React.MutableRefObject<HTMLElement | null>
+) => {
+  const [element, setElement] = useState<HTMLElement | undefined>();
 
   useEffect(() => {
-    window.addEventListener('beforeunload', setScrollPosition);
+    const refElement = ref.current;
+    if (refElement) {
+      setElement((curr) => curr || refElement);
+    }
+  }, [ref, ref.current]);
 
+  const setScrollPosition = useCallback(() => {
+    if (element) {
+      localStorage.setItem('scrollPosition', element.scrollTop.toString());
+    }
+  }, [element]);
+
+  useEffect(() => {
     const oldScrollPosition = localStorage.getItem('scrollPosition');
-
-    if (typeof oldScrollPosition !== 'undefined') {
+    if (element && typeof oldScrollPosition !== 'undefined') {
       // eslint-disable-next-line no-param-reassign
-      ref.current.scrollTop = oldScrollPosition;
+      element.scrollTop = Number(oldScrollPosition);
       localStorage.removeItem('scrollPosition');
     }
+
+    window.addEventListener('beforeunload', setScrollPosition);
 
     return () => {
       window.removeEventListener('beforeunload', setScrollPosition);
     };
-  }, [ref, setScrollPosition]);
+  }, [element, setScrollPosition]);
 };
 
 export default useScrollPosition;

@@ -465,9 +465,6 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   return (
     <>
       <PublishedModal open={showModal} handleClose={handleCloseModal} />
-      <SHeadLine variant={3} weight={600}>
-        {t(`preview.title-${router?.query?.tab}`)}
-      </SHeadLine>
       <STabletContent>
         <SLeftPart>
           <STabletPlayer>
@@ -487,6 +484,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           </STabletPlayer>
         </SLeftPart>
         <SRightPart>
+          <SHeadLine variant={3} weight={600}>
+            {t(`preview.title-${router?.query?.tab}`)}
+          </SHeadLine>
           <SHeadline variant={5}>
             <PostTitleContent>{post.title}</PostTitleContent>
           </SHeadline>
@@ -530,7 +530,7 @@ const STabletContent = styled.div`
 
 const SHeadLine = styled(Text)`
   padding: 26px 0;
-  text-align: center;
+  text-align: start;
 
   ${({ theme }) => theme.media.laptop} {
     padding: 8px 0;
@@ -542,10 +542,12 @@ const SLeftPart = styled.div`
   flex: 1;
   max-width: calc(50% - 76px);
   margin-right: 76px;
+  margin-top: 70px;
 
   ${({ theme }) => theme.media.laptop} {
     max-width: 352px;
     margin-right: 16px;
+    margin-top: 86px;
   }
 `;
 
