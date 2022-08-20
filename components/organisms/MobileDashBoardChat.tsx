@@ -12,6 +12,8 @@ import GoBackButton from '../molecules/GoBackButton';
 import MobileChatList from '../molecules/creator/dashboard/MobileChatList';
 import MobileChatArea from '../molecules/creator/dashboard/MobileChatArea';
 import { useGetChats } from '../../contexts/chatContext';
+import isBrowser from '../../utils/isBrowser';
+import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 interface IMobileDashBoardChat {
   closeChat: () => void;
@@ -23,11 +25,14 @@ const MobileDashBoardChat: React.FC<IMobileDashBoardChat> = ({ closeChat }) => {
     setChatData({ chatRoom, showChatList });
   };
   const { t } = useTranslation('page-Creator');
-  const [chatListHidden, setChatListHidden] =
-    useState<boolean | undefined>(false);
-  const [newMessage, setNewMessage] =
-    useState<newnewapi.IChatMessage | null | undefined>();
+  const [chatListHidden, setChatListHidden] = useState<boolean | undefined>(
+    false
+  );
+  const [newMessage, setNewMessage] = useState<
+    newnewapi.IChatMessage | null | undefined
+  >();
   const [searchText, setSearchText] = useState<string>('');
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
   useEffect(() => {
     setSearchText('');
@@ -55,6 +60,16 @@ const MobileDashBoardChat: React.FC<IMobileDashBoardChat> = ({ closeChat }) => {
   const passInputValue = (str: string) => {
     setSearchText(str);
   };
+
+  useEffect(() => {
+    if (isBrowser()) {
+      enableOverlayMode();
+    }
+
+    return () => {
+      disableOverlayMode();
+    };
+  }, []);
 
   return (
     <SContainer>

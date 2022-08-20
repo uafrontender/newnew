@@ -16,6 +16,7 @@ import SearchInput from '../atoms/chat/SearchInput';
 import NewMessage from '../molecules/chat/NewMessage';
 import { IChatData } from '../interfaces/ichat';
 import { useAppSelector } from '../../redux-store/store';
+import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 const GoBackButton = dynamic(() => import('../molecules/GoBackButton'));
 
@@ -58,6 +59,8 @@ export const Chat: React.FC<IChat> = ({
   const [newLastMessage, setNewLastMessage] = useState<{
     chatId: number | Long.Long | null | undefined;
   } | null>(null);
+
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
   const showChatList = () => {
     setChatListHidden(false);
@@ -110,16 +113,11 @@ export const Chat: React.FC<IChat> = ({
 
   useEffect(() => {
     if (isMobileOrTablet) {
-      document.body.style.cssText = `
-        overflow: hidden;
-        position: fixed;
-      `;
-    } else {
-      document.body.style.cssText = '';
+      enableOverlayMode();
     }
 
     return () => {
-      document.body.style.cssText = '';
+      disableOverlayMode();
     };
   }, [isMobileOrTablet]);
 

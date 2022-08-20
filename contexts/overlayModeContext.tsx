@@ -4,6 +4,7 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -61,6 +62,7 @@ export const OverlayModeProvider: React.FC<IOverlayModeProvider> = ({
 export function useOverlayMode() {
   const context = useContext(OverlayModeContext);
   const id = useRef(uuid());
+
   if (!context)
     throw new Error(
       'useOverlayMode must be used inside a `OverlayModeProvider`'
