@@ -9,7 +9,7 @@ import { formatNumber } from '../../utils/format';
 
 interface RewardListI {}
 
-export const RewardList: React.FC<RewardListI> = () => {
+export const RewardList: React.FC<RewardListI> = React.memo(() => {
   const { t } = useTranslation('common');
   // TODO: remove test data
   const [receivedRewards, setReceivedRewards] = useState<newnewapi.Reward[]>([
@@ -101,8 +101,8 @@ export const RewardList: React.FC<RewardListI> = () => {
         paging: null,
       });
 
-      console.log('LOAD RECEIVED');
       const res = await getRewards(receivedRewardsPayload);
+      console.log('LOAD RECEIVED');
       console.log(res);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
@@ -129,8 +129,8 @@ export const RewardList: React.FC<RewardListI> = () => {
         paging: null,
       });
 
-      console.log('LOAD REWARDS');
       const res = await getRewards(availableRewardsPayload);
+      console.log('LOAD REWARDS');
       console.log(res);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
@@ -199,7 +199,7 @@ export const RewardList: React.FC<RewardListI> = () => {
       <RewardCard holder />
     </RewardsContainer>
   );
-};
+});
 
 export default RewardList;
 

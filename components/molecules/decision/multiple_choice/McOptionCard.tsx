@@ -452,6 +452,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           updateStripeSetupIntentRequest
         );
 
+        // TODO: remove debug logs
+        console.log(updateRes);
+
         if (
           !updateRes.data ||
           updateRes.error ||
