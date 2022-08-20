@@ -118,7 +118,11 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
     [user.userData?.options?.isOfferingSubscription]
   );
 
-  const { data, hasMore, loadMore } = usePagination(loadData, 50, !showModal);
+  const { data, loading, hasMore, loadMore } = usePagination(
+    loadData,
+    50,
+    !showModal
+  );
 
   const chatRooms: IChatRoomUserNameWithoutEmoji[] = useMemo(
     () =>
@@ -149,10 +153,10 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   );
 
   useUpdateEffect(() => {
-    if (data.length > 0 && hasMore) {
-      loadMore();
+    if (data.length > 0 && !loading && hasMore) {
+      loadMore().catch((e) => console.error(e));
     }
-  }, [data, hasMore, loadMore]);
+  }, [data, loading, hasMore, loadMore]);
 
   useEffect(() => {
     const obj = chatRooms.reduce((acc: { [key: string]: any }, c) => {

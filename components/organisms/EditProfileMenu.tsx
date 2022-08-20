@@ -665,20 +665,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   ]);
   const scrollPosition = useRef(0);
 
-  // Effects
-  useEffect(() => {
-    scrollPosition.current = window ? window.scrollY : 0;
-
-    document.body.style.cssText = `
-      overflow: hidden;
-    `;
-
-    return () => {
-      document.body.style.cssText = '';
-      window?.scroll(0, scrollPosition.current);
-    };
-  }, []);
-
   useEffect(() => {
     const verify = () => {
       if (!isBrowser()) return;

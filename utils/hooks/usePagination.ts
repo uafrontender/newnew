@@ -16,6 +16,7 @@ interface PaginatedData<T> {
   data: T[];
   loading: boolean;
   hasMore: boolean;
+  initialLoadDone: boolean;
   loadMore: (limit?: number) => Promise<void>;
 }
 
@@ -25,9 +26,10 @@ function usePagination<T>(
   delay?: boolean
 ): PaginatedData<T> {
   const [data, setData] = useState<T[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [delayed, setDelayed] = useState(delay);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [initialLoadDone, setInitialLoadDone] = useState<boolean>(false);
+  const [delayed, setDelayed] = useState<boolean>(!!delay);
 
   const savedPageToken = useRef<string | undefined>(undefined);
 
@@ -82,24 +84,30 @@ function usePagination<T>(
     setData([]);
     setHasMore(true);
     setLoading(false);
-    loadMoreData().catch((e) => console.error(e));
+
+    loadMoreData()
+      .then(() => {
+        setInitialLoadDone(true);
+      })
+      .catch((e) => console.error(e));
   }, [delayed, loadMoreData]);
 
   const loadMore = useCallback(
     async (limit?: number) => {
-      if (delayed || loading || !hasMore) {
+      if (delayed || loading || !hasMore || !initialLoadDone) {
         return;
       }
 
       return loadMoreData(limit);
     },
-    [delayed, loading, hasMore, loadMoreData]
+    [delayed, loading, hasMore, initialLoadDone, loadMoreData]
   );
 
   return {
     data,
     loading,
     hasMore,
+    initialLoadDone,
     loadMore,
   };
 }

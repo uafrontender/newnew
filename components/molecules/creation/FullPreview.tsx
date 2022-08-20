@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -35,21 +35,6 @@ const FullPreview: React.FC<IFullPreview> = (props) => {
     e.preventDefault();
     e.stopPropagation();
   };
-
-  useEffect(() => {
-    if (open) {
-      document.body.style.cssText = `
-        overflow: hidden;
-        position: fixed;
-      `;
-    } else {
-      document.body.style.cssText = '';
-    }
-
-    return () => {
-      document.body.style.cssText = '';
-    };
-  }, [open]);
 
   return (
     <Modal show={open} onClose={handleClose}>

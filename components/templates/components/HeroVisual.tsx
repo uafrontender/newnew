@@ -2,11 +2,11 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import styled, { keyframes, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
-import { AuthLayoutContext } from './AuthLayout';
-import useImageLoaded from '../../utils/hooks/useImageLoaded';
-import assets from '../../constants/assets';
+import { AuthLayoutContext } from '../AuthLayout';
+import useImageLoaded from '../../../utils/hooks/useImageLoaded';
+import assets from '../../../constants/assets';
 // Cyclic dependency
-import isSafari from '../../utils/isSafari';
+import isSafari from '../../../utils/isSafari';
 
 interface IHeroVisual {}
 

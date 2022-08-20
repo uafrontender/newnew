@@ -42,7 +42,6 @@ import {
   TThumbnailParameters,
 } from '../../../redux-store/slices/creationStateSlice';
 import { Mixpanel } from '../../../utils/mixpanel';
-import isBrowser from '../../../utils/isBrowser';
 import CoverImagePreviewEdit from './CoverImagePreviewEdit';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
@@ -472,22 +471,6 @@ const FileUpload: React.FC<IFileUpload> = ({
     isDesktop,
     handleFullPreview,
   ]);
-
-  useEffect(() => {
-    if (isBrowser()) {
-      if (showEllipseMenu) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = 'auto';
-      }
-    }
-
-    return () => {
-      if (isBrowser()) {
-        document.body.style.overflow = 'auto';
-      }
-    };
-  }, [showEllipseMenu]);
 
   return (
     <SWrapper>
