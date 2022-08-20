@@ -334,21 +334,6 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     return true;
   }, [isAnnouncement, isMyAnnouncement, chatRoom]);
 
-  useEffect(() => {
-    if (isBrowser()) {
-      document.body.style.cssText = `
-        overflow: hidden;
-        position: fixed;
-      `;
-    } else {
-      document.body.style.cssText = '';
-    }
-
-    return () => {
-      document.body.style.cssText = '';
-    };
-  }, []);
-
   const messagesScrollContainerRef = useRef<HTMLDivElement>();
 
   useEffect(() => {

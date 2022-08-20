@@ -21,7 +21,6 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   const { t } = useTranslation('page-Profile');
   const theme = useTheme();
   const { cards, isCardsLoading, handleSetCards, fetchCards } = useCards();
-
   const [isAddCardModal, setIsAddCardModal] = useState(false);
 
   useEffect(() => {
@@ -79,11 +78,11 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
 
   return (
     <SSettingsContainer>
-      <SCardsContainer $isNoCards={!cards || cards?.length === 0}>
+      <SCardsContainer isNoCards={!cards || cards?.length === 0}>
         <STitle
           variant={1}
           weight={600}
-          $isNoCards={!cards || cards?.length === 0}
+          isNoCards={!cards || cards?.length === 0}
         >
           {t('Settings.sections.cards.myPaymentMethods')}
         </STitle>
@@ -115,30 +114,33 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
         )}
 
         {/* Empty cards view */}
-        {!cards?.length && !isCardsLoading && (
+        {!cards?.length && (
           <>
-            <SSubText variant={3} weight={600}>
-              {t('Settings.sections.cards.hint')}
-            </SSubText>
+            {!isCardsLoading && (
+              <>
+                <SSubText variant={3} weight={600}>
+                  {t('Settings.sections.cards.hint')}
+                </SSubText>
 
-            <SButton size='sm' onClick={() => setIsAddCardModal(true)}>
-              {t('Settings.sections.cards.button.addNewCard')}
-            </SButton>
+                <SButton size='sm' onClick={() => setIsAddCardModal(true)}>
+                  {t('Settings.sections.cards.button.addNewCard')}
+                </SButton>
+              </>
+            )}
+            {isCardsLoading && (
+              <SLoader>
+                <Lottie
+                  width={75}
+                  height={75}
+                  options={{
+                    loop: true,
+                    autoplay: true,
+                    animationData: logoAnimation,
+                  }}
+                />
+              </SLoader>
+            )}
           </>
-        )}
-
-        {!cards?.length && isCardsLoading && (
-          <SLoader>
-            <Lottie
-              width={75}
-              height={75}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: logoAnimation,
-              }}
-            />
-          </SLoader>
         )}
 
         {!!cards?.length && (
@@ -182,10 +184,10 @@ const SSettingsContainer = styled.div`
 `;
 
 const STitle = styled(Text)<{
-  $isNoCards: boolean;
+  isNoCards: boolean;
 }>`
-  ${({ $isNoCards }) =>
-    $isNoCards
+  ${({ isNoCards }) =>
+    isNoCards
       ? css`
           font-size: 24px;
           line-height: 32px;
@@ -209,19 +211,19 @@ const STitle = styled(Text)<{
 `;
 
 const SCardsContainer = styled.div<{
-  $isNoCards: boolean;
+  isNoCards: boolean;
 }>`
   position: relative;
-  padding: ${({ $isNoCards }) =>
-    $isNoCards ? '30px 16px 32px' : '16px !important'};
+  padding: ${({ isNoCards }) =>
+    isNoCards ? '30px 16px 32px' : '16px !important'};
   min-height: 243px;
   overflow: hidden;
 
   border-radius: ${({ theme }) => theme.borderRadius.large};
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
-  ${({ $isNoCards }) =>
-    $isNoCards
+  ${({ isNoCards }) =>
+    isNoCards
       ? css`
           display: flex;
           flex-direction: column;
@@ -240,8 +242,8 @@ const SCardsContainer = styled.div<{
   user-select: none;
 
   ${({ theme }) => theme.media.tablet} {
-    padding: ${({ $isNoCards }) =>
-      $isNoCards ? '30px 24px 31px' : '24px !important'};
+    padding: ${({ isNoCards }) =>
+      isNoCards ? '30px 24px 31px' : '24px !important'};
   }
 `;
 

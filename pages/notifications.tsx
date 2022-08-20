@@ -1,7 +1,12 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-lonely-if */
-import React, { ReactElement, useCallback, useEffect, useState } from 'react';
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useState,
+  useMemo,
+  useRef,
+} from 'react';
 import Head from 'next/head';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
@@ -25,6 +30,10 @@ import { useNotifications } from '../contexts/notificationsContext';
 import assets from '../constants/assets';
 import { useAppSelector } from '../redux-store/store';
 import Button from '../components/atoms/Button';
+import usePagination, {
+  PaginatedResponse,
+  Paging,
+} from '../utils/hooks/usePagination';
 
 const NoResults = dynamic(
   () => import('../components/molecules/notifications/NoResults')
@@ -38,176 +47,165 @@ export const Notifications = () => {
   const { ref: scrollRef, inView } = useInView();
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  const [notifications, setNotifications] = useState<
-    newnewapi.INotification[] | null
-  >(null);
-  const [unreadNotifications, setUnreadNotifications] = useState<
-    number[] | null
-  >(null);
-  const [notificationsNextPageToken, setNotificationsNextPageToken] = useState<
-    string | undefined | null
-  >('');
-  const [loading, setLoading] = useState<boolean | undefined>(undefined);
-  const [initialLoad, setInitialLoad] = useState<boolean>(true);
-  const [defaultLimit, setDefaultLimit] = useState<number>(6);
+
+  const [newNotifications, setNewNotifications] = useState<
+    newnewapi.INotification[]
+  >([]);
+  const [unreadNotificationIds, setUnreadNotificationIds] = useState<number[]>(
+    []
+  );
+
+  const localUnreadNotificationCount = useRef<number | undefined>(undefined);
   const { unreadNotificationCount, fetchNotificationCount } =
     useNotifications();
-  const [localUnreadNotificationCount, setLocalUnreadNotificationCount] =
-    useState<number>(0);
 
-  const fetchNotification = useCallback(
-    async (args?: any) => {
-      if (loading) return;
-      const limit: number = args && args.limit ? args.limit : defaultLimit;
-      const pageToken: string = args && args.pageToken ? args.pageToken : null;
+  const loadData = useCallback(
+    async (
+      paging: Paging
+    ): Promise<PaginatedResponse<newnewapi.INotification>> => {
+      const payload = new newnewapi.GetMyNotificationsRequest({
+        paging,
+      });
 
-      try {
-        if (!pageToken && limit === defaultLimit) {
-          setNotifications([]);
-        }
+      const res = await getMyNotifications(payload);
 
-        setLoading(true);
-        const payload = new newnewapi.GetMyNotificationsRequest({
-          paging: {
-            limit,
-            pageToken,
-          },
-        });
+      if (!res.data || res.error) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
 
-        const res = await getMyNotifications(payload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (res.data.notifications.length > 0) {
-          if (limit === defaultLimit) {
-            setNotifications((curr) => {
-              const arr = curr ? [...curr] : [];
-              res.data?.notifications.forEach((item) => {
-                arr.push(item);
-              });
-              return arr;
-            });
-            setUnreadNotifications((curr) => {
-              const arr = curr ? [...curr] : [];
-              res.data?.notifications.forEach((item) => {
-                if (!item.isRead) {
-                  arr.push(item.id as number);
-                }
-              });
-              return arr;
-            });
-            setNotificationsNextPageToken(res.data.paging?.nextPageToken);
-          } else {
-            setNotifications((curr) => {
-              const arr = curr ? [...curr] : [];
-              if (res.data?.notifications[0])
-                arr.unshift(res.data.notifications[0]);
-              return arr;
-            });
-            setUnreadNotifications((curr) => {
-              const arr = curr ? [...curr] : [];
-              if (res.data?.notifications[0].id)
-                arr.push(res.data.notifications[0].id as number);
-              return arr;
-            });
-            // We don`t update token since we only loaded the new first items
+      setUnreadNotificationIds((curr) => {
+        const arr = curr.slice();
+        res.data?.notifications.forEach((item) => {
+          if (!item.isRead) {
+            arr.push(item.id as number);
           }
-        } else {
-          // If there is no results then there is no more pages to load
-          setNotificationsNextPageToken(null);
-        }
-
-        if (!res.data.paging?.nextPageToken)
-          setNotificationsNextPageToken(null);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setLoading(false);
-      }
-    },
-    [loading, defaultLimit]
-  );
-
-  const readNotification = useCallback(
-    async () => {
-      try {
-        const payload = new newnewapi.MarkAsReadRequest({
-          notificationIds: unreadNotifications,
         });
-        const res = await markAsRead(payload);
-        if (unreadNotifications && notifications) {
-          const arr = notifications;
-          unreadNotifications.forEach((unreadItem) => {
-            const index = arr.findIndex(
-              (item) => (item.id as number) === unreadItem
-            );
-            if (index > -1) {
-              arr[index].isRead = true;
-            }
-          });
-          setNotifications(arr);
-        }
-        if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-        fetchNotificationCount();
-        setUnreadNotifications(null);
-      } catch (err) {
-        console.error(err);
-      }
+        return arr;
+      });
+
+      return {
+        nextData: res.data.notifications,
+        nextPageToken: res.data.paging?.nextPageToken,
+      };
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [unreadNotifications, notifications]
+    []
   );
+
+  const {
+    data: notifications,
+    loading,
+    hasMore,
+    initialLoadDone,
+    loadMore,
+  } = usePagination(loadData, 6);
+
+  const fetchNewNotification = useCallback(async () => {
+    const payload = new newnewapi.GetMyNotificationsRequest({
+      paging: {
+        limit: 1,
+      },
+    });
+
+    const res = await getMyNotifications(payload);
+
+    if (!res.data || res.error) {
+      throw new Error(res.error?.message ?? 'Request failed');
+    }
+
+    setUnreadNotificationIds((curr) => {
+      const arr = curr.slice();
+      if (res.data?.notifications[0].id)
+        arr.push(res.data.notifications[0].id as number);
+      return arr;
+    });
+
+    setNewNotifications((curr) => {
+      const arr = curr.slice();
+      res.data?.notifications.forEach((item) => {
+        if (!item.isRead) {
+          arr.push(item);
+        }
+      });
+      return arr;
+    });
+  }, []);
+
+  const markNotificationsAsRead = useCallback(async () => {
+    try {
+      const payload = new newnewapi.MarkAsReadRequest({
+        notificationIds: unreadNotificationIds,
+      });
+
+      const res = await markAsRead(payload);
+
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+      setUnreadNotificationIds([]);
+      fetchNotificationCount();
+    } catch (err) {
+      console.error(err);
+    }
+  }, [unreadNotificationIds, fetchNotificationCount]);
 
   const handleMarkAllAsRead = useCallback(async () => {
     try {
       const payload = new newnewapi.EmptyRequest({});
       await markAllAsRead(payload);
+
       fetchNotificationCount();
-      setUnreadNotifications(null);
+      setUnreadNotificationIds([]);
     } catch (err) {
       console.error(err);
     }
   }, [fetchNotificationCount]);
 
   useEffect(() => {
-    if (!notifications) {
-      fetchNotification();
+    if (unreadNotificationIds.length > 0) {
+      markNotificationsAsRead();
     }
-  }, [notifications, fetchNotification]);
+  }, [unreadNotificationIds, markNotificationsAsRead]);
 
   useEffect(() => {
-    if (unreadNotifications && unreadNotifications.length > 0) {
-      readNotification();
+    if (localUnreadNotificationCount.current === undefined) {
+      localUnreadNotificationCount.current = unreadNotificationCount;
+      return;
     }
-  }, [unreadNotifications, readNotification]);
 
-  useEffect(() => {
-    if (initialLoad) {
-      setLocalUnreadNotificationCount(unreadNotificationCount);
-      setInitialLoad(false);
+    if (!initialLoadDone) {
+      return;
+    }
+
+    // TODO: What if there are 2 new notifications?
+    if (unreadNotificationCount > localUnreadNotificationCount.current) {
+      fetchNewNotification();
     } else {
-      if (unreadNotificationCount > localUnreadNotificationCount) {
-        fetchNotification({ limit: 1 });
-      } else {
-        setLocalUnreadNotificationCount(unreadNotificationCount);
-      }
+      localUnreadNotificationCount.current = unreadNotificationCount;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialLoad, unreadNotificationCount]);
+  }, [initialLoadDone, unreadNotificationCount, fetchNewNotification]);
 
   useEffect(() => {
-    if (inView && !loading && notificationsNextPageToken) {
-      fetchNotification({ pageToken: notificationsNextPageToken });
+    if (inView && !loading && hasMore) {
+      loadMore().catch((e) => console.error(e));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, loading, notificationsNextPageToken]);
+  }, [inView, loading, hasMore, loadMore]);
 
   useEffect(() => {
-    if (!user.loggedIn) {
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router?.push('/sign-up');
     }
-  }, [user.loggedIn, router]);
+  }, [user.loggedIn, user._persist?.rehydrated, router]);
+
+  const displayedNotifications: newnewapi.INotification[] = useMemo(() => {
+    const allNotifications = [...newNotifications, ...notifications];
+    const notificationsWithStatus = allNotifications.map((notification) => {
+      const isRead = !unreadNotificationIds.includes(notification.id as number);
+      return {
+        ...notification,
+        isRead,
+      };
+    });
+    return notificationsWithStatus;
+  }, [notifications, newNotifications, unreadNotificationIds]);
 
   const renderNotification = useCallback(
     (item: newnewapi.INotification) => (
@@ -234,32 +232,24 @@ export const Notifications = () => {
             </SButton>
           )}
         </SHeadingWrapper>
-        {loading === undefined ? (
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
-        ) : !notifications && loading ? (
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
-        ) : notifications && notifications.length < 1 && !loading ? (
+
+        {displayedNotifications.length > 0 ? (
+          displayedNotifications?.map(renderNotification)
+        ) : !hasMore ? (
           <NoResults />
-        ) : (
-          notifications?.map(renderNotification)
-        )}
-        {notificationsNextPageToken && !loading && (
+        ) : !initialLoadDone ? (
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        ) : null}
+
+        {initialLoadDone && hasMore && !loading && (
           <SRef ref={scrollRef}>
             <Lottie
               width={64}

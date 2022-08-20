@@ -58,10 +58,10 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
   const { data, loading, hasMore, loadMore } = usePagination(loadData, 10);
 
   useEffect(() => {
-    if (inView && hasMore) {
+    if (inView && !loading && hasMore) {
       loadMore().catch((e) => console.error(e));
     }
-  }, [inView, hasMore, loadMore]);
+  }, [inView, loading, hasMore, loadMore]);
 
   const hasNoResults = data.length === 0 && !hasMore;
 

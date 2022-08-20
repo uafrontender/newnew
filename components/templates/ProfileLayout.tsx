@@ -460,7 +460,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const moreButtonRef = useRef() as any;
 
   return (
-    <ErrorBoundary>
+    <>
       <SGeneral restrictMaxWidth>
         <SProfileLayout>
           <ProfileBackground
@@ -680,7 +680,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />
-    </ErrorBoundary>
+    </>
   );
 };
 
