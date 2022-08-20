@@ -12,7 +12,6 @@ interface IModal {
   overlaydim?: boolean;
   additionalz?: number;
   custombackdropfiltervalue?: number;
-  withoutOverlay?: boolean;
   children: ReactNode;
   onClose?: () => void;
 }
@@ -24,21 +23,20 @@ const Modal: React.FC<IModal> = React.memo((props) => {
     overlaydim,
     additionalz,
     custombackdropfiltervalue,
-    withoutOverlay,
     children,
     onClose,
   } = props;
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
   useEffect(() => {
-    if (!withoutOverlay && show) {
+    if (show) {
       enableOverlayMode();
     }
 
     return () => {
       disableOverlayMode();
     };
-  }, [withoutOverlay, show, enableOverlayMode, disableOverlayMode]);
+  }, [show, enableOverlayMode, disableOverlayMode]);
 
   useEffect(() => {
     const blurredBody = document.getElementById('__next');
@@ -48,42 +46,40 @@ const Modal: React.FC<IModal> = React.memo((props) => {
     }
   }, [show]);
 
-  if (!show) return null;
-
-  if (isBrowser()) {
-    return ReactDOM.createPortal(
-      <AnimatePresence>
-        <StyledModalOverlay
-          key='modal-overlay'
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{
-            type: 'tween',
-            duration: transitionspeed ?? 0.15,
-            delay: 0,
-          }}
-          // show={show}
-          // onClick={onClose}
-          overlaydim={!overlaydim ? 'false' : overlaydim.toString()}
-          additionalz={additionalz ?? undefined}
-          custombackdropfiltervalue={custombackdropfiltervalue ?? undefined}
-          transitionspeed={transitionspeed ?? 0.15}
-        >
-          <SClickableDiv
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose?.();
-            }}
-          />
-          {children}
-        </StyledModalOverlay>
-      </AnimatePresence>,
-      document.getElementById('modal-root') as HTMLElement
-    );
+  if (!show || !isBrowser()) {
+    return null;
   }
 
-  return null;
+  return ReactDOM.createPortal(
+    <AnimatePresence>
+      <StyledModalOverlay
+        key='modal-overlay'
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{
+          type: 'tween',
+          duration: transitionspeed ?? 0.15,
+          delay: 0,
+        }}
+        // show={show}
+        // onClick={onClose}
+        overlaydim={!overlaydim ? 'false' : overlaydim.toString()}
+        additionalz={additionalz ?? undefined}
+        custombackdropfiltervalue={custombackdropfiltervalue ?? undefined}
+        transitionspeed={transitionspeed ?? 0.15}
+      >
+        <SClickableDiv
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose?.();
+          }}
+        />
+        {children}
+      </StyledModalOverlay>
+    </AnimatePresence>,
+    document.getElementById('modal-root') as HTMLElement
+  );
 });
 
 interface IStyledModalOverlay {
