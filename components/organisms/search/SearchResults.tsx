@@ -66,13 +66,9 @@ export const SearchResults = () => {
             active={activeTab === tab.id}
             key={tab.id}
             onClick={() => {
-              if (tab.id === 'posts') {
-                router.push(
-                  `/search?query=${searchValue}&type=${searchType}&tab=${tab.id}`
-                );
-              } else {
-                router.push(`/search?query=${searchValue}&tab=${tab.id}`);
-              }
+              router.push(
+                `/search?query=${searchValue}&type=${searchType}&tab=${tab.id}`
+              );
             }}
           >
             <InlineSvg
