@@ -190,6 +190,7 @@ interface ISSidebar {
 const SSidebar = styled.div<ISSidebar>`
   padding-top: 16px;
   height: 100%;
+
   background: ${(props) =>
     props.theme.name === 'light'
       ? props.theme.colors.white
@@ -258,6 +259,7 @@ const SContent = styled.div`
   position: fixed;
   padding: 0 0 20px;
   width: 100vw;
+
   ${(props) => props.theme.media.laptop} {
     width: calc(100% - 384px);
     margin-left: auto;

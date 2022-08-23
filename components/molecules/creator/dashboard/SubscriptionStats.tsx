@@ -20,21 +20,22 @@ import { getMyRooms } from '../../../../api/endpoints/chat';
 import Lottie from '../../../atoms/Lottie';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import { useAppSelector } from '../../../../redux-store/store';
-import { useGetChats } from '../../../../contexts/chatContext';
 
 export const SubscriptionStats = () => {
   const { t } = useTranslation('page-Creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const { setMobileChatOpened } = useGetChats();
   const [filter, setFilter] = useState('7_days');
-  const [mySubscribersIsLoading, setMySubscribersIsLoading] =
-    useState<boolean | null>(null);
+  const [mySubscribersIsLoading, setMySubscribersIsLoading] = useState<
+    boolean | null
+  >(null);
   const [newSubs, setNewSubs] = useState<newnewapi.ISubscriber[]>([]);
-  const [myAnnouncementRoomId, setMyAnnouncementRoomId] =
-    useState<number | undefined>();
+  const [myAnnouncementRoomId, setMyAnnouncementRoomId] = useState<
+    number | undefined
+  >();
   const [loadingRoom, setLoadingRoom] = useState<boolean>(false);
 
   async function fetchMySubscribers(
@@ -224,24 +225,20 @@ export const SubscriptionStats = () => {
               {t('dashboard.subscriptionStats.banner.description')}
             </SDescription>
           </SBannerTopBlock>
-          {!isMobile ? (
-            <Link
-              href={`/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoomId}`}
-            >
-              <a>
-                <SButton view='primaryGrad'>
-                  {t('dashboard.subscriptionStats.banner.submit')}
-                </SButton>
-              </a>
-            </Link>
-          ) : (
-            <SButton
-              view='primaryGrad'
-              onClick={() => setMobileChatOpened(true)}
-            >
-              {t('dashboard.subscriptionStats.banner.submit')}
-            </SButton>
-          )}
+
+          <Link
+            href={
+              !isMobile
+                ? `/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoomId}`
+                : `/direct-messages/${user.userData?.username}-announcement`
+            }
+          >
+            <a>
+              <SButton view='primaryGrad'>
+                {t('dashboard.subscriptionStats.banner.submit')}
+              </SButton>
+            </a>
+          </Link>
         </SBannerContainer>
       )}
     </SContainer>
