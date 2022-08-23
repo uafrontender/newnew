@@ -227,43 +227,47 @@ const ChatList: React.FC<IFunctionProps> = ({
     }
   };
 
-  const fetchRoomByUsername = async (
-    name: string,
-    roomKind: number,
-    myRole?: number
-  ) => {
-    try {
-      const payload = new newnewapi.GetMyRoomsRequest({
-        searchQuery: name,
-        roomKind,
-        myRole,
-      });
-      const res = await getMyRooms(payload);
+  const fetchRoomByUsername = useCallback(
+    async (name: string | null, roomKind: number, myRole?: number) => {
+      try {
+        const payload = new newnewapi.GetMyRoomsRequest({
+          searchQuery: name,
+          roomKind,
+          myRole,
+        });
+        const res = await getMyRooms(payload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
-      }
-      if (res.data && res.data.rooms.length > 0) {
-        const room = res.data.rooms[0];
-        if (room.myRole === 1) {
-          setActiveTab('chatRoomsCreators');
-        } else {
-          setActiveTab('chatRoomsSubs');
+        if (!res.data || res.error) {
+          throw new Error(res.error?.message ?? 'Request failed');
         }
-
-        if (room.id) {
-          if (activeChatIndex !== room.id.toString()) {
-            setActiveChatIndex(room.id.toString());
+        if (res.data && res.data.rooms.length > 0) {
+          const room = res.data.rooms[0];
+          if (name === null && roomKind === 4) {
+            setActiveTab('chatRoomsSubs');
+            setUpdatedChat(room);
+            return room;
           }
+          if (room.myRole === 1) {
+            setActiveTab('chatRoomsCreators');
+          } else {
+            setActiveTab('chatRoomsSubs');
+          }
+
+          if (room.id) {
+            if (activeChatIndex !== room.id.toString()) {
+              setActiveChatIndex(room.id.toString());
+            }
+          }
+          setUpdatedChat(room);
+          return room;
         }
-        setUpdatedChat(room);
-        return room;
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-    return null;
-  };
+      return null;
+    },
+    [activeChatIndex]
+  );
 
   const getRoomByUserName = useCallback(
     (uname: string) => {
@@ -272,7 +276,13 @@ const ChatList: React.FC<IFunctionProps> = ({
         isComplicatedRequest.length > 0 &&
         isComplicatedRequest[isComplicatedRequest.length - 1] === 'announcement'
       ) {
-        return fetchRoomByUsername(isComplicatedRequest[0], 4);
+        const isMyAnnouncement =
+          isComplicatedRequest[0] === user.userData?.username;
+        return fetchRoomByUsername(
+          isMyAnnouncement ? null : isComplicatedRequest[0],
+          4,
+          isMyAnnouncement ? 2 : undefined
+        );
       }
       if (
         isComplicatedRequest.length > 0 &&
@@ -283,13 +293,12 @@ const ChatList: React.FC<IFunctionProps> = ({
 
       return fetchRoomByUsername(uname, 1);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [user.userData?.username, fetchRoomByUsername]
   );
 
   useEffectOnce(() => {
     (async () => {
-      if (username && username !== '-mobile') {
+      if (username && username !== '-mobile' && user.userData?.username) {
         const room = await getRoomByUserName(username);
         if (room) {
           openChat({ chatRoom: room, showChatList: null });
@@ -735,6 +744,12 @@ const SSectionContent = styled.div`
   position: relative;
   overflow-y: auto;
   flex-direction: column;
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 `;
 
 const STabs = styled.div`

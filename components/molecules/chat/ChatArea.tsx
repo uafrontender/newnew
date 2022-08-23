@@ -142,14 +142,14 @@ const ChatArea: React.FC<IChatArea> = ({
         console.error(err);
       }
     }
-    if (chatRoom) {
+    if (chatRoom && chatRoom.visavis) {
       if (chatRoom.myRole === 1) {
         fetchIsSubscribed();
       } else {
-        const isMyActive = mySubscribers.find(
+        const isMyActiveSub = mySubscribers.find(
           (sub) => sub.user?.uuid === chatRoom.visavis?.uuid
         );
-        if (!isMyActive) setIsMessagingDisabled(true);
+        if (!isMyActiveSub) setIsMessagingDisabled(true);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -274,7 +274,6 @@ const ChatArea: React.FC<IChatArea> = ({
   }, [usersIBlocked, chatRoom, isVisavisBlocked]);
 
   useEffect(() => {
-    // console.log(usersBlockedMe, chatRoom);
     if (usersBlockedMe.length > 0 && chatRoom) {
       const isBlocked = usersBlockedMe.find(
         (i) => i === chatRoom?.visavis?.uuid
@@ -283,12 +282,7 @@ const ChatArea: React.FC<IChatArea> = ({
         setIsMessagingDisabled(true);
       }
     }
-    // if (isMessagingDisabled) setIsMessagingDisabled(false);
-  }, [
-    usersBlockedMe,
-    chatRoom,
-    // isMessagingDisabled
-  ]);
+  }, [usersBlockedMe, chatRoom]);
 
   useEffect(() => {
     if (newMessage && newMessage.roomId === chatRoom?.id) {
@@ -834,6 +828,12 @@ const SCenterPart = styled.div`
   flex-direction: column-reverse;
   padding: 0 12px;
   position: relative;
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   ${({ theme }) => theme.media.tablet} {
     padding: 0 24px;
   }
