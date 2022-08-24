@@ -17,20 +17,14 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import {
   deleteMcOption,
   doFreeVote,
-  voteOnPost,
   // voteOnPostWithWallet,
 } from '../../../../api/endpoints/multiple_choice';
-import {
-  createStripeSetupIntent,
-  // getTopUpWalletWithPaymentPurposeUrl,
-} from '../../../../api/endpoints/payments';
 
 import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../../checkout/PaymentModal';
 import McOptionConfirmVoteModal from './McOptionConfirmVoteModal';
 
 import { formatNumber } from '../../../../utils/format';
@@ -60,6 +54,9 @@ import McConfirmDeleteOptionModal from './moderation/McConfirmDeleteOptionModal'
 import { Mixpanel } from '../../../../utils/mixpanel';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
+import useStripePayment from '../../../../utils/hooks/useStripePayment';
+import PaymentModalNew from '../../checkout/PaymentModalNew';
+import { StripePaymentFinalizeOptions } from '../../../../utils/stripePayment';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 const getPayWithCardErrorMessage = (
@@ -409,22 +406,41 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   //   router.locale,
   // ]);
 
+  const createStripeRequest = useCallback(() => {
+    console.log('CALLED');
+    console.log({
+      postUuid: postId,
+      votesCount: parseInt(supportBidAmount),
+      optionId: option.id,
+    });
+    const voteOnPostRequest = new newnewapi.VoteOnPostRequest({
+      postUuid: postId,
+      votesCount: parseInt(supportBidAmount),
+      optionId: option.id,
+    });
+
+    const payload = new newnewapi.CreateStripeSetupIntentRequest({
+      ...(!user.loggedIn ? { guestEmail: '' } : {}),
+      ...(!user.loggedIn
+        ? { successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${postId}` }
+        : {}),
+      mcVoteRequest: voteOnPostRequest,
+    });
+
+    return payload;
+  }, [postId, supportBidAmount, option.id, user.loggedIn]);
+  const stripePayment = useStripePayment(createStripeRequest);
+
   const handlePayWithCard = useCallback(
-    async ({
-      cardUuid,
-      stripeSetupIntentClientSecret,
-      saveCard,
-    }: {
-      cardUuid?: string;
-      stripeSetupIntentClientSecret: string;
-      saveCard?: boolean;
-    }) => {
+    async (options: StripePaymentFinalizeOptions) => {
       setLoadingModalOpen(true);
       handleCloseConfirmVoteModal();
 
       if (!user.loggedIn) {
         router.push(
-          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+          `${
+            process.env.NEXT_PUBLIC_APP_URL
+          }/sign-up-payment?stripe_setup_intent_client_secret=${stripePayment.getStripeToken()}`
         );
         return;
       }
@@ -435,35 +451,18 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         _component: 'McOptionCard',
       });
       try {
-        const stripeContributionRequest =
-          new newnewapi.StripeContributionRequest({
-            cardUuid,
-            stripeSetupIntentClientSecret,
-            ...(saveCard !== undefined
-              ? {
-                  saveCard,
-                }
-              : {}),
-          });
+        const status = await stripePayment.finalize(options);
 
-        const res = await voteOnPost(stripeContributionRequest);
-
-        if (
-          !res.data ||
-          res.error ||
-          res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
-        ) {
-          throw new Error(
-            res.error?.message ??
-              t(getPayWithCardErrorMessage(res.data?.status))
-          );
+        if (status !== newnewapi.VoteOnPostResponse.Status.SUCCESS) {
+          throw new Error(t(getPayWithCardErrorMessage(status)));
         }
 
-        const optionFromResponse = (res.data
-          .option as newnewapi.MultipleChoice.Option)!!;
-        optionFromResponse.isSupportedByMe = true;
+        const updatedOption = new newnewapi.MultipleChoice.Option({
+          ...option,
+          isSupportedByMe: true,
+        });
 
-        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        handleAddOrUpdateOptionFromResponse(updatedOption);
 
         handleSetPaymentSuccessModalOpen(true);
         handleSetSupportedBid('');
@@ -484,6 +483,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       postId,
       user.loggedIn,
       router,
+      option,
+      stripePayment,
       t,
     ]
   );
@@ -508,10 +509,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         throw new Error(res.error?.message ?? 'Request failed');
       }
 
-      const optionFromResponse = res.data
-        .option as newnewapi.MultipleChoice.Option;
-      optionFromResponse.isSupportedByMe = true;
-      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+      const updatedOption = new newnewapi.MultipleChoice.Option({
+        ...option,
+        isSupportedByMe: true,
+      });
+      handleAddOrUpdateOptionFromResponse(updatedOption);
       setLoadingModalOpen(false);
       handleResetFreeVote();
       handleSetPaymentSuccessModalOpen(true);
@@ -522,40 +524,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     }
   }, [
     postId,
-    option.id,
+    option,
     appConstants.mcFreeVoteCount,
     handleAddOrUpdateOptionFromResponse,
     handleSetPaymentSuccessModalOpen,
     handleResetFreeVote,
   ]);
-
-  const createSetupIntent = useCallback(async () => {
-    try {
-      const voteOnPostRequest = new newnewapi.VoteOnPostRequest({
-        postUuid: postId,
-        votesCount: parseInt(supportBidAmount),
-        optionId: option.id,
-      });
-
-      const payload = new newnewapi.CreateStripeSetupIntentRequest({
-        ...(!user.loggedIn ? { guestEmail: '' } : {}),
-        ...(!user.loggedIn
-          ? { successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${postId}` }
-          : {}),
-        mcVoteRequest: voteOnPostRequest,
-      });
-      const response = await createStripeSetupIntent(payload);
-
-      if (!response.data || response.error) {
-        throw new Error(response.error?.message || 'Some error occurred');
-      }
-
-      return response.data;
-    } catch (err) {
-      console.error(err);
-      return undefined;
-    }
-  }, [postId, supportBidAmount, option.id, user.loggedIn]);
 
   const goToNextStep = () => {
     if (
@@ -832,22 +806,14 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         />
         {/* Payment Modal */}
         {paymentModalOpen ? (
-          <PaymentModal
-            zIndex={12}
+          <PaymentModalNew
+            stripePayment={stripePayment}
             isOpen={paymentModalOpen}
-            amount={(parseInt(supportBidAmount) * 100 || 0) * votePrice}
-            createStripeSetupIntent={createSetupIntent}
-            // {...(walletBalance?.usdCents &&
-            // walletBalance.usdCents >=
-            //   parseInt(supportBidAmount) * votePrice * 100
-            //   ? {}
-            //   : {
-            //       predefinedOption: 'card',
-            //     })}
-            // predefinedOption='card'
-            onClose={() => setPaymentModalOpen(false)}
-            handlePayWithCard={handlePayWithCard}
+            zIndex={12}
             redirectUrl={`post/${postId}`}
+            amount={(parseInt(supportBidAmount) * 100 || 0) * votePrice}
+            onPay={handlePayWithCard}
+            onClose={() => setPaymentModalOpen(false)}
             // handlePayWithWallet={handlePayWithWallet}
             bottomCaption={
               <>
@@ -895,7 +861,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 {option.text}
               </SPaymentModalOptionText>
             </SPaymentModalHeader>
-          </PaymentModal>
+          </PaymentModalNew>
         ) : null}
         {/* Loading Modal */}
         <LoadingModal isOpen={loadingModalOpen} zIndex={14} />

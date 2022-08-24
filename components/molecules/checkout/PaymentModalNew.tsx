@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../redux-store/store';
 import { useCards } from '../../../contexts/cardsContext';
@@ -9,41 +8,39 @@ import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
 import Modal from '../../organisms/Modal';
 import InlineSvg from '../../atoms/InlineSVG';
 import GoBackButton from '../GoBackButton';
-import CheckoutForm from './CheckoutForm';
 import Lottie from '../../atoms/Lottie';
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import logoAnimation from '../../../public/animations/mobile_logo.json';
+import {
+  StripePayment,
+  StripePaymentFinalizeOptions,
+} from '../../../utils/stripePayment';
+import CheckoutFormNew from './CheckoutFormNew';
 
 interface IPaymentModal {
+  stripePayment: StripePayment;
   isOpen: boolean;
   zIndex: number;
   redirectUrl: string;
   amount?: number;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
-  handlePayWithCard?: (params: {
-    cardUuid?: string;
-    stripeSetupIntentClientSecret: string;
-    saveCard?: boolean;
-  }) => void;
-  createStripeSetupIntent?: () => Promise<
-    newnewapi.CreateStripeSetupIntentResponse | undefined
-  >;
+  onPay: (options: StripePaymentFinalizeOptions) => void;
   onClose: () => void;
   children: React.ReactNode;
 }
 
-const PaymentModal: React.FC<IPaymentModal> = ({
+const PaymentModalNew: React.FC<IPaymentModal> = ({
+  stripePayment,
   isOpen,
   zIndex,
   redirectUrl,
   amount,
   showTocApply,
   bottomCaption,
+  onPay,
   onClose,
-  handlePayWithCard,
-  createStripeSetupIntent,
   children,
 }) => {
   const theme = useTheme();
@@ -53,25 +50,16 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   );
   const { isCardsLoading } = useCards();
 
-  const [stripeSetupIntent, setStripeSetupIntent] =
-    useState<newnewapi.CreateStripeSetupIntentResponse>();
-
   const [isLoadingSetupIntent, setIsLoadingSetupIntent] = useState(false);
+  const [currentStripeToken, setCurrentStripeToken] = useState<string>();
 
   useEffect(() => {
-    const getSetupIntent = async () => {
-      setIsLoadingSetupIntent(true);
-
-      const setupIntent = await createStripeSetupIntent?.();
-
-      setStripeSetupIntent(setupIntent);
+    setIsLoadingSetupIntent(true);
+    stripePayment.initialize().then(({ status, token }) => {
+      if (status!) setCurrentStripeToken(token);
       setIsLoadingSetupIntent(false);
-    };
-
-    if (!stripeSetupIntent) {
-      getSetupIntent();
-    }
-  }, [createStripeSetupIntent, stripeSetupIntent]);
+    });
+  }, [stripePayment]);
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
@@ -105,17 +93,13 @@ const PaymentModal: React.FC<IPaymentModal> = ({
               }}
             />
           )}
-          <StripeElements
-            stipeSecret={
-              stripeSetupIntent?.stripeSetupIntentClientSecret || undefined
-            }
-          >
-            <CheckoutForm
-              bottomCaption={bottomCaption}
-              amount={amount}
-              handlePayWithCard={handlePayWithCard}
-              stipeSecret={stripeSetupIntent?.stripeSetupIntentClientSecret!}
+          <StripeElements stipeSecret={currentStripeToken}>
+            <CheckoutFormNew
+              stripePayment={stripePayment}
               redirectUrl={redirectUrl}
+              amount={amount}
+              bottomCaption={bottomCaption}
+              onPay={onPay}
             />
           </StripeElements>
         </SContentContainer>
@@ -124,14 +108,13 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   );
 };
 
-PaymentModal.defaultProps = {
+PaymentModalNew.defaultProps = {
   amount: undefined,
   showTocApply: undefined,
   bottomCaption: null,
-  handlePayWithCard: () => {},
 };
 
-export default PaymentModal;
+export default PaymentModalNew;
 
 const SWrapper = styled.div`
   width: 100%;
