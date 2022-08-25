@@ -178,8 +178,6 @@ export const General: React.FC<IGeneral> = (props) => {
 
   const mobileNavigationVisible = isMobile && scrollDirection !== 'down';
 
-  throw new Error('test');
-
   return (
     <SBaseLayout
       id='generalContainer'
