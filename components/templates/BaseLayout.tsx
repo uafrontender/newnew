@@ -58,8 +58,4 @@ const SWrapper = styled.div`
 
   min-height: 100vh;
   width: 100vw;
-
-  @supports (-webkit-touch-callout: none) {
-    height: -webkit-fill-available;
-  }
 `;
