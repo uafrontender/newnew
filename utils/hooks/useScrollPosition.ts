@@ -10,17 +10,18 @@ export const useScrollPosition = () => {
 
   useEffect(() => {
     const oldScrollPosition = Number(localStorage.getItem('scrollPosition'));
+
     if (oldScrollPosition > 0) {
       // A delay to let page load
       setTimeout(() => {
-        window.scrollTo(0, oldScrollPosition);
-      }, 100);
+        window.scroll(0, oldScrollPosition);
+      }, 300);
     }
 
-    window.addEventListener('beforeunload', setScrollPosition);
+    window.addEventListener('pagehide', setScrollPosition);
 
     return () => {
-      window.removeEventListener('beforeunload', setScrollPosition);
+      window.removeEventListener('pagehide', setScrollPosition);
     };
   }, [setScrollPosition]);
 };
