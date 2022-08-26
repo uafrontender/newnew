@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useOverlayMode } from '../../contexts/overlayModeContext';
-import ErrorBoundary from '../organisms/ErrorBoundary';
 
 interface IBaseLayout {
   id?: string;
@@ -33,20 +32,18 @@ const BaseLayout: React.FunctionComponent<IBaseLayout> = React.memo(
     }, [overlayModeEnabled]);
 
     return (
-      <ErrorBoundary>
-        <SWrapper
-          id={id}
-          className={className}
-          ref={(element) => {
-            if (containerRef) {
-              // eslint-disable-next-line no-param-reassign
-              containerRef.current = element;
-            }
-          }}
-        >
-          {children}
-        </SWrapper>
-      </ErrorBoundary>
+      <SWrapper
+        id={id}
+        className={className}
+        ref={(element) => {
+          if (containerRef) {
+            // eslint-disable-next-line no-param-reassign
+            containerRef.current = element;
+          }
+        }}
+      >
+        {children}
+      </SWrapper>
     );
   }
 );
@@ -56,10 +53,6 @@ export default BaseLayout;
 const SWrapper = styled.div`
   position: relative;
 
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
-
-  @supports (-webkit-touch-callout: none) {
-    height: -webkit-fill-available;
-  }
 `;
