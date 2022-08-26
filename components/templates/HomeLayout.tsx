@@ -3,7 +3,6 @@ import React from 'react';
 import { LayoutGroup } from 'framer-motion';
 
 import GeneralTemplate from './General';
-import BaseLayout from './BaseLayout';
 
 interface IHomeLayout {
   children: React.ReactNode;
@@ -12,16 +11,15 @@ interface IHomeLayout {
 const HomeLayout: React.FC<IHomeLayout> = (props) => {
   const { children } = props;
 
+  // TODO: fix Error boundary issue (not on top)
   return (
-    <BaseLayout>
-      <LayoutGroup>
-        <GeneralTemplate
-        // restrictMaxWidth={true}
-        >
-          {children}
-        </GeneralTemplate>
-      </LayoutGroup>
-    </BaseLayout>
+    <LayoutGroup>
+      <GeneralTemplate
+      // restrictMaxWidth={true}
+      >
+        {children}
+      </GeneralTemplate>
+    </LayoutGroup>
   );
 };
 
