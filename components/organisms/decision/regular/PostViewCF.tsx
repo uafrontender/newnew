@@ -13,62 +13,64 @@ import dynamic from 'next/dynamic';
 import { useInView } from 'react-intersection-observer';
 import { toast } from 'react-toastify';
 
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
+import { SocketContext } from '../../../../contexts/socketContext';
+import { ChannelsContext } from '../../../../contexts/channelsContext';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
+import { fetchPostByUUID, markPost } from '../../../../api/endpoints/post';
 import {
   doPledgeCrowdfunding,
   fetchPledges,
-} from '../../../api/endpoints/crowdfunding';
+} from '../../../../api/endpoints/crowdfunding';
 
-import Button from '../../atoms/Button';
-import PostVideo from '../../molecules/decision/PostVideo';
-import PostTimer from '../../molecules/decision/PostTimer';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
-import Headline from '../../atoms/Headline';
-import PostVotingTab from '../../molecules/decision/PostVotingTab';
-import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
-import CfBackersStatsSectionFailed from '../../molecules/decision/crowdfunding/CfBackersStatsSectionFailed';
+import Button from '../../../atoms/Button';
+import PostVideo from '../../../molecules/decision/PostVideo';
+import PostTimer from '../../../molecules/decision/PostTimer';
+import PostTopInfo from '../../../molecules/decision/PostTopInfo';
+import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
+import Headline from '../../../atoms/Headline';
+import PostVotingTab from '../../../molecules/decision/PostVotingTab';
+import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
+import CfBackersStatsSectionFailed from '../../../molecules/decision/crowdfunding/CfBackersStatsSectionFailed';
 
 // Utils
-import switchPostType from '../../../utils/switchPostType';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
-import { DotPositionEnum } from '../../atoms/decision/TutorialTooltip';
-import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
-import { useGetAppConstants } from '../../../contexts/appConstantsContext';
-import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import { Mixpanel } from '../../../utils/mixpanel';
+import switchPostType from '../../../../utils/switchPostType';
+import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
+import { DotPositionEnum } from '../../../atoms/decision/TutorialTooltip';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
+import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
-const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
-const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
+const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
+const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
 const PaymentSuccessModal = dynamic(
-  () => import('../../molecules/decision/PaymentSuccessModal')
+  () => import('../../../molecules/decision/PaymentSuccessModal')
 );
-const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
+const HeroPopup = dynamic(
+  () => import('../../../molecules/decision/HeroPopup')
+);
 const TutorialTooltip = dynamic(
-  () => import('../../atoms/decision/TutorialTooltip')
+  () => import('../../../atoms/decision/TutorialTooltip')
 );
 const PostSuccessBox = dynamic(
-  () => import('../../molecules/decision/PostSuccessBox')
+  () => import('../../../molecules/decision/PostSuccessBox')
 );
 const PostWaitingForResponseBox = dynamic(
-  () => import('../../molecules/decision/PostWaitingForResponseBox')
+  () => import('../../../molecules/decision/PostWaitingForResponseBox')
 );
 const CfPledgeLevelsModal = dynamic(
-  () => import('../../molecules/decision/crowdfunding/CfPledgeLevelsModal')
+  () => import('../../../molecules/decision/crowdfunding/CfPledgeLevelsModal')
 );
 const CfPledgeLevelsSection = dynamic(
-  () => import('../../molecules/decision/crowdfunding/CfPledgeLevelsSection')
+  () => import('../../../molecules/decision/crowdfunding/CfPledgeLevelsSection')
 );
 const CfBackersStatsSection = dynamic(
-  () => import('../../molecules/decision/crowdfunding/CfBackersStatsSection')
+  () => import('../../../molecules/decision/crowdfunding/CfBackersStatsSection')
 );
 const CfCrowdfundingSuccess = dynamic(
-  () => import('../../molecules/decision/crowdfunding/CfCrowdfundingSuccess')
+  () => import('../../../molecules/decision/crowdfunding/CfCrowdfundingSuccess')
 );
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {

@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
 import { useAppSelector } from '../../../../redux-store/store';
-import { TCfPledgeWithHighestField } from '../../../organisms/decision/PostViewCF';
+import { TCfPledgeWithHighestField } from '../../../organisms/decision/regular/PostViewCF';
 
 import Button from '../../../atoms/Button';
 import CfPledgeCard from './CfPledgeCard';

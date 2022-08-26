@@ -29,7 +29,7 @@ import {
 import { validateText } from '../../../../api/endpoints/infrastructure';
 import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 
-import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../organisms/decision/regular/PostViewAC';
 import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 

@@ -13,7 +13,7 @@ import styled, { css, useTheme } from 'styled-components';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import Text from '../../../atoms/Text';
-import { TCfPledgeWithHighestField } from '../../../organisms/decision/PostViewCF';
+import { TCfPledgeWithHighestField } from '../../../organisms/decision/regular/PostViewCF';
 
 interface ICfPledgeCard {
   pledge: TCfPledgeWithHighestField;

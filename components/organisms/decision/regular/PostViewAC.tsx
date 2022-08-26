@@ -9,67 +9,111 @@ import React, {
   useState,
 } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
+import moment from 'moment';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
-import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
+import { useRouter } from 'next/router';
 
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
+import { SocketContext } from '../../../../contexts/socketContext';
+import { ChannelsContext } from '../../../../contexts/channelsContext';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
+import { fetchPostByUUID, markPost } from '../../../../api/endpoints/post';
 import {
-  fetchAcOptionById,
   fetchCurrentBidsForPost,
-} from '../../../api/endpoints/auction';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
+  placeBidOnAuction,
+} from '../../../../api/endpoints/auction';
 
-import Headline from '../../atoms/Headline';
-import PostVotingTab from '../../molecules/decision/PostVotingTab';
-import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
-import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
-import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
-import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
-import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
+import PostVideo from '../../../molecules/decision/PostVideo';
+import PostTimer from '../../../molecules/decision/PostTimer';
+import PostTopInfo from '../../../molecules/decision/PostTopInfo';
+import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
 
-import switchPostType from '../../../utils/switchPostType';
-import { fetchPostByUUID } from '../../../api/endpoints/post';
-import switchPostStatus, {
-  TPostStatusStringified,
-} from '../../../utils/switchPostStatus';
-import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
-import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
-import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import useResponseUpload from '../../../utils/hooks/useResponseUpload';
-import { Mixpanel } from '../../../utils/mixpanel';
+// Utils
+import switchPostType from '../../../../utils/switchPostType';
+import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
+import Headline from '../../../atoms/Headline';
+import PostVotingTab from '../../../molecules/decision/PostVotingTab';
+import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
-const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
-const ResponseTimer = dynamic(
-  () => import('../../molecules/decision/ResponseTimer')
+const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
+const AcOptionsTab = dynamic(
+  () => import('../../../molecules/decision/auction/AcOptionsTab')
 );
-const PostTimer = dynamic(() => import('../../molecules/decision/PostTimer'));
-const AcOptionsTabModeration = dynamic(
-  () =>
-    import('../../molecules/decision/auction/moderation/AcOptionsTabModeration')
+const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
+const PaymentSuccessModal = dynamic(
+  () => import('../../../molecules/decision/PaymentSuccessModal')
 );
-const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
+const HeroPopup = dynamic(
+  () => import('../../../molecules/decision/HeroPopup')
+);
+
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.PlaceBidResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.PlaceBidResponse.Status.NOT_ENOUGH_MONEY:
+      return 'errors.notEnoughMoney';
+    case newnewapi.PlaceBidResponse.Status.CARD_NOT_FOUND:
+      return 'errors.cardNotFound';
+    case newnewapi.PlaceBidResponse.Status.CARD_CANNOT_BE_USED:
+      return 'errors.cardCannotBeUsed';
+    case newnewapi.PlaceBidResponse.Status.BLOCKED_BY_CREATOR:
+      return 'errors.blockedByCreator';
+    case newnewapi.PlaceBidResponse.Status.BIDDING_NOT_STARTED:
+      return 'errors.biddingNotStarted';
+    case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
+      return 'errors.biddingIsEnded';
+    default:
+      return 'errors.requestFailed';
+  }
+};
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
 };
 
-interface IPostModerationAC {
+interface IPostViewAC {
   post: newnewapi.Auction;
   postStatus: TPostStatusStringified;
+  stripeSetupIntentClientSecret?: string;
+  saveCard?: boolean;
+  isFollowingDecision: boolean;
+  hasRecommendations: boolean;
+  handleSetIsFollowingDecision: (newValue: boolean) => void;
+  resetSetupIntentClientSecret: () => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleReportOpen: () => void;
+  handleRemoveFromStateUnfavorited: () => void;
+  handleAddPostToStateFavorited: () => void;
 }
 
-const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
-  ({ post, postStatus, handleUpdatePostStatus, handleGoBack }) => {
-    const dispatch = useAppDispatch();
+const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
+  ({
+    post,
+    stripeSetupIntentClientSecret,
+    saveCard,
+    resetSetupIntentClientSecret,
+    postStatus,
+    isFollowingDecision,
+    hasRecommendations,
+    handleSetIsFollowingDecision,
+    handleGoBack,
+    handleUpdatePostStatus,
+    handleReportOpen,
+    handleRemoveFromStateUnfavorited,
+    handleAddPostToStateFavorited,
+  }) => {
     const { t } = useTranslation('modal-Post');
+    const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -79,7 +123,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
-    const showSelectWinnerOption = useMemo(
+    const showSelectingWinnerOption = useMemo(
       () => postStatus === 'waiting_for_decision',
       [postStatus]
     );
@@ -88,12 +132,10 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-    const [winningOptionId, setWinningOptionId] = useState(
-      post.winningOptionId ?? undefined
+    // Response viewed
+    const [responseViewed, setResponseViewed] = useState(
+      post.isResponseViewedByMe ?? false
     );
-
-    // Announcement
-    const [announcement, setAnnouncement] = useState(post.announcement);
 
     // Comments
     const { ref: commentsSectionRef, inView } = useInView({
@@ -112,48 +154,10 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       }
     };
 
-    // Response upload
-    const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<
-      newnewapi.IVideoUrls | undefined
-    >(undefined);
-
-    // Tabs
-    const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
-      post.response ||
-        responseFreshlyUploaded ||
-        postStatus === 'waiting_for_response' ||
-        postStatus === 'processing_response'
-        ? 'response'
-        : 'announcement'
-    );
-
-    const {
-      handleCancelVideoUpload,
-      handleItemChange,
-      handleResetVideoUploadAndProcessingState,
-      handleUploadVideoNotProcessed,
-      handleUploadVideoProcessed,
-      handleVideoDelete,
-      responseFileProcessingETA,
-      responseFileProcessingError,
-      responseFileProcessingLoading,
-      responseFileProcessingProgress,
-      responseFileUploadETA,
-      responseFileUploadError,
-      responseFileUploadLoading,
-      responseFileUploadProgress,
-      uploadedResponseVideoUrl,
-      videoProcessing,
-      responseUploading,
-      responseUploadSuccess,
-    } = useResponseUpload({
-      postId: post.postUuid,
-      postStatus,
-      openedTab,
-      handleUpdatePostStatus,
-      handleUpdateResponseVideo: (newValue) =>
-        setResponseFreshlyUploaded(newValue),
-    });
+    // Vote after stripe redirect
+    const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+    const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] =
+      useState(false);
 
     // Total amount
     const [totalAmount, setTotalAmount] = useState(
@@ -171,17 +175,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     const [optionsLoading, setOptionsLoading] = useState(false);
     const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
-    // Winning option
-    const [winningOption, setWinningOption] = useState<
-      newnewapi.Auction.Option | undefined
-    >();
-
-    const handleUpdateWinningOption = (
-      selectedOption: newnewapi.Auction.Option
-    ) => {
-      setWinningOption(selectedOption);
-      setWinningOptionId(selectedOption.id);
-    };
+    // const currLocation = `/post/${post.postUuid}`;
 
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
@@ -271,7 +265,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
 
     const fetchBids = useCallback(
       async (pageToken?: string) => {
-        if (optionsLoading) return;
+        if (optionsLoading || loadingModalOpen) return;
         try {
           setOptionsLoading(true);
           setLoadingOptionsError('');
@@ -311,7 +305,20 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           console.error(err);
         }
       },
-      [post, setOptions, sortOptions, optionsLoading]
+      [optionsLoading, loadingModalOpen, post.postUuid, sortOptions]
+    );
+
+    const handleRemoveOption = useCallback(
+      (optionToRemove: newnewapi.Auction.Option) => {
+        setOptions((curr) => {
+          const workingArr = [...curr];
+          const workingArrUnsorted = [
+            ...workingArr.filter((o) => o.id !== optionToRemove.id),
+          ];
+          return sortOptions(workingArrUnsorted);
+        });
+      },
+      [setOptions, sortOptions]
     );
 
     const fetchPostLatestData = useCallback(async () => {
@@ -324,19 +331,11 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-
-        if (res.data.auction?.winningOptionId && !winningOptionId) {
-          setWinningOptionId(res.data.auction?.winningOptionId);
-        }
         if (res.data.auction) {
           setTotalAmount(res.data.auction.totalAmount?.usdCents as number);
           setNumberOfOptions(res.data.auction.optionCount as number);
           if (res.data.auction.status)
             handleUpdatePostStatus(res.data.auction.status);
-          if (!responseFreshlyUploaded && res.data.auction?.response) {
-            setResponseFreshlyUploaded(res.data.auction.response);
-          }
-          setAnnouncement(res.data.auction?.announcement);
         }
       } catch (err) {
         console.error(err);
@@ -344,27 +343,31 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const handleRemoveOption = useCallback(
-      (optionToRemove: newnewapi.Auction.Option) => {
-        Mixpanel.track('Removed Option', {
-          _stage: 'Post',
-          _postUuid: post.postUuid,
-          _component: 'PostModerationAC',
-        });
+    const handleAddOrUpdateOptionFromResponse = useCallback(
+      (newOption: newnewapi.Auction.Option) => {
         setOptions((curr) => {
           const workingArr = [...curr];
-          const workingArrUnsorted = [
-            ...workingArr.filter((o) => o.id !== optionToRemove.id),
-          ];
+          let workingArrUnsorted;
+          const idx = workingArr.findIndex((op) => op.id === newOption?.id);
+          if (idx === -1) {
+            workingArrUnsorted = [
+              ...workingArr,
+              newOption as TAcOptionWithHighestField,
+            ];
+          } else {
+            workingArr[idx].supporterCount =
+              newOption?.supporterCount as number;
+            workingArr[idx].totalAmount =
+              newOption?.totalAmount as newnewapi.IMoneyAmount;
+            workingArr[idx].isSupportedByMe = newOption?.isSupportedByMe;
+            workingArrUnsorted = workingArr;
+          }
+
           return sortOptions(workingArrUnsorted);
         });
       },
-      [setOptions, sortOptions, post.postUuid]
+      [setOptions, sortOptions]
     );
-
-    const handleOnResponseTimeExpired = () => {
-      handleUpdatePostStatus('FAILED');
-    };
 
     const handleOnVotingTimeExpired = () => {
       if (options && options.some((o) => o.supporterCount > 0)) {
@@ -377,47 +380,61 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     // Increment channel subs after mounting
     // Decrement when unmounting
     useEffect(() => {
-      addChannel(post.postUuid, {
-        postUpdates: {
-          postUuid: post.postUuid,
-        },
-      });
+      if (socketConnection?.connected) {
+        addChannel(post.postUuid, {
+          postUpdates: {
+            postUuid: post.postUuid,
+          },
+        });
+      }
 
       return () => {
         removeChannel(post.postUuid);
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [socketConnection?.connected]);
 
+    // Mark post as viewed if logged in
     useEffect(() => {
-      setOptions([]);
-      setOptionsNextPageToken('');
-      fetchBids();
-      fetchPostLatestData();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [post.postUuid]);
-
-    useEffect(() => {
-      async function fetchAndSetWinningOption(id: number) {
+      async function markAsViewed() {
+        if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
+          return;
         try {
-          const payload = new newnewapi.GetAcOptionRequest({
-            optionId: id,
+          const markAsViewedPayload = new newnewapi.MarkPostRequest({
+            markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
+            postUuid: post.postUuid,
           });
 
-          const res = await fetchAcOptionById(payload);
+          const res = await markPost(markAsViewedPayload);
 
-          if (res.data?.option) {
-            setWinningOption(res.data.option as newnewapi.Auction.Option);
-          }
+          if (res.error) throw new Error('Failed to mark post as viewed');
         } catch (err) {
           console.error(err);
         }
       }
 
-      if (winningOptionId && !winningOption?.id) {
-        fetchAndSetWinningOption(winningOptionId as number);
-      }
-    }, [winningOptionId, winningOption?.id]);
+      // setTimeout used to fix the React memory leak warning
+      const timer = setTimeout(() => {
+        markAsViewed();
+      });
+      return () => {
+        clearTimeout(timer);
+      };
+    }, [post, user.loggedIn, user.userData?.userUuid]);
+
+    useEffect(() => {
+      // setTimeout used to fix the React memory leak warning
+      const timer = setTimeout(() => {
+        setOptions([]);
+        setOptionsNextPageToken('');
+        fetchBids();
+        fetchPostLatestData();
+      });
+      return () => {
+        clearTimeout(timer);
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [post.postUuid]);
 
     useEffect(() => {
       const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -459,6 +476,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           });
         }
       };
+
       const socketHandlerPostData = (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostUpdated.decode(arr);
@@ -466,38 +484,20 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         if (!decoded) return;
         const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
         if (decodedParsed.postUuid === post.postUuid) {
-          setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents ?? 0);
-          setNumberOfOptions(decoded.post?.auction?.optionCount ?? 0);
-
-          if (!responseFreshlyUploaded && decoded.post?.auction?.response) {
-            setResponseFreshlyUploaded(decoded.post.auction.response);
-          }
+          if (decoded.post?.auction?.totalAmount?.usdCents)
+            setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents);
+          if (decoded.post?.auction?.optionCount)
+            setNumberOfOptions(decoded.post?.auction?.optionCount);
         }
       };
 
-      const socketHandlerPostStatus = async (data: any) => {
+      const socketHandlerPostStatus = (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
         if (!decoded) return;
         if (decoded.postUuid === post.postUuid && decoded.auction) {
           handleUpdatePostStatus(decoded.auction);
-
-          if (
-            !responseFreshlyUploaded &&
-            postStatus === 'processing_response' &&
-            switchPostStatus('ac', decoded.auction) === 'succeeded'
-          ) {
-            const fetchPostPayload = new newnewapi.GetPostRequest({
-              postUuid: post.postUuid,
-            });
-
-            const res = await fetchPostByUUID(fetchPostPayload);
-
-            if (res.data?.auction?.response) {
-              setResponseFreshlyUploaded(res.data?.auction?.response);
-            }
-          }
         }
       };
 
@@ -526,17 +526,82 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     }, [
       socketConnection,
       post,
-      postStatus,
       user.userData?.userUuid,
       setOptions,
       sortOptions,
     ]);
 
     useEffect(() => {
-      if (loadingOptionsError) {
-        toast.error(loadingOptionsError);
+      const makeBidAfterStripeRedirect = async () => {
+        if (!stripeSetupIntentClientSecret || loadingModalOpen) return;
+
+        if (!user._persist?.rehydrated) {
+          return;
+        }
+
+        if (!user.loggedIn) {
+          router.push(
+            `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+          );
+          return;
+        }
+
+        Mixpanel.track('MakeBidAfterStripeRedirect', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostViewAC',
+        });
+
+        try {
+          setLoadingModalOpen(true);
+
+          const stripeContributionRequest =
+            new newnewapi.StripeContributionRequest({
+              stripeSetupIntentClientSecret,
+              ...(saveCard !== undefined
+                ? {
+                    saveCard,
+                  }
+                : {}),
+            });
+
+          resetSetupIntentClientSecret();
+
+          const res = await placeBidOnAuction(stripeContributionRequest);
+
+          if (
+            !res.data ||
+            res.error ||
+            res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
+          ) {
+            throw new Error(
+              res.error?.message ??
+                t(getPayWithCardErrorMessage(res.data?.status))
+            );
+          }
+
+          const optionFromResponse = res.data
+            .option as newnewapi.Auction.Option;
+          optionFromResponse.isSupportedByMe = true;
+          handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+          await fetchPostLatestData();
+
+          setLoadingModalOpen(false);
+          setPaymentSuccessModalOpen(true);
+        } catch (err: any) {
+          console.error(err);
+          toast.error(err.message);
+
+          setLoadingModalOpen(false);
+        }
+      };
+
+      if (stripeSetupIntentClientSecret && !loadingModalOpen) {
+        makeBidAfterStripeRedirect();
       }
-    }, [loadingOptionsError]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user._persist?.rehydrated]);
 
     const goToNextStep = () => {
       if (
@@ -559,10 +624,15 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       }
     };
 
+    useEffect(() => {
+      if (loadingOptionsError) {
+        toast.error(loadingOptionsError);
+      }
+    }, [loadingOptionsError]);
+
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     useEffect(() => {
       if (
-        options.length > 0 &&
         user.userTutorialsProgressSynced &&
         user.userTutorialsProgress.remainingAcSteps &&
         user.userTutorialsProgress.remainingAcSteps[0] ===
@@ -572,7 +642,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       } else {
         setIsPopupVisible(false);
       }
-    }, [options, user]);
+    }, [user]);
 
     // Scroll to comments if hash is present
     useEffect(() => {
@@ -624,124 +694,113 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                 onClick={handleGoBack}
               />
             )}
-            {postStatus === 'waiting_for_response' ||
-            postStatus === 'waiting_for_decision' ? (
-              <ResponseTimer
+            {postStatus === 'voting' ? (
+              <PostTimer
                 timestampSeconds={new Date(
-                  (post.responseUploadDeadline?.seconds as number) * 1000
+                  (post.expiresAt?.seconds as number) * 1000
                 ).getTime()}
-                onTimeExpired={handleOnResponseTimeExpired}
+                postType='ac'
+                onTimeExpired={handleOnVotingTimeExpired}
               />
-            ) : Date.now() > (post.expiresAt?.seconds as number) * 1000 ? (
+            ) : (
               <PostTimerEnded
                 timestampSeconds={new Date(
                   (post.expiresAt?.seconds as number) * 1000
                 ).getTime()}
                 postType='ac'
               />
-            ) : (
-              <PostTimer
-                timestampSeconds={new Date(
-                  (post.expiresAt?.seconds as number) * 1000
-                ).getTime()}
-                postType='ac'
-                isTutorialVisible={options.length > 0}
-                onTimeExpired={handleOnVotingTimeExpired}
-              />
             )}
           </SExpiresSection>
-          <PostVideoModeration
-            key={`key_${announcement?.coverImageUrl}`}
+          <PostVideo
             postId={post.postUuid}
-            announcement={announcement!!}
-            response={(post.response || responseFreshlyUploaded) ?? undefined}
-            thumbnails={{
-              startTime: 1,
-              endTime: 3,
-            }}
-            postStatus={postStatus}
+            announcement={post.announcement!!}
+            response={post.response ?? undefined}
+            responseViewed={responseViewed}
+            handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
             isMuted={mutedMode}
-            openedTab={openedTab}
-            responseFileProcessingETA={responseFileProcessingETA}
-            responseFileProcessingError={responseFileProcessingError}
-            responseFileProcessingLoading={responseFileProcessingLoading}
-            responseFileProcessingProgress={responseFileProcessingProgress}
-            responseFileUploadETA={responseFileUploadETA}
-            responseFileUploadError={responseFileUploadError}
-            responseFileUploadLoading={responseFileUploadLoading}
-            responseFileUploadProgress={responseFileUploadProgress}
-            uploadedResponseVideoUrl={uploadedResponseVideoUrl}
-            videoProcessing={videoProcessing}
-            handleChangeTab={(newValue) => setOpenedTab(newValue)}
             handleToggleMuted={() => handleToggleMutedMode()}
-            handleUpdateResponseVideo={(newValue) =>
-              setResponseFreshlyUploaded(newValue)
-            }
-            handleUpdatePostStatus={handleUpdatePostStatus}
-            handleCancelVideoUpload={handleCancelVideoUpload}
-            handleItemChange={handleItemChange}
-            handleResetVideoUploadAndProcessingState={
-              handleResetVideoUploadAndProcessingState
-            }
-            handleUploadVideoNotProcessed={handleUploadVideoNotProcessed}
-            handleUploadVideoProcessed={handleUploadVideoProcessed}
-            handleVideoDelete={handleVideoDelete}
           />
-          <PostTopInfoModeration
+          <PostTopInfo
             postType='ac'
+            postId={post.postUuid}
             postStatus={postStatus}
             title={post.title}
-            postId={post.postUuid}
             amountInBids={totalAmount}
-            hasWinner={!!winningOptionId}
-            hasResponse={!!post.response}
-            hidden={openedTab === 'response'}
-            handleUpdatePostStatus={handleUpdatePostStatus}
+            hasWinner={!!post.winningOptionId}
+            creator={post.creator!!}
+            isFollowingDecision={isFollowingDecision}
+            hasRecommendations={hasRecommendations}
+            handleSetIsFollowingDecision={handleSetIsFollowingDecision}
+            handleReportOpen={handleReportOpen}
+            handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited}
+            handleAddPostToStateFavorited={handleAddPostToStateFavorited}
           />
           <SActivitesContainer
             decisionFailed={postStatus === 'failed'}
-            showSelectWinnerOption={showSelectWinnerOption}
+            showSelectingWinnerOption={showSelectingWinnerOption}
           >
-            {openedTab === 'announcement' ? (
-              <>
-                <PostVotingTab>
-                  {`${t('tabs.bids')} ${
-                    !!numberOfOptions && numberOfOptions > 0
-                      ? numberOfOptions
-                      : ''
-                  }`}
-                </PostVotingTab>
-                <AcOptionsTabModeration
-                  postId={post.postUuid}
-                  postStatus={postStatus}
-                  options={options}
-                  optionsLoading={optionsLoading}
-                  pagingToken={optionsNextPageToken}
-                  winningOptionId={(winningOption?.id as number) ?? undefined}
-                  handleLoadBids={fetchBids}
-                  handleRemoveOption={handleRemoveOption}
-                  handleUpdatePostStatus={handleUpdatePostStatus}
-                  handleUpdateWinningOption={handleUpdateWinningOption}
-                />
-              </>
-            ) : (
-              <PostResponseTabModeration
-                postId={post.postUuid}
-                postType='ac'
-                postStatus={postStatus}
-                postTitle={post.title}
-                responseUploading={responseUploading}
-                responseReadyToBeUploaded={
-                  !!uploadedResponseVideoUrl &&
-                  !responseFileUploadLoading &&
-                  !responseFileProcessingLoading
-                }
-                responseUploadSuccess={responseUploadSuccess}
-                winningOptionAc={winningOption}
-                handleUploadResponse={handleUploadVideoProcessed}
-              />
-            )}
+            <PostVotingTab>
+              {`${t('tabs.bids')} ${
+                !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
+              }`}
+            </PostVotingTab>
+            <AcOptionsTab
+              postId={post.postUuid}
+              postStatus={postStatus}
+              postText={post.title}
+              postCreator={
+                (post.creator?.nickname as string) ?? post.creator?.username
+              }
+              postDeadline={moment(
+                (post.responseUploadDeadline?.seconds as number) * 1000
+              )
+                .subtract(3, 'days')
+                .calendar()}
+              options={options}
+              // optionToAnimate={optionToAnimate}
+              optionsLoading={optionsLoading}
+              pagingToken={optionsNextPageToken}
+              minAmount={
+                post.minimalBid?.usdCents
+                  ? parseInt((post.minimalBid?.usdCents / 100).toFixed(0))
+                  : 5
+              }
+              handleLoadBids={fetchBids}
+              handleAddOrUpdateOptionFromResponse={
+                handleAddOrUpdateOptionFromResponse
+              }
+              handleRemoveOption={handleRemoveOption}
+            />
           </SActivitesContainer>
+
+          {/* Loading Modal */}
+          {loadingModalOpen && (
+            <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+          )}
+          {/* Payment success Modal */}
+          {paymentSuccessModalOpen && (
+            <PaymentSuccessModal
+              postType='ac'
+              isVisible={paymentSuccessModalOpen}
+              closeModal={() => {
+                Mixpanel.track('Close Payment Success Modal', {
+                  _stage: 'Post',
+                  _post: post.postUuid,
+                });
+                setPaymentSuccessModalOpen(false);
+              }}
+            >
+              {t('paymentSuccessModal.ac', {
+                postCreator:
+                  (post.creator?.nickname as string) ?? post.creator?.username,
+                postDeadline: moment(
+                  (post.responseUploadDeadline?.seconds as number) * 1000
+                )
+                  .subtract(3, 'days')
+                  .calendar(),
+              })}
+            </PaymentSuccessModal>
+          )}
           {isPopupVisible && (
             <HeroPopup
               isPopupVisible={isPopupVisible}
@@ -758,7 +817,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             <CommentsBottomSection
               postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
-              canDeleteComments
               onFormBlur={handleCommentBlur}
               onFormFocus={handleCommentFocus}
             />
@@ -769,9 +827,11 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
   }
 );
 
-PostModerationAC.defaultProps = {};
+PostViewAC.defaultProps = {
+  stripeSetupIntentClientSecret: undefined,
+};
 
-export default PostModerationAC;
+export default PostViewAC;
 
 const SWrapper = styled.div`
   width: 100%;
@@ -779,6 +839,9 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
+    height: 648px;
+    min-height: 0;
+
     display: inline-grid;
     grid-template-areas:
       'expires expires'
@@ -790,8 +853,6 @@ const SWrapper = styled.div`
     grid-column-gap: 16px;
 
     align-items: flex-start;
-
-    padding-bottom: 24px;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -802,8 +863,6 @@ const SWrapper = styled.div`
       'video title'
       'video activities';
     grid-template-columns: 410px 1fr;
-
-    padding-bottom: initial;
   }
 `;
 
@@ -832,7 +891,7 @@ const SGoBackButton = styled(GoBackButton)`
 `;
 
 const SActivitesContainer = styled.div<{
-  showSelectWinnerOption: boolean;
+  showSelectingWinnerOption: boolean;
   decisionFailed: boolean;
 }>`
   grid-area: activities;
@@ -846,29 +905,18 @@ const SActivitesContainer = styled.div<{
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    ${({ showSelectWinnerOption, decisionFailed }) =>
-      showSelectWinnerOption
-        ? css`
-            max-height: 500px;
-          `
-        : !decisionFailed
-        ? css`
-            max-height: 500px;
-          `
-        : css`
-            max-height: 500px;
-          `}
+    max-height: calc(500px);
   }
 
   ${({ theme }) => theme.media.laptop} {
-    ${({ showSelectWinnerOption, decisionFailed }) =>
-      showSelectWinnerOption
+    ${({ showSelectingWinnerOption, decisionFailed }) =>
+      showSelectingWinnerOption
         ? css`
             max-height: calc(580px - 130px);
           `
         : !decisionFailed
         ? css`
-            max-height: unset;
+            max-height: 580px;
           `
         : css`
             max-height: calc(580px - 120px);

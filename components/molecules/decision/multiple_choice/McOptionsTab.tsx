@@ -31,7 +31,7 @@ import {
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 
-import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../organisms/decision/regular/PostViewMC';
 import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 
 import Text from '../../../atoms/Text';

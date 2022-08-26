@@ -4,25 +4,25 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-import { markPost } from '../../../api/endpoints/post';
-import PostVideo from '../../molecules/decision/PostVideo';
-import PostScheduledSection from '../../molecules/decision/PostScheduledSection';
+import { SocketContext } from '../../../../contexts/socketContext';
+import { ChannelsContext } from '../../../../contexts/channelsContext';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
+import { markPost } from '../../../../api/endpoints/post';
+import PostVideo from '../../../molecules/decision/PostVideo';
+import PostScheduledSection from '../../../molecules/decision/PostScheduledSection';
 
 // Utils
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import { TPostType } from '../../../utils/switchPostType';
-import { Mixpanel } from '../../../utils/mixpanel';
+import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
+import { TPostType } from '../../../../utils/switchPostType';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
-const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const PostTopInfo = dynamic(
-  () => import('../../molecules/decision/PostTopInfo')
+  () => import('../../../molecules/decision/PostTopInfo')
 );
 const PostTopInfoModeration = dynamic(
-  () => import('../../molecules/decision/PostTopInfoModeration')
+  () => import('../../../molecules/decision/PostTopInfoModeration')
 );
 
 interface IPostViewScheduled {

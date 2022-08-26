@@ -5,20 +5,20 @@ import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import { useAppSelector } from '../../../redux-store/store';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import { SocketContext } from '../../../../contexts/socketContext';
+import { ChannelsContext } from '../../../../contexts/channelsContext';
+import { useAppSelector } from '../../../../redux-store/store';
+import PostTopInfo from '../../../molecules/decision/PostTopInfo';
 
 // Utils
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import PostVideoProcessingHolder from '../../molecules/decision/PostVideoProcessingHolder';
-import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
-import { TPostType } from '../../../utils/switchPostType';
-import assets from '../../../constants/assets';
-import Text from '../../atoms/Text';
+import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
+import PostVideoProcessingHolder from '../../../molecules/decision/PostVideoProcessingHolder';
+import PostTopInfoModeration from '../../../molecules/decision/PostTopInfoModeration';
+import { TPostType } from '../../../../utils/switchPostType';
+import assets from '../../../../constants/assets';
+import Text from '../../../atoms/Text';
 
-const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 
 const DARK_IMAGES = {
   ac: assets.creation.darkMcAnimated,

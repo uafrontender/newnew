@@ -1,94 +1,102 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import styled from 'styled-components';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
+import { useInView } from 'react-intersection-observer';
 
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import { fetchPostByUUID } from '../../../api/endpoints/post';
-import { fetchPledges } from '../../../api/endpoints/crowdfunding';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
+import { SocketContext } from '../../../../contexts/socketContext';
+import { ChannelsContext } from '../../../../contexts/channelsContext';
+import {
+  fetchAcOptionById,
+  fetchCurrentBidsForPost,
+} from '../../../../api/endpoints/auction';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 
-import Text from '../../atoms/Text';
-import Headline from '../../atoms/Headline';
-import PostVotingTab from '../../molecules/decision/PostVotingTab';
-import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
-import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
-import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
-import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
-import PostResponseTabModeration from '../../molecules/decision/PostResponseTabModeration';
+import Headline from '../../../atoms/Headline';
+import PostVotingTab from '../../../molecules/decision/PostVotingTab';
+import PostTopInfoModeration from '../../../molecules/decision/PostTopInfoModeration';
+import PostVideoModeration from '../../../molecules/decision/PostVideoModeration';
+import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
+import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
+import PostResponseTabModeration from '../../../molecules/decision/PostResponseTabModeration';
 
+import switchPostType from '../../../../utils/switchPostType';
+import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import switchPostStatus, {
   TPostStatusStringified,
-} from '../../../utils/switchPostStatus';
-import switchPostType from '../../../utils/switchPostType';
-import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
-import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
-import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import useResponseUpload from '../../../utils/hooks/useResponseUpload';
-import { formatNumber } from '../../../utils/format';
+} from '../../../../utils/switchPostStatus';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
+import useResponseUpload from '../../../../utils/hooks/useResponseUpload';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
-const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
-  () => import('../../molecules/decision/ResponseTimer')
+  () => import('../../../molecules/decision/ResponseTimer')
 );
-const PostTimer = dynamic(() => import('../../molecules/decision/PostTimer'));
-const CfBackersStatsSectionModeration = dynamic(
+const PostTimer = dynamic(
+  () => import('../../../molecules/decision/PostTimer')
+);
+const AcOptionsTabModeration = dynamic(
   () =>
     import(
-      '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModeration'
+      '../../../molecules/decision/auction/moderation/AcOptionsTabModeration'
     )
 );
-const CfCrowdfundingSuccessModeration = dynamic(
-  () =>
-    import(
-      '../../molecules/decision/crowdfunding/moderation/CfCrowdfundingSuccessModeration'
-    )
+const HeroPopup = dynamic(
+  () => import('../../../molecules/decision/HeroPopup')
 );
-const CfBackersStatsSectionModerationFailed = dynamic(
-  () =>
-    import(
-      '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModerationFailed'
-    )
-);
-const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
 
-export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
+export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
 };
 
-interface IPostModerationCF {
-  post: newnewapi.Crowdfunding;
+interface IPostModerationAC {
+  post: newnewapi.Auction;
   postStatus: TPostStatusStringified;
-  handleUpdatePostStatus: (postStatus: number | string) => void;
   handleGoBack: () => void;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
-const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
+const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
   ({ post, postStatus, handleUpdatePostStatus, handleGoBack }) => {
-    const router = useRouter();
-    const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
+    const { t } = useTranslation('modal-Post');
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+    const router = useRouter();
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
+
+    const showSelectWinnerOption = useMemo(
+      () => postStatus === 'waiting_for_decision',
+      [postStatus]
+    );
 
     // Socket
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
+
+    const [winningOptionId, setWinningOptionId] = useState(
+      post.winningOptionId ?? undefined
+    );
 
     // Announcement
     const [announcement, setAnnouncement] = useState(post.announcement);
@@ -104,30 +112,11 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
           'none';
       }
     };
-
     const handleCommentBlur = () => {
       if (isMobile && !!document.getElementById('action-button-mobile')) {
         document.getElementById('action-button-mobile')!!.style.display = '';
       }
     };
-
-    // Total amount
-    const [totalAmount, setTotalAmount] = useState<
-      newnewapi.MoneyAmount | undefined
-    >((post?.totalAmount as newnewapi.MoneyAmount) || undefined);
-
-    // Current backers
-    const [currentBackers, setCurrentBackers] = useState(
-      post.currentBackerCount ?? 0
-    );
-
-    // Pledges
-    const [pledges, setPledges] = useState<TCfPledgeWithHighestField[]>([]);
-    const [pledgesNextPageToken, setPledgesNextPageToken] = useState<
-      string | undefined | null
-    >('');
-    const [pledgesLoading, setPledgesLoading] = useState(false);
-    const [loadingPledgesError, setLoadingPledgesError] = useState('');
 
     // Response upload
     const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<
@@ -172,33 +161,80 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         setResponseFreshlyUploaded(newValue),
     });
 
+    // Total amount
+    const [totalAmount, setTotalAmount] = useState(
+      post.totalAmount?.usdCents ?? 0
+    );
+
+    // Options
+    const [options, setOptions] = useState<TAcOptionWithHighestField[]>([]);
+    const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
+      post.optionCount ?? ''
+    );
+    const [optionsNextPageToken, setOptionsNextPageToken] = useState<
+      string | undefined | null
+    >('');
+    const [optionsLoading, setOptionsLoading] = useState(false);
+    const [loadingOptionsError, setLoadingOptionsError] = useState('');
+
+    // Winning option
+    const [winningOption, setWinningOption] = useState<
+      newnewapi.Auction.Option | undefined
+    >();
+
+    const handleUpdateWinningOption = (
+      selectedOption: newnewapi.Auction.Option
+    ) => {
+      setWinningOption(selectedOption);
+      setWinningOptionId(selectedOption.id);
+    };
+
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
     }, [dispatch]);
 
-    const sortPleges = useCallback(
-      (unsortedArr: TCfPledgeWithHighestField[]) => {
+    const sortOptions = useCallback(
+      (unsortedArr: TAcOptionWithHighestField[]) => {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < unsortedArr.length; i++) {
           // eslint-disable-next-line no-param-reassign
           unsortedArr[i].isHighest = false;
         }
 
-        const highestPledge = unsortedArr.sort(
+        const highestOption = unsortedArr.sort(
           (a, b) =>
-            (b?.amount?.usdCents as number) - (a?.amount?.usdCents as number)
+            (b?.totalAmount?.usdCents as number) -
+            (a?.totalAmount?.usdCents as number)
         )[0];
 
-        const pledgesByUser = user.userData?.userUuid
+        unsortedArr.forEach((option, i) => {
+          if (i > 0) {
+            // eslint-disable-next-line no-param-reassign
+            option.isHighest = false;
+          }
+        });
+
+        const optionsByUser = user.userData?.userUuid
           ? unsortedArr
               .filter((o) => o.creator?.uuid === user.userData?.userUuid)
               .sort((a, b) => {
-                // Sort by newest first
                 return (b.id as number) - (a.id as number);
               })
           : [];
 
-        // const pledgesByVipUsers = [];
+        const optionsSupportedByUser = user.userData?.userUuid
+          ? unsortedArr
+              .filter((o) => o.isSupportedByMe)
+              .sort((a, b) => {
+                return (b.id as number) - (a.id as number);
+              })
+          : [];
+
+        const optionsByVipUsers = unsortedArr
+          .filter((o) => o.isCreatedBySubscriber)
+          .sort((a, b) => {
+            return (b.id as number) - (a.id as number);
+          });
 
         const workingArrSorted = unsortedArr.sort((a, b) => {
           // Sort the rest by newest first
@@ -206,15 +242,17 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         });
 
         const joinedArr = [
-          ...(highestPledge &&
-          highestPledge.creator?.uuid === user.userData?.userUuid
-            ? [highestPledge]
+          ...(highestOption &&
+          (highestOption.creator?.uuid === user.userData?.userUuid ||
+            highestOption.isSupportedByMe)
+            ? [highestOption]
             : []),
-          ...pledgesByUser,
-          // ...pledgesByVipUsers,
-          ...(highestPledge &&
-          highestPledge.creator?.uuid !== user.userData?.userUuid
-            ? [highestPledge]
+          ...optionsByUser,
+          ...optionsSupportedByUser,
+          ...optionsByVipUsers,
+          ...(highestOption &&
+          highestOption.creator?.uuid !== user.userData?.userUuid
+            ? [highestOption]
             : []),
           ...workingArrSorted,
         ];
@@ -222,12 +260,14 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         const workingSortedUnique =
           joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
 
-        const highestPledgeIdx = (
-          workingSortedUnique as TCfPledgeWithHighestField[]
-        ).findIndex((o) => o.id === highestPledge.id);
+        const highestOptionIdx = (
+          workingSortedUnique as TAcOptionWithHighestField[]
+        ).findIndex((o) => o.id === highestOption.id);
 
-        if (workingSortedUnique[highestPledgeIdx]) {
-          workingSortedUnique[highestPledgeIdx].isHighest = true;
+        if (workingSortedUnique[highestOptionIdx]) {
+          (
+            workingSortedUnique[highestOptionIdx] as TAcOptionWithHighestField
+          ).isHighest = true;
         }
 
         return workingSortedUnique;
@@ -235,14 +275,14 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
       [user.userData?.userUuid]
     );
 
-    const fetchPledgesForPost = useCallback(
+    const fetchBids = useCallback(
       async (pageToken?: string) => {
-        if (pledgesLoading) return;
+        if (optionsLoading) return;
         try {
-          setPledgesLoading(true);
-          setLoadingPledgesError('');
+          setOptionsLoading(true);
+          setLoadingOptionsError('');
 
-          const getCurrentPledgesPayload = new newnewapi.GetPledgesRequest({
+          const getCurrentBidsPayload = new newnewapi.GetAcOptionsRequest({
             postUuid: post.postUuid,
             ...(pageToken
               ? {
@@ -253,32 +293,31 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
               : {}),
           });
 
-          const res = await fetchPledges(getCurrentPledgesPayload);
+          const res = await fetchCurrentBidsForPost(getCurrentBidsPayload);
 
           if (!res.data || res.error)
             throw new Error(res.error?.message ?? 'Request failed');
 
-          if (res.data && res.data.pledges) {
-            setPledges((curr) => {
+          if (res.data && res.data.options) {
+            setOptions((curr) => {
               const workingArr = [
                 ...curr,
-                ...(res.data?.pledges as TCfPledgeWithHighestField[]),
+                ...(res.data?.options as TAcOptionWithHighestField[]),
               ];
-              const workingArrUnsorted = [...workingArr];
 
-              return sortPleges(workingArrUnsorted);
+              return sortOptions(workingArr);
             });
-            setPledgesNextPageToken(res.data.paging?.nextPageToken);
+            setOptionsNextPageToken(res.data.paging?.nextPageToken);
           }
 
-          setPledgesLoading(false);
+          setOptionsLoading(false);
         } catch (err) {
-          setPledgesLoading(false);
-          setLoadingPledgesError((err as Error).message);
+          setOptionsLoading(false);
+          setLoadingOptionsError((err as Error).message);
           console.error(err);
         }
       },
-      [pledgesLoading, setPledges, sortPleges, post]
+      [post, setOptions, sortOptions, optionsLoading]
     );
 
     const fetchPostLatestData = useCallback(async () => {
@@ -292,19 +331,18 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
 
-        if (res.data.crowdfunding) {
-          setCurrentBackers(res.data.crowdfunding.currentBackerCount as number);
-          if (res.data.crowdfunding.status)
-            handleUpdatePostStatus(res.data.crowdfunding.status);
-          if (res.data.crowdfunding.totalAmount) {
-            setTotalAmount(
-              res.data.crowdfunding.totalAmount as newnewapi.MoneyAmount
-            );
+        if (res.data.auction?.winningOptionId && !winningOptionId) {
+          setWinningOptionId(res.data.auction?.winningOptionId);
+        }
+        if (res.data.auction) {
+          setTotalAmount(res.data.auction.totalAmount?.usdCents as number);
+          setNumberOfOptions(res.data.auction.optionCount as number);
+          if (res.data.auction.status)
+            handleUpdatePostStatus(res.data.auction.status);
+          if (!responseFreshlyUploaded && res.data.auction?.response) {
+            setResponseFreshlyUploaded(res.data.auction.response);
           }
-          if (!responseFreshlyUploaded && res.data.crowdfunding?.response) {
-            setResponseFreshlyUploaded(res.data.crowdfunding.response);
-          }
-          setAnnouncement(res.data.crowdfunding?.announcement);
+          setAnnouncement(res.data.auction?.announcement);
         }
       } catch (err) {
         console.error(err);
@@ -312,13 +350,31 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const handleRemoveOption = useCallback(
+      (optionToRemove: newnewapi.Auction.Option) => {
+        Mixpanel.track('Removed Option', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostModerationAC',
+        });
+        setOptions((curr) => {
+          const workingArr = [...curr];
+          const workingArrUnsorted = [
+            ...workingArr.filter((o) => o.id !== optionToRemove.id),
+          ];
+          return sortOptions(workingArrUnsorted);
+        });
+      },
+      [setOptions, sortOptions, post.postUuid]
+    );
+
     const handleOnResponseTimeExpired = () => {
       handleUpdatePostStatus('FAILED');
     };
 
     const handleOnVotingTimeExpired = () => {
-      if (currentBackers >= post.targetBackerCount) {
-        handleUpdatePostStatus('WAITING_FOR_RESPONSE');
+      if (options && options.some((o) => o.supporterCount > 0)) {
+        handleUpdatePostStatus('WAITING_FOR_DECISION');
       } else {
         handleUpdatePostStatus('FAILED');
       }
@@ -340,41 +396,75 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
     }, []);
 
     useEffect(() => {
-      setPledges([]);
-      setPledgesNextPageToken('');
-      fetchPledgesForPost();
+      setOptions([]);
+      setOptionsNextPageToken('');
+      fetchBids();
       fetchPostLatestData();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [post.postUuid]);
 
     useEffect(() => {
-      const socketHandlerPledgeCreated = (data: any) => {
+      async function fetchAndSetWinningOption(id: number) {
+        try {
+          const payload = new newnewapi.GetAcOptionRequest({
+            optionId: id,
+          });
+
+          const res = await fetchAcOptionById(payload);
+
+          if (res.data?.option) {
+            setWinningOption(res.data.option as newnewapi.Auction.Option);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      if (winningOptionId && !winningOption?.id) {
+        fetchAndSetWinningOption(winningOptionId as number);
+      }
+    }, [winningOptionId, winningOption?.id]);
+
+    useEffect(() => {
+      const socketHandlerOptionCreatedOrUpdated = (data: any) => {
         const arr = new Uint8Array(data);
-        const decoded = newnewapi.CfPledgeCreated.decode(arr);
-        if (decoded.pledge && decoded.postUuid === post.postUuid) {
-          if (decoded.pledge.creator?.uuid === user.userData?.userUuid) return;
-          setPledges((curr) => {
+        const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
+        if (decoded.option && decoded.postUuid === post.postUuid) {
+          setOptions((curr) => {
             const workingArr = [...curr];
             let workingArrUnsorted;
             const idx = workingArr.findIndex(
-              (op) => op.id === decoded.pledge?.id
+              (op) => op.id === decoded.option?.id
             );
             if (idx === -1) {
               workingArrUnsorted = [
                 ...workingArr,
-                decoded.pledge as TCfPledgeWithHighestField,
+                decoded.option as TAcOptionWithHighestField,
               ];
             } else {
-              workingArr[idx].amount!!.usdCents = decoded.pledge?.amount
-                ?.usdCents as number;
+              workingArr[idx].supporterCount = decoded.option
+                ?.supporterCount as number;
+              workingArr[idx].totalAmount = decoded.option
+                ?.totalAmount as newnewapi.IMoneyAmount;
               workingArrUnsorted = workingArr;
             }
 
-            return sortPleges(workingArrUnsorted);
+            return sortOptions(workingArrUnsorted);
           });
         }
       };
 
+      const socketHandlerOptionDeleted = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.AcOptionDeleted.decode(arr);
+
+        if (decoded.optionId) {
+          setOptions((curr) => {
+            const workingArr = [...curr];
+            return workingArr.filter((o) => o.id !== decoded.optionId);
+          });
+        }
+      };
       const socketHandlerPostData = (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostUpdated.decode(arr);
@@ -382,18 +472,11 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         if (!decoded) return;
         const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
         if (decodedParsed.postUuid === post.postUuid) {
-          if (decoded.post?.crowdfunding?.currentBackerCount)
-            setCurrentBackers(decoded.post?.crowdfunding?.currentBackerCount);
-          if (decoded.post?.crowdfunding?.totalAmount) {
-            setTotalAmount(
-              decoded.post?.crowdfunding.totalAmount as newnewapi.MoneyAmount
-            );
-          }
-          if (
-            !responseFreshlyUploaded &&
-            decoded.post?.crowdfunding?.response
-          ) {
-            setResponseFreshlyUploaded(decoded.post.crowdfunding.response);
+          setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents ?? 0);
+          setNumberOfOptions(decoded.post?.auction?.optionCount ?? 0);
+
+          if (!responseFreshlyUploaded && decoded.post?.auction?.response) {
+            setResponseFreshlyUploaded(decoded.post.auction.response);
           }
         }
       };
@@ -403,13 +486,13 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
         if (!decoded) return;
-        if (decoded.postUuid === post.postUuid && decoded.crowdfunding) {
-          handleUpdatePostStatus(decoded.crowdfunding);
+        if (decoded.postUuid === post.postUuid && decoded.auction) {
+          handleUpdatePostStatus(decoded.auction);
 
           if (
             !responseFreshlyUploaded &&
             postStatus === 'processing_response' &&
-            switchPostStatus('cf', decoded.crowdfunding) === 'succeeded'
+            switchPostStatus('ac', decoded.auction) === 'succeeded'
           ) {
             const fetchPostPayload = new newnewapi.GetPostRequest({
               postUuid: post.postUuid,
@@ -417,44 +500,65 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
 
             const res = await fetchPostByUUID(fetchPostPayload);
 
-            if (res.data?.crowdfunding?.response) {
-              setResponseFreshlyUploaded(res.data?.crowdfunding?.response);
+            if (res.data?.auction?.response) {
+              setResponseFreshlyUploaded(res.data?.auction?.response);
             }
           }
         }
       };
 
       if (socketConnection) {
-        socketConnection?.on('CfPledgeCreated', socketHandlerPledgeCreated);
+        socketConnection?.on(
+          'AcOptionCreatedOrUpdated',
+          socketHandlerOptionCreatedOrUpdated
+        );
+        socketConnection?.on('AcOptionDeleted', socketHandlerOptionDeleted);
         socketConnection?.on('PostUpdated', socketHandlerPostData);
         socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
 
       return () => {
         if (socketConnection && socketConnection?.connected) {
-          socketConnection?.off('CfPledgeCreated', socketHandlerPledgeCreated);
+          socketConnection?.off(
+            'AcOptionCreatedOrUpdated',
+            socketHandlerOptionCreatedOrUpdated
+          );
+          socketConnection?.off('AcOptionDeleted', socketHandlerOptionDeleted);
           socketConnection?.off('PostUpdated', socketHandlerPostData);
           socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection, post, postStatus, setPledges, sortPleges]);
+    }, [
+      socketConnection,
+      post,
+      postStatus,
+      user.userData?.userUuid,
+      setOptions,
+      sortOptions,
+    ]);
+
+    useEffect(() => {
+      if (loadingOptionsError) {
+        toast.error(loadingOptionsError);
+      }
+    }, [loadingOptionsError]);
 
     const goToNextStep = () => {
       if (
-        user.userTutorialsProgress.remainingCfSteps &&
-        user.userTutorialsProgress.remainingCfSteps[0]
+        user.userTutorialsProgress.remainingAcSteps &&
+        user.userTutorialsProgress.remainingAcSteps[0]
       ) {
         if (user.loggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            cfCurrentStep: user.userTutorialsProgress.remainingCfSteps[0],
+            acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
           });
           markTutorialStepAsCompleted(payload);
         }
         dispatch(
           setUserTutorialsProgress({
-            remainingCfSteps: [
-              ...user.userTutorialsProgress.remainingCfSteps,
+            remainingAcSteps: [
+              ...user.userTutorialsProgress.remainingAcSteps,
             ].slice(1),
           })
         );
@@ -464,16 +568,17 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     useEffect(() => {
       if (
+        options.length > 0 &&
         user.userTutorialsProgressSynced &&
-        user.userTutorialsProgress.remainingCfSteps &&
-        user.userTutorialsProgress.remainingCfSteps[0] ===
-          newnewapi.CfTutorialStep.CF_HERO
+        user.userTutorialsProgress.remainingAcSteps &&
+        user.userTutorialsProgress.remainingAcSteps[0] ===
+          newnewapi.AcTutorialStep.AC_HERO
       ) {
         setIsPopupVisible(true);
       } else {
         setIsPopupVisible(false);
       }
-    }, [user]);
+    }, [options, user]);
 
     // Scroll to comments if hash is present
     useEffect(() => {
@@ -525,7 +630,8 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
                 onClick={handleGoBack}
               />
             )}
-            {postStatus === 'waiting_for_response' ? (
+            {postStatus === 'waiting_for_response' ||
+            postStatus === 'waiting_for_decision' ? (
               <ResponseTimer
                 timestampSeconds={new Date(
                   (post.responseUploadDeadline?.seconds as number) * 1000
@@ -537,14 +643,15 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
                 timestampSeconds={new Date(
                   (post.expiresAt?.seconds as number) * 1000
                 ).getTime()}
-                postType='cf'
+                postType='ac'
               />
             ) : (
               <PostTimer
                 timestampSeconds={new Date(
                   (post.expiresAt?.seconds as number) * 1000
                 ).getTime()}
-                postType='cf'
+                postType='ac'
+                isTutorialVisible={options.length > 0}
                 onTimeExpired={handleOnVotingTimeExpired}
               />
             )}
@@ -587,53 +694,46 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
             handleVideoDelete={handleVideoDelete}
           />
           <PostTopInfoModeration
-            postType='cf'
+            postType='ac'
             postStatus={postStatus}
             title={post.title}
             postId={post.postUuid}
-            hasWinner={false}
+            amountInBids={totalAmount}
+            hasWinner={!!winningOptionId}
             hasResponse={!!post.response}
-            totalPledges={currentBackers}
-            targetPledges={post.targetBackerCount}
             hidden={openedTab === 'response'}
             handleUpdatePostStatus={handleUpdatePostStatus}
           />
-          <SActivitesContainer>
+          <SActivitesContainer
+            decisionFailed={postStatus === 'failed'}
+            showSelectWinnerOption={showSelectWinnerOption}
+          >
             {openedTab === 'announcement' ? (
               <>
-                <PostVotingTab>{t('tabs.backers')}</PostVotingTab>
-                {postStatus === 'waiting_for_response' ||
-                postStatus === 'succeeded' ? (
-                  <CfCrowdfundingSuccessModeration
-                    currentNumBackers={currentBackers}
-                    targetBackerCount={post.targetBackerCount}
-                  />
-                ) : postStatus === 'failed' ? (
-                  <CfBackersStatsSectionModerationFailed
-                    targetBackerCount={post.targetBackerCount}
-                    currentNumBackers={currentBackers}
-                  />
-                ) : (
-                  <CfBackersStatsSectionModeration
-                    targetBackerCount={post.targetBackerCount}
-                    currentNumBackers={currentBackers}
-                  />
-                )}
-                {postStatus !== 'failed' && totalAmount && (
-                  <SMoneyRaised>
-                    <SMoneyRaisedCopy variant={3} weight={600}>
-                      {t('cfPostModeration.moneyRaised')}
-                    </SMoneyRaisedCopy>
-                    <SMoneyRaisedAMount variant={6}>
-                      ${formatNumber(totalAmount.usdCents / 100 ?? 0, true)}
-                    </SMoneyRaisedAMount>
-                  </SMoneyRaised>
-                )}
+                <PostVotingTab>
+                  {`${t('tabs.bids')} ${
+                    !!numberOfOptions && numberOfOptions > 0
+                      ? numberOfOptions
+                      : ''
+                  }`}
+                </PostVotingTab>
+                <AcOptionsTabModeration
+                  postId={post.postUuid}
+                  postStatus={postStatus}
+                  options={options}
+                  optionsLoading={optionsLoading}
+                  pagingToken={optionsNextPageToken}
+                  winningOptionId={(winningOption?.id as number) ?? undefined}
+                  handleLoadBids={fetchBids}
+                  handleRemoveOption={handleRemoveOption}
+                  handleUpdatePostStatus={handleUpdatePostStatus}
+                  handleUpdateWinningOption={handleUpdateWinningOption}
+                />
               </>
             ) : (
               <PostResponseTabModeration
                 postId={post.postUuid}
-                postType='cf'
+                postType='ac'
                 postStatus={postStatus}
                 postTitle={post.title}
                 responseUploading={responseUploading}
@@ -643,7 +743,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
                   !responseFileProcessingLoading
                 }
                 responseUploadSuccess={responseUploadSuccess}
-                moneyBacked={totalAmount as newnewapi.MoneyAmount}
+                winningOptionAc={winningOption}
                 handleUploadResponse={handleUploadVideoProcessed}
               />
             )}
@@ -651,7 +751,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
           {isPopupVisible && (
             <HeroPopup
               isPopupVisible={isPopupVisible}
-              postType='CF'
+              postType='AC'
               closeModal={goToNextStep}
             />
           )}
@@ -664,6 +764,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
             <CommentsBottomSection
               postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
+              canDeleteComments
               onFormBlur={handleCommentBlur}
               onFormFocus={handleCommentFocus}
             />
@@ -674,9 +775,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
   }
 );
 
-PostModerationCF.defaultProps = {};
+PostModerationAC.defaultProps = {};
 
-export default PostModerationCF;
+export default PostModerationAC;
 
 const SWrapper = styled.div`
   width: 100%;
@@ -684,7 +785,7 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    display: grid;
+    display: inline-grid;
     grid-template-areas:
       'expires expires'
       'title title'
@@ -695,6 +796,8 @@ const SWrapper = styled.div`
     grid-column-gap: 16px;
 
     align-items: flex-start;
+
+    padding-bottom: 24px;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -705,6 +808,8 @@ const SWrapper = styled.div`
       'video title'
       'video activities';
     grid-template-columns: 410px 1fr;
+
+    padding-bottom: initial;
   }
 `;
 
@@ -732,7 +837,10 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitesContainer = styled.div<{
+  showSelectWinnerOption: boolean;
+  decisionFailed: boolean;
+}>`
   grid-area: activities;
 
   display: flex;
@@ -742,20 +850,37 @@ const SActivitesContainer = styled.div`
 
   height: 100%;
   width: 100%;
-`;
 
-const SMoneyRaised = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-`;
+  ${({ theme }) => theme.media.tablet} {
+    ${({ showSelectWinnerOption, decisionFailed }) =>
+      showSelectWinnerOption
+        ? css`
+            max-height: 500px;
+          `
+        : !decisionFailed
+        ? css`
+            max-height: 500px;
+          `
+        : css`
+            max-height: 500px;
+          `}
+  }
 
-const SMoneyRaisedCopy = styled(Text)`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  ${({ theme }) => theme.media.laptop} {
+    ${({ showSelectWinnerOption, decisionFailed }) =>
+      showSelectWinnerOption
+        ? css`
+            max-height: calc(580px - 130px);
+          `
+        : !decisionFailed
+        ? css`
+            max-height: unset;
+          `
+        : css`
+            max-height: calc(580px - 120px);
+          `}
+  }
 `;
-
-const SMoneyRaisedAMount = styled(Headline)``;
 
 // Comments
 const SCommentsHeadline = styled(Headline)`

@@ -17,42 +17,44 @@ import dynamic from 'next/dynamic';
 import { useInView } from 'react-intersection-observer';
 import { useRouter } from 'next/router';
 
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
+import { SocketContext } from '../../../../contexts/socketContext';
+import { ChannelsContext } from '../../../../contexts/channelsContext';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
+import { fetchPostByUUID, markPost } from '../../../../api/endpoints/post';
 import {
   fetchCurrentOptionsForMCPost,
   voteOnPost,
-} from '../../../api/endpoints/multiple_choice';
+} from '../../../../api/endpoints/multiple_choice';
 
-import PostVideo from '../../molecules/decision/PostVideo';
-import PostTimer from '../../molecules/decision/PostTimer';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import Headline from '../../atoms/Headline';
-import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
-import PostVotingTab from '../../molecules/decision/PostVotingTab';
-import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
+import PostVideo from '../../../molecules/decision/PostVideo';
+import PostTimer from '../../../molecules/decision/PostTimer';
+import PostTopInfo from '../../../molecules/decision/PostTopInfo';
+import Headline from '../../../atoms/Headline';
+import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
+import PostVotingTab from '../../../molecules/decision/PostVotingTab';
+import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
 
 // Utils
-import switchPostType from '../../../utils/switchPostType';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import { useGetAppConstants } from '../../../contexts/appConstantsContext';
-import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
-import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
-import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
-import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import { Mixpanel } from '../../../utils/mixpanel';
+import switchPostType from '../../../../utils/switchPostType';
+import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
+import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
+import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
-const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
-const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
+const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
+const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
 const McOptionsTab = dynamic(
-  () => import('../../molecules/decision/multiple_choice/McOptionsTab')
+  () => import('../../../molecules/decision/multiple_choice/McOptionsTab')
 );
-const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
+const HeroPopup = dynamic(
+  () => import('../../../molecules/decision/HeroPopup')
+);
 const PaymentSuccessModal = dynamic(
-  () => import('../../molecules/decision/PaymentSuccessModal')
+  () => import('../../../molecules/decision/PaymentSuccessModal')
 );
 
 const getPayWithCardErrorMessage = (
