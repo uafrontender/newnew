@@ -657,28 +657,22 @@ export const PostCard: React.FC<ICard> = React.memo(
                 handleUserClick(postParsed.creator?.username!!);
               }}
             />
-            <SUsername
-              variant={2}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleUserClick(postParsed.creator?.username!!);
-              }}
-            >
-              {Date.now() > endsAtTime
-                ? postParsed.creator?.nickname &&
-                  postParsed.creator?.nickname?.length > (isMobile ? 7 : 5)
-                  ? `${postParsed.creator?.nickname?.substring(
-                      0,
-                      isMobile ? 5 : 3
-                    )}...`
-                  : postParsed.creator?.nickname
-                : postParsed.creator?.nickname &&
-                  postParsed.creator?.nickname?.length > (isMobile ? 18 : 9)
-                ? `${postParsed.creator?.nickname?.substring(
-                    0,
-                    isMobile ? 15 : 9
-                  )}...`
-                : postParsed.creator?.nickname}
+            <SUsernameContainer>
+              <SUsername
+                variant={2}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleUserClick(postParsed.creator?.username!!);
+                }}
+              >
+                {postParsed.creator?.nickname}
+              </SUsername>
+              <SInlineSVG
+                svg={VerificationCheckmark}
+                width='16px'
+                height='16px'
+                fill='none'
+              />
               {postParsed.creator?.options?.isVerified && (
                 <SInlineSVG
                   svg={VerificationCheckmark}
@@ -687,8 +681,8 @@ export const PostCard: React.FC<ICard> = React.memo(
                   fill='none'
                 />
               )}
-            </SUsername>
-            <CardTimer startsAt={startsAtTime} endsAt={endsAtTime} />
+            </SUsernameContainer>
+            <SCardTimer startsAt={startsAtTime} endsAt={endsAtTime} />
           </SBottomStart>
           <STextOutside variant={3} weight={600}>
             {getTitleContent(postParsed.title)}
@@ -1189,30 +1183,36 @@ const SHashtag = styled.span`
 const SBottomStart = styled.div<{
   hasEnded: boolean;
 }>`
-  display: grid;
-  grid-template-areas: 'avatar nickname timer';
-  grid-template-columns: ${({ hasEnded }) =>
-    hasEnded ? '24px 3fr 9fr' : '24px 5fr 10fr'};
+  display: flex;
+  flex-direction: row;
   align-items: center;
 
   height: 32px;
 
   margin-bottom: 4px;
+  overflow: hidden;
 `;
 
 const SUserAvatarOutside = styled(UserAvatar)`
-  grid-area: avatar;
-
+  flex-shrink: 0;
   width: 24px;
   height: 24px;
   min-width: 24px;
   min-height: 24px;
 `;
 
-const SUsername = styled(Text)`
-  grid-area: nickname;
+// Move all styles to here
+const SUsernameContainer = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  flex-shrink: 1;
+  flex-grow: 1;
+  overflow: hidden;
+`;
+
+const SUsername = styled(Text)`
+  display: inline-block;
+  flex-shrink: 1;
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
@@ -1221,6 +1221,13 @@ const SUsername = styled(Text)`
   margin-left: 6px;
 
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const SCardTimer = styled(CardTimer)`
+  flex-shrink: 0;
+  margin-left: 6px;
 `;
 
 interface ISBottomEnd {
@@ -1353,5 +1360,5 @@ const SButtonIcon = styled(Button)`
 `;
 
 const SInlineSVG = styled(InlineSVG)`
-  margin-left: 2px;
+  flex-shrink: 0;
 `;

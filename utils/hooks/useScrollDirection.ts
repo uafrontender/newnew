@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export const useScrollDirection = (ref: any) => {
+export const useScrollDirection = () => {
   const [scrollDirection, setScrollDirection] = useState('');
 
   useEffect(() => {
@@ -28,15 +28,12 @@ export const useScrollDirection = (ref: any) => {
       }
     };
 
-    // ref.current?.addEventListener('scroll', onScroll);
     document?.addEventListener('scroll', onScroll);
 
     return () => {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      // ref.current?.removeEventListener('scroll', onScroll);
       document?.removeEventListener('scroll', onScroll);
-    }
-  }, [ref, scrollDirection]);
+    };
+  }, [scrollDirection]);
 
   return {
     scrollDirection,
