@@ -28,11 +28,13 @@ import Lottie from '../Lottie';
 import NoResults from './NoResults';
 import PopularTagsResults from './PopularTagsResults';
 import getChunks from '../../../utils/getChunks/getChunks';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
   const theme = useTheme();
   const dispatch = useAppDispatch();
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
   const inputRef: any = useRef();
   const inputContainerRef: any = useRef();
   const [searchValue, setSearchValue] = useState('');
@@ -190,6 +192,21 @@ const SearchInput: React.FC = React.memo(() => {
     setIsResultsDropVisible(false);
     resetResults();
   }
+
+  useEffect(() => {
+    if (isMobileOrTablet && isResultsDropVisible) {
+      enableOverlayMode();
+    }
+
+    return () => {
+      disableOverlayMode();
+    };
+  }, [
+    isMobileOrTablet,
+    isResultsDropVisible,
+    enableOverlayMode,
+    disableOverlayMode,
+  ]);
 
   return (
     <>
@@ -424,11 +441,16 @@ const SResultsDropMobile = styled.div`
   position: fixed;
   border-radius: 0;
   width: 100vw;
-  height: calc(100vh - 112px);
+  height: fill-available;
   top: 56px;
   left: 0;
   padding: 16px;
   overflow: auto;
+
+  @supports (-webkit-touch-callout: none) {
+    /* CSS specific to iOS devices */
+    padding-bottom: 32px;
+  }
 
   ${({ theme }) => theme.media.tablet} {
     margin-top: 16px;

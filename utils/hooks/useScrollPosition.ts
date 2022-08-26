@@ -1,37 +1,36 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback } from 'react';
 
-export const useScrollPosition = (
-  ref: React.MutableRefObject<HTMLElement | null>
-) => {
-  const [element, setElement] = useState<HTMLElement | undefined>();
+const SCROLL_POSITION_KEY = 'scrollPosition';
+
+export const useScrollPosition = () => {
+  const setScrollPosition = useCallback((event: PageTransitionEvent) => {
+    if (!event.persisted) {
+      sessionStorage.setItem(
+        SCROLL_POSITION_KEY,
+        document.documentElement.scrollTop.toString()
+      );
+    }
+  }, []);
 
   useEffect(() => {
-    const refElement = ref.current;
-    if (refElement) {
-      setElement((curr) => curr || refElement);
-    }
-  }, [ref, ref.current]);
+    const oldScrollPosition = Number(
+      sessionStorage.getItem(SCROLL_POSITION_KEY)
+    );
+    sessionStorage.removeItem(SCROLL_POSITION_KEY);
 
-  const setScrollPosition = useCallback(() => {
-    if (element) {
-      localStorage.setItem('scrollPosition', element.scrollTop.toString());
-    }
-  }, [element]);
-
-  useEffect(() => {
-    const oldScrollPosition = localStorage.getItem('scrollPosition');
-    if (element && typeof oldScrollPosition !== 'undefined') {
-      // eslint-disable-next-line no-param-reassign
-      element.scrollTop = Number(oldScrollPosition);
-      localStorage.removeItem('scrollPosition');
+    if (oldScrollPosition > 0) {
+      // A delay for letting page to load
+      setTimeout(() => {
+        window.scroll(0, oldScrollPosition);
+      }, 300);
     }
 
-    window.addEventListener('beforeunload', setScrollPosition);
+    window.addEventListener('pagehide', setScrollPosition);
 
     return () => {
-      window.removeEventListener('beforeunload', setScrollPosition);
+      window.removeEventListener('pagehide', setScrollPosition);
     };
-  }, [element, setScrollPosition]);
+  }, [setScrollPosition]);
 };
 
 export default useScrollPosition;
