@@ -150,9 +150,9 @@ export const General: React.FC<IGeneral> = (props) => {
     mySubscribersTotal,
   ]);
 
-  useScrollPosition(wrapperRef);
+  useScrollPosition();
   // useRefreshOnScrollTop();
-  const { scrollDirection } = useScrollDirection(wrapperRef);
+  const { scrollDirection } = useScrollDirection();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -282,11 +282,7 @@ interface ISWrapper {
 }
 
 const SBaseLayout = styled(BaseLayout)<ISWrapper>`
-  min-height: -moz-available;
-  min-height: -webkit-fill-available;
-  min-height: fill-available;
   display: flex;
-  overflow-y: auto;
   transition: padding ease 0.5s;
   padding-top: ${(props) => (props.withBanner ? 96 : 56)}px;
   padding-bottom: 56px;
@@ -302,7 +298,6 @@ const SBaseLayout = styled(BaseLayout)<ISWrapper>`
       display: none;
     }
     scrollbar-width: none;
-    -ms-overflow-style: none;
   }
 
   ${({ theme }) => theme.media.laptop} {
