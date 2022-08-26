@@ -1,18 +1,25 @@
 import { useEffect, useCallback } from 'react';
 
+const SCROLL_POSITION_KEY = 'scrollPosition';
+
 export const useScrollPosition = () => {
-  const setScrollPosition = useCallback(() => {
-    localStorage.setItem(
-      'scrollPosition',
-      document.documentElement.scrollTop.toString()
-    );
+  const setScrollPosition = useCallback((event: PageTransitionEvent) => {
+    if (!event.persisted) {
+      sessionStorage.setItem(
+        SCROLL_POSITION_KEY,
+        document.documentElement.scrollTop.toString()
+      );
+    }
   }, []);
 
   useEffect(() => {
-    const oldScrollPosition = Number(localStorage.getItem('scrollPosition'));
+    const oldScrollPosition = Number(
+      sessionStorage.getItem(SCROLL_POSITION_KEY)
+    );
+    sessionStorage.removeItem(SCROLL_POSITION_KEY);
 
     if (oldScrollPosition > 0) {
-      // A delay to let page load
+      // A delay for letting page to load
       setTimeout(() => {
         window.scroll(0, oldScrollPosition);
       }, 300);
