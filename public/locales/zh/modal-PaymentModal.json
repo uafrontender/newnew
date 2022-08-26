@@ -12,6 +12,11 @@
     }
   },
   "rewardsText": "使用我的奖励",
+  "cardOptions_NEED_TRANSLATION": {
+    "primary": "Primary card **** {{last4}}",
+    "new": "New card"
+  },
+  "saveCardToggle_NEED_TRANSLATION": "Save card for future use",
   "payButton": "支付",
   "tocApplyLink": "條款",
   "tocApplyText": "適用",

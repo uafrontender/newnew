@@ -12,6 +12,11 @@
     }
   },
   "rewardsText": "Utilizar mis recompensas",
+  "cardOptions_NEED_TRANSLATION": {
+    "primary": "Primary card **** {{last4}}",
+    "new": "New card"
+  },
+  "saveCardToggle_NEED_TRANSLATION": "Save card for future use",
   "payButton": "Pagar",
   "tocApplyLink": "Términos",
   "tocApplyText": "Aplicar",

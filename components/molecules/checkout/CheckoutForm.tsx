@@ -183,14 +183,14 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
               setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard)
             }
             selected={selectedPaymentMethod === PaymentMethodTypes.PrimaryCard}
-            label={`Primary card **** ${primaryCard.last4}`}
+            label={t('cardOptions.primary', { last4: primaryCard.last4 })}
           />
           <OptionCard
             handleClick={() =>
               setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
             }
             selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
-            label='New card'
+            label={t('cardOptions.new')}
           />
         </>
       )}
@@ -216,8 +216,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
                 checked={saveCard}
                 onChange={() => setSaveCard((prevState) => !prevState)}
               />
-              <SSaveCardText variant={3}>
-                Save card for future use
+              <SSaveCardText variant={3} weight={600}>
+                {t('saveCardToggle')}
               </SSaveCardText>
             </SSaveCard>
           )}
