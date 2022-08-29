@@ -56,5 +56,13 @@
         "a": "不是。雖然每個創作者都可以提供訂閱，但有些創作者選擇不提供,"
       }
     }
+  },
+  "errors_NEED_TRANSLATION": {
+    "notEnoughMoney": "Not enough money",
+    "cardNotFound": "Card not found",
+    "cardCannotBeUsed": "This card can not be used",
+    "blockedByCreator": "Blocked by creator",
+    "requestFailed": "Request failed",
+    "subscriptionUnavailable": "Subscription not available"
   }
 }
