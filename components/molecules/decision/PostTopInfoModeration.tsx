@@ -68,11 +68,11 @@ const PostTopInfoModeration: React.FunctionComponent<
     if (postStatus !== 'failed') return '';
 
     if (postType === 'ac') {
-      if (!hasWinner) {
-        return 'ac-no-winner';
-      }
       if (amountInBids === 0 || !amountInBids) {
         return 'ac';
+      }
+      if (!hasWinner) {
+        return 'ac-no-winner';
       }
     }
 

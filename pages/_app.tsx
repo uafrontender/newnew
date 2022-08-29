@@ -65,6 +65,7 @@ import ModalNotificationsContextProvider from '../contexts/modalNotificationsCon
 import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
 import { OverlayModeProvider } from '../contexts/overlayModeContext';
+import ErrorBoundary from '../components/organisms/ErrorBoundary';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -231,21 +232,25 @@ const MyApp = (props: IMyApp): ReactElement => {
                                             <>
                                               <ToastContainer />
                                               <VideoProcessingWrapper>
-                                                {!pageProps.error ? (
-                                                  getLayout(
-                                                    <Component {...pageProps} />
-                                                  )
-                                                ) : (
-                                                  <Error
-                                                    title={
-                                                      pageProps.error?.message
-                                                    }
-                                                    statusCode={
-                                                      pageProps.error
-                                                        ?.statusCode ?? 500
-                                                    }
-                                                  />
-                                                )}
+                                                <ErrorBoundary>
+                                                  {!pageProps.error ? (
+                                                    getLayout(
+                                                      <Component
+                                                        {...pageProps}
+                                                      />
+                                                    )
+                                                  ) : (
+                                                    <Error
+                                                      title={
+                                                        pageProps.error?.message
+                                                      }
+                                                      statusCode={
+                                                        pageProps.error
+                                                          ?.statusCode ?? 500
+                                                      }
+                                                    />
+                                                  )}
+                                                </ErrorBoundary>
                                               </VideoProcessingWrapper>
                                               <ReCaptchaBadgeModal />
                                             </>
