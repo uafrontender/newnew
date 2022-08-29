@@ -37,7 +37,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import isBrowser from '../../../utils/isBrowser';
 import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
-import validateMessageText from '../../../utils/validateMessageText';
+import validateInputText from '../../../utils/validateMessageText';
 
 const UserAvatar = dynamic(() => import('../UserAvatar'));
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
@@ -87,6 +87,7 @@ const ChatArea: React.FC<IChatArea> = ({
 
   const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
   const [messageText, setMessageText] = useState<string>('');
+  const [messageTextValid, setMessageTextValid] = useState(false);
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
   const [isVisavisBlocked, setIsVisavisBlocked] = useState<boolean>(false);
   const [isMessagingDisabled, setIsMessagingDisabled] =
@@ -328,13 +329,13 @@ const ChatArea: React.FC<IChatArea> = ({
   };
 
   const submitMessage = useCallback(async () => {
-    if (chatRoom && messageText.length > 0) {
+    if (chatRoom && messageTextValid) {
       try {
         setSendingMessage(true);
         const payload = new newnewapi.SendMessageRequest({
           roomId: chatRoom.id,
           content: {
-            text: messageText,
+            text: messageText.trim(),
           },
         });
         const res = await sendMessage(payload);
@@ -354,12 +355,12 @@ const ChatArea: React.FC<IChatArea> = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatRoom?.id, messageText]);
+  }, [chatRoom?.id, messageTextValid, messageText]);
 
   const handleSubmit = useCallback(() => {
     if (!sendingMessage) submitMessage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sendingMessage, submitMessage, messageText]);
+  }, [sendingMessage, submitMessage]);
 
   const handleChange = useCallback(
     (id: string, value: string, isShiftEnter: boolean) => {
@@ -373,8 +374,9 @@ const ChatArea: React.FC<IChatArea> = ({
         return;
       }
 
-      const msgText = validateMessageText(value);
-      setMessageText(msgText);
+      const isValid = validateInputText(value);
+      setMessageTextValid(isValid);
+      setMessageText(value);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [messageText, isMobileOrTablet, handleSubmit]
@@ -731,14 +733,14 @@ const ChatArea: React.FC<IChatArea> = ({
             </STextArea>
             <SButton
               withShadow
-              view={messageText ? 'primaryGrad' : 'secondary'}
+              view={messageTextValid ? 'primaryGrad' : 'secondary'}
               onClick={handleSubmit}
-              disabled={!messageText}
+              disabled={!messageTextValid}
             >
               <SInlineSVG
                 svg={sendIcon}
                 fill={
-                  messageText
+                  messageTextValid
                     ? theme.colors.white
                     : theme.colorsThemed.text.primary
                 }
