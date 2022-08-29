@@ -55,6 +55,7 @@ import isAnimatedImage from '../../utils/isAnimatedImage';
 import resizeImage from '../../utils/resizeImage';
 import genderPronouns from '../../constants/genderPronouns';
 import getGenderPronouns from '../../utils/genderPronouns';
+import validateMessageText from '../../utils/validateMessageText';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -723,10 +724,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   }, [formErrors, dataInEdit]);
 
   const handleLocalValidation = (value: string) => {
-    let bio = value.trimStart();
-    if (bio.length > 1 && bio[bio.length - 2] === ' ') {
-      bio = bio.trimEnd();
-    }
+    const bio = validateMessageText(value);
     handleUpdateDataInEdit('bio', bio);
   };
 

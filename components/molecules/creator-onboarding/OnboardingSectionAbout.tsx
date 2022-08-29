@@ -20,6 +20,7 @@ import {
   setUserData,
 } from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
+import validateMessageText from '../../../utils/validateMessageText';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -121,13 +122,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
   };
 
   const handleLocalValidation = (value: string) => {
-    let bio = value;
-    if (bio.length > 0) {
-      bio = bio.trimStart();
-      if (bio.length > 1 && bio[bio.length - 2] === ' ') {
-        bio = bio.trimEnd();
-      }
-    }
+    const bio = validateMessageText(value);
     handleUpdateBioInEdit(bio);
   };
 

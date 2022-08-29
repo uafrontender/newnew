@@ -33,6 +33,7 @@ import {
   sendMessage,
 } from '../../../../api/endpoints/chat';
 import isBrowser from '../../../../utils/isBrowser';
+import validateMessageText from '../../../../utils/validateMessageText';
 
 interface IChat {
   roomID: string;
@@ -44,7 +45,14 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
   const router = useRouter();
 
   const { ref: scrollRef, inView } = useInView();
-  const user = useAppSelector((state) => state.user);
+  const { user, ui } = useAppSelector((state) => state);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(ui.resizeMode);
 
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
@@ -215,9 +223,24 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     }
   }, [newMessage]);
 
-  const handleChange = useCallback((id: string, value: string) => {
-    setMessageText(value);
-  }, []);
+  const handleSubmit = useCallback(() => {
+    if (!sendingMessage) submitMessage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messageText]);
+
+  const handleChange = useCallback(
+    (id: string, value: string) => {
+      if (value.charCodeAt(value.length - 1) === 10 && !isMobileOrTablet) {
+        setMessageText(value.slice(0, -1));
+        handleSubmit();
+        return;
+      }
+
+      const msgText = validateMessageText(value);
+      setMessageText(msgText);
+    },
+    [isMobileOrTablet, handleSubmit]
+  );
 
   const submitMessage = useCallback(async () => {
     if (messageText.length > 0) {
@@ -243,11 +266,6 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomID, messageText]);
-
-  const handleSubmit = useCallback(() => {
-    if (!sendingMessage) submitMessage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageText]);
 
   const handleGoBack = useCallback(() => {
     router.push('/creator/dashboard?tab=chat');

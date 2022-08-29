@@ -37,6 +37,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import isBrowser from '../../../utils/isBrowser';
 import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import validateMessageText from '../../../utils/validateMessageText';
 
 const UserAvatar = dynamic(() => import('../UserAvatar'));
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
@@ -372,10 +373,7 @@ const ChatArea: React.FC<IChatArea> = ({
         return;
       }
 
-      let msgText = value.trimStart();
-      if (msgText.length > 1 && msgText[msgText.length - 2] === ' ') {
-        msgText = msgText.trimEnd();
-      }
+      const msgText = validateMessageText(value);
       setMessageText(msgText);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
