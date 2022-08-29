@@ -1,5 +1,5 @@
 function validateInputText(input: string): boolean {
-  // Require at least one letter or digit
+  // Don't allow whitespace only strings
   const whiteSpaceStringRegex = /^[\s]*$/;
   if (whiteSpaceStringRegex.test(input)) {
     return false;
