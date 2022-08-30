@@ -221,7 +221,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
         <PaymentModal
           // predefinedOption='card'
           isOpen={paymentModalOpen}
-          zIndex={10}
+          zIndex={20}
           showTocApply
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}

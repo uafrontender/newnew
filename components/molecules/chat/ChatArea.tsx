@@ -1,6 +1,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-lonely-if */
 /* eslint-disable no-unused-expressions */
+/* eslint-disable no-nested-ternary */
 import React, {
   useState,
   useEffect,
@@ -37,6 +38,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import isBrowser from '../../../utils/isBrowser';
 import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import validateInputText from '../../../utils/validateMessageText';
 
 const UserAvatar = dynamic(() => import('../UserAvatar'));
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
@@ -86,6 +88,7 @@ const ChatArea: React.FC<IChatArea> = ({
 
   const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
   const [messageText, setMessageText] = useState<string>('');
+  const [messageTextValid, setMessageTextValid] = useState(false);
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
   const [isVisavisBlocked, setIsVisavisBlocked] = useState<boolean>(false);
   const [isMessagingDisabled, setIsMessagingDisabled] =
@@ -327,13 +330,13 @@ const ChatArea: React.FC<IChatArea> = ({
   };
 
   const submitMessage = useCallback(async () => {
-    if (chatRoom && messageText.length > 0) {
+    if (chatRoom && messageTextValid) {
       try {
         setSendingMessage(true);
         const payload = new newnewapi.SendMessageRequest({
           roomId: chatRoom.id,
           content: {
-            text: messageText,
+            text: messageText.trim(),
           },
         });
         const res = await sendMessage(payload);
@@ -353,12 +356,12 @@ const ChatArea: React.FC<IChatArea> = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatRoom?.id, messageText]);
+  }, [chatRoom?.id, messageTextValid, messageText]);
 
   const handleSubmit = useCallback(() => {
     if (!sendingMessage) submitMessage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sendingMessage, submitMessage, messageText]);
+  }, [sendingMessage, submitMessage]);
 
   const handleChange = useCallback(
     (id: string, value: string, isShiftEnter: boolean) => {
@@ -372,11 +375,9 @@ const ChatArea: React.FC<IChatArea> = ({
         return;
       }
 
-      let msgText = value.trimStart();
-      if (msgText.length > 1 && msgText[msgText.length - 2] === ' ') {
-        msgText = msgText.trimEnd();
-      }
-      setMessageText(msgText);
+      const isValid = validateInputText(value);
+      setMessageTextValid(isValid);
+      setMessageText(value);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [messageText, isMobileOrTablet, handleSubmit]
@@ -525,7 +526,7 @@ const ChatArea: React.FC<IChatArea> = ({
     }
   };
 
-  const isTextareaHidden = useCallback(() => {
+  const isTextareaVisible = useCallback(() => {
     if (
       isMessagingDisabled ||
       isVisavisBlocked ||
@@ -535,9 +536,11 @@ const ChatArea: React.FC<IChatArea> = ({
     ) {
       return false;
     }
+
     if (isAnnouncement && !isMyAnnouncement) {
       return false;
     }
+
     return true;
   }, [
     isVisavisBlocked,
@@ -707,21 +710,25 @@ const ChatArea: React.FC<IChatArea> = ({
               // isAnnouncement={isAnnouncement}
             />
           )}
-        {isSubscriptionExpired && chatRoom && chatRoom.visavis?.uuid && (
-          <SubscriptionExpired
-            user={chatRoom.visavis}
-            setupIntentClientSecretFromRedirect={
-              setupIntentClientSecretFromRedirect
-            }
-            saveCardFromRedirect={saveCardFromRedirect}
-            resetStripeSetupIntent={resetStripeSetupIntent}
-          />
-        )}
-        {localUserData.accountDeleted && <AccountDeleted />}
-        {isMessagingDisabled && chatRoom && chatRoom.visavis && (
-          <MessagingDisabled user={chatRoom.visavis} />
-        )}
-        {isTextareaHidden() && (
+
+        {localUserData.accountDeleted ? (
+          <AccountDeleted />
+        ) : chatRoom && chatRoom.visavis ? (
+          isMessagingDisabled ? (
+            <MessagingDisabled user={chatRoom.visavis} />
+          ) : isSubscriptionExpired && chatRoom.visavis?.uuid ? (
+            <SubscriptionExpired
+              user={chatRoom.visavis}
+              setupIntentClientSecretFromRedirect={
+                setupIntentClientSecretFromRedirect
+              }
+              saveCardFromRedirect={saveCardFromRedirect}
+              resetStripeSetupIntent={resetStripeSetupIntent}
+            />
+          ) : null
+        ) : null}
+
+        {isTextareaVisible() && (
           <SBottomTextarea>
             <STextArea>
               <TextArea
@@ -733,14 +740,14 @@ const ChatArea: React.FC<IChatArea> = ({
             </STextArea>
             <SButton
               withShadow
-              view={messageText ? 'primaryGrad' : 'secondary'}
+              view={messageTextValid ? 'primaryGrad' : 'secondary'}
               onClick={handleSubmit}
-              disabled={!messageText}
+              disabled={!messageTextValid}
             >
               <SInlineSVG
                 svg={sendIcon}
                 fill={
-                  messageText
+                  messageTextValid
                     ? theme.colors.white
                     : theme.colorsThemed.text.primary
                 }
@@ -750,21 +757,21 @@ const ChatArea: React.FC<IChatArea> = ({
             </SButton>
           </SBottomTextarea>
         )}
-        {chatRoom?.visavis && (
-          <ReportModal
-            show={confirmReportUser}
-            reportedDisplayname={getDisplayname(chatRoom.visavis)}
-            onClose={() => setConfirmReportUser(false)}
-            onSubmit={async ({ reasons, message }) => {
-              if (chatRoom?.visavis?.uuid) {
-                await reportUser(chatRoom.visavis.uuid, reasons, message).catch(
-                  (e) => console.error(e)
-                );
-              }
-            }}
-          />
-        )}
       </SBottomPart>
+      {chatRoom?.visavis && (
+        <ReportModal
+          show={confirmReportUser}
+          reportedDisplayname={getDisplayname(chatRoom.visavis)}
+          onClose={() => setConfirmReportUser(false)}
+          onSubmit={async ({ reasons, message }) => {
+            if (chatRoom?.visavis?.uuid) {
+              await reportUser(chatRoom.visavis.uuid, reasons, message).catch(
+                (e) => console.error(e)
+              );
+            }
+          }}
+        />
+      )}
     </SContainer>
   );
 };
