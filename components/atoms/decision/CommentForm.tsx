@@ -20,6 +20,7 @@ import CommentTextArea from './CommentTextArea';
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import { CommentFromUrlContext } from '../../../contexts/commentFromUrlContext';
+import validateInputText from '../../../utils/validateMessageText';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -79,6 +80,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const [commentText, setCommentText] = useState('');
     const [commentTextError, setCommentTextError] = useState('');
     const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+    const [commentToSend, setCommentToSend] = useState('');
 
     const validateTextViaAPI = useCallback(async (text: string) => {
       setIsAPIValidateLoading(true);
@@ -96,6 +98,17 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
           setCommentTextError(errorSwitch(res.data?.status));
         } else {
           setCommentTextError('');
+        }
+
+        if (text.length > 0) {
+          const isValidLocal = validateInputText(text);
+          if (!isValidLocal) {
+            setCommentTextError(
+              errorSwitch(newnewapi.ValidateTextResponse.Status.TOO_SHORT)
+            );
+            setIsAPIValidateLoading(false);
+            return;
+          }
         }
 
         setIsAPIValidateLoading(false);
@@ -124,8 +137,6 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const handleSubmit = useCallback(
       async (e: React.MouseEvent | React.KeyboardEvent) => {
         e.preventDefault();
-        if (isAPIValidateLoading) return;
-
         // Redirect only after the persist data is pulled
         if (!user.loggedIn && user._persist?.rehydrated) {
           if (!isRoot) {
@@ -147,19 +158,26 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
           return;
         }
 
-        await onSubmit(commentText);
-        setCommentText('');
+        setCommentToSend(commentText);
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [
-        commentText,
-        user.loggedIn,
-        user._persist?.rehydrated,
-        isAPIValidateLoading,
-        onSubmit,
-        isRoot,
-      ]
+      [commentText, user.loggedIn, user._persist?.rehydrated, onSubmit, isRoot]
     );
+
+    // TODO: Add loading state for mobile button on mobile
+    useEffect(() => {
+      if (!commentToSend || !!commentTextError) {
+        return;
+      }
+
+      if (isAPIValidateLoading) {
+        return;
+      }
+
+      onSubmit(commentToSend);
+      setCommentText('');
+      setCommentToSend('');
+    }, [commentToSend, commentTextError, isAPIValidateLoading, onSubmit]);
 
     const handleBlur = useCallback(() => {
       setFocusedInput(false);
