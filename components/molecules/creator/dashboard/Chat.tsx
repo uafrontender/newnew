@@ -33,6 +33,7 @@ import {
   sendMessage,
 } from '../../../../api/endpoints/chat';
 import isBrowser from '../../../../utils/isBrowser';
+import validateInputText from '../../../../utils/validateMessageText';
 
 interface IChat {
   roomID: string;
@@ -44,11 +45,19 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
   const router = useRouter();
 
   const { ref: scrollRef, inView } = useInView();
-  const user = useAppSelector((state) => state.user);
+  const { user, ui } = useAppSelector((state) => state);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(ui.resizeMode);
 
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
   const [messageText, setMessageText] = useState<string>('');
+  const [messageTextValid, setMessageTextValid] = useState(false);
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState<
     newnewapi.IChatMessage | null | undefined
@@ -215,18 +224,35 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     }
   }, [newMessage]);
 
-  const handleChange = useCallback((id: string, value: string) => {
-    setMessageText(value);
-  }, []);
+  const handleSubmit = useCallback(() => {
+    if (!sendingMessage) submitMessage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messageText]);
+
+  const handleChange = useCallback(
+    (id: string, value: string) => {
+      if (value.charCodeAt(value.length - 1) === 10 && !isMobileOrTablet) {
+        setMessageText(value.slice(0, -1));
+        handleSubmit();
+        return;
+      }
+
+      const isValid = validateInputText(value);
+      setMessageTextValid(isValid);
+      setMessageText(value);
+    },
+    [isMobileOrTablet, handleSubmit]
+  );
 
   const submitMessage = useCallback(async () => {
-    if (messageText.length > 0) {
+    if (messageTextValid) {
       try {
         setSendingMessage(true);
+        const trimmedMessageText = messageText.trim();
         const payload = new newnewapi.SendMessageRequest({
           roomId: toNumber(roomID),
           content: {
-            text: messageText,
+            text: trimmedMessageText,
           },
         });
         const res = await sendMessage(payload);
@@ -234,6 +260,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           throw new Error(res.error?.message ?? 'Request failed');
         if (res.data.message) setMessages([res.data.message].concat(messages));
 
+        setMessageTextValid(false);
         setMessageText('');
         setSendingMessage(false);
       } catch (err) {
@@ -242,12 +269,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomID, messageText]);
-
-  const handleSubmit = useCallback(() => {
-    if (!sendingMessage) submitMessage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageText]);
+  }, [messageTextValid, roomID, messageText]);
 
   const handleGoBack = useCallback(() => {
     router.push('/creator/dashboard?tab=chat');
@@ -442,14 +464,14 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           </STextArea>
           <SButton
             withShadow
-            view={messageText ? 'primaryGrad' : 'secondary'}
+            view={messageTextValid ? 'primaryGrad' : 'secondary'}
             onClick={handleSubmit}
-            disabled={!messageText}
+            disabled={!messageTextValid}
           >
             <SInlineSVG
               svg={sendIcon}
               fill={
-                messageText
+                messageTextValid
                   ? theme.colors.white
                   : theme.colorsThemed.text.primary
               }

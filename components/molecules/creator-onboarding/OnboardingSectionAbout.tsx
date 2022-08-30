@@ -20,6 +20,7 @@ import {
   setUserData,
 } from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
+import validateInputText from '../../../utils/validateMessageText';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -110,7 +111,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
   const validateBioViaApiDebounced = useMemo(
     () =>
       debounce((text: string) => {
-        validateBioViaApi(text);
+        validateBioViaApi(text.trim());
       }, 250),
     [validateBioViaApi]
   );
@@ -118,17 +119,6 @@ const OnboardingSectionAbout: React.FunctionComponent<
   const handleUpdateBioInEdit = (value: string) => {
     setBioInEdit(value);
     validateBioViaApiDebounced(value);
-  };
-
-  const handleLocalValidation = (value: string) => {
-    let bio = value;
-    if (bio.length > 0) {
-      bio = bio.trimStart();
-      if (bio.length > 1 && bio[bio.length - 2] === ' ') {
-        bio = bio.trimEnd();
-      }
-    }
-    handleUpdateBioInEdit(bio);
   };
 
   // Is form valid
@@ -139,7 +129,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
       setLoadingModalOpen(true);
 
       const updateBioPayload = new newnewapi.UpdateMeRequest({
-        bio: bioInEdit,
+        bio: bioInEdit.trim(),
       });
 
       const updateMeRes = await updateMe(updateBioPayload);
@@ -173,7 +163,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
   }, [bioInEdit, dispatch, router]);
 
   useEffect(() => {
-    if (bioInEdit.length > 0 && bioError === '') {
+    if (validateInputText(bioInEdit) && bioError === '') {
       setIsFormValid(true);
     } else {
       setIsFormValid(false);
@@ -193,7 +183,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
               errorCaption={t(`aboutSection.bio.errors.${bioError}`)}
               placeholder={t('aboutSection.bio.placeholder')}
               maxChars={150}
-              onChange={(e) => handleLocalValidation(e.target.value)}
+              onChange={(e) => handleUpdateBioInEdit(e.target.value)}
             />
           </SFormItemContainer>
         </STopContainer>

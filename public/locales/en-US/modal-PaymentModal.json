@@ -12,11 +12,6 @@
     }
   },
   "rewardsText": "Use my rewards",
-  "cardOptions": {
-    "primary": "Primary card **** {{last4}}",
-    "new": "New card"
-  },
-  "saveCardToggle": "Save card for future use",
   "payButton": "Pay",
   "tocApplyLink": "Terms",
   "tocApplyText": "apply",
@@ -27,5 +22,8 @@
     "tos": "Terms of Service",
     "apply": "apply."
   },
+  "primaryCard": "Primary card",
+  "newCard": "New card",
+  "saveCard": "Save card for future use",
   "email": "Email"
 }

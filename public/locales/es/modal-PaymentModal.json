@@ -12,11 +12,6 @@
     }
   },
   "rewardsText": "Utilizar mis recompensas",
-  "cardOptions_NEED_TRANSLATION": {
-    "primary": "Primary card **** {{last4}}",
-    "new": "New card"
-  },
-  "saveCardToggle_NEED_TRANSLATION": "Save card for future use",
   "payButton": "Pagar",
   "tocApplyLink": "Términos",
   "tocApplyText": "Aplicar",
@@ -27,5 +22,8 @@
     "tos": "condiciones de servicio",
     "apply": "de Google."
   },
+  "primaryCard_NEED_TRANSLATION": "Primary card_es",
+  "newCard_NEED_TRANSLATION": "New card_es",
+  "saveCard_NEED_TRANSLATION": "Save card for future use_es",
   "email": "Correo electrónico"
 }

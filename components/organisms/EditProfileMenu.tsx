@@ -55,6 +55,7 @@ import isAnimatedImage from '../../utils/isAnimatedImage';
 import resizeImage from '../../utils/resizeImage';
 import genderPronouns from '../../constants/genderPronouns';
 import getGenderPronouns from '../../utils/genderPronouns';
+import validateInputText from '../../utils/validateMessageText';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -467,7 +468,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const payload = new newnewapi.UpdateMeRequest({
         nickname: dataInEdit.nickname,
-        bio: dataInEdit.bio,
+        bio: dataInEdit.bio.trim(),
         // Update avatar
         ...(avatarUrlInEdit && avatarUrlInEdit !== user.userData?.avatarUrl
           ? { avatarUrl: avatarUrlInEdit }
@@ -699,7 +700,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     if (
       (!avatarUrlInEdit ||
         isEqual(avatarUrlInEdit, user.userData?.avatarUrl)) &&
-      isEqual(dataInEdit, initialData) &&
+      dataInEdit.bio.trim() === initialData.bio &&
+      dataInEdit.genderPronouns === initialData.genderPronouns &&
+      dataInEdit.nickname.trim() === initialData.nickname &&
+      dataInEdit.username.trim() === initialData.username &&
       isEqual(coverUrlInEdit, user.userData?.coverUrl)
     ) {
       handleSetWasModified(false);
@@ -715,20 +719,23 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   ]);
 
   useEffect(() => {
-    if (Object.values(formErrors).every((v) => v === '')) {
-      setIsDataValid(true);
-    } else {
+    if (
+      Object.entries(dataInEdit).some(
+        ([key, value]) =>
+          key !== 'genderPronouns' && !validateInputText(value as string)
+      )
+    ) {
       setIsDataValid(false);
+      return;
     }
-  }, [formErrors, dataInEdit]);
 
-  const handleLocalValidation = (value: string) => {
-    let bio = value.trimStart();
-    if (bio.length > 1 && bio[bio.length - 2] === ' ') {
-      bio = bio.trimEnd();
+    if (Object.values(formErrors).some((v) => v !== '')) {
+      setIsDataValid(false);
+      return;
     }
-    handleUpdateDataInEdit('bio', bio);
-  };
+
+    setIsDataValid(true);
+  }, [formErrors, dataInEdit]);
 
   // Gender Pronouns
   const genderOptions: TDropdownSelectItem<number>[] = useMemo(
@@ -878,7 +885,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     `editProfileMenu.inputs.bio.errors.${formErrors.bioError}`
                   )}
                   isValid={!formErrors.bioError}
-                  onChange={(e) => handleLocalValidation(e.target.value)}
+                  onChange={(e) =>
+                    handleUpdateDataInEdit('bio', e.target.value)
+                  }
                 />
               </STextInputsWrapper>
             </ProfileGeneralContent>
