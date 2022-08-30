@@ -56,5 +56,13 @@
         "a": "No. Aunque todos los creadores tienen la capacidad de ofrecer suscripciones, algunos deciden no hacerlo."
       }
     }
+  },
+  "errors_NEED_TRANSLATION": {
+    "notEnoughMoney": "Not enough money",
+    "cardNotFound": "Card not found",
+    "cardCannotBeUsed": "This card can not be used",
+    "blockedByCreator": "Blocked by creator",
+    "requestFailed": "Request failed",
+    "subscriptionUnavailable": "Subscription not available"
   }
 }

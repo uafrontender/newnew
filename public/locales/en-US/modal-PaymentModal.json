@@ -22,5 +22,8 @@
     "tos": "Terms of Service",
     "apply": "apply."
   },
+  "primaryCard": "Primary card",
+  "newCard": "New card",
+  "saveCard": "Save card for future use",
   "email": "Email"
 }
