@@ -28,11 +28,7 @@ import {
 import { useAppSelector } from '../../../redux-store/store';
 
 import Modal from '../Modal';
-import Button from '../../atoms/Button';
-import Headline from '../../atoms/Headline';
-import InlineSvg from '../../atoms/InlineSVG';
 // Views
-import RegularView from './regular';
 import ModerationView from './moderation';
 import WaitingForResponseView from './awaiting';
 import SuccessView from './success';
@@ -60,9 +56,8 @@ import { usePostModalState } from '../../../contexts/postModalContext';
 
 // Icons
 import assets from '../../../constants/assets';
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import PostModalRegular from './PostModalRegular';
 
-const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
 const PostFailedBox = dynamic(
   () => import('../../molecules/decision/PostFailedBox')
 );
@@ -942,141 +937,35 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   // Render regular Decision view
   return (
-    <>
-      <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
-        <Head>
-          <title>{t(`meta.${typeOfPost}.title`)}</title>
-          <meta
-            name='description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-          <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-          <meta
-            property='og:description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-        </Head>
-        {!isMobile && (
-          <SGoBackButtonDesktop
-            view='secondary'
-            iconOnly
-            onClick={handleCloseAndGoBack}
-          >
-            <InlineSvg
-              svg={CancelIcon}
-              fill={theme.colorsThemed.text.primary}
-              width='24px'
-              height='24px'
-            />
-          </SGoBackButtonDesktop>
-        )}
-        {postParsed && typeOfPost ? (
-          <SPostModalContainer
-            loaded={recommendedPosts && recommendedPosts.length > 0}
-            id='post-modal-container'
-            isMyPost={isMyPost}
-            onClick={(e) => e.stopPropagation()}
-            ref={(el) => {
-              modalContainerRef.current = el!!;
-            }}
-          >
-            {postStatus !== 'deleted_by_admin' &&
-            postStatus !== 'deleted_by_creator' ? (
-              <RegularView
-                postParsed={postParsed}
-                typeOfPost={typeOfPost}
-                postStatus={postStatus}
-                stripeSetupIntentClientSecret={
-                  stripeSetupIntentClientSecret ?? undefined
-                }
-                saveCard={saveCard}
-                isFollowingDecision={isFollowingDecision}
-                hasRecommendations={recommendedPosts.length > 0}
-                handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-                resetSetupIntentClientSecret={resetSetupIntentClientSecret}
-                handleGoBackInsidePost={handleGoBackInsidePost}
-                handleUpdatePostStatus={handleUpdatePostStatus}
-                handleReportOpen={handleReportOpen}
-                handleRemoveFromStateUnfavorited={
-                  handleRemoveFromStateUnfavorited!!
-                }
-                handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
-              />
-            ) : (
-              <PostFailedBox
-                title={t('postDeleted.title', {
-                  postType: t(`postType.${typeOfPost}`),
-                })}
-                body={
-                  deletedByCreator
-                    ? t('postDeleted.body.byCreator', {
-                        creator: getDisplayname(postParsed.creator!!),
-                        postType: t(`postType.${typeOfPost}`),
-                      })
-                    : t('postDeleted.body.byAdmin', {
-                        creator: getDisplayname(postParsed.creator!!),
-                        postType: t(`postType.${typeOfPost}`),
-                      })
-                }
-                buttonCaption={t('postDeleted.buttonText', {
-                  postTypeMultiple: t(`postType.multiple.${typeOfPost}`),
-                })}
-                imageSrc={
-                  theme.name === 'light'
-                    ? LIGHT_IMAGES[typeOfPost]
-                    : DARK_IMAGES[typeOfPost]
-                }
-                style={{
-                  marginBottom: '24px',
-                }}
-                handleButtonClick={handleSeeNewDeletedBox}
-              />
-            )}
-            <SRecommendationsSection
-              id='recommendations-section-heading'
-              loaded={recommendedPosts && recommendedPosts.length > 0}
-            >
-              <Headline variant={4}>
-                {recommendedPosts.length > 0
-                  ? t('recommendationsSection.heading')
-                  : null}
-              </Headline>
-              {recommendedPosts && (
-                <ListPostModal
-                  loading={recommendedPostsLoading}
-                  collection={recommendedPosts}
-                  skeletonsBgColor={theme.colorsThemed.background.tertiary}
-                  skeletonsHighlightColor={
-                    theme.colorsThemed.background.secondary
-                  }
-                  handlePostClicked={handleOpenRecommendedPost}
-                />
-              )}
-              <div
-                ref={loadingRef}
-                style={{
-                  position: 'relative',
-                  bottom: '10px',
-                  ...(recommendedPostsLoading
-                    ? {
-                        display: 'none',
-                      }
-                    : {}),
-                }}
-              />
-            </SRecommendationsSection>
-          </SPostModalContainer>
-        ) : null}
-      </Modal>
-      {postParsed?.creator && reportPostOpen && (
-        <ReportModal
-          show={reportPostOpen}
-          reportedDisplayname={getDisplayname(postParsed?.creator)}
-          onSubmit={handleReportSubmit}
-          onClose={handleReportClose}
-        />
-      )}
-    </>
+    <PostModalRegular
+      open={open}
+      modalContainerRef={modalContainerRef}
+      isMyPost={isMyPost}
+      postParsed={postParsed}
+      typeOfPost={typeOfPost}
+      postStatus={postStatus}
+      isFollowingDecision={isFollowingDecision}
+      deletedByCreator={deletedByCreator}
+      hasRecommendations={recommendedPosts.length > 0}
+      recommendedPosts={recommendedPosts}
+      saveCard={saveCard}
+      stripeSetupIntentClientSecret={stripeSetupIntentClientSecret}
+      handleSeeNewDeletedBox={handleSeeNewDeletedBox}
+      handleOpenRecommendedPost={handleOpenRecommendedPost}
+      loadingRef={loadingRef}
+      recommendedPostsLoading={recommendedPostsLoading}
+      reportPostOpen={reportPostOpen}
+      handleReportSubmit={handleReportSubmit}
+      handleReportClose={handleReportClose}
+      handleSetIsFollowingDecision={handleSetIsFollowingDecision}
+      handleGoBackInsidePost={handleGoBackInsidePost}
+      handleUpdatePostStatus={handleUpdatePostStatus}
+      handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited}
+      handleAddPostToStateFavorited={handleAddPostToStateFavorited}
+      handleReportOpen={handleReportOpen}
+      resetSetupIntentClientSecret={resetSetupIntentClientSecret}
+      handleCloseAndGoBack={handleCloseAndGoBack}
+    />
   );
 };
 
@@ -1157,38 +1046,5 @@ const SPostModalContainer = styled.div<{
 
     padding: 24px;
     padding-bottom: 24px;
-  }
-`;
-
-const SRecommendationsSection = styled.div<{
-  loaded: boolean;
-}>`
-  min-height: ${({ loaded }) => (loaded ? '600px' : '0')};
-`;
-
-const SGoBackButtonDesktop = styled(Button)`
-  position: absolute;
-  right: 0;
-  top: 0;
-
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-
-  border: transparent;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  font-size: 20px;
-  line-height: 28px;
-  font-weight: bold;
-  text-transform: capitalize;
-
-  cursor: pointer;
-
-  z-index: 2;
-
-  ${({ theme }) => theme.media.laptopM} {
-    right: 24px;
-    top: 32px;
   }
 `;
