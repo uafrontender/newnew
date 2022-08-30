@@ -175,9 +175,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
             <SItemWithMargin>
               <RewardButton
                 balance={
-                  rewardBalance?.usdCents
-                    ? rewardBalance.usdCents / 100 || 0
-                    : 0
+                  rewardBalance ? rewardBalance.usdCents / 100 : undefined
                 }
               />
             </SItemWithMargin>

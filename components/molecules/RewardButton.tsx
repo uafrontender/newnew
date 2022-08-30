@@ -7,7 +7,7 @@ import ArrowLeftIcon from '../../public/images/svg/icons/outlined/ArrowRight.svg
 import { formatNumber } from '../../utils/format';
 
 interface RewardButtonI {
-  balance: number;
+  balance: number | undefined;
   offer?: boolean;
 }
 
@@ -42,7 +42,12 @@ const RewardButton: React.FC<RewardButtonI> = ({ balance, offer }) => {
   return (
     <Link href='/rewards'>
       <Container>
-        <Value>${formatNumber(balance * (portion / REWARD_TICKS))}</Value>
+        {/* TODO: Add a proper skeleton */}
+        <Value>
+          {balance
+            ? `${formatNumber(balance * (portion / REWARD_TICKS))}`
+            : null}
+        </Value>
         <ArrowContainer>
           <Arrow>
             <InlineSvg

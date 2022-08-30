@@ -2,8 +2,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useContext, useState } from 'react';
-import { useTranslation } from 'next-i18next';
+import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
@@ -18,10 +17,6 @@ import CheckoutForm from './CheckoutForm';
 import Lottie from '../../atoms/Lottie';
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import assets from '../../../constants/assets';
-import Toggle from '../../atoms/Toggle';
-import { RewardContext } from '../../../contexts/rewardContext';
-import { formatNumber } from '../../../utils/format';
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 
 interface IPaymentModal {
@@ -128,6 +123,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
               handlePayWithCard={handlePayWithCard}
               stipeSecret={stripeSetupIntent?.stripeSetupIntentClientSecret!}
               redirectUrl={redirectUrl}
+              noRewards={noRewards}
             />
           </StripeElements>
         </SContentContainer>

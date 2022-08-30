@@ -11,87 +11,20 @@ interface RewardListI {}
 
 export const RewardList: React.FC<RewardListI> = React.memo(() => {
   const { t } = useTranslation('common');
-  // TODO: remove test data
-  const [receivedRewards, setReceivedRewards] = useState<newnewapi.Reward[]>([
-    /* new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.SIGN_UP,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      receivedAt: new google.protobuf.Timestamp({
-        seconds: Date.now(),
-      }),
-    }),
-    new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.BID,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      receivedAt: new google.protobuf.Timestamp({
-        seconds: Date.now(),
-      }),
-    }), */
-  ]);
 
   // TODO: add loading state
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [receivedRewardsLoading, setReceivedRewardsLoading] = useState(false);
-  // TODO: remove test data
-  const [availableRewards, setAvailableRewards] = useState<newnewapi.Reward[]>([
-    /*
-    new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.VOTE,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-    }),
-    new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.PLEDGE,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-    }),
-    new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.SUBSCRIBE_X_CREATORS_LEVEL_1,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-    }),
-    new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.SUBSCRIBE_X_CREATORS_LEVEL_2,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: '2' },
-    }),
-    new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.BID_SAME_CREATOR_X_TIMES_LEVEL_1,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: '2' },
-    }),
-    new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.VOTE_SAME_CREATOR_X_TIMES_LEVEL_1,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: '2' },
-    }),
-    new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.BACK_SAME_CREATOR_X_TIMES_LEVEL_1,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: '2' },
-    }),
-    new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.BID_IN_A_WEEK_X_TIMES_LEVEL_1,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: '2' },
-    }),
-    new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.VOTE_IN_A_WEEK_X_TIMES_LEVEL_1,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: '2' },
-    }),
-    new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.BACK_IN_A_WEEK_X_TIMES_LEVEL_1,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: '2' },
-    }),
-    new newnewapi.Reward({
-      type: newnewapi.Reward.RewardType.INVITE_X_FRIENDS_LEVEL_1,
-      amount: new newnewapi.MoneyAmount({ usdCents: 500 }),
-      extra: { amount: '3' },
-    }), */
-  ]);
+  const [receivedRewards, setReceivedRewards] = useState<newnewapi.Reward[]>(
+    []
+  );
 
   // TODO: add loading state
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [availableRewardsLoading, setAvailableRewardsLoading] = useState(false);
+  const [availableRewards, setAvailableRewards] = useState<newnewapi.Reward[]>(
+    []
+  );
 
   const fetchReceivedRewards = useCallback(async () => {
     try {
@@ -102,18 +35,10 @@ export const RewardList: React.FC<RewardListI> = React.memo(() => {
       });
 
       const res = await getRewards(receivedRewardsPayload);
-      console.log('LOAD RECEIVED');
-      console.log(res);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
       setReceivedRewards(res.data.rewards as newnewapi.Reward[]);
-
-      // TODO: use pagination
-      /* res.data.paging?.total
-        ? setReceivedRewardsTotal(res.data.paging?.total)
-        : setReceivedRewardsTotal(0); */
-
       setReceivedRewardsLoading(false);
     } catch (err) {
       console.error(err);
@@ -130,8 +55,6 @@ export const RewardList: React.FC<RewardListI> = React.memo(() => {
       });
 
       const res = await getRewards(availableRewardsPayload);
-      console.log('LOAD REWARDS');
-      console.log(res);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
