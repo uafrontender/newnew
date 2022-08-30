@@ -1,5 +1,11 @@
 /* eslint-disable no-unneeded-ternary */
-import React, { useRef, useMemo, useState, useCallback } from 'react';
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useCallback,
+  useEffect,
+} from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import _compact from 'lodash/compact';
@@ -20,6 +26,7 @@ import { createPost } from '../../../../api/endpoints/post';
 import { maxLength, minLength } from '../../../../utils/validation';
 import {
   clearCreation,
+  setCreationStartDate,
   setPostData,
 } from '../../../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
@@ -140,6 +147,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       .hours(time.hours())
       .minutes(time.minutes());
   }, [post.startsAt]);
+
   const formatExpiresAt: (inSeconds?: boolean) => any = useCallback(
     (inSeconds = false) => {
       const time = moment(
@@ -410,6 +418,29 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       router?.push('/creation');
     }
   }, [post.title, router]);
+
+  // This effect results in the form re-rendering every second
+  // However, it re renders after every letter typed anyway
+  // TODO: optimize this view
+  useEffect(() => {
+    let updateStartDate: any;
+
+    if (post.startsAt.type === 'right-away') {
+      updateStartDate = setInterval(() => {
+        const newStartAt = {
+          type: post.startsAt.type,
+          date: moment().format(),
+          time: moment().format('hh:mm'),
+          'hours-format': post.startsAt['hours-format'],
+        };
+        dispatch(setCreationStartDate(newStartAt));
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(updateStartDate);
+    };
+  }, [post.startsAt, dispatch]);
 
   if (isMobile) {
     return (
