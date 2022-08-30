@@ -1,6 +1,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-lonely-if */
 /* eslint-disable no-unused-expressions */
+/* eslint-disable no-nested-ternary */
 import React, {
   useState,
   useEffect,
@@ -525,7 +526,7 @@ const ChatArea: React.FC<IChatArea> = ({
     }
   };
 
-  const isTextareaHidden = useCallback(() => {
+  const isTextareaVisible = useCallback(() => {
     if (
       isMessagingDisabled ||
       isVisavisBlocked ||
@@ -535,9 +536,11 @@ const ChatArea: React.FC<IChatArea> = ({
     ) {
       return false;
     }
+
     if (isAnnouncement && !isMyAnnouncement) {
       return false;
     }
+
     return true;
   }, [
     isVisavisBlocked,
@@ -707,21 +710,25 @@ const ChatArea: React.FC<IChatArea> = ({
               // isAnnouncement={isAnnouncement}
             />
           )}
-        {isSubscriptionExpired && chatRoom && chatRoom.visavis?.uuid && (
-          <SubscriptionExpired
-            user={chatRoom.visavis}
-            setupIntentClientSecretFromRedirect={
-              setupIntentClientSecretFromRedirect
-            }
-            saveCardFromRedirect={saveCardFromRedirect}
-            resetStripeSetupIntent={resetStripeSetupIntent}
-          />
-        )}
-        {localUserData.accountDeleted && <AccountDeleted />}
-        {isMessagingDisabled && chatRoom && chatRoom.visavis && (
-          <MessagingDisabled user={chatRoom.visavis} />
-        )}
-        {isTextareaHidden() && (
+
+        {localUserData.accountDeleted ? (
+          <AccountDeleted />
+        ) : chatRoom && chatRoom.visavis ? (
+          isMessagingDisabled ? (
+            <MessagingDisabled user={chatRoom.visavis} />
+          ) : isSubscriptionExpired && chatRoom.visavis?.uuid ? (
+            <SubscriptionExpired
+              user={chatRoom.visavis}
+              setupIntentClientSecretFromRedirect={
+                setupIntentClientSecretFromRedirect
+              }
+              saveCardFromRedirect={saveCardFromRedirect}
+              resetStripeSetupIntent={resetStripeSetupIntent}
+            />
+          ) : null
+        ) : null}
+
+        {isTextareaVisible() && (
           <SBottomTextarea>
             <STextArea>
               <TextArea
@@ -750,21 +757,21 @@ const ChatArea: React.FC<IChatArea> = ({
             </SButton>
           </SBottomTextarea>
         )}
-        {chatRoom?.visavis && (
-          <ReportModal
-            show={confirmReportUser}
-            reportedDisplayname={getDisplayname(chatRoom.visavis)}
-            onClose={() => setConfirmReportUser(false)}
-            onSubmit={async ({ reasons, message }) => {
-              if (chatRoom?.visavis?.uuid) {
-                await reportUser(chatRoom.visavis.uuid, reasons, message).catch(
-                  (e) => console.error(e)
-                );
-              }
-            }}
-          />
-        )}
       </SBottomPart>
+      {chatRoom?.visavis && (
+        <ReportModal
+          show={confirmReportUser}
+          reportedDisplayname={getDisplayname(chatRoom.visavis)}
+          onClose={() => setConfirmReportUser(false)}
+          onSubmit={async ({ reasons, message }) => {
+            if (chatRoom?.visavis?.uuid) {
+              await reportUser(chatRoom.visavis.uuid, reasons, message).catch(
+                (e) => console.error(e)
+              );
+            }
+          }}
+        />
+      )}
     </SContainer>
   );
 };

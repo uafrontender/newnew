@@ -423,6 +423,7 @@ const SButtonsWrapper = styled.div`
 
 const SDescription = styled.div`
   margin-top: 24px;
+  text-align: center;
 `;
 
 const SText = styled.span`
