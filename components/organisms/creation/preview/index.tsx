@@ -694,9 +694,5 @@ const SInlineSVG = styled(InlineSVG)`
 
 const SText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-  text-align: left;
-
-  ${({ theme }) => theme.media.tablet} {
-    text-align: center;
-  }
+  text-align: center;
 `;
