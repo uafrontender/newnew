@@ -20,6 +20,7 @@ import CommentTextArea from './CommentTextArea';
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import { CommentFromUrlContext } from '../../../contexts/commentFromUrlContext';
+import validateInputText from '../../../utils/validateMessageText';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -97,6 +98,17 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
           setCommentTextError(errorSwitch(res.data?.status));
         } else {
           setCommentTextError('');
+        }
+
+        if (text.length > 0) {
+          const isValidLocal = validateInputText(text);
+          if (!isValidLocal) {
+            setCommentTextError(
+              errorSwitch(newnewapi.ValidateTextResponse.Status.TOO_SHORT)
+            );
+            setIsAPIValidateLoading(false);
+            return;
+          }
         }
 
         setIsAPIValidateLoading(false);
