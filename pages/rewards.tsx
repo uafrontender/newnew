@@ -133,7 +133,7 @@ export const Rewards = () => {
               )}
               $
               {!user.loggedIn
-                ? formatNumber(currentSignupRewardAmount)
+                ? formatNumber(currentSignupRewardAmount?.usdCents ?? 0)
                 : isRewardBalanceLoading || !rewardBalance
                 ? formatNumber(0)
                 : formatNumber(rewardBalance.usdCents! / 100 ?? 0)}
