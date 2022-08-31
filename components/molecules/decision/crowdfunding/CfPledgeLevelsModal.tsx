@@ -13,6 +13,7 @@ import { doPledgeCrowdfunding } from '../../../../api/endpoints/crowdfunding';
 import {
   // getTopUpWalletWithPaymentPurposeUrl,
   createStripeSetupIntent,
+  updateStripeSetupIntent,
 } from '../../../../api/endpoints/payments';
 
 import Text from '../../../atoms/Text';
@@ -30,6 +31,7 @@ import EllipseModal, { EllipseModalButton } from '../../../atoms/EllipseModal';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import PaymentModal from '../../checkout/PaymentModal';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import getRewardErrorStatusTextKey from '../../../../utils/getRewardErrorStatusTextKey';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 const getPayWithCardErrorMessage = (
@@ -240,10 +242,12 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 
   const handlePayWithCard = useCallback(
     async ({
+      rewardAmount,
       cardUuid,
       stripeSetupIntentClientSecret,
       saveCard,
     }: {
+      rewardAmount: number;
       cardUuid?: string;
       stripeSetupIntentClientSecret: string;
       saveCard?: boolean;
@@ -262,7 +266,34 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         _postUuid: post.postUuid,
         _component: 'CfPledgeLevelsModal',
       });
+
       try {
+        if (rewardAmount > 0) {
+          const updateStripeSetupIntentRequest =
+            new newnewapi.UpdateStripeSetupIntentRequest({
+              stripeSetupIntentClientSecret,
+              rewardAmount: new newnewapi.MoneyAmount({
+                usdCents: rewardAmount,
+              }),
+            });
+
+          const updateRes = await updateStripeSetupIntent(
+            updateStripeSetupIntentRequest
+          );
+
+          if (
+            !updateRes.data ||
+            updateRes.error ||
+            updateRes.data.status !==
+              newnewapi.UpdateStripeSetupIntentResponse.Status.SUCCESS
+          ) {
+            throw new Error(
+              updateRes.error?.message ??
+                t(getRewardErrorStatusTextKey(updateRes.data?.status))
+            );
+          }
+        }
+
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             cardUuid,

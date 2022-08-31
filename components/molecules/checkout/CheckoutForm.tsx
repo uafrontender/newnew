@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useContext } from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled from 'styled-components';
@@ -21,6 +21,8 @@ import { formatNumber } from '../../../utils/format';
 import { useCards } from '../../../contexts/cardsContext';
 import { useAppSelector } from '../../../redux-store/store';
 import { updateStripeSetupIntent } from '../../../api/endpoints/payments';
+import { RewardContext } from '../../../contexts/rewardContext';
+import assets from '../../../constants/assets';
 import { IReCaptchaRes } from '../../interfaces/reCaptcha';
 
 // eslint-disable-next-line no-shadow
@@ -34,12 +36,14 @@ interface ICheckoutForm {
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
   handlePayWithCard?: (params: {
+    rewardAmount: number;
     cardUuid?: string;
     stripeSetupIntentClientSecret: string;
     saveCard?: boolean;
   }) => void;
   stipeSecret: string;
   redirectUrl: string;
+  noRewards?: boolean;
 }
 
 const CheckoutForm: React.FC<ICheckoutForm> = ({
@@ -49,6 +53,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   bottomCaption,
   stipeSecret,
   redirectUrl,
+  noRewards,
 }) => {
   const { t } = useTranslation('modal-PaymentModal');
   const elements = useElements();
@@ -74,6 +79,13 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const [saveCard, setSaveCard] = useState(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
+  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
+  const [useRewards, setUseRewards] = useState(false);
+
+  const rewardUsed =
+    useRewards && rewardBalance?.usdCents && amount
+      ? Math.min(rewardBalance.usdCents, amount)
+      : 0;
 
   const handleSetEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -118,6 +130,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             primaryCard
           ) {
             handlePayWithCard?.({
+              rewardAmount: rewardUsed,
               cardUuid: primaryCard.cardUuid as string,
               stripeSetupIntentClientSecret: stipeSecret,
             });
@@ -151,6 +164,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             }
 
             handlePayWithCard?.({
+              rewardAmount: rewardUsed,
               stripeSetupIntentClientSecret: stipeSecret,
               saveCard,
               ...(!loggedIn ? { email } : {}),
@@ -212,9 +226,6 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           {/* Show save toggle only if user already has primary card otherwise card will be saved in any case */}
           {isStripeReady && primaryCard && (
             <SSaveCard>
-              <SSaveCardText variant={3} weight={600}>
-                {t('saveCardToggle')}
-              </SSaveCardText>
               <Toggle
                 checked={saveCard}
                 onChange={() => setSaveCard((prevState) => !prevState)}
@@ -223,6 +234,25 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             </SSaveCard>
           )}
         </SPaymentFormWrapper>
+      )}
+      {!noRewards && (
+        <RewardContainer>
+          <RewardImage src={assets.decision.gold} alt='reward balance' />
+          <RewardText>{t('rewardsText')}</RewardText>
+          <RewardBalance>
+            $
+            {rewardBalance?.usdCents
+              ? Math.round(rewardBalance.usdCents / 100)
+              : 0}
+          </RewardBalance>
+          <Toggle
+            checked={useRewards}
+            disabled={isRewardBalanceLoading}
+            onChange={() => {
+              setUseRewards((curr) => !curr);
+            }}
+          />
+        </RewardContainer>
       )}
       <SPayButtonDiv>
         <SPayButton
@@ -234,7 +264,10 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         >
           {t('payButton')}
           {amount &&
-            ` $${formatNumber(Math.max(amount, 0) / 100, amount % 1 === 0)}`}
+            ` $${formatNumber(
+              Math.max(amount - rewardUsed, 0) / 100,
+              amount % 1 === 0
+            )}`}
         </SPayButton>
         {bottomCaption || null}
         {showTocApply && (
@@ -280,16 +313,55 @@ const SPaymentFormWrapper = styled.div`
 const SSaveCard = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 24px;
-
-  padding-top: 14px;
-
-  border-top: 1px solid
-    ${({ theme }) => theme.colorsThemed.background.outlines2};
+  margin-top: 12px;
 `;
 
-const SSaveCardText = styled(Text)``;
+const SSaveCardText = styled(Text)`
+  margin-left: 8px;
+`;
+
+const RewardContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border: 1px solid;
+  border-color: ${({ theme }) => theme.colorsThemed.text.primary};
+  border-radius: 24px;
+  height: 78px;
+  margin-bottom: 16px;
+  padding-left: 16px;
+  padding-right: 18px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 24px;
+    padding-left: 20px;
+    padding-right: 30px;
+  }
+`;
+
+const RewardImage = styled.img`
+  height: 40px;
+  width: 40px;
+  margin-right: 16px;
+  object-fit: cover;
+`;
+
+const RewardText = styled.div`
+  ${({ theme }) => theme.colorsThemed.text.primary};
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  margin-right: 8px;
+  flex-grow: 1;
+`;
+
+const RewardBalance = styled.div`
+  ${({ theme }) => theme.colorsThemed.text.primary};
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 32px;
+  margin-right: 20px;
+`;
 
 const SPayButtonDiv = styled.div`
   width: 100%;

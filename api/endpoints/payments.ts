@@ -108,6 +108,23 @@ export const fetchSetStripeLinkCreator = (
     signal ?? undefined
   );
 
+// Rewards
+export const getRewardBalance = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.GetRewardBalanceResponse
+  >(
+    newnewapi.EmptyRequest,
+    newnewapi.GetRewardBalanceResponse,
+    `${BASE_URL_PAYMENTS}/get_reward_balance`,
+    'post',
+    payload,
+    signal ?? undefined
+  );
+
 // Wallet
 export const getWalletBalance = (
   payload: newnewapi.EmptyRequest,

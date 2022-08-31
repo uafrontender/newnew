@@ -28,6 +28,7 @@ import ReportBugButton from '../molecules/ReportBugButton';
 import { usePostModalState } from '../../contexts/postModalContext';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
 
 interface IGeneral {
@@ -264,6 +265,7 @@ export const General: React.FC<IGeneral> = (props) => {
             zIndex={moreMenuMobileOpen ? 9 : undefined}
           />
         )}
+        <ModalNotifications />
       </SkeletonTheme>
     </SBaseLayout>
   );

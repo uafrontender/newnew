@@ -22,6 +22,7 @@ import {
 } from '../../../../api/endpoints/multiple_choice';
 import {
   createStripeSetupIntent,
+  updateStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 
@@ -60,6 +61,7 @@ import McConfirmDeleteOptionModal from './moderation/McConfirmDeleteOptionModal'
 import { Mixpanel } from '../../../../utils/mixpanel';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
+import getRewardErrorStatusTextKey from '../../../../utils/getRewardErrorStatusTextKey';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 const getPayWithCardErrorMessage = (
@@ -411,10 +413,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   const handlePayWithCard = useCallback(
     async ({
+      rewardAmount,
       cardUuid,
       stripeSetupIntentClientSecret,
       saveCard,
     }: {
+      rewardAmount: number;
       cardUuid?: string;
       stripeSetupIntentClientSecret: string;
       saveCard?: boolean;
@@ -434,7 +438,34 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         _postUuid: postId,
         _component: 'McOptionCard',
       });
+
       try {
+        if (rewardAmount > 0) {
+          const updateStripeSetupIntentRequest =
+            new newnewapi.UpdateStripeSetupIntentRequest({
+              stripeSetupIntentClientSecret,
+              rewardAmount: new newnewapi.MoneyAmount({
+                usdCents: rewardAmount,
+              }),
+            });
+
+          const updateRes = await updateStripeSetupIntent(
+            updateStripeSetupIntentRequest
+          );
+
+          if (
+            !updateRes.data ||
+            updateRes.error ||
+            updateRes.data.status !==
+              newnewapi.UpdateStripeSetupIntentResponse.Status.SUCCESS
+          ) {
+            throw new Error(
+              updateRes.error?.message ??
+                t(getRewardErrorStatusTextKey(updateRes.data?.status))
+            );
+          }
+        }
+
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             cardUuid,
@@ -835,7 +866,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <PaymentModal
             zIndex={12}
             isOpen={paymentModalOpen}
-            amount={(parseInt(supportBidAmount) * 100 || 0) * votePrice}
+            amount={(parseInt(supportBidAmount) || 0) * votePrice}
             createStripeSetupIntent={createSetupIntent}
             // {...(walletBalance?.usdCents &&
             // walletBalance.usdCents >=
