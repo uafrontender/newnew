@@ -44,7 +44,7 @@ const RewardButton: React.FC<RewardButtonI> = ({ balance, offer }) => {
       <Container>
         {/* TODO: Add a proper skeleton */}
         <Value>
-          {balance
+          {balance !== undefined
             ? `${formatNumber(balance * (portion / REWARD_TICKS))}`
             : null}
         </Value>
