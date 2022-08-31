@@ -189,32 +189,44 @@
       "3": "...por votar en una publicación",
       "4": "...por patrocinar un Goal",
       "5": "...por suscribirte a un creador",
-      "6": "...por suscribirte a {{amount}} creadores",
+      "6": "...por suscribirte a {{creators}} creadores",
       "7": "...por ofertar dos veces con el mismo creador",
       "8": "...por votar dos veces con el mismo creador",
       "9": "...por patrocinar al mismo creador dos veces",
       "10": "...por ofertas dos veces en una semana",
       "11": "...por votar dos veces en una semana",
       "12": "...por patrocinar dos Goals en una semana",
-      "13": "...por invitar a {{amount}} amigos a NewNew"
+      "13": "...por invitar a {{friends}} amigos a NewNew"
     },
-    "itemDescription": {
-      "0": "Registrarte",
-      "1": "Hacer una oferta de $4",
-      "2": "Votar por $4",
-      "3": "Patrocinar un Goal por $4",
-      "4": "Suscribirte a un creador",
-      "5": "Subscribirte a tres creadores",
-      "6": "Ofertar en el mismo creador dos veces",
-      "7": "Votar en el mismo creador dos veces",
-      "8": "Patrocinar al mismo creador dos veces",
-      "9": "Hacer una oferta 2 días seguidos",
-      "10": "Votar 2 días seguidos",
-      "11": "Patrocinar Goals 2 días seguidos",
-      "12": "Ofertar en una opción ganadora",
-      "13": "Votar por una opción ganadora",
-      "14": "Invitar 5 amigos",
-      "15": "Obtener un voto en una publicación tuya"
+    "receivedItemDescription_NEED_TRANSLATION": {
+      "1": "Signed up",
+      "2": "Placed a bid",
+      "3": "Voted on a post",
+      "4": "Backed a goal",
+      "5": "Subscribed to a creator",
+      "6": "Subscribed to {{creators}} creators",
+      "7": "Bid twice on the same creator",
+      "8": "Voted twice on the same creator",
+      "9": "Backed the same creator twice",
+      "10": "Placed bids twice in one week",
+      "11": "Voted twice in one week",
+      "12": "Backed goals twice in one week",
+      "13": "Invited {{friends}} friends"
+    },
+    "availableItemDescription_NEED_TRANSLATION": {
+      "1": "Sign up",
+      "2": "Place a bid",
+      "3": "Vote on a post",
+      "4": "Back a Goal",
+      "5": "Subscribe to a creator",
+      "6": "Subscribe to {{creators}} creators",
+      "7": "Bid twice on the same creator",
+      "8": "Vote twice on the same creator",
+      "9": "Back the same Creator twice",
+      "10": "Bid twice in one week",
+      "11": "Vote twice in one week",
+      "12": "Back goals twice in one week",
+      "13": "Invite {{friends}} friends to NewNew"
     }
   }
 }
