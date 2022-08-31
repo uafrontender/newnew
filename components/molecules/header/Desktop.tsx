@@ -261,7 +261,11 @@ export const Desktop: React.FC = React.memo(() => {
             {currentSignupRewardAmount ? (
               <SItemWithMargin>
                 <RewardButton
-                  balance={currentSignupRewardAmount.usdCents ?? undefined}
+                  balance={
+                    currentSignupRewardAmount.usdCents
+                      ? currentSignupRewardAmount.usdCents / 100
+                      : undefined
+                  }
                   offer
                 />
               </SItemWithMargin>
