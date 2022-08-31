@@ -800,7 +800,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
               minAmount={appConstants?.minMcVotes ?? 2}
               votePrice={
                 appConstants?.mcVotePrice
-                  ? Math.floor(appConstants?.mcVotePrice / 100)
+                  ? Math.floor(appConstants?.mcVotePrice)
                   : 1
               }
               canSubscribe={!!canSubscribe}

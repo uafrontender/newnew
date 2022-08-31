@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import Link from 'next/link';
@@ -19,6 +19,9 @@ import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import RewardButton from '../RewardButton';
+import { RewardContext } from '../../../contexts/rewardContext';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 interface ITablet {}
@@ -33,6 +36,8 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
+  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
+  const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
@@ -167,6 +172,14 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 </SItemWithMargin>
               </>
             )}
+            <SItemWithMargin>
+              <RewardButton
+                balance={
+                  rewardBalance ? rewardBalance.usdCents / 100 : undefined
+                }
+                loading={isRewardBalanceLoading}
+              />
+            </SItemWithMargin>
           </>
         ) : (
           <>
@@ -205,6 +218,14 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 </a>
               </Link>
             </SItemWithMargin>
+            {currentSignupRewardAmount ? (
+              <SItemWithMargin>
+                <RewardButton
+                  balance={currentSignupRewardAmount.usdCents ?? undefined}
+                  offer
+                />
+              </SItemWithMargin>
+            ) : null}
           </>
         )}
       </SRightBlock>

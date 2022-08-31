@@ -1,3 +1,7 @@
+/* eslint-disable react/jsx-no-target-blank */
+/* eslint-disable no-nested-ternary */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -21,8 +25,10 @@ interface IPaymentModal {
   amount?: number;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
+  noRewards?: boolean;
   onClose: () => void;
   handlePayWithCard?: (params: {
+    rewardAmount: number;
     cardUuid?: string;
     stripeSetupIntentClientSecret: string;
     saveCard?: boolean;
@@ -40,6 +46,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   amount,
   showTocApply,
   bottomCaption,
+  noRewards,
   onClose,
   handlePayWithCard,
   children,
@@ -116,6 +123,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
               handlePayWithCard={handlePayWithCard}
               stipeSecret={stripeSetupIntent?.stripeSetupIntentClientSecret!}
               redirectUrl={redirectUrl}
+              noRewards={noRewards}
             />
           </StripeElements>
         </SContentContainer>
@@ -128,6 +136,7 @@ PaymentModal.defaultProps = {
   amount: undefined,
   showTocApply: undefined,
   bottomCaption: null,
+  noRewards: undefined,
   handlePayWithCard: () => {},
 };
 
