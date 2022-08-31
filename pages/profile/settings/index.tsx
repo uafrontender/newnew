@@ -59,6 +59,7 @@ import assets from '../../../constants/assets';
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
+
   // Translations
   const { t } = useTranslation('page-Profile');
   // TEMP
@@ -508,13 +509,24 @@ const SBlockOption = styled.a`
   }
 `;
 
-export async function getStaticProps(context: {
+export async function getServerSideProps(context: {
   locale: string;
 }): Promise<any> {
   const translationContext = await serverSideTranslations(context.locale, [
     'common',
     'page-Profile',
+    'page-VerifyEmail',
   ]);
+
+  // @ts-ignore
+  if (!context?.req?.cookies?.accessToken) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/',
+      },
+    };
+  }
 
   return {
     props: {
