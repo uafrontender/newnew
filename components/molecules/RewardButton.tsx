@@ -50,7 +50,7 @@ const RewardButton: React.FC<RewardButtonI> = ({ balance, loading, offer }) => {
       <Container>
         <Value>
           {balance !== undefined
-            ? `${formatNumber(balance * (portion / REWARD_TICKS))}`
+            ? `$${formatNumber(balance * (portion / REWARD_TICKS))}`
             : null}
         </Value>
         <ArrowContainer>
