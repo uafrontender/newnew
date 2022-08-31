@@ -3,7 +3,13 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
@@ -36,6 +42,7 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import useResponseUpload from '../../../../utils/hooks/useResponseUpload';
 import { formatNumber } from '../../../../utils/format';
+import { usePostModalInnerState } from '..';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
@@ -70,15 +77,10 @@ export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
 };
 
-interface IPostModerationCF {
-  post: newnewapi.Crowdfunding;
-  postStatus: TPostStatusStringified;
-  handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleGoBack: () => void;
-}
+interface IPostModerationCF {}
 
 const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
-  ({ post, postStatus, handleUpdatePostStatus, handleGoBack }) => {
+  () => {
     const router = useRouter();
     const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
@@ -86,6 +88,17 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
+    );
+
+    const {
+      postParsed,
+      postStatus,
+      handleGoBackInsidePost,
+      handleUpdatePostStatus,
+    } = usePostModalInnerState();
+    const post = useMemo(
+      () => postParsed as newnewapi.Crowdfunding,
+      [postParsed]
     );
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
@@ -526,7 +539,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
                 style={{
                   gridArea: 'closeBtnMobile',
                 }}
-                onClick={handleGoBack}
+                onClick={handleGoBackInsidePost}
               />
             )}
             {postStatus === 'waiting_for_response' ? (
@@ -591,16 +604,10 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
             handleVideoDelete={handleVideoDelete}
           />
           <PostTopInfoModeration
-            postType='cf'
-            postStatus={postStatus}
-            title={post.title}
-            postId={post.postUuid}
             hasWinner={false}
-            hasResponse={!!post.response}
             totalPledges={currentBackers}
             targetPledges={post.targetBackerCount}
             hidden={openedTab === 'response'}
-            handleUpdatePostStatus={handleUpdatePostStatus}
           />
           <SActivitesContainer>
             {openedTab === 'announcement' ? (

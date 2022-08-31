@@ -4,6 +4,8 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, {
+  createContext,
+  MutableRefObject,
   useCallback,
   useContext,
   useEffect,
@@ -11,13 +13,10 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
-import Head from 'next/head';
-import dynamic from 'next/dynamic';
 
 import {
   deleteMyPost,
@@ -27,18 +26,9 @@ import {
 } from '../../../api/endpoints/post';
 import { useAppSelector } from '../../../redux-store/store';
 
-import Modal from '../Modal';
-// Views
-import ModerationView from './moderation';
-import WaitingForResponseView from './awaiting';
-import SuccessView from './success';
-// Controls
-import PostSuccessOrWaitingControls from '../../molecules/decision/PostSuccessOrWaitingControls';
-import PostModerationControls from '../../molecules/decision/PostModerationControls';
-
 // Utils
 import isBrowser from '../../../utils/isBrowser';
-import switchPostType from '../../../utils/switchPostType';
+import switchPostType, { TPostType } from '../../../utils/switchPostType';
 import switchPostStatus, {
   TPostStatusStringified,
 } from '../../../utils/switchPostStatus';
@@ -46,7 +36,6 @@ import switchPostStatusString from '../../../utils/switchPostStatusString';
 import CommentFromUrlContextProvider, {
   CommentFromUrlContext,
 } from '../../../contexts/commentFromUrlContext';
-import getDisplayname from '../../../utils/getDisplayname';
 import { reportPost } from '../../../api/endpoints/report';
 import { ReportData } from '../../molecules/chat/ReportModal';
 import { Mixpanel } from '../../../utils/mixpanel';
@@ -54,29 +43,106 @@ import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory'
 import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
 import { usePostModalState } from '../../../contexts/postModalContext';
 
-// Icons
-import assets from '../../../constants/assets';
+// Views
 import PostModalRegular from './PostModalRegular';
+import PostModalModeration from './PostModalModeration';
+import PostModalAwaitingSuccess from './PostModalAwaitingSuccess';
 
-const PostFailedBox = dynamic(
-  () => import('../../molecules/decision/PostFailedBox')
-);
-const PostSuccessAnimationBackground = dynamic(
-  () => import('../../molecules/decision/PostSuccessAnimationBackground')
-);
-const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
+const PostModalInnerContext = createContext<{
+  open: boolean;
+  modalContainerRef: MutableRefObject<HTMLDivElement | undefined>;
+  isMyPost: boolean;
+  postParsed:
+    | newnewapi.Auction
+    | newnewapi.Crowdfunding
+    | newnewapi.MultipleChoice
+    | undefined;
+  typeOfPost: TPostType | undefined;
+  postStatus: TPostStatusStringified;
+  isFollowingDecision: boolean;
+  deletedByCreator: boolean;
+  hasRecommendations: boolean;
+  recommendedPosts: newnewapi.Post[];
+  saveCard: boolean | undefined;
+  stripeSetupIntentClientSecret: string | undefined;
+  loadingRef: any;
+  recommendedPostsLoading: boolean;
+  reportPostOpen: boolean;
+  handleSeeNewDeletedBox: () => void;
+  handleOpenRecommendedPost: (newPost: newnewapi.Post) => void;
+  handleReportSubmit: ({ reasons, message }: ReportData) => Promise<void>;
+  handleReportClose: () => void;
+  handleSetIsFollowingDecision: (v: boolean) => void;
+  handleGoBackInsidePost: () => void;
+  handleUpdatePostStatus: (newStatus: number | string) => void;
+  handleRemoveFromStateUnfavorited: (() => void) | undefined;
+  handleAddPostToStateFavorited: (() => void) | undefined;
+  handleReportOpen: () => void;
+  resetSetupIntentClientSecret: () => void;
+  handleCloseAndGoBack: () => void;
+  shareMenuOpen: boolean;
+  deletePostOpen: boolean;
+  ellipseMenuOpen: boolean;
+  handleDeletePost: () => Promise<void>;
+  handleFollowDecision: () => Promise<void>;
+  handleEllipseMenuClose: () => void;
+  handleOpenDeletePostModal: () => void;
+  handleShareClose: () => void;
+  handleOpenShareMenu: () => void;
+  handleOpenEllipseMenu: () => void;
+  handleCloseDeletePostModal: () => void;
+}>({
+  open: false,
+  modalContainerRef: {} as MutableRefObject<HTMLDivElement | undefined>,
+  isMyPost: false,
+  postParsed: undefined,
+  typeOfPost: undefined,
+  postStatus: 'voting',
+  isFollowingDecision: false,
+  deletedByCreator: false,
+  hasRecommendations: false,
+  recommendedPosts: [],
+  saveCard: undefined,
+  stripeSetupIntentClientSecret: undefined,
+  loadingRef: undefined,
+  recommendedPostsLoading: false,
+  reportPostOpen: false,
+  handleSeeNewDeletedBox: () => {},
+  handleOpenRecommendedPost: (newPost: newnewapi.Post) => {},
+  handleReportSubmit: (() => {}) as unknown as ({
+    reasons,
+    message,
+  }: ReportData) => Promise<void>,
+  handleReportClose: () => {},
+  handleSetIsFollowingDecision: (v: boolean) => {},
+  handleGoBackInsidePost: () => {},
+  handleUpdatePostStatus: (newStatus: number | string) => {},
+  handleRemoveFromStateUnfavorited: undefined,
+  handleAddPostToStateFavorited: undefined,
+  handleReportOpen: () => {},
+  resetSetupIntentClientSecret: () => {},
+  handleCloseAndGoBack: () => {},
+  shareMenuOpen: false,
+  deletePostOpen: false,
+  ellipseMenuOpen: false,
+  handleDeletePost: (() => {}) as () => Promise<void>,
+  handleFollowDecision: (() => {}) as () => Promise<void>,
+  handleEllipseMenuClose: () => {},
+  handleOpenDeletePostModal: () => {},
+  handleShareClose: () => {},
+  handleOpenShareMenu: () => {},
+  handleOpenEllipseMenu: () => {},
+  handleCloseDeletePostModal: () => {},
+});
 
-const DARK_IMAGES = {
-  ac: assets.creation.darkAcAnimated,
-  cf: assets.creation.darkCfAnimated,
-  mc: assets.creation.darkMcAnimated,
-};
-
-const LIGHT_IMAGES = {
-  ac: assets.creation.lightAcAnimated,
-  cf: assets.creation.lightCfAnimated,
-  mc: assets.creation.lightMcAnimated,
-};
+export function usePostModalInnerState() {
+  const context = useContext(PostModalInnerContext);
+  if (!context)
+    throw new Error(
+      'usePostModalInnerState must be used inside a `PostModalInnerContextProvider`'
+    );
+  return context;
+}
 
 interface IPostModal {
   isOpen: boolean;
@@ -108,14 +174,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   handleRemoveFromStateUnfavorited,
   handleAddPostToStateFavorited,
 }) => {
-  const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
 
   const { handleSetPostOverlayOpen, isConfirmToClosePost } =
     usePostModalState();
@@ -288,7 +349,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     () => setDeletePostOpen(true),
     []
   );
-  const handleCloseDeletePostModal = () => setDeletePostOpen(false);
+  const handleCloseDeletePostModal = useCallback(
+    () => setDeletePostOpen(false),
+    []
+  );
 
   const handleDeletePost = useCallback(async () => {
     try {
@@ -323,6 +387,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       console.error(err);
     }
   }, [
+    handleCloseDeletePostModal,
     handleRemoveFromStateDeleted,
     handleUpdatePostStatus,
     postParsed?.postUuid,
@@ -503,6 +568,86 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       }
     },
     [postParsed]
+  );
+
+  const contextValueMemo = useMemo(
+    () => ({
+      open,
+      modalContainerRef,
+      isMyPost,
+      postParsed,
+      typeOfPost,
+      postStatus,
+      isFollowingDecision,
+      deletedByCreator,
+      hasRecommendations: recommendedPosts.length > 0,
+      recommendedPosts,
+      saveCard,
+      stripeSetupIntentClientSecret,
+      handleSeeNewDeletedBox,
+      handleOpenRecommendedPost,
+      loadingRef,
+      recommendedPostsLoading,
+      reportPostOpen,
+      handleReportSubmit,
+      handleReportClose,
+      handleSetIsFollowingDecision,
+      handleGoBackInsidePost,
+      handleUpdatePostStatus,
+      handleRemoveFromStateUnfavorited,
+      handleAddPostToStateFavorited,
+      handleReportOpen,
+      resetSetupIntentClientSecret,
+      handleCloseAndGoBack,
+      shareMenuOpen,
+      deletePostOpen,
+      ellipseMenuOpen,
+      handleDeletePost,
+      handleFollowDecision,
+      handleEllipseMenuClose,
+      handleOpenDeletePostModal,
+      handleShareClose,
+      handleOpenShareMenu,
+      handleOpenEllipseMenu,
+      handleCloseDeletePostModal,
+    }),
+    [
+      deletedByCreator,
+      handleAddPostToStateFavorited,
+      handleCloseAndGoBack,
+      handleGoBackInsidePost,
+      handleOpenRecommendedPost,
+      handleRemoveFromStateUnfavorited,
+      handleReportClose,
+      handleReportOpen,
+      handleReportSubmit,
+      handleSeeNewDeletedBox,
+      handleUpdatePostStatus,
+      isFollowingDecision,
+      isMyPost,
+      loadingRef,
+      open,
+      postParsed,
+      postStatus,
+      recommendedPosts,
+      recommendedPostsLoading,
+      reportPostOpen,
+      resetSetupIntentClientSecret,
+      saveCard,
+      stripeSetupIntentClientSecret,
+      typeOfPost,
+      shareMenuOpen,
+      deletePostOpen,
+      ellipseMenuOpen,
+      handleDeletePost,
+      handleFollowDecision,
+      handleEllipseMenuClose,
+      handleOpenDeletePostModal,
+      handleShareClose,
+      handleOpenShareMenu,
+      handleOpenEllipseMenu,
+      handleCloseDeletePostModal,
+    ]
   );
 
   useEffect(() => {
@@ -717,255 +862,19 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Render Awaiting Response & Success Decision views
-  if (shouldRenderVotingFinishedModal && !isMyPost) {
-    return (
-      <>
-        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
-          {postStatus === 'succeeded' && !isMobile && (
-            <PostSuccessAnimationBackground />
-          )}
-          <Head>
-            <title>{t(`meta.${typeOfPost}.title`)}</title>
-            <meta
-              name='description'
-              content={t(`meta.${typeOfPost}.description`)}
-            />
-            <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-            <meta
-              property='og:description'
-              content={t(`meta.${typeOfPost}.description`)}
-            />
-          </Head>
-          {!isMobile && (
-            <PostSuccessOrWaitingControls
-              ellipseMenuOpen={ellipseMenuOpen}
-              isFollowingDecision={isFollowingDecision}
-              isMobile={isMobile}
-              postUuid={postParsed?.postUuid ?? ''}
-              shareMenuOpen={shareMenuOpen}
-              typeOfPost={typeOfPost ?? 'ac'}
-              handleCloseAndGoBack={handleCloseAndGoBack}
-              handleEllipseMenuClose={handleEllipseMenuClose}
-              handleFollowDecision={handleFollowDecision}
-              handleReportOpen={handleReportOpen}
-              handleShareClose={handleShareClose}
-              handleOpenShareMenu={handleOpenShareMenu}
-              handleOpenEllipseMenu={handleOpenEllipseMenu}
-            />
-          )}
-          {postParsed && typeOfPost ? (
-            <SPostModalContainer
-              id='post-modal-container'
-              isMyPost={isMyPost}
-              loaded={recommendedPosts && recommendedPosts.length > 0}
-              style={{
-                ...(isMobile
-                  ? {
-                      paddingTop: 0,
-                    }
-                  : {}),
-              }}
-              onClick={(e) => e.stopPropagation()}
-              ref={(el) => {
-                modalContainerRef.current = el!!;
-              }}
-            >
-              {postStatus === 'succeeded' ? (
-                <SuccessView postParsed={postParsed} typeOfPost={typeOfPost} />
-              ) : null}
-              {postStatus === 'waiting_for_response' ||
-              postStatus === 'waiting_for_decision' ? (
-                <WaitingForResponseView
-                  postParsed={postParsed}
-                  typeOfPost={typeOfPost}
-                />
-              ) : null}
-              {isMobile && (
-                <PostSuccessOrWaitingControls
-                  ellipseMenuOpen={ellipseMenuOpen}
-                  isFollowingDecision={isFollowingDecision}
-                  isMobile={isMobile}
-                  postUuid={postParsed?.postUuid ?? ''}
-                  shareMenuOpen={shareMenuOpen}
-                  typeOfPost={typeOfPost ?? 'ac'}
-                  handleCloseAndGoBack={handleCloseAndGoBack}
-                  handleEllipseMenuClose={handleEllipseMenuClose}
-                  handleFollowDecision={handleFollowDecision}
-                  handleReportOpen={handleReportOpen}
-                  handleShareClose={handleShareClose}
-                  handleOpenShareMenu={handleOpenShareMenu}
-                  handleOpenEllipseMenu={handleOpenEllipseMenu}
-                />
-              )}
-            </SPostModalContainer>
-          ) : null}
-        </Modal>
-        {postParsed?.creator && reportPostOpen && (
-          <ReportModal
-            show={reportPostOpen}
-            reportedDisplayname={getDisplayname(postParsed?.creator)}
-            onSubmit={handleReportSubmit}
-            onClose={handleReportClose}
-          />
-        )}
-      </>
-    );
-  }
-
-  // Render Moderation view
-  if (isMyPost) {
-    return (
-      <>
-        <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
-          {(postStatus === 'succeeded' ||
-            postStatus === 'waiting_for_response') &&
-            !isMobile && <PostSuccessAnimationBackground />}
-          <Head>
-            <title>{t(`meta.${typeOfPost}.title`)}</title>
-            <meta
-              name='description'
-              content={t(`meta.${typeOfPost}.description`)}
-            />
-            <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-            <meta
-              property='og:description'
-              content={t(`meta.${typeOfPost}.description`)}
-            />
-          </Head>
-          {!isMobile && (
-            <PostModerationControls
-              isMobile={isMobile}
-              postUuid={postParsed?.postUuid ?? ''}
-              postStatus={postStatus}
-              shareMenuOpen={shareMenuOpen}
-              typeOfPost={typeOfPost ?? 'ac'}
-              deletePostOpen={deletePostOpen}
-              ellipseMenuOpen={ellipseMenuOpen}
-              handleCloseAndGoBack={handleCloseAndGoBack}
-              handleDeletePost={handleDeletePost}
-              handleEllipseMenuClose={handleEllipseMenuClose}
-              handleOpenDeletePostModal={handleOpenDeletePostModal}
-              handleShareClose={handleShareClose}
-              handleOpenShareMenu={handleOpenShareMenu}
-              handleOpenEllipseMenu={handleOpenEllipseMenu}
-              handleCloseDeletePostModal={handleCloseDeletePostModal}
-            />
-          )}
-          {postParsed && typeOfPost ? (
-            <SPostModalContainer
-              loaded={recommendedPosts && recommendedPosts.length > 0}
-              id='post-modal-container'
-              isMyPost={isMyPost}
-              onClick={(e) => e.stopPropagation()}
-              ref={(el) => {
-                modalContainerRef.current = el!!;
-              }}
-            >
-              {postStatus !== 'deleted_by_admin' &&
-              postStatus !== 'deleted_by_creator' ? (
-                <ModerationView
-                  postParsed={postParsed}
-                  postStatus={postStatus}
-                  typeOfPost={typeOfPost}
-                  isFollowingDecision={isFollowingDecision}
-                  hasRecommendations={recommendedPosts.length > 0}
-                  handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-                  handleGoBackInsidePost={handleGoBackInsidePost}
-                  handleUpdatePostStatus={handleUpdatePostStatus}
-                  handleRemoveFromStateUnfavorited={
-                    handleRemoveFromStateUnfavorited!!
-                  }
-                  handleAddPostToStateFavorited={
-                    handleAddPostToStateFavorited!!
-                  }
-                  handleReportOpen={handleReportOpen}
-                />
-              ) : (
-                <PostFailedBox
-                  title={t('postDeletedByMe.title', {
-                    postType: t(`postType.${typeOfPost}`),
-                  })}
-                  body={
-                    deletedByCreator
-                      ? t('postDeletedByMe.body.byCreator', {
-                          postType: t(`postType.${typeOfPost}`),
-                        })
-                      : t('postDeletedByMe.body.byAdmin', {
-                          postType: t(`postType.${typeOfPost}`),
-                        })
-                  }
-                  imageSrc={
-                    theme.name === 'light'
-                      ? LIGHT_IMAGES[typeOfPost]
-                      : DARK_IMAGES[typeOfPost]
-                  }
-                  buttonCaption={t('postDeletedByMe.buttonText')}
-                  handleButtonClick={() => {
-                    Mixpanel.track('Post Failed Redirect to Creation', {
-                      _stage: 'Post',
-                    });
-                    router.push('/creation');
-                  }}
-                />
-              )}
-              {isMobile && (
-                <PostModerationControls
-                  isMobile={isMobile}
-                  postUuid={postParsed?.postUuid ?? ''}
-                  postStatus={postStatus}
-                  shareMenuOpen={shareMenuOpen}
-                  typeOfPost={typeOfPost ?? 'ac'}
-                  deletePostOpen={deletePostOpen}
-                  ellipseMenuOpen={ellipseMenuOpen}
-                  handleCloseAndGoBack={handleCloseAndGoBack}
-                  handleDeletePost={handleDeletePost}
-                  handleEllipseMenuClose={handleEllipseMenuClose}
-                  handleOpenDeletePostModal={handleOpenDeletePostModal}
-                  handleShareClose={handleShareClose}
-                  handleOpenShareMenu={handleOpenShareMenu}
-                  handleOpenEllipseMenu={handleOpenEllipseMenu}
-                  handleCloseDeletePostModal={handleCloseDeletePostModal}
-                />
-              )}
-            </SPostModalContainer>
-          ) : null}
-        </Modal>
-      </>
-    );
-  }
-
-  // Render regular Decision view
   return (
-    <PostModalRegular
-      open={open}
-      modalContainerRef={modalContainerRef}
-      isMyPost={isMyPost}
-      postParsed={postParsed}
-      typeOfPost={typeOfPost}
-      postStatus={postStatus}
-      isFollowingDecision={isFollowingDecision}
-      deletedByCreator={deletedByCreator}
-      hasRecommendations={recommendedPosts.length > 0}
-      recommendedPosts={recommendedPosts}
-      saveCard={saveCard}
-      stripeSetupIntentClientSecret={stripeSetupIntentClientSecret}
-      handleSeeNewDeletedBox={handleSeeNewDeletedBox}
-      handleOpenRecommendedPost={handleOpenRecommendedPost}
-      loadingRef={loadingRef}
-      recommendedPostsLoading={recommendedPostsLoading}
-      reportPostOpen={reportPostOpen}
-      handleReportSubmit={handleReportSubmit}
-      handleReportClose={handleReportClose}
-      handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-      handleGoBackInsidePost={handleGoBackInsidePost}
-      handleUpdatePostStatus={handleUpdatePostStatus}
-      handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited}
-      handleAddPostToStateFavorited={handleAddPostToStateFavorited}
-      handleReportOpen={handleReportOpen}
-      resetSetupIntentClientSecret={resetSetupIntentClientSecret}
-      handleCloseAndGoBack={handleCloseAndGoBack}
-    />
+    <PostModalInnerContext.Provider value={contextValueMemo}>
+      {isMyPost ? (
+        // Render Moderation view
+        <PostModalModeration />
+      ) : shouldRenderVotingFinishedModal && !isMyPost ? (
+        // Render awaiting reponse or success view
+        <PostModalAwaitingSuccess />
+      ) : (
+        // Render regular view
+        <PostModalRegular />
+      )}
+    </PostModalInnerContext.Provider>
   );
 };
 
@@ -983,68 +892,3 @@ export default (props: IPostModal) => (
     <PostModal {...props} />
   </CommentFromUrlContextProvider>
 );
-
-const SPostModalContainer = styled.div<{
-  isMyPost: boolean;
-  loaded: boolean;
-}>`
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  z-index: 1;
-  overscroll-behavior: none;
-
-  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
-
-  height: 100%;
-  width: 100%;
-  padding: 16px;
-  padding-bottom: 86px;
-
-  /* No select */
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-
-  /* Hide scrollbar */
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
-  ${({ theme }) => theme.media.tablet} {
-    top: 64px;
-    /*transform: none; */
-    /* top: 50%; */
-    /* transform: translateY(-50%); */
-    padding-bottom: 16px;
-
-    background-color: ${({ theme }) =>
-      theme.name === 'dark'
-        ? theme.colorsThemed.background.secondary
-        : theme.colorsThemed.background.primary};
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
-    width: 100%;
-    height: calc(100% - 64px);
-  }
-
-  ${({ theme }) => theme.media.laptopM} {
-    top: 32px;
-    left: calc(50% - 496px);
-    width: 992px;
-    height: calc(100% - 64px);
-    max-height: ${({ loaded }) => (loaded ? 'unset' : '840px')};
-
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-    padding: 24px;
-    padding-bottom: 24px;
-  }
-`;

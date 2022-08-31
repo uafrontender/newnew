@@ -35,14 +35,13 @@ import PostResponseTabModeration from '../../../molecules/decision/PostResponseT
 
 import switchPostType from '../../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../../api/endpoints/post';
-import switchPostStatus, {
-  TPostStatusStringified,
-} from '../../../../utils/switchPostStatus';
+import switchPostStatus from '../../../../utils/switchPostStatus';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import useResponseUpload from '../../../../utils/hooks/useResponseUpload';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import { usePostModalInnerState } from '..';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
@@ -65,15 +64,10 @@ export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
 };
 
-interface IPostModerationAC {
-  post: newnewapi.Auction;
-  postStatus: TPostStatusStringified;
-  handleGoBack: () => void;
-  handleUpdatePostStatus: (postStatus: number | string) => void;
-}
+interface IPostModerationAC {}
 
 const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
-  ({ post, postStatus, handleUpdatePostStatus, handleGoBack }) => {
+  () => {
     const dispatch = useAppDispatch();
     const { t } = useTranslation('modal-Post');
     const { user } = useAppSelector((state) => state);
@@ -82,6 +76,14 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       resizeMode
     );
     const router = useRouter();
+
+    const {
+      postParsed,
+      postStatus,
+      handleGoBackInsidePost,
+      handleUpdatePostStatus,
+    } = usePostModalInnerState();
+    const post = useMemo(() => postParsed as newnewapi.Auction, [postParsed]);
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
@@ -627,7 +629,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                 style={{
                   gridArea: 'closeBtnMobile',
                 }}
-                onClick={handleGoBack}
+                onClick={handleGoBackInsidePost}
               />
             )}
             {postStatus === 'waiting_for_response' ||
@@ -694,15 +696,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             handleVideoDelete={handleVideoDelete}
           />
           <PostTopInfoModeration
-            postType='ac'
-            postStatus={postStatus}
-            title={post.title}
-            postId={post.postUuid}
             amountInBids={totalAmount}
             hasWinner={!!winningOptionId}
-            hasResponse={!!post.response}
             hidden={openedTab === 'response'}
-            handleUpdatePostStatus={handleUpdatePostStatus}
           />
           <SActivitesContainer
             decisionFailed={postStatus === 'failed'}

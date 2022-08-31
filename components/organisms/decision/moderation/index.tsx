@@ -1,10 +1,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { newnewapi } from 'newnew-api';
 
-import { TPostType } from '../../../../utils/switchPostType';
-
-import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
+import { usePostModalInnerState } from '..';
 
 // Views
 const PostModerationAC = dynamic(() => import('./PostModerationAC'));
@@ -15,110 +12,34 @@ const PostViewProcessingAnnouncement = dynamic(
   () => import('../common/PostViewProcessingAnnouncement')
 );
 
-interface IModerationView {
-  postParsed:
-    | newnewapi.Auction
-    | newnewapi.Crowdfunding
-    | newnewapi.MultipleChoice;
-  typeOfPost: TPostType;
-  postStatus: TPostStatusStringified;
-  isFollowingDecision: boolean;
-  hasRecommendations: boolean;
-  handleSetIsFollowingDecision: (v: boolean) => void;
-  handleGoBackInsidePost: () => void;
-  handleUpdatePostStatus: (newStatus: number | string) => void;
-  handleRemoveFromStateUnfavorited: (() => void) | undefined;
-  handleAddPostToStateFavorited: (() => void) | undefined;
-  handleReportOpen: () => void;
-}
+interface IModerationView {}
 
-const ModerationView: React.FunctionComponent<IModerationView> = ({
-  postParsed,
-  typeOfPost,
-  postStatus,
-  isFollowingDecision,
-  hasRecommendations,
-  handleSetIsFollowingDecision,
-  handleGoBackInsidePost,
-  handleUpdatePostStatus,
-  handleRemoveFromStateUnfavorited,
-  handleAddPostToStateFavorited,
-  handleReportOpen,
-}) => {
+const ModerationView: React.FunctionComponent<IModerationView> = () => {
+  const { postParsed, postStatus, typeOfPost } = usePostModalInnerState();
+
   if (postStatus === 'processing_announcement' && postParsed) {
     return (
       <PostViewProcessingAnnouncement
         key={postParsed.postUuid}
-        post={postParsed}
-        postStatus={postStatus}
         variant='moderation'
-        postType={typeOfPost as string}
-        isFollowingDecision={isFollowingDecision}
-        hasRecommendations={hasRecommendations}
-        handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-        handleGoBack={handleGoBackInsidePost}
-        handleUpdatePostStatus={handleUpdatePostStatus}
-        handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
-        handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
-        handleReportOpen={handleReportOpen}
       />
     );
   }
 
   if (postStatus === 'scheduled' && postParsed) {
-    return (
-      <PostViewScheduled
-        key={postParsed.postUuid}
-        postType={typeOfPost as string}
-        post={postParsed}
-        postStatus={postStatus}
-        variant='moderation'
-        isFollowingDecision={isFollowingDecision}
-        hasRecommendations={hasRecommendations}
-        handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-        handleGoBack={handleGoBackInsidePost}
-        handleUpdatePostStatus={handleUpdatePostStatus}
-        handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited!!}
-        handleAddPostToStateFavorited={handleAddPostToStateFavorited!!}
-        handleReportOpen={handleReportOpen}
-      />
-    );
+    return <PostViewScheduled key={postParsed.postUuid} variant='moderation' />;
   }
 
   if (typeOfPost === 'mc' && postParsed) {
-    return (
-      <PostModerationMC
-        key={postParsed.postUuid}
-        postStatus={postStatus}
-        post={postParsed as newnewapi.MultipleChoice}
-        handleUpdatePostStatus={handleUpdatePostStatus}
-        handleGoBack={handleGoBackInsidePost}
-      />
-    );
+    return <PostModerationMC key={postParsed.postUuid} />;
   }
 
   if (typeOfPost === 'ac' && postParsed) {
-    return (
-      <PostModerationAC
-        key={postParsed.postUuid}
-        post={postParsed as newnewapi.Auction}
-        postStatus={postStatus}
-        handleGoBack={handleGoBackInsidePost}
-        handleUpdatePostStatus={handleUpdatePostStatus}
-      />
-    );
+    return <PostModerationAC key={postParsed.postUuid} />;
   }
 
   if (typeOfPost === 'cf' && postParsed) {
-    return (
-      <PostModerationCF
-        key={postParsed.postUuid}
-        postStatus={postStatus}
-        post={postParsed as newnewapi.Crowdfunding}
-        handleUpdatePostStatus={handleUpdatePostStatus}
-        handleGoBack={handleGoBackInsidePost}
-      />
-    );
+    return <PostModerationCF key={postParsed.postUuid} />;
   }
 
   return null;

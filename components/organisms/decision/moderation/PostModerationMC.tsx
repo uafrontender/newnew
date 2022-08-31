@@ -2,7 +2,13 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
@@ -37,6 +43,7 @@ import PostResponseTabModeration from '../../../molecules/decision/PostResponseT
 
 import useResponseUpload from '../../../../utils/hooks/useResponseUpload';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import { usePostModalInnerState } from '..';
 
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -60,15 +67,10 @@ export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
 };
 
-interface IPostModerationMC {
-  post: newnewapi.MultipleChoice;
-  postStatus: TPostStatusStringified;
-  handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleGoBack: () => void;
-}
+interface IPostModerationMC {}
 
 const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
-  ({ post, postStatus, handleUpdatePostStatus, handleGoBack }) => {
+  () => {
     const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
@@ -77,6 +79,17 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       resizeMode
     );
     const router = useRouter();
+
+    const {
+      postParsed,
+      postStatus,
+      handleGoBackInsidePost,
+      handleUpdatePostStatus,
+    } = usePostModalInnerState();
+    const post = useMemo(
+      () => postParsed as newnewapi.MultipleChoice,
+      [postParsed]
+    );
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
@@ -600,7 +613,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
                 style={{
                   gridArea: 'closeBtnMobile',
                 }}
-                onClick={handleGoBack}
+                onClick={handleGoBackInsidePost}
               />
             )}
             {postStatus === 'waiting_for_response' ? (
@@ -665,15 +678,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             handleVideoDelete={handleVideoDelete}
           />
           <PostTopInfoModeration
-            postType='mc'
-            postStatus={postStatus}
-            title={post.title}
-            postId={post.postUuid}
             totalVotes={totalVotes}
             hasWinner={false}
-            hasResponse={!!post.response}
             hidden={openedTab === 'response'}
-            handleUpdatePostStatus={handleUpdatePostStatus}
           />
           <SActivitesContainer decisionFailed={postStatus === 'failed'}>
             {openedTab === 'announcement' ? (

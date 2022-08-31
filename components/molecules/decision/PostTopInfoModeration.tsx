@@ -6,16 +6,15 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
 import { formatNumber } from '../../../utils/format';
-import { TPostType } from '../../../utils/switchPostType';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import { Mixpanel } from '../../../utils/mixpanel';
+import { usePostModalInnerState } from '../../organisms/decision';
 
 import Text from '../../atoms/Text';
-import PostFailedBox from './PostFailedBox';
 import Headline from '../../atoms/Headline';
+import PostFailedBox from './PostFailedBox';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 import assets from '../../../constants/assets';
-import PostTitleContent from '../../atoms/PostTitleContent';
-import { Mixpanel } from '../../../utils/mixpanel';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -30,39 +29,33 @@ const LIGHT_IMAGES = {
 };
 
 interface IPostTopInfoModeration {
-  title: string;
-  postId: string;
-  postStatus: TPostStatusStringified;
+  hasWinner: boolean;
+  hidden?: boolean;
   totalVotes?: number;
   totalPledges?: number;
   targetPledges?: number;
-  postType?: TPostType;
   amountInBids?: number;
-  hasResponse: boolean;
-  hasWinner: boolean;
-  hidden?: boolean;
-  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostTopInfoModeration: React.FunctionComponent<
   IPostTopInfoModeration
 > = ({
-  title,
-  postId,
-  postType,
-  postStatus,
+  hasWinner,
   totalVotes,
   amountInBids,
   totalPledges,
   targetPledges,
-  hasResponse,
-  hasWinner,
   hidden,
-  handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
+
+  const { postParsed, typeOfPost, postStatus } = usePostModalInnerState();
+
+  const postId = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
+  const title = useMemo(() => postParsed?.title ?? '', [postParsed]);
+  const postType = useMemo(() => typeOfPost ?? 'ac', [typeOfPost]);
 
   const failureReason = useMemo(() => {
     if (postStatus !== 'failed') return '';
@@ -177,7 +170,6 @@ const PostTopInfoModeration: React.FunctionComponent<
 };
 
 PostTopInfoModeration.defaultProps = {
-  postType: undefined,
   totalVotes: undefined,
   amountInBids: undefined,
   totalPledges: undefined,

@@ -2,28 +2,25 @@
 import React from 'react';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
 import { usePostModalInnerState } from '.';
+import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppSelector } from '../../../redux-store/store';
-import getDisplayname from '../../../utils/getDisplayname';
 
 import Modal from '../Modal';
-import RegularView from './regular';
-import Button from '../../atoms/Button';
-import Headline from '../../atoms/Headline';
-import InlineSvg from '../../atoms/InlineSVG';
+import ModerationView from './moderation';
+import PostModerationControls from '../../molecules/decision/PostModerationControls';
+import PostSuccessAnimationBackground from '../../molecules/decision/PostSuccessAnimationBackground';
 
 // Icons
 import assets from '../../../constants/assets';
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
-const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
 const PostFailedBox = dynamic(
   () => import('../../molecules/decision/PostFailedBox')
 );
-const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -37,15 +34,19 @@ const LIGHT_IMAGES = {
   mc: assets.creation.lightMcAnimated,
 };
 
-interface IPostModalRegular {}
+interface IPostModalModeration {}
 
-const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
+const PostModalModeration: React.FunctionComponent<
+  IPostModalModeration
+> = () => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
   const {
     open,
     modalContainerRef,
@@ -55,19 +56,25 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
     postStatus,
     deletedByCreator,
     recommendedPosts,
-    handleSeeNewDeletedBox,
-    handleOpenRecommendedPost,
-    loadingRef,
-    recommendedPostsLoading,
-    reportPostOpen,
-    handleReportSubmit,
-    handleReportClose,
+    shareMenuOpen,
+    deletePostOpen,
+    ellipseMenuOpen,
+    handleDeletePost,
+    handleEllipseMenuClose,
+    handleOpenDeletePostModal,
+    handleShareClose,
+    handleOpenShareMenu,
+    handleOpenEllipseMenu,
+    handleCloseDeletePostModal,
     handleCloseAndGoBack,
   } = usePostModalInnerState();
 
   return (
     <>
       <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
+        {(postStatus === 'succeeded' ||
+          postStatus === 'waiting_for_response') &&
+          !isMobile && <PostSuccessAnimationBackground />}
         <Head>
           <title>{t(`meta.${typeOfPost}.title`)}</title>
           <meta
@@ -81,18 +88,23 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
           />
         </Head>
         {!isMobile && (
-          <SGoBackButtonDesktop
-            view='secondary'
-            iconOnly
-            onClick={handleCloseAndGoBack}
-          >
-            <InlineSvg
-              svg={CancelIcon}
-              fill={theme.colorsThemed.text.primary}
-              width='24px'
-              height='24px'
-            />
-          </SGoBackButtonDesktop>
+          <PostModerationControls
+            isMobile={isMobile}
+            postUuid={postParsed?.postUuid ?? ''}
+            postStatus={postStatus}
+            shareMenuOpen={shareMenuOpen}
+            typeOfPost={typeOfPost ?? 'ac'}
+            deletePostOpen={deletePostOpen}
+            ellipseMenuOpen={ellipseMenuOpen}
+            handleCloseAndGoBack={handleCloseAndGoBack}
+            handleDeletePost={handleDeletePost}
+            handleEllipseMenuClose={handleEllipseMenuClose}
+            handleOpenDeletePostModal={handleOpenDeletePostModal}
+            handleShareClose={handleShareClose}
+            handleOpenShareMenu={handleOpenShareMenu}
+            handleOpenEllipseMenu={handleOpenEllipseMenu}
+            handleCloseDeletePostModal={handleCloseDeletePostModal}
+          />
         )}
         {postParsed && typeOfPost ? (
           <SPostModalContainer
@@ -106,86 +118,62 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
           >
             {postStatus !== 'deleted_by_admin' &&
             postStatus !== 'deleted_by_creator' ? (
-              <RegularView />
+              <ModerationView />
             ) : (
               <PostFailedBox
-                title={t('postDeleted.title', {
+                title={t('postDeletedByMe.title', {
                   postType: t(`postType.${typeOfPost}`),
                 })}
                 body={
                   deletedByCreator
-                    ? t('postDeleted.body.byCreator', {
-                        creator: getDisplayname(postParsed.creator!!),
+                    ? t('postDeletedByMe.body.byCreator', {
                         postType: t(`postType.${typeOfPost}`),
                       })
-                    : t('postDeleted.body.byAdmin', {
-                        creator: getDisplayname(postParsed.creator!!),
+                    : t('postDeletedByMe.body.byAdmin', {
                         postType: t(`postType.${typeOfPost}`),
                       })
                 }
-                buttonCaption={t('postDeleted.buttonText', {
-                  postTypeMultiple: t(`postType.multiple.${typeOfPost}`),
-                })}
                 imageSrc={
                   theme.name === 'light'
                     ? LIGHT_IMAGES[typeOfPost]
                     : DARK_IMAGES[typeOfPost]
                 }
-                style={{
-                  marginBottom: '24px',
+                buttonCaption={t('postDeletedByMe.buttonText')}
+                handleButtonClick={() => {
+                  Mixpanel.track('Post Failed Redirect to Creation', {
+                    _stage: 'Post',
+                  });
+                  router.push('/creation');
                 }}
-                handleButtonClick={handleSeeNewDeletedBox}
               />
             )}
-            <SRecommendationsSection
-              id='recommendations-section-heading'
-              loaded={recommendedPosts && recommendedPosts.length > 0}
-            >
-              <Headline variant={4}>
-                {recommendedPosts.length > 0
-                  ? t('recommendationsSection.heading')
-                  : null}
-              </Headline>
-              {recommendedPosts && (
-                <ListPostModal
-                  loading={recommendedPostsLoading}
-                  collection={recommendedPosts}
-                  skeletonsBgColor={theme.colorsThemed.background.tertiary}
-                  skeletonsHighlightColor={
-                    theme.colorsThemed.background.secondary
-                  }
-                  handlePostClicked={handleOpenRecommendedPost}
-                />
-              )}
-              <div
-                ref={loadingRef}
-                style={{
-                  position: 'relative',
-                  bottom: '10px',
-                  ...(recommendedPostsLoading
-                    ? {
-                        display: 'none',
-                      }
-                    : {}),
-                }}
+            {isMobile && (
+              <PostModerationControls
+                isMobile={isMobile}
+                postUuid={postParsed?.postUuid ?? ''}
+                postStatus={postStatus}
+                shareMenuOpen={shareMenuOpen}
+                typeOfPost={typeOfPost ?? 'ac'}
+                deletePostOpen={deletePostOpen}
+                ellipseMenuOpen={ellipseMenuOpen}
+                handleCloseAndGoBack={handleCloseAndGoBack}
+                handleDeletePost={handleDeletePost}
+                handleEllipseMenuClose={handleEllipseMenuClose}
+                handleOpenDeletePostModal={handleOpenDeletePostModal}
+                handleShareClose={handleShareClose}
+                handleOpenShareMenu={handleOpenShareMenu}
+                handleOpenEllipseMenu={handleOpenEllipseMenu}
+                handleCloseDeletePostModal={handleCloseDeletePostModal}
               />
-            </SRecommendationsSection>
+            )}
           </SPostModalContainer>
         ) : null}
       </Modal>
-      {postParsed?.creator && reportPostOpen && (
-        <ReportModal
-          show={reportPostOpen}
-          reportedDisplayname={getDisplayname(postParsed?.creator)}
-          onSubmit={handleReportSubmit}
-          onClose={handleReportClose}
-        />
-      )}
     </>
   );
 };
 
-export default PostModalRegular;
+export default PostModalModeration;
 
 const SPostModalContainer = styled.div<{
   isMyPost: boolean;
@@ -249,38 +237,5 @@ const SPostModalContainer = styled.div<{
 
     padding: 24px;
     padding-bottom: 24px;
-  }
-`;
-
-const SRecommendationsSection = styled.div<{
-  loaded: boolean;
-}>`
-  min-height: ${({ loaded }) => (loaded ? '600px' : '0')};
-`;
-
-const SGoBackButtonDesktop = styled(Button)`
-  position: absolute;
-  right: 0;
-  top: 0;
-
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-
-  border: transparent;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  font-size: 20px;
-  line-height: 28px;
-  font-weight: bold;
-  text-transform: capitalize;
-
-  cursor: pointer;
-
-  z-index: 2;
-
-  ${({ theme }) => theme.media.laptopM} {
-    right: 24px;
-    top: 32px;
   }
 `;
