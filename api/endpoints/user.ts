@@ -67,6 +67,21 @@ export const sendVerificationNewEmail = (
     signal ?? undefined,
   );
 
+export const confirmMyEmail = (
+  payload: newnewapi.ConfirmMyEmailRequest, signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.ConfirmMyEmailRequest,
+    newnewapi.ConfirmMyEmailResponse
+  >(
+    newnewapi.ConfirmMyEmailRequest,
+    newnewapi.ConfirmMyEmailResponse,
+    `${BASE_URL_USER}/confirm_my_email`,
+    'post',
+    payload,
+    signal ?? undefined,
+  );
+
 // NB! Maybe the auth should be optional
 export const setMyEmail = (payload: newnewapi.SetMyEmailRequest, signal?: RequestInit['signal']) =>
   fetchProtobuf<newnewapi.SetMyEmailRequest, newnewapi.SetMyEmailResponse>(

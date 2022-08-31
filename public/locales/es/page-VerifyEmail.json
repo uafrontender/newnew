@@ -19,5 +19,7 @@
     "invalidToken": "El token no es válido"
   },
   "verifying": "Verificando tu correo electrónico...",
-  "backButton": "Regresar"
+  "backButton": "Regresar",
+  "updated_NEED_TRANSLATION": "We updated your email!",
+  "backToProfile_NEED_TRANSLATION": "Back to Profile"
 }
