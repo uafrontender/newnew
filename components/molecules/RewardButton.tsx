@@ -76,11 +76,11 @@ export default RewardButton;
 
 const SGenericSkeleton = styled(GenericSkeleton)`
   height: 36px;
-  min-width: 84px;
+  min-width: 88px;
   border-radius: 16px;
 
   ${(props) => props.theme.media.tablet} {
-    min-width: 96px;
+    min-width: 100px;
     height: 48px;
   }
 `;
@@ -91,7 +91,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   height: 36px;
-  min-width: 84px;
+  min-width: 88px;
   border: 1px solid;
   border-color: ${(props) => props.theme.colorsThemed.text.primary};
   border-radius: 16px;
@@ -106,7 +106,7 @@ const Container = styled.div`
   }
 
   ${(props) => props.theme.media.tablet} {
-    min-width: 96px;
+    min-width: 100px;
     padding: 0px 16px;
     height: 48px;
   }
