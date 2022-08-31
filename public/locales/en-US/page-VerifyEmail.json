@@ -19,5 +19,7 @@
     "invalidToken": "Invalid token"
   },
   "verifying": "Verifying your email...",
-  "backButton": "Back"
+  "backButton": "Back",
+  "updated": "We updated your email!",
+  "backToProfile": "Back to Profile"
 }
