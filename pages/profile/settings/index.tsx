@@ -69,9 +69,11 @@ const MyProfileSettingsIndex = () => {
   const socketConnection = useContext(SocketContext);
   // Redux
   const dispatch = useAppDispatch();
+
   const { userData, loggedIn, _persist } = useAppSelector(
     (state: any) => state.user
   );
+
   const { resizeMode, colorMode } = useAppSelector((state: any) => state.ui);
   // Measurements
   const isMobileOrTablet = [

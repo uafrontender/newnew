@@ -60,6 +60,8 @@ import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
+import RewardContextProvider from '../contexts/rewardContext';
+import ModalNotificationsContextProvider from '../contexts/modalNotificationsContext';
 import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
 import { OverlayModeProvider } from '../contexts/overlayModeContext';
@@ -215,49 +217,55 @@ const MyApp = (props: IMyApp): ReactElement => {
                 <PersistanceProvider store={store}>
                   <SyncUserWrapper>
                     <NotificationsProvider>
-                      <BlockedUsersProvider>
-                        <FollowingsContextProvider>
-                          {/* <WalletContextProvider> */}
-                          <CardsContextProvider>
-                            <SubscriptionsProvider>
-                              <ChatsProvider>
-                                <OverlayModeProvider>
-                                  <ResizeMode>
-                                    <PostModalContextProvider>
-                                      <GlobalTheme initialTheme={colorMode}>
-                                        <>
-                                          <ToastContainer />
-                                          <VideoProcessingWrapper>
-                                            <ErrorBoundary>
-                                              {!pageProps.error ? (
-                                                getLayout(
-                                                  <Component {...pageProps} />
-                                                )
-                                              ) : (
-                                                <Error
-                                                  title={
-                                                    pageProps.error?.message
-                                                  }
-                                                  statusCode={
-                                                    pageProps.error
-                                                      ?.statusCode ?? 500
-                                                  }
-                                                />
-                                              )}
-                                            </ErrorBoundary>
-                                          </VideoProcessingWrapper>
-                                          <ReCaptchaBadgeModal />
-                                        </>
-                                      </GlobalTheme>
-                                    </PostModalContextProvider>
-                                  </ResizeMode>
-                                </OverlayModeProvider>
-                              </ChatsProvider>
-                            </SubscriptionsProvider>
-                          </CardsContextProvider>
-                          {/* </WalletContextProvider> */}
-                        </FollowingsContextProvider>
-                      </BlockedUsersProvider>
+                      <ModalNotificationsContextProvider>
+                        <BlockedUsersProvider>
+                          <FollowingsContextProvider>
+                            {/* <WalletContextProvider> */}
+                            <RewardContextProvider>
+                              <CardsContextProvider>
+                                <SubscriptionsProvider>
+                                  <ChatsProvider>
+                                    <OverlayModeProvider>
+                                      <ResizeMode>
+                                        <PostModalContextProvider>
+                                          <GlobalTheme initialTheme={colorMode}>
+                                            <>
+                                              <ToastContainer />
+                                              <VideoProcessingWrapper>
+                                                <ErrorBoundary>
+                                                  {!pageProps.error ? (
+                                                    getLayout(
+                                                      <Component
+                                                        {...pageProps}
+                                                      />
+                                                    )
+                                                  ) : (
+                                                    <Error
+                                                      title={
+                                                        pageProps.error?.message
+                                                      }
+                                                      statusCode={
+                                                        pageProps.error
+                                                          ?.statusCode ?? 500
+                                                      }
+                                                    />
+                                                  )}
+                                                </ErrorBoundary>
+                                              </VideoProcessingWrapper>
+                                              <ReCaptchaBadgeModal />
+                                            </>
+                                          </GlobalTheme>
+                                        </PostModalContextProvider>
+                                      </ResizeMode>
+                                    </OverlayModeProvider>
+                                  </ChatsProvider>
+                                </SubscriptionsProvider>
+                              </CardsContextProvider>
+                            </RewardContextProvider>
+                            {/* </WalletContextProvider> */}
+                          </FollowingsContextProvider>
+                        </BlockedUsersProvider>
+                      </ModalNotificationsContextProvider>
                     </NotificationsProvider>
                   </SyncUserWrapper>
                 </PersistanceProvider>

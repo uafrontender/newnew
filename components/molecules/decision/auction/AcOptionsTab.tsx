@@ -24,6 +24,7 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { placeBidWithWallet } from '../../../../api/endpoints/auction';
 import {
   createStripeSetupIntent,
+  updateStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 import { validateText } from '../../../../api/endpoints/infrastructure';
@@ -55,6 +56,7 @@ import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import PostTitleContent from '../../../atoms/PostTitleContent';
+import getRewardErrorStatusTextKey from '../../../../utils/getRewardErrorStatusTextKey';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -111,6 +113,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   handleRemoveOption,
 }) => {
   const theme = useTheme();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
@@ -355,10 +358,12 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   const handlePayWithCard = useCallback(
     async ({
+      rewardAmount,
       cardUuid,
       stripeSetupIntentClientSecret,
       saveCard,
     }: {
+      rewardAmount: number;
       cardUuid?: string;
       stripeSetupIntentClientSecret: string;
       saveCard?: boolean;
@@ -372,12 +377,38 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         return;
       }
 
+      Mixpanel.track('PayWithCard', {
+        _stage: 'Post',
+        _postUuid: postId,
+        _component: 'AcOptionsTab',
+      });
+
       try {
-        Mixpanel.track('PayWithCard', {
-          _stage: 'Post',
-          _postUuid: postId,
-          _component: 'AcOptionsTab',
-        });
+        if (rewardAmount > 0) {
+          const updateStripeSetupIntentRequest =
+            new newnewapi.UpdateStripeSetupIntentRequest({
+              stripeSetupIntentClientSecret,
+              rewardAmount: new newnewapi.MoneyAmount({
+                usdCents: rewardAmount,
+              }),
+            });
+
+          const updateRes = await updateStripeSetupIntent(
+            updateStripeSetupIntentRequest
+          );
+
+          if (
+            !updateRes.data ||
+            updateRes.error ||
+            updateRes.data.status !==
+              newnewapi.UpdateStripeSetupIntentResponse.Status.SUCCESS
+          ) {
+            throw new Error(
+              updateRes.error?.message ??
+                t(getRewardErrorStatusTextKey(updateRes.data?.status))
+            );
+          }
+        }
 
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({

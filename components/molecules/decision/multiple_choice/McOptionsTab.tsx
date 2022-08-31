@@ -28,6 +28,7 @@ import {
 } from '../../../../api/endpoints/multiple_choice';
 import {
   createStripeSetupIntent,
+  updateStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 
@@ -57,6 +58,7 @@ import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import PostTitleContent from '../../../atoms/PostTitleContent';
+import getRewardErrorStatusTextKey from '../../../../utils/getRewardErrorStatusTextKey';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -370,10 +372,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   const handlePayWithCard = useCallback(
     async ({
+      rewardAmount,
       cardUuid,
       stripeSetupIntentClientSecret,
       saveCard,
     }: {
+      rewardAmount: number;
       cardUuid?: string;
       stripeSetupIntentClientSecret: string;
       saveCard?: boolean;
@@ -394,6 +398,32 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       });
 
       try {
+        if (rewardAmount > 0) {
+          const updateStripeSetupIntentRequest =
+            new newnewapi.UpdateStripeSetupIntentRequest({
+              stripeSetupIntentClientSecret,
+              rewardAmount: new newnewapi.MoneyAmount({
+                usdCents: rewardAmount,
+              }),
+            });
+
+          const updateRes = await updateStripeSetupIntent(
+            updateStripeSetupIntentRequest
+          );
+
+          if (
+            !updateRes.data ||
+            updateRes.error ||
+            updateRes.data.status !==
+              newnewapi.UpdateStripeSetupIntentResponse.Status.SUCCESS
+          ) {
+            throw new Error(
+              updateRes.error?.message ??
+                t(getRewardErrorStatusTextKey(updateRes.data?.status))
+            );
+          }
+        }
+
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             cardUuid,
@@ -798,7 +828,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={(parseInt(newBidAmount) * 100 || 0) * votePrice}
+          amount={(parseInt(newBidAmount) || 0) * votePrice}
           createStripeSetupIntent={createSetupIntent}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(newBidAmount) * votePrice * 100
