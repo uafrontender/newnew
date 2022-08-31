@@ -36,7 +36,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
-  const { rewardBalance } = useContext(RewardContext);
+  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
   const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
@@ -177,6 +177,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 balance={
                   rewardBalance ? rewardBalance.usdCents / 100 : undefined
                 }
+                loading={isRewardBalanceLoading}
               />
             </SItemWithMargin>
           </>
@@ -219,7 +220,10 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
             </SItemWithMargin>
             {currentSignupRewardAmount ? (
               <SItemWithMargin>
-                <RewardButton balance={currentSignupRewardAmount} offer />
+                <RewardButton
+                  balance={currentSignupRewardAmount.usdCents ?? undefined}
+                  offer
+                />
               </SItemWithMargin>
             ) : null}
           </>

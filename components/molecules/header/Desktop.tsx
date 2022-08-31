@@ -28,7 +28,7 @@ export const Desktop: React.FC = React.memo(() => {
   const { unreadNotificationCount } = useNotifications();
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
-  const { rewardBalance } = useContext(RewardContext);
+  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
   const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
@@ -216,6 +216,7 @@ export const Desktop: React.FC = React.memo(() => {
                 balance={
                   rewardBalance ? rewardBalance.usdCents / 100 : undefined
                 }
+                loading={isRewardBalanceLoading}
               />
             </SItemWithMargin>
           </>
@@ -259,7 +260,10 @@ export const Desktop: React.FC = React.memo(() => {
             </SItemWithMargin>
             {currentSignupRewardAmount ? (
               <SItemWithMargin>
-                <RewardButton balance={currentSignupRewardAmount} offer />
+                <RewardButton
+                  balance={currentSignupRewardAmount.usdCents ?? undefined}
+                  offer
+                />
               </SItemWithMargin>
             ) : null}
           </>

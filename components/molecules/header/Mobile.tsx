@@ -17,7 +17,7 @@ import Button from '../../atoms/Button';
 export const Mobile: React.FC = React.memo(() => {
   const user = useAppSelector((state) => state.user);
   const { t } = useTranslation();
-  const { rewardBalance } = useContext(RewardContext);
+  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
   const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
 
   return (
@@ -80,6 +80,7 @@ export const Mobile: React.FC = React.memo(() => {
                 balance={
                   rewardBalance ? rewardBalance.usdCents / 100 : undefined
                 }
+                loading={isRewardBalanceLoading}
               />
             </SItemWithMargin>
           </>
@@ -106,7 +107,10 @@ export const Mobile: React.FC = React.memo(() => {
             </SItemWithMargin>
             {currentSignupRewardAmount && (
               <SItemWithMargin>
-                <RewardButton balance={currentSignupRewardAmount} offer />
+                <RewardButton
+                  balance={currentSignupRewardAmount.usdCents ?? undefined}
+                  offer
+                />
               </SItemWithMargin>
             )}
           </>

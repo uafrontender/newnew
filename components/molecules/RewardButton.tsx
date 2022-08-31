@@ -5,20 +5,22 @@ import Link from 'next/link';
 import InlineSvg from '../atoms/InlineSVG';
 import ArrowLeftIcon from '../../public/images/svg/icons/outlined/ArrowRight.svg';
 import { formatNumber } from '../../utils/format';
+import GenericSkeleton from './GenericSkeleton';
 
 interface RewardButtonI {
   balance: number | undefined;
+  loading?: boolean;
   offer?: boolean;
 }
 
 const REWARD_TICKS = 4;
 
-const RewardButton: React.FC<RewardButtonI> = ({ balance, offer }) => {
+const RewardButton: React.FC<RewardButtonI> = ({ balance, loading, offer }) => {
   const theme = useTheme();
   const [portion, setPortion] = useState(offer ? 0 : REWARD_TICKS);
 
   useEffect(() => {
-    if (!offer) {
+    if (!offer || loading) {
       return () => {};
     }
 
@@ -37,12 +39,15 @@ const RewardButton: React.FC<RewardButtonI> = ({ balance, offer }) => {
     return () => {
       clearInterval(interval);
     };
-  }, [balance, offer]);
+  }, [balance, loading, offer]);
+
+  if (loading) {
+    return <SGenericSkeleton />;
+  }
 
   return (
     <Link href='/rewards'>
       <Container>
-        {/* TODO: Add a proper skeleton */}
         <Value>
           {balance !== undefined
             ? `${formatNumber(balance * (portion / REWARD_TICKS))}`
@@ -69,6 +74,17 @@ RewardButton.defaultProps = {
 
 export default RewardButton;
 
+const SGenericSkeleton = styled(GenericSkeleton)`
+  height: 36px;
+  min-width: 84px;
+  border-radius: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    min-width: 96px;
+    height: 48px;
+  }
+`;
+
 const Container = styled.div`
   display: flex;
   flex-direction: row;
@@ -92,9 +108,6 @@ const Container = styled.div`
   ${(props) => props.theme.media.tablet} {
     min-width: 96px;
     padding: 0px 16px;
-  }
-
-  ${(props) => props.theme.media.tablet} {
     height: 48px;
   }
 `;
