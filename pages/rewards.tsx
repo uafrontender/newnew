@@ -445,8 +445,9 @@ const InfoButton = styled.div`
   width: 17px;
   height: 17px;
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.5);
-  border-color: rgba(255, 255, 255, 0.5);
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  border-color: ${(props) => props.theme.colorsThemed.text.primary};
+  opacity: 0.5;
   border: 1px solid;
   border-radius: 100%;
   cursor: pointer;
