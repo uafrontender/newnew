@@ -126,8 +126,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
   const optionsAreValid =
     tab !== 'multiple-choice' ||
-    multiplechoice.choices.findIndex((item) =>
-      validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)
+    multiplechoice.choices.findIndex(
+      (item: newnewapi.CreateMultipleChoiceBody.IOption) =>
+        validateText(
+          item.text as string,
+          CREATION_OPTION_MIN,
+          CREATION_OPTION_MAX
+        )
     ) === -1;
 
   const disabled =
@@ -277,9 +282,11 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         };
       } else if (tab === 'multiple-choice') {
         body.multiplechoice = {
-          options: multiplechoice.choices.map((choice) => ({
-            text: choice.text,
-          })),
+          options: multiplechoice.choices.map(
+            (choice: newnewapi.CreateMultipleChoiceBody.IOption) => ({
+              text: choice.text,
+            })
+          ),
           isSuggestionsAllowed: multiplechoice.options.allowSuggestions,
         };
       } else if (tab === 'crowdfunding') {

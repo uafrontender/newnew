@@ -1,108 +1,113 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-import { getMcOption } from '../../../api/endpoints/multiple_choice';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
+import { fetchAcOptionById } from '../../../../api/endpoints/auction';
 
 // Utils
-import Headline from '../../atoms/Headline';
-import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
-import { formatNumber } from '../../../utils/format';
-import getDisplayname from '../../../utils/getDisplayname';
-import secondsToDHMS from '../../../utils/secondsToDHMS';
-import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import PostTitleContent from '../../atoms/PostTitleContent';
-import { Mixpanel } from '../../../utils/mixpanel';
+import Headline from '../../../atoms/Headline';
+import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
+import DecisionEndedBox from '../../../molecules/decision/success/DecisionEndedBox';
 
-const WaitingForResponseBox = dynamic(
-  () => import('../../molecules/decision/waiting/WaitingForResponseBox')
+import { formatNumber } from '../../../../utils/format';
+import getDisplayname from '../../../../utils/getDisplayname';
+import assets from '../../../../constants/assets';
+import { fetchPostByUUID } from '../../../../api/endpoints/post';
+import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
+import PostTitleContent from '../../../atoms/PostTitleContent';
+
+const AcSuccessOptionsTab = dynamic(
+  () =>
+    import('../../../molecules/decision/auction/success/AcSuccessOptionsTab')
 );
 const CommentsBottomSection = dynamic(
-  () => import('../../molecules/decision/success/CommentsBottomSection')
+  () => import('../../../molecules/decision/success/CommentsBottomSection')
 );
-const McSuccessOptionsTab = dynamic(
-  () =>
-    import(
-      '../../molecules/decision/multiple_choice/success/McSuccessOptionsTab'
-    )
-);
-interface IPostAwaitingResponseMC {
-  post: newnewapi.MultipleChoice;
+
+interface IPostSuccessAC {
+  post: newnewapi.Auction;
 }
 
-const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
-  React.memo(({ post }) => {
+const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
+  ({ post }) => {
     const { t } = useTranslation('modal-Post');
+    const theme = useTheme();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
-    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
     const router = useRouter();
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
-    const waitingTime = useMemo(() => {
-      const end = (post.responseUploadDeadline?.seconds as number) * 1000;
-      const parsed = (end - Date.now()) / 1000;
-      const dhms = secondsToDHMS(parsed);
-
-      let countdownsrt = `${dhms.days} ${t(
-        'acPostAwaiting.hero.expires.days'
-      )} ${dhms.hours} ${t('acPostAwaiting.hero.expires.hours')}`;
-
-      if (dhms.days === '0') {
-        countdownsrt = `${dhms.hours} ${t(
-          'acPostAwaiting.hero.expires.hours'
-        )} ${dhms.minutes} ${t('acPostAwaiting.hero.expires.minutes')}`;
-        if (dhms.hours === '0') {
-          countdownsrt = `${dhms.minutes} ${t(
-            'acPostAwaiting.hero.expires.minutes'
-          )} ${dhms.seconds} ${t('acPostAwaiting.hero.expires.seconds')}`;
-          if (dhms.minutes === '0') {
-            countdownsrt = `${dhms.seconds} ${t(
-              'acPostAwaiting.hero.expires.seconds'
-            )}`;
-          }
-        }
-      }
-      countdownsrt = `${countdownsrt} `;
-      return countdownsrt;
-    }, [post.responseUploadDeadline?.seconds, t]);
-
     // Winninfg option
-    const [winningOption, setWinningOption] =
-      useState<newnewapi.MultipleChoice.Option | undefined>();
+    const [winningOption, setWinningOption] = useState<
+      newnewapi.Auction.Option | undefined
+    >();
 
     // Video
     // Open video tab
-    const [videoTab, setVideoTab] =
-      useState<'announcement' | 'response'>('announcement');
+    const [videoTab, setVideoTab] = useState<'announcement' | 'response'>(
+      'announcement'
+    );
     // Response viewed
     const [responseViewed, setResponseViewed] = useState(
       post.isResponseViewedByMe ?? false
     );
+    const fetchPostLatestData = useCallback(async () => {
+      try {
+        const fetchPostPayload = new newnewapi.GetPostRequest({
+          postUuid: post.postUuid,
+        });
+
+        const res = await fetchPostByUUID(fetchPostPayload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+
+        if (res.data.auction?.isResponseViewedByMe) {
+          setResponseViewed(true);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     // Muted mode
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
     }, [dispatch]);
 
-    // Main screen vs all options
-    const [openedMainSection, setOpenedMainSection] =
-      useState<'main' | 'options'>('main');
+    // Main screen vs all bids
+    const [openedMainSection, setOpenedMainSection] = useState<'main' | 'bids'>(
+      'main'
+    );
 
     // Comments
     const { ref: commentsSectionRef, inView } = useInView({
       threshold: 0.8,
     });
+
+    // Check if the response has been viewed
+    useEffect(() => {
+      fetchPostLatestData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Scroll to comments if hash is present
     useEffect(() => {
@@ -111,6 +116,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
         if (!hash) {
           return;
         }
+
         const parsedHash = hash.substring(1);
 
         if (parsedHash === 'comments') {
@@ -145,25 +151,19 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     useEffect(() => {
       async function fetchAndSetWinningOption(id: number) {
         try {
-          const payload = new newnewapi.GetMcOptionRequest({
+          const payload = new newnewapi.GetAcOptionRequest({
             optionId: id,
           });
 
-          const res = await getMcOption(payload);
-
-          console.log(res);
+          const res = await fetchAcOptionById(payload);
 
           if (res.data?.option) {
-            setWinningOption(
-              res.data.option as newnewapi.MultipleChoice.Option
-            );
+            setWinningOption(res.data.option as newnewapi.Auction.Option);
           }
         } catch (err) {
           console.log(err);
         }
       }
-
-      console.log(post.winningOptionId);
 
       if (post.winningOptionId) {
         fetchAndSetWinningOption(post.winningOptionId as number);
@@ -187,13 +187,15 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
           <SActivitesContainer dimmedBackground={openedMainSection === 'main'}>
             {openedMainSection === 'main' ? (
               <>
-                <WaitingForResponseBox
-                  title={t('mcPostAwaiting.hero.title')}
-                  body={t('mcPostAwaiting.hero.body', {
-                    creator: post.creator?.nickname,
-                    time: waitingTime,
-                  })}
-                />
+                <DecisionEndedBox
+                  imgSrc={
+                    theme.name === 'light'
+                      ? assets.creation.lightAcAnimated
+                      : assets.creation.darkAcAnimated
+                  }
+                >
+                  {t('acPostSuccess.heroText')}
+                </DecisionEndedBox>
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>
                     <SCreator>
@@ -202,16 +204,21 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                       </a>
                       <a href={`/${post.creator?.username}`}>
                         <SWantsToKnow>
-                          {t('mcPostSuccess.wantsToKnow', {
+                          {t('acPostSuccess.wantsToKnow', {
                             creator: post.creator?.nickname,
                           })}
                         </SWantsToKnow>
                       </a>
                     </SCreator>
-                    <STotal>
-                      {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
-                      <span>{t('mcPostSuccess.inTotalVotes')}</span>
-                    </STotal>
+                    {post.totalAmount?.usdCents && (
+                      <STotal>
+                        {`$${formatNumber(
+                          post.totalAmount.usdCents / 100 ?? 0,
+                          true
+                        )}`}{' '}
+                        <span>{t('acPostSuccess.inTotalBids')}</span>
+                      </STotal>
+                    )}
                   </SCreatorInfoDiv>
                   <SPostTitle variant={4}>
                     <PostTitleContent>{post.title}</PostTitleContent>
@@ -221,44 +228,23 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                     <>
                       <SWinningBidCreator>
                         <SCreator>
-                          <Link
-                            href={`/${
-                              winningOption.creator?.uuid !== post.creator?.uuid
-                                ? winningOption.creator?.username!!
-                                : winningOption.firstVoter?.username!!
-                            }`}
-                          >
+                          <Link href={`/${winningOption.creator?.username}`}>
                             <SCreatorImage
-                              src={
-                                winningOption.creator?.uuid !==
-                                post.creator?.uuid
-                                  ? winningOption.creator?.avatarUrl!!
-                                  : winningOption.firstVoter?.avatarUrl!!
-                              }
+                              src={winningOption.creator?.avatarUrl ?? ''}
                             />
                           </Link>
                           <SWinningBidCreatorText>
                             <SSpan>
                               <Link
-                                href={`/${
-                                  winningOption.creator?.uuid !==
-                                  post.creator?.uuid
-                                    ? winningOption.creator?.username!!
-                                    : winningOption.firstVoter?.username!!
-                                }`}
+                                href={`/${winningOption.creator?.username}`}
                               >
                                 {winningOption.creator?.uuid ===
                                   user.userData?.userUuid ||
                                 winningOption.isSupportedByMe
                                   ? winningOption.supporterCount > 1
                                     ? t('me')
-                                    : t('I')
-                                  : getDisplayname(
-                                      winningOption.creator?.uuid !==
-                                        post.creator?.uuid
-                                        ? winningOption.creator!!
-                                        : winningOption.firstVoter!!
-                                    )}
+                                    : t('my')
+                                  : getDisplayname(winningOption.creator!!)}
                               </Link>
                             </SSpan>
                             {winningOption.supporterCount > 1 ? (
@@ -268,55 +254,73 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                                   winningOption.supporterCount,
                                   true
                                 )}{' '}
-                                {t('mcPostSuccess.others')}
+                                {t('acPostSuccess.others')}
                               </>
                             ) : null}{' '}
-                            {t('mcPostSuccess.voted')}
+                            {t('acPostSuccess.bid')}
                           </SWinningBidCreatorText>
                         </SCreator>
                       </SWinningBidCreator>
-                      <SWinningOptionAmount variant={4}>
-                        {`${formatNumber(winningOption.voteCount ?? 0, true)}`}{' '}
-                        {winningOption.voteCount > 1
-                          ? t('mcPostSuccess.votes')
-                          : t('mcPostSuccess.vote')}
-                      </SWinningOptionAmount>
+                      {winningOption.totalAmount?.usdCents && (
+                        <SWinningOptionAmount variant={4}>
+                          {`$${formatNumber(
+                            winningOption.totalAmount.usdCents / 100 ?? 0,
+                            true
+                          )}`}
+                        </SWinningOptionAmount>
+                      )}
                       <SSeparator />
                       <SWinningOptionDetails>
                         <SWinningOptionDetailsBidChosen>
-                          {t('mcPostSuccess.optionChosen')}
+                          {t('acPostSuccess.bidChosen')}
                         </SWinningOptionDetailsBidChosen>
                         <SWinningOptionDetailsSeeAll
-                          onClickCapture={() => {
-                            Mixpanel.track('Winning Option Details See All', {
-                              _stage: 'Post',
-                              _postUuid: post.postUuid,
-                              _component: 'PostAwaitingResponseMC',
-                            });
-                          }}
-                          onClick={() => setOpenedMainSection('options')}
+                          onClick={() => setOpenedMainSection('bids')}
                         >
-                          {t('mcPostSuccess.seeAll')}
+                          {t('acPostSuccess.seeAll')}
                         </SWinningOptionDetailsSeeAll>
                         <SWinningOptionDetailsTitle variant={4}>
-                          {winningOption.text}
+                          {winningOption.title}
                         </SWinningOptionDetailsTitle>
                       </SWinningOptionDetails>
                     </>
                   )}
                 </SMainSectionWrapper>
+                {!isMobile ? (
+                  <>
+                    {!responseViewed && videoTab === 'announcement' ? (
+                      <SWatchResponseWrapper>
+                        <SWatchResponseBtn
+                          shouldView={!responseViewed}
+                          onClick={() => setVideoTab('response')}
+                        >
+                          {t('postVideoSuccess.tabs.watchResponseFirstTime')}
+                        </SWatchResponseBtn>
+                      </SWatchResponseWrapper>
+                    ) : null}
+                    {responseViewed ? (
+                      <SToggleVideoWidget>
+                        <SChangeTabBtn
+                          shouldView={videoTab === 'announcement'}
+                          onClick={() => setVideoTab('announcement')}
+                        >
+                          {t('postVideoSuccess.tabs.watchOriginal')}
+                        </SChangeTabBtn>
+                        <SChangeTabBtn
+                          shouldView={videoTab === 'response'}
+                          onClick={() => setVideoTab('response')}
+                        >
+                          {t('postVideoSuccess.tabs.watchResponse')}
+                        </SChangeTabBtn>
+                      </SToggleVideoWidget>
+                    ) : null}
+                  </>
+                ) : null}
               </>
             ) : (
-              <McSuccessOptionsTab
+              <AcSuccessOptionsTab
                 post={post}
-                handleGoBack={() => {
-                  Mixpanel.track('Go Back', {
-                    _stage: 'Post',
-                    _postUuid: post.postUuid,
-                    _component: 'PostAwaitingResponseMC',
-                  });
-                  setOpenedMainSection('main');
-                }}
+                handleGoBack={() => setOpenedMainSection('main')}
               />
             )}
           </SActivitesContainer>
@@ -334,9 +338,10 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
         )}
       </>
     );
-  });
+  }
+);
 
-export default PostAwaitingResponseMC;
+export default PostSuccessAC;
 
 const SWrapper = styled.div`
   width: 100%;
@@ -391,7 +396,7 @@ const SActivitesContainer = styled.div<{
     height: 728px;
     display: flex;
     flex-direction: column;
-    /* justify-content: space-between; */
+    justify-content: space-between;
   }
 `;
 
@@ -407,7 +412,7 @@ const SMainSectionWrapper = styled.div`
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: flex-start\;;
   }
 `;
 
@@ -641,6 +646,84 @@ const SWinningOptionDetailsTitle = styled(Headline)`
   text-align: center;
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
+  }
+`;
+
+// Watch response for the first time
+const SWatchResponseWrapper = styled.div`
+  width: 100%;
+  height: 60px;
+
+  overflow: hidden;
+  border-radius: 16px;
+`;
+
+const SWatchResponseBtn = styled.button<{
+  shouldView?: boolean;
+}>`
+  background: ${({ shouldView, theme }) =>
+    shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)'};
+  border: transparent;
+  border-radius: 16px;
+
+  padding: 17px 24px;
+
+  width: 100%;
+  height: 100%;
+
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+
+  cursor: pointer;
+
+  &:active,
+  &:focus {
+    outline: none;
+  }
+`;
+
+const SToggleVideoWidget = styled.div`
+  display: flex;
+
+  height: 60px;
+  width: 100%;
+
+  overflow: hidden;
+  border-radius: 16px;
+`;
+
+const SChangeTabBtn = styled.button<{
+  shouldView?: boolean;
+}>`
+  background: ${({ shouldView, theme }) =>
+    shouldView
+      ? theme.colorsThemed.accent.blue
+      : theme.colorsThemed.background.tertiary};
+  border: transparent;
+
+  padding: 17px 24px;
+
+  width: 50%;
+  height: 100%;
+
+  text-align: center;
+  color: ${({ shouldView, theme }) =>
+    shouldView
+      ? '#ffffff'
+      : theme.name === 'dark'
+      ? '#ffffff'
+      : theme.colorsThemed.text.tertiary};
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+
+  cursor: pointer;
+
+  &:active,
+  &:focus {
+    outline: none;
   }
 `;
 

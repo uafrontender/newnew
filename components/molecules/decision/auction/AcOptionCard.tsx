@@ -26,7 +26,7 @@ import {
   updateStripeSetupIntent,
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
-import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../organisms/decision/regular/PostViewAC';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
