@@ -11,7 +11,7 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
 // Utils
-import { usePostModalInnerState } from '..';
+import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { markPost } from '../../../../api/endpoints/post';
 import { SocketContext } from '../../../../contexts/socketContext';

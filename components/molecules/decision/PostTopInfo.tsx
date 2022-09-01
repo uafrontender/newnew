@@ -35,12 +35,11 @@ import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verif
 import { formatNumber } from '../../../utils/format';
 import { markPost } from '../../../api/endpoints/post';
 import { FollowingsContext } from '../../../contexts/followingContext';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
 import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';
-import { usePostModalInnerState } from '../../organisms/decision';
+import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,

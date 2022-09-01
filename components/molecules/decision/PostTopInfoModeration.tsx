@@ -7,7 +7,7 @@ import { useTranslation } from 'next-i18next';
 
 import { formatNumber } from '../../../utils/format';
 import { Mixpanel } from '../../../utils/mixpanel';
-import { usePostModalInnerState } from '../../organisms/decision';
+import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
 
 import Text from '../../atoms/Text';
 import Headline from '../../atoms/Headline';
