@@ -40,6 +40,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import assets from '../../../constants/assets';
 import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { usePostModalInnerState } from '../../organisms/decision';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -54,41 +55,19 @@ const LIGHT_IMAGES = {
 };
 
 interface IPostTopInfo {
-  postId: string;
-  postStatus: TPostStatusStringified;
-  title: string;
-  creator: newnewapi.IUser;
-  isFollowingDecision: boolean;
-  handleSetIsFollowingDecision: (newValue: boolean) => void;
-  postType?: TPostType;
   totalVotes?: number;
   totalPledges?: number;
   targetPledges?: number;
   amountInBids?: number;
   hasWinner: boolean;
-  hasRecommendations: boolean;
-  handleReportOpen: () => void;
-  handleRemoveFromStateUnfavorited?: () => void;
-  handleAddPostToStateFavorited?: () => void;
 }
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
-  postId,
-  postStatus,
-  title,
-  creator,
-  isFollowingDecision,
-  handleSetIsFollowingDecision,
-  postType,
   totalVotes,
   totalPledges,
   targetPledges,
   amountInBids,
   hasWinner,
-  hasRecommendations,
-  handleReportOpen,
-  handleRemoveFromStateUnfavorited,
-  handleAddPostToStateFavorited,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -98,6 +77,23 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  const {
+    postParsed,
+    typeOfPost,
+    postStatus,
+    isFollowingDecision,
+    hasRecommendations,
+    handleRemoveFromStateUnfavorited,
+    handleAddPostToStateFavorited,
+    handleReportOpen,
+    handleSetIsFollowingDecision,
+  } = usePostModalInnerState();
+
+  const postId = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
+  const title = useMemo(() => postParsed?.title ?? '', [postParsed]);
+  const creator = useMemo(() => postParsed?.creator!!, [postParsed]);
+  const postType = useMemo(() => typeOfPost ?? 'ac', [typeOfPost]);
 
   const failureReason = useMemo(() => {
     if (postStatus !== 'failed') return '';
@@ -422,13 +418,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 };
 
 PostTopInfo.defaultProps = {
-  postType: undefined,
   amountInBids: undefined,
   totalVotes: undefined,
   totalPledges: undefined,
   targetPledges: undefined,
-  handleRemoveFromStateUnfavorited: undefined,
-  handleAddPostToStateFavorited: undefined,
 };
 
 export default PostTopInfo;

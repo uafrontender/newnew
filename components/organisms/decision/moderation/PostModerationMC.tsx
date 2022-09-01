@@ -1,5 +1,6 @@
-/* eslint-disable no-nested-ternary */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
 import React, {
   useCallback,
@@ -8,118 +9,68 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
-import moment from 'moment';
 import dynamic from 'next/dynamic';
-import { useInView } from 'react-intersection-observer';
 import { useRouter } from 'next/router';
+import { useInView } from 'react-intersection-observer';
+import { useTranslation } from 'next-i18next';
 
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import {
   fetchCurrentOptionsForMCPost,
-  voteOnPost,
-} from '../../../api/endpoints/multiple_choice';
+  getMcOption,
+} from '../../../../api/endpoints/multiple_choice';
+import switchPostStatus, {
+  TPostStatusStringified,
+} from '../../../../utils/switchPostStatus';
+import switchPostType from '../../../../utils/switchPostType';
+import { fetchPostByUUID } from '../../../../api/endpoints/post';
+import { SocketContext } from '../../../../contexts/socketContext';
+import { ChannelsContext } from '../../../../contexts/channelsContext';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
+import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 
-import PostVideo from '../../molecules/decision/PostVideo';
-import PostTimer from '../../molecules/decision/PostTimer';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import Headline from '../../atoms/Headline';
-import CommentsBottomSection from '../../molecules/decision/success/CommentsBottomSection';
-import PostVotingTab from '../../molecules/decision/PostVotingTab';
-import PostTimerEnded from '../../molecules/decision/PostTimerEnded';
+import PostVideoModeration from '../../../molecules/decision/PostVideoModeration';
+import PostTopInfoModeration from '../../../molecules/decision/PostTopInfoModeration';
+import Headline from '../../../atoms/Headline';
+import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
+import PostVotingTab from '../../../molecules/decision/PostVotingTab';
+import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
+import PostResponseTabModeration from '../../../molecules/decision/PostResponseTabModeration';
 
-// Utils
-import switchPostType from '../../../utils/switchPostType';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import { useGetAppConstants } from '../../../contexts/appConstantsContext';
-import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
-import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
-import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
-import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import { Mixpanel } from '../../../utils/mixpanel';
+import useResponseUpload from '../../../../utils/hooks/useResponseUpload';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import { usePostModalInnerState } from '..';
 
-const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
-const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
-const McOptionsTab = dynamic(
-  () => import('../../molecules/decision/multiple_choice/McOptionsTab')
+const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
+const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
+const HeroPopup = dynamic(
+  () => import('../../../molecules/decision/HeroPopup')
 );
-const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
-const PaymentSuccessModal = dynamic(
-  () => import('../../molecules/decision/PaymentSuccessModal')
+const ResponseTimer = dynamic(
+  () => import('../../../molecules/decision/ResponseTimer')
 );
-
-const getPayWithCardErrorMessage = (
-  status?: newnewapi.VoteOnPostResponse.Status
-) => {
-  switch (status) {
-    case newnewapi.VoteOnPostResponse.Status.NOT_ENOUGH_FUNDS:
-      return 'errors.notEnoughMoney';
-    case newnewapi.VoteOnPostResponse.Status.CARD_NOT_FOUND:
-      return 'errors.cardNotFound';
-    case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
-      return 'errors.cardCannotBeUsed';
-    case newnewapi.VoteOnPostResponse.Status.BLOCKED_BY_CREATOR:
-      return 'errors.blockedByCreator';
-    case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
-      return 'errors.mcCancelled';
-    case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:
-      return 'errors.mcFinished';
-    case newnewapi.VoteOnPostResponse.Status.MC_NOT_STARTED:
-      return 'errors.mcNotStarted';
-    case newnewapi.VoteOnPostResponse.Status.ALREADY_VOTED:
-      return 'errors.alreadyVoted';
-    case newnewapi.VoteOnPostResponse.Status.MC_VOTE_COUNT_TOO_SMALL:
-      return 'errors.mcVoteCountTooSmall';
-    case newnewapi.VoteOnPostResponse.Status.NOT_ALLOWED_TO_CREATE_NEW_OPTION:
-      return 'errors.notAllowedToCreateNewOption';
-    default:
-      return 'errors.requestFailed';
-  }
-};
+const PostTimer = dynamic(
+  () => import('../../../molecules/decision/PostTimer')
+);
+const McOptionsTabModeration = dynamic(
+  () =>
+    import(
+      '../../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration'
+    )
+);
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
 };
 
-interface IPostViewMC {
-  post: newnewapi.MultipleChoice;
-  stripeSetupIntentClientSecret?: string;
-  saveCard?: boolean;
-  resetSetupIntentClientSecret: () => void;
-  postStatus: TPostStatusStringified;
-  isFollowingDecision: boolean;
-  hasRecommendations: boolean;
-  handleSetIsFollowingDecision: (newValue: boolean) => void;
-  handleGoBack: () => void;
-  handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleReportOpen: () => void;
-  handleRemoveFromStateUnfavorited: () => void;
-  handleAddPostToStateFavorited: () => void;
-}
+interface IPostModerationMC {}
 
-const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
-  ({
-    post,
-    postStatus,
-    stripeSetupIntentClientSecret,
-    saveCard,
-    isFollowingDecision,
-    hasRecommendations,
-    handleSetIsFollowingDecision,
-    resetSetupIntentClientSecret,
-    handleGoBack,
-    handleUpdatePostStatus,
-    handleReportOpen,
-    handleRemoveFromStateUnfavorited,
-    handleAddPostToStateFavorited,
-  }) => {
+const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
+  () => {
     const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
@@ -129,17 +80,25 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     );
     const router = useRouter();
 
+    const {
+      postParsed,
+      postStatus,
+      handleGoBackInsidePost,
+      handleUpdatePostStatus,
+    } = usePostModalInnerState();
+    const post = useMemo(
+      () => postParsed as newnewapi.MultipleChoice,
+      [postParsed]
+    );
+
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
-    const { appConstants } = useGetAppConstants();
     // Socket
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-    // Response viewed
-    const [responseViewed, setResponseViewed] = useState(
-      post.isResponseViewedByMe ?? false
-    );
+    // Announcement
+    const [announcement, setAnnouncement] = useState(post.announcement);
 
     // Comments
     const { ref: commentsSectionRef, inView } = useInView({
@@ -152,32 +111,60 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           'none';
       }
     };
+
     const handleCommentBlur = () => {
       if (isMobile && !!document.getElementById('action-button-mobile')) {
         document.getElementById('action-button-mobile')!!.style.display = '';
       }
     };
 
-    // Post loading state
-    const [postLoading, setPostLoading] = useState(false);
+    // Response upload
+    const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<
+      newnewapi.IVideoUrls | undefined
+    >(undefined);
 
-    // Vote after stripe redirect
+    // Tabs
+    const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
+      post.response ||
+        responseFreshlyUploaded ||
+        postStatus === 'waiting_for_response' ||
+        postStatus === 'processing_response'
+        ? 'response'
+        : 'announcement'
+    );
+
+    const {
+      handleCancelVideoUpload,
+      handleItemChange,
+      handleResetVideoUploadAndProcessingState,
+      handleUploadVideoNotProcessed,
+      handleUploadVideoProcessed,
+      handleVideoDelete,
+      responseFileProcessingETA,
+      responseFileProcessingError,
+      responseFileProcessingLoading,
+      responseFileProcessingProgress,
+      responseFileUploadETA,
+      responseFileUploadError,
+      responseFileUploadLoading,
+      responseFileUploadProgress,
+      uploadedResponseVideoUrl,
+      videoProcessing,
+      responseUploading,
+      responseUploadSuccess,
+    } = useResponseUpload({
+      postId: post.postUuid,
+      postStatus,
+      openedTab,
+      handleUpdatePostStatus,
+      handleUpdateResponseVideo: (newValue) =>
+        setResponseFreshlyUploaded(newValue),
+    });
+
     const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-    const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] =
-      useState(false);
 
     // Total votes
     const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
-
-    // Free votes
-    const [hasFreeVote, setHasFreeVote] = useState(
-      post.canVoteForFree ?? false
-    );
-    const handleResetFreeVote = () => setHasFreeVote(false);
-
-    const [canSubscribe, setCanSubscribe] = useState(
-      post.creator?.options?.isOfferingSubscription
-    );
 
     // Options
     const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
@@ -190,12 +177,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     const [optionsLoading, setOptionsLoading] = useState(false);
     const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
-    const hasVotedOptionId = useMemo(() => {
-      const supportedOption = options.find((o) => o.isSupportedByMe);
-
-      if (supportedOption) return supportedOption.id;
-      return undefined;
-    }, [options]);
+    // Winning option
+    const [winningOption, setWinningOption] = useState<
+      newnewapi.MultipleChoice.Option | undefined
+    >();
 
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
@@ -229,11 +214,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
               )
           : [];
 
-        const optionsByVipUsers = unsortedArr
-          .filter((o) => o.isCreatedBySubscriber)
-          .sort((a, b) => {
-            return (b.id as number) - (a.id as number);
-          });
+        // const optionsByVipUsers = [];
 
         const workingArrSorted = unsortedArr.sort(
           (a, b) => (b?.voteCount as number) - (a?.voteCount as number)
@@ -246,7 +227,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             : []),
           ...optionsByUser,
           ...optionsSupportedByUser,
-          ...optionsByVipUsers,
+          // ...optionsByVipUsers,
           ...(highestOption &&
           highestOption.creator?.uuid !== user.userData?.userUuid
             ? [highestOption]
@@ -272,7 +253,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
 
     const fetchOptions = useCallback(
       async (pageToken?: string) => {
-        if (optionsLoading || loadingModalOpen) return;
+        if (optionsLoading) return;
         try {
           setOptionsLoading(true);
           setLoadingOptionsError('');
@@ -314,38 +295,16 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           console.error(err);
         }
       },
-      [optionsLoading, loadingModalOpen, post.postUuid, sortOptions]
-    );
-
-    const handleAddOrUpdateOptionFromResponse = useCallback(
-      (newOrUpdatedption: newnewapi.MultipleChoice.Option) => {
-        setOptions((curr) => {
-          const workingArr = [...curr];
-          let workingArrUnsorted;
-          const idx = workingArr.findIndex(
-            (op) => op.id === newOrUpdatedption.id
-          );
-          if (idx === -1) {
-            workingArrUnsorted = [
-              ...workingArr,
-              newOrUpdatedption as TMcOptionWithHighestField,
-            ];
-          } else {
-            workingArr[idx].voteCount = newOrUpdatedption.voteCount as number;
-            workingArr[idx].supporterCount =
-              newOrUpdatedption.supporterCount as number;
-            workingArr[idx].isSupportedByMe = true;
-            workingArrUnsorted = workingArr;
-          }
-
-          return sortOptions(workingArrUnsorted);
-        });
-      },
-      [setOptions, sortOptions]
+      [optionsLoading, setOptions, sortOptions, post]
     );
 
     const handleRemoveOption = useCallback(
       (optionToRemove: newnewapi.MultipleChoice.Option) => {
+        Mixpanel.track('Removed Option', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostModerationMC',
+        });
         setOptions((curr) => {
           const workingArr = [...curr];
           const workingArrUnsorted = [
@@ -354,11 +313,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           return sortOptions(workingArrUnsorted);
         });
       },
-      [setOptions, sortOptions]
+      [setOptions, sortOptions, post.postUuid]
     );
 
     const fetchPostLatestData = useCallback(async () => {
-      setPostLoading(true);
       try {
         const fetchPostPayload = new newnewapi.GetPostRequest({
           postUuid: post.postUuid,
@@ -366,44 +324,42 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
 
         const res = await fetchPostByUUID(fetchPostPayload);
 
-        if (!res.data || res.error) {
+        if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        }
 
-        setHasFreeVote(res.data.multipleChoice?.canVoteForFree ?? false);
-        setTotalVotes(res.data.multipleChoice?.totalVotes as number);
-        setNumberOfOptions(res.data.multipleChoice?.optionCount as number);
-        if (res.data.multipleChoice?.status)
-          handleUpdatePostStatus(res.data.multipleChoice?.status);
+        if (res.data.multipleChoice) {
+          setTotalVotes(res.data.multipleChoice.totalVotes as number);
+          setNumberOfOptions(res.data.multipleChoice.optionCount as number);
+          if (res.data.multipleChoice.status)
+            handleUpdatePostStatus(res.data.multipleChoice.status);
 
-        if (user.loggedIn && post.creator?.options?.isOfferingSubscription) {
-          const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-            creatorUuid: post.creator?.uuid,
-          });
-
-          const responseSubStatus = await getSubscriptionStatus(
-            getStatusPayload
-          );
-
-          if (
-            responseSubStatus.data?.status?.activeRenewsAt ||
-            responseSubStatus.data?.status?.activeCancelsAt
-          ) {
-            setCanSubscribe(false);
+          if (!responseFreshlyUploaded && res.data.multipleChoice?.response) {
+            setResponseFreshlyUploaded(res.data.multipleChoice.response);
+          }
+          setAnnouncement(res.data.multipleChoice?.announcement);
+          if (res.data.multipleChoice?.winningOptionId && !winningOption) {
+            const winner = options.find(
+              (o) => o.id === res!!.data!!.multipleChoice!!.winningOptionId
+            );
+            if (winner) {
+              setWinningOption(winner);
+            }
           }
         }
-
-        setPostLoading(false);
       } catch (err) {
         console.error(err);
-        setPostLoading(false);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const handleOnVotingTimeExpired = () => {
+    const handleOnResponseTimeExpired = () => {
+      handleUpdatePostStatus('FAILED');
+    };
+
+    const handleOnVotingTimeExpired = async () => {
       if (options.some((o) => o.supporterCount > 0)) {
         handleUpdatePostStatus('WAITING_FOR_RESPONSE');
+        await fetchPostLatestData();
       } else {
         handleUpdatePostStatus('FAILED');
       }
@@ -412,61 +368,49 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     // Increment channel subs after mounting
     // Decrement when unmounting
     useEffect(() => {
-      if (socketConnection?.connected) {
-        addChannel(post.postUuid, {
-          postUpdates: {
-            postUuid: post.postUuid,
-          },
-        });
-      }
+      addChannel(post.postUuid, {
+        postUpdates: {
+          postUuid: post.postUuid,
+        },
+      });
 
       return () => {
         removeChannel(post.postUuid);
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection?.connected]);
+    }, []);
 
-    // Mark post as viewed if logged in
     useEffect(() => {
-      async function markAsViewed() {
-        if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
-          return;
+      setOptions([]);
+      setOptionsNextPageToken('');
+      fetchOptions();
+      fetchPostLatestData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [post.postUuid]);
+
+    useEffect(() => {
+      async function fetchAndSetWinningOption(id: number) {
         try {
-          const markAsViewedPayload = new newnewapi.MarkPostRequest({
-            markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
-            postUuid: post.postUuid,
+          const payload = new newnewapi.GetMcOptionRequest({
+            optionId: id,
           });
 
-          const res = await markPost(markAsViewedPayload);
+          const res = await getMcOption(payload);
 
-          if (res.error) throw new Error('Failed to mark post as viewed');
+          if (res.data?.option) {
+            setWinningOption(
+              res.data.option as newnewapi.MultipleChoice.Option
+            );
+          }
         } catch (err) {
           console.error(err);
         }
       }
 
-      // setTimeout used to fix the React memory leak warning
-      const timer = setTimeout(() => {
-        markAsViewed();
-      });
-      return () => {
-        clearTimeout(timer);
-      };
-    }, [post, user.loggedIn, user.userData?.userUuid]);
-
-    useEffect(() => {
-      // setTimeout used to fix the React memory leak warning
-      const timer = setTimeout(() => {
-        setOptions([]);
-        setOptionsNextPageToken('');
-        fetchOptions();
-        fetchPostLatestData();
-      });
-      return () => {
-        clearTimeout(timer);
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [post.postUuid]);
+      if (post.winningOptionId) {
+        fetchAndSetWinningOption(post.winningOptionId as number);
+      }
+    }, [post.winningOptionId]);
 
     useEffect(() => {
       const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -485,7 +429,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
                 decoded.option as TMcOptionWithHighestField,
               ];
             } else {
-              // workingArr[idx] = decoded.option as TMcOptionWithHighestField;
               workingArr[idx].voteCount = decoded.option?.voteCount as number;
               workingArr[idx].supporterCount = decoded.option
                 ?.supporterCount as number;
@@ -521,16 +464,39 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             setTotalVotes(decoded.post?.multipleChoice?.totalVotes);
           if (decoded.post?.multipleChoice?.optionCount)
             setNumberOfOptions(decoded.post?.multipleChoice?.optionCount);
+
+          if (
+            !responseFreshlyUploaded &&
+            decoded.post?.multipleChoice?.response
+          ) {
+            setResponseFreshlyUploaded(decoded.post.multipleChoice.response);
+          }
         }
       };
 
-      const socketHandlerPostStatus = (data: any) => {
+      const socketHandlerPostStatus = async (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
         if (!decoded) return;
         if (decoded.postUuid === post.postUuid && decoded.multipleChoice) {
           handleUpdatePostStatus(decoded.multipleChoice);
+
+          if (
+            !responseFreshlyUploaded &&
+            postStatus === 'processing_response' &&
+            switchPostStatus('mc', decoded.multipleChoice) === 'succeeded'
+          ) {
+            const fetchPostPayload = new newnewapi.GetPostRequest({
+              postUuid: post.postUuid,
+            });
+
+            const res = await fetchPostByUUID(fetchPostPayload);
+
+            if (res.data?.multipleChoice?.response) {
+              setResponseFreshlyUploaded(res.data?.multipleChoice?.response);
+            }
+          }
         }
       };
 
@@ -559,82 +525,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
     }, [
       socketConnection,
       post,
+      postStatus,
       user.userData?.userUuid,
       setOptions,
       sortOptions,
     ]);
-
-    useEffect(() => {
-      const makeVoteAfterStripeRedirect = async () => {
-        if (!stripeSetupIntentClientSecret) return;
-
-        if (!user._persist?.rehydrated) {
-          return;
-        }
-
-        if (!user.loggedIn) {
-          router.push(
-            `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
-          );
-          return;
-        }
-
-        Mixpanel.track('MakeVoteAfterStripeRedirect', {
-          _stage: 'Post',
-          _postUuid: post.postUuid,
-          _component: 'PostViewMC',
-        });
-
-        try {
-          setLoadingModalOpen(true);
-
-          const stripeContributionRequest =
-            new newnewapi.StripeContributionRequest({
-              stripeSetupIntentClientSecret,
-              ...(saveCard !== undefined
-                ? {
-                    saveCard,
-                  }
-                : {}),
-            });
-
-          resetSetupIntentClientSecret();
-
-          const res = await voteOnPost(stripeContributionRequest);
-
-          if (
-            !res.data ||
-            res.error ||
-            res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
-          ) {
-            throw new Error(
-              res.error?.message ??
-                t(getPayWithCardErrorMessage(res.data?.status))
-            );
-          }
-
-          const optionFromResponse = res.data
-            .option as newnewapi.MultipleChoice.Option;
-          optionFromResponse.isSupportedByMe = true;
-          handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
-          await fetchPostLatestData();
-
-          setLoadingModalOpen(false);
-          handleResetFreeVote();
-          setPaymentSuccessModalOpen(true);
-        } catch (err: any) {
-          console.error(err);
-          toast.error(err.message);
-          setLoadingModalOpen(false);
-        }
-      };
-
-      if (stripeSetupIntentClientSecret && !loadingModalOpen) {
-        makeVoteAfterStripeRedirect();
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user._persist?.rehydrated]);
 
     const goToNextStep = () => {
       if (
@@ -656,12 +551,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
         );
       }
     };
-
-    useEffect(() => {
-      if (loadingOptionsError) {
-        toast.error(loadingOptionsError);
-      }
-    }, [loadingOptionsError]);
 
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     useEffect(() => {
@@ -724,10 +613,24 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
                 style={{
                   gridArea: 'closeBtnMobile',
                 }}
-                onClick={handleGoBack}
+                onClick={handleGoBackInsidePost}
               />
             )}
-            {postStatus === 'voting' ? (
+            {postStatus === 'waiting_for_response' ? (
+              <ResponseTimer
+                timestampSeconds={new Date(
+                  (post.responseUploadDeadline?.seconds as number) * 1000
+                ).getTime()}
+                onTimeExpired={handleOnResponseTimeExpired}
+              />
+            ) : Date.now() > (post.expiresAt?.seconds as number) * 1000 ? (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='mc'
+              />
+            ) : (
               <PostTimer
                 timestampSeconds={new Date(
                   (post.expiresAt?.seconds as number) * 1000
@@ -735,113 +638,93 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
                 postType='mc'
                 onTimeExpired={handleOnVotingTimeExpired}
               />
-            ) : (
-              <PostTimerEnded
-                timestampSeconds={new Date(
-                  (post.expiresAt?.seconds as number) * 1000
-                ).getTime()}
-                postType='mc'
-              />
             )}
           </SExpiresSection>
-          <PostVideo
+          <PostVideoModeration
+            key={`key_${announcement?.coverImageUrl}`}
             postId={post.postUuid}
-            announcement={post.announcement!!}
-            response={post.response ?? undefined}
-            responseViewed={responseViewed}
-            handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
-            isMuted={mutedMode}
-            handleToggleMuted={() => handleToggleMutedMode()}
-          />
-          <PostTopInfo
-            postType='mc'
-            postId={post.postUuid}
+            announcement={announcement!!}
+            response={(post.response || responseFreshlyUploaded) ?? undefined}
+            thumbnails={{
+              startTime: 1,
+              endTime: 3,
+            }}
             postStatus={postStatus}
-            title={post.title}
+            isMuted={mutedMode}
+            openedTab={openedTab}
+            responseFileProcessingETA={responseFileProcessingETA}
+            responseFileProcessingError={responseFileProcessingError}
+            responseFileProcessingLoading={responseFileProcessingLoading}
+            responseFileProcessingProgress={responseFileProcessingProgress}
+            responseFileUploadETA={responseFileUploadETA}
+            responseFileUploadError={responseFileUploadError}
+            responseFileUploadLoading={responseFileUploadLoading}
+            responseFileUploadProgress={responseFileUploadProgress}
+            uploadedResponseVideoUrl={uploadedResponseVideoUrl}
+            videoProcessing={videoProcessing}
+            handleChangeTab={(newValue) => setOpenedTab(newValue)}
+            handleToggleMuted={() => handleToggleMutedMode()}
+            handleUpdateResponseVideo={(newValue) =>
+              setResponseFreshlyUploaded(newValue)
+            }
+            handleUpdatePostStatus={handleUpdatePostStatus}
+            handleCancelVideoUpload={handleCancelVideoUpload}
+            handleItemChange={handleItemChange}
+            handleResetVideoUploadAndProcessingState={
+              handleResetVideoUploadAndProcessingState
+            }
+            handleUploadVideoNotProcessed={handleUploadVideoNotProcessed}
+            handleUploadVideoProcessed={handleUploadVideoProcessed}
+            handleVideoDelete={handleVideoDelete}
+          />
+          <PostTopInfoModeration
             totalVotes={totalVotes}
             hasWinner={false}
-            creator={post.creator!!}
-            isFollowingDecision={isFollowingDecision}
-            hasRecommendations={hasRecommendations}
-            handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-            handleReportOpen={handleReportOpen}
-            handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited}
-            handleAddPostToStateFavorited={handleAddPostToStateFavorited}
+            hidden={openedTab === 'response'}
           />
-          <SActivitesContainer
-            shorterSection={
-              postStatus === 'failed' ||
-              (post.isSuggestionsAllowed &&
-                !hasVotedOptionId &&
-                hasFreeVote &&
-                postStatus === 'voting')
-            }
-          >
-            <PostVotingTab>
-              {`${t('tabs.options')} ${
-                !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
-              }`}
-            </PostVotingTab>
-            <McOptionsTab
-              post={post}
-              postLoading={postLoading}
-              postStatus={postStatus}
-              postCreator={
-                (post.creator?.nickname as string) ?? post.creator?.username
-              }
-              postDeadline={moment(
-                (post.responseUploadDeadline?.seconds as number) * 1000
-              )
-                .subtract(3, 'days')
-                .calendar()}
-              options={options}
-              optionsLoading={optionsLoading}
-              pagingToken={optionsNextPageToken}
-              minAmount={appConstants?.minMcVotes ?? 2}
-              votePrice={
-                appConstants?.mcVotePrice
-                  ? Math.floor(appConstants?.mcVotePrice)
-                  : 1
-              }
-              canSubscribe={!!canSubscribe}
-              canVoteForFree={hasFreeVote}
-              hasVotedOptionId={(hasVotedOptionId as number) ?? undefined}
-              handleLoadOptions={fetchOptions}
-              handleResetFreeVote={handleResetFreeVote}
-              handleAddOrUpdateOptionFromResponse={
-                handleAddOrUpdateOptionFromResponse
-              }
-              handleRemoveOption={handleRemoveOption}
-            />
+          <SActivitesContainer decisionFailed={postStatus === 'failed'}>
+            {openedTab === 'announcement' ? (
+              <>
+                <PostVotingTab>
+                  {`${t('tabs.options')} ${
+                    !!numberOfOptions && numberOfOptions > 0
+                      ? numberOfOptions
+                      : ''
+                  }`}
+                </PostVotingTab>
+                <McOptionsTabModeration
+                  post={post}
+                  options={options}
+                  optionsLoading={optionsLoading}
+                  pagingToken={optionsNextPageToken}
+                  winningOptionId={(winningOption?.id as number) ?? undefined}
+                  handleLoadOptions={fetchOptions}
+                  handleRemoveOption={handleRemoveOption}
+                />
+              </>
+            ) : (
+              <PostResponseTabModeration
+                postId={post.postUuid}
+                postType='mc'
+                postStatus={postStatus}
+                postTitle={post.title}
+                responseUploading={responseUploading}
+                responseReadyToBeUploaded={
+                  !!uploadedResponseVideoUrl &&
+                  !responseFileUploadLoading &&
+                  !responseFileProcessingLoading
+                }
+                responseUploadSuccess={responseUploadSuccess}
+                winningOptionMc={winningOption}
+                handleUploadResponse={handleUploadVideoProcessed}
+              />
+            )}
           </SActivitesContainer>
           {/* Loading Modal */}
           {loadingModalOpen && (
             <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
           )}
-          {/* Payment success Modal */}
-          {paymentSuccessModalOpen && (
-            <PaymentSuccessModal
-              postType='mc'
-              isVisible={paymentSuccessModalOpen}
-              closeModal={() => {
-                Mixpanel.track('Close Payment Success Modal', {
-                  _stage: 'Post',
-                  _post: post.postUuid,
-                });
-                setPaymentSuccessModalOpen(false);
-              }}
-            >
-              {t('paymentSuccessModal.mc', {
-                postCreator:
-                  (post.creator?.nickname as string) ?? post.creator?.username,
-                postDeadline: moment(
-                  (post.responseUploadDeadline?.seconds as number) * 1000
-                )
-                  .subtract(3, 'days')
-                  .calendar(),
-              })}
-            </PaymentSuccessModal>
-          )}
+
           {isPopupVisible && (
             <HeroPopup
               isPopupVisible={isPopupVisible}
@@ -868,11 +751,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
   }
 );
 
-PostViewMC.defaultProps = {
-  stripeSetupIntentClientSecret: undefined,
-};
+PostModerationMC.defaultProps = {};
 
-export default PostViewMC;
+export default PostModerationMC;
 
 const SWrapper = styled.div`
   width: 100%;
@@ -880,8 +761,6 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 648px;
-
     display: grid;
     grid-template-areas:
       'expires expires'
@@ -931,7 +810,7 @@ const SGoBackButton = styled(GoBackButton)`
 `;
 
 const SActivitesContainer = styled.div<{
-  shorterSection: boolean;
+  decisionFailed: boolean;
 }>`
   grid-area: activities;
 
@@ -944,14 +823,21 @@ const SActivitesContainer = styled.div<{
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    max-height: calc(452px);
+    ${({ decisionFailed }) =>
+      !decisionFailed
+        ? css`
+            max-height: 500px;
+          `
+        : css`
+            max-height: 500px;
+          `}
   }
 
   ${({ theme }) => theme.media.laptop} {
-    ${({ shorterSection }) =>
-      !shorterSection
+    ${({ decisionFailed }) =>
+      !decisionFailed
         ? css`
-            max-height: 500px;
+            max-height: unset;
           `
         : css`
             max-height: calc(580px - 120px);

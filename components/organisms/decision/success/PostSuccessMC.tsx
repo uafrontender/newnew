@@ -12,34 +12,40 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-import { fetchAcOptionById } from '../../../api/endpoints/auction';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
+import { getMcOption } from '../../../../api/endpoints/multiple_choice';
 
 // Utils
-import Headline from '../../atoms/Headline';
-import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
-import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
+import Headline from '../../../atoms/Headline';
+import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
 
-import { formatNumber } from '../../../utils/format';
-import getDisplayname from '../../../utils/getDisplayname';
-import assets from '../../../constants/assets';
-import { fetchPostByUUID } from '../../../api/endpoints/post';
-import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import PostTitleContent from '../../atoms/PostTitleContent';
+import { formatNumber } from '../../../../utils/format';
+import getDisplayname from '../../../../utils/getDisplayname';
+import assets from '../../../../constants/assets';
+import { fetchPostByUUID } from '../../../../api/endpoints/post';
+import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
+import PostTitleContent from '../../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
-const AcSuccessOptionsTab = dynamic(
-  () => import('../../molecules/decision/auction/success/AcSuccessOptionsTab')
+const McSuccessOptionsTab = dynamic(
+  () =>
+    import(
+      '../../../molecules/decision/multiple_choice/success/McSuccessOptionsTab'
+    )
 );
 const CommentsBottomSection = dynamic(
-  () => import('../../molecules/decision/success/CommentsBottomSection')
+  () => import('../../../molecules/decision/success/CommentsBottomSection')
+);
+const DecisionEndedBox = dynamic(
+  () => import('../../../molecules/decision/success/DecisionEndedBox')
 );
 
-interface IPostSuccessAC {
-  post: newnewapi.Auction;
+interface IPostSuccessMC {
+  post: newnewapi.MultipleChoice;
 }
 
-const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
+const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
   ({ post }) => {
     const { t } = useTranslation('modal-Post');
     const theme = useTheme();
@@ -54,13 +60,15 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     // Winninfg option
-    const [winningOption, setWinningOption] =
-      useState<newnewapi.Auction.Option | undefined>();
+    const [winningOption, setWinningOption] = useState<
+      newnewapi.MultipleChoice.Option | undefined
+    >();
 
     // Video
     // Open video tab
-    const [videoTab, setVideoTab] =
-      useState<'announcement' | 'response'>('announcement');
+    const [videoTab, setVideoTab] = useState<'announcement' | 'response'>(
+      'announcement'
+    );
     // Response viewed
     const [responseViewed, setResponseViewed] = useState(
       post.isResponseViewedByMe ?? false
@@ -76,7 +84,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
 
-        if (res.data.auction?.isResponseViewedByMe) {
+        if (res.data.multipleChoice?.isResponseViewedByMe) {
           setResponseViewed(true);
         }
       } catch (err) {
@@ -90,9 +98,10 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
       dispatch(toggleMutedMode(''));
     }, [dispatch]);
 
-    // Main screen vs all bids
-    const [openedMainSection, setOpenedMainSection] =
-      useState<'main' | 'bids'>('main');
+    // Main screen vs all options
+    const [openedMainSection, setOpenedMainSection] = useState<
+      'main' | 'options'
+    >('main');
 
     // Comments
     const { ref: commentsSectionRef, inView } = useInView({
@@ -112,7 +121,6 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
         if (!hash) {
           return;
         }
-
         const parsedHash = hash.substring(1);
 
         if (parsedHash === 'comments') {
@@ -147,14 +155,18 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     useEffect(() => {
       async function fetchAndSetWinningOption(id: number) {
         try {
-          const payload = new newnewapi.GetAcOptionRequest({
+          const payload = new newnewapi.GetMcOptionRequest({
             optionId: id,
           });
 
-          const res = await fetchAcOptionById(payload);
+          const res = await getMcOption(payload);
+
+          console.log(res);
 
           if (res.data?.option) {
-            setWinningOption(res.data.option as newnewapi.Auction.Option);
+            setWinningOption(
+              res.data.option as newnewapi.MultipleChoice.Option
+            );
           }
         } catch (err) {
           console.log(err);
@@ -184,13 +196,14 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
             {openedMainSection === 'main' ? (
               <>
                 <DecisionEndedBox
+                  type='mc'
                   imgSrc={
                     theme.name === 'light'
-                      ? assets.creation.lightAcAnimated
-                      : assets.creation.darkAcAnimated
+                      ? assets.creation.lightMcAnimated
+                      : assets.creation.darkMcAnimated
                   }
                 >
-                  {t('acPostSuccess.heroText')}
+                  {t('mcPostSuccess.heroText')}
                 </DecisionEndedBox>
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>
@@ -200,21 +213,16 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                       </a>
                       <a href={`/${post.creator?.username}`}>
                         <SWantsToKnow>
-                          {t('acPostSuccess.wantsToKnow', {
+                          {t('mcPostSuccess.wantsToKnow', {
                             creator: post.creator?.nickname,
                           })}
                         </SWantsToKnow>
                       </a>
                     </SCreator>
-                    {post.totalAmount?.usdCents && (
-                      <STotal>
-                        {`$${formatNumber(
-                          post.totalAmount.usdCents / 100 ?? 0,
-                          true
-                        )}`}{' '}
-                        <span>{t('acPostSuccess.inTotalBids')}</span>
-                      </STotal>
-                    )}
+                    <STotal>
+                      {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
+                      <span>{t('mcPostSuccess.inTotalVotes')}</span>
+                    </STotal>
                   </SCreatorInfoDiv>
                   <SPostTitle variant={4}>
                     <PostTitleContent>{post.title}</PostTitleContent>
@@ -224,23 +232,44 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                     <>
                       <SWinningBidCreator>
                         <SCreator>
-                          <Link href={`/${winningOption.creator?.username}`}>
+                          <Link
+                            href={`/${
+                              winningOption.creator?.uuid !== post.creator?.uuid
+                                ? winningOption.creator?.username!!
+                                : winningOption.firstVoter?.username!!
+                            }`}
+                          >
                             <SCreatorImage
-                              src={winningOption.creator?.avatarUrl ?? ''}
+                              src={
+                                winningOption.creator?.uuid !==
+                                post.creator?.uuid
+                                  ? winningOption.creator?.avatarUrl!!
+                                  : winningOption.firstVoter?.avatarUrl!!
+                              }
                             />
                           </Link>
                           <SWinningBidCreatorText>
                             <SSpan>
                               <Link
-                                href={`/${winningOption.creator?.username}`}
+                                href={`/${
+                                  winningOption.creator?.uuid !==
+                                  post.creator?.uuid
+                                    ? winningOption.creator?.username!!
+                                    : winningOption.firstVoter?.username!!
+                                }`}
                               >
                                 {winningOption.creator?.uuid ===
                                   user.userData?.userUuid ||
                                 winningOption.isSupportedByMe
                                   ? winningOption.supporterCount > 1
                                     ? t('me')
-                                    : t('my')
-                                  : getDisplayname(winningOption.creator!!)}
+                                    : t('I')
+                                  : getDisplayname(
+                                      winningOption.creator?.uuid !==
+                                        post.creator?.uuid
+                                        ? winningOption.creator!!
+                                        : winningOption.firstVoter!!
+                                    )}
                               </Link>
                             </SSpan>
                             {winningOption.supporterCount > 1 ? (
@@ -250,33 +279,38 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                                   winningOption.supporterCount,
                                   true
                                 )}{' '}
-                                {t('acPostSuccess.others')}
+                                {t('mcPostSuccess.others')}
                               </>
                             ) : null}{' '}
-                            {t('acPostSuccess.bid')}
+                            {t('mcPostSuccess.voted')}
                           </SWinningBidCreatorText>
                         </SCreator>
                       </SWinningBidCreator>
-                      {winningOption.totalAmount?.usdCents && (
-                        <SWinningOptionAmount variant={4}>
-                          {`$${formatNumber(
-                            winningOption.totalAmount.usdCents / 100 ?? 0,
-                            true
-                          )}`}
-                        </SWinningOptionAmount>
-                      )}
+                      <SWinningOptionAmount variant={4}>
+                        {`${formatNumber(winningOption.voteCount ?? 0, true)}`}{' '}
+                        {winningOption.voteCount > 1
+                          ? t('mcPostSuccess.votes')
+                          : t('mcPostSuccess.vote')}
+                      </SWinningOptionAmount>
                       <SSeparator />
                       <SWinningOptionDetails>
                         <SWinningOptionDetailsBidChosen>
-                          {t('acPostSuccess.bidChosen')}
+                          {t('mcPostSuccess.optionChosen')}
                         </SWinningOptionDetailsBidChosen>
                         <SWinningOptionDetailsSeeAll
-                          onClick={() => setOpenedMainSection('bids')}
+                          onClickCapture={() => {
+                            Mixpanel.track('Winning Option Details See All', {
+                              _stage: 'Post',
+                              _postUuid: post.postUuid,
+                              _component: 'PostSuccessMC',
+                            });
+                          }}
+                          onClick={() => setOpenedMainSection('options')}
                         >
-                          {t('acPostSuccess.seeAll')}
+                          {t('mcPostSuccess.seeAll')}
                         </SWinningOptionDetailsSeeAll>
                         <SWinningOptionDetailsTitle variant={4}>
-                          {winningOption.title}
+                          {winningOption.text}
                         </SWinningOptionDetailsTitle>
                       </SWinningOptionDetails>
                     </>
@@ -288,6 +322,13 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                       <SWatchResponseWrapper>
                         <SWatchResponseBtn
                           shouldView={!responseViewed}
+                          onClickCapture={() => {
+                            Mixpanel.track('Watch Response', {
+                              _stage: 'Post',
+                              _postUuid: post.postUuid,
+                              _component: 'PostSuccessMC',
+                            });
+                          }}
                           onClick={() => setVideoTab('response')}
                         >
                           {t('postVideoSuccess.tabs.watchResponseFirstTime')}
@@ -298,12 +339,26 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                       <SToggleVideoWidget>
                         <SChangeTabBtn
                           shouldView={videoTab === 'announcement'}
+                          onClickCapture={() => {
+                            Mixpanel.track('Set Tab Announcement', {
+                              _stage: 'Post',
+                              _postUuid: post.postUuid,
+                              _component: 'PostSuccessMC',
+                            });
+                          }}
                           onClick={() => setVideoTab('announcement')}
                         >
                           {t('postVideoSuccess.tabs.watchOriginal')}
                         </SChangeTabBtn>
                         <SChangeTabBtn
                           shouldView={videoTab === 'response'}
+                          onClickCapture={() => {
+                            Mixpanel.track('Set Tab Response', {
+                              _stage: 'Post',
+                              _postUuid: post.postUuid,
+                              _component: 'PostSuccessMC',
+                            });
+                          }}
                           onClick={() => setVideoTab('response')}
                         >
                           {t('postVideoSuccess.tabs.watchResponse')}
@@ -314,9 +369,16 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                 ) : null}
               </>
             ) : (
-              <AcSuccessOptionsTab
+              <McSuccessOptionsTab
                 post={post}
-                handleGoBack={() => setOpenedMainSection('main')}
+                handleGoBack={() => {
+                  Mixpanel.track('Go Back', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'PostSuccessMC',
+                  });
+                  setOpenedMainSection('main');
+                }}
               />
             )}
           </SActivitesContainer>
@@ -337,7 +399,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
   }
 );
 
-export default PostSuccessAC;
+export default PostSuccessMC;
 
 const SWrapper = styled.div`
   width: 100%;
