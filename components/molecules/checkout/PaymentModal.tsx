@@ -1,7 +1,3 @@
-/* eslint-disable react/jsx-no-target-blank */
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -22,11 +18,15 @@ import logoAnimation from '../../../public/animations/mobile_logo.json';
 interface IPaymentModal {
   isOpen: boolean;
   zIndex: number;
+  redirectUrl: string;
   amount?: number;
+  noRewards?: boolean;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
-  noRewards?: boolean;
   onClose: () => void;
+  createStripeSetupIntent?: () => Promise<
+    newnewapi.CreateStripeSetupIntentResponse | undefined
+  >;
   handlePayWithCard?: (params: {
     rewardAmount: number;
     cardUuid?: string;
@@ -34,36 +34,32 @@ interface IPaymentModal {
     saveCard?: boolean;
   }) => void;
   children: React.ReactNode;
-  createStripeSetupIntent?: () => Promise<
-    newnewapi.CreateStripeSetupIntentResponse | undefined
-  >;
-  redirectUrl: string;
 }
 
 const PaymentModal: React.FC<IPaymentModal> = ({
   isOpen,
   zIndex,
+  redirectUrl,
   amount,
+  noRewards,
   showTocApply,
   bottomCaption,
-  noRewards,
   onClose,
+  createStripeSetupIntent,
   handlePayWithCard,
   children,
-  createStripeSetupIntent,
-  redirectUrl,
 }) => {
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const { isCardsLoading } = useCards();
 
   const [stripeSetupIntent, setStripeSetupIntent] =
     useState<newnewapi.CreateStripeSetupIntentResponse>();
 
   const [isLoadingSetupIntent, setIsLoadingSetupIntent] = useState(false);
+  const { isCardsLoading } = useCards();
 
   useEffect(() => {
     const getSetupIntent = async () => {
@@ -89,8 +85,9 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             e.stopPropagation();
           }}
         >
-          {isMobile && <SGoBackButton onClick={() => onClose()} />}
-          {!isMobile && (
+          {isMobile ? (
+            <SGoBackButton onClick={() => onClose()} />
+          ) : (
             <SCloseButton onClick={() => onClose()}>
               <InlineSvg
                 svg={CancelIcon}
@@ -118,12 +115,13 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             }
           >
             <CheckoutForm
-              bottomCaption={bottomCaption}
-              amount={amount}
-              handlePayWithCard={handlePayWithCard}
               stipeSecret={stripeSetupIntent?.stripeSetupIntentClientSecret!}
               redirectUrl={redirectUrl}
+              amount={amount}
               noRewards={noRewards}
+              showTocApply={showTocApply ?? false}
+              bottomCaption={bottomCaption}
+              handlePayWithCard={handlePayWithCard}
             />
           </StripeElements>
         </SContentContainer>
