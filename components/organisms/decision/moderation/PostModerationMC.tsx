@@ -33,13 +33,13 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 
-import PostVideoModeration from '../../../molecules/decision/PostVideoModeration';
-import PostTopInfoModeration from '../../../molecules/decision/PostTopInfoModeration';
+import PostVideoModeration from '../../../molecules/decision/moderation/PostVideoModeration';
+import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTopInfoModeration';
 import Headline from '../../../atoms/Headline';
-import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
+import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
 import PostVotingTab from '../../../molecules/decision/PostVotingTab';
 import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
-import PostResponseTabModeration from '../../../molecules/decision/PostResponseTabModeration';
+import PostResponseTabModeration from '../../../molecules/decision/moderation/PostResponseTabModeration';
 
 import useResponseUpload from '../../../../utils/hooks/useResponseUpload';
 import { Mixpanel } from '../../../../utils/mixpanel';
@@ -59,7 +59,7 @@ const PostTimer = dynamic(
 const McOptionsTabModeration = dynamic(
   () =>
     import(
-      '../../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration'
+      '../../../molecules/decision/moderation/multiple_choice/McOptionsTabModeration'
     )
 );
 

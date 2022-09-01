@@ -27,7 +27,7 @@ const PostTopInfo = dynamic(
   () => import('../../../molecules/decision/PostTopInfo')
 );
 const PostTopInfoModeration = dynamic(
-  () => import('../../../molecules/decision/PostTopInfoModeration')
+  () => import('../../../molecules/decision/moderation/PostTopInfoModeration')
 );
 
 interface IPostViewScheduled {

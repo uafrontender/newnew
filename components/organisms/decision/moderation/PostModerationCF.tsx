@@ -27,11 +27,11 @@ import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import Text from '../../../atoms/Text';
 import Headline from '../../../atoms/Headline';
 import PostVotingTab from '../../../molecules/decision/PostVotingTab';
-import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
-import PostVideoModeration from '../../../molecules/decision/PostVideoModeration';
-import PostTopInfoModeration from '../../../molecules/decision/PostTopInfoModeration';
+import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
+import PostVideoModeration from '../../../molecules/decision/moderation/PostVideoModeration';
+import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTopInfoModeration';
 import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
-import PostResponseTabModeration from '../../../molecules/decision/PostResponseTabModeration';
+import PostResponseTabModeration from '../../../molecules/decision/moderation/PostResponseTabModeration';
 
 import switchPostStatus, {
   TPostStatusStringified,
@@ -54,19 +54,19 @@ const PostTimer = dynamic(
 const CfBackersStatsSectionModeration = dynamic(
   () =>
     import(
-      '../../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModeration'
+      '../../../molecules/decision/moderation/crowdfunding/CfBackersStatsSectionModeration'
     )
 );
 const CfCrowdfundingSuccessModeration = dynamic(
   () =>
     import(
-      '../../../molecules/decision/crowdfunding/moderation/CfCrowdfundingSuccessModeration'
+      '../../../molecules/decision/moderation/crowdfunding/CfCrowdfundingSuccessModeration'
     )
 );
 const CfBackersStatsSectionModerationFailed = dynamic(
   () =>
     import(
-      '../../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModerationFailed'
+      '../../../molecules/decision/moderation/crowdfunding/CfBackersStatsSectionModerationFailed'
     )
 );
 const HeroPopup = dynamic(

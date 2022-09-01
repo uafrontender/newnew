@@ -12,7 +12,7 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import Modal from '../Modal';
 import ModerationView from './moderation';
-import PostModerationControls from '../../molecules/decision/PostModerationControls';
+import PostModerationControls from '../../molecules/decision/moderation/PostModerationControls';
 import PostSuccessAnimationBackground from '../../molecules/decision/PostSuccessAnimationBackground';
 
 // Icons

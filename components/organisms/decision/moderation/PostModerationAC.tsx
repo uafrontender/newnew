@@ -27,11 +27,11 @@ import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 
 import Headline from '../../../atoms/Headline';
 import PostVotingTab from '../../../molecules/decision/PostVotingTab';
-import PostTopInfoModeration from '../../../molecules/decision/PostTopInfoModeration';
-import PostVideoModeration from '../../../molecules/decision/PostVideoModeration';
-import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
+import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTopInfoModeration';
+import PostVideoModeration from '../../../molecules/decision/moderation/PostVideoModeration';
+import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
 import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
-import PostResponseTabModeration from '../../../molecules/decision/PostResponseTabModeration';
+import PostResponseTabModeration from '../../../molecules/decision/moderation/PostResponseTabModeration';
 
 import switchPostType from '../../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../../api/endpoints/post';
@@ -53,7 +53,7 @@ const PostTimer = dynamic(
 const AcOptionsTabModeration = dynamic(
   () =>
     import(
-      '../../../molecules/decision/auction/moderation/AcOptionsTabModeration'
+      '../../../molecules/decision/moderation/auction/AcOptionsTabModeration'
     )
 );
 const HeroPopup = dynamic(

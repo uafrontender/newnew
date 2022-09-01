@@ -36,7 +36,7 @@ import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
 import switchPostType from '../../../../utils/switchPostType';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
-import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
+import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
 import Headline from '../../../atoms/Headline';
 import PostVotingTab from '../../../molecules/decision/PostVotingTab';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
@@ -45,7 +45,7 @@ import { usePostModalInnerState } from '../../../../contexts/postModalInnerConte
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
-  () => import('../../../molecules/decision/auction/AcOptionsTab')
+  () => import('../../../molecules/decision/regular/auction/AcOptionsTab')
 );
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
 const PaymentSuccessModal = dynamic(

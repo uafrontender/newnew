@@ -36,8 +36,8 @@ import PostTopInfo from '../../../molecules/decision/PostTopInfo';
 import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
 import Headline from '../../../atoms/Headline';
 import PostVotingTab from '../../../molecules/decision/PostVotingTab';
-import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
-import CfBackersStatsSectionFailed from '../../../molecules/decision/crowdfunding/CfBackersStatsSectionFailed';
+import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
+import CfBackersStatsSectionFailed from '../../../molecules/decision/regular/crowdfunding/CfBackersStatsSectionFailed';
 
 // Utils
 import switchPostType from '../../../../utils/switchPostType';
@@ -62,22 +62,34 @@ const TutorialTooltip = dynamic(
   () => import('../../../atoms/decision/TutorialTooltip')
 );
 const PostSuccessBox = dynamic(
-  () => import('../../../molecules/decision/PostSuccessBox')
+  () => import('../../../molecules/decision/success/PostSuccessBox')
 );
 const PostWaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/PostWaitingForResponseBox')
 );
 const CfPledgeLevelsModal = dynamic(
-  () => import('../../../molecules/decision/crowdfunding/CfPledgeLevelsModal')
+  () =>
+    import(
+      '../../../molecules/decision/regular/crowdfunding/CfPledgeLevelsModal'
+    )
 );
 const CfPledgeLevelsSection = dynamic(
-  () => import('../../../molecules/decision/crowdfunding/CfPledgeLevelsSection')
+  () =>
+    import(
+      '../../../molecules/decision/regular/crowdfunding/CfPledgeLevelsSection'
+    )
 );
 const CfBackersStatsSection = dynamic(
-  () => import('../../../molecules/decision/crowdfunding/CfBackersStatsSection')
+  () =>
+    import(
+      '../../../molecules/decision/regular/crowdfunding/CfBackersStatsSection'
+    )
 );
 const CfCrowdfundingSuccess = dynamic(
-  () => import('../../../molecules/decision/crowdfunding/CfCrowdfundingSuccess')
+  () =>
+    import(
+      '../../../molecules/decision/regular/crowdfunding/CfCrowdfundingSuccess'
+    )
 );
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {

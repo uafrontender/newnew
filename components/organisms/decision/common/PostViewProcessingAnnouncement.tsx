@@ -12,7 +12,7 @@ import { ChannelsContext } from '../../../../contexts/channelsContext';
 
 import Text from '../../../atoms/Text';
 import PostTopInfo from '../../../molecules/decision/PostTopInfo';
-import PostTopInfoModeration from '../../../molecules/decision/PostTopInfoModeration';
+import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTopInfoModeration';
 import PostVideoProcessingHolder from '../../../molecules/decision/PostVideoProcessingHolder';
 
 import assets from '../../../../constants/assets';
