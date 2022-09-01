@@ -66,11 +66,13 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
   const hasNoResults = data.length === 0 && !hasMore;
 
   if (hasNoResults) {
-    <div>
-      <SNoResults>
-        <NoResults />
-      </SNoResults>
-    </div>;
+    return (
+      <div>
+        <SNoResults>
+          <NoResults />
+        </SNoResults>
+      </div>
+    );
   }
 
   return (

@@ -133,10 +133,14 @@ export const Rewards = () => {
               )}
               $
               {!user.loggedIn
-                ? formatNumber(currentSignupRewardAmount?.usdCents ?? 0)
-                : isRewardBalanceLoading || !rewardBalance
+                ? formatNumber(
+                    currentSignupRewardAmount?.usdCents
+                      ? currentSignupRewardAmount.usdCents / 100
+                      : 0
+                  )
+                : isRewardBalanceLoading || !rewardBalance?.usdCents
                 ? formatNumber(0)
-                : formatNumber(rewardBalance.usdCents! / 100 ?? 0)}
+                : formatNumber(rewardBalance.usdCents / 100 ?? 0)}
             </BalanceValue>
             <SButton
               onClick={() => {
@@ -445,8 +449,9 @@ const InfoButton = styled.div`
   width: 17px;
   height: 17px;
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.5);
-  border-color: rgba(255, 255, 255, 0.5);
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  border-color: ${(props) => props.theme.colorsThemed.text.primary};
+  opacity: 0.5;
   border: 1px solid;
   border-radius: 100%;
   cursor: pointer;
