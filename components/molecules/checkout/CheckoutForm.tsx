@@ -32,7 +32,10 @@ enum PaymentMethodTypes {
 }
 
 interface ICheckoutForm {
+  stipeSecret: string;
+  redirectUrl: string;
   amount?: number;
+  noRewards?: boolean;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
   handlePayWithCard?: (params: {
@@ -41,46 +44,40 @@ interface ICheckoutForm {
     stripeSetupIntentClientSecret: string;
     saveCard?: boolean;
   }) => void;
-  stipeSecret: string;
-  redirectUrl: string;
-  noRewards?: boolean;
 }
 
 const CheckoutForm: React.FC<ICheckoutForm> = ({
-  handlePayWithCard,
-  amount,
-  showTocApply,
-  bottomCaption,
   stipeSecret,
   redirectUrl,
+  amount,
   noRewards,
+  showTocApply,
+  bottomCaption,
+  handlePayWithCard,
 }) => {
   const { t } = useTranslation('modal-PaymentModal');
-  const elements = useElements();
-  const stripe = useStripe();
-
   const { loggedIn } = useAppSelector((state) => state.user);
 
   const [isStripeReady, setIsStripeReady] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    PaymentMethodTypes | undefined
+  >();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [saveCard, setSaveCard] = useState(false);
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [useRewards, setUseRewards] = useState(false);
 
+  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
+  const elements = useElements();
   const { cards } = useCards();
+  const stripe = useStripe();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const primaryCard = useMemo(
     () => cards?.find((card) => card.isPrimary),
     [cards]
   );
-
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
-    PaymentMethodTypes | undefined
-  >();
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [saveCard, setSaveCard] = useState(false);
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
-  const [useRewards, setUseRewards] = useState(false);
 
   const rewardUsed =
     useRewards && rewardBalance?.usdCents && amount
@@ -92,10 +89,9 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     setEmailError('');
   };
 
-  const { executeRecaptcha } = useGoogleReCaptcha();
-
   const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     try {
       if (!stripe || !elements) {
         throw new Error('Stripe initialization error');
@@ -235,6 +231,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           )}
         </SPaymentFormWrapper>
       )}
+
       {!noRewards && (
         <RewardContainer>
           <RewardImage src={assets.decision.gold} alt='reward balance' />
@@ -254,6 +251,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           />
         </RewardContainer>
       )}
+
       <SPayButtonDiv>
         <SPayButton
           type='submit'

@@ -121,6 +121,11 @@ const SDescriptionWrapper = styled.div`
 
 const SDescription = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  text-align: center;
+
+  ${({ theme }) => theme.media.tablet} {
+    text-align: start;
+  }
 `;
 
 // const SLearnMore = styled.p`
