@@ -133,10 +133,14 @@ export const Rewards = () => {
               )}
               $
               {!user.loggedIn
-                ? formatNumber(currentSignupRewardAmount?.usdCents ?? 0)
-                : isRewardBalanceLoading || !rewardBalance
+                ? formatNumber(
+                    currentSignupRewardAmount?.usdCents
+                      ? currentSignupRewardAmount.usdCents / 100
+                      : 0
+                  )
+                : isRewardBalanceLoading || !rewardBalance?.usdCents
                 ? formatNumber(0)
-                : formatNumber(rewardBalance.usdCents! / 100 ?? 0)}
+                : formatNumber(rewardBalance.usdCents / 100 ?? 0)}
             </BalanceValue>
             <SButton
               onClick={() => {
