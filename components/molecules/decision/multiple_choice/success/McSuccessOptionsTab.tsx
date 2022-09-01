@@ -10,7 +10,7 @@ import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import GoBackButton from '../../../GoBackButton';
-import { TMcOptionWithHighestField } from '../../../../organisms/decision/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
 import { fetchCurrentOptionsForMCPost } from '../../../../../api/endpoints/multiple_choice';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import McOptionsCard from '../McOptionCard';

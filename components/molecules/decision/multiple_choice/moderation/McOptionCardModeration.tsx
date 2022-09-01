@@ -13,7 +13,7 @@ import { useTranslation } from 'next-i18next';
 import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../../redux-store/store';
-import { TMcOptionWithHighestField } from '../../../../organisms/decision/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';

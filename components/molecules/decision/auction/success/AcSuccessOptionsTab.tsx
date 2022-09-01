@@ -10,7 +10,7 @@ import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import GoBackButton from '../../../GoBackButton';
-import { TAcOptionWithHighestField } from '../../../../organisms/decision/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
 import { fetchCurrentBidsForPost } from '../../../../../api/endpoints/auction';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import AcOptionCard from '../AcOptionCard';
@@ -37,8 +37,9 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
 
   // Options
   const [options, setOptions] = useState<TAcOptionWithHighestField[]>([]);
-  const [optionsNextPageToken, setOptionsNextPageToken] =
-    useState<string | undefined | null>('');
+  const [optionsNextPageToken, setOptionsNextPageToken] = useState<
+    string | undefined | null
+  >('');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
 

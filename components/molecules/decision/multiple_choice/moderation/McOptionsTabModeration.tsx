@@ -11,7 +11,7 @@ import { useInView } from 'react-intersection-observer';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
-import { TMcOptionWithHighestField } from '../../../../organisms/decision/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
 
 import Button from '../../../../atoms/Button';
 import GradientMask from '../../../../atoms/GradientMask';
@@ -28,100 +28,101 @@ interface IMcOptionsTabModeration {
   handleRemoveOption: (optionToRemove: newnewapi.MultipleChoice.Option) => void;
 }
 
-const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
-  ({
-    post,
-    options,
-    optionsLoading,
-    pagingToken,
-    winningOptionId,
-    handleLoadOptions,
-    handleRemoveOption,
-  }) => {
-    const theme = useTheme();
-    const { t } = useTranslation('modal-Post');
-    const { resizeMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
-    // Infinite load
-    const { ref: loadingRef, inView } = useInView();
+const McOptionsTabModeration: React.FunctionComponent<
+  IMcOptionsTabModeration
+> = ({
+  post,
+  options,
+  optionsLoading,
+  pagingToken,
+  winningOptionId,
+  handleLoadOptions,
+  handleRemoveOption,
+}) => {
+  const theme = useTheme();
+  const { t } = useTranslation('modal-Post');
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  // Infinite load
+  const { ref: loadingRef, inView } = useInView();
 
-    const containerRef = useRef<HTMLDivElement>();
-    const { showTopGradient, showBottomGradient } =
-      useScrollGradients(containerRef);
+  const containerRef = useRef<HTMLDivElement>();
+  const { showTopGradient, showBottomGradient } =
+    useScrollGradients(containerRef);
 
-    useEffect(() => {
-      if (inView && !optionsLoading && pagingToken) {
-        handleLoadOptions(pagingToken);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, pagingToken, optionsLoading]);
+  useEffect(() => {
+    if (inView && !optionsLoading && pagingToken) {
+      handleLoadOptions(pagingToken);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, pagingToken, optionsLoading]);
 
-    return (
-      <>
-        <STabContainer
-          key='bids'
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+  return (
+    <>
+      <STabContainer
+        key='bids'
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <SBidsContainer
+          ref={(el) => {
+            containerRef.current = el!!;
+          }}
         >
-          <SBidsContainer
-            ref={(el) => {
-              containerRef.current = el!!;
-            }}
-          >
-            {!isMobile ? (
-              <>
-                <GradientMask
-                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                  positionTop
-                  active={showTopGradient}
-                />
-                <GradientMask
-                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                  positionBottom={0}
-                  active={showBottomGradient}
-                />
-              </>
-            ) : null}
-            {/* Seems like every option has a creator now. */}
-            {/* TODO: confirm, update types, remove unnecessary parameter 'creator'. */}
-            {options.map((option, i) => (
-              <McOptionCardModeration
-                index={i}
-                key={option.id.toString()}
-                option={option as TMcOptionWithHighestField}
-                creator={option.creator ?? post.creator!!}
-                canBeDeleted={options.length > 2}
-                isWinner={winningOptionId?.toString() === option.id.toString()}
-                isCreatorsBid={
-                  !option.creator || option.creator?.uuid === post.creator?.uuid
-                }
-                handleRemoveOption={() => handleRemoveOption(option)}
+          {!isMobile ? (
+            <>
+              <GradientMask
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+                positionTop
+                active={showTopGradient}
               />
-            ))}
-            {!isMobile ? (
-              <SLoaderDiv ref={loadingRef} />
-            ) : pagingToken ? (
-              <SLoadMoreBtn
-                onClickCapture={() => {
-                  Mixpanel.track('Click Load More', {
-                    _stage: 'Post',
-                    _postUuid: post.postUuid,
-                    _component: 'McOptionsTabModeration',
-                  });
-                }}
-                onClick={() => handleLoadOptions(pagingToken)}
-              >
-                {t('loadMoreButton')}
-              </SLoadMoreBtn>
-            ) : null}
-          </SBidsContainer>
-        </STabContainer>
-      </>
-    );
-  };
+              <GradientMask
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+                positionBottom={0}
+                active={showBottomGradient}
+              />
+            </>
+          ) : null}
+          {/* Seems like every option has a creator now. */}
+          {/* TODO: confirm, update types, remove unnecessary parameter 'creator'. */}
+          {options.map((option, i) => (
+            <McOptionCardModeration
+              index={i}
+              key={option.id.toString()}
+              option={option as TMcOptionWithHighestField}
+              creator={option.creator ?? post.creator!!}
+              canBeDeleted={options.length > 2}
+              isWinner={winningOptionId?.toString() === option.id.toString()}
+              isCreatorsBid={
+                !option.creator || option.creator?.uuid === post.creator?.uuid
+              }
+              handleRemoveOption={() => handleRemoveOption(option)}
+            />
+          ))}
+          {!isMobile ? (
+            <SLoaderDiv ref={loadingRef} />
+          ) : pagingToken ? (
+            <SLoadMoreBtn
+              onClickCapture={() => {
+                Mixpanel.track('Click Load More', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTabModeration',
+                });
+              }}
+              onClick={() => handleLoadOptions(pagingToken)}
+            >
+              {t('loadMoreButton')}
+            </SLoadMoreBtn>
+          ) : null}
+        </SBidsContainer>
+      </STabContainer>
+    </>
+  );
+};
 
 McOptionsTabModeration.defaultProps = {};
 

@@ -11,24 +11,24 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 
 // Utils
-import Headline from '../../atoms/Headline';
-import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
-import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
+import Headline from '../../../atoms/Headline';
+import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
+import DecisionEndedBox from '../../../molecules/decision/success/DecisionEndedBox';
 
-import { formatNumber } from '../../../utils/format';
-import { fetchPledges } from '../../../api/endpoints/crowdfunding';
-import assets from '../../../constants/assets';
-import { fetchPostByUUID } from '../../../api/endpoints/post';
-import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import PostTitleContent from '../../atoms/PostTitleContent';
-import { Mixpanel } from '../../../utils/mixpanel';
+import { formatNumber } from '../../../../utils/format';
+import { fetchPledges } from '../../../../api/endpoints/crowdfunding';
+import assets from '../../../../constants/assets';
+import { fetchPostByUUID } from '../../../../api/endpoints/post';
+import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
+import PostTitleContent from '../../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 const CommentsBottomSection = dynamic(
-  () => import('../../molecules/decision/success/CommentsBottomSection')
+  () => import('../../../molecules/decision/success/CommentsBottomSection')
 );
 
 interface IPostSuccessCF {
@@ -50,13 +50,15 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     // My pledge amount
-    const [myPledgeAmount, setMyPledgeAmount] =
-      useState<newnewapi.MoneyAmount | undefined>(undefined);
+    const [myPledgeAmount, setMyPledgeAmount] = useState<
+      newnewapi.MoneyAmount | undefined
+    >(undefined);
     const [pledges, setPledges] = useState<newnewapi.Crowdfunding.IPledge[]>(
       []
     );
-    const [pledgesNextPageToken, setPledgesNextPageToken] =
-      useState<string | undefined | null>('');
+    const [pledgesNextPageToken, setPledgesNextPageToken] = useState<
+      string | undefined | null
+    >('');
     const [pledgesLoading, setPledgesLoading] = useState(false);
     const [loadingPledgesError, setLoadingPledgesError] = useState('');
 
@@ -106,8 +108,9 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
 
     // Video
     // Open video tab
-    const [videoTab, setVideoTab] =
-      useState<'announcement' | 'response'>('announcement');
+    const [videoTab, setVideoTab] = useState<'announcement' | 'response'>(
+      'announcement'
+    );
     // Response viewed
     const [responseViewed, setResponseViewed] = useState(
       post.isResponseViewedByMe ?? false

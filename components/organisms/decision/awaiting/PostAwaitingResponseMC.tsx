@@ -1,115 +1,111 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-import { getMcOption } from '../../../api/endpoints/multiple_choice';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
+import { getMcOption } from '../../../../api/endpoints/multiple_choice';
 
 // Utils
-import Headline from '../../atoms/Headline';
-import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
+import Headline from '../../../atoms/Headline';
+import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
+import { formatNumber } from '../../../../utils/format';
+import getDisplayname from '../../../../utils/getDisplayname';
+import secondsToDHMS from '../../../../utils/secondsToDHMS';
+import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
+import PostTitleContent from '../../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
-import { formatNumber } from '../../../utils/format';
-import getDisplayname from '../../../utils/getDisplayname';
-import assets from '../../../constants/assets';
-import { fetchPostByUUID } from '../../../api/endpoints/post';
-import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import PostTitleContent from '../../atoms/PostTitleContent';
-import { Mixpanel } from '../../../utils/mixpanel';
-
+const WaitingForResponseBox = dynamic(
+  () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
+);
+const CommentsBottomSection = dynamic(
+  () => import('../../../molecules/decision/success/CommentsBottomSection')
+);
 const McSuccessOptionsTab = dynamic(
   () =>
     import(
-      '../../molecules/decision/multiple_choice/success/McSuccessOptionsTab'
+      '../../../molecules/decision/multiple_choice/success/McSuccessOptionsTab'
     )
 );
-const CommentsBottomSection = dynamic(
-  () => import('../../molecules/decision/success/CommentsBottomSection')
-);
-const DecisionEndedBox = dynamic(
-  () => import('../../molecules/decision/success/DecisionEndedBox')
-);
-
-interface IPostSuccessMC {
+interface IPostAwaitingResponseMC {
   post: newnewapi.MultipleChoice;
 }
 
-const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
-  ({ post }) => {
+const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
+  React.memo(({ post }) => {
     const { t } = useTranslation('modal-Post');
-    const theme = useTheme();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
-    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
+    const { mutedMode } = useAppSelector((state) => state.ui);
     const router = useRouter();
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
+    const waitingTime = useMemo(() => {
+      const end = (post.responseUploadDeadline?.seconds as number) * 1000;
+      const parsed = (end - Date.now()) / 1000;
+      const dhms = secondsToDHMS(parsed);
+
+      let countdownsrt = `${dhms.days} ${t(
+        'acPostAwaiting.hero.expires.days'
+      )} ${dhms.hours} ${t('acPostAwaiting.hero.expires.hours')}`;
+
+      if (dhms.days === '0') {
+        countdownsrt = `${dhms.hours} ${t(
+          'acPostAwaiting.hero.expires.hours'
+        )} ${dhms.minutes} ${t('acPostAwaiting.hero.expires.minutes')}`;
+        if (dhms.hours === '0') {
+          countdownsrt = `${dhms.minutes} ${t(
+            'acPostAwaiting.hero.expires.minutes'
+          )} ${dhms.seconds} ${t('acPostAwaiting.hero.expires.seconds')}`;
+          if (dhms.minutes === '0') {
+            countdownsrt = `${dhms.seconds} ${t(
+              'acPostAwaiting.hero.expires.seconds'
+            )}`;
+          }
+        }
+      }
+      countdownsrt = `${countdownsrt} `;
+      return countdownsrt;
+    }, [post.responseUploadDeadline?.seconds, t]);
+
     // Winninfg option
-    const [winningOption, setWinningOption] =
-      useState<newnewapi.MultipleChoice.Option | undefined>();
+    const [winningOption, setWinningOption] = useState<
+      newnewapi.MultipleChoice.Option | undefined
+    >();
 
     // Video
     // Open video tab
-    const [videoTab, setVideoTab] =
-      useState<'announcement' | 'response'>('announcement');
+    const [videoTab, setVideoTab] = useState<'announcement' | 'response'>(
+      'announcement'
+    );
     // Response viewed
     const [responseViewed, setResponseViewed] = useState(
       post.isResponseViewedByMe ?? false
     );
-    const fetchPostLatestData = useCallback(async () => {
-      try {
-        const fetchPostPayload = new newnewapi.GetPostRequest({
-          postUuid: post.postUuid,
-        });
-
-        const res = await fetchPostByUUID(fetchPostPayload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (res.data.multipleChoice?.isResponseViewedByMe) {
-          setResponseViewed(true);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     // Muted mode
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
     }, [dispatch]);
 
     // Main screen vs all options
-    const [openedMainSection, setOpenedMainSection] =
-      useState<'main' | 'options'>('main');
+    const [openedMainSection, setOpenedMainSection] = useState<
+      'main' | 'options'
+    >('main');
 
     // Comments
     const { ref: commentsSectionRef, inView } = useInView({
       threshold: 0.8,
     });
-
-    // Check if the response has been viewed
-    useEffect(() => {
-      fetchPostLatestData();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     // Scroll to comments if hash is present
     useEffect(() => {
@@ -170,6 +166,8 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
         }
       }
 
+      console.log(post.winningOptionId);
+
       if (post.winningOptionId) {
         fetchAndSetWinningOption(post.winningOptionId as number);
       }
@@ -192,16 +190,13 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
           <SActivitesContainer dimmedBackground={openedMainSection === 'main'}>
             {openedMainSection === 'main' ? (
               <>
-                <DecisionEndedBox
-                  type='mc'
-                  imgSrc={
-                    theme.name === 'light'
-                      ? assets.creation.lightMcAnimated
-                      : assets.creation.darkMcAnimated
-                  }
-                >
-                  {t('mcPostSuccess.heroText')}
-                </DecisionEndedBox>
+                <WaitingForResponseBox
+                  title={t('mcPostAwaiting.hero.title')}
+                  body={t('mcPostAwaiting.hero.body', {
+                    creator: post.creator?.nickname,
+                    time: waitingTime,
+                  })}
+                />
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>
                     <SCreator>
@@ -299,7 +294,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                             Mixpanel.track('Winning Option Details See All', {
                               _stage: 'Post',
                               _postUuid: post.postUuid,
-                              _component: 'PostSuccessMC',
+                              _component: 'PostAwaitingResponseMC',
                             });
                           }}
                           onClick={() => setOpenedMainSection('options')}
@@ -313,57 +308,6 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                     </>
                   )}
                 </SMainSectionWrapper>
-                {!isMobile ? (
-                  <>
-                    {!responseViewed && videoTab === 'announcement' ? (
-                      <SWatchResponseWrapper>
-                        <SWatchResponseBtn
-                          shouldView={!responseViewed}
-                          onClickCapture={() => {
-                            Mixpanel.track('Watch Response', {
-                              _stage: 'Post',
-                              _postUuid: post.postUuid,
-                              _component: 'PostSuccessMC',
-                            });
-                          }}
-                          onClick={() => setVideoTab('response')}
-                        >
-                          {t('postVideoSuccess.tabs.watchResponseFirstTime')}
-                        </SWatchResponseBtn>
-                      </SWatchResponseWrapper>
-                    ) : null}
-                    {responseViewed ? (
-                      <SToggleVideoWidget>
-                        <SChangeTabBtn
-                          shouldView={videoTab === 'announcement'}
-                          onClickCapture={() => {
-                            Mixpanel.track('Set Tab Announcement', {
-                              _stage: 'Post',
-                              _postUuid: post.postUuid,
-                              _component: 'PostSuccessMC',
-                            });
-                          }}
-                          onClick={() => setVideoTab('announcement')}
-                        >
-                          {t('postVideoSuccess.tabs.watchOriginal')}
-                        </SChangeTabBtn>
-                        <SChangeTabBtn
-                          shouldView={videoTab === 'response'}
-                          onClickCapture={() => {
-                            Mixpanel.track('Set Tab Response', {
-                              _stage: 'Post',
-                              _postUuid: post.postUuid,
-                              _component: 'PostSuccessMC',
-                            });
-                          }}
-                          onClick={() => setVideoTab('response')}
-                        >
-                          {t('postVideoSuccess.tabs.watchResponse')}
-                        </SChangeTabBtn>
-                      </SToggleVideoWidget>
-                    ) : null}
-                  </>
-                ) : null}
               </>
             ) : (
               <McSuccessOptionsTab
@@ -372,7 +316,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                   Mixpanel.track('Go Back', {
                     _stage: 'Post',
                     _postUuid: post.postUuid,
-                    _component: 'PostSuccessMC',
+                    _component: 'PostAwaitingResponseMC',
                   });
                   setOpenedMainSection('main');
                 }}
@@ -393,10 +337,9 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
         )}
       </>
     );
-  }
-);
+  });
 
-export default PostSuccessMC;
+export default PostAwaitingResponseMC;
 
 const SWrapper = styled.div`
   width: 100%;
@@ -451,7 +394,7 @@ const SActivitesContainer = styled.div<{
     height: 728px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    /* justify-content: space-between; */
   }
 `;
 
@@ -467,7 +410,7 @@ const SMainSectionWrapper = styled.div`
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start\;;
+    justify-content: flex-start;
   }
 `;
 
@@ -701,84 +644,6 @@ const SWinningOptionDetailsTitle = styled(Headline)`
   text-align: center;
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
-  }
-`;
-
-// Watch response for the first time
-const SWatchResponseWrapper = styled.div`
-  width: 100%;
-  height: 60px;
-
-  overflow: hidden;
-  border-radius: 16px;
-`;
-
-const SWatchResponseBtn = styled.button<{
-  shouldView?: boolean;
-}>`
-  background: ${({ shouldView, theme }) =>
-    shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)'};
-  border: transparent;
-  border-radius: 16px;
-
-  padding: 17px 24px;
-
-  width: 100%;
-  height: 100%;
-
-  color: #ffffff;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-
-  cursor: pointer;
-
-  &:active,
-  &:focus {
-    outline: none;
-  }
-`;
-
-const SToggleVideoWidget = styled.div`
-  display: flex;
-
-  height: 60px;
-  width: 100%;
-
-  overflow: hidden;
-  border-radius: 16px;
-`;
-
-const SChangeTabBtn = styled.button<{
-  shouldView?: boolean;
-}>`
-  background: ${({ shouldView, theme }) =>
-    shouldView
-      ? theme.colorsThemed.accent.blue
-      : theme.colorsThemed.background.tertiary};
-  border: transparent;
-
-  padding: 17px 24px;
-
-  width: 50%;
-  height: 100%;
-
-  text-align: center;
-  color: ${({ shouldView, theme }) =>
-    shouldView
-      ? '#ffffff'
-      : theme.name === 'dark'
-      ? '#ffffff'
-      : theme.colorsThemed.text.tertiary};
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-
-  cursor: pointer;
-
-  &:active,
-  &:focus {
-    outline: none;
   }
 `;
 
