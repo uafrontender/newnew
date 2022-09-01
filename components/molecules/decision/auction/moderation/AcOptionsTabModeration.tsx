@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 
-import { TAcOptionWithHighestField } from '../../../../organisms/decision/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';

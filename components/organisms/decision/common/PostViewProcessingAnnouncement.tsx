@@ -1,24 +1,23 @@
 /* eslint-disable no-lonely-if */
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import { useAppSelector } from '../../../redux-store/store';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import { usePostModalInnerState } from '..';
+import { useAppSelector } from '../../../../redux-store/store';
+import { SocketContext } from '../../../../contexts/socketContext';
+import { ChannelsContext } from '../../../../contexts/channelsContext';
 
-// Utils
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import PostVideoProcessingHolder from '../../molecules/decision/PostVideoProcessingHolder';
-import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
-import { TPostType } from '../../../utils/switchPostType';
-import assets from '../../../constants/assets';
-import Text from '../../atoms/Text';
+import Text from '../../../atoms/Text';
+import PostTopInfo from '../../../molecules/decision/PostTopInfo';
+import PostTopInfoModeration from '../../../molecules/decision/PostTopInfoModeration';
+import PostVideoProcessingHolder from '../../../molecules/decision/PostVideoProcessingHolder';
 
-const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+import assets from '../../../../constants/assets';
+
+const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 
 const DARK_IMAGES = {
   ac: assets.creation.darkMcAnimated,
@@ -35,43 +34,34 @@ const LIGHT_IMAGES = {
 };
 
 interface IPostViewProcessingAnnouncement {
-  post: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
-  postStatus: TPostStatusStringified;
-  postType: string;
   variant: 'decision' | 'moderation';
-  isFollowingDecision: boolean;
-  hasRecommendations: boolean;
-  handleSetIsFollowingDecision: (newValue: boolean) => void;
-  handleGoBack: () => void;
-  handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleRemoveFromStateUnfavorited: () => void;
-  handleAddPostToStateFavorited: () => void;
-  handleReportOpen: () => void;
 }
 
 // TODO: memorize
 const PostViewProcessingAnnouncement: React.FunctionComponent<
   IPostViewProcessingAnnouncement
-> = ({
-  post,
-  postStatus,
-  postType,
-  variant,
-  isFollowingDecision,
-  hasRecommendations,
-  handleSetIsFollowingDecision,
-  handleGoBack,
-  handleUpdatePostStatus,
-  handleRemoveFromStateUnfavorited,
-  handleAddPostToStateFavorited,
-  handleReportOpen,
-}) => {
+> = ({ variant }) => {
   const { t } = useTranslation('modal-Post');
   const theme = useTheme();
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
+  );
+
+  const {
+    postParsed,
+    typeOfPost,
+    handleGoBackInsidePost,
+    handleUpdatePostStatus,
+  } = usePostModalInnerState();
+  const post = useMemo(
+    () =>
+      postParsed as
+        | newnewapi.Auction
+        | newnewapi.Crowdfunding
+        | newnewapi.MultipleChoice,
+    [postParsed]
   );
 
   // Socket
@@ -131,7 +121,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
             style={{
               gridArea: 'closeBtnMobile',
             }}
-            onClick={handleGoBack}
+            onClick={handleGoBackInsidePost}
           />
         )}
       </SExpiresSection>
@@ -143,43 +133,22 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
         }
       />
       {variant === 'decision' ? (
-        <PostTopInfo
-          title={post.title}
-          postId={post.postUuid}
-          postStatus={postStatus}
-          postType={postType as TPostType}
-          creator={post.creator!!}
-          hasWinner={false}
-          isFollowingDecision={isFollowingDecision}
-          hasRecommendations={hasRecommendations}
-          handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-          handleReportOpen={handleReportOpen}
-          handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited}
-          handleAddPostToStateFavorited={handleAddPostToStateFavorited}
-        />
+        <PostTopInfo hasWinner={false} />
       ) : (
-        <PostTopInfoModeration
-          title={post.title}
-          postId={post.postUuid}
-          postStatus={postStatus}
-          postType={postType as TPostType}
-          hasWinner={false}
-          hasResponse={false}
-          handleUpdatePostStatus={handleUpdatePostStatus}
-        />
+        <PostTopInfoModeration hasWinner={false} />
       )}
       <SActivitiesContainer>
         <SDecisionImage
           src={
             theme.name === 'light'
               ? /* @ts-ignore */
-                LIGHT_IMAGES[postType]
+                LIGHT_IMAGES[typeOfPost]
               : /* @ts-ignore */
-                DARK_IMAGES[postType]
+                DARK_IMAGES[typeOfPost]
           }
         />
         <SText variant={2} weight={600}>
-          {t(`postViewProcessingAnnouncement.stayTuned.${postType}`)}
+          {t(`postViewProcessingAnnouncement.stayTuned.${typeOfPost}`)}
         </SText>
       </SActivitiesContainer>
     </SWrapper>

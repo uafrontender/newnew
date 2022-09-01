@@ -26,7 +26,7 @@ import {
   // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 
-import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../organisms/decision/regular/PostViewMC';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';

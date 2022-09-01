@@ -14,7 +14,7 @@ import { NextPageWithLayout } from '../_app';
 import { getUserByUsername } from '../../api/endpoints/user';
 import { fetchUsersPosts } from '../../api/endpoints/post';
 
-import PostModal from '../../components/organisms/decision/PostModal';
+import PostModal from '../../components/organisms/decision';
 import PostList from '../../components/organisms/see-more/PostList';
 import InlineSvg from '../../components/atoms/InlineSVG';
 
@@ -61,8 +61,9 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   const { t } = useTranslation('page-Profile');
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >();
 
   // Loading state
   const [isLoading, setIsLoading] = useState(false);

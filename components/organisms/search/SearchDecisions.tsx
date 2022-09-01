@@ -19,7 +19,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import SortOption from '../../atoms/SortOption';
 
 const PostList = dynamic(() => import('./PostList'));
-const PostModal = dynamic(() => import('../decision/PostModal'));
+const PostModal = dynamic(() => import('../decision'));
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
 
 interface ISearchDecisions {
