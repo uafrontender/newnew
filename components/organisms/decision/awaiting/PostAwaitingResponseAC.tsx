@@ -24,11 +24,11 @@ const WaitingForResponseBox = dynamic(
 const AcWaitingOptionsSection = dynamic(
   () =>
     import(
-      '../../../molecules/decision/auction/waiting/AcWaitingOptionsSection'
+      '../../../molecules/decision/waiting/auction/AcWaitingOptionsSection'
     )
 );
 const CommentsBottomSection = dynamic(
-  () => import('../../../molecules/decision/success/CommentsBottomSection')
+  () => import('../../../molecules/decision/common/CommentsBottomSection')
 );
 
 interface IPostAwaitingResponseAC {

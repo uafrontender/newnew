@@ -1,7 +1,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 
-import { usePostModalInnerState } from '..';
+import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 
 // Views
 const PostModerationAC = dynamic(() => import('./PostModerationAC'));

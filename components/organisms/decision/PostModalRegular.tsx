@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
-import { usePostModalInnerState } from '.';
+import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
 import { useAppSelector } from '../../../redux-store/store';
 import getDisplayname from '../../../utils/getDisplayname';
 
@@ -21,7 +21,7 @@ import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
 const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
 const PostFailedBox = dynamic(
-  () => import('../../molecules/decision/PostFailedBox')
+  () => import('../../molecules/decision/common/PostFailedBox')
 );
 const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 

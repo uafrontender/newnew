@@ -27,13 +27,13 @@ import {
   voteOnPost,
 } from '../../../../api/endpoints/multiple_choice';
 
-import PostVideo from '../../../molecules/decision/PostVideo';
-import PostTimer from '../../../molecules/decision/PostTimer';
-import PostTopInfo from '../../../molecules/decision/PostTopInfo';
+import PostVideo from '../../../molecules/decision/common/PostVideo';
+import PostTimer from '../../../molecules/decision/common/PostTimer';
+import PostTopInfo from '../../../molecules/decision/common/PostTopInfo';
 import Headline from '../../../atoms/Headline';
-import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
-import PostVotingTab from '../../../molecules/decision/PostVotingTab';
-import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
+import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
+import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
+import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 
 // Utils
 import switchPostType from '../../../../utils/switchPostType';
@@ -43,18 +43,19 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '..';
+import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
 const McOptionsTab = dynamic(
-  () => import('../../../molecules/decision/multiple_choice/McOptionsTab')
+  () =>
+    import('../../../molecules/decision/regular/multiple_choice/McOptionsTab')
 );
 const HeroPopup = dynamic(
-  () => import('../../../molecules/decision/HeroPopup')
+  () => import('../../../molecules/decision/common/HeroPopup')
 );
 const PaymentSuccessModal = dynamic(
-  () => import('../../../molecules/decision/PaymentSuccessModal')
+  () => import('../../../molecules/decision/common/PaymentSuccessModal')
 );
 
 const getPayWithCardErrorMessage = (
