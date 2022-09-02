@@ -25,14 +25,14 @@ import { reportMessage } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
 
 const CommentEllipseMenu = dynamic(
-  () => import('../../molecules/decision/CommentEllipseMenu')
+  () => import('../../molecules/decision/common/CommentEllipseMenu')
 );
 const CommentEllipseModal = dynamic(
-  () => import('../../molecules/decision/CommentEllipseModal')
+  () => import('../../molecules/decision/common/CommentEllipseModal')
 );
 const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 const DeleteCommentModal = dynamic(
-  () => import('../../molecules/decision/DeleteCommentModal')
+  () => import('../../molecules/decision/common/DeleteCommentModal')
 );
 
 interface IComment {

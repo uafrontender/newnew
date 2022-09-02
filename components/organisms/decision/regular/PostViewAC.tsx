@@ -27,32 +27,32 @@ import {
   placeBidOnAuction,
 } from '../../../../api/endpoints/auction';
 
-import PostVideo from '../../../molecules/decision/PostVideo';
-import PostTimer from '../../../molecules/decision/PostTimer';
-import PostTopInfo from '../../../molecules/decision/PostTopInfo';
-import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
+import PostVideo from '../../../molecules/decision/common/PostVideo';
+import PostTimer from '../../../molecules/decision/common/PostTimer';
+import PostTopInfo from '../../../molecules/decision/common/PostTopInfo';
+import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 
 // Utils
 import switchPostType from '../../../../utils/switchPostType';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
-import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
+import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
 import Headline from '../../../atoms/Headline';
-import PostVotingTab from '../../../molecules/decision/PostVotingTab';
+import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '..';
+import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
-  () => import('../../../molecules/decision/auction/AcOptionsTab')
+  () => import('../../../molecules/decision/regular/auction/AcOptionsTab')
 );
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
 const PaymentSuccessModal = dynamic(
-  () => import('../../../molecules/decision/PaymentSuccessModal')
+  () => import('../../../molecules/decision/common/PaymentSuccessModal')
 );
 const HeroPopup = dynamic(
-  () => import('../../../molecules/decision/HeroPopup')
+  () => import('../../../molecules/decision/common/HeroPopup')
 );
 
 const getPayWithCardErrorMessage = (

@@ -17,9 +17,12 @@ import isSafari from '../../../../utils/isSafari';
 import isBrowser from '../../../../utils/isBrowser';
 import { Mixpanel } from '../../../../utils/mixpanel';
 
-const PostBitmovinPlayer = dynamic(() => import('../PostBitmovinPlayer'), {
-  ssr: false,
-});
+const PostBitmovinPlayer = dynamic(
+  () => import('../common/PostBitmovinPlayer'),
+  {
+    ssr: false,
+  }
+);
 
 interface IPostVideoSuccess {
   postId: string;
@@ -56,8 +59,9 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
   ].includes(resizeMode);
 
   // Show controls on shorter screens
-  const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] =
-    useState<number | undefined>(undefined);
+  const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] = useState<
+    number | undefined
+  >(undefined);
 
   useEffect(() => {
     async function markResponseAsViewed() {

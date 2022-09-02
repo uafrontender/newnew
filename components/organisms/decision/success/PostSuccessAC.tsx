@@ -30,10 +30,10 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 
 const AcSuccessOptionsTab = dynamic(
   () =>
-    import('../../../molecules/decision/auction/success/AcSuccessOptionsTab')
+    import('../../../molecules/decision/success/auction/AcSuccessOptionsTab')
 );
 const CommentsBottomSection = dynamic(
-  () => import('../../../molecules/decision/success/CommentsBottomSection')
+  () => import('../../../molecules/decision/common/CommentsBottomSection')
 );
 
 interface IPostSuccessAC {

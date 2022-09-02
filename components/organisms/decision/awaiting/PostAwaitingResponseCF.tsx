@@ -27,7 +27,7 @@ const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
 );
 const CommentsBottomSection = dynamic(
-  () => import('../../../molecules/decision/success/CommentsBottomSection')
+  () => import('../../../molecules/decision/common/CommentsBottomSection')
 );
 
 interface IPostAwaitingResponseCF {

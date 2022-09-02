@@ -165,7 +165,6 @@ const SContentContainer = styled.div<{
   flex-direction: column;
   width: 100%;
   height: 100%;
-  max-height: 90vh;
   overflow-y: scroll;
 
   /* Hide scrollbar */
@@ -189,6 +188,7 @@ const SContentContainer = styled.div<{
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 24px;
+    max-height: 90vh;
     /* padding-bottom: 116px; */
   }
 `;
@@ -227,7 +227,6 @@ const SCloseButton = styled.button`
 
 const SHeaderContainer = styled.div`
   margin-bottom: 16px;
-  flex-grow: 1;
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 24px;
