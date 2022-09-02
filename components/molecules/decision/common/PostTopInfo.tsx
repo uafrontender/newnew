@@ -14,32 +14,32 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppSelector } from '../../../../redux-store/store';
 
-import { TPostType } from '../../../utils/switchPostType';
+import { TPostType } from '../../../../utils/switchPostType';
 
-import Text from '../../atoms/Text';
-import Button from '../../atoms/Button';
-import Headline from '../../atoms/Headline';
-import InlineSvg from '../../atoms/InlineSVG';
+import Text from '../../../atoms/Text';
+import Button from '../../../atoms/Button';
+import Headline from '../../../atoms/Headline';
+import InlineSvg from '../../../atoms/InlineSVG';
 import PostFailedBox from './PostFailedBox';
 import PostShareEllipseMenu from './PostShareEllipseMenu';
 import PostShareEllipseModal from './PostShareEllipseModal';
 import PostEllipseMenu from './PostEllipseMenu';
 import PostEllipseModal from './PostEllipseModal';
 
-import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
-import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
+import MoreIconFilled from '../../../../public/images/svg/icons/filled/More.svg';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 
-import { formatNumber } from '../../../utils/format';
-import { markPost } from '../../../api/endpoints/post';
-import { FollowingsContext } from '../../../contexts/followingContext';
-import getDisplayname from '../../../utils/getDisplayname';
-import assets from '../../../constants/assets';
-import PostTitleContent from '../../atoms/PostTitleContent';
-import { Mixpanel } from '../../../utils/mixpanel';
-import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
+import { formatNumber } from '../../../../utils/format';
+import { markPost } from '../../../../api/endpoints/post';
+import { FollowingsContext } from '../../../../contexts/followingContext';
+import getDisplayname from '../../../../utils/getDisplayname';
+import assets from '../../../../constants/assets';
+import PostTitleContent from '../../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,

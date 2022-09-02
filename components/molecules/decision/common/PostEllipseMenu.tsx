@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 
-import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
+import EllipseMenu, { EllipseMenuButton } from '../../../atoms/EllipseMenu';
 
-import isBrowser from '../../../utils/isBrowser';
+import isBrowser from '../../../../utils/isBrowser';
 
 interface IPostEllipseMenu {
   postType: string;

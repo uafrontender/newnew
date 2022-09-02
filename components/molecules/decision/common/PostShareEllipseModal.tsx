@@ -4,16 +4,17 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
-import { InlineSvg } from '../../atoms/InlineSVG';
-import Headline from '../../atoms/Headline';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
-import copyIcon from '../../../public/images/svg/icons/outlined/Link.svg';
-import tiktokIcon from '../../../public/images/svg/icons/socials/TikTok.svg';
-import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
-import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
-import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
-import EllipseModal from '../../atoms/EllipseModal';
-import { Mixpanel } from '../../../utils/mixpanel';
+import Headline from '../../../atoms/Headline';
+import { InlineSvg } from '../../../atoms/InlineSVG';
+import EllipseModal from '../../../atoms/EllipseModal';
+
+import copyIcon from '../../../../public/images/svg/icons/outlined/Link.svg';
+import tiktokIcon from '../../../../public/images/svg/icons/socials/TikTok.svg';
+import twitterIcon from '../../../../public/images/svg/icons/socials/Twitter.svg';
+import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.svg';
+import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,

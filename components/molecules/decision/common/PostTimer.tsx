@@ -8,17 +8,17 @@ import dynamic from 'next/dist/shared/lib/dynamic';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useUpdateEffect } from 'react-use';
 import styled, { css } from 'styled-components';
-import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
-import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import usePageVisibility from '../../../utils/hooks/usePageVisibility';
-import isBrowser from '../../../utils/isBrowser';
-import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
-import { TPostType } from '../../../utils/switchPostType';
-import { DotPositionEnum } from '../../atoms/decision/TutorialTooltip';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
+import isBrowser from '../../../../utils/isBrowser';
+import secondsToDHMS, { DHMS } from '../../../../utils/secondsToDHMS';
+import { TPostType } from '../../../../utils/switchPostType';
+import { DotPositionEnum } from '../../../atoms/decision/TutorialTooltip';
 
 const TutorialTooltip = dynamic(
-  () => import('../../atoms/decision/TutorialTooltip')
+  () => import('../../../atoms/decision/TutorialTooltip')
 );
 
 interface IPostTimer {

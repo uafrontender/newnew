@@ -2,11 +2,11 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
-import Button from '../../atoms/Button';
-import Modal from '../../organisms/Modal';
-import Headline from '../../atoms/Headline';
+import Button from '../../../atoms/Button';
+import Modal from '../../../organisms/Modal';
+import Headline from '../../../atoms/Headline';
 
-import { TPostType } from '../../../utils/switchPostType';
+import { TPostType } from '../../../../utils/switchPostType';
 
 interface IPaymentSuccessModal {
   postType: TPostType;

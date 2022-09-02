@@ -2,9 +2,9 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 
-import InlineSvg from '../../atoms/InlineSVG';
+import InlineSvg from '../../../atoms/InlineSVG';
 
-import StatisticsIconFilled from '../../../public/images/svg/icons/filled/Statistics.svg';
+import StatisticsIconFilled from '../../../../public/images/svg/icons/filled/Statistics.svg';
 
 interface IPostVotingTab {
   children: string;

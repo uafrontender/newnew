@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
 
-import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
+import EllipseModal, { EllipseModalButton } from '../../../atoms/EllipseModal';
 
 interface IPostEllipseModal {
   postType: string;

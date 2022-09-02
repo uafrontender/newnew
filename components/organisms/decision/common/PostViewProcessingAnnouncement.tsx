@@ -11,9 +11,9 @@ import { SocketContext } from '../../../../contexts/socketContext';
 import { ChannelsContext } from '../../../../contexts/channelsContext';
 
 import Text from '../../../atoms/Text';
-import PostTopInfo from '../../../molecules/decision/PostTopInfo';
+import PostTopInfo from '../../../molecules/decision/common/PostTopInfo';
 import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTopInfoModeration';
-import PostVideoProcessingHolder from '../../../molecules/decision/PostVideoProcessingHolder';
+import PostVideoProcessingHolder from '../../../molecules/decision/common/PostVideoProcessingHolder';
 
 import assets from '../../../../constants/assets';
 

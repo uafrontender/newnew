@@ -1,8 +1,9 @@
-import moment from 'moment';
-import { useTranslation } from 'next-i18next';
 import React from 'react';
+import moment from 'moment';
 import styled from 'styled-components';
-import { TPostType } from '../../../utils/switchPostType';
+import { useTranslation } from 'next-i18next';
+
+import { TPostType } from '../../../../utils/switchPostType';
 
 interface IPostTimerEnded {
   timestampSeconds: number;

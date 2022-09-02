@@ -26,11 +26,11 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 
 import Headline from '../../../atoms/Headline';
-import PostVotingTab from '../../../molecules/decision/PostVotingTab';
+import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
 import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTopInfoModeration';
 import PostVideoModeration from '../../../molecules/decision/moderation/PostVideoModeration';
 import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
-import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
+import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 import PostResponseTabModeration from '../../../molecules/decision/moderation/PostResponseTabModeration';
 
 import switchPostType from '../../../../utils/switchPostType';
@@ -45,10 +45,10 @@ import { usePostModalInnerState } from '../../../../contexts/postModalInnerConte
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
-  () => import('../../../molecules/decision/ResponseTimer')
+  () => import('../../../molecules/decision/common/ResponseTimer')
 );
 const PostTimer = dynamic(
-  () => import('../../../molecules/decision/PostTimer')
+  () => import('../../../molecules/decision/common/PostTimer')
 );
 const AcOptionsTabModeration = dynamic(
   () =>
@@ -57,7 +57,7 @@ const AcOptionsTabModeration = dynamic(
     )
 );
 const HeroPopup = dynamic(
-  () => import('../../../molecules/decision/HeroPopup')
+  () => import('../../../molecules/decision/common/HeroPopup')
 );
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {

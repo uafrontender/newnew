@@ -46,8 +46,8 @@ import SuggestionTextArea from '../../../../atoms/decision/SuggestionTextArea';
 import PaymentModal from '../../../checkout/PaymentModal';
 import LoadingModal from '../../../LoadingModal';
 import GradientMask from '../../../../atoms/GradientMask';
-import OptionActionMobileModal from '../../OptionActionMobileModal';
-import PaymentSuccessModal from '../../PaymentSuccessModal';
+import OptionActionMobileModal from '../../common/OptionActionMobileModal';
+import PaymentSuccessModal from '../../common/PaymentSuccessModal';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 // import { WalletContext } from '../../../../../contexts/walletContext';
 import TutorialTooltip, {

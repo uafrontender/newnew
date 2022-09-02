@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
-import { checkCanDeleteAcOption } from '../../../api/endpoints/auction';
-import { checkCanDeleteMcOption } from '../../../api/endpoints/multiple_choice';
-import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
+import { checkCanDeleteAcOption } from '../../../../api/endpoints/auction';
+import { checkCanDeleteMcOption } from '../../../../api/endpoints/multiple_choice';
+
+import EllipseModal, { EllipseModalButton } from '../../../atoms/EllipseModal';
 
 interface IOptionModal {
   isOpen: boolean;

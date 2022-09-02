@@ -1,7 +1,7 @@
 /* eslint-disable react/require-default-props */
 import React, { useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
-import assets from '../../../constants/assets';
+import assets from '../../../../constants/assets';
 
 const PostSuccessAnimationBackground: React.FunctionComponent<{
   noBlur?: boolean;

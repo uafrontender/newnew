@@ -37,12 +37,15 @@ import PostVideoCoverImageEdit from './PostVideoCoverImageEdit';
 import EllipseModal, { EllipseModalButton } from '../../../atoms/EllipseModal';
 import EllipseMenu, { EllipseMenuButton } from '../../../atoms/EllipseMenu';
 
-const PostBitmovinPlayer = dynamic(() => import('../PostBitmovinPlayer'), {
-  ssr: false,
-});
+const PostBitmovinPlayer = dynamic(
+  () => import('../common/PostBitmovinPlayer'),
+  {
+    ssr: false,
+  }
+);
 
 const PostVideoThumbnailEdit = dynamic(
-  () => import('../PostVideoThumbnailEdit'),
+  () => import('./PostVideoThumbnailEdit'),
   {
     ssr: false,
   }

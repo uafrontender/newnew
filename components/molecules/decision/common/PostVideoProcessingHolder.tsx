@@ -3,44 +3,43 @@ import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
-import Text from '../../atoms/Text';
-import Headline from '../../atoms/Headline';
-import assets from '../../../constants/assets';
+import Text from '../../../atoms/Text';
+import Headline from '../../../atoms/Headline';
+import assets from '../../../../constants/assets';
 
 interface IPostVideoProcessingHolder {
   holderText: 'decision' | 'moderation';
 }
 
-const PostVideoProcessingHolder: React.FunctionComponent<IPostVideoProcessingHolder> =
-  ({ holderText }) => {
-    const theme = useTheme();
-    const { t } = useTranslation('modal-Post');
-    return (
-      <SVideoWrapper>
-        <SHourglassCard>
-          <SImgContainer>
-            <img
-              className='hourglass-img'
-              src={
-                theme.name === 'light'
-                  ? assets.decision.lightHourglassAnimated
-                  : assets.decision.darkHourglassAnimated
-              }
-              alt='video is processed'
-            />
-          </SImgContainer>
-          <SHeadline variant={6}>
-            {t(
-              `postViewProcessingAnnouncement.videoHolder.${holderText}.title`
-            )}
-          </SHeadline>
-          <SText variant={3}>
-            {t(`postViewProcessingAnnouncement.videoHolder.${holderText}.body`)}
-          </SText>
-        </SHourglassCard>
-      </SVideoWrapper>
-    );
-  };
+const PostVideoProcessingHolder: React.FunctionComponent<
+  IPostVideoProcessingHolder
+> = ({ holderText }) => {
+  const theme = useTheme();
+  const { t } = useTranslation('modal-Post');
+  return (
+    <SVideoWrapper>
+      <SHourglassCard>
+        <SImgContainer>
+          <img
+            className='hourglass-img'
+            src={
+              theme.name === 'light'
+                ? assets.decision.lightHourglassAnimated
+                : assets.decision.darkHourglassAnimated
+            }
+            alt='video is processed'
+          />
+        </SImgContainer>
+        <SHeadline variant={6}>
+          {t(`postViewProcessingAnnouncement.videoHolder.${holderText}.title`)}
+        </SHeadline>
+        <SText variant={3}>
+          {t(`postViewProcessingAnnouncement.videoHolder.${holderText}.body`)}
+        </SText>
+      </SHourglassCard>
+    </SVideoWrapper>
+  );
+};
 
 export default PostVideoProcessingHolder;
 

@@ -32,7 +32,7 @@ const CommentEllipseModal = dynamic(
 );
 const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 const DeleteCommentModal = dynamic(
-  () => import('../../molecules/decision/DeleteCommentModal')
+  () => import('../../molecules/decision/common/DeleteCommentModal')
 );
 
 interface IComment {

@@ -5,16 +5,16 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 
-import { markPost } from '../../../api/endpoints/post';
-import { useAppSelector } from '../../../redux-store/store';
+import { markPost } from '../../../../api/endpoints/post';
+import { useAppSelector } from '../../../../redux-store/store';
 
-import Button from '../../atoms/Button';
-import InlineSvg from '../../atoms/InlineSVG';
+import Button from '../../../atoms/Button';
+import InlineSvg from '../../../atoms/InlineSVG';
 
-import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
-import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
-import isBrowser from '../../../utils/isBrowser';
-import { Mixpanel } from '../../../utils/mixpanel';
+import VolumeOff from '../../../../public/images/svg/icons/filled/VolumeOFF1.svg';
+import VolumeOn from '../../../../public/images/svg/icons/filled/VolumeON.svg';
+import isBrowser from '../../../../utils/isBrowser';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
@@ -51,12 +51,14 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
   ].includes(resizeMode);
 
   // Show controls on shorter screens
-  const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] =
-    useState<number | undefined>(undefined);
+  const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] = useState<
+    number | undefined
+  >(undefined);
 
   // Tabs
-  const [openedTab, setOpenedTab] =
-    useState<'announcement' | 'response'>('announcement');
+  const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
+    'announcement'
+  );
 
   useEffect(() => {
     async function markResponseAsViewed() {

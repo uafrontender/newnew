@@ -20,7 +20,7 @@ import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
 import LoadingModal from '../../../LoadingModal';
 import InlineSvg from '../../../../atoms/InlineSVG';
-import OptionActionMobileModal from '../../OptionActionMobileModal';
+import OptionActionMobileModal from '../../common/OptionActionMobileModal';
 import BidAmountTextInput from '../../../../atoms/decision/BidAmountTextInput';
 
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';

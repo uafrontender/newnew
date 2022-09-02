@@ -27,13 +27,13 @@ import {
   voteOnPost,
 } from '../../../../api/endpoints/multiple_choice';
 
-import PostVideo from '../../../molecules/decision/PostVideo';
-import PostTimer from '../../../molecules/decision/PostTimer';
-import PostTopInfo from '../../../molecules/decision/PostTopInfo';
+import PostVideo from '../../../molecules/decision/common/PostVideo';
+import PostTimer from '../../../molecules/decision/common/PostTimer';
+import PostTopInfo from '../../../molecules/decision/common/PostTopInfo';
 import Headline from '../../../atoms/Headline';
 import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
-import PostVotingTab from '../../../molecules/decision/PostVotingTab';
-import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
+import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
+import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 
 // Utils
 import switchPostType from '../../../../utils/switchPostType';
@@ -52,10 +52,10 @@ const McOptionsTab = dynamic(
     import('../../../molecules/decision/regular/multiple_choice/McOptionsTab')
 );
 const HeroPopup = dynamic(
-  () => import('../../../molecules/decision/HeroPopup')
+  () => import('../../../molecules/decision/common/HeroPopup')
 );
 const PaymentSuccessModal = dynamic(
-  () => import('../../../molecules/decision/PaymentSuccessModal')
+  () => import('../../../molecules/decision/common/PaymentSuccessModal')
 );
 
 const getPayWithCardErrorMessage = (

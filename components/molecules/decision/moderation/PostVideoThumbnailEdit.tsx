@@ -5,19 +5,19 @@ import { PlayerEvent } from 'bitmovin-player';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 
-import Text from '../../atoms/Text';
-import Modal from '../../organisms/Modal';
-import Button from '../../atoms/Button';
-import Caption from '../../atoms/Caption';
-import Headline from '../../atoms/Headline';
-import InlineSVG from '../../atoms/InlineSVG';
+import Text from '../../../atoms/Text';
+import Modal from '../../../organisms/Modal';
+import Button from '../../../atoms/Button';
+import Caption from '../../../atoms/Caption';
+import Headline from '../../../atoms/Headline';
+import InlineSVG from '../../../atoms/InlineSVG';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppSelector } from '../../../../redux-store/store';
 
-import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+import chevronLeft from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 
-const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
+const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
 });
 

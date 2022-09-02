@@ -30,12 +30,12 @@ import {
 } from '../../../../api/endpoints/crowdfunding';
 
 import Button from '../../../atoms/Button';
-import PostVideo from '../../../molecules/decision/PostVideo';
-import PostTimer from '../../../molecules/decision/PostTimer';
-import PostTopInfo from '../../../molecules/decision/PostTopInfo';
-import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
+import PostVideo from '../../../molecules/decision/common/PostVideo';
+import PostTimer from '../../../molecules/decision/common/PostTimer';
+import PostTopInfo from '../../../molecules/decision/common/PostTopInfo';
+import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 import Headline from '../../../atoms/Headline';
-import PostVotingTab from '../../../molecules/decision/PostVotingTab';
+import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
 import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
 import CfBackersStatsSectionFailed from '../../../molecules/decision/regular/crowdfunding/CfBackersStatsSectionFailed';
 
@@ -53,10 +53,10 @@ import { usePostModalInnerState } from '../../../../contexts/postModalInnerConte
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
 const PaymentSuccessModal = dynamic(
-  () => import('../../../molecules/decision/PaymentSuccessModal')
+  () => import('../../../molecules/decision/common/PaymentSuccessModal')
 );
 const HeroPopup = dynamic(
-  () => import('../../../molecules/decision/HeroPopup')
+  () => import('../../../molecules/decision/common/HeroPopup')
 );
 const TutorialTooltip = dynamic(
   () => import('../../../atoms/decision/TutorialTooltip')
@@ -65,7 +65,7 @@ const PostSuccessBox = dynamic(
   () => import('../../../molecules/decision/success/PostSuccessBox')
 );
 const PostWaitingForResponseBox = dynamic(
-  () => import('../../../molecules/decision/PostWaitingForResponseBox')
+  () => import('../../../molecules/decision/common/PostWaitingForResponseBox')
 );
 const CfPledgeLevelsModal = dynamic(
   () =>
@@ -202,6 +202,27 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(() => {
   const [currentBackers, setCurrentBackers] = useState(
     post.currentBackerCount ?? 0
   );
+
+  const fetchPostLatestData = useCallback(async () => {
+    try {
+      const fetchPostPayload = new newnewapi.GetPostRequest({
+        postUuid: post.postUuid,
+      });
+
+      const res = await fetchPostByUUID(fetchPostPayload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      if (res.data.crowdfunding) {
+        setCurrentBackers(res.data.crowdfunding.currentBackerCount as number);
+        if (res.data.crowdfunding.status)
+          handleUpdatePostStatus(res.data.crowdfunding.status);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Pledge levels
   const { standardPledgeAmounts } = useGetAppConstants().appConstants;
@@ -341,30 +362,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(() => {
         ];
         return sortPleges(workingArrUnsorted);
       });
+      fetchPostLatestData();
     },
-    [setPledges, sortPleges]
+    [setPledges, sortPleges, fetchPostLatestData]
   );
-
-  const fetchPostLatestData = useCallback(async () => {
-    try {
-      const fetchPostPayload = new newnewapi.GetPostRequest({
-        postUuid: post.postUuid,
-      });
-
-      const res = await fetchPostByUUID(fetchPostPayload);
-
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-      if (res.data.crowdfunding) {
-        setCurrentBackers(res.data.crowdfunding.currentBackerCount as number);
-        if (res.data.crowdfunding.status)
-          handleUpdatePostStatus(res.data.crowdfunding.status);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const handleFollowDecision = useCallback(async () => {
     try {

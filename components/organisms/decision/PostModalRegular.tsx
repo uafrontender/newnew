@@ -21,7 +21,7 @@ import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
 const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
 const PostFailedBox = dynamic(
-  () => import('../../molecules/decision/PostFailedBox')
+  () => import('../../molecules/decision/common/PostFailedBox')
 );
 const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 

@@ -4,18 +4,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../redux-store/store';
+import isBrowser from '../../../../utils/isBrowser';
+import { useAppSelector } from '../../../../redux-store/store';
+import secondsToDHMS, { DHMS } from '../../../../utils/secondsToDHMS';
+import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 
-import Text from '../../atoms/Text';
-import Headline from '../../atoms/Headline';
+import Text from '../../../atoms/Text';
+import Button from '../../../atoms/Button';
+import Headline from '../../../atoms/Headline';
 
-// Utils
-import isBrowser from '../../../utils/isBrowser';
-import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
-import Button from '../../atoms/Button';
-import assets from '../../../constants/assets';
-import usePageVisibility from '../../../utils/hooks/usePageVisibility';
-// import assets from '../../../constants/assets';
+import assets from '../../../../constants/assets';
 
 interface IPostScheduledSection {
   postType: string;

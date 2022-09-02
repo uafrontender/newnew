@@ -5,17 +5,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useUpdateEffect } from 'react-use';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppSelector } from '../../../../redux-store/store';
 
-import InlineSvg from '../../atoms/InlineSVG';
+import InlineSvg from '../../../atoms/InlineSVG';
 
-import isBrowser from '../../../utils/isBrowser';
-import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
+import isBrowser from '../../../../utils/isBrowser';
+import secondsToDHMS, { DHMS } from '../../../../utils/secondsToDHMS';
 
 // Icons
-import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-import AlertIconInverted from '../../../public/images/svg/icons/filled/AlertInverted.svg';
-import usePageVisibility from '../../../utils/hooks/usePageVisibility';
+import AlertIcon from '../../../../public/images/svg/icons/filled/Alert.svg';
+import AlertIconInverted from '../../../../public/images/svg/icons/filled/AlertInverted.svg';
+import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 
 interface IResponseTimer {
   timestampSeconds: number;

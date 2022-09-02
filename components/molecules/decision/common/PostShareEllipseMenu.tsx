@@ -4,18 +4,18 @@ import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 
-import InlineSvg from '../../atoms/InlineSVG';
-import EllipseMenu from '../../atoms/EllipseMenu';
-import Caption from '../../atoms/Caption';
+import isBrowser from '../../../../utils/isBrowser';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
-import isBrowser from '../../../utils/isBrowser';
+import Caption from '../../../atoms/Caption';
+import InlineSvg from '../../../atoms/InlineSVG';
+import EllipseMenu from '../../../atoms/EllipseMenu';
 
-import copyIcon from '../../../public/images/svg/icons/outlined/Link.svg';
-import tiktokIcon from '../../../public/images/svg/icons/socials/TikTok.svg';
-import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
-import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
-import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
-import { Mixpanel } from '../../../utils/mixpanel';
+import copyIcon from '../../../../public/images/svg/icons/outlined/Link.svg';
+import tiktokIcon from '../../../../public/images/svg/icons/socials/TikTok.svg';
+import twitterIcon from '../../../../public/images/svg/icons/socials/Twitter.svg';
+import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.svg';
+import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,

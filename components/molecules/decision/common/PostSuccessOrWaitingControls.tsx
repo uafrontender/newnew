@@ -1,19 +1,19 @@
 import React, { useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 
-import { TPostType } from '../../../utils/switchPostType';
+import { TPostType } from '../../../../utils/switchPostType';
 
-import Button from '../../atoms/Button';
-import InlineSvg from '../../atoms/InlineSVG';
+import Button from '../../../atoms/Button';
+import InlineSvg from '../../../atoms/InlineSVG';
 import PostEllipseMenu from './PostEllipseMenu';
 import PostShareEllipseMenu from './PostShareEllipseMenu';
 import PostEllipseModal from './PostEllipseModal';
 import PostShareEllipseModal from './PostShareEllipseModal';
 
 // Icons
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import ShareIcon from '../../../public/images/svg/icons/filled/Share.svg';
-import MoreIcon from '../../../public/images/svg/icons/filled/More.svg';
+import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+import ShareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
+import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
 
 interface IPostSuccessOrWaitingControls {
   typeOfPost: TPostType;

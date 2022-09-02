@@ -15,10 +15,11 @@ import {
   SourceConfig,
 } from 'bitmovin-player';
 
-import logoAnimation from '../../../public/animations/mobile_logo.json';
-import PlayIcon from '../../../public/images/svg/icons/filled/Play.svg';
-import Lottie from '../../atoms/Lottie';
-import InlineSvg from '../../atoms/InlineSVG';
+import Lottie from '../../../atoms/Lottie';
+import InlineSvg from '../../../atoms/InlineSVG';
+
+import logoAnimation from '../../../../public/animations/mobile_logo.json';
+import PlayIcon from '../../../../public/images/svg/icons/filled/Play.svg';
 
 interface IPostBitmovinPlayer {
   id: string;

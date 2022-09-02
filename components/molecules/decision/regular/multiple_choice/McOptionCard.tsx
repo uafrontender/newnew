@@ -54,12 +54,12 @@ import { setUserTutorialsProgress } from '../../../../../redux-store/slices/user
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import Headline from '../../../../atoms/Headline';
 import assets from '../../../../../constants/assets';
-import OptionEllipseMenu from '../../OptionEllipseMenu';
+import OptionEllipseMenu from '../../common/OptionEllipseMenu';
 import ReportModal, { ReportData } from '../../../chat/ReportModal';
 import { reportEventOption } from '../../../../../api/endpoints/report';
 import InlineSvg from '../../../../atoms/InlineSVG';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
-import OptionEllipseModal from '../../OptionEllipseModal';
+import OptionEllipseModal from '../../common/OptionEllipseModal';
 import McConfirmDeleteOptionModal from '../../moderation/multiple_choice/McConfirmDeleteOptionModal';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';

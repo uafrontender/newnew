@@ -37,14 +37,14 @@ import InlineSvg from '../../../../atoms/InlineSVG';
 import BidAmountTextInput from '../../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../../LoadingModal';
 import PaymentModal from '../../../checkout/PaymentModal';
-import PaymentSuccessModal from '../../PaymentSuccessModal';
-import OptionActionMobileModal from '../../OptionActionMobileModal';
+import PaymentSuccessModal from '../../common/PaymentSuccessModal';
+import OptionActionMobileModal from '../../common/OptionActionMobileModal';
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../../atoms/decision/TutorialTooltip';
 import Headline from '../../../../atoms/Headline';
-import OptionEllipseModal from '../../OptionEllipseModal';
-import OptionEllipseMenu from '../../OptionEllipseMenu';
+import OptionEllipseModal from '../../common/OptionEllipseModal';
+import OptionEllipseMenu from '../../common/OptionEllipseMenu';
 import ReportModal, { ReportData } from '../../../chat/ReportModal';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import AcConfirmDeleteOptionModal from '../../moderation/auction/AcConfirmDeleteOptionModal';

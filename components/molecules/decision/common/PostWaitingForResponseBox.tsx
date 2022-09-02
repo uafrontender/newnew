@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Text from '../../atoms/Text';
+import Text from '../../../atoms/Text';
 
-import PostSuccessIcon from '../../../public/images/decision/post-excited-img.png';
+import PostSuccessIcon from '../../../../public/images/decision/post-excited-img.png';
 
 interface IPostWaitingForResponseBox {
   title: string;
@@ -13,17 +13,18 @@ interface IPostWaitingForResponseBox {
   handleButtonClick: () => void;
 }
 
-const PostWaitingForResponseBox: React.FunctionComponent<IPostWaitingForResponseBox> =
-  ({ title, body, buttonCaption, style, handleButtonClick }) => (
-    <SWaitingForResponseBox style={style ?? {}}>
-      <SIconImg src={PostSuccessIcon.src} />
-      <SHeadline variant={2}>{title}</SHeadline>
-      <SBody variant={3}>{body}</SBody>
-      <SCtaButtonContainer>
-        <SCTAButton onClick={handleButtonClick}>{buttonCaption}</SCTAButton>
-      </SCtaButtonContainer>
-    </SWaitingForResponseBox>
-  );
+const PostWaitingForResponseBox: React.FunctionComponent<
+  IPostWaitingForResponseBox
+> = ({ title, body, buttonCaption, style, handleButtonClick }) => (
+  <SWaitingForResponseBox style={style ?? {}}>
+    <SIconImg src={PostSuccessIcon.src} />
+    <SHeadline variant={2}>{title}</SHeadline>
+    <SBody variant={3}>{body}</SBody>
+    <SCtaButtonContainer>
+      <SCTAButton onClick={handleButtonClick}>{buttonCaption}</SCTAButton>
+    </SCtaButtonContainer>
+  </SWaitingForResponseBox>
+);
 
 PostWaitingForResponseBox.defaultProps = {
   style: undefined,

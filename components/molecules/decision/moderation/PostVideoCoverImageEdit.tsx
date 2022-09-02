@@ -10,7 +10,7 @@ import Modal from '../../../organisms/Modal';
 import Button from '../../../atoms/Button';
 import InlineSVG from '../../../atoms/InlineSVG';
 import Headline from '../../../atoms/Headline';
-import CoverImageEdit from '../CoverImageEdit';
+import CoverImageEdit from './CoverImageEdit';
 import CoverImageZoomSlider from '../../../atoms/profile/ProfileImageZoomSlider';
 
 import { useAppSelector } from '../../../../redux-store/store';

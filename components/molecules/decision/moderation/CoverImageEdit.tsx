@@ -2,10 +2,10 @@ import { useTranslation } from 'next-i18next';
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 
-import isImage from '../../../utils/isImage';
-import resizeImage from '../../../utils/resizeImage';
-import Button from '../../atoms/Button';
-import Caption from '../../atoms/Caption';
+import isImage from '../../../../utils/isImage';
+import resizeImage from '../../../../utils/resizeImage';
+import Button from '../../../atoms/Button';
+import Caption from '../../../atoms/Caption';
 
 interface ICoverImageEdit {
   customCoverImageUrl?: string;

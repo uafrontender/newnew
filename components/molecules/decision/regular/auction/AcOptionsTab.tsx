@@ -45,10 +45,10 @@ import BidAmountTextInput from '../../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../../LoadingModal';
 import PaymentModal from '../../../checkout/PaymentModal';
 import GradientMask from '../../../../atoms/GradientMask';
-import OptionActionMobileModal from '../../OptionActionMobileModal';
+import OptionActionMobileModal from '../../common/OptionActionMobileModal';
 
 import NoContentYetImg from '../../../../../public/images/decision/no-content-yet-mock.png';
-import PaymentSuccessModal from '../../PaymentSuccessModal';
+import PaymentSuccessModal from '../../common/PaymentSuccessModal';
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../../atoms/decision/TutorialTooltip';

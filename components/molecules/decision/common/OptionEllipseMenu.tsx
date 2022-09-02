@@ -3,11 +3,11 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
+import isBrowser from '../../../../utils/isBrowser';
+import { checkCanDeleteMcOption } from '../../../../api/endpoints/multiple_choice';
+import { checkCanDeleteAcOption } from '../../../../api/endpoints/auction';
 
-import isBrowser from '../../../utils/isBrowser';
-import { checkCanDeleteMcOption } from '../../../api/endpoints/multiple_choice';
-import { checkCanDeleteAcOption } from '../../../api/endpoints/auction';
+import EllipseMenu, { EllipseMenuButton } from '../../../atoms/EllipseMenu';
 
 interface IOptionMenu {
   xy: {

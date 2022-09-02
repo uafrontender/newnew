@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Text from '../../atoms/Text';
+import Text from '../../../atoms/Text';
 
-import PostFailIcon from '../../../public/images/decision/post-failed-img.png';
+import PostFailIcon from '../../../../public/images/decision/post-failed-img.png';
 
 interface IPostFailedBox {
   title: string;

@@ -2,13 +2,13 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
-import Text from '../../atoms/Text';
-import Modal from '../../organisms/Modal';
-import Headline from '../../atoms/Headline';
-import preventParentClick from '../../../utils/preventParentClick';
+import Text from '../../../atoms/Text';
+import Modal from '../../../organisms/Modal';
+import Headline from '../../../atoms/Headline';
+import preventParentClick from '../../../../utils/preventParentClick';
 
-import Button from '../../atoms/Button';
-import assets from '../../../constants/assets';
+import Button from '../../../atoms/Button';
+import assets from '../../../../constants/assets';
 
 const DARK_IMAGES: any = {
   AC: assets.creation.darkAcAnimated,

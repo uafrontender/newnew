@@ -6,8 +6,8 @@ import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 
 import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
-import PostShareEllipseMenu from '../PostShareEllipseMenu';
-import PostShareEllipseModal from '../PostShareEllipseModal';
+import PostShareEllipseMenu from '../common/PostShareEllipseMenu';
+import PostShareEllipseModal from '../common/PostShareEllipseModal';
 import PostConfirmDeleteModal from './PostConfirmDeleteModal';
 import PostEllipseModalModeration from './PostEllipseModalModeration';
 import PostEllipseMenuModeration from './PostEllipseMenuModeration';

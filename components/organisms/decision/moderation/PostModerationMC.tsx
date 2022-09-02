@@ -37,8 +37,8 @@ import PostVideoModeration from '../../../molecules/decision/moderation/PostVide
 import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTopInfoModeration';
 import Headline from '../../../atoms/Headline';
 import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
-import PostVotingTab from '../../../molecules/decision/PostVotingTab';
-import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
+import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
+import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 import PostResponseTabModeration from '../../../molecules/decision/moderation/PostResponseTabModeration';
 
 import useResponseUpload from '../../../../utils/hooks/useResponseUpload';
@@ -48,13 +48,13 @@ import { usePostModalInnerState } from '../../../../contexts/postModalInnerConte
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const HeroPopup = dynamic(
-  () => import('../../../molecules/decision/HeroPopup')
+  () => import('../../../molecules/decision/common/HeroPopup')
 );
 const ResponseTimer = dynamic(
-  () => import('../../../molecules/decision/ResponseTimer')
+  () => import('../../../molecules/decision/common/ResponseTimer')
 );
 const PostTimer = dynamic(
-  () => import('../../../molecules/decision/PostTimer')
+  () => import('../../../molecules/decision/common/PostTimer')
 );
 const McOptionsTabModeration = dynamic(
   () =>

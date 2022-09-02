@@ -13,13 +13,13 @@ import { useAppSelector } from '../../../redux-store/store';
 import Modal from '../Modal';
 import ModerationView from './moderation';
 import PostModerationControls from '../../molecules/decision/moderation/PostModerationControls';
-import PostSuccessAnimationBackground from '../../molecules/decision/PostSuccessAnimationBackground';
+import PostSuccessAnimationBackground from '../../molecules/decision/success/PostSuccessAnimationBackground';
 
 // Icons
 import assets from '../../../constants/assets';
 
 const PostFailedBox = dynamic(
-  () => import('../../molecules/decision/PostFailedBox')
+  () => import('../../molecules/decision/common/PostFailedBox')
 );
 
 const DARK_IMAGES = {

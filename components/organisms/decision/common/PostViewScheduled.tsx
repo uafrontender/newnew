@@ -19,12 +19,12 @@ import { ChannelsContext } from '../../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 
-import PostVideo from '../../../molecules/decision/PostVideo';
-import PostScheduledSection from '../../../molecules/decision/PostScheduledSection';
+import PostVideo from '../../../molecules/decision/common/PostVideo';
+import PostScheduledSection from '../../../molecules/decision/common/PostScheduledSection';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const PostTopInfo = dynamic(
-  () => import('../../../molecules/decision/PostTopInfo')
+  () => import('../../../molecules/decision/common/PostTopInfo')
 );
 const PostTopInfoModeration = dynamic(
   () => import('../../../molecules/decision/moderation/PostTopInfoModeration')

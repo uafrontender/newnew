@@ -10,7 +10,7 @@ import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 import InlineSvg from '../../../atoms/InlineSVG';
 import Modal from '../../../organisms/Modal';
-import PostSuccessAnimationBackground from '../PostSuccessAnimationBackground';
+import PostSuccessAnimationBackground from '../success/PostSuccessAnimationBackground';
 
 import assets from '../../../../constants/assets';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';

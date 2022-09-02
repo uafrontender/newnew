@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Modal from '../../organisms/Modal';
+import Modal from '../../../organisms/Modal';
 
 interface IOptionActionMobileModal {
   isOpen: boolean;
@@ -10,20 +10,21 @@ interface IOptionActionMobileModal {
   onClose: () => void;
 }
 
-const OptionActionMobileModal: React.FunctionComponent<IOptionActionMobileModal> =
-  ({ isOpen, zIndex, children, onClose }) => (
-    <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
-      <SWrapper>
-        <SContentContainer
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          {children}
-        </SContentContainer>
-      </SWrapper>
-    </Modal>
-  );
+const OptionActionMobileModal: React.FunctionComponent<
+  IOptionActionMobileModal
+> = ({ isOpen, zIndex, children, onClose }) => (
+  <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
+    <SWrapper>
+      <SContentContainer
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        {children}
+      </SContentContainer>
+    </SWrapper>
+  </Modal>
+);
 
 export default OptionActionMobileModal;
 

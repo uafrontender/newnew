@@ -2,7 +2,8 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import Headline from '../../atoms/Headline';
+
+import Headline from '../../../atoms/Headline';
 
 interface IPostTitle {
   shrink?: boolean;

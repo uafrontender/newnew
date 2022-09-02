@@ -11,7 +11,7 @@ import { usePostModalInnerState } from '../../../../contexts/postModalInnerConte
 
 import Text from '../../../atoms/Text';
 import Headline from '../../../atoms/Headline';
-import PostFailedBox from '../PostFailedBox';
+import PostFailedBox from '../common/PostFailedBox';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 
 import assets from '../../../../constants/assets';
