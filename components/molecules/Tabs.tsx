@@ -12,6 +12,7 @@ interface ITabs {
   tabs: Tab[];
   draggable?: boolean;
   activeTabIndex: number;
+  hideIndicatorOnResizing?: boolean;
   withTabIndicator?: boolean;
 }
 
@@ -22,9 +23,17 @@ export interface Tab {
 }
 
 const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
-  const { t, tabs, draggable, activeTabIndex, withTabIndicator } = props;
+  const {
+    t,
+    tabs,
+    draggable,
+    activeTabIndex,
+    withTabIndicator,
+    hideIndicatorOnResizing,
+  } = props;
   const router = useRouter();
 
+  const [isResizing, setIsResizing] = useState(false);
   const [windowSize, setWindowSize] = useState({
     width: isBrowser() ? window?.innerWidth : 0,
     height: isBrowser() ? window?.innerHeight : 0,
@@ -261,10 +270,14 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
 
   useEffect(() => {
     let timeout: any;
+    let timeoutResizing: any;
 
     const updateContainerWidth = () => {
       if (isBrowser()) {
+        setIsResizing(true);
         clearTimeout(timeout);
+        clearTimeout(timeoutResizing);
+
         timeout = setTimeout(() => {
           setContainerWidth(tabsRef.current?.getBoundingClientRect().width!!);
           setWindowSize({
@@ -272,6 +285,10 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
             height: window?.innerHeight ?? 0,
           });
         }, 1500);
+
+        timeoutResizing = setTimeout(() => {
+          setIsResizing(false);
+        }, 2000);
       }
     };
 
@@ -371,6 +388,11 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
             style={{
               width: activeTabIndicator.width,
               left: activeTabIndicator.left,
+              ...(isResizing && hideIndicatorOnResizing
+                ? {
+                    background: 'transparent',
+                  }
+                : {}),
             }}
           />
         )}
