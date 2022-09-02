@@ -527,30 +527,6 @@ const CommentsBottomSection: React.FunctionComponent<
     commentsLoading,
   ]);
 
-  useEffect(() => {
-    const handleScrollCommentsTab = () => {
-      const currScrollTop = scrollRef.current?.scrollTop;
-      if (currScrollTop && currScrollTop <= 0) {
-        document.getElementById('post-modal-container')?.scrollBy({
-          top: -30,
-        });
-      }
-    };
-
-    if (isMobile && isBrowser()) {
-      scrollRef.current?.addEventListener('scroll', handleScrollCommentsTab);
-    }
-
-    return () => {
-      if (isMobile && isBrowser()) {
-        scrollRef.current?.removeEventListener(
-          'scroll',
-          handleScrollCommentsTab
-        );
-      }
-    };
-  }, [isMobile]);
-
   return (
     <>
       <STabContainer
