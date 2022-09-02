@@ -722,7 +722,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     if (
       Object.entries(dataInEdit).some(
         ([key, value]) =>
-          key !== 'genderPronouns' && !validateInputText(value as string)
+          key !== 'genderPronouns' &&
+          key !== 'bio' &&
+          !validateInputText(value as string)
       )
     ) {
       setIsDataValid(false);
