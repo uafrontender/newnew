@@ -26,12 +26,12 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 
 import Headline from '../../../atoms/Headline';
-import PostVotingTab from '../../../molecules/decision/PostVotingTab';
-import PostTopInfoModeration from '../../../molecules/decision/PostTopInfoModeration';
-import PostVideoModeration from '../../../molecules/decision/PostVideoModeration';
-import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
-import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
-import PostResponseTabModeration from '../../../molecules/decision/PostResponseTabModeration';
+import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
+import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTopInfoModeration';
+import PostVideoModeration from '../../../molecules/decision/moderation/PostVideoModeration';
+import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
+import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
+import PostResponseTabModeration from '../../../molecules/decision/moderation/PostResponseTabModeration';
 
 import switchPostType from '../../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../../api/endpoints/post';
@@ -41,23 +41,23 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import useResponseUpload from '../../../../utils/hooks/useResponseUpload';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '..';
+import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
-  () => import('../../../molecules/decision/ResponseTimer')
+  () => import('../../../molecules/decision/common/ResponseTimer')
 );
 const PostTimer = dynamic(
-  () => import('../../../molecules/decision/PostTimer')
+  () => import('../../../molecules/decision/common/PostTimer')
 );
 const AcOptionsTabModeration = dynamic(
   () =>
     import(
-      '../../../molecules/decision/auction/moderation/AcOptionsTabModeration'
+      '../../../molecules/decision/moderation/auction/AcOptionsTabModeration'
     )
 );
 const HeroPopup = dynamic(
-  () => import('../../../molecules/decision/HeroPopup')
+  () => import('../../../molecules/decision/common/HeroPopup')
 );
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {

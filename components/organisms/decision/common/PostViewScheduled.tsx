@@ -11,7 +11,7 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
 // Utils
-import { usePostModalInnerState } from '..';
+import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { markPost } from '../../../../api/endpoints/post';
 import { SocketContext } from '../../../../contexts/socketContext';
@@ -19,15 +19,15 @@ import { ChannelsContext } from '../../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 
-import PostVideo from '../../../molecules/decision/PostVideo';
-import PostScheduledSection from '../../../molecules/decision/PostScheduledSection';
+import PostVideo from '../../../molecules/decision/common/PostVideo';
+import PostScheduledSection from '../../../molecules/decision/common/PostScheduledSection';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const PostTopInfo = dynamic(
-  () => import('../../../molecules/decision/PostTopInfo')
+  () => import('../../../molecules/decision/common/PostTopInfo')
 );
 const PostTopInfoModeration = dynamic(
-  () => import('../../../molecules/decision/PostTopInfoModeration')
+  () => import('../../../molecules/decision/moderation/PostTopInfoModeration')
 );
 
 interface IPostViewScheduled {
