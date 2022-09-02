@@ -5,17 +5,18 @@ import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
-import { usePostModalInnerState } from '.';
+import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
 import { useAppSelector } from '../../../redux-store/store';
 import getDisplayname from '../../../utils/getDisplayname';
 
 import Modal from '../Modal';
 import SuccessView from './success';
 import WaitingForResponseView from './awaiting';
-import PostSuccessOrWaitingControls from '../../molecules/decision/PostSuccessOrWaitingControls';
+import PostSuccessOrWaitingControls from '../../molecules/decision/common/PostSuccessOrWaitingControls';
 
 const PostSuccessAnimationBackground = dynamic(
-  () => import('../../molecules/decision/PostSuccessAnimationBackground')
+  () =>
+    import('../../molecules/decision/success/PostSuccessAnimationBackground')
 );
 const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 

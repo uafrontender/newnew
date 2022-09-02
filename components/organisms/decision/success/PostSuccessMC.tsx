@@ -31,11 +31,11 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 const McSuccessOptionsTab = dynamic(
   () =>
     import(
-      '../../../molecules/decision/multiple_choice/success/McSuccessOptionsTab'
+      '../../../molecules/decision/success/multiple_choice/McSuccessOptionsTab'
     )
 );
 const CommentsBottomSection = dynamic(
-  () => import('../../../molecules/decision/success/CommentsBottomSection')
+  () => import('../../../molecules/decision/common/CommentsBottomSection')
 );
 const DecisionEndedBox = dynamic(
   () => import('../../../molecules/decision/success/DecisionEndedBox')

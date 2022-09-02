@@ -33,33 +33,33 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 
-import PostVideoModeration from '../../../molecules/decision/PostVideoModeration';
-import PostTopInfoModeration from '../../../molecules/decision/PostTopInfoModeration';
+import PostVideoModeration from '../../../molecules/decision/moderation/PostVideoModeration';
+import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTopInfoModeration';
 import Headline from '../../../atoms/Headline';
-import CommentsBottomSection from '../../../molecules/decision/success/CommentsBottomSection';
-import PostVotingTab from '../../../molecules/decision/PostVotingTab';
-import PostTimerEnded from '../../../molecules/decision/PostTimerEnded';
-import PostResponseTabModeration from '../../../molecules/decision/PostResponseTabModeration';
+import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
+import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
+import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
+import PostResponseTabModeration from '../../../molecules/decision/moderation/PostResponseTabModeration';
 
 import useResponseUpload from '../../../../utils/hooks/useResponseUpload';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '..';
+import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const HeroPopup = dynamic(
-  () => import('../../../molecules/decision/HeroPopup')
+  () => import('../../../molecules/decision/common/HeroPopup')
 );
 const ResponseTimer = dynamic(
-  () => import('../../../molecules/decision/ResponseTimer')
+  () => import('../../../molecules/decision/common/ResponseTimer')
 );
 const PostTimer = dynamic(
-  () => import('../../../molecules/decision/PostTimer')
+  () => import('../../../molecules/decision/common/PostTimer')
 );
 const McOptionsTabModeration = dynamic(
   () =>
     import(
-      '../../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration'
+      '../../../molecules/decision/moderation/multiple_choice/McOptionsTabModeration'
     )
 );
 

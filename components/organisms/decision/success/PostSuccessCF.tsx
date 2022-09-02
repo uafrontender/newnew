@@ -28,7 +28,7 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 
 const CommentsBottomSection = dynamic(
-  () => import('../../../molecules/decision/success/CommentsBottomSection')
+  () => import('../../../molecules/decision/common/CommentsBottomSection')
 );
 
 interface IPostSuccessCF {

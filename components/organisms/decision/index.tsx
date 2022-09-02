@@ -4,8 +4,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, {
-  createContext,
-  MutableRefObject,
   useCallback,
   useContext,
   useEffect,
@@ -18,6 +16,16 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 
+import { Mixpanel } from '../../../utils/mixpanel';
+import isBrowser from '../../../utils/isBrowser';
+import switchPostType from '../../../utils/switchPostType';
+import switchPostStatus, {
+  TPostStatusStringified,
+} from '../../../utils/switchPostStatus';
+import switchPostStatusString from '../../../utils/switchPostStatusString';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
+
 import {
   deleteMyPost,
   fetchMoreLikePosts,
@@ -25,124 +33,16 @@ import {
   markPost,
 } from '../../../api/endpoints/post';
 import { useAppSelector } from '../../../redux-store/store';
-
-// Utils
-import isBrowser from '../../../utils/isBrowser';
-import switchPostType, { TPostType } from '../../../utils/switchPostType';
-import switchPostStatus, {
-  TPostStatusStringified,
-} from '../../../utils/switchPostStatus';
-import switchPostStatusString from '../../../utils/switchPostStatusString';
+import { usePostModalState } from '../../../contexts/postModalContext';
 import CommentFromUrlContextProvider, {
   CommentFromUrlContext,
 } from '../../../contexts/commentFromUrlContext';
-import { reportPost } from '../../../api/endpoints/report';
-import { ReportData } from '../../molecules/chat/ReportModal';
-import { Mixpanel } from '../../../utils/mixpanel';
-import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
-import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
-import { usePostModalState } from '../../../contexts/postModalContext';
+import PostModalInnerContextProvider from '../../../contexts/postModalInnerContext';
 
 // Views
 import PostModalRegular from './PostModalRegular';
 import PostModalModeration from './PostModalModeration';
 import PostModalAwaitingSuccess from './PostModalAwaitingSuccess';
-
-const PostModalInnerContext = createContext<{
-  open: boolean;
-  modalContainerRef: MutableRefObject<HTMLDivElement | undefined>;
-  isMyPost: boolean;
-  postParsed:
-    | newnewapi.Auction
-    | newnewapi.Crowdfunding
-    | newnewapi.MultipleChoice
-    | undefined;
-  typeOfPost: TPostType | undefined;
-  postStatus: TPostStatusStringified;
-  isFollowingDecision: boolean;
-  deletedByCreator: boolean;
-  hasRecommendations: boolean;
-  recommendedPosts: newnewapi.Post[];
-  saveCard: boolean | undefined;
-  stripeSetupIntentClientSecret: string | undefined;
-  loadingRef: any;
-  recommendedPostsLoading: boolean;
-  reportPostOpen: boolean;
-  handleSeeNewDeletedBox: () => void;
-  handleOpenRecommendedPost: (newPost: newnewapi.Post) => void;
-  handleReportSubmit: ({ reasons, message }: ReportData) => Promise<void>;
-  handleReportClose: () => void;
-  handleSetIsFollowingDecision: (v: boolean) => void;
-  handleGoBackInsidePost: () => void;
-  handleUpdatePostStatus: (newStatus: number | string) => void;
-  handleRemoveFromStateUnfavorited: (() => void) | undefined;
-  handleAddPostToStateFavorited: (() => void) | undefined;
-  handleReportOpen: () => void;
-  resetSetupIntentClientSecret: () => void;
-  handleCloseAndGoBack: () => void;
-  shareMenuOpen: boolean;
-  deletePostOpen: boolean;
-  ellipseMenuOpen: boolean;
-  handleDeletePost: () => Promise<void>;
-  handleFollowDecision: () => Promise<void>;
-  handleEllipseMenuClose: () => void;
-  handleOpenDeletePostModal: () => void;
-  handleShareClose: () => void;
-  handleOpenShareMenu: () => void;
-  handleOpenEllipseMenu: () => void;
-  handleCloseDeletePostModal: () => void;
-}>({
-  open: false,
-  modalContainerRef: {} as MutableRefObject<HTMLDivElement | undefined>,
-  isMyPost: false,
-  postParsed: undefined,
-  typeOfPost: undefined,
-  postStatus: 'voting',
-  isFollowingDecision: false,
-  deletedByCreator: false,
-  hasRecommendations: false,
-  recommendedPosts: [],
-  saveCard: undefined,
-  stripeSetupIntentClientSecret: undefined,
-  loadingRef: undefined,
-  recommendedPostsLoading: false,
-  reportPostOpen: false,
-  handleSeeNewDeletedBox: () => {},
-  handleOpenRecommendedPost: (newPost: newnewapi.Post) => {},
-  handleReportSubmit: (() => {}) as unknown as ({
-    reasons,
-    message,
-  }: ReportData) => Promise<void>,
-  handleReportClose: () => {},
-  handleSetIsFollowingDecision: (v: boolean) => {},
-  handleGoBackInsidePost: () => {},
-  handleUpdatePostStatus: (newStatus: number | string) => {},
-  handleRemoveFromStateUnfavorited: undefined,
-  handleAddPostToStateFavorited: undefined,
-  handleReportOpen: () => {},
-  resetSetupIntentClientSecret: () => {},
-  handleCloseAndGoBack: () => {},
-  shareMenuOpen: false,
-  deletePostOpen: false,
-  ellipseMenuOpen: false,
-  handleDeletePost: (() => {}) as () => Promise<void>,
-  handleFollowDecision: (() => {}) as () => Promise<void>,
-  handleEllipseMenuClose: () => {},
-  handleOpenDeletePostModal: () => {},
-  handleShareClose: () => {},
-  handleOpenShareMenu: () => {},
-  handleOpenEllipseMenu: () => {},
-  handleCloseDeletePostModal: () => {},
-});
-
-export function usePostModalInnerState() {
-  const context = useContext(PostModalInnerContext);
-  if (!context)
-    throw new Error(
-      'usePostModalInnerState must be used inside a `PostModalInnerContextProvider`'
-    );
-  return context;
-}
 
 interface IPostModal {
   isOpen: boolean;
@@ -230,10 +130,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const handleSetIsFollowingDecision = (v: boolean) =>
     setIsFollowingDecision(v);
 
-  const [shareMenuOpen, setShareMenuOpen] = useState(false);
-  const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
-  const [reportPostOpen, setReportPostOpen] = useState(false);
-
   const handleFollowDecision = useCallback(async () => {
     try {
       Mixpanel.track('Favorite Post', {
@@ -291,37 +187,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     },
     [typeOfPost]
   );
-
-  const handleReportOpen = useCallback(() => {
-    if (!user.loggedIn && user._persist?.rehydrated) {
-      router.push(
-        `/sign-up?reason=report&redirect=${encodeURIComponent(
-          window.location.href
-        )}`
-      );
-      return;
-    }
-    setReportPostOpen(true);
-  }, [user, router]);
-
-  const handleOpenShareMenu = useCallback(() => {
-    setShareMenuOpen(true);
-  }, []);
-  const handleOpenEllipseMenu = useCallback(() => {
-    setEllipseMenuOpen(true);
-  }, []);
-
-  const handleReportClose = useCallback(() => {
-    setReportPostOpen(false);
-  }, []);
-
-  const handleShareClose = useCallback(() => {
-    setShareMenuOpen(false);
-  }, []);
-
-  const handleEllipseMenuClose = useCallback(() => {
-    setEllipseMenuOpen(false);
-  }, []);
 
   const isMyPost = useMemo(
     () =>
@@ -394,16 +259,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     postStatus,
     postStatusesToUseHideInsteadOfDelete,
   ]);
-
-  useEffect(() => {
-    if (commentIdFromUrl) {
-      handleSetCommentIdFromUrl?.(commentIdFromUrl);
-    }
-    if (commentContentFromUrl) {
-      handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentIdFromUrl, commentContentFromUrl]);
 
   const resetSetupIntentClientSecret = useCallback(() => {
     setStripeSetupIntentClientSecret(undefined);
@@ -559,97 +414,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     [setRecommendedPosts, recommendedPostsLoading, postParsed]
   );
 
-  const handleReportSubmit = useCallback(
-    async ({ reasons, message }: ReportData) => {
-      if (postParsed) {
-        await reportPost(postParsed.postUuid, reasons, message).catch((e) =>
-          console.error(e)
-        );
-      }
-    },
-    [postParsed]
-  );
+  // Comment ID from URL
+  useEffect(() => {
+    if (commentIdFromUrl) {
+      handleSetCommentIdFromUrl?.(commentIdFromUrl);
+    }
+    if (commentContentFromUrl) {
+      handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [commentIdFromUrl, commentContentFromUrl]);
 
-  const contextValueMemo = useMemo(
-    () => ({
-      open,
-      modalContainerRef,
-      isMyPost,
-      postParsed,
-      typeOfPost,
-      postStatus,
-      isFollowingDecision,
-      deletedByCreator,
-      hasRecommendations: recommendedPosts.length > 0,
-      recommendedPosts,
-      saveCard,
-      stripeSetupIntentClientSecret,
-      handleSeeNewDeletedBox,
-      handleOpenRecommendedPost,
-      loadingRef,
-      recommendedPostsLoading,
-      reportPostOpen,
-      handleReportSubmit,
-      handleReportClose,
-      handleSetIsFollowingDecision,
-      handleGoBackInsidePost,
-      handleUpdatePostStatus,
-      handleRemoveFromStateUnfavorited,
-      handleAddPostToStateFavorited,
-      handleReportOpen,
-      resetSetupIntentClientSecret,
-      handleCloseAndGoBack,
-      shareMenuOpen,
-      deletePostOpen,
-      ellipseMenuOpen,
-      handleDeletePost,
-      handleFollowDecision,
-      handleEllipseMenuClose,
-      handleOpenDeletePostModal,
-      handleShareClose,
-      handleOpenShareMenu,
-      handleOpenEllipseMenu,
-      handleCloseDeletePostModal,
-    }),
-    [
-      deletedByCreator,
-      handleAddPostToStateFavorited,
-      handleCloseAndGoBack,
-      handleGoBackInsidePost,
-      handleOpenRecommendedPost,
-      handleRemoveFromStateUnfavorited,
-      handleReportClose,
-      handleReportOpen,
-      handleReportSubmit,
-      handleSeeNewDeletedBox,
-      handleUpdatePostStatus,
-      isFollowingDecision,
-      isMyPost,
-      loadingRef,
-      open,
-      postParsed,
-      postStatus,
-      recommendedPosts,
-      recommendedPostsLoading,
-      reportPostOpen,
-      resetSetupIntentClientSecret,
-      saveCard,
-      stripeSetupIntentClientSecret,
-      typeOfPost,
-      shareMenuOpen,
-      deletePostOpen,
-      ellipseMenuOpen,
-      handleDeletePost,
-      handleFollowDecision,
-      handleEllipseMenuClose,
-      handleOpenDeletePostModal,
-      handleShareClose,
-      handleOpenShareMenu,
-      handleOpenEllipseMenu,
-      handleCloseDeletePostModal,
-    ]
-  );
-
+  // Additional hash
   useEffect(() => {
     if (isOpen && postParsed) {
       let additionalHash;
@@ -698,6 +474,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.locale]);
 
+  // Fetch whether or not the Post is favorited
   useEffect(() => {
     async function fetchIsFavorited() {
       try {
@@ -822,6 +599,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, isConfirmToClosePost]);
 
+  // Infinite scroll
   useEffect(() => {
     if (inView && !recommendedPostsLoading) {
       if (nextPageToken) {
@@ -843,6 +621,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     triedLoading,
   ]);
 
+  // Post status
   useEffect(() => {
     setPostStatus(() => {
       if (typeOfPost && postParsed?.status) {
@@ -863,7 +642,35 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   }, []);
 
   return (
-    <PostModalInnerContext.Provider value={contextValueMemo}>
+    <PostModalInnerContextProvider
+      open={open}
+      postParsed={postParsed}
+      typeOfPost={typeOfPost}
+      postStatus={postStatus}
+      handleUpdatePostStatus={handleUpdatePostStatus}
+      loadingRef={loadingRef}
+      modalContainerRef={modalContainerRef}
+      isMyPost={isMyPost}
+      deletedByCreator={deletedByCreator}
+      handleSeeNewDeletedBox={handleSeeNewDeletedBox}
+      recommendedPosts={recommendedPosts}
+      recommendedPostsLoading={recommendedPostsLoading}
+      handleOpenRecommendedPost={handleOpenRecommendedPost}
+      saveCard={saveCard}
+      stripeSetupIntentClientSecret={stripeSetupIntentClientSecret}
+      resetSetupIntentClientSecret={resetSetupIntentClientSecret}
+      handleCloseAndGoBack={handleCloseAndGoBack}
+      handleGoBackInsidePost={handleGoBackInsidePost}
+      isFollowingDecision={isFollowingDecision}
+      handleFollowDecision={handleFollowDecision}
+      handleSetIsFollowingDecision={handleSetIsFollowingDecision}
+      handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited}
+      handleAddPostToStateFavorited={handleAddPostToStateFavorited}
+      deletePostOpen={deletePostOpen}
+      handleDeletePost={handleDeletePost}
+      handleOpenDeletePostModal={handleOpenDeletePostModal}
+      handleCloseDeletePostModal={handleCloseDeletePostModal}
+    >
       {isMyPost ? (
         // Render Moderation view
         <PostModalModeration />
@@ -874,7 +681,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         // Render regular view
         <PostModalRegular />
       )}
-    </PostModalInnerContext.Provider>
+    </PostModalInnerContextProvider>
   );
 };
 

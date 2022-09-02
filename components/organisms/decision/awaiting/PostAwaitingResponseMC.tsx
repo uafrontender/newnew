@@ -28,12 +28,12 @@ const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
 );
 const CommentsBottomSection = dynamic(
-  () => import('../../../molecules/decision/success/CommentsBottomSection')
+  () => import('../../../molecules/decision/common/CommentsBottomSection')
 );
 const McSuccessOptionsTab = dynamic(
   () =>
     import(
-      '../../../molecules/decision/multiple_choice/success/McSuccessOptionsTab'
+      '../../../molecules/decision/success/multiple_choice/McSuccessOptionsTab'
     )
 );
 interface IPostAwaitingResponseMC {

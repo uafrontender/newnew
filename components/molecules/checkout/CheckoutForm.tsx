@@ -222,11 +222,13 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           {/* Show save toggle only if user already has primary card otherwise card will be saved in any case */}
           {isStripeReady && primaryCard && (
             <SSaveCard>
+              <SSaveCardText variant={3} weight={600}>
+                {t('saveCard')}
+              </SSaveCardText>
               <Toggle
                 checked={saveCard}
                 onChange={() => setSaveCard((prevState) => !prevState)}
               />
-              <SSaveCardText variant={3}>{t('saveCard')}</SSaveCardText>
             </SSaveCard>
           )}
         </SPaymentFormWrapper>
@@ -310,13 +312,18 @@ const SPaymentFormWrapper = styled.div`
 
 const SSaveCard = styled.div`
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin-top: 12px;
+
+  padding-top: 14px;
+  border-top: 1px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
+
+  margin-top: 24px;
+  margin-bottom: 20px;
 `;
 
-const SSaveCardText = styled(Text)`
-  margin-left: 8px;
-`;
+const SSaveCardText = styled(Text)``;
 
 const RewardContainer = styled.div`
   display: flex;
