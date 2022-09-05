@@ -16,9 +16,6 @@ import Modal from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
 import Button from '../../atoms/Button';
 import CheckMark from '../CheckMark';
-import InlineSvg from '../../atoms/InlineSVG';
-
-import CloseIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
 export interface ReportData {
   reasons: newnewapi.ReportingReason[];
@@ -216,9 +213,6 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             isCloseButton
             onClick={preventParentClick()}
           >
-            <SCloseButton onClick={handleClose}>
-              <InlineSvg svg={CloseIcon} />
-            </SCloseButton>
             <SConformationTitle>
               {t('modal.reportSent.title')}
             </SConformationTitle>
@@ -387,14 +381,6 @@ const SConformationModal = styled(ModalPaper)`
   ${(props) => props.theme.media.tablet} {
     max-width: 480px;
   }
-`;
-
-const SCloseButton = styled.div`
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  color: white;
-  cursor: pointer;
 `;
 
 const SConformationTitle = styled.strong`
