@@ -34,7 +34,8 @@ interface IConfirmEmail {
 
 const ConfirmEmail: NextPage<IConfirmEmail> = ({ email_address, token }) => {
   const router = useRouter();
-  const { t } = useTranslation('page-VerifyEmail');
+  const { t: tVerifyEmail } = useTranslation('page-VerifyEmail');
+  const { t } = useTranslation('page-Profile');
   const { syncedHistoryReplaceState } = useSynchronizedHistory();
   const { loggedIn, _persist } = useAppSelector((state) => state.user);
 
@@ -83,7 +84,7 @@ const ConfirmEmail: NextPage<IConfirmEmail> = ({ email_address, token }) => {
       if (
         data?.status === newnewapi.ConfirmMyEmailResponse.Status.AUTH_FAILURE
       ) {
-        setErrorMessage(t('error.invalidCode'));
+        setErrorMessage(tVerifyEmail('error.invalidCode'));
         throw new Error('Invalid code');
       }
 
@@ -91,11 +92,11 @@ const ConfirmEmail: NextPage<IConfirmEmail> = ({ email_address, token }) => {
         data?.status !== newnewapi.ConfirmMyEmailResponse.Status.SUCCESS ||
         error
       ) {
-        setErrorMessage(t(error?.message ?? 'Request failed'));
+        setErrorMessage(error?.message ?? 'Request failed');
         throw new Error(error?.message ?? 'Request failed');
       }
 
-      router.push(
+      router.replace(
         '/profile/settings?editEmail=true&step=1',
         '/profile/settings/edit-email?step=1'
       );
@@ -105,7 +106,7 @@ const ConfirmEmail: NextPage<IConfirmEmail> = ({ email_address, token }) => {
       isSubmitted.current = true;
       setIsLoading(false);
     }
-  }, [t, tokenValue, router]);
+  }, [tVerifyEmail, tokenValue, router]);
 
   useEffect(() => {
     if (tokenValue && emailAddress && !isSubmitted.current && !isLoading) {
@@ -137,7 +138,7 @@ const ConfirmEmail: NextPage<IConfirmEmail> = ({ email_address, token }) => {
         }}
         errorMessage={errorMessage}
         isLoading={isLoading}
-        text={t('verifying')}
+        text={tVerifyEmail('verifying')}
       />
     </div>
   );
@@ -153,6 +154,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'page-VerifyEmail',
+    'page-Profile',
   ]);
 
   const { email_address, token } = context.query;

@@ -14,11 +14,11 @@ import { sendVerificationNewEmail } from '../../../api/endpoints/user';
 
 import Logo from '../../../public/images/svg/mobile-logo.svg';
 
-interface IEditEmailModal {
+interface IEditEmailStepTwoModal {
   onComplete: (email: string) => void;
 }
 
-const EditEmailModal = ({ onComplete }: IEditEmailModal) => {
+const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
   const { t } = useTranslation('page-Profile');
   const { t: tVerify } = useTranslation('page-VerifyEmail');
   const { t: tCommon } = useTranslation('common');
@@ -131,7 +131,7 @@ const EditEmailModal = ({ onComplete }: IEditEmailModal) => {
   );
 };
 
-export default EditEmailModal;
+export default EditEmailStepTwoModal;
 
 const SHeadline = styled(Headline)`
   text-align: center;

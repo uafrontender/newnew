@@ -92,23 +92,29 @@ const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
     >
       {show && (
         <SModalPaper isCloseButton onClose={onClose} isMobileFullScreen>
-          {(step === Steps.verifyEmail || step === Steps.newEmail) && (
-            <AnimationContent
-              initial={step === Steps.newEmail ? MInitialDisappear : false}
-              animate={step === Steps.newEmail ? MAnimationDisappear : false}
-            >
-              <AnimatePresence>
-                <SContent>
-                  <EditEmailStepOne onComplete={completeStepOne} />
-                </SContent>
-              </AnimatePresence>
-            </AnimationContent>
-          )}
+          {(step === Steps.verifyEmail || step === Steps.newEmail) &&
+            (!initialStep || initialStep === Steps.verifyEmail.toString()) && (
+              <AnimationContent
+                initial={step === Steps.newEmail ? MInitialDisappear : false}
+                animate={step === Steps.newEmail ? MAnimationDisappear : false}
+              >
+                <AnimatePresence>
+                  <SContent>
+                    <EditEmailStepOne onComplete={completeStepOne} />
+                  </SContent>
+                </AnimatePresence>
+              </AnimationContent>
+            )}
 
           {(step === Steps.newEmail || step === Steps.verifyNewEmail) && (
             <AnimationContent
               initial={
-                step === Steps.newEmail ? MInitialAppear : MInitialDisappear
+                // eslint-disable-next-line no-nested-ternary
+                initialStep === Steps.newEmail.toString()
+                  ? false
+                  : step === Steps.newEmail
+                  ? MInitialAppear
+                  : MInitialDisappear
               }
               animate={
                 step === Steps.newEmail ? MAnimationAppear : MAnimationDisappear
@@ -122,33 +128,38 @@ const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
             </AnimationContent>
           )}
 
-          {(step === Steps.verifyNewEmail || step === Steps.success) && (
-            <AnimationContent
-              initial={
-                step === Steps.verifyNewEmail
-                  ? MInitialAppear
-                  : MInitialDisappear
-              }
-              animate={
-                step === Steps.verifyNewEmail
-                  ? MAnimationAppear
-                  : MAnimationDisappear
-              }
-            >
-              <AnimatePresence>
-                <SContent>
-                  <EditEmailStepThree
-                    onComplete={completeStepThree}
-                    newEmail={newEmail}
-                  />
-                </SContent>
-              </AnimatePresence>
-            </AnimationContent>
-          )}
+          {(step === Steps.verifyNewEmail || step === Steps.success) &&
+            (!initialStep || initialStep !== Steps.success.toString()) && (
+              <AnimationContent
+                initial={
+                  step === Steps.verifyNewEmail
+                    ? MInitialAppear
+                    : MInitialDisappear
+                }
+                animate={
+                  step === Steps.verifyNewEmail
+                    ? MAnimationAppear
+                    : MAnimationDisappear
+                }
+              >
+                <AnimatePresence>
+                  <SContent>
+                    <EditEmailStepThree
+                      onComplete={completeStepThree}
+                      newEmail={newEmail}
+                    />
+                  </SContent>
+                </AnimatePresence>
+              </AnimationContent>
+            )}
 
           {step === Steps.success && (
             <AnimationContent
-              initial={MInitialAppear}
+              initial={
+                initialStep === Steps.success.toString()
+                  ? false
+                  : MInitialAppear
+              }
               animate={MAnimationAppear}
               centered
             >
