@@ -181,6 +181,15 @@ const SOnboardingInput = styled.input<ISOnboardingInput>`
       return theme.colorsThemed.accent.error;
     }};
   }
+
+  // hide autofill icon in Safari
+  &::-webkit-contacts-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+  }
 `;
 
 const SErrorDiv = styled.div`
