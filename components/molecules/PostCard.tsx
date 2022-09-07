@@ -667,12 +667,6 @@ export const PostCard: React.FC<ICard> = React.memo(
               >
                 {postParsed.creator?.nickname}
               </SUsername>
-              <SInlineSVG
-                svg={VerificationCheckmark}
-                width='16px'
-                height='16px'
-                fill='none'
-              />
               {postParsed.creator?.options?.isVerified && (
                 <SInlineSVG
                   svg={VerificationCheckmark}

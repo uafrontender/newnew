@@ -14,11 +14,11 @@ import { sendVerificationNewEmail } from '../../../api/endpoints/user';
 
 import Logo from '../../../public/images/svg/mobile-logo.svg';
 
-interface IEditEmailModal {
+interface IEditEmailStepTwoModal {
   onComplete: (email: string) => void;
 }
 
-const EditEmailModal = ({ onComplete }: IEditEmailModal) => {
+const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
   const { t } = useTranslation('page-Profile');
   const { t: tVerify } = useTranslation('page-VerifyEmail');
   const { t: tCommon } = useTranslation('common');
@@ -45,54 +45,60 @@ const EditEmailModal = ({ onComplete }: IEditEmailModal) => {
     }
   };
 
-  const requestVerificationCode = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const sendVerificationCodePayload =
-        new newnewapi.SendVerificationEmailRequest({
-          emailAddress: newEmail,
-          useCase: newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
-        });
+  const requestVerificationCode = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      try {
+        setIsLoading(true);
+        const sendVerificationCodePayload =
+          new newnewapi.SendVerificationEmailRequest({
+            emailAddress: newEmail,
+            useCase:
+              newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
+          });
 
-      const { data, error } = await sendVerificationNewEmail(
-        sendVerificationCodePayload
-      );
+        const { data, error } = await sendVerificationNewEmail(
+          sendVerificationCodePayload
+        );
 
-      if (
-        data?.status ===
-        newnewapi.SendVerificationEmailResponse.Status.EMAIL_TAKEN
-      ) {
-        setNewEmailError(tVerify('error.emailTaken'));
-        setIsValid(false);
+        if (
+          data?.status ===
+          newnewapi.SendVerificationEmailResponse.Status.EMAIL_TAKEN
+        ) {
+          setNewEmailError(tVerify('error.emailTaken'));
+          setIsValid(false);
 
-        throw new Error('Email taken');
+          throw new Error('Email taken');
+        }
+
+        if (
+          data?.status ===
+          newnewapi.SendVerificationEmailResponse.Status
+            .NOT_CONFIRMED_EXISTING_EMAIL
+        ) {
+          setNewEmailError(tVerify('error.notConfirmedEmail'));
+          setIsValid(false);
+
+          throw new Error('Existing email is not Not confirmed');
+        }
+
+        if (
+          data?.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SUCCESS
+        ) {
+          toast.error(tCommon('toastErrors.generic'));
+          throw new Error(error?.message ?? 'Request failed');
+        }
+
+        onComplete(newEmail);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
       }
-
-      if (
-        data?.status ===
-        newnewapi.SendVerificationEmailResponse.Status
-          .NOT_CONFIRMED_EXISTING_EMAIL
-      ) {
-        setNewEmailError(tVerify('error.notConfirmedEmail'));
-        setIsValid(false);
-
-        throw new Error('Existing email is not Not confirmed');
-      }
-
-      if (
-        data?.status !== newnewapi.SendVerificationEmailResponse.Status.SUCCESS
-      ) {
-        toast.error(tCommon('toastErrors.generic'));
-        throw new Error(error?.message ?? 'Request failed');
-      }
-
-      onComplete(newEmail);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [onComplete, newEmail, tVerify, tCommon]);
+    },
+    [onComplete, newEmail, tVerify, tCommon]
+  );
 
   return (
     <>
@@ -105,33 +111,35 @@ const EditEmailModal = ({ onComplete }: IEditEmailModal) => {
       <SHeadline variant={4}>
         {t('Settings.sections.personalInformation.emailInput.whatsNew')}
       </SHeadline>
-      <SInputWrapper>
-        <SettingEmailInput
-          labelCaption={t(
-            'Settings.sections.personalInformation.emailInput.label'
-          )}
-          placeholder={t(
-            'Settings.sections.personalInformation.emailInput.placeholder'
-          )}
-          isValid={isValid}
-          errorCaption={newEmailError}
-          onChange={handleSetNewEmail}
-          value={newEmail}
-          disabled={isLoading}
-        />
-      </SInputWrapper>
-      <SButton
-        onClick={requestVerificationCode}
-        disabled={!newEmail || !!newEmailError}
-        loading={isLoading}
-      >
-        {t('Settings.sections.personalInformation.emailInput.confirmEmail')}
-      </SButton>
+      <SForm onSubmit={requestVerificationCode}>
+        <SInputWrapper>
+          <SettingEmailInput
+            labelCaption={t(
+              'Settings.sections.personalInformation.emailInput.label'
+            )}
+            placeholder={t(
+              'Settings.sections.personalInformation.emailInput.placeholder'
+            )}
+            isValid={isValid}
+            errorCaption={newEmailError}
+            onChange={handleSetNewEmail}
+            value={newEmail}
+            disabled={isLoading}
+          />
+        </SInputWrapper>
+        <SButton
+          type='submit'
+          disabled={!newEmail || !!newEmailError}
+          loading={isLoading}
+        >
+          {t('Settings.sections.personalInformation.emailInput.confirmEmail')}
+        </SButton>
+      </SForm>
     </>
   );
 };
 
-export default EditEmailModal;
+export default EditEmailStepTwoModal;
 
 const SHeadline = styled(Headline)`
   text-align: center;
@@ -140,6 +148,12 @@ const SHeadline = styled(Headline)`
   ${({ theme }) => theme.media.laptopM} {
     margin-bottom: 40px;
   }
+`;
+
+const SForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const SInputWrapper = styled.div`
