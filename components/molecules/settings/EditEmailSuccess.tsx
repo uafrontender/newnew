@@ -8,11 +8,11 @@ import Button from '../../atoms/Button';
 
 import Logo from '../../../public/images/svg/mobile-logo.svg';
 
-interface IEditEmailModal {
+interface IEditEmailSuccessModal {
   onComplete: () => void;
 }
 
-const EditEmailModal = ({ onComplete }: IEditEmailModal) => {
+const EditEmailSuccessModal = ({ onComplete }: IEditEmailSuccessModal) => {
   const theme = useTheme();
   const { t } = useTranslation('page-VerifyEmail');
 
@@ -30,7 +30,7 @@ const EditEmailModal = ({ onComplete }: IEditEmailModal) => {
   );
 };
 
-export default EditEmailModal;
+export default EditEmailSuccessModal;
 
 const SHeadline = styled(Headline)`
   text-align: center;

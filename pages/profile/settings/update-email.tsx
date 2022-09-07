@@ -37,7 +37,8 @@ const UdpateEmail: NextPage<IUdpateEmail> = ({ email_address, token }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const { t } = useTranslation('page-VerifyEmail');
+  const { t: tVerifyEmail } = useTranslation('page-VerifyEmail');
+  const { t } = useTranslation('page-Profile');
   const { syncedHistoryReplaceState } = useSynchronizedHistory();
   const { loggedIn, _persist } = useAppSelector((state) => state.user);
 
@@ -65,7 +66,7 @@ const UdpateEmail: NextPage<IUdpateEmail> = ({ email_address, token }) => {
 
   useEffect(() => {
     if (router.isReady && !router.query.token) {
-      router.push('/profile/settings');
+      router.replace('/profile/settings');
     }
   }, [router]);
 
@@ -87,7 +88,7 @@ const UdpateEmail: NextPage<IUdpateEmail> = ({ email_address, token }) => {
       if (
         data?.status === newnewapi.ConfirmMyEmailResponse.Status.AUTH_FAILURE
       ) {
-        setErrorMessage(t('error.invalidCode'));
+        setErrorMessage(tVerifyEmail('error.invalidCode'));
         throw new Error('Invalid code');
       }
 
@@ -95,7 +96,7 @@ const UdpateEmail: NextPage<IUdpateEmail> = ({ email_address, token }) => {
         data?.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS ||
         error
       ) {
-        setErrorMessage(t(error?.message ?? 'Request failed'));
+        setErrorMessage(error?.message ?? 'Request failed');
 
         throw new Error(error?.message ?? 'Request failed');
       }
@@ -105,16 +106,16 @@ const UdpateEmail: NextPage<IUdpateEmail> = ({ email_address, token }) => {
           email: data?.me?.email,
         })
       );
-      router.push(
+      router.replace(
         '/profile/settings?editEmail=true&step=3',
-        '/profile/settings/edit-email?step=3'
+        '/profile/settings/edit-email'
       );
     } catch (err) {
       console.error(err);
     } finally {
       setIsLoading(false);
     }
-  }, [emailAddress, dispatch, tokenValue, t, router]);
+  }, [emailAddress, dispatch, tokenValue, tVerifyEmail, router]);
 
   useEffect(() => {
     if (tokenValue && emailAddress && !isSubmitted.current && !isLoading) {
@@ -141,11 +142,11 @@ const UdpateEmail: NextPage<IUdpateEmail> = ({ email_address, token }) => {
       <EditEmailLoadingModal
         show
         onClose={() => {
-          router.push('/profile/settings');
+          router.replace('/profile/settings');
         }}
         errorMessage={errorMessage}
         isLoading={isLoading}
-        text={t('verifying')}
+        text={tVerifyEmail('verifying')}
       />
     </div>
   );
@@ -161,6 +162,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'page-VerifyEmail',
+    'page-Profile',
   ]);
 
   const { email_address, token } = context.query;

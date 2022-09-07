@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import dynamic from 'next/dynamic';
 
 import { useAppSelector } from '../../redux-store/store';
@@ -28,6 +28,7 @@ const ModalPaper: React.FC<IModalPaper> = React.memo(
     isMobileFullScreen,
     ...otherProps
   }) => {
+    const theme = useTheme();
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -51,7 +52,12 @@ const ModalPaper: React.FC<IModalPaper> = React.memo(
           )}
           {isCloseButton && !isMobileFullScreen && (
             <SCloseButton onClick={onClose}>
-              <InlineSvg svg={CloseIcon} />
+              <InlineSvg
+                svg={CloseIcon}
+                fill={theme.colorsThemed.text.primary}
+                width='24px'
+                height='24px'
+              />
             </SCloseButton>
           )}
           <SContent>{children}</SContent>

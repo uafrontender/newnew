@@ -19,12 +19,15 @@ import { setUserData } from '../../../redux-store/slices/userStateSlice';
 import Logo from '../../../public/images/svg/mobile-logo.svg';
 import { useAppDispatch } from '../../../redux-store/store';
 
-interface IEditEmailModal {
+interface IEditEmailStepThreeModal {
   onComplete: () => void;
   newEmail: string;
 }
 
-const EditEmailModal = ({ onComplete, newEmail }: IEditEmailModal) => {
+const EditEmailStepThreeModal = ({
+  onComplete,
+  newEmail,
+}: IEditEmailStepThreeModal) => {
   const { t } = useTranslation('page-Profile');
   const { t: tVerifyEmail } = useTranslation('page-VerifyEmail');
   const theme = useTheme();
@@ -174,7 +177,7 @@ const EditEmailModal = ({ onComplete, newEmail }: IEditEmailModal) => {
   );
 };
 
-export default EditEmailModal;
+export default EditEmailStepThreeModal;
 
 const SWrapper = styled.div`
   display: flex;
