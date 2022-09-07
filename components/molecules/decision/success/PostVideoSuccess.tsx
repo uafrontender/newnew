@@ -29,6 +29,7 @@ interface IPostVideoSuccess {
   announcement: newnewapi.IVideoUrls;
   response?: newnewapi.IVideoUrls;
   responseViewed: boolean;
+  additionalResponses?: newnewapi.IVideoUrls[];
   openedTab: 'announcement' | 'response';
   setOpenedTab: (tab: 'announcement' | 'response') => void;
   handleSetResponseViewed: (newValue: boolean) => void;
@@ -42,6 +43,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
   announcement,
   response,
   responseViewed,
+  additionalResponses,
   openedTab,
   setOpenedTab,
   handleSetResponseViewed,

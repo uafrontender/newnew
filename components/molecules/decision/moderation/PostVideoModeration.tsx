@@ -25,7 +25,6 @@ import VolumeOn from '../../../../public/images/svg/icons/filled/VolumeON.svg';
 import ThumbnailIcon from '../../../../public/images/svg/icons/filled/AddImage.svg';
 
 import PostVideoResponseUpload from './PostVideoResponseUpload';
-import ToggleVideoWidget from '../../../atoms/moderation/ToggleVideoWidget';
 import {
   TThumbnailParameters,
   TVideoProcessingData,
@@ -36,6 +35,8 @@ import isBrowser from '../../../../utils/isBrowser';
 import PostVideoCoverImageEdit from './PostVideoCoverImageEdit';
 import EllipseModal, { EllipseModalButton } from '../../../atoms/EllipseModal';
 import EllipseMenu, { EllipseMenuButton } from '../../../atoms/EllipseMenu';
+import SlidingToggleVideoWidget from '../../../atoms/moderation/SlidingToggleVideoWidget';
+import PostVideoResponseUploadedTab from './PostVideoResponseUploadedTab';
 
 const PostBitmovinPlayer = dynamic(
   () => import('../common/PostBitmovinPlayer'),
@@ -79,6 +80,9 @@ interface IPostVideoModeration {
   handleToggleMuted: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleUpdateResponseVideo: (newResponse: newnewapi.IVideoUrls) => void;
+  additionalResponses?: newnewapi.IVideoUrls[];
+  handleAddAdditonalResponse: (newVideo: newnewapi.IVideoUrls) => void;
+  handleDeleteAdditonalResponse: (videoUuid: string) => void;
 }
 
 const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
@@ -107,6 +111,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   handleUploadVideoProcessed,
   handleChangeTab,
   handleToggleMuted,
+  additionalResponses,
+  handleAddAdditonalResponse,
+  handleDeleteAdditonalResponse,
 }) => {
   const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -364,41 +371,16 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             </SSoundButton>
           </>
         ) : response ? (
-          <>
-            <PostBitmovinPlayer
-              id={postId}
-              resources={response}
-              muted={isMuted}
-              showPlayButton
-            />
-            <SSoundButton
-              id='sound-button'
-              iconOnly
-              view='transparent'
-              onClick={(e) => {
-                Mixpanel.track('Toggle Muted Mode', {
-                  _stage: 'Post',
-                  _postUuid: postId,
-                });
-                e.stopPropagation();
-                handleToggleMuted();
-              }}
-              style={{
-                ...(soundBtnBottomOverriden
-                  ? {
-                      bottom: soundBtnBottomOverriden,
-                    }
-                  : {}),
-              }}
-            >
-              <InlineSvg
-                svg={isMuted ? VolumeOff : VolumeOn}
-                width={isMobileOrTablet ? '20px' : '24px'}
-                height={isMobileOrTablet ? '20px' : '24px'}
-                fill='#FFFFFF'
-              />
-            </SSoundButton>
-          </>
+          <PostVideoResponseUploadedTab
+            postId={postId}
+            response={response}
+            isMuted={isMuted}
+            soundBtnBottomOverriden={soundBtnBottomOverriden}
+            handleToggleMuted={handleToggleMuted}
+            additionalResponses={additionalResponses}
+            handleAddAdditonalResponse={handleAddAdditonalResponse}
+            handleDeleteAdditonalResponse={handleDeleteAdditonalResponse}
+          />
         ) : uploadedResponseVideoUrl &&
           videoProcessing.targetUrls &&
           !responseFileUploadLoading &&
@@ -467,9 +449,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         {response ||
         postStatus === 'waiting_for_response' ||
         postStatus === 'processing_response' ? (
-          <ToggleVideoWidget
-            currentTab={openedTab}
-            responseUploaded={response !== undefined}
+          <SlidingToggleVideoWidget
+            postId={postId}
+            openedTab={openedTab}
             disabled={responseFileUploadLoading || responseFileUploadLoading}
             wrapperCSS={{
               ...(soundBtnBottomOverriden

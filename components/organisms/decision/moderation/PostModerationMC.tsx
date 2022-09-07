@@ -123,6 +123,40 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       newnewapi.IVideoUrls | undefined
     >(undefined);
 
+    // Additional responses
+    // const [additionalResponses, setAdditionalResponses] = useState<
+    //   newnewapi.IVideoUrls[]
+    // >(post.additionalResponses);
+
+    // TEMP
+    const [additionalResponses, setAdditionalResponses] = useState<
+      newnewapi.IVideoUrls[]
+    >(
+      post.response
+        ? new Array<newnewapi.IVideoUrls>(5).fill(post.response).map((v, i) => {
+            const workingObj = { ...v };
+            workingObj.uuid = `uuid_${i}`;
+            return workingObj;
+          })
+        : []
+    );
+
+    const handleAddAdditonalResponse = useCallback(
+      async (newVideo: newnewapi.IVideoUrls) => {
+        setAdditionalResponses((curr) => [...curr, newVideo]);
+      },
+      [setAdditionalResponses]
+    );
+    const handleDeleteAdditonalResponse = useCallback(
+      async (videoUuid: string) => {
+        setAdditionalResponses((curr) => {
+          const workingArray = curr.filter((video) => video.uuid !== videoUuid);
+          return workingArray;
+        });
+      },
+      [setAdditionalResponses]
+    );
+
     // Tabs
     const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
       post.response ||
@@ -676,6 +710,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             handleUploadVideoNotProcessed={handleUploadVideoNotProcessed}
             handleUploadVideoProcessed={handleUploadVideoProcessed}
             handleVideoDelete={handleVideoDelete}
+            additionalResponses={additionalResponses}
+            handleAddAdditonalResponse={handleAddAdditonalResponse}
+            handleDeleteAdditonalResponse={handleDeleteAdditonalResponse}
           />
           <PostTopInfoModeration
             totalVotes={totalVotes}

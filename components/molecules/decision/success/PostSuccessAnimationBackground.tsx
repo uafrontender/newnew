@@ -8,6 +8,9 @@ const PostSuccessAnimationBackground: React.FunctionComponent<{
 }> = React.memo(({ noBlur }) => {
   const elements = useMemo(() => [1, 2, 3], []);
 
+  // TEMP
+  return null;
+
   return (
     <SContainer>
       {elements.map((el, i) => (
