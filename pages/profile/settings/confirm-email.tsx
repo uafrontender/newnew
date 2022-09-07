@@ -63,7 +63,7 @@ const ConfirmEmail: NextPage<IConfirmEmail> = ({ email_address, token }) => {
 
   useEffect(() => {
     if (router.isReady && !router.query.token) {
-      router.push('/profile/settings');
+      router.replace('/profile/settings');
     }
   }, [router]);
 
@@ -98,7 +98,7 @@ const ConfirmEmail: NextPage<IConfirmEmail> = ({ email_address, token }) => {
 
       router.replace(
         '/profile/settings?editEmail=true&step=1',
-        '/profile/settings/edit-email?step=1'
+        '/profile/settings/edit-email'
       );
     } catch (err: any) {
       console.error(err);
@@ -134,7 +134,7 @@ const ConfirmEmail: NextPage<IConfirmEmail> = ({ email_address, token }) => {
       <EditEmailLoadingModal
         show
         onClose={() => {
-          router.push('/profile/settings');
+          router.replace('/profile/settings');
         }}
         errorMessage={errorMessage}
         isLoading={isLoading}

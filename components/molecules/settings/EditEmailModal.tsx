@@ -11,6 +11,7 @@ import EditEmailStepThree from './EditEmailStepThree';
 import EditEmailSuccess from './EditEmailSuccess';
 
 import { useAppSelector } from '../../../redux-store/store';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 
 interface IEditEmailModal {
   show: boolean;
@@ -28,6 +29,16 @@ enum Steps {
 const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const router = useRouter();
+  const { syncedHistoryReplaceState } = useSynchronizedHistory();
+
+  useEffect(() => {
+    if (show) {
+      syncedHistoryReplaceState(
+        { editEmail: false },
+        '/profile/settings/edit-email'
+      );
+    }
+  }, [syncedHistoryReplaceState, show]);
 
   const {
     query: { step: initialStep },
@@ -161,7 +172,7 @@ const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
                   : MInitialAppear
               }
               animate={MAnimationAppear}
-              centered
+              $centered
             >
               <AnimatePresence>
                 <SContent>
@@ -224,7 +235,7 @@ const SModalPaper = styled(ModalPaper)`
 `;
 
 interface IAnimationContent {
-  centered?: boolean;
+  $centered?: boolean;
 }
 
 const AnimationContent = styled(motion.div)<IAnimationContent>`
@@ -242,8 +253,8 @@ const AnimationContent = styled(motion.div)<IAnimationContent>`
     margin-top: 56px;
   }
 
-  ${({ centered }) =>
-    centered
+  ${({ $centered }) =>
+    $centered
       ? css`
           ${({ theme }) => theme.media.tablet} {
             justify-content: center;

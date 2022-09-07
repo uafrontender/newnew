@@ -1,7 +1,6 @@
 import React, { ReactElement, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useUpdateEffect } from 'react-use';
@@ -31,6 +30,7 @@ const EditEmailPage: NextPage = () => {
   if (!isBrowser()) {
     return <div />;
   }
+
   return (
     <div>
       <Head>
@@ -56,10 +56,6 @@ export default EditEmailPage;
 export async function getServerSideProps(context: {
   locale: string;
 }): Promise<any> {
-  const translationContext = await serverSideTranslations(context.locale, [
-    'page-Profile',
-  ]);
-
   // @ts-ignore
   if (!context?.req?.cookies?.accessToken) {
     return {
@@ -71,8 +67,9 @@ export async function getServerSideProps(context: {
   }
 
   return {
-    props: {
-      ...translationContext,
+    redirect: {
+      permanent: false,
+      destination: '/profile/settings',
     },
   };
 }

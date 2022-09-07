@@ -66,7 +66,7 @@ const UdpateEmail: NextPage<IUdpateEmail> = ({ email_address, token }) => {
 
   useEffect(() => {
     if (router.isReady && !router.query.token) {
-      router.push('/profile/settings');
+      router.replace('/profile/settings');
     }
   }, [router]);
 
@@ -108,7 +108,7 @@ const UdpateEmail: NextPage<IUdpateEmail> = ({ email_address, token }) => {
       );
       router.replace(
         '/profile/settings?editEmail=true&step=3',
-        '/profile/settings/edit-email?step=3'
+        '/profile/settings/edit-email'
       );
     } catch (err) {
       console.error(err);
@@ -142,7 +142,7 @@ const UdpateEmail: NextPage<IUdpateEmail> = ({ email_address, token }) => {
       <EditEmailLoadingModal
         show
         onClose={() => {
-          router.push('/profile/settings');
+          router.replace('/profile/settings');
         }}
         errorMessage={errorMessage}
         isLoading={isLoading}
