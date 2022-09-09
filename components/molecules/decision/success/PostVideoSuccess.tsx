@@ -5,17 +5,13 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 
+import isBrowser from '../../../../utils/isBrowser';
+import { Mixpanel } from '../../../../utils/mixpanel';
 import { markPost } from '../../../../api/endpoints/post';
 import { useAppSelector } from '../../../../redux-store/store';
 
-import Button from '../../../atoms/Button';
-import InlineSvg from '../../../atoms/InlineSVG';
-
-import VolumeOff from '../../../../public/images/svg/icons/filled/VolumeOFF1.svg';
-import VolumeOn from '../../../../public/images/svg/icons/filled/VolumeON.svg';
-import isSafari from '../../../../utils/isSafari';
-import isBrowser from '../../../../utils/isBrowser';
-import { Mixpanel } from '../../../../utils/mixpanel';
+import PostVideoResponsesSlider from '../moderation/PostVideoResponsesSlider';
+import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 
 const PostBitmovinPlayer = dynamic(
   () => import('../common/PostBitmovinPlayer'),
@@ -148,48 +144,27 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
     <SVideoWrapper>
       {openedTab === 'response' && response ? (
         <>
-          <PostBitmovinPlayer
-            // key={`${postId}--${isMuted ? 'muted' : 'sound'}`}
-            key={postId}
-            id={`video-${postId}`}
-            resources={response}
-            muted={isMuted}
-            showPlayButton
-          />
-          <SSoundButton
-            id='sound-button'
-            iconOnly
-            view='transparent'
-            onClick={(e) => {
-              Mixpanel.track('Toggle Muted Mode', {
-                _stage: 'Post',
-                _postUuid: postId,
-              });
-              e.stopPropagation();
-              handleToggleMuted();
-              if (isSafari()) {
-                (
-                  document?.getElementById(
-                    `bitmovinplayer-video-${postId}`
-                  ) as HTMLVideoElement
-                )?.play();
-              }
-            }}
-            style={{
-              ...(soundBtnBottomOverriden
-                ? {
-                    bottom: soundBtnBottomOverriden,
-                  }
-                : {}),
-            }}
-          >
-            <InlineSvg
-              svg={isMuted ? VolumeOff : VolumeOn}
-              width={isMobileOrTablet ? '20px' : '24px'}
-              height={isMobileOrTablet ? '20px' : '24px'}
-              fill='#FFFFFF'
+          {!additionalResponses || additionalResponses.length === 0 ? (
+            <PostBitmovinPlayer
+              // key={`${postId}--${isMuted ? 'muted' : 'sound'}`}
+              key={postId}
+              id={`video-${postId}`}
+              resources={response}
+              muted={isMuted}
+              showPlayButton
             />
-          </SSoundButton>
+          ) : (
+            <PostVideoResponsesSlider
+              videos={[response, ...additionalResponses]}
+              isMuted={isMuted}
+            />
+          )}
+          <PostVideoSoundButton
+            postId={postId}
+            isMuted={isMuted}
+            soundBtnBottomOverriden={soundBtnBottomOverriden}
+            handleToggleMuted={handleToggleMuted}
+          />
         </>
       ) : (
         <>
@@ -199,40 +174,12 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             muted={isMuted}
             showPlayButton
           />
-          <SSoundButton
-            id='sound-button'
-            iconOnly
-            view='transparent'
-            onClick={(e) => {
-              Mixpanel.track('Toggle Muted Mode', {
-                _stage: 'Post',
-                _postUuid: postId,
-              });
-              e.stopPropagation();
-              handleToggleMuted();
-              if (isSafari()) {
-                (
-                  document?.getElementById(
-                    `bitmovinplayer-video-${postId}`
-                  ) as HTMLVideoElement
-                )?.play();
-              }
-            }}
-            style={{
-              ...(soundBtnBottomOverriden
-                ? {
-                    bottom: soundBtnBottomOverriden,
-                  }
-                : {}),
-            }}
-          >
-            <InlineSvg
-              svg={isMuted ? VolumeOff : VolumeOn}
-              width={isMobileOrTablet ? '20px' : '24px'}
-              height={isMobileOrTablet ? '20px' : '24px'}
-              fill='#FFFFFF'
-            />
-          </SSoundButton>
+          <PostVideoSoundButton
+            postId={postId}
+            isMuted={isMuted}
+            soundBtnBottomOverriden={soundBtnBottomOverriden}
+            handleToggleMuted={handleToggleMuted}
+          />
         </>
       )}
       {!responseViewed && openedTab === 'announcement' && response ? (
@@ -328,31 +275,6 @@ const SVideoWrapper = styled.div`
   ${({ theme }) => theme.media.laptop} {
     width: 410px;
     height: 728px;
-  }
-`;
-
-const SSoundButton = styled(Button)`
-  position: absolute;
-  right: 16px;
-  bottom: 24px;
-
-  padding: 8px;
-  width: 36px;
-  height: 36px;
-
-  border-radius: ${({ theme }) => theme.borderRadius.small};
-
-  ${({ theme }) => theme.media.tablet} {
-    width: 36px;
-    height: 36px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    padding: 12px;
-    width: 48px;
-    height: 48px;
-
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
 `;
 

@@ -147,6 +147,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       },
       [setAdditionalResponses]
     );
+
     const handleDeleteAdditonalResponse = useCallback(
       async (videoUuid: string) => {
         setAdditionalResponses((curr) => {

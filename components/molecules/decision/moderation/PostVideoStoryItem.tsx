@@ -61,8 +61,18 @@ const SPlaceHolder = styled.div`
   width: 100%;
   height: 100%;
 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 16px;
+
+  // Temp
   background-color: blue;
-  border: 1px yellow solid;
 `;
 
-const SImg = styled.img``;
+const SImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;

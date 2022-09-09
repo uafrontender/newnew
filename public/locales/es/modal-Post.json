@@ -127,7 +127,8 @@
       "backToOriginalVideo": "Volver al original",
       "backToResponse": "Ver respuesta"
     },
-    "reuploadButton": "volver a subir",
+    "reuploadButton": "Volver a subir",
+    "addVideoButton_NEED_TRANSLATION": "Add video",
     "cannotLeavePageMsg": "¿Estás seguro de que quieres cerrar esta página? El progreso de la carga se perderá",
     "floatingUploadResponseButton": "Hacer un video de respuesta",
     "setThumbnail": "Establecer una miniatura",

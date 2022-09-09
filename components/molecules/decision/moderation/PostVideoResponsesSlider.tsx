@@ -7,22 +7,34 @@ import isBrowser from '../../../../utils/isBrowser';
 import PostVideoStoryItem from './PostVideoStoryItem';
 import Button from '../../../atoms/Button';
 
+import arrowIconLeft from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import arrowIconRight from '../../../../public/images/svg/icons/outlined/ChevronRight.svg';
+import InlineSvg from '../../../atoms/InlineSVG';
+import PostVideoStoriesPreviewSlider from './PostVideoStoriesPreviewSlider';
+
 interface IPostVideoResponsesSlider {
   videos: newnewapi.IVideoUrls[];
+  dotsBottom?: number;
   isMuted?: boolean;
+  isEditingStories?: boolean;
+  handleDeleteAdditionalVideo: (videoUuid: string) => void;
 }
 
 const PostVideoResponsesSlider: React.FunctionComponent<
   IPostVideoResponsesSlider
-> = ({ videos, isMuted }) => {
+> = ({
+  videos,
+  dotsBottom,
+  isMuted,
+  isEditingStories,
+  handleDeleteAdditionalVideo,
+}) => {
   const videosLength = useMemo(() => videos.length, [videos.length]);
   // const lengthMemo = useRef<number>(videosLength);
   const containerRef = useRef<HTMLDivElement>();
   const [currentVideo, setCurrentVideo] = useState(0);
 
   const [hovered, setHovered] = useState(false);
-
-  console.log(videos);
 
   const scrollSliderTo = (to: number) => {
     const containerWidth = containerRef.current?.getBoundingClientRect().width;
@@ -104,7 +116,15 @@ const PostVideoResponsesSlider: React.FunctionComponent<
           />
         ))}
       </SContainer>
-      <SDotsContainer>
+      <SDotsContainer
+        style={{
+          ...(dotsBottom
+            ? {
+                bottom: `${dotsBottom}px`,
+              }
+            : {}),
+        }}
+      >
         {videos.map((item, i) => (
           <SDot
             key={item.uuid ?? i}
@@ -117,31 +137,54 @@ const PostVideoResponsesSlider: React.FunctionComponent<
         ))}
       </SDotsContainer>
       <SScrollLeft
+        view='transparent'
+        iconOnly
         disabled={currentVideo === 0}
         style={{
           ...(hovered
             ? {
-                visibility: 'visible',
+                opacity: 1,
               }
             : {}),
         }}
         onClick={() => scrollSliderTo(currentVideo - 1)}
       >
-        Left
+        <InlineSvg
+          svg={arrowIconLeft}
+          fill='#FFFFFF'
+          width='24px'
+          height='24px'
+        />
       </SScrollLeft>
       <SScrollRight
+        view='transparent'
+        iconOnly
         disabled={currentVideo === videosLength - 1}
         style={{
           ...(hovered
             ? {
-                visibility: 'visible',
+                opacity: 1,
               }
             : {}),
         }}
         onClick={() => scrollSliderTo(currentVideo + 1)}
       >
-        Right
+        <InlineSvg
+          svg={arrowIconRight}
+          fill='#FFFFFF'
+          width='24px'
+          height='24px'
+        />
       </SScrollRight>
+      {isEditingStories ? (
+        <PostVideoStoriesPreviewSlider
+          videos={videos}
+          currentActive={currentVideo}
+          offsetBottom={dotsBottom ?? 0}
+          handleChangeCurrentActive={scrollSliderTo}
+          handleDeleteAdditionalVideo={handleDeleteAdditionalVideo}
+        />
+      ) : null}
     </SWrapper>
   );
 };
@@ -175,28 +218,30 @@ const SContainer = styled.div`
 const SScrollLeft = styled(Button)`
   position: absolute;
 
-  top: calc(50%);
-  left: 10px;
+  top: calc(50% - 24px);
+  left: 24px;
 
   display: none;
-  visibility: hidden;
 
   ${({ theme }) => theme.media.laptop} {
     display: block;
+    opacity: 0;
+    transition: 0.3s linear;
   }
 `;
 
 const SScrollRight = styled(Button)`
   position: absolute;
 
-  top: calc(50%);
-  right: 10px;
+  top: calc(50% - 24px);
+  right: 24px;
 
   display: none;
-  visibility: hidden;
 
   ${({ theme }) => theme.media.laptop} {
     display: block;
+    opacity: 0;
+    transition: 0.3s linear;
   }
 `;
 
@@ -204,11 +249,15 @@ const SDotsContainer = styled.div`
   position: absolute;
 
   width: 100%;
-  bottom: 120px;
+  bottom: 80px;
 
   display: flex;
   justify-content: center;
   gap: 4px;
+
+  ${({ theme }) => theme.media.tablet} {
+    bottom: 45px;
+  }
 `;
 
 const SDot = styled.button<{
