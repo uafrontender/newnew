@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
 import React, {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import { uuid } from 'uuidv4';
+import { v4 as uuidv4 } from 'uuid';
 
 export const OverlayModeContext = createContext<{
   overlayModeEnabled: boolean;
@@ -61,7 +59,7 @@ export const OverlayModeProvider: React.FC<IOverlayModeProvider> = ({
 
 export function useOverlayMode() {
   const context = useContext(OverlayModeContext);
-  const id = useRef(uuid());
+  const id = useRef(uuidv4());
 
   if (!context)
     throw new Error(
