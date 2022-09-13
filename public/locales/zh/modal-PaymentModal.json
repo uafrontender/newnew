@@ -25,5 +25,11 @@
   "primaryCard_NEED_TRANSLATION": "Primary card",
   "newCard_NEED_TRANSLATION": "New card",
   "saveCard_NEED_TRANSLATION": "Save card for future use",
-  "email": "電子郵件"
+  "email": "電子郵件",
+  "errors_NEED_TRANSLATION": {
+    "wrongEmail": "Email can't be used",
+    "rewardNotEnough": "Rewards balance is insufficient",
+    "paymentFailed": "Payment failed",
+    "requestFailed": "Request failed"
+  }
 }

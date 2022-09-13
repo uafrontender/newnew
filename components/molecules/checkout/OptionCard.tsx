@@ -41,8 +41,8 @@ const OptionCard: React.FunctionComponent<IOptionCard> = ({
       <SAnimation>
         <Lottie
           ref={ref}
-          width={24}
-          height={24}
+          width={20}
+          height={20}
           options={{
             loop: false,
             autoplay: false,
@@ -51,7 +51,9 @@ const OptionCard: React.FunctionComponent<IOptionCard> = ({
         />
       </SAnimation>
       <SLabelContent>
-        <Text variant={2}>{label}</Text>
+        <Text variant={3} weight={600}>
+          {label}
+        </Text>
         {/* <SFeesText
           variant={2}
         >
@@ -88,9 +90,8 @@ const SOptionCard = styled.button<{
       ? 'linear-gradient(0deg, rgba(29, 106, 255, 0.2), rgba(29, 106, 255, 0.2))'
       : theme.colorsThemed.background.tertiary};
 
-  padding: 16px 16px;
+  padding: 16px;
   margin-top: 12px;
-  margin-bottom: 12px;
 
   cursor: pointer;
   transition: 0.2s linear;

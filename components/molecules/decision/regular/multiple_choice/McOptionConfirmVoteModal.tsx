@@ -251,7 +251,10 @@ const SContentContainer = styled.div`
   flex-direction: column;
   align-items: center;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : theme.colorsThemed.background.primary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   padding: 16px;
