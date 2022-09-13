@@ -257,7 +257,8 @@
       "notifications": {
         "title": "Notifications",
         "email": "Email Notifications",
-        "push": "Push Notifications"
+        "push": "Push Notifications",
+        "inApp": "In-app Notifications"
       },
       "transactions": {
         "title": "Transactions",

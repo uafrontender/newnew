@@ -257,7 +257,8 @@
       "notifications": {
         "title": "Notificaciones",
         "email": "Notificaciones por correo electrónico",
-        "push": "Notificaciones Push"
+        "push": "Notificaciones Push",
+        "inApp_NEED_TRANSLATION": "In-app Notifications"
       },
       "transactions": {
         "title": "Transacciones",

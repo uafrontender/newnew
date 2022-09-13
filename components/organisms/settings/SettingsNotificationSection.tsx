@@ -12,6 +12,7 @@ import Lottie from '../../atoms/Lottie';
 import Text from '../../atoms/Text';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import Toggle from '../../atoms/Toggle';
+import usePushNotifications from '../../../utils/hooks/usePushNotifications';
 
 const SettingsNotificationsSection = () => {
   const { t } = useTranslation('page-Profile');
@@ -19,6 +20,8 @@ const SettingsNotificationsSection = () => {
   const [myNotificationState, setMyNotificationState] = useState<
     newnewapi.INotificationState[] | null
   >(null);
+
+  const { inSubscribed, subscribe, unsubscribe } = usePushNotifications();
 
   const fetchMyNotificationState = async () => {
     if (isLoading) return;
@@ -97,14 +100,14 @@ const SettingsNotificationsSection = () => {
               {subsection.notificationSource &&
               subsection.notificationSource === 1
                 ? t('Settings.sections.notifications.email')
-                : t('Settings.sections.notifications.push')}
+                : t('Settings.sections.notifications.inApp')}
             </Text>
             <Toggle
               title={
                 subsection.notificationSource &&
                 subsection.notificationSource === 1
                   ? t('Settings.sections.notifications.email')
-                  : t('Settings.sections.notifications.push')
+                  : t('Settings.sections.notifications.inApp')
               }
               checked={subsection.isEnabled ?? false}
               onChange={() => handleUpdateItem(idx)}
@@ -112,6 +115,18 @@ const SettingsNotificationsSection = () => {
           </SSubsection>
         ))
       )}
+      <SSubsection>
+        <Text variant={2} weight={600}>
+          {t('Settings.sections.notifications.push')}
+        </Text>
+        <Toggle
+          title={t('Settings.sections.notifications.push')}
+          checked={inSubscribed}
+          onChange={
+            inSubscribed ? () => unsubscribe() : () => subscribe('news')
+          }
+        />
+      </SSubsection>
     </SWrapper>
   );
 };

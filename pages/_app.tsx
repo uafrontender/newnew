@@ -34,8 +34,6 @@ import { useAppSelector, wrapper } from '../redux-store/store';
 
 import isBrowser from '../utils/isBrowser';
 
-import usePushNotifications from '../utils/hooks/usePushNotifications';
-
 // Socket context
 import SocketContextProvider from '../contexts/socketContext';
 
@@ -86,8 +84,6 @@ const MyApp = (props: IMyApp): ReactElement => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
-
-  usePushNotifications();
 
   // Shared layouts
   const getLayout = useMemo(
