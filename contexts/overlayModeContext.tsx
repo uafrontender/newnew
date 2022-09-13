@@ -9,7 +9,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { uuid } from 'uuidv4';
+import { v4 } from 'uuid';
 
 export const OverlayModeContext = createContext<{
   overlayModeEnabled: boolean;
@@ -61,7 +61,7 @@ export const OverlayModeProvider: React.FC<IOverlayModeProvider> = ({
 
 export function useOverlayMode() {
   const context = useContext(OverlayModeContext);
-  const id = useRef(uuid());
+  const id = useRef(v4());
 
   if (!context)
     throw new Error(
