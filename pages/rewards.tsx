@@ -24,6 +24,7 @@ import { formatNumber } from '../utils/format';
 import { RewardContext } from '../contexts/rewardContext';
 import { useGetAppConstants } from '../contexts/appConstantsContext';
 import useRewardInstructionVisible from '../utils/hooks/useRewardInstructionVisible';
+import GenericSkeleton from '../components/molecules/GenericSkeleton';
 
 export const Rewards = () => {
   const router = useRouter();
@@ -35,6 +36,14 @@ export const Rewards = () => {
 
   const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
   const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
+
+  const rewardBalanceValue: number | undefined = !user.loggedIn
+    ? currentSignupRewardAmount?.usdCents
+      ? currentSignupRewardAmount.usdCents / 100
+      : undefined
+    : isRewardBalanceLoading || !rewardBalance?.usdCents
+    ? undefined
+    : rewardBalance.usdCents / 100;
 
   return (
     <>
@@ -125,23 +134,21 @@ export const Rewards = () => {
 
           <Section>
             <SectionTitle>{t('balance.title')}</SectionTitle>
-            <BalanceValue>
-              {!instructionVisible && (
-                <InfoButton onClick={() => setInstructionVisible(true)}>
-                  i
-                </InfoButton>
-              )}
-              $
-              {!user.loggedIn
-                ? formatNumber(
-                    currentSignupRewardAmount?.usdCents
-                      ? currentSignupRewardAmount.usdCents / 100
-                      : 0
-                  )
-                : isRewardBalanceLoading || !rewardBalance?.usdCents
-                ? formatNumber(0)
-                : formatNumber(rewardBalance.usdCents / 100 ?? 0)}
-            </BalanceValue>
+            {rewardBalanceValue === undefined ? (
+              <SkeletonBalanceValue
+                bgColor={theme.colorsThemed.background.quaternary}
+                highlightColor={theme.colorsThemed.background.tertiary}
+              />
+            ) : (
+              <BalanceValue>
+                {!instructionVisible && (
+                  <InfoButton onClick={() => setInstructionVisible(true)}>
+                    i
+                  </InfoButton>
+                )}
+                ${formatNumber(rewardBalanceValue)}
+              </BalanceValue>
+            )}
             <SButton
               onClick={() => {
                 if (user.loggedIn) {
@@ -426,6 +433,14 @@ const SectionTitle = styled.div`
   ${({ theme }) => theme.media.tablet} {
     line-height: 32px;
   }
+`;
+
+const SkeletonBalanceValue = styled(GenericSkeleton)`
+  height: 64px;
+  width: 180px;
+  position: relative;
+  margin-bottom: 24px;
+  border-radius: 16px;
 `;
 
 const BalanceValue = styled.div`

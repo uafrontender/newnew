@@ -15,6 +15,7 @@ interface RewardButtonI {
 
 const REWARD_TICKS = 4;
 
+// TODO: probably it should not count up while on the rewards page
 const RewardButton: React.FC<RewardButtonI> = ({ balance, loading, offer }) => {
   const theme = useTheme();
   const [portion, setPortion] = useState(offer ? 0 : REWARD_TICKS);
