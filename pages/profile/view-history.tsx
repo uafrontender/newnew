@@ -18,10 +18,10 @@ import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
 import assets from '../../constants/assets';
+import { Mixpanel } from '../../utils/mixpanel';
+import switchPostType from '../../utils/switchPostType';
 
-const PostModal = dynamic(
-  () => import('../../components/organisms/decision/PostModal')
-);
+const PostModal = dynamic(() => import('../../components/organisms/decision'));
 const PostList = dynamic(
   () => import('../../components/organisms/see-more/PostList')
 );
@@ -38,6 +38,9 @@ interface IMyProfileViewHistory {
   handleUpdateCount: (value: number) => void;
   handleUpdateFilter: (value: newnewapi.Post.Filter) => void;
   handleSetPosts: React.Dispatch<React.SetStateAction<newnewapi.Post[]>>;
+  handleSetFavoritePosts: React.Dispatch<
+    React.SetStateAction<newnewapi.Post[]>
+  >;
 }
 
 const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
@@ -52,11 +55,13 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
   handleUpdateCount,
   handleUpdateFilter,
   handleSetPosts,
+  handleSetFavoritePosts,
 }) => {
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >();
 
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
@@ -65,6 +70,10 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'Profile Page',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(post);
     setPostModalOpen(true);
   };
@@ -74,6 +83,9 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
   }, []);
 
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Profile Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };
@@ -141,6 +153,39 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
 
+  const handleRemovePostFromFavorites = (postUuid: string) => {
+    handleSetFavoritePosts((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+  };
+
+  const handleAddPostToFavorites = (postToAdd: newnewapi.Post) => {
+    handleSetFavoritePosts((curr) => {
+      // need for initial load favorites on favorites tab
+      if (curr.length === 0) {
+        return [];
+      }
+
+      const newArr = [...curr];
+
+      const alreadyAdded = curr.findIndex(
+        (p) =>
+          switchPostType(p)[0].postUuid ===
+          switchPostType(postToAdd)[0].postUuid
+      );
+
+      if (alreadyAdded !== -1) {
+        return newArr;
+      }
+
+      const updated = [postToAdd, ...newArr];
+      return updated;
+    });
+  };
+
   return (
     <div>
       <Head>
@@ -167,6 +212,8 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
                 left: 0,
               }}
               handlePostClicked={handleOpenPostModal}
+              handleRemovePostFromState={handleRemovePostFromFavorites}
+              handleAddPostToState={handleAddPostToFavorites}
             />
           )}
           {posts && posts.length === 0 && !isLoading && (
@@ -219,6 +266,7 @@ export async function getServerSideProps(
       'component-PostCard',
       'modal-Post',
       'modal-PaymentModal',
+      'modal-ResponseSuccessModal',
     ]);
 
     // const { req } = context;
@@ -264,7 +312,6 @@ export async function getServerSideProps(
       },
     };
   } catch (err) {
-    console.log(err);
     return {
       props: {
         error: {

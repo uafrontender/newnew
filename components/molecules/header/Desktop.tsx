@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -12,9 +12,13 @@ import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
 // import { WalletContext } from '../../../contexts/walletContext';
+import { RewardContext } from '../../../contexts/rewardContext';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import RewardButton from '../RewardButton';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -24,6 +28,8 @@ export const Desktop: React.FC = React.memo(() => {
   const { unreadNotificationCount } = useNotifications();
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
+  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
+  const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -116,7 +122,16 @@ export const Desktop: React.FC = React.memo(() => {
                 <SItemWithMargin>
                   <Link href='/creator/dashboard'>
                     <a>
-                      <Button view='quaternary'>{t('button.dashboard')}</Button>
+                      <Button
+                        view='quaternary'
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _button: 'Dashboard',
+                          });
+                        }}
+                      >
+                        {t('button.dashboard')}
+                      </Button>
                     </a>
                   </Link>
                 </SItemWithMargin>
@@ -129,7 +144,16 @@ export const Desktop: React.FC = React.memo(() => {
                     }
                   >
                     <a>
-                      <Button withShadow view='primaryGrad'>
+                      <Button
+                        id='create'
+                        withShadow
+                        view='primaryGrad'
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _button: 'New Post',
+                          });
+                        }}
+                      >
                         {t('button.createDecision')}
                       </Button>
                     </a>
@@ -187,25 +211,65 @@ export const Desktop: React.FC = React.memo(() => {
                 </SItemWithMargin>
               </>
             )}
+            <SItemWithMargin>
+              <RewardButton
+                balance={
+                  rewardBalance ? rewardBalance.usdCents / 100 : undefined
+                }
+                loading={isRewardBalanceLoading}
+              />
+            </SItemWithMargin>
           </>
         ) : (
           <>
             <SItemWithMargin>
-              <Link href='/sign-up?to=log-in'>
-                <a>
-                  <Button view='quaternary'>{t('button.loginIn')}</Button>
-                </a>
-              </Link>
-            </SItemWithMargin>
-            <SItemWithMargin>
               <Link href='/sign-up'>
                 <a>
-                  <Button withDim withShrink withShadow view='primaryGrad'>
-                    {t('button.signUp')}
+                  <Button
+                    id='log-in'
+                    view='quaternary'
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Sign in',
+                      });
+                    }}
+                  >
+                    {t('button.signIn')}
                   </Button>
                 </a>
               </Link>
             </SItemWithMargin>
+            <SItemWithMargin>
+              <Link href='/sign-up?to=create'>
+                <a>
+                  <Button
+                    withDim
+                    withShrink
+                    withShadow
+                    view='primaryGrad'
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Create now',
+                      });
+                    }}
+                  >
+                    {t('button.createOnNewnew')}
+                  </Button>
+                </a>
+              </Link>
+            </SItemWithMargin>
+            {currentSignupRewardAmount ? (
+              <SItemWithMargin>
+                <RewardButton
+                  balance={
+                    currentSignupRewardAmount.usdCents
+                      ? currentSignupRewardAmount.usdCents / 100
+                      : undefined
+                  }
+                  offer
+                />
+              </SItemWithMargin>
+            ) : null}
           </>
         )}
       </SRightBlock>

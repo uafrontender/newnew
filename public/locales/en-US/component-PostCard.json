@@ -12,7 +12,7 @@
       "cf": "Back this Goal"
     },
     "seeResults": {
-      "ac": "See Event",
+      "ac": "See Bid",
       "mc": "See Superpoll",
       "cf": "See Goal"
     }
@@ -22,6 +22,7 @@
     "daysLeft": "d",
     "hoursLeft": "h",
     "minutesLeft": "m",
-    "endedOn": "Ended on "
+    "endedOn": "Ended on ",
+    "soon": "Coming Soon"
   }
 }

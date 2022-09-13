@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 
-export const useScrollDirection = (ref: any) => {
+export const useScrollDirection = () => {
   const [scrollDirection, setScrollDirection] = useState('');
 
   useEffect(() => {
     const threshold = 10;
-    let lastScrollY = ref.current?.scrollTop;
+    let lastScrollY = window?.scrollY;
     let ticking = false;
 
     const updateScrollDir = () => {
-      const scrollY = ref.current?.scrollTop;
+      const scrollY = window?.scrollY;
 
       if (Math.abs(scrollY - lastScrollY) < threshold) {
         ticking = false;
@@ -28,8 +28,12 @@ export const useScrollDirection = (ref: any) => {
       }
     };
 
-    ref.current?.addEventListener('scroll', onScroll);
-  }, [ref, scrollDirection]);
+    document?.addEventListener('scroll', onScroll);
+
+    return () => {
+      document?.removeEventListener('scroll', onScroll);
+    };
+  }, [scrollDirection]);
 
   return {
     scrollDirection,

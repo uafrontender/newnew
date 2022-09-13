@@ -15,59 +15,65 @@ interface IFunction {
 
 const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
   const { t } = useTranslation('common');
-  const renderItem = useCallback((post: newnewapi.IPost) => {
-    const postType = Object.keys(post)[0];
-    const data = Object.values(post)[0] as
-      | newnewapi.Auction
-      | newnewapi.Crowdfunding
-      | newnewapi.MultipleChoice;
+  const renderItem = useCallback(
+    (post: newnewapi.IPost) => {
+      const postType = Object.keys(post)[0];
+      const data = Object.values(post)[0] as
+        | newnewapi.Auction
+        | newnewapi.Crowdfunding
+        | newnewapi.MultipleChoice;
 
-    let postTypeConverted = '';
+      let postTypeConverted = '';
 
-    const timestampSeconds = new Date(
-      (data.expiresAt?.seconds as number) * 1000
-    ).getTime();
+      const timestampSeconds = new Date(
+        (data.expiresAt?.seconds as number) * 1000
+      ).getTime();
 
-    const parsed = secondsToDHMS((timestampSeconds - Date.now()) / 1000);
+      const parsed = secondsToDHMS(
+        (timestampSeconds - Date.now()) / 1000,
+        'noTrim'
+      );
 
-    switch (postType) {
-      case 'auction':
-        postTypeConverted = 'Event';
-        break;
-      case 'crowdfunding':
-        postTypeConverted = 'Goal';
-        break;
-      default:
-        postTypeConverted = 'Superpoll';
-    }
+      switch (postType) {
+        case 'auction':
+          postTypeConverted = t('postType.ac');
+          break;
+        case 'crowdfunding':
+          postTypeConverted = t('postType.cf');
+          break;
+        default:
+          postTypeConverted = t('postType.mc');
+      }
 
-    return (
-      <Link href={`/post/${data.postUuid}`} key={data.postUuid}>
-        <a>
-          <SPost>
-            <SLeftSide>
-              <SUserAvatar>
-                <UserAvatar avatarUrl={data.creator?.avatarUrl ?? ''} />
-              </SUserAvatar>
-              <SPostData>
-                {data.title && (
-                  <SPostTitle>{textTrim(data.title, 28)}</SPostTitle>
-                )}
-                <SCreatorUsername>{data.creator?.nickname}</SCreatorUsername>
-              </SPostData>
-            </SLeftSide>
-            <SPostDetails>
-              <SPostType>{postTypeConverted}</SPostType>
-              <SPostEnded>
-                {parsed.days !== '00' && `${parsed.days}d`}{' '}
-                {`${parsed.hours}h ${parsed.minutes}m ${parsed.seconds}s `}
-              </SPostEnded>
-            </SPostDetails>
-          </SPost>
-        </a>
-      </Link>
-    );
-  }, []);
+      return (
+        <Link href={`/post/${data.postUuid}`} key={data.postUuid}>
+          <a>
+            <SPost>
+              <SLeftSide>
+                <SUserAvatar>
+                  <UserAvatar avatarUrl={data.creator?.avatarUrl ?? ''} />
+                </SUserAvatar>
+                <SPostData>
+                  {data.title && (
+                    <SPostTitle>{textTrim(data.title, 28)}</SPostTitle>
+                  )}
+                  <SCreatorUsername>{data.creator?.nickname}</SCreatorUsername>
+                </SPostData>
+              </SLeftSide>
+              <SPostDetails>
+                <SPostType>{postTypeConverted}</SPostType>
+                <SPostEnded>
+                  {parsed.days !== '00' && `${parsed.days}d`}{' '}
+                  {`${parsed.hours}h ${parsed.minutes}m ${parsed.seconds}s `}
+                </SPostEnded>
+              </SPostDetails>
+            </SPost>
+          </a>
+        </Link>
+      );
+    },
+    [t]
+  );
 
   return (
     <SContainer>

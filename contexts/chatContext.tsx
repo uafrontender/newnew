@@ -11,18 +11,38 @@ import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
 import { getTotalUnreadMessageCounts } from '../api/endpoints/chat';
+import { IChatData } from '../components/interfaces/ichat';
 
 const ChatsContext = createContext({
   unreadCountForUser: 0,
   unreadCountForCreator: 0,
   unreadCount: 0,
+  mobileChatOpened: false,
+  chatData: {
+    chatRoom: null,
+    showChatList: null,
+  } as IChatData,
+  setChatData: (newChatData: IChatData) => {},
+  setMobileChatOpened: (
+    mobileChatOpened: boolean,
+    initialChatRoom?: IChatData
+  ) => {},
 });
 
-export const ChatsProvider: React.FC = ({ children }) => {
+interface IChatsProvider {
+  children: React.ReactNode;
+}
+
+export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   const user = useAppSelector((state) => state.user);
   const [unreadCountForUser, setUnreadCountForUser] = useState<number>(0);
   const [unreadCountForCreator, setUnreadCountForCreator] = useState<number>(0);
   const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [mobileChatOpened, _setMobileChatOpened] = useState<boolean>(false);
+  const [chatData, setChatData] = useState<IChatData>({
+    chatRoom: null,
+    showChatList: null,
+  });
 
   const socketConnection = useContext(SocketContext);
 
@@ -35,6 +55,21 @@ export const ChatsProvider: React.FC = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
+
+  const setMobileChatOpened = (
+    mobileChatOpened: boolean,
+    initialChatData?: IChatData
+  ) => {
+    if (initialChatData) {
+      setChatData(initialChatData);
+    }
+
+    if (!mobileChatOpened) {
+      setChatData({ chatRoom: null, showChatList: null });
+    }
+
+    return _setMobileChatOpened(mobileChatOpened);
+  };
 
   useEffect(() => {
     async function getUnread() {
@@ -66,7 +101,7 @@ export const ChatsProvider: React.FC = ({ children }) => {
     };
 
     if (socketConnection) {
-      socketConnection.on(
+      socketConnection?.on(
         'ChatUnreadCountsChanged',
         socketHandlerMessageCreated
       );
@@ -79,9 +114,22 @@ export const ChatsProvider: React.FC = ({ children }) => {
       unreadCountForUser,
       unreadCountForCreator,
       unreadCount,
+      mobileChatOpened,
+      chatData,
+      setChatData,
+      setMobileChatOpened,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [unreadCount, unreadCountForUser, unreadCountForCreator, setData]
+    [
+      unreadCount,
+      unreadCountForUser,
+      unreadCountForCreator,
+      setData,
+      mobileChatOpened,
+      chatData,
+      setChatData,
+      setMobileChatOpened,
+    ]
   );
 
   return (

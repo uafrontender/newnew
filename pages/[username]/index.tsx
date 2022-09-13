@@ -14,7 +14,7 @@ import { NextPageWithLayout } from '../_app';
 import { getUserByUsername } from '../../api/endpoints/user';
 import { fetchUsersPosts } from '../../api/endpoints/post';
 
-import PostModal from '../../components/organisms/decision/PostModal';
+import PostModal from '../../components/organisms/decision';
 import PostList from '../../components/organisms/see-more/PostList';
 import InlineSvg from '../../components/atoms/InlineSVG';
 
@@ -27,6 +27,8 @@ import {
 } from '../../components/atoms/profile/NoContentCommon';
 import getDisplayname from '../../utils/getDisplayname';
 import Button from '../../components/atoms/Button';
+import switchPostType from '../../utils/switchPostType';
+import { Mixpanel } from '../../utils/mixpanel';
 
 interface IUserPageIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -59,8 +61,9 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   const { t } = useTranslation('page-Profile');
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >();
 
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
@@ -68,6 +71,10 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'Profile Page',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(post);
     setPostModalOpen(true);
   };
@@ -77,6 +84,9 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   }, []);
 
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Profile Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };
@@ -296,6 +306,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'component-PostCard',
     'modal-Post',
     'modal-PaymentModal',
+    'modal-ResponseSuccessModal',
   ]);
 
   if (!username || Array.isArray(username)) {

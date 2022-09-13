@@ -18,7 +18,7 @@ interface IChangeLanguage {}
 export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
   const { t } = useTranslation('common');
   const ref: any = useRef();
-  const { push, locale, pathname } = useRouter();
+  const { push, locale, asPath, pathname } = useRouter();
   const [focused, setFocused] = useState(false);
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -34,12 +34,14 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
   const handleChangeLanguageClick = () => {
     setFocused(!focused);
   };
+
   const handleCloseClick = () => {
     setFocused(false);
   };
+
   const renderItem = (item: string) => {
     const handleItemClick = () => {
-      push(pathname, pathname, { locale: item });
+      push(pathname, asPath, { locale: item });
     };
 
     return (
@@ -62,6 +64,10 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
       handleCloseClick();
     }
   });
+
+  if (options.length < 2) {
+    return null;
+  }
 
   return (
     <SContainer ref={ref}>
@@ -92,7 +98,8 @@ const SContainer = styled.div`
   position: relative;
 
   /* TEMP */
-  display: none;
+  // Enabled for vlad/apply-translations branch
+  // display: none;
 `;
 
 interface ISListHolder {

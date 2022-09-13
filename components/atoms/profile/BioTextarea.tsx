@@ -27,7 +27,11 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
   useEffect(() => {
     if (focused) return;
     if (isValid) setErrorBordersShown(false);
-  }, [focused, isValid]);
+
+    if (!isValid && errorCaption) {
+      setErrorBordersShown(true);
+    }
+  }, [focused, isValid, errorCaption]);
 
   useEffect(() => {
     setCharCounter((value as string).length);
@@ -49,11 +53,6 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
           }}
           onBlur={() => {
             setFocused(false);
-            if (!isValid) {
-              setErrorBordersShown(true);
-            } else {
-              setErrorBordersShown(false);
-            }
           }}
           onFocus={() => {
             setFocused(true);

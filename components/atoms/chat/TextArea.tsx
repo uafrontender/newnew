@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { ChangeEvent, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import TextAreaAutoSize from 'react-textarea-autosize';
 
@@ -12,19 +12,28 @@ interface ITextArea {
   value: string;
   error?: string;
   maxlength?: number;
-  onChange: (key: string, value: string | boolean) => void;
+  onChange: (key: string, value: string, isShiftEnter: boolean) => void;
   placeholder: string;
 }
 
 export const TextArea: React.FC<ITextArea> = (props) => {
   const { id = '', maxlength, value, error, onChange, placeholder } = props;
 
+  const [isShiftEnter, setisShiftEnter] = useState<boolean>(false);
+
   const handleChange = useCallback(
-    (e) => {
-      onChange(id, e.target.value);
+    (e: ChangeEvent<HTMLTextAreaElement>) => {
+      onChange(id, e.target.value, isShiftEnter);
     },
-    [id, onChange]
+    [id, onChange, isShiftEnter]
   );
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    /* eslint-disable no-unused-expressions */
+    e.key === 'Enter' && e.shiftKey === true
+      ? setisShiftEnter(true)
+      : setisShiftEnter(false);
+  }, []);
 
   return (
     <SWrapper>
@@ -34,6 +43,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
           onChange={handleChange}
           placeholder={placeholder}
           maxLength={maxlength}
+          onKeyDown={handleKeyDown}
         />
       </SContent>
       {error ? (

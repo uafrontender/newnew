@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  useRef,
+} from 'react';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -6,6 +12,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { toNumber } from 'lodash';
 import { useInView } from 'react-intersection-observer';
+import Link from 'next/link';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -25,6 +32,8 @@ import {
   markRoomAsRead,
   sendMessage,
 } from '../../../../api/endpoints/chat';
+import isBrowser from '../../../../utils/isBrowser';
+import validateInputText from '../../../../utils/validateMessageText';
 
 interface IChat {
   roomID: string;
@@ -36,16 +45,26 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
   const router = useRouter();
 
   const { ref: scrollRef, inView } = useInView();
-  const user = useAppSelector((state) => state.user);
+  const { user, ui } = useAppSelector((state) => state);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(ui.resizeMode);
 
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
   const [messageText, setMessageText] = useState<string>('');
+  const [messageTextValid, setMessageTextValid] = useState(false);
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
-  const [newMessage, setNewMessage] =
-    useState<newnewapi.IChatMessage | null | undefined>();
-  const [messagesNextPageToken, setMessagesNextPageToken] =
-    useState<string | undefined | null>('');
+  const [newMessage, setNewMessage] = useState<
+    newnewapi.IChatMessage | null | undefined
+  >();
+  const [messagesNextPageToken, setMessagesNextPageToken] = useState<
+    string | undefined | null
+  >('');
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
 
@@ -157,12 +176,15 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       }
     };
     if (socketConnection) {
-      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+      socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
+          'ChatMessageCreated',
+          socketHandlerMessageCreated
+        );
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -189,18 +211,48 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newMessage]);
 
-  const handleChange = useCallback((id, value) => {
-    setMessageText(value);
-  }, []);
+  const messagesScrollContainerRef = useRef<HTMLDivElement>();
+
+  useEffect(() => {
+    if (newMessage && isBrowser()) {
+      setTimeout(() => {
+        messagesScrollContainerRef.current?.scrollBy({
+          top: messagesScrollContainerRef.current?.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 100);
+    }
+  }, [newMessage]);
+
+  const handleSubmit = useCallback(() => {
+    if (!sendingMessage) submitMessage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messageText]);
+
+  const handleChange = useCallback(
+    (id: string, value: string) => {
+      if (value.charCodeAt(value.length - 1) === 10 && !isMobileOrTablet) {
+        setMessageText(value.slice(0, -1));
+        handleSubmit();
+        return;
+      }
+
+      const isValid = validateInputText(value);
+      setMessageTextValid(isValid);
+      setMessageText(value);
+    },
+    [isMobileOrTablet, handleSubmit]
+  );
 
   const submitMessage = useCallback(async () => {
-    if (messageText.length > 0) {
+    if (messageTextValid) {
       try {
         setSendingMessage(true);
+        const trimmedMessageText = messageText.trim();
         const payload = new newnewapi.SendMessageRequest({
           roomId: toNumber(roomID),
           content: {
-            text: messageText,
+            text: trimmedMessageText,
           },
         });
         const res = await sendMessage(payload);
@@ -208,6 +260,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           throw new Error(res.error?.message ?? 'Request failed');
         if (res.data.message) setMessages([res.data.message].concat(messages));
 
+        setMessageTextValid(false);
         setMessageText('');
         setSendingMessage(false);
       } catch (err) {
@@ -216,19 +269,14 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomID, messageText]);
-
-  const handleSubmit = useCallback(() => {
-    if (!sendingMessage) submitMessage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageText]);
+  }, [messageTextValid, roomID, messageText]);
 
   const handleGoBack = useCallback(() => {
     router.push('/creator/dashboard?tab=chat');
   }, [router]);
 
   const renderMessage = useCallback(
-    (item: newnewapi.IChatMessage, index) => {
+    (item: newnewapi.IChatMessage, index: number) => {
       const prevElement = messages[index - 1];
       const nextElement = messages[index + 1];
 
@@ -331,10 +379,10 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
 
   const handleUserClick = useCallback(() => {
     if (chatRoom?.visavis?.username) {
-      router.push(`/u/${chatRoom?.visavis?.username}`);
+      router.push(`/${chatRoom?.visavis?.username}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageText]);
+  }, [messageText, chatRoom?.visavis?.username]);
 
   return (
     <SContainer>
@@ -348,11 +396,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           onClick={handleGoBack}
         />
         {chatRoom?.kind === 4 ? (
-          <SUserAvatar
-            withClick
-            onClick={handleUserClick}
-            avatarUrl={user?.userData?.avatarUrl ?? ''}
-          />
+          <SUserAvatar avatarUrl={user?.userData?.avatarUrl ?? ''} />
         ) : (
           <SUserAvatar
             withClick
@@ -363,10 +407,11 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         {chatRoom?.kind === 4 ? (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
-              {user.userData?.nickname
-                ? user.userData?.nickname
-                : user.userData?.username}{' '}
-              {t('announcement.title')}
+              {t('announcement.title', {
+                username: user.userData?.nickname
+                  ? user.userData?.nickname
+                  : user.userData?.username,
+              })}
             </SUserNickName>
             <SUserName variant={2} weight={600}>
               {`${
@@ -387,15 +432,24 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
                 ? chatRoom?.visavis?.nickname
                 : chatRoom?.visavis?.username}
             </SUserNickName>
-            <SUserName variant={2} weight={600}>
-              {chatRoom?.visavis?.username
-                ? `@${chatRoom?.visavis?.username}`
-                : chatRoom?.visavis?.nickname}
-            </SUserName>
+            <Link href={`/${chatRoom?.visavis?.username}`}>
+              <a>
+                <SUserName variant={2} weight={600}>
+                  {chatRoom?.visavis?.username
+                    ? `@${chatRoom?.visavis?.username}`
+                    : chatRoom?.visavis?.nickname}
+                </SUserName>
+              </a>
+            </Link>
           </SUserDescription>
         )}
       </STopPart>
-      <SCenterPart id='messagesScrollContainer'>
+      <SCenterPart
+        id='messagesScrollContainer'
+        ref={(el) => {
+          messagesScrollContainerRef.current = el!!;
+        }}
+      >
         {messages.length > 0 && messages.map(renderMessage)}
       </SCenterPart>
       <SBottomPart>
@@ -410,14 +464,14 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           </STextArea>
           <SButton
             withShadow
-            view={messageText ? 'primaryGrad' : 'secondary'}
+            view={messageTextValid ? 'primaryGrad' : 'secondary'}
             onClick={handleSubmit}
-            disabled={!messageText}
+            disabled={!messageTextValid}
           >
             <SInlineSVG
               svg={sendIcon}
               fill={
-                messageText
+                messageTextValid
                   ? theme.colors.white
                   : theme.colorsThemed.text.primary
               }
@@ -564,9 +618,6 @@ const SMessageContent = styled.div<ISMessageContent>`
     if (props.mine) {
       return props.theme.colorsThemed.accent.blue;
     }
-    if (props.theme.name === 'light') {
-      return props.theme.colors.white;
-    }
 
     return props.theme.colorsThemed.background.tertiary;
   }};
@@ -605,7 +656,7 @@ const SMessageContent = styled.div<ISMessageContent>`
         }
 
         return css`
-          border-radius: 16px 16px 16px 8px;
+          border-radius: 16px 8px 16px 16px;
         `;
       }
     } else {
@@ -656,7 +707,7 @@ const SMessageContent = styled.div<ISMessageContent>`
     }
 
     return css`
-      border-radius: 16px 16px 16px 8px;
+      border-radius: 16px 16px 8px 16px;
     `;
   }}
 `;
@@ -668,7 +719,9 @@ interface ISMessageText {
 
 const SMessageText = styled(Text)<ISMessageText>`
   line-height: 20px;
-  max-width: 412px;
+  max-width: 80vw;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
   color: ${(props) => {
     if (props.type === 'info') {
       return props.theme.colorsThemed.text.tertiary;
@@ -680,6 +733,10 @@ const SMessageText = styled(Text)<ISMessageText>`
 
     return props.theme.colorsThemed.text.primary;
   }};
+
+  ${({ theme }) => theme.media.tablet} {
+    max-width: 412px;
+  }
 `;
 
 const SRef = styled.span`

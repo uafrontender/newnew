@@ -16,6 +16,7 @@ declare module 'styled-components' {
       black: string;
       blue: string;
       dark: string;
+      darkGray: string;
     };
     colorsThemed: {
       statusBar: {
@@ -181,6 +182,7 @@ declare module 'styled-components' {
       arrowLeft: string;
       arrowRight: string;
       blueDiagonal: string;
+      blueReversedDiagonal: string;
       blueHorizontal: string;
       heroNotifications: string;
       heroNotificationsTablet: string;

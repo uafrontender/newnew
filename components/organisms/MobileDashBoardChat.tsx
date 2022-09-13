@@ -11,25 +11,28 @@ import { IChatData } from '../interfaces/ichat';
 import GoBackButton from '../molecules/GoBackButton';
 import MobileChatList from '../molecules/creator/dashboard/MobileChatList';
 import MobileChatArea from '../molecules/creator/dashboard/MobileChatArea';
+import { useGetChats } from '../../contexts/chatContext';
+import isBrowser from '../../utils/isBrowser';
+import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 interface IMobileDashBoardChat {
   closeChat: () => void;
 }
 
 const MobileDashBoardChat: React.FC<IMobileDashBoardChat> = ({ closeChat }) => {
-  const [chatData, setChatData] = useState<IChatData>({
-    chatRoom: null,
-    showChatList: null,
-  });
+  const { chatData, setChatData } = useGetChats();
   const openChat = ({ chatRoom }: IChatData) => {
     setChatData({ chatRoom, showChatList });
   };
   const { t } = useTranslation('page-Creator');
-  const [chatListHidden, setChatListHidden] =
-    useState<boolean | undefined>(false);
-  const [newMessage, setNewMessage] =
-    useState<newnewapi.IChatMessage | null | undefined>();
+  const [chatListHidden, setChatListHidden] = useState<boolean | undefined>(
+    false
+  );
+  const [newMessage, setNewMessage] = useState<
+    newnewapi.IChatMessage | null | undefined
+  >();
   const [searchText, setSearchText] = useState<string>('');
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
   useEffect(() => {
     setSearchText('');
@@ -58,6 +61,16 @@ const MobileDashBoardChat: React.FC<IMobileDashBoardChat> = ({ closeChat }) => {
     setSearchText(str);
   };
 
+  useEffect(() => {
+    if (isBrowser()) {
+      enableOverlayMode();
+    }
+
+    return () => {
+      disableOverlayMode();
+    };
+  }, []);
+
   return (
     <SContainer>
       <SSidebar hidden={chatListHidden !== undefined && chatListHidden}>
@@ -70,7 +83,9 @@ const MobileDashBoardChat: React.FC<IMobileDashBoardChat> = ({ closeChat }) => {
           />
           <NewMessage openChat={openChat} />
         </SToolbar>
-        <MobileChatList searchText={searchText} openChat={openChat} />
+        {!chatListHidden && (
+          <MobileChatList searchText={searchText} openChat={openChat} />
+        )}
       </SSidebar>
       <SContent>
         <MobileChatArea {...chatData} showChatList={showChatList} />

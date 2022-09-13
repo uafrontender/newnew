@@ -1,6 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme, css } from 'styled-components';
@@ -8,6 +14,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { debounce, isEqual } from 'lodash';
 import validator from 'validator';
 import { Area, Point } from 'react-easy-crop/types';
+import { toast } from 'react-toastify';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
@@ -48,6 +55,7 @@ import isAnimatedImage from '../../utils/isAnimatedImage';
 import resizeImage from '../../utils/resizeImage';
 import genderPronouns from '../../constants/genderPronouns';
 import getGenderPronouns from '../../utils/genderPronouns';
+import validateInputText from '../../utils/validateMessageText';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -184,7 +192,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
         const res = await validateUsernameTextField(payload);
 
-        if (!res.data?.status) throw new Error('An error occured');
+        if (!res.data?.status) throw new Error('An error occurred');
         if (res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK) {
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
@@ -239,7 +247,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
         const res = await validateText(payload);
 
-        if (!res.data?.status) throw new Error('An error occured');
+        if (!res.data?.status) throw new Error('An error occurred');
 
         if (kind === newnewapi.ValidateTextRequest.Kind.USER_NICKNAME) {
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
@@ -317,6 +325,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         );
       } else if (key === 'username') {
         if (value === user.userData?.username) {
+          validateUsernameViaAPIDebounced.cancel();
           // reset error if username equal to initial username
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
@@ -392,7 +401,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             }
 
             setCropCoverImage({ x: 0, y: 0 });
-            setCoverUrlInEdit(reader.result as string);
+            setCoverUrlInEdit(properlySizedImage.url);
             setCoverUrlInEditAnimated(isAnimatedImage(file.name));
           });
         }
@@ -406,9 +415,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     setCropCoverImage(location);
   };
 
-  const onCropCompleteCoverImage = useCallback((_, croppedAreaPixels: Area) => {
-    setCroppedAreaCoverImage(croppedAreaPixels);
-  }, []);
+  const onCropCompleteCoverImage = useCallback(
+    (_: any, croppedAreaPixels: Area) => {
+      setCroppedAreaCoverImage(croppedAreaPixels);
+    },
+    []
+  );
 
   const handleUpdateUserData = useCallback(async () => {
     if (isAPIValidateLoading) return;
@@ -437,7 +449,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         const res = await getImageUploadUrl(imageUrlPayload);
 
         if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'An error occured');
+          throw new Error(res.error?.message ?? 'An error occurred');
 
         const uploadResponse = await fetch(res.data.uploadUrl, {
           method: 'PUT',
@@ -456,7 +468,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const payload = new newnewapi.UpdateMeRequest({
         nickname: dataInEdit.nickname,
-        bio: dataInEdit.bio,
+        bio: dataInEdit.bio.trim(),
         // Update avatar
         ...(avatarUrlInEdit && avatarUrlInEdit !== user.userData?.avatarUrl
           ? { avatarUrl: avatarUrlInEdit }
@@ -499,13 +511,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setIsLoading(false);
       if ((err as Error).message === 'No token') {
         dispatch(logoutUserClearCookiesAndRedirect());
-      }
-      // Refresh token was present, session probably expired
-      // Redirect to sign up page
-      if ((err as Error).message === 'Refresh token invalid') {
+      } else if ((err as Error).message === 'Refresh token invalid') {
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
+      } else {
+        toast.error('toastErrors.generic');
       }
     }
   }, [
@@ -593,7 +604,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   };
 
   const onCropCompleteProfileImage = useCallback(
-    (_, croppedAreaPixels: Area) => {
+    (_: any, croppedAreaPixels: Area) => {
       setCroppedAreaProfileImage(croppedAreaPixels);
     },
     []
@@ -617,7 +628,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       const res = await getImageUploadUrl(imageUrlPayload);
 
       if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'An error occured');
+        throw new Error(res.error?.message ?? 'An error occurred');
 
       const uploadResponse = await fetch(res.data.uploadUrl, {
         method: 'PUT',
@@ -653,8 +664,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     handleSetStageToEditingGeneral,
     dispatch,
   ]);
+  const scrollPosition = useRef(0);
 
-  // Effects
   useEffect(() => {
     const verify = () => {
       if (!isBrowser()) return;
@@ -689,7 +700,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     if (
       (!avatarUrlInEdit ||
         isEqual(avatarUrlInEdit, user.userData?.avatarUrl)) &&
-      isEqual(dataInEdit, initialData) &&
+      dataInEdit.bio.trim() === initialData.bio &&
+      dataInEdit.genderPronouns === initialData.genderPronouns &&
+      dataInEdit.nickname.trim() === initialData.nickname &&
+      dataInEdit.username.trim() === initialData.username &&
       isEqual(coverUrlInEdit, user.userData?.coverUrl)
     ) {
       handleSetWasModified(false);
@@ -705,12 +719,25 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   ]);
 
   useEffect(() => {
-    if (Object.values(formErrors).every((v) => v === '')) {
-      setIsDataValid(true);
-    } else {
+    if (
+      Object.entries(dataInEdit).some(
+        ([key, value]) =>
+          key !== 'genderPronouns' &&
+          key !== 'bio' &&
+          !validateInputText(value as string)
+      )
+    ) {
       setIsDataValid(false);
+      return;
     }
-  }, [formErrors]);
+
+    if (Object.values(formErrors).some((v) => v !== '')) {
+      setIsDataValid(false);
+      return;
+    }
+
+    setIsDataValid(true);
+  }, [formErrors, dataInEdit]);
 
   // Gender Pronouns
   const genderOptions: TDropdownSelectItem<number>[] = useMemo(
@@ -825,7 +852,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   )}
                   placeholder={t('editProfileMenu.inputs.username.placeholder')}
                   isValid={!formErrors.usernameError}
-                  onChange={(value) => {
+                  onChange={(value: any) => {
                     handleUpdateDataInEdit('username', value as string);
                   }}
                 />
@@ -838,7 +865,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                         ? genderOptions.find(
                             (o) => o.value === dataInEdit.genderPronouns
                           )?.name!!
-                        : 'Gender'
+                        : t('editProfileMenu.inputs.genderPronouns.placeholder')
                     }
                     options={genderOptions}
                     selected={dataInEdit.genderPronouns}
@@ -1111,22 +1138,28 @@ const STextInputsWrapper = styled.div`
 const ProfilePictureContent = styled.div`
   overflow-y: auto;
   padding: 0 20px;
+  height: 100%;
 `;
 
 const SSliderWrapper = styled.div`
   display: none;
-
   ${({ theme }) => theme.media.tablet} {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 107px;
+    z-index: 1;
+    background-color: ${({ theme }) =>
+      theme.name === 'light'
+        ? 'rgba(255, 255, 255, 0.5)'
+        : 'rgba(11, 10, 19, 0.5)'};
     display: flex;
     flex-direction: row;
     justify-content: center;
-
     margin-top: 24px;
-    padding: 0px 24px;
-
+    padding: 0 24px;
     button {
       background: transparent;
-
       &:hover:enabled {
         background: transparent;
         cursor: pointer;
@@ -1159,7 +1192,10 @@ const SControlsWrapper = styled.div`
 const SEditProfilePicture = styled(motion.div)`
   display: flex;
   flex-direction: column;
-  height: 100%;
+
+  ${({ theme }) => theme.media.tablet} {
+    height: 100%;
+  }
 `;
 
 const SControlsWrapperPicture = styled.div`
@@ -1167,6 +1203,7 @@ const SControlsWrapperPicture = styled.div`
   justify-content: space-between;
   align-items: center;
 
+  margin-top: auto;
   padding: 16px;
 
   ${({ theme }) => theme.media.tablet} {
@@ -1193,37 +1230,30 @@ const UsernamePopupList = ({
   </SUsernamePopupList>
 );
 
-const SUsernamePopupListItem = styled.div<{
-  isValid: boolean;
-}>`
+const SUsernamePopupListItem = styled.div<{ isValid: boolean }>`
   display: flex;
   justify-content: flex-start;
   align-items: center;
 
   &:before {
     content: '✓';
-    color: ${({ isValid }) => (isValid ? '#FFFFFF' : 'transparent')};
+    color: ${({ isValid }) => (isValid ? '#fff' : 'transparent')};
     font-size: 8px;
     text-align: center;
     line-height: 13px;
     display: block;
-
     position: relative;
     top: -1px;
-
     width: 13px;
     height: 13px;
     margin-right: 4px;
-
     border-radius: 50%;
     border-width: 1.5px;
     border-style: solid;
     border-color: ${({ theme, isValid }) =>
       isValid ? 'transparent' : theme.colorsThemed.text.secondary};
-
     background-color: ${({ theme, isValid }) =>
       isValid ? theme.colorsThemed.accent.success : 'transparent'};
-
     transition: 0.2s ease-in-out;
   }
 `;
@@ -1232,36 +1262,14 @@ const SUsernamePopupList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-
   font-weight: 600;
   font-size: 12px;
   line-height: 16px;
-
-  color: #ffffff;
+  color: #fff;
 `;
 
 const SDropdownSelectWrapper = styled.div`
   margin-bottom: 16px;
-`;
-
-const SPreviewDiv = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-
-  margin-top: 6px;
-  margin-bottom: 16px;
-
-  text-align: center;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  & > div {
-    margin-right: 4px;
-  }
 `;
 
 const SDropdownSelect = styled(DropdownSelect)`

@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { useTheme } from 'styled-components';
+import { useRouter } from 'next/router';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -11,11 +12,9 @@ import Footer from '../organisms/Footer';
 import Header from '../organisms/Header';
 import Cookie from '../molecules/Cookie';
 import Container from '../atoms/Grid/Container';
-import ErrorBoundary from '../organisms/ErrorBoundary';
 import BottomNavigation from '../organisms/BottomNavigation';
 import FloatingMessages from '../molecules/creator/dashboard/FloatingMessages';
 
-import useOverlay from '../../utils/hooks/useOverlay';
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
 import { useAppSelector } from '../../redux-store/store';
 import useScrollDirection from '../../utils/hooks/useScrollDirection';
@@ -27,27 +26,45 @@ import { useNotifications } from '../../contexts/notificationsContext';
 import { useGetChats } from '../../contexts/chatContext';
 import ReportBugButton from '../molecules/ReportBugButton';
 import { usePostModalState } from '../../contexts/postModalContext';
+import useHasMounted from '../../utils/hooks/useHasMounted';
+import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+import ModalNotifications from '../molecules/ModalNotifications';
+import BaseLayout from './BaseLayout';
 
 interface IGeneral {
-  children: React.ReactNode;
+  className?: string;
   withChat?: boolean;
   specialStatusBarColor?: string;
   restrictMaxWidth?: boolean;
+  children: React.ReactNode;
 }
 
 export const General: React.FC<IGeneral> = (props) => {
-  const { children, withChat, specialStatusBarColor, restrictMaxWidth } = props;
+  const {
+    className,
+    withChat,
+    specialStatusBarColor,
+    restrictMaxWidth,
+    children,
+  } = props;
   const user = useAppSelector((state) => state.user);
-  const { banner, resizeMode } = useAppSelector((state) => state.ui);
+  const { banner, resizeMode, globalSearchActive } = useAppSelector(
+    (state) => state.ui
+  );
   const theme = useTheme();
   const [cookies] = useCookies();
+  const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
-  const { unreadCount } = useGetChats();
+  const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
   const { postOverlayOpen } = usePostModalState();
+  const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
+
+  const hasMounted = useHasMounted();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
 
-  const wrapperRef: any = useRef();
+  // TODO: fix an issue when scroll position is set before resizing of the wrapper
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const bottomNavigation = useMemo(() => {
     let bottomNavigationShadow: TBottomNavigationItem[] = [
       {
@@ -106,13 +123,20 @@ export const General: React.FC<IGeneral> = (props) => {
             width: '33%',
             counter: unreadNotificationCount,
           },
-          {
-            key: 'dms',
-            url: '/direct-messages',
-            width: '33%',
-            counter: unreadCount,
-          },
-        ];
+        ].concat(
+          (user.userData?.options?.isOfferingSubscription &&
+            mySubscribersTotal > 0) ||
+            creatorsImSubscribedTo.length > 0
+            ? [
+                {
+                  key: 'dms',
+                  url: '/direct-messages',
+                  width: '33%',
+                  counter: unreadCount,
+                },
+              ]
+            : []
+        );
       }
     }
 
@@ -121,106 +145,129 @@ export const General: React.FC<IGeneral> = (props) => {
     user.loggedIn,
     unreadNotificationCount,
     user.userData?.options?.isCreator,
+    user.userData?.options?.isOfferingSubscription,
     unreadCount,
+    creatorsImSubscribedTo.length,
+    mySubscribersTotal,
   ]);
 
-  useOverlay(wrapperRef);
-  useScrollPosition(wrapperRef);
+  useScrollPosition();
   // useRefreshOnScrollTop();
-  const { scrollDirection } = useScrollDirection(wrapperRef);
+  const { scrollDirection } = useScrollDirection();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
 
-  const [isOpenedChat, setIsOpenedChat] = useState(false);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   const openChat = () => {
-    setIsOpenedChat(true);
+    setMobileChatOpened(true);
   };
 
   const closeChat = () => {
-    setIsOpenedChat(false);
+    setMobileChatOpened(false);
   };
 
   const chatButtonVisible =
-    withChat && user.userData?.options?.isOfferingSubscription;
+    isMobile && withChat && user.userData?.options?.isOfferingSubscription;
 
   const mobileNavigationVisible = isMobile && scrollDirection !== 'down';
 
   return (
-    <ErrorBoundary>
+    <SBaseLayout
+      id='generalContainer'
+      className={className}
+      containerRef={wrapperRef}
+      withBanner={!!banner?.show}
+    >
       <SkeletonTheme
         baseColor={theme.colorsThemed.background.secondary}
         highlightColor={theme.colorsThemed.background.tertiary}
       >
-        <SWrapper
-          id='generalScrollContainer'
-          ref={wrapperRef}
-          withBanner={!!banner?.show}
-          {...props}
-        >
-          <Head>
-            <meta
-              name='theme-color'
-              content={
-                specialStatusBarColor
-                  ? specialStatusBarColor
-                  : theme.colorsThemed.statusBar.background
-              }
+        <Head>
+          <meta
+            name='theme-color'
+            content={
+              specialStatusBarColor
+                ? specialStatusBarColor
+                : theme.colorsThemed.statusBar.background
+            }
+          />
+        </Head>
+        <Header
+          visible={!isMobile || mobileNavigationVisible || globalSearchActive}
+        />
+        <SContent>
+          <Container
+            {...(restrictMaxWidth
+              ? {}
+              : {
+                  noMaxContent: true,
+                })}
+          >
+            <Row>
+              <Col>{children}</Col>
+            </Row>
+          </Container>
+        </SContent>
+        <Footer />
+        {hasMounted && (
+          <>
+            <BottomNavigation
+              collection={bottomNavigation}
+              moreMenuMobileOpen={moreMenuMobileOpen}
+              handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
+              visible={mobileNavigationVisible && !globalSearchActive}
             />
-          </Head>
-          <Header visible={!isMobile || mobileNavigationVisible} />
-          <SContent>
-            <Container
-              {...(restrictMaxWidth
-                ? {}
-                : {
-                    noMaxContent: true,
-                  })}
+            <SortingContainer
+              id='sorting-container'
+              withCookie={cookies.accepted !== 'true'}
+              bottomNavigationVisible={mobileNavigationVisible}
+            />
+            <CookieContainer
+              bottomNavigationVisible={mobileNavigationVisible}
+              zIndex={moreMenuMobileOpen ? 9 : 10}
             >
-              <Row>
-                <Col>{children}</Col>
-              </Row>
-            </Container>
-          </SContent>
-          <Footer />
-          <BottomNavigation
-            collection={bottomNavigation}
-            moreMenuMobileOpen={moreMenuMobileOpen}
-            handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-            visible={mobileNavigationVisible}
-          />
-          <SortingContainer
-            id='sorting-container'
-            withCookie={cookies.accepted !== 'true'}
+              <Cookie />
+            </CookieContainer>
+          </>
+        )}
+        {chatButtonVisible && (
+          <ChatContainer
             bottomNavigationVisible={mobileNavigationVisible}
-          />
-          <CookieContainer bottomNavigationVisible={mobileNavigationVisible}>
-            <Cookie />
-          </CookieContainer>
-          {chatButtonVisible && (
-            <ChatContainer bottomNavigationVisible={mobileNavigationVisible}>
-              {!isOpenedChat ? (
-                <FloatingMessages withCounter openChat={openChat} />
-              ) : (
-                <MobileDashBoardChat closeChat={closeChat} />
-              )}
-            </ChatContainer>
-          )}
+            zIndex={moreMenuMobileOpen ? 9 : 10}
+          >
+            {!mobileChatOpened ? (
+              <FloatingMessages withCounter openChat={openChat} />
+            ) : (
+              <MobileDashBoardChat closeChat={closeChat} />
+            )}
+          </ChatContainer>
+        )}
+        {!isMobileOrTablet && !router.route.includes('direct-messages') && (
           <ReportBugButton
             bottom={
               (isMobile ? 24 : 16) +
-              (isMobile && (mobileNavigationVisible || postOverlayOpen)
+              (isMobile &&
+              (mobileNavigationVisible || postOverlayOpen) &&
+              !mobileChatOpened
                 ? 56
                 : 0) +
-              (chatButtonVisible ? 72 : 0)
+              (chatButtonVisible && !mobileChatOpened ? 72 : 0)
             }
             right={4}
             zIndex={moreMenuMobileOpen ? 9 : undefined}
           />
-        </SWrapper>
+        )}
+        <ModalNotifications />
       </SkeletonTheme>
-    </ErrorBoundary>
+    </SBaseLayout>
   );
 };
 
@@ -236,11 +283,8 @@ interface ISWrapper {
   withBanner: boolean;
 }
 
-const SWrapper = styled.div<ISWrapper>`
-  width: 100vw;
-  height: 100vh;
+const SBaseLayout = styled(BaseLayout)<ISWrapper>`
   display: flex;
-  overflow-y: auto;
   transition: padding ease 0.5s;
   padding-top: ${(props) => (props.withBanner ? 96 : 56)}px;
   padding-bottom: 56px;
@@ -256,7 +300,6 @@ const SWrapper = styled.div<ISWrapper>`
       display: none;
     }
     scrollbar-width: none;
-    -ms-overflow-style: none;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -278,12 +321,13 @@ const SContent = styled.main`
 
 interface ICookieContainer {
   bottomNavigationVisible: boolean;
+  zIndex: number;
 }
 
 const CookieContainer = styled.div<ICookieContainer>`
   left: 50%;
   bottom: ${(props) => (props.bottomNavigationVisible ? 62 : 6)}px;
-  z-index: 10;
+  z-index: ${(props) => props.zIndex};
   position: fixed;
   transform: translateX(-50%);
   transition: bottom ease 0.5s;
@@ -296,12 +340,13 @@ const CookieContainer = styled.div<ICookieContainer>`
 
 interface IChatContainer {
   bottomNavigationVisible: boolean;
+  zIndex: number;
 }
 
 const ChatContainer = styled.div<IChatContainer>`
   right: 16px;
   bottom: ${(props) => (props.bottomNavigationVisible ? 72 : 16)}px;
-  z-index: 10;
+  z-index: ${(props) => props.zIndex};
   position: fixed;
   transition: bottom ease 0.5s;
 `;

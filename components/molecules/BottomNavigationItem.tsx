@@ -1,5 +1,5 @@
 import React from 'react';
-import { scroller } from 'react-scroll';
+import { animateScroll } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -23,6 +23,7 @@ import notificationsIconOutlined from '../../public/images/svg/icons/outlined/No
 import iconDirectMessages from '../../public/images/svg/icons/outlined/Comments.svg';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
+import { Mixpanel } from '../../utils/mixpanel';
 
 const icons: any = {
   outlined: {
@@ -65,12 +66,17 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
 
   const active = item.url === router.route;
 
-  const handleClick = () => {
+  const handleClick = (value: any) => {
     if (router.pathname === '/' && item.url === '/') {
-      scroller.scrollTo('top-reload', {
+      animateScroll.scrollToTop({
         smooth: 'easeInOutQuart',
         duration: SCROLL_TO_TOP,
-        containerId: 'generalScrollContainer',
+      });
+    }
+    if (value.key === 'add') {
+      Mixpanel.track('Navigation Item Clicked', {
+        _stage: 'Creation',
+        _button: 'New Post',
       });
     }
   };
@@ -100,7 +106,7 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
       </SCaption>
     </SContainer>
   ) : (
-    <SContainer width={item.width} onClick={handleClick}>
+    <SContainer width={item.width} onClick={() => handleClick(item)}>
       <Link href={item.url}>
         <a>
           <SSVGContainer>
@@ -138,7 +144,6 @@ interface ISContainer {
 
 const SContainer = styled.div<ISContainer>`
   width: ${(props) => props.width};
-  margin: 0 8px;
   cursor: pointer;
   padding: 8px 2px;
   display: flex;
@@ -146,13 +151,22 @@ const SContainer = styled.div<ISContainer>`
   flex-direction: column;
   justify-content: center;
 
-  max-width: 56px;
+  max-width: 63px;
+
   a {
     display: flex;
     width: 100%;
     align-items: center;
     flex-direction: column;
     justify-content: center;
+  }
+
+  ${({ theme }) => theme.media.mobileM} {
+    margin: 0 5px;
+  }
+
+  ${({ theme }) => theme.media.mobileL} {
+    margin: 0 8px;
   }
 `;
 

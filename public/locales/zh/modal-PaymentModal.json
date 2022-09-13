@@ -1,0 +1,29 @@
+{
+  "paymentMethodTitle": "支付方式",
+  "options": {
+    "wallet": {
+      "subtitle": "支付方式",
+      "name": "NewNew錢包",
+      "fees": "無費用"
+    },
+    "card": {
+      "name": "信用卡或借記卡",
+      "fees": "費率最高3%"
+    }
+  },
+  "rewardsText": "使用我的奖励",
+  "payButton": "支付",
+  "tocApplyLink": "條款",
+  "tocApplyText": "適用",
+  "reCaptchaTos": {
+    "siteProtectedBy": "本網站受reCAPTCHA和Google保護。",
+    "privacyPolicy": "隱私政策",
+    "and": "和",
+    "tos": "服務條款",
+    "apply": "適用。"
+  },
+  "primaryCard_NEED_TRANSLATION": "Primary card",
+  "newCard_NEED_TRANSLATION": "New card",
+  "saveCard_NEED_TRANSLATION": "Save card for future use",
+  "email": "電子郵件"
+}

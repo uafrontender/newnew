@@ -1,0 +1,232 @@
+{
+  "welcome": "Bienvenido a {{NEXT_PUBLIC_APP_NAME}}!",
+  "topSectionTitle": "Top 10 en {{country}}",
+  "heroSection": {
+    "title": "Únete y \nmoldea la realidad",
+    "subTitle": "Haz ofertas y vota por lo que sucederá a continuación en el mundo",
+    "signIn": "Iniciar sesión",
+    "explore": "Explorar Ahora",
+    "exploreNow": "Explorar ahora"
+  },
+  "shareTo": "Compartir a",
+  "ellipse": {
+    "copyLink": "Copiar enlace",
+    "linkCopied": "¡Enlace copiado!",
+    "followDecision": "Marcar {{postType}} como favorito",
+    "followCreator": "Marcar seguidor como favorito",
+    "unFollowDecision": "Quitar {{postType}} de favoritos",
+    "unFollowCreator": "Quitar creador de favoritos",
+    "unsubscribe": "Anular suscripción",
+    "removeSubscription": "Eliminar suscripción",
+    "removeBid": "Eliminar oferta",
+    "removeOption": "Eliminar opción",
+    "view": "Ver perfil",
+    "report": "Reportar",
+    "reportUser": "Reportar usuario",
+    "reportGroup": "Reportar grupo",
+    "reportBid": "Reportar oferta",
+    "reportOption": "Reportar opción",
+    "block": "Bloquear",
+    "blockUser": "Bloquear usuario",
+    "blockGroup": "Bloquear grupo",
+    "unblock": "Desbloquear",
+    "unblockUser": "Desbloquear usuario",
+    "unblockGroup": "Desbloquear grupo",
+    "delete": "Borrar",
+    "deleteDecision": "Borrar {{postType}}",
+    "cancel": "Cancelar"
+  },
+  "postType": {
+    "ac": "Bid",
+    "mc": "Superpoll",
+    "cf": "Goal"
+  },
+  "dragToReposition": "Arrastra para reposicionar la imagen",
+  "mobileBottomNavigation": {
+    "add": "Crear",
+    "home": "Inicio",
+    "more": "Más",
+    "share": "Compartir",
+    "dashboard": "Panel",
+    "dms": "Mensajes directos",
+    "notifications": "Notificaciones"
+  },
+  "mobileTopNavigation": {
+    "myBalance": "Mi balance: ${{value}}",
+    "profile": "Perfil"
+  },
+  "button": {
+    "createDecision": "Nueva publicación",
+    "create": "Crear",
+    "signIn": "Iniciar sesión",
+    "dashboard": "Panel",
+    "createOnNewnew": "Crear ahora",
+    "cancel": "Cancelar"
+  },
+  "footer": {
+    "topTitle": "NewNew",
+    "centerTitle": "Conecta con nosotros",
+    "bottomTitle": "Social",
+    "about": "Acerca de nosotros",
+    "press": "Prensa",
+    "jobs": "Trabaja en NewNew",
+    "help": "Ayuda",
+    "faq": "Preguntas frecuentes",
+    "twitter": "Twitter",
+    "howItWorks": "Cómo funciona",
+    "guidelines": "Normas comunitarias",
+    "accessibility": "Accesibilidad",
+    "inc": "© NewNew Inc",
+    "terms": "Términos",
+    "privacy": "Privacidad"
+  },
+  "language": {
+    "ddLanguageTitle": {
+      "en-US": "English",
+      "es": "Español",
+      "zh": "漢語"
+    },
+    "selectedLanguageTitle": {
+      "en-US": "English",
+      "es": "Español",
+      "zh": "漢語"
+    }
+  },
+  "cookie": {
+    "text": "Usamos",
+    "link": "Más información"
+  },
+  "reportBug": "Reportar un error",
+  "error": {
+    "text": {
+      "min": "El texto es demasiado corto, mínimo {{value}} caracteres",
+      "max": "El texto es demasiado largo, máximo {{value}} caracteres",
+      "badWords": "El texto contiene malas palabras",
+      "containsLinks": "Enlaces no permitidos"
+    }
+  },
+  "modal": {
+    "reportUser": {
+      "title": "Reportar",
+      "subtitle": "Ayúdanos a entender para que podamos investigar...",
+      "options": {
+        "spam": "Sospechoso o spam",
+        "abuse": "Abusivo o dañino",
+        "suicide": "Expresa intenciones de autolesionarse o suicidarse",
+        "hateSpeech": "Discurso de odio",
+        "harassment": "Acoso o intimidación",
+        "copyright": "Derechos de autor",
+        "other": "Otro"
+      },
+      "additionalInfo": {
+        "placeholder": "Por favor, cuéntanos un poco más..."
+      },
+      "button": {
+        "cancel": "Cancelar",
+        "report": "Reportar"
+      }
+    },
+    "reportSent": {
+      "title": "¡Estamos en ello!",
+      "subtitle": "Te agradecemos que te pongas en contacto con nosotros. Investigaremos tu reporte lo antes posible y tomaremos las medidas necesarias para garantizar la seguridad de todos.",
+      "button": "Aceptar"
+    }
+  },
+  "myLink": {
+    "copy": "Mi enlace",
+    "copied": "¡Copiado!"
+  },
+  "socials": {
+    "copy": "Copiar enlace",
+    "copied": "¡Enlace copiado!"
+  },
+  "search": {
+    "placeholder": "Búsqueda",
+    "topPosts": "Publicaciones populares",
+    "popularCreators": "Creadores populares",
+    "creatorSubtitle": "Ver publicaciones",
+    "allResults": "Todos los resultados",
+    "noResults": {
+      "title": "No encontramos nada",
+      "description": "Intenta cambiar tu búsqueda o explora las novedades",
+      "action": "Explorar"
+    }
+  },
+  "creatorCard": {
+    "subscriptionCost": "${{amount}} Mensual"
+  },
+  "gotIt": "Aceptar",
+  "sortingOption": {
+    "sortingtype": "Ordenar",
+    "sortingtype-all": "Todos",
+    "sortingtype-num_bids": "Participantes",
+    "sortingtype-num_bids-ac": "Número de ofertas",
+    "sortingtype-num_bids-mc": "Número de votos",
+    "sortingtype-num_bids-cf": "Número de patrocinadores",
+    "sortingtype-newest": "Más reciente",
+    "bid": "Oferta",
+    "bid-lowest": "Más baja",
+    "bid-highest": "Más alta",
+    "time": "Tiempo",
+    "time-ending-soon": "Terminando pronto",
+    "time-newest": "Más reciente",
+    "time-oldest": "Más antigüa",
+    "numbers-of-bids": "Número de ofertas",
+    "numbers-of-bids-fewest": "El menor número de ofertas primero",
+    "numbers-of-bids-most-first": "El mayor número de ofertas primero"
+  },
+  "toastErrors": {
+    "generic": "Se ha producido un error, inténtalo de nuevo más tarde"
+  },
+  "rewards": {
+    "earned": "ganaste ${{value}}",
+    "earn": "gana ${{value}}",
+    "modalTitle": "¡Ganaste ${{amount}}!",
+    "modalButton": "Genial",
+    "modalDescription": {
+      "1": "...por registrarte",
+      "2": "...por hacer una oferta",
+      "3": "...por votar en una publicación",
+      "4": "...por patrocinar un Goal",
+      "5": "...por suscribirte a un creador",
+      "6": "...por suscribirte a {{creators}} creadores",
+      "7": "...por ofertar dos veces con el mismo creador",
+      "8": "...por votar dos veces con el mismo creador",
+      "9": "...por patrocinar al mismo creador dos veces",
+      "10": "...por ofertas dos veces en una semana",
+      "11": "...por votar dos veces en una semana",
+      "12": "...por patrocinar dos Goals en una semana",
+      "13": "...por invitar a {{friends}} amigos a NewNew"
+    },
+    "receivedItemDescription_NEED_TRANSLATION": {
+      "1": "Signed up",
+      "2": "Placed a bid",
+      "3": "Voted on a post",
+      "4": "Backed a goal",
+      "5": "Subscribed to a creator",
+      "6": "Subscribed to {{creators}} creators",
+      "7": "Bid twice on the same creator",
+      "8": "Voted twice on the same creator",
+      "9": "Backed the same creator twice",
+      "10": "Placed bids twice in one week",
+      "11": "Voted twice in one week",
+      "12": "Backed goals twice in one week",
+      "13": "Invited {{friends}} friends"
+    },
+    "availableItemDescription_NEED_TRANSLATION": {
+      "1": "Sign up",
+      "2": "Place a bid",
+      "3": "Vote on a post",
+      "4": "Back a Goal",
+      "5": "Subscribe to a creator",
+      "6": "Subscribe to {{creators}} creators",
+      "7": "Bid twice on the same creator",
+      "8": "Vote twice on the same creator",
+      "9": "Back the same Creator twice",
+      "10": "Bid twice in one week",
+      "11": "Vote twice in one week",
+      "12": "Back goals twice in one week",
+      "13": "Invite {{friends}} friends to NewNew"
+    }
+  }
+}

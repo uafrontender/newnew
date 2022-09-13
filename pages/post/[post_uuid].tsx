@@ -25,10 +25,9 @@ import HomeLayout from '../../components/templates/HomeLayout';
 import switchPostType from '../../utils/switchPostType';
 import { toggleMutedMode } from '../../redux-store/slices/uiStateSlice';
 import isBrowser from '../../utils/isBrowser';
+import { Mixpanel } from '../../utils/mixpanel';
 
-const PostModal = dynamic(
-  () => import('../../components/organisms/decision/PostModal')
-);
+const PostModal = dynamic(() => import('../../components/organisms/decision'));
 
 const TopSection = dynamic(
   () => import('../../components/organisms/home/TopSection')
@@ -42,9 +41,21 @@ interface IPostPage {
   top10posts: newnewapi.NonPagedPostsResponse;
   postUuid: string;
   post: newnewapi.Post;
+  setup_intent_client_secret?: string;
+  comment_id?: string;
+  comment_content?: string;
+  save_card?: boolean;
 }
 
-const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
+const PostPage: NextPage<IPostPage> = ({
+  top10posts,
+  postUuid,
+  post,
+  setup_intent_client_secret,
+  comment_id,
+  comment_content,
+  save_card,
+}) => {
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const dispatch = useAppDispatch();
@@ -72,6 +83,10 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
   >(post ?? undefined);
 
   const handleOpenPostModal = (postToOpen: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'Post',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(postToOpen);
     setPostModalOpen(true);
   };
@@ -81,13 +96,18 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
   }, []);
 
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Post',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
 
     if (isBrowser()) {
-      const { idx } = window.history.state;
-      if (idx < 2) {
-        router?.replace('/');
+      // const { idx } = window.history.state;
+      if (postParsed?.creator?.username) {
+        router?.push(`/${postParsed?.creator?.username}`);
+      } else {
+        router?.push('/');
       }
     }
   };
@@ -103,13 +123,6 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (isMobile && !postModalOpen) {
-      router.push('/');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postModalOpen, isMobile]);
 
   return (
     <>
@@ -129,7 +142,7 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
           content={postParsed?.announcement?.thumbnailImageUrl ?? ''}
         />
       </Head>
-      {!user.loggedIn && <HeroSection />}
+      {!user.loggedIn && user._persist?.rehydrated && <HeroSection />}
       {!isMobile && topSectionCollection.length > 0 && (
         <TopSection
           collection={topSectionCollection}
@@ -140,7 +153,11 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
         <PostModal
           isOpen
           post={displayedPost}
-          // Required to avoid wierd cases when navigating back to the post using browser back button
+          stripeSetupIntentClientSecretFromRedirect={setup_intent_client_secret}
+          saveCardFromRedirect={save_card}
+          commentIdFromUrl={comment_id}
+          commentContentFromUrl={comment_content}
+          // Required to avoid weird cases when navigating back to the post using browser back button
           manualCurrLocation='forced_redirect_to_home'
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
@@ -156,10 +173,17 @@ export default PostPage;
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { post_uuid } = context.query;
+  const {
+    post_uuid,
+    setup_intent_client_secret,
+    comment_id,
+    comment_content,
+    save_card,
+  } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'modal-Post',
+    'modal-ResponseSuccessModal',
     'component-PostCard',
     'modal-PaymentModal',
   ]);
@@ -201,6 +225,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         : {}),
       postUuid: post_uuid,
       post: res.data.toJSON(),
+      ...(setup_intent_client_secret
+        ? {
+            setup_intent_client_secret,
+          }
+        : {}),
+      ...(save_card
+        ? {
+            save_card: save_card === 'true',
+          }
+        : {}),
+      ...(comment_id
+        ? {
+            comment_id,
+          }
+        : {}),
+      ...(comment_content
+        ? {
+            comment_content,
+          }
+        : {}),
       ...translationContext,
     },
   };

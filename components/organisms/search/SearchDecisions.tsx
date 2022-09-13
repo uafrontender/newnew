@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { toast } from 'react-toastify';
 
 import Button from '../../atoms/Button';
 import Sorting from '../Sorting';
@@ -13,13 +14,17 @@ import Sorting from '../Sorting';
 import { searchPosts } from '../../../api/endpoints/search';
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
+import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppSelector } from '../../../redux-store/store';
+import SortOption from '../../atoms/SortOption';
 
 const PostList = dynamic(() => import('./PostList'));
-const PostModal = dynamic(() => import('../decision/PostModal'));
+const PostModal = dynamic(() => import('../decision'));
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
 
-interface IFunction {
+interface ISearchDecisions {
   query: string;
+  type: string;
 }
 
 const parseFilterToArray = (filter: string): newnewapi.Post.Filter[] => {
@@ -79,9 +84,17 @@ const sortOptions: any = [
   },
 ];
 
-export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
+export const SearchDecisions: React.FC<ISearchDecisions> = ({
+  query,
+  type,
+}) => {
   const { t: tCommon } = useTranslation('common');
   const router = useRouter();
+
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
@@ -90,10 +103,17 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   >();
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'Search Page',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(post);
     setPostModalOpen(true);
   };
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Search Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };
@@ -137,6 +157,10 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
 
         const payload = new newnewapi.SearchPostsRequest({
           query,
+          searchType:
+            type === 'hashtags'
+              ? newnewapi.SearchPostsRequest.SearchType.HASHTAGS
+              : newnewapi.SearchPostsRequest.SearchType.UNSET,
           paging: {
             limit: 20,
             pageToken: pageToken ?? null,
@@ -165,7 +189,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
             return arr;
           });
           setPostsRoomsNextPageToken(res.data.paging?.nextPageToken);
-        } else {
+        } else if (!pageToken) {
           setResultsPosts([]);
           setHasNoResults(true);
         }
@@ -177,11 +201,12 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
         setLoadingPosts(false);
       } catch (err) {
         setLoadingPosts(false);
+        toast.error('toastErrors.generic');
         console.error(err);
       }
     },
 
-    [postSorting, query, initialLoad, activeTabs, hasNoResults]
+    [postSorting, query, type, initialLoad, activeTabs, hasNoResults]
   );
 
   const handleRemovePostFromState = (postUuid: string) => {
@@ -206,6 +231,10 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   }, [inView, loadingPosts, postsNextPageToken]);
 
   useEffect(() => {
+    if (router.query.tab !== 'posts') {
+      return;
+    }
+
     const routerArr: string[] = [];
     activeTabs.forEach((filterValue) => {
       switch (filterValue) {
@@ -220,17 +249,19 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
           break;
       }
     });
+
     router.push({
       pathname: '/search',
       query: {
         query,
+        type,
         tab: 'posts',
         filter: routerArr.length > 0 ? routerArr.join('-') : '',
         sorting: postSorting,
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postSorting, activeTabs, query]);
+  }, [postSorting, activeTabs, query, type]);
 
   const tabTypes = useMemo(
     () => [
@@ -254,14 +285,14 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   );
 
   const updateActiveTabs = useCallback(
-    (type: newnewapi.Post.Filter) => {
+    (tabType: newnewapi.Post.Filter) => {
       if (!loadingPosts) {
         setActiveTabs((curr) => {
           const arr = [...curr];
-          const index = arr.findIndex((item) => item === type);
+          const index = arr.findIndex((item) => item === tabType);
 
           if (index < 0) {
-            arr.push(type);
+            arr.push(tabType);
           } else {
             arr.splice(index, 1);
           }
@@ -272,6 +303,10 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
     },
     [loadingPosts]
   );
+
+  const clearSorting = useCallback(() => {
+    setPostSorting('all');
+  }, []);
 
   const Tabs = useCallback(
     () => (
@@ -287,9 +322,25 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
             {tab.title}
           </STab>
         ))}
+        {selectedSorting &&
+          selectedSorting.sortingtype !== 'all' &&
+          !isMobile && (
+            <SortOption
+              sorts={selectedSorting}
+              category=''
+              onClick={clearSorting}
+            />
+          )}
       </STabs>
     ),
-    [activeTabs, tabTypes, updateActiveTabs]
+    [
+      activeTabs,
+      tabTypes,
+      selectedSorting,
+      isMobile,
+      clearSorting,
+      updateActiveTabs,
+    ]
   );
 
   const handleTypeChange = useCallback(
@@ -336,7 +387,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
           manualCurrLocation={isBrowser() ? window.location.href : ''}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemovePostFromState={() =>
+          handleRemoveFromStateDeleted={() =>
             handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
           }
         />

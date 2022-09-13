@@ -13,11 +13,11 @@ import UserAvatar from '../../UserAvatar';
 import Lottie from '../../../atoms/Lottie';
 import Caption from '../../../atoms/Caption';
 import Indicator from '../../../atoms/Indicator';
-import NoResults from '../../notifications/NoResults';
+import NoResults from './notifications/NoResults';
 import { useAppSelector } from '../../../../redux-store/store';
 import {
   getMyNotifications,
-  markAsRead,
+  markAllAsRead,
 } from '../../../../api/endpoints/notification';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import { useNotifications } from '../../../../contexts/notificationsContext';
@@ -34,12 +34,15 @@ export const NotificationsList: React.FC<IFunction> = ({
   const scrollRef: any = useRef();
   const { ref: scrollRefNotifications, inView } = useInView();
   const user = useAppSelector((state) => state.user);
-  const [notifications, setNotifications] =
-    useState<newnewapi.INotification[] | null>(null);
-  const [unreadNotifications, setUnreadNotifications] =
-    useState<number[] | null>(null);
-  const [notificationsNextPageToken, setNotificationsNextPageToken] =
-    useState<string | undefined | null>('');
+  const [notifications, setNotifications] = useState<
+    newnewapi.INotification[] | null
+  >(null);
+  const [unreadNotifications, setUnreadNotifications] = useState<
+    number[] | null
+  >(null);
+  const [notificationsNextPageToken, setNotificationsNextPageToken] = useState<
+    string | undefined | null
+  >('');
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [defaultLimit, setDefaultLimit] = useState<number>(11);
@@ -48,7 +51,7 @@ export const NotificationsList: React.FC<IFunction> = ({
     useState<number>(0);
 
   const fetchNotification = useCallback(
-    async (args?) => {
+    async (args?: any) => {
       if (loading) return;
       setLoading(true);
       const limit: number = args && args.limit ? args.limit : defaultLimit;
@@ -95,10 +98,16 @@ export const NotificationsList: React.FC<IFunction> = ({
               if (res.data) arr.push(res.data.notifications[0].id as number);
               return arr;
             });
+            // We don`t update token since we only loaded the new first items
           }
-        }
-        if (!res.data.paging?.nextPageToken && notificationsNextPageToken)
+        } else {
+          // If there is no results then there is no more pages to load
           setNotificationsNextPageToken(null);
+        }
+
+        if (!res.data.paging?.nextPageToken) {
+          setNotificationsNextPageToken(null);
+        }
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -109,23 +118,17 @@ export const NotificationsList: React.FC<IFunction> = ({
     [loading]
   );
 
-  const readNotification = useCallback(
-    async () => {
-      try {
-        const payload = new newnewapi.MarkAsReadRequest({
-          notificationIds: unreadNotifications,
-        });
-        const res = await markAsRead(payload);
+  const markAllNotifications = useCallback(async () => {
+    try {
+      const payload = new newnewapi.EmptyRequest();
+      const res = await markAllAsRead(payload);
 
-        if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-        setUnreadNotifications(null);
-      } catch (err) {
-        console.error(err);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [unreadNotifications, markReadNotifications]
-  );
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+      setUnreadNotifications(null);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
 
   useEffect(() => {
     if (!notifications) {
@@ -134,15 +137,10 @@ export const NotificationsList: React.FC<IFunction> = ({
   }, [notifications, fetchNotification]);
 
   useEffect(() => {
-    if (
-      markReadNotifications &&
-      unreadNotifications &&
-      unreadNotifications.length > 0
-    ) {
-      readNotification();
+    if (markReadNotifications) {
+      markAllNotifications();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [markReadNotifications]);
+  }, [markReadNotifications, markAllNotifications]);
 
   useEffect(() => {
     if (inView && !loading && notificationsNextPageToken) {
@@ -360,4 +358,5 @@ const SNotificationItemIndicator = styled(Indicator)`
 const SRef = styled.span`
   overflow: hidden;
   text-align: center;
+  flex-shrink: 0;
 `;

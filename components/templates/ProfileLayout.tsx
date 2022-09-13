@@ -8,12 +8,14 @@ import React, {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -33,10 +35,7 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
 // import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 // import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
-import {
-  getSubscriptionStatus,
-  unsubscribeFromCreator,
-} from '../../api/endpoints/subscription';
+import { getSubscriptionStatus } from '../../api/endpoints/subscription';
 // import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
 
@@ -52,6 +51,8 @@ import UnsubscribeModal from '../molecules/profile/UnsubscribeModal';
 import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
+import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
+import CustomLink from '../atoms/CustomLink';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -66,6 +67,7 @@ interface IProfileLayout {
   postsCachedActivityFilter?: newnewapi.Post.Filter;
   postsCachedActivityPageToken?: string | null | undefined;
   postsCachedActivityCount?: number;
+  children: React.ReactNode;
 }
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
@@ -98,10 +100,14 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     'tablet',
   ].includes(resizeMode);
 
+  const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
+    resizeMode
+  );
+
   // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [wasSubscribed, setWasSubscribed] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
+  const [wasSubscribed, setWasSubscribed] = useState<boolean | null>(null);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
   // Share
@@ -127,7 +133,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           }, 1500);
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
     }
   }, [user.username]);
@@ -154,6 +160,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       unblockUser(uuid);
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   };
 
@@ -281,7 +288,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   );
 
   const handleClickReport = useCallback(() => {
-    if (!currentUser.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!currentUser.loggedIn && currentUser._persist?.rehydrated) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -400,7 +408,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       currentUser.loggedIn &&
       currentUser.userData?.userUuid?.toString() === user.uuid.toString()
     ) {
-      router.push(
+      router.replace(
         currentUser.userData?.options?.isCreator
           ? '/profile/my-posts'
           : '/profile'
@@ -435,6 +443,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         }
       } catch (err) {
         console.error(err);
+        toast.error('toastErrors.generic');
       }
     }
 
@@ -448,8 +457,10 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     // isSub ? setIsSubscribed(true) : setIsSubscribed(false);
   }, [creatorsImSubscribedTo, user.uuid]);
 
+  const moreButtonRef = useRef() as any;
+
   return (
-    <ErrorBoundary>
+    <>
       <SGeneral restrictMaxWidth>
         <SProfileLayout>
           <ProfileBackground
@@ -458,7 +469,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           {/* Favorites and more options buttons */}
           <SBackButton
             onClick={() => {
-              router.back();
+              router.push('/');
             }}
           />
           {/* <SFavoritesButton
@@ -484,10 +495,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             </SSVGContainer>
             {t('profileLayout.buttons.favorites')}
           </SFavoritesButton> */}
+
           <SMoreButton
             view='transparent'
             iconOnly
             onClick={() => setIsEllipseMenuOpen(true)}
+            ref={moreButtonRef}
           >
             <SSVGContainer active={ellipseMenuOpen}>
               <InlineSvg
@@ -502,7 +515,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           {!isMobile && (
             <UserEllipseMenu
               isVisible={ellipseMenuOpen}
-              isSubscribed={isSubscribed}
+              isSubscribed={!!isSubscribed}
               isBlocked={isUserBlocked}
               loggedIn={currentUser.loggedIn}
               handleClose={() => setIsEllipseMenuOpen(false)}
@@ -517,10 +530,15 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               handleClickUnsubscribe={() => {
                 setUnsubscribeModalOpen(true);
               }}
+              anchorElement={moreButtonRef.current}
+              offsetTop={isDesktop ? '-25px' : '0'}
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
           {isSubscribed && <SSubcribedTag>{t('subscribed-tag')}</SSubcribedTag>}
+          {wasSubscribed && (
+            <SSubcribedTag>{t('subscriptionCancelled-tag')}</SSubcribedTag>
+          )}
           <div
             style={{
               position: 'relative',
@@ -530,7 +548,17 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             }}
           >
             <SUsernameWrapper>
-              <SUsername variant={4}>{user.nickname}</SUsername>
+              <SUsername variant={4}>
+                {user.nickname}
+                {user.options?.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='32px'
+                    height='32px'
+                    fill='none'
+                  />
+                )}
+              </SUsername>
               {isGenderPronounsDefined(user.genderPronouns) && (
                 <SGenderPronouns variant={2}>
                   {t(
@@ -585,18 +613,20 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 )}
               </SShareButton>
             </SShareDiv>
-            {user.options?.isOfferingSubscription ? (
-              <Link
+            {user.options?.isOfferingSubscription &&
+            user.uuid !== currentUser.userData?.userUuid ? (
+              <CustomLink
                 href={
                   !isSubscribed && !wasSubscribed
                     ? `/${user.username}/subscribe`
-                    : `/direct-messages/${user.username}`
+                    : `/direct-messages/${user.username}-cr`
                 }
+                disabled={isSubscribed === null || wasSubscribed === null}
               >
                 <SSendButton withShadow view='primaryGrad'>
                   {t('profileLayout.buttons.sendMessage')}
                 </SSendButton>
-              </Link>
+              </CustomLink>
             ) : null}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
           </div>
@@ -613,7 +643,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         <UserEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={10}
-          isSubscribed={isSubscribed}
+          isSubscribed={!!isSubscribed}
           isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           onClose={() => setIsEllipseMenuOpen(false)}
@@ -645,15 +675,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       <ReportModal
         show={confirmReportUser}
         reportedDisplayname={
-          currentUser.userData
-            ? currentUser.userData.nickname ||
-              `@${currentUser.userData.username}`
-            : ''
+          user.nickname ? user.nickname || `@${user.username}` : ''
         }
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />
-    </ErrorBoundary>
+    </>
   );
 };
 
@@ -698,6 +725,8 @@ const SUsernameWrapper = styled.div`
 
 const SUsername = styled(Headline)`
   text-align: center;
+  display: flex;
+  align-items: center;
 `;
 
 const SGenderPronouns = styled(Text)`
@@ -920,4 +949,8 @@ const SSubcribedTag = styled.div`
   ${({ theme }) => theme.media.laptop} {
     top: 275px;
   }
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  margin-left: 4px;
 `;

@@ -9,9 +9,15 @@ import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { darkTheme, lightTheme } from './themes';
 import { setColorMode } from '../redux-store/slices/uiStateSlice';
 
-const GlobalTheme: React.FunctionComponent<{
+interface IGlobalTheme {
   initialTheme: string;
-}> = ({ initialTheme, children }) => {
+  children: React.ReactNode;
+}
+
+const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
+  initialTheme,
+  children,
+}) => {
   const dispatch = useAppDispatch();
   const { colorMode } = useAppSelector((state) => state.ui);
   const [cookies] = useCookies();

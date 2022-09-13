@@ -19,6 +19,7 @@ interface IList {
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
   showSubscriptionPrice?: boolean;
+  withEllipseMenu?: boolean;
 }
 
 export const CreatorsList: React.FC<IList> = ({
@@ -28,6 +29,7 @@ export const CreatorsList: React.FC<IList> = ({
   skeletonsBgColor,
   skeletonsHighlightColor,
   showSubscriptionPrice = false,
+  withEllipseMenu = false,
 }) => {
   const renderItem = (item: newnewapi.IUser) => {
     const handleItemClick = () => {
@@ -40,6 +42,7 @@ export const CreatorsList: React.FC<IList> = ({
           subscribedTo={subscribedTo}
           showSubscriptionPrice={showSubscriptionPrice}
           item={item}
+          withEllipseMenu={withEllipseMenu ?? false}
         />
       </SItemWrapper>
     );
@@ -139,10 +142,6 @@ const SListWrapper = styled.div`
       width: calc(20% - 32px);
     }
 
-    ${(props) => props.theme.media.desktop} {
-      width: calc(16.65% - 32px);
-    }
-
     div {
       .skeletonSpan {
         display: block;
@@ -169,10 +168,6 @@ const SItemWrapper = styled.div`
 
   ${(props) => props.theme.media.laptopL} {
     width: calc(20% - 32px);
-  }
-
-  ${(props) => props.theme.media.desktop} {
-    width: calc(16.65% - 32px);
   }
 `;
 

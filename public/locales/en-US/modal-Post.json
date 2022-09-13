@@ -1,7 +1,7 @@
 {
   "meta": {
     "ac": {
-      "title": "NewNew Event",
+      "title": "NewNew Bid",
       "description": "Make money, bid in auctions with friends and support creators on NewNew"
     },
     "mc": {
@@ -17,11 +17,11 @@
   "me": "me",
   "I": "I",
   "postType": {
-    "ac": "Event",
+    "ac": "Bid",
     "mc": "Superpoll",
     "cf": "Goal",
     "multiple": {
-      "ac": "Events",
+      "ac": "Bids",
       "mc": "Superpolls",
       "cf": "Goals"
     }
@@ -57,12 +57,12 @@
       "cf": "You’re backing this goal!"
     },
     "doneButton": "Sounds good!",
-    "ac": "{{postCreator}} will pick their favorite bid once the event is over.",
+    "ac": "{{postCreator}} will pick their favorite bid once time is up.",
     "mc": "{{postCreator}} will do the option with the most amount of votes when the superpoll is over.",
     "cf": "{{postCreator}} will do the goal once it gets enough backers."
   },
   "postFailedBoxModeration": {
-    "title": "{{ postType }} is cancelled",
+    "title": "{{postType}} is cancelled",
     "reason": {
       "no-response": "Response was not uploaded",
       "ac-no-winner": "Winner was not selected",
@@ -70,34 +70,34 @@
       "mc": "Time ran out before any votes were made",
       "cf": "Time ran out before the goal was reached"
     },
-    "buttonText": "New {{ postType }}"
+    "buttonText": "New {{postType}}"
   },
   "postFailedBox": {
-    "title": "This {{ postType }} is canceled",
+    "title": "This {{postType}} is canceled",
     "reason": {
-      "no-response": "{{ creator }} didn't post a response video in time",
-      "ac-no-winner": "{{ creator }} didn't choose a bid in time",
+      "no-response": "{{creator}} didn't post a response video in time",
+      "ac-no-winner": "{{creator}} didn't choose a bid in time",
       "ac": "Time ran out before any bids were made",
       "mc": "Time ran out before any votes were made",
       "cf": "Time ran out before the goal was reached"
     },
-    "buttonText": "See new {{ postTypeMultiple }}"
+    "buttonText": "See new {{postTypeMultiple}}"
   },
   "postDeletedByMe": {
-    "title": "This {{ postType }} has been deleted",
+    "title": "This {{postType}} has been deleted",
     "body": {
-      "byCreator": "You deleted this {{ postType }}",
-      "byAdmin": "This {{ postType }} was in violation of our Community Guidelines"
+      "byCreator": "You deleted this {{postType}}",
+      "byAdmin": "This {{postType}} was in violation of our Community Guidelines"
     },
     "buttonText": "Make a new one"
   },
   "postDeleted": {
-    "title": "This {{ postType }} has been deleted",
+    "title": "This {{postType}} has been deleted",
     "body": {
-      "byCreator": "{{ creator }} deleted this {{ postType }}",
-      "byAdmin": "This {{ postType }} was in violation of our Community Guidelines"
+      "byCreator": "{{creator}} deleted this {{postType}}",
+      "byAdmin": "This {{postType}} was in violation of our Community Guidelines"
     },
-    "buttonText": "See new {{ postTypeMultiple }}"
+    "buttonText": "See new {{postTypeMultiple}}"
   },
   "postSuccessModeration": {
     "title": "Your response is live!",
@@ -116,7 +116,7 @@
     }
   },
   "postSuccess": {
-    "title": "This {{ postType }} is finished!",
+    "title": "This {{postType}} is finished!",
     "body": "Checkout more like it.",
     "buttonText": "See more"
   },
@@ -127,6 +127,7 @@
       "backToOriginalVideo": "Back to original",
       "backToResponse": "Watch response"
     },
+    "reuploadButton": "re-upload",
     "cannotLeavePageMsg": "Are you sure you want to close this page? Upload progress will be lost",
     "floatingUploadResponseButton": "Make a response video",
     "setThumbnail": "Set a thumbnail",
@@ -165,8 +166,8 @@
       },
       "video": {
         "error": {
-          "minLength": "Video duration too small, choose from 10 seconds",
-          "maxLength": "Video duration too long, choose up to 10 minutes",
+          "minLength": "Video must be at least 10 seconds long",
+          "maxLength": "Video must be less than 10 minutes long",
           "maxSize": "Video size too big, choose up to 10gb",
           "title": "Ooops...",
           "description": "There was an error and your file could not be uploaded. Would you like to try again."
@@ -185,7 +186,7 @@
         },
         "processing": {
           "title": "Processing the video",
-          "description": "You can publish the response while the video is being processed",
+          "description": "Your video is being processed... hang tight!",
           "process": "{{progress}}% • {{time}} left",
           "uploadNonProcessed": "Publish"
         },
@@ -207,8 +208,8 @@
     }
   },
   "deletePostModal": {
-    "title": "Delete {{ postType }}",
-    "body": "Are you sure you want to delete this {{ postType }}? You won't be able to restore it once it's deleted...",
+    "title": "Delete {{postType}}",
+    "body": "Are you sure you want to delete this {{postType}}? You won't be able to restore it once it's deleted...",
     "button": {
       "cancel": "Cancel",
       "confirm": "Delete"
@@ -241,7 +242,7 @@
   },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
-      "ac": "This Event will begin once the video \nhas been processed",
+      "ac": "This Bid will begin once the video \nhas been processed",
       "mc": "This Superpoll will begin once the video \nhas been processed",
       "cf": "This Goal will begin once the video \nhas been processed"
     },
@@ -259,7 +260,7 @@
   "postScheduled": {
     "decision": {
       "title": "Coming soon...",
-      "subtitle_1": "{{ postType }} will be live shortly.",
+      "subtitle_1": "{{postType}} will be live shortly.",
       "subtitle_2": "Get notified once it's up!",
       "timer": {
         "days": "Days",
@@ -267,12 +268,12 @@
         "minutes": "Minutes",
         "seconds": "Seconds"
       },
-      "followButton": "Favorite {{ postType }}",
-      "unFollowButton": "Unfavorite {{ postType }}"
+      "followButton": "Favorite {{postType}}",
+      "unFollowButton": "Unfavorite {{postType}}"
     },
     "moderation": {
       "title": "Coming soon",
-      "subtitle_1": "Your {{ postType }} is not active yet.",
+      "subtitle_1": "Your {{postType}} is not active yet.",
       "subtitle_2": "It will start in",
       "timer": {
         "days": "Days",
@@ -284,11 +285,11 @@
   },
   "acPost": {
     "paymentModalHeader": {
-      "title": "{{ creator }}'s Event",
+      "title": "{{creator}}'s Bid",
       "subtitle": "Your bid"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} chooses your bid.",
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{creator}} chooses your bid.",
       "terms": "Terms",
       "apply": "apply"
     },
@@ -340,9 +341,9 @@
         "biddersBidAmount": "bidders bid",
         "bidderBidAmount": "bidder bid",
         "on": "on",
-        "suggestedByMe": "my",
-        "suggestedByUser": "{{username}}'s",
-        "bidTo": "bid to"
+        "suggestedByMe": "my bid",
+        "suggestedByUser": "{{username}}'s bid",
+        "to": "to"
       }
     },
     "floatingActionButton": {
@@ -355,7 +356,7 @@
       "votes": "total votes"
     },
     "paymentModalHeader": {
-      "title": "{{ creator }}'s Superpoll",
+      "title": "{{creator}}'s Superpoll",
       "subtitle": "Option you chose"
     },
     "paymentModalFooter": {
@@ -377,7 +378,7 @@
         "votes": "votes",
         "vote": "vote",
         "mySuggestion": "My suggestion",
-        "subscriberSuggestion": "{{ nickname }}'s suggestion",
+        "subscriberSuggestion": "{{nickname}}'s suggestion",
         "others": "others",
         "voters": "voters",
         "voted": "voted",
@@ -385,8 +386,6 @@
         "supportButton": "Vote",
         "supportAgainButton": "Vote \nagain",
         "raiseBidButton": "Vote",
-        "doubleMyVoteCaption": "Want to see this option win, then increase the chances of success and double your bid!",
-        "doubleMyVoteButton": "Double my vote",
         "placeABidButton": "Place a vote",
         "cancelButton": "Cancel",
         "moreButton": "More",
@@ -401,9 +400,9 @@
           "vote": "vote",
           "votes": "votes",
           "custom": "Custom votes",
-          "buySingleVote": "Buy 1 vote to vote on {{ creator }}'s Superpoll",
-          "buyMultipleVotes": "Buy {{amount}} votes to vote on {{ creator }}'s Superpoll",
-          "buyAnyVotes": "Buy any number of votes you want to vote on {{ creator }}'s Superpoll",
+          "buySingleVote": "Buy 1 vote to vote on {{creator}}'s Superpoll",
+          "buyMultipleVotes": "Buy {{amount}} votes to vote on {{creator}}'s Superpoll",
+          "buyAnyVotes": "Buy any number of votes you want to vote on {{creator}}'s Superpoll",
           "optionCaption": "Superpoll option",
           "voteButton": "Vote"
         }
@@ -422,9 +421,10 @@
             "vote": "vote"
           }
         },
-        "subscribeToCreatorCaption": "Subscribe to {{ creator }} to add your own options to this Superpoll!",
+        "subscribeToCreatorCaption": "Subscribe to {{creator}} to add your own options to this Superpoll!",
         "subscribeButton": "Subscribe",
         "suggestionPlaceholder": "Add your own option...",
+        "suggestionPlaceholderDesktop": "Add an option ...",
         "placeABidButton": "Add my option"
       }
     },
@@ -441,7 +441,8 @@
   },
   "cfPost": {
     "backersStatsSection": {
-      "ofBackers": "of {{ targetBackers }} backers",
+      "ofBackers": "of {{targetBackers}} backers",
+      "myBacking": "My backing:",
       "my": "my",
       "pledge": "pledge"
     },
@@ -466,10 +467,10 @@
       }
     },
     "paymentModalHeader": {
-      "title": "{{ creator }}'s Goal"
+      "title": "{{creator}}'s Goal"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} reaches their goal.",
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{creator}} reaches their goal.",
       "terms": "Terms",
       "apply": "apply"
     },
@@ -477,6 +478,10 @@
     "floatingActionButton": {
       "choosePledgeButton": "Back this goal"
     }
+  },
+  "thumbnailEllipseMenu": {
+    "selectSnippetButton": "Select a snippet",
+    "uploadImageButton": "Upload an image"
   },
   "postVideoThumbnailEdit": {
     "title": "Set a thumbnail",
@@ -486,6 +491,16 @@
     "toast": {
       "success": "Success! Thumbnail will be changed once processed",
       "error": "An error occurred"
+    }
+  },
+  "postVideoCoverImageEdit": {
+    "title": "Upload an image",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "uploadCoverImage": {
+      "caption": "Select custom cover image",
+      "uploadBtn": "Select",
+      "deleteBtn": "Delete"
     }
   },
   "acPostModeration": {
@@ -509,7 +524,8 @@
         }
       },
       "optionCard": {
-        "pickButton": "Select"
+        "pickButton": "Select",
+        "pickedButton": "Chosen"
       }
     },
     "winnerTab": {
@@ -548,6 +564,7 @@
     }
   },
   "cfPostModeration": {
+    "moneyRaised": "Total raised",
     "winnerTab": {
       "winnerOptionCard": {
         "backersToldYou": "backers successfully funded",
@@ -557,8 +574,8 @@
     }
   },
   "acPostSuccess": {
-    "heroText": "This Event has ended!",
-    "wantsToKnow": "{{ creator }} wants to know...",
+    "heroText": "This Bid has ended!",
+    "wantsToKnow": "{{creator}} wants to know...",
     "inTotalBids": "in total bids",
     "others": "others",
     "bid": "bid",
@@ -570,7 +587,7 @@
   },
   "mcPostSuccess": {
     "heroText": "This Superpoll has ended!",
-    "wantsToKnow": "{{ creator }} wants to know...",
+    "wantsToKnow": "{{creator}} wants to know...",
     "inTotalVotes": "total votes",
     "others": "others",
     "voted": "voted",
@@ -584,15 +601,15 @@
   },
   "cfPostSuccess": {
     "heroText": "This Goal has ended!",
-    "wantsToKnow": "{{ creator }}'s Goal",
-    "creatorsBackers": "{{ creator }}'s backers",
-    "ofTargetBackers": "of {{ target_count }} backers",
+    "wantsToKnow": "{{creator}}'s Goal",
+    "creatorsBackers": "{{creator}}'s backers",
+    "ofTargetBackers": "of {{target_count}} backers",
     "youBackedFor": "You backed it for"
   },
   "acPostAwaiting": {
     "hero": {
       "title": "Time's up!",
-      "body": "{{ creator }} has {{ time }} to select and do their favorite bid!",
+      "body": "{{creator}} has {{time}} to select and do their favorite bid!",
       "expires": {
         "days": "days",
         "hours": "hours",
@@ -600,7 +617,7 @@
         "seconds": "seconds"
       }
     },
-    "wantsToKnow": "{{ creator }} wants to know...",
+    "wantsToKnow": "{{creator}} wants to know...",
     "inTotalBids": "in total bids",
     "others": "others",
     "bid": "bid",
@@ -612,7 +629,7 @@
   "mcPostAwaiting": {
     "hero": {
       "title": "Votes are in!",
-      "body": "{{ creator }} has {{ time }} to do this option. Stay tuned!",
+      "body": "{{creator}} has {{time}} to do this option. Stay tuned!",
       "expires": {
         "days": "days",
         "hours": "hours",
@@ -620,7 +637,7 @@
         "seconds": "seconds"
       }
     },
-    "wantsToKnow": "{{ creator }} wants to know...",
+    "wantsToKnow": "{{creator}} wants to know...",
     "inTotalVotes": "total votes",
     "others": "others",
     "voted": "voted",
@@ -635,7 +652,7 @@
   "cfPostAwaiting": {
     "hero": {
       "title": "It's happening!",
-      "body": "{{ creator }} has {{ time }} to show you this Goal. Stay tuned!",
+      "body": "{{creator}} has {{time}} to show you this Goal. Stay tuned!",
       "expires": {
         "days": "days",
         "hours": "hours",
@@ -643,9 +660,9 @@
         "seconds": "seconds"
       }
     },
-    "wantsToKnow": "{{ creator }}'s Goal",
-    "creatorsBackers": "{{ creator }}'s backers",
-    "ofTargetBackers": "of {{ target_count }} backers",
+    "wantsToKnow": "{{creator}}'s Goal",
+    "creatorsBackers": "{{creator}}'s backers",
+    "ofTargetBackers": "of {{target_count}} backers",
     "youBackedFor": "You backed it for"
   },
   "recommendationsSection": {
@@ -681,7 +698,7 @@
     "button": "Got it"
   },
   "heroPopupAC": {
-    "title": "Events",
+    "title": "Bids",
     "text": "Control the outcome...\n Send the creator a bid with what you want them to do, how much you’d spend, then watch them do the bid!"
   },
   "heroPopupMC": {
@@ -691,6 +708,33 @@
   "heroPopupCF": {
     "title": "Goals",
     "text": "Pool money with others to back goals made by your favorite creators. If enough people back the goal, you’ll watch the creator do it!"
+  },
+  "postResponseTabModeration": {
+    "awaiting": {
+      "topHeader": "Time to post \nyour response!",
+      "postResponseBtn": "Post Response",
+      "youWillGet": "You'll get"
+    },
+    "succeeded": {
+      "topHeader": "Response \npublished!",
+      "youMade": "You made",
+      "shareBtn": "Share",
+      "linkCopied": "Link copied!"
+    },
+    "winner": {
+      "inResponseToYourPost": "In response to your post",
+      "ac": {
+        "numBiddersChoseSingular": "{{amount}} bidder chose",
+        "numBiddersChose": "{{amount}} bidders chose",
+        "optionCreator": "<0>{{nickname}}</0>'s bid"
+      },
+      "mc": {
+        "numBiddersChoseSingular": "{{amount}} voter chose",
+        "numBiddersChose": "{{amount}} voters chose",
+        "optionOwn": "the option",
+        "optionCreator": "<0>{{nickname}}</0>'s option"
+      }
+    }
   },
   "tutorials": {
     "ac": {
@@ -744,5 +788,25 @@
       }
     }
   },
-  "seeMore": ""
+  "errors": {
+    "notEnoughMoney": "Not enough money",
+    "cardNotFound": "Card not found",
+    "cardCannotBeUsed": "This card can not be used",
+    "blockedByCreator": "Blocked by creator",
+    "biddingNotStarted": "Bidding is not started yet",
+    "biddingIsEnded": "Bidding is ended already",
+    "mcCancelled": "Superpoll is cancelled",
+    "mcFinished": "Superpoll is finished already",
+    "mcNotStarted": "Superpoll is not started yet",
+    "alreadyVoted": "You are already voted",
+    "mcVoteCountTooSmall": "Vote count is too small",
+    "notAllowedToCreateNewOption": "New option is not allowed",
+    "cfCancelled": "Goal is cancelled",
+    "cfFinished": "Goal is finished already",
+    "cfNotStarted": "Goal is not started yet",
+    "rewardWrongEmail": "Reward can't be used by this account",
+    "rewardNotEnough": "Rewards balance is insufficient",
+    "rewardInvalidIntent": "Payment failed",
+    "requestFailed": "Request failed"
+  }
 }

@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "title": "NewNew - Haz ofertas, vota y coopera sobre decisiones ajenas",
+    "description": "Decide qué será lo siguiente que las personas harán con sus vidas. Vota, haz ofertas y coopera con la comunidad en NewNew para ver a personas hacer cosas en la vida real"
+  },
+  "cardsSection": {
+    "title": {
+      "biggest": "Lo mejor de todos los tiempos",
+      "for-you": "Para ti",
+      "ac": "Los Bids más grandes",
+      "mc": "Superpolls populares",
+      "cf": "Goals populares"
+    },
+    "button": {
+      "showMore": "Ver más",
+      "showMoreCreator": "Ver más de {{name}}",
+      "creatorOnTheRise": "En ascenso"
+    }
+  },
+  "tutorial": {
+    "ac": {
+      "title": "Bid",
+      "caption": "Envía al creador una oferta con lo que quieres que haga, cuánto estás dispuesto a gastar y ve si acepta tu oferta."
+    },
+    "mc": {
+      "title": "Superpoll",
+      "caption": "Un creador hace una Superencuesta en la que pagas por votar. Cuando se acaba el tiempo, mira cómo el creador realiza la opción que obtiene la mayor cantidad de votos."
+    },
+    "cf": {
+      "title": "Goal",
+      "caption": "Reúne dinero con otros para respaldar los objetivos de tus creadores favoritos. Si un número suficiente de personas respalda el Goal, verás cómo el creador lo realiza."
+    }
+  }
+}

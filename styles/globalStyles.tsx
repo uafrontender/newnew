@@ -9,6 +9,7 @@ const GlobalStyle = createGlobalStyle`
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    -webkit-tap-highlight-color:  rgba(255, 255, 255, 0); 
   }
 
   *, *:before, *:after {
@@ -36,6 +37,13 @@ const GlobalStyle = createGlobalStyle`
   body {
     color: ${({ theme }) => theme.colorsThemed.text.primary};
     background: ${({ theme }) => theme.colorsThemed.background.primary};
+
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
   body.blurred {

@@ -33,6 +33,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'page-Creator',
+    'page-Chat',
   ]);
 
   return {

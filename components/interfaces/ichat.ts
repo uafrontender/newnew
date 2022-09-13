@@ -11,4 +11,5 @@ export interface IChatData {
 
   isNewMessage?: boolean;
   showChatList: { (): void } | null;
+  updateLastMessage?: { (data: any): any } | null;
 }

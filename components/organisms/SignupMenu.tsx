@@ -44,6 +44,7 @@ import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.
 import isBrowser from '../../utils/isBrowser';
 import { AuthLayoutContext } from '../templates/AuthLayout';
 import isSafari from '../../utils/isSafari';
+import { Mixpanel } from '../../utils/mixpanel';
 
 export interface ISignupMenu {
   goal?: string;
@@ -102,16 +103,19 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
       if (!data || error) throw new Error(error?.message ?? 'Request failed');
 
       dispatch(setSignupEmailInput(emailInput));
-      setIsSubmitLoading(false);
 
       authLayoutContext.setShouldHeroUnmount(true);
 
+      const verificationPath = `/verify-email${
+        goal === 'create' ? '?to=create' : ''
+      }`;
+
       if (!isSafari()) {
         setTimeout(() => {
-          router.push('/verify-email');
+          router.push(verificationPath);
         }, 1000);
       } else {
-        router.push('/verify-email');
+        router.push(verificationPath);
       }
     } catch (err: any) {
       setIsSubmitLoading(false);
@@ -134,6 +138,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
   const redirectUrlParam = redirectURL
     ? `?redirect_url=${encodeURIComponent(redirectURL)}`
+    : goal === 'create'
+    ? `?redirect_url=${process.env.NEXT_PUBLIC_APP_URL}/creator-onboarding`
     : '';
 
   return (
@@ -149,15 +155,18 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
       <SMenuWrapper>
         <SSignInBackButton
           defer={isMobile ? 250 : undefined}
-          onClick={() => router.back()}
+          onClick={() => {
+            Mixpanel.track('Back Button Clicked', {
+              _stage: 'Sign Up',
+            });
+            router.back();
+          }}
         >
           <span>{t('button.back')}</span>
         </SSignInBackButton>
         <SHeadline variant={3}>
           {reason && reason !== 'session_expired'
             ? `${t('heading.sign-in-to')} ${t(`heading.reason.${reason}`)}`
-            : goal
-            ? t(`heading.${goal}`)
             : t('heading.sign-in')}
         </SHeadline>
         <SSubheading variant={2} weight={600}>
@@ -188,11 +197,14 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverBgColor='#000'
               hoverContentColor='#FFF'
               pressedBgColor={theme.colorsThemed.social.apple.pressed}
-              onClick={() =>
+              onClick={() => {
+                Mixpanel.track('Sign In With Apple Clicked', {
+                  _stage: 'Sign Up',
+                });
                 handleSignupRedirect(
                   `${BASE_URL_AUTH}/apple${redirectUrlParam}`
-                )
-              }
+                );
+              }}
             >
               {t('signUpOptions.apple')}
             </SignInButton>
@@ -204,9 +216,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverSvg={FacebookIconLight}
               hoverBgColor={theme.colorsThemed.social.facebook.hover}
               pressedBgColor={theme.colorsThemed.social.facebook.pressed}
-              onClick={() =>
-                handleSignupRedirect(`${BASE_URL_AUTH}/fb${redirectUrlParam}`)
-              }
+              onClick={() => {
+                Mixpanel.track('Sign In With Facebook Clicked', {
+                  _stage: 'Sign Up',
+                });
+                handleSignupRedirect(`${BASE_URL_AUTH}/fb${redirectUrlParam}`);
+              }}
             >
               {t('signUpOptions.facebook')}
             </SignInButton>
@@ -217,11 +232,14 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               svg={TwitterIcon}
               hoverBgColor={theme.colorsThemed.social.twitter.hover}
               pressedBgColor={theme.colorsThemed.social.twitter.pressed}
-              onClick={() =>
+              onClick={() => {
+                Mixpanel.track('Sign In With Twitter Clicked', {
+                  _stage: 'Sign Up',
+                });
                 handleSignupRedirect(
                   `${BASE_URL_AUTH}/twitter${redirectUrlParam}`
-                )
-              }
+                );
+              }}
             >
               {t('signUpOptions.twitter')}
             </SignInButton>
@@ -237,6 +255,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
             />
           </motion.div>
           <SEmailSignInForm
+            id='authenticate-form'
             onSubmit={(e) => {
               e.preventDefault();
               if (
@@ -250,6 +269,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
           >
             <motion.div variants={item}>
               <SignInTextInput
+                id='authenticate-input'
                 name='email'
                 type='email'
                 autoComplete='true'
@@ -278,13 +298,14 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 disabled={
                   !emailInputValid || isSubmitLoading || emailInput.length === 0
                 }
-                onClick={() => {}}
+                onClick={() => {
+                  Mixpanel.track('Sign In With Email Clicked', {
+                    _stage: 'Sign Up',
+                    _email: emailInput,
+                  });
+                }}
               >
-                <span>
-                  {goal !== 'log-in'
-                    ? t('signUpOptions.signInButton')
-                    : t('signUpOptions.logInButton')}
-                </span>
+                <span>{t('signUpOptions.signInButton')}</span>
               </EmailSignInButton>
             </motion.div>
           </SEmailSignInForm>
@@ -298,19 +319,42 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
             {t('legalDisclaimer.mainText')}
             <br />
             <Link href='https://privacy.newnew.co'>
-              <a href='https://privacy.newnew.co' target='_blank'>
+              <a
+                href='https://privacy.newnew.co'
+                target='_blank'
+                onClickCapture={() =>
+                  Mixpanel.track('Privacy Link Clicked', {
+                    _stage: 'Sign Up',
+                  })
+                }
+              >
                 {t('legalDisclaimer.privacyPolicy')}
               </a>
             </Link>
-            {', '}
             <Link href='https://terms.newnew.co'>
-              <a href='https://terms.newnew.co' target='_blank'>
+              <a
+                href='https://terms.newnew.co'
+                target='_blank'
+                onClickCapture={() =>
+                  Mixpanel.track('Terms Link Clicked', {
+                    _stage: 'Sign Up',
+                  })
+                }
+              >
                 {t('legalDisclaimer.terms')}
               </a>
             </Link>{' '}
             {t('legalDisclaimer.and')}{' '}
             <Link href='https://communityguidelines.newnew.co'>
-              <a href='https://communityguidelines.newnew.co' target='_blank'>
+              <a
+                href='https://communityguidelines.newnew.co'
+                target='_blank'
+                onClickCapture={() =>
+                  Mixpanel.track('Community Guidelines Link Clicked', {
+                    _stage: 'Sign Up',
+                  })
+                }
+              >
                 {t('legalDisclaimer.communityGuidelines')}
               </a>
             </Link>

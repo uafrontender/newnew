@@ -42,6 +42,7 @@ import getLocalizedMonth from '../../../utils/getMonth';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import { useAppSelector } from '../../../redux-store/store';
 
 // Import and register locales (for weekdays)
 for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
@@ -49,6 +50,7 @@ for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
 
   if (localeName === 'en') localeName = 'en-us';
   if (localeName === 'es-MX') localeName = 'es';
+  if (localeName === 'zh') localeName = 'zh-TW';
 
   const importedLocale = require(`date-fns/locale/${localeName}/index.js`);
   registerLocale(SUPPORTED_LANGUAGES[i], importedLocale as any);
@@ -99,6 +101,11 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
     handleResetSubmitError,
   }) => {
     const theme = useTheme();
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
+
     const [calendarOpen, setCalendarOpen] = useState(false);
     const months: TDropdownSelectItem<number>[] = Array(12)
       .fill('')
@@ -153,6 +160,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       );
     };
 
+    // eslint-disable-next-line react/no-unstable-nested-components
     const CustomInputForwardRef = forwardRef<
       HTMLInputElement,
       React.DetailedHTMLProps<
@@ -257,6 +265,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
               value={inputData}
               onChange={handleChange}
               onPaste={(e) => e.preventDefault()}
+              onFocus={props.disabled ? () => {} : (props.onClick as any)}
             />
             <SPseudoPlaceholder
               dangerouslySetInnerHTML={{
@@ -311,7 +320,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
             renderCustomHeader={handleRenderCustomHeader}
             customInput={<CustomInputForwardRef disabled={disabled} />}
             // Calendar
-            popperPlacement='top-end'
+            popperPlacement={isMobile ? 'bottom' : 'bottom-end'}
             popperModifiers={[
               {
                 name: 'offset',

@@ -61,6 +61,7 @@ const FullPreview: React.FC<IFullPreview> = (props) => {
               id='full-preview'
               resources={value}
               borderRadius={isMobile ? '0' : '16px'}
+              showPlayButton
             />
           )}
         </SModalVideoWrapper>
@@ -87,7 +88,6 @@ const SMobileContainer = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
-  min-height: 100vh;
 
   ${({ theme }) => theme.media.mobileL} {
     top: 50%;
@@ -140,12 +140,12 @@ const SModalCloseIcon = styled.div`
 
 const SModalTopLine = styled.div`
   display: flex;
-  padding: 18px 0;
+  padding: 18px 12px;
   align-items: center;
   margin-bottom: 16px;
 
   ${({ theme }) => theme.media.mobileL} {
-    padding: 10px 0;
+    padding: 10px 12px;
     margin-bottom: 24px;
     justify-content: space-between;
   }

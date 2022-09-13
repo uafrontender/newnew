@@ -10,20 +10,26 @@ import { AnimatePresence } from 'framer-motion';
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
 import Logo from '../molecules/Logo';
-import HeroVisual from './HeroVisual';
+import HeroVisual from './components/HeroVisual';
 import Container from '../atoms/Grid/Container';
-import ErrorBoundary from '../organisms/ErrorBoundary';
 
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import assets from '../../constants/assets';
+import BaseLayout from './BaseLayout';
 
 export const AuthLayoutContext = createContext({
   shouldHeroUnmount: false,
   setShouldHeroUnmount: (newValue: boolean) => {},
 });
 
-const AuthLayoutContextProvider: React.FC = ({ children }) => {
+interface IAuthLayoutContextProvider {
+  children: React.ReactNode;
+}
+
+const AuthLayoutContextProvider: React.FC<IAuthLayoutContextProvider> = ({
+  children,
+}) => {
   const [shouldHeroUnmount, setShouldHeroUnmount] = useState(false);
 
   const contextValue = useMemo(
@@ -43,47 +49,40 @@ const AuthLayoutContextProvider: React.FC = ({ children }) => {
   );
 };
 
-export interface IAuthLayout {}
-
-const SAuthLayout = styled.div`
-  position: relative;
-
-  height: 100vh;
-  width: 100vw;
-`;
+export interface IAuthLayout {
+  children: React.ReactNode;
+}
 
 const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {
   const router = useRouter();
   const theme = useTheme();
 
   return (
-    <ErrorBoundary>
+    <BaseLayout>
       <SkeletonTheme
         baseColor={theme.colorsThemed.background.secondary}
         highlightColor={theme.colorsThemed.background.tertiary}
       >
         <AuthLayoutContextProvider>
-          <SAuthLayout>
-            <Container>
-              <BackgroundVisual
-                view={
-                  router.pathname.includes('verify-email') ||
-                  router.pathname.includes('verify-new-email') ||
-                  router.pathname.includes('unsubscribe')
-                    ? 'floating-items'
-                    : 'hero-visual'
-                }
-              />
-              {!router.pathname.includes('verify-email') &&
-              !router.pathname.includes('verify-new-email') ? (
-                <HomeLogoButton />
-              ) : null}
-              <AnimatePresence>{children}</AnimatePresence>
-            </Container>
-          </SAuthLayout>
+          <Container>
+            <BackgroundVisual
+              view={
+                router.pathname.includes('verify-email') ||
+                router.pathname.includes('verify-new-email') ||
+                router.pathname.includes('unsubscribe')
+                  ? 'floating-items'
+                  : 'hero-visual'
+              }
+            />
+            {!router.pathname.includes('verify-email') &&
+            !router.pathname.includes('verify-new-email') ? (
+              <HomeLogoButton />
+            ) : null}
+            <AnimatePresence>{children}</AnimatePresence>
+          </Container>
         </AuthLayoutContextProvider>
       </SkeletonTheme>
-    </ErrorBoundary>
+    </BaseLayout>
   );
 };
 

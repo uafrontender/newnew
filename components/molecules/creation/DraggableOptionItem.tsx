@@ -18,8 +18,10 @@ import {
   CREATION_OPTION_MAX,
   CREATION_OPTION_MIN,
 } from '../../../constants/general';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IOptionItem {
+  id?: string;
   item: {
     id: number;
     text: string;
@@ -30,13 +32,14 @@ interface IOptionItem {
     value: string,
     min: number,
     max: number,
-    kind: newnewapi.ValidateTextRequest.Kind
+    kind: newnewapi.ValidateTextRequest.Kind,
+    index: number
   ) => Promise<string>;
   handleChange: (index: number, item: object | null) => void;
 }
 
 const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
-  const { item, index, withDelete, validation, handleChange } = props;
+  const { id, item, index, withDelete, validation, handleChange } = props;
   const [value, setValue] = useState(item.text);
   const [error, setError] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -46,13 +49,17 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   const dragControls = useDragControls();
 
   const handleInputChange = (e: any) => {
-    setValue(e.target.value);
+    setValue(e.target.value.trim() ? e.target.value : '');
     handleChange(index, {
       ...item,
-      text: e.target.value,
+      text: e.target.value.trim() ? e.target.value : '',
     });
   };
   const handleInputBlur = async (e: any) => {
+    Mixpanel.track('Superpoll Option Text Change', {
+      _stage: 'Creation',
+      _text: e.target.value,
+    });
     if (e.target.value.length < 1 && index > 1) {
       handleChange(index, null);
       return;
@@ -63,7 +70,8 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
         e.target.value,
         CREATION_OPTION_MIN,
         CREATION_OPTION_MAX,
-        newnewapi.ValidateTextRequest.Kind.POST_OPTION
+        newnewapi.ValidateTextRequest.Kind.POST_OPTION,
+        index
       )
     );
   };
@@ -71,13 +79,16 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
     setError('');
   };
   const handleDelete = () => {
+    Mixpanel.track('Superpoll Delete Option', { _stage: 'Creation' });
     handleChange(index, null);
   };
   const handlePointerDown = (event: any) => {
+    Mixpanel.track('Superpoll Dragging Option Start', { _stage: 'Creation' });
     dragControls.start(event);
     setIsDragging(true);
   };
   const handlePointerUp = () => {
+    Mixpanel.track('Superpoll Dragging Option End', { _stage: 'Creation' });
     setIsDragging(false);
   };
 
@@ -86,19 +97,22 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   useEffect(() => {
     const func = async () => {
       if (validateTitleDebounced) {
+        const trimmedTitle = (validateTitleDebounced as string).trim();
+
         setError(
           await validation(
-            validateTitleDebounced,
+            trimmedTitle,
             CREATION_OPTION_MIN,
             CREATION_OPTION_MAX,
-            newnewapi.ValidateTextRequest.Kind.POST_OPTION
+            newnewapi.ValidateTextRequest.Kind.POST_OPTION,
+            index
           )
         );
       }
     };
 
     func();
-  }, [validation, validateTitleDebounced]);
+  }, [validation, index, validateTitleDebounced]);
 
   return (
     <SWrapper
@@ -111,6 +125,7 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
       <STextAreaWrapper>
         <SLeftPart error={!!error} isDragging={isDragging}>
           <STextArea
+            id={id}
             value={item.text}
             onBlur={handleInputBlur}
             onFocus={handleInputFocus}

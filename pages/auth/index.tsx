@@ -7,6 +7,7 @@ import { newnewapi } from 'newnew-api';
 import jsonwebtoken from 'jsonwebtoken';
 import getRawBody from 'raw-body';
 import qs from 'querystring';
+import { useUpdateEffect } from 'react-use';
 
 import Lottie from '../../components/atoms/Lottie';
 
@@ -45,14 +46,20 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (user.loggedIn) router?.push('/');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setMounted(true);
   }, []);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
+    if (user.loggedIn) router?.push('/');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
+
+  useUpdateEffect(() => {
     async function handleAuth() {
+      if (isLoading || user.loggedIn) return;
       try {
         setIsLoading(true);
 
@@ -102,7 +109,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
         }
 
         if (!res!! || res!!.error || !res.data)
-          throw new Error(res!!.error?.message ?? 'An error occured');
+          throw new Error(res!!.error?.message ?? 'An error occurred');
 
         const { data } = res!!;
 
@@ -166,7 +173,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
 
     handleAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mounted]);
 
   return (
     <div>

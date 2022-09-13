@@ -1,5 +1,11 @@
 /* eslint-disable no-unneeded-ternary */
-import React, { useRef, useMemo, useState, useCallback } from 'react';
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useCallback,
+  useEffect,
+} from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import _compact from 'lodash/compact';
@@ -8,6 +14,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import { useUpdateEffect } from 'react-use';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -19,6 +26,7 @@ import { createPost } from '../../../../api/endpoints/post';
 import { maxLength, minLength } from '../../../../utils/validation';
 import {
   clearCreation,
+  setCreationStartDate,
   setPostData,
 } from '../../../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
@@ -32,6 +40,10 @@ import {
 
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
+import urltoFile from '../../../../utils/urlToFile';
+import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
+import PostTitleContent from '../../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -58,6 +70,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     multiplechoice,
     videoProcessing,
     fileProcessing,
+    customCoverImageUrl,
   } = useAppSelector((state) => state.creation);
   const { userData } = useAppSelector((state) => state.user);
   const validateText = useCallback(
@@ -110,11 +123,18 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     CREATION_TITLE_MIN,
     CREATION_TITLE_MAX
   );
+
   const optionsAreValid =
     tab !== 'multiple-choice' ||
-    multiplechoice.choices.findIndex((item) =>
-      validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)
+    multiplechoice.choices.findIndex(
+      (item: newnewapi.CreateMultipleChoiceBody.IOption) =>
+        validateText(
+          item.text as string,
+          CREATION_OPTION_MIN,
+          CREATION_OPTION_MAX
+        )
     ) === -1;
+
   const disabled =
     loading ||
     !titleIsValid ||
@@ -132,6 +152,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       .hours(time.hours())
       .minutes(time.minutes());
   }, [post.startsAt]);
+
   const formatExpiresAt: (inSeconds?: boolean) => any = useCallback(
     (inSeconds = false) => {
       const time = moment(
@@ -146,6 +167,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       if (post.expiresAt === '1-hour') {
         dateValue.add(1, 'h');
         seconds = 3600;
+      } else if (post.expiresAt === '3-hours') {
+        dateValue.add(3, 'h');
+        seconds = 10800;
       } else if (post.expiresAt === '6-hours') {
         seconds = 21600;
         dateValue.add(6, 'h');
@@ -170,17 +194,60 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     },
     [post.expiresAt, post.startsAt]
   );
+
   const handleClose = useCallback(() => {
+    Mixpanel.track('Post Edit', { _stage: 'Creation' });
     router.back();
   }, [router]);
+
   const handleCloseModal = useCallback(() => {
     setShowModal(false);
     router.push('/');
     dispatch(clearCreation({}));
   }, [dispatch, router]);
+
   const handleSubmit = useCallback(async () => {
+    if (loading) return;
+    Mixpanel.track('Publish Post', { _stage: 'Creation' });
     setLoading(true);
     try {
+      let hasCoverImage = false;
+
+      if (customCoverImageUrl) {
+        const coverImageFile = await urltoFile(
+          customCoverImageUrl,
+          'coverImage',
+          'image/jpeg'
+        );
+        const videoFileSubdirectory = post.announcementVideoUrl
+          .split('/')
+          .slice(-2, -1)
+          .join('');
+
+        const imageUrlPayload = new newnewapi.GetCoverImageUploadUrlRequest({
+          videoFileSubdirectory,
+        });
+
+        const res = await getCoverImageUploadUrl(imageUrlPayload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'An error occured');
+
+        const uploadResponse = await fetch(res.data.uploadUrl, {
+          method: 'PUT',
+          body: coverImageFile,
+          headers: {
+            'Content-Type': 'image/jpeg',
+          },
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Upload failed');
+        }
+
+        hasCoverImage = true;
+      }
+
       const body: Omit<newnewapi.CreatePostRequest, 'toJSON'> = {
         post: {
           title: post.title,
@@ -203,6 +270,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             },
           },
           announcementVideoUrl: post.announcementVideoUrl,
+          hasCoverImage,
         },
       };
 
@@ -214,9 +282,11 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         };
       } else if (tab === 'multiple-choice') {
         body.multiplechoice = {
-          options: multiplechoice.choices.map((choice) => ({
-            text: choice.text,
-          })),
+          options: multiplechoice.choices.map(
+            (choice: newnewapi.CreateMultipleChoiceBody.IOption) => ({
+              text: choice.text,
+            })
+          ),
           isSuggestionsAllowed: multiplechoice.options.allowSuggestions,
         };
       } else if (tab === 'crowdfunding') {
@@ -247,8 +317,15 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       setLoading(false);
     }
   }, [
+    customCoverImageUrl,
+    post.title,
+    post.options,
+    post.startsAt.type,
+    post.thumbnailParameters.startTime,
+    post.thumbnailParameters.endTime,
+    post.announcementVideoUrl,
+    loading,
     tab,
-    post,
     router,
     auction,
     isMobile,
@@ -343,9 +420,39 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     </SChoiceItem>
   );
 
+  useUpdateEffect(() => {
+    if (!post.title) {
+      router?.push('/creation');
+    }
+  }, [post.title, router]);
+
+  // This effect results in the form re-rendering every second
+  // However, it re renders after every letter typed anyway
+  // TODO: optimize this view
+  useEffect(() => {
+    let updateStartDate: any;
+
+    if (post.startsAt.type === 'right-away') {
+      updateStartDate = setInterval(() => {
+        const newStartAt = {
+          type: post.startsAt.type,
+          date: moment().format(),
+          time: moment().format('hh:mm'),
+          'hours-format': post.startsAt['hours-format'],
+        };
+        dispatch(setCreationStartDate(newStartAt));
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(updateStartDate);
+    };
+  }, [post.startsAt, dispatch]);
+
   if (isMobile) {
     return (
       <>
+        <PublishedModal open={showModal} handleClose={handleCloseModal} />
         <SContent>
           <STopLine>
             <SInlineSVG
@@ -357,7 +464,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               onClick={handleGoBack}
             />
             <SHeadlineMobile variant={2} weight={600}>
-              {post.title}
+              <PostTitleContent>{post.title}</PostTitleContent>
             </SHeadlineMobile>
           </STopLine>
           {tab === 'multiple-choice' && (
@@ -370,6 +477,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
                 id='preview-mobile'
                 muted={false}
                 resources={videoProcessing?.targetUrls}
+                showPlayButton
               />
             ) : (
               <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
@@ -395,9 +503,6 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   return (
     <>
       <PublishedModal open={showModal} handleClose={handleCloseModal} />
-      <SHeadLine variant={3} weight={600}>
-        {t(`preview.title-${router?.query?.tab}`)}
-      </SHeadLine>
       <STabletContent>
         <SLeftPart>
           <STabletPlayer>
@@ -409,6 +514,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
                 resources={videoProcessing?.targetUrls}
                 mutePosition='left'
                 borderRadius='16px'
+                showPlayButton
               />
             ) : (
               <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
@@ -416,7 +522,12 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           </STabletPlayer>
         </SLeftPart>
         <SRightPart>
-          <SHeadline variant={5}>{post.title}</SHeadline>
+          <SHeadLine variant={3} weight={600}>
+            {t(`preview.title-${router?.query?.tab}`)}
+          </SHeadLine>
+          <SHeadline variant={5}>
+            <PostTitleContent>{post.title}</PostTitleContent>
+          </SHeadline>
           {tab === 'multiple-choice' && (
             <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>
           )}
@@ -426,6 +537,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               {t('preview.button.edit')}
             </Button>
             <Button
+              id='publish'
               view='primaryGrad'
               loading={loading}
               onClick={handleSubmit}
@@ -456,7 +568,7 @@ const STabletContent = styled.div`
 
 const SHeadLine = styled(Text)`
   padding: 26px 0;
-  text-align: center;
+  text-align: start;
 
   ${({ theme }) => theme.media.laptop} {
     padding: 8px 0;
@@ -468,10 +580,12 @@ const SLeftPart = styled.div`
   flex: 1;
   max-width: calc(50% - 76px);
   margin-right: 76px;
+  margin-top: 70px;
 
   ${({ theme }) => theme.media.laptop} {
     max-width: 352px;
     margin-right: 16px;
+    margin-top: 86px;
   }
 `;
 
@@ -618,9 +732,5 @@ const SInlineSVG = styled(InlineSVG)`
 
 const SText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-  text-align: left;
-
-  ${({ theme }) => theme.media.tablet} {
-    text-align: center;
-  }
+  text-align: center;
 `;

@@ -1,0 +1,232 @@
+{
+  "welcome": "歡迎使用{{NEXT_PUBLIC_APP_NAME}}！",
+  "topSectionTitle": "{{country}}前十名",
+  "heroSection": {
+    "title": "共同重塑現實",
+    "subTitle": "出價並就世界的下一步行動投票",
+    "signIn": "登入",
+    "explore": "開始瀏覽",
+    "exploreNow": "開始瀏覽"
+  },
+  "shareTo": "分享到",
+  "ellipse": {
+    "copyLink": "複製連結",
+    "linkCopied": "連結已複製！",
+    "followDecision": "最喜歡的 {{postType}}",
+    "followCreator": "最喜歡的創作者",
+    "unFollowDecision": "不喜歡的{{postType}}",
+    "unFollowCreator": "不喜歡的創作者",
+    "unsubscribe": "取消訂閱",
+    "removeSubscription": "移除訂閱",
+    "removeBid": "移除投標",
+    "removeOption": "移除選項",
+    "view": "查看個人資料",
+    "report": "舉報",
+    "reportUser": "舉報用戶",
+    "reportGroup": "舉報該組",
+    "reportBid": "舉報出價",
+    "reportOption": "舉報選項",
+    "block": "屏蔽",
+    "blockUser": "屏蔽用戶",
+    "blockGroup": "屏蔽該組",
+    "unblock": "解除屏蔽",
+    "unblockUser": "解除屏蔽用戶",
+    "unblockGroup": "解除屏蔽該組",
+    "delete": "刪除",
+    "deleteDecision": "刪除{{postType}}",
+    "cancel": "取消"
+  },
+  "postType": {
+    "ac": "Bid",
+    "mc": "Superpoll",
+    "cf": "Goal"
+  },
+  "dragToReposition": "拖動以重新定位圖片",
+  "mobileBottomNavigation": {
+    "add": "創建",
+    "home": "主頁",
+    "more": "更多",
+    "share": "分享",
+    "dashboard": "儀錶板",
+    "dms": "私訊",
+    "notifications": "通知"
+  },
+  "mobileTopNavigation": {
+    "myBalance": "我的餘額以${{value}}",
+    "profile": "個人資料"
+  },
+  "button": {
+    "createDecision": "新帖子",
+    "create": "創建",
+    "signIn": "登入",
+    "dashboard": "儀錶板",
+    "createOnNewnew": "開始創建",
+    "cancel": "取消"
+  },
+  "footer": {
+    "topTitle": "NewNew",
+    "centerTitle": "聯絡我們",
+    "bottomTitle": "社交",
+    "about": "關於",
+    "press": "新聞報道",
+    "jobs": "NewNew工作機會",
+    "help": "幫助",
+    "faq": "常見問題",
+    "twitter": "Twitter",
+    "howItWorks": "如何運作",
+    "guidelines": "社區指南",
+    "accessibility": "可訪問性",
+    "inc": "© NewNew Inc",
+    "terms": "條款",
+    "privacy": "隱私"
+  },
+  "language": {
+    "ddLanguageTitle": {
+      "en-US": "English",
+      "es": "Español",
+      "zh": "漢語"
+    },
+    "selectedLanguageTitle": {
+      "en-US": "English",
+      "es": "Español",
+      "zh": "漢語"
+    }
+  },
+  "cookie": {
+    "text": "我們使用",
+    "link": "瞭解更多"
+  },
+  "reportBug": "報告錯誤",
+  "error": {
+    "text": {
+      "min": "文本太短，最少{{value}}字元",
+      "max": "文本太長，最多{{value}}字元",
+      "badWords": "文本中有髒話",
+      "containsLinks": "不允許插入連結"
+    }
+  },
+  "modal": {
+    "reportUser": {
+      "title": "舉報",
+      "subtitle": "幫助我們瞭解，以便我們進行調查......",
+      "options": {
+        "spam": "可疑的或垃圾郵件",
+        "abuse": "辱駡或有害",
+        "suicide": "有自我傷害或自殺意圖",
+        "hateSpeech": "仇恨言論",
+        "harassment": "騷擾或霸淩",
+        "copyright": "版權",
+        "other": "其他"
+      },
+      "additionalInfo": {
+        "placeholder": "請再提供更多詳情......"
+      },
+      "button": {
+        "cancel": "取消",
+        "report": "舉報"
+      }
+    },
+    "reportSent": {
+      "title": "我們馬上處理！",
+      "subtitle": "感謝告知,我們會儘快調查此事，並採取適當的措施，確保每個人的安全。",
+      "button": "知道了"
+    }
+  },
+  "myLink": {
+    "copy": "我的連結",
+    "copied": "已複製！"
+  },
+  "socials": {
+    "copy": "複製連結",
+    "copied": "連結已複製！"
+  },
+  "search": {
+    "placeholder": "搜索",
+    "topPosts": "熱門帖子",
+    "popularCreators": "熱門創作者",
+    "creatorSubtitle": "查看帖子",
+    "allResults": "所有結果",
+    "noResults": {
+      "title": "沒有找到任何內容",
+      "description": "嘗試搜索或瀏覽其他內容",
+      "action": "瀏覽"
+    }
+  },
+  "creatorCard": {
+    "subscriptionCost": "${{amount}} 每月"
+  },
+  "gotIt": "知道了",
+  "sortingOption": {
+    "sortingtype": "順序",
+    "sortingtype-all": "所有",
+    "sortingtype-num_bids": "參與者",
+    "sortingtype-num_bids-ac": "出價數量",
+    "sortingtype-num_bids-mc": "投票數量",
+    "sortingtype-num_bids-cf": "支持者人數",
+    "sortingtype-newest": "最新",
+    "bid": "出價",
+    "bid-lowest": "最低",
+    "bid-highest": "最高",
+    "time": "時間",
+    "time-ending-soon": "最快結束",
+    "time-newest": "最新",
+    "time-oldest": "最舊",
+    "numbers-of-bids": "出價數量",
+    "numbers-of-bids-fewest": "最少",
+    "numbers-of-bids-most-first": "最先"
+  },
+  "toastErrors": {
+    "generic": "发生错误，请稍后再试"
+  },
+  "rewards": {
+    "earned": "已賺取${{value}}",
+    "earn": "賺取${{value}}",
+    "modalTitle": "你賺到了${{amount}}！",
+    "modalButton": "很棒",
+    "modalDescription_NEED_TRANSLATION": {
+      "1": "...for signing up",
+      "2": "...for placing a bid",
+      "3": "...for voting on a post",
+      "4": "...for backing a goal",
+      "5": "...for subscribing to a creator",
+      "6": "...for subscribing to {{creators}} creators",
+      "7": "...for bidding twice on the same creator",
+      "8": "...for voting twice on the same creator",
+      "9": "...for backing the same creator twice",
+      "10": "...for bidding twice in one week",
+      "11": "...for voting twice in one week",
+      "12": "...for backing goals twice in one week",
+      "13": "...for inviting {{friends}} friends to NewNew"
+    },
+    "receivedItemDescription_NEED_TRANSLATION": {
+      "1": "Signed up",
+      "2": "Placed a bid",
+      "3": "Voted on a post",
+      "4": "Backed a goal",
+      "5": "Subscribed to a creator",
+      "6": "Subscribed to {{creators}} creators",
+      "7": "Bid twice on the same creator",
+      "8": "Voted twice on the same creator",
+      "9": "Backed the same creator twice",
+      "10": "Placed bids twice in one week",
+      "11": "Voted twice in one week",
+      "12": "Backed goals twice in one week",
+      "13": "Invited {{friends}} friends"
+    },
+    "availableItemDescription_NEED_TRANSLATION": {
+      "1": "Sign up",
+      "2": "Place a bid",
+      "3": "Vote on a post",
+      "4": "Back a Goal",
+      "5": "Subscribe to a creator",
+      "6": "Subscribe to {{creators}} creators",
+      "7": "Bid twice on the same creator",
+      "8": "Vote twice on the same creator",
+      "9": "Back the same Creator twice",
+      "10": "Bid twice in one week",
+      "11": "Vote twice in one week",
+      "12": "Back goals twice in one week",
+      "13": "Invite {{friends}} friends to NewNew"
+    }
+  }
+}

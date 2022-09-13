@@ -51,6 +51,7 @@ const ProfileTabs: React.FunctionComponent<IProfileTabs> = (props) => {
     <Tabs
       t={t}
       tabs={tabs}
+      hideIndicatorOnResizing
       activeTabIndex={findActiveTab(tabs, router.pathname, pageType)}
     />
   );

@@ -25,6 +25,7 @@ interface IList {
   skeletonsHighlightColor?: string;
   handlePostClicked: (post: newnewapi.Post) => void;
   handleRemovePostFromState?: (uuid: string) => void;
+  handleAddPostToState?: (post: newnewapi.Post) => void;
 }
 
 export const PostList: React.FC<IList> = ({
@@ -36,6 +37,7 @@ export const PostList: React.FC<IList> = ({
   skeletonsHighlightColor,
   handlePostClicked,
   handleRemovePostFromState,
+  handleAddPostToState,
 }) => {
   const { postOverlayOpen } = usePostModalState();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -61,6 +63,9 @@ export const PostList: React.FC<IList> = ({
           shouldStop={postOverlayOpen}
           handleRemovePostFromState={() =>
             handleRemovePostFromState?.(switchPostType(item)[0].postUuid)
+          }
+          handleAddPostToState={() =>
+            handleAddPostToState?.(switchPostType(item)[0])
           }
         />
       </SItemWrapper>
@@ -167,10 +172,6 @@ const SListWrapper = styled.div`
       width: calc(20% - 32px);
     }
 
-    ${(props) => props.theme.media.desktop} {
-      width: calc(16.65% - 32px);
-    }
-
     div {
       .skeletonSpan {
         display: block;
@@ -190,17 +191,13 @@ const SItemWrapper = styled.div`
     margin: 0 8px 24px 8px;
   }
 
-  ${(props) => props.theme.media.laptop} {
+  ${(props) => props.theme.media.laptopM} {
     width: calc(25% - 32px);
     margin: 0 16px 32px 16px;
   }
 
   ${(props) => props.theme.media.laptopL} {
     width: calc(20% - 32px);
-  }
-
-  ${(props) => props.theme.media.desktop} {
-    width: calc(16.65% - 32px);
   }
 `;
 

@@ -6,7 +6,7 @@ export const useLeavePageConfirm = (
   isConfirm: boolean,
   message: string,
   allowedRoutes: string[],
-  callback?: () => void,
+  callback?: () => void
 ) => {
   useBeforeUnload(isConfirm, message);
 
@@ -16,11 +16,7 @@ export const useLeavePageConfirm = (
         0,
         route.indexOf('?') !== -1 ? route.indexOf('?') : undefined
       );
-
-      if (
-        !allowedRoutes.includes(routeTrimmed) &&
-        isConfirm
-      ) {
+      if (!allowedRoutes.includes(routeTrimmed) && isConfirm) {
         if (!window.confirm(message)) {
           // eslint-disable-next-line no-throw-literal
           throw 'Route Canceled';

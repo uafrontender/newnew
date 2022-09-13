@@ -11,6 +11,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { toast } from 'react-toastify';
 
 import { NextPageWithLayout } from './_app';
 import PostList from '../components/organisms/see-more/PostList';
@@ -29,10 +30,9 @@ import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import switchPostType from '../utils/switchPostType';
 import assets from '../constants/assets';
+import { Mixpanel } from '../utils/mixpanel';
 
-const PostModal = dynamic(
-  () => import('../components/organisms/decision/PostModal')
-);
+const PostModal = dynamic(() => import('../components/organisms/decision'));
 const TopSection = dynamic(
   () => import('../components/organisms/home/TopSection')
 );
@@ -46,7 +46,7 @@ interface ISearch {
 
 const Search: NextPage<ISearch> = ({ top10posts }) => {
   const { t } = useTranslation('page-SeeMore');
-  const { loggedIn } = useAppSelector((state) => state.user);
+  const { loggedIn, _persist } = useAppSelector((state) => state.user);
 
   const router = useRouter();
   const categoryRef = useRef(router.query.category?.toString() ?? 'ac');
@@ -62,8 +62,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
   const [collectionLoaded, setCollectionLoaded] = useState<newnewapi.Post[]>(
     []
   );
-  const [nextPageToken, setNextPageToken] =
-    useState<string | null | undefined>('');
+  const [nextPageToken, setNextPageToken] = useState<string | null | undefined>(
+    ''
+  );
   const [isCollectionLoading, setIsCollectionLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
 
@@ -105,7 +106,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           res = await fetchForYouPosts(fyPayload);
 
-          if (res.data && (res.data as newnewapi.PagedPostsResponse).posts) {
+          if (res.data && (res.data as newnewapi.PagedPostsResponse)?.posts) {
             setCollectionLoaded((curr) => [
               ...curr,
               ...((res.data as newnewapi.PagedPostsResponse)
@@ -138,7 +139,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           if (
             res.data &&
-            (res.data as newnewapi.PagedAuctionsResponse).auctions
+            (res.data as newnewapi.PagedAuctionsResponse)?.auctions
           ) {
             setCollectionLoaded((curr) => [
               ...curr,
@@ -172,7 +173,8 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           if (
             res.data &&
-            (res.data as newnewapi.PagedMultipleChoicesResponse).multipleChoices
+            (res.data as newnewapi.PagedMultipleChoicesResponse)
+              ?.multipleChoices
           ) {
             setCollectionLoaded((curr) => [
               ...curr,
@@ -206,7 +208,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           if (
             res.data &&
-            (res.data as newnewapi.PagedCrowdfundingsResponse).crowdfundings
+            (res.data as newnewapi.PagedCrowdfundingsResponse)?.crowdfundings
           ) {
             setCollectionLoaded((curr) => [
               ...curr,
@@ -238,7 +240,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
           res = await fetchBiggestPosts(biggestPayload);
 
-          if (res.data && (res.data as newnewapi.PagedPostsResponse).posts) {
+          if (res.data && (res.data as newnewapi.PagedPostsResponse)?.posts) {
             setCollectionLoaded((curr) => [
               ...curr,
               ...((res.data as newnewapi.PagedPostsResponse)
@@ -251,8 +253,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
           throw new Error('Request failed');
         }
       } catch (err) {
-        setIsCollectionLoading(false);
         console.error(err);
+        setIsCollectionLoading(false);
+        toast.error('toastErrors.generic');
       }
     },
     [setCollectionLoaded, loggedIn, isCollectionLoading]
@@ -260,10 +263,15 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>(undefined);
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >(undefined);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
+    Mixpanel.track('Open Post Modal', {
+      _stage: 'See More Page',
+      _postUuid: switchPostType(post)[0].postUuid,
+    });
     setDisplayedPost(post);
     setPostModalOpen(true);
   };
@@ -273,6 +281,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
   }, []);
 
   const handleClosePostModal = () => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'See More Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };
@@ -300,7 +311,6 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     scroller.scrollTo(category, {
       smooth: true,
       offset: -100,
-      containerId: 'generalScrollContainer',
     });
   }, [router.query.category, router.query.sort]);
 
@@ -320,7 +330,8 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
       }
     }
 
-    if (category === 'for-you' && !loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (category === 'for-you' && _persist?.rehydrated && !loggedIn) {
       router?.push('/sign-up');
       return;
     }
@@ -369,23 +380,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     isCollectionLoading,
     router.query.category,
     router.query.sort,
+    _persist?.rehydrated,
     loggedIn,
   ]);
-
-  // Clear sorting
-  useEffect(() => {
-    const category = router.query.category?.toString() ?? 'ac';
-    if (category === 'for-you') {
-      const newQuery = { ...router.query };
-
-      delete newQuery.sort;
-
-      router?.push({
-        query: newQuery,
-        pathname: router.pathname,
-      });
-    }
-  }, [router]);
 
   return (
     <>
@@ -405,7 +402,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      {topSectionCollection.length > 0 && (
+      {topSectionCollection?.length > 0 && (
         <TopSection
           collection={topSectionCollection}
           handlePostClicked={handleOpenPostModal}
@@ -433,7 +430,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
           post={displayedPost}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemovePostFromState={() =>
+          handleRemoveFromStateDeleted={() =>
             handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
           }
         />
@@ -455,6 +452,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'component-PostCard',
     'modal-Post',
     'modal-PaymentModal',
+    'modal-ResponseSuccessModal',
   ]);
 
   const top10payload = new newnewapi.EmptyRequest({});

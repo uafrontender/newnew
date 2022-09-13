@@ -1,13 +1,15 @@
 /* eslint-disable no-lonely-if */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import moment from 'moment';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
+import { useTranslation } from 'next-i18next';
+import { toast } from 'react-toastify';
+
 import UserAvatar from '../../molecules/UserAvatar';
 import Button from '../Button';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
-
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import InlineSVG from '../InlineSVG';
 import SubscriberEllipseMenu from './SubscriberEllipseMenu';
@@ -23,6 +25,7 @@ interface ISubscriberRow {
 }
 
 const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -74,6 +77,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
       if (subscriber.user?.uuid) unblockUser(subscriber.user.uuid);
     } catch (err) {
       console.error(err);
+      toast.error('toastErrors.generic');
     }
   }
 
@@ -88,6 +92,8 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
   const onUserReport = () => {
     setConfirmReportUser(true);
   };
+
+  const moreButtonRef: any = useRef<HTMLButtonElement>();
 
   return (
     <SContainer>
@@ -111,13 +117,14 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
           <Link
             href={`/creator/dashboard?tab=direct-messages&roomID=${subscriber.chatRoomId}`}
           >
-            DM
+            {t('subscriptions.messageOne')}
           </Link>
         )}
         <SMoreButton
           view='transparent'
           iconOnly
           onClick={() => handleOpenEllipseMenu()}
+          ref={moreButtonRef}
         >
           <InlineSVG
             svg={MoreIconFilled}
@@ -135,6 +142,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
               userBlocked={isSubscriberBlocked}
               onUserBlock={onUserBlock}
               onUserReport={onUserReport}
+              anchorElement={moreButtonRef?.current}
             />
             <ReportModal
               show={confirmReportUser}

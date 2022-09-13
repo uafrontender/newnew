@@ -32,7 +32,7 @@ export default class MyDocument extends Document {
             {initialProps.styles}
             {sheet.getStyleElement()}
           </>
-        ),
+        ) as any,
       };
     } finally {
       sheet.seal();
@@ -47,21 +47,21 @@ export default class MyDocument extends Document {
           <link href='/fonts/font-gilroy.css' rel='stylesheet' />
           <link
             rel='preload'
-            href='/fonts/Radomir Tinkov - Gilroy-Medium.otf'
+            href='/fonts/Radomir-Tinkov-Gilroy-Medium.otf'
             as='font'
             type='font/otf'
             crossOrigin='anonymous'
           />
           <link
             rel='preload'
-            href='/fonts/Radomir Tinkov - Gilroy-SemiBold.otf'
+            href='/fonts/Radomir-Tinkov-Gilroy-SemiBold.otf'
             as='font'
             type='font/otf'
             crossOrigin='anonymous'
           />
           <link
             rel='preload'
-            href='/fonts/Radomir Tinkov - Gilroy-Bold.otf'
+            href='/fonts/Radomir-Tinkov-Gilroy-Bold.otf'
             as='font'
             type='font/otf'
             crossOrigin='anonymous'

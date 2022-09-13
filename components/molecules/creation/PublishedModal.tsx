@@ -21,6 +21,8 @@ import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
 import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
+import PostTitleContent from '../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -51,10 +53,11 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-  const preventCLick = (e: any) => {
+  const preventClick = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
   };
+
   const socialButtons = useMemo(
     () => [
       // {
@@ -78,14 +81,18 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
 
   const postTypeText = useCallback(() => {
     if (postData) {
-      if (postData.auction) return 'Event';
+      if (postData.auction) return 'Bid';
       if (postData.crowdfunding) return 'Goal';
       return 'Superpoll';
     }
-    return 'Event';
+    return 'Bid';
   }, [postData]);
 
   async function copyPostUrlToClipboard(url: string) {
+    Mixpanel.track('Copy Post Url to Clipboard', {
+      _stage: 'Creation',
+      _url: url,
+    });
     if ('clipboard' in navigator) {
       await navigator.clipboard.writeText(url);
     } else {
@@ -138,6 +145,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const handleViewMyPost = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (postData) {
+        Mixpanel.track('See My Post Click');
         let url;
         if (window) {
           url = `${window.location.origin}/post/`;
@@ -152,9 +160,9 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
               url += postData.multipleChoice.postUuid;
             }
 
-            router.push(url);
-
-            dispatch(clearCreation({}));
+            router.push(url).then(() => {
+              dispatch(clearCreation({}));
+            });
           }
         }
       }
@@ -167,6 +175,8 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
 
     if (post.expiresAt === '1-hour') {
       dateValue.add(1, 'h');
+    } else if (post.expiresAt === '3-hours') {
+      dateValue.add(3, 'h');
     } else if (post.expiresAt === '6-hours') {
       dateValue.add(6, 'h');
     } else if (post.expiresAt === '12-hours') {
@@ -208,7 +218,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
 
   return (
     <Modal show={open} onClose={handleClose}>
-      <SMobileContainer onClick={preventCLick}>
+      <SMobileContainer onClick={preventClick}>
         <SContent>
           <SPlayerWrapper>
             {open ? (
@@ -219,6 +229,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
                   resources={videoProcessing?.targetUrls}
                   thumbnails={post.thumbnailParameters}
                   borderRadius='16px'
+                  showPlayButton
                 />
               ) : (
                 <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
@@ -233,13 +244,16 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
                 : user.userData?.nickname}
             </SUserTitle>
             <SCaption variant={2} weight={700}>
-              {t('secondStep.card.left', {
-                time: formatExpiresAtNoStartsAt().fromNow(true),
-              })}
+              {post.startsAt.type === 'right-away'
+                ? t('secondStep.card.left', {
+                    time: formatExpiresAtNoStartsAt().fromNow(true),
+                  })
+                : t('secondStep.card.soon')}
             </SCaption>
           </SUserBlock>
           <SPostTitleText variant={3} weight={600}>
-            {post?.title}
+            {/* Navigation here only works when done through the router */}
+            <PostTitleContent target='router'>{post.title}</PostTitleContent>
           </SPostTitleText>
           <STitle variant={6}>
             {t(
@@ -249,7 +263,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             )}
           </STitle>
           <SSocials>{socialButtons.map(renderItem)}</SSocials>
-          <SButtonWrapper onClick={handleViewMyPost}>
+          <SButtonWrapper id='see-post' onClick={handleViewMyPost}>
             <SButtonTitle>
               {t(
                 `published.button.submit-${

@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "title": "電子郵件驗證",
+    "description": "驗證電子郵件"
+  },
+  "heading": {
+    "mainHeading": "驗證你的電子郵件",
+    "subHeading": "請輸入我們發送的代碼"
+  },
+  "expired": {
+    "noCodeReceived": "我沒有收到代碼。",
+    "resendButtonText": "再次發送"
+  },
+  "error": {
+    "invalidCode": "代碼錯誤。再試一次......",
+    "emailTaken": "電子郵件地址已被佔用",
+    "notConfirmedEmail": "當前的電子郵件沒有被確認或時間過期",
+    "noToken": "沒有令牌",
+    "invalidToken": "无效的令牌"
+  },
+  "verifying": "正在驗證新電子郵件......",
+  "backButton": "返回",
+  "updated_NEED_TRANSLATION": "We updated your email!",
+  "backToProfile_NEED_TRANSLATION": "Back to Profile"
+}

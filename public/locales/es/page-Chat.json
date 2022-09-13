@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "title": "Mensajes directos"
+  },
+  "chat": {
+    "today": "Hoy",
+    "placeholder": "Escribe un mensaje...",
+    "welcomeMessage": "¡Te has suscrito con éxito! Ahora puedes enviar un mensaje a",
+    "noMessagesFirstLine": "No hay mensajes aquí todavía...",
+    "noMessagesSecondLine": "Envia un mensaje para iniciar la conversación.",
+    "typing": "Escribiendo..."
+  },
+  "userBlocked": {
+    "title": "Has bloqueado a ",
+    "message": "Tendrás que desbloquearlos para chatear con ellos. No te preocupes, no pueden ver que los has bloqueado...",
+    "buttonText": "Desbloquear"
+  },
+  "groupBlocked": {
+    "title": "Grupo bloqueado",
+    "message": "Desbloquea el grupo para continuar la conversación.",
+    "buttonText": "Desbloquear"
+  },
+  "subscriptionExpired": {
+    "title": "Suscripción caducada",
+    "message": "Solo los suscriptores pueden enviar mensajes. Renueva tu suscripción.",
+    "buttonText": "Renovar suscripción"
+  },
+  "messagingDisabled": {
+    "title": "Mensajería desactivada",
+    "message": " desactivó temporalmente su suscripción. Vuelve a visitarnos pronto."
+  },
+  "accountDeleted": {
+    "title": "Cuenta eliminada",
+    "message": "La cuenta ya no está disponible.",
+    "buttonText": "Eliminar conversación"
+  },
+  "toolbar": {
+    "searchPlaceholder": "Buscar mensajes o usuarios"
+  },
+  "modal": {
+    "blockUser": {
+      "title": "Bloquear",
+      "messageFirstPart": "¿Estás seguro de que quieres bloquear a",
+      "messageSecondPart": "de mandarte mensajes?",
+      "button": {
+        "cancel": "Cancelar",
+        "confirm": "Bloquear"
+      }
+    },
+    "blockGroup": {
+      "title": "Bloquear grupo",
+      "button": {
+        "confirm": "Bloquear grupo"
+      }
+    },
+    "newMessage": {
+      "title": "Nuevo mensaje",
+      "searchPlaceholder": "Buscar",
+      "noResultsText": "No hay resultados para",
+      "noResultsSearchText": "Intenta un nuevo nombre..."
+    },
+    "renewSubscriptionsSubtitle": "Renovar la suscripción a"
+  },
+  "emptyInbox": {
+    "title": "Su bandeja de entrada está vacía",
+    "text": "Una vez que inicies una nueva conversación, la verás listada aquí"
+  },
+  "newAnnouncement": {
+    "title": "Nuevo anuncio",
+    "text": "Solo tú puedes enviar mensajes al grupo.",
+    "created": "Tú creaste el anuncio",
+    "member": "miembro",
+    "members": "miembros"
+  },
+  "default": {
+    "searchPlaceholder": "Buscar"
+  },
+  "announcement": {
+    "title": "El anuncio de {{username}}",
+    "topMessageStart": "Solamente",
+    "topMessageEnd": "puede mandar mensajes"
+  },
+  "userTypes": {
+    "all": "Todos",
+    "subscribers": "Mis suscriptores",
+    "subscribing": "Creadores"
+  },
+  "dates": {
+    "now": "ahora",
+    "min": "min",
+    "today": "hoy"
+  }
+}

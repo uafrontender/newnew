@@ -1,5 +1,5 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
@@ -10,6 +10,7 @@ import { SUserAvatar } from '../../../atoms/chat/styles';
 
 import Text from '../../../atoms/Text';
 import UserAvatar from '../../UserAvatar';
+import Lottie from '../../../atoms/Lottie';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import { getMyRooms } from '../../../../api/endpoints/chat';
@@ -17,8 +18,13 @@ import { useGetChats } from '../../../../contexts/chatContext';
 import textTrim from '../../../../utils/textTrim';
 import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
+import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 
-export const ChatList = () => {
+interface IChatList {
+  searchText: string;
+}
+
+export const ChatList: React.FC<IChatList> = ({ searchText }) => {
   const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const router = useRouter();
@@ -26,15 +32,21 @@ export const ChatList = () => {
   const { unreadCountForCreator } = useGetChats();
   const { ref: scrollRef, inView } = useInView();
 
+  const prevSearchText = useRef('');
+
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
-  const [chatRooms, setChatRooms] =
-    useState<newnewapi.IChatRoom[] | null>(null);
-  const [chatRoomsNextPageToken, setChatRoomsNextPageToken] =
-    useState<string | undefined | null>('');
-  const [searchedRooms, setSearchedRooms] =
-    useState<newnewapi.IChatRoom[] | null>(null);
-  const [updatedChat, setUpdatedChat] =
-    useState<newnewapi.IChatRoom | null>(null);
+  const [chatRooms, setChatRooms] = useState<newnewapi.IChatRoom[] | null>(
+    null
+  );
+  const [chatRoomsNextPageToken, setChatRoomsNextPageToken] = useState<
+    string | undefined | null
+  >('');
+  const [searchedRooms, setSearchedRooms] = useState<
+    newnewapi.IChatRoom[] | null
+  >(null);
+  const [updatedChat, setUpdatedChat] = useState<newnewapi.IChatRoom | null>(
+    null
+  );
 
   const fetchMyRooms = useCallback(
     async (pageToken?: string) => {
@@ -130,22 +142,26 @@ export const ChatList = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, loadingRooms, chatRoomsNextPageToken]);
 
-  // useEffect(() => {
-  //   if (searchText) {
-  //     if (chatRooms) {
-  //       setSearchedRooms(null);
-  //       const arr = [] as newnewapi.IChatRoom[];
-  //       chatRooms.forEach((chat) => {
-  //         if (chat.visavis?.nickname?.startsWith(searchText) || chat.visavis?.username?.startsWith(searchText)) {
-  //           arr.push(chat);
-  //         }
-  //       });
-  //       setSearchedRooms(arr);
-  //     }
-  //   } else {
-  //     setSearchedRooms(null);
-  //   }
-  // }, [searchText, chatRooms, searchedRooms]);
+  useEffect(() => {
+    if (searchText && searchText !== prevSearchText.current && chatRooms) {
+      prevSearchText.current = searchText;
+
+      if (chatRooms) {
+        setSearchedRooms(null);
+        const arr = chatRooms.filter(
+          (chat) =>
+            chat.visavis?.nickname?.startsWith(searchText) ||
+            chat.visavis?.username?.startsWith(searchText)
+        );
+        setSearchedRooms(arr);
+      }
+    }
+
+    if (searchedRooms && !searchText) {
+      setSearchedRooms(null);
+      prevSearchText.current = '';
+    }
+  }, [searchText, chatRooms, searchedRooms]);
 
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom) => {
@@ -180,18 +196,18 @@ export const ChatList = () => {
             />
           </SMyAvatarMassupdate>
         );
-        chatName = `${
-          user.userData?.nickname
+        chatName = t('announcement.title', {
+          username: user.userData?.nickname
             ? user.userData?.nickname
-            : user.userData?.username
-        } ${t('announcement.title')}`;
+            : user.userData?.username,
+        });
       }
       if (chat.kind === 4 && chat.myRole === 1) {
-        chatName = `${
-          chat.visavis?.nickname
+        chatName = t('announcement.title', {
+          username: chat.visavis?.nickname
             ? chat.visavis?.nickname
-            : chat.visavis?.username
-        } ${t('announcement.title')}`;
+            : chat.visavis?.username,
+        });
       }
 
       let lastMsg = chat.lastMessage?.content?.text;
@@ -241,11 +257,28 @@ export const ChatList = () => {
 
   // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
+  const displayedRooms = searchText ? searchedRooms : chatRooms;
+
   return (
     <>
+      {loadingRooms && (
+        <SLoader>
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        </SLoader>
+      )}
       {chatRooms && (
         <>
-          <SSectionContent>{chatRooms.map(renderChatItem)}</SSectionContent>
+          <SSectionContent>
+            {(displayedRooms || []).map(renderChatItem)}
+          </SSectionContent>
           {chatRoomsNextPageToken && !searchedRooms && (
             <SRef ref={scrollRef}>Loading...</SRef>
           )}
@@ -292,6 +325,13 @@ const SSectionContent = styled.div`
       background: ${({ theme }) => theme.colorsThemed.background.outlines2};
     }
   }
+`;
+
+const SLoader = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 `;
 
 const SChatItem = styled.div`

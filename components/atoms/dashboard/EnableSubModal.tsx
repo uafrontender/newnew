@@ -40,11 +40,10 @@ const EnableSubModal: React.FC<IEnableSubModal> = ({
               <SProductInfo>{`${t('enableSubModal.confirmationTextFirstPart')}
             $${formatNumber(
               selectedProduct.monthlyRate.usdCents / 100 ?? 0,
-              true
+              false
             )}
             ${t('enableSubModal.confirmationTextSecondPart')}`}</SProductInfo>
             )}
-            <SNote>{t('enableSubModal.note')}</SNote>
           </SModalContent>
           <SConfirmButton view='primaryGrad' onClick={handleSubmit}>
             {t('enableSubModal.button')}
@@ -113,12 +112,6 @@ const SProductInfo = styled.div`
   margin: 0 0 6px;
   background: ${(props) => props.theme.colorsThemed.background.quaternary};
   text-align: center;
-`;
-
-const SNote = styled.p`
-  font-size: 12px;
-  margin-bottom: 20px;
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
 `;
 
 const SConfirmButton = styled(Button)`

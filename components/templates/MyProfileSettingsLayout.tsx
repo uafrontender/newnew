@@ -2,17 +2,20 @@ import React from 'react';
 import styled from 'styled-components';
 
 import General from './General';
-import ErrorBoundary from '../organisms/ErrorBoundary';
 
-const MyProfileSettingsLayout: React.FunctionComponent = (props) => {
+interface IMyProfileSettingsLayout {
+  children: React.ReactNode;
+}
+
+const MyProfileSettingsLayout: React.FunctionComponent<
+  IMyProfileSettingsLayout
+> = (props) => {
   const { children } = props;
 
   return (
-    <ErrorBoundary>
-      <SGeneral>
-        <SSettingsLayout>{children}</SSettingsLayout>
-      </SGeneral>
-    </ErrorBoundary>
+    <SGeneral>
+      <SSettingsLayout>{children}</SSettingsLayout>
+    </SGeneral>
   );
 };
 
@@ -25,13 +28,13 @@ const SGeneral = styled(General)`
     z-index: 6;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 767px) {
     main {
-      div:first-child {
+      > div:first-child {
         padding-left: 0;
         padding-right: 0;
 
-        div:first-child {
+        > div:first-child {
           margin-left: 0;
           margin-right: 0;
         }

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { formatNumber } from '../../../utils/format';
 
 interface IBidAmountTextInput {
+  id?: string;
   value: string;
   minAmount: number;
   disabled?: boolean;
@@ -15,6 +16,7 @@ interface IBidAmountTextInput {
 }
 
 const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
+  id,
   value,
   minAmount,
   disabled,
@@ -38,8 +40,7 @@ const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
     if (/[^0-9]/.test(newValue)) return;
     if (newValue.length > 5) return;
 
-    // @ts-ignore
-    onChange(newValue ? (newValue as number) : '');
+    onChange(newValue);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -53,9 +54,7 @@ const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
         : e.target.value;
     if (/[^0-9]/.test(currentValue)) return;
 
-    // @ts-ignore
-    if (currentValue.length > 0 && (currentValue as number) < minAmount) {
-      // @ts-ignore
+    if (currentValue.length > 0 && parseInt(currentValue) < minAmount) {
       onChange(minAmount.toString());
     }
   };
@@ -67,6 +66,7 @@ const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
   return (
     <SWrapper>
       <SInput
+        id={id}
         ref={(el) => {
           inputRef.current = el!!;
         }}

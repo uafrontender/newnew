@@ -8,13 +8,27 @@ import { InlineSvg } from '../../atoms/InlineSVG';
 
 import MessageIcon from '../../../public/images/svg/icons/filled/MessageIcon.svg';
 import MessageCircle from '../../../public/images/svg/icons/filled/MessageCircle.svg';
+import NotificationsIcon from '../../../public/images/svg/icons/filled/Notifications.svg';
 import { useAppSelector } from '../../../redux-store/store';
 import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
+
+const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
+  if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
+    return MessageIcon;
+  }
+
+  if (target.creatorDashboard && target?.creatorDashboard.section === 1) {
+    return NotificationsIcon;
+  }
+
+  return MessageCircle;
+};
 
 const Notification: React.FC<newnewapi.INotification> = ({
   content,
   createdAt,
   target,
+  isRead,
 }) => {
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -22,13 +36,10 @@ const Notification: React.FC<newnewapi.INotification> = ({
     resizeMode
   );
   const user = useAppSelector((state) => state.user);
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState('/direct-messages');
 
   useEffect(() => {
-    if (url.length < 1 && target) {
-      if (target.creatorDashboard && target?.creatorDashboard.section === 2)
-        setUrl('/direct-messages');
-
+    if (url === '/direct-messages' && target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 1)
         setUrl('/creator/subscribers');
 
@@ -59,11 +70,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
               {target && (
                 <SIcon>
                   <SInlineSVG
-                    svg={
-                      target === newnewapi.RoutingTarget.ChatRoomTarget
-                        ? MessageIcon
-                        : MessageCircle
-                    }
+                    svg={getNotificationIcon(target)}
                     fill={theme.colors.white}
                     width='14px'
                     height='14px'
@@ -78,14 +85,17 @@ const Notification: React.FC<newnewapi.INotification> = ({
                   clickable
                   svg={mobileLogo}
                   fill='#fff'
-                  width='48px'
-                  height='48px'
+                  width={isMobile ? '24px' : '48px'}
+                  height={isMobile ? '24px' : '48px'}
                 />
               </SIconHolder>
             </SAvatarHolder>
           )}
           <SText>
-            <STitle>{content?.relatedUser?.nicknameOrUsername}</STitle>
+            <STitle>
+              {content?.relatedUser?.nicknameOrUsername}{' '}
+              {!isRead && <SBullet />}
+            </STitle>
             <p>{content?.message}</p>
             <SDate>
               {moment((createdAt?.seconds as number) * 1000).fromNow()}
@@ -111,10 +121,13 @@ const SWrapper = styled.div`
   padding: 12px 0 0;
   border-bottom: 0;
   cursor: pointer;
+  min-height: 75px;
+
   ${({ theme }) => theme.media.tablet} {
     border-bottom: 1px solid
       ${(props) => props.theme.colorsThemed.background.outlines1};
     padding: 20px 0;
+    min-height: 'unset';
   }
 `;
 
@@ -132,6 +145,14 @@ const SUserAvatar = styled(UserAvatar)`
   }
 `;
 
+const SBullet = styled.div`
+  width: 8px;
+  height: 8px;
+  background: #e8354d;
+  border-radius: 50%;
+  margin-left: 8px;
+`;
+
 const SAvatarHolder = styled.div`
   flex-shrink: 0;
   margin-right: 12px;
@@ -144,6 +165,8 @@ const SAvatarHolder = styled.div`
 const STitle = styled.div`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   margin-bottom: 0;
+  display: flex;
+  align-items: center;
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 12px;
   }
@@ -188,20 +211,25 @@ const SDate = styled.div`
 
 const SIcon = styled.span`
   position: absolute;
-  right: calc(50% - 20px);
-  top: 36px;
+  right: calc(50% - 16px);
+  top: 32px;
   bottom: -5px;
-  width: 40px;
-  height: 40px;
-  background: ${(props) => props.theme.colors.blue};
-  border: 8px solid ${(props) => props.theme.colorsThemed.background.primary};
+  width: 32px;
+  height: 32px;
+  background: ${(props) => props.theme.colorsThemed.accent.blue};
+  border: 4px solid ${(props) => props.theme.colorsThemed.background.primary};
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+
   ${({ theme }) => theme.media.tablet} {
     right: -14px;
     top: -14px;
+
+    width: 40px;
+    height: 40px;
+    border: 8px solid ${(props) => props.theme.colorsThemed.background.primary};
   }
 `;
 
@@ -212,10 +240,18 @@ const SInlineSVG = styled(InlineSvg)`
 
 const SIconHolder = styled.div`
   background: ${(props) => props.theme.colorsThemed.accent.blue};
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  border-radius: 50%;
+  ${({ theme }) => theme.media.tablet} {
+    width: 72px;
+    height: 72px;
+    min-width: 72px;
+    min-height: 72px;
+  }
 `;

@@ -101,10 +101,26 @@ export const SChatItemCenter = styled.div`
   overflow: hidden;
 `;
 
+export const SChatItemContent = styled.div`
+  width: 100%;
+  display: flex;
+  padding: 2px 0 2px 12px;
+  flex-direction: column;
+  overflow: hidden;
+`;
+
+export const SChatItemContentWrapper = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+`;
+
 export const SChatItemText = styled(Text)`
   margin-bottom: 4px;
   max-width: 228px;
   overflow: hidden;
+  display: flex;
+  align-items: center;
 `;
 
 export const SChatItemLastMessage = styled(Text)`
@@ -118,13 +134,13 @@ export const SChatItemRight = styled.div`
   padding: 2px 0;
   align-items: flex-end;
   flex-direction: column;
-  margin-left: -12px;
+  margin-left: auto;
 `;
 
 export const SChatItemTime = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   white-space: nowrap;
-  margin-bottom: 4px;
+  padding-left: 5px;
 `;
 
 export const SChatSeparator = styled.div`

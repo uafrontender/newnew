@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "title": "Verificación de correo electrónico",
+    "description": "Verificar correo electrónico"
+  },
+  "heading": {
+    "mainHeading": "Verifica tu correo electrónico",
+    "subHeading": "Por favor, introduce el código que hemos enviado a"
+  },
+  "expired": {
+    "noCodeReceived": "No recibí un código.",
+    "resendButtonText": "Reenviar código"
+  },
+  "error": {
+    "invalidCode": "Código incorrecto. Inténtalo de nuevo...",
+    "emailTaken": "Este correo electrónico ya está en uso",
+    "notConfirmedEmail": "Este correo electrónico no fue confirmado o el tiempo expiró",
+    "noToken": "No hay ningún token",
+    "invalidToken": "El token no es válido"
+  },
+  "verifying": "Verificando tu correo electrónico...",
+  "backButton": "Regresar",
+  "updated_NEED_TRANSLATION": "We updated your email!",
+  "backToProfile_NEED_TRANSLATION": "Back to Profile"
+}

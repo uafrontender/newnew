@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "title": "Recompensas NewNew",
+    "description": "Recompensas NewNew"
+  },
+  "title": "Recompensas NewNew",
+  "button": {
+    "back": "Regresar"
+  },
+  "instruction": {
+    "title": "Cómo ganar créditos gratis",
+    "bid": {
+      "title": "Hacer oferta",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    },
+    "earn": {
+      "title": "Gane créditos con tu oferta",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    },
+    "spend": {
+      "title": "Gasta tus recompensas",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    }
+  },
+  "balance": {
+    "title": "Recompensas para tu próxima compra",
+    "button": {
+      "signUp": "¡Inscríbete para gastar tus recompensas!",
+      "spend": "¡Gastar mis recompensas!"
+    }
+  },
+  "rewards": {
+    "title": "Mis logros"
+  }
+}

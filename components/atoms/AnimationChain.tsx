@@ -56,9 +56,10 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
       ) as HTMLVideoElement;
 
       if (currentVideo) {
-        // TODO: Handle the error as it can can fail due to...
-        // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
-        currentVideo.play();
+        currentVideo.play().catch((e) => {
+          // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
+          console.log(e);
+        });
       }
     }, [videoSrcList, currentVideoIndex, getPreviousIndex]);
 
@@ -119,6 +120,7 @@ const Video = styled.video<{ visibility?: 'play' | 'hold' }>`
 
   // Chrome can't show white background, needs brightness fix
   @media screen and (-webkit-min-device-pixel-ratio: 0) {
-    -webkit-filter: brightness(101%);
+    -webkit-filter: ${({ theme }) =>
+      theme.name === 'light' ? 'brightness(101%)' : undefined};
   }
 `;

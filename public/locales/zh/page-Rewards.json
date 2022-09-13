@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "title": "NewNew 獎勵",
+    "description": "NewNew 獎勵"
+  },
+  "title": "NewNew 獎勵",
+  "button": {
+    "back": "返回"
+  },
+  "instruction": {
+    "title": "如何賺取免費積分",
+    "bid": {
+      "title": "出價",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    },
+    "earn": {
+      "title": "通過你的bid賺取積分",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    },
+    "spend": {
+      "title": "花掉你的獎勵",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    }
+  },
+  "balance": {
+    "title": "獎勵可用於你的下一次購買付款",
+    "button": {
+      "signUp": "註冊後即可花費你的獎勵",
+      "spend": "花費我的獎勵!"
+    }
+  },
+  "rewards": {
+    "title": "我的里程碑"
+  }
+}

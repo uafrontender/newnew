@@ -47,7 +47,7 @@
   "Favorites": {
     "meta": {
       "title": "NewNew Favorites",
-      "description": "Browse through all of your saved favorite posts, posts and creators"
+      "description": "Browse through all of your saved favorite posts and creator"
     },
     "noContent": {
       "description": "Any creators you favorite\nwill be shown here"
@@ -82,12 +82,13 @@
   },
   "accountPrivate": "{{username}}'s activity is private",
   "subscribed-tag": "SUBSCRIBED",
+  "subscriptionCancelled-tag": "CANCELLED",
   "modal": {
     "blockUser": {
       "title": "Block user",
       "messageFirstPart": "Do you really want to block",
       "messageSecondPart": "?",
-      "button:": {
+      "button": {
         "cancel": "Cancel",
         "confirm": "Block user"
       }
@@ -210,6 +211,20 @@
           }
         }
       },
+      "cards": {
+        "title": "My cards",
+        "myPaymentMethods": "My payment methods",
+        "hint": "You’ll need a card on file to participate in posts",
+        "button": {
+          "addNewCard": "Add a new card",
+          "addCard": "Add card"
+        },
+        "primary": "Primary",
+        "ellipse": {
+          "makePrimary": "Make it primary",
+          "removeCard": "Remove card"
+        }
+      },
       "personalInformation": {
         "title": "Personal information",
         "emailInput": {
@@ -218,7 +233,11 @@
           "errors": {
             "invalidEmail": "Please enter a valid email address",
             "emailTaken": "Email taken"
-          }
+          },
+          "whatsNew": "What’s your new email address?",
+          "confirmEmail": "Confirm new email",
+          "verifyNewEmail": "Verify your new email",
+          "edit": "Edit"
         },
         "birthDateInput": {
           "label": "Date of birth",
@@ -244,7 +263,7 @@
         "title": "Transactions",
         "you": "You",
         "type": {
-          "1": "event",
+          "1": "bid",
           "2": "superpoll",
           "3": "goal"
         },
@@ -262,11 +281,11 @@
         "privacySubsections": {
           "spendings": {
             "title": "Hide my spending from others",
-            "caption": "People will not be able to see how much you spent on events, superpolls and goals"
+            "caption": "People will not be able to see how much you spent on bids, superpolls and goals"
           },
           "private": {
             "title": "Make my activity private",
-            "caption": "People will not be able to see any of your activity on events, superpolls and goals"
+            "caption": "People will not be able to see any of your activity on bids, superpolls and goals"
           }
         },
         "blockedUsers": {

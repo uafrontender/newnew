@@ -1,11 +1,13 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+/* eslint-disable no-nested-ternary */
+import React, { ReactElement, useState } from 'react';
 import Head from 'next/head';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import { useEffectOnce, useUpdateEffect } from 'react-use';
 
 import General from '../../components/templates/General';
 
@@ -20,6 +22,7 @@ export const Chat = () => {
   const { t } = useTranslation('page-Chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
+
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
     'mobile',
@@ -29,15 +32,7 @@ export const Chat = () => {
     'tablet',
   ].includes(resizeMode);
 
-  const [chatListHidden, setChatListHidden] =
-    useState<boolean | undefined>(undefined);
-
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
-
-  useEffect(() => {
-    /* eslint-disable no-unused-expressions */
-    isMobileOrTablet ? setChatListHidden(true) : setChatListHidden(undefined);
-  }, [isMobileOrTablet]);
 
   const fetchLastActiveRoom = async () => {
     try {
@@ -52,18 +47,23 @@ export const Chat = () => {
         setIsLoaded(true);
         throw new Error(res.error?.message ?? 'Request failed');
       }
+
       if (res.data.rooms.length > 0) {
         const chatRoom = res.data.rooms[0];
         let route = '';
 
         if (chatRoom?.visavis?.username) {
-          chatRoom.kind === 1
-            ? (route = chatRoom.visavis.username)
-            : (route = `${chatRoom.visavis.username}-announcement`);
+          route =
+            chatRoom.kind === 1
+              ? chatRoom.myRole === 1
+                ? `${chatRoom.visavis.username}-cr`
+                : chatRoom.visavis.username
+              : `${chatRoom.visavis.username}-announcement`;
         } else {
-          chatRoom.kind === 4 && chatRoom.myRole === 2
-            ? (route = `${user.userData?.username}-announcement`)
-            : '';
+          route =
+            chatRoom.kind === 4 && chatRoom.myRole === 2
+              ? `${user.userData?.username}-announcement`
+              : '';
         }
         router?.push(`/direct-messages/${route}`);
       } else {
@@ -75,16 +75,20 @@ export const Chat = () => {
     }
   };
 
-  useEffect(() => {
-    if (!user.loggedIn) {
-      router?.push('/sign-up?to=log-in');
+  useUpdateEffect(() => {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
+      router?.push('/sign-up');
     }
-  }, [router, user.loggedIn]);
+  }, [router, user.loggedIn, user._persist?.rehydrated]);
 
-  useEffect(() => {
-    fetchLastActiveRoom();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffectOnce(() => {
+    if (!isMobileOrTablet) {
+      fetchLastActiveRoom();
+    } else {
+      router?.push(`/direct-messages/-mobile`);
+    }
+  });
 
   return (
     <>
@@ -92,7 +96,7 @@ export const Chat = () => {
         <title>{t('meta.title')}</title>
       </Head>
       <SContainer>
-        <SSidebar hidden={chatListHidden !== undefined && chatListHidden}>
+        <SSidebar>
           {!isLoaded ? (
             <Lottie
               width={64}
@@ -182,40 +186,15 @@ const SContainer = styled.div`
   }
 `;
 
-interface ISSidebar {
-  hidden: boolean;
-}
-
-const SSidebar = styled.div<ISSidebar>`
+const SSidebar = styled.div`
+  position: static;
   padding-top: 16px;
   height: 100%;
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colors.white
-      : props.theme.colors.black};
   flex-shrink: 0;
-  ${(props) => {
-    if (props.hidden === false) {
-      return css`
-        ${props.theme.media.mobile} {
-          z-index: 20;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          right: 0;
-          position: fixed;
-          padding: 0 15px;
-        }
-      `;
-    }
-    return css`
-      left: -100vw;
-      width: 100vw;
-    `;
-  }}
+  width: 100%;
+
   ${(props) => props.theme.media.laptop} {
     background: none;
-    position: static;
     width: 352px;
     padding: 0;
     z-index: 0;

@@ -11,6 +11,7 @@ import { Player, PlayerConfig, PlayerEvent } from 'bitmovin-player';
 import Button from './Button';
 import InlineSVG from './InlineSVG';
 
+import PlayIcon from '../../public/images/svg/icons/filled/Play.svg';
 import volumeOn from '../../public/images/svg/icons/filled/VolumeON.svg';
 import volumeOff from '../../public/images/svg/icons/filled/VolumeOFF1.svg';
 
@@ -25,6 +26,7 @@ interface IBitmovinPlayer {
   mutePosition?: 'left' | 'right';
   setCurrentTime?: (time: number) => void;
   withMuteControl?: boolean;
+  showPlayButton?: boolean;
 }
 
 export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
@@ -39,6 +41,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
     withMuteControl,
     setDuration,
     setCurrentTime,
+    showPlayButton,
   } = props;
   const theme = useTheme();
   const [init, setInit] = useState(false);
@@ -75,26 +78,30 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
         setCurrentTime(e.time);
       }
 
-      if (player.current.getCurrentTime() >= thumbnails.endTime) {
-        player.current.pause();
-        player.current.seek(thumbnails.startTime);
-        player.current.play();
+      if (player.current?.getCurrentTime() >= thumbnails.endTime) {
+        player.current?.pause();
+        player.current?.seek(thumbnails.startTime);
+        player.current?.play();
       }
     },
     [setCurrentTime, thumbnails]
   );
+
   const handlePlaybackFinished = useCallback(() => {
-    player.current.play();
+    player.current?.play();
   }, []);
+
   const toggleThumbnailVideoMuted = useCallback(() => {
     setIsMuted(!isMuted);
   }, [isMuted]);
+
   const destroyPlayer = useCallback(() => {
     if (player.current != null) {
       setInit(false);
-      player.current.destroy();
+      player.current?.destroy();
     }
   }, []);
+
   const setupPlayer = useCallback(() => {
     player.current = new Player(playerRef.current, playerConfig);
 
@@ -104,21 +111,22 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
 
     setInit(true);
   }, [innerRef, playerConfig]);
+
   const loadSource = useCallback(() => {
     if (!isLoading && !loaded) {
       setIsLoading(true);
 
-      player.current.load(playerSource).then(
+      player.current?.load(playerSource).then(
         () => {
           setLoaded(true);
           setIsLoading(false);
 
           // TODO: Handle the error as it can can fail due to...
           // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
-          player.current.play();
+          player.current?.play();
 
           if (setDuration) {
-            setDuration(player.current.getDuration());
+            setDuration(player.current?.getDuration());
           }
         },
         (reason: any) => {
@@ -131,24 +139,25 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
       );
     }
   }, [isLoading, loaded, playerSource, setDuration]);
+
   const subscribe = useCallback(() => {
-    if (player.current.handlePlaybackFinished) {
-      player.current.off(
+    if (player.current?.handlePlaybackFinished) {
+      player.current?.off(
         PlayerEvent.PlaybackFinished,
-        player.current.handlePlaybackFinished
+        player.current?.handlePlaybackFinished
       );
     }
-    player.current.on(PlayerEvent.PlaybackFinished, handlePlaybackFinished);
+    player.current?.on(PlayerEvent.PlaybackFinished, handlePlaybackFinished);
     player.current.handlePlaybackFinished = handlePlaybackFinished;
 
     if (thumbnails?.endTime) {
-      if (player.current.handleTimeChange) {
-        player.current.off(
+      if (player.current?.handleTimeChange) {
+        player.current?.off(
           PlayerEvent.TimeChanged,
-          player.current.handleTimeChange
+          player.current?.handleTimeChange
         );
       }
-      player.current.on(PlayerEvent.TimeChanged, handleTimeChange);
+      player.current?.on(PlayerEvent.TimeChanged, handleTimeChange);
       player.current.handleTimeChange = handleTimeChange;
     }
   }, [handlePlaybackFinished, handleTimeChange, thumbnails?.endTime]);
@@ -162,31 +171,78 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
       destroyPlayer();
     };
   }, [destroyPlayer, setupPlayer]);
+
   useEffect(() => {
     if (init) {
       subscribe();
     }
   }, [init, subscribe]);
+
   useEffect(() => {
     if (init) {
       loadSource();
     }
   }, [init, loadSource]);
+
   useEffect(() => {
     if (player.current && loaded) {
       if (isMuted) {
-        player.current.mute();
+        player.current?.mute();
       } else {
-        player.current.unmute();
+        player.current?.unmute();
       }
     }
   }, [player, isMuted, loaded]);
+
+  const [isPaused, setIsPaused] = useState(false);
+
+  const handleSetIsPaused = useCallback((stateValue: boolean) => {
+    setIsPaused(stateValue);
+  }, []);
+
+  useEffect(() => {
+    player.current?.on(PlayerEvent.Paused, () => handleSetIsPaused(true));
+    player.current?.on(PlayerEvent.Play, () => handleSetIsPaused(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playerSource]);
 
   return (
     <SContent borderRadius={borderRadius}>
       <SImageBG src={resources.thumbnailImageUrl} />
       <SVideoWrapper borderRadius={borderRadius}>
-        <SWrapper id={id} ref={playerRef} />
+        <SWrapper
+          id={id}
+          ref={playerRef}
+          onClick={() => {
+            if (loaded) {
+              if (player.current?.isPlaying()) {
+                player.current?.pause();
+              } else {
+                player.current?.play();
+              }
+            }
+          }}
+        />
+        {showPlayButton && isPaused && (
+          <SPlayPseudoButton
+            onClick={() => {
+              if (loaded) {
+                if (player.current?.isPlaying()) {
+                  player.current?.pause();
+                } else {
+                  player.current?.play();
+                }
+              }
+            }}
+          >
+            <InlineSVG
+              svg={PlayIcon}
+              width='32px'
+              height='32px'
+              fill='#FFFFFF'
+            />
+          </SPlayPseudoButton>
+        )}
       </SVideoWrapper>
       {withMuteControl && (
         <SModalSoundIcon position={mutePosition}>
@@ -220,6 +276,7 @@ BitmovinPlayer.defaultProps = {
   withMuteControl: false,
   setDuration: () => {},
   setCurrentTime: () => {},
+  showPlayButton: false,
 };
 
 interface ISContent {
@@ -304,5 +361,28 @@ const SModalSoundIcon = styled.div<ISModalSoundIcon>`
     width: 36px;
     height: 36px;
     border-radius: 12px;
+  }
+`;
+
+const SPlayPseudoButton = styled.button`
+  position: absolute;
+  top: calc(50% - 32px);
+  left: calc(50% - 32px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 64px;
+  height: 64px;
+  background: rgba(11, 10, 19, 0.65);
+  border-radius: 21px;
+  border: transparent;
+
+  cursor: pointer;
+
+  &:focus,
+  &:active {
+    outline: none;
   }
 `;

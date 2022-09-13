@@ -26,6 +26,7 @@ import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import switchPostType from '../utils/switchPostType';
 import isBrowser from '../utils/isBrowser';
 import assets from '../constants/assets';
+import { Mixpanel } from '../utils/mixpanel';
 
 const TopSection = dynamic(
   () => import('../components/organisms/home/TopSection')
@@ -36,9 +37,7 @@ const HeroSection = dynamic(
 const CardsSection = dynamic(
   () => import('../components/organisms/home/CardsSection')
 );
-const PostModal = dynamic(
-  () => import('../components/organisms/decision/PostModal')
-);
+const PostModal = dynamic(() => import('../components/organisms/decision'));
 const TutorialCard = dynamic(
   () => import('../components/molecules/TutorialCard')
 );
@@ -46,10 +45,15 @@ const TutorialCard = dynamic(
 interface IHome {
   top10posts: newnewapi.NonPagedPostsResponse;
   postFromQuery?: newnewapi.Post;
+  assumeLoggedIn?: boolean;
 }
 
 // No sense to memorize
-const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
+const Home: NextPage<IHome> = ({
+  top10posts,
+  postFromQuery,
+  assumeLoggedIn,
+}) => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
@@ -67,17 +71,17 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   // Auctions
   const [collectionAC, setCollectionAC] = useState<newnewapi.Post[]>([]);
   const [collectionACInitialLoading, setCollectionACInitialLoading] =
-    useState(false);
+    useState(true);
   const [collectionACError, setCollectionACError] = useState(false);
   // Multiple choice
   const [collectionMC, setCollectionMC] = useState<newnewapi.Post[]>([]);
   const [collectionMCInitialLoading, setCollectionMCInitialLoading] =
-    useState(false);
+    useState(true);
   const [collectionMCError, setCollectionMCError] = useState(false);
   // Crowdfunding
   const [collectionCF, setCollectionCF] = useState<newnewapi.Post[]>([]);
   const [collectionCFInitialLoading, setCollectionCFInitialLoading] =
-    useState(false);
+    useState(true);
   const [collectionCFError, setCollectionCFError] = useState(false);
   // Biggest of all time
   const [collectionBiggest, setCollectionBiggest] = useState<newnewapi.Post[]>(
@@ -103,6 +107,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
 
   const handleOpenPostModal = useCallback(
     (post: newnewapi.IPost) => {
+      Mixpanel.track('Open Post Modal', {
+        _stage: 'Home Page',
+        _postUuid: switchPostType(post)[0].postUuid,
+      });
       setDisplayedPost(post);
       setPostModalOpen(true);
     },
@@ -114,6 +122,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   }, []);
 
   const handleClosePostModal = useCallback(() => {
+    Mixpanel.track('Close Post Modal', {
+      _stage: 'Home Page',
+    });
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   }, []);
@@ -349,8 +360,8 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
         <meta property='og:description' content={t('meta.description')} />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      {!user.loggedIn && <HeroSection />}
-      {topSectionCollection.length > 0 && (
+      {(!user.loggedIn || !assumeLoggedIn) && <HeroSection />}
+      {topSectionCollection?.length > 0 && (
         <TopSection
           collection={topSectionCollection}
           handlePostClicked={handleOpenPostModal}
@@ -358,7 +369,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       )}
       {user.loggedIn &&
         !collectionFYError &&
-        (collectionFYInitialLoading || collectionFY.length > 0) && (
+        (collectionFYInitialLoading || collectionFY?.length > 0) && (
           <CardsSection
             title={t('cardsSection.title.for-you')}
             category='for-you'
@@ -367,6 +378,31 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
             handlePostClicked={handleOpenPostModal}
           />
         )}
+      {!collectionMCError && (
+        <CardsSection
+          title={t('cardsSection.title.mc')}
+          category='mc'
+          collection={collectionMC}
+          loading={collectionMCInitialLoading}
+          handlePostClicked={handleOpenPostModal}
+          tutorialCard={
+            !collectionMCInitialLoading &&
+            (!user.loggedIn ||
+              !assumeLoggedIn ||
+              collectionMC?.length === 0) ? (
+              <TutorialCard
+                image={
+                  theme.name === 'light'
+                    ? assets.creation.lightMcAnimated
+                    : assets.creation.darkMcAnimated
+                }
+                title={t('tutorial.mc.title')}
+                caption={t('tutorial.mc.caption')}
+              />
+            ) : undefined
+          }
+        />
+      )}
       {!collectionACError && (
         <CardsSection
           title={t('cardsSection.title.ac')}
@@ -375,7 +411,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionACInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn || collectionAC.length === 0 ? (
+            !collectionACInitialLoading &&
+            (!user.loggedIn ||
+              !assumeLoggedIn ||
+              collectionAC?.length === 0) ? (
               <TutorialCard
                 image={
                   theme.name === 'light'
@@ -394,28 +433,6 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           }
         />
       )}
-      {!collectionMCError && (
-        <CardsSection
-          title={t('cardsSection.title.mc')}
-          category='mc'
-          collection={collectionMC}
-          loading={collectionMCInitialLoading}
-          handlePostClicked={handleOpenPostModal}
-          tutorialCard={
-            !user.loggedIn || collectionMC.length === 0 ? (
-              <TutorialCard
-                image={
-                  theme.name === 'light'
-                    ? assets.creation.lightMcAnimated
-                    : assets.creation.darkMcAnimated
-                }
-                title={t('tutorial.mc.title')}
-                caption={t('tutorial.mc.caption')}
-              />
-            ) : undefined
-          }
-        />
-      )}
       {!collectionCFError && (
         <CardsSection
           title={t('cardsSection.title.cf')}
@@ -424,7 +441,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionCFInitialLoading}
           handlePostClicked={handleOpenPostModal}
           tutorialCard={
-            !user.loggedIn || collectionCF.length === 0 ? (
+            !collectionCFInitialLoading &&
+            (!user.loggedIn ||
+              !assumeLoggedIn ||
+              collectionCF?.length === 0) ? (
               <TutorialCard
                 image={
                   theme.name === 'light'
@@ -476,7 +496,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           manualCurrLocation={isBrowser() ? window.location.pathname : ''}
           handleClose={handleClosePostModal}
           handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemovePostFromState={() =>
+          handleRemoveFromStateDeleted={() =>
             handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
           }
         />
@@ -493,8 +513,10 @@ export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { post } = context.query;
+  const { req } = context;
+  const accessToken = req.cookies?.accessToken;
 
-  // console.log(context.query['?session_id']);
+  const assumeLoggedIn = !!accessToken && !Array.isArray(accessToken);
 
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
@@ -502,6 +524,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'component-PostCard',
     'modal-Post',
     'modal-PaymentModal',
+    'modal-ResponseSuccessModal',
     'page-Chat',
   ]);
 
@@ -527,6 +550,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
               }
             : {}),
           postFromQuery: res.data.toJSON(),
+          assumeLoggedIn,
           ...translationContext,
         },
       };
@@ -540,6 +564,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             top10posts: resTop10.data.toJSON(),
           }
         : {}),
+      assumeLoggedIn,
       ...translationContext,
     },
   };

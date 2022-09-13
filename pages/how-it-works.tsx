@@ -62,7 +62,7 @@ export const HowItWorks = () => {
                   ? assets.creation.lightAcAnimated
                   : assets.creation.darkAcAnimated
               }
-              alt='events'
+              alt='bids'
               // Quick fix for animated image alignment
               style={
                 // eslint-disable-next-line no-nested-ternary
@@ -177,7 +177,9 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 20px ${({ theme }) => theme.media.tablet} {
+  padding-top: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
     padding-top: 38px;
     padding-left: 20px;
     padding-right: 20px;

@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -21,6 +21,7 @@ import tiktokIcon from '../../../../public/images/svg/icons/socials/TikTok.svg';
 import twitterIcon from '../../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -61,11 +62,11 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
 
   const postTypeText = useCallback(() => {
     if (postData) {
-      if (postData.auction) return 'Event';
+      if (postData.auction) return 'Bid';
       if (postData.crowdfunding) return 'Goal';
       return 'Superpoll';
     }
-    return 'Event';
+    return 'Bid';
   }, [postData]);
 
   interface IItemButtonAttrs extends NamedNodeMap {
@@ -127,9 +128,9 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
               url += postData.multipleChoice.postUuid;
             }
 
-            router.push(url);
-
-            dispatch(clearCreation({}));
+            router.push(url).then(() => {
+              dispatch(clearCreation({}));
+            });
           }
         }
       }
@@ -163,6 +164,8 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
 
     if (post.expiresAt === '1-hour') {
       dateValue.add(1, 'h');
+    } else if (post.expiresAt === '3-hours') {
+      dateValue.add(3, 'h');
     } else if (post.expiresAt === '6-hours') {
       dateValue.add(6, 'h');
     } else if (post.expiresAt === '12-hours') {
@@ -202,6 +205,18 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     </SItem>
   );
 
+  useEffect(() => {
+    router.beforePopState((state: any) => {
+      router.push('/profile/my-posts');
+      return false;
+    });
+
+    return () => {
+      router.beforePopState(() => true);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <SContent>
@@ -212,6 +227,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
               muted={false}
               resources={videoProcessing?.targetUrls}
               thumbnails={post.thumbnailParameters}
+              showPlayButton
             />
           ) : (
             <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
@@ -225,13 +241,15 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
               : user.userData?.nickname}
           </SUserTitle>
           <SCaption variant={2} weight={700}>
-            {t('secondStep.card.left', {
-              time: formatExpiresAtNoStartsAt().fromNow(true),
-            })}
+            {post.startsAt.type === 'right-away'
+              ? t('secondStep.card.left', {
+                  time: formatExpiresAtNoStartsAt().fromNow(true),
+                })
+              : t('secondStep.card.soon')}
           </SCaption>
         </SUserBlock>
         <SPostTitleText variant={3} weight={600}>
-          {post?.title}
+          <PostTitleContent>{post.title}</PostTitleContent>
         </SPostTitleText>
         <STitle variant={6}>
           {t(

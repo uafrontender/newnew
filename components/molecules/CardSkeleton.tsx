@@ -41,12 +41,12 @@ const CardSkeleton: React.FunctionComponent<ICardSkeleton> = ({
     }}
     wrapper={
       // eslint-disable-next-line react/no-unstable-nested-components
-      ({ children: skeletons }) => (
+      (props) => (
         <SSingleSkeletonWrapper
           width={cardWidth ?? undefined}
           height={cardHeight ?? undefined}
         >
-          {skeletons}
+          {(props as any).children}
         </SSingleSkeletonWrapper>
       )
     }
@@ -111,37 +111,36 @@ interface ICardSkeletonSection {
   height?: string;
 }
 
-export const CardSkeletonSection: React.FunctionComponent<ICardSkeletonSection> =
-  ({ count, width, height }) => {
-    const { resizeMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
-    const isTablet = ['tablet'].includes(resizeMode);
-    const isLaptop = ['laptop'].includes(resizeMode);
-    const isDesktop = ['laptopL'].includes(resizeMode);
-    return (
-      <SCardSkeletonSectionWrapper>
-        <CardSkeleton
-          count={count}
-          cardWidth={
-            width ?? isMobile
-              ? '100vw'
-              : isTablet
-              ? '200px'
-              : isLaptop
-              ? '215px'
-              : isDesktop
-              ? '15vw'
-              : '13vw'
-          }
-          cardHeight={
-            height ?? isMobile ? '564px' : isTablet ? '300px' : '336px'
-          }
-        />
-      </SCardSkeletonSectionWrapper>
-    );
-  };
+export const CardSkeletonSection: React.FunctionComponent<
+  ICardSkeletonSection
+> = ({ count, width, height }) => {
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isLaptop = ['laptop'].includes(resizeMode);
+  const isDesktop = ['laptopL'].includes(resizeMode);
+  return (
+    <SCardSkeletonSectionWrapper>
+      <CardSkeleton
+        count={count}
+        cardWidth={
+          width ?? isMobile
+            ? 'calc(100vw - 64px)'
+            : isTablet
+            ? '200px'
+            : isLaptop
+            ? '215px'
+            : isDesktop
+            ? '15vw'
+            : '13vw'
+        }
+        cardHeight={height ?? isMobile ? '564px' : isTablet ? '300px' : '336px'}
+      />
+    </SCardSkeletonSectionWrapper>
+  );
+};
 
 CardSkeletonSection.defaultProps = {
   width: undefined,
@@ -237,10 +236,6 @@ const SCardSkeletonListWrapper = styled.div`
 
       ${(props) => props.theme.media.laptopL} {
         width: calc(20% - 32px);
-      }
-
-      ${(props) => props.theme.media.desktop} {
-        width: calc(16.65% - 32px);
       }
     }
   }

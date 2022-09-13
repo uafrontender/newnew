@@ -11,7 +11,19 @@
       "fees": "up to 3% fees"
     }
   },
+  "rewardsText": "Use my rewards",
   "payButton": "Pay",
   "tocApplyLink": "Terms",
-  "tocApplyText": "apply"
+  "tocApplyText": "apply",
+  "reCaptchaTos": {
+    "siteProtectedBy": "This site is protected by reCAPTCHA and the Google",
+    "privacyPolicy": "Privacy Policy",
+    "and": "and",
+    "tos": "Terms of Service",
+    "apply": "apply."
+  },
+  "primaryCard": "Primary card",
+  "newCard": "New card",
+  "saveCard": "Save card for future use",
+  "email": "Email"
 }

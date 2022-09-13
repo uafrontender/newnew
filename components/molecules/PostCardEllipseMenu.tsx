@@ -1,19 +1,23 @@
-/* eslint-disable consistent-return */
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+/* eslint-disable consistent-return */ import React, {
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { toast } from 'react-toastify';
 
-import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
-import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
-import Text from '../atoms/Text';
+import EllipseMenu, { EllipseMenuButton } from '../atoms/EllipseMenu';
+
+import isBrowser from '../../utils/isBrowser';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
 import switchPostType from '../../utils/switchPostType';
 import { useAppSelector } from '../../redux-store/store';
+import { Mixpanel } from '../../utils/mixpanel';
 
 interface IPostCardEllipseMenu {
   postUuid: string;
@@ -24,6 +28,7 @@ interface IPostCardEllipseMenu {
   onClose: () => void;
   handleRemovePostFromState?: () => void;
   handleAddPostToState?: () => void;
+  anchorElement?: HTMLElement;
 }
 
 const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
@@ -37,15 +42,23 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       onClose,
       handleRemovePostFromState,
       handleAddPostToState,
+      anchorElement,
     }) => {
       const theme = useTheme();
       const router = useRouter();
       const { t } = useTranslation('common');
-      const containerRef = useRef<HTMLDivElement>();
       const user = useAppSelector((state) => state.user);
 
-      useOnClickEsc(containerRef, onClose);
-      useOnClickOutside(containerRef, onClose);
+      useEffect(() => {
+        if (isBrowser()) {
+          const postModal = document.getElementById('post-modal-container');
+          if (isVisible && postModal) {
+            postModal.style.overflow = 'hidden';
+          } else if (postModal) {
+            postModal.style.overflow = 'scroll';
+          }
+        }
+      }, [isVisible]);
 
       // Share
       const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -61,7 +74,10 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       const handleCopyLink = useCallback(() => {
         if (window) {
           const url = `${window.location.origin}/post/${postUuid}`;
-
+          Mixpanel.track('Copied Link Post Modal', {
+            _stage: 'Post',
+            _postUuid: postUuid,
+          });
           copyPostUrlToClipboard(url)
             .then(() => {
               setIsCopiedUrl(true);
@@ -82,7 +98,13 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
 
       const handleFollowDecision = useCallback(async () => {
         try {
-          if (!user.loggedIn) {
+          Mixpanel.track('Favorite Post', {
+            _stage: 'Post',
+            _postUuid: postUuid,
+          });
+
+          // Redirect only after the persist data is pulled
+          if (!user.loggedIn && user._persist?.rehydrated) {
             router.push(
               `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
                 `${process.env.NEXT_PUBLIC_APP_URL}/post/${postUuid}`
@@ -110,6 +132,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           }
         } catch (err) {
           console.error(err);
+          toast.error('toastErrors.generic');
         }
       }, [
         handleAddPostToState,
@@ -118,6 +141,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
         postUuid,
         router,
         user.loggedIn,
+        user._persist?.rehydrated,
       ]);
 
       useEffect(() => {
@@ -154,98 +178,61 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       }, [user.loggedIn, postUuid]);
 
       return (
-        <AnimatePresence>
-          {isVisible && (
-            <SContainer
-              ref={(el) => {
-                containerRef.current = el!!;
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <SButton onClick={() => handleCopyLink()}>
-                <Text variant={3}>
-                  {isCopiedUrl
-                    ? t('ellipse.linkCopied')
-                    : t('ellipse.copyLink')}
-                </Text>
-              </SButton>
-              {postCreator.uuid !== user.userData?.userUuid && (
-                <>
-                  {!isFollowingLoading ? (
-                    <SButton onClick={() => handleFollowDecision()}>
-                      <Text variant={3}>
-                        {!isFollowingDecision
-                          ? t('ellipse.followDecision', {
-                              postType: t(`postType.${postType}`),
-                            })
-                          : t('ellipse.unFollowDecision', {
-                              postType: t(`postType.${postType}`),
-                            })}
-                      </Text>
-                    </SButton>
-                  ) : (
-                    <Skeleton
-                      count={1}
-                      height='100%'
-                      width='100px'
-                      highlightColor={theme.colorsThemed.background.primary}
-                    />
-                  )}
-                  <SButton
-                    onClick={() => {
-                      handleReportOpen();
-                      onClose();
-                    }}
-                  >
-                    <Text variant={3} tone='error'>
-                      {t('ellipseMenu.report')}
-                    </Text>
-                  </SButton>
-                </>
+        <SEllipseMenu
+          isOpen={isVisible}
+          onClose={onClose}
+          anchorElement={anchorElement}
+        >
+          <SEllipseMenuButton variant={3} onClick={() => handleCopyLink()}>
+            {isCopiedUrl ? t('ellipse.linkCopied') : t('ellipse.copyLink')}
+          </SEllipseMenuButton>
+          {postCreator.uuid !== user.userData?.userUuid && (
+            <>
+              {!isFollowingLoading ? (
+                <SEllipseMenuButton variant={3} onClick={handleFollowDecision}>
+                  {!isFollowingDecision
+                    ? t('ellipse.followDecision', {
+                        postType: t(`postType.${postType}`),
+                      })
+                    : t('ellipse.unFollowDecision', {
+                        postType: t(`postType.${postType}`),
+                      })}
+                </SEllipseMenuButton>
+              ) : (
+                <Skeleton
+                  count={1}
+                  height='100%'
+                  width='100px'
+                  highlightColor={theme.colorsThemed.background.primary}
+                />
               )}
-            </SContainer>
+              <SEllipseMenuButton
+                variant={3}
+                tone='error'
+                onClick={() => {
+                  Mixpanel.track('Report Open Post Modal', {
+                    _stage: 'Post',
+                    _postUuid: postUuid,
+                  });
+                  handleReportOpen();
+                  onClose();
+                }}
+              >
+                {t('ellipse.report')}
+              </SEllipseMenuButton>
+            </>
           )}
-        </AnimatePresence>
+        </SEllipseMenu>
       );
     }
   );
 
 export default PostCardEllipseMenu;
 
-const SContainer = styled(motion.div)`
-  position: absolute;
-  top: 56px;
-  z-index: 10;
-  right: 16px;
-  width: calc(100% - 32px);
-
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 16px;
-
-  padding: 12px;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-
-  ${({ theme }) => theme.media.tablet} {
-    right: 12px;
-  }
+const SEllipseMenu = styled(EllipseMenu)`
+  position: fixed;
 `;
 
-const SButton = styled.button`
-  background: none;
-  border: transparent;
-
-  cursor: pointer;
-
+const SEllipseMenuButton = styled(EllipseMenuButton)`
   text-align: right;
-
-  &:focus {
-    outline: none;
-  }
 `;

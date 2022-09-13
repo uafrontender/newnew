@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface IText {
-  weight?: 500 | 600;
+  weight?: 500 | 600 | 700;
   variant?: 1 | 2 | 3 | 4 | 5;
   onClick?: (e: any) => void;
   tone?: 'neutral' | 'error';

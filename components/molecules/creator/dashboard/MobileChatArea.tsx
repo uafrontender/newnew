@@ -1,5 +1,11 @@
 /* eslint-disable consistent-return */
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  useRef,
+} from 'react';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -19,6 +25,8 @@ import Text from '../../../atoms/Text';
 import TextArea from '../../../atoms/chat/TextArea';
 import Button from '../../../atoms/Button';
 import UserAvatar from '../../UserAvatar';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import isBrowser from '../../../../utils/isBrowser';
 
 const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
@@ -32,8 +40,9 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
   const [messageText, setMessageText] = useState<string>('');
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
-  const [newMessage, setNewMessage] =
-    useState<newnewapi.IChatMessage | null | undefined>();
+  const [newMessage, setNewMessage] = useState<
+    newnewapi.IChatMessage | null | undefined
+  >();
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
@@ -49,8 +58,9 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
 
-  const [messagesNextPageToken, setMessagesNextPageToken] =
-    useState<string | undefined | null>('');
+  const [messagesNextPageToken, setMessagesNextPageToken] = useState<
+    string | undefined | null
+  >('');
   const [messagesLoading, setMessagesLoading] = useState(false);
 
   const getChatMessages = useCallback(
@@ -130,12 +140,15 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       }
     };
     if (socketConnection) {
-      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+      socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
+          'ChatMessageCreated',
+          socketHandlerMessageCreated
+        );
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -162,7 +175,7 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newMessage]);
 
-  const handleChange = useCallback((id, value) => {
+  const handleChange = useCallback((id: string, value: string) => {
     setMessageText(value);
   }, []);
 
@@ -197,7 +210,7 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   }, [messageText]);
 
   const renderMessage = useCallback(
-    (item: newnewapi.IChatMessage, index) => {
+    (item: newnewapi.IChatMessage, index: number) => {
       const prevElement = messages[index - 1];
       const nextElement = messages[index + 1];
 
@@ -321,6 +334,19 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     return true;
   }, [isAnnouncement, isMyAnnouncement, chatRoom]);
 
+  const messagesScrollContainerRef = useRef<HTMLDivElement>();
+
+  useEffect(() => {
+    if (newMessage && isBrowser()) {
+      setTimeout(() => {
+        messagesScrollContainerRef.current?.scrollBy({
+          top: messagesScrollContainerRef.current?.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 100);
+    }
+  }, [newMessage]);
+
   return (
     <SContainer>
       {chatRoom && (
@@ -328,10 +354,25 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           <GoBackButton onClick={clickHandler} />
           <SUserData>
             <SUserName>
-              {isMyAnnouncement
-                ? user.userData?.nickname
-                : chatRoom.visavis?.nickname}
-              {isAnnouncement && t('announcement.title')}
+              {
+                // eslint-disable-next-line no-nested-ternary
+                isAnnouncement
+                  ? t('announcement.title', {
+                      username: isMyAnnouncement
+                        ? user.userData?.nickname
+                        : chatRoom.visavis?.nickname,
+                    })
+                  : isMyAnnouncement
+                  ? user.userData?.nickname
+                  : chatRoom.visavis?.nickname
+              }
+              {chatRoom.visavis?.options?.isVerified && !isAnnouncement && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                />
+              )}
             </SUserName>
             <SUserAlias>
               {!isAnnouncement
@@ -349,7 +390,12 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           </SUserData>
         </STopPart>
       )}
-      <SCenterPart id='messagesScrollContainer'>
+      <SCenterPart
+        id='messagesScrollContainer'
+        ref={(el) => {
+          messagesScrollContainerRef.current = el!!;
+        }}
+      >
         {messages.length > 0 && messages.map(renderMessage)}
       </SCenterPart>
       <SBottomPart>
@@ -417,6 +463,8 @@ const SUserName = styled.strong`
   font-weight: 600;
   font-size: 16px;
   padding-bottom: 4px;
+  display: flex;
+  align-items: center;
 `;
 
 const SCenterPart = styled.div`
@@ -657,7 +705,9 @@ interface ISMessageText {
 
 const SMessageText = styled(Text)<ISMessageText>`
   line-height: 20px;
-  max-width: 412px;
+  max-width: 80vw;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
   color: ${(props) => {
     if (props.type === 'info') {
       return props.theme.colorsThemed.text.tertiary;
@@ -669,6 +719,10 @@ const SMessageText = styled(Text)<ISMessageText>`
 
     return props.theme.colorsThemed.text.primary;
   }};
+
+  ${({ theme }) => theme.media.tablet} {
+    max-width: 412px;
+  }
 `;
 const SRef = styled.span`
   text-indent: -9999px;

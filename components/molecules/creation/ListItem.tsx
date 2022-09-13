@@ -14,6 +14,7 @@ import {
   clearCreation,
   clearPostData,
 } from '../../../redux-store/slices/creationStateSlice';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const DARK_IMAGES_ANIMATED: any = {
   auction: assets.creation.darkAcAnimated,
@@ -65,6 +66,7 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
   return (
     <Link href={link}>
       <a
+        id={itemKey}
         role='button'
         onMouseEnter={() => {
           setMouseEntered(true);
@@ -73,6 +75,10 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
           setMouseEntered(false);
         }}
         onClick={() => {
+          Mixpanel.track('Post Type Selected', {
+            _stage: 'Creation',
+            _postType: itemKey,
+          });
           dispatch(clearCreation({}));
           dispatch(clearPostData({}));
         }}

@@ -17,6 +17,9 @@ import { parse } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
 import * as Sentry from '@sentry/browser';
+import { useRouter } from 'next/router';
+import moment from 'moment';
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 
 // Custom error page
 import Error from './_error';
@@ -49,6 +52,7 @@ import { ChatsProvider } from '../contexts/chatContext';
 import SyncUserWrapper from '../contexts/syncUserWrapper';
 import AppConstantsContextProvider from '../contexts/appConstantsContext';
 import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
+import CardsContextProvider from '../contexts/cardsContext';
 
 // Images to be prefetched
 import assets from '../constants/assets';
@@ -58,6 +62,12 @@ import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
+import RewardContextProvider from '../contexts/rewardContext';
+import ModalNotificationsContextProvider from '../contexts/modalNotificationsContext';
+import { Mixpanel } from '../utils/mixpanel';
+import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
+import { OverlayModeProvider } from '../contexts/overlayModeContext';
+import ErrorBoundary from '../components/organisms/ErrorBoundary';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -73,7 +83,9 @@ interface IMyApp extends AppProps {
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString, colorMode } = props;
   const store = useStore();
+  const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
+  const { locale } = useRouter();
 
   usePushNotifications();
 
@@ -88,10 +100,28 @@ const MyApp = (props: IMyApp): ReactElement => {
   const PRE_FETCHING_DELAY = 2500;
   useEffect(() => {
     setTimeout(() => {
-      const currentTheme = getColorMode(store.getState()?.ui?.colorMode);
+      const currentTheme = getColorMode(
+        // @ts-ignore:next-line
+        store.getState()?.ui?.colorMode as string
+      );
       setPreFetchImages(currentTheme);
     }, PRE_FETCHING_DELAY);
   }, [store]);
+
+  useEffect(() => {
+    // Imported one by one not to reak import\no-dynamic-require
+    if (locale === 'zh') {
+      // eslint-disable-next-line global-require
+      require('moment/locale/zh-tw');
+      moment.locale('zh-tw');
+    } else if (locale === 'es') {
+      // eslint-disable-next-line global-require
+      require('moment/locale/es');
+      moment.locale('es');
+    } else if (locale === 'en-US') {
+      moment.locale('en-US');
+    }
+  });
 
   useEffect(() => {
     const hotjarIdVariable = process.env.NEXT_PUBLIC_HOTJAR_ID;
@@ -111,31 +141,41 @@ const MyApp = (props: IMyApp): ReactElement => {
   }, []);
 
   useEffect(() => {
-    const currentResizeMode = store.getState()?.ui?.resizeMode;
+    if (user.loggedIn && user.userData?.username) {
+      Mixpanel.identify(user.userData.username);
+      Mixpanel.people.set({
+        $name: user.userData.username,
+        $email: user.userData.email,
+        newnewId: user.userData.userUuid,
+      });
+      Mixpanel.track('Session started!');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.loggedIn]);
 
-    let resizeMode = 'mobile';
+  useEffect(() => {
+    let newResizeMode = 'mobile';
     const ua = parse(
       uaString || (isBrowser() ? window?.navigator?.userAgent : '')
     );
 
     if (ua.isTablet) {
-      resizeMode = 'tablet';
+      newResizeMode = 'tablet';
     } else if (ua.isDesktop) {
-      resizeMode = 'laptop';
+      newResizeMode = 'laptop';
 
-      if (['laptopL', 'desktop'].includes(currentResizeMode)) {
+      if (['laptopL', 'desktop'].includes(resizeMode)) {
         // keep old mode in case laptop
-        resizeMode = currentResizeMode;
+        newResizeMode = resizeMode;
       }
-    } else if (['mobileL', 'mobileM', 'mobileS'].includes(currentResizeMode)) {
+    } else if (['mobileL', 'mobileM', 'mobileS'].includes(resizeMode)) {
       // keep old mode in case mobile
-      resizeMode = currentResizeMode;
+      newResizeMode = resizeMode;
     }
-
-    if (resizeMode !== currentResizeMode) {
+    if (newResizeMode !== resizeMode) {
       store.dispatch(setResizeMode(resizeMode));
     }
-  }, [store, uaString]);
+  }, [resizeMode, uaString, store]);
 
   // TODO: move to the store logic
   useEffect(() => {
@@ -158,61 +198,94 @@ const MyApp = (props: IMyApp): ReactElement => {
         {preFetchImages === 'light' && PRE_FETCH_LINKS_LIGHT}
       </Head>
       <CookiesProvider cookies={cookiesInstance}>
-        <AppConstantsContextProvider>
-          <SocketContextProvider>
-            <ChannelsContextProvider>
-              <PersistanceProvider store={store}>
-                <SyncUserWrapper>
-                  <NotificationsProvider>
-                    <BlockedUsersProvider>
-                      <FollowingsContextProvider>
-                        {/* <WalletContextProvider> */}
-                        <SubscriptionsProvider>
-                          <ChatsProvider>
-                            <ResizeMode>
-                              <PostModalContextProvider>
-                                <GlobalTheme initialTheme={colorMode}>
-                                  <div>
-                                    <ToastContainer />
-                                    <VideoProcessingWrapper>
-                                      {!pageProps.error ? (
-                                        getLayout(<Component {...pageProps} />)
-                                      ) : (
-                                        <Error
-                                          title={pageProps.error?.message}
-                                          statusCode={
-                                            pageProps.error?.statusCode ?? 500
-                                          }
-                                        />
-                                      )}
-                                    </VideoProcessingWrapper>
-                                  </div>
-                                </GlobalTheme>
-                              </PostModalContextProvider>
-                            </ResizeMode>
-                          </ChatsProvider>
-                        </SubscriptionsProvider>
-                        {/* </WalletContextProvider> */}
-                      </FollowingsContextProvider>
-                    </BlockedUsersProvider>
-                  </NotificationsProvider>
-                </SyncUserWrapper>
-              </PersistanceProvider>
-            </ChannelsContextProvider>
-          </SocketContextProvider>
-        </AppConstantsContextProvider>
+        <GoogleReCaptchaProvider
+          reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ''}
+          language={locale}
+          scriptProps={{
+            async: false,
+            defer: false,
+            appendTo: 'head',
+            nonce: undefined,
+          }}
+          container={{
+            element: 'recaptchaBadge',
+            parameters: {
+              badge: 'bottomleft',
+              theme: 'dark',
+            },
+          }}
+        >
+          <AppConstantsContextProvider>
+            <SocketContextProvider>
+              <ChannelsContextProvider>
+                <PersistanceProvider store={store}>
+                  <SyncUserWrapper>
+                    <NotificationsProvider>
+                      <ModalNotificationsContextProvider>
+                        <BlockedUsersProvider>
+                          <FollowingsContextProvider>
+                            {/* <WalletContextProvider> */}
+                            <RewardContextProvider>
+                              <CardsContextProvider>
+                                <SubscriptionsProvider>
+                                  <ChatsProvider>
+                                    <OverlayModeProvider>
+                                      <ResizeMode>
+                                        <PostModalContextProvider>
+                                          <GlobalTheme initialTheme={colorMode}>
+                                            <>
+                                              <ToastContainer />
+                                              <VideoProcessingWrapper>
+                                                <ErrorBoundary>
+                                                  {!pageProps.error ? (
+                                                    getLayout(
+                                                      <Component
+                                                        {...pageProps}
+                                                      />
+                                                    )
+                                                  ) : (
+                                                    <Error
+                                                      title={
+                                                        pageProps.error?.message
+                                                      }
+                                                      statusCode={
+                                                        pageProps.error
+                                                          ?.statusCode ?? 500
+                                                      }
+                                                    />
+                                                  )}
+                                                </ErrorBoundary>
+                                              </VideoProcessingWrapper>
+                                              <ReCaptchaBadgeModal />
+                                            </>
+                                          </GlobalTheme>
+                                        </PostModalContextProvider>
+                                      </ResizeMode>
+                                    </OverlayModeProvider>
+                                  </ChatsProvider>
+                                </SubscriptionsProvider>
+                              </CardsContextProvider>
+                            </RewardContextProvider>
+                            {/* </WalletContextProvider> */}
+                          </FollowingsContextProvider>
+                        </BlockedUsersProvider>
+                      </ModalNotificationsContextProvider>
+                    </NotificationsProvider>
+                  </SyncUserWrapper>
+                </PersistanceProvider>
+              </ChannelsContextProvider>
+            </SocketContextProvider>
+          </AppConstantsContextProvider>
+        </GoogleReCaptchaProvider>
       </CookiesProvider>
     </>
   );
 };
 
-// @ts-ignore
 const MyAppWithTranslation = appWithTranslation(MyApp);
 
-// @ts-ignore
 const MyAppWithTranslationAndRedux = wrapper.withRedux(MyAppWithTranslation);
 
-// @ts-ignore
 MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
   const appProps = await App.getInitialProps(appContext);
 

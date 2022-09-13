@@ -1,135 +1,145 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useState,
+  useRef,
+} from 'react';
 import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import InlineSvg from '../../atoms/InlineSVG';
 
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
+import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 
-type TOnboardingSectionUsernameInput =
-  React.ComponentPropsWithoutRef<'input'> & {
-    isValid?: boolean;
-    popupCaption: ReactElement;
-    frequencyCaption: string;
-    errorCaption: string;
+interface TOnboardingSectionUsernameInput
+  extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange'> {
+  isValid?: boolean;
+  popupCaption: ReactElement;
+  frequencyCaption: string;
+  errorCaption: string;
+  onChange: (value: string) => void;
+}
+
+const OnboardingSectionUsernameInput: React.FunctionComponent<
+  TOnboardingSectionUsernameInput
+> = ({
+  value,
+  popupCaption,
+  frequencyCaption,
+  errorCaption,
+  isValid,
+  disabled,
+  onChange,
+  onFocus,
+  ...rest
+}) => {
+  const [errorBordersShown, setErrorBordersShown] = useState(false);
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [focused, setFocused] = useState(false);
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue =
+      (value as string).length > 0 ? e.target.value.slice(1) : e.target.value;
+
+    onChange(newValue);
   };
 
-const OnboardingSectionUsernameInput: React.FunctionComponent<TOnboardingSectionUsernameInput> =
-  ({
-    value,
-    popupCaption,
-    frequencyCaption,
-    errorCaption,
-    isValid,
-    disabled,
-    onChange,
-    onFocus,
-    ...rest
-  }) => {
-    const [errorBordersShown, setErrorBordersShown] = useState(false);
-    const [isPopupVisible, setIsPopupVisible] = useState(false);
-    const [focused, setFocused] = useState(false);
+  useEffect(() => {
+    if (focused) return;
+    if (isValid) setErrorBordersShown(false);
+  }, [focused, isValid]);
 
-    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue =
-        (value as string).length > 0 ? e.target.value.slice(1) : e.target.value;
+  const inputContainerRef = useRef(null);
 
-      const pseudoEvent = {
-        target: {
-          value: newValue,
-        },
-      };
+  const closePopup = useCallback(() => {
+    setIsPopupVisible(false);
+  }, []);
 
-      // @ts-ignore
-      onChange(pseudoEvent || '');
-    };
+  useOnClickOutside(inputContainerRef, closePopup);
 
-    useEffect(() => {
-      if (focused) return;
-      if (isValid) setErrorBordersShown(false);
-    }, [focused, isValid]);
-
-    return (
-      <SWrapper>
-        <SInputWrapper>
-          <SOnboardingSectionUsernameInput
-            value={(value as string).length > 0 ? `@${value}` : value}
-            id='username_input'
-            disabled={disabled}
-            errorBordersShown={errorBordersShown}
-            onChange={handleOnChange}
-            onBlur={() => {
-              setIsPopupVisible(false);
-              setFocused(false);
-              if (!isValid && errorCaption) {
-                setErrorBordersShown(true);
-              } else {
-                setErrorBordersShown(false);
-              }
-            }}
-            onFocus={(e) => {
-              if (onFocus) onFocus(e);
-              setFocused(true);
-              setIsPopupVisible(true);
+  return (
+    <SWrapper>
+      <SInputWrapper ref={inputContainerRef}>
+        <SOnboardingSectionUsernameInput
+          value={(value as string).length > 0 ? `@${value}` : value}
+          id='username_input'
+          disabled={disabled}
+          errorBordersShown={errorBordersShown}
+          onChange={handleOnChange}
+          onBlur={() => {
+            setIsPopupVisible(false);
+            setFocused(false);
+            if (!isValid && errorCaption) {
+              setErrorBordersShown(true);
+            } else {
               setErrorBordersShown(false);
-            }}
-            {...rest}
-          />
-          <SStyledButton
-            disabled={disabled}
-            onClick={() => setIsPopupVisible((curr) => !curr)}
-          >
-            <InlineSvg svg={AlertIcon} width='24px' height='24px' />
-          </SStyledButton>
-          <AnimatePresence>
-            {isPopupVisible ? (
-              <SPopup
-                initial={{
-                  y: 30,
-                  opacity: 0,
-                }}
-                animate={{
-                  y: 0,
-                  opacity: 1,
-                  transition: {
-                    opacity: {
-                      duration: 0.1,
-                    },
-                    y: {
-                      type: 'spring',
-                      velocity: -300,
-                      stiffness: 100,
-                      delay: 0.1,
-                    },
-                  },
-                }}
-                exit={{
-                  y: 30,
-                  opacity: 0,
-                  transition: {
+            }
+          }}
+          onFocus={(e) => {
+            if (onFocus) onFocus(e);
+            setFocused(true);
+            setIsPopupVisible(true);
+            setErrorBordersShown(false);
+          }}
+          {...rest}
+        />
+        <SStyledButton
+          disabled={disabled}
+          onClick={() => setIsPopupVisible((curr) => !curr)}
+        >
+          <InlineSvg svg={AlertIcon} width='24px' height='24px' />
+        </SStyledButton>
+        <AnimatePresence>
+          {isPopupVisible ? (
+            <SPopup
+              initial={{
+                y: 30,
+                opacity: 0,
+              }}
+              animate={{
+                y: 0,
+                opacity: 1,
+                transition: {
+                  opacity: {
                     duration: 0.1,
                   },
-                }}
-              >
-                {popupCaption}
-              </SPopup>
-            ) : null}
-          </AnimatePresence>
-        </SInputWrapper>
-        {!errorBordersShown && window ? (
-          <SPreviewDiv>{`${window.location.origin}/${value}`}</SPreviewDiv>
-        ) : null}
-        {errorBordersShown ? (
-          <AnimatedPresence animation='t-09'>
-            <SErrorDiv>
-              <InlineSvg svg={AlertIcon} width='16px' height='16px' />
-              {errorCaption}
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null}
-      </SWrapper>
-    );
-  };
+                  y: {
+                    type: 'spring',
+                    velocity: -300,
+                    stiffness: 100,
+                    delay: 0.1,
+                  },
+                },
+              }}
+              exit={{
+                y: 30,
+                opacity: 0,
+                transition: {
+                  duration: 0.1,
+                },
+              }}
+            >
+              {popupCaption}
+            </SPopup>
+          ) : null}
+        </AnimatePresence>
+      </SInputWrapper>
+      {!errorBordersShown && window ? (
+        <SPreviewDiv>{`${window.location.origin}/${value}`}</SPreviewDiv>
+      ) : null}
+      {errorBordersShown ? (
+        <AnimatedPresence animation='t-09'>
+          <SErrorDiv>
+            <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+            {errorCaption}
+          </SErrorDiv>
+        </AnimatedPresence>
+      ) : null}
+    </SWrapper>
+  );
+};
 
 OnboardingSectionUsernameInput.defaultProps = {
   isValid: undefined,

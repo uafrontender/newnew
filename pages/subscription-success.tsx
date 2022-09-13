@@ -38,12 +38,11 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
         const res = await getSubscriptionStatus(getStatusPayload);
 
         if (res.data?.status?.activeRenewsAt) {
-          console.log('Subscribed! Redirecting to chat');
           fetchCreatorsImSubscribedTo();
           // I think we should not check is room created or not at this point
           // we can do this on chat page and if not try to create again
           // if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-          router.push(`/direct-messages/${username}`);
+          router.push(`/direct-messages/${username}-cr`);
         }
       } catch (err) {
         console.error(err);
@@ -66,15 +65,15 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
     };
 
     if (socketConnection) {
-      socketConnection.on(
+      socketConnection?.on(
         'CreatorSubscriptionChanged',
         handlerSubscriptionUpdated
       );
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off(
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
           'CreatorSubscriptionChanged',
           handlerSubscriptionUpdated
         );

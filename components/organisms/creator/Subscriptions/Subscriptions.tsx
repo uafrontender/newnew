@@ -13,12 +13,13 @@ import { getMyRooms } from '../../../../api/endpoints/chat';
 import Button from '../../../atoms/Button';
 import Lottie from '../../../atoms/Lottie';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
+import { useGetChats } from '../../../../contexts/chatContext';
 
 const SubscribersTable = dynamic(
   () => import('../../../molecules/creator/dashboard/SubscribersTable')
 );
 const NoResults = dynamic(
-  () => import('../../../molecules/creator/dashboard/NoResults')
+  () => import('../../../molecules/creator/dashboard/subscriptions/NoResults')
 );
 const Navigation = dynamic(
   () => import('../../../molecules/creator/Navigation')
@@ -30,14 +31,14 @@ export const Subscriptions: React.FC = React.memo(() => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-
+  const { setMobileChatOpened } = useGetChats();
   const { mySubscribersTotal, isMySubscribersIsLoading } =
     useGetSubscriptions();
   const [mySubscriptionProduct, setMySubscriptionProduct] =
     useState<newnewapi.ISubscriptionProduct | null>(null);
 
-  const [myAnnouncementRoomId, setMyAnnouncementRoomId] =
-    useState<number | undefined>();
+  const [myAnnouncementRoom, setMyAnnouncementRoom] =
+    useState<newnewapi.IChatRoom | undefined>();
   const [loadingRoom, setLoadingRoom] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,7 +58,7 @@ export const Subscriptions: React.FC = React.memo(() => {
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
       if (res.data && res.data.rooms[0].id) {
-        setMyAnnouncementRoomId(res.data.rooms[0].id as number);
+        setMyAnnouncementRoom(res.data.rooms[0]);
       }
       setLoadingRoom(false);
     } catch (err) {
@@ -67,9 +68,9 @@ export const Subscriptions: React.FC = React.memo(() => {
   };
 
   useEffect(() => {
-    if (!myAnnouncementRoomId && mySubscribersTotal > 0) fetchMyRoom();
+    if (!myAnnouncementRoom && mySubscribersTotal > 0) fetchMyRoom();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [myAnnouncementRoomId, mySubscribersTotal]);
+  }, [myAnnouncementRoom, mySubscribersTotal]);
 
   const fetchMySubscriptionProduct = async () => {
     if (isLoading) return;
@@ -104,17 +105,33 @@ export const Subscriptions: React.FC = React.memo(() => {
             {t('subscriptions.title')}{' '}
             {mySubscribersTotal > 0 && `(${mySubscribersTotal})`}
           </STitle>
-          {myAnnouncementRoomId && mySubscribersTotal > 0 && (
-            <Link
-              href={`/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoomId}`}
-            >
-              <a>
-                <Button view='primaryGrad'>
-                  {t('subscriptions.messageAll')}
-                </Button>
-              </a>
-            </Link>
-          )}
+          {myAnnouncementRoom && mySubscribersTotal > 0 ? (
+            isMobile ? (
+              <Button
+                view='primaryGrad'
+                onClick={() => {
+                  if (isMobile) {
+                    setMobileChatOpened(true, {
+                      chatRoom: myAnnouncementRoom,
+                      showChatList: null,
+                    });
+                  }
+                }}
+              >
+                {t('subscriptions.messageAll')}
+              </Button>
+            ) : (
+              <Link
+                href={`/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoom.id}`}
+              >
+                <a>
+                  <Button view='primaryGrad'>
+                    {t('subscriptions.messageAll')}
+                  </Button>
+                </a>
+              </Link>
+            )
+          ) : null}
         </STitleBlock>
         {!isMySubscribersIsLoading ? (
           !mySubscribersTotal || mySubscribersTotal < 1 ? (

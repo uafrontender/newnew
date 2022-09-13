@@ -13,6 +13,7 @@ import { SCROLL_TO_TOP } from '../../constants/timings';
 
 import logoText from '../../public/images/svg/logo_text.svg';
 import logoAnimation from '../../public/animations/mobile_logo.json';
+import { Mixpanel } from '../../utils/mixpanel';
 
 export const Logo: React.FunctionComponent<{
   style?: React.CSSProperties;
@@ -27,11 +28,13 @@ export const Logo: React.FunctionComponent<{
   );
 
   const handleClick = () => {
+    Mixpanel.track('Navigation Item Clicked', {
+      _button: 'Header Logo',
+    });
     if (router.pathname === '/') {
       scroller.scrollTo('top-reload', {
         smooth: 'easeInOutQuart',
         duration: SCROLL_TO_TOP,
-        containerId: 'generalScrollContainer',
       });
     }
   };
@@ -70,12 +73,14 @@ export const Logo: React.FunctionComponent<{
             isStopped={!loading}
           />
         </SAnimationWrapper>
-        <SInlineSVG
-          svg={logoText}
-          fill={theme.colorsThemed.text.primary}
-          width={isMobile ? '81px' : '94px'}
-          height={isMobile ? '21px' : '21px'}
-        />
+        {!isMobile && (
+          <SInlineSVG
+            svg={logoText}
+            fill={theme.colorsThemed.text.primary}
+            width={isMobile ? '81px' : '94px'}
+            height={isMobile ? '21px' : '21px'}
+          />
+        )}
       </SWrapper>
     </Link>
   );
