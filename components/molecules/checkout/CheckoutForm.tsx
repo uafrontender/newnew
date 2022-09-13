@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useContext } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useContext,
+  useEffect,
+  useCallback,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled from 'styled-components';
@@ -9,21 +15,22 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
-import { newnewapi } from 'newnew-api';
+import { StripePaymentElementOptions } from '@stripe/stripe-js';
 
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 import Toggle from '../../atoms/Toggle';
 import OptionCard from './OptionCard';
 import Input from '../../atoms/Input';
+import CheckMark from '../CheckMark';
 
 import { formatNumber } from '../../../utils/format';
 import { useCards } from '../../../contexts/cardsContext';
 import { useAppSelector } from '../../../redux-store/store';
-import { updateStripeSetupIntent } from '../../../api/endpoints/payments';
 import { RewardContext } from '../../../contexts/rewardContext';
 import assets from '../../../constants/assets';
 import { IReCaptchaRes } from '../../interfaces/reCaptcha';
+import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 
 // eslint-disable-next-line no-shadow
 enum PaymentMethodTypes {
@@ -32,22 +39,20 @@ enum PaymentMethodTypes {
 }
 
 interface ICheckoutForm {
-  stipeSecret: string;
+  setupIntent: ISetupIntent;
   redirectUrl: string;
   amount?: number;
   noRewards?: boolean;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
   handlePayWithCard?: (params: {
-    rewardAmount: number;
     cardUuid?: string;
-    stripeSetupIntentClientSecret: string;
     saveCard?: boolean;
   }) => void;
 }
 
 const CheckoutForm: React.FC<ICheckoutForm> = ({
-  stipeSecret,
+  setupIntent,
   redirectUrl,
   amount,
   noRewards,
@@ -79,10 +84,20 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     [cards]
   );
 
+  useEffect(() => {
+    if (!selectedPaymentMethod && primaryCard) {
+      setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard);
+    }
+  }, [selectedPaymentMethod, primaryCard]);
+
   const rewardUsed =
     useRewards && rewardBalance?.usdCents && amount
       ? Math.min(rewardBalance.usdCents, amount)
       : 0;
+
+  const toggleSaveCard = useCallback(() => {
+    setSaveCard((prevState) => !prevState);
+  }, []);
 
   const handleSetEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -121,28 +136,48 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         const jsonRes: IReCaptchaRes = await res.json();
 
         if (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5) {
+          // save used rewards amount
+          if (rewardUsed > 0) {
+            const { errorKey } = await setupIntent.update({
+              ...(rewardUsed > 0 ? { rewardAmount: rewardUsed } : {}),
+            });
+
+            if (errorKey) {
+              throw new Error(t(errorKey));
+            }
+          }
+
+          // pay with rewards amount only
+          if (amount && rewardUsed >= amount && primaryCard) {
+            await handlePayWithCard?.({
+              cardUuid: primaryCard.cardUuid as string,
+            });
+            return;
+          }
+
+          // pay with primary card
           if (
             selectedPaymentMethod === PaymentMethodTypes.PrimaryCard &&
             primaryCard
           ) {
-            handlePayWithCard?.({
-              rewardAmount: rewardUsed,
+            await handlePayWithCard?.({
               cardUuid: primaryCard.cardUuid as string,
-              stripeSetupIntentClientSecret: stipeSecret,
             });
+
+            // pay with new card
           } else if (
             selectedPaymentMethod === PaymentMethodTypes.NewCard ||
             !primaryCard
           ) {
             if (!loggedIn) {
-              const updateStripeSetupIntentRequest =
-                new newnewapi.UpdateStripeSetupIntentRequest({
-                  stripeSetupIntentClientSecret: stipeSecret,
-                  guestEmail: email,
-                  saveCard,
-                });
+              const { errorKey } = await setupIntent.update({
+                email,
+                saveCard,
+              });
 
-              await updateStripeSetupIntent(updateStripeSetupIntentRequest);
+              if (errorKey) {
+                throw new Error(t(errorKey));
+              }
             }
 
             const { error } = await stripe.confirmSetup({
@@ -154,16 +189,11 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             });
 
             if (error) {
-              toast.error(error.message);
-
               throw new Error(error.message);
             }
 
-            handlePayWithCard?.({
-              rewardAmount: rewardUsed,
-              stripeSetupIntentClientSecret: stipeSecret,
+            await handlePayWithCard?.({
               saveCard,
-              ...(!loggedIn ? { email } : {}),
             });
           }
         } else {
@@ -178,63 +208,22 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         }
       }
     } catch (err: any) {
+      toast.error(err.message);
       console.error(err);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const paymentElementOptions: StripePaymentElementOptions = useMemo(
+    () => ({ terms: { card: 'never' } }),
+    []
+  );
+
   return (
-    <form onSubmit={handleSubmit}>
-      {primaryCard && (
-        <>
-          <OptionCard
-            handleClick={() =>
-              setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard)
-            }
-            selected={selectedPaymentMethod === PaymentMethodTypes.PrimaryCard}
-            label={`${t('primaryCard')} **** ${primaryCard.last4}`}
-          />
-          <OptionCard
-            handleClick={() =>
-              setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
-            }
-            selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
-            label={t('newCard')}
-          />
-        </>
-      )}
-
-      {(selectedPaymentMethod === PaymentMethodTypes.NewCard ||
-        !primaryCard) && (
-        <SPaymentFormWrapper>
-          {!loggedIn && isStripeReady && (
-            <Input
-              value={email}
-              isValid={email.length > 0 && !emailError}
-              onChange={handleSetEmail}
-              placeholder={t('email')}
-              type='email'
-              errorCaption={emailError}
-            />
-          )}
-          <PaymentElement onReady={() => setIsStripeReady(true)} />
-          {/* Show save toggle only if user already has primary card otherwise card will be saved in any case */}
-          {isStripeReady && primaryCard && (
-            <SSaveCard>
-              <SSaveCardText variant={3} weight={600}>
-                {t('saveCard')}
-              </SSaveCardText>
-              <Toggle
-                checked={saveCard}
-                onChange={() => setSaveCard((prevState) => !prevState)}
-              />
-            </SSaveCard>
-          )}
-        </SPaymentFormWrapper>
-      )}
-
-      {!noRewards && (
+    <SForm onSubmit={handleSubmit}>
+      {/* Rewards */}
+      {!noRewards && !!rewardBalance?.usdCents && (
         <RewardContainer>
           <RewardImage src={assets.decision.gold} alt='reward balance' />
           <RewardText>{t('rewardsText')}</RewardText>
@@ -252,6 +241,65 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             }}
           />
         </RewardContainer>
+      )}
+
+      {/* Payment method */}
+      {!(amount && rewardUsed >= amount && primaryCard) && (
+        <>
+          <Text variant='subtitle'>{t('paymentMethodTitle')}</Text>
+          {primaryCard && (
+            <>
+              <OptionCard
+                handleClick={() =>
+                  setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard)
+                }
+                selected={
+                  selectedPaymentMethod === PaymentMethodTypes.PrimaryCard
+                }
+                label={`${t('primaryCard')} **** ${primaryCard.last4}`}
+              />
+              <OptionCard
+                handleClick={() =>
+                  setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
+                }
+                selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
+                label={t('newCard')}
+              />
+            </>
+          )}
+
+          {(selectedPaymentMethod === PaymentMethodTypes.NewCard ||
+            !primaryCard) && (
+            <SPaymentFormWrapper isSingleForm={!primaryCard}>
+              {!loggedIn && isStripeReady && (
+                <SEmailInput
+                  value={email}
+                  isValid={email.length > 0 && !emailError}
+                  onChange={handleSetEmail}
+                  placeholder={t('email')}
+                  type='email'
+                  errorCaption={emailError}
+                />
+              )}
+              <PaymentElement
+                onReady={() => setIsStripeReady(true)}
+                options={paymentElementOptions}
+              />
+              {/* Show save toggle only if user already has primary card otherwise card will be saved in any case */}
+              {isStripeReady && primaryCard && (
+                <SSaveCard>
+                  <CheckMark
+                    selected={saveCard}
+                    handleChange={toggleSaveCard}
+                    label={t('saveCard')}
+                    variant={2}
+                    size='small'
+                  />
+                </SSaveCard>
+              )}
+            </SPaymentFormWrapper>
+          )}
+        </>
       )}
 
       <SPayButtonDiv>
@@ -300,30 +348,50 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             </STocApplyReCaptcha> */
         }
       </SPayButtonDiv>
-    </form>
+    </SForm>
   );
 };
 
 export default CheckoutForm;
 
-const SPaymentFormWrapper = styled.div`
-  margin-bottom: 16px;
+const SForm = styled.form`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+const SPaymentFormWrapper = styled.div<{ isSingleForm: boolean }>`
+  margin-top: ${({ isSingleForm }) => (isSingleForm ? '12px' : '24px')};
 `;
 
 const SSaveCard = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  margin-top: 24px;
+  padding-top: 11px;
+  margin-bottom: 24px;
 
-  padding-top: 14px;
   border-top: 1px solid
     ${({ theme }) => theme.colorsThemed.background.outlines1};
 
-  margin-top: 24px;
-  margin-bottom: 20px;
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 0;
+  }
 `;
 
-const SSaveCardText = styled(Text)``;
+const SEmailInput = styled(Input)`
+  padding: 10.5px 20px;
+  margin-bottom: 12px;
+  border-color: transparent;
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  }
+  &:-ms-input-placeholder {
+    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  }
+  &::-ms-input-placeholder {
+    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  }
+`;
 
 const RewardContainer = styled.div`
   display: flex;
@@ -331,7 +399,7 @@ const RewardContainer = styled.div`
   align-items: center;
   border: 1px solid;
   border-color: ${({ theme }) => theme.colorsThemed.text.primary};
-  border-radius: 24px;
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
   height: 78px;
   margin-bottom: 16px;
   padding-left: 16px;
@@ -361,15 +429,23 @@ const RewardText = styled.div`
 `;
 
 const RewardBalance = styled.div`
-  ${({ theme }) => theme.colorsThemed.text.primary};
   font-weight: 600;
   font-size: 24px;
   line-height: 32px;
   margin-right: 20px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
 `;
 
 const SPayButtonDiv = styled.div`
   width: 100%;
+  margin-top: auto;
+  margin-bottom: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 24px;
+    margin-bottom: 0;
+  }
 `;
 
 const SPayButton = styled(Button)`

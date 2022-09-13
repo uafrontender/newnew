@@ -37,23 +37,30 @@ export const StripeElements: React.FC<IStripeElements> = ({
           borderRadius: '16px',
           fontSizeBase: '16px',
           fontLineHeight: '24px',
+          spacingGridRow: '12px',
+          spacingGridColumn: '10px',
         },
         rules: {
           '.Label': {
             color: 'transparent',
+            lineHeight: '0px',
           },
           '.Input': {
-            padding: '12px 20px',
+            padding: '10.5px 20px',
             lineHeight: '24px',
-            border: `1.5px solid ${theme.colorsThemed.background.outlines1}`,
+            border: '1.5px solid transparent',
             fontWeight: '500',
           },
           '.Input:focus': {
             borderColor: `${theme.colorsThemed.background.outlines2}`,
             outline: '0',
           },
+          '.Input:hover': {
+            borderColor: `${theme.colorsThemed.background.outlines2}`,
+            outline: '0',
+          },
           '.Input::placeholder': {
-            color: `${theme.colorsThemed.text.quaternary}`,
+            color: `${theme.colorsThemed.text.tertiary}`,
           },
           '.Error': {
             fontWeight: '600',
