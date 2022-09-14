@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { SocketContext } from '../../contexts/socketContext';
 import { usePostModalState } from '../../contexts/postModalContext';
 
-import { uploadPostResponse } from '../../api/endpoints/post';
+import { uploadAdditionalPostResponse, uploadPostResponse } from '../../api/endpoints/post';
 import { getVideoUploadUrl, removeUploadedFile, startVideoProcessing, stopVideoProcessing } from '../../api/endpoints/upload';
 import waitResourceIsAvailable from '../checkResourceAvailable';
 
@@ -19,6 +19,7 @@ interface IUseResponseUpload {
   openedTab: 'announcement' | 'response';
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleUpdateResponseVideo: (newResponse: newnewapi.IVideoUrls) => void;
+  handleUpdateAdditionalResponseVideo: (newResponse: newnewapi.IVideoUrls) => void;
 }
 
 const useResponseUpload = ({
@@ -27,6 +28,7 @@ const useResponseUpload = ({
   openedTab,
   handleUpdatePostStatus,
   handleUpdateResponseVideo,
+  handleUpdateAdditionalResponseVideo,
 }: IUseResponseUpload) => {
   const { t } = useTranslation('modal-Post');
   const socketConnection = useContext(SocketContext);
@@ -58,6 +60,8 @@ const useResponseUpload = ({
   // Updating Post data
   const [responseUploading, setResponseUploading] = useState(false);
   const [responseUploadSuccess, setResponseUploadSuccess] = useState(false);
+
+  const [additionalResponseUploading, setAdditionalResponseUploading] = useState(false);
 
   const { handleSetIsConfirmToClosePost } = usePostModalState();
 
@@ -281,6 +285,39 @@ const useResponseUpload = ({
     }
   }, [postId, uploadedResponseVideoUrl, t, handleUpdatePostStatus]);
 
+  const handleUploadAdditionalVideoProcessed = useCallback(async () => {
+    setAdditionalResponseUploading(true);
+    try {
+      const payload = new newnewapi.UploadAdditionalPostResponseRequest({
+        postUuid: postId,
+        additionalResponseVideoUrl: uploadedResponseVideoUrl,
+      });
+
+      const res = await uploadAdditionalPostResponse(payload);
+
+      if (res.data) {
+        // @ts-ignore
+        let responseObj;
+        if (res.data.auction) responseObj = res.data.auction.response;
+        if (res.data.multipleChoice)
+          responseObj = res.data.multipleChoice.response;
+        if (res.data.crowdfunding) responseObj = res.data.crowdfunding.response;
+        // @ts-ignore
+        if (responseObj) handleUpdateAdditionalResponseVideo(responseObj);
+        setUploadedResponseVideoUrl('');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('toastErrors.generic');
+    } finally {
+      setAdditionalResponseUploading(false);
+    }
+  }, [
+    postId,
+    uploadedResponseVideoUrl,
+    handleUpdateAdditionalResponseVideo,
+  ]);
+
   const handlerSocketUpdated = useCallback(
     async (data: any) => {
       const arr = new Uint8Array(data);
@@ -403,6 +440,7 @@ const useResponseUpload = ({
     uploadedResponseVideoUrl,
     responseUploading,
     responseUploadSuccess,
+    additionalResponseUploading,
     responseFileUploadETA,
     responseFileUploadProgress,
     responseFileUploadLoading,
@@ -414,6 +452,7 @@ const useResponseUpload = ({
     handleItemChange,
     handleUploadVideoProcessed,
     handleUploadVideoNotProcessed,
+    handleUploadAdditionalVideoProcessed,
     handleResetVideoUploadAndProcessingState,
     handleCancelVideoUpload,
     handleVideoDelete,

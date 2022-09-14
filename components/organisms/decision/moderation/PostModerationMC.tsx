@@ -140,6 +140,12 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           })
         : []
     );
+    const [uploadingAdditionalResponse, setUploadingAdditionalResponse] =
+      useState(false);
+    const [
+      readyToUploadAdditionalResponse,
+      setReadyToUploadAdditionalResponse,
+    ] = useState(false);
 
     const handleAddAdditonalResponse = useCallback(
       async (newVideo: newnewapi.IVideoUrls) => {
@@ -158,6 +164,15 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       [setAdditionalResponses]
     );
 
+    const handleSetUploadingAdditionalResponse = useCallback(
+      (newValue: boolean) => setUploadingAdditionalResponse(newValue),
+      []
+    );
+    const handleSetReadyToUploadAdditionalResponse = useCallback(
+      (newValue: boolean) => setReadyToUploadAdditionalResponse(newValue),
+      []
+    );
+
     // Tabs
     const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
       post.response ||
@@ -174,6 +189,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       handleResetVideoUploadAndProcessingState,
       handleUploadVideoNotProcessed,
       handleUploadVideoProcessed,
+      handleUploadAdditionalVideoProcessed,
       handleVideoDelete,
       responseFileProcessingETA,
       responseFileProcessingError,
@@ -187,6 +203,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       videoProcessing,
       responseUploading,
       responseUploadSuccess,
+      additionalResponseUploading,
     } = useResponseUpload({
       postId: post.postUuid,
       postStatus,
@@ -194,6 +211,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       handleUpdatePostStatus,
       handleUpdateResponseVideo: (newValue) =>
         setResponseFreshlyUploaded(newValue),
+      handleUpdateAdditionalResponseVideo: handleAddAdditonalResponse,
     });
 
     const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -697,6 +715,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             responseFileUploadProgress={responseFileUploadProgress}
             uploadedResponseVideoUrl={uploadedResponseVideoUrl}
             videoProcessing={videoProcessing}
+            uploadingAdditionalResponse={
+              uploadingAdditionalResponse || readyToUploadAdditionalResponse
+            }
             handleChangeTab={(newValue) => setOpenedTab(newValue)}
             handleToggleMuted={() => handleToggleMutedMode()}
             handleUpdateResponseVideo={(newValue) =>
@@ -713,6 +734,12 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             handleVideoDelete={handleVideoDelete}
             additionalResponses={additionalResponses}
             handleAddAdditonalResponse={handleAddAdditonalResponse}
+            handleSetUploadingAdditionalResponse={
+              handleSetUploadingAdditionalResponse
+            }
+            handleSetReadyToUploadAdditionalResponse={
+              handleSetReadyToUploadAdditionalResponse
+            }
             handleDeleteAdditonalResponse={handleDeleteAdditonalResponse}
           />
           <PostTopInfoModeration
@@ -754,7 +781,14 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
                 }
                 responseUploadSuccess={responseUploadSuccess}
                 winningOptionMc={winningOption}
+                uploadingAdditionalResponse={uploadingAdditionalResponse}
+                readyToUploadAdditionalResponse={
+                  readyToUploadAdditionalResponse
+                }
                 handleUploadResponse={handleUploadVideoProcessed}
+                handleUploadAdditionalResponse={
+                  handleUploadAdditionalVideoProcessed
+                }
               />
             )}
           </SActivitesContainer>

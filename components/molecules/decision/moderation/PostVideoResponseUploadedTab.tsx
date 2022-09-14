@@ -66,7 +66,8 @@ interface IPostVideoResponseUploadedTab {
   onChange: (id: string, value: any) => void;
   handleCancelVideoUpload: () => void;
   handleResetVideoUploadAndProcessingState: () => void;
-  handleUploadVideoNotProcessed: () => void;
+  handleSetUploadingAdditionalResponse: (newValue: boolean) => void;
+  handleSetReadyToUploadAdditionalResponse: (newValue: boolean) => void;
 }
 
 const PostVideoResponseUploadedTab: React.FunctionComponent<
@@ -97,7 +98,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   onChange,
   handleCancelVideoUpload,
   handleResetVideoUploadAndProcessingState,
-  handleUploadVideoNotProcessed,
+  handleSetUploadingAdditionalResponse,
+  handleSetReadyToUploadAdditionalResponse,
 }) => {
   const { t } = useTranslation('modal-Post');
   const [openedTab, setOpenedTab] = useState<'regular' | 'editing'>('regular');
@@ -128,7 +130,15 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     handleCloseDeleteVideoClick();
     setLocalFile(null);
     onChange(id, null);
-  }, [handleCloseDeleteVideoClick, id, onChange]);
+    handleSetUploadingAdditionalResponse(false);
+    handleSetReadyToUploadAdditionalResponse(false);
+  }, [
+    handleCloseDeleteVideoClick,
+    id,
+    onChange,
+    handleSetUploadingAdditionalResponse,
+    handleSetReadyToUploadAdditionalResponse,
+  ]);
 
   const handleDeleteAndChangeVideo = useCallback(async () => {
     try {
@@ -142,6 +152,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
       setLocalFile(null);
       onChange(id, null);
+      handleSetUploadingAdditionalResponse(true);
 
       Mixpanel.track('Post Additional Video Response Upload', {
         _stage: 'Post',
@@ -150,7 +161,12 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     } catch (err) {
       console.error(err);
     }
-  }, [id, onChange, videoProcessing?.targetUrls?.originalVideoUrl]);
+  }, [
+    id,
+    onChange,
+    videoProcessing?.targetUrls?.originalVideoUrl,
+    handleSetUploadingAdditionalResponse,
+  ]);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,11 +190,12 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
         } else {
           setLocalFile(file);
           onChange(id, file);
+          handleSetUploadingAdditionalResponse(true);
           setOpenedTab('editing');
         }
       }
     },
-    [id, onChange, t]
+    [id, onChange, t, handleSetUploadingAdditionalResponse]
   );
   const handleRetryVideoUpload = useCallback(() => {
     onChange(id, localFile);
@@ -208,11 +225,20 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
       setLocalFile(null);
       onChange(id, null);
+      handleSetUploadingAdditionalResponse(false);
+      handleSetReadyToUploadAdditionalResponse(false);
       handleResetVideoUploadAndProcessingState();
     } catch (err) {
       console.error(err);
     }
-  }, [id, onChange, videoProcessing, handleResetVideoUploadAndProcessingState]);
+  }, [
+    id,
+    onChange,
+    videoProcessing,
+    handleResetVideoUploadAndProcessingState,
+    handleSetUploadingAdditionalResponse,
+    handleSetReadyToUploadAdditionalResponse,
+  ]);
 
   const renderUploading = useCallback(() => {
     let content;
@@ -288,23 +314,10 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       );
     }
 
+    // TEMP
     if (progressProcessing === 100) {
       const temp = (
         <SFileBox>
-          <input
-            id='file'
-            ref={inputRef}
-            type='file'
-            style={{ display: 'none' }}
-            accept='video/*'
-            multiple={false}
-            onChange={(e) => {
-              handleFileChange(e);
-              if (inputRef.current) {
-                inputRef.current.value = '';
-              }
-            }}
-          />
           <SPlayerWrapper>
             <PostBitmovinPlayer
               id='small-thumbnail'
@@ -333,7 +346,6 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     errorProcessing,
     loadingProcessing,
     progressProcessing,
-    handleFileChange,
     etaUpload,
     progressUpload,
     handleCancelVideoUpload,
@@ -344,6 +356,14 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     thumbnails,
     handleDeleteVideoShow,
   ]);
+
+  useEffect(() => {
+    if (progressProcessing === 100) {
+      handleSetReadyToUploadAdditionalResponse(true);
+    } else {
+      handleSetReadyToUploadAdditionalResponse(false);
+    }
+  }, [progressProcessing, handleSetReadyToUploadAdditionalResponse]);
 
   return (
     <SContainer>

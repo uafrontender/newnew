@@ -78,7 +78,10 @@ interface IPostVideoModeration {
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleUpdateResponseVideo: (newResponse: newnewapi.IVideoUrls) => void;
   additionalResponses?: newnewapi.IVideoUrls[];
+  uploadingAdditionalResponse: boolean;
   handleAddAdditonalResponse: (newVideo: newnewapi.IVideoUrls) => void;
+  handleSetUploadingAdditionalResponse: (newValue: boolean) => void;
+  handleSetReadyToUploadAdditionalResponse: (newValue: boolean) => void;
   handleDeleteAdditonalResponse: (videoUuid: string) => void;
 }
 
@@ -109,8 +112,11 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   handleChangeTab,
   handleToggleMuted,
   additionalResponses,
+  uploadingAdditionalResponse,
   handleAddAdditonalResponse,
   handleDeleteAdditonalResponse,
+  handleSetUploadingAdditionalResponse,
+  handleSetReadyToUploadAdditionalResponse,
 }) => {
   const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -374,7 +380,12 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             handleResetVideoUploadAndProcessingState={
               handleResetVideoUploadAndProcessingState
             }
-            handleUploadVideoNotProcessed={handleUploadVideoNotProcessed}
+            handleSetUploadingAdditionalResponse={
+              handleSetUploadingAdditionalResponse
+            }
+            handleSetReadyToUploadAdditionalResponse={
+              handleSetReadyToUploadAdditionalResponse
+            }
           />
         ) : uploadedResponseVideoUrl &&
           videoProcessing.targetUrls &&
@@ -423,7 +434,8 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         {(response ||
           postStatus === 'waiting_for_response' ||
           postStatus === 'processing_response') &&
-        !isEditingStories ? (
+        !isEditingStories &&
+        !uploadingAdditionalResponse ? (
           <SlidingToggleVideoWidget
             postId={postId}
             openedTab={openedTab}
