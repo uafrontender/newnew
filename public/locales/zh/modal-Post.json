@@ -290,7 +290,7 @@
       "subtitle": "你的出價"
     },
     "paymentModalFooter": {
-      "body": "你的銀行卡信息將被暫時保留。\n只有當{{creator}}選擇了你的出價時，你才會被扣款。",
+      "body": "你的銀行卡信息將被暫時保留。只有當{{creator}}選擇了你的出價時，你才會被扣款。",
       "terms": "條款",
       "apply": "適用"
     },
@@ -361,7 +361,7 @@
       "subtitle": "你選擇的選項"
     },
     "paymentModalFooter": {
-      "body": "你的銀行卡信息將被暫時保留。\n只有當你選擇的選項獲得最多的票數時，你才會被扣款。",
+      "body": "你的銀行卡信息將被暫時保留。只有當你選擇的選項獲得最多的票數時，你才會被扣款。",
       "terms": "條款",
       "apply": "適用"
     },
@@ -471,7 +471,7 @@
       "title": "{{creator}}的Goal"
     },
     "paymentModalFooter": {
-      "body": "你的銀行卡信息將被暫時保留。\n只有{{creator}}完成其Goal後，你才會被扣款。",
+      "body": "你的銀行卡信息將被暫時保留。只有{{creator}}完成其Goal後，你才會被扣款。",
       "terms": "條款",
       "apply": "適用"
     },

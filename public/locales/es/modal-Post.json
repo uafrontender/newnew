@@ -290,7 +290,7 @@
       "subtitle": "Tu oferta"
     },
     "paymentModalFooter": {
-      "body": "Se colocará una retención temporal en tu tarjeta. \nSolo se te cobrará si el {{creator}} elige tu oferta.",
+      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el {{creator}} elige tu oferta.",
       "terms": "Términos",
       "apply": "aplicar"
     },
@@ -361,7 +361,7 @@
       "subtitle": "La opción que has elegido"
     },
     "paymentModalFooter": {
-      "body": "Se colocará una retención temporal en tu tarjeta. \nSolo se te cobrará si el {{creator}} elige tu oferta.",
+      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el {{creator}} elige tu oferta.",
       "terms": "Términos",
       "apply": "aplicar"
     },
@@ -473,7 +473,7 @@
       "title": "El Goal de {{creator}}"
     },
     "paymentModalFooter": {
-      "body": "Se colocará una retención temporal en tu tarjeta. \nSolo se te cobrará si el {{creator}} elige tu oferta.",
+      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el {{creator}} elige tu oferta.",
       "terms": "Términos",
       "apply": "aplicar"
     },

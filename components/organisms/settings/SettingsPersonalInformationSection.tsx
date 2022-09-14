@@ -141,7 +141,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<
         <EditEmailModal
           show={!!editEmail}
           onClose={() => {
-            router.push('/profile/settings');
+            router.replace('/profile/settings');
           }}
         />
         <SettingsBirthDateInput

@@ -11,49 +11,50 @@ type TOnboardingSectionNicknameInput =
     errorCaption: string;
   };
 
-const OnboardingSectionNicknameInput: React.FunctionComponent<TOnboardingSectionNicknameInput> =
-  ({ value, isValid, errorCaption, onChange, onFocus, ...rest }) => {
-    const [errorBordersShown, setErrorBordersShown] = useState(false);
-    const [focused, setFocused] = useState(false);
+const OnboardingSectionNicknameInput: React.FunctionComponent<
+  TOnboardingSectionNicknameInput
+> = ({ value, isValid, errorCaption, onChange, onFocus, ...rest }) => {
+  const [errorBordersShown, setErrorBordersShown] = useState(false);
+  const [focused, setFocused] = useState(false);
 
-    useEffect(() => {
-      if (focused) return;
-      if (isValid) setErrorBordersShown(false);
-    }, [focused, isValid]);
+  useEffect(() => {
+    if (focused) return;
+    if (isValid) setErrorBordersShown(false);
+  }, [focused, isValid]);
 
-    return (
-      <SWrapper>
-        <SOnboardingSectionNicknameInput
-          value={value}
-          id='nickname_input'
-          errorBordersShown={errorBordersShown}
-          onChange={onChange}
-          onBlur={() => {
-            setFocused(false);
-            if (!isValid) {
-              setErrorBordersShown(true);
-            } else {
-              setErrorBordersShown(false);
-            }
-          }}
-          onFocus={(e) => {
-            if (onFocus) onFocus(e);
-            setFocused(true);
+  return (
+    <SWrapper>
+      <SOnboardingSectionNicknameInput
+        value={value}
+        id='nickname_input'
+        errorBordersShown={errorBordersShown}
+        onChange={onChange}
+        onBlur={() => {
+          setFocused(false);
+          if (!isValid) {
+            setErrorBordersShown(true);
+          } else {
             setErrorBordersShown(false);
-          }}
-          {...rest}
-        />
-        {errorBordersShown ? (
-          <AnimatedPresence animation='t-09'>
-            <SErrorDiv>
-              <InlineSvg svg={AlertIcon} width='16px' height='16px' />
-              {errorCaption}
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null}
-      </SWrapper>
-    );
-  };
+          }
+        }}
+        onFocus={(e) => {
+          if (onFocus) onFocus(e);
+          setFocused(true);
+          setErrorBordersShown(false);
+        }}
+        {...rest}
+      />
+      {errorBordersShown ? (
+        <AnimatedPresence animation='t-09'>
+          <SErrorDiv>
+            <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+            {errorCaption}
+          </SErrorDiv>
+        </AnimatedPresence>
+      ) : null}
+    </SWrapper>
+  );
+};
 
 OnboardingSectionNicknameInput.defaultProps = {
   isValid: undefined,
@@ -125,6 +126,15 @@ const SOnboardingSectionNicknameInput = styled.input<ISOnboardingSectionNickname
 
   &:disabled {
     opacity: 0.5;
+  }
+
+  // hide autofill icon in Safari
+  &::-webkit-contacts-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
   }
 `;
 

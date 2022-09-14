@@ -180,7 +180,7 @@ export const NotificationsList: React.FC<IFunction> = ({
       if (target.postAnnounce && target?.postAnnounce.postUuid)
         return `/post/${target.postAnnounce.postUuid}`;
     }
-    return '';
+    return '/direct-messages';
   };
 
   const renderNotificationItem = useCallback(

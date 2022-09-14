@@ -25,5 +25,11 @@
   "primaryCard": "Primary card",
   "newCard": "New card",
   "saveCard": "Save card for future use",
-  "email": "Email"
+  "email": "Email",
+  "errors": {
+    "wrongEmail": "Email can't be used",
+    "rewardNotEnough": "Rewards balance is insufficient",
+    "paymentFailed": "Payment failed",
+    "requestFailed": "Request failed"
+  }
 }

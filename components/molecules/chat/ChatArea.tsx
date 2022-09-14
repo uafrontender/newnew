@@ -583,8 +583,8 @@ const ChatArea: React.FC<IChatArea> = ({
                         : chatRoom.visavis?.nickname,
                     })
                   : isMyAnnouncement
-                  ? user.userData?.nickname
-                  : chatRoom.visavis?.nickname
+                  ? user.userData?.nickname || user.userData?.username
+                  : chatRoom.visavis?.nickname || chatRoom.visavis?.username
               }
               {chatRoom.visavis?.options?.isVerified && !isAnnouncement && (
                 <SInlineSVG

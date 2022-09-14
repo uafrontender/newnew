@@ -25,5 +25,11 @@
   "primaryCard_NEED_TRANSLATION": "Primary card_es",
   "newCard_NEED_TRANSLATION": "New card_es",
   "saveCard_NEED_TRANSLATION": "Save card for future use_es",
-  "email": "Correo electrónico"
+  "email": "Correo electrónico",
+  "errors_NEED_TRANSLATION": {
+    "wrongEmail": "Email can't be used",
+    "rewardNotEnough": "Rewards balance is insufficient",
+    "paymentFailed": "Payment failed",
+    "requestFailed": "Request failed"
+  }
 }

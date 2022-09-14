@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../redux-store/store';
 import { useCards } from '../../../contexts/cardsContext';
 import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
+import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 
 import Modal from '../../organisms/Modal';
 import InlineSvg from '../../atoms/InlineSVG';
@@ -24,28 +24,24 @@ interface IPaymentModal {
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
   onClose: () => void;
-  createStripeSetupIntent?: () => Promise<
-    newnewapi.CreateStripeSetupIntentResponse | undefined
-  >;
   handlePayWithCard?: (params: {
-    rewardAmount: number;
     cardUuid?: string;
-    stripeSetupIntentClientSecret: string;
     saveCard?: boolean;
   }) => void;
   children: React.ReactNode;
+  setupIntent: ISetupIntent;
 }
 
 const PaymentModal: React.FC<IPaymentModal> = ({
   isOpen,
   zIndex,
+  setupIntent,
   redirectUrl,
   amount,
   noRewards,
   showTocApply,
   bottomCaption,
   onClose,
-  createStripeSetupIntent,
   handlePayWithCard,
   children,
 }) => {
@@ -55,9 +51,6 @@ const PaymentModal: React.FC<IPaymentModal> = ({
     resizeMode
   );
 
-  const [stripeSetupIntent, setStripeSetupIntent] =
-    useState<newnewapi.CreateStripeSetupIntentResponse>();
-
   const [isLoadingSetupIntent, setIsLoadingSetupIntent] = useState(false);
   const { isCardsLoading } = useCards();
 
@@ -65,16 +58,14 @@ const PaymentModal: React.FC<IPaymentModal> = ({
     const getSetupIntent = async () => {
       setIsLoadingSetupIntent(true);
 
-      const setupIntent = await createStripeSetupIntent?.();
-
-      setStripeSetupIntent(setupIntent);
+      await setupIntent?.init();
       setIsLoadingSetupIntent(false);
     };
 
-    if (!stripeSetupIntent) {
+    if (!setupIntent.setupIntentClientSecret) {
       getSetupIntent();
     }
-  }, [createStripeSetupIntent, stripeSetupIntent]);
+  }, [setupIntent, setupIntent.setupIntentClientSecret]);
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
@@ -110,18 +101,16 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             />
           )}
           <StripeElements
-            stipeSecret={
-              stripeSetupIntent?.stripeSetupIntentClientSecret || undefined
-            }
+            stipeSecret={setupIntent?.setupIntentClientSecret || undefined}
           >
             <CheckoutForm
-              stipeSecret={stripeSetupIntent?.stripeSetupIntentClientSecret!}
+              setupIntent={setupIntent}
               redirectUrl={redirectUrl}
-              amount={amount}
               noRewards={noRewards}
-              showTocApply={showTocApply ?? false}
+              amount={amount}
               bottomCaption={bottomCaption}
               handlePayWithCard={handlePayWithCard}
+              showTocApply={showTocApply}
             />
           </StripeElements>
         </SContentContainer>
@@ -174,7 +163,10 @@ const SContentContainer = styled.div<{
   scrollbar-width: none;
   -ms-overflow-style: none;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : theme.colorsThemed.background.primary};
 
   padding: 16px;
 

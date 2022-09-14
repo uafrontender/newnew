@@ -18,11 +18,11 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import Logo from '../../../public/images/svg/mobile-logo.svg';
 
-interface IEditEmailModal {
+interface IEditEmailStepOneModal {
   onComplete: () => void;
 }
 
-const EditEmailModal = ({ onComplete }: IEditEmailModal) => {
+const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
   const theme = useTheme();
   const { t } = useTranslation('page-VerifyEmail');
 
@@ -177,7 +177,7 @@ const EditEmailModal = ({ onComplete }: IEditEmailModal) => {
   );
 };
 
-export default EditEmailModal;
+export default EditEmailStepOneModal;
 
 const SWrapper = styled.div`
   display: flex;
