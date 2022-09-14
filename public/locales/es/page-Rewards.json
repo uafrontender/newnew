@@ -7,19 +7,19 @@
   "button": {
     "back": "Regresar"
   },
-  "instruction": {
-    "title": "Cómo ganar créditos gratis",
-    "bid": {
-      "title": "Hacer oferta",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  "instruction_NEED_TRANSLATION": {
+    "title": "How to Earn Rewards on NewNew",
+    "step-1": {
+      "title": "Earn your rewards",
+      "description": "Hit milestones and earn rewards on NewNew (AKA get free $)"
     },
-    "earn": {
-      "title": "Gane créditos con tu oferta",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    "step-2": {
+      "title": "Grow your rewards",
+      "description": "The more milestones you reach, the more free $ you’ll earn on NewNew"
     },
-    "spend": {
-      "title": "Gasta tus recompensas",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    "step-3": {
+      "title": "Use your rewards",
+      "description": "Use your free $ to bid, vote, and back your favorite creators"
     }
   },
   "balance": {

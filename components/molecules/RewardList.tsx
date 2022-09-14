@@ -132,6 +132,7 @@ const RewardsContainer = styled.div`
   justify-content: center;
   flex-wrap: wrap;
   gap: 16px;
+  min-height: 100px;
 `;
 
 const RewardCard = styled.div<{ received?: boolean; holder?: boolean }>`

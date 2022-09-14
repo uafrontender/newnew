@@ -24,6 +24,7 @@ import { formatNumber } from '../utils/format';
 import { RewardContext } from '../contexts/rewardContext';
 import { useGetAppConstants } from '../contexts/appConstantsContext';
 import useRewardInstructionVisible from '../utils/hooks/useRewardInstructionVisible';
+import GenericSkeleton from '../components/molecules/GenericSkeleton';
 
 export const Rewards = () => {
   const router = useRouter();
@@ -35,6 +36,14 @@ export const Rewards = () => {
 
   const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
   const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
+
+  const rewardBalanceValue: number | undefined = !user.loggedIn
+    ? typeof currentSignupRewardAmount?.usdCents === 'number'
+      ? currentSignupRewardAmount.usdCents / 100
+      : undefined
+    : !isRewardBalanceLoading && typeof rewardBalance?.usdCents === 'number'
+    ? rewardBalance.usdCents / 100
+    : undefined;
 
   return (
     <>
@@ -82,40 +91,49 @@ export const Rewards = () => {
               <StepsContainer>
                 <Step>
                   <StepImage>
-                    <img src={assets.decision.votes} alt='bid' />
+                    <img
+                      src={assets.decision.votes}
+                      alt={t('instruction.step-1.title')}
+                    />
                   </StepImage>
                   <StepCard>
                     <Text variant={2} weight={600}>
-                      {t('instruction.bid.title')}
+                      {t('instruction.step-1.title')}
                     </Text>
                     <StepDescription>
-                      {t('instruction.bid.description')}
+                      {t('instruction.step-1.description')}
                     </StepDescription>
                   </StepCard>
                 </Step>
                 <Step>
                   <StepImage>
-                    <img src={assets.decision.gold} alt='earn' />
+                    <img
+                      src={assets.decision.gold}
+                      alt={t('instruction.step-2.title')}
+                    />
                   </StepImage>
                   <StepCard>
                     <Text variant={2} weight={600}>
-                      {t('instruction.earn.title')}
+                      {t('instruction.step-2.title')}
                     </Text>
                     <StepDescription>
-                      {t('instruction.earn.description')}
+                      {t('instruction.step-2.description')}
                     </StepDescription>
                   </StepCard>
                 </Step>
                 <Step>
                   <StepImage>
-                    <img src={assets.common.darkAc} alt='spend' />
+                    <img
+                      src={assets.common.darkAc}
+                      alt={t('instruction.step-3.title')}
+                    />
                   </StepImage>
                   <StepCard>
                     <Text variant={2} weight={600}>
-                      {t('instruction.spend.title')}
+                      {t('instruction.step-3.title')}
                     </Text>
                     <StepDescription>
-                      {t('instruction.spend.description')}
+                      {t('instruction.step-3.description')}
                     </StepDescription>
                   </StepCard>
                 </Step>
@@ -125,23 +143,21 @@ export const Rewards = () => {
 
           <Section>
             <SectionTitle>{t('balance.title')}</SectionTitle>
-            <BalanceValue>
-              {!instructionVisible && (
-                <InfoButton onClick={() => setInstructionVisible(true)}>
-                  i
-                </InfoButton>
-              )}
-              $
-              {!user.loggedIn
-                ? formatNumber(
-                    currentSignupRewardAmount?.usdCents
-                      ? currentSignupRewardAmount.usdCents / 100
-                      : 0
-                  )
-                : isRewardBalanceLoading || !rewardBalance?.usdCents
-                ? formatNumber(0)
-                : formatNumber(rewardBalance.usdCents / 100 ?? 0)}
-            </BalanceValue>
+            {rewardBalanceValue === undefined ? (
+              <SkeletonBalanceValue
+                bgColor={theme.colorsThemed.background.quaternary}
+                highlightColor={theme.colorsThemed.background.tertiary}
+              />
+            ) : (
+              <BalanceValue>
+                {!instructionVisible && (
+                  <InfoButton onClick={() => setInstructionVisible(true)}>
+                    i
+                  </InfoButton>
+                )}
+                ${formatNumber(rewardBalanceValue)}
+              </BalanceValue>
+            )}
             <SButton
               onClick={() => {
                 if (user.loggedIn) {
@@ -426,6 +442,14 @@ const SectionTitle = styled.div`
   ${({ theme }) => theme.media.tablet} {
     line-height: 32px;
   }
+`;
+
+const SkeletonBalanceValue = styled(GenericSkeleton)`
+  height: 64px;
+  width: 180px;
+  position: relative;
+  margin-bottom: 24px;
+  border-radius: 16px;
 `;
 
 const BalanceValue = styled.div`
