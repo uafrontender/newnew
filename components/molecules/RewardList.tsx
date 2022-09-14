@@ -3,14 +3,21 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getRewards } from '../../api/endpoints/reward';
+import { APIResponse } from '../../api/apiConfigs';
+import {
+  getAvailableRewards,
+  getGuestRewards,
+  getReceivedRewards,
+} from '../../api/endpoints/reward';
 import assets from '../../constants/assets';
+import { useAppSelector } from '../../redux-store/store';
 import { formatNumber } from '../../utils/format';
 
 interface RewardListI {}
 
 export const RewardList: React.FC<RewardListI> = React.memo(() => {
   const { t } = useTranslation('common');
+  const user = useAppSelector((state) => state.user);
 
   // TODO: add loading state
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -27,14 +34,13 @@ export const RewardList: React.FC<RewardListI> = React.memo(() => {
   );
 
   const fetchReceivedRewards = useCallback(async () => {
+    if (!user.loggedIn) {
+      return;
+    }
+
     try {
       setReceivedRewardsLoading(true);
-      const receivedRewardsPayload = new newnewapi.GetRewardsRequest({
-        filter: newnewapi.GetRewardsRequest.Filter.RECEIVED,
-        paging: null,
-      });
-
-      const res = await getRewards(receivedRewardsPayload);
+      const res = await getReceivedRewards();
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
@@ -44,17 +50,19 @@ export const RewardList: React.FC<RewardListI> = React.memo(() => {
       console.error(err);
       setReceivedRewardsLoading(false);
     }
-  }, []);
+  }, [user.loggedIn]);
 
   const fetchAvailableRewards = useCallback(async () => {
     try {
       setAvailableRewardsLoading(true);
-      const availableRewardsPayload = new newnewapi.GetRewardsRequest({
-        filter: newnewapi.GetRewardsRequest.Filter.AVAILABLE,
-        paging: null,
-      });
 
-      const res = await getRewards(availableRewardsPayload);
+      let res: APIResponse<newnewapi.GetRewardsResponse>;
+      if (user.loggedIn) {
+        res = await getAvailableRewards();
+      } else {
+        res = await getGuestRewards();
+      }
+
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
@@ -70,7 +78,7 @@ export const RewardList: React.FC<RewardListI> = React.memo(() => {
       console.error(err);
       setAvailableRewardsLoading(false);
     }
-  }, []);
+  }, [user.loggedIn]);
 
   useEffect(() => {
     fetchReceivedRewards();
