@@ -7,15 +7,31 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 interface GenericSkeleton {
   className?: string;
+  bgColor?: string;
+  highlightColor?: string;
 }
 
 const GenericSkeleton: React.FunctionComponent<GenericSkeleton> = ({
   className,
+  bgColor,
+  highlightColor,
 }) => (
   <Skeleton
     duration={2}
     className='skeletonSpan'
     containerClassName='skeletonsContainer'
+    {...{
+      ...(bgColor
+        ? {
+            baseColor: bgColor,
+          }
+        : {}),
+      ...(highlightColor
+        ? {
+            highlightColor,
+          }
+        : {}),
+    }}
     wrapper={
       // eslint-disable-next-line react/no-unstable-nested-components
       (props) => (
@@ -48,8 +64,9 @@ const SSingleSkeletonWrapper = styled.div`
 
   .skeletonSpan {
     &:after {
-      width: 200%;
-      height: 200%;
+      width: 400%;
+      height: 400%;
+      top: 200%;
 
       animation-name: ${SkeletonDiagonal};
     }
