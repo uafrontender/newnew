@@ -8,18 +8,18 @@
     "back": "Back"
   },
   "instruction": {
-    "title": "How to Earn Free Credits",
-    "bid": {
-      "title": "Place a bid",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    "title": "How to Earn Rewards on NewNew",
+    "step-1": {
+      "title": "Earn your rewards",
+      "description": "Hit milestones and earn rewards on NewNew (AKA get free $)"
     },
-    "earn": {
-      "title": "Earn credits on your bid",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    "step-2": {
+      "title": "Grow your rewards",
+      "description": "The more milestones you reach, the more free $ you’ll earn on NewNew"
     },
-    "spend": {
-      "title": "Spend your rewards",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    "step-3": {
+      "title": "Use your rewards",
+      "description": "Use your free $ to bid, vote, and back your favorite creators"
     }
   },
   "balance": {

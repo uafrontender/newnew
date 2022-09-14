@@ -7,19 +7,19 @@
   "button": {
     "back": "返回"
   },
-  "instruction": {
-    "title": "如何賺取免費積分",
-    "bid": {
-      "title": "出價",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  "instruction_NEED_TRANSLATION": {
+    "title": "How to Earn Rewards on NewNew",
+    "step-1": {
+      "title": "Earn your rewards",
+      "description": "Hit milestones and earn rewards on NewNew (AKA get free $)"
     },
-    "earn": {
-      "title": "通過你的bid賺取積分",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    "step-2": {
+      "title": "Grow your rewards",
+      "description": "The more milestones you reach, the more free $ you’ll earn on NewNew"
     },
-    "spend": {
-      "title": "花掉你的獎勵",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    "step-3": {
+      "title": "Use your rewards",
+      "description": "Use your free $ to bid, vote, and back your favorite creators"
     }
   },
   "balance": {

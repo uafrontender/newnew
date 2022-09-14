@@ -91,40 +91,49 @@ export const Rewards = () => {
               <StepsContainer>
                 <Step>
                   <StepImage>
-                    <img src={assets.decision.votes} alt='bid' />
+                    <img
+                      src={assets.decision.votes}
+                      alt={t('instruction.step-1.title')}
+                    />
                   </StepImage>
                   <StepCard>
                     <Text variant={2} weight={600}>
-                      {t('instruction.bid.title')}
+                      {t('instruction.step-1.title')}
                     </Text>
                     <StepDescription>
-                      {t('instruction.bid.description')}
+                      {t('instruction.step-1.description')}
                     </StepDescription>
                   </StepCard>
                 </Step>
                 <Step>
                   <StepImage>
-                    <img src={assets.decision.gold} alt='earn' />
+                    <img
+                      src={assets.decision.gold}
+                      alt={t('instruction.step-2.title')}
+                    />
                   </StepImage>
                   <StepCard>
                     <Text variant={2} weight={600}>
-                      {t('instruction.earn.title')}
+                      {t('instruction.step-2.title')}
                     </Text>
                     <StepDescription>
-                      {t('instruction.earn.description')}
+                      {t('instruction.step-2.description')}
                     </StepDescription>
                   </StepCard>
                 </Step>
                 <Step>
                   <StepImage>
-                    <img src={assets.common.darkAc} alt='spend' />
+                    <img
+                      src={assets.common.darkAc}
+                      alt={t('instruction.step-3.title')}
+                    />
                   </StepImage>
                   <StepCard>
                     <Text variant={2} weight={600}>
-                      {t('instruction.spend.title')}
+                      {t('instruction.step-3.title')}
                     </Text>
                     <StepDescription>
-                      {t('instruction.spend.description')}
+                      {t('instruction.step-3.description')}
                     </StepDescription>
                   </StepCard>
                 </Step>
