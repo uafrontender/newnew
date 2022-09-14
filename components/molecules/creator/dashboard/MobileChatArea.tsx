@@ -27,6 +27,7 @@ import Button from '../../../atoms/Button';
 import UserAvatar from '../../UserAvatar';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import isBrowser from '../../../../utils/isBrowser';
+import validateInputText from '../../../../utils/validateMessageText';
 
 const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
@@ -39,6 +40,7 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   const [messageText, setMessageText] = useState<string>('');
+  const [messageTextValid, setMessageTextValid] = useState(false);
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState<
     newnewapi.IChatMessage | null | undefined
@@ -176,17 +178,21 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   }, [newMessage]);
 
   const handleChange = useCallback((id: string, value: string) => {
+    const isValid = validateInputText(value);
+    setMessageTextValid(isValid);
     setMessageText(value);
   }, []);
 
   const submitMessage = useCallback(async () => {
-    if (chatRoom && messageText.length > 0) {
+    if (chatRoom && messageTextValid) {
+      const tmpMsgText = messageText.trim();
       try {
         setSendingMessage(true);
+        setMessageText('');
         const payload = new newnewapi.SendMessageRequest({
           roomId: chatRoom.id,
           content: {
-            text: messageText,
+            text: tmpMsgText,
           },
         });
         const res = await sendMessage(payload);
@@ -194,10 +200,10 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           throw new Error(res.error?.message ?? 'Request failed');
         if (res.data.message) setMessages([res.data.message].concat(messages));
 
-        setMessageText('');
         setSendingMessage(false);
       } catch (err) {
         console.error(err);
+        setMessageText(tmpMsgText);
         setSendingMessage(false);
       }
     }
@@ -359,12 +365,13 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                 isAnnouncement
                   ? t('announcement.title', {
                       username: isMyAnnouncement
-                        ? user.userData?.nickname
-                        : chatRoom.visavis?.nickname,
+                        ? user.userData?.nickname || user.userData?.username
+                        : chatRoom.visavis?.nickname ||
+                          chatRoom.visavis?.username,
                     })
                   : isMyAnnouncement
-                  ? user.userData?.nickname
-                  : chatRoom.visavis?.nickname
+                  ? user.userData?.nickname || user.userData?.username
+                  : chatRoom.visavis?.nickname || chatRoom.visavis?.username
               }
               {chatRoom.visavis?.options?.isVerified && !isAnnouncement && (
                 <SInlineSVG
@@ -411,14 +418,14 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
             </STextArea>
             <SButton
               withShadow
-              view={messageText ? 'primaryGrad' : 'secondary'}
+              view={messageTextValid ? 'primaryGrad' : 'secondary'}
               onClick={handleSubmit}
               disabled={!messageText}
             >
               <SInlineSVG
                 svg={sendIcon}
                 fill={
-                  messageText
+                  messageTextValid
                     ? theme.colors.white
                     : theme.colorsThemed.text.primary
                 }

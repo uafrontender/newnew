@@ -43,9 +43,12 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
           // we can do this on chat page and if not try to create again
           // if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
           router.push(`/direct-messages/${username}-cr`);
+        } else {
+          router.push(`/direct-messages/`);
         }
       } catch (err) {
         console.error(err);
+        router.push(`/direct-messages/`);
       }
     }
 

@@ -221,9 +221,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
           </SMyAvatarMassupdate>
         );
         chatName = t('announcement.title', {
-          username: user.userData?.nickname
-            ? user.userData?.nickname
-            : user.userData?.username,
+          username: user.userData?.nickname || user.userData?.username,
         });
       }
 
