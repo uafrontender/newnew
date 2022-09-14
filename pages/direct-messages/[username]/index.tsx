@@ -77,6 +77,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'common',
     'page-Chat',
     'modal-PaymentModal',
+    'page-SubscribeToUser',
   ]);
 
   const { req } = context;
