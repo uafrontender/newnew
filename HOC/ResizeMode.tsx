@@ -14,7 +14,6 @@ interface IResizeMode {
 export const ResizeMode: React.FC<IResizeMode> = (props) => {
   const { children } = props;
   const ref: MutableRefObject<any> = useRef();
-  const resizeObserver = useRef<ResizeObserver | undefined>();
   // TODO: these two cause handleResizeObserver and thus the whole logic to restart. Change it
   const dispatch = useAppDispatch();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -33,48 +32,15 @@ export const ResizeMode: React.FC<IResizeMode> = (props) => {
     }
   }, [dispatch, resizeMode]);
 
-  const start = useCallback(() => {
-    if (resizeObserver.current) {
-      return;
-    }
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(handleResizeObserver);
 
-    const newResizeObserver = new ResizeObserver(handleResizeObserver);
-    newResizeObserver.observe(ref.current);
-    resizeObserver.current = newResizeObserver;
+    resizeObserver.observe(ref.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
   }, [handleResizeObserver]);
-
-  const stop = useCallback(() => {
-    if (!resizeObserver.current) {
-      return;
-    }
-
-    resizeObserver.current.disconnect();
-    resizeObserver.current = undefined;
-  }, []);
-
-  useEffect(() => {
-    start();
-
-    return () => {
-      stop();
-    };
-  }, [start, stop]);
-
-  useEffect(() => {
-    function onVisibilityChange() {
-      if (document.visibilityState === 'visible') {
-        start();
-      } else {
-        stop();
-      }
-    }
-
-    window.addEventListener('visibilitychange', onVisibilityChange);
-
-    return () => {
-      window.removeEventListener('visibilitychange', onVisibilityChange);
-    };
-  }, [start, stop]);
 
   return <SContainer ref={ref}>{children}</SContainer>;
 };
