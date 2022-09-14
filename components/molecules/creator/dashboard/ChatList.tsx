@@ -197,16 +197,12 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
           </SMyAvatarMassupdate>
         );
         chatName = t('announcement.title', {
-          username: user.userData?.nickname
-            ? user.userData?.nickname
-            : user.userData?.username,
+          username: user.userData?.nickname || user.userData?.username,
         });
       }
       if (chat.kind === 4 && chat.myRole === 1) {
         chatName = t('announcement.title', {
-          username: chat.visavis?.nickname
-            ? chat.visavis?.nickname
-            : chat.visavis?.username,
+          username: chat.visavis?.nickname || chat.visavis?.username,
         });
       }
 

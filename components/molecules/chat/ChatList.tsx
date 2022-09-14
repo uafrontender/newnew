@@ -580,15 +580,11 @@ const ChatList: React.FC<IFunctionProps> = ({
 
         if (chat.myRole === 2) {
           chatName = t('announcement.title', {
-            username: user.userData?.nickname
-              ? user.userData?.nickname
-              : user.userData?.username,
+            username: user.userData?.nickname || user.userData?.username,
           });
         } else {
           chatName = t('announcement.title', {
-            username: chat.visavis?.nickname
-              ? chat.visavis?.nickname
-              : chat.visavis?.username,
+            username: chat.visavis?.nickname || chat.visavis?.username,
           });
         }
       }

@@ -197,7 +197,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
         ) {
           setLoadingModalOpen(true);
           router.push(
-            `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`
+            `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}`
           );
         } else {
           throw new Error(t(getPayWithCardErrorMessage(res.data?.status)));
