@@ -17,7 +17,7 @@ import Link from 'next/link';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
-import TextArea from '../../../atoms/creation/TextArea';
+import TextArea from '../../../atoms/chat/TextArea';
 import InlineSVG from '../../../atoms/InlineSVG';
 import UserAvatar from '../../UserAvatar';
 import { useAppSelector } from '../../../../redux-store/store';
@@ -230,8 +230,12 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
   }, [messageText]);
 
   const handleChange = useCallback(
-    (id: string, value: string) => {
-      if (value.charCodeAt(value.length - 1) === 10 && !isMobileOrTablet) {
+    (id: string, value: string, isShiftEnter: boolean) => {
+      if (
+        value.charCodeAt(value.length - 1) === 10 &&
+        !isShiftEnter &&
+        !isMobileOrTablet
+      ) {
         setMessageText(value.slice(0, -1));
         handleSubmit();
         return;
@@ -241,7 +245,8 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       setMessageTextValid(isValid);
       setMessageText(value);
     },
-    [isMobileOrTablet, handleSubmit]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [messageText, isMobileOrTablet, handleSubmit]
   );
 
   const submitMessage = useCallback(async () => {
@@ -408,9 +413,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
               {t('announcement.title', {
-                username: user.userData?.nickname
-                  ? user.userData?.nickname
-                  : user.userData?.username,
+                username: user.userData?.nickname || user.userData?.username,
               })}
             </SUserNickName>
             <SUserName variant={2} weight={600}>
