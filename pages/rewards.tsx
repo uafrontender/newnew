@@ -38,12 +38,12 @@ export const Rewards = () => {
   const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
 
   const rewardBalanceValue: number | undefined = !user.loggedIn
-    ? currentSignupRewardAmount?.usdCents
+    ? typeof currentSignupRewardAmount?.usdCents === 'number'
       ? currentSignupRewardAmount.usdCents / 100
       : undefined
-    : isRewardBalanceLoading || !rewardBalance?.usdCents
-    ? undefined
-    : rewardBalance.usdCents / 100;
+    : !isRewardBalanceLoading && typeof rewardBalance?.usdCents === 'number'
+    ? rewardBalance.usdCents / 100
+    : undefined;
 
   return (
     <>
