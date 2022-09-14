@@ -1,10 +1,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   ReactElement,
   useCallback,
-  // useContext,
   useEffect,
   useMemo,
   useState,
@@ -14,7 +11,6 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import Link from 'next/link';
 import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../redux-store/store';
@@ -27,12 +23,13 @@ import Headline from '../atoms/Headline';
 import InlineSvg from '../atoms/InlineSVG';
 import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
-import ErrorBoundary from '../organisms/ErrorBoundary';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
 
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
+import NotificationsIconFilled from '../../public/images/svg/icons/filled/Notifications.svg';
+import NotificationsIconOutlined from '../../public/images/svg/icons/outlined/Notifications.svg';
 // import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 // import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
 import { getSubscriptionStatus } from '../../api/endpoints/subscription';
@@ -92,13 +89,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
 
   const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
     resizeMode
@@ -459,6 +449,17 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   const moreButtonRef = useRef() as any;
 
+  // TODO: load real data
+  const subscribedToSmsNotifications = false;
+
+  const handleSmsNotificationButtonClicked = useCallback(() => {
+    if (subscribedToSmsNotifications) {
+      // TODO: unsubscribe
+    } else {
+      // TODO: Show modal to subscribe
+    }
+  }, [subscribedToSmsNotifications]);
+
   return (
     <>
       <SGeneral restrictMaxWidth>
@@ -496,22 +497,60 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             {t('profileLayout.buttons.favorites')}
           </SFavoritesButton> */}
 
-          <SMoreButton
-            view='transparent'
-            iconOnly
-            onClick={() => setIsEllipseMenuOpen(true)}
-            ref={moreButtonRef}
-          >
-            <SSVGContainer active={ellipseMenuOpen}>
+          <SSideButtons>
+            {isMobile ? (
+              <SIconButton
+                active={subscribedToSmsNotifications}
+                onClick={handleSmsNotificationButtonClicked}
+              >
+                <InlineSvg
+                  svg={
+                    subscribedToSmsNotifications
+                      ? NotificationsIconFilled
+                      : NotificationsIconOutlined
+                  }
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </SIconButton>
+            ) : (
+              <SIconButtonWithText
+                active={subscribedToSmsNotifications}
+                onClick={handleSmsNotificationButtonClicked}
+              >
+                <InlineSvg
+                  svg={
+                    subscribedToSmsNotifications
+                      ? NotificationsIconFilled
+                      : NotificationsIconOutlined
+                  }
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+                {/* TODO: add translations, use better wording */}
+                {t(
+                  subscribedToSmsNotifications
+                    ? 'profileLayout.buttons.disableSmsNotifications'
+                    : 'profileLayout.buttons.enableSmsNotifications'
+                )}
+              </SIconButtonWithText>
+            )}
+
+            <SIconButton
+              active={ellipseMenuOpen}
+              ref={moreButtonRef}
+              onClick={() => setIsEllipseMenuOpen(true)}
+            >
               <InlineSvg
                 svg={MoreIconFilled}
                 fill={theme.colorsThemed.text.primary}
-                width={isMobileOrTablet ? '16px' : '24px'}
-                height={isMobileOrTablet ? '16px' : '24px'}
+                width='24px'
+                height='24px'
               />
-            </SSVGContainer>
-            {t('profileLayout.buttons.more')}
-          </SMoreButton>
+            </SIconButton>
+          </SSideButtons>
           {!isMobile && (
             <UserEllipseMenu
               isVisible={ellipseMenuOpen}
@@ -535,9 +574,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
-          {isSubscribed && <SSubcribedTag>{t('subscribed-tag')}</SSubcribedTag>}
+          {isSubscribed && (
+            <SSubscribedTag>{t('subscribed-tag')}</SSubscribedTag>
+          )}
           {wasSubscribed && (
-            <SSubcribedTag>{t('subscriptionCancelled-tag')}</SSubcribedTag>
+            <SSubscribedTag>{t('subscriptionCancelled-tag')}</SSubscribedTag>
           )}
           <div
             style={{
@@ -703,20 +744,6 @@ const SGeneral = styled(General)`
   header {
     z-index: 6;
   }
-
-  @media (max-width: 768px) {
-    main {
-      div:first-child {
-        padding-left: 0;
-        padding-right: 0;
-
-        div:first-child {
-          margin-left: 0;
-          margin-right: 0;
-        }
-      }
-    }
-  }
 `;
 
 const SUsernameWrapper = styled.div`
@@ -802,23 +829,35 @@ const SBioText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
-const SSVGContainer = styled.div<{
+const SIconButton = styled.div<{
   active: boolean;
 }>`
   display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
 
-  ${({ theme }) => theme.media.laptop} {
-    padding: 12px;
-    border-radius: 16px;
-    margin-bottom: 8px;
-    background: ${({ theme, active }) =>
-      active
-        ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;'
-        : theme.colorsThemed.background.quinary};
-    transition: 0.2s linear;
-  }
+  padding: 12px;
+  border-radius: 16px;
+  cursor: pointer;
+
+  user-select: none;
+  transition: background 0.2s linear;
+  background: ${({ theme, active }) =>
+    active
+      ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;'
+      : theme.colorsThemed.background.quinary};
+
+  // TODO: add hover/active effects
+`;
+
+const SIconButtonWithText = styled(SIconButton)`
+  gap: 12px;
+  padding: 12px 24px;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 24px;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
 `;
 
 const SBackButton = styled(BackButton)`
@@ -867,39 +906,23 @@ const SBackButton = styled(BackButton)`
 //   }
 // `;
 
-const SMoreButton = styled(Button)`
+const SSideButtons = styled.div`
+  display: flex;
   position: absolute;
+  width: 100%;
+  gap: 16px;
+  padding: 16px;
+
   top: 164px;
-  left: 4px;
-
-  background: none;
-  &:active:enabled,
-  &:hover:enabled,
-  &:focus:enabled {
-    background: none;
-  }
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    font-weight: 600;
-    font-size: 10px;
-    line-height: 12px;
-  }
+  justify-content: space-between;
 
   ${(props) => props.theme.media.tablet} {
     top: 204px;
-    left: initial;
-    right: 4px;
   }
 
   ${(props) => props.theme.media.laptop} {
     top: 244px;
+    justify-content: flex-end;
   }
 `;
 
@@ -923,7 +946,7 @@ const SProfileLayout = styled.div`
   }
 `;
 
-const SSubcribedTag = styled.div`
+const SSubscribedTag = styled.div`
   position: absolute;
   top: 195px;
   left: calc(50% - 38px);

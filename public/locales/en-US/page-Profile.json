@@ -117,7 +117,8 @@
     },
     "buttons": {
       "favorites": "Favorites",
-      "more": "More",
+      "enableSmsNotifications": "Notify me",
+      "disableSmsNotifications": "Notified",
       "sendMessage": "Send message",
       "copied": "Link copied!"
     }

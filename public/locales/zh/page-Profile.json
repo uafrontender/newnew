@@ -117,7 +117,8 @@
     },
     "buttons": {
       "favorites": "收藏",
-      "more": "更多",
+      "enableSmsNotifications_NEED_TRANSLATION": "Notify me",
+      "disableSmsNotifications_NEED_TRANSLATION": "Notified",
       "sendMessage": "發送消息",
       "copied": "連結已複製！"
     }
