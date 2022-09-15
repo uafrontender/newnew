@@ -14,6 +14,7 @@ interface IResizeMode {
 export const ResizeMode: React.FC<IResizeMode> = (props) => {
   const { children } = props;
   const ref: MutableRefObject<any> = useRef();
+  // TODO: these two cause handleResizeObserver and thus the whole logic to restart. Change it
   const dispatch = useAppDispatch();
   const { resizeMode } = useAppSelector((state) => state.ui);
 

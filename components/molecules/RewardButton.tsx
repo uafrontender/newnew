@@ -15,6 +15,7 @@ interface RewardButtonI {
 
 const REWARD_TICKS = 4;
 
+// TODO: probably it should not count up while on the rewards page
 const RewardButton: React.FC<RewardButtonI> = ({ balance, loading, offer }) => {
   const theme = useTheme();
   const [portion, setPortion] = useState(offer ? 0 : REWARD_TICKS);
@@ -55,7 +56,7 @@ const RewardButton: React.FC<RewardButtonI> = ({ balance, loading, offer }) => {
         </Value>
         <ArrowContainer>
           <Arrow>
-            <InlineSvg
+            <SArrowIcon
               svg={ArrowLeftIcon}
               width='24px'
               height='24px'
@@ -76,8 +77,16 @@ export default RewardButton;
 
 const SGenericSkeleton = styled(GenericSkeleton)`
   height: 36px;
-  min-width: 88px;
+  min-width: 68px;
   border-radius: 16px;
+
+  ${(props) => props.theme.media.mobileM} {
+    min-width: 74px;
+  }
+
+  ${(props) => props.theme.media.mobileL} {
+    min-width: 76px;
+  }
 
   ${(props) => props.theme.media.tablet} {
     min-width: 100px;
@@ -91,18 +100,23 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   height: 36px;
-  min-width: 88px;
+  min-width: 68px;
   border: 1px solid;
   border-color: ${(props) => props.theme.colorsThemed.text.primary};
   border-radius: 16px;
   color: ${(props) => props.theme.colorsThemed.text.primary};
-  padding: 0px 12px 0px 8px;
+  padding: 0px 6px 0 8px;
   cursor: pointer;
 
   :hover {
     span {
       left: 4px;
     }
+  }
+
+  ${(props) => props.theme.media.mobileM} {
+    min-width: 74px;
+    padding: 0px 8px;
   }
 
   ${(props) => props.theme.media.tablet} {
@@ -113,9 +127,18 @@ const Container = styled.div`
 `;
 
 const Value = styled.div`
-  font-size: 14px;
-  line-height: 24px;
+  font-size: 12px;
+  line-height: 16px;
   font-weight: 700;
+
+  ${(props) => props.theme.media.mobileM} {
+    font-size: 13px;
+  }
+
+  ${(props) => props.theme.media.mobileL} {
+    font-size: 14px;
+    line-height: 24px;
+  }
 
   ${(props) => props.theme.media.tablet} {
     margin-right: 4px;
@@ -130,4 +153,14 @@ const Arrow = styled.span`
   position: relative;
   left: 0px;
   transition: left 500ms;
+`;
+
+const SArrowIcon = styled(InlineSvg)`
+  width: 22px;
+  height: 22px;
+
+  ${(props) => props.theme.media.mobileM} {
+    width: 24px;
+    height: 24px;
+  }
 `;

@@ -63,6 +63,7 @@
     "cardCannotBeUsed": "This card can not be used",
     "blockedByCreator": "Blocked by creator",
     "requestFailed": "Request failed",
-    "subscriptionUnavailable": "Subscription not available"
+    "subscriptionUnavailable": "Subscription not available",
+    "alreadySubscribed": "You already subscribed to this creator"
   }
 }

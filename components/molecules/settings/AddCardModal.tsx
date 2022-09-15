@@ -122,6 +122,11 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
         onReady={() => {
           setIsStripeReady(true);
         }}
+        options={{
+          terms: {
+            card: 'never',
+          },
+        }}
       />
       {errorMessage && (
         <SErrorText variant={3} tone='error'>

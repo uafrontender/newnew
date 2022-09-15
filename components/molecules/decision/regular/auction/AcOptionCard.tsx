@@ -24,11 +24,9 @@ import {
 } from '../../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
 // import { placeBidWithWallet } from '../../../../api/endpoints/auction';
-import {
-  createStripeSetupIntent,
-  updateStripeSetupIntent,
-  // getTopUpWalletWithPaymentPurposeUrl,
-} from '../../../../../api/endpoints/payments';
+import // updateStripeSetupIntent,
+// getTopUpWalletWithPaymentPurposeUrl,
+'../../../../../api/endpoints/payments';
 import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
 
 import Text from '../../../../atoms/Text';
@@ -68,7 +66,8 @@ import BidIconLight from '../../../../../public/images/decision/bid-icon-light.p
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
-import getRewardErrorStatusTextKey from '../../../../../utils/getRewardErrorStatusTextKey';
+import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
+// import getRewardErrorStatusTextKey from '../../../../../utils/getRewardErrorStatusTextKey';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -378,57 +377,37 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   //   router.locale,
   // ]);
 
-  const createSetupIntent = useCallback(async () => {
-    try {
-      const placeBidRequest = new newnewapi.PlaceBidRequest({
+  const placeBidRequest = useMemo(
+    () =>
+      new newnewapi.PlaceBidRequest({
         postUuid: postId,
         amount: new newnewapi.MoneyAmount({
           usdCents: parseInt(supportBidAmount) * 100,
         }),
         optionId: option.id,
-      });
+      }),
+    [postId, supportBidAmount, option.id]
+  );
 
-      const payload = new newnewapi.CreateStripeSetupIntentRequest({
-        acBidRequest: placeBidRequest,
-        ...(!user.loggedIn ? { guestEmail: '' } : {}),
-        ...(!user.loggedIn
-          ? { successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${postId}` }
-          : {}),
-      });
-      const response = await createStripeSetupIntent(payload);
-
-      if (
-        !response.data ||
-        response.error ||
-        !response.data?.stripeSetupIntentClientSecret
-      ) {
-        throw new Error(response.error?.message || 'Some error occurred');
-      }
-
-      return response.data;
-    } catch (err) {
-      console.error(err);
-      return undefined;
-    }
-  }, [postId, option.id, supportBidAmount, user.loggedIn]);
+  const setupIntent = useStripeSetupIntent({
+    purpose: placeBidRequest,
+    isGuest: !user.loggedIn,
+    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${postId}`,
+  });
 
   const handlePayWithCard = useCallback(
     async ({
-      rewardAmount,
       cardUuid,
-      stripeSetupIntentClientSecret,
       saveCard,
     }: {
-      rewardAmount: number;
       cardUuid?: string;
-      stripeSetupIntentClientSecret: string;
       saveCard?: boolean;
     }) => {
       setLoadingModalOpen(true);
 
-      if (!user.loggedIn) {
+      if (setupIntent.isGuest) {
         router.push(
-          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${setupIntent.setupIntentClientSecret}`
         );
         return;
       }
@@ -440,36 +419,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       });
 
       try {
-        if (rewardAmount > 0) {
-          const updateStripeSetupIntentRequest =
-            new newnewapi.UpdateStripeSetupIntentRequest({
-              stripeSetupIntentClientSecret,
-              rewardAmount: new newnewapi.MoneyAmount({
-                usdCents: rewardAmount,
-              }),
-            });
-
-          const updateRes = await updateStripeSetupIntent(
-            updateStripeSetupIntentRequest
-          );
-
-          if (
-            !updateRes.data ||
-            updateRes.error ||
-            updateRes.data.status !==
-              newnewapi.UpdateStripeSetupIntentResponse.Status.SUCCESS
-          ) {
-            throw new Error(
-              updateRes.error?.message ??
-                t(getRewardErrorStatusTextKey(updateRes.data?.status))
-            );
-          }
-        }
-
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             cardUuid,
-            stripeSetupIntentClientSecret,
+            stripeSetupIntentClientSecret: setupIntent.setupIntentClientSecret,
             ...(saveCard !== undefined
               ? {
                   saveCard,
@@ -499,21 +452,22 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         handleSetSupportedBid('');
         setSupportBidAmount('');
         setIsSupportFormOpen(false);
+        setPaymentModalOpen(false);
       } catch (err: any) {
         console.error(err);
         toast.error(err.message);
       } finally {
         setLoadingModalOpen(false);
-        setPaymentModalOpen(false);
+        setupIntent.destroy();
       }
     },
     [
       handleSetSupportedBid,
       postId,
-      user.loggedIn,
       router,
       handleAddOrUpdateOptionFromResponse,
       t,
+      setupIntent,
     ]
   );
 
@@ -869,7 +823,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={parseInt(supportBidAmount) * 100 || 0}
-          createStripeSetupIntent={createSetupIntent}
+          setupIntent={setupIntent}
           redirectUrl={`post/${postId}`}
           // {...(walletBalance?.usdCents &&
           // walletBalance.usdCents >= parseInt(supportBidAmount) * 100
@@ -882,23 +836,18 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           handlePayWithCard={handlePayWithCard}
           // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
-            <>
-              <SPaymentSign variant={3}>
-                {t('acPost.paymentModalFooter.body', { creator: postCreator })}
-              </SPaymentSign>
-              <SPaymentTerms variant={3}>
-                *{' '}
-                <Link href='https://terms.newnew.co'>
-                  <SPaymentTermsLink
-                    href='https://terms.newnew.co'
-                    target='_blank'
-                  >
-                    {t('acPost.paymentModalFooter.terms')}
-                  </SPaymentTermsLink>
-                </Link>{' '}
-                {t('acPost.paymentModalFooter.apply')}
-              </SPaymentTerms>
-            </>
+            <SPaymentSign variant='subtitle'>
+              {t('acPost.paymentModalFooter.body', { creator: postCreator })}*
+              <Link href='https://terms.newnew.co'>
+                <SPaymentTermsLink
+                  href='https://terms.newnew.co'
+                  target='_blank'
+                >
+                  {t('acPost.paymentModalFooter.terms')}
+                </SPaymentTermsLink>
+              </Link>{' '}
+              {t('acPost.paymentModalFooter.apply')}
+            </SPaymentSign>
           }
           // payButtonCaptionKey={t('acPost.paymentModalPayButton')}
         >
@@ -920,7 +869,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             <SPaymentModalPostText variant={2}>
               <PostTitleContent>{postText}</PostTitleContent>
             </SPaymentModalPostText>
-            <SPaymentModalTitle variant={3}>
+            <SPaymentModalTitle variant='subtitle'>
               {t('acPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
             <SPaymentModalOptionText variant={5}>
@@ -1332,8 +1281,7 @@ const SPaymentModalPostText = styled(Text)`
 `;
 
 const SPaymentModalTitle = styled(Text)`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 `;
 
 const SPaymentModalOptionText = styled(Headline)`
@@ -1357,21 +1305,12 @@ const STutorialTooltipHolder = styled.div`
 const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
   white-space: pre-wrap;
 `;
 
 const SPaymentTermsLink = styled.a`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-`;
-
-const SPaymentTerms = styled(Text)`
-  margin-top: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  text-align: center;
-  white-space: pre-wrap;
 `;
 
 const SEllipseButtonMobile = styled(Button)`

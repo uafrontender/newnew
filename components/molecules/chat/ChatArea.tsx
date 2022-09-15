@@ -331,12 +331,14 @@ const ChatArea: React.FC<IChatArea> = ({
 
   const submitMessage = useCallback(async () => {
     if (chatRoom && messageTextValid) {
+      const tmpMsgText = messageText.trim();
       try {
         setSendingMessage(true);
+        setMessageText('');
         const payload = new newnewapi.SendMessageRequest({
           roomId: chatRoom.id,
           content: {
-            text: messageText.trim(),
+            text: tmpMsgText,
           },
         });
         const res = await sendMessage(payload);
@@ -346,12 +348,11 @@ const ChatArea: React.FC<IChatArea> = ({
         if (res.data.message) {
           setMessages([res.data.message].concat(messages));
         }
-
-        setMessageText('');
         setSendingMessage(false);
         if (updateLastMessage) updateLastMessage({ roomId: chatRoom.id });
       } catch (err) {
         console.error(err);
+        setMessageText(tmpMsgText);
         setSendingMessage(false);
       }
     }
@@ -579,12 +580,13 @@ const ChatArea: React.FC<IChatArea> = ({
                 isAnnouncement
                   ? t('announcement.title', {
                       username: isMyAnnouncement
-                        ? user.userData?.nickname
-                        : chatRoom.visavis?.nickname,
+                        ? user.userData?.nickname || user.userData?.username
+                        : chatRoom.visavis?.nickname ||
+                          chatRoom.visavis?.username,
                     })
                   : isMyAnnouncement
-                  ? user.userData?.nickname
-                  : chatRoom.visavis?.nickname
+                  ? user.userData?.nickname || user.userData?.username
+                  : chatRoom.visavis?.nickname || chatRoom.visavis?.username
               }
               {chatRoom.visavis?.options?.isVerified && !isAnnouncement && (
                 <SInlineSVG

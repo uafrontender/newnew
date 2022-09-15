@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useRef,
   useState,
+  useMemo,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -18,11 +19,8 @@ import {
   useAppSelector,
 } from '../../../../../redux-store/store';
 import { doPledgeCrowdfunding } from '../../../../../api/endpoints/crowdfunding';
-import {
-  createStripeSetupIntent,
-  updateStripeSetupIntent,
-  // getTopUpWalletWithPaymentPurposeUrl,
-} from '../../../../../api/endpoints/payments';
+import // getTopUpWalletWithPaymentPurposeUrl,
+'../../../../../api/endpoints/payments';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
@@ -47,7 +45,7 @@ import assets from '../../../../../constants/assets';
 import Headline from '../../../../atoms/Headline';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
-import getRewardErrorStatusTextKey from '../../../../../utils/getRewardErrorStatusTextKey';
+import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 const getPayWithCardErrorMessage = (
@@ -258,23 +256,36 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   //   handleSetPaymentSuccessModalOpen,
   // ]);
 
+  const doPledgeRequest = useMemo(
+    () =>
+      new newnewapi.DoPledgeRequest({
+        postUuid: post.postUuid,
+        amount: new newnewapi.MoneyAmount({
+          usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
+        }),
+      }),
+    [post.postUuid, pledgeAmount]
+  );
+
+  const setupIntent = useStripeSetupIntent({
+    purpose: doPledgeRequest,
+    isGuest: !user.loggedIn,
+    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${post.postUuid}`,
+  });
+
   const handlePayWithCard = useCallback(
     async ({
-      rewardAmount,
       cardUuid,
-      stripeSetupIntentClientSecret,
       saveCard,
     }: {
-      rewardAmount: number;
       cardUuid?: string;
-      stripeSetupIntentClientSecret: string;
       saveCard?: boolean;
     }) => {
       setLoadingModalOpen(true);
 
-      if (!user.loggedIn) {
+      if (setupIntent.isGuest) {
         router.push(
-          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${setupIntent.setupIntentClientSecret}`
         );
         return;
       }
@@ -286,36 +297,10 @@ const CfPledgeLevelsSection: React.FunctionComponent<
       });
 
       try {
-        if (rewardAmount > 0) {
-          const updateStripeSetupIntentRequest =
-            new newnewapi.UpdateStripeSetupIntentRequest({
-              stripeSetupIntentClientSecret,
-              rewardAmount: new newnewapi.MoneyAmount({
-                usdCents: rewardAmount,
-              }),
-            });
-
-          const updateRes = await updateStripeSetupIntent(
-            updateStripeSetupIntentRequest
-          );
-
-          if (
-            !updateRes.data ||
-            updateRes.error ||
-            updateRes.data.status !==
-              newnewapi.UpdateStripeSetupIntentResponse.Status.SUCCESS
-          ) {
-            throw new Error(
-              updateRes.error?.message ??
-                t(getRewardErrorStatusTextKey(updateRes.data?.status))
-            );
-          }
-        }
-
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             cardUuid,
-            stripeSetupIntentClientSecret,
+            stripeSetupIntentClientSecret: setupIntent.setupIntentClientSecret,
             ...(saveCard !== undefined
               ? {
                   saveCard,
@@ -343,20 +328,21 @@ const CfPledgeLevelsSection: React.FunctionComponent<
         );
 
         handleSetPaymentSuccessModalOpen(true);
+        setPaymentModalOpen(false);
         setIsFormOpen(false);
       } catch (err: any) {
         console.error(err);
         toast.error(err.message);
       } finally {
         setLoadingModalOpen(false);
-        setPaymentModalOpen(false);
+        setupIntent.destroy();
       }
     },
     [
       handleSetPaymentSuccessModalOpen,
       post.postUuid,
       handleAddPledgeFromResponse,
-      user.loggedIn,
+      setupIntent,
       router,
       t,
     ]
@@ -365,37 +351,6 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   useEffect(() => {
     if (!paymentModalOpen) setPledgeAmount(undefined);
   }, [paymentModalOpen]);
-
-  const createSetupIntent = useCallback(async () => {
-    try {
-      const doPledgeRequest = new newnewapi.DoPledgeRequest({
-        postUuid: post.postUuid,
-        amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
-        }),
-      });
-
-      const payload = new newnewapi.CreateStripeSetupIntentRequest({
-        ...(!user.loggedIn ? { guestEmail: '' } : {}),
-        ...(!user.loggedIn
-          ? {
-              successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${post.postUuid}`,
-            }
-          : {}),
-        cfPledgeRequest: doPledgeRequest,
-      });
-      const response = await createStripeSetupIntent(payload);
-
-      if (!response.data || response.error) {
-        throw new Error(response.error?.message || 'Some error occurred');
-      }
-
-      return response.data;
-    } catch (err) {
-      console.error(err);
-      return undefined;
-    }
-  }, [post.postUuid, pledgeAmount, user.loggedIn]);
 
   const goToNextStep = () => {
     if (
@@ -543,7 +498,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={pledgeAmount || 0}
-          createStripeSetupIntent={createSetupIntent}
+          setupIntent={setupIntent}
           // {...(walletBalance?.usdCents &&
           // pledgeAmount &&
           // walletBalance.usdCents >= pledgeAmount
@@ -557,27 +512,25 @@ const CfPledgeLevelsSection: React.FunctionComponent<
           redirectUrl={`post/${post.postUuid}`}
           // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
-            <>
+            <SPaymentSign variant='subtitle'>
               {post.creator && (
-                <SPaymentSign variant={3}>
+                <>
                   {t('cfPost.paymentModalFooter.body', {
                     creator: getDisplayname(post.creator),
                   })}
-                </SPaymentSign>
+                </>
               )}
-              <SPaymentTerms variant={3}>
-                *{' '}
-                <Link href='https://terms.newnew.co'>
-                  <SPaymentTermsLink
-                    href='https://terms.newnew.co'
-                    target='_blank'
-                  >
-                    {t('cfPost.paymentModalFooter.terms')}
-                  </SPaymentTermsLink>
-                </Link>{' '}
-                {t('cfPost.paymentModalFooter.apply')}
-              </SPaymentTerms>
-            </>
+              *
+              <Link href='https://terms.newnew.co'>
+                <SPaymentTermsLink
+                  href='https://terms.newnew.co'
+                  target='_blank'
+                >
+                  {t('cfPost.paymentModalFooter.terms')}
+                </SPaymentTermsLink>
+              </Link>{' '}
+              {t('cfPost.paymentModalFooter.apply')}
+            </SPaymentSign>
           }
           // payButtonCaptionKey={t('cfPost.paymentModalPayButton')}
         >
@@ -772,19 +725,10 @@ const STutorialTooltipHolder = styled.div`
 const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
   white-space: pre-wrap; ;
 `;
 
 const SPaymentTermsLink = styled.a`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-`;
-
-const SPaymentTerms = styled(Text)`
-  margin-top: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  text-align: center;
-  white-space: pre-wrap;
 `;

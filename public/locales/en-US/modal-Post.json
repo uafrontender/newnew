@@ -289,7 +289,7 @@
       "subtitle": "Your bid"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{creator}} chooses your bid.",
+      "body": "A temporary hold will be placed on your card. You’ll only get charged if {{creator}} chooses your bid.",
       "terms": "Terms",
       "apply": "apply"
     },
@@ -360,7 +360,7 @@
       "subtitle": "Option you chose"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if the option you chose gets the most votes.",
+      "body": "A temporary hold will be placed on your card. You’ll only get charged if the option you chose gets the most votes.",
       "terms": "Terms",
       "apply": "apply"
     },
@@ -470,7 +470,7 @@
       "title": "{{creator}}'s Goal"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{creator}} reaches their goal.",
+      "body": "A temporary hold will be placed on your card. You’ll only get charged if {{creator}} reaches their goal.",
       "terms": "Terms",
       "apply": "apply"
     },
@@ -804,9 +804,6 @@
     "cfCancelled": "Goal is cancelled",
     "cfFinished": "Goal is finished already",
     "cfNotStarted": "Goal is not started yet",
-    "rewardWrongEmail": "Reward can't be used by this account",
-    "rewardNotEnough": "Rewards balance is insufficient",
-    "rewardInvalidIntent": "Payment failed",
     "requestFailed": "Request failed"
   }
 }

@@ -248,7 +248,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             )}
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
-                {chat.visavis?.nickname}
+                {chat.visavis?.nickname || chat.visavis?.username}
                 {chat.visavis?.options && chat.visavis?.options.isVerified && (
                   <SInlineSVG
                     svg={VerificationCheckmark}
