@@ -36,7 +36,7 @@ const SmsNotificationModal: React.FC<ISmsNotificationModal> = React.memo(
 
         setCurrentPhoneNumber(phoneNumber);
       },
-      []
+      [t]
     );
 
     const submitSmsNotificationsRequest = useCallback(() => {
