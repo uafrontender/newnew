@@ -118,7 +118,7 @@
     "buttons": {
       "favorites": "Favorites",
       "enableSmsNotifications": "Notify me",
-      "disableSmsNotifications": "Notified",
+      "disableSmsNotifications": "Notifications ON",
       "sendMessage": "Send message",
       "copied": "Link copied!"
     }

@@ -118,7 +118,7 @@
     "buttons": {
       "favorites": "Favoritos",
       "enableSmsNotifications_NEED_TRANSLATION": "Notify me",
-      "disableSmsNotifications_NEED_TRANSLATION": "Notified",
+      "disableSmsNotifications_NEED_TRANSLATION": "Notifications ON",
       "sendMessage": "Escribir mensaje",
       "copied": "¡Enlace copiado!"
     }
