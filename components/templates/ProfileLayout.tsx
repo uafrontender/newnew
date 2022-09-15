@@ -50,6 +50,7 @@ import getGenderPronouns, {
 } from '../../utils/genderPronouns';
 import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 import CustomLink from '../atoms/CustomLink';
+import SmsNotificationModal from '../molecules/profile/SmsNotificationModal';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -130,8 +131,10 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
-  const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+  const [confirmReportUser, setConfirmReportUser] = useState(false);
   const [unsubscribeModalOpen, setUnsubscribeModalOpen] = useState(false);
+  const [smsNotificationModalOpen, setSmsNotificationModalOpen] =
+    useState(false);
   const { usersIBlocked, unblockUser } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(user.uuid),
@@ -301,6 +304,22 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   );
   const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
 
+  const handleSmsNotificationModalClose = useCallback(
+    () => setSmsNotificationModalOpen(false),
+    []
+  );
+
+  // TODO: load real data
+  const subscribedToSmsNotifications = false;
+
+  const handleSmsNotificationButtonClicked = useCallback(() => {
+    if (subscribedToSmsNotifications) {
+      // TODO: unsubscribe
+    } else {
+      setSmsNotificationModalOpen(true);
+    }
+  }, [subscribedToSmsNotifications]);
+
   const renderChildren = () => {
     let postsForPage = {};
     let postsForPageFilter;
@@ -448,17 +467,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   }, [creatorsImSubscribedTo, user.uuid]);
 
   const moreButtonRef = useRef() as any;
-
-  // TODO: load real data
-  const subscribedToSmsNotifications = false;
-
-  const handleSmsNotificationButtonClicked = useCallback(() => {
-    if (subscribedToSmsNotifications) {
-      // TODO: unsubscribe
-    } else {
-      // TODO: Show modal to subscribe
-    }
-  }, [subscribedToSmsNotifications]);
 
   return (
     <>
@@ -720,6 +728,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         }
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
+      />
+      <SmsNotificationModal
+        show={smsNotificationModalOpen}
+        subject={user.username}
+        onClose={handleSmsNotificationModalClose}
       />
     </>
   );

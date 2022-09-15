@@ -231,5 +231,20 @@
       "12": "Back goals twice in one week",
       "13": "Invite {{friends}} friends to NewNew"
     }
+  },
+  "smsNotifications": {
+    "title": "Enter your phone number",
+    "success": "Success",
+    "description": "With it, we will notify you about the {{subject}} updates.",
+    "confirmation": "Confirmation SMS was sent to {{phoneNumber}} number.",
+    "tos": "",
+    "button": { "continue": "Continue", "close": "Cool!" },
+    "phoneError": {
+      "0": "Invalid number",
+      "1": "Invalid country code",
+      "2": "Too short",
+      "3": "Too long",
+      "4": "Invalid number"
+    }
   }
 }
