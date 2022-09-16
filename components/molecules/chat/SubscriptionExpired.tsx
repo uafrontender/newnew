@@ -215,7 +215,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
         </PaymentModal>
         {/* Loading Modal */}
         {loadingModalOpen && (
-          <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+          <LoadingModal isOpen={loadingModalOpen} zIndex={50} />
         )}
       </SBottomActionContainer>
     );

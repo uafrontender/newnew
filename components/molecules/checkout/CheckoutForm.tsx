@@ -188,13 +188,11 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
               redirect: 'if_required',
             });
 
-            if (error) {
-              throw new Error(error.message);
+            if (!error) {
+              await handlePayWithCard?.({
+                saveCard,
+              });
             }
-
-            await handlePayWithCard?.({
-              saveCard,
-            });
           }
         } else {
           throw new Error(
@@ -216,7 +214,9 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   };
 
   const paymentElementOptions: StripePaymentElementOptions = useMemo(
-    () => ({ terms: { card: 'never' } }),
+    () => ({
+      terms: { card: 'never' },
+    }),
     []
   );
 
@@ -439,7 +439,7 @@ const RewardBalance = styled.div`
 
 const SPayButtonDiv = styled.div`
   width: 100%;
-  margin-top: auto;
+  margin-top: 40px;
   margin-bottom: 24px;
 
   ${({ theme }) => theme.media.tablet} {
