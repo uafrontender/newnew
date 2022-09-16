@@ -54,11 +54,9 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
       redirect: 'if_required',
     });
 
-    if (error) {
-      throw new Error(error.message);
+    if (!error) {
+      onSuccess(setupIntent);
     }
-
-    onSuccess(setupIntent);
   };
 
   const { executeRecaptcha } = useGoogleReCaptcha();
