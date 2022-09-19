@@ -566,7 +566,6 @@ const SCloseButton = styled.button`
 const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
   white-space: pre-wrap;
 `;
