@@ -10,13 +10,14 @@ import InlineSvg from '../../../atoms/InlineSVG';
 interface IPostVideoThumbnailItem {
   index: number;
   video: newnewapi.IVideoUrls;
+  canDelete: boolean;
   handleClick: () => void;
   handleDeleteVideo: () => void;
 }
 
 const PostVideoThumbnailItem: React.FunctionComponent<
   IPostVideoThumbnailItem
-> = ({ index, video, handleClick, handleDeleteVideo }) => {
+> = ({ index, video, canDelete, handleClick, handleDeleteVideo }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 

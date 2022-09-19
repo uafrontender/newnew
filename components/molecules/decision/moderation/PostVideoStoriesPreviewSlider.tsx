@@ -10,6 +10,7 @@ interface IPostVideoStoriesPreviewSlider {
   videos: newnewapi.IVideoUrls[];
   currentActive: number;
   offsetBottom: number;
+  canDeleteOnlyNonUploaded?: boolean;
   handleChangeCurrentActive: (idx: number) => void;
   handleDeleteAdditionalVideo: (videoUuid: string) => void;
 }
@@ -20,6 +21,7 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
   videos,
   currentActive,
   offsetBottom,
+  canDeleteOnlyNonUploaded,
   handleChangeCurrentActive,
   handleDeleteAdditionalVideo,
 }) => {
@@ -55,11 +57,12 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
           containerRef.current = el!!;
         }}
       >
-        {videos.map((video, i) => (
+        {videos.map((video, i, arr) => (
           <PostVideoThumbnailItem
             key={video.uuid ?? i}
             index={i}
             video={video}
+            canDelete={!canDeleteOnlyNonUploaded ? true : i === arr.length - 1}
             handleClick={() => handleChangeCurrentActive(i)}
             handleDeleteVideo={() => handleDeleteAdditionalVideo(video.uuid!!)}
           />

@@ -17,23 +17,18 @@ import isBrowser from '../../../../utils/isBrowser';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { useAppSelector } from '../../../../redux-store/store';
 import { setPostThumbnail } from '../../../../api/endpoints/post';
-import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
-import {
-  TThumbnailParameters,
-  TVideoProcessingData,
-} from '../../../../redux-store/slices/creationStateSlice';
+import { TThumbnailParameters } from '../../../../redux-store/slices/creationStateSlice';
+import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
-import Button from '../../../atoms/Button';
-import InlineSvg from '../../../atoms/InlineSVG';
 import EllipseMenu, { EllipseMenuButton } from '../../../atoms/EllipseMenu';
 import EllipseModal, { EllipseModalButton } from '../../../atoms/EllipseModal';
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 import SlidingToggleVideoWidget from '../../../atoms/moderation/SlidingToggleVideoWidget';
 import PostVideoResponseUploadedTab from './PostVideoResponseUploadedTab';
+import PostVideoAnnouncementTab from './PostVideoAnnouncementTab';
 import PostVideoResponseUpload from './PostVideoResponseUpload';
 import PostVideoCoverImageEdit from './PostVideoCoverImageEdit';
-
-import ThumbnailIcon from '../../../../public/images/svg/icons/filled/AddImage.svg';
 
 const PostBitmovinPlayer = dynamic(
   () => import('../common/PostBitmovinPlayer'),
@@ -51,72 +46,18 @@ const PostVideoThumbnailEdit = dynamic(
 
 interface IPostVideoModeration {
   postId: string;
-  postStatus: TPostStatusStringified;
-  announcement: newnewapi.IVideoUrls;
-  response?: newnewapi.IVideoUrls;
   thumbnails: any;
+  announcement: newnewapi.IVideoUrls;
   isMuted: boolean;
-  openedTab: 'announcement' | 'response';
-  videoProcessing: TVideoProcessingData;
-  responseFileUploadETA: number;
-  responseFileUploadError: boolean;
-  responseFileUploadLoading: boolean;
-  responseFileUploadProgress: number;
-  responseFileProcessingETA: number;
-  responseFileProcessingError: boolean;
-  responseFileProcessingLoading: boolean;
-  responseFileProcessingProgress: number;
-  uploadedResponseVideoUrl: string;
-  handleItemChange: (id: string, value: File) => Promise<void>;
-  handleCancelVideoUpload: () => void | undefined;
-  handleResetVideoUploadAndProcessingState: () => void;
-  handleUploadVideoNotProcessed: () => Promise<void>;
-  handleVideoDelete: () => Promise<void>;
-  handleUploadVideoProcessed: () => Promise<void>;
-  handleChangeTab: (nevValue: 'announcement' | 'response') => void;
   handleToggleMuted: () => void;
-  handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleUpdateResponseVideo: (newResponse: newnewapi.IVideoUrls) => void;
-  additionalResponses?: newnewapi.IVideoUrls[];
-  uploadingAdditionalResponse: boolean;
-  handleAddAdditonalResponse: (newVideo: newnewapi.IVideoUrls) => void;
-  handleSetUploadingAdditionalResponse: (newValue: boolean) => void;
-  handleSetReadyToUploadAdditionalResponse: (newValue: boolean) => void;
-  handleDeleteAdditonalResponse: (videoUuid: string) => void;
 }
 
 const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   postId,
-  postStatus,
   announcement,
-  response,
   thumbnails,
   isMuted,
-  openedTab,
-  videoProcessing,
-  uploadedResponseVideoUrl,
-  responseFileUploadETA,
-  responseFileUploadError,
-  responseFileUploadLoading,
-  responseFileUploadProgress,
-  responseFileProcessingETA,
-  responseFileProcessingError,
-  responseFileProcessingLoading,
-  responseFileProcessingProgress,
-  handleItemChange,
-  handleCancelVideoUpload,
-  handleResetVideoUploadAndProcessingState,
-  handleUploadVideoNotProcessed,
-  handleVideoDelete,
-  handleUploadVideoProcessed,
-  handleChangeTab,
   handleToggleMuted,
-  additionalResponses,
-  uploadingAdditionalResponse,
-  handleAddAdditonalResponse,
-  handleDeleteAdditonalResponse,
-  handleSetUploadingAdditionalResponse,
-  handleSetReadyToUploadAdditionalResponse,
 }) => {
   const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -130,6 +71,19 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  const { postStatus } = usePostModalInnerState();
+  const {
+    coreResponse,
+    openedTab,
+    handleVideoDelete,
+    additionalResponseUploading,
+    readyToUploadAdditionalResponse,
+    responseFileUploadLoading,
+    uploadedResponseVideoUrl,
+    videoProcessing,
+    responseFileProcessingLoading,
+  } = usePostModerationResponsesContext();
 
   const ellipseButtonRef = useRef<HTMLButtonElement>();
   const [currentCoverUrl, setCurrentCoverUrl] = useState(
@@ -188,10 +142,10 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
   const isSetThumbnailButtonIconOnly = useMemo(
     () =>
-      response ||
+      !!coreResponse ||
       postStatus === 'waiting_for_response' ||
       postStatus === 'processing_response',
-    [response, postStatus]
+    [coreResponse, postStatus]
   );
 
   const handleSubmitNewThumbnail = async (params: TThumbnailParameters) => {
@@ -285,116 +239,33 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     <>
       <SVideoWrapper id='video-wrapper'>
         {openedTab === 'announcement' ? (
-          <>
-            <PostBitmovinPlayer
-              id={postId}
-              resources={announcement}
-              muted={isMuted}
-              showPlayButton
-            />
-            {isSetThumbnailButtonIconOnly ? (
-              <SSetThumbnailButtonIconOnly
-                iconOnly
-                view='transparent'
-                ref={ellipseButtonRef as any}
-                onClick={() => {
-                  Mixpanel.track('Open Ellipse Menu', {
-                    _stage: 'Post',
-                    _postUuid: postId,
-                    _component: 'PostVideoModeration',
-                  });
-                  handleOpenEllipseMenu();
-                }}
-                style={{
-                  ...(soundBtnBottomOverriden
-                    ? {
-                        bottom: soundBtnBottomOverriden,
-                      }
-                    : {}),
-                }}
-              >
-                <InlineSvg
-                  svg={ThumbnailIcon}
-                  width={isMobileOrTablet ? '20px' : '24px'}
-                  height={isMobileOrTablet ? '20px' : '24px'}
-                  fill='#FFFFFF'
-                />
-              </SSetThumbnailButtonIconOnly>
-            ) : (
-              <SSetThumbnailButton
-                view='transparent'
-                ref={ellipseButtonRef as any}
-                onClick={() => {
-                  Mixpanel.track('Open Ellipse Menu', {
-                    _stage: 'Post',
-                    _postUuid: postId,
-                    _component: 'PostVideoModeration',
-                  });
-                  handleOpenEllipseMenu();
-                }}
-                style={{
-                  ...(soundBtnBottomOverriden
-                    ? {
-                        bottom: soundBtnBottomOverriden,
-                      }
-                    : {}),
-                }}
-              >
-                {t('postVideo.setThumbnail')}
-              </SSetThumbnailButton>
-            )}
-            <PostVideoSoundButton
-              postId={postId}
-              isMuted={isMuted}
-              soundBtnBottomOverriden={soundBtnBottomOverriden}
-              handleToggleMuted={handleToggleMuted}
-            />
-          </>
-        ) : response ? (
-          <PostVideoResponseUploadedTab
+          <PostVideoAnnouncementTab
             postId={postId}
-            response={response}
+            announcement={announcement}
             isMuted={isMuted}
+            isSetThumbnailButtonIconOnly={isSetThumbnailButtonIconOnly}
+            ellipseButtonRef={ellipseButtonRef}
+            soundBtnBottomOverriden={soundBtnBottomOverriden}
+            handleOpenEllipseMenu={handleOpenEllipseMenu}
+            handleToggleMuted={handleToggleMuted}
+          />
+        ) : coreResponse ? (
+          <PostVideoResponseUploadedTab
+            id='video'
+            isMuted={isMuted}
+            isEditingStories={isEditingStories}
             soundBtnBottomOverriden={soundBtnBottomOverriden}
             handleToggleMuted={handleToggleMuted}
-            additionalResponses={additionalResponses}
-            handleAddAdditonalResponse={handleAddAdditonalResponse}
-            handleDeleteAdditonalResponse={handleDeleteAdditonalResponse}
-            isEditingStories={isEditingStories}
             handleToggleEditingStories={handleToggleEditingStories}
-            id='video'
-            thumbnails={{}}
-            postStatus={postStatus}
-            value={videoProcessing?.targetUrls!!}
-            videoProcessing={videoProcessing}
-            etaUpload={responseFileUploadETA}
-            errorUpload={responseFileUploadError}
-            loadingUpload={responseFileUploadLoading}
-            progressUpload={responseFileUploadProgress}
-            etaProcessing={responseFileProcessingETA}
-            errorProcessing={responseFileProcessingError}
-            loadingProcessing={responseFileProcessingLoading}
-            progressProcessing={responseFileProcessingProgress}
-            onChange={handleItemChange}
-            handleCancelVideoUpload={handleCancelVideoUpload}
-            handleResetVideoUploadAndProcessingState={
-              handleResetVideoUploadAndProcessingState
-            }
-            handleSetUploadingAdditionalResponse={
-              handleSetUploadingAdditionalResponse
-            }
-            handleSetReadyToUploadAdditionalResponse={
-              handleSetReadyToUploadAdditionalResponse
-            }
           />
         ) : uploadedResponseVideoUrl &&
-          videoProcessing.targetUrls &&
+          videoProcessing?.targetUrls &&
           !responseFileUploadLoading &&
           !responseFileProcessingLoading ? (
           <>
             <PostBitmovinPlayer
               id={postId}
-              resources={videoProcessing.targetUrls}
+              resources={videoProcessing.targetUrls!!}
               muted={isMuted}
               showPlayButton
             />
@@ -409,36 +280,17 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             />
           </>
         ) : (
-          <PostVideoResponseUpload
-            id='video'
-            thumbnails={{}}
-            postStatus={postStatus}
-            value={videoProcessing?.targetUrls!!}
-            videoProcessing={videoProcessing}
-            etaUpload={responseFileUploadETA}
-            errorUpload={responseFileUploadError}
-            loadingUpload={responseFileUploadLoading}
-            progressUpload={responseFileUploadProgress}
-            etaProcessing={responseFileProcessingETA}
-            errorProcessing={responseFileProcessingError}
-            loadingProcessing={responseFileProcessingLoading}
-            progressProcessing={responseFileProcessingProgress}
-            onChange={handleItemChange}
-            handleCancelVideoUpload={handleCancelVideoUpload}
-            handleResetVideoUploadAndProcessingState={
-              handleResetVideoUploadAndProcessingState
-            }
-            handleUploadVideoNotProcessed={handleUploadVideoNotProcessed}
-          />
+          <PostVideoResponseUpload id='video' />
         )}
-        {(response ||
+        {(coreResponse ||
           postStatus === 'waiting_for_response' ||
           postStatus === 'processing_response') &&
         !isEditingStories &&
-        !uploadingAdditionalResponse ? (
+        !responseFileProcessingLoading &&
+        !responseFileUploadLoading &&
+        !additionalResponseUploading &&
+        !readyToUploadAdditionalResponse ? (
           <SlidingToggleVideoWidget
-            postId={postId}
-            openedTab={openedTab}
             disabled={responseFileUploadLoading || responseFileUploadLoading}
             wrapperCSS={{
               ...(soundBtnBottomOverriden
@@ -447,7 +299,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
                   }
                 : {}),
             }}
-            handleChangeTab={handleChangeTab}
           />
         ) : null}
       </SVideoWrapper>
@@ -543,9 +394,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   );
 };
 
-PostVideoModeration.defaultProps = {
-  response: undefined,
-};
+PostVideoModeration.defaultProps = {};
 
 export default PostVideoModeration;
 
@@ -585,54 +434,6 @@ const SVideoWrapper = styled.div`
   ${({ theme }) => theme.media.laptop} {
     width: 410px;
     height: 728px;
-  }
-`;
-
-const SSetThumbnailButtonIconOnly = styled(Button)`
-  position: absolute;
-  right: 64px;
-  bottom: 16px;
-
-  padding: 8px;
-  width: 36px;
-  height: 36px;
-
-  border-radius: ${({ theme }) => theme.borderRadius.small};
-
-  ${({ theme }) => theme.media.tablet} {
-    right: initial;
-    left: 16px;
-    width: 36px;
-    height: 36px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    right: 72px;
-    padding: 12px;
-    width: 48px;
-    height: 48px;
-
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
-  }
-`;
-
-const SSetThumbnailButton = styled(Button)`
-  position: absolute;
-  right: 64px;
-  bottom: 16px;
-
-  padding: 8px;
-  height: 36px;
-
-  border-radius: ${({ theme }) => theme.borderRadius.small};
-
-  ${({ theme }) => theme.media.laptop} {
-    right: 72px;
-
-    padding: 12px;
-    height: 48px;
-
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
 `;
 

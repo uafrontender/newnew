@@ -3,19 +3,21 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import { Mixpanel } from '../../../utils/mixpanel';
+import { usePostModerationResponsesContext } from '../../../contexts/postModerationResponsesContext';
+import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
 
 interface ISlidingToggleVideoWidget {
-  postId: string;
-  openedTab: 'announcement' | 'response';
   disabled?: boolean;
   wrapperCSS?: React.CSSProperties;
-  handleChangeTab: (newValue: 'announcement' | 'response') => void;
 }
 
 const SlidingToggleVideoWidget: React.FunctionComponent<
   ISlidingToggleVideoWidget
-> = ({ postId, openedTab, disabled, wrapperCSS, handleChangeTab }) => {
+> = ({ disabled, wrapperCSS }) => {
   const { t } = useTranslation('modal-Post');
+
+  const { postParsed } = usePostModalInnerState();
+  const { openedTab, handleChangeTab } = usePostModerationResponsesContext();
 
   return (
     <SToggleVideoWidget style={{ ...(wrapperCSS || {}) }}>
@@ -25,7 +27,7 @@ const SlidingToggleVideoWidget: React.FunctionComponent<
         onClickCapture={() => {
           Mixpanel.track('Set Opened Tab Announcement', {
             _stage: 'Post',
-            _postUuid: postId,
+            _postUuid: postParsed?.postUuid,
             _component: 'PostVideoSuccess',
           });
         }}
@@ -39,7 +41,7 @@ const SlidingToggleVideoWidget: React.FunctionComponent<
         onClickCapture={() => {
           Mixpanel.track('Set Opened Tab Response', {
             _stage: 'Post',
-            _postUuid: postId,
+            _postUuid: postParsed?.postUuid,
             _component: 'PostVideoSuccess',
           });
         }}

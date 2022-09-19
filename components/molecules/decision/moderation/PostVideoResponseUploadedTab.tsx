@@ -1,6 +1,12 @@
-/* eslint-disable no-nested-ternary */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+/* eslint-disable no-nested-ternary */
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled, { keyframes } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
@@ -13,24 +19,21 @@ import {
   removeUploadedFile,
   stopVideoProcessing,
 } from '../../../../api/endpoints/upload';
-import { TVideoProcessingData } from '../../../../redux-store/slices/creationStateSlice';
-import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 import {
   MAX_VIDEO_DURATION,
   MAX_VIDEO_SIZE,
   MIN_VIDEO_DURATION,
 } from '../../../../constants/general';
+import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
-import Button from '../../../atoms/Button';
-import PostVideoResponseUploadedRegular from './PostVideoResponseUploadedRegular';
-import PostVideoResponseUploadedEditing from './PostVideoResponseUploadedEditing';
-import Caption from '../../../atoms/Caption';
 import Text from '../../../atoms/Text';
-import Headline from '../../../atoms/Headline';
+import Button from '../../../atoms/Button';
+import Caption from '../../../atoms/Caption';
 import InlineSvg from '../../../atoms/InlineSVG';
+import PostVideoResponseUploaded from './PostVideoResponseUploaded';
+import PostVideoEditStoryButton from '../../../atoms/decision/PostVideoEditStoryButton';
 
 import errorIcon from '../../../../public/images/svg/icons/filled/Alert.svg';
-import PostVideoEditStoryButton from '../../../atoms/decision/PostVideoEditStoryButton';
 
 const PostBitmovinPlayer = dynamic(
   () => import('../../../atoms/BitmovinPlayer'),
@@ -40,69 +43,46 @@ const PostBitmovinPlayer = dynamic(
 );
 
 interface IPostVideoResponseUploadedTab {
-  postId: string;
-  response: newnewapi.IVideoUrls;
+  id: string;
   isMuted: boolean;
   soundBtnBottomOverriden?: number;
-  handleToggleMuted: () => void;
-  additionalResponses?: newnewapi.IVideoUrls[];
-  handleAddAdditonalResponse: (newVideo: newnewapi.IVideoUrls) => void;
-  handleDeleteAdditonalResponse: (videoUuid: string) => void;
   isEditingStories: boolean;
+  handleToggleMuted: () => void;
   handleToggleEditingStories: () => void;
-  id: string;
-  value: newnewapi.IVideoUrls;
-  etaUpload: number;
-  errorUpload: boolean;
-  loadingUpload: boolean;
-  progressUpload: number;
-  etaProcessing: number;
-  errorProcessing: boolean;
-  loadingProcessing: boolean;
-  progressProcessing: number;
-  thumbnails: any;
-  videoProcessing?: TVideoProcessingData;
-  postStatus: TPostStatusStringified;
-  onChange: (id: string, value: any) => void;
-  handleCancelVideoUpload: () => void;
-  handleResetVideoUploadAndProcessingState: () => void;
-  handleSetUploadingAdditionalResponse: (newValue: boolean) => void;
-  handleSetReadyToUploadAdditionalResponse: (newValue: boolean) => void;
 }
 
 const PostVideoResponseUploadedTab: React.FunctionComponent<
   IPostVideoResponseUploadedTab
 > = ({
-  postId,
-  response,
+  id,
   isMuted,
+  isEditingStories,
   soundBtnBottomOverriden,
   handleToggleMuted,
-  additionalResponses,
-  handleAddAdditonalResponse,
-  handleDeleteAdditonalResponse,
-  isEditingStories,
   handleToggleEditingStories,
-  id,
-  value,
-  etaUpload,
-  errorUpload,
-  loadingUpload,
-  progressUpload,
-  etaProcessing,
-  errorProcessing,
-  loadingProcessing,
-  progressProcessing,
-  thumbnails,
-  videoProcessing,
-  onChange,
-  handleCancelVideoUpload,
-  handleResetVideoUploadAndProcessingState,
-  handleSetUploadingAdditionalResponse,
-  handleSetReadyToUploadAdditionalResponse,
 }) => {
   const { t } = useTranslation('modal-Post');
-  const [openedTab, setOpenedTab] = useState<'regular' | 'editing'>('regular');
+  const {
+    additionalResponses,
+    videoProcessing,
+    responseFileUploadETA,
+    responseFileUploadError,
+    responseFileUploadLoading,
+    responseFileUploadProgress,
+    responseFileProcessingError,
+    responseFileProcessingLoading,
+    responseFileProcessingProgress,
+    handleItemChange,
+    handleCancelVideoUpload,
+    handleResetVideoUploadAndProcessingState,
+    handleSetUploadingAdditionalResponse,
+    handleSetReadyToUploadAdditionalResponse,
+  } = usePostModerationResponsesContext();
+  const value = useMemo(() => videoProcessing?.targetUrls, [videoProcessing]);
+
+  const [currentStep, setCurrentStep] = useState<'regular' | 'editing'>(
+    'regular'
+  );
 
   const [showVideoDelete, setShowVideoDelete] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -129,16 +109,17 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     });
     handleCloseDeleteVideoClick();
     setLocalFile(null);
-    onChange(id, null);
+    handleItemChange(id, null);
     handleSetUploadingAdditionalResponse(false);
     handleSetReadyToUploadAdditionalResponse(false);
   }, [
     handleCloseDeleteVideoClick,
     id,
-    onChange,
+    handleItemChange,
     handleSetUploadingAdditionalResponse,
     handleSetReadyToUploadAdditionalResponse,
   ]);
+  const handleDeleteUnuploadedAdditonalResponse = () => {};
 
   const handleDeleteAndChangeVideo = useCallback(async () => {
     try {
@@ -151,7 +132,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       if (res.error) throw new Error('An error occurred');
 
       setLocalFile(null);
-      onChange(id, null);
+      handleItemChange(id, null);
       handleSetUploadingAdditionalResponse(true);
 
       Mixpanel.track('Post Additional Video Response Upload', {
@@ -163,7 +144,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     }
   }, [
     id,
-    onChange,
+    handleItemChange,
     videoProcessing?.targetUrls?.originalVideoUrl,
     handleSetUploadingAdditionalResponse,
   ]);
@@ -189,17 +170,17 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
           toast.error(t('postVideo.uploadResponseForm.video.error.maxLength'));
         } else {
           setLocalFile(file);
-          onChange(id, file);
+          handleItemChange(id, file);
           handleSetUploadingAdditionalResponse(true);
-          setOpenedTab('editing');
+          setCurrentStep('editing');
         }
       }
     },
-    [id, onChange, t, handleSetUploadingAdditionalResponse]
+    [id, handleItemChange, t, handleSetUploadingAdditionalResponse]
   );
   const handleRetryVideoUpload = useCallback(() => {
-    onChange(id, localFile);
-  }, [id, localFile, onChange]);
+    handleItemChange(id, localFile);
+  }, [id, localFile, handleItemChange]);
 
   const handleCancelVideoProcessing = useCallback(async () => {
     try {
@@ -224,7 +205,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       }
 
       setLocalFile(null);
-      onChange(id, null);
+      handleItemChange(id, null);
       handleSetUploadingAdditionalResponse(false);
       handleSetReadyToUploadAdditionalResponse(false);
       handleResetVideoUploadAndProcessingState();
@@ -233,7 +214,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     }
   }, [
     id,
-    onChange,
+    handleItemChange,
     videoProcessing,
     handleResetVideoUploadAndProcessingState,
     handleSetUploadingAdditionalResponse,
@@ -243,7 +224,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   const renderUploading = useCallback(() => {
     let content;
 
-    if (loadingUpload) {
+    if (responseFileUploadLoading) {
       content = (
         <SLoadingBox>
           <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
@@ -255,8 +236,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
           <SLoadingBottomBlock>
             <SLoadingDescription variant={2} weight={600}>
               {t('postVideo.uploadResponseForm.video.loading.process', {
-                time: `${etaUpload} seconds`,
-                progress: progressUpload,
+                time: `${responseFileUploadETA} seconds`,
+                progress: responseFileUploadProgress,
               })}
             </SLoadingDescription>
             <SLoadingBottomBlockButton
@@ -267,11 +248,11 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
             </SLoadingBottomBlockButton>
           </SLoadingBottomBlock>
           <SLoadingProgress>
-            <SLoadingProgressFilled progress={progressUpload} />
+            <SLoadingProgressFilled progress={responseFileUploadProgress} />
           </SLoadingProgress>
         </SLoadingBox>
       );
-    } else if (errorUpload || errorProcessing) {
+    } else if (responseFileUploadError || responseFileProcessingError) {
       content = (
         <SErrorBox>
           <SErrorTitleWrapper>
@@ -300,7 +281,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
           </SErrorBottomBlock>
         </SErrorBox>
       );
-    } else if (loadingProcessing) {
+    } else if (responseFileProcessingLoading) {
       content = (
         <SLoadingBox>
           <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
@@ -313,9 +294,26 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
         </SLoadingBox>
       );
     }
+    // } else if (responseFileProcessingProgress === 100) {
+    //   content = (
+    //     <PostVideoResponseUploadedEditing
+    //       key='editing'
+    //       isMuted={isMuted}
+    //       soundBtnBottomOverriden={soundBtnBottomOverriden}
+    //       handleToggleMuted={handleToggleMuted}
+    //       additionalResponses={[
+    //         ...(additionalResponses ? (additionalResponses as any) : []),
+    //         value,
+    //       ]}
+    //       handleDeleteUnuploadedAdditonalResponse={
+    //         handleDeleteUnuploadedAdditonalResponse
+    //       }
+    //     />
+    //   );
+    // }
 
     // TEMP
-    if (progressProcessing === 100) {
+    if (responseFileProcessingProgress === 100) {
       const temp = (
         <SFileBox>
           <SPlayerWrapper>
@@ -323,7 +321,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
               id='small-thumbnail'
               innerRef={playerRef}
               resources={value}
-              thumbnails={thumbnails}
+              thumbnails={{}}
               borderRadius='8px'
             />
           </SPlayerWrapper>
@@ -340,54 +338,44 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
     return content;
   }, [
+    responseFileUploadLoading,
+    responseFileUploadError,
+    responseFileProcessingError,
+    responseFileProcessingLoading,
+    responseFileProcessingProgress,
     t,
-    loadingUpload,
-    errorUpload,
-    errorProcessing,
-    loadingProcessing,
-    progressProcessing,
-    etaUpload,
-    progressUpload,
+    responseFileUploadETA,
+    responseFileUploadProgress,
     handleCancelVideoUpload,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
     localFile,
     value,
-    thumbnails,
     handleDeleteVideoShow,
   ]);
 
   useEffect(() => {
-    if (progressProcessing === 100) {
+    if (responseFileProcessingProgress === 100) {
       handleSetReadyToUploadAdditionalResponse(true);
     } else {
       handleSetReadyToUploadAdditionalResponse(false);
     }
-  }, [progressProcessing, handleSetReadyToUploadAdditionalResponse]);
+  }, [
+    responseFileProcessingProgress,
+    handleSetReadyToUploadAdditionalResponse,
+  ]);
 
   return (
     <SContainer>
-      {openedTab === 'regular' ? (
-        <PostVideoResponseUploadedRegular
-          postId={postId}
-          response={response}
+      {!responseFileUploadLoading && !responseFileProcessingLoading ? (
+        <PostVideoResponseUploaded
           isMuted={isMuted}
           isEditingStories={isEditingStories}
           soundBtnBottomOverriden={soundBtnBottomOverriden}
           handleToggleMuted={handleToggleMuted}
-          additionalResponses={additionalResponses}
-          handleDeleteAdditonalResponse={handleDeleteAdditonalResponse}
-        />
-      ) : progressProcessing === 100 ? (
-        <PostVideoResponseUploadedEditing
-          postId={postId}
-          response={response}
-          isMuted={isMuted}
-          soundBtnBottomOverriden={soundBtnBottomOverriden}
-          handleToggleMuted={handleToggleMuted}
-          additionalResponses={[...(additionalResponses ?? []), value]}
-          handleAddAdditonalResponse={handleAddAdditonalResponse}
-          handleDeleteAdditonalResponse={handleDeleteAdditonalResponse}
+          handleDeleteUnuploadedAdditonalResponse={
+            handleDeleteUnuploadedAdditonalResponse
+          }
         />
       ) : (
         renderUploading()
@@ -406,12 +394,12 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
           }
         }}
       />
-      {openedTab === 'regular' ? (
+      {currentStep === 'regular' ? (
         <SUploadVideoButton onClick={() => handleButtonClick()}>
           {t('postVideo.addVideoButton')}
         </SUploadVideoButton>
       ) : null}
-      {openedTab === 'regular' &&
+      {currentStep === 'regular' &&
       additionalResponses &&
       additionalResponses?.length > 0 ? (
         <PostVideoEditStoryButton
@@ -420,7 +408,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
           handleClick={handleToggleEditingStories}
         />
       ) : null}
-      {openedTab === 'editing' && progressProcessing === 100 ? (
+      {currentStep === 'editing' && responseFileProcessingProgress === 100 ? (
         <SUploadVideoButton onClick={() => handleDeleteAndChangeVideo()}>
           {t('postVideo.reuploadButton')}
         </SUploadVideoButton>
@@ -469,50 +457,6 @@ const SInput = styled.input`
 `;
 
 // Temp
-const SWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: ${(props) => props.theme.colorsThemed.background.tertiary};
-`;
-
-const SDropBox = styled.label`
-  width: 100%;
-  height: 100%;
-  cursor: copy;
-  display: flex;
-  padding: 16px;
-  background: ${(props) => props.theme.colorsThemed.background.tertiary};
-  align-items: center;
-  border-radius: 16px;
-  flex-direction: column;
-  justify-content: center;
-
-  ${({ theme }) => theme.media.tablet} {
-    padding: 24px;
-  }
-`;
-
-const SHeadline = styled(Headline)`
-  text-align: center;
-
-  margin-bottom: 12px;
-`;
-
-const SPlaceholder = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  margin-bottom: 12px;
-`;
-
-const SButton = styled(Button)`
-  cursor: copy;
-
-  margin-bottom: 16px;
-`;
-
 const SFileBox = styled.div`
   height: 108px;
   display: flex;

@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../../redux-store/store';
 
@@ -16,32 +15,56 @@ const PostBitmovinPlayer = dynamic(
   }
 );
 
-interface IPostVideoResponseUploadedEditing {
+interface IPostVideoResponseUploaded {
   isMuted: boolean;
   soundBtnBottomOverriden?: number;
+  isEditingStories?: boolean;
   handleToggleMuted: () => void;
-  additionalResponses?: newnewapi.IVideoUrls[];
-  handleDeleteUnuploadedAdditonalResponse: (videoUuid: string) => void;
+  handleDeleteUnuploadedAdditonalResponse: () => void;
 }
 
-const PostVideoResponseUploadedEditing: React.FunctionComponent<
-  IPostVideoResponseUploadedEditing
+const PostVideoResponseUploaded: React.FunctionComponent<
+  IPostVideoResponseUploaded
 > = ({
   isMuted,
   soundBtnBottomOverriden,
+  isEditingStories,
   handleToggleMuted,
-  additionalResponses,
   handleDeleteUnuploadedAdditonalResponse,
 }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isTablet = ['tablet'].includes(resizeMode);
 
   const { postParsed } = usePostModalInnerState();
-  const { coreResponse } = usePostModerationResponsesContext();
+  const {
+    coreResponse,
+    additionalResponses,
+    videoProcessing,
+    responseFileProcessingProgress,
+    handleDeleteAdditionalResponse,
+  } = usePostModerationResponsesContext();
+  const value = useMemo(() => videoProcessing?.targetUrls, [videoProcessing]);
+
+  const responses = useMemo(() => {
+    if (additionalResponses) {
+      if (responseFileProcessingProgress === 100) {
+        return [coreResponse, ...additionalResponses, value];
+      }
+      return [coreResponse, ...additionalResponses];
+    }
+
+    return undefined;
+  }, [
+    coreResponse,
+    additionalResponses,
+    value,
+    responseFileProcessingProgress,
+  ]);
 
   return (
     <>
-      {!additionalResponses || additionalResponses.length === 0 ? (
+      {/* {!additionalResponses || additionalResponses.length === 0 ? ( */}
+      {!responses || responses.length === 0 ? (
         <>
           <PostBitmovinPlayer
             id={postParsed?.postUuid ?? ''}
@@ -52,19 +75,22 @@ const PostVideoResponseUploadedEditing: React.FunctionComponent<
         </>
       ) : (
         <PostVideoResponsesSlider
-          videos={[coreResponse!!, ...additionalResponses]}
+          // videos={[coreResponse!!, ...additionalResponses]}
+          videos={responses!!}
           isMuted={isMuted}
+          isEditingStories={isEditingStories}
           {...(soundBtnBottomOverriden
             ? {
-                dotsBottom: soundBtnBottomOverriden + 72,
+                dotsBottom:
+                  soundBtnBottomOverriden + (!isEditingStories ? 72 : 0),
               }
             : {})}
           {...(isTablet && !soundBtnBottomOverriden
             ? {
-                dotsBottom: 112,
+                dotsBottom: !isEditingStories ? 112 : 0,
               }
             : {})}
-          handleDeleteAdditionalVideo={handleDeleteUnuploadedAdditonalResponse}
+          handleDeleteAdditionalVideo={handleDeleteAdditionalResponse}
         />
       )}
       <PostVideoSoundButton
@@ -77,4 +103,4 @@ const PostVideoResponseUploadedEditing: React.FunctionComponent<
   );
 };
 
-export default PostVideoResponseUploadedEditing;
+export default PostVideoResponseUploaded;

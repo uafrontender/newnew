@@ -44,6 +44,7 @@ import PostResponseTabModeration from '../../../molecules/decision/moderation/Po
 import useResponseUpload from '../../../../utils/hooks/useResponseUpload';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import PostModerationResponsesContextProvider from '../../../../contexts/postModerationResponsesContext';
 
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -118,101 +119,33 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       }
     };
 
-    // Response upload
-    const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<
-      newnewapi.IVideoUrls | undefined
-    >(undefined);
-
     // Additional responses
     // const [additionalResponses, setAdditionalResponses] = useState<
     //   newnewapi.IVideoUrls[]
     // >(post.additionalResponses);
 
     // TEMP
-    const [additionalResponses, setAdditionalResponses] = useState<
-      newnewapi.IVideoUrls[]
-    >(
-      post.response
-        ? new Array<newnewapi.IVideoUrls>(5).fill(post.response).map((v, i) => {
-            const workingObj = { ...v };
-            workingObj.uuid = `uuid_${i}`;
-            return workingObj;
-          })
-        : []
-    );
-    const [uploadingAdditionalResponse, setUploadingAdditionalResponse] =
-      useState(false);
-    const [
-      readyToUploadAdditionalResponse,
-      setReadyToUploadAdditionalResponse,
-    ] = useState(false);
-
-    const handleAddAdditonalResponse = useCallback(
-      async (newVideo: newnewapi.IVideoUrls) => {
-        setAdditionalResponses((curr) => [...curr, newVideo]);
-      },
-      [setAdditionalResponses]
-    );
-
-    const handleDeleteAdditonalResponse = useCallback(
-      async (videoUuid: string) => {
-        setAdditionalResponses((curr) => {
-          const workingArray = curr.filter((video) => video.uuid !== videoUuid);
-          return workingArray;
-        });
-      },
-      [setAdditionalResponses]
-    );
-
-    const handleSetUploadingAdditionalResponse = useCallback(
-      (newValue: boolean) => setUploadingAdditionalResponse(newValue),
-      []
-    );
-    const handleSetReadyToUploadAdditionalResponse = useCallback(
-      (newValue: boolean) => setReadyToUploadAdditionalResponse(newValue),
-      []
-    );
+    const mockAdditionalResponses = post.response
+      ? new Array<newnewapi.IVideoUrls>(5).fill(post.response).map((v, i) => {
+          const workingObj = { ...v };
+          workingObj.uuid = `uuid_${i}`;
+          return workingObj;
+        })
+      : [];
 
     // Tabs
     const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
       post.response ||
-        responseFreshlyUploaded ||
         postStatus === 'waiting_for_response' ||
         postStatus === 'processing_response'
         ? 'response'
         : 'announcement'
     );
 
-    const {
-      handleCancelVideoUpload,
-      handleItemChange,
-      handleResetVideoUploadAndProcessingState,
-      handleUploadVideoNotProcessed,
-      handleUploadVideoProcessed,
-      handleUploadAdditionalVideoProcessed,
-      handleVideoDelete,
-      responseFileProcessingETA,
-      responseFileProcessingError,
-      responseFileProcessingLoading,
-      responseFileProcessingProgress,
-      responseFileUploadETA,
-      responseFileUploadError,
-      responseFileUploadLoading,
-      responseFileUploadProgress,
-      uploadedResponseVideoUrl,
-      videoProcessing,
-      responseUploading,
-      responseUploadSuccess,
-      additionalResponseUploading,
-    } = useResponseUpload({
-      postId: post.postUuid,
-      postStatus,
-      openedTab,
-      handleUpdatePostStatus,
-      handleUpdateResponseVideo: (newValue) =>
-        setResponseFreshlyUploaded(newValue),
-      handleUpdateAdditionalResponseVideo: handleAddAdditonalResponse,
-    });
+    const handleChangeTab = useCallback(
+      (newValue: 'announcement' | 'response') => setOpenedTab(newValue),
+      []
+    );
 
     const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
@@ -386,9 +319,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           if (res.data.multipleChoice.status)
             handleUpdatePostStatus(res.data.multipleChoice.status);
 
-          if (!responseFreshlyUploaded && res.data.multipleChoice?.response) {
-            setResponseFreshlyUploaded(res.data.multipleChoice.response);
-          }
+          // if (!responseFreshlyUploaded && res.data.multipleChoice?.response) {
+          //   setResponseFreshlyUploaded(res.data.multipleChoice.response);
+          // }
           setAnnouncement(res.data.multipleChoice?.announcement);
           if (res.data.multipleChoice?.winningOptionId && !winningOption) {
             const winner = options.find(
@@ -518,12 +451,12 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           if (decoded.post?.multipleChoice?.optionCount)
             setNumberOfOptions(decoded.post?.multipleChoice?.optionCount);
 
-          if (
-            !responseFreshlyUploaded &&
-            decoded.post?.multipleChoice?.response
-          ) {
-            setResponseFreshlyUploaded(decoded.post.multipleChoice.response);
-          }
+          // if (
+          //   !responseFreshlyUploaded &&
+          //   decoded.post?.multipleChoice?.response
+          // ) {
+          //   setResponseFreshlyUploaded(decoded.post.multipleChoice.response);
+          // }
         }
       };
 
@@ -536,7 +469,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           handleUpdatePostStatus(decoded.multipleChoice);
 
           if (
-            !responseFreshlyUploaded &&
+            // !responseFreshlyUploaded &&
             postStatus === 'processing_response' &&
             switchPostStatus('mc', decoded.multipleChoice) === 'succeeded'
           ) {
@@ -546,9 +479,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
 
             const res = await fetchPostByUUID(fetchPostPayload);
 
-            if (res.data?.multipleChoice?.response) {
-              setResponseFreshlyUploaded(res.data?.multipleChoice?.response);
-            }
+            // if (res.data?.multipleChoice?.response) {
+            //   setResponseFreshlyUploaded(res.data?.multipleChoice?.response);
+            // }
           }
         }
       };
@@ -660,150 +593,105 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     return (
       <>
         <SWrapper>
-          <SExpiresSection>
-            {isMobile && (
-              <SGoBackButton
-                style={{
-                  gridArea: 'closeBtnMobile',
-                }}
-                onClick={handleGoBackInsidePost}
-              />
-            )}
-            {postStatus === 'waiting_for_response' ? (
-              <ResponseTimer
-                timestampSeconds={new Date(
-                  (post.responseUploadDeadline?.seconds as number) * 1000
-                ).getTime()}
-                onTimeExpired={handleOnResponseTimeExpired}
-              />
-            ) : Date.now() > (post.expiresAt?.seconds as number) * 1000 ? (
-              <PostTimerEnded
-                timestampSeconds={new Date(
-                  (post.expiresAt?.seconds as number) * 1000
-                ).getTime()}
-                postType='mc'
-              />
-            ) : (
-              <PostTimer
-                timestampSeconds={new Date(
-                  (post.expiresAt?.seconds as number) * 1000
-                ).getTime()}
-                postType='mc'
-                onTimeExpired={handleOnVotingTimeExpired}
-              />
-            )}
-          </SExpiresSection>
-          <PostVideoModeration
-            key={`key_${announcement?.coverImageUrl}`}
-            postId={post.postUuid}
-            announcement={announcement!!}
-            response={(post.response || responseFreshlyUploaded) ?? undefined}
-            thumbnails={{
-              startTime: 1,
-              endTime: 3,
-            }}
-            postStatus={postStatus}
-            isMuted={mutedMode}
+          <PostModerationResponsesContextProvider
             openedTab={openedTab}
-            responseFileProcessingETA={responseFileProcessingETA}
-            responseFileProcessingError={responseFileProcessingError}
-            responseFileProcessingLoading={responseFileProcessingLoading}
-            responseFileProcessingProgress={responseFileProcessingProgress}
-            responseFileUploadETA={responseFileUploadETA}
-            responseFileUploadError={responseFileUploadError}
-            responseFileUploadLoading={responseFileUploadLoading}
-            responseFileUploadProgress={responseFileUploadProgress}
-            uploadedResponseVideoUrl={uploadedResponseVideoUrl}
-            videoProcessing={videoProcessing}
-            uploadingAdditionalResponse={
-              uploadingAdditionalResponse || readyToUploadAdditionalResponse
-            }
-            handleChangeTab={(newValue) => setOpenedTab(newValue)}
-            handleToggleMuted={() => handleToggleMutedMode()}
-            handleUpdateResponseVideo={(newValue) =>
-              setResponseFreshlyUploaded(newValue)
-            }
-            handleUpdatePostStatus={handleUpdatePostStatus}
-            handleCancelVideoUpload={handleCancelVideoUpload}
-            handleItemChange={handleItemChange}
-            handleResetVideoUploadAndProcessingState={
-              handleResetVideoUploadAndProcessingState
-            }
-            handleUploadVideoNotProcessed={handleUploadVideoNotProcessed}
-            handleUploadVideoProcessed={handleUploadVideoProcessed}
-            handleVideoDelete={handleVideoDelete}
-            additionalResponses={additionalResponses}
-            handleAddAdditonalResponse={handleAddAdditonalResponse}
-            handleSetUploadingAdditionalResponse={
-              handleSetUploadingAdditionalResponse
-            }
-            handleSetReadyToUploadAdditionalResponse={
-              handleSetReadyToUploadAdditionalResponse
-            }
-            handleDeleteAdditonalResponse={handleDeleteAdditonalResponse}
-          />
-          <PostTopInfoModeration
-            totalVotes={totalVotes}
-            hasWinner={false}
-            hidden={openedTab === 'response'}
-          />
-          <SActivitesContainer decisionFailed={postStatus === 'failed'}>
-            {openedTab === 'announcement' ? (
-              <>
-                <PostVotingTab>
-                  {`${t('tabs.options')} ${
-                    !!numberOfOptions && numberOfOptions > 0
-                      ? numberOfOptions
-                      : ''
-                  }`}
-                </PostVotingTab>
-                <McOptionsTabModeration
-                  post={post}
-                  options={options}
-                  optionsLoading={optionsLoading}
-                  pagingToken={optionsNextPageToken}
-                  winningOptionId={(winningOption?.id as number) ?? undefined}
-                  handleLoadOptions={fetchOptions}
-                  handleRemoveOption={handleRemoveOption}
+            handleChangeTab={handleChangeTab}
+            coreResponseInitial={post.response ?? undefined}
+            // additionalResponsesInitial={post.additionalResponses}
+            additionalResponsesInitial={mockAdditionalResponses}
+          >
+            <SExpiresSection>
+              {isMobile && (
+                <SGoBackButton
+                  style={{
+                    gridArea: 'closeBtnMobile',
+                  }}
+                  onClick={handleGoBackInsidePost}
                 />
-              </>
-            ) : (
-              <PostResponseTabModeration
-                postId={post.postUuid}
-                postType='mc'
-                postStatus={postStatus}
-                postTitle={post.title}
-                responseUploading={responseUploading}
-                responseReadyToBeUploaded={
-                  !!uploadedResponseVideoUrl &&
-                  !responseFileUploadLoading &&
-                  !responseFileProcessingLoading
-                }
-                responseUploadSuccess={responseUploadSuccess}
-                winningOptionMc={winningOption}
-                uploadingAdditionalResponse={uploadingAdditionalResponse}
-                readyToUploadAdditionalResponse={
-                  readyToUploadAdditionalResponse
-                }
-                handleUploadResponse={handleUploadVideoProcessed}
-                handleUploadAdditionalResponse={
-                  handleUploadAdditionalVideoProcessed
-                }
+              )}
+              {postStatus === 'waiting_for_response' ? (
+                <ResponseTimer
+                  timestampSeconds={new Date(
+                    (post.responseUploadDeadline?.seconds as number) * 1000
+                  ).getTime()}
+                  onTimeExpired={handleOnResponseTimeExpired}
+                />
+              ) : Date.now() > (post.expiresAt?.seconds as number) * 1000 ? (
+                <PostTimerEnded
+                  timestampSeconds={new Date(
+                    (post.expiresAt?.seconds as number) * 1000
+                  ).getTime()}
+                  postType='mc'
+                />
+              ) : (
+                <PostTimer
+                  timestampSeconds={new Date(
+                    (post.expiresAt?.seconds as number) * 1000
+                  ).getTime()}
+                  postType='mc'
+                  onTimeExpired={handleOnVotingTimeExpired}
+                />
+              )}
+            </SExpiresSection>
+            <PostVideoModeration
+              key={`key_${announcement?.coverImageUrl}`}
+              postId={post.postUuid}
+              announcement={announcement!!}
+              thumbnails={{
+                startTime: 1,
+                endTime: 3,
+              }}
+              isMuted={mutedMode}
+              handleToggleMuted={() => handleToggleMutedMode()}
+            />
+            <PostTopInfoModeration
+              totalVotes={totalVotes}
+              hasWinner={false}
+              hidden={openedTab === 'response'}
+            />
+            <SActivitesContainer decisionFailed={postStatus === 'failed'}>
+              {openedTab === 'announcement' ? (
+                <>
+                  <PostVotingTab>
+                    {`${t('tabs.options')} ${
+                      !!numberOfOptions && numberOfOptions > 0
+                        ? numberOfOptions
+                        : ''
+                    }`}
+                  </PostVotingTab>
+                  <McOptionsTabModeration
+                    post={post}
+                    options={options}
+                    optionsLoading={optionsLoading}
+                    pagingToken={optionsNextPageToken}
+                    winningOptionId={(winningOption?.id as number) ?? undefined}
+                    handleLoadOptions={fetchOptions}
+                    handleRemoveOption={handleRemoveOption}
+                  />
+                </>
+              ) : (
+                <PostResponseTabModeration
+                  postId={post.postUuid}
+                  postType='mc'
+                  postStatus={postStatus}
+                  postTitle={post.title}
+                  winningOptionMc={winningOption}
+                />
+              )}
+            </SActivitesContainer>
+            {/* Loading Modal */}
+            {loadingModalOpen && (
+              <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+            )}
+
+            {isPopupVisible && (
+              <HeroPopup
+                isPopupVisible={isPopupVisible}
+                postType='MC'
+                closeModal={goToNextStep}
               />
             )}
-          </SActivitesContainer>
-          {/* Loading Modal */}
-          {loadingModalOpen && (
-            <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
-          )}
-
-          {isPopupVisible && (
-            <HeroPopup
-              isPopupVisible={isPopupVisible}
-              postType='MC'
-              closeModal={goToNextStep}
-            />
-          )}
+          </PostModerationResponsesContextProvider>
         </SWrapper>
         {post.isCommentsAllowed && (
           <SCommentsSection id='comments' ref={commentsSectionRef}>

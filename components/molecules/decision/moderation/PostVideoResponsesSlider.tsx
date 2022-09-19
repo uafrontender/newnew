@@ -17,6 +17,7 @@ interface IPostVideoResponsesSlider {
   dotsBottom?: number;
   isMuted?: boolean;
   isEditingStories?: boolean;
+  canDeleteOnlyNonUploaded?: boolean;
   handleDeleteAdditionalVideo: (videoUuid: string) => void;
 }
 
@@ -27,6 +28,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   dotsBottom,
   isMuted,
   isEditingStories,
+  canDeleteOnlyNonUploaded,
   handleDeleteAdditionalVideo,
 }) => {
   const videosLength = useMemo(() => videos.length, [videos.length]);

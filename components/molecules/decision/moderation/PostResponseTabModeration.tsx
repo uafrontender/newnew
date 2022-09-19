@@ -1,8 +1,8 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable camelcase */
 /* eslint-disable react/jsx-pascal-case */
-import React, { useCallback, useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 
@@ -21,22 +21,16 @@ import { useAppSelector } from '../../../../redux-store/store';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import PostResponseSuccessModal from './PostResponseSuccessModal';
 import PostTitleContent from '../../../atoms/PostTitleContent';
+import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
 interface IPostResponseTabModeration {
   postId: string;
   postType: TPostType;
   postStatus: TPostStatusStringified;
   postTitle: string;
-  responseUploading: boolean;
-  responseReadyToBeUploaded: boolean;
-  responseUploadSuccess: boolean;
   winningOptionAc?: newnewapi.Auction.Option;
   winningOptionMc?: newnewapi.MultipleChoice.Option;
   moneyBacked?: newnewapi.MoneyAmount;
-  uploadingAdditionalResponse: boolean;
-  readyToUploadAdditionalResponse: boolean;
-  handleUploadResponse: () => void;
-  handleUploadAdditionalResponse: () => void;
 }
 
 const PostResponseTabModeration: React.FunctionComponent<
@@ -46,20 +40,43 @@ const PostResponseTabModeration: React.FunctionComponent<
   postType,
   postStatus,
   postTitle,
-  responseUploading,
-  responseReadyToBeUploaded,
-  responseUploadSuccess,
   winningOptionAc,
   winningOptionMc,
   moneyBacked,
-  uploadingAdditionalResponse,
-  readyToUploadAdditionalResponse,
-  handleUploadResponse,
-  handleUploadAdditionalResponse,
 }) => {
   const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
+
+  const {
+    coreResponseUploading,
+    responseUploadSuccess,
+    additionalResponseUploading,
+    readyToUploadAdditionalResponse,
+    responseFileUploadLoading,
+    uploadedResponseVideoUrl,
+    responseFileProcessingLoading,
+    handleUploadVideoProcessed,
+    handleUploadAdditionalVideoProcessed,
+  } = usePostModerationResponsesContext();
+
+  const responseReadyToBeUploaded = useMemo(
+    () =>
+      !!uploadedResponseVideoUrl &&
+      !responseFileUploadLoading &&
+      !responseFileProcessingLoading,
+    [
+      responseFileProcessingLoading,
+      responseFileUploadLoading,
+      uploadedResponseVideoUrl,
+    ]
+  );
+
+  console.log(`Ready to be uploaded: ${responseReadyToBeUploaded}`);
+
+  console.log(!!uploadedResponseVideoUrl);
+  console.log(responseFileUploadLoading);
+  console.log(responseFileProcessingLoading);
 
   // Earned amount
   const [earnedAmount, setEarnedAmount] = useState<
@@ -158,10 +175,13 @@ const PostResponseTabModeration: React.FunctionComponent<
 
   if (postStatus === 'succeeded') {
     return (
-      <SContainer>
-        <SDimContainer
+      <>
+        <SSucceededContainer
           dimmed={
-            uploadingAdditionalResponse || readyToUploadAdditionalResponse
+            additionalResponseUploading ||
+            responseFileProcessingLoading ||
+            responseFileUploadLoading ||
+            !!uploadedResponseVideoUrl
           }
         >
           <SHeaderDiv>
@@ -323,8 +343,11 @@ const PostResponseTabModeration: React.FunctionComponent<
               <PostTitleContent>{postTitle}</PostTitleContent>
             </SHeadline>
           </STextContentWrapper>
-        </SDimContainer>
-        {!uploadingAdditionalResponse && !readyToUploadAdditionalResponse ? (
+        </SSucceededContainer>
+        {!additionalResponseUploading &&
+        !readyToUploadAdditionalResponse &&
+        !responseFileUploadLoading &&
+        !responseFileProcessingLoading ? (
           <SShareButton onClick={handleCopyLink}>
             {isCopiedUrl
               ? t('postResponseTabModeration.succeeded.linkCopied')
@@ -333,8 +356,12 @@ const PostResponseTabModeration: React.FunctionComponent<
         ) : readyToUploadAdditionalResponse ? (
           <SUploadButton
             className='uploadButton'
-            disabled={responseUploading || !responseReadyToBeUploaded}
-            onClick={handleUploadAdditionalResponse}
+            disabled={
+              coreResponseUploading ||
+              !responseReadyToBeUploaded ||
+              additionalResponseUploading
+            }
+            onClick={handleUploadAdditionalVideoProcessed}
           >
             {t('postResponseTabModeration.awaiting.postResponseBtn')}
           </SUploadButton>
@@ -351,9 +378,10 @@ const PostResponseTabModeration: React.FunctionComponent<
           isOpen={responseUploadSuccess}
           zIndex={20}
         />
-      </SContainer>
+      </>
     );
   }
+
   return (
     <SContainer>
       <SHeaderDiv>
@@ -525,8 +553,8 @@ const PostResponseTabModeration: React.FunctionComponent<
         </SHeadline>
       </STextContentWrapper>
       <SUploadButton
-        disabled={responseUploading || !responseReadyToBeUploaded}
-        onClick={handleUploadResponse}
+        disabled={coreResponseUploading || !responseReadyToBeUploaded}
+        onClick={handleUploadVideoProcessed}
       >
         {t('postResponseTabModeration.awaiting.postResponseBtn')}
       </SUploadButton>
@@ -558,19 +586,12 @@ const SContainer = styled.div`
   }
 `;
 
-const SDimContainer = styled.div<{
+const SSucceededContainer = styled.div<{
   dimmed?: boolean;
 }>`
   height: 100%;
 
-  ${({ dimmed }) =>
-    dimmed
-      ? css`
-           {
-            opacity: 0.3;
-          }
-        `
-      : null}
+  opacity: ${({ dimmed }) => (dimmed ? 0.3 : 1)};
 
   ${({ theme }) => theme.media.tablet} {
     display: grid;
