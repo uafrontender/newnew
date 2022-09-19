@@ -86,10 +86,10 @@ const SAVED_PHONE_COUNTRY_CODE_KEY = 'savedPhoneCountryCode';
 const SAVED_PHONE_NUMBER_KEY = 'savedPhoneNumber';
 
 const getSmsNotificationSubscriptionErrorMessage = (
-  status?: newnewapi.SubscribeSmsNotificationsResponse.Status
+  status?: newnewapi.SmsNotificationsStatus
 ) => {
   switch (status) {
-    case newnewapi.SubscribeSmsNotificationsResponse.Status.UNKNOWN_STATUS:
+    case newnewapi.SmsNotificationsStatus.UNKNOWN_STATUS:
       return 'smsNotifications.errors.requestFailed';
     default:
       return 'smsNotifications.errors.requestFailed';
@@ -375,11 +375,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           if (
             !res.data ||
             res.error ||
-            (res.data.status !==
-              newnewapi.SubscribeSmsNotificationsResponse.Status.SUCCESS &&
+            (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
               res.data.status !==
-                newnewapi.SubscribeSmsNotificationsResponse.Status
-                  .SERVICE_SMS_SENT)
+                newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
           ) {
             throw new Error(
               res.error?.message ??
@@ -401,11 +399,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           if (
             !res.data ||
             res.error ||
-            (res.data.status !==
-              newnewapi.SubscribeSmsNotificationsResponse.Status.SUCCESS &&
+            (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
               res.data.status !==
-                newnewapi.SubscribeSmsNotificationsResponse.Status
-                  .SERVICE_SMS_SENT)
+                newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
           ) {
             throw new Error(
               res.error?.message ??
@@ -643,7 +639,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           toast.error(t('smsNotifications.errors.requestFailed'));
           return;
         }
-        setSubscribedToSmsNotifications(!!res.data.subscribedAt);
+        setSubscribedToSmsNotifications(
+          res.data.status !== newnewapi.SmsNotificationsStatus.UNKNOWN_STATUS
+        );
       };
 
       pollGuestSmsSubscriptionStatus();
@@ -663,7 +661,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         return;
       }
 
-      setSubscribedToSmsNotifications(!!res.data.subscribedAt);
+      setSubscribedToSmsNotifications(
+        res.data.status !== newnewapi.SmsNotificationsStatus.UNKNOWN_STATUS
+      );
     });
 
     return () => {};
