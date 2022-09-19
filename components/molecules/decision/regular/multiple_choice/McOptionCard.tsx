@@ -74,8 +74,6 @@ const getPayWithCardErrorMessage = (
       return 'errors.cardNotFound';
     case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
       return 'errors.cardCannotBeUsed';
-    case newnewapi.VoteOnPostResponse.Status.BLOCKED_BY_CREATOR:
-      return 'errors.blockedByCreator';
     case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
       return 'errors.mcCancelled';
     case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:

@@ -43,8 +43,6 @@ const getPayWithCardErrorMessage = (
       return 'errors.cardNotFound';
     case newnewapi.DoPledgeResponse.Status.CARD_CANNOT_BE_USED:
       return 'errors.cardCannotBeUsed';
-    case newnewapi.DoPledgeResponse.Status.BLOCKED_BY_CREATOR:
-      return 'errors.blockedByCreator';
     case newnewapi.DoPledgeResponse.Status.CF_CANCELLED:
       return 'errors.cfCancelled';
     case newnewapi.DoPledgeResponse.Status.CF_FINISHED:

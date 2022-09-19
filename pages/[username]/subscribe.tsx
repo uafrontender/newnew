@@ -53,8 +53,6 @@ const getPayWithCardErrorMessage = (
       return 'errors.cardNotFound';
     case newnewapi.SubscribeToCreatorResponse.Status.CARD_CANNOT_BE_USED:
       return 'errors.cardCannotBeUsed';
-    case newnewapi.SubscribeToCreatorResponse.Status.BLOCKED_BY_CREATOR:
-      return 'errors.blockedByCreator';
     case newnewapi.SubscribeToCreatorResponse.Status.SUBSCRIPTION_UNAVAILABLE:
       return 'errors.subscriptionUnavailable';
     default:
