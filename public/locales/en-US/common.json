@@ -245,6 +245,9 @@
       "2": "The phone number is too short",
       "3": "The phone number is too long",
       "4": "Invalid phone number"
+    },
+    "error": {
+      "requestFailed": "Request failed"
     }
   }
 }

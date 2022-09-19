@@ -1,6 +1,7 @@
 import { useTranslation } from 'next-i18next';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
+import { newnewapi } from 'newnew-api';
 import assets from '../../../constants/assets';
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
@@ -9,55 +10,61 @@ import Modal from '../../organisms/Modal';
 import PhoneNumberInput from './PhoneNumberInput';
 import CloseIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
+export interface SubscriptionToCreator {
+  userId: string;
+  username: string;
+}
+
 interface ISmsNotificationModal {
   show: boolean;
-  subject: string;
+  subscription: SubscriptionToCreator;
   zIndex?: number;
+  onSubmit: (newPhoneNumber: newnewapi.PhoneNumber) => Promise<string>;
   onClose: () => void;
 }
 
 const SmsNotificationModal: React.FC<ISmsNotificationModal> = React.memo(
-  ({ show, subject, zIndex, onClose }) => {
-    const { t } = useTranslation('common');
+  ({ show, subscription, zIndex, onSubmit, onClose }) => {
     const theme = useTheme();
-    const [showSuccess, setShowSuccess] = useState(false);
-    const [currentPhoneNumber, setCurrentPhoneNumber] = useState<string>('');
-    const [phoneNumberError, setPhoneNumberError] = useState<
-      string | undefined
-    >();
+    const [phoneNumber, setPhoneNumber] = useState<string | undefined>();
+    const [busy, setBusy] = useState(false);
 
-    const handlePhoneNumberChanged = useCallback(
-      (phoneNumber: string, errorCode?: number) => {
-        if (errorCode && phoneNumber) {
-          setPhoneNumberError(t(`smsNotifications.phoneError.${errorCode}`));
-        } else {
-          setPhoneNumberError(undefined);
-        }
+    useEffect(() => {
+      if (!show) {
+        setPhoneNumber(undefined);
+      }
+    }, [show]);
 
-        setCurrentPhoneNumber(phoneNumber);
+    const onSmsNotificationRequest = useCallback(
+      (newPhoneNumber: newnewapi.PhoneNumber) => {
+        setBusy(true);
+        onSubmit(newPhoneNumber)
+          .then(() => {
+            setPhoneNumber(newPhoneNumber.number);
+          })
+          .catch(() => {
+            // Do nothing handled by parent
+          })
+          .finally(() => {
+            setBusy(false);
+          });
       },
-      [t]
+      [onSubmit]
     );
 
-    const submitSmsNotificationsRequest = useCallback(() => {
-      if (!currentPhoneNumber || phoneNumberError) {
-        return;
-      }
-
-      // TODO: send a request. Wait for success.
-
-      setShowSuccess(true);
-    }, [currentPhoneNumber, phoneNumberError]);
+    if (!show) {
+      return null;
+    }
 
     return (
-      <Modal show={show} overlaydim additionalz={zIndex} onClose={onClose}>
+      <Modal show overlaydim additionalz={zIndex} onClose={onClose}>
         <Container>
           <Content
             onClick={(e) => {
               e.stopPropagation();
             }}
           >
-            {!showSuccess && (
+            {!phoneNumber && (
               <SCloseButton onClick={onClose}>
                 <InlineSvg
                   svg={CloseIcon}
@@ -76,50 +83,122 @@ const SmsNotificationModal: React.FC<ISmsNotificationModal> = React.memo(
               alt='NewNew logo'
             />
 
-            <STitle>
-              {showSuccess
-                ? t('smsNotifications.success')
-                : t('smsNotifications.title')}
-            </STitle>
-            <SDescription>
-              {/* TODO: make data highlighted by color */}
-              {showSuccess
-                ? t('confirmation', { currentPhoneNumber })
-                : t('smsNotifications.description', { subject })}
-            </SDescription>
-
-            {!showSuccess && (
-              <>
-                <PhoneNumberInput
-                  value={currentPhoneNumber}
-                  onChange={handlePhoneNumberChanged}
-                />
-                <PhoneErrorText variant={3} tone='error'>
-                  {phoneNumberError}
-                </PhoneErrorText>
-                {/* TODO: Add a checkbox and TOS here with links */}
-              </>
+            {phoneNumber ? (
+              <SuccessStepContent phoneNumber={phoneNumber} onClose={onClose} />
+            ) : (
+              <RequestStepContent
+                subject={subscription.username}
+                busy={busy}
+                onSmsNotificationRequest={onSmsNotificationRequest}
+              />
             )}
-            <SButton
-              disabled={!showSuccess && !!phoneNumberError}
-              onClick={() => {
-                if (showSuccess) {
-                  onClose();
-                } else {
-                  submitSmsNotificationsRequest();
-                }
-              }}
-            >
-              {showSuccess
-                ? t('smsNotifications.button.close')
-                : t('smsNotifications.button.continue')}
-            </SButton>
           </Content>
         </Container>
       </Modal>
     );
   }
 );
+
+interface IRequestStepContent {
+  subject: string;
+  busy: boolean;
+  onSmsNotificationRequest: (phoneNumber: newnewapi.PhoneNumber) => void;
+}
+const RequestStepContent: React.FC<IRequestStepContent> = ({
+  subject,
+  busy,
+  onSmsNotificationRequest,
+}) => {
+  const { t } = useTranslation('common');
+  // const [acceptedTos, setAcceptedTos] = useState(false);
+  const [currentCountryCode, setCurrentCountryCode] = useState('');
+  const [currentPhoneNumber, setCurrentPhoneNumber] = useState('');
+  const [phoneNumberError, setPhoneNumberError] = useState<
+    string | undefined
+  >();
+
+  const handlePhoneNumberChanged = useCallback(
+    (countryCode: string, phoneNumber: string, errorCode?: number) => {
+      if (errorCode && phoneNumber) {
+        setPhoneNumberError(t(`smsNotifications.phoneError.${errorCode}`));
+      } else {
+        setPhoneNumberError(undefined);
+      }
+
+      setCurrentCountryCode(countryCode);
+      setCurrentPhoneNumber(phoneNumber);
+    },
+    [t]
+  );
+
+  const disabled =
+    busy || !!phoneNumberError || !currentCountryCode || !currentPhoneNumber;
+
+  return (
+    <>
+      <STitle>{t('smsNotifications.title')}</STitle>
+      <SDescription>
+        {/* TODO: make data highlighted by color */}
+        {t('smsNotifications.description', { subject })}
+      </SDescription>
+
+      <PhoneNumberInput
+        value={currentPhoneNumber}
+        disabled={busy}
+        onChange={handlePhoneNumberChanged}
+      />
+      <PhoneErrorText variant={3} tone='error'>
+        {phoneNumberError}
+      </PhoneErrorText>
+      {/* TODO: Add a checkbox and TOS here with links */}
+      <SButton
+        disabled={disabled}
+        onClick={() => {
+          if (disabled) {
+            return;
+          }
+
+          const phoneNumber = new newnewapi.PhoneNumber({
+            countryCode: currentCountryCode,
+            number: currentPhoneNumber,
+          });
+          onSmsNotificationRequest(phoneNumber);
+        }}
+      >
+        {t('smsNotifications.button.continue')}
+      </SButton>
+    </>
+  );
+};
+
+interface ISuccessStepContent {
+  phoneNumber: string;
+  onClose: () => void;
+}
+
+const SuccessStepContent: React.FC<ISuccessStepContent> = ({
+  phoneNumber,
+  onClose,
+}) => {
+  const { t } = useTranslation('common');
+  return (
+    <>
+      <STitle>{t('smsNotifications.success')}</STitle>
+      <SDescription>
+        {/* TODO: make data highlighted by color */}
+        {t('smsNotifications.confirmation', { phoneNumber })}
+      </SDescription>
+
+      <SButton
+        onClick={() => {
+          onClose();
+        }}
+      >
+        {t('smsNotifications.button.close')}
+      </SButton>
+    </>
+  );
+};
 
 export default SmsNotificationModal;
 

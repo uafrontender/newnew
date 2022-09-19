@@ -5,10 +5,19 @@ import 'intl-tel-input/build/css/intlTelInput.css';
 
 interface IPhoneNumberInput {
   value: string;
-  onChange: (phoneNumber: string, errorCode?: number) => void;
+  disabled: boolean;
+  onChange: (
+    countryCode: string,
+    phoneNumber: string,
+    errorCode?: number
+  ) => void;
 }
 
-const PhoneNumberInput: React.FC<IPhoneNumberInput> = ({ value, onChange }) => {
+const PhoneNumberInput: React.FC<IPhoneNumberInput> = ({
+  value,
+  disabled,
+  onChange,
+}) => {
   const [input, setInput] = useState<HTMLInputElement | undefined>();
   const iti = useRef<intlTelInput.Plugin>();
 
@@ -17,7 +26,7 @@ const PhoneNumberInput: React.FC<IPhoneNumberInput> = ({ value, onChange }) => {
       const intlTel = intlTelInput(input, {
         utilsScript:
           'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js',
-        preferredCountries: ['us', 'ca'],
+        preferredCountries: ['us', 'ca', 'gb', 'fr', 'br', 'jp', 'de'],
       });
 
       iti.current = intlTel;
@@ -40,18 +49,24 @@ const PhoneNumberInput: React.FC<IPhoneNumberInput> = ({ value, onChange }) => {
           }
         }}
         value={value}
+        disabled={disabled}
         onChange={() => {
-          if (iti.current) {
+          if (iti.current && !disabled) {
             const newPhoneNumber = iti.current.getNumber();
+            const country = iti.current.getSelectedCountryData();
 
             if (!newPhoneNumber.match(/^\+?[\d]*$/)) {
               return;
             }
 
             if (!iti.current.isValidNumber()) {
-              onChange(newPhoneNumber, iti.current.getValidationError());
+              onChange(
+                country.iso2,
+                newPhoneNumber,
+                iti.current.getValidationError()
+              );
             } else {
-              onChange(newPhoneNumber);
+              onChange(country.iso2.toUpperCase(), newPhoneNumber);
             }
           }
         }}
@@ -75,8 +90,6 @@ const Root = styled.div`
   }
 
   .iti__flag {
-    height: 9px;
-    width: 16px;
   }
 
   .iti__arrow {

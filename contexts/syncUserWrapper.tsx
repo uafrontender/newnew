@@ -146,6 +146,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
               countryCode: data.me?.countryCode,
               usernameChangedAt: data.me.usernameChangedAt,
               genderPronouns: data.me.genderPronouns,
+              phoneNumber: data.me.phoneNumber,
 
               options: {
                 isActivityPrivate: data.me?.options?.isActivityPrivate,
