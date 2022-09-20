@@ -421,60 +421,6 @@ const SSubheading = styled(Text)`
   }
 `;
 
-interface ISTimeoutDiv {
-  isAlertColor: boolean;
-}
-
-const STimeoutDiv = styled.div<ISTimeoutDiv>`
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-
-  // NB! Temp
-  color: ${({ isAlertColor, theme }) => {
-    if (isAlertColor) return theme.colorsThemed.accent.error;
-    return theme.colorsThemed.text.tertiary;
-  }};
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
-    line-height: 24px;
-  }
-`;
-
-const STimeExpired = styled(Text)`
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
-    line-height: 24px;
-  }
-
-  button {
-    background-color: transparent;
-    border: transparent;
-
-    font-size: inherit;
-    font-weight: 500;
-
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-    cursor: pointer;
-
-    &:hover,
-    &:focus {
-      outline: none;
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-      transition: 0.2s ease;
-    }
-  }
-`;
-
 const SErrorDiv = styled(Text)`
   font-size: 14px;
   line-height: 20px;
