@@ -1,4 +1,4 @@
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import React, { useCallback, useState, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -9,6 +9,7 @@ import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
 import PhoneNumberInput from './PhoneNumberInput';
 import CloseIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import CheckMark from '../CheckMark';
 
 export interface SubscriptionToCreator {
   userId: string;
@@ -110,7 +111,7 @@ const RequestStepContent: React.FC<IRequestStepContent> = ({
   onSmsNotificationRequest,
 }) => {
   const { t } = useTranslation('common');
-  // const [acceptedTos, setAcceptedTos] = useState(false);
+  const [acceptedTos, setAcceptedTos] = useState(false);
   const [currentCountryCode, setCurrentCountryCode] = useState('');
   const [currentPhoneNumber, setCurrentPhoneNumber] = useState('');
   const [phoneNumberError, setPhoneNumberError] = useState<
@@ -132,14 +133,22 @@ const RequestStepContent: React.FC<IRequestStepContent> = ({
   );
 
   const disabled =
-    busy || !!phoneNumberError || !currentCountryCode || !currentPhoneNumber;
+    busy ||
+    !acceptedTos ||
+    !!phoneNumberError ||
+    !currentCountryCode ||
+    !currentPhoneNumber;
 
   return (
     <>
       <STitle>{t('smsNotifications.title')}</STitle>
       <SDescription>
-        {/* TODO: make data highlighted by color */}
-        {t('smsNotifications.description', { subject })}
+        <Trans
+          t={t}
+          i18nKey='smsNotifications.description'
+          // @ts-ignore
+          components={[<SubjectSpan />, { subject }]}
+        />
       </SDescription>
 
       <PhoneNumberInput
@@ -150,7 +159,26 @@ const RequestStepContent: React.FC<IRequestStepContent> = ({
       <PhoneErrorText variant={3} tone='error'>
         {phoneNumberError}
       </PhoneErrorText>
-      {/* TODO: Add a checkbox and TOS here with links */}
+      <STosSection>
+        <CheckMark
+          size='small'
+          label=''
+          selected={acceptedTos}
+          handleChange={() => {
+            setAcceptedTos((curr) => !curr);
+          }}
+        />
+        <STosText>
+          <Trans
+            t={t}
+            i18nKey='smsNotifications.tos'
+            components={[
+              <STosLink href='https://terms.newnew.co' />,
+              <STosLink href='https://privacy.newnew.co' />,
+            ]}
+          />
+        </STosText>
+      </STosSection>
       <SButton
         disabled={disabled}
         onClick={() => {
@@ -185,8 +213,12 @@ const SuccessStepContent: React.FC<ISuccessStepContent> = ({
     <>
       <STitle>{t('smsNotifications.success')}</STitle>
       <SDescription>
-        {/* TODO: make data highlighted by color */}
-        {t('smsNotifications.confirmation', { phoneNumber })}
+        <Trans
+          t={t}
+          i18nKey='smsNotifications.confirmation'
+          // @ts-ignore
+          components={[<SubjectSpan />, { phoneNumber }]}
+        />
       </SDescription>
 
       <SButton
@@ -268,10 +300,38 @@ const SDescription = styled.div`
   text-align: center;
 `;
 
+const SubjectSpan = styled.span`
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+`;
+
 const PhoneErrorText = styled(Text)`
   height: 18px;
   margin-top: 3px;
   margin-bottom: 3px;
+`;
+
+const STosSection = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+`;
+
+const STosText = styled.div`
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  margin-bottom: 32px;
+`;
+
+const STosLink = styled.a`
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
 `;
 
 const SButton = styled(Button)`
