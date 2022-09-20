@@ -27,10 +27,7 @@ import { validateText } from '../../../../../api/endpoints/infrastructure';
 import {
   doFreeVote,
   voteOnPost,
-  // voteOnPostWithWallet,
 } from '../../../../../api/endpoints/multiple_choice';
-import // getTopUpWalletWithPaymentPurposeUrl,
-'../../../../../api/endpoints/payments';
 
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
@@ -46,7 +43,6 @@ import GradientMask from '../../../../atoms/GradientMask';
 import OptionActionMobileModal from '../../common/OptionActionMobileModal';
 import PaymentSuccessModal from '../../common/PaymentSuccessModal';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
-// import { WalletContext } from '../../../../../contexts/walletContext';
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../../atoms/decision/TutorialTooltip';
@@ -147,7 +143,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     'tablet',
   ].includes(resizeMode);
 
-  // const { walletBalance } = useContext(WalletContext);
   const { appConstants } = useGetAppConstants();
 
   // Infinite load
@@ -227,118 +222,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     },
     [setNewOptionText, validateTextViaAPIDebounced]
   );
-
-  // const handlePayWithWallet = useCallback(async () => {
-  //   setLoadingModalOpen(true);
-  //   try {
-  //     // Check if user is logged in
-  //     if (!user.loggedIn) {
-  //       const getTopUpWalletWithPaymentPurposeUrlPayload =
-  //         new newnewapi.TopUpWalletWithPurposeRequest({
-  //           successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //           }post/${post.postUuid}`,
-  //           cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //           }post/${post.postUuid}`,
-  //           ...(!user.loggedIn
-  //             ? {
-  //                 nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-  //               }
-  //             : {}),
-  //           mcVoteRequest: {
-  //             votesCount: parseInt(newBidAmount),
-  //             optionText: newOptionText,
-  //             postUuid: post.postUuid,
-  //           },
-  //         });
-
-  //       const res = await getTopUpWalletWithPaymentPurposeUrl(
-  //         getTopUpWalletWithPaymentPurposeUrlPayload
-  //       );
-
-  //       if (!res.data || !res.data.sessionUrl || res.error)
-  //         throw new Error(res.error?.message ?? 'Request failed');
-
-  //       window.location.href = res.data.sessionUrl;
-  //     } else {
-  //       const makeBidPayload = new newnewapi.VoteOnPostRequest({
-  //         votesCount: parseInt(newBidAmount),
-  //         optionText: newOptionText,
-  //         postUuid: post.postUuid,
-  //       });
-
-  //       const res = await voteOnPostWithWallet(makeBidPayload);
-
-  //       if (
-  //         res.data &&
-  //         res.data.status ===
-  //           newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE
-  //       ) {
-  //         const getTopUpWalletWithPaymentPurposeUrlPayload =
-  //           new newnewapi.TopUpWalletWithPurposeRequest({
-  //             successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //             }post/${post.postUuid}`,
-  //             cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //             }post/${post.postUuid}`,
-  //             mcVoteRequest: {
-  //               votesCount: parseInt(newBidAmount),
-  //               optionText: newOptionText,
-  //               postUuid: post.postUuid,
-  //             },
-  //           });
-
-  //         const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
-  //           getTopUpWalletWithPaymentPurposeUrlPayload
-  //         );
-
-  //         if (
-  //           !resStripeRedirect.data ||
-  //           !resStripeRedirect.data.sessionUrl ||
-  //           resStripeRedirect.error
-  //         )
-  //           throw new Error(
-  //             resStripeRedirect.error?.message ?? 'Request failed'
-  //           );
-
-  //         window.location.href = resStripeRedirect.data.sessionUrl;
-  //         return;
-  //       }
-
-  //       if (
-  //         !res.data ||
-  //         res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
-  //         res.error
-  //       )
-  //         throw new Error(res.error?.message ?? 'Request failed');
-
-  //       const optionFromResponse = (res.data
-  //         .option as newnewapi.MultipleChoice.Option)!!;
-  //       optionFromResponse.isSupportedByMe = true;
-  //       handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
-  //       setNewBidAmount('');
-  //       setNewOptionText('');
-  //       setSuggestNewMobileOpen(false);
-  //       setPaymentModalOpen(false);
-  //       setLoadingModalOpen(false);
-  //       setPaymentSuccessModalOpen(true);
-  //     }
-  //   } catch (err) {
-  //     setPaymentModalOpen(false);
-  //     setLoadingModalOpen(false);
-  //     console.error(err);
-  //   }
-  // }, [
-  //   newBidAmount,
-  //   newOptionText,
-  //   post.postUuid,
-  //   user.loggedIn,
-  //   router.locale,
-  //   handleAddOrUpdateOptionFromResponse,
-  // ]);
 
   const voteOnPostRequest = useMemo(
     () =>
@@ -781,26 +664,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           zIndex={12}
           amount={(parseInt(newBidAmount) || 0) * votePrice}
           setupIntent={setupIntent}
-          // {...(walletBalance?.usdCents &&
-          // walletBalance.usdCents >= parseInt(newBidAmount) * votePrice * 100
-          //   ? {}
-          //   : {
-          //       predefinedOption: 'card',
-          //     })}
-
-          // {...{
-          //   ...(walletBalance &&
-          //   walletBalance?.usdCents < parseInt(newBidAmount) * votePrice
-          //     ? {
-          //         predefinedOption: 'card',
-          //       }
-          //     : {}),
-          // }}
-          // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
           redirectUrl={`post/${post.postUuid}`}
-          // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
             <SPaymentSign variant='subtitle'>
               {t('mcPost.paymentModalFooter.body', { creator: postCreator })}*
@@ -815,7 +681,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               {t('mcPost.paymentModalFooter.apply')}
             </SPaymentSign>
           }
-          // payButtonCaptionKey={t('mcPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
             <SPaymentModalHeading>

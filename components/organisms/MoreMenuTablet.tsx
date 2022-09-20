@@ -10,11 +10,7 @@ import InlineSvg from '../atoms/InlineSVG';
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
-// import WalletIconFilled from '../../public/images/svg/icons/filled/Wallet.svg';
-// import WalletIconOutlined from '../../public/images/svg/icons/outlined/Wallet.svg';
 import { useAppSelector } from '../../redux-store/store';
-// import { WalletContext } from '../../contexts/walletContext';
-// import { formatNumber } from '../../utils/format';
 import copyIcon from '../../public/images/svg/icons/outlined/Link.svg';
 
 interface IMoreMenuTablet {
@@ -26,12 +22,10 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
   isVisible,
   handleClose,
 }) => {
-  // const theme = useTheme();
   const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
 
   const user = useAppSelector((state) => state.user);
-  // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
@@ -101,38 +95,6 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
               {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}
             </SMyLinkButton>
           )}
-          {/* <SButton
-            onClick={() =>
-              router.route.includes('/profile/settings')
-                ? handleClose()
-                : handleClick('/profile/settings')
-            }
-          >
-            <InlineSvg
-              svg={
-                router.route.includes('profile/settings')
-                  ? WalletIconFilled
-                  : WalletIconOutlined
-              }
-              fill={
-                router.route.includes('profile/settings')
-                  ? theme.colorsThemed.accent.blue
-                  : theme.colorsThemed.text.tertiary
-              }
-              width='24px'
-              height='24px'
-            />
-            <Text variant={2}>
-              {!isBalanceLoading && walletBalance && walletBalance?.usdCents > 0
-                ? t('mobileTopNavigation.myBalance', {
-                    value: formatNumber(
-                      Math.floor(walletBalance.usdCents / 100),
-                      true
-                    ),
-                  })
-                : t('mobileTopNavigation.myBalance')}
-            </Text>
-          </SButton> */}
         </SContainer>
       )}
     </AnimatePresence>

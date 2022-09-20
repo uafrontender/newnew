@@ -1,13 +1,13 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 
-import Button from '../Button';
-import InlineSvg from '../InlineSVG';
+import Button from './Button';
+import InlineSvg from './InlineSVG';
 
-import MinusIcon from '../../../public/images/svg/icons/outlined/Minus.svg';
-import PlusIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
+import MinusIcon from '../../public/images/svg/icons/outlined/Minus.svg';
+import PlusIcon from '../../public/images/svg/icons/outlined/Plus.svg';
 
-interface ITopUpWalletSlider {
+interface IValueSlider {
   value: number;
   min: number;
   max: number;
@@ -17,7 +17,7 @@ interface ITopUpWalletSlider {
   handleDecrement: () => void;
 }
 
-const TopUpWalletSlider: React.FunctionComponent<ITopUpWalletSlider> = ({
+const ValueSlider: React.FunctionComponent<IValueSlider> = ({
   value,
   min,
   max,
@@ -70,7 +70,7 @@ const TopUpWalletSlider: React.FunctionComponent<ITopUpWalletSlider> = ({
   );
 };
 
-export default TopUpWalletSlider;
+export default ValueSlider;
 
 const SSliderWrapper = styled.div`
   display: none;

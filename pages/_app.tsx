@@ -44,7 +44,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import ChannelsContextProvider from '../contexts/channelsContext';
 import { SubscriptionsProvider } from '../contexts/subscriptionsContext';
 import FollowingsContextProvider from '../contexts/followingContext';
-// import WalletContextProvider from '../contexts/walletContext';
 import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
 import SyncUserWrapper from '../contexts/syncUserWrapper';
@@ -219,7 +218,6 @@ const MyApp = (props: IMyApp): ReactElement => {
                       <ModalNotificationsContextProvider>
                         <BlockedUsersProvider>
                           <FollowingsContextProvider>
-                            {/* <WalletContextProvider> */}
                             <CardsContextProvider>
                               <SubscriptionsProvider>
                                 <ChatsProvider>
@@ -257,7 +255,6 @@ const MyApp = (props: IMyApp): ReactElement => {
                                 </ChatsProvider>
                               </SubscriptionsProvider>
                             </CardsContextProvider>
-                            {/* </WalletContextProvider> */}
                           </FollowingsContextProvider>
                         </BlockedUsersProvider>
                       </ModalNotificationsContextProvider>

@@ -19,8 +19,6 @@ import {
   useAppSelector,
 } from '../../../../../redux-store/store';
 import { doPledgeCrowdfunding } from '../../../../../api/endpoints/crowdfunding';
-import // getTopUpWalletWithPaymentPurposeUrl,
-'../../../../../api/endpoints/payments';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
@@ -46,7 +44,6 @@ import Headline from '../../../../atoms/Headline';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
-// import { WalletContext } from '../../../../contexts/walletContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.DoPledgeResponse.Status
@@ -95,7 +92,6 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   const user = useAppSelector((state) => state.user);
 
   const { appConstants } = useGetAppConstants();
-  // const { walletBalance } = useContext(WalletContext);
 
   const containerRef = useRef<HTMLDivElement>();
 
@@ -134,127 +130,6 @@ const CfPledgeLevelsSection: React.FunctionComponent<
     setCustomPledgeAmount('');
     setIsFormOpen(false);
   };
-
-  // Make a pledge and close all forms and modals
-  // const handlePayWithWallet = useCallback(async () => {
-  //  if (!user._persist?.rehydrated) {
-  //    return;
-  //  }
-  //
-  //   setLoadingModalOpen(true);
-  //   try {
-  //     // Check if user is logged in
-  //     if (!user.loggedIn) {
-  //       const getTopUpWalletWithPaymentPurposeUrlPayload =
-  //         new newnewapi.TopUpWalletWithPurposeRequest({
-  //           successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //           }post/${post.postUuid}`,
-  //           cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //           }post/${post.postUuid}`,
-  //           ...(!user.loggedIn
-  //             ? {
-  //                 nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-  //               }
-  //             : {}),
-  //           cfPledgeRequest: {
-  //             amount: new newnewapi.MoneyAmount({
-  //               usdCents: parseInt(pledgeAmount?.toString()!!),
-  //             }),
-  //             postUuid: post.postUuid,
-  //           },
-  //         });
-
-  //       const res = await getTopUpWalletWithPaymentPurposeUrl(
-  //         getTopUpWalletWithPaymentPurposeUrlPayload
-  //       );
-
-  //       if (!res.data || !res.data.sessionUrl || res.error)
-  //         throw new Error(res.error?.message ?? 'Request failed');
-
-  //       window.location.href = res.data.sessionUrl;
-  //     } else {
-  //       const makePledgePayload = new newnewapi.DoPledgeRequest({
-  //         amount: new newnewapi.MoneyAmount({
-  //           usdCents: parseInt(pledgeAmount?.toString()!!),
-  //         }),
-  //         postUuid: post.postUuid,
-  //       });
-
-  //       const res = await doPledgeWithWallet(makePledgePayload);
-
-  //       if (
-  //         res.data &&
-  //         res.data.status ===
-  //           newnewapi.DoPledgeResponse.Status.INSUFFICIENT_WALLET_BALANCE
-  //       ) {
-  //         const getTopUpWalletWithPaymentPurposeUrlPayload =
-  //           new newnewapi.TopUpWalletWithPurposeRequest({
-  //             successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //             }post/${post.postUuid}`,
-  //             cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //             }post/${post.postUuid}`,
-  //             cfPledgeRequest: {
-  //               amount: new newnewapi.MoneyAmount({
-  //                 usdCents: parseInt(pledgeAmount?.toString()!!),
-  //               }),
-  //               postUuid: post.postUuid,
-  //             },
-  //           });
-
-  //         const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
-  //           getTopUpWalletWithPaymentPurposeUrlPayload
-  //         );
-
-  //         if (
-  //           !resStripeRedirect.data ||
-  //           !resStripeRedirect.data.sessionUrl ||
-  //           resStripeRedirect.error
-  //         )
-  //           throw new Error(
-  //             resStripeRedirect.error?.message ?? 'Request failed'
-  //           );
-
-  //         window.location.href = resStripeRedirect.data.sessionUrl;
-  //         return;
-  //       }
-
-  //       if (
-  //         !res.data ||
-  //         res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS ||
-  //         res.error
-  //       )
-  //         throw new Error(res.error?.message ?? 'Request failed');
-
-  //       setIsFormOpen(false);
-  //       setCustomPledgeAmount('');
-  //       handleAddPledgeFromResponse(
-  //         res.data.pledge as newnewapi.Crowdfunding.Pledge
-  //       );
-
-  //       setCustomPledgeAmount('');
-  //       setIsFormOpen(false);
-  //       setPaymentModalOpen(false);
-  //       setLoadingModalOpen(false);
-  //       handleSetPaymentSuccessModalOpen(true);
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //     setPaymentModalOpen(false);
-  //     setLoadingModalOpen(false);
-  //   }
-  // }, [
-  //   user.loggedIn,
-  //   user._persist?.rehydrated,
-  //   router.locale,
-  //   post.postUuid,
-  //   pledgeAmount,
-  //   handleAddPledgeFromResponse,
-  //   handleSetPaymentSuccessModalOpen,
-  // ]);
 
   const doPledgeRequest = useMemo(
     () =>
@@ -499,18 +374,9 @@ const CfPledgeLevelsSection: React.FunctionComponent<
           zIndex={12}
           amount={pledgeAmount || 0}
           setupIntent={setupIntent}
-          // {...(walletBalance?.usdCents &&
-          // pledgeAmount &&
-          // walletBalance.usdCents >= pledgeAmount
-          //   ? {}
-          //   : {
-          //       predefinedOption: 'card',
-          //     })}
-          // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
           redirectUrl={`post/${post.postUuid}`}
-          // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
             <SPaymentSign variant='subtitle'>
               {post.creator && (
@@ -532,7 +398,6 @@ const CfPledgeLevelsSection: React.FunctionComponent<
               {t('cfPost.paymentModalFooter.apply')}
             </SPaymentSign>
           }
-          // payButtonCaptionKey={t('cfPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
             <SPaymentModalHeading>
