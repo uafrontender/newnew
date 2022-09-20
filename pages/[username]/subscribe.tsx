@@ -20,7 +20,6 @@ import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../redux-store/store';
-// import { WalletContext } from '../../contexts/walletContext';
 import { getUserByUsername } from '../../api/endpoints/user';
 import {
   getSubscriptionStatus,
@@ -122,8 +121,6 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
     user.username,
   ]);
 
-  // const { walletBalance } = useContext(WalletContext);
-
   const [isScrolledDown, setIsScrolledDown] = useState(false);
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
   const topSectionRef = useRef<HTMLDivElement>();
@@ -132,19 +129,6 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
     number | undefined
   >(undefined);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-
-  // const predefinedOption = useMemo(() => {
-  //   if (walletBalance && subscriptionPrice) {
-  //     return walletBalance.usdCents >= subscriptionPrice ? 'wallet' : 'card';
-  //   }
-  //   return undefined;
-  // }, [walletBalance, subscriptionPrice]);
-  const predefinedOption = useMemo(() => {
-    if (subscriptionPrice) {
-      return 'card';
-    }
-    return undefined;
-  }, [subscriptionPrice]);
 
   const subPriceFormatted = useMemo(
     () =>
@@ -497,7 +481,6 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
       )}
       <PaymentModal
         zIndex={10}
-        // predefinedOption={predefinedOption}
         isOpen={isPaymentModalOpen}
         amount={subscriptionPrice || 0}
         onClose={handleClosePaymentModal}
@@ -505,8 +488,6 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
         showTocApply
         setupIntent={setupIntent}
         redirectUrl={`${user.username}/subscribe`}
-        // handlePayWithWallet={handlePayRegistered}
-        // payButtonCaptionKey={t('paymentModal.payButton')}
       >
         <SPaymentModalHeader>
           <SPaymentModalTitle variant='subtitle'>

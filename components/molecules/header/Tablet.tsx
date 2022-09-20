@@ -13,7 +13,6 @@ import NavigationItem from '../NavigationItem';
 import { useGetChats } from '../../../contexts/chatContext';
 
 import { useAppSelector } from '../../../redux-store/store';
-// import { WalletContext } from '../../../contexts/walletContext';
 
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
@@ -31,8 +30,6 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
-
-  // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
@@ -77,19 +74,6 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 }}
               />
             </SItemWithMargin>
-            {/* {user.userData?.options?.isCreator && !isBalanceLoading && (
-              <SItemWithMargin>
-                <NavigationItem
-                  item={{
-                    url: '/profile/settings',
-                    key: 'my-balance-tablet',
-                    value: walletBalance?.usdCents
-                      ? parseInt((walletBalance.usdCents / 100).toFixed(0)) ?? 0
-                      : undefined,
-                  }}
-                />
-              </SItemWithMargin>
-            )} */}
           </>
         )}
         <SItemWithMargin

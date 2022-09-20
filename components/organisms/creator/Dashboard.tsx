@@ -52,16 +52,18 @@ export const Dashboard: React.FC = React.memo(() => {
   const { mySubscribers } = useGetSubscriptions();
   const [mySubscriptionProduct, setMySubscriptionProduct] =
     useState<newnewapi.ISubscriptionProduct | null>(null);
-  const [isToDosCompleted, setIsToDosCompleted] =
-    useState<boolean | undefined>(undefined);
+  const [isToDosCompleted, setIsToDosCompleted] = useState<boolean | undefined>(
+    undefined
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isEarningsLoading, setIsEarningsLoading] = useState(true);
   const [isMySubscriptionProductLoading, setIsMySubscriptionProductLoading] =
     useState(true);
   const [expirationPosts, setExpirationPosts] = useState<newnewapi.IPost[]>([]);
   const filter = '7_days';
-  const [myEarnings, setMyEarnings] =
-    useState<newnewapi.GetMyEarningsResponse | undefined>();
+  const [myEarnings, setMyEarnings] = useState<
+    newnewapi.GetMyEarningsResponse | undefined
+  >();
   const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] =
     useState(true);
   const [hasMyPosts, setHasMyPosts] = useState(false);
