@@ -190,7 +190,6 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
           handlePayWithCard={handlePayWithCard}
           redirectUrl={`/direct-messages/${user.username}`}
           setupIntent={setupIntent}
-          noRewards
         >
           <div>
             <SPaymentModalTitle variant='subtitle'>
@@ -215,7 +214,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
         </PaymentModal>
         {/* Loading Modal */}
         {loadingModalOpen && (
-          <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+          <LoadingModal isOpen={loadingModalOpen} zIndex={50} />
         )}
       </SBottomActionContainer>
     );

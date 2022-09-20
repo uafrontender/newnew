@@ -20,17 +20,23 @@ const OptionCard: React.FunctionComponent<IOptionCard> = ({
   label,
 }) => {
   const ref: any = useRef();
+  const prevSelected = useRef(selected);
+  const isStoppedRef = useRef(true);
 
   useEffect(() => {
-    ref.current.anim.stop();
+    if (prevSelected.current !== selected) {
+      prevSelected.current = selected;
+      ref.current.anim.stop();
+      isStoppedRef.current = false;
 
-    if (selected) {
-      ref.current.anim.setSegment(0, 23);
-    } else {
-      ref.current.anim.setSegment(1, 1);
+      if (selected) {
+        ref.current.anim.setSegment(0, 23);
+      } else {
+        ref.current.anim.setSegment(1, 1);
+      }
+      ref.current.anim.play();
     }
-    ref.current.anim.play();
-  }, [ref, selected]);
+  }, [ref, selected, prevSelected]);
 
   return (
     <SOptionCard
@@ -48,6 +54,7 @@ const OptionCard: React.FunctionComponent<IOptionCard> = ({
             autoplay: false,
             animationData: checkBoxAnim,
           }}
+          isStopped={isStoppedRef.current}
         />
       </SAnimation>
       <SLabelContent>

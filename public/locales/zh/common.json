@@ -177,56 +177,5 @@
   },
   "toastErrors": {
     "generic": "发生错误，请稍后再试"
-  },
-  "rewards": {
-    "earned": "已賺取${{value}}",
-    "earn": "賺取${{value}}",
-    "modalTitle": "你賺到了${{amount}}！",
-    "modalButton": "很棒",
-    "modalDescription_NEED_TRANSLATION": {
-      "1": "...for signing up",
-      "2": "...for placing a bid",
-      "3": "...for voting on a post",
-      "4": "...for backing a goal",
-      "5": "...for subscribing to a creator",
-      "6": "...for subscribing to {{creators}} creators",
-      "7": "...for bidding twice on the same creator",
-      "8": "...for voting twice on the same creator",
-      "9": "...for backing the same creator twice",
-      "10": "...for bidding twice in one week",
-      "11": "...for voting twice in one week",
-      "12": "...for backing goals twice in one week",
-      "13": "...for inviting {{friends}} friends to NewNew"
-    },
-    "receivedItemDescription_NEED_TRANSLATION": {
-      "1": "Signed up",
-      "2": "Placed a bid",
-      "3": "Voted on a post",
-      "4": "Backed a goal",
-      "5": "Subscribed to a creator",
-      "6": "Subscribed to {{creators}} creators",
-      "7": "Bid twice on the same creator",
-      "8": "Voted twice on the same creator",
-      "9": "Backed the same creator twice",
-      "10": "Placed bids twice in one week",
-      "11": "Voted twice in one week",
-      "12": "Backed goals twice in one week",
-      "13": "Invited {{friends}} friends"
-    },
-    "availableItemDescription_NEED_TRANSLATION": {
-      "1": "Sign up",
-      "2": "Place a bid",
-      "3": "Vote on a post",
-      "4": "Back a Goal",
-      "5": "Subscribe to a creator",
-      "6": "Subscribe to {{creators}} creators",
-      "7": "Bid twice on the same creator",
-      "8": "Vote twice on the same creator",
-      "9": "Back the same Creator twice",
-      "10": "Bid twice in one week",
-      "11": "Vote twice in one week",
-      "12": "Back goals twice in one week",
-      "13": "Invite {{friends}} friends to NewNew"
-    }
   }
 }

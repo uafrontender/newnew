@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
@@ -8,17 +8,12 @@ import Logo from '../Logo';
 import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/search/SearchInput';
 import { useAppSelector } from '../../../redux-store/store';
-import { RewardContext } from '../../../contexts/rewardContext';
-import { useGetAppConstants } from '../../../contexts/appConstantsContext';
-import RewardButton from '../RewardButton';
 import { Mixpanel } from '../../../utils/mixpanel';
 import Button from '../../atoms/Button';
 
 export const Mobile: React.FC = React.memo(() => {
   const user = useAppSelector((state) => state.user);
   const { t } = useTranslation();
-  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
-  const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
 
   return (
     <SContainer>
@@ -75,14 +70,6 @@ export const Mobile: React.FC = React.memo(() => {
                 </Link>
               </SItemWithMargin>
             )}
-            <SItemWithMargin>
-              <RewardButton
-                balance={
-                  rewardBalance ? rewardBalance.usdCents / 100 : undefined
-                }
-                loading={isRewardBalanceLoading}
-              />
-            </SItemWithMargin>
           </>
         ) : (
           <>
@@ -105,18 +92,6 @@ export const Mobile: React.FC = React.memo(() => {
                 </a>
               </Link>
             </SItemWithMargin>
-            {currentSignupRewardAmount && (
-              <SItemWithMargin>
-                <RewardButton
-                  balance={
-                    currentSignupRewardAmount.usdCents
-                      ? currentSignupRewardAmount.usdCents / 100
-                      : undefined
-                  }
-                  offer
-                />
-              </SItemWithMargin>
-            )}
           </>
         )}
       </SRightBlock>
