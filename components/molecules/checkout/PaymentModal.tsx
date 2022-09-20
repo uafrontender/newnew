@@ -20,7 +20,6 @@ interface IPaymentModal {
   zIndex: number;
   redirectUrl: string;
   amount?: number;
-  noRewards?: boolean;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
   onClose: () => void;
@@ -38,7 +37,6 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   setupIntent,
   redirectUrl,
   amount,
-  noRewards,
   showTocApply,
   bottomCaption,
   onClose,
@@ -106,7 +104,6 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             <CheckoutForm
               setupIntent={setupIntent}
               redirectUrl={redirectUrl}
-              noRewards={noRewards}
               amount={amount}
               bottomCaption={bottomCaption}
               handlePayWithCard={handlePayWithCard}
@@ -123,7 +120,6 @@ PaymentModal.defaultProps = {
   amount: undefined,
   showTocApply: undefined,
   bottomCaption: null,
-  noRewards: undefined,
   handlePayWithCard: () => {},
 };
 
