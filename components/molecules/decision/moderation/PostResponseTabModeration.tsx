@@ -660,7 +660,9 @@ const SUserAvatar = styled.img`
   object-fit: contain;
 `;
 
-const SHeadline = styled(Headline)``;
+const SHeadline = styled(Headline)`
+  white-space: pre-wrap;
+`;
 
 const SUploadButton = styled(Button)`
   position: fixed;

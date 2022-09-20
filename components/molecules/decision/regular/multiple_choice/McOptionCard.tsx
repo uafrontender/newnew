@@ -1546,6 +1546,7 @@ const SPaymentModalHeadingPostCreator = styled(Text)`
 const SPaymentModalPostText = styled(Text)`
   display: flex;
   align-items: center;
+  white-space: pre-wrap;
   gap: 8px;
 
   margin-bottom: 24px;

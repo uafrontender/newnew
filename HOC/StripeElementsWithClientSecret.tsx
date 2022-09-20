@@ -51,6 +51,13 @@ export const StripeElements: React.FC<IStripeElements> = ({
             border: '1.5px solid transparent',
             fontWeight: '500',
           },
+          '.Input:autofill': {
+            visibility: 'hidden',
+            display: 'none !important',
+            pointerEvents: 'none',
+            position: 'absolute',
+            right: '0',
+          },
           '.Input:focus': {
             borderColor: `${theme.colorsThemed.background.outlines2}`,
             outline: '0',
