@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useMemo,
-  useContext,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled from 'styled-components';
@@ -19,7 +13,6 @@ import { StripePaymentElementOptions } from '@stripe/stripe-js';
 
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
-import Toggle from '../../atoms/Toggle';
 import OptionCard from './OptionCard';
 import Input from '../../atoms/Input';
 import CheckMark from '../CheckMark';
@@ -27,8 +20,6 @@ import CheckMark from '../CheckMark';
 import { formatNumber } from '../../../utils/format';
 import { useCards } from '../../../contexts/cardsContext';
 import { useAppSelector } from '../../../redux-store/store';
-import { RewardContext } from '../../../contexts/rewardContext';
-import assets from '../../../constants/assets';
 import { IReCaptchaRes } from '../../interfaces/reCaptcha';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 
@@ -42,7 +33,6 @@ interface ICheckoutForm {
   setupIntent: ISetupIntent;
   redirectUrl: string;
   amount?: number;
-  noRewards?: boolean;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
   handlePayWithCard?: (params: {
@@ -55,7 +45,6 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   setupIntent,
   redirectUrl,
   amount,
-  noRewards,
   showTocApply,
   bottomCaption,
   handlePayWithCard,
@@ -71,9 +60,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const [saveCard, setSaveCard] = useState(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [useRewards, setUseRewards] = useState(false);
 
-  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
   const elements = useElements();
   const { cards } = useCards();
   const stripe = useStripe();
@@ -89,11 +76,6 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard);
     }
   }, [selectedPaymentMethod, primaryCard]);
-
-  const rewardUsed =
-    useRewards && rewardBalance?.usdCents && amount
-      ? Math.min(rewardBalance.usdCents, amount)
-      : 0;
 
   const toggleSaveCard = useCallback(() => {
     setSaveCard((prevState) => !prevState);
@@ -136,25 +118,6 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         const jsonRes: IReCaptchaRes = await res.json();
 
         if (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5) {
-          // save used rewards amount
-          if (rewardUsed > 0) {
-            const { errorKey } = await setupIntent.update({
-              ...(rewardUsed > 0 ? { rewardAmount: rewardUsed } : {}),
-            });
-
-            if (errorKey) {
-              throw new Error(t(errorKey));
-            }
-          }
-
-          // pay with rewards amount only
-          if (amount && rewardUsed >= amount && primaryCard) {
-            await handlePayWithCard?.({
-              cardUuid: primaryCard.cardUuid as string,
-            });
-            return;
-          }
-
           // pay with primary card
           if (
             selectedPaymentMethod === PaymentMethodTypes.PrimaryCard &&
@@ -222,29 +185,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
 
   return (
     <SForm onSubmit={handleSubmit}>
-      {/* Rewards */}
-      {!noRewards && !!rewardBalance?.usdCents && (
-        <RewardContainer>
-          <RewardImage src={assets.decision.gold} alt='reward balance' />
-          <RewardText>{t('rewardsText')}</RewardText>
-          <RewardBalance>
-            $
-            {rewardBalance?.usdCents
-              ? Math.round(rewardBalance.usdCents / 100)
-              : 0}
-          </RewardBalance>
-          <Toggle
-            checked={useRewards}
-            disabled={isRewardBalanceLoading}
-            onChange={() => {
-              setUseRewards((curr) => !curr);
-            }}
-          />
-        </RewardContainer>
-      )}
-
       {/* Payment method */}
-      {!(amount && rewardUsed >= amount && primaryCard) && (
+      {!(amount && primaryCard) && (
         <>
           <Text variant='subtitle'>{t('paymentMethodTitle')}</Text>
           {primaryCard && (
@@ -311,11 +253,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           loading={isSubmitting}
         >
           {t('payButton')}
-          {amount &&
-            ` $${formatNumber(
-              Math.max(amount - rewardUsed, 0) / 100,
-              amount % 1 === 0
-            )}`}
+          {amount && ` $${formatNumber(amount / 100, amount % 1 === 0)}`}
         </SPayButton>
         {bottomCaption || null}
         {showTocApply && (
@@ -391,50 +329,6 @@ const SEmailInput = styled(Input)`
   &::-ms-input-placeholder {
     color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   }
-`;
-
-const RewardContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  border: 1px solid;
-  border-color: ${({ theme }) => theme.colorsThemed.text.primary};
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-  height: 78px;
-  margin-bottom: 16px;
-  padding-left: 16px;
-  padding-right: 18px;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 24px;
-    padding-left: 20px;
-    padding-right: 30px;
-  }
-`;
-
-const RewardImage = styled.img`
-  height: 40px;
-  width: 40px;
-  margin-right: 16px;
-  object-fit: cover;
-`;
-
-const RewardText = styled.div`
-  ${({ theme }) => theme.colorsThemed.text.primary};
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-  margin-right: 8px;
-  flex-grow: 1;
-`;
-
-const RewardBalance = styled.div`
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 32px;
-  margin-right: 20px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
 `;
 
 const SPayButtonDiv = styled.div`
