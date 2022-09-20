@@ -1276,6 +1276,7 @@ const SPaymentModalPostText = styled(Text)`
   display: flex;
   align-items: center;
   gap: 8px;
+  white-space: pre-wrap;
 
   margin-bottom: 24px;
 `;

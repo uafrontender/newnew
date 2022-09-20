@@ -364,6 +364,7 @@ const STotal = styled.div`
 // Post title
 const SPostTitle = styled(Headline)`
   text-align: center;
+  white-space: pre-wrap;
 
   margin-top: 8px;
   ${({ theme }) => theme.media.tablet} {
