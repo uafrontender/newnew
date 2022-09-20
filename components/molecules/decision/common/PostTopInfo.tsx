@@ -374,10 +374,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             />
           ) : null}
         </SActionsDiv>
-        <SPostTitle>
-          <Headline variant={5}>
-            <PostTitleContent>{title}</PostTitleContent>
-          </Headline>
+        <SPostTitle variant={5}>
+          <PostTitleContent>{title}</PostTitleContent>
         </SPostTitle>
         {showSelectingWinnerOption ? (
           <SSelectingWinnerOption>
@@ -470,8 +468,9 @@ const SWrapper = styled.div<{
   }
 `;
 
-const SPostTitle = styled.div`
+const SPostTitle = styled(Headline)`
   grid-area: title;
+  white-space: pre-wrap;
 
   display: flex;
   align-items: center;
