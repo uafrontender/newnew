@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-interface ITopUpWalletInput {
+interface IMoneyInput {
   isOpen: boolean;
   value: number;
   onChange: (newValue: number) => void;
 }
 
-const TopUpWalletInput: React.FunctionComponent<ITopUpWalletInput> = ({
+const MoneyInput: React.FunctionComponent<IMoneyInput> = ({
   isOpen,
   value,
   onChange,
@@ -39,7 +39,7 @@ const TopUpWalletInput: React.FunctionComponent<ITopUpWalletInput> = ({
   );
 };
 
-export default TopUpWalletInput;
+export default MoneyInput;
 
 const SContainer = styled.div`
   margin-top: 154px;
