@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
@@ -72,7 +72,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   );
   const [isResendCodeLoading, setIsResendCodeLoading] = useState(false);
 
-  //Timer
+  // Timer
   const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
 
   const onCodeComplete = useCallback(
