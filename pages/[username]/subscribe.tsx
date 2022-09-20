@@ -503,7 +503,6 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
         onClose={handleClosePaymentModal}
         handlePayWithCard={handleSubscribeWithCard}
         showTocApply
-        noRewards
         setupIntent={setupIntent}
         redirectUrl={`${user.username}/subscribe`}
         // handlePayWithWallet={handlePayRegistered}

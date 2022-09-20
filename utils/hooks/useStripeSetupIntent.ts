@@ -33,7 +33,6 @@ interface ISetupIntentData {
 interface ISetupIntentProps {
   email?: string;
   saveCard?: boolean;
-  rewardAmount?: number;
 }
 
 export interface ISetupIntent extends ISetupIntentData {
@@ -139,7 +138,6 @@ const useStripeSetupIntent = ({
     async ({
       email,
       saveCard,
-      rewardAmount,
     }: ISetupIntentProps): Promise<{ errorKey?: string }> => {
       try {
         if (!setupIntent.setupIntentClientSecret) {
@@ -151,13 +149,6 @@ const useStripeSetupIntent = ({
             stripeSetupIntentClientSecret: setupIntent.setupIntentClientSecret,
             ...(email ? { guestEmail: email } : {}),
             ...(saveCard ? { saveCard: saveCard || false } : {}),
-            ...(rewardAmount
-              ? {
-                  rewardAmount: new newnewapi.MoneyAmount({
-                    usdCents: rewardAmount,
-                  }),
-                }
-              : {}),
           });
 
         const response = await updateStripeSetupIntent(
