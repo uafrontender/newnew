@@ -11,7 +11,6 @@
       "fees": "費率最高3%"
     }
   },
-  "rewardsText": "使用我的奖励",
   "payButton": "支付",
   "tocApplyLink": "條款",
   "tocApplyText": "適用",
@@ -28,7 +27,6 @@
   "email": "電子郵件",
   "errors_NEED_TRANSLATION": {
     "wrongEmail": "Email can't be used",
-    "rewardNotEnough": "Rewards balance is insufficient",
     "paymentFailed": "Payment failed",
     "requestFailed": "Request failed"
   }
