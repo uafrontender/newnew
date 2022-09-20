@@ -706,6 +706,7 @@ const SPaymentModalHeadingPostCreator = styled(Text)`
 const SPaymentModalOptionText = styled(Headline)`
   display: flex;
   align-items: center;
+  white-space: pre-wrap;
   gap: 8px;
 `;
 

@@ -188,7 +188,6 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
           handlePayWithCard={handlePayWithCard}
           redirectUrl={`/direct-messages/${user.username}`}
           setupIntent={setupIntent}
-          noRewards
         >
           <div>
             <SPaymentModalTitle variant='subtitle'>

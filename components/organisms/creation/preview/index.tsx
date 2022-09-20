@@ -567,8 +567,9 @@ const STabletContent = styled.div`
 `;
 
 const SHeadLine = styled(Text)`
-  padding: 26px 0;
   text-align: start;
+  white-space: pre-wrap;
+  padding: 26px 0;
 
   ${({ theme }) => theme.media.laptop} {
     padding: 8px 0;
@@ -653,6 +654,7 @@ const SHeadlineMobile = styled(Caption)`
   overflow: hidden;
   position: relative;
   padding-left: 8px;
+  white-space: pre-wrap;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
 `;

@@ -67,7 +67,6 @@ import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
-// import getRewardErrorStatusTextKey from '../../../../../utils/getRewardErrorStatusTextKey';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -1274,6 +1273,7 @@ const SPaymentModalPostText = styled(Text)`
   display: flex;
   align-items: center;
   gap: 8px;
+  white-space: pre-wrap;
 
   margin-bottom: 24px;
 `;
