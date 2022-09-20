@@ -186,62 +186,56 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   return (
     <SForm onSubmit={handleSubmit}>
       {/* Payment method */}
-      {!(amount && primaryCard) && (
+      <Text variant='subtitle'>{t('paymentMethodTitle')}</Text>
+      {primaryCard && (
         <>
-          <Text variant='subtitle'>{t('paymentMethodTitle')}</Text>
-          {primaryCard && (
-            <>
-              <OptionCard
-                handleClick={() =>
-                  setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard)
-                }
-                selected={
-                  selectedPaymentMethod === PaymentMethodTypes.PrimaryCard
-                }
-                label={`${t('primaryCard')} **** ${primaryCard.last4}`}
-              />
-              <OptionCard
-                handleClick={() =>
-                  setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
-                }
-                selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
-                label={t('newCard')}
-              />
-            </>
-          )}
-
-          {(selectedPaymentMethod === PaymentMethodTypes.NewCard ||
-            !primaryCard) && (
-            <SPaymentFormWrapper isSingleForm={!primaryCard}>
-              {!loggedIn && isStripeReady && (
-                <SEmailInput
-                  value={email}
-                  isValid={email.length > 0 && !emailError}
-                  onChange={handleSetEmail}
-                  placeholder={t('email')}
-                  type='email'
-                  errorCaption={emailError}
-                />
-              )}
-              <PaymentElement
-                onReady={() => setIsStripeReady(true)}
-                options={paymentElementOptions}
-              />
-              {/* Show save toggle only if user already has primary card otherwise card will be saved in any case */}
-              {isStripeReady && primaryCard && (
-                <SSaveCard>
-                  <CheckMark
-                    selected={saveCard}
-                    handleChange={toggleSaveCard}
-                    label={t('saveCard')}
-                    variant={2}
-                    size='small'
-                  />
-                </SSaveCard>
-              )}
-            </SPaymentFormWrapper>
-          )}
+          <OptionCard
+            handleClick={() =>
+              setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard)
+            }
+            selected={selectedPaymentMethod === PaymentMethodTypes.PrimaryCard}
+            label={`${t('primaryCard')} **** ${primaryCard.last4}`}
+          />
+          <OptionCard
+            handleClick={() =>
+              setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
+            }
+            selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
+            label={t('newCard')}
+          />
         </>
+      )}
+
+      {(selectedPaymentMethod === PaymentMethodTypes.NewCard ||
+        !primaryCard) && (
+        <SPaymentFormWrapper isSingleForm={!primaryCard}>
+          {!loggedIn && isStripeReady && (
+            <SEmailInput
+              value={email}
+              isValid={email.length > 0 && !emailError}
+              onChange={handleSetEmail}
+              placeholder={t('email')}
+              type='email'
+              errorCaption={emailError}
+            />
+          )}
+          <PaymentElement
+            onReady={() => setIsStripeReady(true)}
+            options={paymentElementOptions}
+          />
+          {/* Show save toggle only if user already has primary card otherwise card will be saved in any case */}
+          {isStripeReady && primaryCard && (
+            <SSaveCard>
+              <CheckMark
+                selected={saveCard}
+                handleChange={toggleSaveCard}
+                label={t('saveCard')}
+                variant={2}
+                size='small'
+              />
+            </SSaveCard>
+          )}
+        </SPaymentFormWrapper>
       )}
 
       <SPayButtonDiv>
