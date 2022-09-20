@@ -85,22 +85,6 @@ export const voteOnPost = (
     signal ?? undefined
   );
 
-export const voteOnPostWithWallet = (
-  payload: newnewapi.VoteOnPostRequest,
-  signal?: RequestInit['signal']
-) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.VoteOnPostRequest,
-    newnewapi.VoteOnPostResponse
-  >(
-    newnewapi.VoteOnPostRequest,
-    newnewapi.VoteOnPostResponse,
-    `${BASE_URL_MULTICHOICE}/vote_on_post_with_wallet`,
-    'post',
-    payload,
-    signal ?? undefined
-  );
-
 export const doFreeVote = (
   payload: newnewapi.VoteOnPostRequest,
   signal?: RequestInit['signal']

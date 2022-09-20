@@ -101,22 +101,6 @@ export const placeBidOnAuction = (
     signal ?? undefined
   );
 
-export const placeBidWithWallet = (
-  payload: newnewapi.PlaceBidRequest,
-  signal?: RequestInit['signal']
-) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.PlaceBidRequest,
-    newnewapi.PlaceBidResponse
-  >(
-    newnewapi.PlaceBidRequest,
-    newnewapi.PlaceBidResponse,
-    `${BASE_URL_AUCTION}/place_bid_with_wallet`,
-    'post',
-    payload,
-    signal ?? undefined
-  );
-
 export const selectWinningOption = (
   payload: newnewapi.SelectWinningOptionRequest,
   signal?: RequestInit['signal']
