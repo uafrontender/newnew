@@ -108,63 +108,6 @@ export const fetchSetStripeLinkCreator = (
     signal ?? undefined
   );
 
-// Wallet
-export const getWalletBalance = (
-  payload: newnewapi.EmptyRequest,
-  signal?: RequestInit['signal']
-) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.EmptyRequest,
-    newnewapi.GetWalletBalanceResponse
-  >(
-    newnewapi.EmptyRequest,
-    newnewapi.GetWalletBalanceResponse,
-    `${BASE_URL_PAYMENTS}/get_wallet_balance`,
-    'post',
-    payload,
-    signal ?? undefined
-  );
-
-export const getTopUpWalletSessionUrl = (
-  payload: newnewapi.TopUpWalletRequest,
-  signal?: RequestInit['signal']
-) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.TopUpWalletRequest,
-    newnewapi.TopUpWalletResponse
-  >(
-    newnewapi.TopUpWalletRequest,
-    newnewapi.TopUpWalletResponse,
-    `${BASE_URL_PAYMENTS}/top_up_wallet`,
-    'post',
-    payload,
-    signal ?? undefined
-  );
-
-export const getTopUpWalletWithPaymentPurposeUrl = (
-  payload: newnewapi.TopUpWalletWithPurposeRequest,
-  signal?: RequestInit['signal']
-) =>
-  fetchProtobuf<
-    newnewapi.TopUpWalletWithPurposeRequest,
-    newnewapi.TopUpWalletWithPurposeResponse
-  >(
-    newnewapi.TopUpWalletWithPurposeRequest,
-    newnewapi.TopUpWalletWithPurposeResponse,
-    `${BASE_URL_PAYMENTS}/top_up_wallet_with_purpose`,
-    'post',
-    payload,
-    // Optional authentication
-    cookiesInstance.get('accessToken')
-      ? {
-          'x-auth-token': cookiesInstance.get('accessToken'),
-        }
-      : {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
-
 export const getMyEarnings = (
   payload: newnewapi.GetMyEarningsRequest,
   signal?: RequestInit['signal']

@@ -42,7 +42,6 @@ import MyProfileSettingsLayout from '../../../components/templates/MyProfileSett
 import Headline from '../../../components/atoms/Headline';
 import GoBackButton from '../../../components/molecules/GoBackButton';
 import SettingsColorModeSwitch from '../../../components/molecules/profile/SettingsColorModeSwitch';
-// import SettingsWallet from '../../components/organisms/settings/SettingsWallet';
 import SettingsAccordion, {
   AccordionSection,
 } from '../../../components/organisms/settings/SettingsAccordion';
@@ -397,7 +396,6 @@ const MyProfileSettingsIndex = () => {
               : {}),
           }}
         />
-        {/* <SettingsWallet /> */}
         <SettingsAccordion sections={accordionSections} />
         <SBottomLinksDiv>
           {/* TEMP */}
