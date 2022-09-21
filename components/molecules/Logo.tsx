@@ -31,8 +31,10 @@ export const Logo: React.FunctionComponent<{
     Mixpanel.track('Navigation Item Clicked', {
       _button: 'Header Logo',
     });
+
+    // This is used for smooth scrolling unlike the next/Link scrolling by hash
     if (router.pathname === '/') {
-      scroller.scrollTo('top-reload', {
+      scroller.scrollTo('generalContainer', {
         smooth: 'easeInOutQuart',
         duration: SCROLL_TO_TOP,
       });
@@ -49,39 +51,48 @@ export const Logo: React.FunctionComponent<{
     };
   });
 
+  const Content = (
+    <SWrapper
+      {...{
+        ...(style
+          ? {
+              style,
+            }
+          : {}),
+      }}
+      onClick={handleClick}
+    >
+      <SAnimationWrapper>
+        <Lottie
+          width={isMobile ? 55 : 65}
+          height={isMobile ? 45 : 60}
+          options={{
+            loop: false,
+            autoplay: true,
+            animationData: logoAnimation,
+          }}
+          isStopped={!loading}
+        />
+      </SAnimationWrapper>
+      {!isMobile && (
+        <SInlineSVG
+          svg={logoText}
+          fill={theme.colorsThemed.text.primary}
+          width={isMobile ? '81px' : '94px'}
+          height={isMobile ? '21px' : '21px'}
+        />
+      )}
+    </SWrapper>
+  );
+
+  // Don`t add Link if it has no purpose
+  if (router.pathname === '/') {
+    return Content;
+  }
+
   return (
     <Link href='/' passHref>
-      <SWrapper
-        {...{
-          ...(style
-            ? {
-                style,
-              }
-            : {}),
-        }}
-        onClick={handleClick}
-      >
-        <SAnimationWrapper>
-          <Lottie
-            width={isMobile ? 55 : 65}
-            height={isMobile ? 45 : 60}
-            options={{
-              loop: false,
-              autoplay: true,
-              animationData: logoAnimation,
-            }}
-            isStopped={!loading}
-          />
-        </SAnimationWrapper>
-        {!isMobile && (
-          <SInlineSVG
-            svg={logoText}
-            fill={theme.colorsThemed.text.primary}
-            width={isMobile ? '81px' : '94px'}
-            height={isMobile ? '21px' : '21px'}
-          />
-        )}
-      </SWrapper>
+      {Content}
     </Link>
   );
 };
