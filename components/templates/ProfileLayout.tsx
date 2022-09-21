@@ -15,7 +15,7 @@ import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { useAppSelector } from '../../redux-store/store';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
@@ -63,7 +63,6 @@ import {
   unsubscribeFromCreatorSmsNotifications,
   unsubscribeGuestFromCreatorSmsNotifications,
 } from '../../api/endpoints/phone';
-import { setUserData } from '../../redux-store/slices/userStateSlice';
 import { SocketContext } from '../../contexts/socketContext';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
@@ -90,9 +89,9 @@ const getSmsNotificationSubscriptionErrorMessage = (
 ) => {
   switch (status) {
     case newnewapi.SmsNotificationsStatus.UNKNOWN_STATUS:
-      return 'smsNotifications.errors.requestFailed';
+      return 'smsNotifications.error.requestFailed';
     default:
-      return 'smsNotifications.errors.requestFailed';
+      return 'smsNotifications.error.requestFailed';
   }
 };
 
@@ -113,7 +112,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
 
-  const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -408,12 +406,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 t(getSmsNotificationSubscriptionErrorMessage(res.data?.status))
             );
           }
-
-          dispatch(
-            setUserData({
-              phoneNumber,
-            })
-          );
         }
 
         return phoneNumber.number;
@@ -424,7 +416,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         throw err;
       }
     },
-    [currentUser.loggedIn, dispatch, getGuestId, subscription.userId, t]
+    [currentUser.loggedIn, getGuestId, subscription.userId, t]
   );
 
   const handleSmsNotificationButtonClicked = useCallback(async () => {
@@ -640,7 +632,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           return;
         }
         setSubscribedToSmsNotifications(
-          res.data.status !== newnewapi.SmsNotificationsStatus.UNKNOWN_STATUS
+          res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
         );
       };
 
@@ -662,7 +654,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       }
 
       setSubscribedToSmsNotifications(
-        res.data.status !== newnewapi.SmsNotificationsStatus.UNKNOWN_STATUS
+        res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
       );
     });
 
