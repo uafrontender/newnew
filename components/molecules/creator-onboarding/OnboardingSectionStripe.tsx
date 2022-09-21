@@ -128,7 +128,7 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
             </a>
           </Link>
         )}
-        <Link href='/creator-onboarding-subrate'>
+        {/* <Link href='/creator-onboarding-subrate'>
           <a>
             <Button
               view='primaryGrad'
@@ -140,7 +140,7 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
               {t('stripeSection.button.submit')}
             </Button>
           </a>
-        </Link>
+        </Link> */}
       </SControlsDiv>
     </SContainer>
   );
