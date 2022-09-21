@@ -40,8 +40,6 @@ const getPayWithCardErrorMessage = (
       return 'errors.cardNotFound';
     case newnewapi.DoPledgeResponse.Status.CARD_CANNOT_BE_USED:
       return 'errors.cardCannotBeUsed';
-    case newnewapi.DoPledgeResponse.Status.BLOCKED_BY_CREATOR:
-      return 'errors.blockedByCreator';
     case newnewapi.DoPledgeResponse.Status.CF_CANCELLED:
       return 'errors.cfCancelled';
     case newnewapi.DoPledgeResponse.Status.CF_FINISHED:
@@ -431,7 +429,6 @@ const SCloseButton = styled.button`
 const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
   white-space: pre-wrap;
 `;
