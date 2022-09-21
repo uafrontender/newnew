@@ -79,7 +79,13 @@
         "label": "出生日期",
         "captions": {
           "twoTimesOnly": "生日只能更改2次,",
-          "cannotChange": "你不能改變生日,"
+          "cannotChange": "你不能改變生日,",
+          "instruction_NEED_TRANSLATION": "Set your date of birth"
+        },
+        "units": {
+          "day": "天後",
+          "month": "月",
+          "year_NEED_TRANSLATION": "Year"
         },
         "errors": {
           "tooYoung": "必須年滿18歲或以上才能成為創作者"
