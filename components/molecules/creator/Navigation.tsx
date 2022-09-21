@@ -7,8 +7,6 @@ import styled, { css, useTheme } from 'styled-components';
 import InlineSVG from '../../atoms/InlineSVG';
 import dashboardFilledIcon from '../../../public/images/svg/icons/filled/Dashboard.svg';
 import dashboardOutlinedIcon from '../../../public/images/svg/icons/outlined/Dashboard.svg';
-import subscriptionsFilledIcon from '../../../public/images/svg/icons/filled/Subscriptions.svg';
-import subscriptionsOutlinedIcon from '../../../public/images/svg/icons/outlined/Subscriptions.svg';
 import walletFilledIcon from '../../../public/images/svg/icons/filled/Wallet.svg';
 import walletOutlinedIcon from '../../../public/images/svg/icons/outlined/Wallet.svg';
 import Button from '../../atoms/Button';
@@ -34,12 +32,6 @@ export const Navigation = () => {
         label: t('navigation.dashboard'),
         iconFilled: dashboardFilledIcon,
         iconOutlined: dashboardOutlinedIcon,
-      },
-      {
-        url: '/creator/subscribers',
-        label: t('navigation.subscriptions'),
-        iconFilled: subscriptionsFilledIcon,
-        iconOutlined: subscriptionsOutlinedIcon,
       },
       {
         url: '/creator/get-paid',

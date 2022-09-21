@@ -39,9 +39,9 @@ const CreatorOnboardingLayout: React.FunctionComponent<
     if (router.pathname.includes('creator-onboarding-stripe')) {
       return 'titleSetUpStripe';
     }
-    if (router.pathname.includes('creator-onboarding-subrate')) {
-      return 'subRateSection';
-    }
+    // if (router.pathname.includes('creator-onboarding-subrate')) {
+    //   return 'subRateSection';
+    // }
     return 'detailsSection';
   };
 
