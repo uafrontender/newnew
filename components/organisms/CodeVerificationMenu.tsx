@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
@@ -24,11 +24,10 @@ import Text from '../atoms/Text';
 import Headline from '../atoms/Headline';
 import GoBackButton from '../molecules/GoBackButton';
 import VerificationCodeInput from '../atoms/VerificationCodeInput';
+import VerificationCodeResend from '../atoms/VerificationCodeResend';
 import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmailVerification';
 
 // Utils
-import secondsToString from '../../utils/secondsToHMS';
-import isBrowser from '../../utils/isBrowser';
 import AnimatedPresence from '../atoms/AnimatedPresence';
 import { Mixpanel } from '../../utils/mixpanel';
 
@@ -68,16 +67,13 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const [submitError, setSubmitError] = useState<string>('');
 
   // Resend code
-  const [codeInitial, setCodeInital] = useState(
+  const [codeInitial, setCodeInitial] = useState(
     new Array(6).join('.').split('.')
   );
   const [isResendCodeLoading, setIsResendCodeLoading] = useState(false);
 
   // Timer
-  const [timerSeconds, setTimerSeconds] = useState(expirationTime);
-  const [timerActive, setTimerActive] = useState(false);
-  const [timerHidden, setTimerHidden] = useState(false);
-  const interval = useRef<number>();
+  const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
 
   const onCodeComplete = useCallback(
     async (completeCode: string) => {
@@ -89,7 +85,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           _verificationCode: completeCode,
         });
         setSubmitError('');
-        setTimerHidden(true);
+
         setIsSignInWithEmailLoading(true);
 
         const signInRequest = new newnewapi.EmailSignInRequest({
@@ -146,9 +142,6 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         dispatch(setUserLoggedIn(true));
         dispatch(setSignupEmailInput(''));
 
-        // Clean up email state, sign in the user with the response & redirect home
-        setTimerActive(false);
-
         setIsSignInWithEmailLoading(false);
         setIsSuccess(true);
 
@@ -164,14 +157,11 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       } catch (err: any) {
         setIsSignInWithEmailLoading(false);
         setSubmitError(err?.message ?? 'generic_error');
-        setTimerActive(true);
-        setTimerHidden(false);
       }
     },
     [
       setIsSignInWithEmailLoading,
       setSubmitError,
-      setTimerActive,
       setCookie,
       signupEmailInput,
       dispatch,
@@ -183,6 +173,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const handleResendCode = async () => {
     setIsResendCodeLoading(true);
     setSubmitError('');
+    setTimerStartTime(Date.now());
     try {
       Mixpanel.track('Resend code', {
         _stage: 'Sign Up',
@@ -199,10 +190,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       if (!data || error) throw new Error(error?.message ?? 'Request failed');
 
       setIsResendCodeLoading(false);
-      setCodeInital(new Array(6).join('.').split('.'));
-      setTimerSeconds(expirationTime);
-      setTimerActive(true);
+      setCodeInitial(new Array(6).join('.').split('.'));
     } catch (err: any) {
+      setTimerStartTime(null);
       setIsResendCodeLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
     }
@@ -210,34 +200,8 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 
   const handleTryAgain = () => {
     setSubmitError('');
-    setCodeInital(new Array(6).join('.').split('.'));
-    setTimerActive(true);
+    setCodeInitial(new Array(6).join('.').split('.'));
   };
-
-  useEffect(() => {
-    setTimerActive(true);
-  }, []);
-
-  useEffect(() => {
-    if (timerSeconds < 1) {
-      setTimerActive(false);
-      setSubmitError('');
-      setCodeInital(new Array(6).join('.').split('.'));
-    }
-  }, [timerSeconds, setTimerActive, setSubmitError, setCodeInital]);
-
-  useEffect(() => {
-    if (isBrowser()) {
-      if (timerActive) {
-        interval.current = window.setInterval(() => {
-          setTimerSeconds((seconds) => seconds - 1);
-        }, 1000);
-      } else if (!timerActive) {
-        clearInterval(interval.current);
-      }
-    }
-    return () => clearInterval(interval.current);
-  }, [timerActive, timerSeconds]);
 
   return (
     <>
@@ -287,34 +251,19 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           id='verification-input'
           initialValue={codeInitial}
           length={6}
-          disabled={
-            isSignInWithEmailLoading || isResendCodeLoading || timerSeconds < 1
-          }
+          disabled={isSignInWithEmailLoading || isResendCodeLoading}
           error={submitError ? true : undefined}
           onComplete={onCodeComplete}
         />
-        {timerActive && !timerHidden && !submitError && !isSuccess ? (
-          <STimeoutDiv isAlertColor={timerSeconds < 11}>
-            {secondsToString(timerSeconds, 'm:s')}
-          </STimeoutDiv>
-        ) : (
-          !submitError &&
-          !isSignInWithEmailLoading &&
-          !isResendCodeLoading && (
-            <AnimatedPresence
-              animateWhenInView={false}
-              animation='t-01'
-              delay={0.3}
-            >
-              <STimeExpired>
-                {t('expired.noCodeReceived')}{' '}
-                <button type='button' onClick={() => handleResendCode()}>
-                  {t('expired.resendButtonText')}
-                </button>
-              </STimeExpired>
-            </AnimatedPresence>
-          )
-        )}
+        <SVerificationCodeResend
+          expirationTime={expirationTime}
+          onResendClick={handleResendCode}
+          onTimerEnd={() => {
+            setTimerStartTime(null);
+          }}
+          $invisible={!!submitError || !!isSignInWithEmailLoading}
+          startTime={timerStartTime}
+        />
         {!isSignInWithEmailLoading &&
         !isResendCodeLoading &&
         submitError &&
@@ -472,60 +421,6 @@ const SSubheading = styled(Text)`
   }
 `;
 
-interface ISTimeoutDiv {
-  isAlertColor: boolean;
-}
-
-const STimeoutDiv = styled.div<ISTimeoutDiv>`
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-
-  // NB! Temp
-  color: ${({ isAlertColor, theme }) => {
-    if (isAlertColor) return theme.colorsThemed.accent.error;
-    return theme.colorsThemed.text.tertiary;
-  }};
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
-    line-height: 24px;
-  }
-`;
-
-const STimeExpired = styled(Text)`
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
-    line-height: 24px;
-  }
-
-  button {
-    background-color: transparent;
-    border: transparent;
-
-    font-size: inherit;
-    font-weight: 500;
-
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-    cursor: pointer;
-
-    &:hover,
-    &:focus {
-      outline: none;
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-      transition: 0.2s ease;
-    }
-  }
-`;
-
 const SErrorDiv = styled(Text)`
   font-size: 14px;
   line-height: 20px;
@@ -542,4 +437,11 @@ const SErrorDiv = styled(Text)`
   ${({ theme }) => theme.media.laptopL} {
     line-height: 24px;
   }
+`;
+
+const SVerificationCodeResend = styled(VerificationCodeResend)<{
+  $invisible: boolean;
+}>`
+  visibility: ${({ $invisible }) => ($invisible ? 'hidden' : 'visible')};
+  height: 0;
 `;

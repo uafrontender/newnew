@@ -795,7 +795,6 @@
     "notEnoughMoney": "Not enough money",
     "cardNotFound": "Card not found",
     "cardCannotBeUsed": "This card can not be used",
-    "blockedByCreator": "Blocked by creator",
     "biddingNotStarted": "Bidding is not started yet",
     "biddingIsEnded": "Bidding is ended already",
     "mcCancelled": "Superpoll is cancelled",
