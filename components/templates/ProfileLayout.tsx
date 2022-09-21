@@ -1,6 +1,3 @@
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   ReactElement,
   useCallback,
@@ -14,7 +11,6 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import Link from 'next/link';
 import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../redux-store/store';
@@ -27,7 +23,6 @@ import Headline from '../atoms/Headline';
 import InlineSvg from '../atoms/InlineSVG';
 import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
-import ErrorBoundary from '../organisms/ErrorBoundary';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
 
 // Icons
@@ -46,13 +41,12 @@ import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
 import BackButton from '../molecules/profile/BackButton';
-import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
-import UnsubscribeModal from '../molecules/profile/UnsubscribeModal';
 import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
 import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 import CustomLink from '../atoms/CustomLink';
+import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -141,7 +135,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const [unsubscribeModalOpen, setUnsubscribeModalOpen] = useState(false);
   const { usersIBlocked, unblockUser } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(user.uuid),
@@ -515,7 +508,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           {!isMobile && (
             <UserEllipseMenu
               isVisible={ellipseMenuOpen}
-              isSubscribed={!!isSubscribed}
               isBlocked={isUserBlocked}
               loggedIn={currentUser.loggedIn}
               handleClose={() => setIsEllipseMenuOpen(false)}
@@ -527,18 +519,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 }
               }}
               handleClickReport={handleClickReport}
-              handleClickUnsubscribe={() => {
-                setUnsubscribeModalOpen(true);
-              }}
               anchorElement={moreButtonRef.current}
               offsetTop={isDesktop ? '-25px' : '0'}
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
-          {isSubscribed && <SSubcribedTag>{t('subscribed-tag')}</SSubcribedTag>}
-          {wasSubscribed && (
-            <SSubcribedTag>{t('subscriptionCancelled-tag')}</SSubcribedTag>
-          )}
           <div
             style={{
               position: 'relative',
@@ -614,20 +599,17 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               </SShareButton>
             </SShareDiv>
             {user.options?.isOfferingSubscription &&
-            user.uuid !== currentUser.userData?.userUuid ? (
-              <CustomLink
-                href={
-                  !isSubscribed && !wasSubscribed
-                    ? `/${user.username}/subscribe`
-                    : `/direct-messages/${user.username}-cr`
-                }
-                disabled={isSubscribed === null || wasSubscribed === null}
-              >
-                <SSendButton withShadow view='primaryGrad'>
-                  {t('profileLayout.buttons.sendMessage')}
-                </SSendButton>
-              </CustomLink>
-            ) : null}
+              user.uuid !== currentUser.userData?.userUuid &&
+              (isSubscribed || wasSubscribed) && (
+                <CustomLink
+                  href={`/direct-messages/${user.username}-cr`}
+                  disabled={isSubscribed === null || wasSubscribed === null}
+                >
+                  <SSendButton withShadow view='primaryGrad'>
+                    {t('profileLayout.buttons.sendMessage')}
+                  </SSendButton>
+                </CustomLink>
+              )}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
           </div>
           {/* Temp, all creactors for now */}
@@ -643,7 +625,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         <UserEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={10}
-          isSubscribed={!!isSubscribed}
           isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           onClose={() => setIsEllipseMenuOpen(false)}
@@ -657,16 +638,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           handleClickReport={() => {
             setConfirmReportUser(true);
           }}
-          handleClickUnsubscribe={() => {
-            setUnsubscribeModalOpen(true);
-          }}
         />
       )}
-      <UnsubscribeModal
-        confirmUnsubscribe={unsubscribeModalOpen}
-        user={user}
-        closeModal={() => setUnsubscribeModalOpen(false)}
-      />
       <BlockUserModalProfile
         confirmBlockUser={blockUserModalOpen}
         user={user}
@@ -920,34 +893,6 @@ const SProfileLayout = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     margin-top: -16px;
-  }
-`;
-
-const SSubcribedTag = styled.div`
-  position: absolute;
-  top: 195px;
-  left: calc(50% - 38px);
-
-  background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
-
-  width: 76px;
-  padding: 6px 8px;
-  border-radius: 50px;
-
-  color: ${({ theme }) => theme.colors.dark};
-  text-align: center;
-  font-weight: 700;
-  font-size: 10px;
-  line-height: 12px;
-
-  z-index: 5;
-
-  ${({ theme }) => theme.media.tablet} {
-    top: 235px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    top: 275px;
   }
 `;
 
