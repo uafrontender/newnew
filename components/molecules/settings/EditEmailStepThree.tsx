@@ -40,7 +40,7 @@ const EditEmailStepThreeModal = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCodeLoading, setIsCodeLoading] = useState(false);
-  const [isTimerEnded, setIsTimerEnded] = useState(false);
+  const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
 
   useEffect(() => {
     const setTimeoutId = setTimeout(() => {
@@ -55,6 +55,7 @@ const EditEmailStepThreeModal = ({
   const resendVerificationCode = useCallback(async () => {
     try {
       setIsCodeLoading(true);
+      setTimerStartTime(Date.now());
       const sendVerificationCodePayload =
         new newnewapi.SendVerificationEmailRequest({
           emailAddress: newEmail,
@@ -74,10 +75,10 @@ const EditEmailStepThreeModal = ({
       }
 
       setIsCodeLoading(false);
-      setIsTimerEnded(false);
       setCode(new Array(6).join('.').split('.'));
     } catch (err) {
       setIsCodeLoading(false);
+      setTimerStartTime(null);
       console.error(err);
     }
   }, [newEmail]);
@@ -126,7 +127,6 @@ const EditEmailStepThreeModal = ({
   const handleTryAgain = () => {
     setErrorMessage('');
     setCode(new Array(6).join('.').split('.'));
-    setIsTimerEnded(false);
   };
 
   return (
@@ -152,22 +152,21 @@ const EditEmailStepThreeModal = ({
       <VerificationCodeInput
         initialValue={code}
         length={6}
-        disabled={isSubmitting || isCodeLoading || isTimerEnded}
+        disabled={isSubmitting || isCodeLoading}
         error={errorMessage ? true : undefined}
         onComplete={handleSetMyEmail}
         isInputFocused={isInputFocused}
         key={`input-focused-${isInputFocused}`}
       />
-      {!isCodeLoading && (
-        <SVerificationCodeResend
-          expirationTime={60}
-          onResendClick={resendVerificationCode}
-          onTimerEnd={() => {
-            setIsTimerEnded(true);
-          }}
-          $invisible={!!errorMessage || !!isSubmitting}
-        />
-      )}
+      <SVerificationCodeResend
+        expirationTime={60}
+        onResendClick={resendVerificationCode}
+        onTimerEnd={() => {
+          setTimerStartTime(null);
+        }}
+        $invisible={!!errorMessage || !!isSubmitting}
+        startTime={timerStartTime}
+      />
       {errorMessage && (
         <AnimatedPresence animateWhenInView={false} animation='t-09'>
           <SErrorDiv variant={2}>{errorMessage}</SErrorDiv>
