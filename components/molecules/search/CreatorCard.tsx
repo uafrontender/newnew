@@ -1,11 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useRef,
-} from 'react';
+import React, { useCallback, useMemo, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
@@ -17,7 +11,6 @@ import Button from '../../atoms/Button';
 import UserEllipseMenu from '../profile/UserEllipseMenu';
 import ReportModal, { ReportData } from '../chat/ReportModal';
 import BlockUserModalProfile from '../profile/BlockUserModalProfile';
-import UnsubscribeModal from '../profile/UnsubscribeModal';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import { formatNumber } from '../../../utils/format';
@@ -26,8 +19,6 @@ import { reportUser } from '../../../api/endpoints/report';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { markUser } from '../../../api/endpoints/user';
 import UserEllipseModal from '../profile/UserEllipseModal';
-import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 interface ICreatorCard {
@@ -52,11 +43,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
     resizeMode
   );
 
-  // Subscription status
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [wasSubscribed, setWasSubscribed] = useState(false);
-  const { creatorsImSubscribedTo } = useGetSubscriptions();
-
   // Ellipse menu
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
@@ -64,7 +50,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const [unsubscribeModalOpen, setUnsubscribeModalOpen] = useState(false);
   const { usersIBlocked, unblockUser } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(creator.uuid as string),
@@ -110,40 +95,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   );
   const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
 
-  useEffect(() => {
-    async function fetchIsSubscribed() {
-      try {
-        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-          creatorUuid: creator.uuid,
-        });
-
-        const res = await getSubscriptionStatus(getStatusPayload);
-
-        if (res.data?.status?.activeRenewsAt) {
-          setIsSubscribed(true);
-        } else {
-          setIsSubscribed(false);
-        }
-        if (res.data?.status?.activeCancelsAt) {
-          setWasSubscribed(true);
-        } else {
-          setWasSubscribed(false);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    fetchIsSubscribed();
-
-    // TODO: After update GetCreatorsImSubscribedToResponse on backend remaster this section
-    // let isSub = undefined;
-    // if (creatorsImSubscribedTo && creatorsImSubscribedTo.length > 0) {
-    //   isSub = creatorsImSubscribedTo.find((cr) => cr.uuid === user.uuid);
-    // }
-    // isSub ? setIsSubscribed(true) : setIsSubscribed(false);
-  }, [creatorsImSubscribedTo, creator.uuid]);
-
   const moreButtonRef: any = useRef();
 
   return (
@@ -169,7 +120,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       {!isMobile && (
         <UserEllipseMenu
           isVisible={ellipseMenuOpen}
-          isSubscribed={isSubscribed}
           isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           top='48px'
@@ -183,9 +133,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
             }
           }}
           handleClickReport={handleClickReport}
-          handleClickUnsubscribe={() => {
-            setUnsubscribeModalOpen(true);
-          }}
           anchorElement={moreButtonRef.current}
         />
       )}
@@ -193,8 +140,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         <SUserAvatar>
           <UserAvatar avatarUrl={creator.avatarUrl ?? ''} />
         </SUserAvatar>
-        {sign && isSubscribed && <AvatarSign>{sign}</AvatarSign>}
-        {wasSubscribed && <AvatarSign>{t('creatorCard.cancelled')}</AvatarSign>}
       </SUserAvatarContainer>
       <SDisplayNameContainer isVerified={!!creator.options?.isVerified}>
         <SDisplayName>{creator.nickname}</SDisplayName>
@@ -223,7 +168,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         <UserEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={10}
-          isSubscribed={isSubscribed}
           isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           onClose={() => setEllipseMenuOpen(false)}
@@ -237,20 +181,8 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
           handleClickReport={() => {
             setConfirmReportUser(true);
           }}
-          handleClickUnsubscribe={() => {
-            setUnsubscribeModalOpen(true);
-          }}
         />
       )}
-      <UnsubscribeModal
-        confirmUnsubscribe={unsubscribeModalOpen}
-        user={creator}
-        closeModal={() => setUnsubscribeModalOpen(false)}
-        onUnsubcribeSuccess={() => {
-          setIsSubscribed(false);
-          setWasSubscribed(true);
-        }}
-      />
       <BlockUserModalProfile
         confirmBlockUser={blockUserModalOpen}
         user={creator}
@@ -329,24 +261,6 @@ const SUserAvatar = styled.div`
     min-width: 100%;
     min-height: 100%;
   }
-`;
-
-const AvatarSign = styled.div`
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  bottom: -5px;
-  padding: 0px 8px;
-  background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
-  color: #2c2c33;
-  border-radius: 10px;
-  height: 20px;
-  font-size: 8px;
-  line-height: 8px;
-  font-weight: 800;
-  text-transform: uppercase;
-  z-index: 2;
 `;
 
 const SDisplayNameContainer = styled.div<{ isVerified?: boolean }>`

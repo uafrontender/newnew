@@ -153,11 +153,6 @@ export const Chat: React.FC<IChat> = ({
           {...chatData}
           showChatList={showChatList}
           updateLastMessage={updateLastMessage}
-          setupIntentClientSecretFromRedirect={
-            setupIntentClientSecretFromRedirect
-          }
-          saveCardFromRedirect={saveCardFromRedirect}
-          resetStripeSetupIntent={resetStripeSetupIntent}
         />
       </SContent>
     </SContainer>
