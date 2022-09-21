@@ -855,11 +855,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
                 : false
             }
             isValid={dateError === ''}
-            labelCaption={t('detailsSection.form.dateOfBirth.label')}
-            bottomCaption={t(
-              'detailsSection.form.dateOfBirth.captions.twoTimesOnly'
-            )}
-            errorCaption={t('detailsSection.form.dateOfBirth.errors.tooYoung')}
             onChange={handleDateInput}
             handleResetIsValid={() => setDateError('')}
           />
