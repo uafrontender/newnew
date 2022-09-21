@@ -356,11 +356,7 @@ const PostResponseTabModeration: React.FunctionComponent<
         ) : readyToUploadAdditionalResponse ? (
           <SUploadButton
             className='uploadButton'
-            disabled={
-              coreResponseUploading ||
-              !responseReadyToBeUploaded ||
-              additionalResponseUploading
-            }
+            disabled={!responseReadyToBeUploaded || additionalResponseUploading}
             onClick={handleUploadAdditionalVideoProcessed}
           >
             {t('postResponseTabModeration.awaiting.postResponseBtn')}

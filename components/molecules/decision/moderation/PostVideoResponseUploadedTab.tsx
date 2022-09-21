@@ -226,113 +226,78 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
     if (responseFileUploadLoading) {
       content = (
-        <SLoadingBox>
-          <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
-            {t('postVideo.uploadResponseForm.video.loading.title')}
-          </SLoadingTitleWithEllipseAnimated>
-          <SLoadingDescription variant={2} weight={600}>
-            {t('postVideo.uploadResponseForm.video.loading.description')}
-          </SLoadingDescription>
-          <SLoadingBottomBlock>
+        <SLoadingContainer>
+          <SLoadingBox>
+            <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
+              {t('postVideo.uploadResponseForm.video.loading.title')}
+            </SLoadingTitleWithEllipseAnimated>
             <SLoadingDescription variant={2} weight={600}>
-              {t('postVideo.uploadResponseForm.video.loading.process', {
-                time: `${responseFileUploadETA} seconds`,
-                progress: responseFileUploadProgress,
-              })}
+              {t('postVideo.uploadResponseForm.video.loading.description')}
             </SLoadingDescription>
-            <SLoadingBottomBlockButton
-              view='secondary'
-              onClick={handleCancelVideoUpload}
-            >
-              {t('postVideo.uploadResponseForm.button.cancel')}
-            </SLoadingBottomBlockButton>
-          </SLoadingBottomBlock>
-          <SLoadingProgress>
-            <SLoadingProgressFilled progress={responseFileUploadProgress} />
-          </SLoadingProgress>
-        </SLoadingBox>
+            <SLoadingBottomBlock>
+              <SLoadingDescription variant={2} weight={600}>
+                {t('postVideo.uploadResponseForm.video.loading.process', {
+                  time: `${responseFileUploadETA} seconds`,
+                  progress: responseFileUploadProgress,
+                })}
+              </SLoadingDescription>
+              <SLoadingBottomBlockButton
+                view='secondary'
+                onClick={handleCancelVideoUpload}
+              >
+                {t('postVideo.uploadResponseForm.button.cancel')}
+              </SLoadingBottomBlockButton>
+            </SLoadingBottomBlock>
+            <SLoadingProgress>
+              <SLoadingProgressFilled progress={responseFileUploadProgress} />
+            </SLoadingProgress>
+          </SLoadingBox>
+        </SLoadingContainer>
       );
     } else if (responseFileUploadError || responseFileProcessingError) {
       content = (
-        <SErrorBox>
-          <SErrorTitleWrapper>
-            <SInlineSVG svg={errorIcon} width='16px' height='16px' />
-            <SErrorTitle variant={3} weight={600}>
-              {t('postVideo.uploadResponseForm.video.error.title')}
-            </SErrorTitle>
-          </SErrorTitleWrapper>
-          <SLoadingDescription variant={2} weight={600}>
-            {t('postVideo.uploadResponseForm.video.error.description')}
-          </SLoadingDescription>
-          <SErrorBottomBlock>
-            <SLoadingBottomBlockButton
-              view='secondary'
-              onClick={handleCancelVideoProcessing}
-            >
-              {t('postVideo.uploadResponseForm.button.cancel')}
-            </SLoadingBottomBlockButton>
-            <Button
-              view='primaryGrad'
-              onClick={handleRetryVideoUpload}
-              disabled={!localFile}
-            >
-              {t('postVideo.uploadResponseForm.button.retry')}
-            </Button>
-          </SErrorBottomBlock>
-        </SErrorBox>
+        <SLoadingContainer>
+          <SErrorBox>
+            <SErrorTitleWrapper>
+              <SInlineSVG svg={errorIcon} width='16px' height='16px' />
+              <SErrorTitle variant={3} weight={600}>
+                {t('postVideo.uploadResponseForm.video.error.title')}
+              </SErrorTitle>
+            </SErrorTitleWrapper>
+            <SLoadingDescription variant={2} weight={600}>
+              {t('postVideo.uploadResponseForm.video.error.description')}
+            </SLoadingDescription>
+            <SErrorBottomBlock>
+              <SLoadingBottomBlockButton
+                view='secondary'
+                onClick={handleCancelVideoProcessing}
+              >
+                {t('postVideo.uploadResponseForm.button.cancel')}
+              </SLoadingBottomBlockButton>
+              <Button
+                view='primaryGrad'
+                onClick={handleRetryVideoUpload}
+                disabled={!localFile}
+              >
+                {t('postVideo.uploadResponseForm.button.retry')}
+              </Button>
+            </SErrorBottomBlock>
+          </SErrorBox>
+        </SLoadingContainer>
       );
     } else if (responseFileProcessingLoading) {
       content = (
-        <SLoadingBox>
-          <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
-            {t('postVideo.uploadResponseForm.video.processing.title')}
-          </SLoadingTitleWithEllipseAnimated>
-          <SLoadingDescription variant={2} weight={600}>
-            {t('postVideo.uploadResponseForm.video.processing.description')}
-          </SLoadingDescription>
-          <SLoadingBottomBlock />
-        </SLoadingBox>
-      );
-    }
-    // } else if (responseFileProcessingProgress === 100) {
-    //   content = (
-    //     <PostVideoResponseUploadedEditing
-    //       key='editing'
-    //       isMuted={isMuted}
-    //       soundBtnBottomOverriden={soundBtnBottomOverriden}
-    //       handleToggleMuted={handleToggleMuted}
-    //       additionalResponses={[
-    //         ...(additionalResponses ? (additionalResponses as any) : []),
-    //         value,
-    //       ]}
-    //       handleDeleteUnuploadedAdditonalResponse={
-    //         handleDeleteUnuploadedAdditonalResponse
-    //       }
-    //     />
-    //   );
-    // }
-
-    // TEMP
-    if (responseFileProcessingProgress === 100) {
-      const temp = (
-        <SFileBox>
-          <SPlayerWrapper>
-            <PostBitmovinPlayer
-              id='small-thumbnail'
-              innerRef={playerRef}
-              resources={value}
-              thumbnails={{}}
-              borderRadius='8px'
-            />
-          </SPlayerWrapper>
-          <SButtonsContainer>
-            <SButtonsContainerLeft>
-              <SVideoButton danger onClick={handleDeleteVideoShow}>
-                {t('postVideo.uploadResponseForm.video.deleteFile')}
-              </SVideoButton>
-            </SButtonsContainerLeft>
-          </SButtonsContainer>
-        </SFileBox>
+        <SLoadingContainer>
+          <SLoadingBox>
+            <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
+              {t('postVideo.uploadResponseForm.video.processing.title')}
+            </SLoadingTitleWithEllipseAnimated>
+            <SLoadingDescription variant={2} weight={600}>
+              {t('postVideo.uploadResponseForm.video.processing.description')}
+            </SLoadingDescription>
+            <SLoadingBottomBlock />
+          </SLoadingBox>
+        </SLoadingContainer>
       );
     }
 
@@ -342,7 +307,6 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     responseFileUploadError,
     responseFileProcessingError,
     responseFileProcessingLoading,
-    responseFileProcessingProgress,
     t,
     responseFileUploadETA,
     responseFileUploadProgress,
@@ -350,8 +314,6 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
     localFile,
-    value,
-    handleDeleteVideoShow,
   ]);
 
   useEffect(() => {
@@ -522,6 +484,15 @@ const SVideoButton = styled.button<ISVideoButton>`
   line-height: 24px;
 `;
 
+const SLoadingContainer = styled.div`
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const SLoadingBox = styled.div`
   padding: 16px;
   display: flex;
@@ -534,6 +505,8 @@ const SLoadingBox = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     padding: 24px;
+
+    background: ${(props) => props.theme.colorsThemed.background.primary};
   }
 `;
 
@@ -545,13 +518,6 @@ from {
     width: 1em;
   }
 `;
-
-// const SLoadingTitle = styled(Text)`
-//   display: flex;
-//   align-items: center;
-//   margin-bottom: 6px;
-//   flex-direction: row;
-// `;
 
 const SLoadingTitleWithEllipseAnimated = styled(Text)`
   display: flex;
@@ -599,12 +565,6 @@ const SLoadingBottomBlockButton = styled(Button)`
   }
 `;
 
-// const SLoadingPublishButton = styled(Button)`
-//   margin-left: auto;
-
-//   padding: 10px;
-// `;
-
 const SLoadingProgress = styled.div`
   width: 100%;
   height: 6px;
@@ -614,21 +574,6 @@ const SLoadingProgress = styled.div`
   background: ${(props) => props.theme.colorsThemed.background.outlines1};
   border-radius: 16px;
 `;
-
-// const SSpinnerWrapper = styled.div`
-//   @keyframes spin {
-//     from {
-//       transform: rotate(0deg);
-//     }
-//     to {
-//       transform: rotate(360deg);
-//     }
-//   }
-
-//   div {
-//     animation: spin 0.7s linear infinite;
-//   }
-// `;
 
 interface ISProgress {
   progress?: number;
@@ -657,6 +602,8 @@ const SErrorBox = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     padding: 22.5px;
+
+    background: ${(props) => props.theme.colorsThemed.background.primary};
   }
 `;
 
