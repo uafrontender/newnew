@@ -4,6 +4,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { useTranslation } from 'next-i18next';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -30,62 +31,98 @@ interface IOnboardingBirthDateInput {
   locale?: string;
   disabled: boolean;
   isValid: boolean;
-  labelCaption: string;
-  bottomCaption: string;
-  errorCaption: string;
   onChange: (newValue: newnewapi.IDateComponents) => void;
   handleResetIsValid: () => void;
   handleSetActive?: () => void;
 }
 
-const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInput> =
-  ({
-    value,
-    maxDate,
-    locale,
-    disabled,
-    isValid,
-    labelCaption,
-    bottomCaption,
-    errorCaption,
-    onChange,
-    handleResetIsValid,
-    handleSetActive,
-  }) => {
-    const theme = useTheme();
-    const { resizeMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
-    const isTablet = ['tablet'].includes(resizeMode);
+const OnboardingBirthDateInput: React.FunctionComponent<
+  IOnboardingBirthDateInput
+> = ({
+  value,
+  maxDate,
+  locale,
+  disabled,
+  isValid,
+  onChange,
+  handleResetIsValid,
+  handleSetActive,
+}) => {
+  const { t } = useTranslation('page-CreatorOnboarding');
+  const theme = useTheme();
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const isTablet = ['tablet'].includes(resizeMode);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const months: TDropdownSelectItem<number>[] = useMemo(
-      () =>
-        Array(12)
-          .fill('')
-          .map((_, i) => ({
-            name: getLocalizedMonth(i, locale),
-            value: i + 1,
-          })),
-      [locale]
-    );
+  const months: TDropdownSelectItem<number>[] = useMemo(
+    () =>
+      Array(12)
+        .fill('')
+        .map((_, i) => ({
+          name: getLocalizedMonth(i, locale),
+          value: i + 1,
+        })),
+    [locale]
+  );
 
-    const years: TDropdownSelectItem<number>[] = useMemo(() => {
-      const workingArr = [];
-      for (let i = maxDate.getFullYear(); i >= minDate.getFullYear(); i--) {
-        workingArr.push({
-          name: i.toString(),
-          value: i,
-        });
-      }
-      return workingArr;
-    }, [maxDate]);
+  const years: TDropdownSelectItem<number>[] = useMemo(() => {
+    const workingArr = [];
+    for (let i = maxDate.getFullYear(); i >= minDate.getFullYear(); i--) {
+      workingArr.push({
+        name: i.toString(),
+        value: i,
+      });
+    }
+    return workingArr;
+  }, [maxDate]);
 
-    const [availableDays, setAvailableDays] = useState<
-      TDropdownSelectItem<number>[]
-    >(() => {
+  const [availableDays, setAvailableDays] = useState<
+    TDropdownSelectItem<number>[]
+  >(() => {
+    if (!value?.month || !value?.year) {
+      return Array(31)
+        .fill('')
+        .map((_, i) => ({
+          name: (i + 1).toString(),
+          value: i + 1,
+        }));
+    }
+
+    return Array(new Date(value?.year, value?.month, 0).getDate())
+      .fill('')
+      .map((_, i) => ({
+        name: (i + 1).toString(),
+        value: i + 1,
+      }));
+  });
+
+  const handleUpdateDay = useCallback(
+    (day: number) => {
+      const working = { ...value };
+      working.day = day;
+      onChange(working);
+    },
+    [value, onChange]
+  );
+
+  const handleUpdateMonth = (month: number) => {
+    const working = { ...value };
+    working.month = month;
+    onChange(working);
+  };
+
+  const handleUpdateYear = (year: number) => {
+    const working = { ...value };
+    working.year = year;
+    onChange(working);
+  };
+
+  useEffect(() => {
+    setAvailableDays(() => {
       if (!value?.month || !value?.year) {
         return Array(31)
           .fill('')
@@ -94,7 +131,6 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
             value: i + 1,
           }));
       }
-
       return Array(new Date(value?.year, value?.month, 0).getDate())
         .fill('')
         .map((_, i) => ({
@@ -102,153 +138,118 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
           value: i + 1,
         }));
     });
+  }, [value?.month, value?.year, setAvailableDays]);
 
-    const handleUpdateDay = useCallback(
-      (day: number) => {
-        const working = { ...value };
-        working.day = day;
-        onChange(working);
-      },
-      [value, onChange]
-    );
+  useEffect(() => {
+    if (
+      value?.day &&
+      availableDays.findIndex((o) => o.value === value.day) === -1
+    ) {
+      handleUpdateDay(availableDays[availableDays.length - 1].value);
+    }
+  }, [availableDays, handleUpdateDay, value?.day]);
 
-    const handleUpdateMonth = (month: number) => {
-      const working = { ...value };
-      working.month = month;
-      onChange(working);
-    };
-
-    const handleUpdateYear = (year: number) => {
-      const working = { ...value };
-      working.year = year;
-      onChange(working);
-    };
-
-    useEffect(() => {
-      setAvailableDays(() => {
-        if (!value?.month || !value?.year) {
-          return Array(31)
-            .fill('')
-            .map((_, i) => ({
-              name: (i + 1).toString(),
-              value: i + 1,
-            }));
-        }
-        return Array(new Date(value?.year, value?.month, 0).getDate())
-          .fill('')
-          .map((_, i) => ({
-            name: (i + 1).toString(),
-            value: i + 1,
-          }));
-      });
-    }, [value?.month, value?.year, setAvailableDays]);
-
-    useEffect(() => {
-      if (
-        value?.day &&
-        availableDays.findIndex((o) => o.value === value.day) === -1
-      ) {
-        handleUpdateDay(availableDays[availableDays.length - 1].value);
-      }
-    }, [availableDays, handleUpdateDay, value?.day]);
-
-    return (
-      <>
-        <SContainer
-          onMouseEnter={() => handleSetActive?.()}
-          onClickCapture={() => handleResetIsValid()}
-        >
-          <SLabel>{labelCaption}</SLabel>
-          {!isMobile ? (
-            <SDropdownsContainer isValid={isValid}>
-              <DropdownSelect<number>
-                closeOnSelect
-                width='120px'
-                label={value?.day ? value?.day.toString() : 'Day'}
-                options={availableDays}
-                selected={value?.day !== null ? value?.day : undefined}
-                maxItems={6}
-                onSelect={handleUpdateDay}
-                disabled={disabled ?? false}
-              />
-              <DropdownSelect<number>
-                closeOnSelect
-                width='160px'
-                label={
-                  value?.month
-                    ? months.find((o) => o.value === value.month)?.name!!
-                    : 'Month'
-                }
-                options={months}
-                selected={value?.month !== null ? value?.month : undefined}
-                maxItems={6}
-                onSelect={handleUpdateMonth}
-                disabled={disabled ?? false}
-              />
-              <DropdownSelect<number>
-                closeOnSelect
-                width={isTablet ? '100%' : '120px'}
-                label={
-                  value?.year
-                    ? years.find((o) => o.value === value.year)?.name!!
-                    : 'Year'
-                }
-                options={years}
-                selected={value?.year !== null ? value?.year : undefined}
-                maxItems={6}
-                onSelect={handleUpdateYear}
-                disabled={disabled ?? false}
-              />
-            </SDropdownsContainer>
-          ) : (
-            <SLabelButton
+  return (
+    <>
+      <SContainer
+        onMouseEnter={() => handleSetActive?.()}
+        onClickCapture={() => handleResetIsValid()}
+      >
+        <SLabel>{t('detailsSection.form.dateOfBirth.label')}</SLabel>
+        {!isMobile ? (
+          <SDropdownsContainer isValid={isValid}>
+            <DropdownSelect<number>
+              closeOnSelect
+              width='120px'
+              label={
+                value?.day
+                  ? value?.day.toString()
+                  : t('detailsSection.form.dateOfBirth.units.day')
+              }
+              options={availableDays}
+              selected={value?.day !== null ? value?.day : undefined}
+              maxItems={6}
+              onSelect={handleUpdateDay}
               disabled={disabled ?? false}
-              isValid={isValid}
-              onClick={() => setIsModalOpen(true)}
-            >
-              <span>
-                {value?.day && value.month && value.year
-                  ? `${value?.day} ${months.find(
-                      (o) => o.value === value?.month
-                    )?.name!!} ${value?.year}`
-                  : 'Set your date of birth'}
-              </span>
-              <SInlineSVG
-                svg={ArrowDown}
-                fill={theme.colorsThemed.text.quaternary}
-                width='24px'
-                height='24px'
-                focused={isModalOpen}
-              />
-            </SLabelButton>
-          )}
-          {!isValid ? (
-            <AnimatedPresence animation='t-09'>
-              <SErrorDiv>
-                <InlineSvg svg={AlertIcon} width='16px' height='16px' />
-                {errorCaption}
-              </SErrorDiv>
-            </AnimatedPresence>
-          ) : null}
-        </SContainer>
-        <Modal
-          show={isModalOpen}
-          custombackdropfiltervalue={1}
-          onClose={() => setIsModalOpen(false)}
-        >
-          {isModalOpen && value && (
-            <BirthDateMobileInput
-              currentDate={value}
-              months={months}
-              years={years}
-              handleChangeDate={onChange}
-              handleClose={() => setIsModalOpen(false)}
             />
-          )}
-        </Modal>
-      </>
-    );
-  };
+            <DropdownSelect<number>
+              closeOnSelect
+              width='160px'
+              label={
+                value?.month
+                  ? months.find((o) => o.value === value.month)?.name!!
+                  : t('detailsSection.form.dateOfBirth.units.month')
+              }
+              options={months}
+              selected={value?.month !== null ? value?.month : undefined}
+              maxItems={6}
+              onSelect={handleUpdateMonth}
+              disabled={disabled ?? false}
+            />
+            <DropdownSelect<number>
+              closeOnSelect
+              width={isTablet ? '100%' : '120px'}
+              label={
+                value?.year
+                  ? years.find((o) => o.value === value.year)?.name!!
+                  : t('detailsSection.form.dateOfBirth.units.year')
+              }
+              options={years}
+              selected={value?.year !== null ? value?.year : undefined}
+              maxItems={6}
+              onSelect={handleUpdateYear}
+              disabled={disabled ?? false}
+            />
+          </SDropdownsContainer>
+        ) : (
+          <SLabelButton
+            disabled={disabled ?? false}
+            isValid={isValid}
+            onClick={() => setIsModalOpen(true)}
+          >
+            <span>
+              {value?.day && value.month && value.year
+                ? `${value?.day} ${months.find((o) => o.value === value?.month)
+                    ?.name!!} ${value?.year}`
+                : 'Set your date of birth'}
+            </span>
+            <SInlineSVG
+              svg={ArrowDown}
+              fill={theme.colorsThemed.text.quaternary}
+              width='24px'
+              height='24px'
+              focused={isModalOpen}
+            />
+          </SLabelButton>
+        )}
+        {!isValid ? (
+          <AnimatedPresence animation='t-09'>
+            <SErrorDiv>
+              <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+              {/* TODO: improve error messages */}
+              {t('detailsSection.form.dateOfBirth.errors.tooYoung')}
+            </SErrorDiv>
+          </AnimatedPresence>
+        ) : null}
+      </SContainer>
+      <Modal
+        show={isModalOpen}
+        custombackdropfiltervalue={1}
+        onClose={() => setIsModalOpen(false)}
+      >
+        {isModalOpen && value && (
+          <BirthDateMobileInput
+            currentDate={value}
+            months={months}
+            years={years}
+            handleChangeDate={onChange}
+            handleClose={() => setIsModalOpen(false)}
+          />
+        )}
+      </Modal>
+    </>
+  );
+};
 
 OnboardingBirthDateInput.defaultProps = {
   value: undefined,
