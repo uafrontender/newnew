@@ -21,10 +21,7 @@ import {
   deleteMcOption,
   doFreeVote,
   voteOnPost,
-  // voteOnPostWithWallet,
 } from '../../../../../api/endpoints/multiple_choice';
-import // getTopUpWalletWithPaymentPurposeUrl,
-'../../../../../api/endpoints/payments';
 
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
 
@@ -62,7 +59,6 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
-// import { WalletContext } from '../../../../contexts/walletContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -74,8 +70,6 @@ const getPayWithCardErrorMessage = (
       return 'errors.cardNotFound';
     case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
       return 'errors.cardCannotBeUsed';
-    case newnewapi.VoteOnPostResponse.Status.BLOCKED_BY_CREATOR:
-      return 'errors.blockedByCreator';
     case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
       return 'errors.mcCancelled';
     case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:
@@ -149,7 +143,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   );
 
   const { appConstants } = useGetAppConstants();
-  // const { walletBalance } = useContext(WalletContext);
 
   const [amISubscribed, setAmISubscribed] = useState(false);
 
@@ -287,129 +280,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     setIsConfirmVoteModalOpen(false);
     setIsAmountPredefined(false);
   };
-
-  // const handlePayWithWallet = useCallback(async () => {
-  //  if (!user._persist?.rehydrated) {
-  //    return;
-  //  }
-  //   setLoadingModalOpen(true);
-  //   handleCloseConfirmVoteModal();
-  //   try {
-  //     // Check if user is logged in
-  //     if (!user.loggedIn) {
-  //       const getTopUpWalletWithPaymentPurposeUrlPayload =
-  //         new newnewapi.TopUpWalletWithPurposeRequest({
-  //           successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //           }post/${postId}`,
-  //           cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //           }post/${postId}`,
-  //           ...(!user.loggedIn
-  //             ? {
-  //                 nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-  //               }
-  //             : {}),
-  //           mcVoteRequest: {
-  //             votesCount: parseInt(supportBidAmount),
-  //             optionId: option.id,
-  //             postUuid: postId,
-  //           },
-  //         });
-
-  //       const res = await getTopUpWalletWithPaymentPurposeUrl(
-  //         getTopUpWalletWithPaymentPurposeUrlPayload
-  //       );
-
-  //       if (!res.data || !res.data.sessionUrl || res.error)
-  //         throw new Error(res.error?.message ?? 'Request failed');
-
-  //       window.location.href = res.data.sessionUrl;
-  //     } else {
-  //       const makeBidPayload = new newnewapi.VoteOnPostRequest({
-  //         votesCount: parseInt(supportBidAmount),
-  //         optionId: option.id,
-  //         postUuid: postId,
-  //       });
-
-  //       const res = await voteOnPostWithWallet(makeBidPayload);
-
-  //       if (
-  //         res.data &&
-  //         res.data.status ===
-  //           newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE
-  //       ) {
-  //         const getTopUpWalletWithPaymentPurposeUrlPayload =
-  //           new newnewapi.TopUpWalletWithPurposeRequest({
-  //             successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //             }post/${postId}`,
-  //             cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //             }post/${postId}`,
-  //             mcVoteRequest: {
-  //               votesCount: parseInt(supportBidAmount),
-  //               optionId: option.id,
-  //               postUuid: postId,
-  //             },
-  //           });
-
-  //         const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
-  //           getTopUpWalletWithPaymentPurposeUrlPayload
-  //         );
-
-  //         if (
-  //           !resStripeRedirect.data ||
-  //           !resStripeRedirect.data.sessionUrl ||
-  //           resStripeRedirect.error
-  //         )
-  //           throw new Error(
-  //             resStripeRedirect.error?.message ?? 'Request failed'
-  //           );
-
-  //         window.location.href = resStripeRedirect.data.sessionUrl;
-  //         return;
-  //       }
-
-  //       if (
-  //         !res.data ||
-  //         res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
-  //         res.error
-  //       )
-  //         throw new Error(res.error?.message ?? 'Request failed');
-
-  //       const optionFromResponse = (res.data
-  //         .option as newnewapi.MultipleChoice.Option)!!;
-  //       optionFromResponse.isSupportedByMe = true;
-  //       handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
-  //       handleSetSupportedBid('');
-  //       setSupportBidAmount('');
-  //       setIsSupportMenuOpen(false);
-  //       setPaymentModalOpen(false);
-  //       setLoadingModalOpen(false);
-  //       handleSetPaymentSuccessModalOpen(true);
-  //     }
-  //   } catch (err) {
-  //     setPaymentModalOpen(false);
-  //     setLoadingModalOpen(false);
-  //     console.error(err);
-  //   }
-  // }, [
-  //   setPaymentModalOpen,
-  //   setLoadingModalOpen,
-  //   setIsSupportMenuOpen,
-  //   setSupportBidAmount,
-  //   handleSetSupportedBid,
-  //   handleSetPaymentSuccessModalOpen,
-  //   handleAddOrUpdateOptionFromResponse,
-  //   supportBidAmount,
-  //   option.id,
-  //   postId,
-  //   user.loggedIn,
-  //   user._persist?.rehydrated,
-  //   router.locale,
-  // ]);
 
   const voteOnPostRequest = useMemo(
     () =>
@@ -827,18 +697,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             isOpen={paymentModalOpen}
             amount={(parseInt(supportBidAmount) || 0) * votePrice}
             setupIntent={setupIntent}
-            // {...(walletBalance?.usdCents &&
-            // walletBalance.usdCents >=
-            //   parseInt(supportBidAmount) * votePrice * 100
-            //   ? {}
-            //   : {
-            //       predefinedOption: 'card',
-            //     })}
-            // predefinedOption='card'
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCard={handlePayWithCard}
             redirectUrl={`post/${postId}`}
-            // handlePayWithWallet={handlePayWithWallet}
             bottomCaption={
               <SPaymentSign variant='subtitle'>
                 {t('mcPost.paymentModalFooter.body', {
@@ -856,7 +717,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 {t('mcPost.paymentModalFooter.apply')}
               </SPaymentSign>
             }
-            // payButtonCaptionKey={t('mcPost.paymentModalPayButton')}
           >
             <SPaymentModalHeader>
               <SPaymentModalHeading>

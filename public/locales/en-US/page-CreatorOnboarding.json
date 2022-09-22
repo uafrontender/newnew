@@ -79,7 +79,13 @@
         "label": "Date of birth",
         "captions": {
           "twoTimesOnly": "Birthday can be changed 2 times only.",
-          "cannotChange": "You can’t change birthday."
+          "cannotChange": "You can’t change birthday.",
+          "instruction": "Set your date of birth"
+        },
+        "units": {
+          "day": "Day",
+          "month": "Month",
+          "year": "Year"
         },
         "errors": {
           "tooYoung": "You must be 18 or older to become a creator"

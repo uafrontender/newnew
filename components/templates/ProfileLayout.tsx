@@ -1,4 +1,3 @@
-/* eslint-disable no-unsafe-optional-chaining */
 import React, {
   ReactElement,
   useCallback,
@@ -45,8 +44,6 @@ import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
 import BackButton from '../molecules/profile/BackButton';
-import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
-import UnsubscribeModal from '../molecules/profile/UnsubscribeModal';
 import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
@@ -64,6 +61,7 @@ import {
   unsubscribeGuestFromCreatorSmsNotifications,
 } from '../../api/endpoints/phone';
 import { SocketContext } from '../../contexts/socketContext';
+import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -162,7 +160,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState(false);
-  const [unsubscribeModalOpen, setUnsubscribeModalOpen] = useState(false);
   const [smsNotificationModalOpen, setSmsNotificationModalOpen] =
     useState(false);
   const { usersIBlocked, unblockUser } = useGetBlockedUsers();
@@ -810,7 +807,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           {!isMobile && (
             <UserEllipseMenu
               isVisible={ellipseMenuOpen}
-              isSubscribed={!!isSubscribed}
               isBlocked={isUserBlocked}
               loggedIn={currentUser.loggedIn}
               handleClose={() => setIsEllipseMenuOpen(false)}
@@ -822,20 +818,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 }
               }}
               handleClickReport={handleClickReport}
-              handleClickUnsubscribe={() => {
-                setUnsubscribeModalOpen(true);
-              }}
               anchorElement={moreButtonRef.current}
               offsetTop={isDesktop ? '-25px' : '0'}
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
-          {isSubscribed && (
-            <SSubscribedTag>{t('subscribed-tag')}</SSubscribedTag>
-          )}
-          {wasSubscribed && (
-            <SSubscribedTag>{t('subscriptionCancelled-tag')}</SSubscribedTag>
-          )}
           <div
             style={{
               position: 'relative',
@@ -911,20 +898,17 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               </SShareButton>
             </SShareDiv>
             {user.options?.isOfferingSubscription &&
-            user.uuid !== currentUser.userData?.userUuid ? (
-              <CustomLink
-                href={
-                  !isSubscribed && !wasSubscribed
-                    ? `/${user.username}/subscribe`
-                    : `/direct-messages/${user.username}-cr`
-                }
-                disabled={isSubscribed === null || wasSubscribed === null}
-              >
-                <SSendButton withShadow view='primaryGrad'>
-                  {t('profileLayout.buttons.sendMessage')}
-                </SSendButton>
-              </CustomLink>
-            ) : null}
+              user.uuid !== currentUser.userData?.userUuid &&
+              (isSubscribed || wasSubscribed) && (
+                <CustomLink
+                  href={`/direct-messages/${user.username}-cr`}
+                  disabled={isSubscribed === null || wasSubscribed === null}
+                >
+                  <SSendButton withShadow view='primaryGrad'>
+                    {t('profileLayout.buttons.sendMessage')}
+                  </SSendButton>
+                </CustomLink>
+              )}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
           </div>
           {/* Temp, all creactors for now */}
@@ -940,7 +924,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         <UserEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={10}
-          isSubscribed={!!isSubscribed}
           isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           onClose={() => setIsEllipseMenuOpen(false)}
@@ -954,16 +937,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           handleClickReport={() => {
             setConfirmReportUser(true);
           }}
-          handleClickUnsubscribe={() => {
-            setUnsubscribeModalOpen(true);
-          }}
         />
       )}
-      <UnsubscribeModal
-        confirmUnsubscribe={unsubscribeModalOpen}
-        user={user}
-        closeModal={() => setUnsubscribeModalOpen(false)}
-      />
       <BlockUserModalProfile
         confirmBlockUser={blockUserModalOpen}
         user={user}
@@ -1205,34 +1180,6 @@ const SProfileLayout = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     margin-top: -16px;
-  }
-`;
-
-const SSubscribedTag = styled.div`
-  position: absolute;
-  top: 195px;
-  left: calc(50% - 38px);
-
-  background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
-
-  width: 76px;
-  padding: 6px 8px;
-  border-radius: 50px;
-
-  color: ${({ theme }) => theme.colors.dark};
-  text-align: center;
-  font-weight: 700;
-  font-size: 10px;
-  line-height: 12px;
-
-  z-index: 5;
-
-  ${({ theme }) => theme.media.tablet} {
-    top: 235px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    top: 275px;
   }
 `;
 

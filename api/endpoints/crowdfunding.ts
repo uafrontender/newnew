@@ -63,19 +63,3 @@ export const doPledgeCrowdfunding = (
     payload,
     signal ?? undefined
   );
-
-export const doPledgeWithWallet = (
-  payload: newnewapi.DoPledgeRequest,
-  signal?: RequestInit['signal']
-) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.DoPledgeRequest,
-    newnewapi.DoPledgeResponse
-  >(
-    newnewapi.DoPledgeRequest,
-    newnewapi.DoPledgeResponse,
-    `${BASE_URL_CROWDFUNDING}/do_pledge_with_wallet`,
-    'post',
-    payload,
-    signal ?? undefined
-  );

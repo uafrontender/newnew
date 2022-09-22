@@ -42,7 +42,6 @@ type TPageType =
   | 'activelyBidding'
   | 'purchases'
   | 'viewHistory'
-  | 'subscriptions'
   | 'myposts'
   | 'favorites';
 
@@ -60,10 +59,6 @@ interface IMyProfileLayout {
   postsCachedViewHistoryFilter?: newnewapi.Post.Filter;
   postsCachedViewHistoryPageToken?: string | null | undefined;
   postsCachedViewHistoryCount?: number;
-  postsCachedSubscriptions?: newnewapi.Post[];
-  postsCachedSubscriptionsFilter?: newnewapi.Post.Filter;
-  postsCachedSubscriptionsPageToken?: string | null | undefined;
-  postsCachedSubscriptionsCount?: number;
   postsCachedFavorites?: newnewapi.Post[];
   postsCachedFavoritesFilter?: newnewapi.Post.Filter;
   postsCachedFavoritesPageToken?: string | null | undefined;
@@ -86,9 +81,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   postsCachedViewHistory,
   postsCachedViewHistoryFilter,
   postsCachedViewHistoryCount,
-  postsCachedSubscriptions,
-  postsCachedSubscriptionsFilter,
-  postsCachedSubscriptionsCount,
   postsCachedFavorites,
   postsCachedFavoritesFilter,
   postsCachedFavoritesCount,
@@ -98,7 +90,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   postsCachedActivelyBiddingPageToken,
   postsCachedMyPurchasesPageToken,
   postsCachedViewHistoryPageToken,
-  postsCachedSubscriptionsPageToken,
   postsCachedFavoritesPageToken,
   postsCachedMyPostsPageToken,
   children,
@@ -132,10 +123,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       {
         nameToken: 'viewHistory',
         url: '/profile/view-history',
-      },
-      {
-        nameToken: 'subscriptions',
-        url: '/profile/subscriptions',
       },
       {
         nameToken: 'favorites',
@@ -222,20 +209,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const [viewHistoryCount, setViewHistoryCount] = useState(
     postsCachedViewHistoryCount
   );
-
-  const [postsSubscriptions, setPostsSubscriptions] = useState(
-    postsCachedSubscriptions ?? []
-  );
-  const [postsSubscriptionsFilter, setPostsSubscriptionsFilter] = useState(
-    postsCachedSubscriptionsFilter ?? newnewapi.Post.Filter.ALL
-  );
-  const [subscriptionsPageToken, setSubscriptionsPageToken] = useState(
-    postsCachedSubscriptionsPageToken
-  );
-  const [subscriptionsCount, setSubscriptionsCount] = useState(
-    postsCachedSubscriptionsCount
-  );
-
   const [postsFavorites, setPostsFavorites] = useState(
     postsCachedFavorites ?? []
   );
@@ -272,9 +245,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const handleSetPostsViewHistory: React.Dispatch<
     React.SetStateAction<newnewapi.Post[]>
   > = useCallback(setPostsViewHistory, [setPostsViewHistory]);
-  const handleSetPostsSubscriptions: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setPostsSubscriptions, [setPostsSubscriptions]);
 
   const handleSetPostsFavorites: React.Dispatch<
     React.SetStateAction<newnewapi.Post[]>
@@ -297,10 +267,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         }
         case 'viewHistory': {
           setPostsViewHistoryFilter(value);
-          break;
-        }
-        case 'subscriptions': {
-          setPostsSubscriptionsFilter(value);
           break;
         }
         case 'favorites': {
@@ -334,10 +300,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           setViewHistoryPageToken(value);
           break;
         }
-        case 'subscriptions': {
-          setSubscriptionsPageToken(value);
-          break;
-        }
         case 'favorites': {
           setFavoritesPageToken(value);
           break;
@@ -367,10 +329,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         }
         case 'viewHistory': {
           setViewHistoryCount(value);
-          break;
-        }
-        case 'subscriptions': {
-          setSubscriptionsCount(value);
           break;
         }
         case 'favorites': {
@@ -423,14 +381,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         totalCount = viewHistoryCount;
         handleSetPosts = handleSetPostsViewHistory;
         handleSetFavoritePosts = handleSetPostsFavorites;
-        break;
-      }
-      case 'subscriptions': {
-        postsForPage = postsSubscriptions;
-        postsForPageFilter = postsSubscriptionsFilter;
-        pageToken = subscriptionsPageToken;
-        totalCount = subscriptionsCount;
-        handleSetPosts = handleSetPostsSubscriptions;
         break;
       }
       case 'favorites': {
@@ -750,16 +700,12 @@ MyProfileLayout.defaultProps = {
   postsCachedViewHistory: undefined,
   postsCachedViewHistoryFilter: undefined,
   postsCachedViewHistoryCount: undefined,
-  postsCachedSubscriptions: undefined,
-  postsCachedSubscriptionsFilter: undefined,
-  postsCachedSubscriptionsCount: undefined,
   postsCachedFavorites: undefined,
   postsCachedFavoritesFilter: undefined,
   postsCachedFavoritesCount: undefined,
   postsCachedActivelyBiddingPageToken: undefined,
   postsCachedMyPurchasesPageToken: undefined,
   postsCachedViewHistoryPageToken: undefined,
-  postsCachedSubscriptionsPageToken: undefined,
   postsCachedFavoritesPageToken: undefined,
   postsCachedMyPosts: undefined,
   postsCachedMyPostsFilter: undefined,
