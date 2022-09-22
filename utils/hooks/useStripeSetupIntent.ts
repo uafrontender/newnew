@@ -37,7 +37,7 @@ interface ISetupIntentProps {
 
 export interface ISetupIntent extends ISetupIntentData {
   update: (props: ISetupIntentProps) => Promise<{ errorKey?: string }>;
-  init: () => Promise<void>;
+  init: () => Promise<{ errorKey?: string }>;
   destroy: () => void;
 }
 
@@ -122,15 +122,20 @@ const useStripeSetupIntent = ({
         response.error ||
         !response.data?.stripeSetupIntentClientSecret
       ) {
-        throw new Error(response.error?.message || 'Some error occurred');
+        throw new Error(
+          response.error?.message || 'Cannot create SI for unknown reason'
+        );
       }
 
       setSetupIntent((prevState) => ({
         ...prevState,
         setupIntentClientSecret: response?.data?.stripeSetupIntentClientSecret!,
       }));
+
+      return {};
     } catch (err: any) {
       console.error(err);
+      return { errorKey: 'errors.requestFailed' };
     }
   }, [setupIntent]);
 
@@ -182,7 +187,7 @@ const useStripeSetupIntent = ({
       ...prevState,
       setupIntentClientSecret: null,
     }));
-  }, [purpose, isGuest, successUrl]);
+  }, []);
 
   const setupIntentData: ISetupIntent = useMemo(
     () => ({
