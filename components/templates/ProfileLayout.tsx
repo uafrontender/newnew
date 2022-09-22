@@ -338,7 +338,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   // TODO: Move to some other place, create it on app startup
   const getGuestId = useCallback((): string => {
-    const GUEST_ID_KEY = 'savedPhoneNumber';
+    const GUEST_ID_KEY = 'savedGuestId';
     let guestId = localStorage.getItem(GUEST_ID_KEY);
     if (!guestId) {
       guestId = uuidv4();
