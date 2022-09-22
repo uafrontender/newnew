@@ -1,6 +1,8 @@
 import createStorage from './utils/createStorage';
 import enterVerificationCode from './utils/enterVerificationCode';
 
+const VERIFICATION_CODE = '111111';
+
 context('Main flow', () => {
   let eventId = '';
   let superpollId = '';
@@ -12,7 +14,8 @@ context('Main flow', () => {
   });
 
   describe('Creator', () => {
-    const CREATOR_EMAIL = 'test-creator@newnew.co';
+    const suffix = Date.now();
+    const CREATOR_EMAIL = `test-creator+${suffix}@newnew.co`;
 
     const defaultStorage = {
       userTutorialsProgress:
@@ -40,7 +43,7 @@ context('Main flow', () => {
       cy.url().should('include', 'verify-email');
       cy.contains(CREATOR_EMAIL);
 
-      enterVerificationCode();
+      enterVerificationCode(VERIFICATION_CODE);
       // Waiting for code to be verified
       cy.wait(10000);
       cy.url().should('include', '/creator/dashboard');
@@ -191,7 +194,8 @@ context('Main flow', () => {
   });
 
   describe('User', () => {
-    const USER_EMAIL = 'test-user@newnew.co';
+    const suffix = Date.now();
+    const USER_EMAIL = `test-user+${suffix}@newnew.co`;
 
     // Ignore tutorials
     const defaultStorage = {
