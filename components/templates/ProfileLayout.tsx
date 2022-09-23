@@ -201,6 +201,14 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     return [];
   }, [user]);
 
+  const subscription: SubscriptionToCreator = useMemo(
+    () => ({
+      userId: user.uuid,
+      username: user.username,
+    }),
+    [user.uuid, user.username]
+  );
+
   // Posts
   const [creatorsDecisions, setCreatorsDecisions] = useState(
     postsCachedCreatorDecisions ?? []
@@ -347,14 +355,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     return guestId;
   }, []);
 
-  const subscription: SubscriptionToCreator = useMemo(
-    () => ({
-      userId: user.uuid,
-      username: user.username,
-    }),
-    [user.uuid, user.username]
-  );
-
   const submitPhoneSmsNotificationsRequest = useCallback(
     async (phoneNumber: newnewapi.PhoneNumber): Promise<string> => {
       try {
@@ -362,7 +362,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           const guestId = getGuestId();
 
           const res = await subscribeGuestToCreatorSmsNotifications(
-            subscription.userId,
+            user.uuid,
             guestId,
             phoneNumber
           );
@@ -387,7 +387,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           localStorage.setItem(SAVED_PHONE_NUMBER_KEY, phoneNumber.number);
         } else {
           const res = await subscribeToCreatorSmsNotifications(
-            subscription.userId,
+            user.uuid,
             phoneNumber
           );
 
@@ -413,7 +413,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         throw err;
       }
     },
-    [currentUser.loggedIn, getGuestId, subscription.userId, t]
+    [currentUser.loggedIn, getGuestId, user.uuid, t]
   );
 
   const handleSmsNotificationButtonClicked = useCallback(async () => {
@@ -450,18 +450,32 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       } else {
         setSmsNotificationModalOpen(true);
       }
-    } else if (currentUser.userData?.phoneNumber) {
-      const phoneNumber = new newnewapi.PhoneNumber({
-        countryCode: currentUser.userData.phoneNumber.countryCode,
-        number: currentUser.userData.phoneNumber.number,
-      });
-      submitPhoneSmsNotificationsRequest(phoneNumber);
+    } else if (currentUser.userData?.options?.isPhoneNumberConfirmed) {
+      try {
+        const res = await subscribeToCreatorSmsNotifications(user.uuid);
+
+        if (
+          !res.data ||
+          res.error ||
+          (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
+            res.data.status !==
+              newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
+        ) {
+          throw new Error(
+            res.error?.message ??
+              t(getSmsNotificationSubscriptionErrorMessage(res.data?.status))
+          );
+        }
+      } catch (err: any) {
+        console.error(err);
+        toast.error(err.message);
+      }
     } else {
       setSmsNotificationModalOpen(true);
     }
   }, [
     currentUser.loggedIn,
-    currentUser.userData?.phoneNumber,
+    currentUser.userData?.options?.isPhoneNumberConfirmed,
     subscribedToSmsNotifications,
     user.uuid,
     t,
