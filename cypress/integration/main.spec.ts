@@ -4,6 +4,8 @@ import enterVerificationCode from './utils/enterVerificationCode';
 const VERIFICATION_CODE = '111111';
 
 context('Main flow', () => {
+  const testSeed = Date.now();
+
   let eventId = '';
   let superpollId = '';
   let crowdfundingId = '';
@@ -14,8 +16,7 @@ context('Main flow', () => {
   });
 
   describe('Creator', () => {
-    const suffix = Date.now();
-    const CREATOR_EMAIL = `test-creator+${suffix}@newnew.co`;
+    const CREATOR_EMAIL = `test-creator-${testSeed}@newnew.co`;
 
     const defaultStorage = {
       userTutorialsProgress:
@@ -34,9 +35,9 @@ context('Main flow', () => {
       storage.save();
     });
 
-    it('can enter application', () => {
-      cy.get('#log-in').click();
-      cy.url().should('include', '/sign-up');
+    it('can register as a creator', () => {
+      cy.get('#log-in-to-create').click();
+      cy.url().should('include', '/sign-up?to=create');
 
       cy.get('#authenticate-input').type(CREATOR_EMAIL);
       cy.get('#authenticate-form').submit();
@@ -44,13 +45,64 @@ context('Main flow', () => {
       cy.contains(CREATOR_EMAIL);
 
       enterVerificationCode(VERIFICATION_CODE);
-      // Waiting for code to be verified
-      cy.wait(10000);
+      cy.url().should('include', '/creator-onboarding', {
+        timeout: 15000,
+      });
+    });
+
+    it('can onboard', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creator-onboarding`);
+
+      cy.fixture('avatar.png', 'binary')
+        .then(Cypress.Blob.binaryStringToBlob)
+        .then((fileContent) => {
+          cy.get('#avatar-input').attachFile({
+            fileContent,
+            fileName: 'avatar.png',
+            mimeType: 'image/png',
+            encoding: 'utf8',
+          });
+        })
+        .then(() => {
+          cy.get('#save-image').click();
+        });
+
+      cy.get('#settings_first_name_input').type('testCreator');
+      cy.get('#settings_last_name_input').type('testCreator');
+      cy.get('#nickname_input').type('testCreator');
+
+      cy.get('#select-day').click();
+      cy.get('#select-day-options')
+        .children()
+        .first()
+        .children()
+        .last()
+        .click();
+
+      cy.get('#select-month').click();
+      cy.get('#select-month-options')
+        .children()
+        .first()
+        .children()
+        .last()
+        .click();
+
+      cy.get('#select-year').click();
+      cy.get('#select-year-options')
+        .children()
+        .first()
+        .children()
+        .last()
+        .click();
+
+      cy.get('#tos-checkbox').click();
+      cy.get('#submit-button').click();
+
       cy.url().should('include', '/creator/dashboard');
     });
 
     it('can navigate to creation panel', () => {
-      cy.get('#create').click();
+      cy.get('#create').should('be.enabled').click();
       cy.url().should('include', '/creation');
     });
 
@@ -194,8 +246,7 @@ context('Main flow', () => {
   });
 
   describe('User', () => {
-    const suffix = Date.now();
-    const USER_EMAIL = `test-user+${suffix}@newnew.co`;
+    const USER_EMAIL = `test-user-${testSeed}@newnew.co`;
 
     // Ignore tutorials
     const defaultStorage = {
