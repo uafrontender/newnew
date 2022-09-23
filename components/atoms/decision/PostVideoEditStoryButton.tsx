@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -28,7 +28,8 @@ const PostVideoEditStoryButton: React.FunctionComponent<
 
   return (
     <SPostVideoEditStoryButton
-      id='sound-button'
+      id='edit-story-button'
+      buttonActive={active}
       iconOnly
       view='transparent'
       onClick={(e) => {
@@ -55,7 +56,9 @@ const PostVideoEditStoryButton: React.FunctionComponent<
 
 export default PostVideoEditStoryButton;
 
-const SPostVideoEditStoryButton = styled(Button)`
+const SPostVideoEditStoryButton = styled(Button)<{
+  buttonActive: boolean;
+}>`
   position: absolute;
   left: 16px;
   bottom: 16px;
@@ -65,6 +68,24 @@ const SPostVideoEditStoryButton = styled(Button)`
   height: 36px;
 
   border-radius: ${({ theme }) => theme.borderRadius.small};
+
+  &:focus:enabled,
+  &:hover:enabled {
+    background: #ffffff;
+    svg > path {
+      stroke: black;
+    }
+  }
+
+  ${({ buttonActive }) =>
+    buttonActive
+      ? css`
+          background: #ffffff;
+          svg > path {
+            stroke: black;
+          }
+        `
+      : null}
 
   ${({ theme }) => theme.media.tablet} {
     width: 36px;

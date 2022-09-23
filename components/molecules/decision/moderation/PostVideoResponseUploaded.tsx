@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
 import { useAppSelector } from '../../../../redux-store/store';
@@ -64,19 +65,9 @@ const PostVideoResponseUploaded: React.FunctionComponent<
   return (
     <>
       {/* {!additionalResponses || additionalResponses.length === 0 ? ( */}
-      {!responses || responses.length === 0 ? (
-        <>
-          <PostBitmovinPlayer
-            id={postParsed?.postUuid ?? ''}
-            resources={coreResponse}
-            muted={isMuted}
-            showPlayButton
-          />
-        </>
-      ) : (
+      {responses && responses.length > 0 ? (
         <PostVideoResponsesSlider
-          // videos={[coreResponse!!, ...additionalResponses]}
-          videos={responses!!}
+          videos={responses as newnewapi.IVideoUrls[]}
           isMuted={isMuted}
           isEditingStories={isEditingStories}
           {...(soundBtnBottomOverriden
@@ -91,6 +82,16 @@ const PostVideoResponseUploaded: React.FunctionComponent<
               }
             : {})}
           handleDeleteAdditionalVideo={handleDeleteAdditionalResponse}
+          handleDeleteUnuploadedAdditonalResponse={
+            handleDeleteUnuploadedAdditonalResponse
+          }
+        />
+      ) : (
+        <PostBitmovinPlayer
+          id={postParsed?.postUuid ?? ''}
+          resources={coreResponse}
+          muted={isMuted}
+          showPlayButton
         />
       )}
       <PostVideoSoundButton

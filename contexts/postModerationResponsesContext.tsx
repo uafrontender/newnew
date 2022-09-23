@@ -21,6 +21,7 @@ import {
   stopVideoProcessing,
 } from '../api/endpoints/upload';
 import {
+  deleteAdditionalPostResponse,
   uploadAdditionalPostResponse,
   uploadPostResponse,
 } from '../api/endpoints/post';
@@ -160,10 +161,23 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
   const handleDeleteAdditonalResponse = useCallback(
     async (videoUuid: string) => {
-      setAdditionalResponses((curr) => {
-        const workingArray = curr.filter((video) => video.uuid !== videoUuid);
-        return workingArray;
-      });
+      try {
+        const req = new newnewapi.DeleteAdditionalPostResponseRequest({
+          videoUuid,
+        });
+
+        const res = await deleteAdditionalPostResponse(req);
+
+        if (res.error) throw new Error('Failed to delete video');
+
+        setAdditionalResponses((curr) => {
+          const workingArray = curr.filter((video) => video.uuid !== videoUuid);
+          return workingArray;
+        });
+      } catch (err) {
+        console.error(err);
+        toast.error('Failed to delete video');
+      }
     },
     [setAdditionalResponses]
   );

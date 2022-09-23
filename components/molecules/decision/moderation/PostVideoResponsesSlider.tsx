@@ -11,14 +11,15 @@ import arrowIconLeft from '../../../../public/images/svg/icons/outlined/ChevronL
 import arrowIconRight from '../../../../public/images/svg/icons/outlined/ChevronRight.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import PostVideoStoriesPreviewSlider from './PostVideoStoriesPreviewSlider';
+import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
 interface IPostVideoResponsesSlider {
   videos: newnewapi.IVideoUrls[];
   dotsBottom?: number;
   isMuted?: boolean;
   isEditingStories?: boolean;
-  canDeleteOnlyNonUploaded?: boolean;
   handleDeleteAdditionalVideo: (videoUuid: string) => void;
+  handleDeleteUnuploadedAdditonalResponse: () => void;
 }
 
 const PostVideoResponsesSlider: React.FunctionComponent<
@@ -28,9 +29,15 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   dotsBottom,
   isMuted,
   isEditingStories,
-  canDeleteOnlyNonUploaded,
   handleDeleteAdditionalVideo,
+  handleDeleteUnuploadedAdditonalResponse,
 }) => {
+  const { videoProcessing } = usePostModerationResponsesContext();
+  const uploadedFile = useMemo(
+    () => videoProcessing?.targetUrls,
+    [videoProcessing]
+  );
+
   const videosLength = useMemo(() => videos.length, [videos.length]);
   // const lengthMemo = useRef<number>(videosLength);
   const containerRef = useRef<HTMLDivElement>();
@@ -66,22 +73,13 @@ const PostVideoResponsesSlider: React.FunctionComponent<
       const containerScrollWidth = containerRef.current?.scrollWidth;
       const currentScrollLeft = containerRef.current?.scrollLeft;
 
-      console.log(containerWidth);
-      console.log(currentScrollLeft);
-      console.log(containerScrollWidth);
-
       if (
         containerWidth &&
         containerScrollWidth &&
         currentScrollLeft !== undefined
       ) {
         timeout = setTimeout(() => {
-          console.log(
-            `Current scroll left: ${currentScrollLeft + containerWidth}`
-          );
           const currentIndex = Math.floor(currentScrollLeft / containerWidth);
-
-          console.log(`Current index: ${currentIndex}`);
 
           setCurrentVideo(currentIndex);
         }, 1000);
@@ -97,6 +95,13 @@ const PostVideoResponsesSlider: React.FunctionComponent<
       clearTimeout(timeout);
     };
   }, [videosLength]);
+
+  useEffect(() => {
+    if (uploadedFile?.hlsStreamUrl) {
+      scrollSliderTo(videosLength - 1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uploadedFile]);
 
   return (
     <SWrapper
@@ -185,6 +190,9 @@ const PostVideoResponsesSlider: React.FunctionComponent<
           offsetBottom={dotsBottom ?? 0}
           handleChangeCurrentActive={scrollSliderTo}
           handleDeleteAdditionalVideo={handleDeleteAdditionalVideo}
+          handleDeleteUnuploadedAdditonalResponse={
+            handleDeleteUnuploadedAdditonalResponse
+          }
         />
       ) : null}
     </SWrapper>

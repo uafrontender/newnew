@@ -72,12 +72,6 @@ const PostResponseTabModeration: React.FunctionComponent<
     ]
   );
 
-  console.log(`Ready to be uploaded: ${responseReadyToBeUploaded}`);
-
-  console.log(!!uploadedResponseVideoUrl);
-  console.log(responseFileUploadLoading);
-  console.log(responseFileProcessingLoading);
-
   // Earned amount
   const [earnedAmount, setEarnedAmount] = useState<
     newnewapi.MoneyAmount | undefined
@@ -140,7 +134,7 @@ const PostResponseTabModeration: React.FunctionComponent<
           }, 1500);
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
     }
   }, [postId]);
@@ -356,7 +350,8 @@ const PostResponseTabModeration: React.FunctionComponent<
         ) : readyToUploadAdditionalResponse ? (
           <SUploadButton
             className='uploadButton'
-            disabled={!responseReadyToBeUploaded || additionalResponseUploading}
+            disabled={!responseReadyToBeUploaded}
+            loading={additionalResponseUploading}
             onClick={handleUploadAdditionalVideoProcessed}
           >
             {t('postResponseTabModeration.awaiting.postResponseBtn')}
@@ -761,7 +756,7 @@ const SUploadButton = styled(Button)`
 
   ${({ theme }) => theme.media.tablet} {
     align-self: end;
-    position: static;
+    position: relative;
     width: 100%;
 
     &:disabled {

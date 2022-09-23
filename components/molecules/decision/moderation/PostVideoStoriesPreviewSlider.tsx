@@ -5,6 +5,7 @@ import { newnewapi } from 'newnew-api';
 
 import PostVideoThumbnailItem from './PostVideoThumbnailItem';
 import isBrowser from '../../../../utils/isBrowser';
+import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
 interface IPostVideoStoriesPreviewSlider {
   videos: newnewapi.IVideoUrls[];
@@ -13,6 +14,7 @@ interface IPostVideoStoriesPreviewSlider {
   canDeleteOnlyNonUploaded?: boolean;
   handleChangeCurrentActive: (idx: number) => void;
   handleDeleteAdditionalVideo: (videoUuid: string) => void;
+  handleDeleteUnuploadedAdditonalResponse: () => void;
 }
 
 const PostVideoStoriesPreviewSlider: React.FunctionComponent<
@@ -21,13 +23,14 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
   videos,
   currentActive,
   offsetBottom,
-  canDeleteOnlyNonUploaded,
   handleChangeCurrentActive,
   handleDeleteAdditionalVideo,
+  handleDeleteUnuploadedAdditonalResponse,
 }) => {
-  const containerRef = useRef<HTMLDivElement>();
+  const { readyToUploadAdditionalResponse } =
+    usePostModerationResponsesContext();
 
-  console.log(offsetBottom);
+  const containerRef = useRef<HTMLDivElement>();
 
   useEffect(() => {
     if (currentActive !== undefined && isBrowser()) {
@@ -62,9 +65,14 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
             key={video.uuid ?? i}
             index={i}
             video={video}
-            canDelete={!canDeleteOnlyNonUploaded ? true : i === arr.length - 1}
+            isNonUploadedYet={
+              i === arr.length - 1 && readyToUploadAdditionalResponse
+            }
             handleClick={() => handleChangeCurrentActive(i)}
             handleDeleteVideo={() => handleDeleteAdditionalVideo(video.uuid!!)}
+            handleDeleteUnuploadedAdditonalResponse={() =>
+              handleDeleteUnuploadedAdditonalResponse()
+            }
           />
         ))}
       </SContainer>
@@ -76,12 +84,13 @@ export default PostVideoStoriesPreviewSlider;
 
 const SWrapper = styled.div`
   position: absolute;
-  height: 146px;
-  width: calc(100% - 48px);
   left: 24px;
   bottom: 82px;
 
-  padding: 8px 8px;
+  height: 146px;
+  width: calc(100% - 48px);
+
+  overflow: visible;
 
   background-color: rgba(11, 10, 19, 0.2);
   border-radius: 10px;
@@ -100,9 +109,16 @@ const SWrapper = styled.div`
 `;
 
 const SContainer = styled.div`
-  width: 100%;
-  height: 100%;
+  position: relative;
+  top: -12px;
 
+  width: 100%;
+  height: calc(100% + 12px);
+
+  padding: 8px 8px;
+  padding-top: 20px;
+
+  overflow: visible;
   overflow-x: auto;
   /* Hide scrollbar */
   ::-webkit-scrollbar {

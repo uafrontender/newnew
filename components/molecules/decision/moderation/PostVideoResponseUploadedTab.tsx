@@ -35,13 +35,6 @@ import PostVideoEditStoryButton from '../../../atoms/decision/PostVideoEditStory
 
 import errorIcon from '../../../../public/images/svg/icons/filled/Alert.svg';
 
-const PostBitmovinPlayer = dynamic(
-  () => import('../../../atoms/BitmovinPlayer'),
-  {
-    ssr: false,
-  }
-);
-
 interface IPostVideoResponseUploadedTab {
   id: string;
   isMuted: boolean;
@@ -63,6 +56,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 }) => {
   const { t } = useTranslation('modal-Post');
   const {
+    coreResponse,
     additionalResponses,
     videoProcessing,
     responseFileUploadETA,
@@ -77,8 +71,25 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     handleResetVideoUploadAndProcessingState,
     handleSetUploadingAdditionalResponse,
     handleSetReadyToUploadAdditionalResponse,
+    handleVideoDelete,
   } = usePostModerationResponsesContext();
   const value = useMemo(() => videoProcessing?.targetUrls, [videoProcessing]);
+
+  const responses = useMemo(() => {
+    if (additionalResponses) {
+      if (responseFileProcessingProgress === 100) {
+        return [coreResponse, ...additionalResponses, value];
+      }
+      return [coreResponse, ...additionalResponses];
+    }
+
+    return undefined;
+  }, [
+    coreResponse,
+    additionalResponses,
+    value,
+    responseFileProcessingProgress,
+  ]);
 
   const [currentStep, setCurrentStep] = useState<'regular' | 'editing'>(
     'regular'
@@ -89,20 +100,23 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   const playerRef: any = useRef();
   const [localFile, setLocalFile] = useState<File | null>(null);
 
-  const handleButtonClick = useCallback(() => {
+  const handleUploadButtonClick = useCallback(() => {
     Mixpanel.track('Post Additional Video Response Upload', {
       _stage: 'Post',
     });
     inputRef.current?.click();
   }, []);
+
   const handleDeleteVideoShow = useCallback(() => {
     setShowVideoDelete(true);
     playerRef.current.pause();
   }, []);
+
   const handleCloseDeleteVideoClick = useCallback(() => {
     setShowVideoDelete(false);
     playerRef.current.play();
   }, []);
+
   const handleDeleteVideo = useCallback(() => {
     Mixpanel.track('Post Video Response Delete', {
       _stage: 'Post',
@@ -119,9 +133,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     handleSetUploadingAdditionalResponse,
     handleSetReadyToUploadAdditionalResponse,
   ]);
-  const handleDeleteUnuploadedAdditonalResponse = () => {};
 
-  const handleDeleteAndChangeVideo = useCallback(async () => {
+  const handleDeleteLocalFile = useCallback(async () => {
     try {
       const payload = new newnewapi.RemoveUploadedFileRequest({
         publicUrl: videoProcessing?.targetUrls?.originalVideoUrl,
@@ -132,29 +145,38 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       if (res.error) throw new Error('An error occurred');
 
       setLocalFile(null);
-      handleItemChange(id, null);
-      handleSetUploadingAdditionalResponse(true);
-
-      Mixpanel.track('Post Additional Video Response Upload', {
-        _stage: 'Post',
-      });
-      inputRef.current?.click();
+      await handleItemChange(id, null);
+      handleSetUploadingAdditionalResponse(false);
+      handleSetReadyToUploadAdditionalResponse(false);
     } catch (err) {
       console.error(err);
     }
   }, [
-    id,
-    handleItemChange,
     videoProcessing?.targetUrls?.originalVideoUrl,
+    handleItemChange,
+    id,
     handleSetUploadingAdditionalResponse,
+    handleSetReadyToUploadAdditionalResponse,
   ]);
+
+  const handleDeleteUnuploadedAdditonalResponse = useCallback(async () => {
+    try {
+      await handleVideoDelete();
+    } catch (err) {
+      console.error(err);
+    }
+  }, [handleVideoDelete]);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const { files } = e.target;
 
-      if (!files) {
+      if (!files || !files[0]) {
         return;
+      }
+
+      if (localFile) {
+        await handleDeleteLocalFile();
       }
 
       const file = files[0];
@@ -176,7 +198,14 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
         }
       }
     },
-    [id, handleItemChange, t, handleSetUploadingAdditionalResponse]
+    [
+      localFile,
+      handleDeleteLocalFile,
+      t,
+      handleItemChange,
+      id,
+      handleSetUploadingAdditionalResponse,
+    ]
   );
   const handleRetryVideoUpload = useCallback(() => {
     handleItemChange(id, localFile);
@@ -351,19 +380,17 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
         multiple={false}
         onChange={(e) => {
           handleFileChange(e);
-          if (inputRef.current) {
-            inputRef.current.value = '';
-          }
         }}
       />
       {currentStep === 'regular' ? (
-        <SUploadVideoButton onClick={() => handleButtonClick()}>
+        <SUploadVideoButton onClick={() => handleUploadButtonClick()}>
           {t('postVideo.addVideoButton')}
         </SUploadVideoButton>
       ) : null}
-      {currentStep === 'regular' &&
-      additionalResponses &&
-      additionalResponses?.length > 0 ? (
+      {!responseFileUploadLoading &&
+      !responseFileProcessingLoading &&
+      responses &&
+      responses?.length > 0 ? (
         <PostVideoEditStoryButton
           active={isEditingStories}
           bottomOverriden={soundBtnBottomOverriden}
@@ -371,7 +398,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
         />
       ) : null}
       {currentStep === 'editing' && responseFileProcessingProgress === 100 ? (
-        <SUploadVideoButton onClick={() => handleDeleteAndChangeVideo()}>
+        <SUploadVideoButton onClick={() => handleUploadButtonClick()}>
           {t('postVideo.reuploadButton')}
         </SUploadVideoButton>
       ) : null}
