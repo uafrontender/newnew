@@ -7,13 +7,12 @@ import {
   PaymentElement,
 } from '@stripe/react-stripe-js';
 import { SetupIntent } from '@stripe/stripe-js';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { newnewapi } from 'newnew-api';
 
 import { createStripeSetupIntent } from '../../../api/endpoints/payments';
 import { useAppSelector } from '../../../redux-store/store';
 import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
-import { IReCaptchaRes } from '../../interfaces/reCaptcha';
+import useRecaptcha from '../../../utils/hooks/useRecaptcha';
 
 // Components
 import Modal from '../../organisms/Modal';
@@ -59,45 +58,22 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  const { executeRecaptcha } = useRecaptcha();
 
   const handleSubmitWithCaptchaProtection = async (
     e: React.ChangeEvent<HTMLFormElement>
   ) => {
     try {
       e.preventDefault();
-      if (!executeRecaptcha) {
-        throw new Error('executeRecaptcha not available');
-      }
-
       setIsLoading(true);
+      const { isPassed: isRecaptchaPassed, error: recaptchaError } =
+        await executeRecaptcha();
 
-      const recaptchaToken = await executeRecaptcha();
-
-      if (recaptchaToken) {
-        const res = await fetch('/api/post_recaptcha_query', {
-          method: 'POST',
-          body: JSON.stringify({
-            recaptchaToken,
-          }),
-        });
-
-        const jsonRes: IReCaptchaRes = await res.json();
-
-        if (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5) {
-          await handleConfirmSetup();
-        } else {
-          if (!jsonRes?.errors) {
-            throw new Error('ReCaptcha failed');
-          }
-
-          if (Array.isArray(jsonRes?.errors)) {
-            throw new Error(jsonRes.errors[0]?.toString());
-          }
-
-          throw new Error(jsonRes.errors?.toString());
-        }
+      if (!isRecaptchaPassed) {
+        throw new Error(recaptchaError);
       }
+
+      await handleConfirmSetup();
     } catch (err: any) {
       console.error(err);
       setErrorMessage(err?.message || 'An error occurred');

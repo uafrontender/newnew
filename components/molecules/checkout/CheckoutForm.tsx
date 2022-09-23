@@ -2,7 +2,6 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled from 'styled-components';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { toast } from 'react-toastify';
 import {
   PaymentElement,
@@ -20,8 +19,8 @@ import CheckMark from '../CheckMark';
 import { formatNumber } from '../../../utils/format';
 import { useCards } from '../../../contexts/cardsContext';
 import { useAppSelector } from '../../../redux-store/store';
-import { IReCaptchaRes } from '../../interfaces/reCaptcha';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
+import useRecaptcha from '../../../utils/hooks/useRecaptcha';
 
 // eslint-disable-next-line no-shadow
 enum PaymentMethodTypes {
@@ -64,7 +63,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const elements = useElements();
   const { cards } = useCards();
   const stripe = useStripe();
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  const { executeRecaptcha } = useRecaptcha();
 
   const primaryCard = useMemo(
     () => cards?.find((card) => card.isPrimary),
@@ -99,73 +98,57 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         return;
       }
 
-      if (!executeRecaptcha) {
-        throw new Error('executeRecaptcha not available');
-      }
-
       setIsSubmitting(true);
 
-      const recaptchaToken = await executeRecaptcha();
+      const {
+        isPassed: isRecaptchaPassed,
+        error: recaptchaError,
+        score,
+      } = await executeRecaptcha();
 
-      if (recaptchaToken) {
-        const res = await fetch('/api/post_recaptcha_query', {
-          method: 'POST',
-          body: JSON.stringify({
-            recaptchaToken,
-          }),
+      console.log(score, 'score');
+
+      if (!isRecaptchaPassed) {
+        throw new Error(recaptchaError);
+      }
+
+      // pay with primary card
+      if (
+        selectedPaymentMethod === PaymentMethodTypes.PrimaryCard &&
+        primaryCard
+      ) {
+        await handlePayWithCard?.({
+          cardUuid: primaryCard.cardUuid as string,
         });
 
-        const jsonRes: IReCaptchaRes = await res.json();
+        // pay with new card
+      } else if (
+        selectedPaymentMethod === PaymentMethodTypes.NewCard ||
+        !primaryCard
+      ) {
+        if (!loggedIn) {
+          const { errorKey } = await setupIntent.update({
+            email,
+            saveCard,
+          });
 
-        if (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5) {
-          // pay with primary card
-          if (
-            selectedPaymentMethod === PaymentMethodTypes.PrimaryCard &&
-            primaryCard
-          ) {
-            await handlePayWithCard?.({
-              cardUuid: primaryCard.cardUuid as string,
-            });
-
-            // pay with new card
-          } else if (
-            selectedPaymentMethod === PaymentMethodTypes.NewCard ||
-            !primaryCard
-          ) {
-            if (!loggedIn) {
-              const { errorKey } = await setupIntent.update({
-                email,
-                saveCard,
-              });
-
-              if (errorKey) {
-                throw new Error(t(errorKey));
-              }
-            }
-
-            const { error } = await stripe.confirmSetup({
-              elements,
-              confirmParams: {
-                return_url: `${process.env.NEXT_PUBLIC_APP_URL}/${redirectUrl}?save_card=${saveCard}`,
-              },
-              redirect: 'if_required',
-            });
-
-            if (!error) {
-              await handlePayWithCard?.({
-                saveCard,
-              });
-            }
+          if (errorKey) {
+            throw new Error(t(errorKey));
           }
-        } else {
-          throw new Error(
-            // eslint-disable-next-line no-nested-ternary
-            jsonRes?.errors
-              ? Array.isArray(jsonRes?.errors)
-                ? jsonRes.errors[0]?.toString()
-                : jsonRes.errors?.toString()
-              : 'ReCaptcha failed'
-          );
+        }
+
+        const { error } = await stripe.confirmSetup({
+          elements,
+          confirmParams: {
+            return_url: `${process.env.NEXT_PUBLIC_APP_URL}/${redirectUrl}?save_card=${saveCard}`,
+          },
+          redirect: 'if_required',
+        });
+
+        if (!error) {
+          await handlePayWithCard?.({
+            saveCard,
+          });
         }
       }
     } catch (err: any) {
