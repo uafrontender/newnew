@@ -80,12 +80,12 @@
         "captions": {
           "twoTimesOnly": "生日只能更改2次,",
           "cannotChange": "你不能改變生日,",
-          "instruction_NEED_TRANSLATION": "Set your date of birth"
+          "instruction": "設定出生日期"
         },
         "units": {
-          "day": "天後",
+          "day": "天",
           "month": "月",
-          "year_NEED_TRANSLATION": "Year"
+          "year": "年"
         },
         "errors": {
           "tooYoung": "必須年滿18歲或以上才能成為創作者"
