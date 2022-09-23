@@ -57,12 +57,12 @@
       }
     }
   },
-  "errors_NEED_TRANSLATION": {
-    "notEnoughMoney": "Not enough money",
-    "cardNotFound": "Card not found",
-    "cardCannotBeUsed": "This card can not be used",
-    "requestFailed": "Request failed",
-    "subscriptionUnavailable": "Subscription not available",
-    "alreadySubscribed": "You already subscribed to this creator"
+  "errors": {
+    "notEnoughMoney": "資金不足",
+    "cardNotFound": "未找到卡片",
+    "cardCannotBeUsed": "此卡不能使用",
+    "requestFailed": "請求失敗",
+    "subscriptionUnavailable": "無法訂閱",
+    "alreadySubscribed": "你已經訂閱了此創作者"
   }
 }
