@@ -6,11 +6,9 @@ import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
 interface IUserEllipseModal {
   isOpen: boolean;
   zIndex: number;
-  isSubscribed: boolean;
   isBlocked: boolean;
   loggedIn: boolean;
   onClose: () => void;
-  handleClickUnsubscribe: () => void;
   handleClickReport: () => void;
   handleClickBlock: () => void;
 }
@@ -18,11 +16,9 @@ interface IUserEllipseModal {
 const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
   isOpen,
   zIndex,
-  isSubscribed,
   isBlocked,
   loggedIn,
   onClose,
-  handleClickUnsubscribe,
   handleClickReport,
   handleClickBlock,
 }) => {
@@ -38,18 +34,8 @@ const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
     onClose();
   };
 
-  const unsubHandler = () => {
-    handleClickUnsubscribe();
-    onClose();
-  };
-
   return (
     <EllipseModal show={isOpen} zIndex={zIndex} onClose={onClose}>
-      {isSubscribed && (
-        <EllipseModalButton onClick={unsubHandler}>
-          {t('ellipse.unsubscribe')}
-        </EllipseModalButton>
-      )}
       <EllipseModalButton tone='error' onClick={reportUserHandler}>
         {t('ellipse.report')}
       </EllipseModalButton>
