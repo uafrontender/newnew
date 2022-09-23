@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import {
   useStripe,
   useElements,
@@ -8,6 +8,8 @@ import {
 } from '@stripe/react-stripe-js';
 import { SetupIntent } from '@stripe/stripe-js';
 import { newnewapi } from 'newnew-api';
+import ReCAPTCHA from 'react-google-recaptcha';
+import { toast } from 'react-toastify';
 
 import { createStripeSetupIntent } from '../../../api/endpoints/payments';
 import { useAppSelector } from '../../../redux-store/store';
@@ -30,6 +32,7 @@ interface IAddCardForm {
 }
 
 const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
+  const theme = useTheme();
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
 
@@ -37,7 +40,6 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
   const elements = useElements();
 
   const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [isStripeReady, setIsStripeReady] = useState(false);
 
   const handleConfirmSetup = async () => {
@@ -58,29 +60,30 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const { executeRecaptcha } = useRecaptcha();
-
-  const handleSubmitWithCaptchaProtection = async (
-    e: React.ChangeEvent<HTMLFormElement>
-  ) => {
+  const handleSubmit = async () => {
     try {
-      e.preventDefault();
-      setIsLoading(true);
-      const { isPassed: isRecaptchaPassed, error: recaptchaError } =
-        await executeRecaptcha();
-
-      if (!isRecaptchaPassed) {
-        throw new Error(recaptchaError);
-      }
-
       await handleConfirmSetup();
     } catch (err: any) {
       console.error(err);
       setErrorMessage(err?.message || 'An error occurred');
-    } finally {
-      setIsLoading(false);
     }
   };
+
+  const recaptchaRef = useRef(null);
+
+  const {
+    onChangeRecaptchaV2,
+    isRecaptchaV2Required,
+    submitWithRecaptchaProtection,
+    isSubmitting,
+    errorMessage: recaptchaErrorMessage,
+  } = useRecaptcha(handleSubmit, 0.5, 0.4, recaptchaRef);
+
+  useEffect(() => {
+    if (recaptchaErrorMessage) {
+      toast.error(recaptchaErrorMessage);
+    }
+  }, [recaptchaErrorMessage]);
 
   useEffect(
     () => () => {
@@ -91,7 +94,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
   );
 
   return (
-    <form onSubmit={handleSubmitWithCaptchaProtection}>
+    <form onSubmit={submitWithRecaptchaProtection}>
       <PaymentElement
         onReady={() => {
           setIsStripeReady(true);
@@ -102,6 +105,18 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
           },
         }}
       />
+      {isRecaptchaV2Required && (
+        <SRecaptchaWrapper>
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            size='normal'
+            theme={theme.name === 'dark' ? 'dark' : 'light'}
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY ?? ''}
+            onChange={onChangeRecaptchaV2}
+          />
+        </SRecaptchaWrapper>
+      )}
+
       {errorMessage && (
         <SErrorText variant={3} tone='error'>
           {errorMessage}
@@ -114,11 +129,11 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
           </SCancelButton>
           <SAddButton
             view='primary'
-            disabled={!stripe || isLoading}
+            disabled={!stripe || isSubmitting}
             type='submit'
-            loading={isLoading}
+            loading={isSubmitting}
             style={{
-              ...(isLoading ? { cursor: 'wait' } : {}),
+              ...(isSubmitting ? { cursor: 'wait' } : {}),
             }}
           >
             {t('Settings.sections.cards.button.addCard')}
@@ -240,6 +255,10 @@ AddCardModal.defaultProps = {};
 
 const SModalPaper = styled(ModalPaper)`
   min-height: 200px;
+`;
+
+const SRecaptchaWrapper = styled.div`
+  margin-top: 20px;
 `;
 
 const SModalButtons = styled.div`

@@ -1,7 +1,13 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useCallback,
+  useRef,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { toast } from 'react-toastify';
 import {
   PaymentElement,
@@ -9,6 +15,7 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js';
 import { StripePaymentElementOptions } from '@stripe/stripe-js';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
@@ -48,6 +55,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   bottomCaption,
   handlePayWithCard,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
   const { loggedIn } = useAppSelector((state) => state.user);
 
@@ -55,7 +63,6 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
     PaymentMethodTypes | undefined
   >();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveCard, setSaveCard] = useState(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -63,7 +70,6 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const elements = useElements();
   const { cards } = useCards();
   const stripe = useStripe();
-  const { executeRecaptcha } = useRecaptcha();
 
   const primaryCard = useMemo(
     () => cards?.find((card) => card.isPrimary),
@@ -85,9 +91,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     setEmailError('');
   };
 
-  const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     try {
       if (!stripe || !elements) {
         throw new Error('Stripe initialization error');
@@ -96,20 +100,6 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       if (!loggedIn && !email) {
         setEmailError('Email is required');
         return;
-      }
-
-      setIsSubmitting(true);
-
-      const {
-        isPassed: isRecaptchaPassed,
-        error: recaptchaError,
-        score,
-      } = await executeRecaptcha();
-
-      console.log(score, 'score');
-
-      if (!isRecaptchaPassed) {
-        throw new Error(recaptchaError);
       }
 
       // pay with primary card
@@ -154,10 +144,24 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     } catch (err: any) {
       toast.error(err.message);
       console.error(err);
-    } finally {
-      setIsSubmitting(false);
     }
   };
+
+  const recaptchaRef = useRef(null);
+
+  const {
+    onChangeRecaptchaV2,
+    isRecaptchaV2Required,
+    submitWithRecaptchaProtection,
+    isSubmitting,
+    errorMessage: recaptchaErrorMessage,
+  } = useRecaptcha(handleSubmit, 0.5, 0.4, recaptchaRef);
+
+  useEffect(() => {
+    if (recaptchaErrorMessage) {
+      toast.error(recaptchaErrorMessage);
+    }
+  }, [recaptchaErrorMessage]);
 
   const paymentElementOptions: StripePaymentElementOptions = useMemo(
     () => ({
@@ -167,7 +171,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   );
 
   return (
-    <SForm onSubmit={handleSubmit}>
+    <SForm onSubmit={submitWithRecaptchaProtection}>
       {/* Payment method */}
       <Text variant='subtitle'>{t('paymentMethodTitle')}</Text>
       {primaryCard && (
@@ -219,6 +223,18 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             </SSaveCard>
           )}
         </SPaymentFormWrapper>
+      )}
+
+      {isRecaptchaV2Required && (
+        <SRecaptchaWrapper>
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            size='normal'
+            theme={theme.name === 'dark' ? 'dark' : 'light'}
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY ?? ''}
+            onChange={onChangeRecaptchaV2}
+          />
+        </SRecaptchaWrapper>
       )}
 
       <SPayButtonDiv>
@@ -306,6 +322,10 @@ const SEmailInput = styled(Input)`
   &::-ms-input-placeholder {
     color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   }
+`;
+
+const SRecaptchaWrapper = styled.div`
+  margin-top: 20px;
 `;
 
 const SPayButtonDiv = styled.div`
