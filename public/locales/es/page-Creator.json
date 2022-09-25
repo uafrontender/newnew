@@ -13,12 +13,6 @@
       "new": "Nuevo",
       "earlier": "Anteriores"
     },
-    "enableSubscription": {
-      "title": "Gana más con las suscripciones",
-      "description": "Habilita las suscripciones para obtener ingresos constantes y conectar con las personas que más te ❤️.",
-      "learnMore": "Más información",
-      "submit": "Enciende las suscripciones"
-    },
     "earnings": {
       "title": "Mis ingresos",
       "earned": "ganados en el último",
@@ -47,8 +41,7 @@
       "list": {
         "ac": "Bids",
         "cf": "Superpolls",
-        "mc": "Goals",
-        "subscriptions": "Suscripciones"
+        "mc": "Goals"
       },
       "filter": {
         "today": "Hoy",
@@ -86,33 +79,6 @@
         "leftToRespond": "restantes para responder"
       }
     },
-    "subscriptionStats": {
-      "title": "Suscripciones",
-      "noSubs": "Aumenta la exposición de tu emprendimiento, comparte con tu red",
-      "newTitle": "Recientemente suscritos",
-      "newLink": "Suscripciones",
-      "seeAll": "Ver todas las suscripciones nuevas",
-      "prevWeek": "vs semana anterior",
-      "banner": {
-        "description": "Envía un mensaje de bienvenida a tus nuevos suscriptores",
-        "submit": "Enviar mensaje"
-      },
-      "list": {
-        "subscribers": "Suscriptores",
-        "activeSubs": "Suscriptores activos",
-        "views": "Vistas"
-      },
-      "filter": {
-        "today": "Hoy",
-        "yesterday": "Ayer",
-        "last_7_days": "Últimos 7 días",
-        "last_30_days": "Últimos 30 días",
-        "last_90_days": "Últimos 90 días",
-        "last_12_months": "Últimos 12 meses"
-      },
-      "copyLink": "Copiar tu enlace",
-      "copied": "Copiado"
-    },
     "toDos": {
       "title": "Completa estos pasos para recibir tu pago",
       "subtitle": "¿Ganaste 💰? Sigue estos pasos para retirar tus ganancias...",
@@ -122,19 +88,6 @@
       "addCashOutMethod": "Añadir información bancaria",
       "addCashOutMethodButton": "Añadir"
     }
-  },
-  "subscriptions": {
-    "meta": {
-      "title": "Suscripciones del creador"
-    },
-    "title": "Mis suscriptores",
-    "table": {
-      "subscribers": "Suscriptores",
-      "date": "Fecha de suscripción",
-      "updateSub": "Actualizar suscripción"
-    },
-    "messageOne": "mensaje",
-    "messageAll": "Mandar un mensaje directo a todos"
   },
   "earnings": {
     "meta": {
@@ -156,7 +109,6 @@
   },
   "navigation": {
     "dashboard": "Panel de control",
-    "subscriptions": "Suscriptores",
     "myPosts": "Mis publicaciones",
     "insights": "Estadísticas",
     "earnings": "Ingresos",
@@ -190,44 +142,6 @@
     "default": {
       "searchPlaceholder": "Buscar"
     }
-  },
-  "subRateSection": {
-    "heading": "Establece el precio de tu suscripción",
-    "selectInput": {
-      "perMonth": "/mes",
-      "select": "Seleccionar",
-      "featured": "Popular",
-      "current": "Actual"
-    },
-    "button": {
-      "enable": "Activar la suscripción",
-      "update": "Guardar",
-      "back": "Cancelar"
-    },
-    "removeSubscription": "Eliminar suscripción"
-  },
-  "subscribersFeatures": {
-    "title": "Al suscribirse a ti, tus suscriptores podrán:",
-    "firstFeature": "Mandarte mensajes directos",
-    "secondFeature": "Obtener un voto gratis en tus Superpolls",
-    "thirdFeature": "Añadir sugerencias personalizadas a tus Superpolls",
-    "note": "No te preocupes: la activación de las suscripciones no limitará la participación de los usuarios en tus Bids, Superpolls o Goals."
-  },
-  "enableSubModal": {
-    "title": "Activar la suscripción",
-    "note": "Este precio de suscripción está bloqueado durante 30 días a partir del día en que lo activas",
-    "button": "Sí, activar la suscripción",
-    "confirmationTextFirstPart": "Confirmar",
-    "confirmationTextSecondPart": "suscripción mensual"
-  },
-  "removeSubModal": {
-    "title": "Eliminar mi suscripción",
-    "note": "Si eliminas tu suscripción, no podrás conseguir nuevos suscriptores y tu suscripción terminará para tus suscriptores actuales. También perderás la capacidad de chatear con tus suscriptores. Puedes volver\n a activar tu suscripción en cualquier momento. ",
-    "button": "Eliminar mi suscripción"
-  },
-  "noResults": {
-    "text": "Comparte tu perfil para que otros se enteren de tu suscripción",
-    "updateSub": "Actualizar suscripción"
   },
   "modal": {
     "newMessage": {
