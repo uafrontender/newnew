@@ -524,14 +524,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
-          <div
-            style={{
-              position: 'relative',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
+          <SUserData>
             <SUsernameWrapper>
               <SUsername variant={4}>
                 {user.nickname}
@@ -611,7 +604,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 </CustomLink>
               )}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
-          </div>
+          </SUserData>
           {/* Temp, all creactors for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
           {tabs.length > 0 ? (
@@ -692,6 +685,12 @@ const SGeneral = styled(General)`
   }
 `;
 
+const SUserData = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+`;
+
 const SUsernameWrapper = styled.div`
   margin-bottom: 12px;
 `;
@@ -700,6 +699,7 @@ const SUsername = styled(Headline)`
   text-align: center;
   display: flex;
   align-items: center;
+  justify-content: center;
 `;
 
 const SGenderPronouns = styled(Text)`
