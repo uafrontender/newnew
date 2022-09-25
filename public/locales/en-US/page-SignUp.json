@@ -11,7 +11,6 @@
     "reason": {
       "comment": "comment",
       "bid": "bid",
-      "subscribe": "subscribe",
       "pledge": "make pledge",
       "follow-decision": "favorite post",
       "follow-creator": "favorite creator",

@@ -35,15 +35,6 @@
       "description": "Todos los mensajes que\n hayas previsualizado se mantendrán aquí en tu historial"
     }
   },
-  "Subscriptions": {
-    "meta": {
-      "title": "Suscripciones NewNew",
-      "description": "Editar nombre, nombre de usuario, biografía, foto del perfil y mucho más en la configuración de NewNew"
-    },
-    "noContent": {
-      "description": "Todavía no estás\nsuscrito a ningún creador"
-    }
-  },
   "Favorites": {
     "meta": {
       "title": "Favoritos NewNew",
@@ -74,15 +65,12 @@
     "activelyBidding": "Activo",
     "purchases": "Compras",
     "viewHistory": "Historial",
-    "subscriptions": "Suscripciones",
     "myposts": "Mis publicaciones",
     "favorites": "Favoritos",
     "userInitial": "Publicaciones",
     "activity": "Actividad"
   },
   "accountPrivate": "La actividad de {{username}} es privada",
-  "subscribed-tag": "SUSCRITO",
-  "subscriptionCancelled-tag_NEED_TRANSLATION": "CANCELLED",
   "modal": {
     "blockUser": {
       "title": "Bloquear usuario",
@@ -91,14 +79,6 @@
       "button:": {
         "cancel": "Cancelar",
         "confirm": "Bloquear usuario"
-      }
-    },
-    "unsubscribeUser": {
-      "title": "Dejar de seguir creador",
-      "message": "¿Estás seguro de que quieres dejar de seguir a {{username}}?",
-      "button": {
-        "cancel": "Cancelar",
-        "confirm": "Dejar de seguir"
       }
     },
     "deleteMyAccount": {

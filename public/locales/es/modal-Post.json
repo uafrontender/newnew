@@ -378,7 +378,6 @@
         "votes": "votos",
         "vote": "voto",
         "mySuggestion": "Mi sugerencia",
-        "subscriberSuggestion": "La sugerencia de{{nickname}}",
         "others": "otros",
         "voters": "votantes",
         "voted": "votaron",
@@ -423,8 +422,6 @@
             "vote": "voto"
           }
         },
-        "subscribeToCreatorCaption": "¡Suscríbete a {{creator}} para agregar tus propias opciones a esta Superpoll!",
-        "subscribeButton": "Subscribirme",
         "suggestionPlaceholder": "Agregar tu propia opción...",
         "suggestionPlaceholderDesktop": "Agregar opción...",
         "placeABidButton": "Agregar mi opción"

@@ -13,12 +13,6 @@
       "new": "新的",
       "earlier": "更早"
     },
-    "enableSubscription": {
-      "title": "通過訂閱賺取更多",
-      "description": "啟用訂閱功能，賺取穩定的收入，並與你最❤️的人互聯",
-      "learnMore": "瞭解更多",
-      "submit": "開啟訂閱"
-    },
     "earnings": {
       "title": "我的收入",
       "earned": "上次賺的",
@@ -47,8 +41,7 @@
       "list": {
         "ac": "Bid",
         "cf": "Superpoll",
-        "mc": "Goal",
-        "subscriptions": "訂閱"
+        "mc": "Goal"
       },
       "filter": {
         "today": "今天",
@@ -86,33 +79,6 @@
         "leftToRespond": "內回應"
       }
     },
-    "subscriptionStats": {
-      "title": "訂閱",
-      "noSubs": "為你的業務帶來更多曝光度，與你的網路分享",
-      "newTitle": "最近訂閱的",
-      "newLink": "訂閱",
-      "seeAll": "查看所有新的訂閱者",
-      "prevWeek": "與前一周相比",
-      "banner": {
-        "description": "給你的新訂閱者發送歡迎資訊",
-        "submit": "發送消息"
-      },
-      "list": {
-        "subscribers": "訂閱者",
-        "activeSubs": "活躍的訂閱者",
-        "views": "流覽量"
-      },
-      "filter": {
-        "today": "今天",
-        "yesterday": "昨天",
-        "last_7_days": "過去7天",
-        "last_30_days": "過去30天",
-        "last_90_days": "最近90天",
-        "last_12_months": "過去12個月"
-      },
-      "copyLink": "複製你的連結",
-      "copied": "已複製的"
-    },
     "toDos": {
       "title": "完成這些步驟以獲得報酬",
       "subtitle": "已經賺到💰了？完成下列步驟即可提取你的收入......",
@@ -122,19 +88,6 @@
       "addCashOutMethod": "添加銀行資訊",
       "addCashOutMethodButton": "添加"
     }
-  },
-  "subscriptions": {
-    "meta": {
-      "title": "創作者訂閱"
-    },
-    "title": "我的訂閱者",
-    "table": {
-      "subscribers": "訂閱者",
-      "date": "訂閱日期",
-      "updateSub": "更新訂閱"
-    },
-    "messageOne": "私訊",
-    "messageAll": "私訊全部"
   },
   "earnings": {
     "meta": {
@@ -156,7 +109,6 @@
   },
   "navigation": {
     "dashboard": "儀錶板",
-    "subscriptions": "訂閱者",
     "myPosts": "我的帖子",
     "insights": "深入瞭解",
     "earnings": "收入",
@@ -190,44 +142,6 @@
     "default": {
       "searchPlaceholder": "搜索"
     }
-  },
-  "subRateSection": {
-    "heading": "設置訂閱價格",
-    "selectInput": {
-      "perMonth": "/月",
-      "select": "選擇",
-      "featured": "熱門",
-      "current": "當前"
-    },
-    "button": {
-      "enable": "開啟訂閱",
-      "update": "保存",
-      "back": "取消"
-    },
-    "removeSubscription": "刪除訂閱"
-  },
-  "subscribersFeatures": {
-    "title": "通過訂閱你，你的訂閱者將能夠：",
-    "firstFeature": "直接給你發私訊",
-    "secondFeature": "在你的Superpoll中獲得免費投票",
-    "thirdFeature": "向你的Superpoll添加自訂建議",
-    "note": "不用擔心--開啟訂閱不會限制大家參與你的Bid、Superpoll或Goal"
-  },
-  "enableSubModal": {
-    "title": "開啓訂閱",
-    "note": "該訂閱價格從啟用之日起鎖定30天",
-    "button": "確認，開啟訂閱",
-    "confirmationTextFirstPart": "確認",
-    "confirmationTextSecondPart": "按月訂閱"
-  },
-  "removeSubModal": {
-    "title": "刪除我的訂閱",
-    "note": "如果你刪除你的訂閱，你將無法獲得新的用戶，你目前的用戶的訂閱也將結束。你也將無法與你的用戶聊天的。你可以在任何時候重新開啟你的訂閱。",
-    "button": "刪除我的訂閱"
-  },
-  "noResults": {
-    "text": "分享你的個人資料，讓其他人\n瞭解知道你的訂閱",
-    "updateSub": "更新訂閱"
   },
   "modal": {
     "newMessage": {
