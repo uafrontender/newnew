@@ -35,15 +35,6 @@
       "description": "你預覽過的所有帖子都\n將保存在你的歷史記錄中。"
     }
   },
-  "Subscriptions": {
-    "meta": {
-      "title": "NewNew訂閱",
-      "description": "在NewNew設置中編輯姓名、用戶名、簡歷、個人照片等"
-    },
-    "noContent": {
-      "description": "你尚未訂閱\n任何創作者"
-    }
-  },
   "Favorites": {
     "meta": {
       "title": "NewNew收藏",
@@ -74,15 +65,12 @@
     "activelyBidding": "活躍",
     "purchases": "已購買",
     "viewHistory": "瀏覽歷史",
-    "subscriptions": "已訂閱",
     "myposts": "我的帖子",
     "favorites": "收藏",
     "userInitial": "帖子",
     "activity": "活動"
   },
   "accountPrivate": "{{username}}的活動設為隱秘",
-  "subscribed-tag": "已訂閱",
-  "subscriptionCancelled-tag": "已取消",
   "modal": {
     "blockUser": {
       "title": "屏蔽用戶",
@@ -91,14 +79,6 @@
       "button": {
         "cancel": "取消",
         "confirm": "屏蔽用戶"
-      }
-    },
-    "unsubscribeUser": {
-      "title": "取消訂閱創作者",
-      "message": "真的要取消訂閱{{username}}嗎？",
-      "button": {
-        "cancel": "撤回",
-        "confirm": "取消訂閱"
       }
     },
     "deleteMyAccount": {

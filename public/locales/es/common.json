@@ -16,8 +16,6 @@
     "followCreator": "Marcar seguidor como favorito",
     "unFollowDecision": "Quitar {{postType}} de favoritos",
     "unFollowCreator": "Quitar creador de favoritos",
-    "unsubscribe": "Anular suscripción",
-    "removeSubscription": "Eliminar suscripción",
     "removeBid": "Eliminar oferta",
     "removeOption": "Eliminar opción",
     "view": "Ver perfil",
@@ -152,9 +150,6 @@
       "description": "Intenta cambiar tu búsqueda o explora las novedades",
       "action": "Explorar"
     }
-  },
-  "creatorCard": {
-    "subscriptionCost": "${{amount}} Mensual"
   },
   "gotIt": "Aceptar",
   "sortingOption": {
