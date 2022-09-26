@@ -509,90 +509,59 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           ) : null}
         </SBidsContainer>
         {post.isSuggestionsAllowed &&
-        !hasVotedOptionId &&
-        canVoteForFree &&
-        postStatus === 'voting' ? (
-          <SActionSection
-            ref={(el) => {
-              actionSectionContainer.current = el!!;
-            }}
-          >
-            <SuggestionTextArea
-              value={newOptionText}
-              disabled={optionBeingSupported !== ''}
-              placeholder={t(
-                'mcPost.optionsTab.actionSection.suggestionPlaceholder'
-              )}
-              onChange={handleUpdateNewOptionText}
-            />
-            <SAddFreeVoteButton
-              size='sm'
-              disabled={
-                !newOptionText ||
-                optionBeingSupported !== '' ||
-                !newOptionTextValid
-              }
-              style={{
-                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-              }}
-              onClick={() => {
-                Mixpanel.track('Click Add Free Option', {
-                  _stage: 'Post',
-                  _postUuid: post.postUuid,
-                  _component: 'McOptionsTab',
-                });
-                setUseFreeVoteModalOpen(true);
+          !hasVotedOptionId &&
+          canVoteForFree &&
+          postStatus === 'voting' && (
+            <SActionSection
+              ref={(el) => {
+                actionSectionContainer.current = el!!;
               }}
             >
-              {t('mcPost.optionsTab.actionSection.placeABidButton')}
-            </SAddFreeVoteButton>
-            {user.userTutorialsProgress.remainingMcSteps && (
-              <STutorialTooltipTextAreaHolder>
-                <TutorialTooltip
-                  isTooltipVisible={
-                    user.userTutorialsProgress.remainingMcSteps[0] ===
-                    newnewapi.McTutorialStep.MC_TEXT_FIELD
-                  }
-                  closeTooltip={goToNextStep}
-                  title={t('tutorials.mc.createYourBid.title')}
-                  text={t('tutorials.mc.createYourBid.text')}
-                  dotPosition={DotPositionEnum.BottomRight}
-                />
-              </STutorialTooltipTextAreaHolder>
-            )}
-          </SActionSection>
-        ) : post.isSuggestionsAllowed &&
-          !hasVotedOptionId &&
-          !canVoteForFree &&
-          postStatus === 'voting' &&
-          canSubscribe &&
-          !postLoading ? (
-          <SActionSectionSubscribe
-            ref={(el) => {
-              actionSectionContainer.current = el!!;
-            }}
-          >
-            <SText variant={3}>
-              {t('mcPost.optionsTab.actionSection.subscribeToCreatorCaption', {
-                creator: post.creator?.nickname,
-              })}
-            </SText>
-            <SSubscribeLink href={`/${post.creator?.username}/subscribe`}>
-              <SSubscribeButton>
-                {t('mcPost.optionsTab.actionSection.subscribeButton')}
-              </SSubscribeButton>
-            </SSubscribeLink>
-          </SActionSectionSubscribe>
-        ) : (
-          <div
-            ref={(el) => {
-              actionSectionContainer.current = el!!;
-            }}
-            style={{
-              height: 0,
-            }}
-          />
-        )}
+              <SuggestionTextArea
+                value={newOptionText}
+                disabled={optionBeingSupported !== ''}
+                placeholder={t(
+                  'mcPost.optionsTab.actionSection.suggestionPlaceholder'
+                )}
+                onChange={handleUpdateNewOptionText}
+              />
+              <SAddFreeVoteButton
+                size='sm'
+                disabled={
+                  !newOptionText ||
+                  optionBeingSupported !== '' ||
+                  !newOptionTextValid
+                }
+                style={{
+                  ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+                }}
+                onClick={() => {
+                  Mixpanel.track('Click Add Free Option', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'McOptionsTab',
+                  });
+                  setUseFreeVoteModalOpen(true);
+                }}
+              >
+                {t('mcPost.optionsTab.actionSection.placeABidButton')}
+              </SAddFreeVoteButton>
+              {user.userTutorialsProgress.remainingMcSteps && (
+                <STutorialTooltipTextAreaHolder>
+                  <TutorialTooltip
+                    isTooltipVisible={
+                      user.userTutorialsProgress.remainingMcSteps[0] ===
+                      newnewapi.McTutorialStep.MC_TEXT_FIELD
+                    }
+                    closeTooltip={goToNextStep}
+                    title={t('tutorials.mc.createYourBid.title')}
+                    text={t('tutorials.mc.createYourBid.text')}
+                    dotPosition={DotPositionEnum.BottomRight}
+                  />
+                </STutorialTooltipTextAreaHolder>
+              )}
+            </SActionSection>
+          )}
         {user.userTutorialsProgress.remainingMcSteps && (
           <STutorialTooltipHolder>
             <TutorialTooltip
@@ -900,101 +869,6 @@ const SActionSection = styled.div`
     textarea {
       width: 100%;
     }
-  }
-`;
-
-const SActionSectionSubscribe = styled.div`
-  order: -1;
-
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-
-  min-height: 50px;
-  width: 100%;
-
-  padding-top: 24px;
-
-  background-color: ${({ theme }) =>
-    theme.name === 'dark'
-      ? theme.colorsThemed.background.secondary
-      : theme.colorsThemed.background.primary};
-
-  div {
-    width: 100%;
-    text-align: center;
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    order: unset;
-
-    padding-top: 18px;
-
-    border-top: 1.5px solid
-      ${({ theme }) => theme.colorsThemed.background.outlines1};
-
-    z-index: 5;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    flex-wrap: nowrap;
-    justify-content: initial;
-    gap: 16px;
-
-    div {
-      width: initial;
-      text-align: left;
-    }
-    button {
-      max-width: 130px;
-    }
-  }
-`;
-
-const SText = styled(Text)`
-  height: 100%;
-  align-self: center;
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 24px;
-`;
-
-const SSubscribeLink = styled.a`
-  display: block;
-
-  width: 100%;
-
-  ${({ theme }) => theme.media.laptop} {
-    max-width: 130px;
-  }
-`;
-
-const SSubscribeButton = styled.button`
-  display: block;
-  width: 100%;
-
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-
-  color: ${({ theme }) => theme.colors.dark};
-  font-size: 14px;
-  line-height: 24px;
-  font-weight: bold;
-
-  padding: 16px 24px;
-  border-radius: ${(props) => props.theme.borderRadius.medium};
-  border: transparent;
-  outline: none;
-
-  cursor: pointer;
-
-  :active:enabled,
-  :focus:enabled,
-  :hover:enabled {
-    background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-    outline: none;
   }
 `;
 
