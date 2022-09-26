@@ -574,13 +574,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         {user.userData?.avatarUrl && (
           <ProfileImage src={user.userData?.avatarUrl} />
         )}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
+        <SUserData>
           <SUsernameWrapper>
             <SUsername variant={4}>
               {user.userData?.nickname}
@@ -652,7 +646,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           {user.userData?.bio ? (
             <SBioText variant={3}>{user.userData?.bio}</SBioText>
           ) : null}
-        </div>
+        </SUserData>
         <ProfileTabs pageType='myProfile' tabs={tabs} />
         {/* Edit Profile modal menu */}
         <Modal
@@ -761,14 +755,21 @@ const SBackButton = styled(BackButton)`
   }
 `;
 
+const SUserData = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* alignitems: center; */
+`;
+
 const SUsernameWrapper = styled.div`
   margin-bottom: 12px;
 `;
 
 const SUsername = styled(Headline)`
-  text-align: center;
   display: flex;
   align-items: center;
+  justify-content: center;
 `;
 
 const SGenderPronouns = styled(Text)`
@@ -820,7 +821,7 @@ const SBioText = styled(Text)`
 
   padding-left: 16px;
   padding-right: 16px;
-  margin-bottom: 54px;
+  margin: 0 auto 54px;
 
   max-width: 480px;
 
