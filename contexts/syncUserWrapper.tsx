@@ -414,6 +414,29 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
 
+  useEffect(() => {
+    const handlerSocketMeUpdated = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.MeUpdated.decode(arr);
+
+      if (!decoded) {
+        return;
+      }
+
+      dispatch(setUserData(decoded.me));
+    };
+
+    if (socketConnection) {
+      socketConnection?.on('MeUpdated', handlerSocketMeUpdated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('MeUpdated', handlerSocketMeUpdated);
+      }
+    };
+  }, [socketConnection]);
+
   return <>{children}</>;
 };
 
