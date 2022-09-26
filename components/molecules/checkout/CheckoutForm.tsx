@@ -116,8 +116,10 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         });
 
         const jsonRes: IReCaptchaRes = await res.json();
-
-        if (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5) {
+        if (
+          process.env.NEXT_PUBLIC_ENVIRONMENT === 'test' ||
+          (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5)
+        ) {
           // pay with primary card
           if (
             selectedPaymentMethod === PaymentMethodTypes.PrimaryCard &&
@@ -211,6 +213,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         <SPaymentFormWrapper isSingleForm={!primaryCard}>
           {!loggedIn && isStripeReady && (
             <SEmailInput
+              id='email-input'
               value={email}
               isValid={email.length > 0 && !emailError}
               onChange={handleSetEmail}
@@ -220,6 +223,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             />
           )}
           <PaymentElement
+            id='stripePayment'
             onReady={() => setIsStripeReady(true)}
             options={paymentElementOptions}
           />

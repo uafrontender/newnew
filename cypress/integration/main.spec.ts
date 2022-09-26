@@ -1,4 +1,5 @@
 import createStorage from './utils/createStorage';
+import enterCardInfo from './utils/enterCardInfo';
 import enterVerificationCode from './utils/enterVerificationCode';
 
 const VERIFICATION_CODE = '111111';
@@ -36,6 +37,7 @@ context('Main flow', () => {
     });
 
     it('can register as a creator', () => {
+      cy.log(JSON.stringify(Cypress.env()));
       cy.get('#log-in-to-create').click();
       cy.url().should('include', '/sign-up?to=create');
 
@@ -247,6 +249,9 @@ context('Main flow', () => {
 
   describe('User', () => {
     const USER_EMAIL = `test-user-${testSeed}@newnew.co`;
+    const USER_CARD_NUMBER = '5555558265554449';
+    const USER_CARD_EXPIRY = '1226';
+    const USER_CARD_CVC = '123';
 
     // Ignore tutorials
     const defaultStorage = {
@@ -283,19 +288,14 @@ context('Main flow', () => {
         .should('not.have.css', 'cursor', 'wait')
         .click();
 
-      // TODO: test pay flow
-      // cy.get('#pay', {
-      //   timeout: 30000,
-      // }).click();
+      cy.get('#email-input').type(USER_EMAIL);
+      enterCardInfo(USER_CARD_NUMBER, USER_CARD_EXPIRY, USER_CARD_CVC);
+      cy.get('#pay').click();
 
-      // TODO: enable Stripe testing (or test card adding flow)
-      // cy.url().should('include', 'checkout.stripe.com/pay');
-      // cy.get('#email', { timeout: 10000 }).type(USER_EMAIL);
-      // cy.get('#cardNumber').type('4242424242424242');
-      // cy.get('#cardExpiry').type('1230');
-      // cy.get('#cardCvc').type('123');
-      // cy.get('#billingName').type('user');
-      // cy.get('form').submit();
+      cy.wait(25000);
+
+      cy.get('#paymentSuccess').click();
+      // TODO: fix issue with recaptcha
 
       // TODO: test authentication after payment
 
