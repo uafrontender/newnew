@@ -524,14 +524,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
-          <div
-            style={{
-              position: 'relative',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
+          <SUserData>
             <SUsernameWrapper>
               <SUsername variant={4}>
                 {user.nickname}
@@ -611,7 +604,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 </CustomLink>
               )}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
-          </div>
+          </SUserData>
           {/* Temp, all creactors for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
           {tabs.length > 0 ? (
@@ -692,6 +685,12 @@ const SGeneral = styled(General)`
   }
 `;
 
+const SUserData = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+`;
+
 const SUsernameWrapper = styled.div`
   margin-bottom: 12px;
 `;
@@ -700,6 +699,7 @@ const SUsername = styled(Headline)`
   text-align: center;
   display: flex;
   align-items: center;
+  justify-content: center;
 `;
 
 const SGenderPronouns = styled(Text)`
@@ -748,7 +748,7 @@ const SShareButton = styled(Button)`
 `;
 
 const SSendButton = styled(Button)`
-  margin-bottom: 16px;
+  margin: 0 auto 16px;
   background: ${(props) => props.theme.colorsThemed.accent.yellow};
   color: #2c2c33;
 
@@ -768,7 +768,7 @@ const SBioText = styled(Text)`
 
   padding-left: 16px;
   padding-right: 16px;
-  margin-bottom: 54px;
+  margin: 0 auto 54px;
 
   max-width: 480px;
 
