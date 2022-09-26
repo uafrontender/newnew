@@ -16,11 +16,18 @@ const handler = async (
 
       const recaptchaJson = await recaptchaRes.json();
 
-      return res.status(200).json({ ...recaptchaJson });
+      if (recaptchaJson.success) {
+        return res.status(200).send('ok');
+      }
+
+      return res.status(422).json({
+        message: 'Unprocessable request, Invalid captcha code',
+      });
     } catch (err) {
-      return res.status(400).json((err as any).error);
+      return res.status(400).json((err as any).message);
     }
   }
+
   return res.status(400).send('Invalid method or body');
 };
 

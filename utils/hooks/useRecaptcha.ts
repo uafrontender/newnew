@@ -21,7 +21,6 @@ const useRecaptcha = (
 
   const onChangeRecaptchaV2 = useCallback(
     (recaptchaToken: string | null) => {
-      console.log(recaptchaToken, 'e recaptcha');
       try {
         if (!recaptchaToken) {
           throw new Error('Failed');
@@ -37,7 +36,7 @@ const useRecaptcha = (
 
   const checkRecaptchaV2 = useCallback(async (recaptchaToken: string) => {
     try {
-      const res = await fetch('/api/post_recaptcha_query', {
+      const res = await fetch('/api/post_recaptcha_v2_query', {
         method: 'POST',
         body: JSON.stringify({
           recaptchaToken,
