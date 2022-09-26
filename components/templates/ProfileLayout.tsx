@@ -748,7 +748,7 @@ const SShareButton = styled(Button)`
 `;
 
 const SSendButton = styled(Button)`
-  margin-bottom: 16px;
+  margin: 0 auto 16px;
   background: ${(props) => props.theme.colorsThemed.accent.yellow};
   color: #2c2c33;
 
@@ -768,7 +768,7 @@ const SBioText = styled(Text)`
 
   padding-left: 16px;
   padding-right: 16px;
-  margin-bottom: 54px;
+  margin: 0 auto 54px;
 
   max-width: 480px;
 
