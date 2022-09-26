@@ -821,7 +821,7 @@ const SBioText = styled(Text)`
 
   padding-left: 16px;
   padding-right: 16px;
-  margin-bottom: 54px;
+  margin: 0 auto 54px;
 
   max-width: 480px;
 
