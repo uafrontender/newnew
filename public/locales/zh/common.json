@@ -16,8 +16,6 @@
     "followCreator": "最喜歡的創作者",
     "unFollowDecision": "不喜歡的{{postType}}",
     "unFollowCreator": "不喜歡的創作者",
-    "unsubscribe": "取消訂閱",
-    "removeSubscription": "移除訂閱",
     "removeBid": "移除投標",
     "removeOption": "移除選項",
     "view": "查看個人資料",
@@ -152,9 +150,6 @@
       "description": "嘗試搜索或瀏覽其他內容",
       "action": "瀏覽"
     }
-  },
-  "creatorCard": {
-    "subscriptionCost": "${{amount}} 每月"
   },
   "gotIt": "知道了",
   "sortingOption": {
