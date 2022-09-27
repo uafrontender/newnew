@@ -25,6 +25,11 @@ context('Main flow', () => {
     };
     const storage = createStorage(defaultStorage);
 
+    before(() => {
+      cy.clearCookies();
+      cy.clearLocalStorage();
+    });
+
     beforeEach(() => {
       storage.restore();
       Cypress.Cookies.preserveOnce('accessToken');
@@ -249,7 +254,7 @@ context('Main flow', () => {
 
   describe('User', () => {
     const USER_EMAIL = `test-user-${testSeed}@newnew.co`;
-    const USER_CARD_NUMBER = '5555558265554449';
+    const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
 
@@ -264,6 +269,8 @@ context('Main flow', () => {
     before(() => {
       // Let all posts finish processing
       cy.wait(30000);
+      cy.clearCookies();
+      cy.clearLocalStorage();
     });
 
     beforeEach(() => {
@@ -292,9 +299,11 @@ context('Main flow', () => {
       enterCardInfo(USER_CARD_NUMBER, USER_CARD_EXPIRY, USER_CARD_CVC);
       cy.get('#pay').click();
 
-      cy.wait(25000);
-
-      cy.get('#paymentSuccess').click();
+      cy.wait(10000);
+      enterVerificationCode(VERIFICATION_CODE);
+      cy.get('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
       // TODO: fix issue with recaptcha
 
       // TODO: test authentication after payment
