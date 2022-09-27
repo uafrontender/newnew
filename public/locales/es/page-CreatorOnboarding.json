@@ -80,7 +80,7 @@
         "captions": {
           "twoTimesOnly": "Tu fecha de nacimiento solo se puede cambiar 2 veces.",
           "cannotChange": "No puedes cambiar tu fecha de nacimiento.",
-          "instruction_NEED_TRANSLATION": "Set your date of birth"
+          "instruction": "Establece tu fecha de nacimiento"
         },
         "units": {
           "day": "Día",
