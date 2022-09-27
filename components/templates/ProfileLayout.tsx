@@ -637,37 +637,46 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           user.uuid,
           guestId
         );
+
         if (!res.data || res.error) {
           console.error('Unable to get sms notifications status');
           toast.error(t('smsNotifications.errors.requestFailed'));
-          return;
+          throw new Error('Request failed');
         }
+
         setSubscribedToSmsNotifications(
           res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
         );
       };
 
-      pollGuestSmsSubscriptionStatus();
-      const pollingInterval = setInterval(() => {
-        pollGuestSmsSubscriptionStatus();
-      }, 5000);
+      pollGuestSmsSubscriptionStatus()
+        .then(() => {
+          const pollingInterval = setInterval(() => {
+            pollGuestSmsSubscriptionStatus().catch(() => {
+              clearInterval(pollingInterval);
+            });
+          }, 5000);
 
-      return () => {
-        clearInterval(pollingInterval);
-      };
+          return () => {
+            clearInterval(pollingInterval);
+          };
+        })
+        .catch(() => {
+          // Do nothing
+        });
+    } else {
+      getSmsNotificationsSubscriptionToCreatorStatus(user.uuid).then((res) => {
+        if (!res.data || res.error) {
+          console.error('Unable to get sms notifications status');
+          toast.error(t('smsNotifications.errors.requestFailed'));
+          return;
+        }
+
+        setSubscribedToSmsNotifications(
+          res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
+        );
+      });
     }
-
-    getSmsNotificationsSubscriptionToCreatorStatus(user.uuid).then((res) => {
-      if (!res.data || res.error) {
-        console.error('Unable to get sms notifications status');
-        toast.error(t('smsNotifications.errors.requestFailed'));
-        return;
-      }
-
-      setSubscribedToSmsNotifications(
-        res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
-      );
-    });
 
     return () => {};
   }, [currentUser.loggedIn, user.uuid, t, getGuestId]);
