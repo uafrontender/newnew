@@ -1,17 +1,18 @@
 import React, {
   ReactElement,
   useCallback,
-  // useContext,
   useEffect,
   useMemo,
   useState,
   useRef,
+  useContext,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
+import { v4 as uuidv4 } from 'uuid';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -28,6 +29,8 @@ import ProfileBackground from '../molecules/profile/ProfileBackground';
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
+import NotificationsIconFilled from '../../public/images/svg/icons/filled/Notifications.svg';
+import NotificationsIconOutlined from '../../public/images/svg/icons/outlined/Notifications.svg';
 // import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 // import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
 import { getSubscriptionStatus } from '../../api/endpoints/subscription';
@@ -46,6 +49,18 @@ import getGenderPronouns, {
 } from '../../utils/genderPronouns';
 import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 import CustomLink from '../atoms/CustomLink';
+import SmsNotificationModal, {
+  SubscriptionToCreator,
+} from '../molecules/profile/SmsNotificationModal';
+import {
+  getGuestSmsNotificationsSubscriptionToCreatorStatus,
+  getSmsNotificationsSubscriptionToCreatorStatus,
+  subscribeGuestToCreatorSmsNotifications,
+  subscribeToCreatorSmsNotifications,
+  unsubscribeFromCreatorSmsNotifications,
+  unsubscribeGuestFromCreatorSmsNotifications,
+} from '../../api/endpoints/phone';
+import { SocketContext } from '../../contexts/socketContext';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
@@ -63,6 +78,20 @@ interface IProfileLayout {
   postsCachedActivityCount?: number;
   children: React.ReactNode;
 }
+
+const SAVED_PHONE_COUNTRY_CODE_KEY = 'savedPhoneCountryCode';
+const SAVED_PHONE_NUMBER_KEY = 'savedPhoneNumber';
+
+const getSmsNotificationSubscriptionErrorMessage = (
+  status?: newnewapi.SmsNotificationsStatus
+) => {
+  switch (status) {
+    case newnewapi.SmsNotificationsStatus.UNKNOWN_STATUS:
+      return 'smsNotifications.error.requestFailed';
+    default:
+      return 'smsNotifications.error.requestFailed';
+  }
+};
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   user,
@@ -86,21 +115,17 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
 
   const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
     resizeMode
   );
 
+  const socketConnection = useContext(SocketContext);
   // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
   const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
+  const [subscribedToSmsNotifications, setSubscribedToSmsNotifications] =
+    useState(false);
   const [wasSubscribed, setWasSubscribed] = useState<boolean | null>(null);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
@@ -134,7 +159,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
-  const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+  const [confirmReportUser, setConfirmReportUser] = useState(false);
+  const [smsNotificationModalOpen, setSmsNotificationModalOpen] =
+    useState(false);
   const { usersIBlocked, unblockUser } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(user.uuid),
@@ -173,6 +200,14 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     }
     return [];
   }, [user]);
+
+  const subscription: SubscriptionToCreator = useMemo(
+    () => ({
+      userId: user.uuid,
+      username: user.username,
+    }),
+    [user.uuid, user.username]
+  );
 
   // Posts
   const [creatorsDecisions, setCreatorsDecisions] = useState(
@@ -303,6 +338,150 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     [user.uuid]
   );
   const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
+
+  const handleSmsNotificationModalClose = useCallback(
+    () => setSmsNotificationModalOpen(false),
+    []
+  );
+
+  // TODO: Move to some other place, create it on app startup
+  const getGuestId = useCallback((): string => {
+    const GUEST_ID_KEY = 'savedGuestId';
+    let guestId = localStorage.getItem(GUEST_ID_KEY);
+    if (!guestId) {
+      guestId = uuidv4();
+      localStorage.setItem(GUEST_ID_KEY, guestId);
+    }
+    return guestId;
+  }, []);
+
+  const submitPhoneSmsNotificationsRequest = useCallback(
+    async (phoneNumber: newnewapi.PhoneNumber): Promise<string> => {
+      try {
+        if (!currentUser.loggedIn) {
+          const guestId = getGuestId();
+
+          const res = await subscribeGuestToCreatorSmsNotifications(
+            user.uuid,
+            guestId,
+            phoneNumber
+          );
+
+          if (
+            !res.data ||
+            res.error ||
+            (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
+              res.data.status !==
+                newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
+          ) {
+            throw new Error(
+              res.error?.message ??
+                t(getSmsNotificationSubscriptionErrorMessage(res.data?.status))
+            );
+          }
+
+          localStorage.setItem(
+            SAVED_PHONE_COUNTRY_CODE_KEY,
+            phoneNumber.countryCode
+          );
+          localStorage.setItem(SAVED_PHONE_NUMBER_KEY, phoneNumber.number);
+        } else {
+          const res = await subscribeToCreatorSmsNotifications(
+            user.uuid,
+            phoneNumber
+          );
+
+          if (
+            !res.data ||
+            res.error ||
+            (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
+              res.data.status !==
+                newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
+          ) {
+            throw new Error(
+              res.error?.message ??
+                t(getSmsNotificationSubscriptionErrorMessage(res.data?.status))
+            );
+          }
+        }
+
+        return phoneNumber.number;
+      } catch (err: any) {
+        console.error(err);
+        toast.error(err.message);
+        // Rethrow for a child
+        throw err;
+      }
+    },
+    [currentUser.loggedIn, getGuestId, user.uuid, t]
+  );
+
+  const handleSmsNotificationButtonClicked = useCallback(async () => {
+    if (subscribedToSmsNotifications) {
+      if (!currentUser.loggedIn) {
+        const guestId = getGuestId();
+        const res = await unsubscribeGuestFromCreatorSmsNotifications(
+          user.uuid,
+          guestId
+        );
+
+        if (!res.data || res.error) {
+          console.error('Unsubscribe from SMS failed');
+          toast.error(t('smsNotifications.errors.requestFailed'));
+        }
+      } else {
+        const res = await unsubscribeFromCreatorSmsNotifications(user.uuid);
+
+        if (!res.data || res.error) {
+          console.error('Unsubscribe from SMS failed');
+          toast.error(t('smsNotifications.errors.requestFailed'));
+        }
+      }
+    } else if (!currentUser.loggedIn) {
+      const countryCode = localStorage.getItem(SAVED_PHONE_COUNTRY_CODE_KEY);
+      const number = localStorage.getItem(SAVED_PHONE_NUMBER_KEY);
+
+      if (countryCode && number) {
+        const phoneNumber = new newnewapi.PhoneNumber({
+          countryCode,
+          number,
+        });
+        submitPhoneSmsNotificationsRequest(phoneNumber);
+      } else {
+        setSmsNotificationModalOpen(true);
+      }
+    } else if (currentUser.userData?.options?.isPhoneNumberConfirmed) {
+      try {
+        const res = await subscribeToCreatorSmsNotifications(user.uuid);
+
+        if (
+          !res.data ||
+          res.error ||
+          (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
+            res.data.status !==
+              newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
+        ) {
+          throw new Error(
+            res.error?.message ??
+              t(getSmsNotificationSubscriptionErrorMessage(res.data?.status))
+          );
+        }
+      } catch (err: any) {
+        console.error(err);
+        toast.error(err.message);
+      }
+    } else {
+      setSmsNotificationModalOpen(true);
+    }
+  }, [
+    currentUser.loggedIn,
+    currentUser.userData?.options?.isPhoneNumberConfirmed,
+    subscribedToSmsNotifications,
+    user.uuid,
+    t,
+    getGuestId,
+    submitPhoneSmsNotificationsRequest,
+  ]);
 
   const renderChildren = () => {
     let postsForPage = {};
@@ -450,6 +629,112 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     // isSub ? setIsSubscribed(true) : setIsSubscribed(false);
   }, [creatorsImSubscribedTo, user.uuid]);
 
+  useEffect(() => {
+    if (!currentUser.loggedIn) {
+      const pollGuestSmsSubscriptionStatus = async () => {
+        const guestId = getGuestId();
+        const res = await getGuestSmsNotificationsSubscriptionToCreatorStatus(
+          user.uuid,
+          guestId
+        );
+
+        if (!res.data || res.error) {
+          console.error('Unable to get sms notifications status');
+          toast.error(t('smsNotifications.error.requestFailed'));
+          throw new Error('Request failed');
+        }
+
+        setSubscribedToSmsNotifications(
+          res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
+        );
+      };
+
+      pollGuestSmsSubscriptionStatus()
+        .then(() => {
+          const pollingInterval = setInterval(() => {
+            pollGuestSmsSubscriptionStatus().catch(() => {
+              clearInterval(pollingInterval);
+            });
+          }, 5000);
+
+          return () => {
+            clearInterval(pollingInterval);
+          };
+        })
+        .catch(() => {
+          // Do nothing
+        });
+    } else {
+      getSmsNotificationsSubscriptionToCreatorStatus(user.uuid).then((res) => {
+        if (!res.data || res.error) {
+          console.error('Unable to get sms notifications status');
+          toast.error(t('smsNotifications.errors.requestFailed'));
+          return;
+        }
+
+        setSubscribedToSmsNotifications(
+          res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
+        );
+      });
+    }
+
+    return () => {};
+  }, [currentUser.loggedIn, user.uuid, t, getGuestId]);
+
+  useEffect(() => {
+    const handleSubscribedToSms = async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.SmsNotificationsSubscribed.decode(arr);
+
+      if (!decoded) return;
+
+      if (decoded.object?.creatorUuid === user.uuid) {
+        setSubscribedToSmsNotifications(true);
+      }
+    };
+
+    const handleUnsubscribedFromSms = async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.SmsNotificationsUnsubscribed.decode(arr);
+
+      if (!decoded) return;
+
+      if (decoded.object?.creatorUuid === user.uuid) {
+        setSubscribedToSmsNotifications(false);
+      }
+
+      if (decoded.object && !decoded.object.creatorUuid) {
+        // Unsubscribed from all
+        setSubscribedToSmsNotifications(false);
+      }
+    };
+
+    if (socketConnection && currentUser.loggedIn) {
+      socketConnection?.on('SmsNotificationsSubscribed', handleSubscribedToSms);
+      socketConnection?.on(
+        'SmsNotificationsUnsubscribed',
+        handleUnsubscribedFromSms
+      );
+    }
+
+    return () => {
+      if (
+        socketConnection &&
+        socketConnection?.connected &&
+        currentUser.loggedIn
+      ) {
+        socketConnection?.off(
+          'SmsNotificationsSubscribed',
+          handleSubscribedToSms
+        );
+        socketConnection?.off(
+          'SmsNotificationsUnsubscribed',
+          handleUnsubscribedFromSms
+        );
+      }
+    };
+  }, [currentUser.loggedIn, user.uuid, socketConnection]);
+
   const moreButtonRef = useRef() as any;
 
   return (
@@ -489,22 +774,59 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             {t('profileLayout.buttons.favorites')}
           </SFavoritesButton> */}
 
-          <SMoreButton
-            view='transparent'
-            iconOnly
-            onClick={() => setIsEllipseMenuOpen(true)}
-            ref={moreButtonRef}
-          >
-            <SSVGContainer active={ellipseMenuOpen}>
+          <SSideButtons>
+            {isMobile ? (
+              <SIconButton
+                active={subscribedToSmsNotifications}
+                onClick={handleSmsNotificationButtonClicked}
+              >
+                <InlineSvg
+                  svg={
+                    subscribedToSmsNotifications
+                      ? NotificationsIconFilled
+                      : NotificationsIconOutlined
+                  }
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </SIconButton>
+            ) : (
+              <SIconButtonWithText
+                active={subscribedToSmsNotifications}
+                onClick={handleSmsNotificationButtonClicked}
+              >
+                <InlineSvg
+                  svg={
+                    subscribedToSmsNotifications
+                      ? NotificationsIconFilled
+                      : NotificationsIconOutlined
+                  }
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+                {t(
+                  subscribedToSmsNotifications
+                    ? 'profileLayout.buttons.disableSmsNotifications'
+                    : 'profileLayout.buttons.enableSmsNotifications'
+                )}
+              </SIconButtonWithText>
+            )}
+
+            <SIconButton
+              active={ellipseMenuOpen}
+              ref={moreButtonRef}
+              onClick={() => setIsEllipseMenuOpen(true)}
+            >
               <InlineSvg
                 svg={MoreIconFilled}
                 fill={theme.colorsThemed.text.primary}
-                width={isMobileOrTablet ? '16px' : '24px'}
-                height={isMobileOrTablet ? '16px' : '24px'}
+                width='24px'
+                height='24px'
               />
-            </SSVGContainer>
-            {t('profileLayout.buttons.more')}
-          </SMoreButton>
+            </SIconButton>
+          </SSideButtons>
           {!isMobile && (
             <UserEllipseMenu
               isVisible={ellipseMenuOpen}
@@ -646,6 +968,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />
+      <SmsNotificationModal
+        show={smsNotificationModalOpen}
+        subscription={subscription}
+        onSubmit={submitPhoneSmsNotificationsRequest}
+        onClose={handleSmsNotificationModalClose}
+      />
     </>
   );
 };
@@ -668,28 +996,6 @@ const SGeneral = styled(General)`
 
   header {
     z-index: 6;
-  }
-
-  @media (max-width: 768px) {
-    // TODO: need to rework
-    main {
-      > div:first-child {
-        padding-left: 0;
-        padding-right: 0;
-
-        > div:first-child {
-          margin-left: 0;
-          margin-right: 0;
-          padding-left: 0;
-          padding-right: 0;
-
-          > div:first-child {
-            padding-left: 0;
-            padding-right: 0;
-          }
-        }
-      }
-    }
   }
 `;
 
@@ -783,23 +1089,35 @@ const SBioText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
-const SSVGContainer = styled.div<{
+const SIconButton = styled.div<{
   active: boolean;
 }>`
   display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
 
-  ${({ theme }) => theme.media.laptop} {
-    padding: 12px;
-    border-radius: 16px;
-    margin-bottom: 8px;
-    background: ${({ theme, active }) =>
-      active
-        ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;'
-        : theme.colorsThemed.background.quinary};
-    transition: 0.2s linear;
-  }
+  padding: 12px;
+  border-radius: 16px;
+  cursor: pointer;
+
+  user-select: none;
+  transition: background 0.2s linear;
+  background: ${({ theme, active }) =>
+    active
+      ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;'
+      : theme.colorsThemed.background.quinary};
+
+  // TODO: add hover/active effects
+`;
+
+const SIconButtonWithText = styled(SIconButton)`
+  gap: 12px;
+  padding: 12px 24px;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 24px;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
 `;
 
 const SBackButton = styled(BackButton)`
@@ -848,39 +1166,23 @@ const SBackButton = styled(BackButton)`
 //   }
 // `;
 
-const SMoreButton = styled(Button)`
+const SSideButtons = styled.div`
+  display: flex;
   position: absolute;
+  width: 100%;
+  gap: 16px;
+  padding: 16px;
+
   top: 164px;
-  left: 4px;
-
-  background: none;
-  &:active:enabled,
-  &:hover:enabled,
-  &:focus:enabled {
-    background: none;
-  }
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    font-weight: 600;
-    font-size: 10px;
-    line-height: 12px;
-  }
+  justify-content: space-between;
 
   ${(props) => props.theme.media.tablet} {
     top: 204px;
-    left: initial;
-    right: 4px;
   }
 
   ${(props) => props.theme.media.laptop} {
     top: 244px;
+    justify-content: flex-end;
   }
 `;
 

@@ -146,6 +146,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
               countryCode: data.me?.countryCode,
               usernameChangedAt: data.me.usernameChangedAt,
               genderPronouns: data.me.genderPronouns,
+              phoneNumber: data.me.phoneNumber,
 
               options: {
                 isActivityPrivate: data.me?.options?.isActivityPrivate,
@@ -154,6 +155,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
                 creatorStatus: data.me?.options?.creatorStatus,
                 birthDateUpdatesLeft: data.me?.options?.birthDateUpdatesLeft,
                 isOfferingSubscription: data.me.options?.isOfferingSubscription,
+                isPhoneNumberConfirmed: data.me.options?.isPhoneNumberConfirmed,
               },
             } as TUserData)
           );
@@ -411,6 +413,29 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
+
+  useEffect(() => {
+    const handlerSocketMeUpdated = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.MeUpdated.decode(arr);
+
+      if (!decoded) {
+        return;
+      }
+
+      dispatch(setUserData(decoded.me));
+    };
+
+    if (socketConnection) {
+      socketConnection?.on('MeUpdated', handlerSocketMeUpdated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('MeUpdated', handlerSocketMeUpdated);
+      }
+    };
+  }, [socketConnection]);
 
   return <>{children}</>;
 };
