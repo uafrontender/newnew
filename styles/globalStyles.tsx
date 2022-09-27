@@ -61,6 +61,12 @@ const GlobalStyle = createGlobalStyle`
     color: ${({ theme }) => theme.colorsThemed.text.primary};
     text-decoration: none;
   }
+
+  .iti__flag {background-image: url("../../flags.png");}
+
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .iti__flag {background-image: url("../../flags.png");}
+  }
 `;
 
 export default GlobalStyle;
