@@ -42,7 +42,8 @@ context('Main flow', () => {
     });
 
     it('can register as a creator', () => {
-      cy.log(JSON.stringify(Cypress.env()));
+      cy.task('log', JSON.stringify(Cypress.env()));
+      cy.task('log', Cypress.env('NEXT_PUBLIC_ENVIRONMENT'));
       cy.get('#log-in-to-create').click();
       cy.url().should('include', '/sign-up?to=create');
 
@@ -299,14 +300,19 @@ context('Main flow', () => {
       enterCardInfo(USER_CARD_NUMBER, USER_CARD_EXPIRY, USER_CARD_CVC);
       cy.get('#pay').click();
 
-      cy.contains(USER_EMAIL, { timeout: 60000 });
+      cy.wait(15000);
+      cy.url().then((url) => {
+        cy.task('log', 'debug');
+        cy.task('log', url);
+      });
+
+      cy.url().should('include', 'verify-email', { timeout: 60000 });
+      cy.contains(USER_EMAIL);
       enterVerificationCode(VERIFICATION_CODE);
+
       cy.get('#paymentSuccess', {
         timeout: 15000,
       }).click();
-      // TODO: fix issue with recaptcha
-
-      // TODO: test authentication after payment
 
       // TODO: test that contribution is visible on the post page
     });

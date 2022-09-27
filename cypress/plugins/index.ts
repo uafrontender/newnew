@@ -22,6 +22,14 @@ module.exports = (on, config) => {
 
   config.env.i18n = i18nGeneralConfig.i18n;
 
+  on('task', {
+    log(message) {
+      console.log(message);
+
+      return null;
+    },
+  });
+
   // do not forget to return the changed config object!
   return config;
 };
