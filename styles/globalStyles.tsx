@@ -10,6 +10,7 @@ const GlobalStyle = createGlobalStyle`
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     -webkit-tap-highlight-color:  rgba(255, 255, 255, 0); 
+    height: 100%;
   }
 
   *, *:before, *:after {
@@ -37,6 +38,7 @@ const GlobalStyle = createGlobalStyle`
   body {
     color: ${({ theme }) => theme.colorsThemed.text.primary};
     background: ${({ theme }) => theme.colorsThemed.background.primary};
+    height: 100%;
 
     /* Hide scrollbar */
     ::-webkit-scrollbar {
@@ -49,6 +51,10 @@ const GlobalStyle = createGlobalStyle`
   body.blurred {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+  }
+
+  #__next {
+    height: 100%;
   }
 
   a {
