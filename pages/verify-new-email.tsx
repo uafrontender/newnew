@@ -48,14 +48,6 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
       if (!decoded) return;
 
-      if (redirect === 'settings') {
-        dispatch(
-          setUserData({
-            email: decoded.me?.email,
-          })
-        );
-      }
-
       if (redirect === 'dashboard') {
         const becomeCreatorPayload = new newnewapi.EmptyRequest({});
 
@@ -64,9 +56,9 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
         if (!becomeCreatorRes.data || becomeCreatorRes.error)
           throw new Error('Become creator failed');
 
+        // TODO: ideally we want it happen in syncUserWrapper as well
         dispatch(
           setUserData({
-            email: decoded.me?.email,
             options: {
               isActivityPrivate:
                 becomeCreatorRes.data.me?.options?.isActivityPrivate,
