@@ -16,8 +16,6 @@
     "followCreator": "最喜歡的創作者",
     "unFollowDecision": "不喜歡的{{postType}}",
     "unFollowCreator": "不喜歡的創作者",
-    "unsubscribe": "取消訂閱",
-    "removeSubscription": "移除訂閱",
     "removeBid": "移除投標",
     "removeOption": "移除選項",
     "view": "查看個人資料",
@@ -145,16 +143,13 @@
     "topPosts": "熱門帖子",
     "popularCreators": "熱門創作者",
     "creatorSubtitle": "查看帖子",
-    "popularTags_NEED_TRANSLATION": "Popular Tags",
+    "popularTags": "熱門標籤",
     "allResults": "所有結果",
     "noResults": {
       "title": "沒有找到任何內容",
       "description": "嘗試搜索或瀏覽其他內容",
       "action": "瀏覽"
     }
-  },
-  "creatorCard": {
-    "subscriptionCost": "${{amount}} 每月"
   },
   "gotIt": "知道了",
   "sortingOption": {

@@ -16,8 +16,6 @@
     "followCreator": "Favorite creator",
     "unFollowDecision": "Unfavorite {{postType}}",
     "unFollowCreator": "Unfavorite creator",
-    "unsubscribe": "Unsubscribe",
-    "removeSubscription": "Remove subscription",
     "removeBid": "Remove bid",
     "removeOption": "Remove option",
     "view": "View profile",
@@ -152,11 +150,6 @@
       "description": "Try searching for something else or explore what’s new",
       "action": "Explore"
     }
-  },
-  "creatorCard": {
-    "subscriptionCost": "${{amount}} Monthly",
-    "subscribed": "subscribed",
-    "cancelled": "cancelled"
   },
   "gotIt": "Got it",
   "sortingOption": {

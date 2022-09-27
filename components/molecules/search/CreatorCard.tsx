@@ -3,7 +3,6 @@ import React, { useCallback, useMemo, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
-import { useTranslation } from 'next-i18next';
 
 import UserAvatar from '../UserAvatar';
 import InlineSvg from '../../atoms/InlineSVG';
@@ -13,7 +12,6 @@ import ReportModal, { ReportData } from '../chat/ReportModal';
 import BlockUserModalProfile from '../profile/BlockUserModalProfile';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import { formatNumber } from '../../../utils/format';
 import { useAppSelector } from '../../../redux-store/store';
 import { reportUser } from '../../../api/endpoints/report';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
@@ -24,19 +22,14 @@ import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verif
 interface ICreatorCard {
   creator: newnewapi.IUser;
   // TODO: make sign creator specific, get more data
-  sign?: string;
-  subscriptionPrice?: number;
   withEllipseMenu?: boolean;
 }
 
 export const CreatorCard: React.FC<ICreatorCard> = ({
   creator,
-  sign,
-  subscriptionPrice,
   withEllipseMenu,
 }) => {
   const router = useRouter();
-  const { t } = useTranslation('common');
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -98,7 +91,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   const moreButtonRef: any = useRef();
 
   return (
-    <SCard showSubscriptionPrice={subscriptionPrice !== undefined}>
+    <SCard>
       {withEllipseMenu && (
         <SMoreButton
           view='transparent'
@@ -153,13 +146,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         )}
       </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>
-      {subscriptionPrice !== undefined && subscriptionPrice > 0 && (
-        <SSubscriptionPrice>
-          {t('creatorCard.subscriptionCost', {
-            amount: formatNumber(subscriptionPrice / 100, false),
-          })}
-        </SSubscriptionPrice>
-      )}
       <SBackground>
         <Image src={creator.coverUrl ?? ''} layout='fill' />
       </SBackground>
@@ -202,12 +188,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
 
 export default CreatorCard;
 
-CreatorCard.defaultProps = {
-  sign: '',
-  subscriptionPrice: undefined,
-};
-
-const SCard = styled.div<{ showSubscriptionPrice: boolean }>`
+const SCard = styled.div`
   position: relative;
   padding: 10px;
   display: flex;
@@ -216,8 +197,7 @@ const SCard = styled.div<{ showSubscriptionPrice: boolean }>`
   border: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   position: relative;
-  height: ${({ showSubscriptionPrice }) =>
-    showSubscriptionPrice ? '185px' : '160px'};
+  height: 160px;
   cursor: pointer;
   transition: 0.2s linear;
   &:hover {
@@ -290,15 +270,6 @@ const SUserName = styled.p`
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-`;
-
-const SSubscriptionPrice = styled.p`
-  text-align: center;
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
-  margin-top: 5px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
 
