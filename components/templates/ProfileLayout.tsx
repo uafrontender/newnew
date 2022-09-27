@@ -671,14 +671,22 @@ const SGeneral = styled(General)`
   }
 
   @media (max-width: 768px) {
+    // TODO: need to rework
     main {
-      div:first-child {
+      > div:first-child {
         padding-left: 0;
         padding-right: 0;
 
-        div:first-child {
+        > div:first-child {
           margin-left: 0;
           margin-right: 0;
+          padding-left: 0;
+          padding-right: 0;
+
+          > div:first-child {
+            padding-left: 0;
+            padding-right: 0;
+          }
         }
       }
     }

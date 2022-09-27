@@ -17,9 +17,9 @@ export enum StripeSetupIntentPurposeTypes {
 
 // IDEA: can use stricter types (union type from a set of types)
 interface ISetupIntentData {
-  setupIntentClientSecret: string | null;
+  setupIntentClientSecret?: string | null;
   purposeType?: StripeSetupIntentPurposeTypes;
-  purpose:
+  purpose?:
     | newnewapi.SaveCardRequest
     | newnewapi.PlaceBidRequest
     | newnewapi.VoteOnPostRequest
@@ -37,7 +37,7 @@ interface ISetupIntentProps {
 
 export interface ISetupIntent extends ISetupIntentData {
   update: (props: ISetupIntentProps) => Promise<{ errorKey?: string }>;
-  init: () => Promise<void>;
+  init: () => Promise<{ errorKey?: string }>;
   destroy: () => void;
 }
 
@@ -78,36 +78,49 @@ const useStripeSetupIntent = ({
     | newnewapi.PlaceBidRequest
     | newnewapi.VoteOnPostRequest
     | newnewapi.DoPledgeRequest
-    | string;
+    | string
+    | null;
   isGuest?: boolean;
   successUrl?: string;
 }) => {
-  const [setupIntent, setSetupIntent] = useState<ISetupIntentData>(() => {
-    const purposeType = getStripeSetupIntentPurposeType(purpose);
+  const [setupIntent, setSetupIntent] = useState<ISetupIntentData | null>(
+    () => {
+      if (!purpose) {
+        return null;
+      }
 
-    return {
-      purpose,
-      isGuest,
-      successUrl,
-      purposeType,
-      setupIntentClientSecret: null,
-    };
-  });
+      const purposeType = getStripeSetupIntentPurposeType(purpose);
+
+      return {
+        purpose,
+        isGuest,
+        successUrl,
+        purposeType,
+        setupIntentClientSecret: null,
+      };
+    }
+  );
 
   useEffect(() => {
-    const purposeType = getStripeSetupIntentPurposeType(purpose);
+    if (purpose) {
+      const purposeType = getStripeSetupIntentPurposeType(purpose);
 
-    setSetupIntent({
-      purpose,
-      isGuest,
-      successUrl,
-      purposeType,
-      setupIntentClientSecret: null,
-    });
+      setSetupIntent({
+        purpose,
+        isGuest,
+        successUrl,
+        purposeType,
+        setupIntentClientSecret: null,
+      });
+    }
   }, [purpose, isGuest, successUrl]);
 
   const init = useCallback(async () => {
     try {
+      if (!setupIntent) {
+        return {};
+      }
+
       const payload = new newnewapi.CreateStripeSetupIntentRequest({
         [setupIntent.purposeType!]: setupIntent.purpose,
         ...(setupIntent.isGuest
@@ -122,15 +135,20 @@ const useStripeSetupIntent = ({
         response.error ||
         !response.data?.stripeSetupIntentClientSecret
       ) {
-        throw new Error(response.error?.message || 'Some error occurred');
+        throw new Error(
+          response.error?.message || 'Cannot create SI for unknown reason'
+        );
       }
 
       setSetupIntent((prevState) => ({
-        ...prevState,
+        ...(prevState || {}),
         setupIntentClientSecret: response?.data?.stripeSetupIntentClientSecret!,
       }));
+
+      return {};
     } catch (err: any) {
       console.error(err);
+      return { errorKey: 'errors.requestFailed' };
     }
   }, [setupIntent]);
 
@@ -140,7 +158,7 @@ const useStripeSetupIntent = ({
       saveCard,
     }: ISetupIntentProps): Promise<{ errorKey?: string }> => {
       try {
-        if (!setupIntent.setupIntentClientSecret) {
+        if (!setupIntent?.setupIntentClientSecret) {
           throw new Error('Missing setup intent client secret');
         }
 
@@ -182,7 +200,7 @@ const useStripeSetupIntent = ({
       ...prevState,
       setupIntentClientSecret: null,
     }));
-  }, [purpose, isGuest, successUrl]);
+  }, []);
 
   const setupIntentData: ISetupIntent = useMemo(
     () => ({
