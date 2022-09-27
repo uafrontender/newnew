@@ -859,7 +859,7 @@ const SBidDetails = styled.div<{
     grid-template-areas:
       'amount bidders'
       'optionInfo optionInfo';
-    grid-template-columns: 5fr 4fr;
+    grid-template-columns: 5fr 6fr;
 
     padding: 16px;
 
@@ -945,6 +945,8 @@ const SBiddersInfo = styled(Text)`
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;
     padding-top: 4px;
+
+    text-align: right;
   }
 `;
 

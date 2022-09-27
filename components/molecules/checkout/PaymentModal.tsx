@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
+import { useTranslation } from 'next-i18next';
+import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../redux-store/store';
 import { useCards } from '../../../contexts/cardsContext';
@@ -44,6 +46,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   children,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation('modal-PaymentModal');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -56,14 +59,19 @@ const PaymentModal: React.FC<IPaymentModal> = ({
     const getSetupIntent = async () => {
       setIsLoadingSetupIntent(true);
 
-      await setupIntent?.init();
+      const { errorKey } = await setupIntent.init();
+
+      if (errorKey) {
+        toast.error(t(errorKey));
+      }
+
       setIsLoadingSetupIntent(false);
     };
 
-    if (!setupIntent.setupIntentClientSecret) {
+    if (!setupIntent.setupIntentClientSecret && setupIntent) {
       getSetupIntent();
     }
-  }, [setupIntent, setupIntent.setupIntentClientSecret]);
+  }, [setupIntent, setupIntent.setupIntentClientSecret, t]);
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
