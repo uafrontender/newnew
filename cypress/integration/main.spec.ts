@@ -299,7 +299,7 @@ context('Main flow', () => {
       enterCardInfo(USER_CARD_NUMBER, USER_CARD_EXPIRY, USER_CARD_CVC);
       cy.get('#pay').click();
 
-      cy.wait(10000);
+      cy.contains(USER_EMAIL, { timeout: 60000 });
       enterVerificationCode(VERIFICATION_CODE);
       cy.get('#paymentSuccess', {
         timeout: 15000,
