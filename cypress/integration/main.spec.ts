@@ -42,8 +42,6 @@ context('Main flow', () => {
     });
 
     it('can register as a creator', () => {
-      cy.task('log', JSON.stringify(Cypress.env()));
-      cy.task('log', Cypress.env('NEXT_PUBLIC_ENVIRONMENT'));
       cy.get('#log-in-to-create').click();
       cy.url().should('include', '/sign-up?to=create');
 
