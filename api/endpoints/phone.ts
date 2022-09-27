@@ -14,7 +14,7 @@ export const subscribeToCreatorSmsNotifications = (
 ) => {
   const payload = new newnewapi.SubscribeSmsNotificationsRequest({
     object: {
-      creatorUuid: creatorUuid,
+      creatorUuid,
     },
     phoneNumber,
   });
@@ -38,7 +38,7 @@ export const unsubscribeFromCreatorSmsNotifications = (
 ) => {
   const payload = new newnewapi.UnsubscribeSmsNotificationsRequest({
     object: {
-      creatorUuid: creatorUuid,
+      creatorUuid,
     },
   });
 
@@ -61,7 +61,7 @@ export const getSmsNotificationsSubscriptionToCreatorStatus = (
 ) => {
   const payload = new newnewapi.GetSmsNotificationsStatusRequest({
     object: {
-      creatorUuid: creatorUuid,
+      creatorUuid,
     },
   });
 
@@ -81,16 +81,16 @@ export const getSmsNotificationsSubscriptionToCreatorStatus = (
 // Guest
 export const subscribeGuestToCreatorSmsNotifications = (
   creatorUuid: string,
-  guestUUid: string,
+  guestId: string,
   phoneNumber?: newnewapi.IPhoneNumber,
   signal?: RequestInit['signal']
 ) => {
   const payload = new newnewapi.SubscribeSmsNotificationsRequest({
     object: {
-      creatorUuid: creatorUuid,
+      creatorUuid,
     },
-    guestId: guestUUid,
-    phoneNumber: phoneNumber,
+    guestId,
+    phoneNumber,
   });
 
   return fetchProtobuf<
@@ -108,14 +108,14 @@ export const subscribeGuestToCreatorSmsNotifications = (
 
 export const unsubscribeGuestFromCreatorSmsNotifications = (
   creatorUuid: string,
-  guestUUid: string,
+  guestId: string,
   signal?: RequestInit['signal']
 ) => {
   const payload = new newnewapi.UnsubscribeSmsNotificationsRequest({
     object: {
-      creatorUuid: creatorUuid,
+      creatorUuid,
     },
-    guestId: guestUUid,
+    guestId,
   });
 
   return fetchProtobuf<
@@ -133,14 +133,14 @@ export const unsubscribeGuestFromCreatorSmsNotifications = (
 
 export const getGuestSmsNotificationsSubscriptionToCreatorStatus = (
   creatorUuid: string,
-  guestUUid: string,
+  guestId: string,
   signal?: RequestInit['signal']
 ) => {
   const payload = new newnewapi.GetSmsNotificationsStatusRequest({
     object: {
-      creatorUuid: creatorUuid,
+      creatorUuid,
     },
-    guestId: guestUUid,
+    guestId,
   });
 
   return fetchProtobuf<
