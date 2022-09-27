@@ -111,12 +111,14 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 
   const doPledgeRequest = useMemo(
     () =>
-      new newnewapi.DoPledgeRequest({
-        postUuid: post.postUuid,
-        amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
-        }),
-      }),
+      !pledgeAmount
+        ? null
+        : new newnewapi.DoPledgeRequest({
+            postUuid: post.postUuid,
+            amount: new newnewapi.MoneyAmount({
+              usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
+            }),
+          }),
     [post.postUuid, pledgeAmount]
   );
 
