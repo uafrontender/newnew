@@ -91,24 +91,30 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     e.preventDefault();
 
     try {
+      console.log('TRY');
       if (!stripe || !elements) {
+        console.log('Stripe initialization error');
         throw new Error('Stripe initialization error');
       }
 
       if (!loggedIn && !email) {
+        console.log('Email is required');
         setEmailError('Email is required');
         return;
       }
 
       if (!executeRecaptcha) {
+        console.log('executeRecaptcha not available');
         throw new Error('executeRecaptcha not available');
       }
 
+      console.log('passing');
       setIsSubmitting(true);
 
       const recaptchaToken = await executeRecaptcha();
-
+      console.log('recaptchaToken');
       if (recaptchaToken) {
+        console.log('recaptchaToken true');
         const res = await fetch('/api/post_recaptcha_query', {
           method: 'POST',
           body: JSON.stringify({
@@ -117,11 +123,14 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         });
 
         const jsonRes: IReCaptchaRes = await res.json();
+        console.log('env');
+        console.log(process.env.NEXT_PUBLIC_ENVIRONMENT === 'test');
         if (
           process.env.NEXT_PUBLIC_ENVIRONMENT === 'test' ||
           (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5)
         ) {
           // pay with primary card
+          console.log('pay with primary card');
           if (
             selectedPaymentMethod === PaymentMethodTypes.PrimaryCard &&
             primaryCard
@@ -135,17 +144,23 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             selectedPaymentMethod === PaymentMethodTypes.NewCard ||
             !primaryCard
           ) {
+            console.log('pay with new card');
+            console.log(!loggedIn);
             if (!loggedIn) {
+              console.log('update');
               const { errorKey } = await setupIntent.update({
                 email,
                 saveCard,
               });
 
               if (errorKey) {
+                console.log('errorKey');
                 throw new Error(t(errorKey));
               }
+              console.log('update passed');
             }
 
+            console.log('next');
             const { error } = await stripe.confirmSetup({
               elements,
               confirmParams: {
@@ -154,13 +169,18 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
               redirect: 'if_required',
             });
 
+            console.log('confirmed Setup');
             if (!error) {
+              console.log('no confirm Setup error ');
               await handlePayWithCard?.({
                 saveCard,
               });
             }
+            console.log('error');
+            console.log(error);
           }
         } else {
+          console.log('else');
           throw new Error(
             // eslint-disable-next-line no-nested-ternary
             jsonRes?.errors
@@ -172,8 +192,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         }
       }
     } catch (err: any) {
-      toast.error(err.message);
       console.log(err);
+      toast.error(err.message);
       console.log(err.message);
       console.error(err);
     } finally {

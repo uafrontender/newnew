@@ -304,7 +304,7 @@ context('Main flow', () => {
       //cy.get('#pay').click();
       cy.wait(8000);
       cy.get('#checkout-form').submit();
-      cy.get('#toast-container').then((e) => {
+      /*cy.get('#toast-container').then((e) => {
         cy.task('log', e.html);
       });
       cy.wait(2000);
@@ -327,8 +327,9 @@ context('Main flow', () => {
       cy.get('#toast-container').then((e) => {
         cy.task('log', e.html);
       });
-      cy.get('#toast-container').contains('ReCaptcha failed');
+      cy.get('#toast-container').contains('ReCaptcha failed');*/
 
+      cy.wait(10000);
       cy.url().then((url) => {
         cy.task('log', 'debug');
         cy.task('log', url);
