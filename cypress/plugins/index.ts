@@ -30,6 +30,8 @@ module.exports = (on, config) => {
     },
   });
 
+  require('cypress-terminal-report/src/installLogsPrinter')(on);
+
   // do not forget to return the changed config object!
   return config;
 };
