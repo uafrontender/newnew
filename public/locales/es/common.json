@@ -143,7 +143,7 @@
     "topPosts": "Publicaciones populares",
     "popularCreators": "Creadores populares",
     "creatorSubtitle": "Ver publicaciones",
-    "popularTags_NEED_TRANSLATION": "Popular Tags",
+    "popularTags": "Etiquetas populares",
     "allResults": "Todos los resultados",
     "noResults": {
       "title": "No encontramos nada",
@@ -173,5 +173,23 @@
   },
   "toastErrors": {
     "generic": "Se ha producido un error, inténtalo de nuevo más tarde"
+  },
+  "smsNotifications_NEED_TRANSLATION": {
+    "title": "Enter your phone number",
+    "success": "Success",
+    "description": "With it, we will notify you about the <0>{{subject}}</0> updates.",
+    "confirmation": "Confirmation SMS was sent to {{phoneNumber}} number.",
+    "tos": "I accept the <0>NewNew’s Terms of Service</0> & have read the <1>NewNew’s Privacy Statement</1>. I would like to receive newsletters and updates about  NewNew products at the phone number provided. One message per month. Message and data rates may apply. ",
+    "button": { "continue": "Continue", "close": "Cool!" },
+    "phoneError": {
+      "0": "Invalid phone number",
+      "1": "Invalid country code",
+      "2": "The phone number is too short",
+      "3": "The phone number is too long",
+      "4": "Invalid phone number"
+    },
+    "error": {
+      "requestFailed": "Request failed"
+    }
   }
 }

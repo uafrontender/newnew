@@ -97,7 +97,8 @@
     },
     "buttons": {
       "favorites": "Favoritos",
-      "more": "Más",
+      "enableSmsNotifications_NEED_TRANSLATION": "Notify me",
+      "disableSmsNotifications_NEED_TRANSLATION": "Notifications ON",
       "sendMessage": "Escribir mensaje",
       "copied": "¡Enlace copiado!"
     }
