@@ -253,7 +253,7 @@ context('Main flow', () => {
 
   describe('User', () => {
     const USER_EMAIL = `test-user-${testSeed}@newnew.co`;
-    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_NUMBER = '6011111111111117';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
 
