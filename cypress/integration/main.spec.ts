@@ -283,6 +283,11 @@ context('Main flow', () => {
       storage.save();
     });
 
+    it('can enter signIn page', () => {
+      cy.get('#log-in').click();
+      cy.url().should('include', '/sign-up');
+    });
+
     it('can enter the post page and contribute to an event without prior authentication', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${eventId}`);
       cy.url().should('include', '/post');
