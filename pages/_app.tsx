@@ -226,7 +226,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                                       <PostModalContextProvider>
                                         <GlobalTheme initialTheme={colorMode}>
                                           <>
-                                            <ToastContainer />
+                                            <ToastContainer containerId='toast-container' />
                                             <VideoProcessingWrapper>
                                               <ErrorBoundary>
                                                 {!pageProps.error ? (

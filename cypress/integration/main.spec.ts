@@ -302,9 +302,33 @@ context('Main flow', () => {
       cy.get('#email-input').type(USER_EMAIL);
       enterCardInfo(USER_CARD_NUMBER, USER_CARD_EXPIRY, USER_CARD_CVC);
       //cy.get('#pay').click();
+      cy.wait(8000);
       cy.get('#checkout-form').submit();
+      cy.get('#toast-container').then((e) => {
+        cy.task('log', e.html);
+      });
+      cy.wait(2000);
+      cy.get('#toast-container').then((e) => {
+        cy.task('log', e.html);
+      });
+      cy.wait(4000);
+      cy.get('#toast-container').then((e) => {
+        cy.task('log', e.html);
+      });
+      cy.wait(6000);
+      cy.get('#toast-container').then((e) => {
+        cy.task('log', e.html);
+      });
+      cy.wait(8000);
+      cy.get('#toast-container').then((e) => {
+        cy.task('log', e.html);
+      });
+      cy.wait(10000);
+      cy.get('#toast-container').then((e) => {
+        cy.task('log', e.html);
+      });
+      cy.get('#toast-container').contains('ReCaptcha failed');
 
-      cy.wait(90000);
       cy.url().then((url) => {
         cy.task('log', 'debug');
         cy.task('log', url);

@@ -87,6 +87,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   };
 
   const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
+    console.log('SUBMIT');
     e.preventDefault();
 
     try {
