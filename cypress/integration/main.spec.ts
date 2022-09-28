@@ -253,9 +253,10 @@ context('Main flow', () => {
 
   describe('User', () => {
     const USER_EMAIL = `test-user-${testSeed}@newnew.co`;
-    const USER_CARD_NUMBER = '6011111111111117';
+    const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
+    const USER_CARD_POSTAL_CODE = '90210';
 
     // Ignore tutorials
     const defaultStorage = {
@@ -264,8 +265,8 @@ context('Main flow', () => {
     };
     const storage = createStorage(defaultStorage);
 
-    // TODO: remove
     before(() => {
+      // TODO: remove
       // Let all posts finish processing
       cy.wait(30000);
       cy.clearCookies();
@@ -300,40 +301,15 @@ context('Main flow', () => {
         .click();
 
       cy.get('#email-input').type(USER_EMAIL);
-      enterCardInfo(USER_CARD_NUMBER, USER_CARD_EXPIRY, USER_CARD_CVC);
-      //cy.get('#pay').click();
-      cy.wait(8000);
-      cy.get('#checkout-form').submit();
-      /*cy.get('#toast-container').then((e) => {
-        cy.task('log', e.html);
-      });
-      cy.wait(2000);
-      cy.get('#toast-container').then((e) => {
-        cy.task('log', e.html);
-      });
-      cy.wait(4000);
-      cy.get('#toast-container').then((e) => {
-        cy.task('log', e.html);
-      });
-      cy.wait(6000);
-      cy.get('#toast-container').then((e) => {
-        cy.task('log', e.html);
-      });
-      cy.wait(8000);
-      cy.get('#toast-container').then((e) => {
-        cy.task('log', e.html);
-      });
-      cy.wait(10000);
-      cy.get('#toast-container').then((e) => {
-        cy.task('log', e.html);
-      });
-      cy.get('#toast-container').contains('ReCaptcha failed');*/
+      enterCardInfo(
+        USER_CARD_NUMBER,
+        USER_CARD_EXPIRY,
+        USER_CARD_CVC,
+        USER_CARD_POSTAL_CODE
+      );
 
-      cy.wait(10000);
-      cy.url().then((url) => {
-        cy.task('log', 'debug');
-        cy.task('log', url);
-      });
+      cy.get('#pay').click();
+
       cy.url().should('include', 'verify-email');
       cy.contains(USER_EMAIL);
       enterVerificationCode(VERIFICATION_CODE);
