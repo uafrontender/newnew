@@ -9,7 +9,7 @@ context('Main flow', () => {
 
   let eventId = '';
   let superpollId = '';
-  let crowdfundingId = '';
+  // let crowdfundingId = '';
 
   Cypress.on('uncaught:exception', (err, runnable) => {
     // Do nothing
@@ -192,7 +192,7 @@ context('Main flow', () => {
         });
     });
 
-    it('can create a crowdfunding', () => {
+    /*it('can create a crowdfunding', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creation`);
 
       // Waiting for an element to be attached to the DOM
@@ -233,7 +233,7 @@ context('Main flow', () => {
           const chunks = urlstring.split('/');
           crowdfundingId = chunks[chunks.length - 1];
         });
-    });
+    });*/
   });
 
   describe('User', () => {
@@ -310,8 +310,6 @@ context('Main flow', () => {
     });
 
     // TODO: can contribute to superpoll
-
-    // TODO: can contribute to goal
   });
 
   // TODO: cover creator and successful post case
