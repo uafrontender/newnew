@@ -172,6 +172,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       }
     } catch (err: any) {
       toast.error(err.message);
+      console.log(err);
+      console.log(err.message);
       console.error(err);
     } finally {
       setIsSubmitting(false);
@@ -186,7 +188,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   );
 
   return (
-    <SForm onSubmit={handleSubmit}>
+    <SForm id='checkout-form' onSubmit={handleSubmit}>
       {/* Payment method */}
       <Text variant='subtitle'>{t('paymentMethodTitle')}</Text>
       {primaryCard && (
