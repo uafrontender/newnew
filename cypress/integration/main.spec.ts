@@ -298,13 +298,12 @@ context('Main flow', () => {
       enterCardInfo(USER_CARD_NUMBER, USER_CARD_EXPIRY, USER_CARD_CVC);
       cy.get('#pay').click();
 
-      cy.wait(15000);
+      cy.wait(90000);
       cy.url().then((url) => {
         cy.task('log', 'debug');
         cy.task('log', url);
       });
-
-      cy.url().should('include', 'verify-email', { timeout: 60000 });
+      cy.url().should('include', 'verify-email');
       cy.contains(USER_EMAIL);
       enterVerificationCode(VERIFICATION_CODE);
 
