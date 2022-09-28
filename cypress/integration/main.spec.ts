@@ -3,6 +3,7 @@ import enterCardInfo from './utils/enterCardInfo';
 import enterVerificationCode from './utils/enterVerificationCode';
 
 const VERIFICATION_CODE = '111111';
+const postIdRegex = /post\/(.{36})/;
 
 context('Main flow', () => {
   const testSeed = Date.now();
@@ -140,8 +141,7 @@ context('Main flow', () => {
       cy.url()
         .should('include', '/post')
         .then((urlstring) => {
-          const chunks = urlstring.split('/');
-          eventId = chunks[chunks.length - 1];
+          eventId = urlstring.match(postIdRegex)[1];
         });
     });
 
@@ -187,8 +187,7 @@ context('Main flow', () => {
       cy.url()
         .should('include', '/post')
         .then((urlstring) => {
-          const chunks = urlstring.split('/');
-          superpollId = chunks[chunks.length - 1];
+          superpollId = urlstring.match(postIdRegex)[1];
         });
     });
 
@@ -309,7 +308,22 @@ context('Main flow', () => {
       cy.contains(`${BID_OPTION_AMOUNT}`);
     });
 
-    // TODO: can contribute to superpoll
+    it('can enter the post page and contribute to a superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
+      cy.url().should('include', '/post');
+
+      cy.get('#support-button-0').click();
+      cy.get('#vote-option-0').click();
+      cy.get('#confirm-vote').click();
+
+      cy.get('#pay').click();
+
+      cy.get('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
+
+      cy.get('#support-button-0-supported').click();
+    });
   });
 
   // TODO: cover creator and successful post case
