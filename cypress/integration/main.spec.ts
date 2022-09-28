@@ -78,28 +78,13 @@ context('Main flow', () => {
       cy.get('#nickname_input').type('testCreator');
 
       cy.get('#select-day').click();
-      cy.get('#select-day-options')
-        .children()
-        .first()
-        .children()
-        .last()
-        .click();
+      cy.get('#select-day-options').contains('1').click();
 
       cy.get('#select-month').click();
-      cy.get('#select-month-options')
-        .children()
-        .first()
-        .children()
-        .last()
-        .click();
+      cy.get('#select-month-options').contains('December').click();
 
       cy.get('#select-year').click();
-      cy.get('#select-year-options')
-        .children()
-        .first()
-        .children()
-        .last()
-        .click();
+      cy.get('#select-year-options').contains('1990').click();
 
       cy.get('#tos-checkbox').click();
       cy.get('#submit-button').click();
@@ -266,7 +251,6 @@ context('Main flow', () => {
     const storage = createStorage(defaultStorage);
 
     before(() => {
-      // TODO: remove
       // Let all posts finish processing
       cy.wait(30000);
       cy.clearCookies();
@@ -290,11 +274,14 @@ context('Main flow', () => {
     });
 
     it('can enter the post page and contribute to an event without prior authentication', () => {
+      const BID_OPTION_TEXT = 'something';
+      const BID_OPTION_AMOUNT = '10';
+
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${eventId}`);
       cy.url().should('include', '/post');
 
-      cy.get('#text-input').type('something');
-      cy.get('#bid-input').type('10');
+      cy.get('#text-input').type(BID_OPTION_TEXT);
+      cy.get('#bid-input').type(BID_OPTION_AMOUNT);
       cy.get('#submit')
         .should('be.enabled')
         .should('not.have.css', 'cursor', 'wait')
@@ -318,7 +305,8 @@ context('Main flow', () => {
         timeout: 15000,
       }).click();
 
-      // TODO: test that contribution is visible on the post page
+      cy.contains(BID_OPTION_TEXT);
+      cy.contains(`${BID_OPTION_AMOUNT}`);
     });
 
     // TODO: can contribute to superpoll
