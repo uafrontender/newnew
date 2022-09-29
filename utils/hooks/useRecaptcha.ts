@@ -123,7 +123,10 @@ const useRecaptcha = (
       // reCaptcha v3
       const { isPassed, score, error } = await executeRecaptchaV3();
 
-      if (isPassed && score && score >= minSuccessScore) {
+      if (
+        process.env.NEXT_PUBLIC_ENVIRONMENT === 'test' ||
+        (isPassed && score && score >= minSuccessScore)
+      ) {
         await callback();
         setIsSubmitting(false);
         return;

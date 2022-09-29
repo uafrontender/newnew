@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import CheckMark from '../CheckMark';
 
 interface ICheckboxWithALink {
+  id?: string;
   label: string;
   linkText: string;
   value: boolean;
@@ -11,6 +12,7 @@ interface ICheckboxWithALink {
 }
 
 const CheckboxWithALink: React.FC<ICheckboxWithALink> = ({
+  id,
   label,
   linkText,
   value,
@@ -19,6 +21,7 @@ const CheckboxWithALink: React.FC<ICheckboxWithALink> = ({
 }) => (
   <AgreedToTosSection>
     <CheckMark
+      id={id}
       label={label}
       selected={value}
       handleChange={() => onToggled()}
@@ -42,5 +45,9 @@ const TextTrigger = styled('p')`
 
   color: ${({ theme }) => theme.colorsThemed.accent.blue};
 `;
+
+CheckboxWithALink.defaultProps = {
+  id: undefined,
+};
 
 export default CheckboxWithALink;

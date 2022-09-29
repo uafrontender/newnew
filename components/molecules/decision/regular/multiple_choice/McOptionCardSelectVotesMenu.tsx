@@ -106,8 +106,9 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
                     'mcPost.optionsTab.optionCard.selectVotesMenu.titleMoreVotes'
                   )}
             </STitleText>
-            {availableVotes.map((amount) => (
+            {availableVotes.map((amount, id) => (
               <SButton
+                id={`vote-option-${id}`}
                 key={amount}
                 onClickCapture={() => {
                   Mixpanel.track('Selected Votes Amount', {

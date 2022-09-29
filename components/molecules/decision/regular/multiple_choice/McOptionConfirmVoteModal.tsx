@@ -105,6 +105,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
             </SCaption>
             <SOptionText variant={2}>{optionText}</SOptionText>
             <SVoteButton
+              id='confirm-vote'
               view='primary'
               onClickCapture={() => {
                 Mixpanel.track('Submit Votes Amount and Open Payment Modal', {
