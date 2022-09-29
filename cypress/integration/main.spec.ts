@@ -17,6 +17,10 @@ context('Main flow', () => {
     return false;
   });
 
+  before(() => {
+    cy.task('log', `test seed is ${testSeed}`);
+  });
+
   describe('Creator', () => {
     const CREATOR_EMAIL = `test-creator-${testSeed}@newnew.co`;
 

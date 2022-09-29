@@ -18,7 +18,6 @@ interface IList {
   subscribedTo?: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
-  showSubscriptionPrice?: boolean;
   withEllipseMenu?: boolean;
 }
 
@@ -28,7 +27,6 @@ export const CreatorsList: React.FC<IList> = ({
   subscribedTo = false,
   skeletonsBgColor,
   skeletonsHighlightColor,
-  showSubscriptionPrice = false,
   withEllipseMenu = false,
 }) => {
   const renderItem = (item: newnewapi.IUser) => {
@@ -39,8 +37,6 @@ export const CreatorsList: React.FC<IList> = ({
     return (
       <SItemWrapper key={item.uuid} onClick={handleItemClick}>
         <CreatorCardWithSubscriptionPrice
-          subscribedTo={subscribedTo}
-          showSubscriptionPrice={showSubscriptionPrice}
           item={item}
           withEllipseMenu={withEllipseMenu ?? false}
         />
@@ -90,7 +86,6 @@ CreatorsList.defaultProps = {
   subscribedTo: false,
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
-  showSubscriptionPrice: undefined,
 };
 
 export default CreatorsList;

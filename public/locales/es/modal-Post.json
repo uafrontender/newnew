@@ -378,7 +378,6 @@
         "votes": "votos",
         "vote": "voto",
         "mySuggestion": "Mi sugerencia",
-        "subscriberSuggestion": "La sugerencia de{{nickname}}",
         "others": "otros",
         "voters": "votantes",
         "voted": "votaron",
@@ -423,8 +422,6 @@
             "vote": "voto"
           }
         },
-        "subscribeToCreatorCaption": "¡Suscríbete a {{creator}} para agregar tus propias opciones a esta Superpoll!",
-        "subscribeButton": "Subscribirme",
         "suggestionPlaceholder": "Agregar tu propia opción...",
         "suggestionPlaceholderDesktop": "Agregar opción...",
         "placeABidButton": "Agregar mi opción"
@@ -790,21 +787,21 @@
       }
     }
   },
-  "errors_NEED_TRANSLATION": {
-    "notEnoughMoney": "Not enough money",
-    "cardNotFound": "Card not found",
-    "cardCannotBeUsed": "This card can not be used",
-    "biddingNotStarted": "Bidding is not started yet",
-    "biddingIsEnded": "Bidding is ended already",
-    "mcCancelled": "Superpoll is cancelled",
-    "mcFinished": "Superpoll is finished already",
-    "mcNotStarted": "Superpoll is not started yet",
-    "alreadyVoted": "You are already voted",
-    "mcVoteCountTooSmall": "Vote count is too small",
-    "notAllowedToCreateNewOption": "New option is not allowed",
-    "cfCancelled": "Goal is cancelled",
-    "cfFinished": "Goal is finished already",
-    "cfNotStarted": "Goal is not started yet",
-    "requestFailed": "Request failed"
+  "errors": {
+    "notEnoughMoney": "No hay suficiente dinero",
+    "cardNotFound": "La tarjeta no ha sido encontrada",
+    "cardCannotBeUsed": "Esta tarjeta no puede ser usada",
+    "biddingNotStarted": "La subasta no ha iniciado todavía",
+    "biddingIsEnded": "La subasta ha concluido",
+    "mcCancelled": "El Superpoll ha sido cancelado",
+    "mcFinished": "El Superpoll ya ha concluido",
+    "mcNotStarted": "El Superpoll no ha comenzado",
+    "alreadyVoted": "Ya has votado",
+    "mcVoteCountTooSmall": "El número de votos es demasiado pequeño",
+    "notAllowedToCreateNewOption": "No se permite crear una nueva opción",
+    "cfCancelled": "El Goal ha sido cancelado",
+    "cfFinished": "El Goal ya ha concluido",
+    "cfNotStarted": "El Goal no ha comenzado todavía",
+    "requestFailed": "La solicitud ha fallado"
   }
 }

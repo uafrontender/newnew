@@ -21,13 +21,13 @@
     "tos": "服務條款",
     "apply": "適用。"
   },
-  "primaryCard_NEED_TRANSLATION": "Primary card",
-  "newCard_NEED_TRANSLATION": "New card",
-  "saveCard_NEED_TRANSLATION": "Save card for future use",
+  "primaryCard": "主卡",
+  "newCard": "新卡",
+  "saveCard": "保存卡片供以後使用",
   "email": "電子郵件",
-  "errors_NEED_TRANSLATION": {
-    "wrongEmail": "Email can't be used",
-    "paymentFailed": "Payment failed",
-    "requestFailed": "Request failed"
+  "errors": {
+    "wrongEmail": "電子郵件無法使用",
+    "paymentFailed": "付款失敗",
+    "requestFailed": "請求失敗"
   }
 }
