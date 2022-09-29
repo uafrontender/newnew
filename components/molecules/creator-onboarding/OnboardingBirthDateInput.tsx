@@ -159,6 +159,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<
         {!isMobile ? (
           <SDropdownsContainer isValid={isValid}>
             <DropdownSelect<number>
+              id='select-day'
               closeOnSelect
               width='120px'
               label={
@@ -173,6 +174,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<
               disabled={disabled ?? false}
             />
             <DropdownSelect<number>
+              id='select-month'
               closeOnSelect
               width='160px'
               label={
@@ -187,6 +189,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<
               disabled={disabled ?? false}
             />
             <DropdownSelect<number>
+              id='select-year'
               closeOnSelect
               width={isTablet ? '100%' : '120px'}
               label={

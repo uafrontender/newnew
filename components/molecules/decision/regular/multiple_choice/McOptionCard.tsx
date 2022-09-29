@@ -612,6 +612,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           ) : (
             <>
               <SSupportButtonDesktop
+                id={`support-button-${index}${isBlue ? '-supported' : ''}`}
                 active={isSupportMenuOpen}
                 canVoteForFree={canVoteForFree}
                 view='secondary'

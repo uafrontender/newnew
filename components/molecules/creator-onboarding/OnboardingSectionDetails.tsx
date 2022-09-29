@@ -862,6 +862,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
         {!isMobile && !isTablet && <SSeparator />}
         <SPhotoContainer>
           <OnboardingProfileImageInput
+            id='avatar-input'
             imageInEditUrl={imageInEdit}
             handleChangeImageInEdit={handleSetProfilePictureInEdit}
           />
@@ -887,6 +888,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
         <ControlsSection>
           {!isMobile && !isTablet && (
             <CheckboxWithALink
+              id='tos-checkbox'
               label={t('detailsSection.agreedToTosCheckbox')}
               linkText={"NewNew's terms"}
               value={agreedToTos}
@@ -895,6 +897,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
             />
           )}
           <SButton
+            id='submit-button'
             view='primaryGrad'
             disabled={Object.values(fieldsValid).some((v) => v === false)}
             style={{

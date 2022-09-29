@@ -213,6 +213,7 @@ export const Desktop: React.FC = React.memo(() => {
               <Link href='/sign-up?to=create'>
                 <a>
                   <Button
+                    id='log-in-to-create'
                     withDim
                     withShrink
                     withShadow
