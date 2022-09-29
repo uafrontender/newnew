@@ -25,3 +25,12 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 import 'cypress-file-upload';
+
+Cypress.Commands.add('getIframeElementOf', (container, element) => {
+  return cy
+    .get(container)
+    .find('iframe')
+    .its('0.contentDocument.body')
+    .find(element)
+    .then(cy.wrap);
+});
