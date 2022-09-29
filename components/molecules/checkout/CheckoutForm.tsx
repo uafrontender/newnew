@@ -135,11 +135,13 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           redirect: 'if_required',
         });
 
-        if (!error) {
-          await handlePayWithCard?.({
-            saveCard,
-          });
+        if (error) {
+          throw error;
         }
+
+        await handlePayWithCard?.({
+          saveCard,
+        });
       }
     } catch (err: any) {
       toast.error(err.message);
@@ -171,7 +173,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   );
 
   return (
-    <SForm onSubmit={submitWithRecaptchaProtection}>
+    <SForm id='checkout-form' onSubmit={submitWithRecaptchaProtection}>
       {/* Payment method */}
       <Text variant='subtitle'>{t('paymentMethodTitle')}</Text>
       {primaryCard && (
@@ -198,6 +200,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         <SPaymentFormWrapper isSingleForm={!primaryCard}>
           {!loggedIn && isStripeReady && (
             <SEmailInput
+              id='email-input'
               value={email}
               isValid={email.length > 0 && !emailError}
               onChange={handleSetEmail}
@@ -207,6 +210,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             />
           )}
           <PaymentElement
+            id='stripePayment'
             onReady={() => setIsStripeReady(true)}
             options={paymentElementOptions}
           />

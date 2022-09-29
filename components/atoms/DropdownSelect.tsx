@@ -16,6 +16,7 @@ export type TDropdownSelectItem<T> = {
 };
 
 interface IDropdownSelect<T> {
+  id?: string;
   label: string;
   selected?: T;
   options: TDropdownSelectItem<T>[];
@@ -28,6 +29,7 @@ interface IDropdownSelect<T> {
 }
 
 const DropdownSelect = <T,>({
+  id,
   label,
   selected,
   options,
@@ -76,6 +78,7 @@ const DropdownSelect = <T,>({
       className={className}
     >
       <SLabelButton
+        id={id}
         disabled={disabled ?? false}
         onClick={() => handleToggle()}
         style={{
@@ -94,6 +97,7 @@ const DropdownSelect = <T,>({
       <AnimatePresence>
         {isOpen ? (
           <SOptionsContainer
+            id={`${id}-options`}
             ref={(el) => {
               optionsContainerRef.current = el!!;
             }}
@@ -274,4 +278,3 @@ const SInlineSVG = styled(InlineSvg)<{
 }>`
   transform: ${({ focused }) => (focused ? 'rotate(180deg)' : 'unset')};
 `;
-

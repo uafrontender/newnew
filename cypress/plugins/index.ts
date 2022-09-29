@@ -22,6 +22,16 @@ module.exports = (on, config) => {
 
   config.env.i18n = i18nGeneralConfig.i18n;
 
+  on('task', {
+    log(message) {
+      console.log(message);
+
+      return null;
+    },
+  });
+
+  require('cypress-terminal-report/src/installLogsPrinter')(on);
+
   // do not forget to return the changed config object!
   return config;
 };
