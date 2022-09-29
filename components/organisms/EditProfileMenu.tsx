@@ -155,6 +155,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
+  const { t: tCommon } = useTranslation('common');
 
   const dispatch = useAppDispatch();
   const { user, ui } = useAppSelector((state) => state);
@@ -516,12 +517,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
       } else {
-        toast.error('toastErrors.generic');
+        toast.error(tCommon('toastErrors.generic'));
       }
     }
   }, [
     setIsLoading,
     handleClose,
+    tCommon,
     dispatch,
     dataInEdit,
     avatarUrlInEdit,
