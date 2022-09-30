@@ -84,7 +84,6 @@ export const DropDown: React.FC<IDropDown> = (props) => {
 
   const mobileViewRef = useRef(null);
 
-  useOnClickEsc(mobileViewRef, handleCloseClick);
   useOnClickOutside(mobileViewRef, () => {
     handleCloseClick();
   });
