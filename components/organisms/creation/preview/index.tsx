@@ -449,6 +449,14 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     };
   }, [post.startsAt, dispatch]);
 
+  // Redirect if post state is empty
+  useEffect(() => {
+    if (!post.title) {
+      router.push('/profile/my-posts');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (isMobile) {
     return (
       <>
