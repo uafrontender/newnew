@@ -117,10 +117,11 @@ const RequestStepContent: React.FC<IRequestStepContent> = ({
   const [phoneNumberError, setPhoneNumberError] = useState<
     string | undefined
   >();
+  const [phoneErrorVisible, setPhoneErrorVisible] = useState(false);
 
   const handlePhoneNumberChanged = useCallback(
     (countryCode: string, phoneNumber: string, errorCode?: number) => {
-      if (errorCode && phoneNumber) {
+      if (phoneNumber && phoneNumber.length > 5 && errorCode) {
         setPhoneNumberError(t(`smsNotifications.phoneError.${errorCode}`));
       } else {
         setPhoneNumberError(undefined);
@@ -131,6 +132,21 @@ const RequestStepContent: React.FC<IRequestStepContent> = ({
     },
     [t]
   );
+
+  useEffect(() => {
+    if (phoneNumberError) {
+      const timer = setTimeout(() => {
+        setPhoneErrorVisible(true);
+      }, 3000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+
+    setPhoneErrorVisible(false);
+    return () => {};
+  }, [phoneNumberError]);
 
   const disabled =
     busy ||
@@ -157,7 +173,7 @@ const RequestStepContent: React.FC<IRequestStepContent> = ({
         onChange={handlePhoneNumberChanged}
       />
       <PhoneErrorText variant={3} tone='error'>
-        {phoneNumberError}
+        {phoneErrorVisible ? phoneNumberError : ''}
       </PhoneErrorText>
       <STosSection>
         <CheckMark
