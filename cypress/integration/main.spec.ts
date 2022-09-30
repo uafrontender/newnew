@@ -239,8 +239,8 @@ context('Main flow', () => {
     });*/
   });
 
-  describe('User', () => {
-    const USER_EMAIL = `test-user-${testSeed}@newnew.co`;
+  describe('Guest', () => {
+    const USER_EMAIL = `test-user-${testSeed}0@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
@@ -267,11 +267,6 @@ context('Main flow', () => {
 
     afterEach(() => {
       storage.save();
-    });
-
-    it('can enter signIn page', () => {
-      cy.get('#log-in').click();
-      cy.url().should('include', '/sign-up');
     });
 
     it('can enter the post page and contribute to an event without prior authentication', () => {
@@ -311,7 +306,7 @@ context('Main flow', () => {
       cy.contains(`${BID_OPTION_AMOUNT}`);
     });
 
-    it('can enter the post page and contribute to a superpoll', () => {
+    it('can enter the another post page and contribute to a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
       cy.url().should('include', '/post');
 
@@ -325,9 +320,102 @@ context('Main flow', () => {
         timeout: 15000,
       }).click();
 
-      cy.get('#support-button-0-supported').click();
+      cy.get('#support-button-supported').click();
     });
   });
 
-  // TODO: cover creator and successful post case
+  describe('User', () => {
+    const USER_EMAIL = `test-user-${testSeed}1@newnew.co`;
+    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_EXPIRY = '1226';
+    const USER_CARD_CVC = '123';
+    const USER_CARD_POSTAL_CODE = '90210';
+
+    // Ignore tutorials
+    const defaultStorage = {
+      userTutorialsProgress:
+        '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
+    };
+    const storage = createStorage(defaultStorage);
+
+    before(() => {
+      cy.clearCookies();
+      cy.clearLocalStorage();
+    });
+
+    beforeEach(() => {
+      storage.restore();
+      Cypress.Cookies.preserveOnce('accessToken');
+      Cypress.Cookies.preserveOnce('refreshToken');
+      cy.visit(Cypress.env('NEXT_PUBLIC_APP_URL'));
+    });
+
+    afterEach(() => {
+      storage.save();
+    });
+
+    it('can enter sign in page', () => {
+      cy.get('#log-in').click();
+      cy.url().should('include', '/sign-up');
+
+      cy.get('#authenticate-input').type(USER_EMAIL);
+      cy.get('#authenticate-form').submit();
+      cy.url().should('include', 'verify-email');
+      cy.contains(USER_EMAIL);
+
+      enterVerificationCode(VERIFICATION_CODE);
+      cy.url().should('eq', `${Cypress.env('NEXT_PUBLIC_APP_URL')}/`, {
+        timeout: 15000,
+      });
+    });
+
+    it('can enter the post page and contribute to an event', () => {
+      const BID_OPTION_TEXT = 'something else';
+      const BID_OPTION_AMOUNT = '15';
+
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${eventId}`);
+      cy.url().should('include', '/post');
+
+      cy.get('#text-input').type(BID_OPTION_TEXT);
+      cy.get('#bid-input').type(BID_OPTION_AMOUNT);
+      cy.get('#submit')
+        .should('be.enabled')
+        .should('not.have.css', 'cursor', 'wait')
+        .click();
+
+      cy.wait(4000);
+
+      enterCardInfo(
+        USER_CARD_NUMBER,
+        USER_CARD_EXPIRY,
+        USER_CARD_CVC,
+        USER_CARD_POSTAL_CODE
+      );
+
+      cy.get('#pay').click();
+      cy.get('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
+
+      cy.contains(BID_OPTION_TEXT);
+      cy.contains(`${BID_OPTION_AMOUNT}`);
+    });
+
+    it('can enter the another post page and contribute to a superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
+      cy.url().should('include', '/post');
+
+      cy.get('#support-button-1').click();
+      cy.get('#vote-option-1').click();
+      cy.get('#confirm-vote').click();
+
+      cy.get('#pay').click();
+
+      cy.get('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
+
+      cy.get('#support-button-supported').click();
+    });
+  });
 });
