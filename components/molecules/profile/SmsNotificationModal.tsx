@@ -257,6 +257,7 @@ const Content = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     width: min-content;
+    min-width: 500px;
     padding: 40px 96px;
   }
 `;
