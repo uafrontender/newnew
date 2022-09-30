@@ -1,8 +1,6 @@
-const VERIFICATION_CODE = '111111';
-
-function enterVerificationCode() {
+function enterVerificationCode(verificationCode: string) {
   cy.get('#verification-input').invoke('click');
-  VERIFICATION_CODE.split('').forEach((symbol) => {
+  verificationCode.split('').forEach((symbol) => {
     cy.wait(200);
     cy.focused().type(symbol);
   });

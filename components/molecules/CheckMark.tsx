@@ -54,6 +54,7 @@ const CheckMark: React.FC<ICheckMark> = (props) => {
     >
       <SAnimation>
         <SCheckmark
+          id={id}
           selected={selected ?? false}
           disabled={disabled}
           variant={variant}

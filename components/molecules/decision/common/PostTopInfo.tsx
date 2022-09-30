@@ -472,9 +472,6 @@ const SPostTitle = styled(Headline)`
   grid-area: title;
   white-space: pre-wrap;
 
-  display: flex;
-  align-items: center;
-
   margin-top: 8px;
   margin-bottom: 12px;
 
