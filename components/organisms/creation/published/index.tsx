@@ -69,16 +69,9 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     return 'Bid';
   }, [postData]);
 
-  interface IItemButtonAttrs extends NamedNodeMap {
-    type?: {
-      value: string;
-    };
-  }
-
   const socialBtnClickHandler = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      const attr: IItemButtonAttrs = (e.target as HTMLDivElement).attributes;
-      const val = attr.type?.value;
+    (buttonType: string) => {
+      const val = buttonType;
       if (val === 'copy' && postData) {
         let url;
         if (window) {
@@ -185,11 +178,17 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
 
   const renderItem = (item: any) => (
     <SItem key={item.key} type={item.key}>
-      <SItemButton type={item.key} onClick={socialBtnClickHandler}>
+      <SItemButton
+        buttonType={item.key}
+        onClick={() => socialBtnClickHandler(item.key)}
+      >
         <InlineSVG
           svg={SOCIAL_ICONS[item.key] as string}
           width='25px'
           height='25px'
+          onClick={() => {
+            socialBtnClickHandler(item.key);
+          }}
         />
       </SItemButton>
       <SItemTitle
@@ -214,6 +213,14 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     return () => {
       router.beforePopState(() => true);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Redirect if post state is empty
+  useEffect(() => {
+    if (!post.title) {
+      router.push('/profile/my-posts');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -390,7 +397,7 @@ const SItem = styled.div<{
 `;
 
 interface ISItemButton {
-  type: 'facebook' | 'twitter' | 'instagram' | 'tiktok' | 'copy';
+  buttonType: 'facebook' | 'twitter' | 'instagram' | 'tiktok' | 'copy';
 }
 
 const SItemButton = styled.div<ISItemButton>`
@@ -402,7 +409,16 @@ const SItemButton = styled.div<ISItemButton>`
   align-items: center;
   border-radius: 16px;
   justify-content: center;
-  background: ${(props) => props.theme.colorsThemed.social[props.type].main};
+  background: ${(props) =>
+    props.theme.colorsThemed.social[props.buttonType].main};
+
+  border: transparent;
+  cursor: pointer;
+
+  &:hover:enabled,
+  &:focus:enabled {
+    outline: none;
+  }
 `;
 
 const SItemTitle = styled(Caption)<{
