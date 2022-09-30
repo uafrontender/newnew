@@ -254,8 +254,6 @@ context('Main flow', () => {
     const storage = createStorage(defaultStorage);
 
     before(() => {
-      // Let all posts finish processing
-      cy.wait(30000);
       cy.clearCookies();
       cy.clearLocalStorage();
     });
@@ -279,7 +277,8 @@ context('Main flow', () => {
     it('can enter the post page and contribute to an event without prior authentication', () => {
       const BID_OPTION_TEXT = 'something';
       const BID_OPTION_AMOUNT = '10';
-
+      // Let post finish processing
+      cy.wait(40000);
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${eventId}`);
       cy.url().should('include', '/post');
 
