@@ -418,4 +418,75 @@ context('Main flow', () => {
       cy.get('#support-button-supported').click();
     });
   });
+
+  describe('User which adds a card in the settings', () => {
+    const USER_EMAIL = `test-user-${testSeed}2@newnew.co`;
+    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_EXPIRY = '1226';
+    const USER_CARD_CVC = '123';
+    const USER_CARD_POSTAL_CODE = '90210';
+
+    // Ignore tutorials
+    const defaultStorage = {
+      userTutorialsProgress:
+        '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
+    };
+    const storage = createStorage(defaultStorage);
+
+    before(() => {
+      cy.clearCookies();
+      cy.clearLocalStorage();
+    });
+
+    beforeEach(() => {
+      storage.restore();
+      Cypress.Cookies.preserveOnce('accessToken');
+      Cypress.Cookies.preserveOnce('refreshToken');
+      cy.visit(Cypress.env('NEXT_PUBLIC_APP_URL'));
+    });
+
+    afterEach(() => {
+      storage.save();
+    });
+
+    it('can enter sign in page', () => {
+      cy.get('#log-in').click();
+      cy.url().should('include', '/sign-up');
+
+      cy.get('#authenticate-input').type(USER_EMAIL);
+      cy.get('#authenticate-form').submit();
+      cy.url().should('include', 'verify-email');
+      cy.contains(USER_EMAIL);
+
+      enterVerificationCode(VERIFICATION_CODE);
+      cy.url().should('eq', `${Cypress.env('NEXT_PUBLIC_APP_URL')}/`, {
+        timeout: 15000,
+      });
+    });
+
+    it('can enter settings', () => {
+      // TODO: add test
+    });
+
+    it('can add a card', () => {
+      // TODO: add test
+    });
+
+    it('can enter a post page and contribute to a superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
+      cy.url().should('include', '/post');
+
+      cy.get('#support-button-3').click();
+      cy.get('#vote-option-3').click();
+      cy.get('#confirm-vote').click();
+
+      cy.get('#pay').click();
+
+      cy.get('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
+
+      cy.get('#support-button-supported').click();
+    });
+  });
 });
