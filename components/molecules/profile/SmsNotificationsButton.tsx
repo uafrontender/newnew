@@ -324,7 +324,11 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
                 ? NotificationsIconFilled
                 : NotificationsIconOutlined
             }
-            fill={theme.colorsThemed.text.primary}
+            fill={
+              subscribedToSmsNotifications
+                ? theme.colors.white
+                : theme.colorsThemed.text.primary
+            }
             width='24px'
             height='24px'
           />
@@ -340,7 +344,11 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
                 ? NotificationsIconFilled
                 : NotificationsIconOutlined
             }
-            fill={theme.colorsThemed.text.primary}
+            fill={
+              subscribedToSmsNotifications
+                ? theme.colors.white
+                : theme.colorsThemed.text.primary
+            }
             width='24px'
             height='24px'
           />
@@ -377,6 +385,8 @@ const SIconButton = styled.div<{
 
   user-select: none;
   transition: background 0.2s linear;
+  color: ${({ theme, active }) =>
+    active ? theme.colors.white : theme.colorsThemed.text.primary};
   background: ${({ theme, active }) =>
     active
       ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;'
@@ -391,5 +401,4 @@ const SIconButtonWithText = styled(SIconButton)`
   font-weight: 700;
   font-size: 14px;
   line-height: 24px;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
 `;
