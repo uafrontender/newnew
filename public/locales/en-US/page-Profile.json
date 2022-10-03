@@ -209,7 +209,7 @@
       "personalInformation": {
         "title": "Personal information",
         "emailInput": {
-          "label": "Email Address",
+          "label": "Email address",
           "placeholder": "email@email.com",
           "errors": {
             "invalidEmail": "Please enter a valid email address",

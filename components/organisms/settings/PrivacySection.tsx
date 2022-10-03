@@ -84,7 +84,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
         )}
         {blockedUsers &&
           blockedUsers.map((u) => (
-            <SBlockedUserCard>
+            <SBlockedUserCard key={u.uuid}>
               <SAvatar>
                 <img alt={u.username} src={u.avatarUrl} />
               </SAvatar>
