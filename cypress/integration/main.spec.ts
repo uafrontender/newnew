@@ -384,7 +384,6 @@ context('Main flow', () => {
         .click();
 
       cy.wait(4000);
-
       enterCardInfo(
         USER_CARD_NUMBER,
         USER_CARD_EXPIRY,
@@ -419,7 +418,7 @@ context('Main flow', () => {
     });
   });
 
-  describe('User which adds a card in the settings', () => {
+  describe('User with card added in settings', () => {
     const USER_EMAIL = `test-user-${testSeed}2@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
@@ -465,19 +464,35 @@ context('Main flow', () => {
     });
 
     it('can enter settings', () => {
-      // TODO: add test
+      cy.get('#profile-link').click();
+      cy.url().should('include', 'profile');
+      cy.get('#settings-button').click();
+      cy.url().should('include', 'profile/settings');
     });
 
     it('can add a card', () => {
-      // TODO: add test
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/profile/settings`);
+      cy.get('#cards').click();
+      cy.get('#add-new-card').click();
+
+      cy.wait(4000);
+      enterCardInfo(
+        USER_CARD_NUMBER,
+        USER_CARD_EXPIRY,
+        USER_CARD_CVC,
+        USER_CARD_POSTAL_CODE
+      );
+
+      cy.get('#submit-card').click();
+      cy.get('#add-card-success').click();
     });
 
     it('can enter a post page and contribute to a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
       cy.url().should('include', '/post');
 
-      cy.get('#support-button-3').click();
-      cy.get('#vote-option-3').click();
+      cy.get('#support-button-2').click();
+      cy.get('#vote-option-2').click();
       cy.get('#confirm-vote').click();
 
       cy.get('#pay').click();

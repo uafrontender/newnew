@@ -96,6 +96,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
   return (
     <form onSubmit={submitWithRecaptchaProtection}>
       <PaymentElement
+        id='stripePayment'
         onReady={() => {
           setIsStripeReady(true);
         }}
@@ -128,6 +129,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
             {tCommon('button.cancel')}
           </SCancelButton>
           <SAddButton
+            id='submit-card'
             view='primary'
             disabled={!stripe || isSubmitting}
             type='submit'

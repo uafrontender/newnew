@@ -175,7 +175,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
             </SLoader>
           )}
           {!isProcessing && (
-            <SButton view='primary' onClick={closeModal}>
+            <SButton id='add-card-success' view='primary' onClick={closeModal}>
               {tCommon('gotIt')}
             </SButton>
           )}
