@@ -55,6 +55,10 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
       redirect: 'if_required',
     });
 
+    if (error && error.type === 'card_error') {
+      throw new Error(error.message);
+    }
+
     if (!error) {
       onSuccess(setupIntent);
     }

@@ -144,8 +144,10 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         });
       }
     } catch (err: any) {
-      toast.error(err.message);
-      console.error(err);
+      if ((err.type && err.type === 'card_error') || !err.type) {
+        toast.error(err.message);
+      }
+      console.error(err, 'err');
     }
   };
 
