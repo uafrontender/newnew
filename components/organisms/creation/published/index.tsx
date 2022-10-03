@@ -441,6 +441,7 @@ const SPostTitleText = styled(Text)`
   margin-left: auto;
   margin-right: auto;
   white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SCaption = styled(Caption)`

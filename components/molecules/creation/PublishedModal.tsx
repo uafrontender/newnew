@@ -406,6 +406,7 @@ const SUserTitle = styled(Text)`
   overflow: hidden;
   position: relative;
   padding-left: 12px;
+  word-break: break-word;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 `;
@@ -421,6 +422,7 @@ const SPostTitleText = styled(Text)`
   margin-left: auto;
   margin-right: auto;
   white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SCaption = styled(Caption)`
