@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "title": "Email verification",
+    "description": "Verify email"
+  },
+  "header": {
+    "title": "NewNew Packs",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elitLorem ipsum dolor sit amet, consectetur adipiscing elit"
+  },
+  "packs": {
+    "title": "Your current packs",
+    "votesLeft": "{{amount}} votes left",
+    "chatAccessLeft": "{{amount}} month chat access",
+    "customOptionLeft": "{{amount}} month custom superpoll option"
+  },
+  "search": {
+    "title": "Search creators",
+    "searchInputPlaceholder": "Search creators",
+    "resultsTitle": "Top Creators",
+    "votesLeft": "{{amount}} votes",
+    "buy": "Buy Pack"
+  },
+  "button": {
+    "back": "Back"
+  }
+}
