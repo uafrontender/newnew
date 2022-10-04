@@ -10,8 +10,7 @@
   "packs": {
     "title": "Your current packs",
     "votesLeft": "{{amount}} votes left",
-    "chatAccessLeft": "{{amount}} month chat access",
-    "customOptionLeft": "{{amount}} month custom superpoll option"
+    "chatAccessLeft": "{{amount}} month chat access"
   },
   "search": {
     "title": "Search creators",
