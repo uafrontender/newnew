@@ -39,7 +39,6 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   );
 
   const videosLength = useMemo(() => videos.length, [videos.length]);
-  // const lengthMemo = useRef<number>(videosLength);
   const containerRef = useRef<HTMLDivElement>();
   const [currentVideo, setCurrentVideo] = useState(0);
 
@@ -125,6 +124,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
         ))}
       </SContainer>
       <SDotsContainer
+        isEditingStories={isEditingStories}
         style={{
           ...(dotsBottom
             ? {
@@ -256,18 +256,26 @@ const SScrollRight = styled(Button)`
   }
 `;
 
-const SDotsContainer = styled.div`
+const SDotsContainer = styled.div<{
+  isEditingStories?: boolean;
+}>`
   position: absolute;
 
   width: 100%;
-  bottom: 80px;
+  bottom: ${({ isEditingStories }) => (isEditingStories ? '56px' : '86px')};
 
   display: flex;
   justify-content: center;
   gap: 4px;
 
+  transition: 0.1s linear;
+
   ${({ theme }) => theme.media.tablet} {
     bottom: 45px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    bottom: ${({ isEditingStories }) => (isEditingStories ? '56px' : '86px')};
   }
 `;
 

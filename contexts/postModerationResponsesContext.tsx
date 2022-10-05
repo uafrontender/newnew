@@ -38,8 +38,8 @@ interface IPostModerationResponsesContext {
   handleUploadVideoProcessed: () => Promise<void>;
   handleUploadVideoNotProcessed: () => Promise<void>;
   // Additional responses
-  currentStep: 'regular' | 'editing';
-  handleSetCurrentStep: (step: 'regular' | 'editing') => void;
+  currentAdditionalResponseStep: 'regular' | 'editing';
+  handleSetCurrentAdditionalResponseStep: (step: 'regular' | 'editing') => void;
   additionalResponses: newnewapi.IVideoUrls[];
   additionalResponseUploading: boolean;
   readyToUploadAdditionalResponse: boolean;
@@ -79,8 +79,8 @@ const PostModerationResponsesContext =
     handleUploadVideoProcessed: (() => {}) as () => Promise<void>,
     handleUploadVideoNotProcessed: (() => {}) as () => Promise<void>,
     // Additional responses
-    currentStep: 'regular',
-    handleSetCurrentStep: (step: 'regular' | 'editing') => {},
+    currentAdditionalResponseStep: 'regular',
+    handleSetCurrentAdditionalResponseStep: (step: 'regular' | 'editing') => {},
     additionalResponses: [],
     additionalResponseUploading: false,
     readyToUploadAdditionalResponse: false,
@@ -147,13 +147,15 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   );
 
   // Additional responses
-  const [currentStep, setCurrentStep] = useState<'regular' | 'editing'>(
-    'regular'
-  );
+  const [currentAdditionalResponseStep, setCurrentAdditionalResponseStep] =
+    useState<'regular' | 'editing'>('regular');
 
-  const handleSetCurrentStep = useCallback((step: 'regular' | 'editing') => {
-    setCurrentStep(step);
-  }, []);
+  const handleSetCurrentAdditionalResponseStep = useCallback(
+    (step: 'regular' | 'editing') => {
+      setCurrentAdditionalResponseStep(step);
+    },
+    []
+  );
 
   const [additionalResponses, setAdditionalResponses] = useState<
     newnewapi.IVideoUrls[]
@@ -518,7 +520,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
           setResponseFileProcessingLoading(false);
           setResponseFileProcessingProgress(0);
 
-          setCurrentStep('regular');
+          setCurrentAdditionalResponseStep('regular');
         } else {
           throw new Error('No additional videoUrls in the response');
         }
@@ -658,8 +660,8 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       coreResponse,
       coreResponseUploading,
       // Additional responses
-      currentStep,
-      handleSetCurrentStep,
+      currentAdditionalResponseStep,
+      handleSetCurrentAdditionalResponseStep,
       additionalResponses,
       additionalResponseUploading,
       readyToUploadAdditionalResponse,
@@ -690,8 +692,8 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       handleChangeTab,
       coreResponse,
       coreResponseUploading,
-      currentStep,
-      handleSetCurrentStep,
+      currentAdditionalResponseStep,
+      handleSetCurrentAdditionalResponseStep,
       additionalResponses,
       additionalResponseUploading,
       readyToUploadAdditionalResponse,

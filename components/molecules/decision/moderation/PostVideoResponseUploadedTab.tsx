@@ -56,8 +56,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   const {
     coreResponse,
     additionalResponses,
-    currentStep,
-    handleSetCurrentStep,
+    currentAdditionalResponseStep,
+    handleSetCurrentAdditionalResponseStep,
     videoProcessing,
     responseFileUploadETA,
     responseFileUploadError,
@@ -129,11 +129,11 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   const handleDeleteUnuploadedAdditonalResponse = useCallback(async () => {
     try {
       await handleVideoDelete();
-      handleSetCurrentStep('regular');
+      handleSetCurrentAdditionalResponseStep('regular');
     } catch (err) {
       console.error(err);
     }
-  }, [handleSetCurrentStep, handleVideoDelete]);
+  }, [handleSetCurrentAdditionalResponseStep, handleVideoDelete]);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -161,7 +161,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
         } else {
           setLocalFile(file);
           handleItemChange(id, file);
-          handleSetCurrentStep('editing');
+          handleSetCurrentAdditionalResponseStep('editing');
         }
       }
     },
@@ -171,7 +171,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       t,
       handleItemChange,
       id,
-      handleSetCurrentStep,
+      handleSetCurrentAdditionalResponseStep,
     ]
   );
   const handleRetryVideoUpload = useCallback(() => {
@@ -205,7 +205,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       handleSetUploadingAdditionalResponse(false);
       handleSetReadyToUploadAdditionalResponse(false);
       handleResetVideoUploadAndProcessingState();
-      handleSetCurrentStep('regular');
+      handleSetCurrentAdditionalResponseStep('regular');
     } catch (err) {
       console.error(err);
     }
@@ -217,10 +217,10 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     handleSetUploadingAdditionalResponse,
     handleSetReadyToUploadAdditionalResponse,
     handleResetVideoUploadAndProcessingState,
-    handleSetCurrentStep,
+    handleSetCurrentAdditionalResponseStep,
   ]);
 
-  const renderUploading = useCallback(() => {
+  const renderUploadingState = useCallback(() => {
     let content;
 
     if (responseFileUploadLoading) {
@@ -302,11 +302,11 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
     return content;
   }, [
+    t,
     responseFileUploadLoading,
     responseFileUploadError,
     responseFileProcessingError,
     responseFileProcessingLoading,
-    t,
     responseFileUploadETA,
     responseFileUploadProgress,
     handleCancelVideoUpload,
@@ -339,7 +339,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
           }
         />
       ) : (
-        renderUploading()
+        renderUploadingState()
       )}
       <SInput
         id='file'
@@ -352,7 +352,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
           handleFileChange(e);
         }}
       />
-      {currentStep === 'regular' ? (
+      {currentAdditionalResponseStep === 'regular' ? (
         <SUploadVideoButton onClick={() => handleUploadButtonClick()}>
           {t('postVideo.addVideoButton')}
         </SUploadVideoButton>
@@ -367,7 +367,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
           handleClick={handleToggleEditingStories}
         />
       ) : null}
-      {currentStep === 'editing' && responseFileProcessingProgress === 100 ? (
+      {currentAdditionalResponseStep === 'editing' &&
+      responseFileProcessingProgress === 100 ? (
         <SUploadVideoButton onClick={() => handleUploadButtonClick()}>
           {t('postVideo.reuploadButton')}
         </SUploadVideoButton>

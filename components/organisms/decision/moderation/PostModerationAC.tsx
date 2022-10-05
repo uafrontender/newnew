@@ -35,7 +35,6 @@ import PostResponseTabModeration from '../../../molecules/decision/moderation/Po
 
 import switchPostType from '../../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../../api/endpoints/post';
-import switchPostStatus from '../../../../utils/switchPostStatus';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
@@ -120,15 +119,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       }
     };
 
-    // Response upload
-    const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<
-      newnewapi.IVideoUrls | undefined
-    >(undefined);
-
     // Tabs
     const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
       post.response ||
-        responseFreshlyUploaded ||
         postStatus === 'waiting_for_response' ||
         postStatus === 'processing_response'
         ? 'response'
@@ -318,9 +311,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           setNumberOfOptions(res.data.auction.optionCount as number);
           if (res.data.auction.status)
             handleUpdatePostStatus(res.data.auction.status);
-          if (!responseFreshlyUploaded && res.data.auction?.response) {
-            setResponseFreshlyUploaded(res.data.auction.response);
-          }
           setAnnouncement(res.data.auction?.announcement);
         }
       } catch (err) {
@@ -453,10 +443,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         if (decodedParsed.postUuid === post.postUuid) {
           setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents ?? 0);
           setNumberOfOptions(decoded.post?.auction?.optionCount ?? 0);
-
-          if (!responseFreshlyUploaded && decoded.post?.auction?.response) {
-            setResponseFreshlyUploaded(decoded.post.auction.response);
-          }
         }
       };
 
@@ -467,22 +453,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         if (!decoded) return;
         if (decoded.postUuid === post.postUuid && decoded.auction) {
           handleUpdatePostStatus(decoded.auction);
-
-          if (
-            !responseFreshlyUploaded &&
-            postStatus === 'processing_response' &&
-            switchPostStatus('ac', decoded.auction) === 'succeeded'
-          ) {
-            const fetchPostPayload = new newnewapi.GetPostRequest({
-              postUuid: post.postUuid,
-            });
-
-            const res = await fetchPostByUUID(fetchPostPayload);
-
-            if (res.data?.auction?.response) {
-              setResponseFreshlyUploaded(res.data?.auction?.response);
-            }
-          }
         }
       };
 

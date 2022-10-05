@@ -136,9 +136,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   );
 
   // Show controls on shorter screens
-  const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] = useState<
-    number | undefined
-  >(24);
+  const [bottomOffset, setBottomOffset] = useState<number | undefined>(24);
 
   const isSetThumbnailButtonIconOnly = useMemo(
     () =>
@@ -198,7 +196,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       if (rect && videoRect) {
         const delta = window.innerHeight - videoRect.bottom;
         if (delta < 0) {
-          setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+          setBottomOffset(Math.abs(delta) + 24);
         }
       }
     };
@@ -215,7 +213,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
         if (!isInViewPort) {
           const delta = window.innerHeight - rect.bottom;
-          setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+          setBottomOffset(Math.abs(delta) + 24);
         }
       }
 
@@ -225,7 +223,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     }
 
     return () => {
-      setSoundBtnBottomOverriden(undefined);
+      setBottomOffset(undefined);
 
       if (isBrowser() && !isMobileOrTablet) {
         document
@@ -245,7 +243,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             isMuted={isMuted}
             isSetThumbnailButtonIconOnly={isSetThumbnailButtonIconOnly}
             ellipseButtonRef={ellipseButtonRef}
-            soundBtnBottomOverriden={soundBtnBottomOverriden}
+            soundBtnBottomOverriden={bottomOffset}
             handleOpenEllipseMenu={handleOpenEllipseMenu}
             handleToggleMuted={handleToggleMuted}
           />
@@ -254,7 +252,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             id='video'
             isMuted={isMuted}
             isEditingStories={isEditingStories}
-            soundBtnBottomOverriden={soundBtnBottomOverriden}
+            soundBtnBottomOverriden={bottomOffset}
             handleToggleMuted={handleToggleMuted}
             handleToggleEditingStories={handleToggleEditingStories}
           />
@@ -275,7 +273,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             <PostVideoSoundButton
               postId={postId}
               isMuted={isMuted}
-              soundBtnBottomOverriden={soundBtnBottomOverriden}
+              soundBtnBottomOverriden={bottomOffset}
               handleToggleMuted={handleToggleMuted}
             />
           </>
@@ -293,9 +291,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           <SlidingToggleVideoWidget
             disabled={responseFileUploadLoading || responseFileUploadLoading}
             wrapperCSS={{
-              ...(soundBtnBottomOverriden
+              ...(bottomOffset
                 ? {
-                    bottom: soundBtnBottomOverriden + 8,
+                    bottom: bottomOffset + 8,
                   }
                 : {}),
             }}

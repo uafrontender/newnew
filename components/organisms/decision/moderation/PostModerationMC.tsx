@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
@@ -22,9 +21,6 @@ import {
   fetchCurrentOptionsForMCPost,
   getMcOption,
 } from '../../../../api/endpoints/multiple_choice';
-import switchPostStatus, {
-  TPostStatusStringified,
-} from '../../../../utils/switchPostStatus';
 import switchPostType from '../../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import { SocketContext } from '../../../../contexts/socketContext';
@@ -45,7 +41,6 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 import PostModerationResponsesContextProvider from '../../../../contexts/postModerationResponsesContext';
 
-const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const HeroPopup = dynamic(
   () => import('../../../molecules/decision/common/HeroPopup')
@@ -132,8 +127,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       []
     );
 
-    const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-
     // Total votes
     const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
 
@@ -146,6 +139,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       string | undefined | null
     >('');
     const [optionsLoading, setOptionsLoading] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
     // Winning option
@@ -452,22 +446,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         if (!decoded) return;
         if (decoded.postUuid === post.postUuid && decoded.multipleChoice) {
           handleUpdatePostStatus(decoded.multipleChoice);
-
-          if (
-            // !responseFreshlyUploaded &&
-            postStatus === 'processing_response' &&
-            switchPostStatus('mc', decoded.multipleChoice) === 'succeeded'
-          ) {
-            const fetchPostPayload = new newnewapi.GetPostRequest({
-              postUuid: post.postUuid,
-            });
-
-            const res = await fetchPostByUUID(fetchPostPayload);
-
-            // if (res.data?.multipleChoice?.response) {
-            //   setResponseFreshlyUploaded(res.data?.multipleChoice?.response);
-            // }
-          }
         }
       };
 
@@ -663,11 +641,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
                 />
               )}
             </SActivitesContainer>
-            {/* Loading Modal */}
-            {loadingModalOpen && (
-              <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
-            )}
-
             {isPopupVisible && (
               <HeroPopup
                 isPopupVisible={isPopupVisible}

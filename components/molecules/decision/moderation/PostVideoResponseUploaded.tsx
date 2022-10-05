@@ -34,7 +34,13 @@ const PostVideoResponseUploaded: React.FunctionComponent<
   handleDeleteUnuploadedAdditonalResponse,
 }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isTablet = ['tablet'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   const { postParsed } = usePostModalInnerState();
   const {
@@ -64,21 +70,15 @@ const PostVideoResponseUploaded: React.FunctionComponent<
 
   return (
     <>
-      {/* {!additionalResponses || additionalResponses.length === 0 ? ( */}
       {responses && responses.length > 1 ? (
         <PostVideoResponsesSlider
           videos={responses as newnewapi.IVideoUrls[]}
           isMuted={isMuted}
           isEditingStories={isEditingStories}
-          {...(soundBtnBottomOverriden
+          {...(soundBtnBottomOverriden && !isMobileOrTablet
             ? {
                 dotsBottom:
                   soundBtnBottomOverriden + (!isEditingStories ? 72 : 24),
-              }
-            : {})}
-          {...(isTablet && !soundBtnBottomOverriden
-            ? {
-                dotsBottom: !isEditingStories ? 112 : 0,
               }
             : {})}
           handleDeleteAdditionalVideo={handleDeleteAdditionalResponse}

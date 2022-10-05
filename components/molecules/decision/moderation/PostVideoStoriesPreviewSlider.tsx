@@ -3,9 +3,11 @@ import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import PostVideoThumbnailItem from './PostVideoThumbnailItem';
 import isBrowser from '../../../../utils/isBrowser';
+import { useAppSelector } from '../../../../redux-store/store';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
+
+import PostVideoThumbnailItem from './PostVideoThumbnailItem';
 
 interface IPostVideoStoriesPreviewSlider {
   videos: newnewapi.IVideoUrls[];
@@ -27,6 +29,15 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
   handleDeleteAdditionalVideo,
   handleDeleteUnuploadedAdditonalResponse,
 }) => {
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
   const { readyToUploadAdditionalResponse } =
     usePostModerationResponsesContext();
 
@@ -47,9 +58,9 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
   return (
     <SWrapper
       style={{
-        ...(offsetBottom
+        ...(offsetBottom && !isMobileOrTablet
           ? {
-              bottom: offsetBottom + 64,
+              bottom: offsetBottom + 48,
             }
           : {}),
       }}
@@ -100,7 +111,7 @@ const SWrapper = styled.div`
   ${({ theme }) => theme.media.tablet} {
     height: 84px;
 
-    bottom: 56px;
+    bottom: 64px;
   }
 
   ${({ theme }) => theme.media.laptop} {
