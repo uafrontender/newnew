@@ -161,7 +161,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
             setWinningOption(res.data.option as newnewapi.Auction.Option);
           }
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       }
 
@@ -177,6 +177,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
             postId={post.postUuid}
             announcement={post.announcement!!}
             response={post.response ?? undefined}
+            additionalResponses={post.additionalResponses}
             responseViewed={responseViewed}
             openedTab={videoTab}
             setOpenedTab={(tab) => setVideoTab(tab)}

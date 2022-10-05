@@ -127,7 +127,8 @@
       "backToOriginalVideo": "Back to original",
       "backToResponse": "Watch response"
     },
-    "reuploadButton": "re-upload",
+    "reuploadButton": "Re-upload",
+    "addVideoButton": "Add video",
     "cannotLeavePageMsg": "Are you sure you want to close this page? Upload progress will be lost",
     "floatingUploadResponseButton": "Make a response video",
     "setThumbnail": "Set a thumbnail",
@@ -210,6 +211,14 @@
   "deletePostModal": {
     "title": "Delete {{postType}}",
     "body": "Are you sure you want to delete this {{postType}}? You won't be able to restore it once it's deleted...",
+    "button": {
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
+  },
+  "deleteVideoModal": {
+    "title": "Delete video",
+    "body": "Are you sure you want to delete this video?",
     "button": {
       "cancel": "Cancel",
       "confirm": "Delete"
