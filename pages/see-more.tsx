@@ -27,7 +27,7 @@ import {
 import { APIResponse } from '../api/apiConfigs';
 import { fetchLiveAuctions } from '../api/endpoints/auction';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
-import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
+// import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import switchPostType from '../utils/switchPostType';
 import assets from '../constants/assets';
 import { Mixpanel } from '../utils/mixpanel';
@@ -37,7 +37,7 @@ const TopSection = dynamic(
   () => import('../components/organisms/home/TopSection')
 );
 
-export type TCollectionType = 'ac' | 'mc' | 'cf' | 'biggest' | 'for-you';
+export type TCollectionType = 'ac' | 'mc' /* | 'cf' */ | 'biggest' | 'for-you';
 export type TSortingType = 'all' | 'num_bids' | 'newest';
 
 interface ISearch {
@@ -188,7 +188,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
           throw new Error('Request failed');
         }
 
-        if (categoryToFetch === 'cf') {
+        /* if (categoryToFetch === 'cf') {
           const cfPayload = new newnewapi.PagedCrowdfundingsRequest({
             ...(pageToken
               ? {
@@ -220,7 +220,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
             return;
           }
           throw new Error('Request failed');
-        }
+        } */
 
         if (categoryToFetch === 'biggest') {
           const biggestPayload = new newnewapi.PagedRequest({

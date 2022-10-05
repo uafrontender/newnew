@@ -244,9 +244,9 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
         case newnewapi.Post.Filter.MULTIPLE_CHOICES:
           routerArr.push('mc');
           break;
-        case newnewapi.Post.Filter.CROWDFUNDINGS:
-          routerArr.push('cf');
-          break;
+        // case newnewapi.Post.Filter.CROWDFUNDINGS:
+        //   routerArr.push('cf');
+        //   break;
       }
     });
 
@@ -275,11 +275,11 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
         id: 'multipleChoice',
         title: tCommon('postType.mc'),
       },
-      {
-        type: newnewapi.Post.Filter.CROWDFUNDINGS,
-        id: 'crowdfunding',
-        title: tCommon('postType.cf'),
-      },
+      // {
+      //   type: newnewapi.Post.Filter.CROWDFUNDINGS,
+      //   id: 'crowdfunding',
+      //   title: tCommon('postType.cf'),
+      // },
     ],
     [tCommon]
   );
