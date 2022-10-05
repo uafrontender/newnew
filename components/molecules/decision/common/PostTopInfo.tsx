@@ -471,6 +471,7 @@ const SWrapper = styled.div<{
 const SPostTitle = styled(Headline)`
   grid-area: title;
   white-space: pre-wrap;
+  word-break: break-word;
 
   margin-top: 8px;
   margin-bottom: 12px;

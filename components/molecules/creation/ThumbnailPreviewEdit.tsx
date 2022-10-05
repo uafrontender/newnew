@@ -414,6 +414,7 @@ const SDescription = styled.div`
   margin-top: 24px;
   text-align: center;
   white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SText = styled.span`
