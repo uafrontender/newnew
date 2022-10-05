@@ -186,8 +186,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
                 item={item}
                 shouldStop={postOverlayOpen}
                 index={tutorialCard !== undefined ? index + 1 : index}
-                width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
-                height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
+                width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
+                height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
+                maxWidthTablet='224px'
               />
             </SItemWrapper>
           </React.Fragment>
@@ -206,8 +207,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             item={item}
             shouldStop={postOverlayOpen}
             index={tutorialCard !== undefined ? index + 1 : index}
-            width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
-            height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
+            width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
+            height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
+            maxWidthTablet='224px'
           />
         </SItemWrapper>
       );
@@ -331,7 +333,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
               </SItemWrapper>
             ) : null}
           </SListWrapper>
-          {!isMobile && (
+          {!isMobile && !isTablet && (
             <>
               {!isDragging && canScrollLeft && (
                 <ScrollArrowPermanent
@@ -396,18 +398,18 @@ const SWrapper = styled.div<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 32px 0;
-
-    margin: 0 auto;
-    max-width: 696px;
+    padding: 52px 0 50px;
+    margin: 0 -32px;
   }
 
   ${(props) => props.theme.media.laptop} {
     padding: 60px 0;
+    margin: 0;
   }
 
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
+    margin: 0 auto;
   }
 `;
 
@@ -433,10 +435,10 @@ const SListWrapper = styled.div`
   -ms-overflow-style: none;
 
   ${(props) => props.theme.media.tablet} {
-    left: 32px;
     /* padding: 24px 24px 0 24px; */
     /* padding: 32px 56px 0 64px; */
-    width: calc(100% - 64px);
+    padding: 24px 32px 0;
+    left: -8px;
 
     flex-direction: row;
   }
@@ -482,8 +484,7 @@ const STopWrapper = styled.div`
   justify-content: space-between;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 0px 32px;
-    margin-bottom: 16px;
+    padding: 0 32px;
   }
 
   ${(props) => props.theme.media.laptop} {

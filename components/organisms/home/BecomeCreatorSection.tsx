@@ -77,11 +77,9 @@ const SContainer = styled.section`
   align-items: center;
   width: calc(100% + 96 * 2);
   padding: 22px 0;
-  margin: 0 -16px;
+  margin: 20px -16px 0;
 
   overflow: hidden;
-  margin-top: 20px;
-
   background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
 
   &:before {
@@ -99,6 +97,11 @@ const SContainer = styled.section`
       #1d6aff;
   }
 
+  ${({ theme }) => theme.media.tablet} {
+    margin: 55px -32px 0;
+    padding: 35px 0;
+  }
+
   ${({ theme }) => theme.media.laptop} {
     margin-bottom: 34px;
     margin-top: 11px;
@@ -112,6 +115,12 @@ const SHeadline = styled(Headline)`
   z-index: 1;
   font-size: 20px;
   line-height: 28px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 16px;
+    font-size: 28px;
+    line-height: 36px;
+  }
 
   ${({ theme }) => theme.media.laptop} {
     margin-bottom: 24px;
@@ -136,7 +145,11 @@ const SImageLeftTop = styled(FloatingImage)`
   height: 31px;
   left: 0;
   top: 0;
-  transform: translate(-53%, -33%) rotate(151deg);
+  46 ${({ theme }) => theme.media.tablet} {
+    width: 44px;
+    height: 44px;
+    transform: translate(-49%, -47%) rotate(151deg);
+  }
 
   ${({ theme }) => theme.media.laptop} {
     width: 91px;
@@ -145,11 +158,19 @@ const SImageLeftTop = styled(FloatingImage)`
 `;
 
 const SImageLeftMiddle = styled(FloatingImage)`
-  width: 82px;
+  width: 90px;
   height: 90px;
   left: 0;
   bottom: 0;
   transform: translate(-26%, 34%) rotate(-45deg);
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 94px;
+    height: 94px;
+    left: 6%;
+    bottom: 16%;
+    transform: rotate(-45deg);
+  }
 
   ${({ theme }) => theme.media.laptop} {
     width: 136px;
@@ -166,25 +187,41 @@ const SImageLeftBottom = styled(FloatingImage)`
   top: 0;
   transform: translate(51%, -21%);
 
+  ${({ theme }) => theme.media.tablet} {
+    width: 25px;
+    height: 25px;
+    left: 31%;
+    bottom: 5.7%;
+    top: unset;
+    right: unset;
+    transform: none;
+  }
+
   ${({ theme }) => theme.media.laptop} {
     width: 38px;
     height: 38px;
     left: 31%;
     bottom: 13.7%;
-    transform: none;
   }
 `;
 
 const SImageRightTop = styled(FloatingImage)`
-  width: 68px;
-  height: 68px;
-  right: 12%;
-  top: 9%;
   transform: rotate(151deg);
   visibility: hidden;
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.tablet} {
     visibility: visible;
+    width: 36px;
+    height: 36px;
+    right: 13%;
+    top: 40%;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    width: 68px;
+    height: 68px;
+    right: 12%;
+    top: 9%;
   }
 `;
 
@@ -193,6 +230,14 @@ const SImageRightMiddle = styled(FloatingImage)`
   height: 20px;
   right: 12%;
   bottom: 13px;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 94px;
+    height: 94px;
+    right: 0;
+    bottom: 0;
+    transform: translate(40%, 24%);
+  }
 
   ${({ theme }) => theme.media.laptop} {
     top: 50%;

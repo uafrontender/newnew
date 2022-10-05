@@ -161,20 +161,21 @@ const SContentWrapper = styled.div`
   flex-direction: column;
   width: 100%;
 
-  ${(props) => props.theme.media.laptopM} {
+  ${(props) => props.theme.media.tablet} {
     flex-direction: row;
     justify-content: flex-end;
   }
 `;
 
 const STopWrapper = styled.div`
+  max-width: 300px;
   white-space: pre-line;
 
-  ${(props) => props.theme.media.laptopM} {
+  ${(props) => props.theme.media.tablet} {
     position: absolute;
     left: 0;
     top: 50%;
-    transform: translateY(-48%);
+    transform: translateY(-49%);
   }
 `;
 
@@ -207,6 +208,8 @@ const SSubTitle = styled(Text)`
   margin-top: 16px;
 
   text-align: center;
+  font-size: 16px;
+  line-height: 24px;
 
   ${(props) => props.theme.media.tablet} {
     text-align: left;
@@ -257,8 +260,9 @@ const SLargeAnimation = styled(AnimationChain)`
   ${({ theme }) => theme.media.tablet} {
     order: unset;
     right: unset;
-    height: 642px;
-    margin-top: 24px;
+    width: 405px;
+    max-width: 405px;
+    height: 374px;
 
     * {
       max-width: unset;

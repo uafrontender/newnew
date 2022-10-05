@@ -147,6 +147,11 @@ const STitle = styled(Text)`
 
 const SText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.background.outlines2};
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 14px;
+    line-height: 20px;
+  }
 `;
 
 const SHint = styled(Text)`

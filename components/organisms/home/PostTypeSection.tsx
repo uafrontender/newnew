@@ -32,6 +32,7 @@ const PostTypeSection = ({
   const { postOverlayOpen } = usePostModalState();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
+  const isDesktop = ['laptop', 'laptopM', 'laptopL'].includes(resizeMode);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -46,7 +47,8 @@ const PostTypeSection = ({
           item={post}
           shouldStop={postOverlayOpen}
           index={index}
-          width={isMobile ? '100%' : '204px'}
+          width={isDesktop ? '204px' : '100%'}
+          maxWidthTablet='100%'
         />
       </SItemWrapper>
     );
@@ -111,6 +113,10 @@ const SHeading = styled.div`
   max-width: 380px;
   align-self: center;
 
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 40px;
+  }
+
   ${({ theme }) => theme.media.laptopM} {
     align-items: flex-start;
     align-self: unset;
@@ -134,7 +140,7 @@ const SIconHolder = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     img {
-      height: 160px;
+      height: 120px;
     }
   }
 
@@ -178,6 +184,11 @@ const SPosts = styled.div`
   flex-direction: column;
   gap: 24px;
 
+  ${({ theme }) => theme.media.tablet} {
+    flex-direction: row;
+    gap: 16px;
+  }
+
   ${({ theme }) => theme.media.laptop} {
     gap: 32px;
   }
@@ -188,6 +199,14 @@ const SPosts = styled.div`
 `;
 
 const SItemWrapper = styled.div<{ index: number }>`
+  ${(props) => props.theme.media.tablet} {
+    flex: 1;
+
+    & > div > div:first-child {
+      padding: 61% 0px;
+    }
+  }
+
   ${(props) => props.theme.media.laptopM} {
     transform: ${({ index }) => (index !== 1 ? `translateY(25%)` : 0)};
     height: 386px;
@@ -206,12 +225,22 @@ const SItemWrapper = styled.div<{ index: number }>`
 `;
 
 const SCardSkeletonSection = styled(CardSkeletonSection)`
+  ${({ theme }) => theme.media.tablet} {
+    & > span {
+      left: 0 !important;
+      gap: 16px !important;
+      width: 100%;
+    }
+
+    & > span > div {
+      width: calc((100% - 16px * 2) / 3);
+      height: 412px;
+    }
+  }
+
   ${({ theme }) => theme.media.laptop} {
     height: 483px;
 
-    & > span {
-      left: 0 !important;
-    }
     & > span > div {
       width: 204px;
       height: 386px;
