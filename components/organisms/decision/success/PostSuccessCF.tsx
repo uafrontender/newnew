@@ -228,6 +228,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
             postId={post.postUuid}
             announcement={post.announcement!!}
             response={post.response ?? undefined}
+            additionalResponses={post.additionalResponses}
             responseViewed={responseViewed}
             openedTab={videoTab}
             setOpenedTab={(tab) => setVideoTab(tab)}
