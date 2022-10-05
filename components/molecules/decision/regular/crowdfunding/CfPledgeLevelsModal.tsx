@@ -394,6 +394,7 @@ const SPaymentModalOptionText = styled(Headline)`
   display: flex;
   align-items: center;
   white-space: pre-wrap;
+  word-break: break-word;
   gap: 8px;
 `;
 
@@ -433,6 +434,7 @@ const SPaymentSign = styled(Text)`
 
   text-align: center;
   white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SPaymentTermsLink = styled.a`

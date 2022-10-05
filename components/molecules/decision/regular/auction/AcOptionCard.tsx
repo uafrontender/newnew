@@ -1128,6 +1128,7 @@ const SPaymentModalPostText = styled(Text)`
   align-items: center;
   gap: 8px;
   white-space: pre-wrap;
+  word-break: break-word;
 
   margin-bottom: 24px;
 `;
@@ -1159,6 +1160,7 @@ const SPaymentSign = styled(Text)`
 
   text-align: center;
   white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SPaymentTermsLink = styled.a`

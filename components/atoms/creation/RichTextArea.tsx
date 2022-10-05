@@ -150,7 +150,6 @@ const SContent = styled.div<ISContent>`
   position: relative;
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   border-radius: 16px;
-
   border-width: 1.5px;
   border-style: solid;
   border-color: ${({ theme, error }) => {
@@ -172,6 +171,7 @@ const SContent = styled.div<ISContent>`
     outline: none;
     background: transparent;
     font-weight: 500;
+    word-break: break-all;
 
     font-size: 14px;
     line-height: 20px;
