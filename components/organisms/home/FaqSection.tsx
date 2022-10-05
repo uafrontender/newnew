@@ -105,16 +105,23 @@ const SContainer = styled.section`
   flex-direction: column;
   align-items: center;
   position: relative;
+  padding: 20px 0;
+
+  ${(props) => props.theme.media.laptop} {
+    padding: 60px 128px;
+  }
 
   ${(props) => props.theme.media.laptopM} {
     margin: 0 auto;
-    padding: 60px 128px;
+
     max-width: 1248px;
   }
 `;
 
 const SHeadline = styled(Headline)`
   margin-bottom: 24px;
+  font-size: 28px;
+  line-height: 36px;
 `;
 
 const SList = styled.ul`
@@ -133,7 +140,9 @@ const SListItem = styled.li`
 `;
 
 const STitle = styled(Text)`
-  margin-bottom: 9px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 24px;
 `;
 
 const SText = styled(Text)`
@@ -153,6 +162,12 @@ const SLink = styled.a`
 
 const SFloatingImage = styled.img`
   position: absolute;
+
+  visibility: hidden;
+
+  ${({ theme }) => theme.media.laptop} {
+    visibility: visible;
+  }
 `;
 
 const SSubImageLeftTop = styled(SFloatingImage)`

@@ -45,7 +45,7 @@ const BecomeCreatorSection = () => {
         draggable={false}
       />
       <SImageLeftBottom
-        src={assets.floatingAssets.rightGlassSphere}
+        src={assets.floatingAssets.bottomGlassSphere}
         alt='background'
         draggable={false}
       />
@@ -76,11 +76,11 @@ const SContainer = styled.section`
   justify-content: center;
   align-items: center;
   width: calc(100% + 96 * 2);
-  padding: 60px 0;
-  margin: 0 -96px;
+  padding: 22px 0;
+  margin: 0 -16px;
+
   overflow: hidden;
-  margin-bottom: 34px;
-  margin-top: 11px;
+  margin-top: 20px;
 
   background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
 
@@ -98,70 +98,121 @@ const SContainer = styled.section`
       ),
       #1d6aff;
   }
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-bottom: 34px;
+    margin-top: 11px;
+    padding: 60px 0;
+    margin: 0 -96px;
+  }
 `;
 
 const SHeadline = styled(Headline)`
-  margin-bottom: 24px;
+  margin-bottom: 10px;
   z-index: 1;
+  font-size: 20px;
+  line-height: 28px;
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-bottom: 24px;
+  }
 `;
 
 const SButton = styled(Button)`
   padding: 12px 30px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.darkGray};
+
+  font-size: 16px;
+  line-height: 24px;
 `;
 
-const SImageLeftTop = styled.img`
+const FloatingImage = styled.img`
   position: absolute;
-  width: 91px;
-  height: 91px;
-  left: 19%;
-  top: 0;
-  transform: translateY(-50%) rotate(151deg);
 `;
 
-const SImageLeftMiddle = styled.img`
-  position: absolute;
-  width: 136px;
-  height: 136px;
+const SImageLeftTop = styled(FloatingImage)`
+  width: 31px;
+  height: 31px;
   left: 0;
-  top: 3%;
-  transform: translate(30%, 30%) rotate(-45deg);
+  top: 0;
+  transform: translate(-53%, -33%) rotate(151deg);
+
+  ${({ theme }) => theme.media.laptop} {
+    width: 91px;
+    height: 91px;
+  }
 `;
 
-const SImageLeftBottom = styled.img`
-  position: absolute;
-  width: 38px;
-  height: 38px;
-  left: 31%;
-  bottom: 13.7%;
+const SImageLeftMiddle = styled(FloatingImage)`
+  width: 82px;
+  height: 90px;
+  left: 0;
+  bottom: 0;
+  transform: translate(-26%, 34%) rotate(-45deg);
+
+  ${({ theme }) => theme.media.laptop} {
+    width: 136px;
+    height: 136px;
+    top: 3%;
+    transform: translate(30%, 30%) rotate(-45deg);
+  }
 `;
 
-const SImageRightTop = styled.img`
-  position: absolute;
+const SImageLeftBottom = styled(FloatingImage)`
+  width: 46px;
+  height: 46px;
+  right: 0;
+  top: 0;
+  transform: translate(51%, -21%);
+
+  ${({ theme }) => theme.media.laptop} {
+    width: 38px;
+    height: 38px;
+    left: 31%;
+    bottom: 13.7%;
+    transform: none;
+  }
+`;
+
+const SImageRightTop = styled(FloatingImage)`
   width: 68px;
   height: 68px;
   right: 12%;
   top: 9%;
   transform: rotate(151deg);
+  visibility: hidden;
+
+  ${({ theme }) => theme.media.laptop} {
+    visibility: visible;
+  }
 `;
 
-const SImageRightMiddle = styled.img`
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  right: 27%;
-  top: 50%;
-  transform: translateY(-50%);
+const SImageRightMiddle = styled(FloatingImage)`
+  width: 20px;
+  height: 20px;
+  right: 12%;
+  bottom: 13px;
+
+  ${({ theme }) => theme.media.laptop} {
+    top: 50%;
+    width: 50px;
+    height: 50px;
+  }
 `;
 
-const SImageRightBottom = styled.img`
-  position: absolute;
+const SImageRightBottom = styled(FloatingImage)`
+  width: 46px;
+  height: 46px;
+  bottom: 0;
   width: 161px;
   height: 161px;
-  right: 0;
-  bottom: 0;
   transform: translate(30%, 40%);
+  visibility: hidden;
+
+  ${({ theme }) => theme.media.laptop} {
+    visibility: visible;
+  }
 `;
 
 export default BecomeCreatorSection;

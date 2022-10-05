@@ -348,7 +348,9 @@ const Home: NextPage<IHome> = ({
 );
 
 const SCardsSection = styled(CardsSection)`
-  margin-top: 12px;
+  ${({ theme }) => theme.media.laptop} {
+    margin-top: 12px;
+  }
 `;
 
 export default Home;

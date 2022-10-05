@@ -385,7 +385,7 @@ interface ISWrapper {
 }
 
 const SWrapper = styled.div<ISWrapper>`
-  padding: 24px 0;
+  padding: 20px 0;
 
   /* No select */
   -webkit-touch-callout: none;
@@ -481,10 +481,9 @@ const STopWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  margin-bottom: 16px;
-
   ${(props) => props.theme.media.tablet} {
     padding: 0px 32px;
+    margin-bottom: 16px;
   }
 
   ${(props) => props.theme.media.laptop} {

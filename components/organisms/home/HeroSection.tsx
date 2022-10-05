@@ -43,15 +43,15 @@ export const HeroSection = React.memo(() => {
   }, []);
 
   return (
-    <>
-      <SWrapper
-        // I believe can be commented out now as there's no need for an animation
-        // layoutId='heroSection'
-        transition={{
-          ease: 'easeInOut',
-          duration: 1,
-        }}
-      >
+    <SWrapper
+      // I believe can be commented out now as there's no need for an animation
+      // layoutId='heroSection'
+      transition={{
+        ease: 'easeInOut',
+        duration: 1,
+      }}
+    >
+      <SContentWrapper>
         <STopWrapper>
           <SHeadline>
             <AnimatedPresence
@@ -74,63 +74,33 @@ export const HeroSection = React.memo(() => {
           </SSubTitle>
           <AnimatedPresence start={animateButton} animation='t-01'>
             <SButtonsHolder>
-              {isMobile ? (
-                <>
-                  <Link
-                    href={
-                      user.loggedIn
-                        ? '/creator-onboarding'
-                        : '/sign-up?to=create'
-                    }
+              <Link
+                href={
+                  // eslint-disable-next-line no-nested-ternary
+                  user.loggedIn
+                    ? user.userData?.options?.isCreator
+                      ? '/creation'
+                      : '/creator-onboarding'
+                    : '/sign-up?to=create'
+                }
+              >
+                <a>
+                  <SButton
+                    withShrink
+                    withShadow
+                    view='primary'
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Create now',
+                      });
+                    }}
                   >
-                    <a>
-                      <SButton
-                        withDim
-                        withShrink
-                        view='primaryGrad'
-                        onClick={() => {
-                          Mixpanel.track('Navigation Item Clicked', {
-                            _button: 'Create now',
-                          });
-                        }}
-                      >
-                        {t('button.createOnNewnew')}
-                      </SButton>
-                    </a>
-                  </Link>
-                  <SButton withDim withShrink view='primaryGrad'>
-                    {t('button.createOnNewnew')}
+                    {user.userData?.options?.isCreator
+                      ? t('button.createDecision')
+                      : t('button.createOnNewnew')}
                   </SButton>
-                </>
-              ) : (
-                <Link
-                  href={
-                    // eslint-disable-next-line no-nested-ternary
-                    user.loggedIn
-                      ? user.userData?.options?.isCreator
-                        ? '/creation'
-                        : '/creator-onboarding'
-                      : '/sign-up?to=create'
-                  }
-                >
-                  <a>
-                    <SButton
-                      withShrink
-                      withShadow
-                      view='primary'
-                      onClick={() => {
-                        Mixpanel.track('Navigation Item Clicked', {
-                          _button: 'Create now',
-                        });
-                      }}
-                    >
-                      {user.userData?.options?.isCreator
-                        ? t('button.createDecision')
-                        : t('button.createOnNewnew')}
-                    </SButton>
-                  </a>
-                </Link>
-              )}
+                </a>
+              </Link>
             </SButtonsHolder>
           </AnimatedPresence>
         </STopWrapper>
@@ -161,8 +131,8 @@ export const HeroSection = React.memo(() => {
             }
           />
         )}
-      </SWrapper>
-    </>
+      </SContentWrapper>
+    </SWrapper>
   );
 });
 
@@ -170,30 +140,42 @@ export default HeroSection;
 
 const SWrapper = styled(motion.section)`
   position: relative;
-  display: flex;
-  margin-bottom: 24px;
-  flex-direction: column;
   width: 100%;
-  height: calc(100vh - 120px); // 120px - header height
+  height: calc(100vh - 80px); // 80px - visible header height
+  margin-top: -40px;
 
   ${(props) => props.theme.media.tablet} {
-    align-items: center;
-    flex-direction: row;
-
     max-width: 702px;
     margin: 0 auto;
   }
 
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
-    margin-top: -40px;
+  }
+`;
+
+const SContentWrapper = styled.div`
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  ${(props) => props.theme.media.laptopM} {
+    flex-direction: row;
+    justify-content: flex-end;
   }
 `;
 
 const STopWrapper = styled.div`
-  flex: 1;
-  margin-top: -40px;
   white-space: pre-line;
+
+  ${(props) => props.theme.media.laptopM} {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-48%);
+  }
 `;
 
 const SHeadline = styled(Headline)`
@@ -232,9 +214,6 @@ const SSubTitle = styled(Text)`
 
   ${(props) => props.theme.media.laptop} {
     margin-top: 24px;
-
-    font-size: 16px;
-    line-height: 20px;
   }
 `;
 
@@ -243,10 +222,6 @@ const SButtonsHolder = styled.div`
   margin-top: 24px;
   flex-direction: row;
   justify-content: center;
-
-  button {
-    margin-right: 16px;
-  }
 
   ${(props) => props.theme.media.tablet} {
     margin-top: 24px;
@@ -259,7 +234,7 @@ const SButtonsHolder = styled.div`
 `;
 
 const SLargeAnimation = styled(AnimationChain)`
-  right: 18px;
+  right: 7px;
   order: -1;
 
   flex: 1;
@@ -291,18 +266,12 @@ const SLargeAnimation = styled(AnimationChain)`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(calc(-50% - 40px));
+    margin-top: 0;
     width: 736px;
+    max-width: 736px;
     height: 658px;
     order: unset;
     z-index: -1;
-
-    * {
-      max-width: unset;
-    }
   }
 `;
 
