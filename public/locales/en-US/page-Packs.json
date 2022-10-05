@@ -13,6 +13,9 @@
     "votesLeft": "{{amount}} votes left",
     "chatAccessLeft": "{{amount}} month chat access"
   },
+  "packsModal": {
+    "title": "Your current packs"
+  },
   "search": {
     "title": "Search creators",
     "searchInputPlaceholder": "Search creators",

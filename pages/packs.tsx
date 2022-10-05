@@ -13,7 +13,6 @@ import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
 import assets from '../constants/assets';
 import GoBackButton from '../components/molecules/GoBackButton';
-import UserAvatar from '../components/molecules/UserAvatar';
 import { useAppSelector } from '../redux-store/store';
 import InlineSvg from '../components/atoms/InlineSVG';
 import searchIcon from '../public/images/svg/icons/outlined/Search.svg';
@@ -24,6 +23,8 @@ import usePagination, {
   Paging,
 } from '../utils/hooks/usePagination';
 import { searchCreators } from '../api/endpoints/search';
+import AllPacksModal from '../components/molecules/packs/AllPacksModal';
+import PackCard from '../components/molecules/packs/PackCard';
 
 export const Packs = () => {
   const router = useRouter();
@@ -72,6 +73,8 @@ export const Packs = () => {
     }
   }, [inView, loading, hasMore, loadMore]);
 
+  const visiblePacksNumber = isTablet ? 3 : 4;
+
   return (
     <>
       <Head>
@@ -94,48 +97,25 @@ export const Packs = () => {
 
         <SPacksTitle>
           <SectionTitle>{t('packs.title')}</SectionTitle>
-          <SSeeAllButton
-            onClick={() => {
-              setAllPacksModalOpen(true);
-            }}
-          >
-            {t('packs.seeAll')}
-          </SSeeAllButton>
+          {packs.length > visiblePacksNumber && (
+            <SSeeAllButton
+              onClick={() => {
+                setAllPacksModalOpen(true);
+              }}
+            >
+              {t('packs.seeAll')}
+            </SSeeAllButton>
+          )}
         </SPacksTitle>
         <SPacksContainer>
-          {packs.map((pack) => {
-            const expiresAtTime =
-              (pack.subscriptionExpiresAt!.seconds as number) * 1000;
-            const timeLeft = expiresAtTime - Date.now();
-            const daysLeft = timeLeft / 1000 / 60 / 60 / 24;
-            const monthsLeft = Math.floor(daysLeft / 30);
-
-            return (
-              <SPackContainer>
-                <SUserInfo>
-                  <UserAvatar
-                    avatarUrl={pack.creator?.avatarUrl || undefined}
-                  />
-                  <SUserData>
-                    <SDisplayName>{pack.creator?.nickname}</SDisplayName>
-                    <SUserName>{pack.creator?.username}</SUserName>
-                  </SUserData>
-                </SUserInfo>
-                {/* TODO: add Trans */}
-                <SVotesLeft>
-                  {t('packs.votesLeft', { amount: pack.votesLeft })}
-                </SVotesLeft>
-                <SSubscriptionLeft>
-                  {t('packs.chatAccessLeft', { amount: monthsLeft })}
-                </SSubscriptionLeft>
-              </SPackContainer>
-            );
-          })}
+          {packs.slice(0, visiblePacksNumber).map((pack) => (
+            <PackCard pack={pack} />
+          ))}
 
           {!isMobile &&
-            Array.from('x'.repeat((isTablet ? 3 : 4) - packs.length)).map(
-              () => <SPackContainer holder />
-            )}
+            Array.from(
+              'x'.repeat(Math.max(visiblePacksNumber - packs.length, 0))
+            ).map(() => <PackCard />)}
         </SPacksContainer>
 
         <SectionTitle>{t('search.title')}</SectionTitle>
@@ -160,7 +140,12 @@ export const Packs = () => {
         </SCardsSection>
         {hasMore && !loading && <SRef ref={loadingRef}>Loading...</SRef>}
       </Container>
-      {allPacksModalOpen && null /* TODO: Add modal */}
+      <AllPacksModal
+        show={allPacksModalOpen}
+        onClose={() => {
+          setAllPacksModalOpen(false);
+        }}
+      />
     </>
   );
 };
@@ -268,8 +253,17 @@ const SSeeAllButton = styled.div`
   font-weight: 600;
   font-size: 14px;
   line-height: 24px;
-  padding: 4px;
+  border-radius: 12px;
+  padding: 4px 12px;
   cursor: pointer;
+
+  :hover {
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  }
+
+  :active {
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  }
 `;
 
 const SPacksContainer = styled.div`
@@ -278,64 +272,6 @@ const SPacksContainer = styled.div`
   width: 100%;
   gap: 16px;
   margin-bottom: 84px;
-`;
-
-const SPackContainer = styled.div<{ holder?: boolean }>`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 300px;
-  background-color: ${(props) => props.theme.colorsThemed.background.secondary};
-  opacity: ${({ holder }) => (holder ? '0' : '1')};
-`;
-
-const SUserInfo = styled.div`
-  display: flex;
-  flex-direction: row;
-`;
-
-const SUserData = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 35px;
-  margin-left: 12px;
-`;
-
-const SDisplayName = styled.p`
-  font-weight: 600;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  font-size: 14px;
-  line-height: 20px;
-
-  margin-bottom: 5px;
-`;
-
-const SUserName = styled.p`
-  font-weight: 700;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-  font-size: 12px;
-  line-height: 16px;
-`;
-
-const SVotesLeft = styled.p`
-  font-weight: 700;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  font-size: 28px;
-  line-height: 36px;
-`;
-
-const SSubscriptionLeft = styled.p`
-  font-weight: 600;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-  font-size: 14px;
-  line-height: 20px;
 `;
 
 const SInputWrapper = styled.div`
