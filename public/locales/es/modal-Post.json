@@ -216,6 +216,14 @@
       "confirm": "Eliminar"
     }
   },
+  "deleteVideoModal_NEED_TRANSLATION": {
+    "title": "Delete video",
+    "body": "Are you sure you want to delete this video?",
+    "button": {
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
+  },
   "deleteCommentModal": {
     "title": "Eliminar comentario",
     "body": "¿Estás seguro de que quieres eliminar este comentario?",
