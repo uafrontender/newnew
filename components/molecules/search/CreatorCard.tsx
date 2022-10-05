@@ -1,5 +1,11 @@
 import { newnewapi } from 'newnew-api';
-import React, { useCallback, useMemo, useState, useRef } from 'react';
+import React, {
+  useCallback,
+  useMemo,
+  useState,
+  useRef,
+  useContext,
+} from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
@@ -18,16 +24,18 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { markUser } from '../../../api/endpoints/user';
 import UserEllipseModal from '../profile/UserEllipseModal';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import { PacksContext } from '../../../contexts/packsContext';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
-  // TODO: make sign creator specific, get more data
   withEllipseMenu?: boolean;
+  withPackOffer?: boolean;
 }
 
 export const CreatorCard: React.FC<ICreatorCard> = ({
   creator,
   withEllipseMenu,
+  withPackOffer,
 }) => {
   const router = useRouter();
   const currentUser = useAppSelector((state) => state.user);
@@ -35,6 +43,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { packs } = useContext(PacksContext);
 
   // Ellipse menu
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
@@ -42,7 +51,8 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
 
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
-  const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+  const [confirmReportUser, setConfirmReportUser] = useState(false);
+  const [buyPacksModalOpen, setBuyPacksModalOpen] = useState(false);
   const { usersIBlocked, unblockUser } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(creator.uuid as string),
@@ -89,6 +99,10 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
 
   const moreButtonRef: any = useRef();
+
+  const purchasedVotes = packs.find(
+    (pack) => pack.creator?.uuid === creator.uuid
+  )?.votesLeft;
 
   return (
     <SCard>
@@ -146,6 +160,18 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         )}
       </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>
+      {withPackOffer && (
+        <SButton
+          highlighted={!!purchasedVotes}
+          onClick={(e) => {
+            e.stopPropagation();
+            setBuyPacksModalOpen(true);
+          }}
+        >
+          {/* TODO: add translations */}
+          {purchasedVotes ? `${purchasedVotes} votes` : 'Buy Pack'}
+        </SButton>
+      )}
       <SBackground>
         <Image src={creator.coverUrl ?? ''} layout='fill' />
       </SBackground>
@@ -182,6 +208,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />
+      {buyPacksModalOpen && null /* TODO: Add Modal */}
     </SCard>
   );
 };
@@ -197,7 +224,7 @@ const SCard = styled.div`
   border: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   position: relative;
-  height: 160px;
+  height: auto;
   cursor: pointer;
   transition: 0.2s linear;
   &:hover {
@@ -271,6 +298,42 @@ const SUserName = styled.p`
   font-size: 12px;
   line-height: 16px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SButton = styled.button<{ highlighted: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  white-space: nowrap;
+
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: bold;
+
+  padding: 8px 16px;
+  margin-top: 16px;
+  margin-bottom: 10px;
+
+  color: ${({ theme, highlighted }) =>
+    highlighted
+      ? theme.colors.darkGray
+      : theme.colorsThemed.button.color.primary};
+  background: ${({ theme, highlighted }) =>
+    highlighted
+      ? theme.colorsThemed.accent.yellow
+      : theme.colorsThemed.button.background.primaryGrad};
+  border-radius: ${(props) => props.theme.borderRadius.medium};
+
+  cursor: pointer;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 `;
 
 const SMoreButton = styled(Button)`

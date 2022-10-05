@@ -18,6 +18,7 @@ interface IList {
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
   withEllipseMenu?: boolean;
+  withPackOffer?: boolean;
 }
 
 export const CreatorsList: React.FC<IList> = ({
@@ -26,6 +27,7 @@ export const CreatorsList: React.FC<IList> = ({
   skeletonsBgColor,
   skeletonsHighlightColor,
   withEllipseMenu = false,
+  withPackOffer = false,
 }) => {
   const renderItem = (item: newnewapi.IUser) => {
     const handleItemClick = () => {
@@ -36,7 +38,8 @@ export const CreatorsList: React.FC<IList> = ({
       <SItemWrapper key={item.uuid} onClick={handleItemClick}>
         <CreatorCard
           creator={item}
-          withEllipseMenu={withEllipseMenu ?? false}
+          withEllipseMenu={withEllipseMenu}
+          withPackOffer={withPackOffer}
         />
       </SItemWrapper>
     );
@@ -81,6 +84,7 @@ export const CreatorsList: React.FC<IList> = ({
 };
 
 CreatorsList.defaultProps = {
+  withPackOffer: false,
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
 };

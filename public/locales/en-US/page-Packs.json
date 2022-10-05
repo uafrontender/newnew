@@ -9,6 +9,7 @@
   },
   "packs": {
     "title": "Your current packs",
+    "seeAll": "See all",
     "votesLeft": "{{amount}} votes left",
     "chatAccessLeft": "{{amount}} month chat access"
   },

@@ -1,74 +1,76 @@
-import React from 'react';
+import React, { useState, useContext, useCallback, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import { useInView } from 'react-intersection-observer';
+import { toast } from 'react-toastify';
 
 import { NextPageWithLayout } from './_app';
-
 import HomeLayout from '../components/templates/HomeLayout';
 import assets from '../constants/assets';
 import GoBackButton from '../components/molecules/GoBackButton';
-
-import dateToTimestamp from '../utils/dateToTimestamp';
 import UserAvatar from '../components/molecules/UserAvatar';
 import { useAppSelector } from '../redux-store/store';
+import InlineSvg from '../components/atoms/InlineSVG';
+import searchIcon from '../public/images/svg/icons/outlined/Search.svg';
+import { PacksContext } from '../contexts/packsContext';
+import CreatorsList from '../components/organisms/search/CreatorsList';
+import usePagination, {
+  PaginatedResponse,
+  Paging,
+} from '../utils/hooks/usePagination';
+import { searchCreators } from '../api/endpoints/search';
 
 export const Packs = () => {
   const router = useRouter();
   const { t } = useTranslation('page-Packs');
+  const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
-
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const currentPacks: newnewapi.Pack[] = [
-    new newnewapi.Pack({
-      creator: new newnewapi.User({
-        avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-        nickname: 'CreatorDisplayName',
-        username: 'username',
-      }),
-      createdAt: dateToTimestamp(new Date()),
-      subscriptionExpiresAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-      votesLeft: 4,
-    }),
-    new newnewapi.Pack({
-      creator: new newnewapi.User({
-        avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-        nickname: 'CreatorDisplayName',
-        username: 'username',
-      }),
-      createdAt: dateToTimestamp(new Date()),
-      subscriptionExpiresAt: dateToTimestamp(new Date(Date.now() + 8356800000)),
-      votesLeft: 4500,
-    }),
-    /* new newnewapi.Pack({
-      creator: new newnewapi.User({
-        avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-        nickname: 'CreatorDisplayName',
-        username: 'username',
-      }),
-      createdAt: dateToTimestamp(new Date()),
-      subscriptionExpiresAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-      votesLeft: 231,
-    }),
-    new newnewapi.Pack({
-      creator: new newnewapi.User({
-        avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-        nickname: 'CreatorDisplayName',
-        username: 'username',
-      }),
-      createdAt: dateToTimestamp(new Date()),
-      subscriptionExpiresAt: dateToTimestamp(new Date(Date.now() + 7356800000)),
-      votesLeft: 19465,
-    }), */
-  ];
+  const [allPacksModalOpen, setAllPacksModalOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+
+  const { packs } = useContext(PacksContext);
+  const { ref: loadingRef, inView } = useInView();
+
+  const loadData = useCallback(
+    async (paging: Paging): Promise<PaginatedResponse<newnewapi.IUser>> => {
+      const payload = new newnewapi.SearchCreatorsRequest({
+        query: searchValue,
+        paging,
+        // TODO: add filter
+      });
+
+      const res = await searchCreators(payload);
+
+      if (!res.data || res.error) {
+        toast.error('toastErrors.generic');
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+
+      return {
+        nextData: res.data.creators,
+        nextPageToken: res.data.paging?.nextPageToken,
+      };
+    },
+    [searchValue]
+  );
+
+  const { data, loading, hasMore, loadMore } = usePagination(loadData, 10);
+
+  useEffect(() => {
+    if (inView && !loading && hasMore) {
+      loadMore().catch((e) => console.error(e));
+    }
+  }, [inView, loading, hasMore, loadMore]);
 
   return (
     <>
@@ -89,13 +91,19 @@ export const Packs = () => {
           <STitle>{t('header.title')}</STitle>
           <SDescription>{t('header.description')}</SDescription>
         </SHeader>
+
         <SPacksTitle>
           <SectionTitle>{t('packs.title')}</SectionTitle>
-          {/* TODO: add proper button */}
-          <div>See all</div>
+          <SSeeAllButton
+            onClick={() => {
+              setAllPacksModalOpen(true);
+            }}
+          >
+            {t('packs.seeAll')}
+          </SSeeAllButton>
         </SPacksTitle>
         <SPacksContainer>
-          {currentPacks.map((pack) => {
+          {packs.map((pack) => {
             const expiresAtTime =
               (pack.subscriptionExpiresAt!.seconds as number) * 1000;
             const timeLeft = expiresAtTime - Date.now();
@@ -125,12 +133,34 @@ export const Packs = () => {
           })}
 
           {!isMobile &&
-            Array.from(
-              'x'.repeat((isTablet ? 3 : 4) - currentPacks.length)
-            ).map(() => <SPackContainer holder />)}
+            Array.from('x'.repeat((isTablet ? 3 : 4) - packs.length)).map(
+              () => <SPackContainer holder />
+            )}
         </SPacksContainer>
+
         <SectionTitle>{t('search.title')}</SectionTitle>
+        <SInputWrapper>
+          <SLeftInlineSVG
+            svg={searchIcon}
+            fill={theme.colorsThemed.text.secondary}
+            width={isMobile ? '20px' : '24px'}
+            height={isMobile ? '20px' : '24px'}
+          />
+          <SInput
+            value={searchValue}
+            onChange={(e: any) => {
+              setSearchValue(e.target.value);
+            }}
+            placeholder={t('search.searchInputPlaceholder')}
+          />
+        </SInputWrapper>
+        <SearchResultsTitle>{t('search.resultsTitle')}</SearchResultsTitle>
+        <SCardsSection>
+          <CreatorsList loading={loading} collection={data} withPackOffer />
+        </SCardsSection>
+        {hasMore && !loading && <SRef ref={loadingRef}>Loading...</SRef>}
       </Container>
+      {allPacksModalOpen && null /* TODO: Add modal */}
     </>
   );
 };
@@ -220,6 +250,7 @@ const SPacksTitle = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: flex-start;
   width: 100%;
 `;
 
@@ -230,6 +261,15 @@ const SectionTitle = styled.h3`
   line-height: 40px;
   text-align: 'start';
   margin-bottom: 32px;
+`;
+
+const SSeeAllButton = styled.div`
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 24px;
+  padding: 4px;
+  cursor: pointer;
 `;
 
 const SPacksContainer = styled.div`
@@ -296,4 +336,67 @@ const SSubscriptionLeft = styled.p`
 
   font-size: 14px;
   line-height: 20px;
+`;
+
+const SInputWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  overflow: hidden;
+  background: ${({ theme }) => theme.colorsThemed.background.secondary};
+  border-radius: 16px;
+  width: 100%;
+  margin-bottom: 48px;
+  padding: 6.5px;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding: 11px;
+  }
+`;
+
+const SInput = styled.input`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  width: 100%;
+  border: none;
+  margin: 0 8px;
+  outline: none;
+  font-size: 14px;
+  background: transparent;
+  font-weight: 500;
+  line-height: 24px;
+
+  ::placeholder {
+    color: ${(props) => props.theme.colorsThemed.text.secondary};
+  }
+`;
+
+const SLeftInlineSVG = styled(InlineSvg)`
+  min-width: 20px;
+  min-height: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    min-width: 24px;
+    min-height: 24px;
+  }
+`;
+
+const SearchResultsTitle = styled.h4`
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  text-align: 'start';
+  margin-bottom: 24px;
+`;
+
+const SRef = styled.span`
+  text-indent: -9999px;
+  height: 0;
+  overflow: hidden;
+`;
+
+const SCardsSection = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
 `;
