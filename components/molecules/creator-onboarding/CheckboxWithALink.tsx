@@ -42,6 +42,7 @@ const TextTrigger = styled('p')`
   line-height: 20px;
   font-weight: 600;
   white-space: pre-wrap;
+  word-break: break-word;
 
   color: ${({ theme }) => theme.colorsThemed.accent.blue};
 `;

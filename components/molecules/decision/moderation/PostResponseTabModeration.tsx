@@ -730,6 +730,7 @@ const SUserAvatar = styled.img`
 
 const SHeadline = styled(Headline)`
   white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SUploadButton = styled(Button)`

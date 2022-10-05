@@ -1546,6 +1546,7 @@ const SBottomEndPostTitle = styled(Text)`
   max-width: 100%;
   line-break: loose;
   white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SBottomEndPostTitleHashtag = styled.span`
