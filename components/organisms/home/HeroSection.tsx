@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { scroller } from 'react-scroll';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -12,8 +11,6 @@ import AnimatedPresence from '../../atoms/AnimatedPresence';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-import { SCROLL_EXPLORE } from '../../../constants/timings';
-
 import assets from '../../../constants/assets';
 import AnimationChain from '../../atoms/AnimationChain';
 import { Mixpanel } from '../../../utils/mixpanel';
@@ -22,6 +19,7 @@ export const HeroSection = React.memo(() => {
   const theme = useTheme();
   const { t } = useTranslation('common');
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const user = useAppSelector((state) => state.user);
 
   const [animateTitle, setAnimateTitle] = useState(false);
   const [animateSubTitle, setAnimateSubTitle] = useState(false);
@@ -30,24 +28,6 @@ export const HeroSection = React.memo(() => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const handleExploreClick = () => {
-    Mixpanel.track('Explore Now Clicked', {
-      _stage: 'Hero Section',
-    });
-    if (document.getElementsByName('topSection').length > 0) {
-      scroller.scrollTo('topSection', {
-        offset: isMobile ? -20 : -100,
-        smooth: 'ease',
-        duration: SCROLL_EXPLORE,
-      });
-    } else {
-      scroller.scrollTo('mc', {
-        offset: isMobile ? -20 : -100,
-        smooth: 'ease',
-        duration: SCROLL_EXPLORE,
-      });
-    }
-  };
 
   const handleTitleAnimationEnd = useCallback(() => {
     setAnimateSubTitle(true);
@@ -96,40 +76,60 @@ export const HeroSection = React.memo(() => {
             <SButtonsHolder>
               {isMobile ? (
                 <>
-                  <Link href='/sign-up'>
+                  <Link
+                    href={
+                      user.loggedIn
+                        ? '/creator-onboarding'
+                        : '/sign-up?to=create'
+                    }
+                  >
                     <a>
                       <SButton
                         withDim
                         withShrink
-                        view='secondary'
+                        view='primaryGrad'
                         onClick={() => {
                           Mixpanel.track('Navigation Item Clicked', {
-                            _button: 'Sign in',
+                            _button: 'Create now',
                           });
                         }}
                       >
-                        {t('heroSection.signIn')}
+                        {t('button.createOnNewnew')}
                       </SButton>
                     </a>
                   </Link>
-                  <SButton
-                    withDim
-                    withShrink
-                    view='primaryGrad'
-                    onClick={handleExploreClick}
-                  >
-                    {t('heroSection.explore')}
+                  <SButton withDim withShrink view='primaryGrad'>
+                    {t('button.createOnNewnew')}
                   </SButton>
                 </>
               ) : (
-                <SButton
-                  withShrink
-                  withShadow
-                  view='primaryGrad'
-                  onClick={handleExploreClick}
+                <Link
+                  href={
+                    // eslint-disable-next-line no-nested-ternary
+                    user.loggedIn
+                      ? user.userData?.options?.isCreator
+                        ? '/creation'
+                        : '/creator-onboarding'
+                      : '/sign-up?to=create'
+                  }
                 >
-                  {t('heroSection.exploreNow')}
-                </SButton>
+                  <a>
+                    <SButton
+                      withShrink
+                      withShadow
+                      view='primary'
+                      onClick={() => {
+                        Mixpanel.track('Navigation Item Clicked', {
+                          _button: 'Create now',
+                        });
+                      }}
+                    >
+                      {user.userData?.options?.isCreator
+                        ? t('button.createDecision')
+                        : t('button.createOnNewnew')}
+                    </SButton>
+                  </a>
+                </Link>
               )}
             </SButtonsHolder>
           </AnimatedPresence>
@@ -169,9 +169,12 @@ export const HeroSection = React.memo(() => {
 export default HeroSection;
 
 const SWrapper = styled(motion.section)`
+  position: relative;
   display: flex;
   margin-bottom: 24px;
   flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 120px); // 120px - header height
 
   ${(props) => props.theme.media.tablet} {
     align-items: center;
@@ -183,19 +186,18 @@ const SWrapper = styled(motion.section)`
 
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
+    margin-top: -40px;
   }
 `;
 
 const STopWrapper = styled.div`
   flex: 1;
+  margin-top: -40px;
   white-space: pre-line;
-
-  ${(props) => props.theme.media.laptop} {
-    max-width: 45%;
-  }
 `;
 
 const SHeadline = styled(Headline)`
+  z-index: 2;
   text-align: center;
 
   /* Preserve line break */
@@ -207,19 +209,19 @@ const SHeadline = styled(Headline)`
   }
 
   ${(props) => props.theme.media.laptop} {
-    max-width: 480px;
+    max-width: 587px;
     font-size: 40px;
     line-height: 48px;
   }
 
   ${({ theme }) => theme.media.laptopM} {
-    font-size: 56px;
-    line-height: 64px;
+    font-size: 80px;
+    line-height: 88px;
   }
 `;
 
 const SSubTitle = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
   margin-top: 16px;
 
   text-align: center;
@@ -229,13 +231,10 @@ const SSubTitle = styled(Text)`
   }
 
   ${(props) => props.theme.media.laptop} {
+    margin-top: 24px;
+
     font-size: 16px;
     line-height: 20px;
-  }
-
-  ${({ theme }) => theme.media.laptopM} {
-    font-size: 24px;
-    line-height: 32px;
   }
 `;
 
@@ -250,8 +249,12 @@ const SButtonsHolder = styled.div`
   }
 
   ${(props) => props.theme.media.tablet} {
-    margin-top: 32px;
+    margin-top: 24px;
     justify-content: initial;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin-top: 40px;
   }
 `;
 
@@ -271,8 +274,6 @@ const SLargeAnimation = styled(AnimationChain)`
   z-index: 1;
 
   * {
-    margin-top: -32px;
-    margin-bottom: 32px;
     width: 100%;
     max-width: 360px;
     object-fit: contain;
@@ -286,14 +287,28 @@ const SLargeAnimation = styled(AnimationChain)`
 
     * {
       max-width: unset;
-      margin-top: -10%;
-      margin-bottom: 10%;
+    }
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(calc(-50% - 40px));
+    width: 736px;
+    height: 658px;
+    order: unset;
+    z-index: -1;
+
+    * {
+      max-width: unset;
     }
   }
 `;
 
 const SButton = styled(Button)`
   padding: 12px 24px;
+  text-transform: capitalize;
 
   ${(props) => props.theme.media.tablet} {
     font-size: 16px;

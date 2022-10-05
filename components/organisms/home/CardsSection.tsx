@@ -53,6 +53,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     loading,
     tutorialCard,
     handlePostClicked,
+    ...restProps
   }) => {
     const { t } = useTranslation('page-Home');
     const router = useRouter();
@@ -264,7 +265,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     }, [visibleListItem, collection, scrollStep]);
 
     return (
-      <SWrapper name={category}>
+      <SWrapper name={category} {...restProps}>
         <STopWrapper>
           {type === 'default' ? (
             <Headline variant={4} animation='t-01'>
@@ -402,7 +403,7 @@ const SWrapper = styled.div<ISWrapper>`
   }
 
   ${(props) => props.theme.media.laptop} {
-    padding: 40px 0;
+    padding: 60px 0;
   }
 
   ${(props) => props.theme.media.laptopM} {

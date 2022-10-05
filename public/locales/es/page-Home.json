@@ -19,16 +19,24 @@
   },
   "tutorial": {
     "ac": {
-      "title": "Bid",
+      "title": "Bids",
       "caption": "Envía al creador una oferta con lo que quieres que haga, cuánto estás dispuesto a gastar y ve si acepta tu oferta."
     },
     "mc": {
-      "title": "Superpoll",
+      "title": "Superpolls",
       "caption": "Un creador hace una Superencuesta en la que pagas por votar. Cuando se acaba el tiempo, mira cómo el creador realiza la opción que obtiene la mayor cantidad de votos."
     },
     "cf": {
-      "title": "Goal",
+      "title": "Goals",
       "caption": "Reúne dinero con otros para respaldar los objetivos de tus creadores favoritos. Si un número suficiente de personas respalda el Goal, verás cómo el creador lo realiza."
     }
+  },
+  "FAQ_NEED_TRANSLATION": {
+    "title": "FAQs",
+    "stillHaveQuestion": "Still have a question? Visit the ",
+    "newnewHelpCenter": "NewNew Help Center"
+  },
+  "becomeCreator_NEED_TRANSLATION": {
+    "title": "Ready to become a creator?"
   }
 }

@@ -19,16 +19,24 @@
   },
   "tutorial": {
     "ac": {
-      "title": "Bid",
+      "title": "Bids",
       "caption": "給創作者發送出價，說明你想讓他們做什麼，你願意花多少錢，看他們是否願意接受你的出價。"
     },
     "mc": {
-      "title": "Superpoll",
+      "title": "Superpolls",
       "caption": "創作者發起Superpoll，你花錢去投票，時間到了之後，看創作者完成得到最多票數的選項。"
     },
     "cf": {
-      "title": "Goal",
+      "title": "Goals",
       "caption": "與其他人集資，支持你喜歡的創作者的Goal。如果支持這個Goal的人足夠多，你就會看著創作者照做。"
     }
+  },
+  "FAQ_NEED_TRANSLATION": {
+    "title": "FAQs",
+    "stillHaveQuestion": "Still have a question? Visit the ",
+    "newnewHelpCenter": "NewNew Help Center"
+  },
+  "becomeCreator_NEED_TRANSLATION": {
+    "title": "Ready to become a creator?"
   }
 }

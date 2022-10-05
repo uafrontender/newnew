@@ -41,7 +41,7 @@ interface ISArrowHolder {
 }
 
 const SArrowHolder = styled.div<ISArrowHolder>`
-  top: calc(40% - 18px);
+  top: 49%;
   height: 36px;
   width: 36px;
   cursor: pointer;
@@ -72,7 +72,7 @@ const SArrowHolder = styled.div<ISArrowHolder>`
             left: -116px;
           }
           ${props.theme.media.laptopM} {
-            left: -76px;
+            left: -65px;
           }
         `
       : css`
@@ -83,7 +83,7 @@ const SArrowHolder = styled.div<ISArrowHolder>`
             right: -116px;
           }
           ${props.theme.media.laptopM} {
-            right: -76px;
+            right: -65px;
           }
         `}
 

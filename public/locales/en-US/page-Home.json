@@ -5,7 +5,7 @@
   },
   "cardsSection": {
     "title": {
-      "biggest": "Greatest of all Time",
+      "biggest": "Greatest of All Time",
       "for-you": "For you",
       "ac": "Biggest Bids",
       "mc": "Top Superpolls",
@@ -19,16 +19,24 @@
   },
   "tutorial": {
     "ac": {
-      "title": "Bid",
+      "title": "Bids",
       "caption": "Send the creator a bid with what you want them to do, how much you're willing to spend, and see if they do your bid."
     },
     "mc": {
-      "title": "Superpoll",
+      "title": "Superpolls",
       "caption": "A creator makes a Superpoll that you pay to vote on. When the time's up, watch the creator do the option that gets the most amount of votes."
     },
     "cf": {
-      "title": "Goal",
+      "title": "Goals",
       "caption": "Pool money with others to back the goals made by your favorite creators. If enough people back the goal, you'll watch the creator do it."
     }
+  },
+  "FAQ": {
+    "title": "FAQs",
+    "stillHaveQuestion": "Still have a question? Visit the ",
+    "newnewHelpCenter": "NewNew Help Center"
+  },
+  "becomeCreator": {
+    "title": "Ready to become a creator?"
   }
 }
