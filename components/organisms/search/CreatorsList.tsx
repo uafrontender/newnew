@@ -8,14 +8,13 @@ import router from 'next/router';
 import dynamic from 'next/dynamic';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import { CreatorCardWithSubscriptionPrice } from './CreatorCardWithSubscriptionPrice';
+import CreatorCard from '../../molecules/search/CreatorCard';
 
 const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
 interface IList {
   collection: any;
   loading: boolean;
-  subscribedTo?: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
   withEllipseMenu?: boolean;
@@ -24,7 +23,6 @@ interface IList {
 export const CreatorsList: React.FC<IList> = ({
   collection,
   loading,
-  subscribedTo = false,
   skeletonsBgColor,
   skeletonsHighlightColor,
   withEllipseMenu = false,
@@ -36,8 +34,8 @@ export const CreatorsList: React.FC<IList> = ({
 
     return (
       <SItemWrapper key={item.uuid} onClick={handleItemClick}>
-        <CreatorCardWithSubscriptionPrice
-          item={item}
+        <CreatorCard
+          creator={item}
           withEllipseMenu={withEllipseMenu ?? false}
         />
       </SItemWrapper>
@@ -83,7 +81,6 @@ export const CreatorsList: React.FC<IList> = ({
 };
 
 CreatorsList.defaultProps = {
-  subscribedTo: false,
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
 };
