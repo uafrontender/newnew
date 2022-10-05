@@ -77,6 +77,11 @@ const SPostVideoEditStoryButton = styled(Button)<{
     }
   }
 
+  &:active:enabled {
+    background: ${({ theme, view }) =>
+      theme.colorsThemed.button.background[view ?? 'primary']} !important;
+  }
+
   ${({ buttonActive }) =>
     buttonActive
       ? css`

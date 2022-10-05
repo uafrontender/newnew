@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 import React, {
   useCallback,
@@ -8,7 +7,6 @@ import React, {
   useState,
 } from 'react';
 import styled, { keyframes } from 'styled-components';
-import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'next-i18next';
@@ -58,6 +56,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   const {
     coreResponse,
     additionalResponses,
+    currentStep,
+    handleSetCurrentStep,
     videoProcessing,
     responseFileUploadETA,
     responseFileUploadError,
@@ -91,13 +91,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     responseFileProcessingProgress,
   ]);
 
-  const [currentStep, setCurrentStep] = useState<'regular' | 'editing'>(
-    'regular'
-  );
-
-  const [showVideoDelete, setShowVideoDelete] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const playerRef: any = useRef();
   const [localFile, setLocalFile] = useState<File | null>(null);
 
   const handleUploadButtonClick = useCallback(() => {
@@ -106,33 +100,6 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     });
     inputRef.current?.click();
   }, []);
-
-  const handleDeleteVideoShow = useCallback(() => {
-    setShowVideoDelete(true);
-    playerRef.current.pause();
-  }, []);
-
-  const handleCloseDeleteVideoClick = useCallback(() => {
-    setShowVideoDelete(false);
-    playerRef.current.play();
-  }, []);
-
-  const handleDeleteVideo = useCallback(() => {
-    Mixpanel.track('Post Video Response Delete', {
-      _stage: 'Post',
-    });
-    handleCloseDeleteVideoClick();
-    setLocalFile(null);
-    handleItemChange(id, null);
-    handleSetUploadingAdditionalResponse(false);
-    handleSetReadyToUploadAdditionalResponse(false);
-  }, [
-    handleCloseDeleteVideoClick,
-    id,
-    handleItemChange,
-    handleSetUploadingAdditionalResponse,
-    handleSetReadyToUploadAdditionalResponse,
-  ]);
 
   const handleDeleteLocalFile = useCallback(async () => {
     try {
@@ -162,10 +129,11 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   const handleDeleteUnuploadedAdditonalResponse = useCallback(async () => {
     try {
       await handleVideoDelete();
+      handleSetCurrentStep('regular');
     } catch (err) {
       console.error(err);
     }
-  }, [handleVideoDelete]);
+  }, [handleSetCurrentStep, handleVideoDelete]);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -193,8 +161,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
         } else {
           setLocalFile(file);
           handleItemChange(id, file);
-          handleSetUploadingAdditionalResponse(true);
-          setCurrentStep('editing');
+          handleSetCurrentStep('editing');
         }
       }
     },
@@ -204,7 +171,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       t,
       handleItemChange,
       id,
-      handleSetUploadingAdditionalResponse,
+      handleSetCurrentStep,
     ]
   );
   const handleRetryVideoUpload = useCallback(() => {
@@ -238,16 +205,19 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       handleSetUploadingAdditionalResponse(false);
       handleSetReadyToUploadAdditionalResponse(false);
       handleResetVideoUploadAndProcessingState();
+      handleSetCurrentStep('regular');
     } catch (err) {
       console.error(err);
     }
   }, [
-    id,
+    videoProcessing?.targetUrls?.originalVideoUrl,
+    videoProcessing?.taskUuid,
     handleItemChange,
-    videoProcessing,
-    handleResetVideoUploadAndProcessingState,
+    id,
     handleSetUploadingAdditionalResponse,
     handleSetReadyToUploadAdditionalResponse,
+    handleResetVideoUploadAndProcessingState,
+    handleSetCurrentStep,
   ]);
 
   const renderUploading = useCallback(() => {
@@ -443,72 +413,6 @@ const SInput = styled.input`
   position: absolute;
   left: -1000px;
   visibility: hidden;
-`;
-
-// Temp
-const SFileBox = styled.div`
-  height: 108px;
-  display: flex;
-  flex-direction: row;
-
-  ${({ theme }) => theme.media.tablet} {
-    height: 176px;
-    border: 1px solid
-      ${(props) =>
-        props.theme.name === 'light'
-          ? props.theme.colorsThemed.background.outlines1
-          : 'transparent'};
-    padding: 23px;
-    overflow: hidden;
-    background: ${(props) =>
-      props.theme.name === 'light'
-        ? props.theme.colors.white
-        : props.theme.colorsThemed.background.secondary};
-    border-radius: 16px;
-  }
-`;
-
-const SPlayerWrapper = styled.div`
-  width: 64px;
-  height: 108px;
-
-  ${({ theme }) => theme.media.tablet} {
-    width: 72px;
-    height: 124px;
-  }
-`;
-
-const SButtonsContainer = styled.div`
-  width: calc(100% - 64px);
-  display: flex;
-  padding-left: 16px;
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-const SButtonsContainerLeft = styled.div`
-  display: flex;
-  align-items: flex-start;
-  flex-direction: column;
-  justify-content: space-between;
-`;
-
-interface ISVideoButton {
-  danger?: boolean;
-}
-
-const SVideoButton = styled.button<ISVideoButton>`
-  color: ${(props) =>
-    props.danger
-      ? props.theme.colorsThemed.accent.error
-      : props.theme.colorsThemed.text.secondary};
-  border: none;
-  cursor: pointer;
-  outline: none;
-  font-size: 14px;
-  background: transparent;
-  font-weight: bold;
-  line-height: 24px;
 `;
 
 const SLoadingContainer = styled.div`

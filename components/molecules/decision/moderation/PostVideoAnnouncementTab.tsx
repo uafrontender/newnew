@@ -126,7 +126,7 @@ export default PostVideoAnnouncementTab;
 
 const SSetThumbnailButtonIconOnly = styled(Button)`
   position: absolute;
-  right: 64px;
+  left: 16px;
   bottom: 16px;
 
   padding: 8px;

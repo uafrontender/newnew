@@ -98,9 +98,6 @@ const SContainer = styled.div`
     height: 100px;
     width: 80px;
   }
-
-  // TEMP
-  background-color: blue;
 `;
 
 const SWrapper = styled.div`

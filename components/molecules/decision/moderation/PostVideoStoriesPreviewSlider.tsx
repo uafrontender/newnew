@@ -13,8 +13,8 @@ interface IPostVideoStoriesPreviewSlider {
   offsetBottom: number;
   canDeleteOnlyNonUploaded?: boolean;
   handleChangeCurrentActive: (idx: number) => void;
-  handleDeleteAdditionalVideo: (videoUuid: string) => void;
-  handleDeleteUnuploadedAdditonalResponse: () => void;
+  handleDeleteAdditionalVideo?: (videoUuid: string) => void;
+  handleDeleteUnuploadedAdditonalResponse?: () => void;
 }
 
 const PostVideoStoriesPreviewSlider: React.FunctionComponent<
@@ -69,9 +69,11 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
               i === arr.length - 1 && readyToUploadAdditionalResponse
             }
             handleClick={() => handleChangeCurrentActive(i)}
-            handleDeleteVideo={() => handleDeleteAdditionalVideo(video.uuid!!)}
+            handleDeleteVideo={() =>
+              handleDeleteAdditionalVideo?.(video.uuid!!)
+            }
             handleDeleteUnuploadedAdditonalResponse={() =>
-              handleDeleteUnuploadedAdditonalResponse()
+              handleDeleteUnuploadedAdditonalResponse?.()
             }
           />
         ))}

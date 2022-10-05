@@ -125,20 +125,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       newnewapi.IVideoUrls | undefined
     >(undefined);
 
-    // Additional responses
-    // const [additionalResponses, setAdditionalResponses] = useState<
-    //   newnewapi.IVideoUrls[]
-    // >(post.additionalResponses);
-
-    // TEMP
-    const mockAdditionalResponses = post.response
-      ? new Array<newnewapi.IVideoUrls>(5).fill(post.response).map((v, i) => {
-          const workingObj = { ...v };
-          workingObj.uuid = `uuid_${i}`;
-          return workingObj;
-        })
-      : [];
-
     // Tabs
     const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
       post.response ||
@@ -618,8 +604,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             openedTab={openedTab}
             handleChangeTab={handleChangeTab}
             coreResponseInitial={post.response ?? undefined}
-            // additionalResponsesInitial={post.additionalResponses}
-            additionalResponsesInitial={mockAdditionalResponses}
+            additionalResponsesInitial={post.additionalResponses}
           >
             <SExpiresSection>
               {isMobile && (

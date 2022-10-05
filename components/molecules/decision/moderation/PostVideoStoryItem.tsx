@@ -66,9 +66,6 @@ const SPlaceHolder = styled.div`
   align-items: center;
   overflow: hidden;
   border-radius: 16px;
-
-  // Temp
-  background-color: blue;
 `;
 
 const SImg = styled.img`

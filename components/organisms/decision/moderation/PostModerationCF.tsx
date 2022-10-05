@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
@@ -33,14 +32,11 @@ import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTo
 import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 import PostResponseTabModeration from '../../../molecules/decision/moderation/PostResponseTabModeration';
 
-import switchPostStatus, {
-  TPostStatusStringified,
-} from '../../../../utils/switchPostStatus';
+import switchPostStatus from '../../../../utils/switchPostStatus';
 import switchPostType from '../../../../utils/switchPostType';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
-import useResponseUpload from '../../../../utils/hooks/useResponseUpload';
 import { formatNumber } from '../../../../utils/format';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 import PostModerationResponsesContextProvider from '../../../../contexts/postModerationResponsesContext';
@@ -151,20 +147,6 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
     const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<
       newnewapi.IVideoUrls | undefined
     >(undefined);
-
-    // Additional responses
-    // const [additionalResponses, setAdditionalResponses] = useState<
-    //   newnewapi.IVideoUrls[]
-    // >(post.additionalResponses);
-
-    // TEMP
-    const mockAdditionalResponses = post.response
-      ? new Array<newnewapi.IVideoUrls>(5).fill(post.response).map((v, i) => {
-          const workingObj = { ...v };
-          workingObj.uuid = `uuid_${i}`;
-          return workingObj;
-        })
-      : [];
 
     // Tabs
     const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
@@ -529,8 +511,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
             openedTab={openedTab}
             handleChangeTab={handleChangeTab}
             coreResponseInitial={post.response ?? undefined}
-            // additionalResponsesInitial={post.additionalResponses}
-            additionalResponsesInitial={mockAdditionalResponses}
+            additionalResponsesInitial={post.additionalResponses}
           >
             <SExpiresSection>
               {isMobile && (

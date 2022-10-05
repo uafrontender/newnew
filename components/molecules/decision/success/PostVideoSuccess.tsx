@@ -71,8 +71,6 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
 
         const res = await markPost(payload);
 
-        console.log(res);
-
         if (!res.error) {
           handleSetResponseViewed(true);
         }

@@ -161,15 +161,13 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
 
           const res = await getMcOption(payload);
 
-          console.log(res);
-
           if (res.data?.option) {
             setWinningOption(
               res.data.option as newnewapi.MultipleChoice.Option
             );
           }
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       }
 
@@ -185,19 +183,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
             postId={post.postUuid}
             announcement={post.announcement!!}
             response={post.response ?? undefined}
-            // additionalResponses={post.additionalResponses}
-            // TEMP
-            additionalResponses={
-              post.response
-                ? new Array<newnewapi.IVideoUrls>(5)
-                    .fill(post.response)
-                    .map((v, i) => {
-                      const workingObj = { ...v };
-                      workingObj.uuid = `uuid_${i}`;
-                      return workingObj;
-                    })
-                : []
-            }
+            additionalResponses={post.additionalResponses}
             responseViewed={responseViewed}
             openedTab={videoTab}
             setOpenedTab={(tab) => setVideoTab(tab)}

@@ -38,6 +38,8 @@ interface IPostModerationResponsesContext {
   handleUploadVideoProcessed: () => Promise<void>;
   handleUploadVideoNotProcessed: () => Promise<void>;
   // Additional responses
+  currentStep: 'regular' | 'editing';
+  handleSetCurrentStep: (step: 'regular' | 'editing') => void;
   additionalResponses: newnewapi.IVideoUrls[];
   additionalResponseUploading: boolean;
   readyToUploadAdditionalResponse: boolean;
@@ -77,6 +79,8 @@ const PostModerationResponsesContext =
     handleUploadVideoProcessed: (() => {}) as () => Promise<void>,
     handleUploadVideoNotProcessed: (() => {}) as () => Promise<void>,
     // Additional responses
+    currentStep: 'regular',
+    handleSetCurrentStep: (step: 'regular' | 'editing') => {},
     additionalResponses: [],
     additionalResponseUploading: false,
     readyToUploadAdditionalResponse: false,
@@ -125,6 +129,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   children,
 }) => {
   const { t } = useTranslation('modal-Post');
+  const { t: tCommon } = useTranslation('common');
   const socketConnection = useContext(SocketContext);
 
   const { postParsed, postStatus, handleUpdatePostStatus } =
@@ -142,6 +147,14 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   );
 
   // Additional responses
+  const [currentStep, setCurrentStep] = useState<'regular' | 'editing'>(
+    'regular'
+  );
+
+  const handleSetCurrentStep = useCallback((step: 'regular' | 'editing') => {
+    setCurrentStep(step);
+  }, []);
+
   const [additionalResponses, setAdditionalResponses] = useState<
     newnewapi.IVideoUrls[]
   >(additionalResponsesInitial ?? []);
@@ -159,7 +172,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     [setAdditionalResponses]
   );
 
-  const handleDeleteAdditonalResponse = useCallback(
+  const handleDeleteAdditionalResponse = useCallback(
     async (videoUuid: string) => {
       try {
         const req = new newnewapi.DeleteAdditionalPostResponseRequest({
@@ -176,10 +189,10 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         });
       } catch (err) {
         console.error(err);
-        toast.error('Failed to delete video');
+        toast.error(tCommon('toastErrors.generic'));
       }
     },
-    [setAdditionalResponses]
+    [tCommon]
   );
 
   const handleSetUploadingAdditionalResponse = useCallback(
@@ -285,7 +298,6 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
           reject(new Error('Upload failed'));
         });
         xhr.addEventListener('abort', () => {
-          // console.log('Aborted');
           setResponseFileUploadProgress(0);
           reject(new Error('Upload aborted'));
         });
@@ -410,10 +422,17 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         handleUpdatePostStatus('SUCCEEDED');
         setUploadedResponseVideoUrl('');
         setResponseUploadSuccess(true);
+
+        setResponseFileUploadError(false);
+        setResponseFileUploadLoading(false);
+        setResponseFileUploadProgress(0);
+        setResponseFileProcessingError(false);
+        setResponseFileProcessingLoading(false);
+        setResponseFileProcessingProgress(0);
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      toast.error(tCommon('toastErrors.generic'));
     } finally {
       setCoreResponseUploading(false);
     }
@@ -422,6 +441,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     uploadedResponseVideoUrl,
     handleUpdateResponseVideo,
     handleUpdatePostStatus,
+    tCommon,
   ]);
 
   const handleUploadVideoNotProcessed = useCallback(async () => {
@@ -440,9 +460,9 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      toast.error(tCommon('toastErrors.generic'));
     }
-  }, [postId, uploadedResponseVideoUrl, t, handleUpdatePostStatus]);
+  }, [postId, uploadedResponseVideoUrl, t, handleUpdatePostStatus, tCommon]);
 
   const handleUploadAdditionalVideoProcessed = useCallback(async () => {
     setUploadingAdditionalResponse(true);
@@ -455,23 +475,61 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       const res = await uploadAdditionalPostResponse(payload);
 
       if (res.data) {
-        // @ts-ignore
-        let responseObj;
-        if (res.data.auction) responseObj = res.data.auction.response;
-        if (res.data.multipleChoice)
-          responseObj = res.data.multipleChoice.response;
-        if (res.data.crowdfunding) responseObj = res.data.crowdfunding.response;
-        // @ts-ignore
-        if (responseObj) handleAddAdditonalResponse(responseObj);
-        setUploadedResponseVideoUrl('');
+        let responseObj: newnewapi.IVideoUrls | undefined;
+        if (
+          res.data.auction &&
+          res.data.auction.additionalResponses &&
+          res.data.auction.additionalResponses.length
+        ) {
+          responseObj =
+            res.data.auction.additionalResponses[
+              res.data.auction.additionalResponses.length - 1
+            ];
+        }
+        if (
+          res.data.multipleChoice &&
+          res.data.multipleChoice.additionalResponses &&
+          res.data.multipleChoice.additionalResponses.length
+        ) {
+          responseObj =
+            res.data.multipleChoice.additionalResponses[
+              res.data.multipleChoice.additionalResponses.length - 1
+            ];
+        }
+        if (
+          res.data.crowdfunding &&
+          res.data.crowdfunding.additionalResponses &&
+          res.data.crowdfunding.additionalResponses.length
+        ) {
+          responseObj =
+            res.data.crowdfunding.additionalResponses[
+              res.data.crowdfunding.additionalResponses.length - 1
+            ];
+        }
+
+        if (responseObj) {
+          handleAddAdditonalResponse(responseObj);
+          setUploadedResponseVideoUrl('');
+
+          setResponseFileUploadError(false);
+          setResponseFileUploadLoading(false);
+          setResponseFileUploadProgress(0);
+          setResponseFileProcessingError(false);
+          setResponseFileProcessingLoading(false);
+          setResponseFileProcessingProgress(0);
+
+          setCurrentStep('regular');
+        } else {
+          throw new Error('No additional videoUrls in the response');
+        }
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      toast.error(tCommon('toastErrors.generic'));
     } finally {
       setUploadingAdditionalResponse(false);
     }
-  }, [handleAddAdditonalResponse, postId, uploadedResponseVideoUrl]);
+  }, [handleAddAdditonalResponse, postId, tCommon, uploadedResponseVideoUrl]);
 
   const handlerSocketUpdated = useCallback(
     async (data: any) => {
@@ -510,21 +568,22 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
             setResponseFileProcessingLoading(false);
           } else {
             setResponseFileUploadError(true);
-            toast.error('An error occurred');
+            toast.error(tCommon('toastErrors.generic'));
           }
         } else if (
           decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
         ) {
           setResponseFileUploadError(true);
-          toast.error('An error occurred');
+          toast.error(tCommon('toastErrors.generic'));
         }
       }
     },
     [
-      postId,
       videoProcessing?.taskUuid,
       videoProcessing.targetUrls?.hlsStreamUrl,
+      postId,
       responseFileProcessingProgress,
+      tCommon,
     ]
   );
 
@@ -569,7 +628,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         setResponseFileProcessingLoading(false);
       } else {
         setResponseFileUploadError(true);
-        toast.error('An error occurred');
+        toast.error(tCommon('toastErrors.generic'));
       }
     }
 
@@ -599,10 +658,12 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       coreResponse,
       coreResponseUploading,
       // Additional responses
+      currentStep,
+      handleSetCurrentStep,
       additionalResponses,
       additionalResponseUploading,
       readyToUploadAdditionalResponse,
-      handleDeleteAdditionalResponse: handleDeleteAdditonalResponse,
+      handleDeleteAdditionalResponse,
       videoProcessing,
       uploadedResponseVideoUrl,
       responseUploadSuccess,
@@ -629,10 +690,12 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       handleChangeTab,
       coreResponse,
       coreResponseUploading,
+      currentStep,
+      handleSetCurrentStep,
       additionalResponses,
       additionalResponseUploading,
       readyToUploadAdditionalResponse,
-      handleDeleteAdditonalResponse,
+      handleDeleteAdditionalResponse,
       videoProcessing,
       uploadedResponseVideoUrl,
       responseUploadSuccess,

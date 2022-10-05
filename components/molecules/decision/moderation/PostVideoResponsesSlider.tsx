@@ -18,8 +18,8 @@ interface IPostVideoResponsesSlider {
   dotsBottom?: number;
   isMuted?: boolean;
   isEditingStories?: boolean;
-  handleDeleteAdditionalVideo: (videoUuid: string) => void;
-  handleDeleteUnuploadedAdditonalResponse: () => void;
+  handleDeleteAdditionalVideo?: (videoUuid: string) => void;
+  handleDeleteUnuploadedAdditonalResponse?: () => void;
 }
 
 const PostVideoResponsesSlider: React.FunctionComponent<
@@ -116,6 +116,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
       >
         {videos.map((video, i) => (
           <PostVideoStoryItem
+            key={video.uuid ?? i}
             video={video}
             index={i}
             isVisible={currentVideo === i}

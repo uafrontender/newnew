@@ -3,11 +3,11 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
 import { useAppSelector } from '../../../../redux-store/store';
+import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 import PostVideoResponsesSlider from './PostVideoResponsesSlider';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
-import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
 const PostBitmovinPlayer = dynamic(
   () => import('../common/PostBitmovinPlayer'),
@@ -21,7 +21,7 @@ interface IPostVideoResponseUploaded {
   soundBtnBottomOverriden?: number;
   isEditingStories?: boolean;
   handleToggleMuted: () => void;
-  handleDeleteUnuploadedAdditonalResponse: () => void;
+  handleDeleteUnuploadedAdditonalResponse?: () => void;
 }
 
 const PostVideoResponseUploaded: React.FunctionComponent<
@@ -65,7 +65,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
   return (
     <>
       {/* {!additionalResponses || additionalResponses.length === 0 ? ( */}
-      {responses && responses.length > 0 ? (
+      {responses && responses.length > 1 ? (
         <PostVideoResponsesSlider
           videos={responses as newnewapi.IVideoUrls[]}
           isMuted={isMuted}
@@ -73,7 +73,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
           {...(soundBtnBottomOverriden
             ? {
                 dotsBottom:
-                  soundBtnBottomOverriden + (!isEditingStories ? 72 : 0),
+                  soundBtnBottomOverriden + (!isEditingStories ? 72 : 24),
               }
             : {})}
           {...(isTablet && !soundBtnBottomOverriden
