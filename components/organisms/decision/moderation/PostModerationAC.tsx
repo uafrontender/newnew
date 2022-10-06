@@ -91,6 +91,12 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       [postStatus]
     );
 
+    // Additional responses
+    const [
+      additionalResponsesFreshlyLoaded,
+      setAdditionalResponsesFreshlyLoaded,
+    ] = useState(post.additionalResponses);
+
     // Socket
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
@@ -312,6 +318,12 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           if (res.data.auction.status)
             handleUpdatePostStatus(res.data.auction.status);
           setAnnouncement(res.data.auction?.announcement);
+
+          if (res.data.auction.additionalResponses) {
+            setAdditionalResponsesFreshlyLoaded(
+              res.data.auction.additionalResponses
+            );
+          }
         }
       } catch (err) {
         console.error(err);
@@ -574,7 +586,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             openedTab={openedTab}
             handleChangeTab={handleChangeTab}
             coreResponseInitial={post.response ?? undefined}
-            additionalResponsesInitial={post.additionalResponses}
+            additionalResponsesInitial={additionalResponsesFreshlyLoaded}
           >
             <SExpiresSection>
               {isMobile && (

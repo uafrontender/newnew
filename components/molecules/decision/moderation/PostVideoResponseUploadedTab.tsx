@@ -103,13 +103,15 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
   const handleDeleteLocalFile = useCallback(async () => {
     try {
-      const payload = new newnewapi.RemoveUploadedFileRequest({
-        publicUrl: videoProcessing?.targetUrls?.originalVideoUrl,
-      });
+      if (videoProcessing?.targetUrls?.originalVideoUrl) {
+        const payload = new newnewapi.RemoveUploadedFileRequest({
+          publicUrl: videoProcessing?.targetUrls?.originalVideoUrl,
+        });
 
-      const res = await removeUploadedFile(payload);
+        const res = await removeUploadedFile(payload);
 
-      if (res.error) throw new Error('An error occurred');
+        if (res.error) throw new Error('An error occurred');
+      }
 
       setLocalFile(null);
       await handleItemChange(id, null);
@@ -174,6 +176,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       handleSetCurrentAdditionalResponseStep,
     ]
   );
+
   const handleRetryVideoUpload = useCallback(() => {
     handleItemChange(id, localFile);
   }, [id, localFile, handleItemChange]);
@@ -351,6 +354,10 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
         onChange={(e) => {
           handleFileChange(e);
         }}
+        onClick={(e) => {
+          // @ts-ignore
+          e.target.value = null;
+        }}
       />
       {currentAdditionalResponseStep === 'regular' ? (
         <SUploadVideoButton onClick={() => handleUploadButtonClick()}>
@@ -360,7 +367,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       {!responseFileUploadLoading &&
       !responseFileProcessingLoading &&
       responses &&
-      responses?.length > 0 ? (
+      responses?.length > 1 ? (
         <PostVideoEditStoryButton
           active={isEditingStories}
           bottomOverriden={soundBtnBottomOverriden}
