@@ -88,6 +88,12 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
+    // Additional responses
+    const [
+      additionalResponsesFreshlyLoaded,
+      setAdditionalResponsesFreshlyLoaded,
+    ] = useState(post.additionalResponses);
+
     // Socket
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
@@ -298,9 +304,12 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           if (res.data.multipleChoice.status)
             handleUpdatePostStatus(res.data.multipleChoice.status);
 
-          // if (!responseFreshlyUploaded && res.data.multipleChoice?.response) {
-          //   setResponseFreshlyUploaded(res.data.multipleChoice.response);
-          // }
+          if (res.data.multipleChoice.additionalResponses) {
+            setAdditionalResponsesFreshlyLoaded(
+              res.data.multipleChoice.additionalResponses
+            );
+          }
+
           setAnnouncement(res.data.multipleChoice?.announcement);
           if (res.data.multipleChoice?.winningOptionId && !winningOption) {
             const winner = options.find(
@@ -560,7 +569,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             openedTab={openedTab}
             handleChangeTab={handleChangeTab}
             coreResponseInitial={post.response ?? undefined}
-            additionalResponsesInitial={post.additionalResponses}
+            additionalResponsesInitial={additionalResponsesFreshlyLoaded}
           >
             <SExpiresSection>
               {isMobile && (
