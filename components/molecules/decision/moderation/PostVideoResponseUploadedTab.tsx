@@ -91,6 +91,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     responseFileProcessingProgress,
   ]);
 
+  console.log(responses);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const [localFile, setLocalFile] = useState<File | null>(null);
 
@@ -360,7 +362,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       {!responseFileUploadLoading &&
       !responseFileProcessingLoading &&
       responses &&
-      responses?.length > 0 ? (
+      responses?.length > 1 ? (
         <PostVideoEditStoryButton
           active={isEditingStories}
           bottomOverriden={soundBtnBottomOverriden}
