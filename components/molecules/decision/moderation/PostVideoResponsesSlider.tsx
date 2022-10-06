@@ -81,7 +81,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
           const currentIndex = Math.floor(currentScrollLeft / containerWidth);
 
           setCurrentVideo(currentIndex);
-        }, 1000);
+        }, 350);
       }
     };
 

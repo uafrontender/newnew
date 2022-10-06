@@ -355,24 +355,28 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
   const handleVideoDelete = useCallback(async () => {
     try {
-      const payload = new newnewapi.RemoveUploadedFileRequest({
-        publicUrl: uploadedResponseVideoUrl,
-      });
+      if (uploadedResponseVideoUrl) {
+        const payload = new newnewapi.RemoveUploadedFileRequest({
+          publicUrl: uploadedResponseVideoUrl,
+        });
 
-      const res = await removeUploadedFile(payload);
+        const res = await removeUploadedFile(payload);
 
-      if (res?.error) {
-        throw new Error(res.error?.message ?? 'An error occurred');
+        if (res?.error) {
+          throw new Error(res.error?.message ?? 'An error occurred');
+        }
       }
 
-      const payloadProcessing = new newnewapi.StopVideoProcessingRequest({
-        taskUuid: videoProcessing?.taskUuid,
-      });
+      if (videoProcessing?.taskUuid) {
+        const payloadProcessing = new newnewapi.StopVideoProcessingRequest({
+          taskUuid: videoProcessing?.taskUuid,
+        });
 
-      const resProcessing = await stopVideoProcessing(payloadProcessing);
+        const resProcessing = await stopVideoProcessing(payloadProcessing);
 
-      if (!resProcessing.data || resProcessing.error) {
-        throw new Error(resProcessing.error?.message ?? 'An error occurred');
+        if (!resProcessing.data || resProcessing.error) {
+          throw new Error(resProcessing.error?.message ?? 'An error occurred');
+        }
       }
 
       setUploadedResponseVideoUrl('');
@@ -519,6 +523,10 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
           setResponseFileProcessingError(false);
           setResponseFileProcessingLoading(false);
           setResponseFileProcessingProgress(0);
+          setVideoProcessing({
+            taskUuid: '',
+            targetUrls: {},
+          });
 
           setCurrentAdditionalResponseStep('regular');
         } else {
@@ -719,6 +727,12 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       handleSetReadyToUploadAdditionalResponse,
     ]
   );
+
+  useEffect(() => {
+    if (additionalResponsesInitial) {
+      setAdditionalResponses(() => additionalResponsesInitial);
+    }
+  }, [additionalResponsesInitial]);
 
   return (
     <>
