@@ -138,13 +138,7 @@ export const Desktop: React.FC = React.memo(() => {
                   </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      user.userData?.options?.isCreator
-                        ? '/profile/my-posts'
-                        : '/profile'
-                    }
-                  >
+                  <Link href='/profile/my-posts'>
                     <a>
                       <UserAvatar
                         withClick
@@ -172,14 +166,8 @@ export const Desktop: React.FC = React.memo(() => {
                   </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      user.userData?.options?.isCreator
-                        ? '/profile/my-posts'
-                        : '/profile'
-                    }
-                  >
-                    <a>
+                  <Link href='/profile'>
+                    <a id='profile-link'>
                       <UserAvatar
                         withClick
                         avatarUrl={user.userData?.avatarUrl}

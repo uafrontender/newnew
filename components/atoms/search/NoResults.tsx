@@ -20,10 +20,13 @@ const NoResults: React.FC<IFunctionProps> = ({ closeDrop }) => {
     resizeMode
   );
   const exploreHandler = () => {
+    if (closeDrop) {
+      closeDrop();
+    }
+
     if (router.pathname !== '/') {
       router.push('/');
     } else {
-      if (closeDrop) closeDrop();
       animateScroll.scrollToTop({
         offset: isMobile ? -20 : -100,
         smooth: 'ease',

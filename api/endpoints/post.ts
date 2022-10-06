@@ -88,6 +88,36 @@ export const uploadPostResponse = (
     signal ?? undefined,
   );
 
+export const uploadAdditionalPostResponse = (
+  payload: newnewapi.UploadAdditionalPostResponseRequest, signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.UploadAdditionalPostResponseRequest,
+    newnewapi.Post
+  >(
+    newnewapi.UploadAdditionalPostResponseRequest,
+    newnewapi.Post,
+    `${BASE_URL_POST}/upload_additional_post_response`,
+    'post',
+    payload,
+    signal ?? undefined,
+  );
+
+export const deleteAdditionalPostResponse = (
+  payload: newnewapi.DeleteAdditionalPostResponseRequest, signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.DeleteAdditionalPostResponseRequest,
+    newnewapi.EmptyResponse
+  >(
+    newnewapi.DeleteAdditionalPostResponseRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_POST}/delete_additional_post_response`,
+    'post',
+    payload,
+    signal ?? undefined,
+  );
+
 export const fetchPostByUUID = (payload: newnewapi.GetPostRequest, signal?: RequestInit['signal']) =>
   fetchProtobuf<newnewapi.GetPostRequest, newnewapi.Post>(
     newnewapi.GetPostRequest,
