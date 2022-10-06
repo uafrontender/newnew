@@ -66,7 +66,7 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
 
     if (!hasStarted) {
       return (
-        <SCaption variant={2} weight={700}>
+        <SCaption variant={2} weight={600}>
           {t('timer.soon')}
         </SCaption>
       );
@@ -74,14 +74,14 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
 
     if (hasEnded) {
       return (
-        <SCaptionEnded variant={2} weight={700}>
+        <SCaptionEnded variant={2} weight={600}>
           {t('timer.endedOn')} {expirationDate.toLocaleDateString('en-US')}
         </SCaptionEnded>
       );
     }
 
     return (
-      <SCaption variant={2} weight={700}>
+      <SCaption variant={2} weight={600}>
         {t('timer.timeLeft', { time: parsedString })}
       </SCaption>
     );
@@ -97,6 +97,15 @@ const SCaption = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
 
   white-space: nowrap;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: initial;
+  }
 `;
 
 const SCaptionEnded = styled(Caption)`

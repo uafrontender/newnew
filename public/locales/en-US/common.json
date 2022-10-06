@@ -59,7 +59,8 @@
     "signIn": "Sign in",
     "dashboard": "Dashboard",
     "createOnNewnew": "Create now",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "getStarted": "Get started"
   },
   "footer": {
     "topTitle": "NewNew",

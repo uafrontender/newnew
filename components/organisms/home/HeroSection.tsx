@@ -141,16 +141,22 @@ export default HeroSection;
 const SWrapper = styled(motion.section)`
   position: relative;
   width: 100%;
-  height: calc(100vh - 80px); // 80px - visible header height
-  margin-top: -40px;
+  margin-top: -15px;
 
   ${(props) => props.theme.media.tablet} {
-    max-width: 702px;
-    margin: 0 auto;
+    margin-bottom: 10px;
   }
 
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
+    height: calc(100vh - 80px); // 80px - visible header height
+    margin: -40px auto 0;
+  }
+
+  ${(props) => props.theme.media.laptopL} {
+    display: flex;
+    align-items: center;
+    margin-top: -120px;
   }
 `;
 
@@ -168,7 +174,8 @@ const SContentWrapper = styled.div`
 `;
 
 const STopWrapper = styled.div`
-  max-width: 300px;
+  align-self: center;
+  max-width: 320px;
   white-space: pre-line;
 
   ${(props) => props.theme.media.tablet} {
@@ -176,6 +183,15 @@ const STopWrapper = styled.div`
     left: 0;
     top: 50%;
     transform: translateY(-49%);
+    max-width: 300px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    max-width: 360px;
+  }
+
+  ${(props) => props.theme.media.laptopM} {
+    max-width: 587px;
   }
 `;
 
@@ -187,12 +203,10 @@ const SHeadline = styled(Headline)`
   white-space: pre;
 
   ${(props) => props.theme.media.tablet} {
-    max-width: 320px;
     text-align: left;
   }
 
   ${(props) => props.theme.media.laptop} {
-    max-width: 587px;
     font-size: 40px;
     line-height: 48px;
   }
@@ -217,6 +231,9 @@ const SSubTitle = styled(Text)`
 
   ${(props) => props.theme.media.laptop} {
     margin-top: 24px;
+
+    font-size: 24px;
+    line-height: 32px;
   }
 `;
 
@@ -242,12 +259,13 @@ const SLargeAnimation = styled(AnimationChain)`
 
   flex: 1;
 
-  width: 100%;
+  width: 90%;
   height: 300px;
 
   display: flex;
   align-items: center;
   justify-content: center;
+  align-self: center;
 
   z-index: 1;
 
@@ -269,7 +287,7 @@ const SLargeAnimation = styled(AnimationChain)`
     }
   }
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.laptopM} {
     margin-top: 0;
     width: 736px;
     max-width: 736px;

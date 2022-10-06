@@ -21,7 +21,7 @@ import {
   fetchBiggestPosts,
 } from '../api/endpoints/post';
 import { fetchLiveAuctions } from '../api/endpoints/auction';
-// import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
+import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import switchPostType from '../utils/switchPostType';
 import isBrowser from '../utils/isBrowser';
 import assets from '../constants/assets';
@@ -67,10 +67,10 @@ const Home: NextPage<IHome> = ({
     useState(true);
   const [, setCollectionACError] = useState(false);
   // Multiple choice
-  // const [collectionMC, setCollectionMC] = useState<newnewapi.Post[]>([]);
-  // const [collectionMCInitialLoading, setCollectionMCInitialLoading] =
-  // useState(true);
-  // const [collectionMCError, setCollectionMCError] = useState(false);
+  const [collectionMC, setCollectionMC] = useState<newnewapi.Post[]>([]);
+  const [collectionMCInitialLoading, setCollectionMCInitialLoading] =
+    useState(true);
+  const [, setCollectionMCError] = useState(false);
 
   // Biggest of all time
   const [collectionBiggest, setCollectionBiggest] = useState<newnewapi.Post[]>(
@@ -124,18 +124,18 @@ const Home: NextPage<IHome> = ({
     //   );
     //   return updated;
     // });
-    // setCollectionAC((curr) => {
-    //   const updated = curr.filter(
-    //     (post) => switchPostType(post)[0].postUuid !== postUuid
-    //   );
-    //   return updated;
-    // });
-    // setCollectionMC((curr) => {
-    //   const updated = curr.filter(
-    //     (post) => switchPostType(post)[0].postUuid !== postUuid
-    //   );
-    //   return updated;
-    // });
+    setCollectionAC((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+    setCollectionMC((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
     setCollectionBiggest((curr) => {
       const updated = curr.filter(
         (post) => switchPostType(post)[0].postUuid !== postUuid
@@ -212,34 +212,34 @@ const Home: NextPage<IHome> = ({
   }, []);
 
   // Top Multiple Choices
-  // useEffect(() => {
-  //   async function fetchMultipleChoices() {
-  //     try {
-  //       setCollectionMCInitialLoading(true);
-  //       const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({
-  //         sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
-  //       });
+  useEffect(() => {
+    async function fetchMultipleChoices() {
+      try {
+        setCollectionMCInitialLoading(true);
+        const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({
+          sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+        });
 
-  //       const resMultichoices = await fetchTopMultipleChoices(
-  //         multichoicePayload
-  //       );
+        const resMultichoices = await fetchTopMultipleChoices(
+          multichoicePayload
+        );
 
-  //       if (resMultichoices) {
-  //         setCollectionMC(
-  //           () => resMultichoices.data?.multipleChoices as newnewapi.Post[]
-  //         );
-  //         setCollectionMCInitialLoading(false);
-  //       } else {
-  //         throw new Error('Request failed');
-  //       }
-  //     } catch (err) {
-  //       setCollectionMCInitialLoading(false);
-  //       setCollectionMCError(true);
-  //     }
-  //   }
+        if (resMultichoices) {
+          setCollectionMC(
+            () => resMultichoices.data?.multipleChoices as newnewapi.Post[]
+          );
+          setCollectionMCInitialLoading(false);
+        } else {
+          throw new Error('Request failed');
+        }
+      } catch (err) {
+        setCollectionMCInitialLoading(false);
+        setCollectionMCError(true);
+      }
+    }
 
-  //   fetchMultipleChoices();
-  // }, []);
+    fetchMultipleChoices();
+  }, []);
 
   // Biggest of all time
   useEffect(() => {
@@ -291,8 +291,8 @@ const Home: NextPage<IHome> = ({
             : assets.creation.darkMcAnimated
         }
         openPostModal={handleOpenPostModal}
-        posts={collectionAC.slice(0, 3)}
-        loading={collectionACInitialLoading}
+        posts={collectionMC.slice(0, 3)}
+        loading={collectionMCInitialLoading}
       />
 
       {/* AC posts */}

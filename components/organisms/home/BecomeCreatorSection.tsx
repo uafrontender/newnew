@@ -22,46 +22,46 @@ const BecomeCreatorSection = () => {
       <Link href={user.loggedIn ? '/creator-onboarding' : '/sign-up?to=create'}>
         <a>
           <SButton
-            view='modalSecondary'
+            view='transparent'
             onClick={() => {
               Mixpanel.track('Navigation Item Clicked', {
                 _button: 'Create now',
               });
             }}
           >
-            {tCommon('button.createOnNewnew')}
+            {tCommon('button.getStarted')}
           </SButton>
         </a>
       </Link>
 
       <SImageLeftTop
-        src={assets.floatingAssets.topMiddleSphere}
+        src={assets.floatingAssets.darkTopMiddleSphere}
         alt='background'
         draggable={false}
       />
       <SImageLeftMiddle
-        src={assets.floatingAssets.leftGlassSphere}
+        src={assets.floatingAssets.darkLeftGlassSphere}
         alt='background'
         draggable={false}
       />
       <SImageLeftBottom
-        src={assets.floatingAssets.bottomGlassSphere}
+        src={assets.floatingAssets.darkBottomGlassSphere}
         alt='background'
         draggable={false}
       />
 
       <SImageRightTop
-        src={assets.floatingAssets.topMiddleSphere}
+        src={assets.floatingAssets.darkTopMiddleSphere}
         alt='background'
         draggable={false}
       />
       <SImageRightMiddle
-        src={assets.floatingAssets.leftGlassSphere}
+        src={assets.floatingAssets.darkLeftGlassSphere}
         alt='background'
         draggable={false}
       />
       <SImageRightBottom
-        src={assets.floatingAssets.rightGlassSphere}
+        src={assets.floatingAssets.darkRightGlassSphere}
         alt='background'
         draggable={false}
       />
@@ -98,15 +98,13 @@ const SContainer = styled.section`
   }
 
   ${({ theme }) => theme.media.tablet} {
-    margin: 55px -32px 0;
+    margin: 55px -32px 15px;
     padding: 35px 0;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    margin-bottom: 34px;
-    margin-top: 11px;
     padding: 60px 0;
-    margin: 0 -96px;
+    margin: 15px -96px 34px;
   }
 `;
 
@@ -115,6 +113,7 @@ const SHeadline = styled(Headline)`
   z-index: 1;
   font-size: 20px;
   line-height: 28px;
+  color: ${({ theme }) => theme.colors.white};
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 16px;
@@ -124,16 +123,24 @@ const SHeadline = styled(Headline)`
 
   ${({ theme }) => theme.media.laptop} {
     margin-bottom: 24px;
+    font-size: 32px;
+    line-height: 40px;
   }
 `;
 
 const SButton = styled(Button)`
-  padding: 12px 30px;
+  padding: 12px 24px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.darkGray};
 
   font-size: 16px;
   line-height: 24px;
+  text-transform: capitalize;
+
+  &:focus:enabled,
+  &:hover:enabled {
+    color: ${({ theme }) => theme.colors.white};
+  }
 `;
 
 const FloatingImage = styled.img`
@@ -145,7 +152,9 @@ const SImageLeftTop = styled(FloatingImage)`
   height: 31px;
   left: 0;
   top: 0;
-  46 ${({ theme }) => theme.media.tablet} {
+  transform: translate(-53%, -33%) rotate(151deg);
+
+  ${({ theme }) => theme.media.tablet} {
     width: 44px;
     height: 44px;
     transform: translate(-49%, -47%) rotate(151deg);
@@ -154,6 +163,8 @@ const SImageLeftTop = styled(FloatingImage)`
   ${({ theme }) => theme.media.laptop} {
     width: 91px;
     height: 91px;
+    left: 19%;
+    transform: translateY(-50%) rotate(151deg);
   }
 `;
 
@@ -176,6 +187,7 @@ const SImageLeftMiddle = styled(FloatingImage)`
     width: 136px;
     height: 136px;
     top: 3%;
+    left: 0;
     transform: translate(30%, 30%) rotate(-45deg);
   }
 `;
@@ -241,8 +253,11 @@ const SImageRightMiddle = styled(FloatingImage)`
 
   ${({ theme }) => theme.media.laptop} {
     top: 50%;
+    right: 27%;
+    bottom: unset;
     width: 50px;
     height: 50px;
+    transform: translate(0%, -53%);
   }
 `;
 
@@ -250,6 +265,7 @@ const SImageRightBottom = styled(FloatingImage)`
   width: 46px;
   height: 46px;
   bottom: 0;
+  right: 0;
   width: 161px;
   height: 161px;
   transform: translate(30%, 40%);

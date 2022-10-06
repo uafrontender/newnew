@@ -59,7 +59,8 @@
     "signIn": "登入",
     "dashboard": "儀錶板",
     "createOnNewnew": "開始創建",
-    "cancel": "取消"
+    "cancel": "取消",
+    "getStarted_NEED_TRANSLATION": "Get started"
   },
   "footer": {
     "topTitle": "NewNew",

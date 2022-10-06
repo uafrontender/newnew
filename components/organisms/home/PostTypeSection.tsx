@@ -93,13 +93,13 @@ const SContainer = styled.section<{
         ? css`
             flex-direction: row-reverse;
             ${SHeading} {
-              margin-left: 148px;
+              margin-left: auto;
             }
           `
         : css`
             flex-direction: row;
             ${SHeading} {
-              margin-right: 148px;
+              margin-right: auto;
             }
           `}
   }
@@ -122,9 +122,7 @@ const SHeading = styled.div`
     align-self: unset;
     margin-top: 28px;
     margin-bottom: 0;
-    max-width: 425px;
-
-    max-width: 512px;
+    max-width: 415px;
   }
 `;
 
@@ -153,8 +151,8 @@ const SIconHolder = styled.div`
 
 const SHeadline = styled(Headline)`
   margin-bottom: 16px;
-  font-size: 36px !important;
-  line-height: 44px !important;
+  font-size: 36px;
+  line-height: 44px;
 
   ${({ theme }) => theme.media.laptopM} {
     margin-bottom: 24px;
@@ -207,46 +205,82 @@ const SItemWrapper = styled.div<{ index: number }>`
     }
   }
 
+  ${(props) => props.theme.media.laptop} {
+    & > div {
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+
   ${(props) => props.theme.media.laptopM} {
     transform: ${({ index }) => (index !== 1 ? `translateY(25%)` : 0)};
     height: 386px;
 
     & > div {
+      min-width: 204px;
+      max-width: 204px;
       height: 386px;
       background: ${({ theme }) => theme.colorsThemed.background.backgroundDD};
       border-color: ${({ theme }) =>
-        theme.colorsThemed.background.backgroundDD};
+        theme.name === 'dark'
+          ? theme.colorsThemed.background.backgroundDD
+          : theme.colorsThemed.background.outlines1};
     }
 
     & > div > div:first-child {
-      padding: 58% 0px;
+      padding: 60% 0px;
     }
   }
 `;
 
 const SCardSkeletonSection = styled(CardSkeletonSection)`
-  ${({ theme }) => theme.media.tablet} {
+  &&& {
     & > span {
-      left: 0 !important;
-      gap: 16px !important;
-      width: 100%;
+      left: 0;
+      gap: 0;
+      width: auto;
+    }
+    & > span > div {
+      min-width: 100%;
     }
 
-    & > span > div {
-      width: calc((100% - 16px * 2) / 3);
-      height: 412px;
+    ${({ theme }) => theme.media.tablet} {
+      & > span {
+        gap: 16px;
+        width: auto;
+      }
+
+      & > span > div {
+        min-width: calc((100% - 16px * 2) / 3);
+        max-width: calc((100% - 16px * 2) / 3);
+        height: 412px;
+      }
     }
-  }
 
-  ${({ theme }) => theme.media.laptop} {
-    height: 483px;
+    ${({ theme }) => theme.media.laptop} {
+      & > span {
+        gap: 32px;
+      }
 
-    & > span > div {
-      width: 204px;
-      height: 386px;
+      & > span > div {
+        min-width: calc((100% - 32px * 2) / 3);
+        max-width: calc((100% - 32px * 2) / 3);
+        height: 412px;
+      }
+    }
 
-      &:not(:nth-child(2)) {
-        transform: translateY(25%);
+    ${({ theme }) => theme.media.laptopM} {
+      height: 483px;
+      width: auto;
+
+      & > span > div {
+        min-width: 204px;
+        max-width: 204px;
+        height: 386px;
+
+        &:not(:nth-child(2)) {
+          transform: translateY(25%);
+        }
       }
     }
   }

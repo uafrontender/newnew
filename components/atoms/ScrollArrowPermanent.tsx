@@ -69,7 +69,7 @@ const SArrowHolder = styled.div<ISArrowHolder>`
           left: 12px;
 
           ${props.theme.media.laptop} {
-            left: -116px;
+            left: -80px;
           }
           ${props.theme.media.laptopM} {
             left: -65px;
@@ -80,7 +80,7 @@ const SArrowHolder = styled.div<ISArrowHolder>`
           justify-content: flex-end;
 
           ${props.theme.media.laptop} {
-            right: -116px;
+            right: -80px;
           }
           ${props.theme.media.laptopM} {
             right: -65px;

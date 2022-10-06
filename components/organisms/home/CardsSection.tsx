@@ -459,6 +459,10 @@ const SItemWrapper = styled.div<ISItemWrapper>`
 
   ${(props) => props.theme.media.tablet} {
     margin: 0 8px;
+
+    & > div > div:first-child {
+      padding: 60% 0px;
+    }
   }
 
   ${(props) => props.theme.media.laptop} {

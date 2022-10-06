@@ -59,7 +59,8 @@
     "signIn": "Iniciar sesión",
     "dashboard": "Panel",
     "createOnNewnew": "Crear ahora",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "getStarted_NEED_TRANSLATION": "Get started"
   },
   "footer": {
     "topTitle": "NewNew",

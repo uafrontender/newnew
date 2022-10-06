@@ -1,6 +1,6 @@
 import { useTranslation } from 'next-i18next';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import Headline from '../../atoms/Headline';
 
 import Text from '../../atoms/Text';
@@ -38,6 +38,7 @@ const FAQs = [
 
 const FaqSection = () => {
   const { t } = useTranslation('page-Home');
+  const theme = useTheme();
 
   return (
     <SContainer>
@@ -56,38 +57,62 @@ const FaqSection = () => {
       </SList>
       {/* Left side floating icons */}
       <SSubImageLeftTop
-        src={assets.floatingAssets.subMC}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkSubMC
+            : assets.floatingAssets.lightSubMC
+        }
         alt='background'
         draggable={false}
       />
       <SSubImageLeftMiddle
-        src={assets.floatingAssets.subMC}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkSubMC
+            : assets.floatingAssets.lightSubMC
+        }
         alt='background'
         draggable={false}
       />
       <SSubImageLeftBottom
-        src={assets.floatingAssets.subMC}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkSubMC
+            : assets.floatingAssets.lightSubMC
+        }
         alt='background'
         draggable={false}
       />
 
       {/* Right side floating icons */}
       <SSubImageRightTop
-        src={assets.floatingAssets.subMC}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkSubMC
+            : assets.floatingAssets.lightSubMC
+        }
         alt='background'
         draggable={false}
       />
       <SSubImageRightMiddle
-        src={assets.floatingAssets.subMC}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkSubMC
+            : assets.floatingAssets.lightSubMC
+        }
         alt='background'
         draggable={false}
       />
       <SSubImageRightBottom
-        src={assets.floatingAssets.subMC}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkSubMC
+            : assets.floatingAssets.lightSubMC
+        }
         alt='background'
         draggable={false}
       />
-      <SHint variant={3} weight={700}>
+      <SHint variant={3} weight={600}>
         {t('FAQ.stillHaveQuestion')}{' '}
         <SLink
           href='https://intercom.help/newnew-e1a1ca1980f5/en'
@@ -122,6 +147,11 @@ const SHeadline = styled(Headline)`
   margin-bottom: 24px;
   font-size: 28px;
   line-height: 36px;
+
+  ${({ theme }) => theme.media.laptop} {
+    font-size: 32px;
+    line-height: 40px;
+  }
 `;
 
 const SList = styled.ul`
@@ -146,7 +176,10 @@ const STitle = styled(Text)`
 `;
 
 const SText = styled(Text)`
-  color: ${({ theme }) => theme.colorsThemed.background.outlines2};
+  color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.outlines2
+      : theme.colorsThemed.text.secondary};
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 14px;
@@ -156,13 +189,17 @@ const SText = styled(Text)`
 
 const SHint = styled(Text)`
   margin-top: 24px;
-  color: ${({ theme }) => theme.colorsThemed.background.outlines2};
+  color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.outlines2
+      : theme.colorsThemed.text.secondary};
 `;
 
 const SLink = styled.a`
   color: ${({ theme }) => theme.colorsThemed.accent.blue};
   text-decoration: underline;
   cursor: pointer;
+  font-weight: 700;
 `;
 
 const SFloatingImage = styled.img`
@@ -170,58 +207,109 @@ const SFloatingImage = styled.img`
 
   visibility: hidden;
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.tablet} {
     visibility: visible;
   }
 `;
 
 const SSubImageLeftTop = styled(SFloatingImage)`
-  position: absolute;
-  left: -6%;
-  top: 20%;
-  width: 86px;
-  height: 86px;
-  transform: rotate(13deg);
+  width: 41px;
+  height: 41px;
+  left: -2.3%;
+  top: -3.2%;
+  transform: rotate(19deg);
+  opacity: 0.8;
+
+  ${({ theme }) => theme.media.laptop} {
+    width: ${({ theme }) => (theme.name === 'dark' ? '86px' : '42px')};
+    height: ${({ theme }) => (theme.name === 'dark' ? '86px' : '57px')};
+    left: ${({ theme }) => (theme.name === 'dark' ? '-6%' : '-4%')};
+    top: 20%;
+    transform: rotate(13deg);
+  }
 `;
 
 const SSubImageLeftMiddle = styled(SFloatingImage)`
-  left: 2%;
-  top: 49%;
-  width: 36px;
-  height: 36px;
-  transform: rotate(17deg);
+  width: 19px;
+  height: 19px;
+  top: 15.5%;
+  left: 2.5%;
+  transform: rotate(21deg);
+  opacity: 0.6;
+
+  ${({ theme }) => theme.media.laptop} {
+    width: ${({ theme }) => (theme.name === 'dark' ? '36px' : '20px')};
+    height: ${({ theme }) => (theme.name === 'dark' ? '36px' : '28px')};
+    left: 2%;
+    top: 49%;
+    transform: rotate(17deg);
+  }
 `;
 
 const SSubImageLeftBottom = styled(SFloatingImage)`
-  left: -3.5%;
-  top: 71%;
-  width: 50px;
-  height: 50px;
-  transform: rotate(-59deg);
+  width: 26px;
+  height: 26px;
+  bottom: 1%;
+  left: -2.7%;
+  transform: rotate(-60deg);
+
+  ${({ theme }) => theme.media.laptop} {
+    width: ${({ theme }) => (theme.name === 'dark' ? '50px' : '30px')};
+    height: ${({ theme }) => (theme.name === 'dark' ? '50px' : '38px')};
+    left: -3.5%;
+    top: 71%;
+    transform: rotate(-59deg);
+  }
 `;
 
 const SSubImageRightTop = styled(SFloatingImage)`
-  right: 0;
-  top: 20.5%;
-  width: 112px;
-  height: 112px;
-  transform: scaleX(-1) translateX(-62%);
+  width: 70px;
+  height: 70px;
+  right: -4%;
+  top: 0;
+  transform: scaleX(-1) rotate(17deg);
+
+  ${({ theme }) => theme.media.laptop} {
+    width: ${({ theme }) => (theme.name === 'dark' ? '112px' : '56px')};
+    height: ${({ theme }) => (theme.name === 'dark' ? '112px' : '75px')};
+    right: 0;
+    top: 20.5%;
+    transform: scaleX(-1) translateX(-62%);
+  }
 `;
 
 const SSubImageRightMiddle = styled(SFloatingImage)`
-  right: 1.8%;
-  top: 52%;
-  width: 53px;
-  height: 53px;
-  transform: scaleX(-1) rotate(30deg);
+  width: 19px;
+  height: 19px;
+  top: 15%;
+  right: 5%;
+  transform: scaleX(-1) rotate(33deg);
+  opacity: 0.6;
+
+  ${({ theme }) => theme.media.laptop} {
+    width: ${({ theme }) => (theme.name === 'dark' ? '53px' : '29px')};
+    height: ${({ theme }) => (theme.name === 'dark' ? '53px' : '39px')};
+    right: 1.8%;
+    top: 52%;
+    transform: scaleX(-1) rotate(30deg);
+  }
 `;
 
 const SSubImageRightBottom = styled(SFloatingImage)`
-  right: -3.5%;
-  top: 75.5%;
-  width: 38px;
-  height: 38px;
+  width: 26.23px;
+  height: 26.03px;
+  bottom: 1%;
+  right: 2%;
   transform: scaleX(-1) rotate(-60deg);
+
+  ${({ theme }) => theme.media.laptop} {
+    width: ${({ theme }) => (theme.name === 'dark' ? '38px' : '20px')};
+    height: ${({ theme }) => (theme.name === 'dark' ? '38px' : '26px')};
+    right: -3.5%;
+    top: 75.5%;
+    transform: scaleX(-1) rotate(-60deg);
+    opacity: 0.6;
+  }
 `;
 
 export default FaqSection;

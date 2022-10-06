@@ -243,6 +243,9 @@ const SContainer = styled.div`
   padding: 16px 0;
   align-items: center;
   justify-content: space-between;
+
+  max-width: 1248px;
+  margin: 0 auto;
 `;
 
 const SRightBlock = styled.nav`
