@@ -1,12 +1,53 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable arrow-body-style */
 import React, { useRef, useState } from 'react';
+import ReactDOM from 'react-dom';
+import { useTranslation } from 'next-i18next';
+import { AnimatePresence, motion } from 'framer-motion';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+import { useAppSelector } from '../../../../redux-store/store';
+
 import InlineSvg from '../../../atoms/InlineSVG';
 import DeleteVideoModal from './DeleteVideoModal';
+
+import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+
+interface IPostVideoThumbnailItemHelperModal {
+  top: number;
+  left: number;
+}
+
+const PostVideoThumbnailItemHelperModal: React.FunctionComponent<
+  IPostVideoThumbnailItemHelperModal
+> = ({ top, left }) => {
+  const { t } = useTranslation('modal-Post');
+
+  return ReactDOM.createPortal(
+    <AnimatePresence>
+      <SHelperDiv
+        key='helper-div'
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{
+          type: 'tween',
+          duration: 0.15,
+          delay: 0,
+        }}
+        style={{
+          top: top - 48,
+          left: left + 29.5,
+        }}
+      >
+        <SHelperDivInner>{t('Delete video')}</SHelperDivInner>
+        <SHelperDivPointer />
+      </SHelperDiv>
+    </AnimatePresence>,
+    document.getElementById('modal-root') as HTMLElement
+  );
+};
 
 interface IPostVideoThumbnailItem {
   index: number;
@@ -27,7 +68,18 @@ const PostVideoThumbnailItem: React.FunctionComponent<
   handleDeleteVideo,
   handleDeleteUnuploadedAdditonalResponse,
 }) => {
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
   const containerRef = useRef<HTMLDivElement>();
+
+  const [helperVisible, setHelperVisible] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -50,6 +102,8 @@ const PostVideoThumbnailItem: React.FunctionComponent<
               e.stopPropagation();
               setIsDeleteModalOpen(true);
             }}
+            onMouseEnter={() => setHelperVisible(true)}
+            onMouseLeave={() => setHelperVisible(false)}
           >
             <InlineSvg
               svg={CancelIcon}
@@ -59,6 +113,12 @@ const PostVideoThumbnailItem: React.FunctionComponent<
             />
           </SDeleteButton>
         ) : null}
+        {helperVisible && !isMobileOrTablet && (
+          <PostVideoThumbnailItemHelperModal
+            top={containerRef.current?.getBoundingClientRect().top ?? 0}
+            left={containerRef.current?.getBoundingClientRect().left ?? 0}
+          />
+        )}
       </SContainer>
       <DeleteVideoModal
         isVisible={isDeleteModalOpen}
@@ -137,4 +197,41 @@ const SDeleteButton = styled.button`
   &:active:enabled {
     outline: none;
   }
+`;
+
+// Helper div
+const SHelperDiv = styled(motion.div)`
+  position: fixed;
+
+  z-index: 10;
+`;
+
+const SHelperDivInner = styled.div`
+  z-index: 11;
+  width: 100px;
+  background: white;
+  text-align: center;
+
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colors.dark};
+
+  padding: 6px 10px;
+
+  border-radius: 8px;
+`;
+
+const SHelperDivPointer = styled.div`
+  z-index: -1;
+  position: absolute;
+  bottom: -3px;
+  left: calc(50% - 7px);
+
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+
+  background: #ffffff;
+  transform: matrix(0.71, -0.61, 0.82, 0.71, 0, 0);
 `;
