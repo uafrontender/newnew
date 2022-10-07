@@ -61,6 +61,7 @@ import {
 import {
   CREATION_TITLE_MIN,
   CREATION_TITLE_MAX,
+  CREATION_OPTION_MIN,
 } from '../../../../constants/general';
 
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
@@ -260,15 +261,19 @@ export const CreationSecondStepContent: React.FC<
     Set<number>
   >(new Set());
   const optionsAreValid = useMemo(
-    () => tab !== 'multiple-choice' || invalidMcOptionsIndicies.size === 0,
-    [tab, invalidMcOptionsIndicies]
+    () =>
+      tab !== 'multiple-choice' ||
+      (invalidMcOptionsIndicies.size === 0 &&
+        multiplechoice.choices.filter(
+          (o) => o.text.length < CREATION_OPTION_MIN
+        ).length === 0),
+    [tab, invalidMcOptionsIndicies.size, multiplechoice.choices]
   );
 
   const targetBackersValid =
     tab !== 'crowdfunding' ||
     (crowdfunding.targetBackerCount && crowdfunding?.targetBackerCount >= 1);
-  // const disabled =
-  //   !!titleError || !post.title || !post.announcementVideoUrl || fileUpload.progress !== 100 || !optionsAreValid;
+
   const disabled =
     !!titleError ||
     !post.title ||
