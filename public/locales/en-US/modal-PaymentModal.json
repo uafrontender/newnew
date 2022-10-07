@@ -29,5 +29,6 @@
     "wrongEmail": "Email can't be used",
     "paymentFailed": "Payment failed",
     "requestFailed": "Request failed"
-  }
+  },
+  "processingFee": "Processing fee"
 }

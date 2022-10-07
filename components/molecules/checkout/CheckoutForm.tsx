@@ -252,6 +252,9 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           {t('payButton')}
           {amount && ` $${formatNumber(amount / 100, amount % 1 === 0)}`}
         </SPayButton>
+        <SFeeHint variant='subtitle'>{`${t(
+          'processingFee'
+        )}: ${2.25}%`}</SFeeHint>
         {bottomCaption || null}
         {showTocApply && (
           <STocApply>
@@ -345,6 +348,12 @@ const SPayButtonDiv = styled.div`
 
 const SPayButton = styled(Button)`
   width: 100%;
+`;
+
+const SFeeHint = styled(Text)`
+  margin-top: 8px;
+  text-align: center;
+  text-transform: capitalize;
 `;
 
 const STocApply = styled.div`

@@ -29,5 +29,6 @@
     "wrongEmail": "電子郵件無法使用",
     "paymentFailed": "付款失敗",
     "requestFailed": "請求失敗"
-  }
+  },
+  "processingFee_NEED_TRANSLATION": "Processing fee"
 }
