@@ -41,7 +41,7 @@
       },
       {
         "question": "Can I make money on NewNew?",
-        "answer": "Yes! <0>{{link}}</0> and have people pay to vote and bid on your life decisions!"
+        "answer": "Yes! <0>Sign up to become a creator</0> and have people pay to vote and bid on your life decisions!"
       },
       {
         "question": "How do Bids work?",
@@ -59,9 +59,7 @@
         "question": "What if the creator doesn’t do what was voted on or bid on?",
         "answer": "You won’t be charged if: <1>The creator never uploads a response video to a Superpoll or Bid</1> <1>The creator doesn’t choose your specific Bid</1> <1>The creator doesn’t choose the option you voted on in a Superpoll</1>"
       }
-    ],
-    "signUpToBecomeCreator": "Sign up to become a creator",
-    "becomeCreator": "Become a creator"
+    ]
   },
   "becomeCreator_NEED_TRANSLATION": {
     "title": "Ready to create?"

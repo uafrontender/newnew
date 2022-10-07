@@ -1,6 +1,6 @@
 import { Trans, useTranslation } from 'next-i18next';
 import React from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
 
 import Headline from '../../atoms/Headline';
@@ -11,6 +11,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import assets from '../../../constants/assets';
 
 import CheckmarkIcon from '../../../public/images/svg/icons/filled/Checkmark.svg';
+import PlayIcon from '../../../public/images/svg/icons/filled/Play.svg';
 
 interface IEmbedLink {
   href: string;
@@ -25,14 +26,19 @@ const EmbedLink = ({ href, children }: IEmbedLink) => (
 
 interface IPoint {
   children: React.ReactNode;
-  withBullet?: boolean;
+  variant: 1 | 2;
 }
 
-const Point = ({ children, withBullet }: IPoint) => (
-  <SPoint>
-    {withBullet && (
+const Point = ({ children, variant }: IPoint) => (
+  <SPoint variant={variant}>
+    {variant === 1 && (
       <span>
         <InlineSvg svg={CheckmarkIcon} width='6px' height='5px' />
+      </span>
+    )}
+    {variant === 2 && (
+      <span>
+        <InlineSvg svg={PlayIcon} width='14px' height='14px' />
       </span>
     )}
     {children}
@@ -75,15 +81,10 @@ const FaqSection = () => {
                     }
                   />,
                   // @ts-ignore
-                  <Point />,
+                  <Point variant={2} />,
                   // @ts-ignore
-                  <Point withBullet />,
+                  <Point variant={1} />,
                 ]}
-                values={{
-                  link: user.loggedIn
-                    ? t('faq.becomeCreator')
-                    : t('faq.signUpToBecomeCreator'),
-                }}
               />
             </SText>
           </SListItem>
@@ -353,29 +354,45 @@ const SSubImageRightBottom = styled(SFloatingImage)`
   }
 `;
 
-const SPoint = styled.span`
+const SPoint = styled.span<{ variant: 1 | 2 }>`
   display: flex;
   align-items: center;
   margin-top: 4px;
 
-  & span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 8px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
-
-    & svg {
-      color: ${({ theme }) => theme.colors.dark};
-    }
-  }
-
   &:first-of-type {
     margin-top: 6px;
   }
+
+  ${({ variant }) =>
+    variant === 1
+      ? css`
+          & span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: ${({ theme }) =>
+              theme.colorsThemed.accent.yellow};
+
+            & svg {
+              color: ${({ theme }) => theme.colors.dark};
+            }
+          }
+        `
+      : css`
+          & span {
+            margin-right: 6px;
+          }
+          & svg {
+            fill: ${({ theme }) =>
+              theme.name === 'dark'
+                ? theme.colors.white
+                : theme.colorsThemed.background.outlines2};
+          }
+        `}
 `;
 
 export default FaqSection;
