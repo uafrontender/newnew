@@ -1,4 +1,5 @@
-import React, { useContext, useMemo } from 'react';
+/* eslint-disable react/no-array-index-key */
+import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -7,18 +8,17 @@ import { useAppSelector } from '../../../redux-store/store';
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
-import { PacksContext } from '../../../contexts/packsContext';
 import PackCard from './PackCard';
 
 interface IAllPacksModal {
   show: boolean;
+  packs: newnewapi.Pack[];
   onClose: () => void;
 }
 
 const AllPacksModal: React.FC<IAllPacksModal> = React.memo(
-  ({ show, onClose }) => {
+  ({ show, packs, onClose }) => {
     const { t } = useTranslation('page-Packs');
-    const { packs } = useContext(PacksContext);
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -55,13 +55,13 @@ const AllPacksModal: React.FC<IAllPacksModal> = React.memo(
           onClick={preventParentClick()}
           isCloseButton
         >
-          {setsOfPacks.map((set) => (
+          {setsOfPacks.map((set, setIndex) => (
             <SPackSetContainer>
-              {set.map((pack) => (
-                <SPackCard small pack={pack} />
+              {set.map((pack, index) => (
+                <SPackCard key={`${setIndex}-${index}`} small pack={pack} />
               ))}
-              {Array.from('x'.repeat(setSize - set.length)).map(() => (
-                <PackCard small />
+              {Array.from('x'.repeat(setSize - set.length)).map((v, index) => (
+                <PackCard key={`${setIndex}-${index}-holder`} small />
               ))}
             </SPackSetContainer>
           ))}

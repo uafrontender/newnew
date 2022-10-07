@@ -64,7 +64,6 @@ import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
 import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
-import PacksContextProvider from '../contexts/packsContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -221,43 +220,39 @@ const MyApp = (props: IMyApp): ReactElement => {
                           <FollowingsContextProvider>
                             <CardsContextProvider>
                               <SubscriptionsProvider>
-                                <PacksContextProvider>
-                                  <ChatsProvider>
-                                    <OverlayModeProvider>
-                                      <ResizeMode>
-                                        <PostModalContextProvider>
-                                          <GlobalTheme initialTheme={colorMode}>
-                                            <>
-                                              <ToastContainer containerId='toast-container' />
-                                              <VideoProcessingWrapper>
-                                                <ErrorBoundary>
-                                                  {!pageProps.error ? (
-                                                    getLayout(
-                                                      <Component
-                                                        {...pageProps}
-                                                      />
-                                                    )
-                                                  ) : (
-                                                    <Error
-                                                      title={
-                                                        pageProps.error?.message
-                                                      }
-                                                      statusCode={
-                                                        pageProps.error
-                                                          ?.statusCode ?? 500
-                                                      }
-                                                    />
-                                                  )}
-                                                </ErrorBoundary>
-                                              </VideoProcessingWrapper>
-                                              <ReCaptchaBadgeModal />
-                                            </>
-                                          </GlobalTheme>
-                                        </PostModalContextProvider>
-                                      </ResizeMode>
-                                    </OverlayModeProvider>
-                                  </ChatsProvider>
-                                </PacksContextProvider>
+                                <ChatsProvider>
+                                  <OverlayModeProvider>
+                                    <ResizeMode>
+                                      <PostModalContextProvider>
+                                        <GlobalTheme initialTheme={colorMode}>
+                                          <>
+                                            <ToastContainer containerId='toast-container' />
+                                            <VideoProcessingWrapper>
+                                              <ErrorBoundary>
+                                                {!pageProps.error ? (
+                                                  getLayout(
+                                                    <Component {...pageProps} />
+                                                  )
+                                                ) : (
+                                                  <Error
+                                                    title={
+                                                      pageProps.error?.message
+                                                    }
+                                                    statusCode={
+                                                      pageProps.error
+                                                        ?.statusCode ?? 500
+                                                    }
+                                                  />
+                                                )}
+                                              </ErrorBoundary>
+                                            </VideoProcessingWrapper>
+                                            <ReCaptchaBadgeModal />
+                                          </>
+                                        </GlobalTheme>
+                                      </PostModalContextProvider>
+                                    </ResizeMode>
+                                  </OverlayModeProvider>
+                                </ChatsProvider>
                               </SubscriptionsProvider>
                             </CardsContextProvider>
                           </FollowingsContextProvider>

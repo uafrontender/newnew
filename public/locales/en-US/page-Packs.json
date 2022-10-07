@@ -7,14 +7,18 @@
     "title": "NewNew Packs",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elitLorem ipsum dolor sit amet, consectetur adipiscing elit"
   },
-  "packs": {
+  "packsSection": {
     "title": "Your current packs",
-    "seeAll": "See all",
-    "votesLeft": "{{amount}} votes left",
-    "chatAccessLeft": "{{amount}} month chat access"
+    "seeAll": "See all"
   },
   "packsModal": {
     "title": "Your current packs"
+  },
+  "pack": {
+    "votesLeft": "{{amount}} votes left",
+    "chatAccessLeft": "private chat ({{amount}} month access)",
+    "customOptions": "add custom superpoll options",
+    "expiation": "votes never expire"
   },
   "search": {
     "title": "Search creators",

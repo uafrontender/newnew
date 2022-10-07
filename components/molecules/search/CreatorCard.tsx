@@ -1,11 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import React, {
-  useCallback,
-  useMemo,
-  useState,
-  useRef,
-  useContext,
-} from 'react';
+import React, { useCallback, useMemo, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
@@ -24,7 +18,6 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { markUser } from '../../../api/endpoints/user';
 import UserEllipseModal from '../profile/UserEllipseModal';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import { PacksContext } from '../../../contexts/packsContext';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
@@ -43,7 +36,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const { packs } = useContext(PacksContext);
 
   // Ellipse menu
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
@@ -99,10 +91,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
 
   const moreButtonRef: any = useRef();
-
-  const purchasedVotes = packs.find(
-    (pack) => pack.creator?.uuid === creator.uuid
-  )?.votesLeft;
 
   return (
     <SCard>
@@ -160,16 +148,17 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         )}
       </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>
+      {/* TODO: Add data from search API */}
       {withPackOffer && (
         <SButton
-          highlighted={!!purchasedVotes}
+          highlighted={/* !!purchasedVotes */ false}
           onClick={(e) => {
             e.stopPropagation();
             setBuyPacksModalOpen(true);
           }}
         >
           {/* TODO: add translations */}
-          {purchasedVotes ? `${purchasedVotes} votes` : 'Buy Pack'}
+          {/* purchasedVotes ? `${purchasedVotes} votes` : */ 'Buy Pack'}
         </SButton>
       )}
       <SBackground>
@@ -324,6 +313,7 @@ const SButton = styled.button<{ highlighted: boolean }>`
       ? theme.colorsThemed.accent.yellow
       : theme.colorsThemed.button.background.primaryGrad};
   border-radius: ${(props) => props.theme.borderRadius.medium};
+  border: transparent;
 
   cursor: pointer;
 

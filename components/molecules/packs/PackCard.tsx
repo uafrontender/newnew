@@ -2,7 +2,9 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import styled from 'styled-components';
+import InlineSvg from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
+import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
 
 interface IPackCard {
   className?: string;
@@ -31,16 +33,35 @@ const PackCard: React.FC<IPackCard> = ({ className, pack, small = false }) => {
         />
         <SUserData>
           <SDisplayName>{pack.creator?.nickname}</SDisplayName>
-          <SUserName>{pack.creator?.username}</SUserName>
+          <SUserName>@{pack.creator?.username}</SUserName>
         </SUserData>
       </SUserInfo>
       {/* TODO: add Trans */}
       <SVotesLeft small={small}>
-        {t('packs.votesLeft', { amount: pack.votesLeft })}
+        {t('pack.votesLeft', { amount: pack.votesLeft })}
       </SVotesLeft>
-      <SSubscriptionLeft>
-        {t('packs.chatAccessLeft', { amount: monthsLeft })}
-      </SSubscriptionLeft>
+      <SDescriptionLine>
+        <SBullet>
+          <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
+        </SBullet>
+        <SDescriptionText>
+          {t('pack.chatAccessLeft', { amount: monthsLeft })}
+        </SDescriptionText>
+      </SDescriptionLine>
+      <SDescriptionLine>
+        <SBullet>
+          <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
+        </SBullet>
+        <SDescriptionText>{t('pack.customOptions')}</SDescriptionText>
+      </SDescriptionLine>
+      <SDescriptionLine last>
+        <SBullet>
+          <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
+        </SBullet>
+        <SDescriptionText>
+          {t('pack.expiation', { amount: monthsLeft })}
+        </SDescriptionText>
+      </SDescriptionLine>
     </SPackContainer>
   );
 };
@@ -54,16 +75,20 @@ const SPackContainer = styled.div<{ small: boolean; holder?: boolean }>`
   width: 100%;
   border-radius: 16px;
   padding: ${({ small }) => (small ? '16px' : '24px')};
-  max-width: 300px;
   background-color: ${(props) => props.theme.colorsThemed.background.secondary};
   opacity: ${({ holder }) => (holder ? '0' : '1')};
   overflow: hidden;
+
+  ${({ theme }) => theme.media.tablet} {
+    max-width: 300px;
+  }
 `;
 
 const SUserInfo = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
+  margin-bottom: 32px;
   overflow: hidden;
 `;
 
@@ -77,7 +102,6 @@ const SUserAvatar = styled(UserAvatar)<{ small: boolean }>`
 const SUserData = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: 35px;
   margin-left: 12px;
   overflow: hidden;
 `;
@@ -117,15 +141,40 @@ const SVotesLeft = styled.p<{ small: boolean }>`
   font-size: ${({ small }) => (small ? '24px' : '28px;')};
   line-height: ${({ small }) => (small ? '32px' : '36px;')};
 
+  margin-bottom: 16px;
+
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
 
-const SSubscriptionLeft = styled.p`
+const SDescriptionLine = styled.div<{ last?: boolean }>`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-bottom: ${({ last }) => (last ? '0px' : '8px;')};
+  width: 100%;
+
+  overflow: hidden;
+`;
+
+const SBullet = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  margin-top: 4px;
+  margin-right: 8px;
+  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+`;
+
+const SDescriptionText = styled.p`
   font-weight: 600;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
 
   font-size: 14px;
   line-height: 20px;
@@ -133,5 +182,4 @@ const SSubscriptionLeft = styled.p`
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 `;

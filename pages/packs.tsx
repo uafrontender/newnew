@@ -1,4 +1,5 @@
-import React, { useState, useContext, useCallback, useEffect } from 'react';
+/* eslint-disable react/no-array-index-key */
+import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
@@ -16,7 +17,6 @@ import GoBackButton from '../components/molecules/GoBackButton';
 import { useAppSelector } from '../redux-store/store';
 import InlineSvg from '../components/atoms/InlineSVG';
 import searchIcon from '../public/images/svg/icons/outlined/Search.svg';
-import { PacksContext } from '../contexts/packsContext';
 import CreatorsList from '../components/organisms/search/CreatorsList';
 import usePagination, {
   PaginatedResponse,
@@ -25,6 +25,55 @@ import usePagination, {
 import { searchCreators } from '../api/endpoints/search';
 import AllPacksModal from '../components/molecules/packs/AllPacksModal';
 import PackCard from '../components/molecules/packs/PackCard';
+import BackButton from '../components/molecules/profile/BackButton';
+import dateToTimestamp from '../utils/dateToTimestamp';
+
+const PHPacks = [
+  new newnewapi.Pack({
+    creator: new newnewapi.User({
+      uuid: '3d537e81-d2dc-4bb3-9698-39152a817ab5',
+      avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
+      nickname: 'CreatorDisplayName',
+      username: 'username',
+    }),
+    createdAt: dateToTimestamp(new Date()),
+    subscriptionExpiresAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
+    votesLeft: 4,
+  }),
+  new newnewapi.Pack({
+    creator: new newnewapi.User({
+      uuid: 'c82f8990-5ef3-4a6f-b289-b14117a1094a',
+      avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
+      nickname: 'CreatorDisplayName',
+      username: 'username',
+    }),
+    createdAt: dateToTimestamp(new Date()),
+    subscriptionExpiresAt: dateToTimestamp(new Date(Date.now() + 8356800000)),
+    votesLeft: 4500,
+  }),
+  /* new newnewapi.Pack({
+      creator: new newnewapi.User({
+        uuid: 'b8ba2486-48d6-4c55-9cd7-a494d0b79f98',
+        avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
+        nickname: 'CreatorDisplayName',
+        username: 'username',
+      }),
+      createdAt: dateToTimestamp(new Date()),
+      subscriptionExpiresAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
+      votesLeft: 231,
+    }),
+    new newnewapi.Pack({
+      creator: new newnewapi.User({
+        uuid:'6702c9e9-9f53-4c98-85d7-d9ffa2f22599',
+        avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
+        nickname: 'CreatorDisplayName',
+        username: 'username',
+      }),
+      createdAt: dateToTimestamp(new Date()),
+      subscriptionExpiresAt: dateToTimestamp(new Date(Date.now() + 7356800000)),
+      votesLeft: 19465,
+    }), */
+];
 
 export const Packs = () => {
   const router = useRouter();
@@ -39,10 +88,15 @@ export const Packs = () => {
   const [allPacksModalOpen, setAllPacksModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
 
-  const { packs } = useContext(PacksContext);
+  const [packs, setPacks] = useState<newnewapi.Pack[]>([] /* PHPack */);
   const { ref: loadingRef, inView } = useInView();
 
-  const loadData = useCallback(
+  useEffect(() => {
+    setPacks([]);
+    setPacks(PHPacks);
+  }, []);
+
+  const loadCreatorsData = useCallback(
     async (paging: Paging): Promise<PaginatedResponse<newnewapi.IUser>> => {
       const payload = new newnewapi.SearchCreatorsRequest({
         query: searchValue,
@@ -65,15 +119,15 @@ export const Packs = () => {
     [searchValue]
   );
 
-  const { data, loading, hasMore, loadMore } = usePagination(loadData, 10);
+  const paginatedCreators = usePagination(loadCreatorsData, 10);
 
   useEffect(() => {
-    if (inView && !loading && hasMore) {
-      loadMore().catch((e) => console.error(e));
+    if (inView && !paginatedCreators.loading && paginatedCreators.hasMore) {
+      paginatedCreators.loadMore().catch((e) => console.error(e));
     }
-  }, [inView, loading, hasMore, loadMore]);
+  }, [inView, paginatedCreators]);
 
-  const visiblePacksNumber = isTablet ? 3 : 4;
+  const visiblePacksNumber = isMobile || isTablet ? 3 : 4;
 
   return (
     <>
@@ -86,9 +140,13 @@ export const Packs = () => {
       </Head>
       <Container>
         <SubNavigation>
-          <GoBackButton longArrow onClick={() => router.back()}>
-            {t('button.back')}
-          </GoBackButton>
+          {isMobile ? (
+            <SBackButton onClick={() => router.back()} />
+          ) : (
+            <GoBackButton longArrow onClick={() => router.back()}>
+              {t('button.back')}
+            </GoBackButton>
+          )}
         </SubNavigation>
         <SHeader>
           <STitle>{t('header.title')}</STitle>
@@ -96,33 +154,37 @@ export const Packs = () => {
         </SHeader>
 
         <SPacksTitle>
-          <SectionTitle>{t('packs.title')}</SectionTitle>
+          <SectionTitle>{t('packsSection.title')}</SectionTitle>
           {packs.length > visiblePacksNumber && (
             <SSeeAllButton
               onClick={() => {
                 setAllPacksModalOpen(true);
               }}
             >
-              {t('packs.seeAll')}
+              {t('packsSection.seeAll')}
             </SSeeAllButton>
           )}
         </SPacksTitle>
         <SPacksContainer>
-          {packs.slice(0, visiblePacksNumber).map((pack) => (
-            <PackCard pack={pack} />
+          {packs.slice(0, visiblePacksNumber).map((pack, index) => (
+            <PackCard key={`${index}`} pack={pack} />
           ))}
 
           {!isMobile &&
             Array.from(
               'x'.repeat(Math.max(visiblePacksNumber - packs.length, 0))
-            ).map(() => <PackCard />)}
+            ).map((v, index) => <PackCard key={`${index}-holder`} />)}
         </SPacksContainer>
 
         <SectionTitle>{t('search.title')}</SectionTitle>
         <SInputWrapper>
           <SLeftInlineSVG
             svg={searchIcon}
-            fill={theme.colorsThemed.text.secondary}
+            fill={
+              searchValue
+                ? theme.colorsThemed.text.secondary
+                : theme.colorsThemed.text.quaternary
+            }
             width={isMobile ? '20px' : '24px'}
             height={isMobile ? '20px' : '24px'}
           />
@@ -136,12 +198,19 @@ export const Packs = () => {
         </SInputWrapper>
         <SearchResultsTitle>{t('search.resultsTitle')}</SearchResultsTitle>
         <SCardsSection>
-          <CreatorsList loading={loading} collection={data} withPackOffer />
+          <CreatorsList
+            loading={paginatedCreators.loading}
+            collection={paginatedCreators.data}
+            withPackOffer
+          />
         </SCardsSection>
-        {hasMore && !loading && <SRef ref={loadingRef}>Loading...</SRef>}
+        {paginatedCreators.hasMore && !paginatedCreators.loading && (
+          <SRef ref={loadingRef}>Loading...</SRef>
+        )}
       </Container>
       <AllPacksModal
         show={allPacksModalOpen}
+        packs={packs}
         onClose={() => {
           setAllPacksModalOpen(false);
         }}
@@ -190,27 +259,36 @@ const SubNavigation = styled.div`
   flex-direction: row;
   align-items: flex-start;
   width: 100%;
-  margin-bottom: 96px;
+  margin-bottom: 32px;
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-bottom: 96px;
+  }
+`;
+
+const SBackButton = styled(BackButton)`
+  margin-left: -8px;
 `;
 
 const SHeader = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 84px;
+  margin-bottom: 40px;
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.tablet} {
     max-width: 60%;
+    margin-bottom: 84px;
   }
 `;
 
 const STitle = styled.h1`
   font-weight: 600;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  font-size: 72px;
-  line-height: 86px;
   margin-bottom: 16px;
+
+  font-size: 32px;
+  line-height: 40px;
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 56px;
@@ -226,9 +304,13 @@ const STitle = styled.h1`
 const SDescription = styled.h2`
   font-weight: 500;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  font-size: 16px;
+  line-height: 24px;
 
-  font-size: 24px;
-  line-height: 32px;
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 24px;
+    line-height: 32px;
+  }
 `;
 
 const SPacksTitle = styled.div`
@@ -242,10 +324,16 @@ const SPacksTitle = styled.div`
 const SectionTitle = styled.h3`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: 700;
-  font-size: 32px;
-  line-height: 40px;
-  text-align: 'start';
-  margin-bottom: 32px;
+  text-align: start;
+  font-size: 24px;
+  line-height: 32px;
+  margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 32px;
+    line-height: 40px;
+    margin-bottom: 32px;
+  }
 `;
 
 const SSeeAllButton = styled.div`
@@ -268,10 +356,16 @@ const SSeeAllButton = styled.div`
 
 const SPacksContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   width: 100%;
   gap: 16px;
-  margin-bottom: 84px;
+  margin-bottom: 64px;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 84px;
+  }
 `;
 
 const SInputWrapper = styled.div`
@@ -302,7 +396,7 @@ const SInput = styled.input`
   line-height: 24px;
 
   ::placeholder {
-    color: ${(props) => props.theme.colorsThemed.text.secondary};
+    color: ${(props) => props.theme.colorsThemed.text.quaternary};
   }
 `;
 
