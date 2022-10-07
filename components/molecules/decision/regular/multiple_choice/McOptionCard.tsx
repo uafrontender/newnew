@@ -612,7 +612,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           ) : (
             <>
               <SSupportButtonDesktop
-                id={`support-button-${index}${isBlue ? '-supported' : ''}`}
+                id={`support-button-${isBlue ? 'supported' : index}`}
                 active={isSupportMenuOpen}
                 canVoteForFree={canVoteForFree}
                 view='secondary'
@@ -1408,6 +1408,7 @@ const SPaymentModalPostText = styled(Text)`
   display: flex;
   align-items: center;
   white-space: pre-wrap;
+  word-break: break-word;
   gap: 8px;
 
   margin-bottom: 24px;
@@ -1442,7 +1443,8 @@ const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
   text-align: center;
-  white-space: pre-wrap; ;
+  white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SPaymentTermsLink = styled.a`

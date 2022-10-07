@@ -90,6 +90,16 @@ export async function getServerSideProps(
     };
   }
 
+  // TODO: remove when goals returned
+  if (context.req.url?.includes('crowdfunding')) {
+    return {
+      redirect: {
+        permanent: true,
+        destination: '/creation',
+      },
+    };
+  }
+
   return {
     props: {
       ...translationContext,

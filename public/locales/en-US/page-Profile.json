@@ -204,12 +204,19 @@
         "ellipse": {
           "makePrimary": "Make it primary",
           "removeCard": "Remove card"
+        },
+        "status": {
+          "added": "Success! Your card has been saved",
+          "cannotBeAdded": "Failure! Your card cannot be saved",
+          "duplicate": "This card has been already saved in your profile",
+          "inProgress": "Saving your card. Please wait",
+          "requestFailed": "Something went wrong"
         }
       },
       "personalInformation": {
         "title": "Personal information",
         "emailInput": {
-          "label": "Email Address",
+          "label": "Email address",
           "placeholder": "email@email.com",
           "errors": {
             "invalidEmail": "Please enter a valid email address",
@@ -262,11 +269,11 @@
         "privacySubsections": {
           "spendings": {
             "title": "Hide my spending from others",
-            "caption": "People will not be able to see how much you spent on bids, superpolls and goals"
+            "caption": "People will not be able to see how much you spent on bids and superpolls"
           },
           "private": {
             "title": "Make my activity private",
-            "caption": "People will not be able to see any of your activity on bids, superpolls and goals"
+            "caption": "People will not be able to see any of your activity on bids and superpolls"
           }
         },
         "blockedUsers": {

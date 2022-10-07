@@ -122,7 +122,11 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
                   {t('Settings.sections.cards.hint')}
                 </SSubText>
 
-                <SButton size='sm' onClick={() => setIsAddCardModal(true)}>
+                <SButton
+                  id='add-new-card'
+                  size='sm'
+                  onClick={() => setIsAddCardModal(true)}
+                >
                   {t('Settings.sections.cards.button.addNewCard')}
                 </SButton>
               </>

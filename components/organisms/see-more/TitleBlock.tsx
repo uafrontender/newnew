@@ -57,9 +57,9 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
       {
         key: 'mc',
       },
-      {
-        key: 'cf',
-      },
+      // {
+      //   key: 'cf',
+      // },
       // {
       //   key: 'biggest',
       // },
