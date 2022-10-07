@@ -81,7 +81,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     submitWithRecaptchaProtection,
     isSubmitting,
     errorMessage: recaptchaErrorMessage,
-  } = useRecaptcha(handleSubmit, 0.5, 0.4, recaptchaRef);
+  } = useRecaptcha(handleSubmit, 0.5, 0.1, recaptchaRef);
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
