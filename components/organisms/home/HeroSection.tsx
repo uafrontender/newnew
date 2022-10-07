@@ -153,10 +153,9 @@ const SWrapper = styled(motion.section)`
     margin: -40px auto 0;
   }
 
-  ${(props) => props.theme.media.laptopL} {
+  @media (min-width: 1441px) {
     display: flex;
     align-items: center;
-    margin-top: -120px;
   }
 `;
 
@@ -170,6 +169,10 @@ const SContentWrapper = styled.div`
   ${(props) => props.theme.media.tablet} {
     flex-direction: row;
     justify-content: flex-end;
+  }
+
+  @media (min-width: 1441px) {
+    margin-top: -120px;
   }
 `;
 

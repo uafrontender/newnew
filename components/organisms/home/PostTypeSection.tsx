@@ -81,7 +81,7 @@ const SContainer = styled.section<{
   padding: 20px 0;
 
   ${(props) => props.theme.media.laptop} {
-    padding: 75px 0;
+    padding: 60px 0;
   }
 
   ${({ theme }) => theme.media.laptopM} {
@@ -110,7 +110,7 @@ const SHeading = styled.div`
   flex-direction: column;
   align-items: center;
   margin-bottom: 24px;
-  max-width: 380px;
+  max-width: 365px;
   align-self: center;
 
   ${({ theme }) => theme.media.tablet} {
@@ -122,7 +122,7 @@ const SHeading = styled.div`
     align-self: unset;
     margin-top: 28px;
     margin-bottom: 0;
-    max-width: 415px;
+    max-width: 425px;
   }
 `;
 
@@ -193,6 +193,7 @@ const SPosts = styled.div`
 
   ${(props) => props.theme.media.laptopM} {
     flex-direction: row;
+    height: 482px;
   }
 `;
 
@@ -270,7 +271,7 @@ const SCardSkeletonSection = styled(CardSkeletonSection)`
     }
 
     ${({ theme }) => theme.media.laptopM} {
-      height: 483px;
+      height: 482px;
       width: auto;
 
       & > span > div {

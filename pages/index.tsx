@@ -287,8 +287,6 @@ const Home: NextPage<IHome> = ({
 
         const resBiggest = await fetchBiggestPosts(biggestPayload);
 
-        console.log(resBiggest, 'resBiggest');
-
         if (resBiggest) {
           setCollectionBiggest(
             () => resBiggest.data?.posts as newnewapi.Post[]

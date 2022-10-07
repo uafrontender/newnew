@@ -1,40 +1,33 @@
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
-import Headline from '../../atoms/Headline';
+import Link from 'next/link';
 
+import Headline from '../../atoms/Headline';
 import Text from '../../atoms/Text';
 
 import assets from '../../../constants/assets';
 
-const FAQs = [
-  {
-    question: 'How do subscriptions work?',
-    answer:
-      'Subscribing to your favorite creator lets you unlock exclusive extras. These include 1-on-1 convos with the creator, a free vote on every superpoll the creator makes, and the power to add your own options to their superpolls.',
-  },
-  {
-    question: 'How much is a subscription?',
-    answer:
-      'Every creator sets their own subscription price and subscriptions start as low as $1.99 per month.',
-  },
-  {
-    question:
-      'When I subscribe to one creator, does it mean I’m subscribed to all creators?',
-    answer:
-      'Your subscription gives you access to the specific creator you chose on NewNew.',
-  },
-  {
-    question: 'Can I cancel a subsciption?',
-    answer:
-      'Yes. You can cancel a subscription at any time. Just go to the creator\'s profile, open the "More" menu and then tap unsubscribe. Don’t worry if you cancel in the middle of your billing period, you\'ll still be able to interact with the creator until the end of the billing period.',
-  },
-  {
-    question: 'Do all creators offer a subscription?',
-    answer:
-      'No. Although every creator can offer subscriptions, some creators choose not to.',
-  },
-];
+interface IEmbedLink {
+  href: string;
+  children: React.ReactNode;
+}
+
+const EmbedLink = ({ href, children }: IEmbedLink) => (
+  <Link href={href}>
+    <SLink>{children}</SLink>
+  </Link>
+);
+
+interface IPoint {
+  children: React.ReactNode;
+}
+
+const Point = ({ children }: IPoint) => (
+  <SPoint>
+    <span>👉🏻</span> {children}
+  </SPoint>
+);
 
 const FaqSection = () => {
   const { t } = useTranslation('page-Home');
@@ -42,19 +35,48 @@ const FaqSection = () => {
 
   return (
     <SContainer>
-      <SHeadline variant={4}>{t('FAQ.title')}</SHeadline>
+      <SHeadline variant={4}>{t('faq.title')}</SHeadline>
       <SList>
-        {FAQs.map((item) => (
-          <SListItem>
+        {new Array(6).fill('').map((_, i) => (
+          <SListItem key={t(`faq.items.${i}.question`)}>
             <STitle variant={2} weight={600}>
-              {item.question}
+              {t(`faq.items.${i}.question`)}
             </STitle>
             <SText variant={3} weight={600}>
-              {item.answer}
+              <Trans
+                i18nKey={`faq.items.${i}.answer`}
+                t={t}
+                components={[
+                  // @ts-ignore
+                  <EmbedLink href='/sign-up?to=create' />,
+                  // @ts-ignore
+                  <Point />,
+                ]}
+              />
+              {/* {Array.isArray(
+                t(`faq.items.${i}.answerSubItems`, { returnObjects: true })
+              ) &&
+                t(`faq.items.${i}.answerSubItems`, { returnObjects: true }).map(
+                  (el) => el
+                )} */}
             </SText>
           </SListItem>
         ))}
       </SList>
+      <SHint variant={3} weight={600}>
+        <Trans
+          i18nKey='faq.learMore'
+          t={t}
+          // @ts-ignore
+          components={[
+            <SLink
+              href='https://intercom.help/newnew-e1a1ca1980f5/en'
+              target='_blank'
+            />,
+          ]}
+        />
+      </SHint>
+
       {/* Left side floating icons */}
       <SSubImageLeftTop
         src={
@@ -112,15 +134,6 @@ const FaqSection = () => {
         alt='background'
         draggable={false}
       />
-      <SHint variant={3} weight={600}>
-        {t('FAQ.stillHaveQuestion')}{' '}
-        <SLink
-          href='https://intercom.help/newnew-e1a1ca1980f5/en'
-          target='_blank'
-        >
-          {t('FAQ.newnewHelpCenter')}
-        </SLink>
-      </SHint>
     </SContainer>
   );
 };
@@ -155,10 +168,12 @@ const SHeadline = styled(Headline)`
 `;
 
 const SList = styled.ul`
+  width: 100%;
   list-style: none;
 `;
 
 const SListItem = styled.li`
+  width: 100%;
   padding: 24px;
   margin-bottom: 12px;
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
@@ -309,6 +324,20 @@ const SSubImageRightBottom = styled(SFloatingImage)`
     top: 75.5%;
     transform: scaleX(-1) rotate(-60deg);
     opacity: 0.6;
+  }
+`;
+
+const SPoint = styled.span`
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+
+  & span {
+    margin-right: 6px;
+  }
+
+  &:first-of-type {
+    margin-top: 6px;
   }
 `;
 

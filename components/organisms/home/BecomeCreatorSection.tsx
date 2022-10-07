@@ -29,7 +29,7 @@ const BecomeCreatorSection = () => {
               });
             }}
           >
-            {tCommon('button.getStarted')}
+            {tCommon('button.createOnNewnew')}
           </SButton>
         </a>
       </Link>
