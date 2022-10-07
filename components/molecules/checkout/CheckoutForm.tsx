@@ -144,8 +144,10 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         });
       }
     } catch (err: any) {
-      toast.error(err.message);
-      console.error(err);
+      if ((err.type && err.type === 'card_error') || !err.type) {
+        toast.error(err.message);
+      }
+      console.error(err, 'err');
     }
   };
 
@@ -157,7 +159,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     submitWithRecaptchaProtection,
     isSubmitting,
     errorMessage: recaptchaErrorMessage,
-  } = useRecaptcha(handleSubmit, 0.5, 0.4, recaptchaRef);
+  } = useRecaptcha(handleSubmit, 0.5, 0.1, recaptchaRef);
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
@@ -246,7 +248,9 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           type='submit'
           id='pay'
           view='primaryGrad'
-          disabled={primaryCard ? !selectedPaymentMethod : false}
+          disabled={
+            primaryCard ? !selectedPaymentMethod || isSubmitting : isSubmitting
+          }
           loading={isSubmitting}
         >
           {t('payButton')}
