@@ -41,7 +41,7 @@ const PostVideoThumbnailItemHelperModal: React.FunctionComponent<
           left: left + 29.5,
         }}
       >
-        <SHelperDivInner>{t('Delete video')}</SHelperDivInner>
+        <SHelperDivInner>{t('deleteVideoModal.title')}</SHelperDivInner>
         <SHelperDivPointer />
       </SHelperDiv>
     </AnimatePresence>,
