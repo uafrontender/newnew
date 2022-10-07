@@ -5,8 +5,12 @@ import Link from 'next/link';
 
 import Headline from '../../atoms/Headline';
 import Text from '../../atoms/Text';
+import InlineSvg from '../../atoms/InlineSVG';
 
+import { useAppSelector } from '../../../redux-store/store';
 import assets from '../../../constants/assets';
+
+import CheckmarkIcon from '../../../public/images/svg/icons/filled/Checkmark.svg';
 
 interface IEmbedLink {
   href: string;
@@ -21,17 +25,28 @@ const EmbedLink = ({ href, children }: IEmbedLink) => (
 
 interface IPoint {
   children: React.ReactNode;
+  withBullet?: boolean;
 }
 
-const Point = ({ children }: IPoint) => (
+const Point = ({ children, withBullet }: IPoint) => (
   <SPoint>
-    <span>👉🏻</span> {children}
+    {withBullet && (
+      <span>
+        <InlineSvg svg={CheckmarkIcon} width='6px' height='5px' />
+      </span>
+    )}
+    {children}
   </SPoint>
 );
 
 const FaqSection = () => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
+  const user = useAppSelector((state) => state.user);
+
+  console.log(
+    user.loggedIn ? t('faq.becomeCreator') : t('faq.signUpToBecomeCreator')
+  );
 
   return (
     <SContainer>
@@ -44,21 +59,32 @@ const FaqSection = () => {
             </STitle>
             <SText variant={3} weight={600}>
               <Trans
+                key={`trans-${user.loggedIn}`}
                 i18nKey={`faq.items.${i}.answer`}
                 t={t}
                 components={[
                   // @ts-ignore
-                  <EmbedLink href='/sign-up?to=create' />,
+                  <EmbedLink
+                    href={
+                      // eslint-disable-next-line no-nested-ternary
+                      user.loggedIn
+                        ? user.userData?.options?.isCreator
+                          ? '/creator/dashboard'
+                          : '/creator-onboarding'
+                        : '/sign-up?to=create'
+                    }
+                  />,
                   // @ts-ignore
                   <Point />,
+                  // @ts-ignore
+                  <Point withBullet />,
                 ]}
+                values={{
+                  link: user.loggedIn
+                    ? t('faq.becomeCreator')
+                    : t('faq.signUpToBecomeCreator'),
+                }}
               />
-              {/* {Array.isArray(
-                t(`faq.items.${i}.answerSubItems`, { returnObjects: true })
-              ) &&
-                t(`faq.items.${i}.answerSubItems`, { returnObjects: true }).map(
-                  (el) => el
-                )} */}
             </SText>
           </SListItem>
         ))}
@@ -333,7 +359,18 @@ const SPoint = styled.span`
   margin-top: 4px;
 
   & span {
-    margin-right: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
+
+    & svg {
+      color: ${({ theme }) => theme.colors.dark};
+    }
   }
 
   &:first-of-type {
