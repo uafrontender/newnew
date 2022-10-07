@@ -9,7 +9,9 @@
   },
   "packsSection": {
     "title": "Your current packs",
-    "seeAll": "See all"
+    "seeAll": "See all",
+    "noPacks": "You have no packs. Try searching for creator or buy pack",
+    "search": "Search"
   },
   "packsModal": {
     "title": "Your current packs"

@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
@@ -91,6 +91,8 @@ export const Packs = () => {
   const [packs, setPacks] = useState<newnewapi.Pack[]>([] /* PHPack */);
   const { ref: loadingRef, inView } = useInView();
 
+  const searchInputRef = useRef<HTMLInputElement>();
+
   useEffect(() => {
     setPacks([]);
     setPacks(PHPacks);
@@ -165,16 +167,34 @@ export const Packs = () => {
             </SSeeAllButton>
           )}
         </SPacksTitle>
-        <SPacksContainer>
-          {packs.slice(0, visiblePacksNumber).map((pack, index) => (
-            <PackCard key={`${index}`} pack={pack} />
-          ))}
 
-          {!isMobile &&
-            Array.from(
-              'x'.repeat(Math.max(visiblePacksNumber - packs.length, 0))
-            ).map((v, index) => <PackCard key={`${index}-holder`} />)}
-        </SPacksContainer>
+        {packs.length === 0 ? (
+          <SNoPacksContainer>
+            <SNoPacksImage />
+            <SNoPacksText>{t('packsSection.noPacks')}</SNoPacksText>
+            <SSearchButton
+              onClick={() => {
+                if (searchInputRef.current) {
+                  searchInputRef.current.scrollIntoView({ block: 'center' });
+                  searchInputRef.current.focus();
+                }
+              }}
+            >
+              {t('packsSection.search')}
+            </SSearchButton>
+          </SNoPacksContainer>
+        ) : (
+          <SPacksContainer>
+            {packs.slice(0, visiblePacksNumber).map((pack, index) => (
+              <PackCard key={`${index}`} pack={pack} />
+            ))}
+
+            {!isMobile &&
+              Array.from(
+                'x'.repeat(Math.max(visiblePacksNumber - packs.length, 0))
+              ).map((v, index) => <PackCard key={`${index}-holder`} />)}
+          </SPacksContainer>
+        )}
 
         <SectionTitle>{t('search.title')}</SectionTitle>
         <SInputWrapper>
@@ -189,6 +209,11 @@ export const Packs = () => {
             height={isMobile ? '20px' : '24px'}
           />
           <SInput
+            ref={(element) => {
+              if (element) {
+                searchInputRef.current = element;
+              }
+            }}
             value={searchValue}
             onChange={(e: any) => {
               setSearchValue(e.target.value);
@@ -319,6 +344,87 @@ const SPacksTitle = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   width: 100%;
+`;
+
+const SNoPacksContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 24px;
+  border-radius: 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: ${(props) => props.theme.colorsThemed.tag.color.primary};
+  margin-bottom: 64px;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex-direction: row;
+    margin-bottom: 84px;
+  }
+`;
+
+const SNoPacksImage = styled.img`
+  height: 40px;
+  width: 40px;
+
+  margin-bottom: 16px;
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 0px;
+    margin-right: 16px;
+  }
+`;
+
+const SNoPacksText = styled.p`
+  flex-grow: 1;
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  font-weight: 600;
+  text-align: center;
+  font-size: 20px;
+  line-height: 28px;
+  margin-bottom: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 0px;
+    text-align: start;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+`;
+
+const SSearchButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  white-space: nowrap;
+
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: bold;
+
+  padding: 8px 16px;
+  min-width: 100%;
+
+  color: ${({ theme }) => theme.colors.darkGray};
+  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+  border-radius: ${(props) => props.theme.borderRadius.medium};
+  border: transparent;
+
+  cursor: pointer;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  ${({ theme }) => theme.media.tablet} {
+    min-width: 160px;
+  }
 `;
 
 const SectionTitle = styled.h3`
