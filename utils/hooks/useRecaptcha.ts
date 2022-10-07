@@ -111,7 +111,7 @@ const useRecaptcha = (
         );
 
         if (isReCaptchaV2Passed) {
-          callback();
+          await callback();
         } else {
           setErrorMessage('Recaptcha failed');
         }
