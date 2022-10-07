@@ -248,7 +248,9 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           type='submit'
           id='pay'
           view='primaryGrad'
-          disabled={primaryCard ? !selectedPaymentMethod : false}
+          disabled={
+            primaryCard ? !selectedPaymentMethod || isSubmitting : isSubmitting
+          }
           loading={isSubmitting}
         >
           {t('payButton')}
