@@ -255,7 +255,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           {amount && ` $${formatNumber(amount / 100, amount % 1 === 0)}`}
         </SPayButton>
         <SFeeHint variant='subtitle'>{`${t('processingFee')}: ${(
-          appConstants.customerFee * 100
+          parseFloat(appConstants.customerFee) * 100
         ).toFixed(2)}%`}</SFeeHint>
         {bottomCaption || null}
         {showTocApply && (

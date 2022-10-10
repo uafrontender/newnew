@@ -244,7 +244,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   );
 
   const paymentFeeInCents = useMemo(
-    () => getCustomerPaymentFee(paymentAmountInCents, appConstants.customerFee),
+    () =>
+      getCustomerPaymentFee(
+        paymentAmountInCents,
+        parseFloat(appConstants.customerFee)
+      ),
     [paymentAmountInCents, appConstants.customerFee]
   );
 

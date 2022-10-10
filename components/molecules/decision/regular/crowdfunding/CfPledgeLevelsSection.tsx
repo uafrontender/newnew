@@ -136,7 +136,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<
   );
 
   const paymentFeeInCents = useMemo(
-    () => getCustomerPaymentFee(paymentAmountInCents, appConstants.customerFee),
+    () =>
+      getCustomerPaymentFee(
+        paymentAmountInCents,
+        parseFloat(appConstants.customerFee)
+      ),
     [paymentAmountInCents, appConstants.customerFee]
   );
 

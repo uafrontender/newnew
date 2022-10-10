@@ -228,7 +228,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   );
 
   const paymentFeeInCents = useMemo(
-    () => getCustomerPaymentFee(paymentAmountInCents, appConstants.customerFee),
+    () =>
+      getCustomerPaymentFee(
+        paymentAmountInCents,
+        parseFloat(appConstants.customerFee)
+      ),
     [paymentAmountInCents, appConstants.customerFee]
   );
 

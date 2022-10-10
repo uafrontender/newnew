@@ -28,7 +28,8 @@
   "errors": {
     "wrongEmail": "Email can't be used",
     "paymentFailed": "Payment failed",
-    "requestFailed": "Request failed"
+    "requestFailed": "Request failed",
+    "invalidFee": "Something went wrong. Please reload the page and try again"
   },
   "processingFee": "Processing fee"
 }

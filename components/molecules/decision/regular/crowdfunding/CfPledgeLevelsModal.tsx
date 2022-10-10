@@ -118,7 +118,11 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   );
 
   const paymentFeeInCents = useMemo(
-    () => getCustomerPaymentFee(paymentAmountInCents, appConstants.customerFee),
+    () =>
+      getCustomerPaymentFee(
+        paymentAmountInCents,
+        parseFloat(appConstants.customerFee)
+      ),
     [paymentAmountInCents, appConstants.customerFee]
   );
 
