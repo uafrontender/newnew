@@ -44,6 +44,7 @@ import Headline from '../../../../atoms/Headline';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
+import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.DoPledgeResponse.Status
@@ -129,17 +130,35 @@ const CfPledgeLevelsSection: React.FunctionComponent<
     setIsFormOpen(false);
   };
 
+  const paymentAmountInCents = useMemo(
+    () => parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
+    [pledgeAmount]
+  );
+
+  const paymentFeeInCents = useMemo(
+    () => getCustomerPaymentFee(paymentAmountInCents, appConstants.customerFee),
+    [paymentAmountInCents, appConstants.customerFee]
+  );
+
+  const paymentWithFeeInCents = useMemo(
+    () => paymentAmountInCents + paymentFeeInCents,
+    [paymentAmountInCents, paymentFeeInCents]
+  );
+
   const doPledgeRequest = useMemo(
     () =>
-      !pledgeAmount
+      !paymentAmountInCents
         ? null
         : new newnewapi.DoPledgeRequest({
             postUuid: post.postUuid,
             amount: new newnewapi.MoneyAmount({
-              usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
+              usdCents: paymentAmountInCents,
+            }),
+            customerFee: new newnewapi.MoneyAmount({
+              usdCents: paymentFeeInCents,
             }),
           }),
-    [post.postUuid, pledgeAmount]
+    [post.postUuid, paymentAmountInCents, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
@@ -372,31 +391,34 @@ const CfPledgeLevelsSection: React.FunctionComponent<
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={pledgeAmount || 0}
+          amount={paymentWithFeeInCents || 0}
           setupIntent={setupIntent}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
           redirectUrl={`post/${post.postUuid}`}
           bottomCaption={
-            <SPaymentSign variant='subtitle'>
-              {post.creator && (
-                <>
-                  {t('cfPost.paymentModalFooter.body', {
-                    creator: getDisplayname(post.creator),
-                  })}
-                </>
-              )}
-              *
-              <Link href='https://terms.newnew.co'>
-                <SPaymentTermsLink
-                  href='https://terms.newnew.co'
-                  target='_blank'
-                >
-                  {t('cfPost.paymentModalFooter.terms')}
-                </SPaymentTermsLink>
-              </Link>{' '}
-              {t('cfPost.paymentModalFooter.apply')}
-            </SPaymentSign>
+            (!appConstants.minHoldAmount?.usdCents ||
+              paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
+              <SPaymentSign variant='subtitle'>
+                {post.creator && (
+                  <>
+                    {t('cfPost.paymentModalFooter.body', {
+                      creator: getDisplayname(post.creator),
+                    })}
+                  </>
+                )}
+                *
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('cfPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
+                {t('cfPost.paymentModalFooter.apply')}
+              </SPaymentSign>
+            )
           }
         >
           <SPaymentModalHeader>

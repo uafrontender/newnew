@@ -28,6 +28,7 @@ import { useCards } from '../../../contexts/cardsContext';
 import { useAppSelector } from '../../../redux-store/store';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 import useRecaptcha from '../../../utils/hooks/useRecaptcha';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 // eslint-disable-next-line no-shadow
 enum PaymentMethodTypes {
@@ -58,6 +59,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
   const { loggedIn } = useAppSelector((state) => state.user);
+  const { appConstants } = useGetAppConstants();
 
   const [isStripeReady, setIsStripeReady] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
@@ -252,9 +254,9 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           {t('payButton')}
           {amount && ` $${formatNumber(amount / 100, amount % 1 === 0)}`}
         </SPayButton>
-        <SFeeHint variant='subtitle'>{`${t(
-          'processingFee'
-        )}: ${2.25}%`}</SFeeHint>
+        <SFeeHint variant='subtitle'>{`${t('processingFee')}: ${(
+          appConstants.customerFee * 100
+        ).toFixed(2)}%`}</SFeeHint>
         {bottomCaption || null}
         {showTocApply && (
           <STocApply>
