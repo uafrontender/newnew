@@ -8,18 +8,23 @@ import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
 
 interface IPackCard {
   className?: string;
-  pack?: newnewapi.Pack;
+  creatorPack?: newnewapi.ICreatorPack;
   small?: boolean;
 }
 
-const PackCard: React.FC<IPackCard> = ({ className, pack, small = false }) => {
+const PackCard: React.FC<IPackCard> = ({
+  className,
+  creatorPack,
+  small = false,
+}) => {
   const { t } = useTranslation('page-Packs');
 
-  if (!pack) {
+  if (!creatorPack || !creatorPack.pack || !creatorPack.creator) {
     return <SPackContainer className={className} small={small} holder />;
   }
 
-  const expiresAtTime = (pack.subscriptionExpiresAt!.seconds as number) * 1000;
+  const expiresAtTime =
+    (creatorPack.pack.accessExpiredAt!.seconds as number) * 1000;
   const timeLeft = expiresAtTime - Date.now();
   const daysLeft = timeLeft / 1000 / 60 / 60 / 24;
   const monthsLeft = Math.floor(daysLeft / 30);
@@ -29,16 +34,16 @@ const PackCard: React.FC<IPackCard> = ({ className, pack, small = false }) => {
       <SUserInfo>
         <SUserAvatar
           small={small}
-          avatarUrl={pack.creator?.avatarUrl || undefined}
+          avatarUrl={creatorPack.creator?.avatarUrl || undefined}
         />
         <SUserData>
-          <SDisplayName>{pack.creator?.nickname}</SDisplayName>
-          <SUserName>@{pack.creator?.username}</SUserName>
+          <SDisplayName>{creatorPack.creator?.nickname}</SDisplayName>
+          <SUserName>@{creatorPack.creator?.username}</SUserName>
         </SUserData>
       </SUserInfo>
       {/* TODO: add Trans */}
       <SVotesLeft small={small}>
-        {t('pack.votesLeft', { amount: pack.votesLeft })}
+        {t('pack.votesLeft', { amount: creatorPack.pack.votesLeft })}
       </SVotesLeft>
       <SDescriptionLine>
         <SBullet>
@@ -58,9 +63,7 @@ const PackCard: React.FC<IPackCard> = ({ className, pack, small = false }) => {
         <SBullet>
           <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
         </SBullet>
-        <SDescriptionText>
-          {t('pack.expiation', { amount: monthsLeft })}
-        </SDescriptionText>
+        <SDescriptionText>{t('pack.expiation')}</SDescriptionText>
       </SDescriptionLine>
     </SPackContainer>
   );

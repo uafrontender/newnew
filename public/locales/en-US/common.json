@@ -128,6 +128,14 @@
       "title": "We’re on it!",
       "subtitle": "We appreciate you letting us know. We’ll take a look into this ASAP and take the appropriate steps to ensure everyone’s safety.",
       "button": "Got it"
+    },
+    "buyPack": {
+      "title": "Buy {{username}}'s Pack",
+      "votes": "{{amount}} votes",
+      "chatAccess": "private chat ({{amount}} month access)",
+      "customOptions": "add custom superpoll options",
+      "expiration": "votes never expire",
+      "buy": "Buy for ${{amount}}"
     }
   },
   "myLink": {

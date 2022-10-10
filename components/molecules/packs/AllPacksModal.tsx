@@ -12,12 +12,12 @@ import PackCard from './PackCard';
 
 interface IAllPacksModal {
   show: boolean;
-  packs: newnewapi.Pack[];
+  creatorPacks: newnewapi.ICreatorPack[];
   onClose: () => void;
 }
 
 const AllPacksModal: React.FC<IAllPacksModal> = React.memo(
-  ({ show, packs, onClose }) => {
+  ({ show, creatorPacks, onClose }) => {
     const { t } = useTranslation('page-Packs');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -37,15 +37,15 @@ const AllPacksModal: React.FC<IAllPacksModal> = React.memo(
     }, [isMobile, isTablet]);
 
     const setsOfPacks = useMemo(() => {
-      const sets: newnewapi.Pack[][] = [];
-      while (setSize * sets.length < packs.length) {
+      const sets: newnewapi.ICreatorPack[][] = [];
+      while (setSize * sets.length < creatorPacks.length) {
         sets.push(
-          packs.slice(sets.length * setSize, (sets.length + 1) * setSize)
+          creatorPacks.slice(sets.length * setSize, (sets.length + 1) * setSize)
         );
       }
 
       return sets;
-    }, [setSize, packs]);
+    }, [setSize, creatorPacks]);
 
     return (
       <Modal show={show} onClose={onClose}>
@@ -58,7 +58,11 @@ const AllPacksModal: React.FC<IAllPacksModal> = React.memo(
           {setsOfPacks.map((set, setIndex) => (
             <SPackSetContainer>
               {set.map((pack, index) => (
-                <SPackCard key={`${setIndex}-${index}`} small pack={pack} />
+                <SPackCard
+                  key={`${setIndex}-${index}`}
+                  small
+                  creatorPack={pack}
+                />
               ))}
               {Array.from('x'.repeat(setSize - set.length)).map((v, index) => (
                 <PackCard key={`${setIndex}-${index}-holder`} small />

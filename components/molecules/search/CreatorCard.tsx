@@ -22,13 +22,13 @@ import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verif
 interface ICreatorCard {
   creator: newnewapi.IUser;
   withEllipseMenu?: boolean;
-  withPackOffer?: boolean;
+  onBuyPackClicked?: (creator: newnewapi.IUser) => void;
 }
 
 export const CreatorCard: React.FC<ICreatorCard> = ({
   creator,
   withEllipseMenu,
-  withPackOffer,
+  onBuyPackClicked,
 }) => {
   const router = useRouter();
   const currentUser = useAppSelector((state) => state.user);
@@ -44,7 +44,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState(false);
-  const [buyPacksModalOpen, setBuyPacksModalOpen] = useState(false);
   const { usersIBlocked, unblockUser } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(creator.uuid as string),
@@ -149,12 +148,12 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>
       {/* TODO: Add data from search API */}
-      {withPackOffer && (
+      {onBuyPackClicked && (
         <SButton
           highlighted={/* !!purchasedVotes */ false}
           onClick={(e) => {
             e.stopPropagation();
-            setBuyPacksModalOpen(true);
+            onBuyPackClicked(creator);
           }}
         >
           {/* TODO: add translations */}
@@ -197,7 +196,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />
-      {buyPacksModalOpen && null /* TODO: Add Modal */}
     </SCard>
   );
 };

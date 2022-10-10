@@ -13,12 +13,12 @@ import CreatorCard from '../../molecules/search/CreatorCard';
 const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
 interface IList {
-  collection: any;
+  collection: newnewapi.ISearchCreatorsResultItem[];
   loading: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
   withEllipseMenu?: boolean;
-  withPackOffer?: boolean;
+  onBuyPackClicked?: (creator: newnewapi.IUser) => void;
 }
 
 export const CreatorsList: React.FC<IList> = ({
@@ -27,19 +27,25 @@ export const CreatorsList: React.FC<IList> = ({
   skeletonsBgColor,
   skeletonsHighlightColor,
   withEllipseMenu = false,
-  withPackOffer = false,
+  onBuyPackClicked,
 }) => {
-  const renderItem = (item: newnewapi.IUser) => {
+  const renderItem = (item: newnewapi.ISearchCreatorsResultItem) => {
+    if (!item.creator) {
+      return null;
+    }
+
     const handleItemClick = () => {
-      router.push(`/${item.username}`);
+      if (item.creator) {
+        router.push(`/${item.creator.username}`);
+      }
     };
 
     return (
-      <SItemWrapper key={item.uuid} onClick={handleItemClick}>
+      <SItemWrapper key={item.creator.uuid} onClick={handleItemClick}>
         <CreatorCard
-          creator={item}
+          creator={item.creator}
           withEllipseMenu={withEllipseMenu}
-          withPackOffer={withPackOffer}
+          onBuyPackClicked={onBuyPackClicked}
         />
       </SItemWrapper>
     );
@@ -84,9 +90,9 @@ export const CreatorsList: React.FC<IList> = ({
 };
 
 CreatorsList.defaultProps = {
-  withPackOffer: false,
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
+  onBuyPackClicked: undefined,
 };
 
 export default CreatorsList;

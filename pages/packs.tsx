@@ -24,55 +24,101 @@ import usePagination, {
 } from '../utils/hooks/usePagination';
 import { searchCreators } from '../api/endpoints/search';
 import AllPacksModal from '../components/molecules/packs/AllPacksModal';
+import BuyPackModal from '../components/molecules/packs/BuyPackModal';
 import PackCard from '../components/molecules/packs/PackCard';
 import BackButton from '../components/molecules/profile/BackButton';
 import dateToTimestamp from '../utils/dateToTimestamp';
+import { getMyPacks, getOfferedPacks } from '../api/endpoints/pack';
 
 const PHPacks = [
-  new newnewapi.Pack({
+  new newnewapi.CreatorPack({
     creator: new newnewapi.User({
       uuid: '3d537e81-d2dc-4bb3-9698-39152a817ab5',
       avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
       nickname: 'CreatorDisplayName',
       username: 'username',
     }),
-    createdAt: dateToTimestamp(new Date()),
-    subscriptionExpiresAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-    votesLeft: 4,
+    pack: new newnewapi.Pack({
+      accessExpiredAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
+      votesLeft: 4,
+    }),
   }),
-  new newnewapi.Pack({
+  new newnewapi.CreatorPack({
     creator: new newnewapi.User({
       uuid: 'c82f8990-5ef3-4a6f-b289-b14117a1094a',
       avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
       nickname: 'CreatorDisplayName',
       username: 'username',
     }),
-    createdAt: dateToTimestamp(new Date()),
-    subscriptionExpiresAt: dateToTimestamp(new Date(Date.now() + 8356800000)),
-    votesLeft: 4500,
-  }),
-  /* new newnewapi.Pack({
-      creator: new newnewapi.User({
-        uuid: 'b8ba2486-48d6-4c55-9cd7-a494d0b79f98',
-        avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-        nickname: 'CreatorDisplayName',
-        username: 'username',
-      }),
-      createdAt: dateToTimestamp(new Date()),
-      subscriptionExpiresAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-      votesLeft: 231,
+    pack: new newnewapi.Pack({
+      accessExpiredAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
+      votesLeft: 4200,
     }),
-    new newnewapi.Pack({
-      creator: new newnewapi.User({
-        uuid:'6702c9e9-9f53-4c98-85d7-d9ffa2f22599',
-        avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-        nickname: 'CreatorDisplayName',
-        username: 'username',
-      }),
-      createdAt: dateToTimestamp(new Date()),
-      subscriptionExpiresAt: dateToTimestamp(new Date(Date.now() + 7356800000)),
-      votesLeft: 19465,
-    }), */
+  }),
+  /* new newnewapi.CreatorPack({
+    creator: new newnewapi.User({
+      uuid: 'b8ba2486-48d6-4c55-9cd7-a494d0b79f98',
+      avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
+      nickname: 'CreatorDisplayName',
+      username: 'username',
+    }),
+    pack: new newnewapi.Pack({
+      accessExpiredAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
+      votesLeft: 4,
+    }),
+  }),
+  new newnewapi.CreatorPack({
+    creator: new newnewapi.User({
+      uuid: '6702c9e9-9f53-4c98-85d7-d9ffa2f22599',
+      avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
+      nickname: 'CreatorDisplayName',
+      username: 'username',
+    }),
+    pack: new newnewapi.Pack({
+      accessExpiredAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
+      votesLeft: 4,
+    }),
+  }), */
+];
+
+const OFFERED_PACKS: newnewapi.PackOffer[] = [
+  new newnewapi.PackOffer({
+    accessDuration: new newnewapi.DateInterval({
+      startDate: dateToTimestamp(new Date(Date.now())),
+      endDate: dateToTimestamp(new Date(Date.now() + 5356800000)),
+    }),
+    packUuid: '1',
+    price: new newnewapi.MoneyAmount({ usdCents: 500 }),
+    votesAmount: 500,
+  }),
+  new newnewapi.PackOffer({
+    accessDuration: new newnewapi.DateInterval({
+      startDate: dateToTimestamp(new Date(Date.now())),
+      endDate: dateToTimestamp(new Date(Date.now() + 5356800000)),
+    }),
+    packUuid: '2',
+    price: new newnewapi.MoneyAmount({ usdCents: 500 }),
+    votesAmount: 500,
+  }),
+  new newnewapi.PackOffer({
+    accessDuration: new newnewapi.DateInterval({
+      startDate: dateToTimestamp(new Date(Date.now())),
+      endDate: dateToTimestamp(new Date(Date.now() + 5356800000)),
+    }),
+    packUuid: '3',
+    price: new newnewapi.MoneyAmount({ usdCents: 500 }),
+    votesAmount: 500,
+  }),
+
+  new newnewapi.PackOffer({
+    accessDuration: new newnewapi.DateInterval({
+      startDate: dateToTimestamp(new Date(Date.now())),
+      endDate: dateToTimestamp(new Date(Date.now() + 5356800000)),
+    }),
+    packUuid: '4',
+    price: new newnewapi.MoneyAmount({ usdCents: 500 }),
+    votesAmount: 500,
+  }),
 ];
 
 export const Packs = () => {
@@ -86,24 +132,60 @@ export const Packs = () => {
   const isTablet = ['tablet'].includes(resizeMode);
 
   const [allPacksModalOpen, setAllPacksModalOpen] = useState(false);
+  const [buyPackCreator, setBuyPackCreator] = useState<
+    newnewapi.IUser | undefined
+  >();
+  const [offeredPacks, setOfferedPacks] = useState<newnewapi.IPackOffer[]>([]);
+  const [packs, setPacks] = useState<newnewapi.ICreatorPack[]>([] /* PHPack */);
+
   const [searchValue, setSearchValue] = useState('');
-
-  const [packs, setPacks] = useState<newnewapi.Pack[]>([] /* PHPack */);
   const { ref: loadingRef, inView } = useInView();
-
   const searchInputRef = useRef<HTMLInputElement>();
 
-  useEffect(() => {
-    setPacks([]);
-    setPacks(PHPacks);
+  const loadPackOffers = useCallback(async () => {
+    const payload = new newnewapi.EmptyRequest({});
+    const res = await getOfferedPacks(payload);
+
+    if (!res.data || res.error) {
+      toast.error('toastErrors.generic');
+      throw new Error(res.error?.message ?? 'Request failed');
+    }
+
+    setOfferedPacks(res.data.packOffers);
   }, []);
 
+  useEffect(() => {
+    // loadPackOffers();
+    setOfferedPacks(OFFERED_PACKS);
+  }, [loadPackOffers]);
+
+  // TODO: Use paging
+  const loadUserPacks = useCallback(async () => {
+    const payload = new newnewapi.EmptyRequest({});
+
+    const res = await getMyPacks(payload);
+
+    if (!res.data || res.error) {
+      toast.error('toastErrors.generic');
+      throw new Error(res.error?.message ?? 'Request failed');
+    }
+
+    setPacks(res.data.creatorPacks);
+  }, []);
+
+  useEffect(() => {
+    setPacks(PHPacks);
+  }, [loadUserPacks]);
+
   const loadCreatorsData = useCallback(
-    async (paging: Paging): Promise<PaginatedResponse<newnewapi.IUser>> => {
+    async (
+      paging: Paging
+    ): Promise<PaginatedResponse<newnewapi.ISearchCreatorsResultItem>> => {
       const payload = new newnewapi.SearchCreatorsRequest({
         query: searchValue,
         paging,
-        // TODO: add filter
+        expand: [newnewapi.SearchCreatorsRequest.Expand.PACKS],
+        filter: newnewapi.SearchCreatorsRequest.Filter.OFFERS_PACKS,
       });
 
       const res = await searchCreators(payload);
@@ -186,7 +268,7 @@ export const Packs = () => {
         ) : (
           <SPacksContainer>
             {packs.slice(0, visiblePacksNumber).map((pack, index) => (
-              <PackCard key={`${index}`} pack={pack} />
+              <PackCard key={`${index}`} creatorPack={pack} />
             ))}
 
             {!isMobile &&
@@ -226,7 +308,9 @@ export const Packs = () => {
           <CreatorsList
             loading={paginatedCreators.loading}
             collection={paginatedCreators.data}
-            withPackOffer
+            onBuyPackClicked={(creator) => {
+              setBuyPackCreator(creator);
+            }}
           />
         </SCardsSection>
         {paginatedCreators.hasMore && !paginatedCreators.loading && (
@@ -235,11 +319,21 @@ export const Packs = () => {
       </Container>
       <AllPacksModal
         show={allPacksModalOpen}
-        packs={packs}
+        creatorPacks={packs}
         onClose={() => {
           setAllPacksModalOpen(false);
         }}
       />
+      {buyPackCreator && (
+        <BuyPackModal
+          show
+          creator={buyPackCreator}
+          offeredPacks={offeredPacks}
+          onClose={() => {
+            setBuyPackCreator(undefined);
+          }}
+        />
+      )}
     </>
   );
 };
