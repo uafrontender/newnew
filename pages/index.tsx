@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import Head from 'next/head';
 import type { GetServerSideProps, NextPage } from 'next';
@@ -347,12 +348,12 @@ const Home: NextPage<IHome> = ({
 
       {/* Greatest of all time posts */}
       {!collectionBiggestError &&
-      (collectionBiggestInitialLoading || collectionBiggest?.length > 0) ? (
+      (collectionACInitialLoading || collectionAC?.length > 0) ? (
         <SCardsSection
           title={t('cardsSection.title.biggest')}
           category='biggest'
-          collection={collectionBiggest}
-          loading={collectionBiggestInitialLoading}
+          collection={collectionAC}
+          loading={collectionACInitialLoading}
           handlePostClicked={handleOpenPostModal}
         />
       ) : null}
