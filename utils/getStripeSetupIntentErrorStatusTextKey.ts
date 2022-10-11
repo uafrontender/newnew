@@ -1,6 +1,6 @@
 import { newnewapi } from 'newnew-api';
 
-function getUpdateStripeSetupIntentErrorStatusTextKey(
+export function getUpdateStripeSetupIntentErrorStatusTextKey(
   status?: newnewapi.UpdateStripeSetupIntentResponse.Status
 ) {
   switch (status) {
@@ -14,4 +14,13 @@ function getUpdateStripeSetupIntentErrorStatusTextKey(
   }
 }
 
-export default getUpdateStripeSetupIntentErrorStatusTextKey;
+export function getCreateStripeSetupIntentErrorStatusTextKey(
+  status?: newnewapi.CreateStripeSetupIntentResponse.Status
+) {
+  switch (status) {
+    case newnewapi.CreateStripeSetupIntentResponse.Status.INVALID_CUSTOMER_FEE:
+      return 'errors.invalidFee';
+    default:
+      return 'errors.requestFailed';
+  }
+}
