@@ -85,6 +85,8 @@ const SCtaButtonContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
+
+  margin-left: 8px;
 `;
 
 const SCTAButton = styled.button`
