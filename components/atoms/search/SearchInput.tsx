@@ -72,7 +72,7 @@ const SearchInput: React.FC = React.memo(() => {
     if (isHashtag) {
       router.push(`/search?query=${firstChunk.text}&type=hashtags&tab=posts`);
     } else {
-      const clearedQuery = query.replaceAll('#', '');
+      const clearedQuery = encodeURIComponent(query);
       router.push(`/search?query=${clearedQuery}&tab=posts`);
     }
   };

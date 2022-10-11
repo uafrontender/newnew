@@ -128,6 +128,7 @@
       "backToResponse": "觀看回應"
     },
     "reuploadButton": "重新上傳",
+    "addVideoButton_NEED_TRANSLATION": "Add video",
     "cannotLeavePageMsg": "你確定要關閉這個頁面嗎？上傳進度會丟失",
     "floatingUploadResponseButton": "製作回應視頻",
     "setThumbnail": "設置縮略圖",
@@ -213,6 +214,14 @@
     "button": {
       "cancel": "取消",
       "confirm": "刪除"
+    }
+  },
+  "deleteVideoModal_NEED_TRANSLATION": {
+    "title": "Delete video",
+    "body": "Are you sure you want to delete this video?",
+    "button": {
+      "cancel": "Cancel",
+      "confirm": "Delete"
     }
   },
   "deleteCommentModal": {

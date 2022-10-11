@@ -146,7 +146,7 @@ const PostModerationControls: React.FunctionComponent<
         <PostEllipseMenuModeration
           postType={typeOfPost as string}
           isVisible={ellipseMenuOpen}
-          canDeletePost
+          canDeletePost={postStatus !== 'succeeded'}
           handleClose={handleEllipseMenuClose}
           handleOpenDeletePostModal={handleOpenDeletePostModal}
           anchorElement={moreButtonRef.current}
@@ -156,7 +156,7 @@ const PostModerationControls: React.FunctionComponent<
         <PostEllipseModalModeration
           postType={typeOfPost as string}
           zIndex={11}
-          canDeletePost
+          canDeletePost={postStatus !== 'succeeded'}
           isOpen={ellipseMenuOpen}
           onClose={handleEllipseMenuClose}
           handleOpenDeletePostModal={handleOpenDeletePostModal}

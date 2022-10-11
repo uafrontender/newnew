@@ -202,10 +202,12 @@ const MyProfileSettingsIndex = () => {
 
   const accordionSections: AccordionSection[] = [
     {
+      id: 'cards',
       title: t('Settings.sections.cards.title'),
       content: <SettingsCardsSection />,
     },
     {
+      id: 'info',
       title: t('Settings.sections.personalInformation.title'),
       content: (
         <SettingsPersonalInformationSection
@@ -235,10 +237,12 @@ const MyProfileSettingsIndex = () => {
       ),
     },
     {
+      id: 'notifications',
       title: t('Settings.sections.notifications.title'),
       content: <SettingsNotificationsSection />,
     },
     {
+      id: 'transactions',
       title: t('Settings.sections.transactions.title'),
       content: (
         <TransactionsSection
@@ -251,6 +255,7 @@ const MyProfileSettingsIndex = () => {
       hidden: myTransactionsTotal === 0,
     },
     {
+      id: 'privacy',
       title: t('Settings.sections.privacy.title'),
       content: (
         <PrivacySection

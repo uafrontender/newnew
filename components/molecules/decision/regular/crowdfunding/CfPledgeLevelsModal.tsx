@@ -29,6 +29,8 @@ import PostTitleContent from '../../../../atoms/PostTitleContent';
 import PaymentModal from '../../../checkout/PaymentModal';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
+import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.DoPledgeResponse.Status
@@ -76,6 +78,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
+  const { appConstants } = useGetAppConstants();
 
   const [pledgeAmount, setPledgeAmount] = useState<number | undefined>(
     undefined
@@ -109,17 +112,39 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
     setIsFormOpen(false);
   };
 
+  const paymentAmountInCents = useMemo(
+    () => parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
+    [pledgeAmount]
+  );
+
+  const paymentFeeInCents = useMemo(
+    () =>
+      getCustomerPaymentFee(
+        paymentAmountInCents,
+        parseFloat(appConstants.customerFee)
+      ),
+    [paymentAmountInCents, appConstants.customerFee]
+  );
+
+  const paymentWithFeeInCents = useMemo(
+    () => paymentAmountInCents + paymentFeeInCents,
+    [paymentAmountInCents, paymentFeeInCents]
+  );
+
   const doPledgeRequest = useMemo(
     () =>
-      !pledgeAmount
+      !paymentAmountInCents
         ? null
         : new newnewapi.DoPledgeRequest({
             postUuid: post.postUuid,
             amount: new newnewapi.MoneyAmount({
-              usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
+              usdCents: paymentAmountInCents,
+            }),
+            customerFee: new newnewapi.MoneyAmount({
+              usdCents: paymentFeeInCents,
             }),
           }),
-    [post.postUuid, pledgeAmount]
+    [post.postUuid, paymentAmountInCents, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
@@ -284,31 +309,34 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={14}
-          amount={pledgeAmount || 0}
+          amount={paymentWithFeeInCents || 0}
           onClose={() => setPaymentModalOpen(false)}
           setupIntent={setupIntent}
           handlePayWithCard={handlePayWithCard}
           redirectUrl={`post/${post.postUuid}`}
           bottomCaption={
-            <SPaymentSign variant='subtitle'>
-              {post.creator && (
-                <>
-                  {t('cfPost.paymentModalFooter.body', {
-                    creator: getDisplayname(post.creator),
-                  })}
-                </>
-              )}
-              *
-              <Link href='https://terms.newnew.co'>
-                <SPaymentTermsLink
-                  href='https://terms.newnew.co'
-                  target='_blank'
-                >
-                  {t('cfPost.paymentModalFooter.terms')}
-                </SPaymentTermsLink>
-              </Link>{' '}
-              {t('cfPost.paymentModalFooter.apply')}
-            </SPaymentSign>
+            (!appConstants.minHoldAmount?.usdCents ||
+              paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
+              <SPaymentSign variant='subtitle'>
+                {post.creator && (
+                  <>
+                    {t('cfPost.paymentModalFooter.body', {
+                      creator: getDisplayname(post.creator),
+                    })}
+                  </>
+                )}
+                *
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('cfPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
+                {t('cfPost.paymentModalFooter.apply')}
+              </SPaymentSign>
+            )
           }
         >
           <SPaymentModalHeader>
@@ -394,6 +422,7 @@ const SPaymentModalOptionText = styled(Headline)`
   display: flex;
   align-items: center;
   white-space: pre-wrap;
+  word-break: break-word;
   gap: 8px;
 `;
 
@@ -433,6 +462,7 @@ const SPaymentSign = styled(Text)`
 
   text-align: center;
   white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SPaymentTermsLink = styled.a`

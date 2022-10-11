@@ -55,6 +55,10 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
       redirect: 'if_required',
     });
 
+    if (error && error.type === 'card_error') {
+      throw new Error(error.message);
+    }
+
     if (!error) {
       onSuccess(setupIntent);
     }
@@ -77,7 +81,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     submitWithRecaptchaProtection,
     isSubmitting,
     errorMessage: recaptchaErrorMessage,
-  } = useRecaptcha(handleSubmit, 0.5, 0.4, recaptchaRef);
+  } = useRecaptcha(handleSubmit, 0.5, 0.1, recaptchaRef);
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
@@ -96,6 +100,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
   return (
     <form onSubmit={submitWithRecaptchaProtection}>
       <PaymentElement
+        id='stripePayment'
         onReady={() => {
           setIsStripeReady(true);
         }}
@@ -128,6 +133,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
             {tCommon('button.cancel')}
           </SCancelButton>
           <SAddButton
+            id='submit-card'
             view='primary'
             disabled={!stripe || isSubmitting}
             type='submit'

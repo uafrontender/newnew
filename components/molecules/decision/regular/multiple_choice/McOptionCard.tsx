@@ -59,6 +59,7 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
+import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -281,14 +282,36 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     setIsAmountPredefined(false);
   };
 
+  const paymentAmountInCents = useMemo(
+    () => (parseInt(supportBidAmount) || 0) * votePrice,
+    [votePrice, supportBidAmount]
+  );
+
+  const paymentFeeInCents = useMemo(
+    () =>
+      getCustomerPaymentFee(
+        paymentAmountInCents,
+        parseFloat(appConstants.customerFee)
+      ),
+    [paymentAmountInCents, appConstants.customerFee]
+  );
+
+  const paymentWithFeeInCents = useMemo(
+    () => paymentAmountInCents + paymentFeeInCents,
+    [paymentAmountInCents, paymentFeeInCents]
+  );
+
   const voteOnPostRequest = useMemo(
     () =>
       new newnewapi.VoteOnPostRequest({
         postUuid: postId,
         votesCount: parseInt(supportBidAmount),
+        customerFee: new newnewapi.MoneyAmount({
+          usdCents: paymentFeeInCents,
+        }),
         optionId: option.id,
       }),
-    [postId, supportBidAmount, option.id]
+    [postId, supportBidAmount, option.id, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
@@ -612,7 +635,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           ) : (
             <>
               <SSupportButtonDesktop
-                id={`support-button-${index}${isBlue ? '-supported' : ''}`}
+                id={`support-button-${isBlue ? 'supported' : index}`}
                 active={isSupportMenuOpen}
                 canVoteForFree={canVoteForFree}
                 view='secondary'
@@ -696,27 +719,31 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <PaymentModal
             zIndex={12}
             isOpen={paymentModalOpen}
-            amount={(parseInt(supportBidAmount) || 0) * votePrice}
+            amount={paymentWithFeeInCents}
             setupIntent={setupIntent}
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCard={handlePayWithCard}
             redirectUrl={`post/${postId}`}
             bottomCaption={
-              <SPaymentSign variant='subtitle'>
-                {t('mcPost.paymentModalFooter.body', {
-                  creator: postCreator,
-                })}
-                *
-                <Link href='https://terms.newnew.co'>
-                  <SPaymentTermsLink
-                    href='https://terms.newnew.co'
-                    target='_blank'
-                  >
-                    {t('mcPost.paymentModalFooter.terms')}
-                  </SPaymentTermsLink>
-                </Link>{' '}
-                {t('mcPost.paymentModalFooter.apply')}
-              </SPaymentSign>
+              (!appConstants.minHoldAmount?.usdCents ||
+                paymentWithFeeInCents >
+                  appConstants.minHoldAmount?.usdCents) && (
+                <SPaymentSign variant='subtitle'>
+                  {t('mcPost.paymentModalFooter.body', {
+                    creator: postCreator,
+                  })}
+                  *
+                  <Link href='https://terms.newnew.co'>
+                    <SPaymentTermsLink
+                      href='https://terms.newnew.co'
+                      target='_blank'
+                    >
+                      {t('mcPost.paymentModalFooter.terms')}
+                    </SPaymentTermsLink>
+                  </Link>{' '}
+                  {t('mcPost.paymentModalFooter.apply')}
+                </SPaymentSign>
+              )
             }
           >
             <SPaymentModalHeader>
@@ -1408,6 +1435,7 @@ const SPaymentModalPostText = styled(Text)`
   display: flex;
   align-items: center;
   white-space: pre-wrap;
+  word-break: break-word;
   gap: 8px;
 
   margin-bottom: 24px;
@@ -1442,7 +1470,8 @@ const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
   text-align: center;
-  white-space: pre-wrap; ;
+  white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SPaymentTermsLink = styled.a`

@@ -27,7 +27,9 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
   const { ref: loadingRef, inView } = useInView();
 
   const loadData = useCallback(
-    async (paging: Paging): Promise<PaginatedResponse<newnewapi.IUser>> => {
+    async (
+      paging: Paging
+    ): Promise<PaginatedResponse<newnewapi.ISearchCreatorsResultItem>> => {
       if (query.length === 0) {
         return {
           nextData: [],

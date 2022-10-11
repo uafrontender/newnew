@@ -44,7 +44,7 @@ export const CreatorsList: React.FC<IList> = ({
       <SItemWrapper key={item.creator.uuid} onClick={handleItemClick}>
         <CreatorCard
           creator={item.creator}
-          withEllipseMenu={withEllipseMenu}
+          withEllipseMenu={withEllipseMenu ?? false}
           onBuyPackClicked={onBuyPackClicked}
         />
       </SItemWrapper>
