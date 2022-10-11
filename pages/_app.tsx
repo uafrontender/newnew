@@ -291,12 +291,12 @@ const PRE_FETCH_LINKS_COMMON = (
       as='image'
       media='(min-width: 760px)'
     />
-    <link
+    {/* <link
       rel='prefetch'
       href={assets.floatingAssets.crowdfunding}
       as='image'
       media='(min-width: 760px)'
-    />
+    /> */}
     <link
       rel='prefetch'
       href={assets.floatingAssets.leftGlassSphere}
