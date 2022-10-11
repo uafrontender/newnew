@@ -158,6 +158,7 @@ const SHashtag = styled.span`
 `;
 
 const Query = styled.span`
+  overflow-wrap: break-word;
   color: ${(props) => props.theme.colorsThemed.text.primary};
 `;
 
