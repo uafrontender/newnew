@@ -29,15 +29,15 @@ export const CreatorsList: React.FC<IList> = ({
   skeletonsHighlightColor,
   withEllipseMenu = false,
 }) => {
-  const renderItem = (item: newnewapi.IUser) => {
+  const renderItem = ({ creator }: { creator: newnewapi.IUser }) => {
     const handleItemClick = () => {
-      router.push(`/${item.username}`);
+      router.push(`/${creator.username}`);
     };
 
     return (
-      <SItemWrapper key={item.uuid} onClick={handleItemClick}>
+      <SItemWrapper key={creator.uuid} onClick={handleItemClick}>
         <CreatorCardWithSubscriptionPrice
-          item={item}
+          item={creator}
           withEllipseMenu={withEllipseMenu ?? false}
         />
       </SItemWrapper>
