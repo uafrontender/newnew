@@ -20,7 +20,7 @@ import {
   fetchFeaturedCreatorPosts,
 } from '../api/endpoints/post';
 import { fetchLiveAuctions } from '../api/endpoints/auction';
-import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
+// import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 
 import switchPostType from '../utils/switchPostType';
@@ -81,10 +81,10 @@ const Home: NextPage<IHome> = ({
     useState(true);
   const [collectionMCError, setCollectionMCError] = useState(false);
   // Crowdfunding
-  const [collectionCF, setCollectionCF] = useState<newnewapi.Post[]>([]);
-  const [collectionCFInitialLoading, setCollectionCFInitialLoading] =
-    useState(true);
-  const [collectionCFError, setCollectionCFError] = useState(false);
+  // const [collectionCF, setCollectionCF] = useState<newnewapi.Post[]>([]);
+  // const [collectionCFInitialLoading, setCollectionCFInitialLoading] =
+  //   useState(true);
+  // const [collectionCFError, setCollectionCFError] = useState(false);
   // Biggest of all time
   const [collectionBiggest, setCollectionBiggest] = useState<newnewapi.Post[]>(
     []
@@ -156,12 +156,12 @@ const Home: NextPage<IHome> = ({
       );
       return updated;
     });
-    setCollectionCF((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
+    // setCollectionCF((curr) => {
+    //   const updated = curr.filter(
+    //     (post) => switchPostType(post)[0].postUuid !== postUuid
+    //   );
+    //   return updated;
+    // });
     setCollectionBiggest((curr) => {
       const updated = curr.filter(
         (post) => switchPostType(post)[0].postUuid !== postUuid
@@ -274,30 +274,30 @@ const Home: NextPage<IHome> = ({
   }, []);
 
   // Top Crowdfunding
-  useEffect(() => {
-    async function fetchCrowdfundings() {
-      try {
-        setCollectionCFInitialLoading(true);
-        const cfPayload = new newnewapi.PagedCrowdfundingsRequest({
-          sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
-        });
-
-        const resCF = await fetchTopCrowdfundings(cfPayload);
-
-        if (resCF) {
-          setCollectionCF(() => resCF.data?.crowdfundings as newnewapi.Post[]);
-          setCollectionCFInitialLoading(false);
-        } else {
-          throw new Error('Request failed');
-        }
-      } catch (err) {
-        setCollectionCFInitialLoading(false);
-        setCollectionCFError(true);
-      }
-    }
-
-    fetchCrowdfundings();
-  }, []);
+  // useEffect(() => {
+  //   async function fetchCrowdfundings() {
+  //     try {
+  //       setCollectionCFInitialLoading(true);
+  //       const cfPayload = new newnewapi.PagedCrowdfundingsRequest({
+  //         sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+  //       });
+  //
+  //       const resCF = await fetchTopCrowdfundings(cfPayload);
+  //
+  //       if (resCF) {
+  //         setCollectionCF(() => resCF.data?.crowdfundings as newnewapi.Post[]);
+  //         setCollectionCFInitialLoading(false);
+  //       } else {
+  //         throw new Error('Request failed');
+  //       }
+  //     } catch (err) {
+  //       setCollectionCFInitialLoading(false);
+  //       setCollectionCFError(true);
+  //     }
+  //   }
+  //
+  //   fetchCrowdfundings();
+  // }, []);
 
   // Biggest of all time
   useEffect(() => {
@@ -435,7 +435,7 @@ const Home: NextPage<IHome> = ({
           }
         />
       )}
-      {!collectionCFError && (
+      {/* !collectionCFError && (
         <CardsSection
           title={t('cardsSection.title.cf')}
           category='cf'
@@ -463,7 +463,7 @@ const Home: NextPage<IHome> = ({
             ) : undefined
           }
         />
-      )}
+        ) */}
       {!collectionBiggestError &&
       collectionBiggestInitialLoading &&
       collectionBiggest?.length > 0 ? (

@@ -199,11 +199,11 @@ const VerifyEmailVisual: React.FunctionComponent = () => {
         alt='background'
         className='email-bg-BottomSphereImage'
       />
-      <img
+      {/* <img
         src={assets.floatingAssets.crowdfunding}
         alt='background'
         className='email-bg-CrowdfundingImage'
-      />
+      /> */}
       <img
         src={assets.floatingAssets.leftGlassSphere}
         alt='background'
