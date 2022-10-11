@@ -213,7 +213,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
   return (
-    <Modal show={showModal}>
+    <Modal show={showModal} onClose={closeModal}>
       <SContainer>
         <SModal>
           <SModalHeader>
@@ -321,6 +321,7 @@ const SModal = styled.div`
       : props.theme.colorsThemed.background.secondary};
   max-width: 100%;
   max-height: 100vh;
+  z-index: 1;
 
   ${(props) => props.theme.media.tablet} {
     max-width: 480px;

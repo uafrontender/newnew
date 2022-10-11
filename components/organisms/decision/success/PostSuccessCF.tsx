@@ -228,6 +228,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
             postId={post.postUuid}
             announcement={post.announcement!!}
             response={post.response ?? undefined}
+            additionalResponses={post.additionalResponses}
             responseViewed={responseViewed}
             openedTab={videoTab}
             setOpenedTab={(tab) => setVideoTab(tab)}
@@ -540,6 +541,7 @@ const STotal = styled.div`
 const SPostTitle = styled(Headline)`
   text-align: center;
   white-space: pre-wrap;
+  word-break: break-word;
 
   margin-top: 8px;
   ${({ theme }) => theme.media.tablet} {

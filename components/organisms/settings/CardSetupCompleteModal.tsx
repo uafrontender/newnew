@@ -21,15 +21,15 @@ import { useCards } from '../../../contexts/cardsContext';
 const getCardStatusMessage = (cardStatus: newnewapi.CardStatus) => {
   switch (cardStatus) {
     case newnewapi.CardStatus.ADDED:
-      return 'Success! Your card has been saved';
+      return 'Settings.sections.cards.status.added';
     case newnewapi.CardStatus.CANNOT_BE_ADDED:
-      return 'Failure! Your card cannot be saved';
+      return 'Settings.sections.cards.status.cannotBeAdded';
     case newnewapi.CardStatus.DUPLICATE:
-      return 'This card has been already saved in your profile';
+      return 'Settings.sections.cards.status.duplicate';
     case newnewapi.CardStatus.IN_PROGRESS:
-      return 'Saving your card. Please wait';
+      return 'Settings.sections.cards.status.inProgress';
     default:
-      return 'Something went wrong';
+      return 'Settings.sections.cards.status.requestFailed';
   }
 };
 interface ICardSetupCompleteModal {
@@ -97,7 +97,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           handleSetCard(response.data.card);
         }
 
-        setMessage(getCardStatusMessage(response.data.cardStatus));
+        setMessage(t(getCardStatusMessage(response.data.cardStatus)));
       } catch (err) {
         console.error(err);
         setIsProcessing(false);
@@ -111,7 +111,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
     return () => {
       controller.abort();
     };
-  }, [clientSecret, setupIntentId, handleSetCard, isStatusChecked]);
+  }, [clientSecret, setupIntentId, isStatusChecked, t, handleSetCard]);
 
   useEffect(() => {
     const handleCardAdded = (data: any) => {
@@ -119,7 +119,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
       const decoded = newnewapi.CardStatusChanged.decode(arr);
       if (!decoded) return;
 
-      setMessage(getCardStatusMessage(decoded.cardStatus));
+      setMessage(t(getCardStatusMessage(decoded.cardStatus)));
 
       if (decoded.cardStatus !== newnewapi.CardStatus.IN_PROGRESS) {
         setIsProcessing(false);
@@ -175,7 +175,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
             </SLoader>
           )}
           {!isProcessing && (
-            <SButton view='primary' onClick={closeModal}>
+            <SButton id='add-card-success' view='primary' onClick={closeModal}>
               {tCommon('gotIt')}
             </SButton>
           )}

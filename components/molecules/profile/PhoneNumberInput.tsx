@@ -60,11 +60,13 @@ const PhoneNumberInput: React.FC<IPhoneNumberInput> = ({
             }
 
             if (!iti.current.isValidNumber()) {
-              onChange(
-                country.iso2,
-                newPhoneNumber,
-                iti.current.getValidationError()
-              );
+              const errorCode = iti.current.getValidationError();
+              // TOO_LONG
+              if (errorCode === 3) {
+                return;
+              }
+
+              onChange(country.iso2, newPhoneNumber, errorCode);
             } else {
               onChange(country.iso2.toUpperCase(), newPhoneNumber);
             }
