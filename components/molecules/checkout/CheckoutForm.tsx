@@ -28,6 +28,7 @@ import { useCards } from '../../../contexts/cardsContext';
 import { useAppSelector } from '../../../redux-store/store';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 import useRecaptcha from '../../../utils/hooks/useRecaptcha';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 // eslint-disable-next-line no-shadow
 enum PaymentMethodTypes {
@@ -58,6 +59,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
   const { loggedIn } = useAppSelector((state) => state.user);
+  const { appConstants } = useGetAppConstants();
 
   const [isStripeReady, setIsStripeReady] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
@@ -144,8 +146,10 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         });
       }
     } catch (err: any) {
-      toast.error(err.message);
-      console.error(err);
+      if ((err.type && err.type === 'card_error') || !err.type) {
+        toast.error(err.message);
+      }
+      console.error(err, 'err');
     }
   };
 
@@ -157,7 +161,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     submitWithRecaptchaProtection,
     isSubmitting,
     errorMessage: recaptchaErrorMessage,
-  } = useRecaptcha(handleSubmit, 0.5, 0.4, recaptchaRef);
+  } = useRecaptcha(handleSubmit, 0.5, 0.1, recaptchaRef);
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
@@ -246,12 +250,17 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           type='submit'
           id='pay'
           view='primaryGrad'
-          disabled={primaryCard ? !selectedPaymentMethod : false}
+          disabled={
+            primaryCard ? !selectedPaymentMethod || isSubmitting : isSubmitting
+          }
           loading={isSubmitting}
         >
           {t('payButton')}
           {amount && ` $${formatNumber(amount / 100, amount % 1 === 0)}`}
         </SPayButton>
+        <SFeeHint variant='subtitle'>{`${t('processingFee')}: ${(
+          parseFloat(appConstants.customerFee) * 100
+        ).toFixed(2)}%`}</SFeeHint>
         {bottomCaption || null}
         {showTocApply && (
           <STocApply>
@@ -345,6 +354,12 @@ const SPayButtonDiv = styled.div`
 
 const SPayButton = styled(Button)`
   width: 100%;
+`;
+
+const SFeeHint = styled(Text)`
+  margin-top: 8px;
+  text-align: center;
+  text-transform: capitalize;
 `;
 
 const STocApply = styled.div`

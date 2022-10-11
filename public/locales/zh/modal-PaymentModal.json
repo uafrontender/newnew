@@ -28,6 +28,8 @@
   "errors": {
     "wrongEmail": "電子郵件無法使用",
     "paymentFailed": "付款失敗",
-    "requestFailed": "請求失敗"
-  }
+    "requestFailed": "請求失敗",
+    "invalidFee_NEED_TRANSLATION": "Something went wrong. Please reload the page and try again"
+  },
+  "processingFee_NEED_TRANSLATION": "Processing fee"
 }
