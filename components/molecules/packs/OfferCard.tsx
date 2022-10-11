@@ -12,21 +12,19 @@ interface IOfferCard {
   className?: string;
   packLevel: number;
   packOffer: newnewapi.IPackOffer;
+  onClick: () => void;
 }
 
 const OfferCard: React.FC<IOfferCard> = ({
   className,
   packLevel,
   packOffer,
+  onClick,
 }) => {
   const { t } = useTranslation('common');
   const theme = useTheme();
-
-  const secondsLeft: number =
-    (packOffer.accessDuration!.endDate!.seconds as number) -
-    (packOffer.accessDuration!.startDate!.seconds as number);
-  const daysLeft = secondsLeft / 60 / 60 / 24;
-  const monthsLeft = Math.floor(daysLeft / 30);
+  const daysOfAccess = packOffer.accessDurationInSeconds! / 60 / 60 / 24;
+  const monthsOfAccess = Math.floor(daysOfAccess / 30);
 
   return (
     <SPackContainer className={className}>
@@ -48,7 +46,7 @@ const OfferCard: React.FC<IOfferCard> = ({
           <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
         </SBullet>
         <SDescriptionText>
-          {t('modal.buyPack.chatAccess', { amount: monthsLeft })}
+          {t('modal.buyPack.chatAccess', { amount: monthsOfAccess })}
         </SDescriptionText>
       </SDescriptionLine>
       <SDescriptionLine>
@@ -63,11 +61,7 @@ const OfferCard: React.FC<IOfferCard> = ({
         </SBullet>
         <SDescriptionText>{t('modal.buyPack.expiration')}</SDescriptionText>
       </SDescriptionLine>
-      <BuyButton
-        onClick={() => {
-          // TODO: add buy pack logic
-        }}
-      >
+      <BuyButton onClick={onClick}>
         {t('modal.buyPack.buy', { amount: packOffer.price!.usdCents! / 100 })}
       </BuyButton>
     </SPackContainer>

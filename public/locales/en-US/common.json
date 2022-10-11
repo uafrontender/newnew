@@ -135,7 +135,10 @@
       "chatAccess": "private chat ({{amount}} month access)",
       "customOptions": "add custom superpoll options",
       "expiration": "votes never expire",
-      "buy": "Buy for ${{amount}}"
+      "buy": "Buy for ${{amount}}",
+      "error": {
+        "requestFailed": "Request failed"
+      }
     }
   },
   "myLink": {

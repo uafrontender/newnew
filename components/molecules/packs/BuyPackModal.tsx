@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -10,6 +10,7 @@ import ModalPaper from '../../organisms/ModalPaper';
 import UserAvatar from '../UserAvatar';
 import OfferCard from './OfferCard';
 import { useAppSelector } from '../../../redux-store/store';
+import PackPaymentModal from './PackPaymentModal';
 
 interface IBuyPackModal {
   show: boolean;
@@ -26,39 +27,53 @@ const BuyPackModal: React.FC<IBuyPackModal> = React.memo(
       resizeMode
     );
 
+    const [packToBuy, setPackToBuy] = useState<
+      newnewapi.IPackOffer | undefined
+    >();
+
     return (
-      <Modal show={show} onClose={onClose}>
-        <SModalPaper
-          title={
-            !isMobile
-              ? t('modal.buyPack.title', { username: creator.username })
-              : undefined
-          }
-          onClose={onClose}
-          onClick={preventParentClick()}
-          isCloseButton
-          isMobileFullScreen={isMobile}
-        >
-          <Content>
-            {isMobile && (
-              <SMobileTitle>
-                {t('modal.buyPack.title', { username: creator.username })}
-              </SMobileTitle>
-            )}
-            <SUserAvatar avatarUrl={creator.avatarUrl ?? ''} />
-            <SUsername>{creator.username}</SUsername>
-            <SOfferedPacksList>
-              {offeredPacks.map((pack, index) => (
-                <SOfferCard
-                  key={pack.packUuid}
-                  packLevel={index}
-                  packOffer={pack}
-                />
-              ))}
-            </SOfferedPacksList>
-          </Content>
-        </SModalPaper>
-      </Modal>
+      <>
+        <Modal show={show} onClose={onClose}>
+          <SModalPaper
+            title={
+              !isMobile
+                ? t('modal.buyPack.title', { username: creator.username })
+                : undefined
+            }
+            onClose={onClose}
+            onClick={preventParentClick()}
+            isCloseButton
+            isMobileFullScreen={isMobile}
+          >
+            <Content>
+              {isMobile && (
+                <SMobileTitle>
+                  {t('modal.buyPack.title', { username: creator.username })}
+                </SMobileTitle>
+              )}
+              <SUserAvatar avatarUrl={creator.avatarUrl ?? ''} />
+              <SUsername>{creator.username}</SUsername>
+              <SOfferedPacksList>
+                {offeredPacks.map((pack, index) => (
+                  <SOfferCard
+                    key={pack.packUuid}
+                    packLevel={index}
+                    packOffer={pack}
+                    onClick={() => setPackToBuy(pack)}
+                  />
+                ))}
+              </SOfferedPacksList>
+            </Content>
+          </SModalPaper>
+        </Modal>
+        {packToBuy && (
+          <PackPaymentModal
+            creator={creator}
+            pack={packToBuy}
+            onClose={() => setPackToBuy(undefined)}
+          />
+        )}
+      </>
     );
   }
 );

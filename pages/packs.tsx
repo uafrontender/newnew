@@ -83,41 +83,29 @@ const PHPacks = [
 
 const OFFERED_PACKS: newnewapi.PackOffer[] = [
   new newnewapi.PackOffer({
-    accessDuration: new newnewapi.DateInterval({
-      startDate: dateToTimestamp(new Date(Date.now())),
-      endDate: dateToTimestamp(new Date(Date.now() + 5356800000)),
-    }),
     packUuid: '1',
     price: new newnewapi.MoneyAmount({ usdCents: 500 }),
     votesAmount: 500,
+    accessDurationInSeconds: 60 * 60 * 24 * 30,
   }),
   new newnewapi.PackOffer({
-    accessDuration: new newnewapi.DateInterval({
-      startDate: dateToTimestamp(new Date(Date.now())),
-      endDate: dateToTimestamp(new Date(Date.now() + 5356800000)),
-    }),
     packUuid: '2',
-    price: new newnewapi.MoneyAmount({ usdCents: 500 }),
+    price: new newnewapi.MoneyAmount({ usdCents: 2500 }),
     votesAmount: 500,
+    accessDurationInSeconds: 60 * 60 * 24 * 30 * 2,
   }),
   new newnewapi.PackOffer({
-    accessDuration: new newnewapi.DateInterval({
-      startDate: dateToTimestamp(new Date(Date.now())),
-      endDate: dateToTimestamp(new Date(Date.now() + 5356800000)),
-    }),
     packUuid: '3',
-    price: new newnewapi.MoneyAmount({ usdCents: 500 }),
+    price: new newnewapi.MoneyAmount({ usdCents: 5000 }),
     votesAmount: 500,
+    accessDurationInSeconds: 60 * 60 * 24 * 30 * 3,
   }),
 
   new newnewapi.PackOffer({
-    accessDuration: new newnewapi.DateInterval({
-      startDate: dateToTimestamp(new Date(Date.now())),
-      endDate: dateToTimestamp(new Date(Date.now() + 5356800000)),
-    }),
     packUuid: '4',
-    price: new newnewapi.MoneyAmount({ usdCents: 500 }),
+    price: new newnewapi.MoneyAmount({ usdCents: 7500 }),
     votesAmount: 500,
+    accessDurationInSeconds: 60 * 60 * 24 * 30 * 4,
   }),
 ];
 

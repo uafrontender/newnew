@@ -15,6 +15,7 @@ export enum StripeSetupIntentPurposeTypes {
   placeBid = 'acBidRequest',
   voteOnPost = 'mcVoteRequest',
   doPledge = 'cfPledgeRequest',
+  buyPack = 'buyCreatorsPack',
   subscribe = 'subscribeToCreatorUuid',
 }
 
@@ -50,6 +51,7 @@ function getStripeSetupIntentPurposeType(
     | newnewapi.PlaceBidRequest
     | newnewapi.VoteOnPostRequest
     | newnewapi.DoPledgeRequest
+    | newnewapi.BuyCreatorsPack
     | string
 ): StripeSetupIntentPurposeTypes {
   let purposeType;
@@ -62,6 +64,8 @@ function getStripeSetupIntentPurposeType(
     purposeType = StripeSetupIntentPurposeTypes.voteOnPost;
   } else if (purpose instanceof newnewapi.DoPledgeRequest) {
     purposeType = StripeSetupIntentPurposeTypes.doPledge;
+  } else if (purpose instanceof newnewapi.BuyCreatorsPack) {
+    purposeType = StripeSetupIntentPurposeTypes.buyPack;
   } else if (typeof purpose === 'string') {
     purposeType = StripeSetupIntentPurposeTypes.subscribe;
   } else {
@@ -81,6 +85,7 @@ const useStripeSetupIntent = ({
     | newnewapi.PlaceBidRequest
     | newnewapi.VoteOnPostRequest
     | newnewapi.DoPledgeRequest
+    | newnewapi.BuyCreatorsPack
     | string
     | null;
   isGuest?: boolean;
