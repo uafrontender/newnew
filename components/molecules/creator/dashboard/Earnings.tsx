@@ -87,8 +87,8 @@ export const Earnings: React.FC<IFunctionProps> = ({
       let sum = 0;
       if (myEarnings.auEarnings?.usdCents)
         sum += myEarnings.auEarnings?.usdCents;
-      if (myEarnings.cfEarnings?.usdCents)
-        sum += myEarnings.cfEarnings?.usdCents;
+      // if (myEarnings.cfEarnings?.usdCents)
+      //   sum += myEarnings.cfEarnings?.usdCents;
       if (myEarnings.mcEarnings?.usdCents)
         sum += myEarnings.mcEarnings?.usdCents;
       if (myEarnings.subsEarnings?.usdCents)
@@ -102,9 +102,9 @@ export const Earnings: React.FC<IFunctionProps> = ({
       {
         id: 'ac',
       },
-      {
-        id: 'cf',
-      },
+      // {
+      //   id: 'cf',
+      // },
       {
         id: 'mc',
       },

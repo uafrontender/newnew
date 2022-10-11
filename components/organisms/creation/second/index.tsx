@@ -140,10 +140,10 @@ export const CreationSecondStepContent: React.FC<
         nameToken: 'multiple-choice',
         url: '/creation/multiple-choice',
       },
-      {
+      /* {
         nameToken: 'crowdfunding',
         url: '/creation/crowdfunding',
-      },
+      }, */
     ],
     []
   );
