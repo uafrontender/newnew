@@ -4,7 +4,10 @@ import {
   createStripeSetupIntent,
   updateStripeSetupIntent,
 } from '../../api/endpoints/payments';
-import getUpdateStripeSetupIntentErrorStatusTextKey from '../getUpdateStripeSetupIntentErrorStatusTextKey';
+import {
+  getUpdateStripeSetupIntentErrorStatusTextKey,
+  getCreateStripeSetupIntentErrorStatusTextKey,
+} from '../getStripeSetupIntentErrorStatusTextKey';
 
 // eslint-disable-next-line no-shadow
 export enum StripeSetupIntentPurposeTypes {
@@ -135,9 +138,11 @@ const useStripeSetupIntent = ({
         response.error ||
         !response.data?.stripeSetupIntentClientSecret
       ) {
-        throw new Error(
-          response.error?.message || 'Cannot create SI for unknown reason'
-        );
+        return {
+          errorKey: getCreateStripeSetupIntentErrorStatusTextKey(
+            response.data?.status
+          ),
+        };
       }
 
       setSetupIntent((prevState) => ({
