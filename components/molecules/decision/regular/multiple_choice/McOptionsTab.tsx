@@ -55,6 +55,7 @@ import assets from '../../../../../constants/assets';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
+import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -221,14 +222,36 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     [setNewOptionText, validateTextViaAPIDebounced]
   );
 
+  const paymentAmountInCents = useMemo(
+    () => (parseInt(newBidAmount) || 0) * votePrice,
+    [votePrice, newBidAmount]
+  );
+
+  const paymentFeeInCents = useMemo(
+    () =>
+      getCustomerPaymentFee(
+        paymentAmountInCents,
+        parseFloat(appConstants.customerFee)
+      ),
+    [paymentAmountInCents, appConstants.customerFee]
+  );
+
+  const paymentWithFeeInCents = useMemo(
+    () => paymentAmountInCents + paymentFeeInCents,
+    [paymentAmountInCents, paymentFeeInCents]
+  );
+
   const voteOnPostRequest = useMemo(
     () =>
       new newnewapi.VoteOnPostRequest({
         postUuid: post.postUuid,
         votesCount: parseInt(newBidAmount),
+        customerFee: new newnewapi.MoneyAmount({
+          usdCents: paymentFeeInCents,
+        }),
         optionText: newOptionText,
       }),
-    [post.postUuid, newBidAmount, newOptionText]
+    [post.postUuid, newBidAmount, newOptionText, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
@@ -629,24 +652,27 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={(parseInt(newBidAmount) || 0) * votePrice}
+          amount={paymentWithFeeInCents}
           setupIntent={setupIntent}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
           redirectUrl={`post/${post.postUuid}`}
           bottomCaption={
-            <SPaymentSign variant='subtitle'>
-              {t('mcPost.paymentModalFooter.body', { creator: postCreator })}*
-              <Link href='https://terms.newnew.co'>
-                <SPaymentTermsLink
-                  href='https://terms.newnew.co'
-                  target='_blank'
-                >
-                  {t('mcPost.paymentModalFooter.terms')}
-                </SPaymentTermsLink>
-              </Link>{' '}
-              {t('mcPost.paymentModalFooter.apply')}
-            </SPaymentSign>
+            (!appConstants.minHoldAmount?.usdCents ||
+              paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
+              <SPaymentSign variant='subtitle'>
+                {t('mcPost.paymentModalFooter.body', { creator: postCreator })}*
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('mcPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
+                {t('mcPost.paymentModalFooter.apply')}
+              </SPaymentSign>
+            )
           }
         >
           <SPaymentModalHeader>

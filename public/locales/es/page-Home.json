@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "NewNew - Haz ofertas, vota y coopera sobre decisiones ajenas",
+    "title": "NewNew - Haz ofertas y vota decisiones ajenas",
     "description": "Decide qué será lo siguiente que las personas harán con sus vidas. Vota, haz ofertas y coopera con la comunidad en NewNew para ver a personas hacer cosas en la vida real"
   },
   "cardsSection": {
@@ -24,7 +24,7 @@
     },
     "mc": {
       "title": "Superpoll",
-      "caption": "Un creador hace una Superencuesta en la que pagas por votar. Cuando se acaba el tiempo, mira cómo el creador realiza la opción que obtiene la mayor cantidad de votos."
+      "caption": "Un creador hace una Superpolls en la que pagas por votar. Cuando se acaba el tiempo, mira cómo el creador realiza la opción que obtiene la mayor cantidad de votos."
     },
     "cf": {
       "title": "Goal",

@@ -109,11 +109,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     [postStatus]
   );
 
-  const postStatusesToUseHideInsteadOfDelete = useMemo(
-    () => ['succeeded', 'failed', 'deleted_by_creator', 'deleted_by_admin'],
-    []
-  );
-
   const shouldRenderVotingFinishedModal = useMemo(
     () =>
       postStatus === 'succeeded' ||
@@ -221,32 +216,16 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const handleDeletePost = useCallback(async () => {
     try {
-      // "Hide" Post instead of deleting it
-      if (postStatusesToUseHideInsteadOfDelete.includes(postStatus)) {
-        const payload = new newnewapi.MarkPostRequest({
-          postUuid: postParsed?.postUuid,
-          markAs: newnewapi.MarkPostRequest.Kind.HIDDEN,
-        });
+      const payload = new newnewapi.DeleteMyPostRequest({
+        postUuid: postParsed?.postUuid,
+      });
 
-        const res = await markPost(payload);
+      const res = await deleteMyPost(payload);
 
-        if (!res.error) {
-          handleUpdatePostStatus('DELETED_BY_CREATOR');
-          handleRemoveFromStateDeleted?.();
-          handleCloseDeletePostModal();
-        }
-      } else {
-        const payload = new newnewapi.DeleteMyPostRequest({
-          postUuid: postParsed?.postUuid,
-        });
-
-        const res = await deleteMyPost(payload);
-
-        if (!res.error) {
-          handleUpdatePostStatus('DELETED_BY_CREATOR');
-          handleRemoveFromStateDeleted?.();
-          handleCloseDeletePostModal();
-        }
+      if (!res.error) {
+        handleUpdatePostStatus('DELETED_BY_CREATOR');
+        handleRemoveFromStateDeleted?.();
+        handleCloseDeletePostModal();
       }
     } catch (err) {
       console.error(err);
@@ -256,8 +235,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     handleRemoveFromStateDeleted,
     handleUpdatePostStatus,
     postParsed?.postUuid,
-    postStatus,
-    postStatusesToUseHideInsteadOfDelete,
   ]);
 
   const resetSetupIntentClientSecret = useCallback(() => {
