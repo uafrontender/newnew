@@ -763,7 +763,7 @@ const SBioText = styled(Text)`
   padding-left: 16px;
   padding-right: 16px;
   margin: 0 auto 54px;
-
+  width: 100%;
   max-width: 480px;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
