@@ -103,7 +103,7 @@ export const HowItWorks = () => {
             </SectionContent>
           </Section>
 
-          <Section>
+          {/* <Section>
             <SectionImage
               src={
                 theme.name === 'light'
@@ -125,7 +125,7 @@ export const HowItWorks = () => {
               <Headline variant={3}>{t('goals.title')}</Headline>
               <SectionText variant={5}>{t('goals.text')}</SectionText>
             </SectionContent>
-          </Section>
+            </Section> */}
 
           <ControlsContainer>
             <Link href='/'>

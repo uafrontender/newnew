@@ -549,6 +549,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             {isMobileOrTablet ? null : t('profileLayout.headerButtons.edit')}
           </SButton>
           <SButton
+            id='settings-button'
             view='transparent'
             withDim
             withShrink

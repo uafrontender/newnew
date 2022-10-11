@@ -204,6 +204,13 @@
         "ellipse": {
           "makePrimary": "設為主卡",
           "removeCard": "刪除卡"
+        },
+        "status_NEED_TRANSLATION": {
+          "added": "Success! Your card has been saved",
+          "cannotBeAdded": "Failure! Your card cannot be saved",
+          "duplicate": "This card has been already saved in your profile",
+          "inProgress": "Saving your card. Please wait",
+          "requestFailed": "Something went wrong"
         }
       },
       "personalInformation": {
@@ -262,11 +269,11 @@
         "privacySubsections": {
           "spendings": {
             "title": "不讓別人查看我的消費",
-            "caption": "別人將無法看到你在Bid、Superpoll和Goal上的花費"
+            "caption_NEED_TRANSLATION": "People will not be able to see how much you spent on bids and superpolls"
           },
           "private": {
             "title": "將我的活動設為隱秘",
-            "caption": "人們將無法看到你在Bid、Superpoll和Goal上的任何活動"
+            "caption_NEED_TRANSLATION": "People will not be able to see any of your activity on bids and superpolls"
           }
         },
         "blockedUsers": {

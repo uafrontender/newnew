@@ -17,6 +17,7 @@ export type AccordionSectionItem = React.FunctionComponent & {
 };
 
 export interface AccordionSection {
+  id: string;
   title: string;
   content: ReactElement;
   hidden?: boolean;
@@ -66,6 +67,7 @@ const SettingsAccordion: React.FunctionComponent<ISettingsAccordion> = ({
                 }}
               >
                 <SSettingsAccordionItemHeading
+                  id={section.id}
                   isOpen={sectionsState[i]}
                   onClick={() => handleToggleSection(i)}
                 >

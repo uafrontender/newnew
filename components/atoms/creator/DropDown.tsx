@@ -82,6 +82,12 @@ export const DropDown: React.FC<IDropDown> = (props) => {
     }
   });
 
+  const mobileViewRef = useRef(null);
+
+  useOnClickOutside(mobileViewRef, () => {
+    handleCloseClick();
+  });
+
   return (
     <SContainer ref={ref}>
       <SLabelButton onClick={handleDropDownClick} disabled={disabled ?? false}>
@@ -97,7 +103,9 @@ export const DropDown: React.FC<IDropDown> = (props) => {
       {isMobile ? (
         <Modal show={focused} onClose={handleCloseClick}>
           <SMobileListContainer focused={focused}>
-            <SMobileList>{options.map(renderItem)}</SMobileList>
+            <SMobileList ref={mobileViewRef}>
+              {options.map(renderItem)}
+            </SMobileList>
             <SCancelButton view='modalSecondary' onClick={handleCloseClick}>
               {t('button.cancel')}
             </SCancelButton>
