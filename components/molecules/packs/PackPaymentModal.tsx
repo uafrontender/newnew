@@ -11,9 +11,11 @@ import { useAppSelector } from '../../../redux-store/store';
 import getCustomerPaymentFee from '../../../utils/getCustomerPaymentFee';
 import getDisplayname from '../../../utils/getDisplayname';
 import useStripeSetupIntent from '../../../utils/hooks/useStripeSetupIntent';
+import InlineSvg from '../../atoms/InlineSVG';
 import Text from '../../atoms/Text';
 import PaymentModal from '../checkout/PaymentModal';
 import LoadingModal from '../LoadingModal';
+import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
 
 interface IPackPaymentModal {
   creator: newnewapi.IUser;
@@ -129,6 +131,9 @@ const PackPaymentModal: React.FC<IPackPaymentModal> = ({
     [paymentAmountInCents, paymentFeeInCents]
   );
 
+  const daysOfAccess = pack.accessDurationInSeconds! / 60 / 60 / 24;
+  const monthsOfAccess = Math.floor(daysOfAccess / 30);
+
   // TODO: Handle redirect
   return (
     <>
@@ -141,6 +146,7 @@ const PackPaymentModal: React.FC<IPackPaymentModal> = ({
         onClose={onClose}
         handlePayWithCard={handlePayWithCard}
         bottomCaption={
+          // TODO: fix capture texts
           (!appConstants.minHoldAmount?.usdCents ||
             paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
             <SPaymentSign variant='subtitle'>
@@ -161,28 +167,29 @@ const PackPaymentModal: React.FC<IPackPaymentModal> = ({
           )
         }
       >
-        {/* TODO: Add UI */}
-        {/* <SPaymentModalHeader>
-          <SPaymentModalHeading>
-            <SPaymentModalHeadingPostSymbol>
-              <SPaymentModalHeadingPostSymbolImg src={assets.decision.votes} />
-            </SPaymentModalHeadingPostSymbol>
-            <SPaymentModalHeadingPostCreator variant={3}>
-              {t('mcPost.paymentModalHeader.title', {
-                creator: postCreator,
-              })}
-            </SPaymentModalHeadingPostCreator>
-          </SPaymentModalHeading>
-          <SPaymentModalPostText variant={2}>
-            <PostTitleContent>{postText}</PostTitleContent>
-          </SPaymentModalPostText>
-          <SPaymentModalTitle variant='subtitle'>
-            {t('mcPost.paymentModalHeader.subtitle')}
-          </SPaymentModalTitle>
-          <SPaymentModalOptionText variant={5}>
-            {option.text}
-          </SPaymentModalOptionText>
-            </SPaymentModalHeader> */}
+        <ModalTitle>
+          {t('modal.buyPack.payment.header', { creator: creator.username })}
+        </ModalTitle>
+        <SVotesNumber>
+          {t('modal.buyPack.payment.votes', { amount: pack.votesAmount })}
+        </SVotesNumber>
+        <AccessDescription>
+          {t('modal.buyPack.payment.access', { amount: monthsOfAccess })}
+        </AccessDescription>
+        <SDescriptionLine>
+          <SBullet>
+            <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
+          </SBullet>
+          <SDescriptionText>
+            {t('modal.buyPack.payment.customOptions')}
+          </SDescriptionText>
+        </SDescriptionLine>
+        <SDescriptionLine last>
+          <SBullet>
+            <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
+          </SBullet>
+          <SDescriptionText>{t('modal.buyPack.payment.chat')}</SDescriptionText>
+        </SDescriptionLine>
       </PaymentModal>
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
@@ -204,4 +211,75 @@ const SPaymentSign = styled(Text)`
 
 const SPaymentTermsLink = styled.a`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const ModalTitle = styled.h4`
+  font-weight: 600;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  font-size: 12px;
+  line-height: 16px;
+
+  margin-top: 16px;
+  margin-bottom: 16px;
+`;
+
+const SVotesNumber = styled.p`
+  font-weight: 700;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  font-size: 32px;
+  line-height: 40px;
+
+  margin-bottom: 10px;
+
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const AccessDescription = styled.p`
+  font-weight: 600;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  font-size: 14px;
+  line-height: 20px;
+
+  margin-bottom: 12px;
+`;
+
+const SDescriptionLine = styled.div<{ last?: boolean }>`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-bottom: ${({ last }) => (last ? '0px' : '8px;')};
+  width: 100%;
+
+  overflow: hidden;
+`;
+
+const SBullet = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  margin-top: 4px;
+  margin-right: 8px;
+  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+`;
+
+const SDescriptionText = styled.p`
+  font-weight: 600;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  font-size: 14px;
+  line-height: 20px;
+
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;

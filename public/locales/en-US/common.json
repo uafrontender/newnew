@@ -136,6 +136,13 @@
       "customOptions": "add custom superpoll options",
       "expiration": "votes never expire",
       "buy": "Buy for ${{amount}}",
+      "payment": {
+        "header": "{{creator}}'s Superpoll Bundle",
+        "votes": "{{amount}} votes",
+        "access": "plus get {{amount}} month of:",
+        "customOptions": "add custom superpoll options",
+        "chat": "1-on-1 private chat"
+      },
       "error": {
         "requestFailed": "Request failed"
       }

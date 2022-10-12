@@ -38,9 +38,9 @@ const OfferCard: React.FC<IOfferCard> = ({
         ))}
       </PackIconLine>
       {/* TODO: add Trans */}
-      <SVotesLeft>
+      <SVotesNumber>
         {t('modal.buyPack.votes', { amount: packOffer.votesAmount })}
-      </SVotesLeft>
+      </SVotesNumber>
       <SDescriptionLine>
         <SBullet>
           <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
@@ -99,7 +99,7 @@ const PackLevelIcon = styled.img<{ index: number }>`
   left: ${({ index }) => `${11 * index}px`};
 `;
 
-const SVotesLeft = styled.p`
+const SVotesNumber = styled.p`
   font-weight: 700;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
