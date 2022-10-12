@@ -23,14 +23,14 @@ import usePagination, {
   Paging,
 } from '../utils/hooks/usePagination';
 import { searchCreators } from '../api/endpoints/search';
-import AllPacksModal from '../components/molecules/packs/AllPacksModal';
-import BuyPackModal from '../components/molecules/packs/BuyPackModal';
-import PackCard from '../components/molecules/packs/PackCard';
+import BuyBundleModal from '../components/molecules/bundles/BuyBundleModal';
+import BundleCard from '../components/molecules/bundles/BundleCard';
 import BackButton from '../components/molecules/profile/BackButton';
 import dateToTimestamp from '../utils/dateToTimestamp';
-import { getMyPacks, getOfferedPacks } from '../api/endpoints/pack';
+import { getMyBundles, getOfferedBundles } from '../api/endpoints/bundles';
+import AllBundlesModal from '../components/molecules/bundles/AllBundlesModal';
 
-const PHPacks = [
+const PHBundles = [
   new newnewapi.CreatorPack({
     creator: new newnewapi.User({
       uuid: '3d537e81-d2dc-4bb3-9698-39152a817ab5',
@@ -93,7 +93,7 @@ const PHPacks = [
   }),
 ];
 
-const OFFERED_PACKS: newnewapi.PackOffer[] = [
+const OFFERED_BUNDLES: newnewapi.PackOffer[] = [
   new newnewapi.PackOffer({
     packUuid: '1',
     price: new newnewapi.MoneyAmount({ usdCents: 500 }),
@@ -121,9 +121,9 @@ const OFFERED_PACKS: newnewapi.PackOffer[] = [
   }),
 ];
 
-export const Packs = () => {
+export const Bundles = () => {
   const router = useRouter();
-  const { t } = useTranslation('page-Packs');
+  const { t } = useTranslation('page-Bundles');
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -131,51 +131,53 @@ export const Packs = () => {
   );
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const [allPacksModalOpen, setAllPacksModalOpen] = useState(false);
-  const [buyPackCreator, setBuyPackCreator] = useState<
+  const [allBundlesModalOpen, setAllBundlesModalOpen] = useState(false);
+  const [buyBundleCreator, setBuyBundleCreator] = useState<
     newnewapi.IUser | undefined
   >();
-  const [offeredPacks, setOfferedPacks] = useState<newnewapi.IPackOffer[]>([]);
-  const [packs, setPacks] = useState<newnewapi.ICreatorPack[]>([] /* PHPack */);
+  const [offeredBundles, setOfferedBundles] = useState<newnewapi.IPackOffer[]>(
+    []
+  );
+  const [bundles, setBundles] = useState<newnewapi.ICreatorPack[]>([]);
 
   const [searchValue, setSearchValue] = useState('');
   const { ref: loadingRef, inView } = useInView();
   const searchInputRef = useRef<HTMLInputElement>();
 
-  const loadPackOffers = useCallback(async () => {
+  const loadBundleOffers = useCallback(async () => {
     const payload = new newnewapi.EmptyRequest({});
-    const res = await getOfferedPacks(payload);
+    const res = await getOfferedBundles(payload);
 
     if (!res.data || res.error) {
       toast.error('toastErrors.generic');
       throw new Error(res.error?.message ?? 'Request failed');
     }
 
-    setOfferedPacks(res.data.packOffers);
+    setOfferedBundles(res.data.packOffers);
   }, []);
 
   useEffect(() => {
-    // loadPackOffers();
-    setOfferedPacks(OFFERED_PACKS);
-  }, [loadPackOffers]);
+    // loadBundleOffers();
+    setOfferedBundles(OFFERED_BUNDLES);
+  }, [loadBundleOffers]);
 
   // TODO: Use paging
-  const loadUserPacks = useCallback(async () => {
+  const loadUserBundles = useCallback(async () => {
     const payload = new newnewapi.EmptyRequest({});
 
-    const res = await getMyPacks(payload);
+    const res = await getMyBundles(payload);
 
     if (!res.data || res.error) {
       toast.error('toastErrors.generic');
       throw new Error(res.error?.message ?? 'Request failed');
     }
 
-    setPacks(res.data.creatorPacks);
+    setBundles(res.data.creatorPacks);
   }, []);
 
   useEffect(() => {
-    setPacks(PHPacks);
-  }, [loadUserPacks]);
+    setBundles(PHBundles);
+  }, [loadUserBundles]);
 
   const loadCreatorsData = useCallback(
     async (
@@ -211,7 +213,7 @@ export const Packs = () => {
     }
   }, [inView, paginatedCreators]);
 
-  const visiblePacksNumber = isMobile || isTablet ? 3 : 4;
+  const visibleBundlesNumber = isMobile || isTablet ? 3 : 4;
 
   return (
     <>
@@ -232,28 +234,25 @@ export const Packs = () => {
             </GoBackButton>
           )}
         </SubNavigation>
-        <SHeader>
-          <STitle>{t('header.title')}</STitle>
-          <SDescription>{t('header.description')}</SDescription>
-        </SHeader>
+        <STitle>{t('header.title')}</STitle>
 
-        <SPacksTitle>
-          <SectionTitle>{t('packsSection.title')}</SectionTitle>
-          {packs.length > visiblePacksNumber && (
+        <SBundlesTitle>
+          <SectionTitle>{t('bundlesSection.title')}</SectionTitle>
+          {bundles.length > visibleBundlesNumber && (
             <SSeeAllButton
               onClick={() => {
-                setAllPacksModalOpen(true);
+                setAllBundlesModalOpen(true);
               }}
             >
-              {t('packsSection.seeAll')}
+              {t('bundlesSection.seeAll')}
             </SSeeAllButton>
           )}
-        </SPacksTitle>
+        </SBundlesTitle>
 
-        {packs.length === 0 ? (
-          <SNoPacksContainer>
-            <SNoPacksImage />
-            <SNoPacksText>{t('packsSection.noPacks')}</SNoPacksText>
+        {bundles.length === 0 ? (
+          <SNoBundlesContainer>
+            <SNoBundlesImage />
+            <SNoBundlesText>{t('bundlesSection.noBundles')}</SNoBundlesText>
             <SSearchButton
               onClick={() => {
                 if (searchInputRef.current) {
@@ -262,20 +261,20 @@ export const Packs = () => {
                 }
               }}
             >
-              {t('packsSection.search')}
+              {t('bundlesSection.search')}
             </SSearchButton>
-          </SNoPacksContainer>
+          </SNoBundlesContainer>
         ) : (
-          <SPacksContainer>
-            {packs.slice(0, visiblePacksNumber).map((pack, index) => (
-              <PackCard key={`${index}`} creatorPack={pack} />
+          <SBundlesContainer>
+            {bundles.slice(0, visibleBundlesNumber).map((bundle, index) => (
+              <BundleCard key={`${index}`} creatorBundle={bundle} />
             ))}
 
             {!isMobile &&
               Array.from(
-                'x'.repeat(Math.max(visiblePacksNumber - packs.length, 0))
-              ).map((v, index) => <PackCard key={`${index}-holder`} />)}
-          </SPacksContainer>
+                'x'.repeat(Math.max(visibleBundlesNumber - bundles.length, 0))
+              ).map((v, index) => <BundleCard key={`${index}-holder`} />)}
+          </SBundlesContainer>
         )}
 
         <SectionTitle>{t('search.title')}</SectionTitle>
@@ -308,8 +307,8 @@ export const Packs = () => {
           <CreatorsList
             loading={paginatedCreators.loading}
             collection={paginatedCreators.data}
-            onBuyPackClicked={(creator) => {
-              setBuyPackCreator(creator);
+            onBuyBundleClicked={(creator) => {
+              setBuyBundleCreator(creator);
             }}
           />
         </SCardsSection>
@@ -317,20 +316,20 @@ export const Packs = () => {
           <SRef ref={loadingRef}>Loading...</SRef>
         )}
       </Container>
-      <AllPacksModal
-        show={allPacksModalOpen}
-        creatorPacks={packs}
+      <AllBundlesModal
+        show={allBundlesModalOpen}
+        creatorBundles={bundles}
         onClose={() => {
-          setAllPacksModalOpen(false);
+          setAllBundlesModalOpen(false);
         }}
       />
-      {buyPackCreator && (
-        <BuyPackModal
+      {buyBundleCreator && (
+        <BuyBundleModal
           show
-          creator={buyPackCreator}
-          offeredPacks={offeredPacks}
+          creator={buyBundleCreator}
+          offeredBundles={offeredBundles}
           onClose={() => {
-            setBuyPackCreator(undefined);
+            setBuyBundleCreator(undefined);
           }}
         />
       )}
@@ -338,16 +337,16 @@ export const Packs = () => {
   );
 };
 
-(Packs as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
+(Bundles as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
   <HomeLayout>{page}</HomeLayout>
 );
 
-export default Packs;
+export default Bundles;
 
 export const getServerSideProps = async (context: NextPageContext) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'page-Packs',
+    'page-Bundles',
   ]);
 
   return {
@@ -389,29 +388,17 @@ const SBackButton = styled(BackButton)`
   margin-left: -8px;
 `;
 
-const SHeader = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 40px;
-
-  ${({ theme }) => theme.media.tablet} {
-    max-width: 60%;
-    margin-bottom: 84px;
-  }
-`;
-
 const STitle = styled.h1`
   font-weight: 600;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  margin-bottom: 16px;
-
   font-size: 32px;
   line-height: 40px;
+  margin-bottom: 68px;
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 56px;
     line-height: 64px;
+    margin-bottom: 84px;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -420,19 +407,7 @@ const STitle = styled.h1`
   }
 `;
 
-const SDescription = styled.h2`
-  font-weight: 500;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  font-size: 16px;
-  line-height: 24px;
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 24px;
-    line-height: 32px;
-  }
-`;
-
-const SPacksTitle = styled.div`
+const SBundlesTitle = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -440,7 +415,7 @@ const SPacksTitle = styled.div`
   width: 100%;
 `;
 
-const SNoPacksContainer = styled.div`
+const SNoBundlesContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -458,7 +433,7 @@ const SNoPacksContainer = styled.div`
   }
 `;
 
-const SNoPacksImage = styled.img`
+const SNoBundlesImage = styled.img`
   height: 40px;
   width: 40px;
 
@@ -469,7 +444,7 @@ const SNoPacksImage = styled.img`
   }
 `;
 
-const SNoPacksText = styled.p`
+const SNoBundlesText = styled.p`
   flex-grow: 1;
   color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: 600;
@@ -554,7 +529,7 @@ const SSeeAllButton = styled.div`
   }
 `;
 
-const SPacksContainer = styled.div`
+const SBundlesContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;

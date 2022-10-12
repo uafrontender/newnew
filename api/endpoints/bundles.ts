@@ -5,16 +5,16 @@ import {
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
 
-const BASE_URL_PACK = `${BASE_URL}/pack`;
+const BASE_URL_BUNDLE = `${BASE_URL}/pack`;
 
-export const getOfferedPacks = (
+export const getOfferedBundles = (
   payload: newnewapi.EmptyRequest,
   signal?: RequestInit['signal']
 ) =>
   fetchProtobuf<newnewapi.EmptyRequest, newnewapi.GetOfferedPacksResponse>(
     newnewapi.EmptyRequest,
     newnewapi.GetOfferedPacksResponse,
-    `${BASE_URL_PACK}/get_offered_packs`,
+    `${BASE_URL_BUNDLE}/get_offered_packs`,
     'post',
     payload,
     {},
@@ -23,7 +23,7 @@ export const getOfferedPacks = (
     signal ?? undefined
   );
 
-export const getMyPacks = (
+export const getMyBundles = (
   payload: newnewapi.EmptyRequest,
   signal?: RequestInit['signal']
 ) =>
@@ -33,13 +33,13 @@ export const getMyPacks = (
   >(
     newnewapi.EmptyRequest,
     newnewapi.GetMyPacksResponse,
-    `${BASE_URL_PACK}/get_my_packs`,
+    `${BASE_URL_BUNDLE}/get_my_packs`,
     'post',
     payload,
     signal ?? undefined
   );
 
-export const getMyPackForCreator = (
+export const getMyBundleForCreator = (
   payload: newnewapi.GetMyPackForCreatorRequest,
   signal?: RequestInit['signal']
 ) =>
@@ -49,13 +49,13 @@ export const getMyPackForCreator = (
   >(
     newnewapi.GetMyPackForCreatorRequest,
     newnewapi.GetMyPackForCreatorResponse,
-    `${BASE_URL_PACK}/get_my_pack_for_creator`,
+    `${BASE_URL_BUNDLE}/get_my_pack_for_creator`,
     'post',
     payload,
     signal ?? undefined
   );
 
-export const buyCreatorsPack = (
+export const buyCreatorsBundles = (
   payload: newnewapi.StripeContributionRequest,
   signal?: RequestInit['signal']
 ) =>
@@ -65,7 +65,7 @@ export const buyCreatorsPack = (
   >(
     newnewapi.StripeContributionRequest,
     newnewapi.BuyCreatorsPackResponse,
-    `${BASE_URL_PACK}/buy_creators_pack`,
+    `${BASE_URL_BUNDLE}/buy_creators_pack`,
     'post',
     payload,
     signal ?? undefined

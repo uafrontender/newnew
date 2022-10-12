@@ -10,24 +10,24 @@ import ModalPaper from '../../organisms/ModalPaper';
 import UserAvatar from '../UserAvatar';
 import OfferCard from './OfferCard';
 import { useAppSelector } from '../../../redux-store/store';
-import PackPaymentModal from './PackPaymentModal';
+import BundlePaymentModal from './BundlePaymentModal';
 
-interface IBuyPackModal {
+interface IBuyBundleModal {
   show: boolean;
   creator: newnewapi.IUser;
-  offeredPacks: newnewapi.IPackOffer[];
+  offeredBundles: newnewapi.IPackOffer[];
   onClose: () => void;
 }
 
-const BuyPackModal: React.FC<IBuyPackModal> = React.memo(
-  ({ show, creator, offeredPacks, onClose }) => {
+const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
+  ({ show, creator, offeredBundles, onClose }) => {
     const { t } = useTranslation('common');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
 
-    const [packToBuy, setPackToBuy] = useState<
+    const [bundleToBuy, setBundleToBuy] = useState<
       newnewapi.IPackOffer | undefined
     >();
 
@@ -35,11 +35,7 @@ const BuyPackModal: React.FC<IBuyPackModal> = React.memo(
       <>
         <Modal show={show} onClose={onClose}>
           <SModalPaper
-            title={
-              !isMobile
-                ? t('modal.buyPack.title', { username: creator.username })
-                : undefined
-            }
+            title={!isMobile ? t('modal.buyBundle.title') : undefined}
             onClose={onClose}
             onClick={preventParentClick()}
             isCloseButton
@@ -47,31 +43,29 @@ const BuyPackModal: React.FC<IBuyPackModal> = React.memo(
           >
             <Content>
               {isMobile && (
-                <SMobileTitle>
-                  {t('modal.buyPack.title', { username: creator.username })}
-                </SMobileTitle>
+                <SMobileTitle>{t('modal.buyBundle.title')}</SMobileTitle>
               )}
               <SUserAvatar avatarUrl={creator.avatarUrl ?? ''} />
               <SUsername>{creator.username}</SUsername>
-              <SOfferedPacksList>
-                {offeredPacks.map((pack, index) => (
+              <SOfferedBundleList>
+                {offeredBundles.map((bundle, index) => (
                   <SOfferCard
-                    key={pack.packUuid}
-                    packLevel={index}
-                    packOffer={pack}
-                    onClick={() => setPackToBuy(pack)}
+                    key={bundle.packUuid}
+                    bundleLevel={index}
+                    bundleOffer={bundle}
+                    onClick={() => setBundleToBuy(bundle)}
                   />
                 ))}
-              </SOfferedPacksList>
-              <Terms>{t('modal.buyPack.terms')}</Terms>
+              </SOfferedBundleList>
+              <Terms>{t('modal.buyBundle.terms')}</Terms>
             </Content>
           </SModalPaper>
         </Modal>
-        {packToBuy && (
-          <PackPaymentModal
+        {bundleToBuy && (
+          <BundlePaymentModal
             creator={creator}
-            pack={packToBuy}
-            onClose={() => setPackToBuy(undefined)}
+            bundle={bundleToBuy}
+            onClose={() => setBundleToBuy(undefined)}
           />
         )}
       </>
@@ -79,7 +73,7 @@ const BuyPackModal: React.FC<IBuyPackModal> = React.memo(
   }
 );
 
-export default BuyPackModal;
+export default BuyBundleModal;
 
 const SModalPaper = styled(ModalPaper)`
   width: 100%;
@@ -109,8 +103,9 @@ const SMobileTitle = styled.h1`
 `;
 
 const SUserAvatar = styled(UserAvatar)`
-  width: 40px;
-  height: 40px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
   margin-bottom: 8px;
 `;
 
@@ -128,7 +123,7 @@ const SUsername = styled.h4`
   }
 `;
 
-const SOfferedPacksList = styled.div`
+const SOfferedBundleList = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;

@@ -18,7 +18,7 @@ interface IList {
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
   withEllipseMenu?: boolean;
-  onBuyPackClicked?: (creator: newnewapi.IUser) => void;
+  onBuyBundleClicked?: (creator: newnewapi.IUser) => void;
 }
 
 export const CreatorsList: React.FC<IList> = ({
@@ -27,7 +27,7 @@ export const CreatorsList: React.FC<IList> = ({
   skeletonsBgColor,
   skeletonsHighlightColor,
   withEllipseMenu = false,
-  onBuyPackClicked,
+  onBuyBundleClicked,
 }) => {
   const renderItem = (item: newnewapi.ISearchCreatorsResultItem) => {
     if (!item.creator) {
@@ -45,7 +45,7 @@ export const CreatorsList: React.FC<IList> = ({
         <CreatorCard
           creator={item.creator}
           withEllipseMenu={withEllipseMenu ?? false}
-          onBuyPackClicked={onBuyPackClicked}
+          onBuyBundleClicked={onBuyBundleClicked}
         />
       </SItemWrapper>
     );
@@ -92,7 +92,7 @@ export const CreatorsList: React.FC<IList> = ({
 CreatorsList.defaultProps = {
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
-  onBuyPackClicked: undefined,
+  onBuyBundleClicked: undefined,
 };
 
 export default CreatorsList;

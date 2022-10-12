@@ -6,49 +6,49 @@ import InlineSvg from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
 import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
 
-interface IPackCard {
+interface IBundleCard {
   className?: string;
-  creatorPack?: newnewapi.ICreatorPack;
+  creatorBundle?: newnewapi.ICreatorPack;
   small?: boolean;
 }
 
-const PackCard: React.FC<IPackCard> = ({
+const BundleCard: React.FC<IBundleCard> = ({
   className,
-  creatorPack,
+  creatorBundle,
   small = false,
 }) => {
-  const { t } = useTranslation('page-Packs');
+  const { t } = useTranslation('page-Bundles');
 
-  if (!creatorPack || !creatorPack.pack || !creatorPack.creator) {
-    return <SPackContainer className={className} small={small} holder />;
+  if (!creatorBundle || !creatorBundle.pack || !creatorBundle.creator) {
+    return <SBundlesContainer className={className} small={small} holder />;
   }
 
   const expiresAtTime =
-    (creatorPack.pack.accessExpiredAt!.seconds as number) * 1000;
+    (creatorBundle.pack.accessExpiredAt!.seconds as number) * 1000;
   const timeLeft = expiresAtTime - Date.now();
   const daysLeft = timeLeft / 1000 / 60 / 60 / 24;
   const monthsLeft = Math.floor(daysLeft / 30);
 
   return (
-    <SPackContainer className={className} small={small}>
+    <SBundlesContainer className={className} small={small}>
       <SUserInfo>
         <SUserAvatar
           small={small}
-          avatarUrl={creatorPack.creator?.avatarUrl || undefined}
+          avatarUrl={creatorBundle.creator?.avatarUrl || undefined}
         />
         <SUserData>
-          <SDisplayName>{creatorPack.creator?.nickname}</SDisplayName>
-          <SUserName>@{creatorPack.creator?.username}</SUserName>
+          <SDisplayName>{creatorBundle.creator?.nickname}</SDisplayName>
+          <SUserName>@{creatorBundle.creator?.username}</SUserName>
         </SUserData>
       </SUserInfo>
       <SVotesLeft small={small}>
         <Trans
           t={t}
-          i18nKey='pack.votesLeft'
+          i18nKey='bundle.votesLeft'
           // @ts-ignore
           components={[
             <VotesNumberSpan />,
-            { amount: creatorPack.pack.votesLeft },
+            { amount: creatorBundle.pack.votesLeft },
           ]}
         />
       </SVotesLeft>
@@ -57,28 +57,28 @@ const PackCard: React.FC<IPackCard> = ({
           <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
         </SBullet>
         <SDescriptionText>
-          {t('pack.chatAccessLeft', { amount: monthsLeft })}
+          {t('bundle.chatAccessLeft', { amount: monthsLeft })}
         </SDescriptionText>
       </SDescriptionLine>
       <SDescriptionLine>
         <SBullet>
           <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
         </SBullet>
-        <SDescriptionText>{t('pack.customOptions')}</SDescriptionText>
+        <SDescriptionText>{t('bundle.customOptions')}</SDescriptionText>
       </SDescriptionLine>
       <SDescriptionLine last>
         <SBullet>
           <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
         </SBullet>
-        <SDescriptionText>{t('pack.expiation')}</SDescriptionText>
+        <SDescriptionText>{t('bundle.expiation')}</SDescriptionText>
       </SDescriptionLine>
-    </SPackContainer>
+    </SBundlesContainer>
   );
 };
 
-export default PackCard;
+export default BundleCard;
 
-const SPackContainer = styled.div<{ small: boolean; holder?: boolean }>`
+const SBundlesContainer = styled.div<{ small: boolean; holder?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: flex-start;

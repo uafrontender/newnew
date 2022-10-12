@@ -10,71 +10,73 @@ import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 
 interface IOfferCard {
   className?: string;
-  packLevel: number;
-  packOffer: newnewapi.IPackOffer;
+  bundleLevel: number;
+  bundleOffer: newnewapi.IPackOffer;
   onClick: () => void;
 }
 
 const OfferCard: React.FC<IOfferCard> = ({
   className,
-  packLevel,
-  packOffer,
+  bundleLevel,
+  bundleOffer,
   onClick,
 }) => {
   const { t } = useTranslation('common');
   const theme = useTheme();
-  const daysOfAccess = packOffer.accessDurationInSeconds! / 60 / 60 / 24;
+  const daysOfAccess = bundleOffer.accessDurationInSeconds! / 60 / 60 / 24;
   const monthsOfAccess = Math.floor(daysOfAccess / 30);
 
   return (
-    <SPackContainer className={className}>
-      <PackIconLine>
-        {Array.from('x'.repeat(packLevel + 1)).map((v, index) => (
-          <PackLevelIcon
+    <SBundleContainer className={className}>
+      <BundleIconLine>
+        {Array.from('x'.repeat(bundleLevel + 1)).map((v, index) => (
+          <BundleLevelIcon
             key={index}
             src={theme.name === 'light' ? VoteIconLight.src : VoteIconDark.src}
             index={index}
           />
         ))}
-      </PackIconLine>
+      </BundleIconLine>
       <SVotesNumber>
         <Trans
           t={t}
-          i18nKey='modal.buyPack.votes'
+          i18nKey='modal.buyBundle.votes'
           // @ts-ignore
-          components={[<VotesNumberSpan />, { amount: packOffer.votesAmount }]}
+          components={[
+            <VotesNumberSpan />,
+            { amount: bundleOffer.votesAmount },
+          ]}
         />
       </SVotesNumber>
+      <AccessDescription>
+        {t('modal.buyBundle.access', { amount: monthsOfAccess })}
+      </AccessDescription>
       <SDescriptionLine>
         <SBullet>
           <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
         </SBullet>
         <SDescriptionText>
-          {t('modal.buyPack.chatAccess', { amount: monthsOfAccess })}
+          {t('modal.buyBundle.customOptions')}
         </SDescriptionText>
-      </SDescriptionLine>
-      <SDescriptionLine>
-        <SBullet>
-          <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
-        </SBullet>
-        <SDescriptionText>{t('modal.buyPack.customOptions')}</SDescriptionText>
       </SDescriptionLine>
       <SDescriptionLine last>
         <SBullet>
           <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
         </SBullet>
-        <SDescriptionText>{t('modal.buyPack.expiration')}</SDescriptionText>
+        <SDescriptionText>{t('modal.buyBundle.chat')}</SDescriptionText>
       </SDescriptionLine>
       <BuyButton onClick={onClick}>
-        {t('modal.buyPack.buy', { amount: packOffer.price!.usdCents! / 100 })}
+        {t('modal.buyBundle.buy', {
+          amount: bundleOffer.price!.usdCents! / 100,
+        })}
       </BuyButton>
-    </SPackContainer>
+    </SBundleContainer>
   );
 };
 
 export default OfferCard;
 
-const SPackContainer = styled.div`
+const SBundleContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -85,7 +87,7 @@ const SPackContainer = styled.div`
   overflow: hidden;
 `;
 
-const PackIconLine = styled.div`
+const BundleIconLine = styled.div`
   height: 36px;
   width: 36px;
   position: relative;
@@ -96,7 +98,7 @@ const PackIconLine = styled.div`
   overflow: hidden;
 `;
 
-const PackLevelIcon = styled.img<{ index: number }>`
+const BundleLevelIcon = styled.img<{ index: number }>`
   width: 36px;
   height: 36px;
   position: absolute;
@@ -120,6 +122,16 @@ const SVotesNumber = styled.p`
 
 const VotesNumberSpan = styled.span`
   color: ${({ theme }) => theme.colorsThemed.accent.yellow};
+`;
+
+const AccessDescription = styled.p`
+  font-weight: 600;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  font-size: 14px;
+  line-height: 20px;
+
+  margin-bottom: 12px;
 `;
 
 const SDescriptionLine = styled.div<{ last?: boolean }>`
@@ -170,7 +182,7 @@ const BuyButton = styled.button`
 
   padding: 8px 16px;
   width: 100%;
-  margin-top: 31px;
+  margin-top: 32px;
 
   color: ${({ theme }) => theme.colors.darkGray};
   background: ${({ theme }) => theme.colorsThemed.accent.yellow};

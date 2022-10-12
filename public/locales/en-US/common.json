@@ -129,20 +129,16 @@
       "subtitle": "We appreciate you letting us know. We’ll take a look into this ASAP and take the appropriate steps to ensure everyone’s safety.",
       "button": "Got it"
     },
-    "buyPack": {
-      "title": "Buy {{username}}'s Pack",
+    "buyBundle": {
+      "title": "Buy a Superpoll bundle for:",
       "votes": "<0>{{amount}}</0> votes",
-      "chatAccess": "private chat ({{amount}} month access)",
-      "customOptions": "add custom superpoll options",
-      "expiration": "votes never expire",
+      "access": "plus get {{amount}} month of:",
+      "customOptions": "adding custom options to any Superpoll",
+      "chat": "1-on-1 private chat",
       "buy": "Buy for ${{amount}}",
       "terms": "*votes in a bundle never expire",
       "payment": {
-        "header": "{{creator}}'s Superpoll Bundle",
-        "votes": "<0>{{amount}}</0> votes",
-        "access": "plus get {{amount}} month of:",
-        "customOptions": "add custom superpoll options",
-        "chat": "1-on-1 private chat"
+        "header": "{{creator}}'s Superpoll Bundle"
       },
       "error": {
         "requestFailed": "Request failed"
@@ -210,5 +206,9 @@
     "error": {
       "requestFailed": "Request failed"
     }
+  },
+  "creatorCard": {
+    "buyBundle": "Buy Bundle",
+    "purchasedVotes": "{{value}} votes"
   }
 }

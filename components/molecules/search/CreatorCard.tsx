@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
+import { useTranslation } from 'next-i18next';
 
 import UserAvatar from '../UserAvatar';
 import InlineSvg from '../../atoms/InlineSVG';
@@ -22,14 +23,15 @@ import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verif
 interface ICreatorCard {
   creator: newnewapi.IUser;
   withEllipseMenu?: boolean;
-  onBuyPackClicked?: (creator: newnewapi.IUser) => void;
+  onBuyBundleClicked?: (creator: newnewapi.IUser) => void;
 }
 
 export const CreatorCard: React.FC<ICreatorCard> = ({
   creator,
   withEllipseMenu,
-  onBuyPackClicked,
+  onBuyBundleClicked,
 }) => {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -148,16 +150,20 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>
       {/* TODO: Add data from search API */}
-      {onBuyPackClicked && (
+      {onBuyBundleClicked && (
         <SButton
           highlighted={/* !!purchasedVotes */ false}
           onClick={(e) => {
             e.stopPropagation();
-            onBuyPackClicked(creator);
+            onBuyBundleClicked(creator);
           }}
         >
-          {/* TODO: add translations */}
-          {/* purchasedVotes ? `${purchasedVotes} votes` : */ 'Buy Pack'}
+          {
+            // TODO: integrate API, uncomment the logic
+            /* purchasedVotes ?
+              t('creatorCard.purchasedVotes',{value: purchasedVotes})
+              : */ t('creatorCard.buyBundle')
+          }
         </SButton>
       )}
       <SBackground>

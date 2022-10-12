@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
-import { buyCreatorsPack } from '../../../api/endpoints/pack';
+import { buyCreatorsBundles } from '../../../api/endpoints/bundles';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { useAppSelector } from '../../../redux-store/store';
 import getCustomerPaymentFee from '../../../utils/getCustomerPaymentFee';
@@ -17,15 +17,15 @@ import PaymentModal from '../checkout/PaymentModal';
 import LoadingModal from '../LoadingModal';
 import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
 
-interface IPackPaymentModal {
+interface IBundlePaymentModal {
   creator: newnewapi.IUser;
-  pack: newnewapi.IPackOffer;
+  bundle: newnewapi.IPackOffer;
   onClose: () => void;
 }
 
-const PackPaymentModal: React.FC<IPackPaymentModal> = ({
+const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   creator,
-  pack,
+  bundle,
   onClose,
 }) => {
   const { t } = useTranslation('common');
@@ -40,10 +40,10 @@ const PackPaymentModal: React.FC<IPackPaymentModal> = ({
     () =>
       new newnewapi.BuyCreatorsPack({
         creatorUuid: creator.uuid,
-        packUuid: pack.packUuid,
-        amount: pack.price,
+        packUuid: bundle.packUuid,
+        amount: bundle.price,
       }),
-    [creator, pack]
+    [creator, bundle]
   );
 
   // TODO: Fix setup intent
@@ -51,7 +51,7 @@ const PackPaymentModal: React.FC<IPackPaymentModal> = ({
     purpose: voteOnPostRequest,
     isGuest: !user.loggedIn,
     // TODO: Fix redirect
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/packs`,
+    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/bundles`,
   });
 
   const handlePayWithCard = useCallback(
@@ -90,7 +90,7 @@ const PackPaymentModal: React.FC<IPackPaymentModal> = ({
               : {}),
           });
 
-        const res = await buyCreatorsPack(stripeContributionRequest);
+        const res = await buyCreatorsBundles(stripeContributionRequest);
 
         if (
           !res.data ||
@@ -98,7 +98,7 @@ const PackPaymentModal: React.FC<IPackPaymentModal> = ({
           res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
         ) {
           throw new Error(
-            res.error?.message ?? t('modal.buyPack.error.requestFailed')
+            res.error?.message ?? t('modal.buyBundle.error.requestFailed')
           );
         }
 
@@ -115,7 +115,7 @@ const PackPaymentModal: React.FC<IPackPaymentModal> = ({
     [setupIntent, router, t, setPaymentSuccessModalOpen, onClose]
   );
 
-  const paymentAmountInCents = useMemo(() => pack.price!.usdCents!, [pack]);
+  const paymentAmountInCents = useMemo(() => bundle.price!.usdCents!, [bundle]);
 
   const paymentFeeInCents = useMemo(
     () =>
@@ -131,7 +131,7 @@ const PackPaymentModal: React.FC<IPackPaymentModal> = ({
     [paymentAmountInCents, paymentFeeInCents]
   );
 
-  const daysOfAccess = pack.accessDurationInSeconds! / 60 / 60 / 24;
+  const daysOfAccess = bundle.accessDurationInSeconds! / 60 / 60 / 24;
   const monthsOfAccess = Math.floor(daysOfAccess / 30);
 
   // TODO: Handle redirect
@@ -142,7 +142,7 @@ const PackPaymentModal: React.FC<IPackPaymentModal> = ({
         isOpen
         amount={paymentWithFeeInCents}
         setupIntent={setupIntent}
-        redirectUrl='packs'
+        redirectUrl='bundles'
         onClose={onClose}
         handlePayWithCard={handlePayWithCard}
         bottomCaption={
@@ -168,32 +168,32 @@ const PackPaymentModal: React.FC<IPackPaymentModal> = ({
         }
       >
         <ModalTitle>
-          {t('modal.buyPack.payment.header', { creator: creator.username })}
+          {t('modal.buyBundle.payment.header', { creator: creator.username })}
         </ModalTitle>
         <SVotesNumber>
           <Trans
             t={t}
-            i18nKey='modal.buyPack.payment.votes'
+            i18nKey='modal.buyBundle.votes'
             // @ts-ignore
-            components={[<VotesNumberSpan />, { amount: pack.votesAmount }]}
+            components={[<VotesNumberSpan />, { amount: bundle.votesAmount }]}
           />
         </SVotesNumber>
         <AccessDescription>
-          {t('modal.buyPack.payment.access', { amount: monthsOfAccess })}
+          {t('modal.buyBundle.access', { amount: monthsOfAccess })}
         </AccessDescription>
         <SDescriptionLine>
           <SBullet>
             <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
           </SBullet>
           <SDescriptionText>
-            {t('modal.buyPack.payment.customOptions')}
+            {t('modal.buyBundle.customOptions')}
           </SDescriptionText>
         </SDescriptionLine>
         <SDescriptionLine last>
           <SBullet>
             <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
           </SBullet>
-          <SDescriptionText>{t('modal.buyPack.payment.chat')}</SDescriptionText>
+          <SDescriptionText>{t('modal.buyBundle.chat')}</SDescriptionText>
         </SDescriptionLine>
       </PaymentModal>
       {/* Loading Modal */}
@@ -204,7 +204,7 @@ const PackPaymentModal: React.FC<IPackPaymentModal> = ({
   );
 };
 
-export default PackPaymentModal;
+export default BundlePaymentModal;
 
 const SPaymentSign = styled(Text)`
   margin-top: 24px;

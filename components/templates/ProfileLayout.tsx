@@ -48,7 +48,7 @@ import CustomLink from '../atoms/CustomLink';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 import SmsNotificationsButton from '../molecules/profile/SmsNotificationsButton';
 import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
-import SeePacksButton from '../molecules/profile/SeePacksButton';
+import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -503,7 +503,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             )}
             <RightSideButtons>
               {user.options?.isCreator && user.options.isOfferingPacks && (
-                <SSeePacksButton creator={user} />
+                <SSeeBundleButton creator={user} />
               )}
               <SIconButton
                 active={ellipseMenuOpen}
@@ -781,7 +781,7 @@ const RightSideButtons = styled.div`
   justify-content: flex-end;
 `;
 
-const SSeePacksButton = styled(SeePacksButton)`
+const SSeeBundleButton = styled(SeeBundlesButton)`
   margin-right: 16px;
 `;
 

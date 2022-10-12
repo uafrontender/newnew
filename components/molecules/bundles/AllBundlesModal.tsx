@@ -8,17 +8,17 @@ import { useAppSelector } from '../../../redux-store/store';
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
-import PackCard from './PackCard';
+import BundleCard from './BundleCard';
 
-interface IAllPacksModal {
+interface IAllBundlesModal {
   show: boolean;
-  creatorPacks: newnewapi.ICreatorPack[];
+  creatorBundles: newnewapi.ICreatorPack[];
   onClose: () => void;
 }
 
-const AllPacksModal: React.FC<IAllPacksModal> = React.memo(
-  ({ show, creatorPacks, onClose }) => {
-    const { t } = useTranslation('page-Packs');
+const AllBundlesModal: React.FC<IAllBundlesModal> = React.memo(
+  ({ show, creatorBundles, onClose }) => {
+    const { t } = useTranslation('page-Bundles');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -36,38 +36,43 @@ const AllPacksModal: React.FC<IAllPacksModal> = React.memo(
       return 4;
     }, [isMobile, isTablet]);
 
-    const setsOfPacks = useMemo(() => {
+    const setsOfBundles = useMemo(() => {
       const sets: newnewapi.ICreatorPack[][] = [];
-      while (setSize * sets.length < creatorPacks.length) {
+      while (setSize * sets.length < creatorBundles.length) {
         sets.push(
-          creatorPacks.slice(sets.length * setSize, (sets.length + 1) * setSize)
+          creatorBundles.slice(
+            sets.length * setSize,
+            (sets.length + 1) * setSize
+          )
         );
       }
 
       return sets;
-    }, [setSize, creatorPacks]);
+    }, [setSize, creatorBundles]);
 
     return (
       <Modal show={show} onClose={onClose}>
         <SModalPaper
-          title={t('packsModal.title')}
+          title={!isMobile ? t('bundlesModal.title') : undefined}
           onClose={onClose}
           onClick={preventParentClick()}
           isCloseButton
+          isMobileFullScreen={isMobile}
         >
-          {setsOfPacks.map((set, setIndex) => (
-            <SPackSetContainer>
-              {set.map((pack, index) => (
-                <SPackCard
+          {isMobile && <SMobileTitle>{t('bundlesModal.title')}</SMobileTitle>}
+          {setsOfBundles.map((set, setIndex) => (
+            <SBundleSetContainer>
+              {set.map((bundle, index) => (
+                <SBundleCard
                   key={`${setIndex}-${index}`}
                   small
-                  creatorPack={pack}
+                  creatorBundle={bundle}
                 />
               ))}
               {Array.from('x'.repeat(setSize - set.length)).map((v, index) => (
-                <PackCard key={`${setIndex}-${index}-holder`} small />
+                <BundleCard key={`${setIndex}-${index}-holder`} small />
               ))}
-            </SPackSetContainer>
+            </SBundleSetContainer>
           ))}
         </SModalPaper>
       </Modal>
@@ -75,7 +80,7 @@ const AllPacksModal: React.FC<IAllPacksModal> = React.memo(
   }
 );
 
-export default AllPacksModal;
+export default AllBundlesModal;
 
 const SModalPaper = styled(ModalPaper)`
   width: 100%;
@@ -89,14 +94,25 @@ const SModalPaper = styled(ModalPaper)`
   }
 `;
 
-const SPackSetContainer = styled.div`
+const SMobileTitle = styled.h1`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  margin-top: 18px;
+  width: 100%;
+`;
+
+const SBundleSetContainer = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
   gap: 16px;
-  margin-bottom: 20px;
+  margin-top: 12px;
+  margin-bottom: 16px;
 
   ${({ theme }) => theme.media.tablet} {
+    margin-top: 16px;
     margin-bottom: 30px;
   }
 
@@ -105,6 +121,6 @@ const SPackSetContainer = styled.div`
   }
 `;
 
-const SPackCard = styled(PackCard)`
+const SBundleCard = styled(BundleCard)`
   background-color: ${(props) => props.theme.colorsThemed.background.tertiary};
 `;

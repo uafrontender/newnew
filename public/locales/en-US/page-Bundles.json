@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "title": "Superpoll Bundles",
+    "description": ""
+  },
+  "header": {
+    "title": "Superpoll Bundles"
+  },
+  "bundlesSection": {
+    "title": "Your current bundles",
+    "seeAll": "See all",
+    "noBundles": "You have no bundles. Try searching for creator or buy bundle",
+    "search": "Search"
+  },
+  "bundlesModal": {
+    "title": "Your current bundles"
+  },
+  "bundle": {
+    "votesLeft": "<0>{{amount}}</0> votes left",
+    "chatAccessLeft": "private chat ({{amount}} month access)",
+    "customOptions": "add custom superpoll options",
+    "expiation": "votes never expire"
+  },
+  "search": {
+    "title": "Search creators offering Bundles",
+    "searchInputPlaceholder": "Search creators",
+    "resultsTitle": "Top Creators"
+  },
+  "button": {
+    "back": "Back"
+  }
+}

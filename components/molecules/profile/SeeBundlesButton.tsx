@@ -4,10 +4,10 @@ import styled from 'styled-components';
 import { toast } from 'react-toastify';
 
 import { useTranslation } from 'next-i18next';
-import BuyPackModal from '../packs/BuyPackModal';
-import { getOfferedPacks } from '../../../api/endpoints/pack';
+import BuyBundleModal from '../bundles/BuyBundleModal';
+import { getOfferedBundles } from '../../../api/endpoints/bundles';
 
-const OFFERED_PACKS: newnewapi.PackOffer[] = [
+const OFFERED_BUNDLES: newnewapi.PackOffer[] = [
   new newnewapi.PackOffer({
     packUuid: '1',
     price: new newnewapi.MoneyAmount({ usdCents: 500 }),
@@ -35,56 +35,61 @@ const OFFERED_PACKS: newnewapi.PackOffer[] = [
   }),
 ];
 
-interface ISeePacksButton {
+interface ISeeBundlesButton {
   className?: string;
   creator: newnewapi.IUser;
 }
 
-const SeePacksButton: React.FC<ISeePacksButton> = ({ className, creator }) => {
+const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
+  className,
+  creator,
+}) => {
   const { t } = useTranslation('page-Profile');
-  const [offeredPacks, setOfferedPacks] = useState<newnewapi.IPackOffer[]>([]);
-  const [buyPackModalOpen, setBuyPackModalOpen] = useState(false);
+  const [offeredBundles, setOfferedBundles] = useState<newnewapi.IPackOffer[]>(
+    []
+  );
+  const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
 
-  const loadPackOffers = useCallback(async () => {
+  const loadBundlesOffers = useCallback(async () => {
     const payload = new newnewapi.EmptyRequest({});
-    const res = await getOfferedPacks(payload);
+    const res = await getOfferedBundles(payload);
 
     if (!res.data || res.error) {
       toast.error('toastErrors.generic');
       throw new Error(res.error?.message ?? 'Request failed');
     }
 
-    setOfferedPacks(res.data.packOffers);
+    setOfferedBundles(res.data.packOffers);
   }, []);
 
   useEffect(() => {
-    // loadPackOffers();
-    setOfferedPacks(OFFERED_PACKS);
-  }, [loadPackOffers]);
+    // loadBundlesOffers();
+    setOfferedBundles(OFFERED_BUNDLES);
+  }, [loadBundlesOffers]);
 
   return (
     <>
       <SButton
         className={className}
         onClick={() => {
-          setBuyPackModalOpen(true);
+          setBuyBundleModalOpen(true);
         }}
       >
-        {t('profileLayout.buttons.viewPacks')}
+        {t('profileLayout.buttons.viewBundles')}
       </SButton>
-      <BuyPackModal
-        show={buyPackModalOpen}
+      <BuyBundleModal
+        show={buyBundleModalOpen}
         creator={creator}
-        offeredPacks={offeredPacks}
+        offeredBundles={offeredBundles}
         onClose={() => {
-          setBuyPackModalOpen(false);
+          setBuyBundleModalOpen(false);
         }}
       />
     </>
   );
 };
 
-export default SeePacksButton;
+export default SeeBundlesButton;
 
 const SButton = styled.button`
   display: flex;
