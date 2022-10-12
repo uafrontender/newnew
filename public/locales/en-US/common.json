@@ -136,6 +136,7 @@
       "customOptions": "add custom superpoll options",
       "expiration": "votes never expire",
       "buy": "Buy for ${{amount}}",
+      "terms": "*votes in a bundle never expire",
       "payment": {
         "header": "{{creator}}'s Superpoll Bundle",
         "votes": "<0>{{amount}}</0> votes",

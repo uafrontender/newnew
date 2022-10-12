@@ -63,6 +63,7 @@ const BuyPackModal: React.FC<IBuyPackModal> = React.memo(
                   />
                 ))}
               </SOfferedPacksList>
+              <Terms>{t('modal.buyPack.terms')}</Terms>
             </Content>
           </SModalPaper>
         </Modal>
@@ -134,6 +135,7 @@ const SOfferedPacksList = styled.div`
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 20px;
+  margin-bottom: 16px;
 `;
 
 const SOfferCard = styled(OfferCard)`
@@ -146,4 +148,14 @@ const SOfferCard = styled(OfferCard)`
   ${({ theme }) => theme.media.laptop} {
     width: calc(25% - 15px);
   }
+`;
+
+const Terms = styled.p`
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 24px;
+
+  width: 100%;
+  text-align: center;
 `;
