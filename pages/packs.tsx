@@ -55,7 +55,7 @@ const PHPacks = [
       votesLeft: 4200,
     }),
   }),
-  /* new newnewapi.CreatorPack({
+  new newnewapi.CreatorPack({
     creator: new newnewapi.User({
       uuid: 'b8ba2486-48d6-4c55-9cd7-a494d0b79f98',
       avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
@@ -78,7 +78,19 @@ const PHPacks = [
       accessExpiredAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
       votesLeft: 4,
     }),
-  }), */
+  }),
+  new newnewapi.CreatorPack({
+    creator: new newnewapi.User({
+      uuid: '6702c9e9-9f53-4c98-85d7-d9ffa2f22599',
+      avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
+      nickname: 'CreatorDisplayName',
+      username: 'username',
+    }),
+    pack: new newnewapi.Pack({
+      accessExpiredAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
+      votesLeft: 4,
+    }),
+  }),
 ];
 
 const OFFERED_PACKS: newnewapi.PackOffer[] = [

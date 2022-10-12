@@ -48,6 +48,7 @@ import CustomLink from '../atoms/CustomLink';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 import SmsNotificationsButton from '../molecules/profile/SmsNotificationsButton';
 import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
+import SeePacksButton from '../molecules/profile/SeePacksButton';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -500,18 +501,23 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             ) : (
               <div />
             )}
-            <SIconButton
-              active={ellipseMenuOpen}
-              ref={moreButtonRef}
-              onClick={() => setIsEllipseMenuOpen(true)}
-            >
-              <InlineSvg
-                svg={MoreIconFilled}
-                fill={theme.colorsThemed.text.primary}
-                width='24px'
-                height='24px'
-              />
-            </SIconButton>
+            <RightSideButtons>
+              {user.options?.isCreator && user.options.isOfferingPacks && (
+                <SSeePacksButton creator={user} />
+              )}
+              <SIconButton
+                active={ellipseMenuOpen}
+                ref={moreButtonRef}
+                onClick={() => setIsEllipseMenuOpen(true)}
+              >
+                <InlineSvg
+                  svg={MoreIconFilled}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </SIconButton>
+            </RightSideButtons>
           </SSideButtons>
           {!isMobile && (
             <UserEllipseMenu
@@ -767,6 +773,16 @@ const SBioText = styled(Text)`
   max-width: 480px;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+const RightSideButtons = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+`;
+
+const SSeePacksButton = styled(SeePacksButton)`
+  margin-right: 16px;
 `;
 
 const SIconButton = styled.div<{
