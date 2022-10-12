@@ -1,5 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import React from 'react';
 import styled from 'styled-components';
 import InlineSvg from '../../atoms/InlineSVG';
@@ -41,9 +41,16 @@ const PackCard: React.FC<IPackCard> = ({
           <SUserName>@{creatorPack.creator?.username}</SUserName>
         </SUserData>
       </SUserInfo>
-      {/* TODO: add Trans */}
       <SVotesLeft small={small}>
-        {t('pack.votesLeft', { amount: creatorPack.pack.votesLeft })}
+        <Trans
+          t={t}
+          i18nKey='pack.votesLeft'
+          // @ts-ignore
+          components={[
+            <VotesNumberSpan />,
+            { amount: creatorPack.pack.votesLeft },
+          ]}
+        />
       </SVotesLeft>
       <SDescriptionLine>
         <SBullet>
@@ -150,6 +157,10 @@ const SVotesLeft = styled.p<{ small: boolean }>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+`;
+
+const VotesNumberSpan = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.accent.yellow};
 `;
 
 const SDescriptionLine = styled.div<{ last?: boolean }>`

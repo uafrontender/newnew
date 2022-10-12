@@ -1,6 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 import { newnewapi } from 'newnew-api';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import InlineSvg from '../../atoms/InlineSVG';
@@ -37,9 +37,13 @@ const OfferCard: React.FC<IOfferCard> = ({
           />
         ))}
       </PackIconLine>
-      {/* TODO: add Trans */}
       <SVotesNumber>
-        {t('modal.buyPack.votes', { amount: packOffer.votesAmount })}
+        <Trans
+          t={t}
+          i18nKey='modal.buyPack.votes'
+          // @ts-ignore
+          components={[<VotesNumberSpan />, { amount: packOffer.votesAmount }]}
+        />
       </SVotesNumber>
       <SDescriptionLine>
         <SBullet>
@@ -112,6 +116,10 @@ const SVotesNumber = styled.p`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+`;
+
+const VotesNumberSpan = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.accent.yellow};
 `;
 
 const SDescriptionLine = styled.div<{ last?: boolean }>`

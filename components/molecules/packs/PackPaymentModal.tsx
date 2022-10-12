@@ -1,5 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -171,7 +171,12 @@ const PackPaymentModal: React.FC<IPackPaymentModal> = ({
           {t('modal.buyPack.payment.header', { creator: creator.username })}
         </ModalTitle>
         <SVotesNumber>
-          {t('modal.buyPack.payment.votes', { amount: pack.votesAmount })}
+          <Trans
+            t={t}
+            i18nKey='modal.buyPack.payment.votes'
+            // @ts-ignore
+            components={[<VotesNumberSpan />, { amount: pack.votesAmount }]}
+          />
         </SVotesNumber>
         <AccessDescription>
           {t('modal.buyPack.payment.access', { amount: monthsOfAccess })}
@@ -237,6 +242,10 @@ const SVotesNumber = styled.p`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+`;
+
+const VotesNumberSpan = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.accent.yellow};
 `;
 
 const AccessDescription = styled.p`

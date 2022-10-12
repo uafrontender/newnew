@@ -131,14 +131,14 @@
     },
     "buyPack": {
       "title": "Buy {{username}}'s Pack",
-      "votes": "{{amount}} votes",
+      "votes": "<0>{{amount}}</0> votes",
       "chatAccess": "private chat ({{amount}} month access)",
       "customOptions": "add custom superpoll options",
       "expiration": "votes never expire",
       "buy": "Buy for ${{amount}}",
       "payment": {
         "header": "{{creator}}'s Superpoll Bundle",
-        "votes": "{{amount}} votes",
+        "votes": "<0>{{amount}}</0> votes",
         "access": "plus get {{amount}} month of:",
         "customOptions": "add custom superpoll options",
         "chat": "1-on-1 private chat"

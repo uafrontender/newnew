@@ -17,7 +17,7 @@
     "title": "Your current packs"
   },
   "pack": {
-    "votesLeft": "{{amount}} votes left",
+    "votesLeft": "<0>{{amount}}</0> votes left",
     "chatAccessLeft": "private chat ({{amount}} month access)",
     "customOptions": "add custom superpoll options",
     "expiation": "votes never expire"
