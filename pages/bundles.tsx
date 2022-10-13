@@ -112,7 +112,6 @@ const OFFERED_BUNDLES: newnewapi.PackOffer[] = [
     votesAmount: 500,
     accessDurationInSeconds: 60 * 60 * 24 * 30 * 3,
   }),
-
   new newnewapi.PackOffer({
     packUuid: '4',
     price: new newnewapi.MoneyAmount({ usdCents: 7500 }),

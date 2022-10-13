@@ -249,6 +249,9 @@
     "winner": "Winner",
     "history": "History"
   },
+  "optionsTabLine": {
+    "availableVotes": "You have <0>{{amount}}</0> votes"
+  },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
       "ac": "This Bid will begin once the video \nhas been processed",

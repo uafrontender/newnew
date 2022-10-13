@@ -1,6 +1,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
+import { Trans, useTranslation } from 'next-i18next';
 
 import InlineSvg from '../../../atoms/InlineSVG';
 
@@ -8,12 +9,15 @@ import StatisticsIconFilled from '../../../../public/images/svg/icons/filled/Sta
 
 interface IPostVotingTab {
   children: string;
+  numberOfAvailableVotes?: number;
 }
 
 const PostVotingTab: React.FunctionComponent<IPostVotingTab> = ({
   children,
+  numberOfAvailableVotes,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation('modal-Post');
 
   return (
     <STabs>
@@ -27,6 +31,19 @@ const PostVotingTab: React.FunctionComponent<IPostVotingTab> = ({
           />
           <div>{children}</div>
         </STab>
+        {numberOfAvailableVotes !== undefined && (
+          <SAvailableVotes>
+            <Trans
+              t={t}
+              i18nKey='optionsTabLine.availableVotes'
+              // @ts-ignore
+              components={[
+                <VotesNumberSpan />,
+                { amount: numberOfAvailableVotes },
+              ]}
+            />
+          </SAvailableVotes>
+        )}
       </STabsContainer>
     </STabs>
   );
@@ -47,7 +64,7 @@ const STabs = styled.div`
 
 const STabsContainer = styled.div`
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 24px;
 
   width: 100%;
@@ -101,4 +118,15 @@ const STab = styled.div`
   ${({ theme }) => theme.media.tablet} {
     padding-bottom: 12px;
   }
+`;
+
+const SAvailableVotes = styled.p`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 24px;
+`;
+
+const VotesNumberSpan = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.accent.yellow};
 `;

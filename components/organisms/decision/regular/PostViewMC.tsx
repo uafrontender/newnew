@@ -44,6 +44,8 @@ import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import dateToTimestamp from '../../../../utils/dateToTimestamp';
+import { getMyBundleForCreator } from '../../../../api/endpoints/bundles';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -121,6 +123,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
+
+  // Bundle
+  const [bundle, setBundle] = useState<newnewapi.IPack | undefined>();
 
   // Response viewed
   const [responseViewed, setResponseViewed] = useState(
@@ -247,6 +252,27 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     },
     [user.userData?.userUuid]
   );
+
+  const loadBundle = useCallback(async () => {
+    if (post.creator?.uuid) {
+      try {
+        const payload = new newnewapi.GetMyPackForCreatorRequest({
+          creatorUuid: post.creator.uuid,
+        });
+
+        const res = await getMyBundleForCreator(payload);
+
+        if (!res.data || !res.data.pack || res.error) {
+          throw new Error(res.error?.message ?? 'Request failed');
+        }
+
+        setBundle(res.data.pack);
+      } catch (err: any) {
+        console.error(err);
+        toast.error(err.message);
+      }
+    }
+  }, [post.creator?.uuid]);
 
   const fetchOptions = useCallback(
     async (pageToken?: string) => {
@@ -429,6 +455,18 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       clearTimeout(timer);
     };
   }, [post, user.loggedIn, user.userData?.userUuid]);
+
+  useEffect(() => {
+    // TODO: enable
+    // loadBundle();
+
+    setBundle(
+      new newnewapi.Pack({
+        accessExpiredAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
+        votesLeft: 4,
+      })
+    );
+  }, [loadBundle]);
 
   useEffect(() => {
     // setTimeout used to fix the React memory leak warning
@@ -730,7 +768,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           handleToggleMuted={() => handleToggleMutedMode()}
         />
         <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
-        <SActivitesContainer
+        <SActivitiesContainer
           shorterSection={
             postStatus === 'failed' ||
             (post.isSuggestionsAllowed &&
@@ -739,7 +777,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
               postStatus === 'voting')
           }
         >
-          <PostVotingTab>
+          <PostVotingTab
+            numberOfAvailableVotes={bundle?.votesLeft ?? undefined}
+          >
             {`${t('tabs.options')} ${
               !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
             }`}
@@ -775,7 +815,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             }
             handleRemoveOption={handleRemoveOption}
           />
-        </SActivitesContainer>
+        </SActivitiesContainer>
         {/* Loading Modal */}
         {loadingModalOpen && (
           <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
@@ -891,7 +931,7 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div<{
+const SActivitiesContainer = styled.div<{
   shorterSection: boolean;
 }>`
   grid-area: activities;
