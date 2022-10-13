@@ -348,12 +348,12 @@ const Home: NextPage<IHome> = ({
 
       {/* Greatest of all time posts */}
       {!collectionBiggestError &&
-      (collectionACInitialLoading || collectionAC?.length > 0) ? (
+      (collectionBiggestInitialLoading || collectionBiggest?.length > 0) ? (
         <SCardsSection
           title={t('cardsSection.title.biggest')}
           category='biggest'
-          collection={collectionAC}
-          loading={collectionACInitialLoading}
+          collection={collectionBiggest}
+          loading={collectionBiggestInitialLoading}
           handlePostClicked={handleOpenPostModal}
         />
       ) : null}

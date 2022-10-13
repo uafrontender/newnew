@@ -9,6 +9,7 @@ import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 
 import { usePostModalState } from '../../../contexts/postModalContext';
 import { useAppSelector } from '../../../redux-store/store';
+import switchPostType from '../../../utils/switchPostType';
 
 interface IPostTypeSectionProps {
   posts: newnewapi.Post[];
@@ -42,7 +43,11 @@ const PostTypeSection = ({
       openPostModal(post);
     };
     return (
-      <SItemWrapper index={index} onClick={handleOpenPostModal}>
+      <SItemWrapper
+        key={switchPostType(post)[0].postUuid}
+        index={index}
+        onClick={handleOpenPostModal}
+      >
         <PostCard
           item={post}
           shouldStop={postOverlayOpen}
