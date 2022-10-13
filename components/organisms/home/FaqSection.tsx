@@ -50,10 +50,6 @@ const FaqSection = () => {
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
 
-  console.log(
-    user.loggedIn ? t('faq.becomeCreator') : t('faq.signUpToBecomeCreator')
-  );
-
   return (
     <SContainer>
       <SHeadline variant={4}>{t('faq.title')}</SHeadline>
@@ -222,6 +218,7 @@ const SText = styled(Text)`
     theme.name === 'dark'
       ? theme.colorsThemed.background.outlines2
       : theme.colorsThemed.text.secondary};
+  white-space: pre-line;
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 14px;
