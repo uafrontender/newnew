@@ -1,13 +1,13 @@
 /* eslint-disable prefer-template */
 /* eslint-disable arrow-body-style */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
 import Caption from './Caption';
 
 import isBrowser from '../../utils/isBrowser';
-import secondsToDHM, { DHM } from '../../utils/secondsToDHM';
+import secondsToDHMS, { DHMS } from '../../utils/secondsToDHMS';
 import usePageVisibility from '../../utils/hooks/usePageVisibility';
 
 interface ICardTimer {
@@ -25,13 +25,15 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
     const hasEnded = Date.now() > endsAt;
     const expirationDate = new Date(endsAt);
 
-    const [parsedSeconds, setParsedSeconds] = useState<DHM>(
-      secondsToDHM(parsed, 'noTrim')
+    const [parsedSeconds, setParsedSeconds] = useState<DHMS>(
+      secondsToDHMS(parsed)
     );
     const [seconds, setSeconds] = useState(parsed);
     const interval = useRef<number>();
 
-    const parsedString = `
+    const parsedString = useMemo(() => {
+      if (parsedSeconds.hours !== '0') {
+        return `
     ${
       parsedSeconds.days !== '0'
         ? `${parsedSeconds.days}${t('timer.daysLeft')}`
@@ -48,6 +50,26 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
         : ''
     }
   `;
+      }
+
+      return `
+      ${
+        parsedSeconds.minutes !== '0'
+          ? `${parsedSeconds.minutes}${t('timer.minutesLeft')}`
+          : ''
+      }
+      ${
+        parsedSeconds.seconds !== '0'
+          ? `${parsedSeconds.seconds}${t('timer.secondsLeft')}`
+          : ''
+      }`;
+    }, [
+      parsedSeconds.days,
+      parsedSeconds.hours,
+      parsedSeconds.minutes,
+      parsedSeconds.seconds,
+      t,
+    ]);
 
     useEffect(() => {
       // TODO: we can set the interval recursively and first one can
@@ -55,13 +77,13 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
       if (isBrowser() && isPageVisible) {
         interval.current = window.setInterval(() => {
           setSeconds(() => (endsAt - Date.now()) / 1000);
-        }, 1000 * 60);
+        }, 1000);
       }
       return () => clearInterval(interval.current);
     }, [endsAt, isPageVisible]);
 
     useEffect(() => {
-      setParsedSeconds(secondsToDHM(seconds, 'noTrim'));
+      setParsedSeconds(secondsToDHMS(seconds));
     }, [seconds]);
 
     if (!hasStarted) {
