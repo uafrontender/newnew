@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import InlineSvg from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
 import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
+import formatTimeLeft from '../../../utils/formatTimeLeft';
 
 interface IBundleCard {
   className?: string;
@@ -26,8 +27,7 @@ const BundleCard: React.FC<IBundleCard> = ({
   const expiresAtTime =
     (creatorBundle.pack.accessExpiredAt!.seconds as number) * 1000;
   const timeLeft = expiresAtTime - Date.now();
-  const daysLeft = timeLeft / 1000 / 60 / 60 / 24;
-  const monthsLeft = Math.floor(daysLeft / 30);
+  const formattedTimeLeft = formatTimeLeft(timeLeft);
 
   return (
     <SBundlesContainer className={className} small={small}>
@@ -52,14 +52,12 @@ const BundleCard: React.FC<IBundleCard> = ({
           ]}
         />
       </SVotesLeft>
-      <SDescriptionLine>
-        <SBullet>
-          <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
-        </SBullet>
-        <SDescriptionText>
-          {t('bundle.chatAccessLeft', { amount: monthsLeft })}
-        </SDescriptionText>
-      </SDescriptionLine>
+      <AccessDescription>
+        {t('bundle.access', {
+          amount: formattedTimeLeft.value,
+          unit: t(`bundle.unit.${formattedTimeLeft.unit}`),
+        })}
+      </AccessDescription>
       <SDescriptionLine>
         <SBullet>
           <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
@@ -70,7 +68,7 @@ const BundleCard: React.FC<IBundleCard> = ({
         <SBullet>
           <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
         </SBullet>
-        <SDescriptionText>{t('bundle.expiation')}</SDescriptionText>
+        <SDescriptionText>{t('bundle.chat')}</SDescriptionText>
       </SDescriptionLine>
     </SBundlesContainer>
   );
@@ -151,7 +149,7 @@ const SVotesLeft = styled.p<{ small: boolean }>`
   font-size: ${({ small }) => (small ? '24px' : '28px;')};
   line-height: ${({ small }) => (small ? '32px' : '36px;')};
 
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 
   width: 100%;
   overflow: hidden;
@@ -161,6 +159,16 @@ const SVotesLeft = styled.p<{ small: boolean }>`
 
 const VotesNumberSpan = styled.span`
   color: ${({ theme }) => theme.colorsThemed.accent.yellow};
+`;
+
+const AccessDescription = styled.p`
+  font-weight: 600;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  font-size: 14px;
+  line-height: 20px;
+
+  margin-bottom: 12px;
 `;
 
 const SDescriptionLine = styled.div<{ last?: boolean }>`

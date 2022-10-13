@@ -132,11 +132,15 @@
     "buyBundle": {
       "title": "Buy a Superpoll bundle for:",
       "votes": "<0>{{amount}}</0> votes",
-      "access": "plus get {{amount}} month of:",
+      "access": "plus get {{amount}} {{unit}} of:",
       "customOptions": "adding custom options to any Superpoll",
       "chat": "1-on-1 private chat",
       "buy": "Buy for ${{amount}}",
       "terms": "*votes in a bundle never expire",
+      "unit": {
+        "month": "month",
+        "months": "months"
+      },
       "payment": {
         "header": "{{creator}}'s Superpoll Bundle"
       },

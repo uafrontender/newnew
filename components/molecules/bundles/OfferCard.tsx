@@ -26,6 +26,8 @@ const OfferCard: React.FC<IOfferCard> = ({
   const daysOfAccess = bundleOffer.accessDurationInSeconds! / 60 / 60 / 24;
   const monthsOfAccess = Math.floor(daysOfAccess / 30);
 
+  const unit = monthsOfAccess > 1 ? 'months' : 'month';
+
   return (
     <SBundleContainer className={className}>
       <BundleIconLine>
@@ -49,7 +51,10 @@ const OfferCard: React.FC<IOfferCard> = ({
         />
       </SVotesNumber>
       <AccessDescription>
-        {t('modal.buyBundle.access', { amount: monthsOfAccess })}
+        {t('modal.buyBundle.access', {
+          amount: monthsOfAccess,
+          unit: t(`modal.buyBundle.unit.${unit}`),
+        })}
       </AccessDescription>
       <SDescriptionLine>
         <SBullet>
