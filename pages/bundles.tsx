@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
@@ -97,11 +97,11 @@ export const Bundles = () => {
   const router = useRouter();
   const { t } = useTranslation('page-Bundles');
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { user, ui } = useAppSelector((state) => state);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
+    ui.resizeMode
   );
-  const isTablet = ['tablet'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(ui.resizeMode);
 
   const [allBundlesModalOpen, setAllBundlesModalOpen] = useState(false);
   const [buyBundleCreator, setBuyBundleCreator] = useState<
@@ -111,7 +111,6 @@ export const Bundles = () => {
 
   const [searchValue, setSearchValue] = useState('');
   const { ref: loadingRef, inView } = useInView();
-  const searchInputRef = useRef<HTMLInputElement>();
 
   // TODO: Use paging
   const loadUserBundles = useCallback(async () => {
@@ -160,6 +159,15 @@ export const Bundles = () => {
   const paginatedCreators = usePagination(loadCreatorsData, 10);
 
   useEffect(() => {
+    if (
+      (!user.loggedIn && user._persist?.rehydrated) ||
+      (bundles.length === 0 && false) /* && bundles are loaded */
+    ) {
+      router.replace('/');
+    }
+  }, [user.loggedIn, user._persist?.rehydrated, bundles, router]);
+
+  useEffect(() => {
     if (inView && !paginatedCreators.loading && paginatedCreators.hasMore) {
       paginatedCreators.loadMore().catch((e) => console.error(e));
     }
@@ -200,35 +208,16 @@ export const Bundles = () => {
             </SSeeAllButton>
           )}
         </SBundlesTitle>
+        <SBundlesContainer>
+          {bundles.slice(0, visibleBundlesNumber).map((bundle, index) => (
+            <BundleCard key={`${index}`} creatorBundle={bundle} />
+          ))}
 
-        {bundles.length === 0 ? (
-          <SNoBundlesContainer>
-            <SNoBundlesImage />
-            <SNoBundlesText>{t('bundlesSection.noBundles')}</SNoBundlesText>
-            <SSearchButton
-              onClick={() => {
-                if (searchInputRef.current) {
-                  searchInputRef.current.scrollIntoView({ block: 'center' });
-                  searchInputRef.current.focus();
-                }
-              }}
-            >
-              {t('bundlesSection.search')}
-            </SSearchButton>
-          </SNoBundlesContainer>
-        ) : (
-          <SBundlesContainer>
-            {bundles.slice(0, visibleBundlesNumber).map((bundle, index) => (
-              <BundleCard key={`${index}`} creatorBundle={bundle} />
-            ))}
-
-            {!isMobile &&
-              Array.from(
-                'x'.repeat(Math.max(visibleBundlesNumber - bundles.length, 0))
-              ).map((v, index) => <BundleCard key={`${index}-holder`} />)}
-          </SBundlesContainer>
-        )}
-
+          {!isMobile &&
+            Array.from(
+              'x'.repeat(Math.max(visibleBundlesNumber - bundles.length, 0))
+            ).map((v, index) => <BundleCard key={`${index}-holder`} />)}
+        </SBundlesContainer>
         <SectionTitle>{t('search.title')}</SectionTitle>
         <SInputWrapper>
           <SLeftInlineSVG
@@ -242,11 +231,6 @@ export const Bundles = () => {
             height={isMobile ? '20px' : '24px'}
           />
           <SInput
-            ref={(element) => {
-              if (element) {
-                searchInputRef.current = element;
-              }
-            }}
             value={searchValue}
             onChange={(e: any) => {
               setSearchValue(e.target.value);
@@ -364,87 +348,6 @@ const SBundlesTitle = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   width: 100%;
-`;
-
-const SNoBundlesContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  padding: 24px;
-  border-radius: 16px;
-  border-width: 1px;
-  border-style: solid;
-  border-color: ${(props) => props.theme.colorsThemed.tag.color.primary};
-  margin-bottom: 64px;
-
-  ${({ theme }) => theme.media.tablet} {
-    flex-direction: row;
-    margin-bottom: 84px;
-  }
-`;
-
-const SNoBundlesImage = styled.img`
-  height: 40px;
-  width: 40px;
-
-  margin-bottom: 16px;
-  ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 0px;
-    margin-right: 16px;
-  }
-`;
-
-const SNoBundlesText = styled.p`
-  flex-grow: 1;
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  font-weight: 600;
-  text-align: center;
-  font-size: 20px;
-  line-height: 28px;
-  margin-bottom: 24px;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 0px;
-    text-align: start;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-`;
-
-const SSearchButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  white-space: nowrap;
-
-  font-size: 14px;
-  line-height: 24px;
-  font-weight: bold;
-
-  padding: 8px 16px;
-  min-width: 100%;
-
-  color: ${({ theme }) => theme.colors.darkGray};
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-  border-radius: ${(props) => props.theme.borderRadius.medium};
-  border: transparent;
-
-  cursor: pointer;
-
-  /* No select */
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-
-  ${({ theme }) => theme.media.tablet} {
-    min-width: 160px;
-  }
 `;
 
 const SectionTitle = styled.h3`

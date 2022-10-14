@@ -1,9 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import {
-  BASE_URL,
-  fetchProtobuf,
-  fetchProtobufProtectedIntercepted,
-} from '../apiConfigs';
+import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 
 const BASE_URL_BUNDLE = `${BASE_URL}/pack`;
 
