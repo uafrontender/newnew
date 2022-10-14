@@ -9,7 +9,7 @@ import React, {
   useState,
 } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
@@ -40,7 +40,6 @@ import switchPostType from '../../../../utils/switchPostType';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
-import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
@@ -157,14 +156,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   // Total votes
   const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
-
-  // Free votes
-  const [hasFreeVote, setHasFreeVote] = useState(post.canVoteForFree ?? false);
-  const handleResetFreeVote = () => setHasFreeVote(false);
-
-  const [canSubscribe, setCanSubscribe] = useState(
-    post.creator?.options?.isOfferingSubscription
-  );
 
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
@@ -373,27 +364,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
       }
-
-      setHasFreeVote(res.data.multipleChoice?.canVoteForFree ?? false);
       setTotalVotes(res.data.multipleChoice?.totalVotes as number);
       setNumberOfOptions(res.data.multipleChoice?.optionCount as number);
       if (res.data.multipleChoice?.status)
         handleUpdatePostStatus(res.data.multipleChoice?.status);
-
-      if (user.loggedIn && post.creator?.options?.isOfferingSubscription) {
-        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-          creatorUuid: post.creator?.uuid,
-        });
-
-        const responseSubStatus = await getSubscriptionStatus(getStatusPayload);
-
-        if (
-          responseSubStatus.data?.status?.activeRenewsAt ||
-          responseSubStatus.data?.status?.activeCancelsAt
-        ) {
-          setCanSubscribe(false);
-        }
-      }
 
       setPostLoading(false);
     } catch (err) {
@@ -635,7 +609,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         await fetchPostLatestData();
 
         setLoadingModalOpen(false);
-        handleResetFreeVote();
         setPaymentSuccessModalOpen(true);
       } catch (err: any) {
         console.error(err);
@@ -768,18 +741,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           handleToggleMuted={() => handleToggleMutedMode()}
         />
         <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
-        <SActivitiesContainer
-          shorterSection={
-            postStatus === 'failed' ||
-            (post.isSuggestionsAllowed &&
-              !hasVotedOptionId &&
-              hasFreeVote &&
-              postStatus === 'voting')
-          }
-        >
-          <PostVotingTab
-            numberOfAvailableVotes={bundle?.votesLeft ?? undefined}
-          >
+        <SActivitiesContainer>
+          <PostVotingTab bundleVotes={bundle?.votesLeft ?? undefined}>
             {`${t('tabs.options')} ${
               !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
             }`}
@@ -805,11 +768,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                 ? Math.floor(appConstants?.mcVotePrice)
                 : 1
             }
-            canSubscribe={!!canSubscribe}
-            canVoteForFree={hasFreeVote}
             hasVotedOptionId={(hasVotedOptionId as number) ?? undefined}
+            bundleVotes={bundle?.votesLeft ?? undefined}
             handleLoadOptions={fetchOptions}
-            handleResetFreeVote={handleResetFreeVote}
             handleAddOrUpdateOptionFromResponse={
               handleAddOrUpdateOptionFromResponse
             }
@@ -931,9 +892,7 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitiesContainer = styled.div<{
-  shorterSection: boolean;
-}>`
+const SActivitiesContainer = styled.div`
   grid-area: activities;
 
   display: flex;
@@ -946,17 +905,6 @@ const SActivitiesContainer = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     max-height: calc(452px);
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    ${({ shorterSection }) =>
-      !shorterSection
-        ? css`
-            max-height: 500px;
-          `
-        : css`
-            max-height: calc(580px - 120px);
-          `}
   }
 `;
 

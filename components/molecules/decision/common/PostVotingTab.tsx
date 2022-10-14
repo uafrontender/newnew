@@ -9,12 +9,12 @@ import StatisticsIconFilled from '../../../../public/images/svg/icons/filled/Sta
 
 interface IPostVotingTab {
   children: string;
-  numberOfAvailableVotes?: number;
+  bundleVotes?: number;
 }
 
 const PostVotingTab: React.FunctionComponent<IPostVotingTab> = ({
   children,
-  numberOfAvailableVotes,
+  bundleVotes,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
@@ -31,18 +31,15 @@ const PostVotingTab: React.FunctionComponent<IPostVotingTab> = ({
           />
           <div>{children}</div>
         </STab>
-        {numberOfAvailableVotes !== undefined && (
-          <SAvailableVotes>
+        {bundleVotes !== undefined && (
+          <SBundleVotes>
             <Trans
               t={t}
-              i18nKey='optionsTabLine.availableVotes'
+              i18nKey='optionsTabLine.bundleVotes'
               // @ts-ignore
-              components={[
-                <VotesNumberSpan />,
-                { amount: numberOfAvailableVotes },
-              ]}
+              components={[<VotesNumberSpan />, { amount: bundleVotes }]}
             />
-          </SAvailableVotes>
+          </SBundleVotes>
         )}
       </STabsContainer>
     </STabs>
@@ -120,7 +117,7 @@ const STab = styled.div`
   }
 `;
 
-const SAvailableVotes = styled.p`
+const SBundleVotes = styled.p`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: 700;
   font-size: 14px;

@@ -25,7 +25,7 @@ import {
 import { validateText } from '../../../../../api/endpoints/infrastructure';
 // import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
 import {
-  doFreeVote,
+  voteWithBundleVotes,
   voteOnPost,
 } from '../../../../../api/endpoints/multiple_choice';
 
@@ -48,7 +48,7 @@ import TutorialTooltip, {
 } from '../../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
-import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
+import UseBundleVotesModal from './UseBundleVotesModal';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import Headline from '../../../../atoms/Headline';
 import assets from '../../../../../constants/assets';
@@ -56,6 +56,7 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import BuyBundleModal from '../../../bundles/BuyBundleModal';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -95,10 +96,8 @@ interface IMcOptionsTab {
   pagingToken: string | undefined | null;
   minAmount: number;
   votePrice: number;
-  canVoteForFree: boolean;
   hasVotedOptionId?: number;
-  canSubscribe: boolean;
-  handleResetFreeVote: () => void;
+  bundleVotes?: number;
   handleLoadOptions: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
@@ -117,11 +116,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   pagingToken,
   minAmount,
   votePrice,
-  canVoteForFree,
   hasVotedOptionId,
-  canSubscribe,
+  bundleVotes,
   handleLoadOptions,
-  handleResetFreeVote,
   handleRemoveOption,
   handleAddOrUpdateOptionFromResponse,
 }) => {
@@ -152,9 +149,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     useScrollGradients(containerRef);
 
   const [heightDelta, setHeightDelta] = useState(
-    post.isSuggestionsAllowed && !hasVotedOptionId && postStatus === 'voting'
-      ? 56
-      : 0
+    !hasVotedOptionId && postStatus === 'voting' ? 56 : 0
   );
   const actionSectionContainer = useRef<HTMLDivElement>();
 
@@ -175,6 +170,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const [useFreeVoteModalOpen, setUseFreeVoteModalOpen] = useState(false);
   const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
+
+  // Bundle modal
+  const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
 
   // Handlers
   const validateTextViaAPI = useCallback(async (text: string) => {
@@ -345,7 +343,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         postUuid: post.postUuid,
       });
 
-      const res = await doFreeVote(payload);
+      const res = await voteWithBundleVotes(payload);
 
       if (
         !res.data ||
@@ -364,7 +362,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       setNewOptionText('');
       setSuggestNewMobileOpen(false);
       setLoadingModalOpen(false);
-      handleResetFreeVote();
       setPaymentSuccessModalOpen(true);
     } catch (err) {
       console.error(err);
@@ -375,7 +372,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     newOptionText,
     post.postUuid,
     appConstants.mcFreeVoteCount,
-    handleResetFreeVote,
     handleAddOrUpdateOptionFromResponse,
   ]);
 
@@ -397,7 +393,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     });
 
     if (
-      post.isSuggestionsAllowed &&
       !postLoading &&
       !hasVotedOptionId &&
       postStatus === 'voting' &&
@@ -411,13 +406,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     return () => {
       resizeObserver.disconnect();
     };
-  }, [
-    hasVotedOptionId,
-    postLoading,
-    post.isSuggestionsAllowed,
-    postStatus,
-    isMobileOrTablet,
-  ]);
+  }, [hasVotedOptionId, postLoading, postStatus, isMobileOrTablet]);
 
   const goToNextStep = () => {
     if (
@@ -484,12 +473,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               minAmount={minAmount}
               votePrice={votePrice}
               optionBeingSupported={optionBeingSupported}
+              bundleVotes={bundleVotes}
               votingAllowed={postStatus === 'voting'}
-              canVoteForFree={canVoteForFree}
               isCreatorsBid={
                 !option.creator || option.creator?.uuid === post.creator?.uuid
               }
-              handleResetFreeVote={handleResetFreeVote}
               noAction={
                 (hasVotedOptionId !== undefined &&
                   hasVotedOptionId !== option.id) ||
@@ -531,60 +519,69 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
-        {post.isSuggestionsAllowed &&
-          !hasVotedOptionId &&
-          canVoteForFree &&
-          postStatus === 'voting' && (
-            <SActionSection
-              ref={(el) => {
-                actionSectionContainer.current = el!!;
+        {!hasVotedOptionId && postStatus === 'voting' && (
+          <SActionSection
+            ref={(el) => {
+              actionSectionContainer.current = el!!;
+            }}
+          >
+            <SuggestionTextArea
+              value={newOptionText}
+              disabled={optionBeingSupported !== ''}
+              placeholder={t(
+                'mcPost.optionsTab.actionSection.suggestionPlaceholder'
+              )}
+              onChange={handleUpdateNewOptionText}
+            />
+            <SAddOptionButton
+              size='sm'
+              disabled={
+                !newOptionText ||
+                optionBeingSupported !== '' ||
+                !newOptionTextValid
+              }
+              style={{
+                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+              }}
+              onClick={() => {
+                Mixpanel.track('Click Add Free Option', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTab',
+                });
+                setUseFreeVoteModalOpen(true);
               }}
             >
-              <SuggestionTextArea
-                value={newOptionText}
-                disabled={optionBeingSupported !== ''}
-                placeholder={t(
-                  'mcPost.optionsTab.actionSection.suggestionPlaceholder'
-                )}
-                onChange={handleUpdateNewOptionText}
-              />
-              <SAddFreeVoteButton
-                size='sm'
-                disabled={
-                  !newOptionText ||
-                  optionBeingSupported !== '' ||
-                  !newOptionTextValid
-                }
-                style={{
-                  ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-                }}
-                onClick={() => {
-                  Mixpanel.track('Click Add Free Option', {
-                    _stage: 'Post',
-                    _postUuid: post.postUuid,
-                    _component: 'McOptionsTab',
-                  });
-                  setUseFreeVoteModalOpen(true);
-                }}
-              >
-                {t('mcPost.optionsTab.actionSection.placeABidButton')}
-              </SAddFreeVoteButton>
-              {user.userTutorialsProgress.remainingMcSteps && (
-                <STutorialTooltipTextAreaHolder>
-                  <TutorialTooltip
-                    isTooltipVisible={
-                      user.userTutorialsProgress.remainingMcSteps[0] ===
-                      newnewapi.McTutorialStep.MC_TEXT_FIELD
-                    }
-                    closeTooltip={goToNextStep}
-                    title={t('tutorials.mc.createYourBid.title')}
-                    text={t('tutorials.mc.createYourBid.text')}
-                    dotPosition={DotPositionEnum.BottomRight}
-                  />
-                </STutorialTooltipTextAreaHolder>
-              )}
-            </SActionSection>
-          )}
+              {t('mcPost.optionsTab.actionSection.placeABidButton')}
+            </SAddOptionButton>
+            {user.userTutorialsProgress.remainingMcSteps && (
+              <STutorialTooltipTextAreaHolder>
+                <TutorialTooltip
+                  isTooltipVisible={
+                    user.userTutorialsProgress.remainingMcSteps[0] ===
+                    newnewapi.McTutorialStep.MC_TEXT_FIELD
+                  }
+                  closeTooltip={goToNextStep}
+                  title={t('tutorials.mc.createYourBid.title')}
+                  text={t('tutorials.mc.createYourBid.text')}
+                  dotPosition={DotPositionEnum.BottomRight}
+                />
+              </STutorialTooltipTextAreaHolder>
+            )}
+          </SActionSection>
+        )}
+        <SBundlesContainer>
+          <SBundlesText>
+            {t('mcPost.optionsTab.actionSection.offersBundles')}
+          </SBundlesText>
+          <SViewButton
+            onClick={() => {
+              setBuyBundleModalOpen(true);
+            }}
+          >
+            {t('mcPost.optionsTab.actionSection.viewBundles')}
+          </SViewButton>
+        </SBundlesContainer>
         {user.userTutorialsProgress.remainingMcSteps && (
           <STutorialTooltipHolder>
             <TutorialTooltip
@@ -617,7 +614,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               )}
               onChange={handleUpdateNewOptionText}
             />
-            <SAddFreeVoteButton
+            <SAddOptionButton
               size='sm'
               disabled={
                 !newOptionText ||
@@ -637,16 +634,20 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               }}
             >
               {t('mcPost.optionsTab.actionSection.placeABidButton')}
-            </SAddFreeVoteButton>
+            </SAddOptionButton>
           </SSuggestNewContainer>
         </OptionActionMobileModal>
       ) : null}
-      {/* Use Free vote modal */}
-      <McConfirmUseFreeVoteModal
-        isVisible={useFreeVoteModalOpen}
-        handleMakeFreeVote={handleVoteForFree}
-        closeModal={() => setUseFreeVoteModalOpen(false)}
-      />
+      {/* Use bundle vote modal */}
+      {bundleVotes && (
+        <UseBundleVotesModal
+          isVisible={useFreeVoteModalOpen}
+          optionText={optionBeingSupported}
+          bundleVotes={bundleVotes}
+          handleVoteWithBundleVotes={handleVoteForFree}
+          closeModal={() => setUseFreeVoteModalOpen(false)}
+        />
+      )}
       {/* Payment Modal */}
       {paymentModalOpen ? (
         <PaymentModal
@@ -718,8 +719,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       !suggestNewMobileOpen &&
       !hasVotedOptionId &&
       postStatus === 'voting' &&
-      post.isSuggestionsAllowed &&
-      canVoteForFree ? (
+      bundleVotes ? (
         <>
           <SActionButton
             id='action-button-mobile'
@@ -751,6 +751,15 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           )}
         </>
       ) : null}
+      {buyBundleModalOpen && post.creator && (
+        <BuyBundleModal
+          show
+          creator={post.creator}
+          onClose={() => {
+            setBuyBundleModalOpen(false);
+          }}
+        />
+      )}
     </>
   );
 };
@@ -788,7 +797,7 @@ const SBidsContainer = styled.div<{
   padding-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+    height: ${({ heightDelta }) => `calc(100% - ${heightDelta + 72}px)`};
     padding-top: 0px;
     padding-right: 12px;
     margin-right: -14px;
@@ -853,16 +862,16 @@ const SSuggestNewContainer = styled.div`
   }
 `;
 
-const SAddFreeVoteButton = styled(Button)`
+const SAddOptionButton = styled(Button)`
   width: 100%;
 
-  color: ${({ theme }) => theme.colors.dark};
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+  color: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colorsThemed.accent.blue};
 
   &:active:enabled,
   &:hover:enabled,
   &:focus:enabled {
-    background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+    background: ${({ theme }) => theme.colorsThemed.accent.blue};
   }
 `;
 
@@ -1013,4 +1022,74 @@ const SPaymentSign = styled(Text)`
 
 const SPaymentTermsLink = styled.a`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SBundlesContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: ${(props) => props.theme.colorsThemed.tag.color.primary};
+  margin-top: 32px;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex-direction: row;
+    margin-top: 24px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-top: 32px;
+  }
+`;
+
+const SBundlesText = styled.p`
+  flex-grow: 1;
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  font-weight: 600;
+  text-align: center;
+  font-size: 16px;
+  line-height: 24px;
+  margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 0px;
+    text-align: start;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+`;
+
+const SViewButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  white-space: nowrap;
+
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: bold;
+
+  padding: 8px 16px;
+  min-width: auto;
+
+  color: ${({ theme }) => theme.colors.darkGray};
+  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+  border-radius: ${(props) => props.theme.borderRadius.medium};
+  border: transparent;
+
+  cursor: pointer;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 `;

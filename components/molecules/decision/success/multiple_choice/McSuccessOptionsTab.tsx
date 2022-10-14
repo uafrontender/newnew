@@ -208,7 +208,6 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
             creator={option.creator ?? post.creator!!}
             postId={post.postUuid}
             votingAllowed={false}
-            canVoteForFree={false}
             isCreatorsBid={
               !option.creator || option.creator?.uuid === post.creator?.uuid
             }
@@ -219,7 +218,6 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
             minAmount={0}
             votePrice={0}
             noAction
-            handleResetFreeVote={() => {}}
             handleSetSupportedBid={() => {}}
             handleSetPaymentSuccessModalOpen={() => {}}
             handleAddOrUpdateOptionFromResponse={() => {}}

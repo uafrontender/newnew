@@ -250,7 +250,7 @@
     "history": "History"
   },
   "optionsTabLine": {
-    "availableVotes": "You have <0>{{amount}} votes</0>"
+    "bundleVotes": "You have <0>{{amount}} votes</0>"
   },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
