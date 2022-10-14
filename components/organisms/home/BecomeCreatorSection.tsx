@@ -1,7 +1,7 @@
-import { useTranslation } from 'next-i18next';
-import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import { useRouter } from 'next/router';
 
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
@@ -13,27 +13,30 @@ import assets from '../../../constants/assets';
 const BecomeCreatorSection = () => {
   const { t } = useTranslation('page-Home');
   const { t: tCommon } = useTranslation('common');
+  const router = useRouter();
 
   const user = useAppSelector((state) => state.user);
+
+  const handleClickCreateNow = () => {
+    router.push(user.loggedIn ? '/creator-onboarding' : '/sign-up?to=create');
+  };
 
   return (
     <SContainer>
       <SHeadline variant={4}>{t('becomeCreator.title')}</SHeadline>
-      <Link href={user.loggedIn ? '/creator-onboarding' : '/sign-up?to=create'}>
-        <a>
-          <SButton
-            view='transparent'
-            onClick={() => {
-              Mixpanel.track('Navigation Item Clicked', {
-                _button: 'Create now',
-              });
-            }}
-          >
-            {tCommon('button.createOnNewnew')}
-          </SButton>
-        </a>
-      </Link>
+      <SButton
+        view='transparent'
+        onClick={() => {
+          Mixpanel.track('Navigation Item Clicked', {
+            _button: 'Create now',
+          });
+          handleClickCreateNow();
+        }}
+      >
+        {tCommon('button.createOnNewnew')}
+      </SButton>
 
+      {/* Floating Assets */}
       <SImageLeftTop
         src={assets.floatingAssets.darkTopMiddleSphere}
         alt='background'
