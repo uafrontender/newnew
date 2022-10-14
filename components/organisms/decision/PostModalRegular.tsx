@@ -9,7 +9,6 @@ import { usePostModalInnerState } from '../../../contexts/postModalInnerContext'
 import { useAppSelector } from '../../../redux-store/store';
 import getDisplayname from '../../../utils/getDisplayname';
 
-import Modal from '../Modal';
 import RegularView from './regular';
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
@@ -47,7 +46,6 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
     resizeMode
   );
   const {
-    open,
     modalContainerRef,
     isMyPost,
     postParsed,
@@ -67,112 +65,110 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
 
   return (
     <>
-      <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
-        <Head>
-          <title>{t(`meta.${typeOfPost}.title`)}</title>
-          <meta
-            name='description'
-            content={t(`meta.${typeOfPost}.description`)}
+      <Head>
+        <title>{t(`meta.${typeOfPost}.title`)}</title>
+        <meta
+          name='description'
+          content={t(`meta.${typeOfPost}.description`)}
+        />
+        <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
+        <meta
+          property='og:description'
+          content={t(`meta.${typeOfPost}.description`)}
+        />
+      </Head>
+      {!isMobile && (
+        <SGoBackButtonDesktop
+          view='secondary'
+          iconOnly
+          onClick={handleCloseAndGoBack}
+        >
+          <InlineSvg
+            svg={CancelIcon}
+            fill={theme.colorsThemed.text.primary}
+            width='24px'
+            height='24px'
           />
-          <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-          <meta
-            property='og:description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-        </Head>
-        {!isMobile && (
-          <SGoBackButtonDesktop
-            view='secondary'
-            iconOnly
-            onClick={handleCloseAndGoBack}
-          >
-            <InlineSvg
-              svg={CancelIcon}
-              fill={theme.colorsThemed.text.primary}
-              width='24px'
-              height='24px'
+        </SGoBackButtonDesktop>
+      )}
+      {postParsed && typeOfPost ? (
+        <SPostModalContainer
+          loaded={recommendedPosts && recommendedPosts.length > 0}
+          id='post-modal-container'
+          isMyPost={isMyPost}
+          onClick={(e) => e.stopPropagation()}
+          ref={(el) => {
+            modalContainerRef.current = el!!;
+          }}
+        >
+          {postStatus !== 'deleted_by_admin' &&
+          postStatus !== 'deleted_by_creator' ? (
+            <RegularView />
+          ) : (
+            <PostFailedBox
+              title={t('postDeleted.title', {
+                postType: t(`postType.${typeOfPost}`),
+              })}
+              body={
+                deletedByCreator
+                  ? t('postDeleted.body.byCreator', {
+                      creator: getDisplayname(postParsed.creator!!),
+                      postType: t(`postType.${typeOfPost}`),
+                    })
+                  : t('postDeleted.body.byAdmin', {
+                      creator: getDisplayname(postParsed.creator!!),
+                      postType: t(`postType.${typeOfPost}`),
+                    })
+              }
+              buttonCaption={t('postDeleted.buttonText', {
+                postTypeMultiple: t(`postType.multiple.${typeOfPost}`),
+              })}
+              imageSrc={
+                theme.name === 'light'
+                  ? LIGHT_IMAGES[typeOfPost]
+                  : DARK_IMAGES[typeOfPost]
+              }
+              style={{
+                marginBottom: '24px',
+              }}
+              handleButtonClick={handleSeeNewDeletedBox}
             />
-          </SGoBackButtonDesktop>
-        )}
-        {postParsed && typeOfPost ? (
-          <SPostModalContainer
+          )}
+          <SRecommendationsSection
+            id='recommendations-section-heading'
             loaded={recommendedPosts && recommendedPosts.length > 0}
-            id='post-modal-container'
-            isMyPost={isMyPost}
-            onClick={(e) => e.stopPropagation()}
-            ref={(el) => {
-              modalContainerRef.current = el!!;
-            }}
           >
-            {postStatus !== 'deleted_by_admin' &&
-            postStatus !== 'deleted_by_creator' ? (
-              <RegularView />
-            ) : (
-              <PostFailedBox
-                title={t('postDeleted.title', {
-                  postType: t(`postType.${typeOfPost}`),
-                })}
-                body={
-                  deletedByCreator
-                    ? t('postDeleted.body.byCreator', {
-                        creator: getDisplayname(postParsed.creator!!),
-                        postType: t(`postType.${typeOfPost}`),
-                      })
-                    : t('postDeleted.body.byAdmin', {
-                        creator: getDisplayname(postParsed.creator!!),
-                        postType: t(`postType.${typeOfPost}`),
-                      })
+            <Headline variant={4}>
+              {recommendedPosts.length > 0
+                ? t('recommendationsSection.heading')
+                : null}
+            </Headline>
+            {recommendedPosts && (
+              <ListPostModal
+                loading={recommendedPostsLoading}
+                collection={recommendedPosts}
+                skeletonsBgColor={theme.colorsThemed.background.tertiary}
+                skeletonsHighlightColor={
+                  theme.colorsThemed.background.secondary
                 }
-                buttonCaption={t('postDeleted.buttonText', {
-                  postTypeMultiple: t(`postType.multiple.${typeOfPost}`),
-                })}
-                imageSrc={
-                  theme.name === 'light'
-                    ? LIGHT_IMAGES[typeOfPost]
-                    : DARK_IMAGES[typeOfPost]
-                }
-                style={{
-                  marginBottom: '24px',
-                }}
-                handleButtonClick={handleSeeNewDeletedBox}
+                handlePostClicked={handleOpenRecommendedPost}
               />
             )}
-            <SRecommendationsSection
-              id='recommendations-section-heading'
-              loaded={recommendedPosts && recommendedPosts.length > 0}
-            >
-              <Headline variant={4}>
-                {recommendedPosts.length > 0
-                  ? t('recommendationsSection.heading')
-                  : null}
-              </Headline>
-              {recommendedPosts && (
-                <ListPostModal
-                  loading={recommendedPostsLoading}
-                  collection={recommendedPosts}
-                  skeletonsBgColor={theme.colorsThemed.background.tertiary}
-                  skeletonsHighlightColor={
-                    theme.colorsThemed.background.secondary
-                  }
-                  handlePostClicked={handleOpenRecommendedPost}
-                />
-              )}
-              <div
-                ref={loadingRef}
-                style={{
-                  position: 'relative',
-                  bottom: '10px',
-                  ...(recommendedPostsLoading
-                    ? {
-                        display: 'none',
-                      }
-                    : {}),
-                }}
-              />
-            </SRecommendationsSection>
-          </SPostModalContainer>
-        ) : null}
-      </Modal>
+            <div
+              ref={loadingRef}
+              style={{
+                position: 'relative',
+                bottom: '10px',
+                ...(recommendedPostsLoading
+                  ? {
+                      display: 'none',
+                    }
+                  : {}),
+              }}
+            />
+          </SRecommendationsSection>
+        </SPostModalContainer>
+      ) : null}
       {postParsed?.creator && reportPostOpen && (
         <ReportModal
           show={reportPostOpen}
@@ -191,14 +187,14 @@ const SPostModalContainer = styled.div<{
   isMyPost: boolean;
   loaded: boolean;
 }>`
-  position: absolute;
+  /* position: absolute;
   top: 0;
   left: 0;
 
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   z-index: 1;
-  overscroll-behavior: none;
+  overscroll-behavior: none; */
 
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
@@ -229,20 +225,20 @@ const SPostModalContainer = styled.div<{
     /* transform: translateY(-50%); */
     padding-bottom: 16px;
 
-    background-color: ${({ theme }) =>
+    /* background-color: ${({ theme }) =>
       theme.name === 'dark'
         ? theme.colorsThemed.background.secondary
-        : theme.colorsThemed.background.primary};
+        : theme.colorsThemed.background.primary}; */
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     width: 100%;
-    height: calc(100% - 64px);
+    /* height: calc(100% - 64px); */
   }
 
   ${({ theme }) => theme.media.laptopM} {
     top: 32px;
     left: calc(50% - 496px);
-    width: 992px;
-    height: calc(100% - 64px);
+    /* width: 992px;
+    height: calc(100% - 64px); */
     max-height: ${({ loaded }) => (loaded ? 'unset' : '840px')};
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};

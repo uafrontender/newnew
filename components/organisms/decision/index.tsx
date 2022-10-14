@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-alert */
 /* eslint-disable arrow-body-style */
 /* eslint-disable no-nested-ternary */
@@ -331,26 +332,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         _stage: 'Post',
         _postUuid: newPostParsed.postUuid,
       });
-      handleOpenAnotherPost?.(newPost);
-      if (post !== undefined)
-        innerHistoryStack.current.push(post as newnewapi.Post);
-      modalContainerRef.current?.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      });
-      syncedHistoryPushState(
-        {
-          postId: newPostParsed.postUuid,
-        },
-        `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-          newPostParsed.postUuid
-        }`
-      );
-      setRecommendedPosts([]);
-      setNextPageToken('');
-      setTriedLoading(false);
+      router.push(`/post/${newPostParsed.postUuid}`);
     },
-    [handleOpenAnotherPost, post, syncedHistoryPushState, router.locale]
+    [router]
   );
 
   const loadRecommendedPosts = useCallback(
@@ -402,54 +386,54 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, commentContentFromUrl]);
 
-  // Additional hash
-  useEffect(() => {
-    if (isOpen && postParsed) {
-      let additionalHash;
-      if (window?.location?.hash === '#comments') {
-        additionalHash = '#comments';
-      } else if (window?.location?.hash === '#winner') {
-        additionalHash = '#winner';
-      }
-      setOpen(true);
+  // // Additional hash
+  // useEffect(() => {
+  //   if (isOpen && postParsed) {
+  //     let additionalHash;
+  //     if (window?.location?.hash === '#comments') {
+  //       additionalHash = '#comments';
+  //     } else if (window?.location?.hash === '#winner') {
+  //       additionalHash = '#winner';
+  //     }
+  //     setOpen(true);
 
-      // Push if opening fresh
-      // Replace if coming back from a different page
-      const isFromPostPage = !!router?.query?.post_uuid;
-      if (!isFromPostPage) {
-        syncedHistoryPushState(
-          {
-            postId: postParsed.postUuid,
-          },
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            postParsed.postUuid
-          }${additionalHash ?? ''}`
-        );
-      } else {
-        syncedHistoryReplaceState(
-          {
-            postId: postParsed.postUuid,
-          },
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            postParsed.postUuid
-          }${additionalHash ?? ''}`
-        );
-      }
+  //     // Push if opening fresh
+  //     // Replace if coming back from a different page
+  //     const isFromPostPage = !!router?.query?.post_uuid;
+  //     if (!isFromPostPage) {
+  //       syncedHistoryPushState(
+  //         {
+  //           postId: postParsed.postUuid,
+  //         },
+  //         `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+  //           postParsed.postUuid
+  //         }${additionalHash ?? ''}`
+  //       );
+  //     } else {
+  //       syncedHistoryReplaceState(
+  //         {
+  //           postId: postParsed.postUuid,
+  //         },
+  //         `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
+  //           postParsed.postUuid
+  //         }${additionalHash ?? ''}`
+  //       );
+  //     }
 
-      setTimeout(() => {
-        handleSetPostOverlayOpen(true);
-      }, 400);
-    }
+  //     setTimeout(() => {
+  //       handleSetPostOverlayOpen(true);
+  //     }, 400);
+  //   }
 
-    return () => {
-      setOpen(false);
-      handleSetPostOverlayOpen(false);
-      innerHistoryStack.current = [];
-      // eslint-disable-next-line no-useless-return
-      return;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.locale]);
+  //   return () => {
+  //     setOpen(false);
+  //     handleSetPostOverlayOpen(false);
+  //     innerHistoryStack.current = [];
+  //     // eslint-disable-next-line no-useless-return
+  //     return;
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [router.locale]);
 
   // Fetch whether or not the Post is favorited
   useEffect(() => {
@@ -473,108 +457,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       fetchIsFavorited();
     }
   }, [postParsed?.postUuid]);
-
-  // Override next/router default onPopState
-  // More: https://nextjs.org/docs/api-reference/next/router#routerbeforepopstate
-  useEffect(() => {
-    router.beforePopState((state: any) => {
-      if (!state.postId) {
-        return true;
-      }
-
-      if (state.postId && innerHistoryStack.current.length === 0) {
-        syncedHistoryReplaceState(
-          {
-            postId: state.postId,
-          },
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            state.postId
-          }`
-        );
-        return false;
-      }
-
-      return false;
-    });
-
-    return () => {
-      router.beforePopState(() => {
-        return true;
-      });
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.locale]);
-
-  // Close modal on back btn
-  useEffect(() => {
-    const verify = async () => {
-      if (
-        isConfirmToClosePost &&
-        !window.confirm(t('postVideo.cannotLeavePageMsg'))
-      ) {
-        return;
-      }
-
-      if (!isBrowser()) return;
-
-      const postId =
-        new URL(window.location.href).searchParams.get('post') ||
-        window?.history?.state?.postId;
-
-      // Opening a post when navigating back in browser and having `innerHistoryStack` non-empty
-      if (
-        innerHistoryStack.current &&
-        innerHistoryStack.current[innerHistoryStack.current.length - 1]
-      ) {
-        handleOpenAnotherPost?.(
-          innerHistoryStack.current[innerHistoryStack.current.length - 1]
-        );
-        modalContainerRef.current?.scrollTo({
-          top: 0,
-          behavior: 'smooth',
-        });
-        innerHistoryStack.current = innerHistoryStack.current.slice(
-          0,
-          innerHistoryStack.current.length - 1
-        );
-        setRecommendedPosts([]);
-        setNextPageToken('');
-        setTriedLoading(false);
-      }
-
-      // Opening a post when navigating back in browser and having `innerHistoryStack` empty
-      if (postId && !innerHistoryStack.current.length) {
-        const getPostPayload = new newnewapi.GetPostRequest({
-          postUuid: postId,
-        });
-
-        const { data, error } = await fetchPostByUUID(getPostPayload);
-
-        if (!data || error) {
-          handleClose();
-          return;
-        }
-
-        handleOpenAnotherPost?.(data);
-        modalContainerRef.current?.scrollTo({
-          top: 0,
-          behavior: 'smooth',
-        });
-        setRecommendedPosts([]);
-        setNextPageToken('');
-        setTriedLoading(false);
-      }
-
-      if (!postId) {
-        handleClose();
-      }
-    };
-
-    window.addEventListener('popstate', verify);
-
-    return () => window.removeEventListener('popstate', verify);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, isConfirmToClosePost]);
 
   // Infinite scroll
   useEffect(() => {

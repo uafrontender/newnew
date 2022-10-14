@@ -165,7 +165,8 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     const renderItem = (item: any, index: number) => {
       const handleItemClick = () => {
         if (!isDragging) {
-          handlePostClicked(item);
+          // handlePostClicked(item);
+          router.push(`/post/${switchPostType(item)[0].postUuid}`);
         }
       };
 

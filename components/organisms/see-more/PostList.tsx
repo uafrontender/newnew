@@ -5,6 +5,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 
 import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
@@ -45,9 +46,12 @@ export const PostList: React.FC<IList> = ({
     resizeMode
   );
 
+  const router = useRouter();
+
   const renderItem = (item: any, index: number) => {
     const handleItemClick = () => {
       handlePostClicked(item);
+      router.push(`/post/${switchPostType(item)[0].postUuid}`);
     };
 
     return (

@@ -9,7 +9,6 @@ import { usePostModalInnerState } from '../../../contexts/postModalInnerContext'
 import { useAppSelector } from '../../../redux-store/store';
 import getDisplayname from '../../../utils/getDisplayname';
 
-import Modal from '../Modal';
 import SuccessView from './success';
 import WaitingForResponseView from './awaiting';
 import PostSuccessOrWaitingControls from '../../molecules/decision/common/PostSuccessOrWaitingControls';
@@ -31,7 +30,6 @@ const PostModalAwaitingSuccess: React.FunctionComponent<
     resizeMode
   );
   const {
-    open,
     modalContainerRef,
     isMyPost,
     postParsed,
@@ -55,86 +53,84 @@ const PostModalAwaitingSuccess: React.FunctionComponent<
 
   return (
     <>
-      <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
-        {postStatus === 'succeeded' && !isMobile && (
-          <PostSuccessAnimationBackground />
-        )}
-        <Head>
-          <title>{t(`meta.${typeOfPost}.title`)}</title>
-          <meta
-            name='description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-          <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-          <meta
-            property='og:description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-        </Head>
-        {!isMobile && (
-          <PostSuccessOrWaitingControls
-            ellipseMenuOpen={ellipseMenuOpen}
-            isFollowingDecision={isFollowingDecision}
-            isMobile={isMobile}
-            postUuid={postParsed?.postUuid ?? ''}
-            shareMenuOpen={shareMenuOpen}
-            typeOfPost={typeOfPost ?? 'ac'}
-            handleCloseAndGoBack={handleCloseAndGoBack}
-            handleEllipseMenuClose={handleEllipseMenuClose}
-            handleFollowDecision={handleFollowDecision}
-            handleReportOpen={handleReportOpen}
-            handleShareClose={handleShareClose}
-            handleOpenShareMenu={handleOpenShareMenu}
-            handleOpenEllipseMenu={handleOpenEllipseMenu}
-          />
-        )}
-        {postParsed && typeOfPost ? (
-          <SPostModalContainer
-            id='post-modal-container'
-            isMyPost={isMyPost}
-            loaded={recommendedPosts && recommendedPosts.length > 0}
-            style={{
-              ...(isMobile
-                ? {
-                    paddingTop: 0,
-                  }
-                : {}),
-            }}
-            onClick={(e) => e.stopPropagation()}
-            ref={(el) => {
-              modalContainerRef.current = el!!;
-            }}
-          >
-            {postStatus === 'succeeded' ? (
-              <SuccessView postParsed={postParsed} typeOfPost={typeOfPost} />
-            ) : null}
-            {postStatus === 'waiting_for_response' ||
-            postStatus === 'waiting_for_decision' ? (
-              <WaitingForResponseView
-                postParsed={postParsed}
-                typeOfPost={typeOfPost}
-              />
-            ) : null}
-            {isMobile && (
-              <PostSuccessOrWaitingControls
-                ellipseMenuOpen={ellipseMenuOpen}
-                isFollowingDecision={isFollowingDecision}
-                isMobile={isMobile}
-                postUuid={postParsed?.postUuid ?? ''}
-                shareMenuOpen={shareMenuOpen}
-                typeOfPost={typeOfPost ?? 'ac'}
-                handleCloseAndGoBack={handleCloseAndGoBack}
-                handleEllipseMenuClose={handleEllipseMenuClose}
-                handleFollowDecision={handleFollowDecision}
-                handleReportOpen={handleReportOpen}
-                handleShareClose={handleShareClose}
-                handleOpenShareMenu={handleOpenShareMenu}
-                handleOpenEllipseMenu={handleOpenEllipseMenu}
-              />
-            )}
-          </SPostModalContainer>
-        ) : null}
-      </Modal>
+      {postStatus === 'succeeded' && !isMobile && (
+        <PostSuccessAnimationBackground />
+      )}
+      <Head>
+        <title>{t(`meta.${typeOfPost}.title`)}</title>
+        <meta
+          name='description'
+          content={t(`meta.${typeOfPost}.description`)}
+        />
+        <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
+        <meta
+          property='og:description'
+          content={t(`meta.${typeOfPost}.description`)}
+        />
+      </Head>
+      {!isMobile && (
+        <PostSuccessOrWaitingControls
+          ellipseMenuOpen={ellipseMenuOpen}
+          isFollowingDecision={isFollowingDecision}
+          isMobile={isMobile}
+          postUuid={postParsed?.postUuid ?? ''}
+          shareMenuOpen={shareMenuOpen}
+          typeOfPost={typeOfPost ?? 'ac'}
+          handleCloseAndGoBack={handleCloseAndGoBack}
+          handleEllipseMenuClose={handleEllipseMenuClose}
+          handleFollowDecision={handleFollowDecision}
+          handleReportOpen={handleReportOpen}
+          handleShareClose={handleShareClose}
+          handleOpenShareMenu={handleOpenShareMenu}
+          handleOpenEllipseMenu={handleOpenEllipseMenu}
+        />
+      )}
+      {postParsed && typeOfPost ? (
+        <SPostModalContainer
+          id='post-modal-container'
+          isMyPost={isMyPost}
+          loaded={recommendedPosts && recommendedPosts.length > 0}
+          style={{
+            ...(isMobile
+              ? {
+                  paddingTop: 0,
+                }
+              : {}),
+          }}
+          onClick={(e) => e.stopPropagation()}
+          ref={(el) => {
+            modalContainerRef.current = el!!;
+          }}
+        >
+          {postStatus === 'succeeded' ? (
+            <SuccessView postParsed={postParsed} typeOfPost={typeOfPost} />
+          ) : null}
+          {postStatus === 'waiting_for_response' ||
+          postStatus === 'waiting_for_decision' ? (
+            <WaitingForResponseView
+              postParsed={postParsed}
+              typeOfPost={typeOfPost}
+            />
+          ) : null}
+          {isMobile && (
+            <PostSuccessOrWaitingControls
+              ellipseMenuOpen={ellipseMenuOpen}
+              isFollowingDecision={isFollowingDecision}
+              isMobile={isMobile}
+              postUuid={postParsed?.postUuid ?? ''}
+              shareMenuOpen={shareMenuOpen}
+              typeOfPost={typeOfPost ?? 'ac'}
+              handleCloseAndGoBack={handleCloseAndGoBack}
+              handleEllipseMenuClose={handleEllipseMenuClose}
+              handleFollowDecision={handleFollowDecision}
+              handleReportOpen={handleReportOpen}
+              handleShareClose={handleShareClose}
+              handleOpenShareMenu={handleOpenShareMenu}
+              handleOpenEllipseMenu={handleOpenEllipseMenu}
+            />
+          )}
+        </SPostModalContainer>
+      ) : null}
       {postParsed?.creator && reportPostOpen && (
         <ReportModal
           show={reportPostOpen}

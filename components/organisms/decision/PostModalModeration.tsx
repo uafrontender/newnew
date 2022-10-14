@@ -10,7 +10,6 @@ import { usePostModalInnerState } from '../../../contexts/postModalInnerContext'
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppSelector } from '../../../redux-store/store';
 
-import Modal from '../Modal';
 import ModerationView from './moderation';
 import PostModerationControls from '../../molecules/decision/moderation/PostModerationControls';
 import PostSuccessAnimationBackground from '../../molecules/decision/success/PostSuccessAnimationBackground';
@@ -48,7 +47,6 @@ const PostModalModeration: React.FunctionComponent<
   );
 
   const {
-    open,
     modalContainerRef,
     isMyPost,
     postParsed,
@@ -71,104 +69,101 @@ const PostModalModeration: React.FunctionComponent<
 
   return (
     <>
-      <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
-        {(postStatus === 'succeeded' ||
-          postStatus === 'waiting_for_response') &&
-          !isMobile && <PostSuccessAnimationBackground />}
-        <Head>
-          <title>{t(`meta.${typeOfPost}.title`)}</title>
-          <meta
-            name='description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-          <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-          <meta
-            property='og:description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-        </Head>
-        {!isMobile && (
-          <PostModerationControls
-            isMobile={isMobile}
-            postUuid={postParsed?.postUuid ?? ''}
-            postStatus={postStatus}
-            shareMenuOpen={shareMenuOpen}
-            typeOfPost={typeOfPost ?? 'ac'}
-            deletePostOpen={deletePostOpen}
-            ellipseMenuOpen={ellipseMenuOpen}
-            handleCloseAndGoBack={handleCloseAndGoBack}
-            handleDeletePost={handleDeletePost}
-            handleEllipseMenuClose={handleEllipseMenuClose}
-            handleOpenDeletePostModal={handleOpenDeletePostModal}
-            handleShareClose={handleShareClose}
-            handleOpenShareMenu={handleOpenShareMenu}
-            handleOpenEllipseMenu={handleOpenEllipseMenu}
-            handleCloseDeletePostModal={handleCloseDeletePostModal}
-          />
-        )}
-        {postParsed && typeOfPost ? (
-          <SPostModalContainer
-            loaded={recommendedPosts && recommendedPosts.length > 0}
-            id='post-modal-container'
-            isMyPost={isMyPost}
-            onClick={(e) => e.stopPropagation()}
-            ref={(el) => {
-              modalContainerRef.current = el!!;
-            }}
-          >
-            {postStatus !== 'deleted_by_admin' &&
-            postStatus !== 'deleted_by_creator' ? (
-              <ModerationView />
-            ) : (
-              <PostFailedBox
-                title={t('postDeletedByMe.title', {
-                  postType: t(`postType.${typeOfPost}`),
-                })}
-                body={
-                  deletedByCreator
-                    ? t('postDeletedByMe.body.byCreator', {
-                        postType: t(`postType.${typeOfPost}`),
-                      })
-                    : t('postDeletedByMe.body.byAdmin', {
-                        postType: t(`postType.${typeOfPost}`),
-                      })
-                }
-                imageSrc={
-                  theme.name === 'light'
-                    ? LIGHT_IMAGES[typeOfPost]
-                    : DARK_IMAGES[typeOfPost]
-                }
-                buttonCaption={t('postDeletedByMe.buttonText')}
-                handleButtonClick={() => {
-                  Mixpanel.track('Post Failed Redirect to Creation', {
-                    _stage: 'Post',
-                  });
-                  router.push('/creation');
-                }}
-              />
-            )}
-            {isMobile && (
-              <PostModerationControls
-                isMobile={isMobile}
-                postUuid={postParsed?.postUuid ?? ''}
-                postStatus={postStatus}
-                shareMenuOpen={shareMenuOpen}
-                typeOfPost={typeOfPost ?? 'ac'}
-                deletePostOpen={deletePostOpen}
-                ellipseMenuOpen={ellipseMenuOpen}
-                handleCloseAndGoBack={handleCloseAndGoBack}
-                handleDeletePost={handleDeletePost}
-                handleEllipseMenuClose={handleEllipseMenuClose}
-                handleOpenDeletePostModal={handleOpenDeletePostModal}
-                handleShareClose={handleShareClose}
-                handleOpenShareMenu={handleOpenShareMenu}
-                handleOpenEllipseMenu={handleOpenEllipseMenu}
-                handleCloseDeletePostModal={handleCloseDeletePostModal}
-              />
-            )}
-          </SPostModalContainer>
-        ) : null}
-      </Modal>
+      {(postStatus === 'succeeded' || postStatus === 'waiting_for_response') &&
+        !isMobile && <PostSuccessAnimationBackground />}
+      <Head>
+        <title>{t(`meta.${typeOfPost}.title`)}</title>
+        <meta
+          name='description'
+          content={t(`meta.${typeOfPost}.description`)}
+        />
+        <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
+        <meta
+          property='og:description'
+          content={t(`meta.${typeOfPost}.description`)}
+        />
+      </Head>
+      {!isMobile && (
+        <PostModerationControls
+          isMobile={isMobile}
+          postUuid={postParsed?.postUuid ?? ''}
+          postStatus={postStatus}
+          shareMenuOpen={shareMenuOpen}
+          typeOfPost={typeOfPost ?? 'ac'}
+          deletePostOpen={deletePostOpen}
+          ellipseMenuOpen={ellipseMenuOpen}
+          handleCloseAndGoBack={handleCloseAndGoBack}
+          handleDeletePost={handleDeletePost}
+          handleEllipseMenuClose={handleEllipseMenuClose}
+          handleOpenDeletePostModal={handleOpenDeletePostModal}
+          handleShareClose={handleShareClose}
+          handleOpenShareMenu={handleOpenShareMenu}
+          handleOpenEllipseMenu={handleOpenEllipseMenu}
+          handleCloseDeletePostModal={handleCloseDeletePostModal}
+        />
+      )}
+      {postParsed && typeOfPost ? (
+        <SPostModalContainer
+          loaded={recommendedPosts && recommendedPosts.length > 0}
+          id='post-modal-container'
+          isMyPost={isMyPost}
+          onClick={(e) => e.stopPropagation()}
+          ref={(el) => {
+            modalContainerRef.current = el!!;
+          }}
+        >
+          {postStatus !== 'deleted_by_admin' &&
+          postStatus !== 'deleted_by_creator' ? (
+            <ModerationView />
+          ) : (
+            <PostFailedBox
+              title={t('postDeletedByMe.title', {
+                postType: t(`postType.${typeOfPost}`),
+              })}
+              body={
+                deletedByCreator
+                  ? t('postDeletedByMe.body.byCreator', {
+                      postType: t(`postType.${typeOfPost}`),
+                    })
+                  : t('postDeletedByMe.body.byAdmin', {
+                      postType: t(`postType.${typeOfPost}`),
+                    })
+              }
+              imageSrc={
+                theme.name === 'light'
+                  ? LIGHT_IMAGES[typeOfPost]
+                  : DARK_IMAGES[typeOfPost]
+              }
+              buttonCaption={t('postDeletedByMe.buttonText')}
+              handleButtonClick={() => {
+                Mixpanel.track('Post Failed Redirect to Creation', {
+                  _stage: 'Post',
+                });
+                router.push('/creation');
+              }}
+            />
+          )}
+          {isMobile && (
+            <PostModerationControls
+              isMobile={isMobile}
+              postUuid={postParsed?.postUuid ?? ''}
+              postStatus={postStatus}
+              shareMenuOpen={shareMenuOpen}
+              typeOfPost={typeOfPost ?? 'ac'}
+              deletePostOpen={deletePostOpen}
+              ellipseMenuOpen={ellipseMenuOpen}
+              handleCloseAndGoBack={handleCloseAndGoBack}
+              handleDeletePost={handleDeletePost}
+              handleEllipseMenuClose={handleEllipseMenuClose}
+              handleOpenDeletePostModal={handleOpenDeletePostModal}
+              handleShareClose={handleShareClose}
+              handleOpenShareMenu={handleOpenShareMenu}
+              handleOpenEllipseMenu={handleOpenEllipseMenu}
+              handleCloseDeletePostModal={handleCloseDeletePostModal}
+            />
+          )}
+        </SPostModalContainer>
+      ) : null}
     </>
   );
 };

@@ -26,6 +26,7 @@ import switchPostType from '../../utils/switchPostType';
 import { toggleMutedMode } from '../../redux-store/slices/uiStateSlice';
 import isBrowser from '../../utils/isBrowser';
 import { Mixpanel } from '../../utils/mixpanel';
+import GeneralLayout from '../../components/templates/General';
 
 const PostModal = dynamic(() => import('../../components/organisms/decision'));
 
@@ -142,13 +143,6 @@ const PostPage: NextPage<IPostPage> = ({
           content={postParsed?.announcement?.thumbnailImageUrl ?? ''}
         />
       </Head>
-      {!user.loggedIn && user._persist?.rehydrated && <HeroSection />}
-      {!isMobile && topSectionCollection.length > 0 && (
-        <TopSection
-          collection={topSectionCollection}
-          handlePostClicked={handleOpenPostModal}
-        />
-      )}
       {post && (
         <PostModal
           isOpen
@@ -169,7 +163,7 @@ const PostPage: NextPage<IPostPage> = ({
 export default PostPage;
 
 (PostPage as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <HomeLayout>{page}</HomeLayout>
+  <GeneralLayout>{page}</GeneralLayout>
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {

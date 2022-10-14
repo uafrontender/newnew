@@ -4,6 +4,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 
 import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
@@ -30,6 +31,7 @@ export const PostList: React.FC<IList> = ({
   skeletonsHighlightColor,
   handlePostClicked,
 }) => {
+  const router = useRouter();
   const { postOverlayOpen } = usePostModalState();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -45,7 +47,7 @@ export const PostList: React.FC<IList> = ({
 
   const renderItem = (item: any, index: number) => {
     const handleItemClick = () => {
-      handlePostClicked(item);
+      router.push(`/post/${switchPostType(item)[0].postUuid}`);
     };
 
     return (

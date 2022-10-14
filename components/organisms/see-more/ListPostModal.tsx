@@ -4,6 +4,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 
 import PostCard from '../../molecules/PostCard';
 
@@ -32,9 +33,12 @@ export const ListPostModal: React.FC<IListPostModal> = React.memo(
       resizeMode
     );
 
+    const router = useRouter();
+
     const renderItem = (item: any, index: number) => {
       const handleItemClick = () => {
-        handlePostClicked(item);
+        // handlePostClicked(item);
+        router.push(`/post/${switchPostType(item)[0].postUuid}`);
       };
 
       return (
