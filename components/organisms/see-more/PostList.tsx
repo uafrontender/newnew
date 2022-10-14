@@ -50,7 +50,6 @@ export const PostList: React.FC<IList> = ({
 
   const renderItem = (item: any, index: number) => {
     const handleItemClick = () => {
-      handlePostClicked(item);
       router.push(`/post/${switchPostType(item)[0].postUuid}`);
     };
 

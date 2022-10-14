@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 
 import PostCard from '../../molecules/PostCard';
 import Headline from '../../atoms/Headline';
@@ -32,6 +33,7 @@ interface ITopSection {
 
 export const TopSection: React.FC<ITopSection> = React.memo(
   ({ collection, handlePostClicked }) => {
+    const router = useRouter();
     const { t } = useTranslation('common');
     const ref: any = useRef();
     const scrollContainerRef: any = useRef();
@@ -112,7 +114,7 @@ export const TopSection: React.FC<ITopSection> = React.memo(
     const renderItem = (item: newnewapi.Post, index: number) => {
       const handleItemClick = () => {
         if (!isDragging) {
-          handlePostClicked(item);
+          router.push(`/post/${switchPostType(item)[0].postUuid}`);
         }
       };
 

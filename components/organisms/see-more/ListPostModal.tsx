@@ -37,7 +37,6 @@ export const ListPostModal: React.FC<IListPostModal> = React.memo(
 
     const renderItem = (item: any, index: number) => {
       const handleItemClick = () => {
-        // handlePostClicked(item);
         router.push(`/post/${switchPostType(item)[0].postUuid}`);
       };
 
