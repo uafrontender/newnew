@@ -96,7 +96,7 @@ const PostResponseTabModeration: React.FunctionComponent<
       )}`;
     }
 
-    if (postType === 'mc' && moneyBacked?.usdCents) {
+    if (postType === 'cf' && moneyBacked?.usdCents) {
       return `$${formatNumber(moneyBacked.usdCents / 100 ?? 0, true)}`;
     }
 
