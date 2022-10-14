@@ -89,7 +89,7 @@ interface IAcOptionCard {
   // shouldAnimate: boolean;
   votingAllowed: boolean;
   postId: string;
-  postCreator: string;
+  postCreatorName: string;
   postDeadline: string;
   postText: string;
   index: number;
@@ -107,7 +107,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   // shouldAnimate,
   votingAllowed,
   postId,
-  postCreator,
+  postCreatorName,
   postDeadline,
   postText,
   index,
@@ -714,7 +714,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             (!appConstants.minHoldAmount?.usdCents ||
               paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
               <SPaymentSign variant='subtitle'>
-                {t('acPost.paymentModalFooter.body', { creator: postCreator })}*
+                {t('acPost.paymentModalFooter.body', {
+                  creator: postCreatorName,
+                })}
+                *
                 <Link href='https://terms.newnew.co'>
                   <SPaymentTermsLink
                     href='https://terms.newnew.co'
@@ -740,7 +743,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
-                {t('acPost.paymentModalHeader.title', { creator: postCreator })}
+                {t('acPost.paymentModalHeader.title', {
+                  creator: postCreatorName,
+                })}
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
@@ -762,7 +767,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         closeModal={() => setPaymentSuccessModalOpen(false)}
       >
         {t('paymentSuccessModal.ac', {
-          postCreator,
+          postCreator: postCreatorName,
           postDeadline,
         })}
       </PaymentSuccessModal>

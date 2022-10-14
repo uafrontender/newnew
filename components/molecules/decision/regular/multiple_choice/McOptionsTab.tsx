@@ -89,7 +89,7 @@ interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
   postLoading: boolean;
   postStatus: TPostStatusStringified;
-  postCreator: string;
+  postCreatorName: string;
   postDeadline: string;
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
@@ -109,7 +109,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   post,
   postLoading,
   postStatus,
-  postCreator,
+  postCreatorName,
   postDeadline,
   options,
   optionsLoading,
@@ -465,7 +465,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               key={option.id.toString()}
               option={option as TMcOptionWithHighestField}
               creator={option.creator ?? post.creator!!}
-              postCreator={postCreator}
+              postCreatorName={postCreatorName}
               postCreatorUuid={post.creator?.uuid ?? ''}
               postText={post.title}
               postId={post.postUuid}
@@ -662,7 +662,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             (!appConstants.minHoldAmount?.usdCents ||
               paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
               <SPaymentSign variant='subtitle'>
-                {t('mcPost.paymentModalFooter.body', { creator: postCreator })}*
+                {t('mcPost.paymentModalFooter.body', {
+                  creator: postCreatorName,
+                })}
+                *
                 <Link href='https://terms.newnew.co'>
                   <SPaymentTermsLink
                     href='https://terms.newnew.co'
@@ -685,7 +688,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
                 {t('mcPost.paymentModalHeader.title', {
-                  creator: postCreator,
+                  creator: postCreatorName,
                 })}
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
@@ -710,7 +713,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         closeModal={() => setPaymentSuccessModalOpen(false)}
       >
         {t('paymentSuccessModal.mc', {
-          postCreator,
+          postCreator: postCreatorName,
           postDeadline,
         })}
       </PaymentSuccessModal>

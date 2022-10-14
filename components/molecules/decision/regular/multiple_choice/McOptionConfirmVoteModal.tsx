@@ -24,7 +24,7 @@ interface IMcConfirmVoteModal {
   zIndex: number;
   minAmount: number;
   votePrice: number;
-  postCreator: string;
+  postCreatorName: string;
   optionText: string;
   predefinedAmount: boolean;
   supportVotesAmount: string;
@@ -38,7 +38,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
   zIndex,
   minAmount,
   votePrice,
-  postCreator,
+  postCreatorName,
   optionText,
   predefinedAmount,
   supportVotesAmount,
@@ -93,11 +93,11 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
               {parseInt(supportVotesAmount) === 1
                 ? t(
                     'mcPost.optionsTab.optionCard.confirmVoteModal.buySingleVote',
-                    { creator: postCreator }
+                    { creator: postCreatorName }
                   )
                 : t(
                     'mcPost.optionsTab.optionCard.confirmVoteModal.buyMultipleVotes',
-                    { creator: postCreator, amount: supportVotesAmount }
+                    { creator: postCreatorName, amount: supportVotesAmount }
                   )}
             </SCreatorsText>
             <SCaption variant={3}>
@@ -157,7 +157,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
           </SHeadline>
           <SCreatorsText variant={2}>
             {t('mcPost.optionsTab.optionCard.confirmVoteModal.buyAnyVotes', {
-              creator: postCreator,
+              creator: postCreatorName,
             })}
           </SCreatorsText>
           <SCaption variant={3}>

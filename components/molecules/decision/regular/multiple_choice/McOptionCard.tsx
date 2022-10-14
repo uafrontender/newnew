@@ -92,7 +92,7 @@ interface IMcOptionCard {
   option: TMcOptionWithHighestField;
   creator: newnewapi.IUser;
   postId: string;
-  postCreator: string;
+  postCreatorName: string;
   postCreatorUuid: string;
   postText: string;
   index: number;
@@ -115,7 +115,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   option,
   creator,
   postId,
-  postCreator,
+  postCreatorName,
   postCreatorUuid,
   postText,
   index,
@@ -683,7 +683,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             isOpen={isConfirmVoteModalOpen}
             predefinedAmount={isAmountPredefined}
             supportVotesAmount={supportBidAmount}
-            postCreator={
+            postCreatorName={
               creator.nickname ? creator.nickname : creator.username ?? ''
             }
             optionText={option.text}
@@ -722,7 +722,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   appConstants.minHoldAmount?.usdCents) && (
                 <SPaymentSign variant='subtitle'>
                   {t('mcPost.paymentModalFooter.body', {
-                    creator: postCreator,
+                    creator: postCreatorName,
                   })}
                   *
                   <Link href='https://terms.newnew.co'>
@@ -747,7 +747,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 </SPaymentModalHeadingPostSymbol>
                 <SPaymentModalHeadingPostCreator variant={3}>
                   {t('mcPost.paymentModalHeader.title', {
-                    creator: postCreator,
+                    creator: postCreatorName,
                   })}
                 </SPaymentModalHeadingPostCreator>
               </SPaymentModalHeading>

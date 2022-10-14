@@ -211,7 +211,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
             isCreatorsBid={
               !option.creator || option.creator?.uuid === post.creator?.uuid
             }
-            postCreator=''
+            postCreatorName=''
             postCreatorUuid={post.creator?.uuid ?? ''}
             postText=''
             index={i}
