@@ -225,6 +225,7 @@ export default Dashboard;
 const SContainer = styled.div`
   position: relative;
   margin-top: -16px;
+  margin-bottom: -24px;
 
   ${(props) => props.theme.media.tablet} {
     margin-top: unset;
@@ -237,10 +238,9 @@ const SContainer = styled.div`
 `;
 
 const SContent = styled.div`
-  min-height: 840px;
-
   ${(props) => props.theme.media.tablet} {
     margin-left: 180px;
+    min-height: 840px;
   }
 
   ${(props) => props.theme.media.laptop} {

@@ -212,8 +212,12 @@ const SRightBlock = styled.nav`
 `;
 
 const SItemWithMargin = styled.div`
-  margin-left: 16px;
+  margin-left: 9px;
   position: relative;
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-left: 16px;
+  }
 `;
 
 const SNavText = styled(Text)`

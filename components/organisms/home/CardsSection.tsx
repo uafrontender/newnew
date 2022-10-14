@@ -53,6 +53,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     loading,
     tutorialCard,
     handlePostClicked,
+    ...restProps
   }) => {
     const { t } = useTranslation('page-Home');
     const router = useRouter();
@@ -185,8 +186,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
                 item={item}
                 shouldStop={postOverlayOpen}
                 index={tutorialCard !== undefined ? index + 1 : index}
-                width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
-                height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
+                width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
+                height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
+                maxWidthTablet='224px'
               />
             </SItemWrapper>
           </React.Fragment>
@@ -205,8 +207,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             item={item}
             shouldStop={postOverlayOpen}
             index={tutorialCard !== undefined ? index + 1 : index}
-            width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
-            height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
+            width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
+            height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
+            maxWidthTablet='224px'
           />
         </SItemWrapper>
       );
@@ -264,7 +267,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     }, [visibleListItem, collection, scrollStep]);
 
     return (
-      <SWrapper name={category}>
+      <SWrapper name={category} {...restProps}>
         <STopWrapper>
           {type === 'default' ? (
             <Headline variant={4} animation='t-01'>
@@ -330,7 +333,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
               </SItemWrapper>
             ) : null}
           </SListWrapper>
-          {!isMobile && (
+          {!isMobile && !isTablet && (
             <>
               {!isDragging && canScrollLeft && (
                 <ScrollArrowPermanent
@@ -384,7 +387,7 @@ interface ISWrapper {
 }
 
 const SWrapper = styled.div<ISWrapper>`
-  padding: 24px 0;
+  padding: 20px 0;
 
   /* No select */
   -webkit-touch-callout: none;
@@ -395,18 +398,18 @@ const SWrapper = styled.div<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 32px 0;
-
-    margin: 0 auto;
-    max-width: 696px;
+    padding: 52px 0 50px;
+    margin: 0 -32px;
   }
 
   ${(props) => props.theme.media.laptop} {
-    padding: 40px 0;
+    padding: 60px 0;
+    margin: 0;
   }
 
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
+    margin: 0 auto;
   }
 `;
 
@@ -432,10 +435,10 @@ const SListWrapper = styled.div`
   -ms-overflow-style: none;
 
   ${(props) => props.theme.media.tablet} {
-    left: 32px;
     /* padding: 24px 24px 0 24px; */
     /* padding: 32px 56px 0 64px; */
-    width: calc(100% - 64px);
+    padding: 24px 32px 0;
+    left: -8px;
 
     flex-direction: row;
   }
@@ -456,6 +459,10 @@ const SItemWrapper = styled.div<ISItemWrapper>`
 
   ${(props) => props.theme.media.tablet} {
     margin: 0 8px;
+
+    & > div > div:first-child {
+      padding: 60% 0px;
+    }
   }
 
   ${(props) => props.theme.media.laptop} {
@@ -480,10 +487,8 @@ const STopWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  margin-bottom: 16px;
-
   ${(props) => props.theme.media.tablet} {
-    padding: 0px 32px;
+    padding: 0 32px;
   }
 
   ${(props) => props.theme.media.laptop} {
