@@ -143,6 +143,7 @@ const SButton = styled(Button)`
   &:focus:enabled,
   &:hover:enabled {
     color: ${({ theme }) => theme.colors.white};
+    background-color: ${({ theme }) => theme.colors.dark};
   }
 `;
 
