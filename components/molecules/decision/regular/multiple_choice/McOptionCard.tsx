@@ -1,9 +1,4 @@
-/* eslint-disable react/require-default-props */
 /* eslint-disable no-nested-ternary */
-/* eslint-disable quotes */
-/* eslint-disable react/jsx-indent */
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable arrow-body-style */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
@@ -96,8 +91,6 @@ interface IMcOptionCard {
   postCreatorUuid: string;
   postText: string;
   index: number;
-  minAmount: number;
-  votePrice: number;
   noAction: boolean;
   votingAllowed: boolean;
   canVoteForFree: boolean;
@@ -120,8 +113,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   postCreatorUuid,
   postText,
   index,
-  minAmount,
-  votePrice,
   noAction,
   votingAllowed,
   canVoteForFree,
@@ -238,9 +229,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   >(undefined);
 
   const [isConfirmVoteModalOpen, setIsConfirmVoteModalOpen] = useState(false);
-  const [isAmountPredefined, setIsAmountPredefined] = useState(false);
 
-  const [supportBidAmount, setSupportBidAmount] = useState('');
+  const [supportVoteOffer, setSupportVoteOffer] =
+    useState<newnewapi.McVoteOffer | null>(null);
+
   const disabled =
     optionBeingSupported !== '' &&
     optionBeingSupported !== option.id.toString();
@@ -265,26 +257,20 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     setPaymentModalOpen(true);
   };
 
-  const handleOpenCustomAmountModal = () => {
-    setSupportBidAmount('');
-    setIsAmountPredefined(false);
-    setIsConfirmVoteModalOpen(true);
-  };
-
-  const handleSetAmountAndOpenModal = (newAmount: string) => {
-    setSupportBidAmount(newAmount);
-    setIsAmountPredefined(true);
+  const handleSetVoteOfferAndOpenModal = (
+    newVoteOffer: newnewapi.McVoteOffer
+  ) => {
+    setSupportVoteOffer(newVoteOffer);
     setIsConfirmVoteModalOpen(true);
   };
 
   const handleCloseConfirmVoteModal = () => {
     setIsConfirmVoteModalOpen(false);
-    setIsAmountPredefined(false);
   };
 
   const paymentAmountInCents = useMemo(
-    () => (parseInt(supportBidAmount) || 0) * votePrice,
-    [votePrice, supportBidAmount]
+    () => supportVoteOffer?.price?.usdCents || 0,
+    [supportVoteOffer]
   );
 
   const paymentFeeInCents = useMemo(
@@ -305,13 +291,13 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     () =>
       new newnewapi.VoteOnPostRequest({
         postUuid: postId,
-        votesCount: parseInt(supportBidAmount),
+        votesCount: supportVoteOffer?.amountOfVotes,
         customerFee: new newnewapi.MoneyAmount({
           usdCents: paymentFeeInCents,
         }),
         optionId: option.id,
       }),
-    [postId, supportBidAmount, option.id, paymentFeeInCents]
+    [postId, supportVoteOffer, option.id, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
@@ -378,7 +364,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         handleSetPaymentSuccessModalOpen(true);
         setPaymentModalOpen(false);
         handleSetSupportedBid('');
-        setSupportBidAmount('');
+        setSupportVoteOffer(null);
         setIsSupportMenuOpen(false);
       } catch (err: any) {
         console.error(err);
@@ -693,18 +679,14 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <McOptionConfirmVoteModal
             zIndex={11}
             isOpen={isConfirmVoteModalOpen}
-            predefinedAmount={isAmountPredefined}
-            supportVotesAmount={supportBidAmount}
+            supportVotesAmount={(
+              supportVoteOffer?.amountOfVotes || 0
+            ).toString()}
             postCreator={
               creator.nickname ? creator.nickname : creator.username ?? ''
             }
             optionText={option.text}
-            minAmount={minAmount}
-            votePrice={votePrice}
             onClose={() => handleCloseConfirmVoteModal()}
-            handleSetSupportVotesAmount={(newValue: string) =>
-              setSupportBidAmount(newValue)
-            }
             handleOpenPaymentModal={() => handleTogglePaymentModalOpen()}
           />
         ) : null}
@@ -780,12 +762,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         <McOptionCardSelectVotesModal
           isVisible={isSupportMenuOpen}
           isSupportedByMe={!!option.isSupportedByMe}
-          availableVotes={appConstants.availableMcVoteAmountOptions}
+          availableVotes={appConstants.mcVoteOffers as newnewapi.McVoteOffer[]}
           handleClose={() => {
             handleCloseSupportForm();
           }}
-          handleOpenCustomAmountModal={handleOpenCustomAmountModal}
-          handleSetAmountAndOpenModal={handleSetAmountAndOpenModal}
+          handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
         >
           <SSelectVotesModalCard isBlue={isBlue}>
             <SBidDetails isBlue={isBlue} noAction={noAction}>
@@ -842,13 +823,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           top={selectVotesMenuTop}
           isVisible={isSupportMenuOpen}
           isSupportedByMe={!!option.isSupportedByMe}
-          availableVotes={appConstants.availableMcVoteAmountOptions}
+          availableVotes={appConstants.mcVoteOffers as newnewapi.McVoteOffer[]}
           handleClose={() => {
             handleCloseSupportForm();
             setSelectVotesMenuTop(undefined);
           }}
-          handleOpenCustomAmountModal={handleOpenCustomAmountModal}
-          handleSetAmountAndOpenModal={handleSetAmountAndOpenModal}
+          handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
         />
       )}
       {/* Ellipse modal */}
