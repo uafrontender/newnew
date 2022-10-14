@@ -1140,13 +1140,9 @@ const SImageHolderOutside = styled.div`
 `;
 
 const SBottomContentOutside = styled.div`
-  padding: 16px 10px 0;
+  padding: 8px 10px 0 10px;
   display: flex;
   flex-direction: column;
-
-  ${(props) => props.theme.media.tablet} {
-    padding: 8px 10px 0 10px;
-  }
 `;
 
 const STextOutside = styled(Text)`
@@ -1181,7 +1177,7 @@ const SBottomStart = styled.div<{
   flex-direction: row;
   align-items: center;
 
-  height: 32px;
+  height: 24px;
 
   margin-bottom: 4px;
   overflow: hidden;
