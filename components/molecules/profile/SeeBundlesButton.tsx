@@ -1,39 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
-import { toast } from 'react-toastify';
 
 import { useTranslation } from 'next-i18next';
 import BuyBundleModal from '../bundles/BuyBundleModal';
-import { getOfferedBundles } from '../../../api/endpoints/bundles';
-
-const OFFERED_BUNDLES: newnewapi.PackOffer[] = [
-  new newnewapi.PackOffer({
-    packUuid: '1',
-    price: new newnewapi.MoneyAmount({ usdCents: 500 }),
-    votesAmount: 500,
-    accessDurationInSeconds: 60 * 60 * 24 * 30,
-  }),
-  new newnewapi.PackOffer({
-    packUuid: '2',
-    price: new newnewapi.MoneyAmount({ usdCents: 2500 }),
-    votesAmount: 500,
-    accessDurationInSeconds: 60 * 60 * 24 * 30 * 2,
-  }),
-  new newnewapi.PackOffer({
-    packUuid: '3',
-    price: new newnewapi.MoneyAmount({ usdCents: 5000 }),
-    votesAmount: 500,
-    accessDurationInSeconds: 60 * 60 * 24 * 30 * 3,
-  }),
-
-  new newnewapi.PackOffer({
-    packUuid: '4',
-    price: new newnewapi.MoneyAmount({ usdCents: 7500 }),
-    votesAmount: 500,
-    accessDurationInSeconds: 60 * 60 * 24 * 30 * 4,
-  }),
-];
 
 interface ISeeBundlesButton {
   className?: string;
@@ -45,27 +15,7 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
   creator,
 }) => {
   const { t } = useTranslation('page-Profile');
-  const [offeredBundles, setOfferedBundles] = useState<newnewapi.IPackOffer[]>(
-    []
-  );
   const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
-
-  const loadBundlesOffers = useCallback(async () => {
-    const payload = new newnewapi.EmptyRequest({});
-    const res = await getOfferedBundles(payload);
-
-    if (!res.data || res.error) {
-      toast.error('toastErrors.generic');
-      throw new Error(res.error?.message ?? 'Request failed');
-    }
-
-    setOfferedBundles(res.data.packOffers);
-  }, []);
-
-  useEffect(() => {
-    // loadBundlesOffers();
-    setOfferedBundles(OFFERED_BUNDLES);
-  }, [loadBundlesOffers]);
 
   return (
     <>
@@ -80,7 +30,6 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
       <BuyBundleModal
         show={buyBundleModalOpen}
         creator={creator}
-        offeredBundles={offeredBundles}
         onClose={() => {
           setBuyBundleModalOpen(false);
         }}

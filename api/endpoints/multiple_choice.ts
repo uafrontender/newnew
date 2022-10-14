@@ -85,7 +85,7 @@ export const voteOnPost = (
     signal ?? undefined
   );
 
-export const doFreeVote = (
+export const voteWithBundleVotes = (
   payload: newnewapi.VoteOnPostRequest,
   signal?: RequestInit['signal']
 ) =>
@@ -95,7 +95,7 @@ export const doFreeVote = (
   >(
     newnewapi.VoteOnPostRequest,
     newnewapi.VoteOnPostResponse,
-    `${BASE_URL_MULTICHOICE}/do_free_vote`,
+    `${BASE_URL_MULTICHOICE}/use_bundle_votes_on_post`,
     'post',
     payload,
     signal ?? undefined

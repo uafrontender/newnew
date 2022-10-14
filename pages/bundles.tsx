@@ -27,7 +27,7 @@ import BuyBundleModal from '../components/molecules/bundles/BuyBundleModal';
 import BundleCard from '../components/molecules/bundles/BundleCard';
 import BackButton from '../components/molecules/profile/BackButton';
 import dateToTimestamp from '../utils/dateToTimestamp';
-import { getMyBundles, getOfferedBundles } from '../api/endpoints/bundles';
+import { getMyBundles } from '../api/endpoints/bundles';
 import AllBundlesModal from '../components/molecules/bundles/AllBundlesModal';
 
 const PHBundles = [
@@ -93,33 +93,6 @@ const PHBundles = [
   }),
 ];
 
-const OFFERED_BUNDLES: newnewapi.PackOffer[] = [
-  new newnewapi.PackOffer({
-    packUuid: '1',
-    price: new newnewapi.MoneyAmount({ usdCents: 500 }),
-    votesAmount: 500,
-    accessDurationInSeconds: 60 * 60 * 24 * 30,
-  }),
-  new newnewapi.PackOffer({
-    packUuid: '2',
-    price: new newnewapi.MoneyAmount({ usdCents: 2500 }),
-    votesAmount: 500,
-    accessDurationInSeconds: 60 * 60 * 24 * 30 * 2,
-  }),
-  new newnewapi.PackOffer({
-    packUuid: '3',
-    price: new newnewapi.MoneyAmount({ usdCents: 5000 }),
-    votesAmount: 500,
-    accessDurationInSeconds: 60 * 60 * 24 * 30 * 3,
-  }),
-  new newnewapi.PackOffer({
-    packUuid: '4',
-    price: new newnewapi.MoneyAmount({ usdCents: 7500 }),
-    votesAmount: 500,
-    accessDurationInSeconds: 60 * 60 * 24 * 30 * 4,
-  }),
-];
-
 export const Bundles = () => {
   const router = useRouter();
   const { t } = useTranslation('page-Bundles');
@@ -134,31 +107,11 @@ export const Bundles = () => {
   const [buyBundleCreator, setBuyBundleCreator] = useState<
     newnewapi.IUser | undefined
   >();
-  const [offeredBundles, setOfferedBundles] = useState<newnewapi.IPackOffer[]>(
-    []
-  );
   const [bundles, setBundles] = useState<newnewapi.ICreatorPack[]>([]);
 
   const [searchValue, setSearchValue] = useState('');
   const { ref: loadingRef, inView } = useInView();
   const searchInputRef = useRef<HTMLInputElement>();
-
-  const loadBundleOffers = useCallback(async () => {
-    const payload = new newnewapi.EmptyRequest({});
-    const res = await getOfferedBundles(payload);
-
-    if (!res.data || res.error) {
-      toast.error('toastErrors.generic');
-      throw new Error(res.error?.message ?? 'Request failed');
-    }
-
-    setOfferedBundles(res.data.packOffers);
-  }, []);
-
-  useEffect(() => {
-    // loadBundleOffers();
-    setOfferedBundles(OFFERED_BUNDLES);
-  }, [loadBundleOffers]);
 
   // TODO: Use paging
   const loadUserBundles = useCallback(async () => {
@@ -326,7 +279,6 @@ export const Bundles = () => {
         <BuyBundleModal
           show
           creator={buyBundleCreator}
-          offeredBundles={offeredBundles}
           onClose={() => {
             setBuyBundleCreator(undefined);
           }}

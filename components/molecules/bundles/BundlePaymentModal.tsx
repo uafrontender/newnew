@@ -133,6 +133,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
 
   const daysOfAccess = bundle.accessDurationInSeconds! / 60 / 60 / 24;
   const monthsOfAccess = Math.floor(daysOfAccess / 30);
+  const unitOfTimeLeft = monthsOfAccess > 1 ? 'months' : 'month';
 
   // TODO: Handle redirect
   return (
@@ -179,7 +180,10 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
           />
         </SVotesNumber>
         <AccessDescription>
-          {t('modal.buyBundle.access', { amount: monthsOfAccess })}
+          {t('modal.buyBundle.access', {
+            amount: monthsOfAccess,
+            unit: unitOfTimeLeft,
+          })}
         </AccessDescription>
         <SDescriptionLine>
           <SBullet>

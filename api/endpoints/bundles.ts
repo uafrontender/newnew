@@ -7,22 +7,6 @@ import {
 
 const BASE_URL_BUNDLE = `${BASE_URL}/pack`;
 
-export const getOfferedBundles = (
-  payload: newnewapi.EmptyRequest,
-  signal?: RequestInit['signal']
-) =>
-  fetchProtobuf<newnewapi.EmptyRequest, newnewapi.GetOfferedPacksResponse>(
-    newnewapi.EmptyRequest,
-    newnewapi.GetOfferedPacksResponse,
-    `${BASE_URL_BUNDLE}/get_offered_packs`,
-    'post',
-    payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
-
 export const getMyBundles = (
   payload: newnewapi.EmptyRequest,
   signal?: RequestInit['signal']
