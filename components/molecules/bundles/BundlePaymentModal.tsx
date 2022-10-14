@@ -182,7 +182,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         <AccessDescription>
           {t('modal.buyBundle.access', {
             amount: monthsOfAccess,
-            unit: unitOfTimeLeft,
+            unit: t(`modal.buyBundle.unit.${unitOfTimeLeft}`),
           })}
         </AccessDescription>
         <SDescriptionLine>
