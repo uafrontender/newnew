@@ -54,8 +54,6 @@ interface IMcOptionsTab {
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
-  minAmount: number;
-  votePrice: number;
   canVoteForFree: boolean;
   hasVotedOptionId?: number;
   canSubscribe: boolean;
@@ -76,8 +74,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   options,
   optionsLoading,
   pagingToken,
-  minAmount,
-  votePrice,
   canVoteForFree,
   hasVotedOptionId,
   canSubscribe,
