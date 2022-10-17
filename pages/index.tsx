@@ -13,11 +13,12 @@ import HomeLayout from '../components/templates/HomeLayout';
 import FaqSection from '../components/organisms/home/FaqSection';
 import PostTypeSection from '../components/organisms/home/PostTypeSection';
 import BecomeCreatorSection from '../components/organisms/home/BecomeCreatorSection';
+import Text from '../components/atoms/Text';
 
 import { useAppSelector } from '../redux-store/store';
 import {
   fetchPostByUUID,
-  // fetchForYouPosts,
+  fetchForYouPosts,
   fetchCuratedPosts,
   fetchBiggestPosts,
 } from '../api/endpoints/post';
@@ -28,6 +29,8 @@ import switchPostType from '../utils/switchPostType';
 import isBrowser from '../utils/isBrowser';
 import assets from '../constants/assets';
 import { Mixpanel } from '../utils/mixpanel';
+import YourPostsSection from '../components/organisms/home/YourPostsSection';
+import Headline from '../components/atoms/Headline';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -59,10 +62,10 @@ const Home: NextPage<IHome> = ({
   //   newnewapi.Post[]
   // >((top10posts?.posts as newnewapi.Post[]) ?? []);
   // For you - authenticated users only
-  // const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
-  // const [collectionFYInitialLoading, setCollectionFYInitialLoading] =
-  // useState(false);
-  // const [collectionFYError, setCollectionFYError] = useState(false);
+  const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
+  const [collectionFYInitialLoading, setCollectionFYInitialLoading] =
+    useState(false);
+  const [collectionFYError, setCollectionFYError] = useState(false);
   // Auctions
   const [collectionAC, setCollectionAC] = useState<newnewapi.Post[]>([]);
   const [collectionACInitialLoading, setCollectionACInitialLoading] =
@@ -158,41 +161,41 @@ const Home: NextPage<IHome> = ({
 
   // Fetch top posts of various types
   // FY posts
-  // useEffect(() => {
-  //   async function fetchFYPosts() {
-  //     try {
-  //       setCollectionFYInitialLoading(true);
+  useEffect(() => {
+    async function fetchFYPosts() {
+      try {
+        setCollectionFYInitialLoading(true);
 
-  //       const fyPayload = new newnewapi.PagedRequest({
-  //         paging: {
-  //           limit: 10,
-  //         },
-  //       });
+        const fyPayload = new newnewapi.PagedRequest({
+          paging: {
+            limit: 10,
+          },
+        });
 
-  //       const resFY = await fetchForYouPosts(fyPayload);
+        const resFY = await fetchForYouPosts(fyPayload);
 
-  //       if (resFY) {
-  //         setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
-  //         setCollectionFYInitialLoading(false);
-  //       } else {
-  //         throw new Error('Request failed');
-  //       }
-  //     } catch (err) {
-  //       setCollectionFYInitialLoading(false);
-  //       setCollectionFYError(true);
-  //     }
-  //   }
+        if (resFY) {
+          setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
+          setCollectionFYInitialLoading(false);
+        } else {
+          throw new Error('Request failed');
+        }
+      } catch (err) {
+        setCollectionFYInitialLoading(false);
+        setCollectionFYError(true);
+      }
+    }
 
-  //   if (user.loggedIn) {
-  //     fetchFYPosts();
-  //   }
+    if (user.loggedIn) {
+      fetchFYPosts();
+    }
 
-  //   return () => {
-  //     setPostModalOpen(false);
-  //     setDisplayedPost(undefined);
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+    return () => {
+      setPostModalOpen(false);
+      setDisplayedPost(undefined);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Live Auctions posts
   useEffect(() => {
@@ -314,37 +317,69 @@ const Home: NextPage<IHome> = ({
         <meta property='og:description' content={t('meta.description')} />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      <HeroSection />
+      {!user.loggedIn && <HeroSection />}
 
-      {/* MC posts */}
-      <PostTypeSection
-        headingPosition='right'
-        title={t('tutorial.mc.title')}
-        caption={t('tutorial.mc.caption')}
-        iconSrc={
-          theme.name === 'light'
-            ? assets.creation.lightMcAnimated
-            : assets.creation.darkMcAnimated
-        }
-        openPostModal={handleOpenPostModal}
-        posts={collectionMC.slice(0, 3)}
-        loading={collectionMCInitialLoading}
-      />
+      {user.userData?.options?.isCreator && (
+        <>
+          <SHeadline>Your posts</SHeadline>
+          <YourPostsSection onPostOpen={handleOpenPostModal} />
+        </>
+      )}
 
-      {/* AC posts */}
-      <PostTypeSection
-        headingPosition='left'
-        title={t('tutorial.ac.title')}
-        caption={t('tutorial.ac.caption')}
-        iconSrc={
-          theme.name === 'light'
-            ? assets.creation.lightAcAnimated
-            : assets.creation.darkAcAnimated
-        }
-        openPostModal={handleOpenPostModal}
-        posts={collectionAC.slice(0, 3)}
-        loading={collectionACInitialLoading}
-      />
+      {!user.loggedIn && (
+        <>
+          {/* MC posts */}
+          <PostTypeSection
+            headingPosition='right'
+            title={t('tutorial.mc.title')}
+            caption={t('tutorial.mc.caption')}
+            iconSrc={
+              theme.name === 'light'
+                ? assets.creation.lightMcAnimated
+                : assets.creation.darkMcAnimated
+            }
+            openPostModal={handleOpenPostModal}
+            posts={collectionMC.slice(0, 3)}
+            loading={collectionMCInitialLoading}
+          />
+
+          {/* AC posts */}
+          <PostTypeSection
+            headingPosition='left'
+            title={t('tutorial.ac.title')}
+            caption={t('tutorial.ac.caption')}
+            iconSrc={
+              theme.name === 'light'
+                ? assets.creation.lightAcAnimated
+                : assets.creation.darkAcAnimated
+            }
+            openPostModal={handleOpenPostModal}
+            posts={collectionAC.slice(0, 3)}
+            loading={collectionACInitialLoading}
+          />
+        </>
+      )}
+
+      {user.loggedIn && (
+        <>
+          <SHeadline>Explore</SHeadline>
+          <SSubtitle variant='subtitle'>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin fames
+            nulla dignissim tellus purus. Faucibus ornare.
+          </SSubtitle>
+          {/* For you */}
+          {!collectionFYError &&
+          (collectionFYInitialLoading || collectionFY?.length > 0) ? (
+            <CardsSection
+              title={t('cardsSection.title.for-you')}
+              category='biggest'
+              collection={collectionFY}
+              loading={collectionFYInitialLoading}
+              handlePostClicked={handleOpenPostModal}
+            />
+          ) : null}
+        </>
+      )}
 
       {/* Greatest of all time posts */}
       {!collectionBiggestError &&
@@ -389,6 +424,22 @@ const SCardsSection = styled(CardsSection)`
   }
 `;
 
+const SHeadline = styled(Headline)`
+  margin-bottom: 24px;
+  margin-top: 40px;
+
+  font-size: 52px;
+  line-height: 40px;
+`;
+
+const SSubtitle = styled(Text)`
+  max-width: 570px;
+
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+`;
+
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -408,9 +459,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'page-Chat',
   ]);
 
-  const top10payload = new newnewapi.EmptyRequest({});
+  // const top10payload = new newnewapi.EmptyRequest({});
 
-  const resTop10 = await fetchCuratedPosts(top10payload);
+  // const resTop10 = await fetchCuratedPosts(top10payload);
 
   if (post || !Array.isArray(post)) {
     const getPostPayload = new newnewapi.GetPostRequest({
@@ -424,11 +475,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (res.data && !res.error) {
       return {
         props: {
-          ...(resTop10.data
-            ? {
-                top10posts: resTop10.data.toJSON(),
-              }
-            : {}),
+          // ...(resTop10.data
+          //   ? {
+          //       top10posts: resTop10.data.toJSON(),
+          //     }
+          //   : {}),
           postFromQuery: res.data.toJSON(),
           assumeLoggedIn,
           ...translationContext,
@@ -439,11 +490,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     props: {
-      ...(resTop10.data
-        ? {
-            top10posts: resTop10.data.toJSON(),
-          }
-        : {}),
+      // ...(resTop10.data
+      //   ? {
+      //       top10posts: resTop10.data.toJSON(),
+      //     }
+      //   : {}),
       assumeLoggedIn,
       ...translationContext,
     },
