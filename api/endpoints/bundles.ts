@@ -9,27 +9,11 @@ export const getMyBundles = (
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
-    newnewapi.GetMyPacksResponse
+    newnewapi.GetMyBundlesResponse
   >(
     newnewapi.EmptyRequest,
-    newnewapi.GetMyPacksResponse,
+    newnewapi.GetMyBundlesResponse,
     `${BASE_URL_BUNDLE}/get_my_packs`,
-    'post',
-    payload,
-    signal ?? undefined
-  );
-
-export const getMyBundleForCreator = (
-  payload: newnewapi.GetMyPackForCreatorRequest,
-  signal?: RequestInit['signal']
-) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.GetMyPackForCreatorRequest,
-    newnewapi.GetMyPackForCreatorResponse
-  >(
-    newnewapi.GetMyPackForCreatorRequest,
-    newnewapi.GetMyPackForCreatorResponse,
-    `${BASE_URL_BUNDLE}/get_my_pack_for_creator`,
     'post',
     payload,
     signal ?? undefined
@@ -41,10 +25,10 @@ export const buyCreatorsBundles = (
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.StripeContributionRequest,
-    newnewapi.BuyCreatorsPackResponse
+    newnewapi.BuyCreatorsBundleResponse
   >(
     newnewapi.StripeContributionRequest,
-    newnewapi.BuyCreatorsPackResponse,
+    newnewapi.BuyCreatorsBundleResponse,
     `${BASE_URL_BUNDLE}/buy_creators_pack`,
     'post',
     payload,

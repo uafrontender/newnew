@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
@@ -26,72 +26,8 @@ import { searchCreators } from '../api/endpoints/search';
 import BuyBundleModal from '../components/molecules/bundles/BuyBundleModal';
 import BundleCard from '../components/molecules/bundles/BundleCard';
 import BackButton from '../components/molecules/profile/BackButton';
-import dateToTimestamp from '../utils/dateToTimestamp';
-import { getMyBundles } from '../api/endpoints/bundles';
 import AllBundlesModal from '../components/molecules/bundles/AllBundlesModal';
-
-const PHBundles = [
-  new newnewapi.CreatorPack({
-    creator: new newnewapi.User({
-      uuid: '3d537e81-d2dc-4bb3-9698-39152a817ab5',
-      avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-      nickname: 'CreatorDisplayName',
-      username: 'username',
-    }),
-    pack: new newnewapi.Pack({
-      accessExpiredAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-      votesLeft: 4,
-    }),
-  }),
-  new newnewapi.CreatorPack({
-    creator: new newnewapi.User({
-      uuid: 'c82f8990-5ef3-4a6f-b289-b14117a1094a',
-      avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-      nickname: 'CreatorDisplayName',
-      username: 'username',
-    }),
-    pack: new newnewapi.Pack({
-      accessExpiredAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-      votesLeft: 4200,
-    }),
-  }),
-  new newnewapi.CreatorPack({
-    creator: new newnewapi.User({
-      uuid: 'b8ba2486-48d6-4c55-9cd7-a494d0b79f98',
-      avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-      nickname: 'CreatorDisplayName',
-      username: 'username',
-    }),
-    pack: new newnewapi.Pack({
-      accessExpiredAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-      votesLeft: 4,
-    }),
-  }),
-  new newnewapi.CreatorPack({
-    creator: new newnewapi.User({
-      uuid: '6702c9e9-9f53-4c98-85d7-d9ffa2f22599',
-      avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-      nickname: 'CreatorDisplayName',
-      username: 'username',
-    }),
-    pack: new newnewapi.Pack({
-      accessExpiredAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-      votesLeft: 4,
-    }),
-  }),
-  new newnewapi.CreatorPack({
-    creator: new newnewapi.User({
-      uuid: '6702c9e9-9f53-4c98-85d7-d9ffa2f22599',
-      avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-      nickname: 'CreatorDisplayName',
-      username: 'username',
-    }),
-    pack: new newnewapi.Pack({
-      accessExpiredAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-      votesLeft: 4,
-    }),
-  }),
-];
+import { BundlesContext } from '../contexts/bundlesContext';
 
 export const Bundles = () => {
   const router = useRouter();
@@ -107,38 +43,23 @@ export const Bundles = () => {
   const [buyBundleCreator, setBuyBundleCreator] = useState<
     newnewapi.IUser | undefined
   >();
-  const [bundles, setBundles] = useState<newnewapi.ICreatorPack[]>([]);
+  const { bundles } = useContext(BundlesContext);
 
   const [searchValue, setSearchValue] = useState('');
   const { ref: loadingRef, inView } = useInView();
 
-  // TODO: Use paging
-  const loadUserBundles = useCallback(async () => {
-    const payload = new newnewapi.EmptyRequest({});
-
-    const res = await getMyBundles(payload);
-
-    if (!res.data || res.error) {
-      toast.error('toastErrors.generic');
-      throw new Error(res.error?.message ?? 'Request failed');
-    }
-
-    setBundles(res.data.creatorPacks);
-  }, []);
-
-  useEffect(() => {
-    setBundles(PHBundles);
-  }, [loadUserBundles]);
-
   const loadCreatorsData = useCallback(
-    async (
-      paging: Paging
-    ): Promise<PaginatedResponse<newnewapi.ISearchCreatorsResultItem>> => {
+    async (paging: Paging): Promise<PaginatedResponse<newnewapi.IUser>> => {
+      // TODO remove block
+      return {
+        nextData: [],
+        nextPageToken: null,
+      };
+
       const payload = new newnewapi.SearchCreatorsRequest({
         query: searchValue,
         paging,
-        expand: [newnewapi.SearchCreatorsRequest.Expand.PACKS],
-        filter: newnewapi.SearchCreatorsRequest.Filter.OFFERS_PACKS,
+        filter: newnewapi.SearchCreatorsRequest.Filter.OFFERS_BUNDLES,
       });
 
       const res = await searchCreators(payload);
@@ -148,10 +69,10 @@ export const Bundles = () => {
         throw new Error(res.error?.message ?? 'Request failed');
       }
 
-      return {
+      /* return {
         nextData: res.data.creators,
         nextPageToken: res.data.paging?.nextPageToken,
-      };
+      }; */
     },
     [searchValue]
   );
@@ -161,7 +82,7 @@ export const Bundles = () => {
   useEffect(() => {
     if (
       (!user.loggedIn && user._persist?.rehydrated) ||
-      (bundles.length === 0 && false) /* && bundles are loaded */
+      bundles?.length === 0
     ) {
       router.replace('/');
     }
@@ -198,7 +119,7 @@ export const Bundles = () => {
 
         <SBundlesTitle>
           <SectionTitle>{t('bundlesSection.title')}</SectionTitle>
-          {bundles.length > visibleBundlesNumber && (
+          {bundles && bundles.length > visibleBundlesNumber && (
             <SSeeAllButton
               onClick={() => {
                 setAllBundlesModalOpen(true);
@@ -209,11 +130,15 @@ export const Bundles = () => {
           )}
         </SBundlesTitle>
         <SBundlesContainer>
-          {bundles.slice(0, visibleBundlesNumber).map((bundle, index) => (
-            <BundleCard key={`${index}`} creatorBundle={bundle} />
-          ))}
+          {bundles &&
+            bundles
+              .slice(0, visibleBundlesNumber)
+              .map((bundle, index) => (
+                <BundleCard key={`${index}`} creatorBundle={bundle} />
+              ))}
 
           {!isMobile &&
+            bundles &&
             Array.from(
               'x'.repeat(Math.max(visibleBundlesNumber - bundles.length, 0))
             ).map((v, index) => <BundleCard key={`${index}-holder`} />)}
@@ -252,13 +177,15 @@ export const Bundles = () => {
           <SRef ref={loadingRef}>Loading...</SRef>
         )}
       </Container>
-      <AllBundlesModal
-        show={allBundlesModalOpen}
-        creatorBundles={bundles}
-        onClose={() => {
-          setAllBundlesModalOpen(false);
-        }}
-      />
+      {bundles && (
+        <AllBundlesModal
+          show={allBundlesModalOpen}
+          creatorBundles={bundles}
+          onClose={() => {
+            setAllBundlesModalOpen(false);
+          }}
+        />
+      )}
       {buyBundleCreator && (
         <BuyBundleModal
           show

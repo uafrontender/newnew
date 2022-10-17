@@ -9,7 +9,7 @@ import formatTimeLeft from '../../../utils/formatTimeLeft';
 
 interface IBundleCard {
   className?: string;
-  creatorBundle?: newnewapi.ICreatorPack;
+  creatorBundle?: newnewapi.ICreatorBundle;
   small?: boolean;
 }
 
@@ -20,12 +20,12 @@ const BundleCard: React.FC<IBundleCard> = ({
 }) => {
   const { t } = useTranslation('page-Bundles');
 
-  if (!creatorBundle || !creatorBundle.pack || !creatorBundle.creator) {
+  if (!creatorBundle || !creatorBundle.bundle || !creatorBundle.creator) {
     return <SBundlesContainer className={className} small={small} holder />;
   }
 
   const expiresAtTime =
-    (creatorBundle.pack.accessExpiredAt!.seconds as number) * 1000;
+    (creatorBundle.bundle.accessExpiresAt!.seconds as number) * 1000;
   const timeLeft = expiresAtTime - Date.now();
   const formattedTimeLeft = formatTimeLeft(timeLeft);
 
@@ -48,7 +48,7 @@ const BundleCard: React.FC<IBundleCard> = ({
           // @ts-ignore
           components={[
             <VotesNumberSpan />,
-            { amount: creatorBundle.pack.votesLeft },
+            { amount: creatorBundle.bundle.votesLeft },
           ]}
         />
       </SVotesLeft>

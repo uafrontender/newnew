@@ -9,7 +9,7 @@ import assets from '../../../../../constants/assets';
 interface IUseBundleVotesModal {
   isVisible: boolean;
   optionText: string;
-  bundleVotes: number;
+  bundleVotesLeft: number;
   handleVoteWithBundleVotes: (voteCount: number) => void;
   closeModal: () => void;
 }
@@ -17,12 +17,14 @@ interface IUseBundleVotesModal {
 const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
   isVisible,
   optionText,
-  bundleVotes,
+  bundleVotesLeft,
   handleVoteWithBundleVotes,
   closeModal,
 }) => {
   const { t } = useTranslation('modal-Post');
-  const [votesToUse, setVotesToUse] = useState<number | undefined>(bundleVotes);
+  const [votesToUse, setVotesToUse] = useState<number | undefined>(
+    bundleVotesLeft
+  );
 
   return (
     <Modal show={isVisible} overlaydim additionalz={12} onClose={closeModal}>
@@ -38,7 +40,7 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
               t={t}
               i18nKey='mcPost.optionsTab.useBundleVotesModal.votesAvailable'
               // @ts-ignore
-              components={[<VotesNumberSpan />, { amount: bundleVotes }]}
+              components={[<VotesNumberSpan />, { amount: bundleVotesLeft }]}
             />
           </SVotesAvailable>
           <OptionTitle>
@@ -65,10 +67,14 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
           <SDoneButton
             view='primaryGrad'
             disabled={
-              !(votesToUse && votesToUse > 0 && votesToUse <= bundleVotes)
+              !(votesToUse && votesToUse > 0 && votesToUse <= bundleVotesLeft)
             }
             onClick={() => {
-              if (votesToUse && votesToUse > 0 && votesToUse <= bundleVotes) {
+              if (
+                votesToUse &&
+                votesToUse > 0 &&
+                votesToUse <= bundleVotesLeft
+              ) {
                 handleVoteWithBundleVotes(votesToUse);
               }
             }}

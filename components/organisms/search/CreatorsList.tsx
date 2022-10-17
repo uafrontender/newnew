@@ -13,7 +13,7 @@ import CreatorCard from '../../molecules/search/CreatorCard';
 const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
 interface IList {
-  collection: newnewapi.ISearchCreatorsResultItem[];
+  collection: newnewapi.IUser[];
   loading: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
@@ -29,21 +29,17 @@ export const CreatorsList: React.FC<IList> = ({
   withEllipseMenu = false,
   onBuyBundleClicked,
 }) => {
-  const renderItem = (item: newnewapi.ISearchCreatorsResultItem) => {
-    if (!item.creator) {
-      return null;
-    }
-
+  const renderItem = (creator: newnewapi.IUser) => {
     const handleItemClick = () => {
-      if (item.creator) {
-        router.push(`/${item.creator.username}`);
+      if (creator) {
+        router.push(`/${creator.username}`);
       }
     };
 
     return (
-      <SItemWrapper key={item.creator.uuid} onClick={handleItemClick}>
+      <SItemWrapper key={creator.uuid} onClick={handleItemClick}>
         <CreatorCard
-          creator={item.creator}
+          creator={creator}
           withEllipseMenu={withEllipseMenu ?? false}
           onBuyBundleClicked={onBuyBundleClicked}
         />

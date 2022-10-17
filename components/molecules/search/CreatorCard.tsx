@@ -1,5 +1,11 @@
 import { newnewapi } from 'newnew-api';
-import React, { useCallback, useMemo, useState, useRef } from 'react';
+import React, {
+  useCallback,
+  useMemo,
+  useState,
+  useRef,
+  useContext,
+} from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
@@ -19,6 +25,7 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { markUser } from '../../../api/endpoints/user';
 import UserEllipseModal from '../profile/UserEllipseModal';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import { BundlesContext } from '../../../contexts/bundlesContext';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
@@ -50,6 +57,12 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(creator.uuid as string),
     [usersIBlocked, creator.uuid]
+  );
+
+  const { bundles } = useContext(BundlesContext);
+  const creatorsBundle = useMemo(
+    () => bundles?.find((bundle) => bundle.creator?.uuid === creator.uuid),
+    [bundles, creator.uuid]
   );
 
   const unblockUserAsync = async (uuid: string) => {
@@ -149,21 +162,19 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         )}
       </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>
-      {/* TODO: Add data from search API */}
       {onBuyBundleClicked && (
         <SButton
-          highlighted={/* !!purchasedVotes */ false}
+          highlighted={!!creatorsBundle}
           onClick={(e) => {
             e.stopPropagation();
             onBuyBundleClicked(creator);
           }}
         >
-          {
-            // TODO: integrate API, uncomment the logic
-            /* purchasedVotes ?
-              t('creatorCard.purchasedVotes',{value: purchasedVotes})
-              : */ t('creatorCard.buyBundle')
-          }
+          {creatorsBundle
+            ? t('creatorCard.purchasedVotes', {
+                value: creatorsBundle.bundle?.votesLeft,
+              })
+            : t('creatorCard.buyBundle')}
         </SButton>
       )}
       <SBackground>

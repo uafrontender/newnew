@@ -19,7 +19,7 @@ import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
 
 interface IBundlePaymentModal {
   creator: newnewapi.IUser;
-  bundle: newnewapi.IPackOffer;
+  bundle: newnewapi.IBundleOffer;
   onClose: () => void;
 }
 
@@ -38,9 +38,9 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
 
   const voteOnPostRequest = useMemo(
     () =>
-      new newnewapi.BuyCreatorsPack({
+      new newnewapi.BuyCreatorsBundle({
         creatorUuid: creator.uuid,
-        packUuid: bundle.packUuid,
+        bundleUuid: bundle.bundleUuid,
         amount: bundle.price,
       }),
     [creator, bundle]

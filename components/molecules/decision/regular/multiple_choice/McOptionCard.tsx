@@ -95,7 +95,7 @@ interface IMcOptionCard {
   votingAllowed: boolean;
   isCreatorsBid: boolean;
   optionBeingSupported?: string;
-  bundleVotes?: number;
+  bundleVotesLeft?: number;
   handleSetSupportedBid: (id: string) => void;
   handleSetPaymentSuccessModalOpen: (newValue: boolean) => void;
   handleAddOrUpdateOptionFromResponse: (
@@ -116,7 +116,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   votingAllowed,
   isCreatorsBid,
   optionBeingSupported,
-  bundleVotes,
+  bundleVotesLeft,
   handleSetSupportedBid,
   handleRemoveOption,
   handleSetPaymentSuccessModalOpen,
@@ -679,10 +679,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           />
         ) : null}
         {/* Use Bundle votes vote modal */}
-        {bundleVotes && (
+        {bundleVotesLeft && (
           <UseBundleVotesModal
             isVisible={bundleVotesModalOpen}
-            bundleVotes={bundleVotes}
+            bundleVotesLeft={bundleVotesLeft}
             optionText={option.text}
             handleVoteWithBundleVotes={handleVoteWithBundleVotes}
             closeModal={() => setBundleVotesModalOpen(false)}
@@ -821,7 +821,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             setSelectVotesMenuTop(undefined);
           }}
           handleOpenBundleVotesModal={
-            bundleVotes ? handleOpenBundleVotesModal : undefined
+            bundleVotesLeft ? handleOpenBundleVotesModal : undefined
           }
           handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
         />

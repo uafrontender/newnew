@@ -22,10 +22,7 @@ import {
 } from '../../../../../redux-store/store';
 import { validateText } from '../../../../../api/endpoints/infrastructure';
 // import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
-import {
-  voteWithBundleVotes,
-  voteOnPost,
-} from '../../../../../api/endpoints/multiple_choice';
+import { voteWithBundleVotes } from '../../../../../api/endpoints/multiple_choice';
 
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
@@ -58,10 +55,8 @@ interface IMcOptionsTab {
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
-  minAmount: number;
-  votePrice: number;
   hasVotedOptionId?: number;
-  bundleVotes?: number;
+  bundle?: newnewapi.IBundle;
   handleLoadOptions: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
@@ -78,10 +73,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   options,
   optionsLoading,
   pagingToken,
-  minAmount,
-  votePrice,
   hasVotedOptionId,
-  bundleVotes,
+  bundle,
   handleLoadOptions,
   handleRemoveOption,
   handleAddOrUpdateOptionFromResponse,
@@ -112,7 +105,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     useScrollGradients(containerRef);
 
   const [heightDelta, setHeightDelta] = useState(
-    !hasVotedOptionId && postStatus === 'voting' ? 56 : 0
+    !hasVotedOptionId && postStatus === 'voting' && bundle ? 58 + 72 : 0
   );
   const actionSectionContainer = useRef<HTMLDivElement>();
 
@@ -240,7 +233,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         ? entry[0]?.borderBoxSize[0]?.blockSize
         : entry[0]?.contentRect.height;
       if (size) {
-        setHeightDelta(size);
+        setHeightDelta(size + 57);
       }
     });
 
@@ -248,6 +241,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       !postLoading &&
       !hasVotedOptionId &&
       postStatus === 'voting' &&
+      bundle &&
       actionSectionContainer.current
     ) {
       resizeObserver.observe(actionSectionContainer.current!!);
@@ -258,7 +252,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     return () => {
       resizeObserver.disconnect();
     };
-  }, [hasVotedOptionId, postLoading, postStatus, isMobileOrTablet]);
+  }, [hasVotedOptionId, postLoading, postStatus, isMobileOrTablet, bundle]);
 
   const goToNextStep = () => {
     if (
@@ -323,7 +317,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               postId={post.postUuid}
               index={i}
               optionBeingSupported={optionBeingSupported}
-              bundleVotes={bundleVotes}
+              bundleVotesLeft={bundle ? bundle.votesLeft! : undefined}
               votingAllowed={postStatus === 'voting'}
               isCreatorsBid={
                 !option.creator || option.creator?.uuid === post.creator?.uuid
@@ -369,7 +363,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
-        {!hasVotedOptionId && postStatus === 'voting' && (
+        {!hasVotedOptionId && postStatus === 'voting' && bundle && (
           <SActionSection
             ref={(el) => {
               actionSectionContainer.current = el!!;
@@ -489,11 +483,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         </OptionActionMobileModal>
       ) : null}
       {/* Use bundle vote modal */}
-      {bundleVotes && (
+      {bundle && (
         <UseBundleVotesModal
           isVisible={useFreeVoteModalOpen}
           optionText={optionBeingSupported}
-          bundleVotes={bundleVotes}
+          bundleVotesLeft={bundle.votesLeft!}
           handleVoteWithBundleVotes={handleVoteWithBundleVotes}
           closeModal={() => setUseFreeVoteModalOpen(false)}
         />
@@ -516,7 +510,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       !suggestNewMobileOpen &&
       !hasVotedOptionId &&
       postStatus === 'voting' &&
-      bundleVotes ? (
+      bundle ? (
         <>
           <SActionButton
             id='action-button-mobile'
@@ -594,7 +588,7 @@ const SBidsContainer = styled.div<{
   padding-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: ${({ heightDelta }) => `calc(100% - ${heightDelta + 72}px)`};
+    height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
     padding-top: 0px;
     padding-right: 12px;
     margin-right: -14px;

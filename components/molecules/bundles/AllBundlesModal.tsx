@@ -12,7 +12,7 @@ import BundleCard from './BundleCard';
 
 interface IAllBundlesModal {
   show: boolean;
-  creatorBundles: newnewapi.ICreatorPack[];
+  creatorBundles: newnewapi.ICreatorBundle[];
   onClose: () => void;
 }
 
@@ -37,7 +37,7 @@ const AllBundlesModal: React.FC<IAllBundlesModal> = React.memo(
     }, [isMobile, isTablet]);
 
     const setsOfBundles = useMemo(() => {
-      const sets: newnewapi.ICreatorPack[][] = [];
+      const sets: newnewapi.ICreatorBundle[][] = [];
       while (setSize * sets.length < creatorBundles.length) {
         sets.push(
           creatorBundles.slice(

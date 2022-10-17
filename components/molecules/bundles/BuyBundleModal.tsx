@@ -13,27 +13,27 @@ import { useAppSelector } from '../../../redux-store/store';
 import BundlePaymentModal from './BundlePaymentModal';
 
 // Load from app constants
-const OFFERED_BUNDLES: newnewapi.PackOffer[] = [
-  new newnewapi.PackOffer({
-    packUuid: '1',
+const OFFERED_BUNDLES: newnewapi.BundleOffer[] = [
+  new newnewapi.BundleOffer({
+    bundleUuid: '1',
     price: new newnewapi.MoneyAmount({ usdCents: 500 }),
     votesAmount: 500,
     accessDurationInSeconds: 60 * 60 * 24 * 30,
   }),
-  new newnewapi.PackOffer({
-    packUuid: '2',
+  new newnewapi.BundleOffer({
+    bundleUuid: '2',
     price: new newnewapi.MoneyAmount({ usdCents: 2500 }),
     votesAmount: 500,
     accessDurationInSeconds: 60 * 60 * 24 * 30 * 2,
   }),
-  new newnewapi.PackOffer({
-    packUuid: '3',
+  new newnewapi.BundleOffer({
+    bundleUuid: '3',
     price: new newnewapi.MoneyAmount({ usdCents: 5000 }),
     votesAmount: 500,
     accessDurationInSeconds: 60 * 60 * 24 * 30 * 3,
   }),
-  new newnewapi.PackOffer({
-    packUuid: '4',
+  new newnewapi.BundleOffer({
+    bundleUuid: '4',
     price: new newnewapi.MoneyAmount({ usdCents: 7500 }),
     votesAmount: 500,
     accessDurationInSeconds: 60 * 60 * 24 * 30 * 4,
@@ -55,7 +55,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
     );
 
     const [bundleToBuy, setBundleToBuy] = useState<
-      newnewapi.IPackOffer | undefined
+      newnewapi.IBundleOffer | undefined
     >();
 
     return (
@@ -77,7 +77,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
               <SOfferedBundleList>
                 {OFFERED_BUNDLES.map((bundle, index) => (
                   <SOfferCard
-                    key={bundle.packUuid}
+                    key={bundle.bundleUuid}
                     bundleLevel={index}
                     bundleOffer={bundle}
                     onClick={() => setBundleToBuy(bundle)}

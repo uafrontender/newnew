@@ -37,14 +37,12 @@ import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 
 // Utils
 import switchPostType from '../../../../utils/switchPostType';
-import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
-import dateToTimestamp from '../../../../utils/dateToTimestamp';
-import { getMyBundleForCreator } from '../../../../api/endpoints/bundles';
+import { BundlesContext } from '../../../../contexts/bundlesContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -118,13 +116,19 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
-  const { appConstants } = useGetAppConstants();
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Bundle
-  const [bundle, setBundle] = useState<newnewapi.IPack | undefined>();
+  const { bundles } = useContext(BundlesContext);
+  const creatorsBundle = useMemo(
+    () =>
+      bundles?.find(
+        (bundle) => bundle.creator?.uuid === postParsed?.creator?.uuid
+      ),
+    [bundles, postParsed?.creator?.uuid]
+  );
 
   // Response viewed
   const [responseViewed, setResponseViewed] = useState(
@@ -243,27 +247,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     },
     [user.userData?.userUuid]
   );
-
-  const loadBundle = useCallback(async () => {
-    if (post.creator?.uuid) {
-      try {
-        const payload = new newnewapi.GetMyPackForCreatorRequest({
-          creatorUuid: post.creator.uuid,
-        });
-
-        const res = await getMyBundleForCreator(payload);
-
-        if (!res.data || !res.data.pack || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
-        }
-
-        setBundle(res.data.pack);
-      } catch (err: any) {
-        console.error(err);
-        toast.error(err.message);
-      }
-    }
-  }, [post.creator?.uuid]);
 
   const fetchOptions = useCallback(
     async (pageToken?: string) => {
@@ -429,18 +412,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       clearTimeout(timer);
     };
   }, [post, user.loggedIn, user.userData?.userUuid]);
-
-  useEffect(() => {
-    // TODO: enable
-    // loadBundle();
-
-    setBundle(
-      new newnewapi.Pack({
-        accessExpiredAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-        votesLeft: 4,
-      })
-    );
-  }, [loadBundle]);
 
   useEffect(() => {
     // setTimeout used to fix the React memory leak warning
@@ -742,7 +713,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         />
         <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
         <SActivitiesContainer>
-          <PostVotingTab bundleVotes={bundle?.votesLeft ?? undefined}>
+          <PostVotingTab
+            bundleVotes={creatorsBundle?.bundle?.votesLeft ?? undefined}
+          >
             {`${t('tabs.options')} ${
               !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
             }`}
@@ -762,14 +735,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             options={options}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
-            minAmount={appConstants?.minMcVotes ?? 2}
-            votePrice={
-              appConstants?.mcVotePrice
-                ? Math.floor(appConstants?.mcVotePrice)
-                : 1
-            }
             hasVotedOptionId={(hasVotedOptionId as number) ?? undefined}
-            bundleVotes={bundle?.votesLeft ?? undefined}
+            bundle={creatorsBundle?.bundle ?? undefined}
             handleLoadOptions={fetchOptions}
             handleAddOrUpdateOptionFromResponse={
               handleAddOrUpdateOptionFromResponse
