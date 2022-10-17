@@ -26,6 +26,7 @@ const SocketContextProvider: React.FC<ISocketContextProvider> = ({
             },
           }
         : {}),
+      transports: ['websocket'],
     });
     setSocket(() => socketConnected);
 
