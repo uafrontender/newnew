@@ -237,8 +237,9 @@ const SPostModalContainer = styled.div<{
   ${({ theme }) => theme.media.laptopM} {
     top: 32px;
     left: calc(50% - 496px);
-    /* width: 992px;
-    height: calc(100% - 64px); */
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
     max-height: ${({ loaded }) => (loaded ? 'unset' : '840px')};
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};

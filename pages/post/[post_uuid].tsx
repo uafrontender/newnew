@@ -1,42 +1,22 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable camelcase */
 /* eslint-disable no-nested-ternary */
-import React, {
-  ReactElement,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { ReactElement, useEffect, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import { fetchCuratedPosts, fetchPostByUUID } from '../../api/endpoints/post';
 
 import { NextPageWithLayout } from '../_app';
-import HomeLayout from '../../components/templates/HomeLayout';
 import switchPostType from '../../utils/switchPostType';
 import { toggleMutedMode } from '../../redux-store/slices/uiStateSlice';
-import isBrowser from '../../utils/isBrowser';
-import { Mixpanel } from '../../utils/mixpanel';
 import GeneralLayout from '../../components/templates/General';
 
 const PostModal = dynamic(() => import('../../components/organisms/decision'));
-
-const TopSection = dynamic(
-  () => import('../../components/organisms/home/TopSection')
-);
-
-const HeroSection = dynamic(
-  () => import('../../components/organisms/home/HeroSection')
-);
 
 interface IPostPage {
   top10posts: newnewapi.NonPagedPostsResponse;
@@ -57,65 +37,14 @@ const PostPage: NextPage<IPostPage> = ({
   comment_content,
   save_card,
 }) => {
-  const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
-  const { mutedMode, resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+  const { mutedMode } = useAppSelector((state) => state.ui);
 
   const [postParsed, typeOfPost] = useMemo(
     () => (post ? switchPostType(post) : [undefined, undefined]),
     [post]
   );
-
-  // Posts
-  // Top section/Curated posts
-  const [topSectionCollection, setTopSectionCollection] = useState<
-    newnewapi.Post[]
-  >((top10posts?.posts as newnewapi.Post[]) ?? []);
-
-  // Display post
-  const [postModalOpen, setPostModalOpen] = useState(!!post);
-  const [displayedPost, setDisplayedPost] = useState<
-    newnewapi.IPost | undefined
-  >(post ?? undefined);
-
-  const handleOpenPostModal = (postToOpen: newnewapi.IPost) => {
-    Mixpanel.track('Open Post Modal', {
-      _stage: 'Post',
-      _postUuid: switchPostType(post)[0].postUuid,
-    });
-    setDisplayedPost(postToOpen);
-    setPostModalOpen(true);
-  };
-
-  const handleSetDisplayedPost = useCallback((postToOpen: newnewapi.IPost) => {
-    setDisplayedPost(postToOpen);
-  }, []);
-
-  const handleClosePostModal = () => {
-    Mixpanel.track('Close Post Modal', {
-      _stage: 'Post',
-    });
-    setPostModalOpen(false);
-    setDisplayedPost(undefined);
-
-    if (isBrowser()) {
-      // const { idx } = window.history.state;
-      if (postParsed?.creator?.username) {
-        router?.push(`/${postParsed?.creator?.username}`);
-      } else {
-        router?.push('/');
-      }
-    }
-  };
-
-  useEffect(() => {
-    router.prefetch('/');
-  }, [router]);
 
   useEffect(() => {
     // if (isSafari() && !mutedMode) {
@@ -145,16 +74,11 @@ const PostPage: NextPage<IPostPage> = ({
       </Head>
       {post && (
         <PostModal
-          isOpen
-          post={displayedPost}
+          post={post}
           stripeSetupIntentClientSecretFromRedirect={setup_intent_client_secret}
           saveCardFromRedirect={save_card}
           commentIdFromUrl={comment_id}
           commentContentFromUrl={comment_content}
-          // Required to avoid weird cases when navigating back to the post using browser back button
-          manualCurrLocation='forced_redirect_to_home'
-          handleClose={() => handleClosePostModal()}
-          handleOpenAnotherPost={handleSetDisplayedPost}
         />
       )}
     </>

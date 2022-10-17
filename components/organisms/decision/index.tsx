@@ -18,7 +18,6 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 
 import { Mixpanel } from '../../../utils/mixpanel';
-import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import switchPostStatus, {
   TPostStatusStringified,
@@ -46,15 +45,11 @@ import PostModalModeration from './PostModalModeration';
 import PostModalAwaitingSuccess from './PostModalAwaitingSuccess';
 
 interface IPostModal {
-  isOpen: boolean;
   post?: newnewapi.IPost;
-  manualCurrLocation?: string;
   stripeSetupIntentClientSecretFromRedirect?: string;
   saveCardFromRedirect?: boolean;
   commentIdFromUrl?: string;
   commentContentFromUrl?: string;
-  handleClose: () => void;
-  handleOpenAnotherPost?: (post: newnewapi.Post) => void;
   handleRemoveFromStateDeleted?: () => void;
   handleRemoveFromStateUnfavorited?: () => void;
   handleAddPostToStateFavorited?: () => void;
@@ -62,15 +57,11 @@ interface IPostModal {
 
 // Memorization does not work
 const PostModal: React.FunctionComponent<IPostModal> = ({
-  isOpen,
   post,
-  manualCurrLocation,
   stripeSetupIntentClientSecretFromRedirect,
   saveCardFromRedirect,
   commentIdFromUrl,
   commentContentFromUrl,
-  handleClose,
-  handleOpenAnotherPost,
   handleRemoveFromStateDeleted,
   handleRemoveFromStateUnfavorited,
   handleAddPostToStateFavorited,
@@ -190,10 +181,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]
   );
 
-  const [currLocation] = useState(
-    manualCurrLocation ?? (isBrowser() ? window.location.href : '')
-  );
-
   const [stripeSetupIntentClientSecret, setStripeSetupIntentClientSecret] =
     useState(() => stripeSetupIntentClientSecretFromRedirect ?? undefined);
 
@@ -266,23 +253,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     ) {
       return;
     }
-    // Required to avoid wierd cases when navigating back to the post using browser back button
-    if (currLocation === 'forced_redirect_to_home') {
-      innerHistoryStack.current = [];
-      handleClose();
-      return;
-    }
-
-    handleClose();
-    syncedHistoryPushState({}, currLocation);
-    innerHistoryStack.current = [];
-  }, [
-    currLocation,
-    handleClose,
-    isConfirmToClosePost,
-    syncedHistoryPushState,
-    t,
-  ]);
+    router.back();
+  }, [isConfirmToClosePost, router, t]);
 
   const handleGoBackInsidePost = useCallback(() => {
     Mixpanel.track('Go Back Inside Post', {
@@ -294,21 +266,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     ) {
       return;
     }
-
-    if (innerHistoryStack.current.length !== 0) {
-      router.back();
-    } else {
-      handleClose();
-      syncedHistoryPushState({}, currLocation);
-    }
-  }, [
-    currLocation,
-    handleClose,
-    isConfirmToClosePost,
-    router,
-    syncedHistoryPushState,
-    t,
-  ]);
+    router.back();
+  }, [isConfirmToClosePost, router, t]);
 
   const handleSeeNewDeletedBox = useCallback(() => {
     Mixpanel.track('Post Failed Button Click', {
@@ -546,8 +505,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
 PostModal.defaultProps = {
   post: undefined,
-  manualCurrLocation: undefined,
-  handleOpenAnotherPost: () => {},
   handleRemoveFromStateDeleted: () => {},
   handleRemoveFromStateUnfavorited: () => {},
   handleAddPostToStateFavorited: () => {},

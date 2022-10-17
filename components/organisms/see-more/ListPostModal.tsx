@@ -148,7 +148,7 @@ const SItemWrapper = styled.div`
   }
 
   ${(props) => props.theme.media.laptopM} {
-    width: calc(25% - 32px);
+    width: calc(20% - 32px);
     margin: 0 16px 32px 16px;
   }
 `;
