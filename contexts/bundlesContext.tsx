@@ -26,7 +26,7 @@ interface IBundleContextProvider {
   children: React.ReactNode;
 }
 
-const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
+export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
   children,
 }) => {
   const user = useAppSelector((state) => state.user);

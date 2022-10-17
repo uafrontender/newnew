@@ -64,7 +64,7 @@ import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
 import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
-import BundlesContextProvider from '../contexts/bundlesContext';
+import { BundlesContextProvider } from '../contexts/bundlesContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
