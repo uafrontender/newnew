@@ -121,7 +121,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
   // Payment modal
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [useFreeVoteModalOpen, setUseFreeVoteModalOpen] = useState(false);
+  const [useBundleVotesModalOpen, setUseBundleVotesModalOpen] = useState(false);
   const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
   // Bundle modal
@@ -174,7 +174,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   );
 
   const handleVoteWithBundleVotes = useCallback(async () => {
-    setUseFreeVoteModalOpen(false);
+    setUseBundleVotesModalOpen(false);
     setLoadingModalOpen(true);
     Mixpanel.track('Vote For Free', {
       _stage: 'Post',
@@ -388,12 +388,15 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
               onClick={() => {
+                // TODO: change event name?
                 Mixpanel.track('Click Add Free Option', {
                   _stage: 'Post',
                   _postUuid: post.postUuid,
                   _component: 'McOptionsTab',
                 });
-                setUseFreeVoteModalOpen(true);
+                // TODO: what if there are no more votes available?
+                // Should UI show pay with card modal
+                setUseBundleVotesModalOpen(true);
               }}
             >
               {t('mcPost.optionsTab.actionSection.placeABidButton')}
@@ -474,7 +477,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   _postUuid: post.postUuid,
                   _component: 'McOptionsTab',
                 });
-                setUseFreeVoteModalOpen(true);
+                setUseBundleVotesModalOpen(true);
               }}
             >
               {t('mcPost.optionsTab.actionSection.placeABidButton')}
@@ -485,11 +488,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {/* Use bundle vote modal */}
       {bundle && (
         <UseBundleVotesModal
-          isVisible={useFreeVoteModalOpen}
+          isVisible={useBundleVotesModalOpen}
           optionText={optionBeingSupported}
           bundleVotesLeft={bundle.votesLeft!}
           handleVoteWithBundleVotes={handleVoteWithBundleVotes}
-          closeModal={() => setUseFreeVoteModalOpen(false)}
+          closeModal={() => setUseBundleVotesModalOpen(false)}
         />
       )}
       {/* Loading Modal */}

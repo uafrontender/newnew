@@ -1,11 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import React, {
-  useCallback,
-  useMemo,
-  useState,
-  useRef,
-  useContext,
-} from 'react';
+import React, { useCallback, useMemo, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
@@ -25,7 +19,7 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { markUser } from '../../../api/endpoints/user';
 import UserEllipseModal from '../profile/UserEllipseModal';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import { BundlesContext } from '../../../contexts/bundlesContext';
+import { useBundles } from '../../../contexts/bundlesContext';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
@@ -59,7 +53,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
     [usersIBlocked, creator.uuid]
   );
 
-  const { bundles } = useContext(BundlesContext);
+  const { bundles } = useBundles();
   const creatorsBundle = useMemo(
     () => bundles?.find((bundle) => bundle.creator?.uuid === creator.uuid),
     [bundles, creator.uuid]

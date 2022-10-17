@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import React, { useState, useCallback, useEffect, useContext } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
@@ -27,7 +27,7 @@ import BuyBundleModal from '../components/molecules/bundles/BuyBundleModal';
 import BundleCard from '../components/molecules/bundles/BundleCard';
 import BackButton from '../components/molecules/profile/BackButton';
 import AllBundlesModal from '../components/molecules/bundles/AllBundlesModal';
-import { BundlesContext } from '../contexts/bundlesContext';
+import { useBundles } from '../contexts/bundlesContext';
 
 export const Bundles = () => {
   const router = useRouter();
@@ -43,7 +43,7 @@ export const Bundles = () => {
   const [buyBundleCreator, setBuyBundleCreator] = useState<
     newnewapi.IUser | undefined
   >();
-  const { bundles } = useContext(BundlesContext);
+  const { bundles } = useBundles();
 
   const [searchValue, setSearchValue] = useState('');
   const { ref: loadingRef, inView } = useInView();

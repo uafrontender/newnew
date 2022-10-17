@@ -220,4 +220,11 @@ const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
   );
 };
 
-export default BundlesContextProvider;
+export function useBundles() {
+  const context = useContext(BundlesContext);
+  if (!context)
+    throw new Error(
+      'useNotifications must be used inside a `NotificationsProvider`'
+    );
+  return context;
+}

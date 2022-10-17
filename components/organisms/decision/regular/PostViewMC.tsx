@@ -42,7 +42,7 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
-import { BundlesContext } from '../../../../contexts/bundlesContext';
+import { useBundles } from '../../../../contexts/bundlesContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -121,7 +121,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Bundle
-  const { bundles } = useContext(BundlesContext);
+  const { bundles } = useBundles();
   const creatorsBundle = useMemo(
     () =>
       bundles?.find(
