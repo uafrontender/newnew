@@ -18,7 +18,6 @@ import { formatNumber } from '../../../../utils/format';
 import { getMyEarningsByPosts } from '../../../../api/endpoints/payments';
 import getDisplayname from '../../../../utils/getDisplayname';
 import { useAppSelector } from '../../../../redux-store/store';
-import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import PostResponseSuccessModal from './PostResponseSuccessModal';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
@@ -46,7 +45,6 @@ const PostResponseTabModeration: React.FunctionComponent<
 }) => {
   const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
-  const { appConstants } = useGetAppConstants();
 
   const {
     coreResponseUploading,
@@ -89,9 +87,10 @@ const PostResponseTabModeration: React.FunctionComponent<
         true
       )}`;
     }
-    if (postType === 'mc' && winningOptionMc?.voteCount) {
+
+    if (postType === 'mc' && winningOptionMc?.totalAmount?.usdCents) {
       return `$${formatNumber(
-        winningOptionMc.voteCount * Math.round(appConstants.mcVotePrice / 100),
+        winningOptionMc.totalAmount.usdCents / 100 ?? 0,
         true
       )}`;
     }
@@ -102,13 +101,12 @@ const PostResponseTabModeration: React.FunctionComponent<
 
     return '';
   }, [
-    appConstants.mcVotePrice,
     earnedAmount,
     earnedAmountLoading,
     moneyBacked,
     postType,
     winningOptionAc?.totalAmount?.usdCents,
-    winningOptionMc?.voteCount,
+    winningOptionMc?.totalAmount?.usdCents,
   ]);
 
   // Share
@@ -429,12 +427,11 @@ const PostResponseTabModeration: React.FunctionComponent<
             )}
           </SAmountHeadline>
         )}
-        {postType === 'mc' && winningOptionMc?.voteCount && (
+        {postType === 'mc' && winningOptionMc?.totalAmount?.usdCents && (
           <SAmountHeadline variant={1}>
             $
             {formatNumber(
-              winningOptionMc.voteCount *
-                Math.round(appConstants.mcVotePrice / 100),
+              winningOptionMc.totalAmount.usdCents / 100 ?? 0,
               true
             )}
           </SAmountHeadline>
