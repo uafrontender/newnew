@@ -177,57 +177,57 @@ const VerifyEmailVisual: React.FunctionComponent = () => {
   return (
     <SVerifyEmailBgWrapper>
       <img
-        src={assets.floatingAssets.darkBottomGlassSphere}
+        src={assets.floatingAssets.bottomGlassSphere}
         alt='background'
         className='email-bg-BottomGlassSphereImage'
       />
       <img
-        src={assets.floatingAssets.darkBottomSphere}
+        src={assets.floatingAssets.bottomSphere}
         alt='background'
         className='email-bg-BottomSphereImage'
       />
       {/* <img
-        src={assets.floatingAssets.darkCrowdfunding}
+        src={assets.floatingAssets.crowdfunding}
         alt='background'
         className='email-bg-CrowdfundingImage'
       /> */}
       <img
-        src={assets.floatingAssets.darkLeftGlassSphere}
+        src={assets.floatingAssets.leftGlassSphere}
         alt='background'
         className='email-bg-LeftGlassSphereImage'
       />
       <img
-        src={assets.floatingAssets.darkSubMC}
+        src={assets.floatingAssets.subMC}
         alt='background'
         className='email-bg-BulbImage'
       />
       <img
-        src={assets.floatingAssets.darkMultipleChoice}
+        src={assets.floatingAssets.multipleChoice}
         alt='background'
         className='email-bg-ChoiceImage'
       />
       <img
-        src={assets.floatingAssets.darkRightGlassSphere}
+        src={assets.floatingAssets.rightGlassSphere}
         alt='background'
         className='email-bg-RightGlassSphereImage'
       />
       <img
-        src={assets.floatingAssets.darkTopGlassSphere}
+        src={assets.floatingAssets.topGlassSphere}
         alt='background'
         className='email-bg-TopGlassSphereImage'
       />
       <img
-        src={assets.floatingAssets.darkTopMiddleSphere}
+        src={assets.floatingAssets.topMiddleSphere}
         alt='background'
         className='email-bg-TopMiddleSphereImage'
       />
       <img
-        src={assets.floatingAssets.darkBottomSphere}
+        src={assets.floatingAssets.bottomSphere}
         alt='background'
         className='email-bg-BottomMiddleSphereImage'
       />
       <img
-        src={assets.floatingAssets.darkVotes}
+        src={assets.floatingAssets.votes}
         alt='background'
         className='email-bg-VotesImage'
       />
