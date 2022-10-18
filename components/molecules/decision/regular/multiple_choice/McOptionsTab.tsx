@@ -22,7 +22,10 @@ import {
 } from '../../../../../redux-store/store';
 import { validateText } from '../../../../../api/endpoints/infrastructure';
 // import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
-import { voteWithBundleVotes } from '../../../../../api/endpoints/multiple_choice';
+import {
+  doFreeVote,
+  voteWithBundleVotes,
+} from '../../../../../api/endpoints/multiple_choice';
 
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
@@ -45,6 +48,7 @@ import UseBundleVotesModal from './UseBundleVotesModal';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import BuyBundleModal from '../../../bundles/BuyBundleModal';
+import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -121,6 +125,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
   // Payment modal
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+  const [useFreeVoteModalOpen, setUseFreeVoteModalOpen] = useState(false);
   const [useBundleVotesModalOpen, setUseBundleVotesModalOpen] = useState(false);
   const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
@@ -172,6 +177,52 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     },
     [setNewOptionText, validateTextViaAPIDebounced]
   );
+
+  const handleVoteForFree = useCallback(async () => {
+    setUseFreeVoteModalOpen(false);
+    setLoadingModalOpen(true);
+    Mixpanel.track('Vote For Free', {
+      _stage: 'Post',
+      _postUuid: post.postUuid,
+      _component: 'McOptionsTab',
+    });
+    try {
+      const payload = new newnewapi.VoteOnPostRequest({
+        votesCount: appConstants.mcFreeVoteCount,
+        optionText: newOptionText,
+        postUuid: post.postUuid,
+      });
+
+      const res = await doFreeVote(payload);
+
+      if (
+        !res.data ||
+        res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+        res.error
+      ) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+
+      const optionFromResponse = (res.data
+        .option as newnewapi.MultipleChoice.Option)!!;
+      optionFromResponse.isSupportedByMe = true;
+      // optionFromResponse.isCreatedBySubscriber = true;
+      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+      setNewOptionText('');
+      setSuggestNewMobileOpen(false);
+      setLoadingModalOpen(false);
+      setPaymentSuccessModalOpen(true);
+    } catch (err) {
+      console.error(err);
+      setLoadingModalOpen(false);
+      toast.error('toastErrors.generic');
+    }
+  }, [
+    newOptionText,
+    post.postUuid,
+    appConstants.mcFreeVoteCount,
+    handleAddOrUpdateOptionFromResponse,
+  ]);
 
   const handleVoteWithBundleVotes = useCallback(async () => {
     setUseBundleVotesModalOpen(false);
@@ -394,9 +445,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   _postUuid: post.postUuid,
                   _component: 'McOptionsTab',
                 });
-                // TODO: what if there are no more votes available?
-                // Should UI show pay with card modal
-                setUseBundleVotesModalOpen(true);
+                setUseFreeVoteModalOpen(true);
               }}
             >
               {t('mcPost.optionsTab.actionSection.placeABidButton')}
@@ -477,7 +526,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   _postUuid: post.postUuid,
                   _component: 'McOptionsTab',
                 });
-                setUseBundleVotesModalOpen(true);
+                setUseFreeVoteModalOpen(true);
               }}
             >
               {t('mcPost.optionsTab.actionSection.placeABidButton')}
@@ -485,6 +534,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           </SSuggestNewContainer>
         </OptionActionMobileModal>
       ) : null}
+      {/* Use Free vote modal */}
+      <McConfirmUseFreeVoteModal
+        isVisible={useFreeVoteModalOpen}
+        handleMakeFreeVote={handleVoteForFree}
+        closeModal={() => setUseFreeVoteModalOpen(false)}
+      />
       {/* Use bundle vote modal */}
       {bundle && (
         <UseBundleVotesModal

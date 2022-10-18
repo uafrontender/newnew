@@ -418,6 +418,13 @@
           "voteButton": "Vote"
         }
       },
+      "confirmUseFreeVoteModal": {
+        "tag": "Free vote",
+        "line_1": "Ready to use your free vote on this option?",
+        "line_2": "Once you do, you won't be able to change the vote.",
+        "line_3": "You can always buy more votes later if you want to add even more!",
+        "useFreeVoteButton": "Use my free vote"
+      },
       "useBundleVotesModal": {
         "votesAvailable": "<0>{{amount}}</0> votes available",
         "optionTitle": "Superpoll option",
