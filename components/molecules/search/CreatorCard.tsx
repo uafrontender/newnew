@@ -24,13 +24,13 @@ import { useBundles } from '../../../contexts/bundlesContext';
 interface ICreatorCard {
   creator: newnewapi.IUser;
   withEllipseMenu?: boolean;
-  onBuyBundleClicked?: (creator: newnewapi.IUser) => void;
+  onBundleClicked?: (creator: newnewapi.IUser) => void;
 }
 
 export const CreatorCard: React.FC<ICreatorCard> = ({
   creator,
   withEllipseMenu,
-  onBuyBundleClicked,
+  onBundleClicked,
 }) => {
   const { t } = useTranslation('common');
   const router = useRouter();
@@ -156,12 +156,12 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         )}
       </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>
-      {onBuyBundleClicked && (
+      {onBundleClicked && (
         <SButton
           highlighted={!!creatorsBundle}
           onClick={(e) => {
             e.stopPropagation();
-            onBuyBundleClicked(creator);
+            onBundleClicked(creator);
           }}
         >
           {creatorsBundle

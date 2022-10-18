@@ -41,7 +41,7 @@ export const CreatorsList: React.FC<IList> = ({
         <CreatorCard
           creator={creator}
           withEllipseMenu={withEllipseMenu ?? false}
-          onBuyBundleClicked={onBuyBundleClicked}
+          onBundleClicked={onBuyBundleClicked}
         />
       </SItemWrapper>
     );

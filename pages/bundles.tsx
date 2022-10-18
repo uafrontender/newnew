@@ -28,6 +28,7 @@ import BundleCard from '../components/molecules/bundles/BundleCard';
 import BackButton from '../components/molecules/profile/BackButton';
 import AllBundlesModal from '../components/molecules/bundles/AllBundlesModal';
 import { useBundles } from '../contexts/bundlesContext';
+import CreatorsBundleModal from '../components/molecules/bundles/CreatorsBundleModal';
 
 export const Bundles = () => {
   const router = useRouter();
@@ -40,7 +41,10 @@ export const Bundles = () => {
   const isTablet = ['tablet'].includes(ui.resizeMode);
 
   const [allBundlesModalOpen, setAllBundlesModalOpen] = useState(false);
-  const [buyBundleCreator, setBuyBundleCreator] = useState<
+  const [shownCreatorBundle, setShownCreatorBundle] = useState<
+    newnewapi.ICreatorBundle | undefined
+  >();
+  const [offeredCreator, setOfferedCreator] = useState<
     newnewapi.IUser | undefined
   >();
   const { bundles } = useBundles();
@@ -50,12 +54,6 @@ export const Bundles = () => {
 
   const loadCreatorsData = useCallback(
     async (paging: Paging): Promise<PaginatedResponse<newnewapi.IUser>> => {
-      // TODO remove block
-      return {
-        nextData: [],
-        nextPageToken: null,
-      };
-
       const payload = new newnewapi.SearchCreatorsRequest({
         query: searchValue,
         paging,
@@ -69,10 +67,10 @@ export const Bundles = () => {
         throw new Error(res.error?.message ?? 'Request failed');
       }
 
-      /* return {
+      return {
         nextData: res.data.creators,
         nextPageToken: res.data.paging?.nextPageToken,
-      }; */
+      };
     },
     [searchValue]
   );
@@ -169,7 +167,15 @@ export const Bundles = () => {
             loading={paginatedCreators.loading}
             collection={paginatedCreators.data}
             onBuyBundleClicked={(creator) => {
-              setBuyBundleCreator(creator);
+              const creatorsBundle = bundles?.find(
+                (bundle) => bundle.creator?.uuid === creator.uuid
+              );
+
+              if (creatorsBundle) {
+                setShownCreatorBundle(creatorsBundle);
+              } else {
+                setOfferedCreator(creator);
+              }
             }}
           />
         </SCardsSection>
@@ -186,12 +192,25 @@ export const Bundles = () => {
           }}
         />
       )}
-      {buyBundleCreator && (
+      {offeredCreator && (
         <BuyBundleModal
           show
-          creator={buyBundleCreator}
+          creator={offeredCreator}
           onClose={() => {
-            setBuyBundleCreator(undefined);
+            setOfferedCreator(undefined);
+            setShownCreatorBundle(undefined);
+          }}
+        />
+      )}
+      {shownCreatorBundle && (
+        <CreatorsBundleModal
+          show
+          creatorsBundle={shownCreatorBundle}
+          onBuyMore={() => {
+            setOfferedCreator(shownCreatorBundle.creator!);
+          }}
+          onClose={() => {
+            setShownCreatorBundle(undefined);
           }}
         />
       )}
