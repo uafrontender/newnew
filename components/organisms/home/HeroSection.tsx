@@ -4,7 +4,6 @@ import { scroller } from 'react-scroll';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import Head from 'next/head';
 
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
@@ -65,27 +64,6 @@ export const HeroSection = React.memo(() => {
 
   return (
     <>
-      <Head>
-        {/* We need to change page colors to fit landing page animation dark mode background */}
-        {theme.name === 'dark' && (
-          <style
-            dangerouslySetInnerHTML={{
-              __html: `
-              body {
-                background-color: #090813 !important;
-              }
-
-              #top-nav-header {
-                background-color: #090813 !important;
-              }
-
-              #top-nav-header-wrapper {
-                background-color: #090813 !important;
-              }`,
-            }}
-          />
-        )}
-      </Head>
       <SWrapper
         // I believe can be commented out now as there's no need for an animation
         // layoutId='heroSection'

@@ -40,8 +40,9 @@ export const Earnings: React.FC<IFunctionProps> = ({
   const { t } = useTranslation('page-Creator');
   const [filter, setFilter] = useState<EarningsFilterType>('7_days');
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
-  const [myEarnings, setMyEarnings] =
-    useState<newnewapi.GetMyEarningsResponse | undefined>();
+  const [myEarnings, setMyEarnings] = useState<
+    newnewapi.GetMyEarningsResponse | undefined
+  >();
   const [totalEarnings, setTotalEarnings] = useState<number | null>(null);
   const [initialLoad, setInitialLoad] = useState(true);
 
@@ -87,8 +88,8 @@ export const Earnings: React.FC<IFunctionProps> = ({
       let sum = 0;
       if (myEarnings.auEarnings?.usdCents)
         sum += myEarnings.auEarnings?.usdCents;
-      if (myEarnings.cfEarnings?.usdCents)
-        sum += myEarnings.cfEarnings?.usdCents;
+      // if (myEarnings.cfEarnings?.usdCents)
+      //   sum += myEarnings.cfEarnings?.usdCents;
       if (myEarnings.mcEarnings?.usdCents)
         sum += myEarnings.mcEarnings?.usdCents;
       if (myEarnings.subsEarnings?.usdCents)
@@ -102,14 +103,11 @@ export const Earnings: React.FC<IFunctionProps> = ({
       {
         id: 'ac',
       },
-      {
-        id: 'cf',
-      },
+      // {
+      //   id: 'cf',
+      // },
       {
         id: 'mc',
-      },
-      {
-        id: 'subscriptions',
       },
     ],
     []
@@ -171,14 +169,6 @@ export const Earnings: React.FC<IFunctionProps> = ({
               )}`
             : '$0.00';
 
-        case 'subscriptions':
-          return myEarnings?.subsEarnings?.usdCents
-            ? `$${formatNumber(
-                myEarnings.subsEarnings.usdCents / 100 ?? 0,
-                false
-              )}`
-            : '$0.00';
-
         default:
           return '$0.00';
       }
@@ -235,17 +225,6 @@ export const Earnings: React.FC<IFunctionProps> = ({
           </STotal>
           <STotalText weight={600}>{splitPeriod()}</STotalText>
         </STotalTextWrapper>
-        {/* <STotalInsights>
-          <STotalInsightsText>
-            {t(`dashboard.earnings.${isMobile ? 'insights' : 'insightsTablet'}`)}
-          </STotalInsightsText>
-          <STotalInsightsArrow
-            svg={arrowRightIcon}
-            fill={theme.colorsThemed.text.secondary}
-            width="24px"
-            height="24px"
-          />
-        </STotalInsights> */}
       </STotalLine>
       <SListHolder>{collection.map(renderListItem)}</SListHolder>
       {isLoading || initialLoad ? (
@@ -343,18 +322,6 @@ const STotalInsights = styled.div`
   flex-direction: row;
 `;
 
-// const STotalInsightsText = styled.div`
-//   color: ${(props) => props.theme.colorsThemed.text.secondary};
-//   font-size: 14px;
-//   line-height: 24px;
-//   margin-right: 4px;
-// `;
-
-// const STotalInsightsArrow = styled(InlineSVG)`
-//   min-width: 24px;
-//   min-height: 24px;
-// `;
-
 const SListHolder = styled.div`
   left: -8px;
   width: calc(100% + 16px);
@@ -377,12 +344,12 @@ const SListItem = styled.div`
   border-radius: 16px;
 
   ${(props) => props.theme.media.tablet} {
-    width: calc(25% - 12px);
+    width: calc(33.33% - 12px);
     margin: 6px;
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: calc(25% - 20px);
+    width: calc(33.33% - 20px);
     margin: 10px;
   }
 `;

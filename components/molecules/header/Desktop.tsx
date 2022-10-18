@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -11,13 +11,9 @@ import SearchInput from '../../atoms/search/SearchInput';
 import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
-// import { WalletContext } from '../../../contexts/walletContext';
-import { RewardContext } from '../../../contexts/rewardContext';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
-import { useGetAppConstants } from '../../../contexts/appConstantsContext';
-import RewardButton from '../RewardButton';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 export const Desktop: React.FC = React.memo(() => {
@@ -27,9 +23,6 @@ export const Desktop: React.FC = React.memo(() => {
   const { unreadCount } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const { globalSearchActive } = useAppSelector((state) => state.ui);
-  // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
-  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
-  const { currentSignupRewardAmount } = useGetAppConstants().appConstants;
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -95,21 +88,6 @@ export const Desktop: React.FC = React.memo(() => {
                 }}
               />
             </SItemWithMargin>
-            {/* {user.userData?.options?.isCreator && !isBalanceLoading && (
-              <SItemWithMargin>
-                <NavigationItem
-                  item={{
-                    url: '/profile/settings',
-                    key: 'my-balance',
-                    value:
-                      walletBalance && walletBalance?.usdCents !== undefined
-                        ? parseInt((walletBalance.usdCents / 100).toFixed(0)) ??
-                          0
-                        : undefined,
-                  }}
-                />
-              </SItemWithMargin>
-            )} */}
           </>
         )}
         <SItemWithMargin>
@@ -160,13 +138,7 @@ export const Desktop: React.FC = React.memo(() => {
                   </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      user.userData?.options?.isCreator
-                        ? '/profile/my-posts'
-                        : '/profile'
-                    }
-                  >
+                  <Link href='/profile/my-posts'>
                     <a>
                       <UserAvatar
                         withClick
@@ -194,14 +166,8 @@ export const Desktop: React.FC = React.memo(() => {
                   </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      user.userData?.options?.isCreator
-                        ? '/profile/my-posts'
-                        : '/profile'
-                    }
-                  >
-                    <a>
+                  <Link href='/profile'>
+                    <a id='profile-link'>
                       <UserAvatar
                         withClick
                         avatarUrl={user.userData?.avatarUrl}
@@ -211,14 +177,6 @@ export const Desktop: React.FC = React.memo(() => {
                 </SItemWithMargin>
               </>
             )}
-            <SItemWithMargin>
-              <RewardButton
-                balance={
-                  rewardBalance ? rewardBalance.usdCents / 100 : undefined
-                }
-                loading={isRewardBalanceLoading}
-              />
-            </SItemWithMargin>
           </>
         ) : (
           <>
@@ -243,6 +201,7 @@ export const Desktop: React.FC = React.memo(() => {
               <Link href='/sign-up?to=create'>
                 <a>
                   <Button
+                    id='log-in-to-create'
                     withDim
                     withShrink
                     withShadow
@@ -258,18 +217,6 @@ export const Desktop: React.FC = React.memo(() => {
                 </a>
               </Link>
             </SItemWithMargin>
-            {currentSignupRewardAmount ? (
-              <SItemWithMargin>
-                <RewardButton
-                  balance={
-                    currentSignupRewardAmount.usdCents
-                      ? currentSignupRewardAmount.usdCents / 100
-                      : undefined
-                  }
-                  offer
-                />
-              </SItemWithMargin>
-            ) : null}
           </>
         )}
       </SRightBlock>

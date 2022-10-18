@@ -56,7 +56,11 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
             {t(`paymentSuccessModal.title.${postType}`)}
           </SModalTitle>
           <SModalMessage>{children}</SModalMessage>
-          <SDoneButton onClick={closeModal} view='primaryGrad'>
+          <SDoneButton
+            id='paymentSuccess'
+            onClick={closeModal}
+            view='primaryGrad'
+          >
             {t('paymentSuccessModal.doneButton')}
           </SDoneButton>
         </SModal>

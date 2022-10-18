@@ -1,17 +1,11 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-
-import { useAppSelector } from '../../../../../redux-store/store';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
 import Modal from '../../../../organisms/Modal';
 import Headline from '../../../../atoms/Headline';
-import VotesAmountInputModal from '../../../../atoms/decision/VotesAmountInputModal';
 
 // Icons
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
@@ -22,105 +16,24 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 interface IMcConfirmVoteModal {
   isOpen: boolean;
   zIndex: number;
-  minAmount: number;
-  votePrice: number;
   postCreator: string;
   optionText: string;
-  predefinedAmount: boolean;
   supportVotesAmount: string;
   onClose: () => void;
-  handleSetSupportVotesAmount: (newAmount: string) => void;
   handleOpenPaymentModal: () => void;
 }
 
 const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
   isOpen,
   zIndex,
-  minAmount,
-  votePrice,
   postCreator,
   optionText,
-  predefinedAmount,
   supportVotesAmount,
   onClose,
-  handleSetSupportVotesAmount,
   handleOpenPaymentModal,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
-
-  if (predefinedAmount) {
-    return (
-      <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
-        <SWrapper>
-          <SContentContainer
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <SCloseButton
-              iconOnly
-              view='transparent'
-              onClick={onClose}
-              onClickCapture={() => {
-                Mixpanel.track('Close McConfirmVoteModal', {
-                  _stage: 'Post',
-                  _component: 'McConfirmVoteModal',
-                });
-              }}
-            >
-              <InlineSvg
-                svg={CancelIcon}
-                fill={theme.colorsThemed.text.primary}
-                width='24px'
-                height='24px'
-              />
-            </SCloseButton>
-            <SImageContainer>
-              <img src={assets.decision.votes} alt='votes' />
-            </SImageContainer>
-            <SHeadline variant={4}>
-              {supportVotesAmount}{' '}
-              {parseInt(supportVotesAmount) === 1
-                ? t('mcPost.optionsTab.optionCard.confirmVoteModal.vote')
-                : t('mcPost.optionsTab.optionCard.confirmVoteModal.votes')}
-            </SHeadline>
-            <SCreatorsText variant={2}>
-              {parseInt(supportVotesAmount) === 1
-                ? t(
-                    'mcPost.optionsTab.optionCard.confirmVoteModal.buySingleVote',
-                    { creator: postCreator }
-                  )
-                : t(
-                    'mcPost.optionsTab.optionCard.confirmVoteModal.buyMultipleVotes',
-                    { creator: postCreator, amount: supportVotesAmount }
-                  )}
-            </SCreatorsText>
-            <SCaption variant={3}>
-              {t('mcPost.optionsTab.optionCard.confirmVoteModal.optionCaption')}
-            </SCaption>
-            <SOptionText variant={2}>{optionText}</SOptionText>
-            <SVoteButton
-              view='primary'
-              onClickCapture={() => {
-                Mixpanel.track('Submit Votes Amount and Open Payment Modal', {
-                  _stage: 'Post',
-                  _component: 'McConfirmVoteModal',
-                });
-              }}
-              onClick={() => handleOpenPaymentModal()}
-            >
-              {t('mcPost.optionsTab.optionCard.confirmVoteModal.voteButton')}
-            </SVoteButton>
-          </SContentContainer>
-        </SWrapper>
-      </Modal>
-    );
-  }
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
@@ -152,57 +65,29 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
             <img src={assets.decision.votes} alt='votes' />
           </SImageContainer>
           <SHeadline variant={4}>
-            {t('mcPost.optionsTab.optionCard.confirmVoteModal.custom')}
+            {supportVotesAmount}{' '}
+            {parseInt(supportVotesAmount) === 1
+              ? t('mcPost.optionsTab.optionCard.confirmVoteModal.vote')
+              : t('mcPost.optionsTab.optionCard.confirmVoteModal.votes')}
           </SHeadline>
           <SCreatorsText variant={2}>
-            {t('mcPost.optionsTab.optionCard.confirmVoteModal.buyAnyVotes', {
-              creator: postCreator,
-            })}
+            {parseInt(supportVotesAmount) === 1
+              ? t(
+                  'mcPost.optionsTab.optionCard.confirmVoteModal.buySingleVote',
+                  { creator: postCreator }
+                )
+              : t(
+                  'mcPost.optionsTab.optionCard.confirmVoteModal.buyMultipleVotes',
+                  { creator: postCreator, amount: supportVotesAmount }
+                )}
           </SCreatorsText>
           <SCaption variant={3}>
             {t('mcPost.optionsTab.optionCard.confirmVoteModal.optionCaption')}
           </SCaption>
           <SOptionText variant={2}>{optionText}</SOptionText>
-          <VotesAmountInputModal
-            value={supportVotesAmount}
-            inputAlign='left'
-            placeholder={
-              minAmount > 1
-                ? t(
-                    'mcPost.optionsTab.actionSection.votesAmount.placeholder.votes'
-                  )
-                : t(
-                    'mcPost.optionsTab.actionSection.votesAmount.placeholder.vote'
-                  )
-            }
-            pseudoPlaceholder={
-              !supportVotesAmount || parseInt(supportVotesAmount) > 1
-                ? t(
-                    'mcPost.optionsTab.actionSection.votesAmount.placeholder.votes'
-                  )
-                : t(
-                    'mcPost.optionsTab.actionSection.votesAmount.placeholder.vote'
-                  )
-            }
-            onChange={(newValue: string) =>
-              handleSetSupportVotesAmount(newValue)
-            }
-            bottomPlaceholder={
-              !supportVotesAmount || parseInt(supportVotesAmount) === 1
-                ? `${1} ${t(
-                    'mcPost.optionsTab.actionSection.votesAmount.placeholder.vote'
-                  )} = $ ${1 * votePrice}`
-                : `${supportVotesAmount} ${t(
-                    'mcPost.optionsTab.actionSection.votesAmount.placeholder.votes'
-                  )} = $ ${parseInt(supportVotesAmount) * votePrice}`
-            }
-            minAmount={minAmount}
-          />
           <SVoteButton
+            id='confirm-vote'
             view='primary'
-            disabled={
-              !supportVotesAmount || parseInt(supportVotesAmount) < minAmount
-            }
             onClickCapture={() => {
               Mixpanel.track('Submit Votes Amount and Open Payment Modal', {
                 _stage: 'Post',

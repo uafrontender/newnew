@@ -66,8 +66,9 @@ export const SearchResults = () => {
             active={activeTab === tab.id}
             key={tab.id}
             onClick={() => {
+              const clearedQuery = encodeURIComponent(searchValue);
               router.push(
-                `/search?query=${searchValue}&type=${searchType}&tab=${tab.id}`
+                `/search?query=${clearedQuery}&type=${searchType}&tab=${tab.id}`
               );
             }}
           >
@@ -157,6 +158,7 @@ const SHashtag = styled.span`
 `;
 
 const Query = styled.span`
+  overflow-wrap: break-word;
   color: ${(props) => props.theme.colorsThemed.text.primary};
 `;
 

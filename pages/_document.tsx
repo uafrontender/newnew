@@ -71,6 +71,7 @@ export default class MyDocument extends Document {
             src={`https://widget.usersnap.com/global/load/${process.env.NEXT_PUBLIC_USERSNAP_GLOBAL_API_KEY}?onload=onUsersnapCXLoad`}
           />
           <script
+            // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
               __html: `
                 window.onUsersnapCXLoad = function(api) {

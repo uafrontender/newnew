@@ -1,14 +1,13 @@
 import React, {
   useState,
   useMemo,
-  useContext,
   useEffect,
   useCallback,
+  useRef,
 } from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import styled from 'styled-components';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import styled, { useTheme } from 'styled-components';
 import { toast } from 'react-toastify';
 import {
   PaymentElement,
@@ -16,10 +15,10 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js';
 import { StripePaymentElementOptions } from '@stripe/stripe-js';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
-import Toggle from '../../atoms/Toggle';
 import OptionCard from './OptionCard';
 import Input from '../../atoms/Input';
 import CheckMark from '../CheckMark';
@@ -27,10 +26,9 @@ import CheckMark from '../CheckMark';
 import { formatNumber } from '../../../utils/format';
 import { useCards } from '../../../contexts/cardsContext';
 import { useAppSelector } from '../../../redux-store/store';
-import { RewardContext } from '../../../contexts/rewardContext';
-import assets from '../../../constants/assets';
-import { IReCaptchaRes } from '../../interfaces/reCaptcha';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
+import useRecaptcha from '../../../utils/hooks/useRecaptcha';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 // eslint-disable-next-line no-shadow
 enum PaymentMethodTypes {
@@ -42,7 +40,6 @@ interface ICheckoutForm {
   setupIntent: ISetupIntent;
   redirectUrl: string;
   amount?: number;
-  noRewards?: boolean;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
   handlePayWithCard?: (params: {
@@ -55,29 +52,26 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   setupIntent,
   redirectUrl,
   amount,
-  noRewards,
   showTocApply,
   bottomCaption,
   handlePayWithCard,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
   const { loggedIn } = useAppSelector((state) => state.user);
+  const { appConstants } = useGetAppConstants();
 
   const [isStripeReady, setIsStripeReady] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
     PaymentMethodTypes | undefined
   >();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveCard, setSaveCard] = useState(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [useRewards, setUseRewards] = useState(false);
 
-  const { rewardBalance, isRewardBalanceLoading } = useContext(RewardContext);
   const elements = useElements();
   const { cards } = useCards();
   const stripe = useStripe();
-  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const primaryCard = useMemo(
     () => cards?.find((card) => card.isPrimary),
@@ -90,11 +84,6 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     }
   }, [selectedPaymentMethod, primaryCard]);
 
-  const rewardUsed =
-    useRewards && rewardBalance?.usdCents && amount
-      ? Math.min(rewardBalance.usdCents, amount)
-      : 0;
-
   const toggleSaveCard = useCallback(() => {
     setSaveCard((prevState) => !prevState);
   }, []);
@@ -104,9 +93,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     setEmailError('');
   };
 
-  const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     try {
       if (!stripe || !elements) {
         throw new Error('Stripe initialization error');
@@ -117,189 +104,149 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         return;
       }
 
-      if (!executeRecaptcha) {
-        throw new Error('executeRecaptcha not available');
-      }
-
-      setIsSubmitting(true);
-
-      const recaptchaToken = await executeRecaptcha();
-
-      if (recaptchaToken) {
-        const res = await fetch('/api/post_recaptcha_query', {
-          method: 'POST',
-          body: JSON.stringify({
-            recaptchaToken,
-          }),
+      // pay with primary card
+      if (
+        selectedPaymentMethod === PaymentMethodTypes.PrimaryCard &&
+        primaryCard
+      ) {
+        await handlePayWithCard?.({
+          cardUuid: primaryCard.cardUuid as string,
         });
 
-        const jsonRes: IReCaptchaRes = await res.json();
+        // pay with new card
+      } else if (
+        selectedPaymentMethod === PaymentMethodTypes.NewCard ||
+        !primaryCard
+      ) {
+        if (!loggedIn) {
+          const { errorKey } = await setupIntent.update({
+            email,
+            saveCard,
+          });
 
-        if (jsonRes?.success && jsonRes?.score && jsonRes?.score > 0.5) {
-          // save used rewards amount
-          if (rewardUsed > 0) {
-            const { errorKey } = await setupIntent.update({
-              ...(rewardUsed > 0 ? { rewardAmount: rewardUsed } : {}),
-            });
-
-            if (errorKey) {
-              throw new Error(t(errorKey));
-            }
+          if (errorKey) {
+            throw new Error(t(errorKey));
           }
-
-          // pay with rewards amount only
-          if (amount && rewardUsed >= amount && primaryCard) {
-            await handlePayWithCard?.({
-              cardUuid: primaryCard.cardUuid as string,
-            });
-            return;
-          }
-
-          // pay with primary card
-          if (
-            selectedPaymentMethod === PaymentMethodTypes.PrimaryCard &&
-            primaryCard
-          ) {
-            await handlePayWithCard?.({
-              cardUuid: primaryCard.cardUuid as string,
-            });
-
-            // pay with new card
-          } else if (
-            selectedPaymentMethod === PaymentMethodTypes.NewCard ||
-            !primaryCard
-          ) {
-            if (!loggedIn) {
-              const { errorKey } = await setupIntent.update({
-                email,
-                saveCard,
-              });
-
-              if (errorKey) {
-                throw new Error(t(errorKey));
-              }
-            }
-
-            const { error } = await stripe.confirmSetup({
-              elements,
-              confirmParams: {
-                return_url: `${process.env.NEXT_PUBLIC_APP_URL}/${redirectUrl}?save_card=${saveCard}`,
-              },
-              redirect: 'if_required',
-            });
-
-            if (error) {
-              throw new Error(error.message);
-            }
-
-            await handlePayWithCard?.({
-              saveCard,
-            });
-          }
-        } else {
-          throw new Error(
-            // eslint-disable-next-line no-nested-ternary
-            jsonRes?.errors
-              ? Array.isArray(jsonRes?.errors)
-                ? jsonRes.errors[0]?.toString()
-                : jsonRes.errors?.toString()
-              : 'ReCaptcha failed'
-          );
         }
+
+        const { error } = await stripe.confirmSetup({
+          elements,
+          confirmParams: {
+            return_url: `${process.env.NEXT_PUBLIC_APP_URL}/${redirectUrl}?save_card=${saveCard}`,
+          },
+          redirect: 'if_required',
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        await handlePayWithCard?.({
+          saveCard,
+        });
       }
     } catch (err: any) {
-      toast.error(err.message);
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
+      if ((err.type && err.type === 'card_error') || !err.type) {
+        toast.error(err.message);
+      }
+      console.error(err, 'err');
     }
   };
 
+  const recaptchaRef = useRef(null);
+
+  const {
+    onChangeRecaptchaV2,
+    isRecaptchaV2Required,
+    submitWithRecaptchaProtection,
+    isSubmitting,
+    errorMessage: recaptchaErrorMessage,
+  } = useRecaptcha(handleSubmit, 0.5, 0.1, recaptchaRef);
+
+  useEffect(() => {
+    if (recaptchaErrorMessage) {
+      toast.error(recaptchaErrorMessage);
+    }
+  }, [recaptchaErrorMessage]);
+
   const paymentElementOptions: StripePaymentElementOptions = useMemo(
-    () => ({ terms: { card: 'never' } }),
+    () => ({
+      terms: { card: 'never' },
+      wallets: {
+        googlePay: 'never',
+        applePay: 'never',
+      },
+    }),
     []
   );
 
   return (
-    <SForm onSubmit={handleSubmit}>
-      {/* Rewards */}
-      {!noRewards && !!rewardBalance?.usdCents && (
-        <RewardContainer>
-          <RewardImage src={assets.decision.gold} alt='reward balance' />
-          <RewardText>{t('rewardsText')}</RewardText>
-          <RewardBalance>
-            $
-            {rewardBalance?.usdCents
-              ? Math.round(rewardBalance.usdCents / 100)
-              : 0}
-          </RewardBalance>
-          <Toggle
-            checked={useRewards}
-            disabled={isRewardBalanceLoading}
-            onChange={() => {
-              setUseRewards((curr) => !curr);
-            }}
+    <SForm id='checkout-form' onSubmit={submitWithRecaptchaProtection}>
+      {/* Payment method */}
+      <Text variant='subtitle'>{t('paymentMethodTitle')}</Text>
+      {primaryCard && (
+        <>
+          <OptionCard
+            handleClick={() =>
+              setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard)
+            }
+            selected={selectedPaymentMethod === PaymentMethodTypes.PrimaryCard}
+            label={`${t('primaryCard')} **** ${primaryCard.last4}`}
           />
-        </RewardContainer>
+          <OptionCard
+            handleClick={() =>
+              setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
+            }
+            selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
+            label={t('newCard')}
+          />
+        </>
       )}
 
-      {/* Payment method */}
-      {!(amount && rewardUsed >= amount && primaryCard) && (
-        <>
-          <Text variant='subtitle'>{t('paymentMethodTitle')}</Text>
-          {primaryCard && (
-            <>
-              <OptionCard
-                handleClick={() =>
-                  setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard)
-                }
-                selected={
-                  selectedPaymentMethod === PaymentMethodTypes.PrimaryCard
-                }
-                label={`${t('primaryCard')} **** ${primaryCard.last4}`}
-              />
-              <OptionCard
-                handleClick={() =>
-                  setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
-                }
-                selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
-                label={t('newCard')}
-              />
-            </>
+      {(selectedPaymentMethod === PaymentMethodTypes.NewCard ||
+        !primaryCard) && (
+        <SPaymentFormWrapper isSingleForm={!primaryCard}>
+          {!loggedIn && isStripeReady && (
+            <SEmailInput
+              id='email-input'
+              value={email}
+              isValid={email.length > 0 && !emailError}
+              onChange={handleSetEmail}
+              placeholder={t('email')}
+              type='email'
+              errorCaption={emailError}
+            />
           )}
+          <PaymentElement
+            id='stripePayment'
+            onReady={() => setIsStripeReady(true)}
+            options={paymentElementOptions}
+          />
+          {/* Show save toggle only if user already has primary card otherwise card will be saved in any case */}
+          {isStripeReady && primaryCard && (
+            <SSaveCard>
+              <CheckMark
+                selected={saveCard}
+                handleChange={toggleSaveCard}
+                label={t('saveCard')}
+                variant={2}
+                size='small'
+              />
+            </SSaveCard>
+          )}
+        </SPaymentFormWrapper>
+      )}
 
-          {(selectedPaymentMethod === PaymentMethodTypes.NewCard ||
-            !primaryCard) && (
-            <SPaymentFormWrapper isSingleForm={!primaryCard}>
-              {!loggedIn && isStripeReady && (
-                <SEmailInput
-                  value={email}
-                  isValid={email.length > 0 && !emailError}
-                  onChange={handleSetEmail}
-                  placeholder={t('email')}
-                  type='email'
-                  errorCaption={emailError}
-                />
-              )}
-              <PaymentElement
-                onReady={() => setIsStripeReady(true)}
-                options={paymentElementOptions}
-              />
-              {/* Show save toggle only if user already has primary card otherwise card will be saved in any case */}
-              {isStripeReady && primaryCard && (
-                <SSaveCard>
-                  <CheckMark
-                    selected={saveCard}
-                    handleChange={toggleSaveCard}
-                    label={t('saveCard')}
-                    variant={2}
-                    size='small'
-                  />
-                </SSaveCard>
-              )}
-            </SPaymentFormWrapper>
-          )}
-        </>
+      {isRecaptchaV2Required && (
+        <SRecaptchaWrapper>
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            size='normal'
+            theme={theme.name === 'dark' ? 'dark' : 'light'}
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY ?? ''}
+            onChange={onChangeRecaptchaV2}
+          />
+        </SRecaptchaWrapper>
       )}
 
       <SPayButtonDiv>
@@ -307,16 +254,17 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           type='submit'
           id='pay'
           view='primaryGrad'
-          disabled={primaryCard ? !selectedPaymentMethod : false}
+          disabled={
+            primaryCard ? !selectedPaymentMethod || isSubmitting : isSubmitting
+          }
           loading={isSubmitting}
         >
           {t('payButton')}
-          {amount &&
-            ` $${formatNumber(
-              Math.max(amount - rewardUsed, 0) / 100,
-              amount % 1 === 0
-            )}`}
+          {amount && ` $${formatNumber(amount / 100, amount % 1 === 0)}`}
         </SPayButton>
+        <SFeeHint variant='subtitle'>{`${t('processingFee')}: ${(
+          parseFloat(appConstants.customerFee) * 100
+        ).toFixed(2)}%`}</SFeeHint>
         {bottomCaption || null}
         {showTocApply && (
           <STocApply>
@@ -393,53 +341,14 @@ const SEmailInput = styled(Input)`
   }
 `;
 
-const RewardContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  border: 1px solid;
-  border-color: ${({ theme }) => theme.colorsThemed.text.primary};
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-  height: 78px;
-  margin-bottom: 16px;
-  padding-left: 16px;
-  padding-right: 18px;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 24px;
-    padding-left: 20px;
-    padding-right: 30px;
-  }
-`;
-
-const RewardImage = styled.img`
-  height: 40px;
-  width: 40px;
-  margin-right: 16px;
-  object-fit: cover;
-`;
-
-const RewardText = styled.div`
-  ${({ theme }) => theme.colorsThemed.text.primary};
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-  margin-right: 8px;
-  flex-grow: 1;
-`;
-
-const RewardBalance = styled.div`
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 32px;
-  margin-right: 20px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
+const SRecaptchaWrapper = styled.div`
+  margin-top: 20px;
+  z-index: 20;
 `;
 
 const SPayButtonDiv = styled.div`
   width: 100%;
-  margin-top: auto;
+  margin-top: 40px;
   margin-bottom: 24px;
 
   ${({ theme }) => theme.media.tablet} {
@@ -450,6 +359,12 @@ const SPayButtonDiv = styled.div`
 
 const SPayButton = styled(Button)`
   width: 100%;
+`;
+
+const SFeeHint = styled(Text)`
+  margin-top: 8px;
+  text-align: center;
+  text-transform: capitalize;
 `;
 
 const STocApply = styled.div`

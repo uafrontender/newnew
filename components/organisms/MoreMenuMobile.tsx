@@ -45,6 +45,11 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
     router.push(`/${url}`);
   };
 
+  const handleCloseShareMenu = () => {
+    setShareMenuOpen(false);
+    handleClose();
+  };
+
   return (
     <AnimatePresence>
       {isVisible && (
@@ -108,7 +113,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
           ) : (
             <ShareMenu
               isVisible={shareMenuOpen}
-              handleClose={() => setShareMenuOpen(false)}
+              handleClose={handleCloseShareMenu}
             />
           )}
         </SContainer>

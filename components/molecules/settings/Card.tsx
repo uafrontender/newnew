@@ -131,38 +131,34 @@ const Card: React.FunctionComponent<ICard> = ({
             </SCardPrimaryText>
           </SLabel>
         )}
-        {!isPrimary && (
-          <>
-            <SMoreButton
-              view='quaternary'
-              iconOnly
-              onClick={() => setIsEllipseMenuOpen(true)}
-              ref={moreButtonRef as any}
-            >
-              <InlineSvg svg={MoreIconFilled} width='14px' height='14px' />
-            </SMoreButton>
+        <SMoreButton
+          view='quaternary'
+          iconOnly
+          onClick={() => setIsEllipseMenuOpen(true)}
+          ref={moreButtonRef as any}
+        >
+          <InlineSvg svg={MoreIconFilled} width='14px' height='14px' />
+        </SMoreButton>
 
-            {!isMobile && (
-              <CardEllipseMenu
-                isVisible={isEllipseMenuOpen}
-                isPrimary={isPrimary}
-                handleClose={() => setIsEllipseMenuOpen(false)}
-                anchorElement={moreButtonRef.current}
-                onSetPrimaryCard={handelSetPrimaryCard}
-                onDeleteCard={handleDeleteCard}
-              />
-            )}
-            {isMobile && (
-              <CardEllipseModal
-                isOpen={isEllipseMenuOpen}
-                zIndex={10}
-                isPrimary={isPrimary}
-                onClose={() => setIsEllipseMenuOpen(false)}
-                onSetPrimaryCard={handelSetPrimaryCard}
-                onDeleteCard={handleDeleteCard}
-              />
-            )}
-          </>
+        {!isMobile && (
+          <CardEllipseMenu
+            isVisible={isEllipseMenuOpen}
+            isPrimary={isPrimary}
+            handleClose={() => setIsEllipseMenuOpen(false)}
+            anchorElement={moreButtonRef.current}
+            onSetPrimaryCard={handelSetPrimaryCard}
+            onDeleteCard={handleDeleteCard}
+          />
+        )}
+        {isMobile && (
+          <CardEllipseModal
+            isOpen={isEllipseMenuOpen}
+            zIndex={10}
+            isPrimary={isPrimary}
+            onClose={() => setIsEllipseMenuOpen(false)}
+            onSetPrimaryCard={handelSetPrimaryCard}
+            onDeleteCard={handleDeleteCard}
+          />
         )}
       </STopLine>
       <SCardMainInfo>

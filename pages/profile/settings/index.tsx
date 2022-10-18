@@ -1,11 +1,5 @@
 /* eslint-disable react/jsx-no-target-blank */
-import React, {
-  ReactElement,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
@@ -42,7 +36,6 @@ import MyProfileSettingsLayout from '../../../components/templates/MyProfileSett
 import Headline from '../../../components/atoms/Headline';
 import GoBackButton from '../../../components/molecules/GoBackButton';
 import SettingsColorModeSwitch from '../../../components/molecules/profile/SettingsColorModeSwitch';
-// import SettingsWallet from '../../components/organisms/settings/SettingsWallet';
 import SettingsAccordion, {
   AccordionSection,
 } from '../../../components/organisms/settings/SettingsAccordion';
@@ -51,7 +44,6 @@ import SettingsNotificationsSection from '../../../components/organisms/settings
 import SettingsCardsSection from '../../../components/organisms/settings/SettingsCards';
 import TransactionsSection from '../../../components/organisms/settings/TransactionsSection';
 import PrivacySection from '../../../components/organisms/settings/PrivacySection';
-import { SocketContext } from '../../../contexts/socketContext';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { getMyTransactions } from '../../../api/endpoints/payments';
 import assets from '../../../constants/assets';
@@ -66,8 +58,6 @@ const MyProfileSettingsIndex = () => {
   // const { t: commonT } = useTranslation('common');
   // useCookies
   const [, , removeCookie] = useCookies();
-  // Socket
-  const socketConnection = useContext(SocketContext);
   // Redux
   const dispatch = useAppDispatch();
 
@@ -212,10 +202,12 @@ const MyProfileSettingsIndex = () => {
 
   const accordionSections: AccordionSection[] = [
     {
+      id: 'cards',
       title: t('Settings.sections.cards.title'),
       content: <SettingsCardsSection />,
     },
     {
+      id: 'info',
       title: t('Settings.sections.personalInformation.title'),
       content: (
         <SettingsPersonalInformationSection
@@ -245,10 +237,12 @@ const MyProfileSettingsIndex = () => {
       ),
     },
     {
+      id: 'notifications',
       title: t('Settings.sections.notifications.title'),
       content: <SettingsNotificationsSection />,
     },
     {
+      id: 'transactions',
       title: t('Settings.sections.transactions.title'),
       content: (
         <TransactionsSection
@@ -261,6 +255,7 @@ const MyProfileSettingsIndex = () => {
       hidden: myTransactionsTotal === 0,
     },
     {
+      id: 'privacy',
       title: t('Settings.sections.privacy.title'),
       content: (
         <PrivacySection
@@ -288,33 +283,6 @@ const MyProfileSettingsIndex = () => {
     fetchMyTransactions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Listen to Me update event
-  useEffect(() => {
-    const handlerSocketMeUpdated = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.MeUpdated.decode(arr);
-
-      if (!decoded) return;
-
-      dispatch(
-        setUserData({
-          email: decoded.me?.email,
-        })
-      );
-    };
-
-    if (socketConnection) {
-      socketConnection?.on('MeUpdated', handlerSocketMeUpdated);
-    }
-
-    return () => {
-      if (socketConnection && socketConnection?.connected) {
-        socketConnection?.off('MeUpdated', handlerSocketMeUpdated);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection]);
 
   useEffect(() => {
     async function fetchUsersIBlocked() {
@@ -397,7 +365,6 @@ const MyProfileSettingsIndex = () => {
               : {}),
           }}
         />
-        {/* <SettingsWallet /> */}
         <SettingsAccordion sections={accordionSections} />
         <SBottomLinksDiv>
           {/* TEMP */}

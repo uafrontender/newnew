@@ -1,10 +1,6 @@
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   ReactElement,
   useCallback,
-  // useContext,
   useEffect,
   useMemo,
   useState,
@@ -14,7 +10,6 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import Link from 'next/link';
 import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../redux-store/store';
@@ -27,7 +22,6 @@ import Headline from '../atoms/Headline';
 import InlineSvg from '../atoms/InlineSVG';
 import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
-import ErrorBoundary from '../organisms/ErrorBoundary';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
 
 // Icons
@@ -46,13 +40,14 @@ import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
 import BackButton from '../molecules/profile/BackButton';
-import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
-import UnsubscribeModal from '../molecules/profile/UnsubscribeModal';
 import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
 import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 import CustomLink from '../atoms/CustomLink';
+import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+import SmsNotificationsButton from '../molecules/profile/SmsNotificationsButton';
+import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -92,13 +87,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
 
   const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
     resizeMode
@@ -140,8 +128,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
-  const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const [unsubscribeModalOpen, setUnsubscribeModalOpen] = useState(false);
+  const [confirmReportUser, setConfirmReportUser] = useState(false);
   const { usersIBlocked, unblockUser } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(user.uuid),
@@ -180,6 +167,14 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     }
     return [];
   }, [user]);
+
+  const subscription: SubscriptionToCreator = useMemo(
+    () => ({
+      userId: user.uuid,
+      username: user.username,
+    }),
+    [user.uuid, user.username]
+  );
 
   // Posts
   const [creatorsDecisions, setCreatorsDecisions] = useState(
@@ -496,26 +491,31 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             {t('profileLayout.buttons.favorites')}
           </SFavoritesButton> */}
 
-          <SMoreButton
-            view='transparent'
-            iconOnly
-            onClick={() => setIsEllipseMenuOpen(true)}
-            ref={moreButtonRef}
-          >
-            <SSVGContainer active={ellipseMenuOpen}>
+          <SSideButtons>
+            {user.options?.isCreator ? (
+              <SmsNotificationsButton
+                subscription={subscription}
+                isMobile={isMobile}
+              />
+            ) : (
+              <div />
+            )}
+            <SIconButton
+              active={ellipseMenuOpen}
+              ref={moreButtonRef}
+              onClick={() => setIsEllipseMenuOpen(true)}
+            >
               <InlineSvg
                 svg={MoreIconFilled}
                 fill={theme.colorsThemed.text.primary}
-                width={isMobileOrTablet ? '16px' : '24px'}
-                height={isMobileOrTablet ? '16px' : '24px'}
+                width='24px'
+                height='24px'
               />
-            </SSVGContainer>
-            {t('profileLayout.buttons.more')}
-          </SMoreButton>
+            </SIconButton>
+          </SSideButtons>
           {!isMobile && (
             <UserEllipseMenu
               isVisible={ellipseMenuOpen}
-              isSubscribed={!!isSubscribed}
               isBlocked={isUserBlocked}
               loggedIn={currentUser.loggedIn}
               handleClose={() => setIsEllipseMenuOpen(false)}
@@ -527,26 +527,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 }
               }}
               handleClickReport={handleClickReport}
-              handleClickUnsubscribe={() => {
-                setUnsubscribeModalOpen(true);
-              }}
               anchorElement={moreButtonRef.current}
               offsetTop={isDesktop ? '-25px' : '0'}
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
-          {isSubscribed && <SSubcribedTag>{t('subscribed-tag')}</SSubcribedTag>}
-          {wasSubscribed && (
-            <SSubcribedTag>{t('subscriptionCancelled-tag')}</SSubcribedTag>
-          )}
-          <div
-            style={{
-              position: 'relative',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
+          <SUserData>
             <SUsernameWrapper>
               <SUsername variant={4}>
                 {user.nickname}
@@ -614,22 +600,19 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               </SShareButton>
             </SShareDiv>
             {user.options?.isOfferingSubscription &&
-            user.uuid !== currentUser.userData?.userUuid ? (
-              <CustomLink
-                href={
-                  !isSubscribed && !wasSubscribed
-                    ? `/${user.username}/subscribe`
-                    : `/direct-messages/${user.username}-cr`
-                }
-                disabled={isSubscribed === null || wasSubscribed === null}
-              >
-                <SSendButton withShadow view='primaryGrad'>
-                  {t('profileLayout.buttons.sendMessage')}
-                </SSendButton>
-              </CustomLink>
-            ) : null}
+              user.uuid !== currentUser.userData?.userUuid &&
+              (isSubscribed || wasSubscribed) && (
+                <CustomLink
+                  href={`/direct-messages/${user.username}-cr`}
+                  disabled={isSubscribed === null || wasSubscribed === null}
+                >
+                  <SSendButton withShadow view='primaryGrad'>
+                    {t('profileLayout.buttons.sendMessage')}
+                  </SSendButton>
+                </CustomLink>
+              )}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
-          </div>
+          </SUserData>
           {/* Temp, all creactors for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
           {tabs.length > 0 ? (
@@ -643,7 +626,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         <UserEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={10}
-          isSubscribed={!!isSubscribed}
           isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           onClose={() => setIsEllipseMenuOpen(false)}
@@ -657,16 +639,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           handleClickReport={() => {
             setConfirmReportUser(true);
           }}
-          handleClickUnsubscribe={() => {
-            setUnsubscribeModalOpen(true);
-          }}
         />
       )}
-      <UnsubscribeModal
-        confirmUnsubscribe={unsubscribeModalOpen}
-        user={user}
-        closeModal={() => setUnsubscribeModalOpen(false)}
-      />
       <BlockUserModalProfile
         confirmBlockUser={blockUserModalOpen}
         user={user}
@@ -703,20 +677,12 @@ const SGeneral = styled(General)`
   header {
     z-index: 6;
   }
+`;
 
-  @media (max-width: 768px) {
-    main {
-      div:first-child {
-        padding-left: 0;
-        padding-right: 0;
-
-        div:first-child {
-          margin-left: 0;
-          margin-right: 0;
-        }
-      }
-    }
-  }
+const SUserData = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
 `;
 
 const SUsernameWrapper = styled.div`
@@ -727,6 +693,7 @@ const SUsername = styled(Headline)`
   text-align: center;
   display: flex;
   align-items: center;
+  justify-content: center;
 `;
 
 const SGenderPronouns = styled(Text)`
@@ -775,7 +742,7 @@ const SShareButton = styled(Button)`
 `;
 
 const SSendButton = styled(Button)`
-  margin-bottom: 16px;
+  margin: 0 auto 16px;
   background: ${(props) => props.theme.colorsThemed.accent.yellow};
   color: #2c2c33;
 
@@ -795,30 +762,33 @@ const SBioText = styled(Text)`
 
   padding-left: 16px;
   padding-right: 16px;
-  margin-bottom: 54px;
-
+  margin: 0 auto 54px;
+  width: 100%;
   max-width: 480px;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
-const SSVGContainer = styled.div<{
+const SIconButton = styled.div<{
   active: boolean;
 }>`
   display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
 
-  ${({ theme }) => theme.media.laptop} {
-    padding: 12px;
-    border-radius: 16px;
-    margin-bottom: 8px;
-    background: ${({ theme, active }) =>
-      active
-        ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;'
-        : theme.colorsThemed.background.quinary};
-    transition: 0.2s linear;
-  }
+  padding: 12px;
+  border-radius: 16px;
+  cursor: pointer;
+
+  user-select: none;
+  transition: background 0.2s linear;
+  background: ${({ theme, active }) =>
+    active
+      ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;'
+      : theme.colorsThemed.background.quinary};
+
+  // TODO: add hover/active effects
 `;
 
 const SBackButton = styled(BackButton)`
@@ -867,39 +837,23 @@ const SBackButton = styled(BackButton)`
 //   }
 // `;
 
-const SMoreButton = styled(Button)`
+const SSideButtons = styled.div`
+  display: flex;
   position: absolute;
+  width: 100%;
+  gap: 16px;
+  padding: 16px;
+
   top: 164px;
-  left: 4px;
-
-  background: none;
-  &:active:enabled,
-  &:hover:enabled,
-  &:focus:enabled {
-    background: none;
-  }
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    font-weight: 600;
-    font-size: 10px;
-    line-height: 12px;
-  }
+  justify-content: space-between;
 
   ${(props) => props.theme.media.tablet} {
     top: 204px;
-    left: initial;
-    right: 4px;
   }
 
   ${(props) => props.theme.media.laptop} {
     top: 244px;
+    justify-content: flex-end;
   }
 `;
 
@@ -920,34 +874,6 @@ const SProfileLayout = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     margin-top: -16px;
-  }
-`;
-
-const SSubcribedTag = styled.div`
-  position: absolute;
-  top: 195px;
-  left: calc(50% - 38px);
-
-  background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
-
-  width: 76px;
-  padding: 6px 8px;
-  border-radius: 50px;
-
-  color: ${({ theme }) => theme.colors.dark};
-  text-align: center;
-  font-weight: 700;
-  font-size: 10px;
-  line-height: 12px;
-
-  z-index: 5;
-
-  ${({ theme }) => theme.media.tablet} {
-    top: 235px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    top: 275px;
   }
 `;
 

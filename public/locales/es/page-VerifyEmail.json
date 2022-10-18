@@ -20,6 +20,6 @@
   },
   "verifying": "Verificando tu correo electrónico...",
   "backButton": "Regresar",
-  "updated_NEED_TRANSLATION": "We updated your email!",
-  "backToProfile_NEED_TRANSLATION": "Back to Profile"
+  "updated": "¡Hemos actualizado tu correo electrónico!",
+  "backToProfile": "Regresar al perfil"
 }

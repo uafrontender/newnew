@@ -35,15 +35,6 @@
       "description": "All posts you previewed\nwill be kept here in your history"
     }
   },
-  "Subscriptions": {
-    "meta": {
-      "title": "NewNew Subscriptions",
-      "description": "Edit name, username, bio, profile photo and more in NewNew settings"
-    },
-    "noContent": {
-      "description": "You’re not subscribed\nto any creators yet"
-    }
-  },
   "Favorites": {
     "meta": {
       "title": "NewNew Favorites",
@@ -74,15 +65,12 @@
     "activelyBidding": "Active",
     "purchases": "Purchases",
     "viewHistory": "Viewing history",
-    "subscriptions": "Subscriptions",
     "myposts": "My posts",
     "favorites": "Favorites",
     "userInitial": "Posts",
     "activity": "Activity"
   },
   "accountPrivate": "{{username}}'s activity is private",
-  "subscribed-tag": "SUBSCRIBED",
-  "subscriptionCancelled-tag": "CANCELLED",
   "modal": {
     "blockUser": {
       "title": "Block user",
@@ -91,14 +79,6 @@
       "button": {
         "cancel": "Cancel",
         "confirm": "Block user"
-      }
-    },
-    "unsubscribeUser": {
-      "title": "Unsubscribe from creator",
-      "message": "Do you really want to unsubscribe from {{username}}?",
-      "button": {
-        "cancel": "Cancel",
-        "confirm": "Unsubscribe"
       }
     },
     "deleteMyAccount": {
@@ -117,7 +97,8 @@
     },
     "buttons": {
       "favorites": "Favorites",
-      "more": "More",
+      "enableSmsNotifications": "Notify me",
+      "disableSmsNotifications": "Notifications ON",
       "sendMessage": "Send message",
       "copied": "Link copied!"
     }
@@ -223,12 +204,19 @@
         "ellipse": {
           "makePrimary": "Make it primary",
           "removeCard": "Remove card"
+        },
+        "status": {
+          "added": "Success! Your card has been saved",
+          "cannotBeAdded": "Failure! Your card cannot be saved",
+          "duplicate": "This card has been already saved in your profile",
+          "inProgress": "Saving your card. Please wait",
+          "requestFailed": "Something went wrong"
         }
       },
       "personalInformation": {
         "title": "Personal information",
         "emailInput": {
-          "label": "Email Address",
+          "label": "Email address",
           "placeholder": "email@email.com",
           "errors": {
             "invalidEmail": "Please enter a valid email address",
@@ -282,11 +270,11 @@
         "privacySubsections": {
           "spendings": {
             "title": "Hide my spending from others",
-            "caption": "People will not be able to see how much you spent on bids, superpolls and goals"
+            "caption": "People will not be able to see how much you spent on bids and superpolls"
           },
           "private": {
             "title": "Make my activity private",
-            "caption": "People will not be able to see any of your activity on bids, superpolls and goals"
+            "caption": "People will not be able to see any of your activity on bids and superpolls"
           }
         },
         "blockedUsers": {

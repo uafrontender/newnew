@@ -3,23 +3,22 @@ import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
+import { newnewapi } from 'newnew-api';
 
 import isBrowser from '../../../../../utils/isBrowser';
 import useOnClickEsc from '../../../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../../../utils/hooks/useOnClickOutside';
 
 import Text from '../../../../atoms/Text';
-import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 
 interface IMcOptionCardSelectVotesMenu {
   isVisible: boolean;
   isSupportedByMe: boolean;
-  availableVotes: number[];
+  availableVotes: newnewapi.McVoteOffer[];
   top?: number;
   handleClose: () => void;
-  handleOpenCustomAmountModal: () => void;
-  handleSetAmountAndOpenModal: (votesAmount: string) => void;
+  handleSetVoteOfferAndOpenModal: (voteOffer: newnewapi.McVoteOffer) => void;
 }
 
 const McOptionCardSelectVotesMenu: React.FunctionComponent<
@@ -30,13 +29,10 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
   isSupportedByMe,
   availableVotes,
   handleClose,
-  handleOpenCustomAmountModal,
-  handleSetAmountAndOpenModal,
+  handleSetVoteOfferAndOpenModal,
 }) => {
   const { t } = useTranslation('modal-Post');
   const containerRef = useRef<HTMLDivElement>();
-
-  const { appConstants } = useGetAppConstants();
 
   const [bottom, setBottom] = useState<number | undefined>(undefined);
 
@@ -106,45 +102,31 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
                     'mcPost.optionsTab.optionCard.selectVotesMenu.titleMoreVotes'
                   )}
             </STitleText>
-            {availableVotes.map((amount) => (
+            {availableVotes.map((voteOffer, id) => (
               <SButton
-                key={amount}
+                id={`vote-option-${id}`}
+                key={voteOffer.amountOfVotes}
                 onClickCapture={() => {
                   Mixpanel.track('Selected Votes Amount', {
                     _stage: 'Post',
                     _component: 'McOptionCardSelectVotesMenu',
                   });
                 }}
-                onClick={() => handleSetAmountAndOpenModal(amount.toString())}
+                onClick={() => handleSetVoteOfferAndOpenModal(voteOffer)}
               >
                 <Text variant={3}>
                   <SBoldSpan>
-                    {amount}{' '}
-                    {amount === 1
+                    {voteOffer.amountOfVotes}{' '}
+                    {voteOffer.amountOfVotes === 1
                       ? t('mcPost.optionsTab.optionCard.selectVotesMenu.vote')
                       : t('mcPost.optionsTab.optionCard.selectVotesMenu.votes')}
                   </SBoldSpan>{' '}
-                  <SOpaqueSpan>
-                    {`($${
-                      amount * Math.round(appConstants.mcVotePrice / 100)
-                    })`}
-                  </SOpaqueSpan>
+                  <SOpaqueSpan>{`($${
+                    (voteOffer.price?.usdCents || 0) / 100
+                  })`}</SOpaqueSpan>
                 </Text>
               </SButton>
             ))}
-            <SButton
-              onClickCapture={() => {
-                Mixpanel.track('Open Custom Votes Amount', {
-                  _stage: 'Post',
-                  _component: 'McOptionCardSelectVotesMenu',
-                });
-              }}
-              onClick={() => handleOpenCustomAmountModal()}
-            >
-              <Text variant={3}>
-                {t('mcPost.optionsTab.optionCard.selectVotesMenu.custom')}
-              </Text>
-            </SButton>
           </SContainer>
         </AnimatePresence>
       </StyledModalOverlay>,

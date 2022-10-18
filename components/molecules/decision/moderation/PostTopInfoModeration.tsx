@@ -232,6 +232,8 @@ const SWrapper = styled.div<{
 
 const SPostTitle = styled(Headline)`
   grid-area: title;
+  white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 // Action buttons

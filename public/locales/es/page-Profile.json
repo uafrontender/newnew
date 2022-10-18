@@ -35,15 +35,6 @@
       "description": "Todos los mensajes que\n hayas previsualizado se mantendrán aquí en tu historial"
     }
   },
-  "Subscriptions": {
-    "meta": {
-      "title": "Suscripciones NewNew",
-      "description": "Editar nombre, nombre de usuario, biografía, foto del perfil y mucho más en la configuración de NewNew"
-    },
-    "noContent": {
-      "description": "Todavía no estás\nsuscrito a ningún creador"
-    }
-  },
   "Favorites": {
     "meta": {
       "title": "Favoritos NewNew",
@@ -74,15 +65,12 @@
     "activelyBidding": "Activo",
     "purchases": "Compras",
     "viewHistory": "Historial",
-    "subscriptions": "Suscripciones",
     "myposts": "Mis publicaciones",
     "favorites": "Favoritos",
     "userInitial": "Publicaciones",
     "activity": "Actividad"
   },
   "accountPrivate": "La actividad de {{username}} es privada",
-  "subscribed-tag": "SUSCRITO",
-  "subscriptionCancelled-tag_NEED_TRANSLATION": "CANCELLED",
   "modal": {
     "blockUser": {
       "title": "Bloquear usuario",
@@ -91,14 +79,6 @@
       "button:": {
         "cancel": "Cancelar",
         "confirm": "Bloquear usuario"
-      }
-    },
-    "unsubscribeUser": {
-      "title": "Dejar de seguir creador",
-      "message": "¿Estás seguro de que quieres dejar de seguir a {{username}}?",
-      "button": {
-        "cancel": "Cancelar",
-        "confirm": "Dejar de seguir"
       }
     },
     "deleteMyAccount": {
@@ -117,7 +97,8 @@
     },
     "buttons": {
       "favorites": "Favoritos",
-      "more": "Más",
+      "enableSmsNotifications_NEED_TRANSLATION": "Notify me",
+      "disableSmsNotifications_NEED_TRANSLATION": "Notifications ON",
       "sendMessage": "Escribir mensaje",
       "copied": "¡Enlace copiado!"
     }
@@ -223,6 +204,13 @@
         "ellipse": {
           "makePrimary": "Convertir en primaria",
           "removeCard": "Remover tarjeta"
+        },
+        "status_NEED_TRANSLATION": {
+          "added": "Success! Your card has been saved",
+          "cannotBeAdded": "Failure! Your card cannot be saved",
+          "duplicate": "This card has been already saved in your profile",
+          "inProgress": "Saving your card. Please wait",
+          "requestFailed": "Something went wrong"
         }
       },
       "personalInformation": {
@@ -282,11 +270,11 @@
         "privacySubsections": {
           "spendings": {
             "title": "Ocultar mis gastos a los demás",
-            "caption": "Las personas no podrán ver cuánto has gastado en Bids, Supergoals ni en Goals."
+            "caption": "Las personas no podrán ver cuánto has gastado en bids ni en superpolls."
           },
           "private": {
             "title": "Hacer mi actividad privada",
-            "caption": "Las personas no podran ver tu actividad en Bids, Supergoals ni en Goals."
+            "caption": "Las personas no podran ver tu actividad en bids ni en superpolls."
           }
         },
         "blockedUsers": {

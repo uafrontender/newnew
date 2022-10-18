@@ -37,7 +37,6 @@ import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 
 // Utils
 import switchPostType from '../../../../utils/switchPostType';
-import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
@@ -68,8 +67,6 @@ const getPayWithCardErrorMessage = (
       return 'errors.cardNotFound';
     case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
       return 'errors.cardCannotBeUsed';
-    case newnewapi.VoteOnPostResponse.Status.BLOCKED_BY_CREATOR:
-      return 'errors.blockedByCreator';
     case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
       return 'errors.mcCancelled';
     case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:
@@ -119,7 +116,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
-  const { appConstants } = useGetAppConstants();
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
@@ -761,12 +757,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             options={options}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
-            minAmount={appConstants?.minMcVotes ?? 2}
-            votePrice={
-              appConstants?.mcVotePrice
-                ? Math.floor(appConstants?.mcVotePrice)
-                : 1
-            }
             canSubscribe={!!canSubscribe}
             canVoteForFree={hasFreeVote}
             hasVotedOptionId={(hasVotedOptionId as number) ?? undefined}

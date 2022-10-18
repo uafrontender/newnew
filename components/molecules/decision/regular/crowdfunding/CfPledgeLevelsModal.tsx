@@ -10,8 +10,6 @@ import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import { doPledgeCrowdfunding } from '../../../../../api/endpoints/crowdfunding';
-import // getTopUpWalletWithPaymentPurposeUrl,
-'../../../../../api/endpoints/payments';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
@@ -31,7 +29,8 @@ import PostTitleContent from '../../../../atoms/PostTitleContent';
 import PaymentModal from '../../../checkout/PaymentModal';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
-// import { WalletContext } from '../../../../contexts/walletContext';
+import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.DoPledgeResponse.Status
@@ -43,8 +42,6 @@ const getPayWithCardErrorMessage = (
       return 'errors.cardNotFound';
     case newnewapi.DoPledgeResponse.Status.CARD_CANNOT_BE_USED:
       return 'errors.cardCannotBeUsed';
-    case newnewapi.DoPledgeResponse.Status.BLOCKED_BY_CREATOR:
-      return 'errors.blockedByCreator';
     case newnewapi.DoPledgeResponse.Status.CF_CANCELLED:
       return 'errors.cfCancelled';
     case newnewapi.DoPledgeResponse.Status.CF_FINISHED:
@@ -81,8 +78,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
-
-  // const { walletBalance } = useContext(WalletContext);
+  const { appConstants } = useGetAppConstants();
 
   const [pledgeAmount, setPledgeAmount] = useState<number | undefined>(
     undefined
@@ -116,138 +112,39 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
     setIsFormOpen(false);
   };
 
-  // Make a pledge and close all forms and modals
-  // const handlePayWithWallet = useCallback(async () => {
-  //  if (!user._persist?.rehydrated) {
-  //    return;
-  //  }
-  //
-  //   setLoadingModalOpen(true);
-  //   try {
-  //     // Check if user is logged in
-  //     if (!user.loggedIn) {
-  //       const getTopUpWalletWithPaymentPurposeUrlPayload =
-  //         new newnewapi.TopUpWalletWithPurposeRequest({
-  //           successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //           }post/${post.postUuid}`,
-  //           cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //           }post/${post.postUuid}`,
-  //           ...(!user.loggedIn
-  //             ? {
-  //                 nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-  //               }
-  //             : {}),
-  //           cfPledgeRequest: {
-  //             amount: new newnewapi.MoneyAmount({
-  //               usdCents: parseInt(pledgeAmount?.toString()!!),
-  //             }),
-  //             postUuid: post.postUuid,
-  //           },
-  //         });
+  const paymentAmountInCents = useMemo(
+    () => parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
+    [pledgeAmount]
+  );
 
-  //       const res = await getTopUpWalletWithPaymentPurposeUrl(
-  //         getTopUpWalletWithPaymentPurposeUrlPayload
-  //       );
+  const paymentFeeInCents = useMemo(
+    () =>
+      getCustomerPaymentFee(
+        paymentAmountInCents,
+        parseFloat(appConstants.customerFee)
+      ),
+    [paymentAmountInCents, appConstants.customerFee]
+  );
 
-  //       if (!res.data || !res.data.sessionUrl || res.error)
-  //         throw new Error(res.error?.message ?? 'Request failed');
-
-  //       window.location.href = res.data.sessionUrl;
-  //     } else {
-  //       const makePledgePayload = new newnewapi.DoPledgeRequest({
-  //         amount: new newnewapi.MoneyAmount({
-  //           usdCents: parseInt(pledgeAmount?.toString()!!),
-  //         }),
-  //         postUuid: post.postUuid,
-  //       });
-
-  //       const res = await doPledgeWithWallet(makePledgePayload);
-
-  //       if (
-  //         res.data &&
-  //         res.data.status ===
-  //           newnewapi.DoPledgeResponse.Status.INSUFFICIENT_WALLET_BALANCE
-  //       ) {
-  //         const getTopUpWalletWithPaymentPurposeUrlPayload =
-  //           new newnewapi.TopUpWalletWithPurposeRequest({
-  //             successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //             }post/${post.postUuid}`,
-  //             cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //             }post/${post.postUuid}`,
-  //             cfPledgeRequest: {
-  //               amount: new newnewapi.MoneyAmount({
-  //                 usdCents: parseInt(pledgeAmount?.toString()!!),
-  //               }),
-  //               postUuid: post.postUuid,
-  //             },
-  //           });
-
-  //         const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
-  //           getTopUpWalletWithPaymentPurposeUrlPayload
-  //         );
-
-  //         if (
-  //           !resStripeRedirect.data ||
-  //           !resStripeRedirect.data.sessionUrl ||
-  //           resStripeRedirect.error
-  //         )
-  //           throw new Error(
-  //             resStripeRedirect.error?.message ?? 'Request failed'
-  //           );
-
-  //         window.location.href = resStripeRedirect.data.sessionUrl;
-  //         return;
-  //       }
-
-  //       if (
-  //         !res.data ||
-  //         res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS ||
-  //         res.error
-  //       )
-  //         throw new Error(res.error?.message ?? 'Request failed');
-
-  //       setIsFormOpen(false);
-  //       setCustomPledgeAmount('');
-  //       handleAddPledgeFromResponse(
-  //         res.data.pledge as newnewapi.Crowdfunding.Pledge
-  //       );
-
-  //       setCustomPledgeAmount('');
-  //       setIsFormOpen(false);
-  //       setPaymentModalOpen(false);
-  //       setLoadingModalOpen(false);
-  //       handleSetPaymentSuccessModalOpen(true);
-  //       onClose();
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //     setPaymentModalOpen(false);
-  //     setLoadingModalOpen(false);
-  //   }
-  // }, [
-  //   pledgeAmount,
-  //   post.postUuid,
-  //   user.loggedIn,
-  //   user._persist?.rehydrated
-  //   router.locale,
-  //   handleAddPledgeFromResponse,
-  //   handleSetPaymentSuccessModalOpen,
-  //   onClose,
-  // ]);
+  const paymentWithFeeInCents = useMemo(
+    () => paymentAmountInCents + paymentFeeInCents,
+    [paymentAmountInCents, paymentFeeInCents]
+  );
 
   const doPledgeRequest = useMemo(
     () =>
-      new newnewapi.DoPledgeRequest({
-        postUuid: post.postUuid,
-        amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(pledgeAmount ? pledgeAmount?.toString() : '0'),
-        }),
-      }),
-    [post.postUuid, pledgeAmount]
+      !paymentAmountInCents
+        ? null
+        : new newnewapi.DoPledgeRequest({
+            postUuid: post.postUuid,
+            amount: new newnewapi.MoneyAmount({
+              usdCents: paymentAmountInCents,
+            }),
+            customerFee: new newnewapi.MoneyAmount({
+              usdCents: paymentFeeInCents,
+            }),
+          }),
+    [post.postUuid, paymentAmountInCents, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
@@ -412,42 +309,35 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={14}
-          amount={pledgeAmount || 0}
-          // {...(walletBalance?.usdCents &&
-          // pledgeAmount &&
-          // walletBalance.usdCents >= pledgeAmount
-          //   ? {}
-          //   : {
-          //       predefinedOption: 'card',
-          //     })}
-          // predefinedOption='card'
+          amount={paymentWithFeeInCents || 0}
           onClose={() => setPaymentModalOpen(false)}
           setupIntent={setupIntent}
           handlePayWithCard={handlePayWithCard}
           redirectUrl={`post/${post.postUuid}`}
-          // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
-            <SPaymentSign variant='subtitle'>
-              {post.creator && (
-                <>
-                  {t('cfPost.paymentModalFooter.body', {
-                    creator: getDisplayname(post.creator),
-                  })}
-                </>
-              )}
-              *
-              <Link href='https://terms.newnew.co'>
-                <SPaymentTermsLink
-                  href='https://terms.newnew.co'
-                  target='_blank'
-                >
-                  {t('cfPost.paymentModalFooter.terms')}
-                </SPaymentTermsLink>
-              </Link>{' '}
-              {t('cfPost.paymentModalFooter.apply')}
-            </SPaymentSign>
+            (!appConstants.minHoldAmount?.usdCents ||
+              paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
+              <SPaymentSign variant='subtitle'>
+                {post.creator && (
+                  <>
+                    {t('cfPost.paymentModalFooter.body', {
+                      creator: getDisplayname(post.creator),
+                    })}
+                  </>
+                )}
+                *
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('cfPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
+                {t('cfPost.paymentModalFooter.apply')}
+              </SPaymentSign>
+            )
           }
-          // payButtonCaptionKey={t('cfPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
             <SPaymentModalHeading>
@@ -531,6 +421,8 @@ const SPaymentModalHeadingPostCreator = styled(Text)`
 const SPaymentModalOptionText = styled(Headline)`
   display: flex;
   align-items: center;
+  white-space: pre-wrap;
+  word-break: break-word;
   gap: 8px;
 `;
 
@@ -568,9 +460,9 @@ const SCloseButton = styled.button`
 const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
   white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SPaymentTermsLink = styled.a`

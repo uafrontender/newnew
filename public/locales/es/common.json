@@ -16,8 +16,6 @@
     "followCreator": "Marcar seguidor como favorito",
     "unFollowDecision": "Quitar {{postType}} de favoritos",
     "unFollowCreator": "Quitar creador de favoritos",
-    "unsubscribe": "Anular suscripción",
-    "removeSubscription": "Eliminar suscripción",
     "removeBid": "Eliminar oferta",
     "removeOption": "Eliminar opción",
     "view": "Ver perfil",
@@ -145,15 +143,13 @@
     "topPosts": "Publicaciones populares",
     "popularCreators": "Creadores populares",
     "creatorSubtitle": "Ver publicaciones",
+    "popularTags": "Etiquetas populares",
     "allResults": "Todos los resultados",
     "noResults": {
       "title": "No encontramos nada",
       "description": "Intenta cambiar tu búsqueda o explora las novedades",
       "action": "Explorar"
     }
-  },
-  "creatorCard": {
-    "subscriptionCost": "${{amount}} Mensual"
   },
   "gotIt": "Aceptar",
   "sortingOption": {
@@ -178,55 +174,22 @@
   "toastErrors": {
     "generic": "Se ha producido un error, inténtalo de nuevo más tarde"
   },
-  "rewards": {
-    "earned": "ganaste ${{value}}",
-    "earn": "gana ${{value}}",
-    "modalTitle": "¡Ganaste ${{amount}}!",
-    "modalButton": "Genial",
-    "modalDescription": {
-      "1": "...por registrarte",
-      "2_NEED_TRANSLATION": "...for placing a bid that was chosen",
-      "3_NEED_TRANSLATION": "...for picking the winning option in a Superpoll",
-      "4_NEED_TRANSLATION": "...for backing a Goal that was successful",
-      "5": "...por suscribirte a un creador",
-      "6": "...por suscribirte a {{creators}} creadores",
-      "7": "...por ofertar dos veces con el mismo creador",
-      "8": "...por votar dos veces con el mismo creador",
-      "9": "...por patrocinar al mismo creador dos veces",
-      "10": "...por ofertas dos veces en una semana",
-      "11": "...por votar dos veces en una semana",
-      "12": "...por patrocinar dos Goals en una semana",
-      "13": "...por invitar a {{friends}} amigos a NewNew"
+  "smsNotifications_NEED_TRANSLATION": {
+    "title": "Enter your phone number",
+    "success": "Success",
+    "description": "With it, we will notify you about the <0>{{subject}}</0> updates.",
+    "confirmation": "Confirmation SMS was sent to {{phoneNumber}} number.",
+    "tos": "I accept the <0>NewNew’s Terms of Service</0> & have read the <1>NewNew’s Privacy Statement</1>. I would like to receive newsletters and updates about  NewNew products at the phone number provided. One message per month. Message and data rates may apply. ",
+    "button": { "continue": "Continue", "close": "Cool!" },
+    "phoneError": {
+      "0": "Invalid phone number",
+      "1": "Invalid country code",
+      "2": "The phone number is too short",
+      "3": "The phone number is too long",
+      "4": "Invalid phone number"
     },
-    "receivedItemDescription_NEED_TRANSLATION": {
-      "1": "Signed up",
-      "2": "Placed a bid that got chosen",
-      "3": "Voted on a Superpoll option that won",
-      "4": "Backed a successful Goal",
-      "5": "Subscribed to a creator",
-      "6": "Subscribed to {{creators}} creators",
-      "7": "Bid twice on the same creator",
-      "8": "Voted twice on the same creator",
-      "9": "Backed the same creator twice",
-      "10": "Placed bids twice in one week",
-      "11": "Voted twice in one week",
-      "12": "Backed goals twice in one week",
-      "13": "Invited {{friends}} friends"
-    },
-    "availableItemDescription_NEED_TRANSLATION": {
-      "1": "Sign up to NewNew",
-      "2": "Place a Bid. The reward unlocks if your bid gets chosen",
-      "3": "Vote in a Superpoll. The reward unlocks if the option you voted on wins",
-      "4": "Back a Goal. The reward unlocks if the creator reaches their Goal",
-      "5": "Subscribe to a creator",
-      "6": "Subscribe to {{creators}} creators",
-      "7": "Bid twice on the same creator. The reward unlocks if your bids are chosen",
-      "8": "Vote twice on the same creator. The reward unlocks if the options you voted on won",
-      "9": "Back the same Creator twice. The reward unlocks if the creator reaches their Goal both times",
-      "10": "Bid twice in one week",
-      "11": "Vote twice in one week",
-      "12": "Back goals twice in one week",
-      "13": "Invite {{friends}} friends to NewNew"
+    "error": {
+      "requestFailed": "Request failed"
     }
   }
 }

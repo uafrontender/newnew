@@ -11,7 +11,6 @@
       "fees": "hasta un 3% de comisiones"
     }
   },
-  "rewardsText": "Utilizar mis recompensas",
   "payButton": "Pagar",
   "tocApplyLink": "Términos",
   "tocApplyText": "Aplicar",
@@ -22,14 +21,15 @@
     "tos": "condiciones de servicio",
     "apply": "de Google."
   },
-  "primaryCard_NEED_TRANSLATION": "Primary card_es",
-  "newCard_NEED_TRANSLATION": "New card_es",
-  "saveCard_NEED_TRANSLATION": "Save card for future use_es",
+  "primaryCard": "Tarjeta primaria",
+  "newCard": "Nueva tarjeta",
+  "saveCard": "Guardar tarjeta para usos futuros",
   "email": "Correo electrónico",
-  "errors_NEED_TRANSLATION": {
-    "wrongEmail": "Email can't be used",
-    "rewardNotEnough": "Rewards balance is insufficient",
-    "paymentFailed": "Payment failed",
-    "requestFailed": "Request failed"
-  }
+  "errors": {
+    "wrongEmail": "Este correo electrónico no puede ser usado",
+    "paymentFailed": "El pago ha fallado",
+    "requestFailed": "La solicitud ha fallado",
+    "invalidFee_NEED_TRANSLATION": "Something went wrong. Please reload the page and try again"
+  },
+  "processingFee_NEED_TRANSLATION": "Processing fee"
 }

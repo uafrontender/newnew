@@ -11,7 +11,6 @@
       "fees": "up to 3% fees"
     }
   },
-  "rewardsText": "Use my rewards",
   "payButton": "Pay",
   "tocApplyLink": "Terms",
   "tocApplyText": "apply",
@@ -28,8 +27,9 @@
   "email": "Email",
   "errors": {
     "wrongEmail": "Email can't be used",
-    "rewardNotEnough": "Rewards balance is insufficient",
     "paymentFailed": "Payment failed",
-    "requestFailed": "Request failed"
-  }
+    "requestFailed": "Request failed",
+    "invalidFee": "Something went wrong. Please reload the page and try again"
+  },
+  "processingFee": "Processing fee"
 }

@@ -22,11 +22,6 @@ import {
   useAppDispatch,
   useAppSelector,
 } from '../../../../../redux-store/store';
-// import { WalletContext } from '../../../../contexts/walletContext';
-// import { placeBidWithWallet } from '../../../../api/endpoints/auction';
-import // updateStripeSetupIntent,
-// getTopUpWalletWithPaymentPurposeUrl,
-'../../../../../api/endpoints/payments';
 import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
 
 import Text from '../../../../atoms/Text';
@@ -67,7 +62,8 @@ import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
-// import getRewardErrorStatusTextKey from '../../../../../utils/getRewardErrorStatusTextKey';
+import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
+import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -79,8 +75,6 @@ const getPayWithCardErrorMessage = (
       return 'errors.cardNotFound';
     case newnewapi.PlaceBidResponse.Status.CARD_CANNOT_BE_USED:
       return 'errors.cardCannotBeUsed';
-    case newnewapi.PlaceBidResponse.Status.BLOCKED_BY_CREATOR:
-      return 'errors.blockedByCreator';
     case newnewapi.PlaceBidResponse.Status.BIDDING_NOT_STARTED:
       return 'errors.biddingNotStarted';
     case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
@@ -132,8 +126,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-
-  // const { walletBalance } = useContext(WalletContext);
+  const { appConstants } = useGetAppConstants();
 
   // const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const isSupportedByMe = useMemo(
@@ -245,148 +238,38 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     setPaymentModalOpen(true);
   };
 
-  // const handlePayWithWallet = useCallback(async () => {
-  //  if (!user._persist?.rehydrated) {
-  //    return;
-  //  }
-  //
-  //   setLoadingModalOpen(true);
-  //   try {
-  //     // Check if user is logged and if the wallet balance is sufficient
-  //     if (!user.loggedIn ||
-  //       (walletBalance &&
-  //         walletBalance?.usdCents < parseInt(supportBidAmount) * 100)
-  //     ) {
-  //       const getTopUpWalletWithPaymentPurposeUrlPayload =
-  //         new newnewapi.TopUpWalletWithPurposeRequest({
-  //           successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //           }post/${postId}`,
-  //           cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //           }post/${postId}`,
-  //           ...(!user.loggedIn
-  //             ? {
-  //                 nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-  //               }
-  //             : {}),
-  //           acBidRequest: {
-  //             amount: new newnewapi.MoneyAmount({
-  //               usdCents: parseInt(supportBidAmount) * 100,
-  //             }),
-  //             optionId: option.id,
-  //             postUuid: postId,
-  //           },
-  //         });
+  const paymentAmountInCents = useMemo(
+    () => parseInt(supportBidAmount) * 100,
+    [supportBidAmount]
+  );
 
-  //       const res = await getTopUpWalletWithPaymentPurposeUrl(
-  //         getTopUpWalletWithPaymentPurposeUrlPayload
-  //       );
+  const paymentFeeInCents = useMemo(
+    () =>
+      getCustomerPaymentFee(
+        paymentAmountInCents,
+        parseFloat(appConstants.customerFee)
+      ),
+    [paymentAmountInCents, appConstants.customerFee]
+  );
 
-  //       if (!res.data || !res.data.sessionUrl || res.error)
-  //         throw new Error(res.error?.message ?? 'Request failed');
-
-  //       window.location.href = res.data.sessionUrl;
-  //     } else {
-  //       const makeBidPayload = new newnewapi.PlaceBidRequest({
-  //         amount: new newnewapi.MoneyAmount({
-  //           usdCents: parseInt(supportBidAmount) * 100,
-  //         }),
-  //         optionId: option.id,
-  //         postUuid: postId,
-  //       });
-
-  //       const res = await placeBidWithWallet(makeBidPayload);
-
-  //       if (
-  //         res.data &&
-  //         res.data.status ===
-  //           newnewapi.PlaceBidResponse.Status.INSUFFICIENT_WALLET_BALANCE
-  //       ) {
-  //         const getTopUpWalletWithPaymentPurposeUrlPayload =
-  //           new newnewapi.TopUpWalletWithPurposeRequest({
-  //             successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //             }post/${postId}`,
-  //             cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
-  //             }post/${postId}`,
-  //             acBidRequest: {
-  //               amount: new newnewapi.MoneyAmount({
-  //                 usdCents: parseInt(supportBidAmount) * 100,
-  //               }),
-  //               optionId: option.id,
-  //               postUuid: postId,
-  //             },
-  //           });
-
-  //         const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
-  //           getTopUpWalletWithPaymentPurposeUrlPayload
-  //         );
-
-  //         if (
-  //           !resStripeRedirect.data ||
-  //           !resStripeRedirect.data.sessionUrl ||
-  //           resStripeRedirect.error
-  //         )
-  //           throw new Error(
-  //             resStripeRedirect.error?.message ?? 'Request failed'
-  //           );
-
-  //         window.location.href = resStripeRedirect.data.sessionUrl;
-  //         return;
-  //       }
-
-  //       if (
-  //         !res.data ||
-  //         res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS ||
-  //         res.error
-  //       )
-  //         throw new Error(res.error?.message ?? 'Request failed');
-
-  //       const optionFromResponse = (res.data
-  //         .option as newnewapi.Auction.Option)!!;
-  //       optionFromResponse.isSupportedByMe = true;
-  //       handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
-  //       handleSetSupportedBid('');
-  //       setSupportBidAmount('');
-  //       setIsSupportFormOpen(false);
-  //       setPaymentModalOpen(false);
-  //       setLoadingModalOpen(false);
-  //       setPaymentSuccesModalOpen(true);
-  //     }
-  //   } catch (err) {
-  //     setPaymentModalOpen(false);
-  //     setLoadingModalOpen(false);
-  //     console.error(err);
-  //   }
-  // }, [
-  //   setPaymentModalOpen,
-  //   setLoadingModalOpen,
-  //   setIsSupportFormOpen,
-  //   setSupportBidAmount,
-  //   handleSetSupportedBid,
-  //   handleAddOrUpdateOptionFromResponse,
-  //   supportBidAmount,
-  //   option.id,
-  //   postId,
-  //   user.loggedIn,
-  //  user._persist?.rehydrated,
-  //   walletBalance,
-  //   router.locale,
-  // ]);
+  const paymentWithFeeInCents = useMemo(
+    () => paymentAmountInCents + paymentFeeInCents,
+    [paymentAmountInCents, paymentFeeInCents]
+  );
 
   const placeBidRequest = useMemo(
     () =>
       new newnewapi.PlaceBidRequest({
         postUuid: postId,
         amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(supportBidAmount) * 100,
+          usdCents: paymentAmountInCents,
+        }),
+        customerFee: new newnewapi.MoneyAmount({
+          usdCents: paymentFeeInCents,
         }),
         optionId: option.id,
       }),
-    [postId, supportBidAmount, option.id]
+    [postId, paymentAmountInCents, option.id, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
@@ -822,34 +705,28 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={parseInt(supportBidAmount) * 100 || 0}
+          amount={paymentWithFeeInCents || 0}
           setupIntent={setupIntent}
           redirectUrl={`post/${postId}`}
-          // {...(walletBalance?.usdCents &&
-          // walletBalance.usdCents >= parseInt(supportBidAmount) * 100
-          //   ? {}
-          //   : {
-          //       predefinedOption: 'card',
-          //     })}
-          // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
-          // handlePayWithWallet={handlePayWithWallet}
           bottomCaption={
-            <SPaymentSign variant='subtitle'>
-              {t('acPost.paymentModalFooter.body', { creator: postCreator })}*
-              <Link href='https://terms.newnew.co'>
-                <SPaymentTermsLink
-                  href='https://terms.newnew.co'
-                  target='_blank'
-                >
-                  {t('acPost.paymentModalFooter.terms')}
-                </SPaymentTermsLink>
-              </Link>{' '}
-              {t('acPost.paymentModalFooter.apply')}
-            </SPaymentSign>
+            (!appConstants.minHoldAmount?.usdCents ||
+              paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
+              <SPaymentSign variant='subtitle'>
+                {t('acPost.paymentModalFooter.body', { creator: postCreator })}*
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('acPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
+                {t('acPost.paymentModalFooter.apply')}
+              </SPaymentSign>
+            )
           }
-          // payButtonCaptionKey={t('acPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
             <SPaymentModalHeading>
@@ -1010,7 +887,7 @@ const SBidDetails = styled.div<{
     grid-template-areas:
       'amount bidders'
       'optionInfo optionInfo';
-    grid-template-columns: 5fr 4fr;
+    grid-template-columns: 5fr 6fr;
 
     padding: 16px;
 
@@ -1096,6 +973,8 @@ const SBiddersInfo = styled(Text)`
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;
     padding-top: 4px;
+
+    text-align: right;
   }
 `;
 
@@ -1276,6 +1155,8 @@ const SPaymentModalPostText = styled(Text)`
   display: flex;
   align-items: center;
   gap: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
 
   margin-bottom: 24px;
 `;
@@ -1307,6 +1188,7 @@ const SPaymentSign = styled(Text)`
 
   text-align: center;
   white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SPaymentTermsLink = styled.a`

@@ -128,6 +128,7 @@
       "backToResponse": "觀看回應"
     },
     "reuploadButton": "重新上傳",
+    "addVideoButton_NEED_TRANSLATION": "Add video",
     "cannotLeavePageMsg": "你確定要關閉這個頁面嗎？上傳進度會丟失",
     "floatingUploadResponseButton": "製作回應視頻",
     "setThumbnail": "設置縮略圖",
@@ -213,6 +214,14 @@
     "button": {
       "cancel": "取消",
       "confirm": "刪除"
+    }
+  },
+  "deleteVideoModal_NEED_TRANSLATION": {
+    "title": "Delete video",
+    "body": "Are you sure you want to delete this video?",
+    "button": {
+      "cancel": "Cancel",
+      "confirm": "Delete"
     }
   },
   "deleteCommentModal": {
@@ -378,7 +387,6 @@
         "votes": "票",
         "vote": "票",
         "mySuggestion": "我的建議",
-        "subscriberSuggestion": "{{nickname}}的建議",
         "others": "其他",
         "voters": "投票者",
         "voted": "投票",
@@ -421,8 +429,6 @@
             "vote": "票"
           }
         },
-        "subscribeToCreatorCaption": "訂閱{{creator}}，為本次Superpoll添加你自己的選項！",
-        "subscribeButton": "訂閱",
         "suggestionPlaceholder": "添加你自己的選項……",
         "suggestionPlaceholderDesktop": "添加選……",
         "placeABidButton": "添加我的選項"
@@ -788,22 +794,21 @@
       }
     }
   },
-  "errors_NEED_TRANSLATION": {
-    "notEnoughMoney": "Not enough money",
-    "cardNotFound": "Card not found",
-    "cardCannotBeUsed": "This card can not be used",
-    "blockedByCreator": "Blocked by creator",
-    "biddingNotStarted": "Bidding is not started yet",
-    "biddingIsEnded": "Bidding is ended already",
-    "mcCancelled": "Superpoll is cancelled",
-    "mcFinished": "Superpoll is finished already",
-    "mcNotStarted": "Superpoll is not started yet",
-    "alreadyVoted": "You are already voted",
-    "mcVoteCountTooSmall": "Vote count is too small",
-    "notAllowedToCreateNewOption": "New option is not allowed",
-    "cfCancelled": "Goal is cancelled",
-    "cfFinished": "Goal is finished already",
-    "cfNotStarted": "Goal is not started yet",
-    "requestFailed": "Request failed"
+  "errors": {
+    "notEnoughMoney": "資金不足",
+    "cardNotFound": "未找到卡片",
+    "cardCannotBeUsed": "此卡不能使用",
+    "biddingNotStarted": "Bidding還未開始",
+    "biddingIsEnded": "Bidding已經結束",
+    "mcCancelled": "Superpoll被取消",
+    "mcFinished": "Superpoll已經結束",
+    "mcNotStarted": "Superpoll還未開始",
+    "alreadyVoted": "你已獲投票",
+    "mcVoteCountTooSmall": "票數太少",
+    "notAllowedToCreateNewOption": "不允許有新的選項",
+    "cfCancelled": "Goal被取消",
+    "cfFinished": "Goal已經完成",
+    "cfNotStarted": "Goal尚未開始",
+    "requestFailed": "請求失敗"
   }
 }

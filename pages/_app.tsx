@@ -44,7 +44,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import ChannelsContextProvider from '../contexts/channelsContext';
 import { SubscriptionsProvider } from '../contexts/subscriptionsContext';
 import FollowingsContextProvider from '../contexts/followingContext';
-// import WalletContextProvider from '../contexts/walletContext';
 import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
 import SyncUserWrapper from '../contexts/syncUserWrapper';
@@ -60,7 +59,6 @@ import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
-import RewardContextProvider from '../contexts/rewardContext';
 import ModalNotificationsContextProvider from '../contexts/modalNotificationsContext';
 import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
@@ -220,49 +218,43 @@ const MyApp = (props: IMyApp): ReactElement => {
                       <ModalNotificationsContextProvider>
                         <BlockedUsersProvider>
                           <FollowingsContextProvider>
-                            {/* <WalletContextProvider> */}
-                            <RewardContextProvider>
-                              <CardsContextProvider>
-                                <SubscriptionsProvider>
-                                  <ChatsProvider>
-                                    <OverlayModeProvider>
-                                      <ResizeMode>
-                                        <PostModalContextProvider>
-                                          <GlobalTheme initialTheme={colorMode}>
-                                            <>
-                                              <ToastContainer />
-                                              <VideoProcessingWrapper>
-                                                <ErrorBoundary>
-                                                  {!pageProps.error ? (
-                                                    getLayout(
-                                                      <Component
-                                                        {...pageProps}
-                                                      />
-                                                    )
-                                                  ) : (
-                                                    <Error
-                                                      title={
-                                                        pageProps.error?.message
-                                                      }
-                                                      statusCode={
-                                                        pageProps.error
-                                                          ?.statusCode ?? 500
-                                                      }
-                                                    />
-                                                  )}
-                                                </ErrorBoundary>
-                                              </VideoProcessingWrapper>
-                                              <ReCaptchaBadgeModal />
-                                            </>
-                                          </GlobalTheme>
-                                        </PostModalContextProvider>
-                                      </ResizeMode>
-                                    </OverlayModeProvider>
-                                  </ChatsProvider>
-                                </SubscriptionsProvider>
-                              </CardsContextProvider>
-                            </RewardContextProvider>
-                            {/* </WalletContextProvider> */}
+                            <CardsContextProvider>
+                              <SubscriptionsProvider>
+                                <ChatsProvider>
+                                  <OverlayModeProvider>
+                                    <ResizeMode>
+                                      <PostModalContextProvider>
+                                        <GlobalTheme initialTheme={colorMode}>
+                                          <>
+                                            <ToastContainer containerId='toast-container' />
+                                            <VideoProcessingWrapper>
+                                              <ErrorBoundary>
+                                                {!pageProps.error ? (
+                                                  getLayout(
+                                                    <Component {...pageProps} />
+                                                  )
+                                                ) : (
+                                                  <Error
+                                                    title={
+                                                      pageProps.error?.message
+                                                    }
+                                                    statusCode={
+                                                      pageProps.error
+                                                        ?.statusCode ?? 500
+                                                    }
+                                                  />
+                                                )}
+                                              </ErrorBoundary>
+                                            </VideoProcessingWrapper>
+                                            <ReCaptchaBadgeModal />
+                                          </>
+                                        </GlobalTheme>
+                                      </PostModalContextProvider>
+                                    </ResizeMode>
+                                  </OverlayModeProvider>
+                                </ChatsProvider>
+                              </SubscriptionsProvider>
+                            </CardsContextProvider>
                           </FollowingsContextProvider>
                         </BlockedUsersProvider>
                       </ModalNotificationsContextProvider>
@@ -311,12 +303,12 @@ const PRE_FETCH_LINKS_COMMON = (
       as='image'
       media='(min-width: 760px)'
     />
-    <link
+    {/* <link
       rel='prefetch'
       href={assets.floatingAssets.crowdfunding}
       as='image'
       media='(min-width: 760px)'
-    />
+    /> */}
     <link
       rel='prefetch'
       href={assets.floatingAssets.leftGlassSphere}

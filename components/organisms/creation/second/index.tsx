@@ -61,6 +61,7 @@ import {
 import {
   CREATION_TITLE_MIN,
   CREATION_TITLE_MAX,
+  CREATION_OPTION_MIN,
 } from '../../../../constants/general';
 
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
@@ -142,10 +143,10 @@ export const CreationSecondStepContent: React.FC<
         nameToken: 'multiple-choice',
         url: '/creation/multiple-choice',
       },
-      {
+      /* {
         nameToken: 'crowdfunding',
         url: '/creation/crowdfunding',
-      },
+      }, */
     ],
     []
   );
@@ -260,15 +261,19 @@ export const CreationSecondStepContent: React.FC<
     Set<number>
   >(new Set());
   const optionsAreValid = useMemo(
-    () => tab !== 'multiple-choice' || invalidMcOptionsIndicies.size === 0,
-    [tab, invalidMcOptionsIndicies]
+    () =>
+      tab !== 'multiple-choice' ||
+      (invalidMcOptionsIndicies.size === 0 &&
+        multiplechoice.choices.filter(
+          (o) => o.text.length < CREATION_OPTION_MIN
+        ).length === 0),
+    [tab, invalidMcOptionsIndicies.size, multiplechoice.choices]
   );
 
   const targetBackersValid =
     tab !== 'crowdfunding' ||
     (crowdfunding.targetBackerCount && crowdfunding?.targetBackerCount >= 1);
-  // const disabled =
-  //   !!titleError || !post.title || !post.announcementVideoUrl || fileUpload.progress !== 100 || !optionsAreValid;
+
   const disabled =
     !!titleError ||
     !post.title ||
@@ -820,17 +825,6 @@ export const CreationSecondStepContent: React.FC<
             <SSeparator margin='16px 0' />
           </>
         )}
-        {tab === 'multiple-choice' &&
-          user?.userData?.options?.isOfferingSubscription && (
-            <SMobileFieldWrapper>
-              <MobileField
-                id='allowSuggestions'
-                type='toggle'
-                value={multiplechoice.options.allowSuggestions}
-                onChange={handleItemChange}
-              />
-            </SMobileFieldWrapper>
-          )}
         <MobileField
           id='comments'
           type='toggle'
@@ -853,8 +847,6 @@ export const CreationSecondStepContent: React.FC<
       t,
       formatExpiresAt,
       formatStartsAt,
-      user?.userData?.options?.isOfferingSubscription,
-      multiplechoice.options.allowSuggestions,
     ]
   );
 
@@ -1463,10 +1455,6 @@ const SFieldWrapper = styled.div`
   margin: 8px;
 `;
 
-const SMobileFieldWrapper = styled.div`
-  margin-bottom: 16px;
-`;
-
 const SButtonWrapper = styled.div`
   left: 0;
   width: 100%;
@@ -1546,6 +1534,7 @@ const SBottomEndPostTitle = styled(Text)`
   max-width: 100%;
   line-break: loose;
   white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SBottomEndPostTitleHashtag = styled.span`

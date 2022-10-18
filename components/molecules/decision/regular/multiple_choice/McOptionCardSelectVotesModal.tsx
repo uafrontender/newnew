@@ -2,8 +2,7 @@ import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { motion } from 'framer-motion';
-
-import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
+import { newnewapi } from 'newnew-api';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
@@ -16,11 +15,10 @@ import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.sv
 interface IMcOptionCardSelectVotesModal {
   isVisible: boolean;
   isSupportedByMe: boolean;
-  availableVotes: number[];
+  availableVotes: newnewapi.McVoteOffer[];
   children: React.ReactNode;
   handleClose: () => void;
-  handleOpenCustomAmountModal: () => void;
-  handleSetAmountAndOpenModal: (votesAmount: string) => void;
+  handleSetVoteOfferAndOpenModal: (votesAmount: newnewapi.McVoteOffer) => void;
 }
 
 const McOptionCardSelectVotesModal: React.FunctionComponent<
@@ -31,13 +29,10 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<
   availableVotes,
   children,
   handleClose,
-  handleOpenCustomAmountModal,
-  handleSetAmountAndOpenModal,
+  handleSetVoteOfferAndOpenModal,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
-
-  const { appConstants } = useGetAppConstants();
 
   return (
     <Modal show={isVisible} overlaydim additionalz={10} onClose={handleClose}>
@@ -65,29 +60,24 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<
         </STitleContainer>
         {children}
         <SButtonsContainer>
-          {availableVotes.map((amount) => (
+          {availableVotes.map((voteOffer) => (
             <SButton
-              key={amount}
-              onClick={() => handleSetAmountAndOpenModal(amount.toString())}
+              key={voteOffer.amountOfVotes}
+              onClick={() => handleSetVoteOfferAndOpenModal(voteOffer)}
             >
               <Text variant={3}>
                 <SBoldSpan>
-                  {amount}{' '}
-                  {amount === 1
+                  {voteOffer.amountOfVotes}{' '}
+                  {voteOffer.amountOfVotes === 1
                     ? t('mcPost.optionsTab.optionCard.selectVotesMenu.vote')
                     : t('mcPost.optionsTab.optionCard.selectVotesMenu.votes')}
                 </SBoldSpan>{' '}
                 <SOpaqueSpan>
-                  {`($${amount * Math.round(appConstants.mcVotePrice / 100)})`}
+                  {`($${(voteOffer.price?.usdCents || 0) / 100})`}
                 </SOpaqueSpan>
               </Text>
             </SButton>
           ))}
-          <SButton onClick={() => handleOpenCustomAmountModal()}>
-            <Text variant={3}>
-              {t('mcPost.optionsTab.optionCard.selectVotesMenu.custom')}
-            </Text>
-          </SButton>
         </SButtonsContainer>
       </SContainer>
     </Modal>
