@@ -302,13 +302,6 @@ const SCommentsForm = styled.form<{
   top: 0;
   z-index: ${({ zIndex }) => zIndex ?? 'unset'};
   background: ${({ theme }) => theme.colorsThemed.background.primary};
-
-  ${(props) => props.theme.media.tablet} {
-    background-color: ${({ theme }) =>
-      theme.name === 'dark'
-        ? theme.colorsThemed.background.secondary
-        : theme.colorsThemed.background.primary};
-  }
 `;
 
 interface ISInputWrapper {}

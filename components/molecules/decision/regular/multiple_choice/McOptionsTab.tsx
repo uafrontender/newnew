@@ -674,11 +674,6 @@ const SActionSection = styled.div`
 
     padding-top: 8px;
 
-    background-color: ${({ theme }) =>
-      theme.name === 'dark'
-        ? theme.colorsThemed.background.secondary
-        : theme.colorsThemed.background.primary};
-
     border-top: 1.5px solid
       ${({ theme }) => theme.colorsThemed.background.outlines1};
 

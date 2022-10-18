@@ -187,15 +187,6 @@ const SPostModalContainer = styled.div<{
   isMyPost: boolean;
   loaded: boolean;
 }>`
-  /* position: absolute;
-  top: 0;
-  left: 0;
-
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  z-index: 1;
-  overscroll-behavior: none; */
-
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
   height: 100%;
@@ -220,15 +211,11 @@ const SPostModalContainer = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     top: 64px;
-    /*transform: none; */
-    /* top: 50%; */
-    /* transform: translateY(-50%); */
+    transform: none;
+    top: 50%;
+    transform: translateY(-50%);
     padding-bottom: 16px;
 
-    /* background-color: ${({ theme }) =>
-      theme.name === 'dark'
-        ? theme.colorsThemed.background.secondary
-        : theme.colorsThemed.background.primary}; */
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     width: 100%;
     /* height: calc(100% - 64px); */
@@ -240,7 +227,6 @@ const SPostModalContainer = styled.div<{
     max-width: 1440px;
     margin-left: auto;
     margin-right: auto;
-    max-height: ${({ loaded }) => (loaded ? 'unset' : '840px')};
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
