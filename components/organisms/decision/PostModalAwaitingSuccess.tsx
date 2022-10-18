@@ -177,10 +177,6 @@ const SPostModalContainer = styled.div<{
   -ms-overflow-style: none;
 
   ${({ theme }) => theme.media.tablet} {
-    top: 64px;
-    /*transform: none; */
-    /* top: 50%; */
-    /* transform: translateY(-50%); */
     padding-bottom: 16px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};

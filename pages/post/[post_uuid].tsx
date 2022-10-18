@@ -9,7 +9,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { fetchCuratedPosts, fetchPostByUUID } from '../../api/endpoints/post';
+import { fetchPostByUUID } from '../../api/endpoints/post';
 
 import { NextPageWithLayout } from '../_app';
 import switchPostType from '../../utils/switchPostType';
@@ -130,17 +130,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  const top10payload = new newnewapi.EmptyRequest({});
-
-  const resTop10 = await fetchCuratedPosts(top10payload);
-
   return {
     props: {
-      ...(resTop10.data
-        ? {
-            top10posts: resTop10.data.toJSON(),
-          }
-        : {}),
       postUuid: post_uuid,
       post: res.data.toJSON(),
       ...(setup_intent_client_secret

@@ -736,8 +736,7 @@ const SWrapper = styled.div`
       'video title'
       'video activities';
     grid-template-columns: 410px 1fr;
-
-    padding-bottom: initial;
+    grid-column-gap: 32px;
   }
 `;
 
