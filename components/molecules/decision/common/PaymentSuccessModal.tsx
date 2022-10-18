@@ -13,13 +13,13 @@ import assets from '../../../../constants/assets';
 const DARK_IMAGES: any = {
   ac: assets.creation.darkAcStatic,
   cf: assets.creation.darkCfStatic,
-  mc: assets.floatingAssets.darkVotes,
+  mc: assets.floatingAssets.votes,
 };
 
 const LIGHT_IMAGES: any = {
   ac: assets.creation.lightAcStatic,
   cf: assets.creation.lightCfStatic,
-  mc: assets.floatingAssets.lightVotes,
+  mc: assets.floatingAssets.votes,
 };
 interface IPaymentSuccessModal {
   postType: TPostType;
