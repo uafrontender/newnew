@@ -30,11 +30,7 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
     <Modal show={isVisible} overlaydim additionalz={12} onClose={closeModal}>
       <SContainer>
         <SModal>
-          <BundleIcon
-            // TODO: change to single ticket asset from AWS
-            src={assets.decision.votes}
-            alt='votes'
-          />
+          <BundleIcon src={assets.common.vote} alt='votes' />
           <SVotesAvailable>
             <Trans
               t={t}

@@ -143,6 +143,7 @@ const assets = {
     darkAnimatedLogo: `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.webp`,
     darkAc: `${APP_ASSETS_ORIGIN}/common/dark-ac.png`,
     goldBig: `${APP_ASSETS_ORIGIN}/common/gold-big.png`,
+    vote: `${APP_ASSETS_ORIGIN}/common/vote.png`,
   },
   cards: {
     background: [

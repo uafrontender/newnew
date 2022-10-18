@@ -37,11 +37,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
             isCloseButton
           >
             <Content>
-              <BundleIcon
-                // TODO: change to single ticket asset from AWS
-                src={assets.decision.votes}
-                alt='votes'
-              />
+              <BundleIcon src={assets.common.vote} alt='votes' />
               <SVotesAvailable>
                 <Trans
                   t={t}
