@@ -49,6 +49,7 @@ import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 import SmsNotificationsButton from '../molecules/profile/SmsNotificationsButton';
 import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
 import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
+import { useBundles } from '../../contexts/bundlesContext';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -98,6 +99,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
   const [wasSubscribed, setWasSubscribed] = useState<boolean | null>(null);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
+  const { bundles } = useBundles();
+  const creatorsBundle = useMemo(
+    () => bundles?.find((bundle) => bundle.creator?.uuid === user.uuid),
+    [bundles, user.uuid]
+  );
 
   // Share
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -502,9 +508,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               <div />
             )}
             <RightSideButtons>
-              {user.options?.isCreator && user.options.isOfferingPacks && (
-                <SSeeBundleButton creator={user} />
-              )}
+              <SSeeBundleButton user={user} creatorsBundle={creatorsBundle} />
               <SIconButton
                 active={ellipseMenuOpen}
                 ref={moreButtonRef}

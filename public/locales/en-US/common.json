@@ -149,6 +149,14 @@
       "error": {
         "requestFailed": "Request failed"
       }
+    },
+    "creatorsBundleModal": {
+      "votesLeft": "<0>{{amount}}</0> votes left",
+      "for": "for <0>{{creator}}</0>",
+      "access": "{{amount}} days left of:",
+      "customOptions": "adding custom options to any Superpoll",
+      "chat": "1-on-1 private chat",
+      "buyButton": "Buy more votes"
     }
   },
   "myLink": {

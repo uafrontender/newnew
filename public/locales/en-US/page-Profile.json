@@ -99,7 +99,8 @@
       "favorites": "Favorites",
       "enableSmsNotifications": "Notify me",
       "disableSmsNotifications": "Notifications ON",
-      "viewBundles": "View bundles",
+      "buyBundles": "Buy Bundles",
+      "votesLeft": "{{amount}} votes left",
       "sendMessage": "Send message",
       "copied": "Link copied!"
     }
