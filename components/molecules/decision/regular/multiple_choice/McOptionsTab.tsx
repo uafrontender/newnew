@@ -109,7 +109,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     useScrollGradients(containerRef);
 
   const [heightDelta, setHeightDelta] = useState(
-    !hasVotedOptionId && postStatus === 'voting' && bundle ? 58 + 72 : 0
+    !hasVotedOptionId && postStatus === 'voting' ? 58 + 72 : 0
   );
   const actionSectionContainer = useRef<HTMLDivElement>();
 
@@ -292,7 +292,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       !postLoading &&
       !hasVotedOptionId &&
       postStatus === 'voting' &&
-      bundle &&
       actionSectionContainer.current
     ) {
       resizeObserver.observe(actionSectionContainer.current!!);
@@ -414,7 +413,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
-        {!hasVotedOptionId && postStatus === 'voting' && bundle && (
+        {!hasVotedOptionId && postStatus === 'voting' && (
           <SActionSection
             ref={(el) => {
               actionSectionContainer.current = el!!;
@@ -445,7 +444,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   _postUuid: post.postUuid,
                   _component: 'McOptionsTab',
                 });
-                setUseFreeVoteModalOpen(true);
+                if (bundle) {
+                  setUseFreeVoteModalOpen(true);
+                } else {
+                  setBuyBundleModalOpen(true);
+                }
               }}
             >
               {t('mcPost.optionsTab.actionSection.placeABidButton')}
@@ -526,7 +529,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   _postUuid: post.postUuid,
                   _component: 'McOptionsTab',
                 });
-                setUseFreeVoteModalOpen(true);
+                if (bundle) {
+                  setUseFreeVoteModalOpen(true);
+                } else {
+                  setBuyBundleModalOpen(true);
+                }
               }}
             >
               {t('mcPost.optionsTab.actionSection.placeABidButton')}
