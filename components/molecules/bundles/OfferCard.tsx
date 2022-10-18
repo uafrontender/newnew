@@ -11,7 +11,7 @@ import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 interface IOfferCard {
   className?: string;
   bundleLevel: number;
-  bundleOffer: newnewapi.IPackOffer;
+  bundleOffer: newnewapi.IBundleOffer;
   onClick: () => void;
 }
 

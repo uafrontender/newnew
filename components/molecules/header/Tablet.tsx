@@ -19,6 +19,9 @@ import MoreMenuTablet from '../../organisms/MoreMenuTablet';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useBundles } from '../../../contexts/bundlesContext';
+import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
+import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 
 interface ITablet {}
 
@@ -29,6 +32,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
+  const { bundles } = useBundles();
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
@@ -52,6 +56,38 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 </a>
               </Link>
             )}
+            {bundles && bundles.length > 0 && (
+              <SItemWithMargin>
+                <Link href='/bundles'>
+                  <a>
+                    <Button
+                      iconOnly
+                      view='quaternary'
+                      onClick={() => {
+                        Mixpanel.track('Navigation Item Clicked', {
+                          _button: 'Bundles',
+                        });
+                      }}
+                    >
+                      <SIconButtonContent>
+                        <SBundleIcon
+                          src={
+                            theme.name === 'light'
+                              ? VoteIconLight.src
+                              : VoteIconDark.src
+                          }
+                        />
+                      </SIconButtonContent>
+                    </Button>
+                    <MoreMenuTablet
+                      isVisible={moreMenuOpen}
+                      handleClose={() => setMoreMenuOpen(false)}
+                    />
+                  </a>
+                </Link>
+              </SItemWithMargin>
+            )}
+
             {((user.userData?.options?.isOfferingSubscription &&
               mySubscribersTotal > 0) ||
               creatorsImSubscribedTo.length > 0) && (
@@ -218,6 +254,15 @@ const SItemWithMargin = styled.div`
   ${({ theme }) => theme.media.laptop} {
     margin-left: 16px;
   }
+`;
+
+const SIconButtonContent = styled.div`
+  display: flex;
+`;
+
+const SBundleIcon = styled.img`
+  width: 24px;
+  height: 24px;
 `;
 
 const SNavText = styled(Text)`

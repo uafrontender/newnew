@@ -30,6 +30,7 @@ import useHasMounted from '../../utils/hooks/useHasMounted';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
+import { useBundles } from '../../contexts/bundlesContext';
 
 interface IGeneral {
   className?: string;
@@ -55,6 +56,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const [cookies] = useCookies();
   const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
+  const { bundles } = useBundles();
   const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
   const { postOverlayOpen } = usePostModalState();
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
@@ -65,12 +67,11 @@ export const General: React.FC<IGeneral> = (props) => {
 
   // TODO: fix an issue when scroll position is set before resizing of the wrapper
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const bottomNavigation = useMemo(() => {
+  const bottomNavigation: TBottomNavigationItem[] = useMemo(() => {
     let bottomNavigationShadow: TBottomNavigationItem[] = [
       {
         key: 'home',
         url: '/',
-        width: '100%',
       },
     ];
 
@@ -80,28 +81,28 @@ export const General: React.FC<IGeneral> = (props) => {
           {
             key: 'home',
             url: '/',
-            width: '20%',
           },
           {
             key: 'dashboard',
             url: '/creator/dashboard',
-            width: '20%',
           },
           {
             key: 'add',
             url: '/creation',
-            width: '20%',
           },
-          {
-            key: 'notifications',
-            url: '/notifications',
-            width: '20%',
-            counter: unreadNotificationCount,
-          },
+          bundles && bundles.length > 0
+            ? {
+                key: 'bundles',
+                url: '/bundles',
+              }
+            : {
+                key: 'notifications',
+                url: '/notifications',
+                counter: unreadNotificationCount,
+              },
           {
             key: 'more',
             url: '/more',
-            width: '20%',
             actionHandler: () => setMoreMenuMobileOpen(true),
           },
         ];
@@ -110,19 +111,21 @@ export const General: React.FC<IGeneral> = (props) => {
           {
             key: 'home',
             url: '/',
-            width: '33%',
           },
           {
             key: 'add',
             url: '/creator-onboarding',
-            width: '33%',
           },
-          {
-            key: 'notifications',
-            url: '/notifications',
-            width: '33%',
-            counter: unreadNotificationCount,
-          },
+          bundles && bundles.length > 0
+            ? {
+                key: 'bundles',
+                url: '/bundles',
+              }
+            : {
+                key: 'notifications',
+                url: '/notifications',
+                counter: unreadNotificationCount,
+              },
         ].concat(
           (user.userData?.options?.isOfferingSubscription &&
             mySubscribersTotal > 0) ||
@@ -131,7 +134,6 @@ export const General: React.FC<IGeneral> = (props) => {
                 {
                   key: 'dms',
                   url: '/direct-messages',
-                  width: '33%',
                   counter: unreadCount,
                 },
               ]
@@ -149,6 +151,7 @@ export const General: React.FC<IGeneral> = (props) => {
     unreadCount,
     creatorsImSubscribedTo.length,
     mySubscribersTotal,
+    bundles,
   ]);
 
   useScrollPosition();

@@ -155,6 +155,8 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
                 creatorStatus: data.me?.options?.creatorStatus,
                 birthDateUpdatesLeft: data.me?.options?.birthDateUpdatesLeft,
                 isOfferingSubscription: data.me.options?.isOfferingSubscription,
+                // TODO: Re-enable
+                // isOfferingBundles: data.me.options?.isOfferingBundles,
                 isPhoneNumberConfirmed: data.me.options?.isPhoneNumberConfirmed,
               },
             } as TUserData)

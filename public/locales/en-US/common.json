@@ -47,13 +47,15 @@
     "share": "Share",
     "dashboard": "Dashboard",
     "dms": "DMs",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "bundles": "Bundles"
   },
   "mobileTopNavigation": {
     "myBalance": "My Balance: ${{value}}",
     "profile": "Profile"
   },
   "button": {
+    "bundles": "Bundles",
     "createDecision": "New post",
     "create": "Create",
     "signIn": "Sign in",

@@ -14,9 +14,11 @@ import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
 import ChatIconFilled from '../../public/images/svg/icons/filled/Chat.svg';
 import ShareIcon from '../../public/images/svg/icons/filled/Share.svg';
+import notificationsIconFilled from '../../public/images/svg/icons/filled/Notifications.svg';
 import ShareMenu from './ShareMenu';
 import { useAppSelector } from '../../redux-store/store';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+import { useBundles } from '../../contexts/bundlesContext';
 
 interface IMoreMenuMobile {
   isVisible: boolean;
@@ -33,6 +35,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
   const containerRef = useRef<HTMLDivElement>();
   const user = useAppSelector((state) => state.user);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const { bundles } = useBundles();
 
   const handleShareMenuClick = () => setShareMenuOpen(!shareMenuOpen);
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
@@ -109,6 +112,34 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
                   height='24px'
                 />
               </SButton>
+              {/* If there are bundles, notifications are moved to more menu */}
+              {/* TODO: Refactor the menu to make it work with the collection, auto split navigation items */}
+              {bundles && bundles.length > 0 && (
+                <SButton
+                  onClick={() =>
+                    router.route.includes('direct-messages')
+                      ? handleClose()
+                      : handleClick('notifications')
+                  }
+                >
+                  <SText
+                    variant={2}
+                    active={router.route.includes('notifications')}
+                  >
+                    {t('mobileBottomNavigation.notifications')}
+                  </SText>
+                  <InlineSvg
+                    svg={notificationsIconFilled}
+                    fill={
+                      router.route.includes('notifications')
+                        ? theme.colorsThemed.accent.blue
+                        : theme.colorsThemed.text.tertiary
+                    }
+                    width='24px'
+                    height='24px'
+                  />
+                </SButton>
+              )}
             </>
           ) : (
             <ShareMenu
