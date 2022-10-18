@@ -825,17 +825,6 @@ export const CreationSecondStepContent: React.FC<
             <SSeparator margin='16px 0' />
           </>
         )}
-        {tab === 'multiple-choice' &&
-          user?.userData?.options?.isOfferingSubscription && (
-            <SMobileFieldWrapper>
-              <MobileField
-                id='allowSuggestions'
-                type='toggle'
-                value={multiplechoice.options.allowSuggestions}
-                onChange={handleItemChange}
-              />
-            </SMobileFieldWrapper>
-          )}
         <MobileField
           id='comments'
           type='toggle'
@@ -858,8 +847,6 @@ export const CreationSecondStepContent: React.FC<
       t,
       formatExpiresAt,
       formatStartsAt,
-      user?.userData?.options?.isOfferingSubscription,
-      multiplechoice.options.allowSuggestions,
     ]
   );
 
@@ -1466,10 +1453,6 @@ const SListWrapper = styled.div`
 const SFieldWrapper = styled.div`
   width: calc(50% - 16px);
   margin: 8px;
-`;
-
-const SMobileFieldWrapper = styled.div`
-  margin-bottom: 16px;
 `;
 
 const SButtonWrapper = styled.div`
