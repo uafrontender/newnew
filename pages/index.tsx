@@ -425,7 +425,7 @@ const SCardsSection = styled(CardsSection)`
 `;
 
 const SHeadline = styled(Headline)`
-  margin-bottom: 24px;
+  margin-bottom: 48px;
   margin-top: 40px;
 
   font-size: 52px;

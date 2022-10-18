@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { newnewapi } from 'newnew-api';
-// import { useTranslation } from 'next-i18next';
+import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import Link from 'next/link';
 
 import CardsSection from './CardsSection';
+import Headline from '../../atoms/Headline';
+import Button from '../../atoms/Button';
 
 import { getMyPosts } from '../../../api/endpoints/user';
 
@@ -12,11 +15,12 @@ interface IYourPostsSection {
 }
 
 const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
-  // const { t } = useTranslation('page-Home');
+  const { t } = useTranslation('common');
 
   const [posts, setPosts] = useState<newnewapi.Post[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const isPostsRequested = useRef(false);
 
   useEffect(() => {
     async function fetchBiggest() {
@@ -40,11 +44,25 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
         setIsError(true);
       } finally {
         setIsLoading(false);
+        isPostsRequested.current = true;
       }
     }
 
     fetchBiggest();
   }, []);
+
+  if (isPostsRequested.current && posts.length === 0) {
+    return (
+      <SCreateFirstContainer>
+        <SHeadline>Post your first Bid or Superpoll</SHeadline>
+        <Link href='/creation'>
+          <a>
+            <Button>{t('button.createDecision')}</Button>
+          </a>
+        </Link>
+      </SCreateFirstContainer>
+    );
+  }
 
   return (
     <SContainer>
@@ -63,9 +81,32 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
 const SContainer = styled.div``;
 
 const SCardsSection = styled(CardsSection)`
+  margin-bottom: 80px;
+  padding: 0;
+
   & > div > div > div > div {
     border-color: ${({ theme }) => theme.colorsThemed.accent.blue};
   }
+`;
+
+const SCreateFirstContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid ${({ theme }) => theme.colorsThemed.accent.blue};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  height: 484px;
+  margin-bottom: 80px;
+`;
+
+const SHeadline = styled(Headline)`
+  margin-bottom: 40px;
+  max-width: 587px;
+
+  text-align: center;
+  font-size: 64px;
+  line-height: 72px;
 `;
 
 export default YourPostsSection;
