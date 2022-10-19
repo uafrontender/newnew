@@ -47,13 +47,15 @@
     "share": "Compartir",
     "dashboard": "Panel",
     "dms": "Mensajes directos",
-    "notifications": "Notificaciones"
+    "notifications": "Notificaciones",
+    "bundles_NEED_TRANSLATION": "Bundles"
   },
   "mobileTopNavigation": {
     "myBalance": "Mi balance: ${{value}}",
     "profile": "Perfil"
   },
   "button": {
+    "bundles_NEED_TRANSLATION": "Bundles",
     "createDecision": "Nueva publicación",
     "create": "Crear",
     "signIn": "Iniciar sesión",
@@ -128,6 +130,39 @@
       "title": "¡Estamos en ello!",
       "subtitle": "Te agradecemos que te pongas en contacto con nosotros. Investigaremos tu reporte lo antes posible y tomaremos las medidas necesarias para garantizar la seguridad de todos.",
       "button": "Aceptar"
+    },
+    "buyBundle_NEED_TRANSLATION": {
+      "title": "Buy a Superpoll bundle for:",
+      "votes": "<0>{{amount}}</0> votes",
+      "access": "plus get {{amount}} {{unit}} of:",
+      "customOptions": "adding custom options to any Superpoll",
+      "chat": "1-on-1 private chat",
+      "buy": "Buy for ${{amount}}",
+      "terms": "*votes in a bundle never expire",
+      "unit": {
+        "month": "month",
+        "months": "months"
+      },
+      "payment": {
+        "header": "{{creator}}'s Superpoll Bundle"
+      },
+      "error": {
+        "requestFailed": "Request failed"
+      }
+    },
+    "creatorsBundleModal_NEED_TRANSLATION": {
+      "votesLeft": "<0>{{amount}}</0> votes left",
+      "for": "for <0>{{creator}}</0>",
+      "access": "{{amount}} {{unit}} left of:",
+      "customOptions": "adding custom options to any Superpoll",
+      "chat": "1-on-1 private chat",
+      "buyButton": "Buy more votes",
+      "unit": {
+        "day": "day",
+        "days": "days",
+        "month": "month",
+        "months": "months"
+      }
     }
   },
   "myLink": {
@@ -191,5 +226,9 @@
     "error": {
       "requestFailed": "Request failed"
     }
+  },
+  "creatorCard_NEED_TRANSLATION": {
+    "buyBundle": "Buy Bundle",
+    "purchasedVotes": "{{value}} votes"
   }
 }

@@ -249,6 +249,9 @@
     "winner": "Ganador",
     "history": "Historial"
   },
+  "optionsTabLine": {
+    "bundleVotes_NEED_TRANSLATION": "You have <0>{{amount}} votes</0>"
+  },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
       "ac": "Este Bid comenzará una vez que el \nvideo haya sido procesado",
@@ -393,8 +396,6 @@
         "supportButton": "Votar",
         "supportAgainButton": "Votar \nde nuevo",
         "raiseBidButton": "Votar",
-        "doubleMyVoteCaption": "Si quieres que esta opción gane, ¡aumenta tus posibilidades de éxito y duplica tu oferta!",
-        "doubleMyVoteButton": "Duplica mi voto",
         "placeABidButton": "Votar",
         "cancelButton": "Cancelar",
         "moreButton": "Más",
@@ -403,7 +404,8 @@
           "titleMoreVotes": "Comprar más votos",
           "vote": "voto",
           "votes": "votos",
-          "custom": "Votos personalizados"
+          "custom": "Votos personalizados",
+          "useVotes_NEED_TRANSLATION": "Use my votes"
         },
         "confirmVoteModal": {
           "vote": "voto",
@@ -423,6 +425,11 @@
         "line_3": "Siempre puedes comprar más votos después si quieres añadir aún más.",
         "useFreeVoteButton": "Usar mi voto gratis"
       },
+      "useBundleVotesModal_NEED_TRANSLATION": {
+        "votesAvailable": "<0>{{amount}}</0> votes available",
+        "optionTitle": "Superpoll option",
+        "button": "Vote"
+      },
       "actionSection": {
         "votesAmount": {
           "placeholder": {
@@ -432,7 +439,9 @@
         },
         "suggestionPlaceholder": "Agregar tu propia opción...",
         "suggestionPlaceholderDesktop": "Agregar opción...",
-        "placeABidButton": "Agregar mi opción"
+        "placeABidButton": "Agregar mi opción",
+        "offersBundles_NEED_TRANSLATION": "{{creator}} offers Superpoll Bundles",
+        "viewBundles_NEED_TRANSLATION": "View Bundles"
       }
     },
     "winnerTab": {
