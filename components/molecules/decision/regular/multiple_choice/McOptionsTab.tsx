@@ -109,7 +109,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     useScrollGradients(containerRef);
 
   const [heightDelta, setHeightDelta] = useState(
-    !hasVotedOptionId && postStatus === 'voting' ? 58 + 72 : 0
+    !hasVotedOptionId &&
+      postStatus === 'voting' &&
+      (post.creator?.options?.isOfferingBundles || bundle)
+      ? 58 + 72
+      : 0
   );
   const actionSectionContainer = useRef<HTMLDivElement>();
 
@@ -292,6 +296,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       !postLoading &&
       !hasVotedOptionId &&
       postStatus === 'voting' &&
+      (post.creator?.options?.isOfferingBundles || bundle) &&
       actionSectionContainer.current
     ) {
       resizeObserver.observe(actionSectionContainer.current!!);
@@ -302,7 +307,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     return () => {
       resizeObserver.disconnect();
     };
-  }, [hasVotedOptionId, postLoading, postStatus, isMobileOrTablet, bundle]);
+  }, [
+    hasVotedOptionId,
+    postLoading,
+    postStatus,
+    isMobileOrTablet,
+    bundle,
+    post.creator?.options?.isOfferingBundles,
+  ]);
 
   const goToNextStep = () => {
     if (
@@ -413,80 +425,80 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
-        {!hasVotedOptionId && postStatus === 'voting' && (
-          <SActionSection
-            ref={(el) => {
-              actionSectionContainer.current = el!!;
-            }}
-          >
-            <SuggestionTextArea
-              value={newOptionText}
-              disabled={optionBeingSupported !== ''}
-              placeholder={t(
-                'mcPost.optionsTab.actionSection.suggestionPlaceholder'
-              )}
-              onChange={handleUpdateNewOptionText}
-            />
-            <SAddOptionButton
-              size='sm'
-              disabled={
-                !newOptionText ||
-                optionBeingSupported !== '' ||
-                !newOptionTextValid
-              }
-              style={{
-                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-              }}
-              onClick={() => {
-                // TODO: change event name?
-                Mixpanel.track('Click Add Free Option', {
-                  _stage: 'Post',
-                  _postUuid: post.postUuid,
-                  _component: 'McOptionsTab',
-                });
-                if (bundle) {
-                  setUseFreeVoteModalOpen(true);
-                } else {
-                  setBuyBundleModalOpen(true);
-                }
+        {!hasVotedOptionId &&
+          postStatus === 'voting' &&
+          (post.creator?.options?.isOfferingBundles || bundle) && (
+            <SActionSection
+              ref={(el) => {
+                actionSectionContainer.current = el!!;
               }}
             >
-              {t('mcPost.optionsTab.actionSection.placeABidButton')}
-            </SAddOptionButton>
-            {user.userTutorialsProgress.remainingMcSteps && (
-              <STutorialTooltipTextAreaHolder>
-                <TutorialTooltip
-                  isTooltipVisible={
-                    user.userTutorialsProgress.remainingMcSteps[0] ===
-                    newnewapi.McTutorialStep.MC_TEXT_FIELD
-                  }
-                  closeTooltip={goToNextStep}
-                  title={t('tutorials.mc.createYourBid.title')}
-                  text={t('tutorials.mc.createYourBid.text')}
-                  dotPosition={DotPositionEnum.BottomRight}
-                />
-              </STutorialTooltipTextAreaHolder>
-            )}
-          </SActionSection>
-        )}
-        {/* TODO: remove test change (|| true) */}
-        {post.creator?.options?.isOfferingBundles ||
-          (true && (
-            <SBundlesContainer>
-              <SBundlesText>
-                {t('mcPost.optionsTab.actionSection.offersBundles', {
-                  creator: postCreatorName,
-                })}
-              </SBundlesText>
-              <SViewButton
+              <SuggestionTextArea
+                value={newOptionText}
+                disabled={optionBeingSupported !== ''}
+                placeholder={t(
+                  'mcPost.optionsTab.actionSection.suggestionPlaceholder'
+                )}
+                onChange={handleUpdateNewOptionText}
+              />
+              <SAddOptionButton
+                size='sm'
+                disabled={
+                  !newOptionText ||
+                  optionBeingSupported !== '' ||
+                  !newOptionTextValid
+                }
+                style={{
+                  ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+                }}
                 onClick={() => {
-                  setBuyBundleModalOpen(true);
+                  // TODO: change event name?
+                  Mixpanel.track('Click Add Free Option', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'McOptionsTab',
+                  });
+                  if (bundle) {
+                    setUseFreeVoteModalOpen(true);
+                  } else {
+                    setBuyBundleModalOpen(true);
+                  }
                 }}
               >
-                {t('mcPost.optionsTab.actionSection.viewBundles')}
-              </SViewButton>
-            </SBundlesContainer>
-          ))}
+                {t('mcPost.optionsTab.actionSection.placeABidButton')}
+              </SAddOptionButton>
+              {user.userTutorialsProgress.remainingMcSteps && (
+                <STutorialTooltipTextAreaHolder>
+                  <TutorialTooltip
+                    isTooltipVisible={
+                      user.userTutorialsProgress.remainingMcSteps[0] ===
+                      newnewapi.McTutorialStep.MC_TEXT_FIELD
+                    }
+                    closeTooltip={goToNextStep}
+                    title={t('tutorials.mc.createYourBid.title')}
+                    text={t('tutorials.mc.createYourBid.text')}
+                    dotPosition={DotPositionEnum.BottomRight}
+                  />
+                </STutorialTooltipTextAreaHolder>
+              )}
+            </SActionSection>
+          )}
+        {post.creator?.options?.isOfferingBundles && (
+          <SBundlesContainer>
+            <SBundlesText>
+              {t('mcPost.optionsTab.actionSection.offersBundles', {
+                creator: postCreatorName,
+              })}
+            </SBundlesText>
+            <SViewButton
+              onClick={() => {
+                setBuyBundleModalOpen(true);
+              }}
+            >
+              {t('mcPost.optionsTab.actionSection.viewBundles')}
+            </SViewButton>
+          </SBundlesContainer>
+        )}
         {user.userTutorialsProgress.remainingMcSteps && (
           <STutorialTooltipHolder>
             <TutorialTooltip
@@ -503,7 +515,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         )}
       </STabContainer>
       {/* Suggest new Modal */}
-      {isMobile && !hasVotedOptionId ? (
+      {isMobile &&
+      !hasVotedOptionId &&
+      (post.creator?.options?.isOfferingBundles || bundle) ? (
         <OptionActionMobileModal
           isOpen={suggestNewMobileOpen}
           onClose={() => setSuggestNewMobileOpen(false)}
@@ -581,7 +595,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       !suggestNewMobileOpen &&
       !hasVotedOptionId &&
       postStatus === 'voting' &&
-      bundle ? (
+      (post.creator?.options?.isOfferingBundles || bundle) ? (
         <>
           <SActionButton
             id='action-button-mobile'
