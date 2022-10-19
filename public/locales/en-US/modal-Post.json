@@ -440,7 +440,7 @@
         "suggestionPlaceholder": "Add your own option...",
         "suggestionPlaceholderDesktop": "Add an option ...",
         "placeABidButton": "Add my option",
-        "offersBundles": "This creator offers voting bundles.",
+        "offersBundles": "{{creator}} offers Superpoll Bundles",
         "viewBundles": "View Bundles"
       }
     },

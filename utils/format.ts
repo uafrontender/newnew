@@ -20,3 +20,18 @@ export const formatString = (
 
   return formatted;
 };
+
+export const splitNumber = (value: number, splitter: string) => {
+  const reversedSymbols = Array.from(value.toString()).reverse();
+  const reversedResult: string[] = [];
+
+  for (let i = 0; i < reversedSymbols.length; i++) {
+    if (i > 0 && i % 3 === 0) {
+      reversedResult.push(splitter);
+    }
+
+    reversedResult.push(reversedSymbols[i]);
+  }
+
+  return reversedResult.reverse().join('');
+};

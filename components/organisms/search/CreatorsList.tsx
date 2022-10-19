@@ -98,13 +98,13 @@ const SListWrapper = styled.div`
   cursor: grab;
   display: flex;
   padding: 8px 0 0 0;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
   position: relative;
   flex-wrap: wrap;
   flex-direction: row;
 
   ${(props) => props.theme.media.tablet} {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
     width: calc(100% + 26px);
     padding: 0;
   }

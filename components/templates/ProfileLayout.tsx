@@ -508,7 +508,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               <div />
             )}
             <RightSideButtons>
-              <SSeeBundleButton user={user} creatorsBundle={creatorsBundle} />
+              {!isMobile && (
+                <SSeeBundleButton user={user} creatorsBundle={creatorsBundle} />
+              )}
               <SIconButton
                 active={ellipseMenuOpen}
                 ref={moreButtonRef}
@@ -622,6 +624,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 </CustomLink>
               )}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
+            {isMobile && (
+              <SMobileSeeBundleButton
+                user={user}
+                creatorsBundle={creatorsBundle}
+              />
+            )}
           </SUserData>
           {/* Temp, all creactors for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
@@ -693,6 +701,7 @@ const SUserData = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
+  margin-bottom: 36px;
 `;
 
 const SUsernameWrapper = styled.div`
@@ -772,7 +781,7 @@ const SBioText = styled(Text)`
 
   padding-left: 16px;
   padding-right: 16px;
-  margin: 0 auto 54px;
+  margin: 0 auto 16px;
   width: 100%;
   max-width: 480px;
 
@@ -787,6 +796,11 @@ const RightSideButtons = styled.div`
 
 const SSeeBundleButton = styled(SeeBundlesButton)`
   margin-right: 16px;
+`;
+
+const SMobileSeeBundleButton = styled(SeeBundlesButton)`
+  margin: auto;
+  margin-bottom: 16px;
 `;
 
 const SIconButton = styled.div<{

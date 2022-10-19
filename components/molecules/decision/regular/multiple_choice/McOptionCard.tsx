@@ -685,7 +685,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             bundleVotesLeft={bundleVotesLeft}
             optionText={option.text}
             handleVoteWithBundleVotes={handleVoteWithBundleVotes}
-            closeModal={() => setBundleVotesModalOpen(false)}
+            onClose={() => setBundleVotesModalOpen(false)}
           />
         )}
         {/* Payment Modal */}
@@ -759,6 +759,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             handleCloseSupportForm();
           }}
           handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
+          handleOpenBundleVotesModal={handleOpenBundleVotesModal}
         >
           <SSelectVotesModalCard isBlue={isBlue}>
             <SBidDetails isBlue={isBlue} noAction={noAction}>

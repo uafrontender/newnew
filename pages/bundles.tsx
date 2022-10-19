@@ -258,9 +258,9 @@ const SubNavigation = styled.div`
   flex-direction: row;
   align-items: flex-start;
   width: 100%;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.tablet} {
     margin-bottom: 96px;
   }
 `;
@@ -272,8 +272,8 @@ const SBackButton = styled(BackButton)`
 const STitle = styled.h1`
   font-weight: 600;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  font-size: 32px;
-  line-height: 40px;
+  font-size: 40px;
+  line-height: 48px;
   margin-bottom: 68px;
 
   ${({ theme }) => theme.media.tablet} {
@@ -352,10 +352,10 @@ const SInputWrapper = styled.div`
   border-radius: 16px;
   width: 100%;
   margin-bottom: 48px;
-  padding: 6.5px;
+  padding: 10px 12px;
 
   ${({ theme }) => theme.media.tablet} {
-    padding: 11px;
+    padding: 20px 24px;
   }
 `;
 
@@ -368,7 +368,7 @@ const SInput = styled.input`
   font-size: 14px;
   background: transparent;
   font-weight: 500;
-  line-height: 24px;
+  line-height: 20px;
 
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};

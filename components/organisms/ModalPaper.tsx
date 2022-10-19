@@ -159,6 +159,7 @@ const SCloseButton = styled.div`
   right: 24px;
   color: white;
   cursor: pointer;
+  z-index: 1;
 `;
 
 const SModalTitleFullScreen = styled.strong`

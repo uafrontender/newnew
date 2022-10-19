@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import UserAvatar from '../UserAvatar';
 import formatTimeLeft from '../../../utils/formatTimeLeft';
 import BulletLine from './BulletLine';
+import { splitNumber } from '../../../utils/format';
 
 interface IBundleCard {
   className?: string;
@@ -47,7 +48,7 @@ const BundleCard: React.FC<IBundleCard> = ({
           // @ts-ignore
           components={[
             <VotesNumberSpan />,
-            { amount: creatorBundle.bundle.votesLeft },
+            { amount: splitNumber(creatorBundle.bundle.votesLeft!, ' ') },
           ]}
         />
       </SVotesLeft>
@@ -96,6 +97,7 @@ const SUserAvatar = styled(UserAvatar)<{ small: boolean }>`
   min-width: ${({ small }) => (small ? '36px' : '48px')};
   height: ${({ small }) => (small ? '36px' : '48px')};
   min-height: ${({ small }) => (small ? '36px' : '48px')};
+  border-radius: 50%;
 `;
 
 const SUserData = styled.div`

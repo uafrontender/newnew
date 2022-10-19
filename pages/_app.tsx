@@ -356,6 +356,8 @@ const PRE_FETCH_LINKS_COMMON = (
       as='image'
       media='(min-width: 760px)'
     />
+    {/* Common */}
+    <link rel='prefetch' href={assets.common.vote} as='image' />
   </>
 );
 

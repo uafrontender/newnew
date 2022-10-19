@@ -5,13 +5,14 @@ import styled from 'styled-components';
 import Button from '../../../../atoms/Button';
 import Modal from '../../../../organisms/Modal';
 import assets from '../../../../../constants/assets';
+import ModalPaper from '../../../../organisms/ModalPaper';
 
 interface IUseBundleVotesModal {
   isVisible: boolean;
   optionText: string;
   bundleVotesLeft: number;
   handleVoteWithBundleVotes: (voteCount: number) => void;
-  closeModal: () => void;
+  onClose: () => void;
 }
 
 const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
@@ -19,7 +20,7 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
   optionText,
   bundleVotesLeft,
   handleVoteWithBundleVotes,
-  closeModal,
+  onClose,
 }) => {
   const { t } = useTranslation('modal-Post');
   const [votesToUse, setVotesToUse] = useState<number | undefined>(
@@ -27,9 +28,9 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
   );
 
   return (
-    <Modal show={isVisible} overlaydim additionalz={12} onClose={closeModal}>
-      <SContainer>
-        <SModal>
+    <Modal show={isVisible} overlaydim additionalz={12} onClose={onClose}>
+      <SModalPaper onClose={onClose} isCloseButton>
+        <SContainer>
           <BundleIcon src={assets.common.vote} alt='votes' />
           <SVotesAvailable>
             <Trans
@@ -77,42 +78,28 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
           >
             {t('mcPost.optionsTab.useBundleVotesModal.button')}
           </SDoneButton>
-        </SModal>
-      </SContainer>
+        </SContainer>
+      </SModalPaper>
     </Modal>
   );
 };
 
 export default UseBundleVotesModal;
 
-const SContainer = styled.div`
+const SModalPaper = styled(ModalPaper)`
   display: flex;
-  height: 100%;
   justify-content: center;
   align-items: center;
+  margin: 16px;
+
+  max-width: 480px;
 `;
 
-const SModal = styled.div`
+const SContainer = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  max-width: 480px;
-  width: 100%;
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colors.white
-      : props.theme.colorsThemed.background.secondary};
-  border-radius: ${(props) => props.theme.borderRadius.medium};
-  color: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
-  padding: 32px;
-  box-sizing: border-box;
-
-  line-height: 24px;
 `;
 
 const BundleIcon = styled.img`
@@ -166,12 +153,13 @@ const SInputWrapper = styled.div`
   background: ${({ theme }) => theme.colorsThemed.background.tertiary};
   border-color: ${({ theme }) => theme.colorsThemed.background.outlines2};
   width: 100%;
-  margin-bottom: 48px;
-  padding: 6.5px;
+  margin-bottom: 24px;
+  padding: 11px 20px;
 
   ${({ theme }) => theme.media.tablet} {
     padding: 11px;
     width: 280px;
+    margin-bottom: 30px;
   }
 `;
 
@@ -181,7 +169,7 @@ const SInput = styled.input`
   border: none;
   margin: 0 8px;
   outline: none;
-  font-size: 14px;
+  font-size: 16px;
   background: transparent;
   font-weight: 500;
   line-height: 24px;
@@ -193,6 +181,7 @@ const SInput = styled.input`
 
 const SDoneButton = styled(Button)`
   width: fit-content;
+  min-width: 140px;
 
   margin-left: auto;
   margin-right: auto;

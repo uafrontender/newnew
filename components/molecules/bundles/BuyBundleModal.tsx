@@ -17,26 +17,26 @@ const OFFERED_BUNDLES: newnewapi.BundleOffer[] = [
   new newnewapi.BundleOffer({
     bundleUuid: '1',
     price: new newnewapi.MoneyAmount({ usdCents: 500 }),
-    votesAmount: 500,
+    votesAmount: 100,
     accessDurationInSeconds: 60 * 60 * 24 * 30,
   }),
   new newnewapi.BundleOffer({
     bundleUuid: '2',
     price: new newnewapi.MoneyAmount({ usdCents: 2500 }),
-    votesAmount: 500,
-    accessDurationInSeconds: 60 * 60 * 24 * 30 * 2,
+    votesAmount: 4500,
+    accessDurationInSeconds: 60 * 60 * 24 * 30 * 3,
   }),
   new newnewapi.BundleOffer({
     bundleUuid: '3',
     price: new newnewapi.MoneyAmount({ usdCents: 5000 }),
-    votesAmount: 500,
-    accessDurationInSeconds: 60 * 60 * 24 * 30 * 3,
+    votesAmount: 10000,
+    accessDurationInSeconds: 60 * 60 * 24 * 30 * 6,
   }),
   new newnewapi.BundleOffer({
     bundleUuid: '4',
     price: new newnewapi.MoneyAmount({ usdCents: 7500 }),
-    votesAmount: 500,
-    accessDurationInSeconds: 60 * 60 * 24 * 30 * 4,
+    votesAmount: 20000,
+    accessDurationInSeconds: 60 * 60 * 24 * 30 * 12,
   }),
 ];
 
@@ -125,15 +125,21 @@ const SMobileTitle = styled.h1`
   font-weight: 700;
   font-size: 24px;
   line-height: 32px;
+  margin-top: 24px;
   margin-bottom: 48px;
   width: 100%;
 `;
 
 const SUserAvatar = styled(UserAvatar)`
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   margin-bottom: 8px;
+
+  ${({ theme }) => theme.media.laptop} {
+    width: 64px;
+    height: 64px;
+  }
 `;
 
 const SUsername = styled.h4`
@@ -156,15 +162,20 @@ const SOfferedBundleList = styled.div`
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
   margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.laptop} {
+    gap: 20px;
+    margin-bottom: 24px;
+  }
 `;
 
 const SOfferCard = styled(OfferCard)`
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    width: calc(50% - 10px);
+    width: calc(50% - 8px);
   }
 
   ${({ theme }) => theme.media.laptop} {

@@ -213,6 +213,24 @@ const SButton = styled.button`
   }
 `;
 
+const SBoldSpan = styled.span``;
+
+const SOpaqueSpan = styled.span`
+  opacity: 0.8;
+`;
+
+const StyledModalOverlay = styled(motion.div)`
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  bottom: 0;
+  z-index: 10;
+  overflow: hidden;
+  position: fixed;
+
+  background-color: transparent;
+`;
+
 const SUseVotesContainer = styled.div`
   width: 100%;
   border-top: 1px solid;
@@ -246,22 +264,4 @@ const SUseVotesButton = styled.button`
   &:active {
     outline: none;
   }
-`;
-
-const SBoldSpan = styled.span``;
-
-const SOpaqueSpan = styled.span`
-  opacity: 0.8;
-`;
-
-const StyledModalOverlay = styled(motion.div)`
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  bottom: 0;
-  z-index: 10;
-  overflow: hidden;
-  position: fixed;
-
-  background-color: transparent;
 `;

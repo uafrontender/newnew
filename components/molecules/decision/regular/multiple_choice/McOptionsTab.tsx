@@ -469,18 +469,24 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             )}
           </SActionSection>
         )}
-        <SBundlesContainer>
-          <SBundlesText>
-            {t('mcPost.optionsTab.actionSection.offersBundles')}
-          </SBundlesText>
-          <SViewButton
-            onClick={() => {
-              setBuyBundleModalOpen(true);
-            }}
-          >
-            {t('mcPost.optionsTab.actionSection.viewBundles')}
-          </SViewButton>
-        </SBundlesContainer>
+        {/* TODO: remove test change (|| true) */}
+        {post.creator?.options?.isOfferingBundles ||
+          (true && (
+            <SBundlesContainer>
+              <SBundlesText>
+                {t('mcPost.optionsTab.actionSection.offersBundles', {
+                  creator: postCreatorName,
+                })}
+              </SBundlesText>
+              <SViewButton
+                onClick={() => {
+                  setBuyBundleModalOpen(true);
+                }}
+              >
+                {t('mcPost.optionsTab.actionSection.viewBundles')}
+              </SViewButton>
+            </SBundlesContainer>
+          ))}
         {user.userTutorialsProgress.remainingMcSteps && (
           <STutorialTooltipHolder>
             <TutorialTooltip
@@ -554,7 +560,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           optionText={optionBeingSupported}
           bundleVotesLeft={bundle.votesLeft!}
           handleVoteWithBundleVotes={handleVoteWithBundleVotes}
-          closeModal={() => setUseBundleVotesModalOpen(false)}
+          onClose={() => setUseBundleVotesModalOpen(false)}
         />
       )}
       {/* Loading Modal */}
