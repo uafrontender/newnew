@@ -6,6 +6,8 @@ import InlineSvg from '../InlineSVG';
 import AnimatedPresence from '../AnimatedPresence';
 
 import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import isSafari from '../../../utils/isSafari';
+import { useAppSelector } from '../../../redux-store/store';
 
 interface ITextArea {
   id?: string;
@@ -14,19 +16,14 @@ interface ITextArea {
   maxlength?: number;
   onChange: (key: string, value: string, isShiftEnter: boolean) => void;
   placeholder: string;
-  // onKeydown?: (e: React.KeyboardEvent) => void;
 }
 
 export const TextArea: React.FC<ITextArea> = (props) => {
-  const {
-    id = '',
-    maxlength,
-    value,
-    error,
-    onChange,
-    placeholder,
-    // onKeydown,
-  } = props;
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const { id = '', maxlength, value, error, onChange, placeholder } = props;
 
   const [isShiftEnter, setisShiftEnter] = useState<boolean>(false);
 
@@ -37,12 +34,28 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     [id, onChange, isShiftEnter]
   );
 
+  function preventScroll(e: any) {
+    e.preventDefault();
+  }
+
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     /* eslint-disable no-unused-expressions */
     e.key === 'Enter' && e.shiftKey === true
       ? setisShiftEnter(true)
       : setisShiftEnter(false);
   }, []);
+
+  const handleBlur = useCallback(() => {
+    if (isSafari() && isMobile)
+      document.body.removeEventListener('touchmove', preventScroll);
+  }, [isMobile]);
+
+  const handleFocus = useCallback(() => {
+    if (isSafari() && isMobile)
+      document.body.addEventListener('touchmove', preventScroll, {
+        passive: false,
+      });
+  }, [isMobile]);
 
   return (
     <SWrapper>
@@ -53,6 +66,8 @@ export const TextArea: React.FC<ITextArea> = (props) => {
           placeholder={placeholder}
           maxLength={maxlength}
           onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
       </SContent>
       {error ? (
@@ -73,7 +88,6 @@ TextArea.defaultProps = {
   id: '',
   error: '',
   maxlength: 524288,
-  // onKeydown: (e: React.KeyboardEvent) => {},
 };
 
 const SWrapper = styled.div`

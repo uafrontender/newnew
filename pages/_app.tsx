@@ -44,12 +44,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import ChannelsContextProvider from '../contexts/channelsContext';
 import { SubscriptionsProvider } from '../contexts/subscriptionsContext';
 import FollowingsContextProvider from '../contexts/followingContext';
-// import WalletContextProvider from '../contexts/walletContext';
 import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
 import SyncUserWrapper from '../contexts/syncUserWrapper';
 import AppConstantsContextProvider from '../contexts/appConstantsContext';
 import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
+import CardsContextProvider from '../contexts/cardsContext';
 
 // Images to be prefetched
 import assets from '../constants/assets';
@@ -59,8 +59,11 @@ import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
+import ModalNotificationsContextProvider from '../contexts/modalNotificationsContext';
 import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
+import { OverlayModeProvider } from '../contexts/overlayModeContext';
+import ErrorBoundary from '../components/organisms/ErrorBoundary';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -212,40 +215,49 @@ const MyApp = (props: IMyApp): ReactElement => {
                 <PersistanceProvider store={store}>
                   <SyncUserWrapper>
                     <NotificationsProvider>
-                      <BlockedUsersProvider>
-                        <FollowingsContextProvider>
-                          {/* <WalletContextProvider> */}
-                          <SubscriptionsProvider>
-                            <ChatsProvider>
-                              <ResizeMode>
-                                <PostModalContextProvider>
-                                  <GlobalTheme initialTheme={colorMode}>
-                                    <>
-                                      <ToastContainer />
-                                      <VideoProcessingWrapper>
-                                        {!pageProps.error ? (
-                                          getLayout(
-                                            <Component {...pageProps} />
-                                          )
-                                        ) : (
-                                          <Error
-                                            title={pageProps.error?.message}
-                                            statusCode={
-                                              pageProps.error?.statusCode ?? 500
-                                            }
-                                          />
-                                        )}
-                                      </VideoProcessingWrapper>
-                                      <ReCaptchaBadgeModal />
-                                    </>
-                                  </GlobalTheme>
-                                </PostModalContextProvider>
-                              </ResizeMode>
-                            </ChatsProvider>
-                          </SubscriptionsProvider>
-                          {/* </WalletContextProvider> */}
-                        </FollowingsContextProvider>
-                      </BlockedUsersProvider>
+                      <ModalNotificationsContextProvider>
+                        <BlockedUsersProvider>
+                          <FollowingsContextProvider>
+                            <CardsContextProvider>
+                              <SubscriptionsProvider>
+                                <ChatsProvider>
+                                  <OverlayModeProvider>
+                                    <ResizeMode>
+                                      <PostModalContextProvider>
+                                        <GlobalTheme initialTheme={colorMode}>
+                                          <>
+                                            <ToastContainer containerId='toast-container' />
+                                            <VideoProcessingWrapper>
+                                              <ErrorBoundary>
+                                                {!pageProps.error ? (
+                                                  getLayout(
+                                                    <Component {...pageProps} />
+                                                  )
+                                                ) : (
+                                                  <Error
+                                                    title={
+                                                      pageProps.error?.message
+                                                    }
+                                                    statusCode={
+                                                      pageProps.error
+                                                        ?.statusCode ?? 500
+                                                    }
+                                                  />
+                                                )}
+                                              </ErrorBoundary>
+                                            </VideoProcessingWrapper>
+                                            <ReCaptchaBadgeModal />
+                                          </>
+                                        </GlobalTheme>
+                                      </PostModalContextProvider>
+                                    </ResizeMode>
+                                  </OverlayModeProvider>
+                                </ChatsProvider>
+                              </SubscriptionsProvider>
+                            </CardsContextProvider>
+                          </FollowingsContextProvider>
+                        </BlockedUsersProvider>
+                      </ModalNotificationsContextProvider>
                     </NotificationsProvider>
                   </SyncUserWrapper>
                 </PersistanceProvider>

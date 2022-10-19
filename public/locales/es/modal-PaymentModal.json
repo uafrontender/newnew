@@ -11,15 +11,25 @@
       "fees": "hasta un 3% de comisiones"
     }
   },
-  "rewardsText_NEED_TRANSLATION": "Use my rewards",
   "payButton": "Pagar",
   "tocApplyLink": "Términos",
   "tocApplyText": "Aplicar",
-  "reCaptchaTos_NEED_TRANSLATION": {
-    "siteProtectedBy": "This site is protected by reCAPTCHA and the Google",
-    "privacyPolicy": "Privacy Policy",
-    "and": "and",
-    "tos": "Terms of Service",
-    "apply": "apply."
-  }
+  "reCaptchaTos": {
+    "siteProtectedBy": "Este sitio está protegido por reCAPTCHA y se aplican la",
+    "privacyPolicy": "política de privacidad",
+    "and": "y las",
+    "tos": "condiciones de servicio",
+    "apply": "de Google."
+  },
+  "primaryCard": "Tarjeta primaria",
+  "newCard": "Nueva tarjeta",
+  "saveCard": "Guardar tarjeta para usos futuros",
+  "email": "Correo electrónico",
+  "errors": {
+    "wrongEmail": "Este correo electrónico no puede ser usado",
+    "paymentFailed": "El pago ha fallado",
+    "requestFailed": "La solicitud ha fallado",
+    "invalidFee_NEED_TRANSLATION": "Something went wrong. Please reload the page and try again"
+  },
+  "processingFee_NEED_TRANSLATION": "Processing fee"
 }

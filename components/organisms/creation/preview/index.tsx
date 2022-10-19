@@ -1,5 +1,11 @@
 /* eslint-disable no-unneeded-ternary */
-import React, { useRef, useMemo, useState, useCallback } from 'react';
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useCallback,
+  useEffect,
+} from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import _compact from 'lodash/compact';
@@ -20,6 +26,7 @@ import { createPost } from '../../../../api/endpoints/post';
 import { maxLength, minLength } from '../../../../utils/validation';
 import {
   clearCreation,
+  setCreationStartDate,
   setPostData,
 } from '../../../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
@@ -65,7 +72,6 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     fileProcessing,
     customCoverImageUrl,
   } = useAppSelector((state) => state.creation);
-  const { userData } = useAppSelector((state) => state.user);
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
       let error = minLength(tCommon, text, min);
@@ -119,8 +125,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
   const optionsAreValid =
     tab !== 'multiple-choice' ||
-    multiplechoice.choices.findIndex((item) =>
-      validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)
+    multiplechoice.choices.findIndex(
+      (item: newnewapi.CreateMultipleChoiceBody.IOption) =>
+        validateText(
+          item.text as string,
+          CREATION_OPTION_MIN,
+          CREATION_OPTION_MAX
+        )
     ) === -1;
 
   const disabled =
@@ -140,6 +151,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       .hours(time.hours())
       .minutes(time.minutes());
   }, [post.startsAt]);
+
   const formatExpiresAt: (inSeconds?: boolean) => any = useCallback(
     (inSeconds = false) => {
       const time = moment(
@@ -269,9 +281,11 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         };
       } else if (tab === 'multiple-choice') {
         body.multiplechoice = {
-          options: multiplechoice.choices.map((choice) => ({
-            text: choice.text,
-          })),
+          options: multiplechoice.choices.map(
+            (choice: newnewapi.CreateMultipleChoiceBody.IOption) => ({
+              text: choice.text,
+            })
+          ),
           isSuggestionsAllowed: multiplechoice.options.allowSuggestions,
         };
       } else if (tab === 'crowdfunding') {
@@ -359,17 +373,6 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             }`
           ),
         },
-        tab === 'multiple-choice' &&
-          userData?.options?.isOfferingSubscription && {
-            key: 'allowSuggestions',
-            value: t(
-              `preview.values.${
-                multiplechoice.options.allowSuggestions
-                  ? 'allowSuggestions-allowed'
-                  : 'allowSuggestions-forbidden'
-              }`
-            ),
-          },
       ]),
     [
       t,
@@ -378,8 +381,6 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       post.options.commentsEnabled,
       auction.minimalBid,
       crowdfunding.targetBackerCount,
-      multiplechoice?.options?.allowSuggestions,
-      userData?.options?.isOfferingSubscription,
       formatExpiresAt,
     ]
   );
@@ -410,6 +411,37 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       router?.push('/creation');
     }
   }, [post.title, router]);
+
+  // This effect results in the form re-rendering every second
+  // However, it re renders after every letter typed anyway
+  // TODO: optimize this view
+  useEffect(() => {
+    let updateStartDate: any;
+
+    if (post.startsAt.type === 'right-away') {
+      updateStartDate = setInterval(() => {
+        const newStartAt = {
+          type: post.startsAt.type,
+          date: moment().format(),
+          time: moment().format('hh:mm'),
+          'hours-format': post.startsAt['hours-format'],
+        };
+        dispatch(setCreationStartDate(newStartAt));
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(updateStartDate);
+    };
+  }, [post.startsAt, dispatch]);
+
+  // Redirect if post state is empty
+  useEffect(() => {
+    if (!post.title) {
+      router.push('/profile/my-posts');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (isMobile) {
     return (
@@ -465,9 +497,6 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   return (
     <>
       <PublishedModal open={showModal} handleClose={handleCloseModal} />
-      <SHeadLine variant={3} weight={600}>
-        {t(`preview.title-${router?.query?.tab}`)}
-      </SHeadLine>
       <STabletContent>
         <SLeftPart>
           <STabletPlayer>
@@ -487,6 +516,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           </STabletPlayer>
         </SLeftPart>
         <SRightPart>
+          <SHeadLine variant={3} weight={600}>
+            {t(`preview.title-${router?.query?.tab}`)}
+          </SHeadLine>
           <SHeadline variant={5}>
             <PostTitleContent>{post.title}</PostTitleContent>
           </SHeadline>
@@ -529,8 +561,10 @@ const STabletContent = styled.div`
 `;
 
 const SHeadLine = styled(Text)`
+  text-align: start;
+  white-space: pre-wrap;
+  word-break: break-word;
   padding: 26px 0;
-  text-align: center;
 
   ${({ theme }) => theme.media.laptop} {
     padding: 8px 0;
@@ -542,10 +576,12 @@ const SLeftPart = styled.div`
   flex: 1;
   max-width: calc(50% - 76px);
   margin-right: 76px;
+  margin-top: 70px;
 
   ${({ theme }) => theme.media.laptop} {
     max-width: 352px;
     margin-right: 16px;
+    margin-top: 86px;
   }
 `;
 
@@ -613,6 +649,8 @@ const SHeadlineMobile = styled(Caption)`
   overflow: hidden;
   position: relative;
   padding-left: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
 `;
@@ -692,9 +730,5 @@ const SInlineSVG = styled(InlineSVG)`
 
 const SText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-  text-align: left;
-
-  ${({ theme }) => theme.media.tablet} {
-    text-align: center;
-  }
+  text-align: center;
 `;

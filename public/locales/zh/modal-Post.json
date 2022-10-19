@@ -57,8 +57,7 @@
       "cf": "你選擇支持這個Goal！"
     },
     "doneButton": "聽起來不錯！",
-    "ac": "{{postCreator}}將在Bid結束後挑選他們最喜歡的出價。",
-    "ac_NEED_TRANSLATION": "{{postCreator}} will pick their favorite bid once time is up.",
+    "ac": "{{postCreator}} 到時間後就會選出他們最喜歡的bid。",
     "mc": "{{postCreator}}將在Superpoll結束後完成得票數最多的選項。",
     "cf": "{{postCreator}}在獲得足夠的支持者后，就會完成這個Goal。"
   },
@@ -129,6 +128,7 @@
       "backToResponse": "觀看回應"
     },
     "reuploadButton": "重新上傳",
+    "addVideoButton_NEED_TRANSLATION": "Add video",
     "cannotLeavePageMsg": "你確定要關閉這個頁面嗎？上傳進度會丟失",
     "floatingUploadResponseButton": "製作回應視頻",
     "setThumbnail": "設置縮略圖",
@@ -216,6 +216,14 @@
       "confirm": "刪除"
     }
   },
+  "deleteVideoModal_NEED_TRANSLATION": {
+    "title": "Delete video",
+    "body": "Are you sure you want to delete this video?",
+    "button": {
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
+  },
   "deleteCommentModal": {
     "title": "刪除評論",
     "body": "你確定要刪除這條評論嗎？",
@@ -290,7 +298,7 @@
       "subtitle": "你的出價"
     },
     "paymentModalFooter": {
-      "body": "你的銀行卡信息將被暫時保留。\n只有當{{creator}}選擇了你的出價時，你才會被扣款。",
+      "body": "你的銀行卡信息將被暫時保留。只有當{{creator}}選擇了你的出價時，你才會被扣款。",
       "terms": "條款",
       "apply": "適用"
     },
@@ -361,7 +369,7 @@
       "subtitle": "你選擇的選項"
     },
     "paymentModalFooter": {
-      "body": "你的銀行卡信息將被暫時保留。\n只有當你選擇的選項獲得最多的票數時，你才會被扣款。",
+      "body": "你的銀行卡信息將被暫時保留。只有當你選擇的選項獲得最多的票數時，你才會被扣款。",
       "terms": "條款",
       "apply": "適用"
     },
@@ -379,7 +387,6 @@
         "votes": "票",
         "vote": "票",
         "mySuggestion": "我的建議",
-        "subscriberSuggestion": "{{nickname}}的建議",
         "others": "其他",
         "voters": "投票者",
         "voted": "投票",
@@ -422,8 +429,6 @@
             "vote": "票"
           }
         },
-        "subscribeToCreatorCaption": "訂閱{{creator}}，為本次Superpoll添加你自己的選項！",
-        "subscribeButton": "訂閱",
         "suggestionPlaceholder": "添加你自己的選項……",
         "suggestionPlaceholderDesktop": "添加選……",
         "placeABidButton": "添加我的選項"
@@ -471,7 +476,7 @@
       "title": "{{creator}}的Goal"
     },
     "paymentModalFooter": {
-      "body": "你的銀行卡信息將被暫時保留。\n只有{{creator}}完成其Goal後，你才會被扣款。",
+      "body": "你的銀行卡信息將被暫時保留。只有{{creator}}完成其Goal後，你才會被扣款。",
       "terms": "條款",
       "apply": "適用"
     },
@@ -788,5 +793,22 @@
         "text": "捐款幫助創作者完成他們的Goal！"
       }
     }
+  },
+  "errors": {
+    "notEnoughMoney": "資金不足",
+    "cardNotFound": "未找到卡片",
+    "cardCannotBeUsed": "此卡不能使用",
+    "biddingNotStarted": "Bidding還未開始",
+    "biddingIsEnded": "Bidding已經結束",
+    "mcCancelled": "Superpoll被取消",
+    "mcFinished": "Superpoll已經結束",
+    "mcNotStarted": "Superpoll還未開始",
+    "alreadyVoted": "你已獲投票",
+    "mcVoteCountTooSmall": "票數太少",
+    "notAllowedToCreateNewOption": "不允許有新的選項",
+    "cfCancelled": "Goal被取消",
+    "cfFinished": "Goal已經完成",
+    "cfNotStarted": "Goal尚未開始",
+    "requestFailed": "請求失敗"
   }
 }

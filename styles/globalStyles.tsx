@@ -9,6 +9,7 @@ const GlobalStyle = createGlobalStyle`
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    -webkit-tap-highlight-color:  rgba(255, 255, 255, 0); 
   }
 
   *, *:before, *:after {
@@ -53,6 +54,12 @@ const GlobalStyle = createGlobalStyle`
   a {
     color: ${({ theme }) => theme.colorsThemed.text.primary};
     text-decoration: none;
+  }
+
+  .iti__flag {background-image: url("../../flags.png");}
+
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .iti__flag {background-image: url("../../flags.png");}
   }
 `;
 

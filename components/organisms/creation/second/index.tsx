@@ -61,6 +61,7 @@ import {
 import {
   CREATION_TITLE_MIN,
   CREATION_TITLE_MAX,
+  CREATION_OPTION_MIN,
 } from '../../../../constants/general';
 
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
@@ -69,6 +70,7 @@ import { setUserTutorialsProgress } from '../../../../redux-store/slices/userSta
 import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 import getChunks from '../../../../utils/getChunks/getChunks';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -113,7 +115,8 @@ export const CreationSecondStepContent: React.FC<
     videoProcessing,
   } = useAppSelector((state) => state.creation);
   const user = useAppSelector((state) => state.user);
-  const { resizeMode, overlay } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { overlayModeEnabled } = useOverlayMode();
 
   const { appConstants } = useGetAppConstants();
 
@@ -258,15 +261,19 @@ export const CreationSecondStepContent: React.FC<
     Set<number>
   >(new Set());
   const optionsAreValid = useMemo(
-    () => tab !== 'multiple-choice' || invalidMcOptionsIndicies.size === 0,
-    [tab, invalidMcOptionsIndicies]
+    () =>
+      tab !== 'multiple-choice' ||
+      (invalidMcOptionsIndicies.size === 0 &&
+        multiplechoice.choices.filter(
+          (o) => o.text.length < CREATION_OPTION_MIN
+        ).length === 0),
+    [tab, invalidMcOptionsIndicies.size, multiplechoice.choices]
   );
 
   const targetBackersValid =
     tab !== 'crowdfunding' ||
     (crowdfunding.targetBackerCount && crowdfunding?.targetBackerCount >= 1);
-  // const disabled =
-  //   !!titleError || !post.title || !post.announcementVideoUrl || fileUpload.progress !== 100 || !optionsAreValid;
+
   const disabled =
     !!titleError ||
     !post.title ||
@@ -541,10 +548,10 @@ export const CreationSecondStepContent: React.FC<
   const handleItemChange = useCallback(
     async (key: string, value: any) => {
       if (key === 'title') {
-        Mixpanel.track('Post Title Change', {
-          _stage: 'Creation',
-          _value: value,
-        });
+        // Mixpanel.track('Post Title Change', {
+        //   _stage: 'Creation',
+        //   _value: value,
+        // });
         dispatch(setCreationTitle(value.trim() ? value : ''));
       } else if (key === 'minimalBid') {
         Mixpanel.track('Minimal Big Change', {
@@ -818,17 +825,6 @@ export const CreationSecondStepContent: React.FC<
             <SSeparator margin='16px 0' />
           </>
         )}
-        {tab === 'multiple-choice' &&
-          user?.userData?.options?.isOfferingSubscription && (
-            <SMobileFieldWrapper>
-              <MobileField
-                id='allowSuggestions'
-                type='toggle'
-                value={multiplechoice.options.allowSuggestions}
-                onChange={handleItemChange}
-              />
-            </SMobileFieldWrapper>
-          )}
         <MobileField
           id='comments'
           type='toggle'
@@ -851,8 +847,6 @@ export const CreationSecondStepContent: React.FC<
       t,
       formatExpiresAt,
       formatStartsAt,
-      user?.userData?.options?.isOfferingSubscription,
-      multiplechoice.options.allowSuggestions,
     ]
   );
 
@@ -958,13 +952,13 @@ export const CreationSecondStepContent: React.FC<
 
   useEffect(() => {
     if (playerRef.current && isDesktop) {
-      if (overlay) {
+      if (overlayModeEnabled) {
         playerRef.current.pause();
       } else {
         playerRef.current.play();
       }
     }
-  }, [overlay, isDesktop]);
+  }, [overlayModeEnabled, isDesktop]);
 
   useEffect(() => {
     switch (activeTabIndex) {
@@ -1461,10 +1455,6 @@ const SFieldWrapper = styled.div`
   margin: 8px;
 `;
 
-const SMobileFieldWrapper = styled.div`
-  margin-bottom: 16px;
-`;
-
 const SButtonWrapper = styled.div`
   left: 0;
   width: 100%;
@@ -1544,9 +1534,13 @@ const SBottomEndPostTitle = styled(Text)`
   max-width: 100%;
   line-break: loose;
   white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SBottomEndPostTitleHashtag = styled.span`
+  display: inline;
+  word-spacing: normal;
+  overflow-wrap: break-word;
   color: ${(props) => props.theme.colorsThemed.accent.blue};
 `;
 

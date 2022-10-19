@@ -4,7 +4,7 @@ import { LayoutGroup } from 'framer-motion';
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
 import Container from '../atoms/Grid/Container';
-import ErrorBoundary from '../organisms/ErrorBoundary';
+import BaseLayout from './BaseLayout';
 
 interface ICreationLayout {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ const CreationLayout: React.FC<ICreationLayout> = (props) => {
   const { children } = props;
 
   return (
-    <ErrorBoundary>
+    <BaseLayout>
       <LayoutGroup>
         <Container>
           <Row>
@@ -22,7 +22,7 @@ const CreationLayout: React.FC<ICreationLayout> = (props) => {
           </Row>
         </Container>
       </LayoutGroup>
-    </ErrorBoundary>
+    </BaseLayout>
   );
 };
 

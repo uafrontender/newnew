@@ -79,7 +79,13 @@
         "label": "Fecha de nacimiento",
         "captions": {
           "twoTimesOnly": "Tu fecha de nacimiento solo se puede cambiar 2 veces.",
-          "cannotChange": "No puedes cambiar tu fecha de nacimiento."
+          "cannotChange": "No puedes cambiar tu fecha de nacimiento.",
+          "instruction": "Establece tu fecha de nacimiento"
+        },
+        "units": {
+          "day": "Día",
+          "month": "Mes",
+          "year": "Año"
         },
         "errors": {
           "tooYoung": "Debes tener 18 años o más para ser un creador"

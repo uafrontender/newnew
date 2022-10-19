@@ -56,40 +56,40 @@ const assets = {
     votes: `${APP_ASSETS_ORIGIN}/floating-assets/votes.png`,
   },
   landing: {
-    darkDesktopLandingStatic: `${APP_ASSETS_ORIGIN}/landing-animations/landing-desktop-dark.png`,
+    darkDesktopLandingStatic: `${APP_ASSETS_ORIGIN}/landing/landing-desktop-dark.png`,
     darkDesktopLandingAnimated: [
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-desktop-dark-1.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-desktop-dark-2.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-desktop-dark-3.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-desktop-dark-4.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-desktop-dark-5.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-desktop-dark-1.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-desktop-dark-2.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-desktop-dark-3.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-desktop-dark-4.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-desktop-dark-5.mp4`,
     ],
 
-    lightDesktopLandingStatic: `${APP_ASSETS_ORIGIN}/landing-animations/landing-desktop-light.png`,
+    lightDesktopLandingStatic: `${APP_ASSETS_ORIGIN}/landing/landing-desktop-light.png`,
     lightDesktopLandingAnimated: [
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-desktop-light-1.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-desktop-light-2.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-desktop-light-3.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-desktop-light-4.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-desktop-light-5.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-desktop-light-1.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-desktop-light-2.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-desktop-light-3.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-desktop-light-4.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-desktop-light-5.mp4`,
     ],
 
-    darkMobileLandingStatic: `${APP_ASSETS_ORIGIN}/landing-animations/landing-mobile-dark.png`,
+    darkMobileLandingStatic: `${APP_ASSETS_ORIGIN}/landing/landing-mobile-dark.png`,
     darkMobileLandingAnimated: [
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-mobile-dark-1.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-mobile-dark-2.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-mobile-dark-3.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-mobile-dark-4.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-mobile-dark-5.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-mobile-dark-1.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-mobile-dark-2.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-mobile-dark-3.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-mobile-dark-4.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-mobile-dark-5.mp4`,
     ],
 
-    lightMobileLandingStatic: `${APP_ASSETS_ORIGIN}/landing-animations/landing-mobile-light.png`,
+    lightMobileLandingStatic: `${APP_ASSETS_ORIGIN}/landing/landing-mobile-light.png`,
     lightMobileLandingAnimated: [
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-mobile-light-1.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-mobile-light-2.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-mobile-light-3.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-mobile-light-4.mp4`,
-      `${APP_ASSETS_ORIGIN}/landing-animations/landing-mobile-light-5.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-mobile-light-1.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-mobile-light-2.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-mobile-light-3.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-mobile-light-4.mp4`,
+      `${APP_ASSETS_ORIGIN}/landing/landing-mobile-light-5.mp4`,
     ],
   },
   signup: {
@@ -127,6 +127,26 @@ const assets = {
   },
   openGraphImage: {
     common: `${APP_ASSETS_ORIGIN}/open-graph-image/common.png`,
+  },
+  common: {
+    lightAnimatedLogo: `${APP_ASSETS_ORIGIN}/common/darkAnimatedLogo.webp`,
+    darkAnimatedLogo: `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.webp`,
+    darkAc: `${APP_ASSETS_ORIGIN}/common/dark-ac.png`,
+    goldBig: `${APP_ASSETS_ORIGIN}/common/gold-big.png`,
+  },
+  cards: {
+    background: [
+      `${APP_ASSETS_ORIGIN}/cards/background-1.png`,
+      `${APP_ASSETS_ORIGIN}/cards/background-3.png`,
+      `${APP_ASSETS_ORIGIN}/cards/background-5.png`,
+      `${APP_ASSETS_ORIGIN}/cards/background-2.png`,
+      `${APP_ASSETS_ORIGIN}/cards/background-4.png`,
+    ],
+  },
+  gilroyFont: {
+    regular: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-Regular.otf`,
+    medium: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-Medium.otf`,
+    semiBold: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-SemiBold.otf`,
   },
 };
 

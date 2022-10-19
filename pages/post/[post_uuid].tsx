@@ -27,9 +27,7 @@ import { toggleMutedMode } from '../../redux-store/slices/uiStateSlice';
 import isBrowser from '../../utils/isBrowser';
 import { Mixpanel } from '../../utils/mixpanel';
 
-const PostModal = dynamic(
-  () => import('../../components/organisms/decision/PostModal')
-);
+const PostModal = dynamic(() => import('../../components/organisms/decision'));
 
 const TopSection = dynamic(
   () => import('../../components/organisms/home/TopSection')
@@ -43,18 +41,20 @@ interface IPostPage {
   top10posts: newnewapi.NonPagedPostsResponse;
   postUuid: string;
   post: newnewapi.Post;
-  session_id?: string;
+  setup_intent_client_secret?: string;
   comment_id?: string;
   comment_content?: string;
+  save_card?: boolean;
 }
 
 const PostPage: NextPage<IPostPage> = ({
   top10posts,
   postUuid,
   post,
-  session_id,
+  setup_intent_client_secret,
   comment_id,
   comment_content,
+  save_card,
 }) => {
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
@@ -142,7 +142,7 @@ const PostPage: NextPage<IPostPage> = ({
           content={postParsed?.announcement?.thumbnailImageUrl ?? ''}
         />
       </Head>
-      {!user.loggedIn && <HeroSection />}
+      {!user.loggedIn && user._persist?.rehydrated && <HeroSection />}
       {!isMobile && topSectionCollection.length > 0 && (
         <TopSection
           collection={topSectionCollection}
@@ -153,7 +153,8 @@ const PostPage: NextPage<IPostPage> = ({
         <PostModal
           isOpen
           post={displayedPost}
-          sessionIdFromRedirect={session_id}
+          stripeSetupIntentClientSecretFromRedirect={setup_intent_client_secret}
+          saveCardFromRedirect={save_card}
           commentIdFromUrl={comment_id}
           commentContentFromUrl={comment_content}
           // Required to avoid weird cases when navigating back to the post using browser back button
@@ -172,7 +173,13 @@ export default PostPage;
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { post_uuid, session_id, comment_id, comment_content } = context.query;
+  const {
+    post_uuid,
+    setup_intent_client_secret,
+    comment_id,
+    comment_content,
+    save_card,
+  } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'modal-Post',
@@ -218,9 +225,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         : {}),
       postUuid: post_uuid,
       post: res.data.toJSON(),
-      ...(session_id
+      ...(setup_intent_client_secret
         ? {
-            session_id,
+            setup_intent_client_secret,
+          }
+        : {}),
+      ...(save_card
+        ? {
+            save_card: save_card === 'true',
           }
         : {}),
       ...(comment_id

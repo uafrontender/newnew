@@ -31,21 +31,23 @@ export const RichTextArea: React.FC<IRichTextArea> = React.memo((props) => {
     onFocus = () => {},
   } = props;
 
-  const inputRef = useRef<HTMLDivElement>();
+  const inputRef = useRef<ContentEditable>();
   const [focused, setFocused] = useState(false);
 
   const clearValue = (rawValue: string) => {
     // Removes spans used to highlight chunks
-    const clearedValue = rawValue
+    const undecoratedValue = rawValue
       .replaceAll(/<\/?span.*?>/g, '')
       .replaceAll('<br>', '');
 
     // Decodes all html entities
     const txt = document.createElement('textarea');
-    txt.innerHTML = clearedValue;
+    txt.innerHTML = undecoratedValue;
     const decodedValue = txt.value;
 
-    return decodedValue;
+    // Replace non breakable spaces with regular ones
+    const clearedValue = decodedValue.replaceAll(String.fromCharCode(160), ' ');
+    return clearedValue;
   };
 
   // TODO: improve control over chariot. Manually control. Old position +- length diff
@@ -79,7 +81,7 @@ export const RichTextArea: React.FC<IRichTextArea> = React.memo((props) => {
     setFocused(false);
 
     if (inputRef.current) {
-      const clearedValue = clearValue(inputRef.current.textContent || '');
+      const clearedValue = clearValue(inputRef.current.lastHtml || '');
       onBlur(id, clearedValue);
     }
   };
@@ -92,6 +94,11 @@ export const RichTextArea: React.FC<IRichTextArea> = React.memo((props) => {
     <SWrapper>
       <SContent error={!!error} showPlaceholder={showPlaceholder}>
         <ContentEditable
+          ref={(element: any) => {
+            if (element) {
+              inputRef.current = element;
+            }
+          }}
           id={id}
           className='div-input'
           onBlur={handleBlur}
@@ -143,7 +150,6 @@ const SContent = styled.div<ISContent>`
   position: relative;
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   border-radius: 16px;
-
   border-width: 1.5px;
   border-style: solid;
   border-color: ${({ theme, error }) => {
@@ -165,6 +171,7 @@ const SContent = styled.div<ISContent>`
     outline: none;
     background: transparent;
     font-weight: 500;
+    word-break: break-all;
 
     font-size: 14px;
     line-height: 20px;
@@ -175,8 +182,9 @@ const SContent = styled.div<ISContent>`
     }
 
     span {
-      display: inline-block;
-      white-space: nowrap;
+      display: inline;
+      word-spacing: normal;
+      overflow-wrap: break-word;
     }
 
     .hashtag {

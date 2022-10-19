@@ -16,14 +16,23 @@ import SearchInput from '../atoms/chat/SearchInput';
 import NewMessage from '../molecules/chat/NewMessage';
 import { IChatData } from '../interfaces/ichat';
 import { useAppSelector } from '../../redux-store/store';
+import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 const GoBackButton = dynamic(() => import('../molecules/GoBackButton'));
 
 interface IChat {
   username?: string;
+  setupIntentClientSecretFromRedirect?: string;
+  saveCardFromRedirect?: boolean;
+  resetStripeSetupIntent: () => void;
 }
 
-export const Chat: React.FC<IChat> = ({ username }) => {
+export const Chat: React.FC<IChat> = ({
+  username,
+  setupIntentClientSecretFromRedirect,
+  saveCardFromRedirect,
+  resetStripeSetupIntent,
+}) => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const [chatData, setChatData] = useState<IChatData>({
@@ -51,6 +60,8 @@ export const Chat: React.FC<IChat> = ({ username }) => {
     chatId: number | Long.Long | null | undefined;
   } | null>(null);
 
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
+
   const showChatList = () => {
     setChatListHidden(false);
   };
@@ -64,13 +75,17 @@ export const Chat: React.FC<IChat> = ({ username }) => {
       let route = '';
       if (chatRoom?.visavis?.username) {
         chatRoom.kind === 1
-          ? (route = chatRoom?.visavis?.username)
+          ? (route =
+              chatRoom.myRole === 2
+                ? chatRoom?.visavis?.username
+                : `${chatRoom?.visavis?.username}-cr`)
           : (route = `${chatRoom?.visavis?.username}-announcement`);
       } else {
         chatRoom && chatRoom.kind === 4 && chatRoom.myRole === 2
           ? (route = `${user.userData?.username}-announcement`)
           : '';
       }
+
       router.push(`/direct-messages/${route}`);
       setChatData({ chatRoom, showChatList });
       if (isMobileOrTablet) setChatListHidden(true);
@@ -98,16 +113,11 @@ export const Chat: React.FC<IChat> = ({ username }) => {
 
   useEffect(() => {
     if (isMobileOrTablet) {
-      document.body.style.cssText = `
-        overflow: hidden;
-        position: fixed;
-      `;
-    } else {
-      document.body.style.cssText = '';
+      enableOverlayMode();
     }
 
     return () => {
-      document.body.style.cssText = '';
+      disableOverlayMode();
     };
   }, [isMobileOrTablet]);
 
@@ -175,6 +185,7 @@ interface ISSidebar {
 const SSidebar = styled.div<ISSidebar>`
   padding-top: 16px;
   height: 100%;
+
   background: ${(props) =>
     props.theme.name === 'light'
       ? props.theme.colors.white
@@ -243,6 +254,7 @@ const SContent = styled.div`
   position: fixed;
   padding: 0 0 20px;
   width: 100vw;
+
   ${(props) => props.theme.media.laptop} {
     width: calc(100% - 384px);
     margin-left: auto;

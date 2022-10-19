@@ -22,6 +22,7 @@
     "daysLeft": "d",
     "hoursLeft": "h",
     "minutesLeft": "m",
+    "secondsLeft_NEED_TRANSLATION": "s",
     "endedOn": "結束於",
     "soon": "即將開始"
   }

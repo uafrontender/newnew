@@ -12,11 +12,9 @@ import Footer from '../organisms/Footer';
 import Header from '../organisms/Header';
 import Cookie from '../molecules/Cookie';
 import Container from '../atoms/Grid/Container';
-import ErrorBoundary from '../organisms/ErrorBoundary';
 import BottomNavigation from '../organisms/BottomNavigation';
 import FloatingMessages from '../molecules/creator/dashboard/FloatingMessages';
 
-import useOverlay from '../../utils/hooks/useOverlay';
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
 import { useAppSelector } from '../../redux-store/store';
 import useScrollDirection from '../../utils/hooks/useScrollDirection';
@@ -30,8 +28,11 @@ import ReportBugButton from '../molecules/ReportBugButton';
 import { usePostModalState } from '../../contexts/postModalContext';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+import ModalNotifications from '../molecules/ModalNotifications';
+import BaseLayout from './BaseLayout';
 
 interface IGeneral {
+  className?: string;
   withChat?: boolean;
   specialStatusBarColor?: string;
   restrictMaxWidth?: boolean;
@@ -39,7 +40,13 @@ interface IGeneral {
 }
 
 export const General: React.FC<IGeneral> = (props) => {
-  const { withChat, specialStatusBarColor, restrictMaxWidth, children } = props;
+  const {
+    className,
+    withChat,
+    specialStatusBarColor,
+    restrictMaxWidth,
+    children,
+  } = props;
   const user = useAppSelector((state) => state.user);
   const { banner, resizeMode, globalSearchActive } = useAppSelector(
     (state) => state.ui
@@ -56,7 +63,8 @@ export const General: React.FC<IGeneral> = (props) => {
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
 
-  const wrapperRef: any = useRef();
+  // TODO: fix an issue when scroll position is set before resizing of the wrapper
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const bottomNavigation = useMemo(() => {
     let bottomNavigationShadow: TBottomNavigationItem[] = [
       {
@@ -143,10 +151,9 @@ export const General: React.FC<IGeneral> = (props) => {
     mySubscribersTotal,
   ]);
 
-  useOverlay(wrapperRef);
-  useScrollPosition(wrapperRef);
+  useScrollPosition();
   // useRefreshOnScrollTop();
-  const { scrollDirection } = useScrollDirection(wrapperRef);
+  const { scrollDirection } = useScrollDirection();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -173,95 +180,94 @@ export const General: React.FC<IGeneral> = (props) => {
   const mobileNavigationVisible = isMobile && scrollDirection !== 'down';
 
   return (
-    <ErrorBoundary>
+    <SBaseLayout
+      id='generalContainer'
+      className={className}
+      containerRef={wrapperRef}
+      withBanner={!!banner?.show}
+    >
       <SkeletonTheme
         baseColor={theme.colorsThemed.background.secondary}
         highlightColor={theme.colorsThemed.background.tertiary}
       >
-        <SWrapper
-          id='generalContainer'
-          ref={wrapperRef}
-          withBanner={!!banner?.show}
-          {...props}
-        >
-          <Head>
-            <meta
-              name='theme-color'
-              content={
-                specialStatusBarColor
-                  ? specialStatusBarColor
-                  : theme.colorsThemed.statusBar.background
-              }
-            />
-          </Head>
-          <Header
-            visible={!isMobile || mobileNavigationVisible || globalSearchActive}
+        <Head>
+          <meta
+            name='theme-color'
+            content={
+              specialStatusBarColor
+                ? specialStatusBarColor
+                : theme.colorsThemed.statusBar.background
+            }
           />
-          <SContent>
-            <Container
-              {...(restrictMaxWidth
-                ? {}
-                : {
-                    noMaxContent: true,
-                  })}
-            >
-              <Row>
-                <Col>{children}</Col>
-              </Row>
-            </Container>
-          </SContent>
-          <Footer />
-          {hasMounted && (
-            <>
-              <BottomNavigation
-                collection={bottomNavigation}
-                moreMenuMobileOpen={moreMenuMobileOpen}
-                handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-                visible={mobileNavigationVisible && !globalSearchActive}
-              />
-              <SortingContainer
-                id='sorting-container'
-                withCookie={cookies.accepted !== 'true'}
-                bottomNavigationVisible={mobileNavigationVisible}
-              />
-              <CookieContainer
-                bottomNavigationVisible={mobileNavigationVisible}
-                zIndex={moreMenuMobileOpen ? 9 : 10}
-              >
-                <Cookie />
-              </CookieContainer>
-            </>
-          )}
-          {chatButtonVisible && (
-            <ChatContainer
+        </Head>
+        <Header
+          visible={!isMobile || mobileNavigationVisible || globalSearchActive}
+        />
+        <SContent>
+          <Container
+            {...(restrictMaxWidth
+              ? {}
+              : {
+                  noMaxContent: true,
+                })}
+          >
+            <Row>
+              <Col>{children}</Col>
+            </Row>
+          </Container>
+        </SContent>
+        <Footer />
+        {hasMounted && (
+          <>
+            <BottomNavigation
+              collection={bottomNavigation}
+              moreMenuMobileOpen={moreMenuMobileOpen}
+              handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
+              visible={mobileNavigationVisible && !globalSearchActive}
+            />
+            <SortingContainer
+              id='sorting-container'
+              withCookie={cookies.accepted !== 'true'}
+              bottomNavigationVisible={mobileNavigationVisible}
+            />
+            <CookieContainer
               bottomNavigationVisible={mobileNavigationVisible}
               zIndex={moreMenuMobileOpen ? 9 : 10}
             >
-              {!mobileChatOpened ? (
-                <FloatingMessages withCounter openChat={openChat} />
-              ) : (
-                <MobileDashBoardChat closeChat={closeChat} />
-              )}
-            </ChatContainer>
-          )}
-          {!isMobileOrTablet && !router.route.includes('direct-messages') && (
-            <ReportBugButton
-              bottom={
-                (isMobile ? 24 : 16) +
-                (isMobile &&
-                (mobileNavigationVisible || postOverlayOpen) &&
-                !mobileChatOpened
-                  ? 56
-                  : 0) +
-                (chatButtonVisible && !mobileChatOpened ? 72 : 0)
-              }
-              right={4}
-              zIndex={moreMenuMobileOpen ? 9 : undefined}
-            />
-          )}
-        </SWrapper>
+              <Cookie />
+            </CookieContainer>
+          </>
+        )}
+        {chatButtonVisible && (
+          <ChatContainer
+            bottomNavigationVisible={mobileNavigationVisible}
+            zIndex={moreMenuMobileOpen ? 9 : 10}
+          >
+            {!mobileChatOpened ? (
+              <FloatingMessages withCounter openChat={openChat} />
+            ) : (
+              <MobileDashBoardChat closeChat={closeChat} />
+            )}
+          </ChatContainer>
+        )}
+        {!isMobileOrTablet && !router.route.includes('direct-messages') && (
+          <ReportBugButton
+            bottom={
+              (isMobile ? 24 : 16) +
+              (isMobile &&
+              (mobileNavigationVisible || postOverlayOpen) &&
+              !mobileChatOpened
+                ? 56
+                : 0) +
+              (chatButtonVisible && !mobileChatOpened ? 72 : 0)
+            }
+            right={4}
+            zIndex={moreMenuMobileOpen ? 9 : undefined}
+          />
+        )}
+        <ModalNotifications />
       </SkeletonTheme>
-    </ErrorBoundary>
+    </SBaseLayout>
   );
 };
 
@@ -277,14 +283,8 @@ interface ISWrapper {
   withBanner: boolean;
 }
 
-const SWrapper = styled.div<ISWrapper>`
-  width: 100vw;
-  min-height: 100vh;
-  min-height: -moz-available;
-  min-height: -webkit-fill-available;
-  min-height: fill-available;
+const SBaseLayout = styled(BaseLayout)<ISWrapper>`
   display: flex;
-  overflow-y: auto;
   transition: padding ease 0.5s;
   padding-top: ${(props) => (props.withBanner ? 96 : 56)}px;
   padding-bottom: 56px;
@@ -300,7 +300,6 @@ const SWrapper = styled.div<ISWrapper>`
       display: none;
     }
     scrollbar-width: none;
-    -ms-overflow-style: none;
   }
 
   ${({ theme }) => theme.media.laptop} {

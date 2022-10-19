@@ -19,6 +19,7 @@ import textTrim from '../../../../utils/textTrim';
 import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 
 interface IChatList {
   searchText: string;
@@ -197,16 +198,12 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
           </SMyAvatarMassupdate>
         );
         chatName = t('announcement.title', {
-          username: user.userData?.nickname
-            ? user.userData?.nickname
-            : user.userData?.username,
+          username: user.userData?.nickname || user.userData?.username,
         });
       }
       if (chat.kind === 4 && chat.myRole === 1) {
         chatName = t('announcement.title', {
-          username: chat.visavis?.nickname
-            ? chat.visavis?.nickname
-            : chat.visavis?.username,
+          username: chat.visavis?.nickname || chat.visavis?.username,
         });
       }
 
@@ -232,6 +229,14 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
                 {chatName}
+                {chat.visavis?.options?.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                    fill='none'
+                  />
+                )}
               </SChatItemText>
               <SChatItemLastMessage variant={3} weight={600}>
                 {lastMsg}
@@ -348,6 +353,8 @@ const SChatItemCenter = styled.div`
 `;
 
 const SChatItemText = styled(Text)`
+  display: flex;
+  align-items: center;
   margin-bottom: 4px;
 `;
 

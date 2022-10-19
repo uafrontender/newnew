@@ -62,8 +62,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   >([]);
 
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
-  const [chatRooms, setChatRooms] =
-    useState<IChatRoomUserNameWithoutEmoji[] | null>(null);
+  const [chatRooms, setChatRooms] = useState<
+    IChatRoomUserNameWithoutEmoji[] | null
+  >(null);
   const [myAnnouncement, setMyAnnouncement] =
     useState<newnewapi.IChatRoom | null>(null);
 
@@ -196,7 +197,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             </SUserAvatar>
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
-                {chat.visavis?.nickname}
+                {chat.visavis?.nickname || chat.visavis?.username}
               </SChatItemText>
               <SUserAlias>@{chat.visavis?.username}</SUserAlias>
             </SChatItemCenter>
@@ -212,7 +213,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
   return (
-    <Modal show={showModal}>
+    <Modal show={showModal} onClose={closeModal}>
       <SContainer>
         <SModal>
           <SModalHeader>
@@ -320,6 +321,7 @@ const SModal = styled.div`
       : props.theme.colorsThemed.background.secondary};
   max-width: 100%;
   max-height: 100vh;
+  z-index: 1;
 
   ${(props) => props.theme.media.tablet} {
     max-width: 480px;

@@ -34,8 +34,11 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
   // Redirect if the user is not logged in
   useEffect(() => {
-    if (!user.loggedIn) router.push('/');
-  }, [user.loggedIn, router]);
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
+      router.push('/');
+    }
+  }, [user.loggedIn, user._persist?.rehydrated, router]);
 
   // Listen to Me update event
   useEffect(() => {
@@ -45,14 +48,6 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
       if (!decoded) return;
 
-      if (redirect === 'settings') {
-        dispatch(
-          setUserData({
-            email: decoded.me?.email,
-          })
-        );
-      }
-
       if (redirect === 'dashboard') {
         const becomeCreatorPayload = new newnewapi.EmptyRequest({});
 
@@ -61,9 +56,9 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
         if (!becomeCreatorRes.data || becomeCreatorRes.error)
           throw new Error('Become creator failed');
 
+        // TODO: ideally we want it happen in syncUserWrapper as well
         dispatch(
           setUserData({
-            email: decoded.me?.email,
             options: {
               isActivityPrivate:
                 becomeCreatorRes.data.me?.options?.isActivityPrivate,

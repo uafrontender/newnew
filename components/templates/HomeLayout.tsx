@@ -2,7 +2,6 @@
 import React from 'react';
 import { LayoutGroup } from 'framer-motion';
 
-import ErrorBoundary from '../organisms/ErrorBoundary';
 import GeneralTemplate from './General';
 
 interface IHomeLayout {
@@ -12,16 +11,15 @@ interface IHomeLayout {
 const HomeLayout: React.FC<IHomeLayout> = (props) => {
   const { children } = props;
 
+  // TODO: fix Error boundary issue (not on top)
   return (
-    <ErrorBoundary>
-      <LayoutGroup>
-        <GeneralTemplate
-        // restrictMaxWidth={true}
-        >
-          {children}
-        </GeneralTemplate>
-      </LayoutGroup>
-    </ErrorBoundary>
+    <LayoutGroup>
+      <GeneralTemplate
+      // restrictMaxWidth={true}
+      >
+        {children}
+      </GeneralTemplate>
+    </LayoutGroup>
   );
 };
 

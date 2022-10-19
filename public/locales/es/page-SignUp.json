@@ -1,17 +1,16 @@
 {
   "meta": {
-    "title_NEED_TRANSLATION": "Sign in to NewNew",
-    "description_NEED_TRANSLATION": "Signing in to NewNew is fast and easy.",
-    "title-create_NEED_TRANSLATION": "Sign in to NewNew",
-    "description-create_NEED_TRANSLATION": "Signing up to NewNew is fast and easy. Join now to be a Creator"
+    "title": "Regístrate a NewNew",
+    "description": "Registrarse en NewNew es rápido y sencillo.",
+    "title-create": "Registrarse a NewNew",
+    "description-create": "Registrarse en NewNew es rápido y sencillo. Únete ahora y conviértete en un creador"
   },
   "heading": {
-    "sign-in_NEED_TRANSLATION": "Sign in",
+    "sign-in": "Registrarse",
     "sign-in-to": "Registrarse para",
     "reason": {
       "comment": "comentar",
       "bid": "ofertar",
-      "subscribe": "suscribirse",
       "pledge": "hacer una contribución",
       "follow-decision": "marcar publicación como favorita",
       "follow-creator": "seguir un creador",
@@ -27,7 +26,7 @@
     "twitter": "Continuar con Twitter",
     "orContinueWith": "o continuar con",
     "email": "Correo electrónico",
-    "signInButton_NEED_TRANSLATION": "Sign in",
+    "signInButton": "Registrarse",
     "logInButton": "Iniciar sesión"
   },
   "error": {

@@ -11,7 +11,6 @@
       "fees": "up to 3% fees"
     }
   },
-  "rewardsText": "Use my rewards",
   "payButton": "Pay",
   "tocApplyLink": "Terms",
   "tocApplyText": "apply",
@@ -21,5 +20,16 @@
     "and": "and",
     "tos": "Terms of Service",
     "apply": "apply."
-  }
+  },
+  "primaryCard": "Primary card",
+  "newCard": "New card",
+  "saveCard": "Save card for future use",
+  "email": "Email",
+  "errors": {
+    "wrongEmail": "Email can't be used",
+    "paymentFailed": "Payment failed",
+    "requestFailed": "Request failed",
+    "invalidFee": "Something went wrong. Please reload the page and try again"
+  },
+  "processingFee": "Processing fee"
 }

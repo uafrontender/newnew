@@ -16,8 +16,6 @@
     "followCreator": "最喜歡的創作者",
     "unFollowDecision": "不喜歡的{{postType}}",
     "unFollowCreator": "不喜歡的創作者",
-    "unsubscribe": "取消訂閱",
-    "removeSubscription": "移除訂閱",
     "removeBid": "移除投標",
     "removeOption": "移除選項",
     "view": "查看個人資料",
@@ -52,13 +50,13 @@
     "notifications": "通知"
   },
   "mobileTopNavigation": {
-    "myBalance": "我的餘額：${{value}}",
+    "myBalance": "我的餘額以${{value}}",
     "profile": "個人資料"
   },
   "button": {
     "createDecision": "新帖子",
     "create": "創建",
-    "signIn_NEED_TRANSLATION": "Sign in",
+    "signIn": "登入",
     "dashboard": "儀錶板",
     "createOnNewnew": "開始創建",
     "cancel": "取消"
@@ -145,6 +143,7 @@
     "topPosts": "熱門帖子",
     "popularCreators": "熱門創作者",
     "creatorSubtitle": "查看帖子",
+    "popularTags": "熱門標籤",
     "allResults": "所有結果",
     "noResults": {
       "title": "沒有找到任何內容",
@@ -152,9 +151,7 @@
       "action": "瀏覽"
     }
   },
-  "creatorCard": {
-    "subscriptionCost": "${{amount}} 每月"
-  },
+  "gotIt": "知道了",
   "sortingOption": {
     "sortingtype": "順序",
     "sortingtype-all": "所有",
@@ -175,48 +172,24 @@
     "numbers-of-bids-most-first": "最先"
   },
   "toastErrors": {
-    "generic_NEED_TRANSLATION": "An error occurred, please try again later"
+    "generic": "发生错误，请稍后再试"
   },
-  "rewards": {
-    "earned_NEED_TRANSLATION": "earned ${{value}}",
-    "earn_NEED_TRANSLATION": "earn ${{value}}",
-    "modalTitle_NEED_TRANSLATION": "You earned ${{amount}}!",
-    "modalButton_NEED_TRANSLATION": "Great",
-    "modalDescription_NEED_TRANSLATION": {
-      "0": "...for signing up",
-      "1": "...for placing a bid of $4",
-      "2": "...for voting for $4",
-      "3": "...for backing a goal for $4",
-      "4": "...for subscribing to a creator",
-      "5": "...for subscribing to 3 creators",
-      "6": "...for bidding on the same creator twice",
-      "7": "...for voting on the same creator twice",
-      "8": "...for backing the same creator twice",
-      "9": "...for placing a bid 2 days in a row",
-      "10": "...for voting 2 days in a row",
-      "11": "...for backing goals 2 days in a row",
-      "12": "...for bidding on a winning option",
-      "13": "...for voting for a winning option",
-      "14": "...for inviting 5 friends",
-      "15": "...for getting a vote on your post"
+  "smsNotifications_NEED_TRANSLATION": {
+    "title": "Enter your phone number",
+    "success": "Success",
+    "description": "With it, we will notify you about the <0>{{subject}}</0> updates.",
+    "confirmation": "Confirmation SMS was sent to {{phoneNumber}} number.",
+    "tos": "I accept the <0>NewNew’s Terms of Service</0> & have read the <1>NewNew’s Privacy Statement</1>. I would like to receive newsletters and updates about  NewNew products at the phone number provided. One message per month. Message and data rates may apply. ",
+    "button": { "continue": "Continue", "close": "Cool!" },
+    "phoneError": {
+      "0": "Invalid phone number",
+      "1": "Invalid country code",
+      "2": "The phone number is too short",
+      "3": "The phone number is too long",
+      "4": "Invalid phone number"
     },
-    "itemDescription_NEED_TRANSLATION": {
-      "0": "Signed up",
-      "1": "Place a bid of $4",
-      "2": "Vote for $4",
-      "3": "Back a goal for $4",
-      "4": "Subscribe to a creator",
-      "5": "Subscribe to 3 creators",
-      "6": "Bid on the same creator twice",
-      "7": "Vote on the same creator twice",
-      "8": "Back the same creator twice",
-      "9": "Placing a bid 2 days in a row",
-      "10": "Vote 2 days in a row",
-      "11": "Back goals 2 days in a row",
-      "12": "Bid on a winning option",
-      "13": "Vote for a winning option",
-      "14": "Invite 5 friends",
-      "15": "Get a vote on your post"
+    "error": {
+      "requestFailed": "Request failed"
     }
   }
 }

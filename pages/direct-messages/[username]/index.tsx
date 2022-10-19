@@ -1,4 +1,5 @@
-import React, { ReactElement } from 'react';
+/* eslint-disable camelcase */
+import React, { ReactElement, useCallback, useState } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -15,25 +16,51 @@ import { useAppSelector } from '../../../redux-store/store';
 
 interface IChat {
   username: string;
+  setup_intent_client_secret?: string;
+  save_card?: boolean;
 }
 
-const Chat: NextPage<IChat> = ({ username }) => {
+const Chat: NextPage<IChat> = ({
+  username,
+  setup_intent_client_secret,
+  save_card,
+}) => {
   const { t } = useTranslation('page-Chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
   useUpdateEffect(() => {
-    if (!user.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router?.push('/sign-up');
     }
-  }, [user.loggedIn, router]);
+  }, [user.loggedIn, user._persist?.rehydrated, router]);
+
+  const [
+    setupIntentClientSecretFromRedirect,
+    setSetupIntentClientSecretFromRedirect,
+  ] = useState(setup_intent_client_secret);
+
+  const [saveCardFromRedirect, setCardFromRedirect] = useState(save_card);
+
+  const resetStripeSetupIntent = useCallback(() => {
+    setSetupIntentClientSecretFromRedirect('');
+    setCardFromRedirect(false);
+  }, []);
 
   return (
     <>
       <Head>
         <title>{t('meta.title')}</title>
       </Head>
-      <Content username={username} />
+      <Content
+        username={username}
+        setupIntentClientSecretFromRedirect={
+          setupIntentClientSecretFromRedirect
+        }
+        saveCardFromRedirect={saveCardFromRedirect}
+        resetStripeSetupIntent={resetStripeSetupIntent}
+      />
     </>
   );
 };
@@ -45,11 +72,12 @@ export default Chat;
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { username } = context.query;
+  const { username, setup_intent_client_secret, save_card } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'page-Chat',
     'modal-PaymentModal',
+    'page-SubscribeToUser',
   ]);
 
   const { req } = context;
@@ -69,6 +97,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       username,
       ...translationContext,
+      ...(setup_intent_client_secret
+        ? {
+            setup_intent_client_secret,
+          }
+        : {}),
+      ...(save_card
+        ? {
+            save_card: save_card === 'true',
+          }
+        : {}),
     },
   };
 };

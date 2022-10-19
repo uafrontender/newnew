@@ -15,6 +15,7 @@ interface IFunction {
 
 const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
   const { t } = useTranslation('common');
+  const { t: tPostCard } = useTranslation('component-PostCard');
   const renderItem = useCallback(
     (post: newnewapi.IPost) => {
       const postType = Object.keys(post)[0];
@@ -28,6 +29,8 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
       const timestampSeconds = new Date(
         (data.expiresAt?.seconds as number) * 1000
       ).getTime();
+
+      const hasEnded = Date.now() > timestampSeconds;
 
       const parsed = secondsToDHMS(
         (timestampSeconds - Date.now()) / 1000,
@@ -62,17 +65,31 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
               </SLeftSide>
               <SPostDetails>
                 <SPostType>{postTypeConverted}</SPostType>
-                <SPostEnded>
-                  {parsed.days !== '00' && `${parsed.days}d`}{' '}
-                  {`${parsed.hours}h ${parsed.minutes}m ${parsed.seconds}s `}
-                </SPostEnded>
+                {!hasEnded ? (
+                  <SPostEnded>
+                    {parsed.days !== '00' &&
+                      `${parsed.days}${tPostCard('timer.daysLeft')}`}{' '}
+                    {`${parsed.hours}${tPostCard('timer.hoursLeft')} ${
+                      parsed.minutes
+                    }${tPostCard('timer.minutesLeft')} ${
+                      parsed.seconds
+                    }${tPostCard('timer.secondsLeft')} `}
+                  </SPostEnded>
+                ) : (
+                  <SPostEnded>
+                    {tPostCard('timer.endedOn')}
+                    {new Date(
+                      (data.expiresAt?.seconds as number) * 1000
+                    ).toLocaleDateString()}
+                  </SPostEnded>
+                )}
               </SPostDetails>
             </SPost>
           </a>
         </Link>
       );
     },
-    [t]
+    [t, tPostCard]
   );
 
   return (

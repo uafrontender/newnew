@@ -72,25 +72,27 @@ export const Mobile: React.FC = React.memo(() => {
             )}
           </>
         ) : (
-          <SItemWithMargin>
-            <Link href='/sign-up?to=create'>
-              <a>
-                <SButton
-                  view='primaryGrad'
-                  withDim
-                  withShrink
-                  withShadow
-                  onClick={() => {
-                    Mixpanel.track('Navigation Item Clicked', {
-                      _button: 'Create now',
-                    });
-                  }}
-                >
-                  {t('button.createOnNewnew')}
-                </SButton>
-              </a>
-            </Link>
-          </SItemWithMargin>
+          <>
+            <SItemWithMargin>
+              <Link href='/sign-up?to=create'>
+                <a>
+                  <SButton
+                    view='primaryGrad'
+                    withDim
+                    withShrink
+                    withShadow
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Create now',
+                      });
+                    }}
+                  >
+                    {t('button.createOnNewnew')}
+                  </SButton>
+                </a>
+              </Link>
+            </SItemWithMargin>
+          </>
         )}
       </SRightBlock>
     </SContainer>
@@ -114,7 +116,11 @@ const SRightBlock = styled.nav`
 `;
 
 const SItemWithMargin = styled.div`
-  margin-left: 16px;
+  margin-left: 6px;
+
+  ${(props) => props.theme.media.mobileM} {
+    margin-left: 16px;
+  }
 
   ${(props) => props.theme.media.tablet} {
     margin-left: 24px;
@@ -127,6 +133,16 @@ const SItemWithMargin = styled.div`
 
 // Not perfect but should work. Include into brand book later
 const SButton = styled(Button)`
-  padding: 12px;
+  padding: 10px 8px;
   height: 36px;
+  font-size: 12px;
+
+  ${(props) => props.theme.media.mobileM} {
+    font-size: 13px;
+  }
+
+  ${(props) => props.theme.media.mobileL} {
+    padding: 12px;
+    font-size: 14px;
+  }
 `;
