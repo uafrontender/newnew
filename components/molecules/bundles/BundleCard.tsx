@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import UserAvatar from '../UserAvatar';
 import formatTimeLeft from '../../../utils/formatTimeLeft';
 import BulletLine from './BulletLine';
-import { splitNumber } from '../../../utils/format';
+import { formatNumber } from '../../../utils/format';
 
 interface IBundleCard {
   className?: string;
@@ -48,7 +48,12 @@ const BundleCard: React.FC<IBundleCard> = ({
           // @ts-ignore
           components={[
             <VotesNumberSpan />,
-            { amount: splitNumber(creatorBundle.bundle.votesLeft!) },
+            {
+              amount: formatNumber(
+                creatorBundle.bundle.votesLeft as number,
+                true
+              ),
+            },
           ]}
         />
       </SVotesLeft>

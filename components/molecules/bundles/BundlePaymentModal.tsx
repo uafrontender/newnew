@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { buyCreatorsBundles } from '../../../api/endpoints/bundles';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { useAppSelector } from '../../../redux-store/store';
-import { splitNumber } from '../../../utils/format';
+import { formatNumber } from '../../../utils/format';
 import getCustomerPaymentFee from '../../../utils/getCustomerPaymentFee';
 import getDisplayname from '../../../utils/getDisplayname';
 import useStripeSetupIntent from '../../../utils/hooks/useStripeSetupIntent';
@@ -178,7 +178,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
             // @ts-ignore
             components={[
               <VotesNumberSpan />,
-              { amount: splitNumber(bundle.votesAmount!) },
+              { amount: formatNumber(bundle.votesAmount as number, true) },
             ]}
           />
         </SVotesNumber>

@@ -6,7 +6,7 @@ import styled, { useTheme } from 'styled-components';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 import BulletLine from './BulletLine';
-import { splitNumber } from '../../../utils/format';
+import { formatNumber } from '../../../utils/format';
 
 interface IOfferCard {
   className?: string;
@@ -46,7 +46,7 @@ const OfferCard: React.FC<IOfferCard> = ({
           // @ts-ignore
           components={[
             <VotesNumberSpan />,
-            { amount: splitNumber(bundleOffer.votesAmount!) },
+            { amount: formatNumber(bundleOffer.votesAmount! as number, true) },
           ]}
         />
       </SVotesNumber>

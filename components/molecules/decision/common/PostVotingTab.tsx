@@ -6,7 +6,7 @@ import { Trans, useTranslation } from 'next-i18next';
 import InlineSvg from '../../../atoms/InlineSVG';
 
 import StatisticsIconFilled from '../../../../public/images/svg/icons/filled/Statistics.svg';
-import { splitNumber } from '../../../../utils/format';
+import { formatNumber } from '../../../../utils/format';
 
 interface IPostVotingTab {
   children: string;
@@ -40,7 +40,7 @@ const PostVotingTab: React.FunctionComponent<IPostVotingTab> = ({
               // @ts-ignore
               components={[
                 <VotesNumberSpan />,
-                { amount: splitNumber(bundleVotes) },
+                { amount: formatNumber(bundleVotes as number, true) },
               ]}
             />
           </SBundleVotes>

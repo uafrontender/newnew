@@ -6,7 +6,7 @@ import Button from '../../../../atoms/Button';
 import Modal from '../../../../organisms/Modal';
 import assets from '../../../../../constants/assets';
 import ModalPaper from '../../../../organisms/ModalPaper';
-import { splitNumber } from '../../../../../utils/format';
+import { formatNumber } from '../../../../../utils/format';
 
 interface IUseBundleVotesModal {
   isVisible: boolean;
@@ -40,7 +40,7 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
               // @ts-ignore
               components={[
                 <VotesNumberSpan />,
-                { amount: splitNumber(bundleVotesLeft) },
+                { amount: formatNumber(bundleVotesLeft as number, true) },
               ]}
             />
           </SVotesAvailable>
