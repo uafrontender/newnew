@@ -11,6 +11,7 @@ import UserAvatar from '../UserAvatar';
 import assets from '../../../constants/assets';
 import formatTimeLeft from '../../../utils/formatTimeLeft';
 import BulletLine from './BulletLine';
+import { splitNumber } from '../../../utils/format';
 
 interface ICreatorsBundleModal {
   show: boolean;
@@ -45,7 +46,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                   // @ts-ignore
                   components={[
                     <VotesNumberSpan />,
-                    { amount: creatorsBundle?.bundle?.votesLeft },
+                    { amount: splitNumber(creatorsBundle?.bundle?.votesLeft!) },
                   ]}
                 />
               </SVotesAvailable>

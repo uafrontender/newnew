@@ -46,7 +46,7 @@ const OfferCard: React.FC<IOfferCard> = ({
           // @ts-ignore
           components={[
             <VotesNumberSpan />,
-            { amount: splitNumber(bundleOffer.votesAmount!, ',') },
+            { amount: splitNumber(bundleOffer.votesAmount!) },
           ]}
         />
       </SVotesNumber>

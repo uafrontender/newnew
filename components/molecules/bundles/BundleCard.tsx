@@ -48,7 +48,7 @@ const BundleCard: React.FC<IBundleCard> = ({
           // @ts-ignore
           components={[
             <VotesNumberSpan />,
-            { amount: splitNumber(creatorBundle.bundle.votesLeft!, ' ') },
+            { amount: splitNumber(creatorBundle.bundle.votesLeft!) },
           ]}
         />
       </SVotesLeft>

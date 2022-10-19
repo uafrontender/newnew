@@ -6,6 +6,7 @@ import Button from '../../../../atoms/Button';
 import Modal from '../../../../organisms/Modal';
 import assets from '../../../../../constants/assets';
 import ModalPaper from '../../../../organisms/ModalPaper';
+import { splitNumber } from '../../../../../utils/format';
 
 interface IUseBundleVotesModal {
   isVisible: boolean;
@@ -37,7 +38,10 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
               t={t}
               i18nKey='mcPost.optionsTab.useBundleVotesModal.votesAvailable'
               // @ts-ignore
-              components={[<VotesNumberSpan />, { amount: bundleVotesLeft }]}
+              components={[
+                <VotesNumberSpan />,
+                { amount: splitNumber(bundleVotesLeft) },
+              ]}
             />
           </SVotesAvailable>
           <OptionTitle>
