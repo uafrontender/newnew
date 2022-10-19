@@ -113,7 +113,7 @@ interface ICardSkeletonSection {
 
 export const CardSkeletonSection: React.FunctionComponent<
   ICardSkeletonSection
-> = ({ count, width, height, ...restProps }) => {
+> = ({ count, width, height }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -122,7 +122,7 @@ export const CardSkeletonSection: React.FunctionComponent<
   const isLaptop = ['laptop'].includes(resizeMode);
   const isDesktop = ['laptopL'].includes(resizeMode);
   return (
-    <SCardSkeletonSectionWrapper {...restProps}>
+    <SCardSkeletonSectionWrapper>
       <CardSkeleton
         count={count}
         cardWidth={

@@ -298,61 +298,61 @@ const PRE_FETCH_LINKS_COMMON = (
     {/* Sign up screen hero */}
     <link
       rel='prefetch'
-      href={assets.floatingAssets.darkBottomGlassSphere}
+      href={assets.floatingAssets.bottomGlassSphere}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.darkBottomSphere}
+      href={assets.floatingAssets.bottomSphere}
       as='image'
       media='(min-width: 760px)'
     />
     {/* <link
       rel='prefetch'
-      href={assets.floatingAssets.darkCrowdfunding}
+      href={assets.floatingAssets.crowdfunding}
       as='image'
       media='(min-width: 760px)'
     /> */}
     <link
       rel='prefetch'
-      href={assets.floatingAssets.darkLeftGlassSphere}
+      href={assets.floatingAssets.leftGlassSphere}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.darkSubMC}
+      href={assets.floatingAssets.subMC}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.darkMultipleChoice}
+      href={assets.floatingAssets.multipleChoice}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.darkRightGlassSphere}
+      href={assets.floatingAssets.rightGlassSphere}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.darkTopGlassSphere}
+      href={assets.floatingAssets.topGlassSphere}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.darkTopMiddleSphere}
+      href={assets.floatingAssets.topMiddleSphere}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.darkVotes}
+      href={assets.floatingAssets.votes}
       as='image'
       media='(min-width: 760px)'
     />

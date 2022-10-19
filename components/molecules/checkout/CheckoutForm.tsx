@@ -172,6 +172,10 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const paymentElementOptions: StripePaymentElementOptions = useMemo(
     () => ({
       terms: { card: 'never' },
+      wallets: {
+        googlePay: 'never',
+        applePay: 'never',
+      },
     }),
     []
   );
@@ -339,6 +343,7 @@ const SEmailInput = styled(Input)`
 
 const SRecaptchaWrapper = styled.div`
   margin-top: 20px;
+  z-index: 20;
 `;
 
 const SPayButtonDiv = styled.div`

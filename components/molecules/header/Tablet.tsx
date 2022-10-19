@@ -248,12 +248,8 @@ const SRightBlock = styled.nav`
 `;
 
 const SItemWithMargin = styled.div`
-  margin-left: 9px;
+  margin-left: 16px;
   position: relative;
-
-  ${({ theme }) => theme.media.laptop} {
-    margin-left: 16px;
-  }
 `;
 
 const SIconButtonContent = styled.div`
