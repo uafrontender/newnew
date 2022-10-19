@@ -3,10 +3,9 @@ import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
-import InlineSvg from '../../atoms/InlineSVG';
-import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
+import BulletLine from './BulletLine';
 
 interface IOfferCard {
   className?: string;
@@ -56,20 +55,10 @@ const OfferCard: React.FC<IOfferCard> = ({
           unit: t(`modal.buyBundle.unit.${unitOfTimeLeft}`),
         })}
       </AccessDescription>
-      <SDescriptionLine>
-        <SBullet>
-          <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
-        </SBullet>
-        <SDescriptionText>
-          {t('modal.buyBundle.customOptions')}
-        </SDescriptionText>
-      </SDescriptionLine>
-      <SDescriptionLine last>
-        <SBullet>
-          <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
-        </SBullet>
-        <SDescriptionText>{t('modal.buyBundle.chat')}</SDescriptionText>
-      </SDescriptionLine>
+      <BundleFeatures>
+        <BulletLine>{t('modal.buyBundle.customOptions')}</BulletLine>
+        <BulletLine>{t('modal.buyBundle.chat')}</BulletLine>
+      </BundleFeatures>
       <BuyButton onClick={onClick}>
         {t('modal.buyBundle.buy', {
           amount: bundleOffer.price!.usdCents! / 100,
@@ -139,39 +128,10 @@ const AccessDescription = styled.p`
   margin-bottom: 12px;
 `;
 
-const SDescriptionLine = styled.div<{ last?: boolean }>`
+const BundleFeatures = styled.div`
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  margin-bottom: ${({ last }) => (last ? '0px' : '8px;')};
-  width: 100%;
-
-  overflow: hidden;
-`;
-
-const SBullet = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
-  border-radius: 50%;
-  width: 12px;
-  height: 12px;
-  margin-top: 4px;
-  margin-right: 8px;
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-`;
-
-const SDescriptionText = styled.p`
-  font-weight: 600;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  font-size: 14px;
-  line-height: 20px;
-
-  width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex-direction: column;
+  gap: 8px;
 `;
 
 const BuyButton = styled.button`

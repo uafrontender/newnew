@@ -2,10 +2,9 @@ import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 import React from 'react';
 import styled from 'styled-components';
-import InlineSvg from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
-import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
 import formatTimeLeft from '../../../utils/formatTimeLeft';
+import BulletLine from './BulletLine';
 
 interface IBundleCard {
   className?: string;
@@ -58,18 +57,10 @@ const BundleCard: React.FC<IBundleCard> = ({
           unit: t(`bundle.unit.${formattedTimeLeft.unit}`),
         })}
       </AccessDescription>
-      <SDescriptionLine>
-        <SBullet>
-          <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
-        </SBullet>
-        <SDescriptionText>{t('bundle.customOptions')}</SDescriptionText>
-      </SDescriptionLine>
-      <SDescriptionLine last>
-        <SBullet>
-          <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
-        </SBullet>
-        <SDescriptionText>{t('bundle.chat')}</SDescriptionText>
-      </SDescriptionLine>
+      <BundleFeatures>
+        <BulletLine>{t('bundle.customOptions')}</BulletLine>
+        <BulletLine>{t('bundle.chat')}</BulletLine>
+      </BundleFeatures>
     </SBundlesContainer>
   );
 };
@@ -171,37 +162,8 @@ const AccessDescription = styled.p`
   margin-bottom: 12px;
 `;
 
-const SDescriptionLine = styled.div<{ last?: boolean }>`
+const BundleFeatures = styled.div`
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  margin-bottom: ${({ last }) => (last ? '0px' : '8px;')};
-  width: 100%;
-
-  overflow: hidden;
-`;
-
-const SBullet = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
-  border-radius: 50%;
-  width: 12px;
-  height: 12px;
-  margin-top: 4px;
-  margin-right: 8px;
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-`;
-
-const SDescriptionText = styled.p`
-  font-weight: 600;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  font-size: 14px;
-  line-height: 20px;
-
-  width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex-direction: column;
+  gap: 8px;
 `;

@@ -9,8 +9,8 @@ import Modal from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
 import UserAvatar from '../UserAvatar';
 import assets from '../../../constants/assets';
-import InlineSvg from '../../atoms/InlineSVG';
-import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
+import formatTimeLeft from '../../../utils/formatTimeLeft';
+import BulletLine from './BulletLine';
 
 interface ICreatorsBundleModal {
   show: boolean;
@@ -26,7 +26,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
     const timeLeft =
       (creatorsBundle.bundle!.accessExpiresAt!.seconds as number) * 1000 -
       Date.now();
-    const daysOfAccessLeft = Math.floor(timeLeft / 1000 / 60 / 60 / 24);
+    const formattedTimeLeft = formatTimeLeft(timeLeft);
 
     return (
       <>
@@ -68,35 +68,16 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
               <SBundleInfo>
                 <AccessDescription>
                   {t('modal.creatorsBundleModal.access', {
-                    amount: daysOfAccessLeft,
+                    amount: formattedTimeLeft.value,
+                    unit: t(
+                      `modal.creatorsBundleModal.unit.${formattedTimeLeft.unit}`
+                    ),
                   })}
                 </AccessDescription>
-                <SDescriptionLine>
-                  <SBullet>
-                    <InlineSvg
-                      svg={RadioIcon}
-                      width='6px'
-                      height='6px'
-                      fill='#000'
-                    />
-                  </SBullet>
-                  <SDescriptionText>
-                    {t('modal.creatorsBundleModal.customOptions')}
-                  </SDescriptionText>
-                </SDescriptionLine>
-                <SDescriptionLine last>
-                  <SBullet>
-                    <InlineSvg
-                      svg={RadioIcon}
-                      width='6px'
-                      height='6px'
-                      fill='#000'
-                    />
-                  </SBullet>
-                  <SDescriptionText>
-                    {t('modal.creatorsBundleModal.chat')}
-                  </SDescriptionText>
-                </SDescriptionLine>
+                <BulletLine>
+                  {t('modal.creatorsBundleModal.customOptions')}
+                </BulletLine>
+                <BulletLine>{t('modal.creatorsBundleModal.chat')}</BulletLine>
               </SBundleInfo>
               <BuyButton onClick={onBuyMore}>
                 {t('modal.creatorsBundleModal.buyButton')}
@@ -180,6 +161,7 @@ const SLink = styled.a`
 const SBundleInfo = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 8px;
   width: 100%;
   padding: 16px 24px;
   margin-bottom: 30px;
@@ -195,42 +177,7 @@ const AccessDescription = styled.p`
   font-size: 14px;
   line-height: 20px;
 
-  margin-bottom: 12px;
-`;
-
-const SDescriptionLine = styled.div<{ last?: boolean }>`
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  margin-bottom: ${({ last }) => (last ? '0px' : '8px;')};
-  width: 100%;
-
-  overflow: hidden;
-`;
-
-const SBullet = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
-  border-radius: 50%;
-  width: 12px;
-  height: 12px;
-  margin-top: 4px;
-  margin-right: 8px;
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-`;
-
-const SDescriptionText = styled.p`
-  font-weight: 600;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  font-size: 14px;
-  line-height: 20px;
-
-  width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  margin-bottom: 4px;
 `;
 
 const BuyButton = styled.button`

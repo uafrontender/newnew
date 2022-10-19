@@ -11,11 +11,10 @@ import { useAppSelector } from '../../../redux-store/store';
 import getCustomerPaymentFee from '../../../utils/getCustomerPaymentFee';
 import getDisplayname from '../../../utils/getDisplayname';
 import useStripeSetupIntent from '../../../utils/hooks/useStripeSetupIntent';
-import InlineSvg from '../../atoms/InlineSVG';
 import Text from '../../atoms/Text';
 import PaymentModal from '../checkout/PaymentModal';
 import LoadingModal from '../LoadingModal';
-import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
+import BulletLine from './BulletLine';
 
 interface IBundlePaymentModal {
   creator: newnewapi.IUser;
@@ -185,20 +184,10 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
             unit: t(`modal.buyBundle.unit.${unitOfTimeLeft}`),
           })}
         </AccessDescription>
-        <SDescriptionLine>
-          <SBullet>
-            <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
-          </SBullet>
-          <SDescriptionText>
-            {t('modal.buyBundle.customOptions')}
-          </SDescriptionText>
-        </SDescriptionLine>
-        <SDescriptionLine last>
-          <SBullet>
-            <InlineSvg svg={RadioIcon} width='6px' height='6px' fill='#000' />
-          </SBullet>
-          <SDescriptionText>{t('modal.buyBundle.chat')}</SDescriptionText>
-        </SDescriptionLine>
+        <BundleFeatures>
+          <BulletLine>{t('modal.buyBundle.customOptions')}</BulletLine>
+          <BulletLine>{t('modal.buyBundle.chat')}</BulletLine>
+        </BundleFeatures>
       </PaymentModal>
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
@@ -262,37 +251,8 @@ const AccessDescription = styled.p`
   margin-bottom: 12px;
 `;
 
-const SDescriptionLine = styled.div<{ last?: boolean }>`
+const BundleFeatures = styled.div`
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  margin-bottom: ${({ last }) => (last ? '0px' : '8px;')};
-  width: 100%;
-
-  overflow: hidden;
-`;
-
-const SBullet = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
-  border-radius: 50%;
-  width: 12px;
-  height: 12px;
-  margin-top: 4px;
-  margin-right: 8px;
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-`;
-
-const SDescriptionText = styled.p`
-  font-weight: 600;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  font-size: 14px;
-  line-height: 20px;
-
-  width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex-direction: column;
+  gap: 8px;
 `;
