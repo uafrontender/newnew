@@ -11,6 +11,7 @@ import useOnClickOutside from '../../../../../utils/hooks/useOnClickOutside';
 
 import Text from '../../../../atoms/Text';
 import { Mixpanel } from '../../../../../utils/mixpanel';
+import { useOverlayMode } from '../../../../../contexts/overlayModeContext';
 
 interface IMcOptionCardSelectVotesMenu {
   isVisible: boolean;
@@ -39,17 +40,17 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
 
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
+
   useEffect(() => {
-    if (isBrowser()) {
-      const container = document.getElementById('post-modal-container');
-      if (container)
-        if (isVisible) {
-          container.style.overflowY = 'hidden';
-        } else {
-          container.style.overflowY = '';
-        }
+    if (isVisible) {
+      enableOverlayMode();
     }
-  }, [isVisible]);
+
+    return () => {
+      disableOverlayMode();
+    };
+  }, [isVisible, enableOverlayMode, disableOverlayMode]);
 
   useEffect(() => {
     if (isVisible) {
