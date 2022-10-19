@@ -151,7 +151,10 @@ const SVotesLeft = styled.p<{ small: boolean }>`
 `;
 
 const VotesNumberSpan = styled.span`
-  color: ${({ theme }) => theme.colorsThemed.accent.yellow};
+  color: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colorsThemed.text.primary
+      : theme.colorsThemed.accent.yellow};
 `;
 
 const AccessDescription = styled.p`
