@@ -66,13 +66,10 @@ export const SearchResults = () => {
             active={activeTab === tab.id}
             key={tab.id}
             onClick={() => {
-              if (tab.id === 'posts') {
-                router.push(
-                  `/search?query=${searchValue}&type=${searchType}&tab=${tab.id}`
-                );
-              } else {
-                router.push(`/search?query=${searchValue}&tab=${tab.id}`);
-              }
+              const clearedQuery = encodeURIComponent(searchValue);
+              router.push(
+                `/search?query=${clearedQuery}&type=${searchType}&tab=${tab.id}`
+              );
             }}
           >
             <InlineSvg
@@ -154,10 +151,14 @@ const SPageTitle = styled.h1`
 `;
 
 const SHashtag = styled.span`
+  display: inline;
+  word-spacing: normal;
+  overflow-wrap: break-word;
   color: ${(props) => props.theme.colorsThemed.accent.blue};
 `;
 
 const Query = styled.span`
+  overflow-wrap: break-word;
   color: ${(props) => props.theme.colorsThemed.text.primary};
 `;
 

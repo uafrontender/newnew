@@ -177,7 +177,9 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 20px ${({ theme }) => theme.media.tablet} {
+  padding-top: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
     padding-top: 38px;
     padding-left: 20px;
     padding-right: 20px;

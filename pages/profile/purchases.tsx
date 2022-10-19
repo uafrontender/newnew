@@ -19,9 +19,7 @@ import assets from '../../constants/assets';
 import switchPostType from '../../utils/switchPostType';
 import { Mixpanel } from '../../utils/mixpanel';
 
-const PostModal = dynamic(
-  () => import('../../components/organisms/decision/PostModal')
-);
+const PostModal = dynamic(() => import('../../components/organisms/decision'));
 const PostList = dynamic(
   () => import('../../components/organisms/see-more/PostList')
 );

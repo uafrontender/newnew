@@ -16,8 +16,6 @@
     "followCreator": "Favorite creator",
     "unFollowDecision": "Unfavorite {{postType}}",
     "unFollowCreator": "Unfavorite creator",
-    "unsubscribe": "Unsubscribe",
-    "removeSubscription": "Remove subscription",
     "removeBid": "Remove bid",
     "removeOption": "Remove option",
     "view": "View profile",
@@ -153,11 +151,7 @@
       "action": "Explore"
     }
   },
-  "creatorCard": {
-    "subscriptionCost": "${{amount}} Monthly",
-    "subscribed": "subscribed",
-    "cancelled": "cancelled"
-  },
+  "gotIt": "Got it",
   "sortingOption": {
     "sortingtype": "Order",
     "sortingtype-all": "All",
@@ -180,55 +174,22 @@
   "toastErrors": {
     "generic": "An error occurred, please try again later"
   },
-  "rewards": {
-    "earned": "earned ${{value}}",
-    "earn": "earn ${{value}}",
-    "modalTitle": "You earned ${{amount}}!",
-    "modalButton": "Great",
-    "modalDescription": {
-      "1": "...for signing up",
-      "2": "...for placing a bid",
-      "3": "...for voting on a post",
-      "4": "...for backing a goal",
-      "5": "...for subscribing to a creator",
-      "6": "...for subscribing to {{amount}} creators",
-      "7": "...for bidding twice on the same creator",
-      "8": "...for voting twice on the same creator",
-      "9": "...for backing the same creator twice",
-      "10": "...for bidding twice in one week",
-      "11": "...for voting twice in one week",
-      "12": "...for backing goals twice in one week",
-      "13": "...for inviting {{amount}} friends to NewNew"
+  "smsNotifications": {
+    "title": "Enter your phone number",
+    "success": "Success",
+    "description": "With it, we will notify you about the <0>{{subject}}</0> updates.",
+    "confirmation": "Confirmation SMS was sent to {{phoneNumber}} number.",
+    "tos": "I accept the <0>NewNew’s Terms of Service</0> & have read the <1>NewNew’s Privacy Statement</1>. I would like to receive newsletters and updates about  NewNew products at the phone number provided. One message per month. Message and data rates may apply. ",
+    "button": { "continue": "Continue", "close": "Cool!" },
+    "phoneError": {
+      "0": "Invalid phone number",
+      "1": "Invalid country code",
+      "2": "The phone number is too short",
+      "3": "The phone number is too long",
+      "4": "Invalid phone number"
     },
-    "receivedItemDescription": {
-      "1": "Signed up",
-      "2": "Placed a bid",
-      "3": "Voted on a post",
-      "4": "Backed a goal",
-      "5": "Subscribed to a creator",
-      "6": "Subscribed to {{amount}} creators",
-      "7": "Bid twice on the same creator",
-      "8": "Voted twice on the same creator",
-      "9": "Backed the same creator twice",
-      "10": "Placed bids twice in one week",
-      "11": "Voted twice in one week",
-      "12": "Backed goals twice in one week",
-      "13": "Invited {{amount}} friends"
-    },
-    "availableItemDescription": {
-      "1": "Sign up",
-      "2": "Place a bid",
-      "3": "Vote on a post",
-      "4": "Back a Goal",
-      "5": "Subscribe to a creator",
-      "6": "Subscribe to {{amount}} creators",
-      "7": "Bid twice on the same creator",
-      "8": "Vote twice on the same creator",
-      "9": "Back the same Creator twice",
-      "10": "Bid twice in one week",
-      "11": "Vote twice in one week",
-      "12": "Back goals twice in one week",
-      "13": "Invite {{amount}} friends to NewNew"
+    "error": {
+      "requestFailed": "Request failed"
     }
   }
 }

@@ -7,12 +7,10 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import moment from 'moment';
 import { useAppSelector } from '../../../redux-store/store';
-import { getMySubscriptionProduct } from '../../../api/endpoints/subscription';
 import Lottie from '../../atoms/Lottie';
 import Headline from '../../atoms/Headline';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import { getMyPosts } from '../../../api/endpoints/user';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import { getMyUrgentPosts } from '../../../api/endpoints/post';
 import FinishProfileSetup from '../../atoms/creator/FinishProfileSetup';
 import { getMyEarnings } from '../../../api/endpoints/payments';
@@ -24,15 +22,6 @@ const DynamicSection = dynamic(
 );
 const ExpirationPosts = dynamic(
   () => import('../../molecules/creator/dashboard/ExpirationPosts')
-);
-const EnableSubscription = dynamic(
-  () => import('../../molecules/creator/dashboard/EnableSubscription')
-);
-const SubscriptionStats = dynamic(
-  () => import('../../molecules/creator/dashboard/SubscriptionStats')
-);
-const EmptySubscriptionStats = dynamic(
-  () => import('../../molecules/creator/dashboard/EmptySubscriptionStats')
 );
 const Earnings = dynamic(
   () => import('../../molecules/creator/dashboard/Earnings')
@@ -49,19 +38,16 @@ export const Dashboard: React.FC = React.memo(() => {
     resizeMode
   );
 
-  const { mySubscribers } = useGetSubscriptions();
-  const [mySubscriptionProduct, setMySubscriptionProduct] =
-    useState<newnewapi.ISubscriptionProduct | null>(null);
-  const [isToDosCompleted, setIsToDosCompleted] =
-    useState<boolean | undefined>(undefined);
+  const [isToDosCompleted, setIsToDosCompleted] = useState<boolean | undefined>(
+    undefined
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isEarningsLoading, setIsEarningsLoading] = useState(true);
-  const [isMySubscriptionProductLoading, setIsMySubscriptionProductLoading] =
-    useState(true);
   const [expirationPosts, setExpirationPosts] = useState<newnewapi.IPost[]>([]);
   const filter = '7_days';
-  const [myEarnings, setMyEarnings] =
-    useState<newnewapi.GetMyEarningsResponse | undefined>();
+  const [myEarnings, setMyEarnings] = useState<
+    newnewapi.GetMyEarningsResponse | undefined
+  >();
   const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] =
     useState(true);
   const [hasMyPosts, setHasMyPosts] = useState(false);
@@ -75,19 +61,6 @@ export const Dashboard: React.FC = React.memo(() => {
         : setIsToDosCompleted(false);
     }
   }, [user.creatorData, user.userData?.bio]);
-
-  const fetchMySubscriptionProduct = async () => {
-    try {
-      const payload = new newnewapi.EmptyRequest();
-      const res = await getMySubscriptionProduct(payload);
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-      if (res.data?.myProduct) setMySubscriptionProduct(res.data?.myProduct);
-      setIsMySubscriptionProductLoading(false);
-    } catch (err) {
-      console.error(err);
-      setIsMySubscriptionProductLoading(false);
-    }
-  };
 
   const fetchMyExpirationPosts = async () => {
     try {
@@ -107,12 +80,6 @@ export const Dashboard: React.FC = React.memo(() => {
       fetchMyExpirationPosts();
     }
   }, [isLoadingExpirationPosts]);
-
-  useEffect(() => {
-    if (!mySubscriptionProduct) {
-      fetchMySubscriptionProduct();
-    }
-  }, [mySubscriptionProduct]);
 
   const loadMyPosts = useCallback(async () => {
     if (isLoading) return;
@@ -248,31 +215,6 @@ export const Dashboard: React.FC = React.memo(() => {
             />
           )}
         </SBlock>
-        {!isMySubscriptionProductLoading ? (
-          !mySubscriptionProduct ? (
-            <SBlock noMargin>
-              <EnableSubscription />
-            </SBlock>
-          ) : (
-            <SBlock noMargin>
-              {mySubscribers.length > 0 ? (
-                <SubscriptionStats />
-              ) : (
-                <EmptySubscriptionStats />
-              )}
-            </SBlock>
-          )
-        ) : (
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
-        )}
       </SContent>
     </SContainer>
   );
@@ -283,6 +225,7 @@ export default Dashboard;
 const SContainer = styled.div`
   position: relative;
   margin-top: -16px;
+  margin-bottom: -24px;
 
   ${(props) => props.theme.media.tablet} {
     margin-top: unset;
@@ -295,10 +238,9 @@ const SContainer = styled.div`
 `;
 
 const SContent = styled.div`
-  min-height: 840px;
-
   ${(props) => props.theme.media.tablet} {
     margin-left: 180px;
+    min-height: 840px;
   }
 
   ${(props) => props.theme.media.laptop} {

@@ -24,11 +24,7 @@ export const SBottomAction = styled.div`
 
 export const SBottomActionLeft = styled.div`
   display: flex;
-  margin-bottom: 24px;
   align-items: center;
-  ${(props) => props.theme.media.tablet} {
-    margin-bottom: 0;
-  }
 `;
 
 export const SBottomActionIcon = styled.span`
@@ -65,8 +61,10 @@ export const SBottomActionButton = styled(Button)`
   margin-left: auto;
   flex-shrink: 0;
   width: 100%;
+  margin-top: 24px;
   ${(props) => props.theme.media.tablet} {
     width: auto;
+    margin-top: 0;
   }
 `;
 

@@ -12,7 +12,7 @@ import { NextPageWithLayout } from '../_app';
 import { getUserByUsername } from '../../api/endpoints/user';
 import { fetchUsersPosts } from '../../api/endpoints/post';
 
-import PostModal from '../../components/organisms/decision/PostModal';
+import PostModal from '../../components/organisms/decision';
 import PostList from '../../components/organisms/see-more/PostList';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import Text from '../../components/atoms/Text';
@@ -55,8 +55,9 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >();
 
   // Loading state
   const [isLoading, setIsLoading] = useState(false);

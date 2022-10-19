@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { ReactElement, useState } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
@@ -54,7 +55,9 @@ export const Chat = () => {
         if (chatRoom?.visavis?.username) {
           route =
             chatRoom.kind === 1
-              ? chatRoom.visavis.username
+              ? chatRoom.myRole === 1
+                ? `${chatRoom.visavis.username}-cr`
+                : chatRoom.visavis.username
               : `${chatRoom.visavis.username}-announcement`;
         } else {
           route =
@@ -73,10 +76,11 @@ export const Chat = () => {
   };
 
   useUpdateEffect(() => {
-    if (!user.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router?.push('/sign-up');
     }
-  }, [router, user.loggedIn]);
+  }, [router, user.loggedIn, user._persist?.rehydrated]);
 
   useEffectOnce(() => {
     if (!isMobileOrTablet) {

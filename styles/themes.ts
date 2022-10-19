@@ -16,6 +16,7 @@ const basicTheme: Omit<
     black: '#000000',
     blue: '#2955EC',
     dark: '#0B0A13',
+    darkGray: '#2C2C33', 
   },
   borderRadius: {
     small: '8px',
@@ -203,6 +204,8 @@ export const lightTheme: DefaultTheme = {
       'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     blueHorizontal:
       'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    blueReversedDiagonal:
+      'linear-gradient(135deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     heroNotifications:
       'linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
     heroNotificationsTablet:
@@ -432,6 +435,8 @@ export const darkTheme: DefaultTheme = {
       'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     blueHorizontal:
       'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    blueReversedDiagonal:
+      'linear-gradient(135deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     heroNotifications:
       'linear-gradient(180deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
     heroNotificationsTablet:

@@ -11,7 +11,6 @@ import SearchInput from '../../atoms/search/SearchInput';
 import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
-// import { WalletContext } from '../../../contexts/walletContext';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
@@ -24,7 +23,6 @@ export const Desktop: React.FC = React.memo(() => {
   const { unreadCount } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const { globalSearchActive } = useAppSelector((state) => state.ui);
-  // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
   const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -90,21 +88,6 @@ export const Desktop: React.FC = React.memo(() => {
                 }}
               />
             </SItemWithMargin>
-            {/* {user.userData?.options?.isCreator && !isBalanceLoading && (
-              <SItemWithMargin>
-                <NavigationItem
-                  item={{
-                    url: '/profile/settings',
-                    key: 'my-balance',
-                    value:
-                      walletBalance && walletBalance?.usdCents !== undefined
-                        ? parseInt((walletBalance.usdCents / 100).toFixed(0)) ??
-                          0
-                        : undefined,
-                  }}
-                />
-              </SItemWithMargin>
-            )} */}
           </>
         )}
         <SItemWithMargin>
@@ -155,13 +138,7 @@ export const Desktop: React.FC = React.memo(() => {
                   </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      user.userData?.options?.isCreator
-                        ? '/profile/my-posts'
-                        : '/profile'
-                    }
-                  >
+                  <Link href='/profile/my-posts'>
                     <a>
                       <UserAvatar
                         withClick
@@ -189,14 +166,8 @@ export const Desktop: React.FC = React.memo(() => {
                   </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      user.userData?.options?.isCreator
-                        ? '/profile/my-posts'
-                        : '/profile'
-                    }
-                  >
-                    <a>
+                  <Link href='/profile'>
+                    <a id='profile-link'>
                       <UserAvatar
                         withClick
                         avatarUrl={user.userData?.avatarUrl}
@@ -230,6 +201,7 @@ export const Desktop: React.FC = React.memo(() => {
               <Link href='/sign-up?to=create'>
                 <a>
                   <Button
+                    id='log-in-to-create'
                     withDim
                     withShrink
                     withShadow

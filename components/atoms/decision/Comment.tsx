@@ -25,14 +25,14 @@ import { reportMessage } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
 
 const CommentEllipseMenu = dynamic(
-  () => import('../../molecules/decision/CommentEllipseMenu')
+  () => import('../../molecules/decision/common/CommentEllipseMenu')
 );
 const CommentEllipseModal = dynamic(
-  () => import('../../molecules/decision/CommentEllipseModal')
+  () => import('../../molecules/decision/common/CommentEllipseModal')
 );
 const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 const DeleteCommentModal = dynamic(
-  () => import('../../molecules/decision/DeleteCommentModal')
+  () => import('../../molecules/decision/common/DeleteCommentModal')
 );
 
 interface IComment {
@@ -84,7 +84,8 @@ const Comment: React.FC<IComment> = ({
   const replies = useMemo(() => comment.replies ?? [], [comment.replies]);
 
   const onUserReport = useCallback(() => {
-    if (!user.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -176,7 +177,7 @@ const Comment: React.FC<IComment> = ({
               )}
             </SActionsDiv>
           </SCommentHeader>
-          <SText>{comment.content?.text}</SText>
+          {!comment.isDeleted && <SText>{comment.content?.text}</SText>}
           {!comment.parentId &&
             !comment.isDeleted &&
             (!isReplyFormOpen ? (
@@ -211,17 +212,17 @@ const Comment: React.FC<IComment> = ({
             )}
           {isReplyFormOpen &&
             replies &&
-            replies.map((item) => (
+            replies.map((item, index) => (
               <Comment
                 key={item.id.toString()}
                 isDeletingComment={isDeletingComment}
                 canDeleteComment={canDeleteComment}
+                lastChild={index === replies.length - 1}
                 comment={item}
                 handleAddComment={(newMsg: string) => handleAddComment(newMsg)}
                 handleDeleteComment={handleDeleteComment}
               />
             ))}
-          {!lastChild && <SSeparator />}
         </SCommentContent>
         <DeleteCommentModal
           isVisible={confirmDeleteComment}
@@ -233,6 +234,7 @@ const Comment: React.FC<IComment> = ({
           }}
         />
       </SComment>
+      {!lastChild && <SSeparator />}
       {isMobile ? (
         <CommentEllipseModal
           isOpen={ellipseMenuOpen}
@@ -276,6 +278,7 @@ const SUserAvatar = styled(UserAvatar)<{
   min-height: 36px;
   flex-shrink: 0;
   margin-right: 12px;
+  margin-bottom: 14px;
   cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
 `;
 

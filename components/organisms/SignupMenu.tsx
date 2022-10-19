@@ -35,7 +35,7 @@ import SignInButton from '../molecules/signup/SignInButton';
 // Icons
 import AlertIcon from '../../public/images/svg/icons/filled/Alert.svg';
 import AppleIcon from '../../public/images/svg/auth/icon-apple.svg';
-// import GoogleIcon from '../../public/images/svg/auth/icon-google.svg';
+import GoogleIcon from '../../public/images/svg/auth/icon-google.svg';
 import TwitterIcon from '../../public/images/svg/auth/icon-twitter.svg';
 import FacebookIcon from '../../public/images/svg/auth/icon-facebook.svg';
 import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.svg';
@@ -175,7 +175,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
             : t('heading.subheadingSessionExpired')}
         </SSubheading>
         <MSContentWrapper variants={container} initial='hidden' animate='show'>
-          {/* <motion.div variants={item}>
+          <motion.div variants={item}>
             <SignInButton
               noRipple
               svg={GoogleIcon}
@@ -189,7 +189,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
             >
               {t('signUpOptions.google')}
             </SignInButton>
-          </motion.div> */}
+          </motion.div>
           <motion.div variants={item}>
             <SignInButton
               noRipple

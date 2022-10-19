@@ -1,17 +1,16 @@
 {
   "meta": {
-    "title_NEED_TRANSLATION": "Sign in to NewNew",
-    "description_NEED_TRANSLATION": "Signing in to NewNew is fast and easy.",
-    "title-create_NEED_TRANSLATION": "Sign in to NewNew",
-    "description-create_NEED_TRANSLATION": "Signing up to NewNew is fast and easy. Join now to be a Creator"
+    "title": "登入 NewNew",
+    "description": "登入到 NewNew 快速而簡單。",
+    "title-create": "登入 NewNew",
+    "description-create": "登入到 NewNew 快速而簡單。現在加入成為創作者"
   },
   "heading": {
-    "sign-in_NEED_TRANSLATION": "Sign in",
-    "sign-in-to": "注冊",
+    "sign-in": "登入",
+    "sign-in-to": "登入",
     "reason": {
       "comment": "評論",
       "bid": "出價",
-      "subscribe": "訂閱",
       "pledge": "作出承諾",
       "follow-decision": "最喜歡的帖子",
       "follow-creator": "最喜愛的創作者",
@@ -27,7 +26,7 @@
     "twitter": "用Twitter登入",
     "orContinueWith": "或使用",
     "email": "電子郵件",
-    "signInButton_NEED_TRANSLATION": "Sign in",
+    "signInButton": "登入",
     "logInButton": "登錄"
   },
   "error": {

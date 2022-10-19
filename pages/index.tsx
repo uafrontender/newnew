@@ -37,9 +37,7 @@ const HeroSection = dynamic(
 const CardsSection = dynamic(
   () => import('../components/organisms/home/CardsSection')
 );
-const PostModal = dynamic(
-  () => import('../components/organisms/decision/PostModal')
-);
+const PostModal = dynamic(() => import('../components/organisms/decision'));
 const TutorialCard = dynamic(
   () => import('../components/molecules/TutorialCard')
 );

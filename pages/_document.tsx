@@ -47,21 +47,21 @@ export default class MyDocument extends Document {
           <link href='/fonts/font-gilroy.css' rel='stylesheet' />
           <link
             rel='preload'
-            href='/fonts/Radomir Tinkov - Gilroy-Medium.otf'
+            href='/fonts/Radomir-Tinkov-Gilroy-Medium.otf'
             as='font'
             type='font/otf'
             crossOrigin='anonymous'
           />
           <link
             rel='preload'
-            href='/fonts/Radomir Tinkov - Gilroy-SemiBold.otf'
+            href='/fonts/Radomir-Tinkov-Gilroy-SemiBold.otf'
             as='font'
             type='font/otf'
             crossOrigin='anonymous'
           />
           <link
             rel='preload'
-            href='/fonts/Radomir Tinkov - Gilroy-Bold.otf'
+            href='/fonts/Radomir-Tinkov-Gilroy-Bold.otf'
             as='font'
             type='font/otf'
             crossOrigin='anonymous'
@@ -71,6 +71,7 @@ export default class MyDocument extends Document {
             src={`https://widget.usersnap.com/global/load/${process.env.NEXT_PUBLIC_USERSNAP_GLOBAL_API_KEY}?onload=onUsersnapCXLoad`}
           />
           <script
+            // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
               __html: `
                 window.onUsersnapCXLoad = function(api) {

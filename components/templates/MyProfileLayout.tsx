@@ -23,7 +23,6 @@ import InlineSvg from '../atoms/InlineSVG';
 import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
 import BackButton from '../molecules/profile/BackButton';
-import ErrorBoundary from '../organisms/ErrorBoundary';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
 import EditProfileMenu, { TEditingStage } from '../organisms/EditProfileMenu';
 
@@ -43,7 +42,6 @@ type TPageType =
   | 'activelyBidding'
   | 'purchases'
   | 'viewHistory'
-  | 'subscriptions'
   | 'myposts'
   | 'favorites';
 
@@ -61,10 +59,6 @@ interface IMyProfileLayout {
   postsCachedViewHistoryFilter?: newnewapi.Post.Filter;
   postsCachedViewHistoryPageToken?: string | null | undefined;
   postsCachedViewHistoryCount?: number;
-  postsCachedSubscriptions?: newnewapi.Post[];
-  postsCachedSubscriptionsFilter?: newnewapi.Post.Filter;
-  postsCachedSubscriptionsPageToken?: string | null | undefined;
-  postsCachedSubscriptionsCount?: number;
   postsCachedFavorites?: newnewapi.Post[];
   postsCachedFavoritesFilter?: newnewapi.Post.Filter;
   postsCachedFavoritesPageToken?: string | null | undefined;
@@ -87,9 +81,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   postsCachedViewHistory,
   postsCachedViewHistoryFilter,
   postsCachedViewHistoryCount,
-  postsCachedSubscriptions,
-  postsCachedSubscriptionsFilter,
-  postsCachedSubscriptionsCount,
   postsCachedFavorites,
   postsCachedFavoritesFilter,
   postsCachedFavoritesCount,
@@ -99,7 +90,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   postsCachedActivelyBiddingPageToken,
   postsCachedMyPurchasesPageToken,
   postsCachedViewHistoryPageToken,
-  postsCachedSubscriptionsPageToken,
   postsCachedFavoritesPageToken,
   postsCachedMyPostsPageToken,
   children,
@@ -133,10 +123,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       {
         nameToken: 'viewHistory',
         url: '/profile/view-history',
-      },
-      {
-        nameToken: 'subscriptions',
-        url: '/profile/subscriptions',
       },
       {
         nameToken: 'favorites',
@@ -223,20 +209,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const [viewHistoryCount, setViewHistoryCount] = useState(
     postsCachedViewHistoryCount
   );
-
-  const [postsSubscriptions, setPostsSubscriptions] = useState(
-    postsCachedSubscriptions ?? []
-  );
-  const [postsSubscriptionsFilter, setPostsSubscriptionsFilter] = useState(
-    postsCachedSubscriptionsFilter ?? newnewapi.Post.Filter.ALL
-  );
-  const [subscriptionsPageToken, setSubscriptionsPageToken] = useState(
-    postsCachedSubscriptionsPageToken
-  );
-  const [subscriptionsCount, setSubscriptionsCount] = useState(
-    postsCachedSubscriptionsCount
-  );
-
   const [postsFavorites, setPostsFavorites] = useState(
     postsCachedFavorites ?? []
   );
@@ -273,9 +245,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const handleSetPostsViewHistory: React.Dispatch<
     React.SetStateAction<newnewapi.Post[]>
   > = useCallback(setPostsViewHistory, [setPostsViewHistory]);
-  const handleSetPostsSubscriptions: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setPostsSubscriptions, [setPostsSubscriptions]);
 
   const handleSetPostsFavorites: React.Dispatch<
     React.SetStateAction<newnewapi.Post[]>
@@ -298,10 +267,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         }
         case 'viewHistory': {
           setPostsViewHistoryFilter(value);
-          break;
-        }
-        case 'subscriptions': {
-          setPostsSubscriptionsFilter(value);
           break;
         }
         case 'favorites': {
@@ -335,10 +300,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           setViewHistoryPageToken(value);
           break;
         }
-        case 'subscriptions': {
-          setSubscriptionsPageToken(value);
-          break;
-        }
         case 'favorites': {
           setFavoritesPageToken(value);
           break;
@@ -368,10 +329,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         }
         case 'viewHistory': {
           setViewHistoryCount(value);
-          break;
-        }
-        case 'subscriptions': {
-          setSubscriptionsCount(value);
           break;
         }
         case 'favorites': {
@@ -424,14 +381,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         totalCount = viewHistoryCount;
         handleSetPosts = handleSetPostsViewHistory;
         handleSetFavoritePosts = handleSetPostsFavorites;
-        break;
-      }
-      case 'subscriptions': {
-        postsForPage = postsSubscriptions;
-        postsForPageFilter = postsSubscriptionsFilter;
-        pageToken = subscriptionsPageToken;
-        totalCount = subscriptionsCount;
-        handleSetPosts = handleSetPostsSubscriptions;
         break;
       }
       case 'favorites': {
@@ -544,7 +493,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   // Redirect to / if user is not logged in
   useUpdateEffect(() => {
-    if (!user.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router.push('/');
     }
   }, [router, user]);
@@ -576,160 +526,153 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   }, []);
 
   return (
-    <ErrorBoundary>
-      <SGeneral restrictMaxWidth>
-        <SMyProfileLayout>
-          <ProfileBackground
-            // Temp
-            pictureURL={
-              user?.userData?.coverUrl ?? '../public/images/mock/profile-bg.png'
-            }
+    <SGeneral restrictMaxWidth>
+      <SMyProfileLayout>
+        <ProfileBackground
+          // Temp
+          pictureURL={
+            user?.userData?.coverUrl ?? '../public/images/mock/profile-bg.png'
+          }
+        >
+          <SButton
+            view='transparent'
+            withShrink
+            withDim
+            iconOnly={isMobileOrTablet}
+            onClick={() => handleOpenEditProfileMenu()}
           >
-            <SButton
-              view='transparent'
-              withShrink
-              withDim
-              iconOnly={isMobileOrTablet}
-              onClick={() => handleOpenEditProfileMenu()}
-            >
-              <InlineSvg
-                svg={EditIcon}
-                width={isMobileOrTablet ? '16px' : '24px'}
-                height={isMobileOrTablet ? '16px' : '24px'}
-              />
-              {isMobileOrTablet ? null : t('profileLayout.headerButtons.edit')}
-            </SButton>
-            <SButton
-              view='transparent'
-              withDim
-              withShrink
-              iconOnly={isMobileOrTablet}
-              onClick={() => router.push('/profile/settings')}
-            >
-              <InlineSvg
-                svg={SettingsIcon}
-                width={isMobileOrTablet ? '16px' : '24px'}
-                height={isMobileOrTablet ? '16px' : '24px'}
-              />
-              {isMobileOrTablet
-                ? null
-                : t('profileLayout.headerButtons.settings')}
-            </SButton>
-          </ProfileBackground>
-          <SBackButton
-            onClick={() => {
-              router.back();
-            }}
-          />
-          {/* NB! Temp */}
-          {user.userData?.avatarUrl && (
-            <ProfileImage src={user.userData?.avatarUrl} />
-          )}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
+            <InlineSvg
+              svg={EditIcon}
+              width={isMobileOrTablet ? '16px' : '24px'}
+              height={isMobileOrTablet ? '16px' : '24px'}
+            />
+            {isMobileOrTablet ? null : t('profileLayout.headerButtons.edit')}
+          </SButton>
+          <SButton
+            id='settings-button'
+            view='transparent'
+            withDim
+            withShrink
+            iconOnly={isMobileOrTablet}
+            onClick={() => router.push('/profile/settings')}
           >
-            <SUsernameWrapper>
-              <SUsername variant={4}>
-                {user.userData?.nickname}
-                {user.userData?.options?.isVerified && (
-                  <SInlineSVG
-                    svg={VerificationCheckmark}
-                    width='32px'
-                    height='32px'
-                    fill='none'
-                  />
-                )}
-              </SUsername>
-              {isGenderPronounsDefined(user.userData?.genderPronouns) && (
-                <SGenderPronouns variant={2}>
-                  {t(
-                    `genderPronouns.${
-                      getGenderPronouns(user.userData?.genderPronouns!!).name
-                    }`
-                  )}
-                </SGenderPronouns>
+            <InlineSvg
+              svg={SettingsIcon}
+              width={isMobileOrTablet ? '16px' : '24px'}
+              height={isMobileOrTablet ? '16px' : '24px'}
+            />
+            {isMobileOrTablet
+              ? null
+              : t('profileLayout.headerButtons.settings')}
+          </SButton>
+        </ProfileBackground>
+        <SBackButton
+          onClick={() => {
+            router.back();
+          }}
+        />
+        {/* NB! Temp */}
+        {user.userData?.avatarUrl && (
+          <ProfileImage src={user.userData?.avatarUrl} />
+        )}
+        <SUserData>
+          <SUsernameWrapper>
+            <SUsername variant={4}>
+              {user.userData?.nickname}
+              {user.userData?.options?.isVerified && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='32px'
+                  height='32px'
+                  fill='none'
+                />
               )}
-            </SUsernameWrapper>
-            <SShareDiv>
-              <SUsernameButton
-                view='tertiary'
-                iconOnly
-                style={{
-                  paddingTop: '8px',
-                  paddingBottom: '8px',
-                  paddingLeft: '16px',
-                  paddingRight: '16px',
-                }}
-                onClick={() => {}}
-              >
-                <SUsernameButtonText>
-                  @{/* Temp! */}
-                  {user.userData?.username &&
-                  user.userData?.username.length > 12
-                    ? `${user.userData?.username.substring(
-                        0,
-                        6
-                      )}...${user.userData?.username.substring(
-                        (user.userData?.username.length || 0) - 3
-                      )}`
-                    : user.userData?.username}
-                </SUsernameButtonText>
-              </SUsernameButton>
-              <SShareButton
-                view='tertiary'
-                iconOnly
-                withDim
-                withShrink
-                style={{
-                  padding: '8px',
-                }}
-                onClick={() => handleCopyLink()}
-              >
-                {isCopiedUrl ? (
-                  t('profileLayout.buttons.copied')
-                ) : (
-                  <InlineSvg
-                    svg={ShareIconFilled}
-                    fill={theme.colorsThemed.text.primary}
-                    width='20px'
-                    height='20px'
-                  />
+            </SUsername>
+            {isGenderPronounsDefined(user.userData?.genderPronouns) && (
+              <SGenderPronouns variant={2}>
+                {t(
+                  `genderPronouns.${
+                    getGenderPronouns(user.userData?.genderPronouns!!).name
+                  }`
                 )}
-              </SShareButton>
-            </SShareDiv>
-            {user.userData?.bio ? (
-              <SBioText variant={3}>{user.userData?.bio}</SBioText>
-            ) : null}
-          </div>
-          <ProfileTabs pageType='myProfile' tabs={tabs} />
-          {/* Edit Profile modal menu */}
-          <Modal
-            show={isEditProfileMenuOpen}
-            overlaydim
-            transitionspeed={isMobileOrTablet ? 0.15 : 0}
-            onClose={handleClosePreventDiscarding}
-          >
-            {isEditProfileMenuOpen ? (
-              <EditProfileMenu
-                stage={editingStage}
-                wasModified={wasModified}
-                handleClose={handleCloseEditProfileMenu}
-                handleSetWasModified={handleSetWasModified}
-                handleClosePreventDiscarding={handleClosePreventDiscarding}
-                handleSetStageToEditingProfilePicture={
-                  handleSetStageToEditingProfilePicture
-                }
-                handleSetStageToEditingGeneral={handleSetStageToEditingGeneral}
-              />
-            ) : null}
-          </Modal>
-        </SMyProfileLayout>
-        {renderChildren()}
-        {/* {!routeChangeLoading
+              </SGenderPronouns>
+            )}
+          </SUsernameWrapper>
+          <SShareDiv>
+            <SUsernameButton
+              view='tertiary'
+              iconOnly
+              style={{
+                paddingTop: '8px',
+                paddingBottom: '8px',
+                paddingLeft: '16px',
+                paddingRight: '16px',
+              }}
+              onClick={() => {}}
+            >
+              <SUsernameButtonText>
+                @{/* Temp! */}
+                {user.userData?.username && user.userData?.username.length > 12
+                  ? `${user.userData?.username.substring(
+                      0,
+                      6
+                    )}...${user.userData?.username.substring(
+                      (user.userData?.username.length || 0) - 3
+                    )}`
+                  : user.userData?.username}
+              </SUsernameButtonText>
+            </SUsernameButton>
+            <SShareButton
+              view='tertiary'
+              iconOnly
+              withDim
+              withShrink
+              style={{
+                padding: '8px',
+              }}
+              onClick={() => handleCopyLink()}
+            >
+              {isCopiedUrl ? (
+                t('profileLayout.buttons.copied')
+              ) : (
+                <InlineSvg
+                  svg={ShareIconFilled}
+                  fill={theme.colorsThemed.text.primary}
+                  width='20px'
+                  height='20px'
+                />
+              )}
+            </SShareButton>
+          </SShareDiv>
+          {user.userData?.bio ? (
+            <SBioText variant={3}>{user.userData?.bio}</SBioText>
+          ) : null}
+        </SUserData>
+        <ProfileTabs pageType='myProfile' tabs={tabs} />
+        {/* Edit Profile modal menu */}
+        <Modal
+          show={isEditProfileMenuOpen}
+          overlaydim
+          transitionspeed={isMobileOrTablet ? 0.15 : 0}
+          onClose={handleClosePreventDiscarding}
+        >
+          {isEditProfileMenuOpen ? (
+            <EditProfileMenu
+              stage={editingStage}
+              wasModified={wasModified}
+              handleClose={handleCloseEditProfileMenu}
+              handleSetWasModified={handleSetWasModified}
+              handleClosePreventDiscarding={handleClosePreventDiscarding}
+              handleSetStageToEditingProfilePicture={
+                handleSetStageToEditingProfilePicture
+              }
+              handleSetStageToEditingGeneral={handleSetStageToEditingGeneral}
+            />
+          ) : null}
+        </Modal>
+      </SMyProfileLayout>
+      {renderChildren()}
+      {/* {!routeChangeLoading
           ? renderChildren() : (
             <CardSkeletonList
               count={8}
@@ -738,8 +681,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               }}
             />
           )} */}
-      </SGeneral>
-    </ErrorBoundary>
+    </SGeneral>
   );
 };
 
@@ -753,16 +695,12 @@ MyProfileLayout.defaultProps = {
   postsCachedViewHistory: undefined,
   postsCachedViewHistoryFilter: undefined,
   postsCachedViewHistoryCount: undefined,
-  postsCachedSubscriptions: undefined,
-  postsCachedSubscriptionsFilter: undefined,
-  postsCachedSubscriptionsCount: undefined,
   postsCachedFavorites: undefined,
   postsCachedFavoritesFilter: undefined,
   postsCachedFavoritesCount: undefined,
   postsCachedActivelyBiddingPageToken: undefined,
   postsCachedMyPurchasesPageToken: undefined,
   postsCachedViewHistoryPageToken: undefined,
-  postsCachedSubscriptionsPageToken: undefined,
   postsCachedFavoritesPageToken: undefined,
   postsCachedMyPosts: undefined,
   postsCachedMyPostsFilter: undefined,
@@ -818,14 +756,21 @@ const SBackButton = styled(BackButton)`
   }
 `;
 
+const SUserData = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* alignitems: center; */
+`;
+
 const SUsernameWrapper = styled.div`
   margin-bottom: 12px;
 `;
 
 const SUsername = styled(Headline)`
-  text-align: center;
   display: flex;
   align-items: center;
+  justify-content: center;
 `;
 
 const SGenderPronouns = styled(Text)`
@@ -877,9 +822,10 @@ const SBioText = styled(Text)`
 
   padding-left: 16px;
   padding-right: 16px;
-  margin-bottom: 54px;
+  margin: 0 auto 54px;
 
   max-width: 480px;
+  width: 100%;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;

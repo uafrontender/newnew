@@ -19,5 +19,7 @@
     "invalidToken": "无效的令牌"
   },
   "verifying": "正在驗證新電子郵件......",
-  "backButton": "返回"
+  "backButton": "返回",
+  "updated": "電子郵件已更新！",
+  "backToProfile": "返回個人資料"
 }

@@ -9,6 +9,7 @@ interface IVerificationInput {
   error?: boolean;
   disabled: boolean;
   onComplete: (completeCode: string) => void;
+  isInputFocused?: boolean;
 }
 
 const VerificationCodeInput: React.FunctionComponent<IVerificationInput> = ({
@@ -18,6 +19,7 @@ const VerificationCodeInput: React.FunctionComponent<IVerificationInput> = ({
   error,
   disabled,
   onComplete,
+  isInputFocused,
 }) => {
   const [code, setCode] = useState(
     initialValue ?? new Array(length).join('.').split('.')
@@ -95,6 +97,7 @@ const VerificationCodeInput: React.FunctionComponent<IVerificationInput> = ({
     }
   }, [code, length, onComplete]);
 
+
   return (
     <>
       {/* Allows tabbing to the input */}
@@ -144,7 +147,7 @@ const VerificationCodeInput: React.FunctionComponent<IVerificationInput> = ({
             autoComplete='off'
             // We need this one to be focused once page opens
             // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus={!code[0].length && i === 0}
+            autoFocus={isInputFocused && !code[0].length && i === 0}
             disabled={disabled}
             readOnly={code[i].length > 0}
             onChange={(e) => handleSlotInput(e, i)}
@@ -170,6 +173,7 @@ const VerificationCodeInput: React.FunctionComponent<IVerificationInput> = ({
 VerificationCodeInput.defaultProps = {
   initialValue: undefined,
   error: undefined,
+  isInputFocused: true,
 };
 
 export default VerificationCodeInput;

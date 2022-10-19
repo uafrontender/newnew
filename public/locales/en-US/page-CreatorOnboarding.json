@@ -79,7 +79,13 @@
         "label": "Date of birth",
         "captions": {
           "twoTimesOnly": "Birthday can be changed 2 times only.",
-          "cannotChange": "You can’t change birthday."
+          "cannotChange": "You can’t change birthday.",
+          "instruction": "Set your date of birth"
+        },
+        "units": {
+          "day": "Day",
+          "month": "Month",
+          "year": "Year"
         },
         "errors": {
           "tooYoung": "You must be 18 or older to become a creator"
@@ -151,27 +157,6 @@
       "requestSetupLink": "Connect with Stripe",
       "stripeConnectedLink": "Stripe connected!",
       "stripeConnecting": "Connecting..."
-    }
-  },
-  "subRateSection": {
-    "meta": {
-      "title": "Grow your passive income.",
-      "description": "Enable subscriptions for your channel and get paid monthly."
-    },
-    "side": {
-      "heading": "Grow your passive income.",
-      "subheading": "Enable subscriptions for your channel and get paid monthly."
-    },
-    "heading": "Set your subscription rate",
-    "selectInput": {
-      "perMonth": "/month",
-      "select": "Select",
-      "featured": "Popular",
-      "noProduct": "No subscription"
-    },
-    "button": {
-      "submit": "Save changes",
-      "back": "Close"
     }
   }
 }

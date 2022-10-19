@@ -107,6 +107,9 @@ const ChatList: React.FC<IFunctionProps> = ({
     [t]
   );
 
+  const elContainer =
+    typeof window !== 'undefined' ? document.getElementById('chatlist') : null;
+
   // Socket
   async function markChatAsRead(id: number) {
     try {
@@ -129,9 +132,9 @@ const ChatList: React.FC<IFunctionProps> = ({
         setLoadingRooms(true);
         const payload = new newnewapi.GetMyRoomsRequest({
           // if I am not creator get only rooms with creators I am subscriber to
-          myRole: user.userData?.options?.isOfferingSubscription ? null : 1,
+          // myRole: user.userData?.options?.isOfferingSubscription ? null : 1,
           paging: {
-            limit: 20,
+            limit: 50,
             pageToken,
           },
         });
@@ -139,13 +142,12 @@ const ChatList: React.FC<IFunctionProps> = ({
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-
         if (res.data && res.data.rooms.length > 0) {
           setChatRooms((curr) => {
             const arr = curr ? [...curr] : [];
             res.data?.rooms.forEach((chat) => {
               if (arr.findIndex((item) => item.id === chat.id) < 0) {
-                // exclude empty announcments rooms from creators
+                // exclude empty announcements rooms from creators
                 const emptyMassUpdateFromCreator =
                   chat.kind === 4 && chat.myRole === 1 && !chat.lastMessage;
                 if (!emptyMassUpdateFromCreator) arr.push(chat);
@@ -206,18 +208,6 @@ const ChatList: React.FC<IFunctionProps> = ({
     ]
   );
 
-  const openRoom = useCallback(
-    (room: newnewapi.IChatRoom) => {
-      if (room.id)
-        if (activeChatIndex !== room.id.toString()) {
-          setActiveChatIndex(room.id.toString());
-          openChat({ chatRoom: room, showChatList: null });
-        }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeChatIndex]
-  );
-
   const fetchLastActiveRoom = async () => {
     try {
       const payload = new newnewapi.GetMyRoomsRequest({
@@ -237,58 +227,78 @@ const ChatList: React.FC<IFunctionProps> = ({
     }
   };
 
-  const fetchRoomByUsername = async (name: string, roomKind: number) => {
-    try {
-      const payload = new newnewapi.GetMyRoomsRequest({
-        searchQuery: name,
-        roomKind,
-      });
-      const res = await getMyRooms(payload);
+  const fetchRoomByUsername = useCallback(
+    async (name: string | null, roomKind: number, myRole?: number) => {
+      try {
+        const payload = new newnewapi.GetMyRoomsRequest({
+          searchQuery: name,
+          roomKind,
+          myRole,
+        });
+        const res = await getMyRooms(payload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
-      }
-      if (res.data && res.data.rooms.length > 0) {
-        const room = res.data.rooms[0];
-        if (room.myRole === 1) {
-          setActiveTab('chatRoomsCreators');
-        } else {
-          setActiveTab('chatRoomsSubs');
+        if (!res.data || res.error) {
+          throw new Error(res.error?.message ?? 'Request failed');
         }
-
-        if (room.id) {
-          if (activeChatIndex !== room.id.toString()) {
-            setActiveChatIndex(room.id.toString());
+        if (res.data && res.data.rooms.length > 0) {
+          const room = res.data.rooms[0];
+          if (name === null && roomKind === 4) {
+            setActiveTab('chatRoomsSubs');
+            setUpdatedChat(room);
+            return room;
           }
+          if (room.myRole === 1) {
+            setActiveTab('chatRoomsCreators');
+          } else {
+            setActiveTab('chatRoomsSubs');
+          }
+
+          if (room.id) {
+            if (activeChatIndex !== room.id.toString()) {
+              setActiveChatIndex(room.id.toString());
+            }
+          }
+          setUpdatedChat(room);
+          return room;
         }
-        setUpdatedChat(room);
-        return room;
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-    return null;
-  };
+      return null;
+    },
+    [activeChatIndex]
+  );
 
   const getRoomByUserName = useCallback(
     (uname: string) => {
-      const isAnnouncementRequested = uname.split('-');
+      const isComplicatedRequest = uname.split('-');
       if (
-        isAnnouncementRequested.length > 0 &&
-        isAnnouncementRequested[isAnnouncementRequested.length - 1] ===
-          'announcement'
+        isComplicatedRequest.length > 0 &&
+        isComplicatedRequest[isComplicatedRequest.length - 1] === 'announcement'
       ) {
-        return fetchRoomByUsername(isAnnouncementRequested[0], 4);
+        const isMyAnnouncement =
+          isComplicatedRequest[0] === user.userData?.username;
+        return fetchRoomByUsername(
+          isMyAnnouncement ? null : isComplicatedRequest[0],
+          4,
+          isMyAnnouncement ? 2 : undefined
+        );
       }
+      if (
+        isComplicatedRequest.length > 0 &&
+        isComplicatedRequest[isComplicatedRequest.length - 1] === 'cr'
+      ) {
+        return fetchRoomByUsername(isComplicatedRequest[0], 1, 1);
+      }
+
       return fetchRoomByUsername(uname, 1);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [user.userData?.username, fetchRoomByUsername]
   );
 
   useEffectOnce(() => {
     (async () => {
-      if (username && username !== '-mobile') {
+      if (username && username !== '-mobile' && user.userData?.username) {
         const room = await getRoomByUserName(username);
         if (room) {
           openChat({ chatRoom: room, showChatList: null });
@@ -319,12 +329,12 @@ const ChatList: React.FC<IFunctionProps> = ({
   }, [unreadCountForCreator, unreadCountForUser]);
 
   useUpdateEffect(() => {
-    if (updatedChat) {
+    if (updatedChat && chatRooms && chatRooms.length > 0) {
       let isAlreadyAdded: number | undefined;
       const isChatWithSub = updatedChat.myRole === 2;
 
       if (displayAllRooms) {
-        isAlreadyAdded = chatRooms?.findIndex(
+        isAlreadyAdded = chatRooms.findIndex(
           (chat) => chat.id === updatedChat.id
         );
       } else {
@@ -336,19 +346,29 @@ const ChatList: React.FC<IFunctionProps> = ({
               (chat) => chat.id === updatedChat.id
             ));
       }
+
       if (isAlreadyAdded !== undefined && isAlreadyAdded > -1) {
         const arr = displayAllRooms
           ? chatRooms
           : isChatWithSub
           ? chatRoomsSubs
           : chatRoomsCreators;
-        arr?.splice(isAlreadyAdded, 1);
 
-        if (updatedChat.id && updatedChat.id.toString() === activeChatIndex) {
-          arr?.splice(0, 0, updatedChat);
-          markChatAsRead(updatedChat.id as number);
+        if (
+          arr &&
+          updatedChat.id &&
+          updatedChat.id.toString() === activeChatIndex
+        ) {
+          arr[isAlreadyAdded] = updatedChat;
+          if (
+            updatedChat.unreadMessageCount !== undefined &&
+            updatedChat.unreadMessageCount !== null &&
+            updatedChat.unreadMessageCount > 0
+          ) {
+            markChatAsRead(updatedChat.id as number);
+          }
         } else {
-          arr?.splice(1, 0, updatedChat);
+          arr[isAlreadyAdded] = updatedChat;
         }
         if (displayAllRooms) {
           setChatRooms(arr);
@@ -357,13 +377,14 @@ const ChatList: React.FC<IFunctionProps> = ({
             ? setChatRoomsSubs(arr ?? [])
             : setChatRoomsCreators(arr ?? []);
         }
+        sortChats();
       } else {
         const arr = displayAllRooms
           ? chatRooms
           : isChatWithSub
           ? chatRoomsSubs
           : chatRoomsCreators;
-        arr?.splice(1, 0, updatedChat);
+        arr?.push(updatedChat);
 
         if (displayAllRooms) {
           setChatRooms(arr);
@@ -377,14 +398,19 @@ const ChatList: React.FC<IFunctionProps> = ({
       setUpdatedChat(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updatedChat]);
+  }, [
+    updatedChat,
+    displayAllRooms,
+    chatRooms,
+    chatRoomsSubs,
+    chatRoomsCreators,
+  ]);
 
   useUpdateEffect(() => {
     if (inView && !loadingRooms && chatRoomsNextPageToken) {
       fetchMyRooms(chatRoomsNextPageToken);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, loadingRooms, chatRoomsNextPageToken]);
+  }, [inView, loadingRooms, chatRoomsNextPageToken, fetchMyRooms]);
 
   useUpdateEffect(() => {
     if (searchText && searchText !== prevSearchText && chatRooms) {
@@ -395,8 +421,8 @@ const ChatList: React.FC<IFunctionProps> = ({
         const arr = [] as newnewapi.IChatRoom[];
         chatRooms.forEach((chat) => {
           if (
-            chat.visavis?.nickname?.startsWith(searchText) ||
-            chat.visavis?.username?.startsWith(searchText)
+            chat.visavis?.nickname?.includes(searchText) ||
+            chat.visavis?.username?.includes(searchText)
           ) {
             arr.push(chat);
           }
@@ -413,6 +439,18 @@ const ChatList: React.FC<IFunctionProps> = ({
     prevSearchText,
     searchedRoomsLoading,
   ]);
+
+  useEffect(() => {
+    if (elContainer && activeChatIndex) {
+      const chatEl = document.getElementById(`chatroom-${activeChatIndex}`);
+      if (chatEl && chatEl.offsetTop > elContainer.scrollTop) {
+        chatEl.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+        });
+      }
+    }
+  }, [activeChatIndex, elContainer]);
 
   const isActiveChat = useCallback(
     (chat: newnewapi.IChatRoom) =>
@@ -501,15 +539,17 @@ const ChatList: React.FC<IFunctionProps> = ({
 
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom, index: number) => {
-      const localChat = chat;
       const handleItemClick = async () => {
-        sortChats();
         if (searchedRooms) setSearchedRooms(null);
         setActiveChatIndex(chat.id ? chat.id.toString() : null);
         openChat({ chatRoom: chat, showChatList: null });
-        localChat.unreadMessageCount = 0;
-        if (chat.unreadMessageCount && chat.unreadMessageCount > 0)
+        if (
+          chat.unreadMessageCount !== undefined &&
+          chat.unreadMessageCount !== null &&
+          chat.unreadMessageCount > 0
+        ) {
           await markChatAsRead(chat.id as number);
+        }
         return null;
       };
 
@@ -540,15 +580,11 @@ const ChatList: React.FC<IFunctionProps> = ({
 
         if (chat.myRole === 2) {
           chatName = t('announcement.title', {
-            username: user.userData?.nickname
-              ? user.userData?.nickname
-              : user.userData?.username,
+            username: user.userData?.nickname || user.userData?.username,
           });
         } else {
           chatName = t('announcement.title', {
-            username: chat.visavis?.nickname
-              ? chat.visavis?.nickname
-              : chat.visavis?.username,
+            username: chat.visavis?.nickname || chat.visavis?.username,
           });
         }
       }
@@ -563,13 +599,11 @@ const ChatList: React.FC<IFunctionProps> = ({
         }
       }
 
-      const unreadMessageCount =
-        localChat.unreadMessageCount && localChat.unreadMessageCount > 0
-          ? localChat.unreadMessageCount
-          : 0;
-
       return (
-        <SChatItemContainer key={chat.id?.toString()}>
+        <SChatItemContainer
+          key={chat.id?.toString()}
+          id={`chatroom-${chat.id}`}
+        >
           <SChatItem
             onClick={handleItemClick}
             className={isActiveChat(chat) ? 'active' : ''}
@@ -602,9 +636,11 @@ const ChatList: React.FC<IFunctionProps> = ({
                     : lastMsg}
                 </SChatItemLastMessage>
                 <SChatItemRight>
-                  {unreadMessageCount > 0 && (
-                    <SUnreadCount>{unreadMessageCount}</SUnreadCount>
-                  )}
+                  {chat.unreadMessageCount !== undefined &&
+                    chat.unreadMessageCount !== null &&
+                    chat.unreadMessageCount > 0 && (
+                      <SUnreadCount>{chat.unreadMessageCount}</SUnreadCount>
+                    )}
                 </SChatItemRight>
               </SChatItemContentWrapper>
             </SChatItemContent>
@@ -657,7 +693,7 @@ const ChatList: React.FC<IFunctionProps> = ({
   return (
     <>
       {isInitialLoaded ? (
-        <SSectionContent>
+        <SSectionContent id='chatlist'>
           {chatRooms && chatRooms.length > 0 ? (
             <>
               {!displayAllRooms && !searchedRooms && <Tabs />}
@@ -704,6 +740,12 @@ const SSectionContent = styled.div`
   position: relative;
   overflow-y: auto;
   flex-direction: column;
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 `;
 
 const STabs = styled.div`

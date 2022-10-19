@@ -6,13 +6,11 @@ import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 
 interface IUserEllipseMenu {
   isVisible: boolean;
-  isSubscribed: boolean;
   isBlocked: boolean;
   loggedIn: boolean;
   top?: string;
   right?: string;
   handleClose: () => void;
-  handleClickUnsubscribe: () => void;
   handleClickReport: () => void;
   handleClickBlock: () => void;
   anchorElement?: HTMLElement;
@@ -21,13 +19,11 @@ interface IUserEllipseMenu {
 
 const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
   isVisible,
-  isSubscribed,
   isBlocked,
   loggedIn,
   anchorElement,
   offsetTop,
   handleClose,
-  handleClickUnsubscribe,
   handleClickReport,
   handleClickBlock,
 }) => {
@@ -40,16 +36,6 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
       anchorElement={anchorElement}
       offsetTop={offsetTop}
     >
-      {isSubscribed && (
-        <EllipseMenuButton
-          onClick={() => {
-            handleClickUnsubscribe();
-            handleClose();
-          }}
-        >
-          {t('ellipse.unsubscribe')}
-        </EllipseMenuButton>
-      )}
       <EllipseMenuButton
         onClick={() => {
           handleClickReport();
