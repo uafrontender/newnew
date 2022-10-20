@@ -16,16 +16,17 @@ import Text from '../../atoms/Text';
 import PaymentModal from '../checkout/PaymentModal';
 import LoadingModal from '../LoadingModal';
 import BulletLine from './BulletLine';
+import BundlePaymentSuccessModal from './BundlePaymentSuccessModal';
 
 interface IBundlePaymentModal {
   creator: newnewapi.IUser;
-  bundle: newnewapi.IBundleOffer;
+  bundleOffer: newnewapi.IBundleOffer;
   onClose: () => void;
 }
 
 const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   creator,
-  bundle,
+  bundleOffer,
   onClose,
 }) => {
   const { t } = useTranslation('common');
@@ -40,10 +41,10 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
     () =>
       new newnewapi.BuyCreatorsBundle({
         creatorUuid: creator.uuid,
-        bundleUuid: bundle.bundleUuid,
-        amount: bundle.price,
+        bundleUuid: bundleOffer.bundleUuid,
+        amount: bundleOffer.price,
       }),
-    [creator, bundle]
+    [creator, bundleOffer]
   );
 
   // TODO: Fix setup intent
@@ -115,7 +116,10 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
     [setupIntent, router, t, setPaymentSuccessModalOpen, onClose]
   );
 
-  const paymentAmountInCents = useMemo(() => bundle.price!.usdCents!, [bundle]);
+  const paymentAmountInCents = useMemo(
+    () => bundleOffer.price!.usdCents!,
+    [bundleOffer]
+  );
 
   const paymentFeeInCents = useMemo(
     () =>
@@ -131,7 +135,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
     [paymentAmountInCents, paymentFeeInCents]
   );
 
-  const daysOfAccess = bundle.accessDurationInSeconds! / 60 / 60 / 24;
+  const daysOfAccess = bundleOffer.accessDurationInSeconds! / 60 / 60 / 24;
   const monthsOfAccess = Math.floor(daysOfAccess / 30);
   const unitOfTimeLeft = monthsOfAccess > 1 ? 'months' : 'month';
 
@@ -178,7 +182,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
             // @ts-ignore
             components={[
               <VotesNumberSpan />,
-              { amount: formatNumber(bundle.votesAmount as number, true) },
+              { amount: formatNumber(bundleOffer.votesAmount as number, true) },
             ]}
           />
         </SVotesNumber>
@@ -196,7 +200,18 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* TODO: Add success modal */}
-      {paymentSuccessModalOpen && <div />}
+      {paymentSuccessModalOpen && (
+        <BundlePaymentSuccessModal
+          show
+          zIndex={13}
+          creator={creator}
+          bundleOffer={bundleOffer}
+          onClose={() => {
+            setPaymentSuccessModalOpen(false);
+            onClose();
+          }}
+        />
+      )}
     </>
   );
 };

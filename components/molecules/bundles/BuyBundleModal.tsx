@@ -91,7 +91,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
         {bundleToBuy && (
           <BundlePaymentModal
             creator={creator}
-            bundle={bundleToBuy}
+            bundleOffer={bundleToBuy}
             onClose={() => setBundleToBuy(undefined)}
           />
         )}

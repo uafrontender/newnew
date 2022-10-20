@@ -4,52 +4,47 @@ import { Trans, useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
 import UserAvatar from '../UserAvatar';
 import assets from '../../../constants/assets';
-import formatTimeLeft from '../../../utils/formatTimeLeft';
-import BulletLine from './BulletLine';
 import { formatNumber } from '../../../utils/format';
-import HighlightedButton from '../../atoms/bundles/HighlightedButton';
+import BulletLine from './BulletLine';
+import Button from '../../atoms/Button';
 
-interface ICreatorsBundleModal {
+interface IBuyBundleModal {
   show: boolean;
-  creatorBundle: newnewapi.ICreatorBundle;
-  onBuyMore: () => void;
+  creator: newnewapi.IUser;
+  bundleOffer: newnewapi.IBundleOffer;
+  zIndex?: number;
   onClose: () => void;
 }
 
-const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
-  ({ show, creatorBundle, onBuyMore, onClose }) => {
+const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
+  ({ show, creator, bundleOffer, zIndex, onClose }) => {
     const { t } = useTranslation('common');
 
-    const timeLeft =
-      (creatorBundle.bundle!.accessExpiresAt!.seconds as number) * 1000 -
-      Date.now();
-    const formattedTimeLeft = formatTimeLeft(timeLeft);
+    const daysOfAccess = bundleOffer.accessDurationInSeconds! / 60 / 60 / 24;
+    const monthsOfAccess = Math.floor(daysOfAccess / 30);
+
+    const unitOfTimeLeft = monthsOfAccess > 1 ? 'months' : 'month';
 
     return (
       <>
-        <Modal show={show} onClose={onClose}>
-          <SModalPaper
-            onClose={onClose}
-            onClick={preventParentClick()}
-            isCloseButton
-          >
+        <Modal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
+          <SModalPaper onClose={onClose}>
             <Content>
               <BundleIcon src={assets.common.vote} alt='votes' />
               <SVotesAvailable>
                 <Trans
                   t={t}
-                  i18nKey='modal.creatorsBundle.votesLeft'
+                  i18nKey='modal.buyBundleSuccess.votes'
                   // @ts-ignore
                   components={[
                     <VotesNumberSpan />,
                     {
                       amount: formatNumber(
-                        creatorBundle?.bundle?.votesLeft as number,
+                        bundleOffer.votesAmount as number,
                         true
                       ),
                     },
@@ -57,38 +52,34 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                 />
               </SVotesAvailable>
               <SUserInfo>
-                <SUserAvatar
-                  avatarUrl={creatorBundle?.creator?.avatarUrl ?? ''}
-                />
+                <SUserAvatar avatarUrl={creator?.avatarUrl ?? ''} />
                 <SUsername>
                   <Trans
                     t={t}
-                    i18nKey='modal.creatorsBundle.for'
+                    i18nKey='modal.buyBundleSuccess.for'
                     // @ts-ignore
                     components={[
-                      <SLink href={`/${creatorBundle?.creator?.username}`} />,
-                      { creator: creatorBundle?.creator?.username },
+                      <SLink href={`/${creator?.username}`} />,
+                      { creator: creator?.username },
                     ]}
                   />
                 </SUsername>
               </SUserInfo>
               <SBundleInfo>
                 <AccessDescription>
-                  {t('modal.creatorsBundle.access', {
-                    amount: formattedTimeLeft.value,
-                    unit: t(
-                      `modal.creatorsBundle.unit.${formattedTimeLeft.unit}`
-                    ),
+                  {t('modal.buyBundleSuccess.access', {
+                    amount: monthsOfAccess,
+                    unit: t(`modal.buyBundleSuccess.unit.${unitOfTimeLeft}`),
                   })}
                 </AccessDescription>
                 <BulletLine>
-                  {t('modal.creatorsBundle.customOptions')}
+                  {t('modal.buyBundleSuccess.customOptions')}
                 </BulletLine>
-                <BulletLine>{t('modal.creatorsBundle.chat')}</BulletLine>
+                <BulletLine>{t('modal.buyBundleSuccess.chat')}</BulletLine>
               </SBundleInfo>
-              <BuyButton onClick={onBuyMore}>
-                {t('modal.creatorsBundle.buyButton')}
-              </BuyButton>
+              <SDoneButton onClick={onClose}>
+                {t('modal.buyBundleSuccess.button')}
+              </SDoneButton>
             </Content>
           </SModalPaper>
         </Modal>
@@ -97,11 +88,12 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
   }
 );
 
-export default CreatorsBundleModal;
+export default BundlePaymentSuccessModal;
 
 const SModalPaper = styled(ModalPaper)`
   width: 100%;
-  padding: 32px 48px;
+  padding: 32px;
+  margin: 16px;
 
   ${({ theme }) => theme.media.tablet} {
     max-width: 500px;
@@ -190,10 +182,10 @@ const AccessDescription = styled.p`
   margin-bottom: 4px;
 `;
 
-const BuyButton = styled(HighlightedButton)`
-  font-size: 14px;
+const SDoneButton = styled(Button)`
+  width: fit-content;
+  min-width: 140px;
 
-  ${({ theme }) => theme.media.tablet} {
-    width: auto;
-  }
+  margin-left: auto;
+  margin-right: auto;
 `;

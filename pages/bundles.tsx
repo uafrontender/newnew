@@ -205,7 +205,7 @@ export const Bundles = () => {
       {shownCreatorBundle && (
         <CreatorsBundleModal
           show
-          creatorsBundle={shownCreatorBundle}
+          creatorBundle={shownCreatorBundle}
           onBuyMore={() => {
             setOfferedCreator(shownCreatorBundle.creator!);
           }}

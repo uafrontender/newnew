@@ -62,7 +62,7 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
       {creatorsBundle && (
         <CreatorsBundleModal
           show={creatorsBundleModalOpen}
-          creatorsBundle={creatorsBundle}
+          creatorBundle={creatorsBundle}
           onBuyMore={() => {
             setBuyBundleModalOpen(true);
           }}
