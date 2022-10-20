@@ -83,7 +83,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
       }),
       new newnewapi.CreatorBundle({
         creator: new newnewapi.User({
-          uuid: 'b8ba2486-48d6-4c55-9cd7-a494d0b79f98',
+          uuid: '9972ee11-beba-418e-980a-1d115e691116',
           avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
           nickname: 'CreatorDisplayName',
           username: 'username',

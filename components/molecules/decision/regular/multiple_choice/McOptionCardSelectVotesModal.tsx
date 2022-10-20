@@ -198,10 +198,6 @@ const SUseVotesButton = styled.button`
   font-size: 16px;
   line-height: 24px;
 
-  div {
-    color: ${({ theme }) => theme.colors.dark};
-  }
-
   &:focus,
   &:hover,
   &:active {

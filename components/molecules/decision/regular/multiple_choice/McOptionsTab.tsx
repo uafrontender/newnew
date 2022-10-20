@@ -49,6 +49,7 @@ import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import BuyBundleModal from '../../../bundles/BuyBundleModal';
 import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
+import HighlightedButton from '../../../../atoms/bundles/HighlightedButton';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -490,13 +491,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 creator: postCreatorName,
               })}
             </SBundlesText>
-            <SViewButton
+            <HighlightedButton
+              size='small'
               onClick={() => {
                 setBuyBundleModalOpen(true);
               }}
             >
               {t('mcPost.optionsTab.actionSection.viewBundles')}
-            </SViewButton>
+            </HighlightedButton>
           </SBundlesContainer>
         )}
         {user.userTutorialsProgress.remainingMcSteps && (
@@ -869,34 +871,4 @@ const SBundlesText = styled.p`
     white-space: nowrap;
     text-overflow: ellipsis;
   }
-`;
-
-const SViewButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  white-space: nowrap;
-
-  font-size: 14px;
-  line-height: 24px;
-  font-weight: bold;
-
-  padding: 8px 16px;
-  min-width: auto;
-
-  color: ${({ theme }) => theme.colors.darkGray};
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-  border-radius: ${(props) => props.theme.borderRadius.medium};
-  border: transparent;
-
-  cursor: pointer;
-
-  /* No select */
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 `;

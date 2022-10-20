@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import BulletLine from './BulletLine';
 import { formatNumber } from '../../../utils/format';
 import TicketSet from '../../atoms/bundles/TicketSet';
+import HighlightedButton from '../../atoms/bundles/HighlightedButton';
 
 interface IBundleOfferCard {
   className?: string;
@@ -113,35 +114,8 @@ const BundleFeatures = styled.div`
   gap: 8px;
 `;
 
-const BuyButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  white-space: nowrap;
-
-  font-size: 14px;
-  line-height: 24px;
-  font-weight: bold;
-
-  padding: 8px 16px;
-  width: 100%;
+const BuyButton = styled(HighlightedButton)`
   margin-top: 32px;
-
-  color: ${({ theme }) => theme.colors.darkGray};
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-  border-radius: ${(props) => props.theme.borderRadius.medium};
-  border: transparent;
-
-  cursor: pointer;
-
-  /* No select */
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 
   ${({ theme }) => theme.media.tablet} {
     min-width: 160px;

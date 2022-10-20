@@ -12,6 +12,7 @@ import assets from '../../../constants/assets';
 import formatTimeLeft from '../../../utils/formatTimeLeft';
 import BulletLine from './BulletLine';
 import { formatNumber } from '../../../utils/format';
+import HighlightedButton from '../../atoms/bundles/HighlightedButton';
 
 interface ICreatorsBundleModal {
   show: boolean;
@@ -189,34 +190,8 @@ const AccessDescription = styled.p`
   margin-bottom: 4px;
 `;
 
-const BuyButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  white-space: nowrap;
-
+const BuyButton = styled(HighlightedButton)`
   font-size: 14px;
-  line-height: 24px;
-  font-weight: bold;
-
-  padding: 12px 24px;
-  width: 100%;
-
-  color: ${({ theme }) => theme.colors.darkGray};
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-  border-radius: ${(props) => props.theme.borderRadius.medium};
-  border: transparent;
-
-  cursor: pointer;
-
-  /* No select */
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 
   ${({ theme }) => theme.media.tablet} {
     width: auto;
