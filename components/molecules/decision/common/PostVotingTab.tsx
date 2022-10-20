@@ -32,8 +32,7 @@ const PostVotingTab: React.FunctionComponent<IPostVotingTab> = ({
           />
           <div>{children}</div>
         </STab>
-        {bundleVotes !== undefined && (
-          // TODO: check if > 0 if a design decision is made
+        {bundleVotes ? (
           <SBundleVotes>
             <Trans
               t={t}
@@ -45,7 +44,7 @@ const PostVotingTab: React.FunctionComponent<IPostVotingTab> = ({
               ]}
             />
           </SBundleVotes>
-        )}
+        ) : null}
       </STabsContainer>
     </STabs>
   );
