@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -26,36 +26,62 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
   const [statusFilter, setStatusFilter] =
     useState<newnewapi.GetRelatedToMePostsRequest.StatusFilter | null>(null);
 
-  useEffect(() => {
-    async function fetchBiggest() {
-      try {
-        setIsLoading(true);
-        const payload = new newnewapi.GetRelatedToMePostsRequest({
-          relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
-          statusFilter,
-          // sorting: newnewapi.PostSorting.ACTIVE_FIRST,
-        });
+  const [nextPageToken, setNextPageToken] = useState<
+    string | undefined | null
+  >();
 
-        const postsResponse = await getMyPosts(payload);
+  console.log(nextPageToken, 'nextPageToken');
 
-        if (postsResponse.data && postsResponse.data.posts) {
-          setPosts((curr) => [
-            ...curr,
-            ...(postsResponse.data?.posts as newnewapi.Post[]),
-          ]);
-        } else {
-          throw new Error('Request failed');
-        }
-      } catch (err) {
-        setIsError(true);
-      } finally {
-        setIsLoading(false);
-        isPostsRequested.current = true;
+  const fetchCreatorPosts = useCallback(async () => {
+    try {
+      const payload = new newnewapi.GetRelatedToMePostsRequest({
+        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
+        statusFilter,
+        needTotalCount: true,
+        paging: {
+          ...(nextPageToken ? { pageToken: nextPageToken } : {}),
+        },
+        // sorting: newnewapi.PostSorting.ACTIVE_FIRST,
+      });
+
+      const postsResponse = await getMyPosts(payload);
+
+      console.log(postsResponse, 'postsResponse');
+
+      if (postsResponse.data && postsResponse.data.posts) {
+        setPosts((curr) => [
+          ...curr,
+          ...(postsResponse.data?.posts as newnewapi.Post[]),
+        ]);
+        setNextPageToken(postsResponse.data.paging?.nextPageToken);
+      } else {
+        throw new Error('Request failed');
       }
+    } catch (err: any) {
+      console.error(err);
+      setIsError(err.message);
+    } finally {
+      isPostsRequested.current = true;
     }
+  }, [statusFilter, nextPageToken]);
 
-    fetchBiggest();
-  }, [statusFilter]);
+  useEffect(() => {
+    const initialFetch = async () => {
+      setIsLoading(true);
+      await fetchCreatorPosts();
+      setIsLoading(false);
+    };
+
+    if (posts.length === 0) {
+      initialFetch();
+    }
+  }, [fetchCreatorPosts, posts.length]);
+
+  const loadMorePosts = useCallback(() => {
+    if (nextPageToken) {
+      fetchCreatorPosts();
+    }
+  }, [fetchCreatorPosts, nextPageToken]);
 
   if (isPostsRequested.current && posts.length === 0) {
     return (
@@ -108,6 +134,7 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
           collection={posts}
           loading={isLoading}
           handlePostClicked={onPostOpen}
+          onReachEnd={loadMorePosts}
         />
       )}
     </SContainer>

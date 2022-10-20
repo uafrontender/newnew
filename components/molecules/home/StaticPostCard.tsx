@@ -69,7 +69,7 @@ const StaticPostCard = ({
         <SBottomEnd type={postType}>
           {postType === 'mc' ? (
             <SButton cardType={postType}>
-              {t('button.withActivity.mcSingular', {
+              {t('button.withActivity.mc', {
                 votes: formatNumber(totalVotes ?? 0, true),
                 total: formatNumber(targetBackerCount ?? 0, true),
                 backed: formatNumber(currentBackerCount ?? 0, true),

@@ -10,12 +10,10 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
-import Link from 'next/link';
 import { toast } from 'react-toastify';
 
 import {
@@ -24,20 +22,15 @@ import {
 } from '../../../../../redux-store/store';
 import { validateText } from '../../../../../api/endpoints/infrastructure';
 // import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
-import {
-  doFreeVote,
-  voteOnPost,
-} from '../../../../../api/endpoints/multiple_choice';
+import { doFreeVote } from '../../../../../api/endpoints/multiple_choice';
 
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 
-import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
 import McOptionCard from './McOptionCard';
 import SuggestionTextArea from '../../../../atoms/decision/SuggestionTextArea';
 // import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
-import PaymentModal from '../../../checkout/PaymentModal';
 import LoadingModal from '../../../LoadingModal';
 import GradientMask from '../../../../atoms/GradientMask';
 import OptionActionMobileModal from '../../common/OptionActionMobileModal';
@@ -50,39 +43,7 @@ import { setUserTutorialsProgress } from '../../../../../redux-store/slices/user
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
-import Headline from '../../../../atoms/Headline';
-import assets from '../../../../../constants/assets';
 import { Mixpanel } from '../../../../../utils/mixpanel';
-import PostTitleContent from '../../../../atoms/PostTitleContent';
-import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
-import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
-
-const getPayWithCardErrorMessage = (
-  status?: newnewapi.VoteOnPostResponse.Status
-) => {
-  switch (status) {
-    case newnewapi.VoteOnPostResponse.Status.NOT_ENOUGH_FUNDS:
-      return 'errors.notEnoughMoney';
-    case newnewapi.VoteOnPostResponse.Status.CARD_NOT_FOUND:
-      return 'errors.cardNotFound';
-    case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
-      return 'errors.cardCannotBeUsed';
-    case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
-      return 'errors.mcCancelled';
-    case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:
-      return 'errors.mcFinished';
-    case newnewapi.VoteOnPostResponse.Status.MC_NOT_STARTED:
-      return 'errors.mcNotStarted';
-    case newnewapi.VoteOnPostResponse.Status.ALREADY_VOTED:
-      return 'errors.alreadyVoted';
-    case newnewapi.VoteOnPostResponse.Status.MC_VOTE_COUNT_TOO_SMALL:
-      return 'errors.mcVoteCountTooSmall';
-    case newnewapi.VoteOnPostResponse.Status.NOT_ALLOWED_TO_CREATE_NEW_OPTION:
-      return 'errors.notAllowedToCreateNewOption';
-    default:
-      return 'errors.requestFailed';
-  }
-};
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -127,7 +88,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
-  const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const dispatch = useAppDispatch();
@@ -166,12 +126,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [newOptionText, setNewOptionText] = useState('');
   const [newOptionTextValid, setNewOptionTextValid] = useState(true);
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [newBidAmount, setNewBidAmount] = useState(minAmount.toString());
   // Mobile modal for new option
   const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
   // Payment modal
-  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const [useFreeVoteModalOpen, setUseFreeVoteModalOpen] = useState(false);
   const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
@@ -220,114 +177,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       }
     },
     [setNewOptionText, validateTextViaAPIDebounced]
-  );
-
-  const paymentAmountInCents = useMemo(
-    () => (parseInt(newBidAmount) || 0) * votePrice,
-    [votePrice, newBidAmount]
-  );
-
-  const paymentFeeInCents = useMemo(
-    () =>
-      getCustomerPaymentFee(
-        paymentAmountInCents,
-        parseFloat(appConstants.customerFee)
-      ),
-    [paymentAmountInCents, appConstants.customerFee]
-  );
-
-  const paymentWithFeeInCents = useMemo(
-    () => paymentAmountInCents + paymentFeeInCents,
-    [paymentAmountInCents, paymentFeeInCents]
-  );
-
-  const voteOnPostRequest = useMemo(
-    () =>
-      new newnewapi.VoteOnPostRequest({
-        postUuid: post.postUuid,
-        votesCount: parseInt(newBidAmount),
-        customerFee: new newnewapi.MoneyAmount({
-          usdCents: paymentFeeInCents,
-        }),
-        optionText: newOptionText,
-      }),
-    [post.postUuid, newBidAmount, newOptionText, paymentFeeInCents]
-  );
-
-  const setupIntent = useStripeSetupIntent({
-    purpose: voteOnPostRequest,
-    isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${post.postUuid}`,
-  });
-
-  const handlePayWithCard = useCallback(
-    async ({
-      cardUuid,
-      saveCard,
-    }: {
-      cardUuid?: string;
-      saveCard?: boolean;
-    }) => {
-      setLoadingModalOpen(true);
-
-      if (setupIntent.isGuest) {
-        router.push(
-          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${setupIntent.setupIntentClientSecret}`
-        );
-        return;
-      }
-
-      Mixpanel.track('PayWithCard', {
-        _stage: 'Post',
-        _postUuid: post.postUuid,
-        _component: 'McOptionsTab',
-      });
-
-      try {
-        const stripeContributionRequest =
-          new newnewapi.StripeContributionRequest({
-            cardUuid,
-            stripeSetupIntentClientSecret: setupIntent.setupIntentClientSecret,
-            ...(saveCard !== undefined
-              ? {
-                  saveCard,
-                }
-              : {}),
-          });
-
-        const res = await voteOnPost(stripeContributionRequest);
-
-        if (
-          !res.data ||
-          res.error ||
-          res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
-        ) {
-          throw new Error(
-            res.error?.message ??
-              t(getPayWithCardErrorMessage(res.data?.status))
-          );
-        }
-
-        const optionFromResponse = (res.data
-          .option as newnewapi.MultipleChoice.Option)!!;
-        optionFromResponse.isSupportedByMe = true;
-
-        handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
-        setPaymentSuccessModalOpen(true);
-        setSuggestNewMobileOpen(false);
-        setPaymentModalOpen(false);
-        setNewBidAmount('');
-        setNewOptionText('');
-      } catch (err: any) {
-        console.error(err);
-        toast.error(err.message);
-      } finally {
-        setLoadingModalOpen(false);
-        setupIntent.destroy();
-      }
-    },
-    [post.postUuid, handleAddOrUpdateOptionFromResponse, setupIntent, router, t]
   );
 
   const handleVoteForFree = useCallback(async () => {
@@ -481,8 +330,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               postText={post.title}
               postId={post.postUuid}
               index={i}
-              minAmount={minAmount}
-              votePrice={votePrice}
               optionBeingSupported={optionBeingSupported}
               votingAllowed={postStatus === 'voting'}
               canVoteForFree={canVoteForFree}
@@ -647,59 +494,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         handleMakeFreeVote={handleVoteForFree}
         closeModal={() => setUseFreeVoteModalOpen(false)}
       />
-      {/* Payment Modal */}
-      {paymentModalOpen ? (
-        <PaymentModal
-          isOpen={paymentModalOpen}
-          zIndex={12}
-          amount={paymentWithFeeInCents}
-          setupIntent={setupIntent}
-          onClose={() => setPaymentModalOpen(false)}
-          handlePayWithCard={handlePayWithCard}
-          redirectUrl={`post/${post.postUuid}`}
-          bottomCaption={
-            (!appConstants.minHoldAmount?.usdCents ||
-              paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
-              <SPaymentSign variant='subtitle'>
-                {t('mcPost.paymentModalFooter.body', { creator: postCreator })}*
-                <Link href='https://terms.newnew.co'>
-                  <SPaymentTermsLink
-                    href='https://terms.newnew.co'
-                    target='_blank'
-                  >
-                    {t('mcPost.paymentModalFooter.terms')}
-                  </SPaymentTermsLink>
-                </Link>{' '}
-                {t('mcPost.paymentModalFooter.apply')}
-              </SPaymentSign>
-            )
-          }
-        >
-          <SPaymentModalHeader>
-            <SPaymentModalHeading>
-              <SPaymentModalHeadingPostSymbol>
-                <SPaymentModalHeadingPostSymbolImg
-                  src={assets.decision.votes}
-                />
-              </SPaymentModalHeadingPostSymbol>
-              <SPaymentModalHeadingPostCreator variant={3}>
-                {t('mcPost.paymentModalHeader.title', {
-                  creator: postCreator,
-                })}
-              </SPaymentModalHeadingPostCreator>
-            </SPaymentModalHeading>
-            <SPaymentModalPostText variant={2}>
-              <PostTitleContent>{post.title}</PostTitleContent>
-            </SPaymentModalPostText>
-            <SPaymentModalTitle variant='subtitle'>
-              {t('mcPost.paymentModalHeader.subtitle')}
-            </SPaymentModalTitle>
-            <SPaymentModalOptionText variant={5}>
-              {newOptionText}
-            </SPaymentModalOptionText>
-          </SPaymentModalHeader>
-        </PaymentModal>
-      ) : null}
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}
@@ -915,63 +709,6 @@ const SActionSection = styled.div`
 //   }
 // `;
 
-// Payment modal header
-const SPaymentModalHeader = styled.div``;
-
-const SPaymentModalHeading = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-
-  gap: 16px;
-
-  padding-right: 64px;
-  margin-bottom: 24px;
-`;
-
-const SPaymentModalHeadingPostSymbol = styled.div`
-  background: ${({ theme }) => theme.colorsThemed.background.quaternary};
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-`;
-
-const SPaymentModalHeadingPostSymbolImg = styled.img`
-  width: 24px;
-`;
-
-const SPaymentModalHeadingPostCreator = styled(Text)`
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 24px;
-`;
-
-const SPaymentModalPostText = styled(Text)`
-  display: flex;
-  align-items: center;
-  white-space: pre-wrap;
-  word-break: break-word;
-  gap: 8px;
-
-  margin-bottom: 24px;
-`;
-
-const SPaymentModalTitle = styled(Text)`
-  margin-bottom: 8px;
-`;
-
-const SPaymentModalOptionText = styled(Headline)`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
-
 const STutorialTooltipHolder = styled.div`
   position: absolute;
   left: 40%;
@@ -1001,16 +738,4 @@ const STutorialTooltipTextAreaHolder = styled.div`
   div {
     width: 190px;
   }
-`;
-
-const SPaymentSign = styled(Text)`
-  margin-top: 24px;
-
-  text-align: center;
-  white-space: pre-wrap;
-  word-break: break-word;
-`;
-
-const SPaymentTermsLink = styled.a`
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;

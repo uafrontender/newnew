@@ -41,6 +41,7 @@ interface ICardSection {
   loading?: boolean;
   tutorialCard?: ReactElement;
   handlePostClicked: (post: newnewapi.Post) => void;
+  onReachEnd?: () => void;
 }
 
 export const CardsSection: React.FC<ICardSection> = React.memo(
@@ -52,6 +53,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     collection,
     loading,
     tutorialCard,
+    onReachEnd,
     handlePostClicked,
     ...restProps
   }) => {
@@ -265,6 +267,12 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             scrollStep
       );
     }, [visibleListItem, collection, scrollStep]);
+
+    useEffect(() => {
+      if (!canScrollRight && collection.length > 0 && onReachEnd) {
+        onReachEnd();
+      }
+    }, [canScrollRight, onReachEnd, collection.length]);
 
     return (
       <SWrapper name={category} {...restProps}>

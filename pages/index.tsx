@@ -18,7 +18,7 @@ import Text from '../components/atoms/Text';
 import { useAppSelector } from '../redux-store/store';
 import {
   fetchPostByUUID,
-  fetchForYouPosts,
+  // fetchForYouPosts,
   fetchCuratedPosts,
   fetchBiggestPosts,
 } from '../api/endpoints/post';
@@ -166,41 +166,41 @@ const Home: NextPage<IHome> = ({
 
   // Fetch top posts of various types
   // FY posts
-  useEffect(() => {
-    async function fetchFYPosts() {
-      try {
-        setCollectionFYInitialLoading(true);
+  // useEffect(() => {
+  //   async function fetchFYPosts() {
+  //     try {
+  //       setCollectionFYInitialLoading(true);
 
-        const fyPayload = new newnewapi.PagedRequest({
-          paging: {
-            limit: 10,
-          },
-        });
+  //       const fyPayload = new newnewapi.PagedRequest({
+  //         paging: {
+  //           limit: 10,
+  //         },
+  //       });
 
-        const resFY = await fetchForYouPosts(fyPayload);
+  //       const resFY = await fetchForYouPosts(fyPayload);
 
-        if (resFY) {
-          setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
-          setCollectionFYInitialLoading(false);
-        } else {
-          throw new Error('Request failed');
-        }
-      } catch (err) {
-        setCollectionFYInitialLoading(false);
-        setCollectionFYError(true);
-      }
-    }
+  //       if (resFY) {
+  //         setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
+  //         setCollectionFYInitialLoading(false);
+  //       } else {
+  //         throw new Error('Request failed');
+  //       }
+  //     } catch (err) {
+  //       setCollectionFYInitialLoading(false);
+  //       setCollectionFYError(true);
+  //     }
+  //   }
 
-    if (user.loggedIn) {
-      fetchFYPosts();
-    }
+  //   if (user.loggedIn) {
+  //     fetchFYPosts();
+  //   }
 
-    return () => {
-      setPostModalOpen(false);
-      setDisplayedPost(undefined);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //   return () => {
+  //     setPostModalOpen(false);
+  //     setDisplayedPost(undefined);
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   // Live Auctions posts
   // useEffect(() => {
@@ -470,20 +470,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     {
       username: '☀️Sunny Claire',
       title: 'We give up...help pick our daughter’s name 🐣',
-      totalAmount: 102558,
-      postType: 'ac',
+      totalVotes: 102558,
+      postType: 'mc',
     },
     {
       username: 'julieberns',
       title: 'Should I quit my job and move to Paris to find 💗?',
-      totalAmount: 44173,
-      postType: 'ac',
+      totalVotes: 44173,
+      postType: 'mc',
     },
     {
       username: 'GTmarkis',
       title: 'Getting my first sports car... YOU CHOOSE IT. I BUY IT!',
-      totalAmount: 23425,
-      postType: 'ac',
+      totalVotes: 23425,
+      postType: 'mc',
     },
   ];
 
@@ -492,19 +492,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       username: 'ambervz',
       title: 'Need ideas on how to breakup w/ my cheating bf',
       totalAmount: 3812,
-      postType: 'mc',
+      postType: 'ac',
     },
     {
       username: 'Jenna B⚡️',
       title: 'I want a new tat! Tell me where to put it👀',
       totalAmount: 4261,
-      postType: 'mc',
+      postType: 'ac',
     },
     {
       username: 'superstacked+',
       title: '😱What should I spend my $250K on???',
       totalAmount: 12482,
-      postType: 'mc',
+      postType: 'ac',
     },
   ];
 
