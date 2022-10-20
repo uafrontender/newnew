@@ -40,6 +40,8 @@ interface ICardSection {
   collection: newnewapi.Post[];
   loading?: boolean;
   tutorialCard?: ReactElement;
+  seeMoreLink?: string;
+  padding?: 'small' | 'large';
   handlePostClicked: (post: newnewapi.Post) => void;
   onReachEnd?: () => void;
 }
@@ -53,6 +55,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     collection,
     loading,
     tutorialCard,
+    seeMoreLink,
     onReachEnd,
     handlePostClicked,
     ...restProps
@@ -220,13 +223,13 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     const handleSeeMoreClick = () => {
       Mixpanel.track('See More in Category Clicked');
       if (type === 'default') {
-        router.push(`/see-more?category=${category}`);
+        router.push(seeMoreLink || `/see-more?category=${category}`);
       }
     };
 
     // Try to pre-fetch the content
     useEffect(() => {
-      router.prefetch(`/see-more?category=${category}`);
+      router.prefetch(seeMoreLink || `/see-more?category=${category}`);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -392,6 +395,7 @@ CardsSection.defaultProps = {
 
 interface ISWrapper {
   name: string;
+  padding?: 'small' | 'large';
 }
 
 const SWrapper = styled.div<ISWrapper>`
@@ -411,7 +415,7 @@ const SWrapper = styled.div<ISWrapper>`
   }
 
   ${(props) => props.theme.media.laptop} {
-    padding: 60px 0;
+    padding: ${({ padding }) => (padding === 'small' ? '40px 0' : '60px 0')};
     margin: 0;
   }
 

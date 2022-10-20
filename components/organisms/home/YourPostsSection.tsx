@@ -30,27 +30,29 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
     string | undefined | null
   >();
 
-  console.log(nextPageToken, 'nextPageToken');
+  console.log(statusFilter, 'statusFilter');
 
   const fetchCreatorPosts = useCallback(async () => {
     try {
       const payload = new newnewapi.GetRelatedToMePostsRequest({
         relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
         statusFilter,
-        needTotalCount: true,
         paging: {
           ...(nextPageToken ? { pageToken: nextPageToken } : {}),
         },
-        // sorting: newnewapi.PostSorting.ACTIVE_FIRST,
+        ...(statusFilter
+          ? {}
+          : { sorting: newnewapi.PostSorting.ACTIVE_FIRST }),
       });
 
       const postsResponse = await getMyPosts(payload);
 
+      console.log(payload, 'payload');
       console.log(postsResponse, 'postsResponse');
 
       if (postsResponse.data && postsResponse.data.posts) {
         setPosts((curr) => [
-          ...curr,
+          ...(nextPageToken ? curr : []),
           ...(postsResponse.data?.posts as newnewapi.Post[]),
         ]);
         setNextPageToken(postsResponse.data.paging?.nextPageToken);
@@ -65,17 +67,17 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
     }
   }, [statusFilter, nextPageToken]);
 
-  useEffect(() => {
-    const initialFetch = async () => {
-      setIsLoading(true);
-      await fetchCreatorPosts();
-      setIsLoading(false);
-    };
+  const initialFetch = useCallback(async () => {
+    setIsLoading(true);
+    await fetchCreatorPosts();
+    setIsLoading(false);
+  }, [fetchCreatorPosts]);
 
+  useEffect(() => {
     if (posts.length === 0) {
       initialFetch();
     }
-  }, [fetchCreatorPosts, posts.length]);
+  }, [initialFetch, posts.length, nextPageToken]);
 
   const loadMorePosts = useCallback(() => {
     if (nextPageToken) {
@@ -83,7 +85,20 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
     }
   }, [fetchCreatorPosts, nextPageToken]);
 
-  if (isPostsRequested.current && posts.length === 0) {
+  const handleSetStatusFilter = (
+    newStatusFilter: newnewapi.GetRelatedToMePostsRequest.StatusFilter
+  ) => {
+    if (statusFilter === newStatusFilter) {
+      setStatusFilter(null);
+    } else {
+      setStatusFilter(newStatusFilter);
+    }
+
+    setNextPageToken(null);
+    setPosts([]);
+  };
+
+  if (isPostsRequested.current && posts.length === 0 && !statusFilter) {
     return (
       <SCreateFirstContainer>
         <SHeadline>Post your first Bid or Superpoll</SHeadline>
@@ -105,7 +120,7 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
             newnewapi.GetRelatedToMePostsRequest.StatusFilter.ACTIVE
           }
           onClick={() =>
-            setStatusFilter(
+            handleSetStatusFilter(
               newnewapi.GetRelatedToMePostsRequest.StatusFilter.ACTIVE
             )
           }
@@ -119,7 +134,7 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
             newnewapi.GetRelatedToMePostsRequest.StatusFilter.ENDED
           }
           onClick={() =>
-            setStatusFilter(
+            handleSetStatusFilter(
               newnewapi.GetRelatedToMePostsRequest.StatusFilter.ENDED
             )
           }
@@ -135,13 +150,21 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
           loading={isLoading}
           handlePostClicked={onPostOpen}
           onReachEnd={loadMorePosts}
+          seeMoreLink='/profile/my-posts'
         />
       )}
     </SContainer>
   );
 };
 
-const SContainer = styled.div``;
+const SContainer = styled.div`
+  position: relative;
+
+  ${(props) => props.theme.media.laptopM} {
+    max-width: 1248px;
+    margin: 0 auto;
+  }
+`;
 
 const SCardsSection = styled(CardsSection)`
   margin-bottom: 80px;
@@ -159,21 +182,53 @@ const SCreateFirstContainer = styled.div`
   justify-content: center;
   border: 2px solid ${({ theme }) => theme.colorsThemed.accent.blue};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
-  height: 484px;
+  height: 198px;
   margin-bottom: 80px;
+
+  ${({ theme }) => theme.media.tablet} {
+    height: 280px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    height: 484px;
+  }
+
+  ${(props) => props.theme.media.laptopM} {
+    max-width: 1248px;
+    margin: 0 auto;
+  }
 `;
 
 const SHeadline = styled(Headline)`
-  margin-bottom: 40px;
+  margin-bottom: 16px;
   max-width: 587px;
 
   text-align: center;
-  font-size: 64px;
-  line-height: 72px;
+
+  font-size: 24px;
+  line-height: 32px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 24px;
+    max-width: 320px;
+
+    font-size: 36px;
+    line-height: 44px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-bottom: 40px;
+    max-width: 520px;
+
+    font-size: 64px;
+    line-height: 72px;
+  }
 `;
 
 const SFilterContainer = styled.div`
   display: flex;
+  position: absolute;
+  top: -10px;
 `;
 
 export default YourPostsSection;

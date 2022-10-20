@@ -73,7 +73,7 @@ const StaticPostCard = ({
                 votes: formatNumber(totalVotes ?? 0, true),
                 total: formatNumber(targetBackerCount ?? 0, true),
                 backed: formatNumber(currentBackerCount ?? 0, true),
-                amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
+                amount: `$${formatNumber(totalAmount ?? 0, true)}`,
               })}
             </SButton>
           ) : (
@@ -91,7 +91,7 @@ const StaticPostCard = ({
                 votes: formatNumber(totalVotes ?? 0, true),
                 total: formatNumber(targetBackerCount ?? 0, true),
                 backed: formatNumber(currentBackerCount ?? 0, true),
-                amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
+                amount: `$${formatNumber(totalAmount ?? 0, true)}`,
               })}
             </SButton>
           )}

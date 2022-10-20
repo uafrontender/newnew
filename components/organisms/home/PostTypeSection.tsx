@@ -21,6 +21,7 @@ interface IPostTypeSectionProps {
   headingPosition: 'right' | 'left';
   loading?: boolean;
   isStatic?: boolean;
+  padding?: 'small' | 'large';
   openPostModal: (post: newnewapi.Post) => void;
 }
 
@@ -32,6 +33,7 @@ const PostTypeSection = ({
   headingPosition,
   loading,
   isStatic,
+  padding,
   openPostModal,
 }: IPostTypeSectionProps) => {
   const { postOverlayOpen } = usePostModalState();
@@ -74,7 +76,7 @@ const PostTypeSection = ({
   );
 
   return (
-    <SContainer headingPosition={headingPosition}>
+    <SContainer headingPosition={headingPosition} padding={padding}>
       <SHeading>
         <SIconHolder>
           <img src={iconSrc} alt={title} draggable={false} />
@@ -100,13 +102,14 @@ const PostTypeSection = ({
 
 const SContainer = styled.section<{
   headingPosition: 'right' | 'left';
+  padding?: 'small' | 'large';
 }>`
   display: flex;
   flex-direction: column;
   padding: 20px 0;
 
   ${(props) => props.theme.media.laptop} {
-    padding: 60px 0;
+    padding: ${({ padding }) => (padding === 'small' ? '40px 0' : '60px 0')};
   }
 
   ${({ theme }) => theme.media.laptopM} {

@@ -18,7 +18,7 @@ import Text from '../components/atoms/Text';
 import { useAppSelector } from '../redux-store/store';
 import {
   fetchPostByUUID,
-  // fetchForYouPosts,
+  fetchForYouPosts,
   fetchCuratedPosts,
   fetchBiggestPosts,
 } from '../api/endpoints/post';
@@ -32,6 +32,7 @@ import { Mixpanel } from '../utils/mixpanel';
 import YourPostsSection from '../components/organisms/home/YourPostsSection';
 import Headline from '../components/atoms/Headline';
 import { TStaticPost } from '../components/molecules/home/StaticPostCard';
+import TutorialCard from '../components/molecules/TutorialCard';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -166,41 +167,41 @@ const Home: NextPage<IHome> = ({
 
   // Fetch top posts of various types
   // FY posts
-  // useEffect(() => {
-  //   async function fetchFYPosts() {
-  //     try {
-  //       setCollectionFYInitialLoading(true);
+  useEffect(() => {
+    async function fetchFYPosts() {
+      try {
+        setCollectionFYInitialLoading(true);
 
-  //       const fyPayload = new newnewapi.PagedRequest({
-  //         paging: {
-  //           limit: 10,
-  //         },
-  //       });
+        const fyPayload = new newnewapi.PagedRequest({
+          paging: {
+            limit: 10,
+          },
+        });
 
-  //       const resFY = await fetchForYouPosts(fyPayload);
+        const resFY = await fetchForYouPosts(fyPayload);
 
-  //       if (resFY) {
-  //         setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
-  //         setCollectionFYInitialLoading(false);
-  //       } else {
-  //         throw new Error('Request failed');
-  //       }
-  //     } catch (err) {
-  //       setCollectionFYInitialLoading(false);
-  //       setCollectionFYError(true);
-  //     }
-  //   }
+        if (resFY) {
+          setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
+          setCollectionFYInitialLoading(false);
+        } else {
+          throw new Error('Request failed');
+        }
+      } catch (err) {
+        setCollectionFYInitialLoading(false);
+        setCollectionFYError(true);
+      }
+    }
 
-  //   if (user.loggedIn) {
-  //     fetchFYPosts();
-  //   }
+    if (user.loggedIn) {
+      fetchFYPosts();
+    }
 
-  //   return () => {
-  //     setPostModalOpen(false);
-  //     setDisplayedPost(undefined);
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+    return () => {
+      setPostModalOpen(false);
+      setDisplayedPost(undefined);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Live Auctions posts
   // useEffect(() => {
@@ -326,7 +327,9 @@ const Home: NextPage<IHome> = ({
 
       {user.userData?.options?.isCreator && (
         <>
-          <SHeadline>Your posts</SHeadline>
+          <SHeading style={{ marginBottom: '48px' }}>
+            <SHeadline>Your posts</SHeadline>
+          </SHeading>
           <YourPostsSection onPostOpen={handleOpenPostModal} />
         </>
       )}
@@ -334,13 +337,13 @@ const Home: NextPage<IHome> = ({
       {user.loggedIn && (
         <>
           {user.userData?.options?.isCreator && (
-            <>
+            <SHeading>
               <SHeadline>Explore</SHeadline>
               <SSubtitle variant='subtitle'>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
                 fames nulla dignissim tellus purus. Faucibus ornare.
               </SSubtitle>
-            </>
+            </SHeading>
           )}
           {/* For you */}
           {!collectionFYError &&
@@ -351,12 +354,26 @@ const Home: NextPage<IHome> = ({
               collection={collectionFY}
               loading={collectionFYInitialLoading}
               handlePostClicked={handleOpenPostModal}
+              tutorialCard={
+                user.loggedIn ? (
+                  <STutorialCard
+                    image={
+                      theme.name === 'dark'
+                        ? assets.common.darkAnimatedLogo
+                        : assets.common.lightAnimatedLogo
+                    }
+                    title={t('cardsSection.title.for-you')}
+                    caption='This section will display posts recommended to you.'
+                  />
+                ) : undefined
+              }
+              padding={user.loggedIn ? 'small' : 'large'}
             />
           ) : null}
         </>
       )}
 
-      {/* MC posts */}
+      {/* MC posts example */}
       <PostTypeSection
         headingPosition='right'
         title={t('tutorial.mc.title')}
@@ -370,9 +387,10 @@ const Home: NextPage<IHome> = ({
         posts={staticSuperpolls}
         isStatic
         // loading={collectionMCInitialLoading}
+        padding={user.loggedIn ? 'small' : 'large'}
       />
 
-      {/* AC posts */}
+      {/* AC posts example */}
       <PostTypeSection
         headingPosition='left'
         title={t('tutorial.ac.title')}
@@ -386,6 +404,7 @@ const Home: NextPage<IHome> = ({
         posts={staticBids}
         isStatic
         // loading={collectionACInitialLoading}
+        padding={user.loggedIn ? 'small' : 'large'}
       />
 
       {/* Greatest of all time posts */}
@@ -397,6 +416,20 @@ const Home: NextPage<IHome> = ({
           collection={collectionBiggest}
           loading={collectionBiggestInitialLoading}
           handlePostClicked={handleOpenPostModal}
+          tutorialCard={
+            user.loggedIn ? (
+              <STutorialCard
+                image={
+                  theme.name === 'dark'
+                    ? assets.common.darkAnimatedLogo
+                    : assets.common.lightAnimatedLogo
+                }
+                title={t('cardsSection.title.biggest')}
+                caption='This section will display the greatest of all time posts.'
+              />
+            ) : undefined
+          }
+          padding={user.loggedIn ? 'small' : 'large'}
         />
       ) : null}
 
@@ -431,9 +464,19 @@ const SCardsSection = styled(CardsSection)`
   }
 `;
 
-const SHeadline = styled(Headline)`
-  margin-bottom: 48px;
+const SHeading = styled.div`
   margin-top: 40px;
+  margin-bottom: 8px;
+
+  ${(props) => props.theme.media.laptopM} {
+    max-width: 1248px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+`;
+
+const SHeadline = styled(Headline)`
+  margin-bottom: 24px;
 
   font-size: 52px;
   line-height: 40px;
@@ -445,6 +488,26 @@ const SSubtitle = styled(Text)`
   font-size: 16px;
   line-height: 24px;
   font-weight: 600;
+`;
+
+const STutorialCard = styled(TutorialCard)`
+  & img {
+    width: 152px;
+    height: 114px;
+  }
+
+  & h4 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  &&& {
+    & div {
+      padding: 0;
+      font-size: 16px;
+      line-height: 24px;
+    }
+  }
 `;
 
 export default Home;
@@ -472,18 +535,24 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       title: 'We give up...help pick our daughter’s name 🐣',
       totalVotes: 102558,
       postType: 'mc',
+      coverImageUrl: assets.home.mcExampleThumb1,
+      avatarUrl: assets.home.mcExampleAvatar1,
     },
     {
       username: 'julieberns',
       title: 'Should I quit my job and move to Paris to find 💗?',
       totalVotes: 44173,
       postType: 'mc',
+      coverImageUrl: assets.home.mcExampleThumb2,
+      avatarUrl: assets.home.mcExampleAvatar2,
     },
     {
       username: 'GTmarkis',
       title: 'Getting my first sports car... YOU CHOOSE IT. I BUY IT!',
       totalVotes: 23425,
       postType: 'mc',
+      coverImageUrl: assets.home.mcExampleThumb3,
+      avatarUrl: assets.home.mcExampleAvatar3,
     },
   ];
 
@@ -493,18 +562,24 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       title: 'Need ideas on how to breakup w/ my cheating bf',
       totalAmount: 3812,
       postType: 'ac',
+      coverImageUrl: assets.home.acExampleThumb1,
+      avatarUrl: assets.home.acExampleAvatar1,
     },
     {
       username: 'Jenna B⚡️',
       title: 'I want a new tat! Tell me where to put it👀',
       totalAmount: 4261,
       postType: 'ac',
+      coverImageUrl: assets.home.acExampleThumb2,
+      avatarUrl: assets.home.acExampleAvatar2,
     },
     {
       username: 'superstacked+',
       title: '😱What should I spend my $250K on???',
       totalAmount: 12482,
       postType: 'ac',
+      coverImageUrl: assets.home.acExampleThumb3,
+      avatarUrl: assets.home.acExampleAvatar3,
     },
   ];
 

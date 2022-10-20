@@ -21,6 +21,7 @@ export const TutorialCard: React.FC<ITutorialCard> = ({
   caption,
   height,
   imageStyle,
+  ...rest
 }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -28,7 +29,7 @@ export const TutorialCard: React.FC<ITutorialCard> = ({
   );
 
   return (
-    <SWrapper>
+    <SWrapper {...rest}>
       <SImageBG id='backgroundPart' height={height}>
         <SImageHolder>
           <img
