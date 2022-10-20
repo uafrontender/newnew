@@ -7,6 +7,7 @@ import Link from 'next/link';
 import CardsSection from './CardsSection';
 import Headline from '../../atoms/Headline';
 import Button from '../../atoms/Button';
+import FilterButton from '../../atoms/FilterButton';
 
 import { getMyPosts } from '../../../api/endpoints/user';
 
@@ -22,14 +23,19 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
   const [isError, setIsError] = useState(false);
   const isPostsRequested = useRef(false);
 
+  const [statusFilter, setStatusFilter] =
+    useState<newnewapi.GetRelatedToMePostsRequest.StatusFilter | null>(null);
+
   useEffect(() => {
     async function fetchBiggest() {
       try {
         setIsLoading(true);
         const payload = new newnewapi.GetRelatedToMePostsRequest({
           relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
-          // filter: postsFilter,
+          statusFilter,
+          // sorting: newnewapi.PostSorting.ACTIVE_FIRST,
         });
+
         const postsResponse = await getMyPosts(payload);
 
         if (postsResponse.data && postsResponse.data.posts) {
@@ -49,7 +55,7 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
     }
 
     fetchBiggest();
-  }, []);
+  }, [statusFilter]);
 
   if (isPostsRequested.current && posts.length === 0) {
     return (
@@ -66,6 +72,36 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
 
   return (
     <SContainer>
+      <SFilterContainer>
+        <FilterButton
+          active={
+            statusFilter ===
+            newnewapi.GetRelatedToMePostsRequest.StatusFilter.ACTIVE
+          }
+          onClick={() =>
+            setStatusFilter(
+              newnewapi.GetRelatedToMePostsRequest.StatusFilter.ACTIVE
+            )
+          }
+          view='secondary'
+        >
+          Active
+        </FilterButton>
+        <FilterButton
+          active={
+            statusFilter ===
+            newnewapi.GetRelatedToMePostsRequest.StatusFilter.ENDED
+          }
+          onClick={() =>
+            setStatusFilter(
+              newnewapi.GetRelatedToMePostsRequest.StatusFilter.ENDED
+            )
+          }
+          view='secondary'
+        >
+          Ended
+        </FilterButton>
+      </SFilterContainer>
       {!isError && (
         <SCardsSection
           category='biggest'
@@ -107,6 +143,10 @@ const SHeadline = styled(Headline)`
   text-align: center;
   font-size: 64px;
   line-height: 72px;
+`;
+
+const SFilterContainer = styled.div`
+  display: flex;
 `;
 
 export default YourPostsSection;

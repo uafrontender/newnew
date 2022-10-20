@@ -7,14 +7,22 @@ interface IFilterButton {
   active: boolean;
   children: React.ReactNode;
   onClick: () => void;
+  view: 'primary' | 'secondary';
 }
 
 export const FilterButton: React.FC<IFilterButton> = ({
   active,
   children,
+  view,
   onClick,
 }) => (
-  <STab size='sm' view='secondary' active={active} onClick={onClick}>
+  <STab
+    size='sm'
+    view='secondary'
+    filterView={view}
+    active={active}
+    onClick={onClick}
+  >
     {children}
   </STab>
 );
@@ -23,6 +31,7 @@ export default FilterButton;
 
 interface ISButton {
   active: boolean;
+  filterView: 'primary' | 'secondary';
 }
 
 const STab = styled(Button)<ISButton>`
@@ -34,10 +43,18 @@ const STab = styled(Button)<ISButton>`
   ${(props) => {
     if (props.active) {
       return css`
-        color: ${props.theme.colorsThemed.background.tertiary} !important;
-        background: ${props.theme.colorsThemed.text.primary} !important;
+        color: ${({ theme }) =>
+          props.filterView === 'primary'
+            ? theme.colorsThemed.background.tertiary
+            : theme.colors.white};
+
+        background: ${({ theme }) =>
+          props.filterView === 'primary'
+            ? theme.colorsThemed.text.primary
+            : theme.colorsThemed.button.background.primary} !important;
       `;
     }
+
     return css`
       color: ${props.theme.colorsThemed.text.primary};
       background: ${props.theme.colorsThemed.background.secondary};

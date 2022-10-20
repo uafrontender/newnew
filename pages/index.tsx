@@ -31,6 +31,7 @@ import assets from '../constants/assets';
 import { Mixpanel } from '../utils/mixpanel';
 import YourPostsSection from '../components/organisms/home/YourPostsSection';
 import Headline from '../components/atoms/Headline';
+import { TStaticPost } from '../components/molecules/home/StaticPostCard';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -44,11 +45,15 @@ interface IHome {
   top10posts: newnewapi.NonPagedPostsResponse;
   postFromQuery?: newnewapi.Post;
   assumeLoggedIn?: boolean;
+  staticSuperpolls: TStaticPost[];
+  staticBids: TStaticPost[];
 }
 
 // No sense to memorize
 const Home: NextPage<IHome> = ({
   top10posts,
+  staticBids,
+  staticSuperpolls,
   postFromQuery,
   assumeLoggedIn,
 }) => {
@@ -67,15 +72,15 @@ const Home: NextPage<IHome> = ({
     useState(false);
   const [collectionFYError, setCollectionFYError] = useState(false);
   // Auctions
-  const [collectionAC, setCollectionAC] = useState<newnewapi.Post[]>([]);
-  const [collectionACInitialLoading, setCollectionACInitialLoading] =
-    useState(true);
-  const [, setCollectionACError] = useState(false);
+  // const [collectionAC, setCollectionAC] = useState<newnewapi.Post[]>([]);
+  // const [collectionACInitialLoading, setCollectionACInitialLoading] =
+  //   useState(true);
+  // const [, setCollectionACError] = useState(false);
   // Multiple choice
-  const [collectionMC, setCollectionMC] = useState<newnewapi.Post[]>([]);
-  const [collectionMCInitialLoading, setCollectionMCInitialLoading] =
-    useState(true);
-  const [, setCollectionMCError] = useState(false);
+  // const [collectionMC, setCollectionMC] = useState<newnewapi.Post[]>([]);
+  // const [collectionMCInitialLoading, setCollectionMCInitialLoading] =
+  // useState(true);
+  // const [, setCollectionMCError] = useState(false);
   // Crowdfunding
   // const [collectionCF, setCollectionCF] = useState<newnewapi.Post[]>([]);
   // const [collectionCFInitialLoading, setCollectionCFInitialLoading] =
@@ -133,18 +138,18 @@ const Home: NextPage<IHome> = ({
     //   );
     //   return updated;
     // });
-    setCollectionAC((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-    setCollectionMC((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
+    // setCollectionAC((curr) => {
+    //   const updated = curr.filter(
+    //     (post) => switchPostType(post)[0].postUuid !== postUuid
+    //   );
+    //   return updated;
+    // });
+    // setCollectionMC((curr) => {
+    //   const updated = curr.filter(
+    //     (post) => switchPostType(post)[0].postUuid !== postUuid
+    //   );
+    //   return updated;
+    // });
     // setCollectionCF((curr) => {
     //   const updated = curr.filter(
     //     (post) => switchPostType(post)[0].postUuid !== postUuid
@@ -198,63 +203,63 @@ const Home: NextPage<IHome> = ({
   }, []);
 
   // Live Auctions posts
-  useEffect(() => {
-    async function fetchAuctions() {
-      try {
-        setCollectionACInitialLoading(true);
+  // useEffect(() => {
+  //   async function fetchAuctions() {
+  //     try {
+  //       setCollectionACInitialLoading(true);
 
-        const liveAuctionsPayload = new newnewapi.PagedAuctionsRequest({
-          sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
-        });
+  //       const liveAuctionsPayload = new newnewapi.PagedAuctionsRequest({
+  //         sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+  //       });
 
-        const resLiveAuctions = await fetchLiveAuctions(liveAuctionsPayload);
+  //       const resLiveAuctions = await fetchLiveAuctions(liveAuctionsPayload);
 
-        if (resLiveAuctions) {
-          setCollectionAC(
-            () => resLiveAuctions.data?.auctions as newnewapi.Post[]
-          );
-          setCollectionACInitialLoading(false);
-        } else {
-          throw new Error('Request failed');
-        }
-      } catch (err) {
-        setCollectionACInitialLoading(false);
-        setCollectionACError(true);
-      }
-    }
+  //       if (resLiveAuctions) {
+  //         setCollectionAC(
+  //           () => resLiveAuctions.data?.auctions as newnewapi.Post[]
+  //         );
+  //         setCollectionACInitialLoading(false);
+  //       } else {
+  //         throw new Error('Request failed');
+  //       }
+  //     } catch (err) {
+  //       setCollectionACInitialLoading(false);
+  //       setCollectionACError(true);
+  //     }
+  //   }
 
-    fetchAuctions();
-  }, []);
+  //   fetchAuctions();
+  // }, []);
 
   // Top Multiple Choices
-  useEffect(() => {
-    async function fetchMultipleChoices() {
-      try {
-        setCollectionMCInitialLoading(true);
-        const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({
-          sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
-        });
+  // useEffect(() => {
+  //   async function fetchMultipleChoices() {
+  //     try {
+  //       setCollectionMCInitialLoading(true);
+  //       const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({
+  //         sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+  //       });
 
-        const resMultichoices = await fetchTopMultipleChoices(
-          multichoicePayload
-        );
+  //       const resMultichoices = await fetchTopMultipleChoices(
+  //         multichoicePayload
+  //       );
 
-        if (resMultichoices) {
-          setCollectionMC(
-            () => resMultichoices.data?.multipleChoices as newnewapi.Post[]
-          );
-          setCollectionMCInitialLoading(false);
-        } else {
-          throw new Error('Request failed');
-        }
-      } catch (err) {
-        setCollectionMCInitialLoading(false);
-        setCollectionMCError(true);
-      }
-    }
+  //       if (resMultichoices) {
+  //         setCollectionMC(
+  //           () => resMultichoices.data?.multipleChoices as newnewapi.Post[]
+  //         );
+  //         setCollectionMCInitialLoading(false);
+  //       } else {
+  //         throw new Error('Request failed');
+  //       }
+  //     } catch (err) {
+  //       setCollectionMCInitialLoading(false);
+  //       setCollectionMCError(true);
+  //     }
+  //   }
 
-    fetchMultipleChoices();
-  }, []);
+  //   fetchMultipleChoices();
+  // }, []);
 
   // Top Crowdfunding
   // useEffect(() => {
@@ -326,47 +331,17 @@ const Home: NextPage<IHome> = ({
         </>
       )}
 
-      {!user.loggedIn && (
-        <>
-          {/* MC posts */}
-          <PostTypeSection
-            headingPosition='right'
-            title={t('tutorial.mc.title')}
-            caption={t('tutorial.mc.caption')}
-            iconSrc={
-              theme.name === 'light'
-                ? assets.creation.lightMcAnimated
-                : assets.creation.darkMcAnimated
-            }
-            openPostModal={handleOpenPostModal}
-            posts={collectionMC.slice(0, 3)}
-            loading={collectionMCInitialLoading}
-          />
-
-          {/* AC posts */}
-          <PostTypeSection
-            headingPosition='left'
-            title={t('tutorial.ac.title')}
-            caption={t('tutorial.ac.caption')}
-            iconSrc={
-              theme.name === 'light'
-                ? assets.creation.lightAcAnimated
-                : assets.creation.darkAcAnimated
-            }
-            openPostModal={handleOpenPostModal}
-            posts={collectionAC.slice(0, 3)}
-            loading={collectionACInitialLoading}
-          />
-        </>
-      )}
-
       {user.loggedIn && (
         <>
-          <SHeadline>Explore</SHeadline>
-          <SSubtitle variant='subtitle'>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin fames
-            nulla dignissim tellus purus. Faucibus ornare.
-          </SSubtitle>
+          {user.userData?.options?.isCreator && (
+            <>
+              <SHeadline>Explore</SHeadline>
+              <SSubtitle variant='subtitle'>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
+                fames nulla dignissim tellus purus. Faucibus ornare.
+              </SSubtitle>
+            </>
+          )}
           {/* For you */}
           {!collectionFYError &&
           (collectionFYInitialLoading || collectionFY?.length > 0) ? (
@@ -381,6 +356,38 @@ const Home: NextPage<IHome> = ({
         </>
       )}
 
+      {/* MC posts */}
+      <PostTypeSection
+        headingPosition='right'
+        title={t('tutorial.mc.title')}
+        caption={t('tutorial.mc.caption')}
+        iconSrc={
+          theme.name === 'light'
+            ? assets.creation.lightMcAnimated
+            : assets.creation.darkMcAnimated
+        }
+        openPostModal={handleOpenPostModal}
+        posts={staticSuperpolls}
+        isStatic
+        // loading={collectionMCInitialLoading}
+      />
+
+      {/* AC posts */}
+      <PostTypeSection
+        headingPosition='left'
+        title={t('tutorial.ac.title')}
+        caption={t('tutorial.ac.caption')}
+        iconSrc={
+          theme.name === 'light'
+            ? assets.creation.lightAcAnimated
+            : assets.creation.darkAcAnimated
+        }
+        openPostModal={handleOpenPostModal}
+        posts={staticBids}
+        isStatic
+        // loading={collectionACInitialLoading}
+      />
+
       {/* Greatest of all time posts */}
       {!collectionBiggestError &&
       (collectionBiggestInitialLoading || collectionBiggest?.length > 0) ? (
@@ -393,7 +400,7 @@ const Home: NextPage<IHome> = ({
         />
       ) : null}
 
-      <FaqSection />
+      {(!user.loggedIn || !user.userData?.options?.isCreator) && <FaqSection />}
 
       {!user.userData?.options?.isCreator && <BecomeCreatorSection />}
 
@@ -459,6 +466,48 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'page-Chat',
   ]);
 
+  const staticSuperpolls = [
+    {
+      username: '☀️Sunny Claire',
+      title: 'We give up...help pick our daughter’s name 🐣',
+      totalAmount: 102558,
+      postType: 'ac',
+    },
+    {
+      username: 'julieberns',
+      title: 'Should I quit my job and move to Paris to find 💗?',
+      totalAmount: 44173,
+      postType: 'ac',
+    },
+    {
+      username: 'GTmarkis',
+      title: 'Getting my first sports car... YOU CHOOSE IT. I BUY IT!',
+      totalAmount: 23425,
+      postType: 'ac',
+    },
+  ];
+
+  const staticBids = [
+    {
+      username: 'ambervz',
+      title: 'Need ideas on how to breakup w/ my cheating bf',
+      totalAmount: 3812,
+      postType: 'mc',
+    },
+    {
+      username: 'Jenna B⚡️',
+      title: 'I want a new tat! Tell me where to put it👀',
+      totalAmount: 4261,
+      postType: 'mc',
+    },
+    {
+      username: 'superstacked+',
+      title: '😱What should I spend my $250K on???',
+      totalAmount: 12482,
+      postType: 'mc',
+    },
+  ];
+
   // const top10payload = new newnewapi.EmptyRequest({});
 
   // const resTop10 = await fetchCuratedPosts(top10payload);
@@ -496,6 +545,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       //     }
       //   : {}),
       assumeLoggedIn,
+      staticSuperpolls,
+      staticBids,
       ...translationContext,
     },
   };

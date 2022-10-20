@@ -4,6 +4,8 @@ import { newnewapi } from 'newnew-api';
 
 import Headline from '../../atoms/Headline';
 import PostCard from '../../molecules/PostCard';
+import StaticPostCard from '../../molecules/home/StaticPostCard';
+import type { TStaticPost } from '../../molecules/home/StaticPostCard';
 import Text from '../../atoms/Text';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 
@@ -12,12 +14,13 @@ import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 
 interface IPostTypeSectionProps {
-  posts: newnewapi.Post[];
+  posts: newnewapi.Post[] | TStaticPost[];
   title: string;
   caption: string;
   iconSrc: string;
   headingPosition: 'right' | 'left';
   loading?: boolean;
+  isStatic?: boolean;
   openPostModal: (post: newnewapi.Post) => void;
 }
 
@@ -28,6 +31,7 @@ const PostTypeSection = ({
   iconSrc,
   headingPosition,
   loading,
+  isStatic,
   openPostModal,
 }: IPostTypeSectionProps) => {
   const { postOverlayOpen } = usePostModalState();
@@ -59,6 +63,16 @@ const PostTypeSection = ({
     );
   };
 
+  const renderStaticPosts = (post: TStaticPost, index: number) => (
+    <SItemWrapper index={index}>
+      <StaticPostCard
+        staticPost={post}
+        width={isDesktop ? '204px' : '100%'}
+        maxWidthTablet='100%'
+      />
+    </SItemWrapper>
+  );
+
   return (
     <SContainer headingPosition={headingPosition}>
       <SHeading>
@@ -71,7 +85,13 @@ const PostTypeSection = ({
         </SCaption>
       </SHeading>
       {!loading && (
-        <SPosts>{posts.map((post, index) => renderPosts(post, index))}</SPosts>
+        <SPosts>
+          {posts.map((post, index) =>
+            isStatic
+              ? renderStaticPosts(post as TStaticPost, index)
+              : renderPosts(post as newnewapi.Post, index)
+          )}
+        </SPosts>
       )}
       {loading && <SCardSkeletonSection count={isMobile ? 1 : 3} />}
     </SContainer>
