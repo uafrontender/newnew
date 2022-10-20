@@ -509,7 +509,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             )}
             <RightSideButtons>
               {!isMobile && (
-                <SSeeBundleButton user={user} creatorsBundle={creatorsBundle} />
+                <SSeeBundleButton user={user} creatorBundle={creatorsBundle} />
               )}
               <SIconButton
                 active={ellipseMenuOpen}
@@ -627,7 +627,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             {isMobile && (
               <SMobileSeeBundleButton
                 user={user}
-                creatorsBundle={creatorsBundle}
+                creatorBundle={creatorsBundle}
               />
             )}
           </SUserData>

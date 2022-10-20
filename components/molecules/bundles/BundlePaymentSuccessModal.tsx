@@ -92,10 +92,11 @@ export default BundlePaymentSuccessModal;
 
 const SModalPaper = styled(ModalPaper)`
   width: 100%;
-  padding: 32px;
+  padding: 24px;
   margin: 16px;
 
   ${({ theme }) => theme.media.tablet} {
+    padding: 32px;
     max-width: 500px;
   }
 `;

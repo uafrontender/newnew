@@ -19,7 +19,12 @@ const TicketSet: React.FC<ITicketSet> = ({
 }) => {
   const theme = useTheme();
   return (
-    <SContainer className={className} size={size}>
+    <SContainer
+      className={className}
+      numberOFTickets={numberOFTickets}
+      size={size}
+      shift={shift}
+    >
       {Array.from('x'.repeat(numberOFTickets)).map((v, index) => (
         <SIcon
           key={index}
@@ -35,9 +40,14 @@ const TicketSet: React.FC<ITicketSet> = ({
 
 export default TicketSet;
 
-const SContainer = styled.div<{ size: number }>`
+const SContainer = styled.div<{
+  numberOFTickets: number;
+  size: number;
+  shift: number;
+}>`
   height: ${({ size }) => `${size}px`};
-  width: 100%;
+  width: ${({ numberOFTickets, size, shift }) =>
+    `${size + shift * (numberOFTickets - 1)}px`};
   position: relative;
   display: flex;
   flex-direction: row;

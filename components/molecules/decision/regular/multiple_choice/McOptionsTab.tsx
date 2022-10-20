@@ -50,6 +50,7 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import BuyBundleModal from '../../../bundles/BuyBundleModal';
 import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 import HighlightedButton from '../../../../atoms/bundles/HighlightedButton';
+import TicketSet from '../../../../atoms/bundles/TicketSet';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -485,20 +486,23 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </SActionSection>
           )}
         {post.creator?.options?.isOfferingBundles && (
-          <SBundlesContainer>
+          <SBundlesContainer highlighted={bundle?.votesLeft === 0}>
+            {bundle?.votesLeft === 0 && (
+              <STicketSet numberOFTickets={2} size={36} shift={11} />
+            )}
             <SBundlesText>
               {t('mcPost.optionsTab.actionSection.offersBundles', {
                 creator: postCreatorName,
               })}
             </SBundlesText>
-            <HighlightedButton
+            <SHighlightedButton
               size='small'
               onClick={() => {
                 setBuyBundleModalOpen(true);
               }}
             >
               {t('mcPost.optionsTab.actionSection.viewBundles')}
-            </HighlightedButton>
+            </SHighlightedButton>
           </SBundlesContainer>
         )}
         {user.userTutorialsProgress.remainingMcSteps && (
@@ -833,7 +837,7 @@ const STutorialTooltipTextAreaHolder = styled.div`
   }
 `;
 
-const SBundlesContainer = styled.div`
+const SBundlesContainer = styled.div<{ highlighted: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -842,7 +846,10 @@ const SBundlesContainer = styled.div`
   border-radius: 16px;
   border-width: 1px;
   border-style: solid;
-  border-color: ${(props) => props.theme.colorsThemed.tag.color.primary};
+  border-color: ${({ theme, highlighted }) =>
+    highlighted
+      ? theme.colorsThemed.accent.yellow
+      : theme.colorsThemed.tag.color.primary};
   margin-top: 32px;
 
   ${({ theme }) => theme.media.tablet} {
@@ -855,6 +862,10 @@ const SBundlesContainer = styled.div`
   }
 `;
 
+const STicketSet = styled(TicketSet)`
+  margin-right: 8px;
+`;
+
 const SBundlesText = styled.p`
   flex-grow: 1;
   color: ${(props) => props.theme.colorsThemed.text.primary};
@@ -863,6 +874,7 @@ const SBundlesText = styled.p`
   font-size: 16px;
   line-height: 24px;
   margin-bottom: 16px;
+  margin-right: 8px;
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 0px;
@@ -871,4 +883,8 @@ const SBundlesText = styled.p`
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+`;
+
+const SHighlightedButton = styled(HighlightedButton)`
+  width: auto;
 `;

@@ -90,7 +90,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
         }),
         bundle: new newnewapi.Bundle({
           accessExpiresAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-          votesLeft: 4,
+          votesLeft: 0,
         }),
       }),
       new newnewapi.CreatorBundle({

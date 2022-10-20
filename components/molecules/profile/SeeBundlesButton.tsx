@@ -11,13 +11,13 @@ import CreatorsBundleModal from '../bundles/CreatorsBundleModal';
 interface ISeeBundlesButton {
   className?: string;
   user: newnewapi.IUser;
-  creatorsBundle?: newnewapi.ICreatorBundle;
+  creatorBundle?: newnewapi.ICreatorBundle;
 }
 
 const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
   className,
   user,
-  creatorsBundle,
+  creatorBundle,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
@@ -26,14 +26,14 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
 
   if (
     !user.options?.isCreator ||
-    (!user.options.isOfferingBundles && !creatorsBundle)
+    (!user.options.isOfferingBundles && !creatorBundle)
   ) {
     return null;
   }
 
   return (
     <>
-      {creatorsBundle ? (
+      {creatorBundle ? (
         <SButton
           className={className}
           onClick={() => {
@@ -44,7 +44,7 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
             src={theme.name === 'light' ? VoteIconLight.src : VoteIconDark.src}
           />
           {t('profileLayout.buttons.votesLeft', {
-            amount: creatorsBundle?.bundle?.votesLeft,
+            amount: creatorBundle?.bundle?.votesLeft,
           })}
         </SButton>
       ) : (
@@ -59,10 +59,10 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
         </SButton>
       )}
 
-      {creatorsBundle && (
+      {creatorBundle && (
         <CreatorsBundleModal
           show={creatorsBundleModalOpen}
-          creatorBundle={creatorsBundle}
+          creatorBundle={creatorBundle}
           onBuyMore={() => {
             setBuyBundleModalOpen(true);
           }}

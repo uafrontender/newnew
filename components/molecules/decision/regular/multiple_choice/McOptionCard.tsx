@@ -679,7 +679,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           />
         ) : null}
         {/* Use Bundle votes vote modal */}
-        {bundleVotesLeft && (
+        {bundleVotesLeft ? (
           <UseBundleVotesModal
             isVisible={bundleVotesModalOpen}
             bundleVotesLeft={bundleVotesLeft}
@@ -687,7 +687,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             handleVoteWithBundleVotes={handleVoteWithBundleVotes}
             onClose={() => setBundleVotesModalOpen(false)}
           />
-        )}
+        ) : null}
         {/* Payment Modal */}
         {paymentModalOpen ? (
           <PaymentModal
