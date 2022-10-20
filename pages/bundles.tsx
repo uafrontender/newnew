@@ -243,6 +243,9 @@ const Container = styled.div`
   flex-direction: column;
   align-items: flex-start;
   padding-top: 4px;
+  background: url(${assets.bundles.votesBackgroundSmall});
+  background-size: contain;
+  background-repeat: no-repeat;
 
   ${({ theme }) => theme.media.tablet} {
     padding-top: 4px;

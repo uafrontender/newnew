@@ -31,7 +31,7 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
 
     return (
       <>
-        <Modal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
+        <SModal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
           <SModalPaper onClose={onClose}>
             <Content>
               <BundleIcon src={assets.common.vote} alt='votes' />
@@ -82,13 +82,19 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
               </SDoneButton>
             </Content>
           </SModalPaper>
-        </Modal>
+        </SModal>
       </>
     );
   }
 );
 
 export default BundlePaymentSuccessModal;
+
+const SModal = styled(Modal)`
+  background: url(${assets.bundles.votesBackground});
+  background-size: cover;
+  background-repeat: no-repeat;
+`;
 
 const SModalPaper = styled(ModalPaper)`
   width: 100%;

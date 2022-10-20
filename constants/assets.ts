@@ -149,6 +149,10 @@ const assets = {
     medium: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-Medium.otf`,
     semiBold: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-SemiBold.otf`,
   },
+  bundles: {
+    votesBackground: `${APP_ASSETS_ORIGIN}/bundles/votes-background.png`,
+    votesBackgroundSmall: `${APP_ASSETS_ORIGIN}/bundles/votes-background-small.png`,
+  },
 };
 
 export default assets;

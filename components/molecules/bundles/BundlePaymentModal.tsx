@@ -200,7 +200,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* TODO: Add success modal */}
-      {paymentSuccessModalOpen && (
+      {(paymentSuccessModalOpen || true) && (
         <BundlePaymentSuccessModal
           show
           zIndex={13}
