@@ -1,28 +1,25 @@
-/* eslint-disable react/no-array-index-key */
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 import React from 'react';
-import styled, { useTheme } from 'styled-components';
-import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
-import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
+import styled from 'styled-components';
 import BulletLine from './BulletLine';
 import { formatNumber } from '../../../utils/format';
+import TicketSet from '../../atoms/bundles/TicketSet';
 
-interface IOfferCard {
+interface IBundleOfferCard {
   className?: string;
   bundleLevel: number;
   bundleOffer: newnewapi.IBundleOffer;
   onClick: () => void;
 }
 
-const OfferCard: React.FC<IOfferCard> = ({
+const BundleOfferCard: React.FC<IBundleOfferCard> = ({
   className,
   bundleLevel,
   bundleOffer,
   onClick,
 }) => {
   const { t } = useTranslation('common');
-  const theme = useTheme();
   const daysOfAccess = bundleOffer.accessDurationInSeconds! / 60 / 60 / 24;
   const monthsOfAccess = Math.floor(daysOfAccess / 30);
 
@@ -30,15 +27,7 @@ const OfferCard: React.FC<IOfferCard> = ({
 
   return (
     <SBundleContainer className={className}>
-      <BundleIconLine>
-        {Array.from('x'.repeat(bundleLevel + 1)).map((v, index) => (
-          <BundleLevelIcon
-            key={index}
-            src={theme.name === 'light' ? VoteIconLight.src : VoteIconDark.src}
-            index={index}
-          />
-        ))}
-      </BundleIconLine>
+      <STicketSet numberOFTickets={bundleLevel + 1} size={36} shift={11} />
       <SVotesNumber>
         <Trans
           t={t}
@@ -69,7 +58,7 @@ const OfferCard: React.FC<IOfferCard> = ({
   );
 };
 
-export default OfferCard;
+export default BundleOfferCard;
 
 const SBundleContainer = styled.div`
   display: flex;
@@ -82,22 +71,8 @@ const SBundleContainer = styled.div`
   overflow: hidden;
 `;
 
-const BundleIconLine = styled.div`
-  height: 36px;
-  width: 36px;
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  width: 100%;
+const STicketSet = styled(TicketSet)`
   margin-bottom: 16px;
-  overflow: hidden;
-`;
-
-const BundleLevelIcon = styled.img<{ index: number }>`
-  width: 36px;
-  height: 36px;
-  position: absolute;
-  left: ${({ index }) => `${11 * index}px`};
 `;
 
 const SVotesNumber = styled.p`

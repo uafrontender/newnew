@@ -8,7 +8,7 @@ import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
 import UserAvatar from '../UserAvatar';
-import OfferCard from './OfferCard';
+import BundleOfferCard from './BunldeOfferCard';
 import { useAppSelector } from '../../../redux-store/store';
 import BundlePaymentModal from './BundlePaymentModal';
 
@@ -76,7 +76,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
               <SUsername>{creator.username}</SUsername>
               <SOfferedBundleList>
                 {OFFERED_BUNDLES.map((bundle, index) => (
-                  <SOfferCard
+                  <SBundleOfferCard
                     key={bundle.bundleUuid}
                     bundleLevel={index}
                     bundleOffer={bundle}
@@ -171,7 +171,7 @@ const SOfferedBundleList = styled.div`
   }
 `;
 
-const SOfferCard = styled(OfferCard)`
+const SBundleOfferCard = styled(BundleOfferCard)`
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
