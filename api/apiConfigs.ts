@@ -103,7 +103,8 @@ export async function fetchProtobuf<
         ...headers,
       },
       mode,
-      credentials,
+      // credentials,
+      credentials: 'include',
       ...(encoded ? { body: encoded } : {}),
       ...(signal ? { signal } : {}),
     })
