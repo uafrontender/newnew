@@ -44,7 +44,7 @@
     "lottie-web": "5.9.4",
     "mixpanel-browser": "^2.45.0",
     "moment": "2.29.1",
-    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#0da2d1daed1d9b7bc02f06292f9ae7b869fa2e9a",
+    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#7dc0a476ac7d381ecec1c15a3eedf0c0e5634bf9",
     "next": "12.1.6",
     "next-i18next": "10.0.1",
     "next-redux-wrapper": "7.0.5",
