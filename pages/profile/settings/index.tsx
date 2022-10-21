@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable react/jsx-no-target-blank */
 import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
@@ -289,17 +290,18 @@ const MyProfileSettingsIndex = () => {
       try {
         const users: newnewapi.User[] = [];
 
-        usersIBlockedIds.forEach(async (uuid) => {
+        for (const uuid of usersIBlockedIds) {
           const payload = new newnewapi.GetUserRequest({
             uuid,
           });
 
+          // eslint-disable-next-line no-await-in-loop
           const res = await getUserByUsername(payload);
 
           if (res.data) {
             users.push(res.data);
           }
-        });
+        }
 
         setBlockedUsers(() => users);
       } catch (err) {
