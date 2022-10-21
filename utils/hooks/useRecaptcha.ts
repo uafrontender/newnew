@@ -47,9 +47,10 @@ const useRecaptcha = (
         return { isPassed: true };
       }
 
+      console.error(`Recaptcha v2 failed. Status: ${res.status}`);
       return { isPassed: false };
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error(`Recaptcha v2 failed. ${err?.message}`);
       return { isPassed: false };
     }
   }, []);
@@ -79,6 +80,12 @@ const useRecaptcha = (
         return { isPassed: true, score: jsonRes?.score };
       }
 
+      console.error(
+        `Recaptcha v3 failed. score:${jsonRes.score}, error codes: ${jsonRes[
+          'error-codes'
+        ]?.toString()}`
+      );
+
       return {
         isPassed: false,
         // eslint-disable-next-line no-nested-ternary
@@ -89,7 +96,7 @@ const useRecaptcha = (
           : 'ReCaptcha failed',
       };
     } catch (err: any) {
-      console.error(err);
+      console.error(`Recaptcha v3 failed. ${err?.message}`);
 
       return {
         isPassed: false,
