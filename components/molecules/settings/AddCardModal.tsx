@@ -265,6 +265,9 @@ AddCardModal.defaultProps = {};
 
 const SModalPaper = styled(ModalPaper)`
   min-height: 200px;
+  & > div {
+    overflow-x: hidden;
+  }
 `;
 
 const SRecaptchaWrapper = styled.div`
