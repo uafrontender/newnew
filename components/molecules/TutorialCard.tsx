@@ -60,7 +60,7 @@ const SWrapper = styled.div`
   flex-direction: column;
   align-items: center;
 
-  padding: 10px;
+  padding: 10px 10px 70px;
 
   border: 1.5px solid;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -79,14 +79,15 @@ const SWrapper = styled.div`
   ${({ theme }) => theme.media.tablet} {
     height: 100%;
     max-height: 434px;
-    max-width: 200px;
+    max-width: 224px;
+    width: 224px;
+    padding: 10px;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: 100%;
 
     max-height: 468px;
-    max-width: 224px;
   }
 `;
 
@@ -96,7 +97,8 @@ interface ISImageBG {
 
 const SImageBG = styled.div<ISImageBG>`
   width: 100%;
-  height: 60%;
+  height: 466px;
+
   position: relative;
 
   padding: 48px;
@@ -110,7 +112,12 @@ const SImageBG = styled.div<ISImageBG>`
   background: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   ${({ theme }) => theme.media.tablet} {
+    height: 72%;
     padding: 16px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    height: 60%;
   }
 `;
 
@@ -137,11 +144,25 @@ const SImageHolder = styled.div`
 `;
 
 const SHeadline = styled(Headline)`
-  margin-top: 36px;
+  margin-top: 16px;
+  margin-bottom: 8px;
   text-align: center;
 
-  ${({ theme }) => theme.media.tablet} {
-    margin-top: 10px;
+  &&& {
+    font-size: 24px;
+    line-height: 32px;
+
+    ${({ theme }) => theme.media.tablet} {
+      margin-top: 24px;
+
+      font-size: 20px;
+      line-height: 28px;
+    }
+
+    ${({ theme }) => theme.media.laptop} {
+      font-size: 24px;
+      line-height: 32px;
+    }
   }
 `;
 
@@ -156,9 +177,15 @@ const SBottomContent = styled(Text)`
 
   ${(props) => props.theme.media.tablet} {
     width: 180px;
+
+    font-size: 14px;
+    line-height: 20px;
   }
 
   ${(props) => props.theme.media.laptop} {
     width: 204px;
+
+    font-size: 16px;
+    line-height: 24px;
   }
 `;

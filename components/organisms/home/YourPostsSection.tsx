@@ -30,8 +30,6 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
     string | undefined | null
   >();
 
-  console.log(statusFilter, 'statusFilter');
-
   const fetchCreatorPosts = useCallback(async () => {
     try {
       const payload = new newnewapi.GetRelatedToMePostsRequest({
@@ -46,9 +44,6 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
       });
 
       const postsResponse = await getMyPosts(payload);
-
-      console.log(payload, 'payload');
-      console.log(postsResponse, 'postsResponse');
 
       if (postsResponse.data && postsResponse.data.posts) {
         setPosts((curr) => [
@@ -98,7 +93,12 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
     setPosts([]);
   };
 
-  if (isPostsRequested.current && posts.length === 0 && !statusFilter) {
+  if (
+    isPostsRequested.current &&
+    posts.length === 0 &&
+    !statusFilter &&
+    !isLoading
+  ) {
     return (
       <SCreateFirstContainer>
         <SHeadline>Post your first Bid or Superpoll</SHeadline>
@@ -157,7 +157,7 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
   );
 };
 
-const SContainer = styled.div`
+const SContainer = styled.section`
   position: relative;
 
   ${(props) => props.theme.media.laptopM} {
@@ -167,11 +167,15 @@ const SContainer = styled.div`
 `;
 
 const SCardsSection = styled(CardsSection)`
-  margin-bottom: 80px;
+  margin-bottom: 40px;
   padding: 0;
 
   & > div > div > div > div {
     border-color: ${({ theme }) => theme.colorsThemed.accent.blue};
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 80px;
   }
 `;
 
@@ -183,10 +187,12 @@ const SCreateFirstContainer = styled.div`
   border: 2px solid ${({ theme }) => theme.colorsThemed.accent.blue};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   height: 198px;
-  margin-bottom: 80px;
+  margin-bottom: 40px;
 
   ${({ theme }) => theme.media.tablet} {
     height: 280px;
+
+    margin-bottom: 80px;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -227,8 +233,15 @@ const SHeadline = styled(Headline)`
 
 const SFilterContainer = styled.div`
   display: flex;
-  position: absolute;
-  top: -10px;
+
+  margin-bottom: 8px;
+
+  ${({ theme }) => theme.media.tablet} {
+    position: absolute;
+    top: -10px;
+
+    margin-bottom: 0;
+  }
 `;
 
 export default YourPostsSection;

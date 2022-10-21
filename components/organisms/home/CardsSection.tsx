@@ -398,7 +398,7 @@ interface ISWrapper {
   padding?: 'small' | 'large';
 }
 
-const SWrapper = styled.div<ISWrapper>`
+const SWrapper = styled.section<ISWrapper>`
   padding: 20px 0;
 
   /* No select */
@@ -474,6 +474,14 @@ const SItemWrapper = styled.div<ISItemWrapper>`
 
     & > div > div:first-child {
       padding: 60% 0px;
+    }
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin: 0 8px;
+
+    & > div > div:first-child {
+      padding: 70% 0px;
     }
   }
 

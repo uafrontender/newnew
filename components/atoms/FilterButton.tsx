@@ -51,7 +51,7 @@ const STab = styled(Button)<ISButton>`
         background: ${({ theme }) =>
           props.filterView === 'primary'
             ? theme.colorsThemed.text.primary
-            : theme.colorsThemed.button.background.primary} !important;
+            : theme.colorsThemed.button.background.primaryGrad} !important;
       `;
     }
 

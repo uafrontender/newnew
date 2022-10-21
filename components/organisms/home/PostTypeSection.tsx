@@ -112,7 +112,7 @@ const SContainer = styled.section<{
     padding: ${({ padding }) => (padding === 'small' ? '40px 0' : '60px 0')};
   }
 
-  ${({ theme }) => theme.media.laptopM} {
+  ${({ theme }) => theme.media.laptopL} {
     margin: 0 auto;
     max-width: 1248px;
 
@@ -145,7 +145,7 @@ const SHeading = styled.div`
     margin-bottom: 40px;
   }
 
-  ${({ theme }) => theme.media.laptopM} {
+  ${({ theme }) => theme.media.laptopL} {
     align-items: flex-start;
     align-self: unset;
     margin-top: 28px;
@@ -182,7 +182,7 @@ const SHeadline = styled(Headline)`
   font-size: 36px;
   line-height: 44px;
 
-  ${({ theme }) => theme.media.laptopM} {
+  ${({ theme }) => theme.media.laptopL} {
     margin-bottom: 24px;
     font-size: 80px;
     line-height: 86px;
@@ -197,7 +197,7 @@ const SCaption = styled(Text)`
   line-height: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-  ${({ theme }) => theme.media.laptopM} {
+  ${({ theme }) => theme.media.laptopL} {
     padding: 0;
     text-align: left;
     font-size: 16px;
@@ -219,7 +219,7 @@ const SPosts = styled.div`
     gap: 32px;
   }
 
-  ${(props) => props.theme.media.laptopM} {
+  ${(props) => props.theme.media.laptopL} {
     flex-direction: row;
     height: 482px;
   }
@@ -241,7 +241,7 @@ const SItemWrapper = styled.div<{ index: number }>`
     }
   }
 
-  ${(props) => props.theme.media.laptopM} {
+  ${(props) => props.theme.media.laptopL} {
     transform: ${({ index }) => (index !== 1 ? `translateY(25%)` : 0)};
     height: 386px;
 
@@ -254,10 +254,6 @@ const SItemWrapper = styled.div<{ index: number }>`
         theme.name === 'dark'
           ? theme.colorsThemed.background.backgroundDD
           : theme.colorsThemed.background.outlines1};
-    }
-
-    & > div > div:first-child {
-      padding: 60% 0px;
     }
   }
 `;
@@ -298,7 +294,7 @@ const SCardSkeletonSection = styled(CardSkeletonSection)`
       }
     }
 
-    ${({ theme }) => theme.media.laptopM} {
+    ${({ theme }) => theme.media.laptopL} {
       height: 482px;
       width: auto;
 

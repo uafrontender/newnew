@@ -466,28 +466,55 @@ const SCardsSection = styled(CardsSection)`
 
 const SHeading = styled.div`
   margin-top: 40px;
-  margin-bottom: 8px;
+  margin-bottom: 20px;
 
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
     margin-left: auto;
     margin-right: auto;
   }
+
+  ${(props) => props.theme.media.tablet} {
+    margin-bottom: 34px;
+
+    & + section {
+      padding-top: 0;
+    }
+  }
 `;
 
 const SHeadline = styled(Headline)`
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 
-  font-size: 52px;
-  line-height: 40px;
+  font-size: 36px;
+  line-height: 44px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 24px;
+
+    font-size: 40px;
+    line-height: 48px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-bottom: 24px;
+
+    font-size: 52px;
+    line-height: 40px;
+  }
 `;
 
 const SSubtitle = styled(Text)`
   max-width: 570px;
 
-  font-size: 16px;
+  font-size: 14px;
   line-height: 24px;
   font-weight: 600;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 24px;
+  }
 `;
 
 const STutorialCard = styled(TutorialCard)`
