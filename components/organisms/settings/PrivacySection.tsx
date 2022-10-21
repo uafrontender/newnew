@@ -9,6 +9,8 @@ import Text from '../../atoms/Text';
 import Toggle from '../../atoms/Toggle';
 import Button from '../../atoms/Button';
 import ConfirmDeleteAccountModal from '../../molecules/settings/ConfirmDeleteAccountModal';
+import InlineSvg from '../../atoms/InlineSVG';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 type TPrivacySection = {
   isSpendingHidden: boolean;
@@ -83,15 +85,26 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
           </Text>
         )}
         {blockedUsers &&
-          blockedUsers.map((u) => (
-            <SBlockedUserCard key={u.uuid}>
+          blockedUsers.map((user) => (
+            <SBlockedUserCard key={user.uuid}>
               <SAvatar>
-                <img alt={u.username} src={u.avatarUrl} />
+                <img alt={user.username} src={user.avatarUrl} />
               </SAvatar>
-              <SNickname variant={3}>{u.nickname}</SNickname>
-              <SUsername variant={2}>{u.username}</SUsername>
+              <SNickname variant={3}>
+                {user.nickname}
+                {user.options?.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                    fill='none'
+                  />
+                )}
+              </SNickname>
+
+              <SUsername variant={2}>{user.username}</SUsername>
               <SUnblockButton
-                onClick={() => handleUnblockUser(u.uuid)}
+                onClick={() => handleUnblockUser(user.uuid)}
                 view='secondary'
               >
                 {t('Settings.sections.privacy.blockedUsers.button.unblock')}
@@ -198,7 +211,14 @@ const SAvatar = styled.div`
 `;
 
 const SNickname = styled(Text)`
+  display: flex;
   grid-area: nickname;
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  min-width: 24px;
+  min-height: 24px;
+  margin-left: 6px;
 `;
 
 const SUsername = styled(Caption)`
