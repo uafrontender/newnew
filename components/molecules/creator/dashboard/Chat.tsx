@@ -24,6 +24,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 
 import sendIcon from '../../../../public/images/svg/icons/filled/Send.svg';
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { ChannelsContext } from '../../../../contexts/channelsContext';
 import {
@@ -434,6 +435,14 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
               {chatRoom?.visavis?.nickname
                 ? chatRoom?.visavis?.nickname
                 : chatRoom?.visavis?.username}
+              {chatRoom?.visavis?.options?.isVerified && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                  fill='none'
+                />
+              )}
             </SUserNickName>
             <Link href={`/${chatRoom?.visavis?.username}`}>
               <a>
@@ -553,6 +562,8 @@ const SUserDescription = styled.div`
 `;
 
 const SUserNickName = styled(Text)`
+  display: flex;
+  align-items: center;
   margin-bottom: 2px;
 `;
 
