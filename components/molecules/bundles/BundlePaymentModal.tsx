@@ -12,6 +12,7 @@ import { formatNumber } from '../../../utils/format';
 import getCustomerPaymentFee from '../../../utils/getCustomerPaymentFee';
 import getDisplayname from '../../../utils/getDisplayname';
 import useStripeSetupIntent from '../../../utils/hooks/useStripeSetupIntent';
+import { Mixpanel } from '../../../utils/mixpanel';
 import Text from '../../atoms/Text';
 import PaymentModal from '../checkout/PaymentModal';
 import LoadingModal from '../LoadingModal';
@@ -72,12 +73,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         return;
       }
 
-      // TODO: add reporting
-      /* Mixpanel.track('PayWithCard', {
-        _stage: 'Post',
-        _postUuid: postId,
-        _component: 'McOptionCard',
-      }); */
+      Mixpanel.track('Buy bundle click');
 
       try {
         const stripeContributionRequest =
@@ -200,7 +196,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* TODO: Add success modal */}
-      {(paymentSuccessModalOpen || true) && (
+      {paymentSuccessModalOpen && (
         <BundlePaymentSuccessModal
           show
           zIndex={13}

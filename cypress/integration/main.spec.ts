@@ -237,9 +237,15 @@ context('Main flow', () => {
           crowdfundingId = chunks[chunks.length - 1];
         });
     });*/
+
+    it('can enable bundles', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/dashboard`);
+
+      // Enable bundles
+    });
   });
 
-  describe('Guest', () => {
+  describe('Guest willing to buy a vote', () => {
     const USER_EMAIL = `test-user-${testSeed}0@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
@@ -306,7 +312,7 @@ context('Main flow', () => {
       cy.contains(`${BID_OPTION_AMOUNT}`);
     });
 
-    it('can enter the another post page and contribute to a superpoll', () => {
+    it('can enter another post page and contribute to a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
       cy.url().should('include', '/post');
 
@@ -324,8 +330,67 @@ context('Main flow', () => {
     });
   });
 
-  describe('User', () => {
+  describe('Guest willing to buy a bundle', () => {
     const USER_EMAIL = `test-user-${testSeed}1@newnew.co`;
+    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_EXPIRY = '1226';
+    const USER_CARD_CVC = '123';
+    const USER_CARD_POSTAL_CODE = '90210';
+
+    // Ignore tutorials
+    const defaultStorage = {
+      userTutorialsProgress:
+        '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
+    };
+    const storage = createStorage(defaultStorage);
+
+    before(() => {
+      cy.clearCookies();
+      cy.clearLocalStorage();
+    });
+
+    beforeEach(() => {
+      storage.restore();
+      Cypress.Cookies.preserveOnce('accessToken');
+      Cypress.Cookies.preserveOnce('refreshToken');
+      cy.visit(Cypress.env('NEXT_PUBLIC_APP_URL'));
+    });
+
+    afterEach(() => {
+      storage.save();
+    });
+
+    it('can enter the post page, buy a bundle and contribute to a superpoll without prior authentication', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
+      cy.url().should('include', '/post');
+
+      // Buy a bundle
+
+      /* cy.get('#email-input').type(USER_EMAIL);
+      enterCardInfo(
+        USER_CARD_NUMBER,
+        USER_CARD_EXPIRY,
+        USER_CARD_CVC,
+        USER_CARD_POSTAL_CODE
+      ); */
+
+      /* cy.get('#paymentSuccess', {
+        timeout: 15000,
+      }).click(); */
+
+      // cy.get('#support-button-0').click();
+      // Click pay with bundle
+
+      // cy.get('#support-button-supported').click();
+    });
+
+    it('can enter another post page and contribute to an event', () => {
+      // Check that card is added just fine
+    });
+  });
+
+  describe('User willing to buy a vote', () => {
+    const USER_EMAIL = `test-user-${testSeed}2@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
@@ -400,7 +465,7 @@ context('Main flow', () => {
       cy.contains(`${BID_OPTION_AMOUNT}`);
     });
 
-    it('can enter the another post page and contribute to a superpoll', () => {
+    it('can enter another post page and contribute to a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
       cy.url().should('include', '/post');
 
@@ -418,8 +483,20 @@ context('Main flow', () => {
     });
   });
 
-  describe('User with card added in settings', () => {
-    const USER_EMAIL = `test-user-${testSeed}2@newnew.co`;
+  describe('User willing to buy a bundle', () => {
+    const USER_EMAIL = `test-user-${testSeed}3@newnew.co`;
+    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_EXPIRY = '1226';
+    const USER_CARD_CVC = '123';
+    const USER_CARD_POSTAL_CODE = '90210';
+
+    // Can buy and use a bundle
+    // Can access chat
+    // Can add a custom option
+  });
+
+  describe('User willing to add card first', () => {
+    const USER_EMAIL = `test-user-${testSeed}4@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
@@ -503,5 +580,8 @@ context('Main flow', () => {
 
       cy.get('#support-button-supported').click();
     });
+
+    // Can buy a bundle with the same card
+    // Can spend votes from bundle
   });
 });
