@@ -328,7 +328,7 @@ const Home: NextPage<IHome> = ({
       {user.userData?.options?.isCreator && (
         <>
           <SHeading style={{ marginBottom: '48px' }}>
-            <SHeadline>Your posts</SHeadline>
+            <SHeadline>{t('section.your')}</SHeadline>
           </SHeading>
           <YourPostsSection onPostOpen={handleOpenPostModal} />
         </>
@@ -338,11 +338,11 @@ const Home: NextPage<IHome> = ({
         <>
           {user.userData?.options?.isCreator && (
             <SHeading>
-              <SHeadline>Explore</SHeadline>
-              <SSubtitle variant='subtitle'>
+              <SHeadline>{t('section.explore')}</SHeadline>
+              {/* <SSubtitle variant='subtitle'>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
                 fames nulla dignissim tellus purus. Faucibus ornare.
-              </SSubtitle>
+              </SSubtitle> */}
             </SHeading>
           )}
           {/* For you */}
@@ -350,7 +350,7 @@ const Home: NextPage<IHome> = ({
           (collectionFYInitialLoading || collectionFY?.length > 0) ? (
             <CardsSection
               title={t('cardsSection.title.for-you')}
-              category='biggest'
+              category='for-you'
               collection={collectionFY}
               loading={collectionFYInitialLoading}
               handlePostClicked={handleOpenPostModal}
@@ -362,8 +362,8 @@ const Home: NextPage<IHome> = ({
                         ? assets.common.darkAnimatedLogo
                         : assets.common.lightAnimatedLogo
                     }
-                    title={t('cardsSection.title.for-you')}
-                    caption='This section will display posts recommended to you.'
+                    title={t('tutorial.for-you.title')}
+                    caption={t('tutorial.for-you.caption')}
                   />
                 ) : undefined
               }
@@ -424,8 +424,8 @@ const Home: NextPage<IHome> = ({
                     ? assets.common.darkAnimatedLogo
                     : assets.common.lightAnimatedLogo
                 }
-                title={t('cardsSection.title.biggest')}
-                caption='This section will display the greatest of all time posts.'
+                title={t('tutorial.biggest.title')}
+                caption={t('tutorial.biggest.caption')}
               />
             ) : undefined
           }
@@ -475,7 +475,7 @@ const SHeading = styled.div`
   }
 
   ${(props) => props.theme.media.tablet} {
-    margin-bottom: 34px;
+    margin-bottom: 48px;
 
     & + section {
       padding-top: 0;

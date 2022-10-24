@@ -16,7 +16,8 @@ interface IYourPostsSection {
 }
 
 const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
-  const { t } = useTranslation('common');
+  const { t: tCommon } = useTranslation('common');
+  const { t } = useTranslation('page-Home');
 
   const [posts, setPosts] = useState<newnewapi.Post[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,42 +31,53 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
     string | undefined | null
   >();
 
-  const fetchCreatorPosts = useCallback(async () => {
-    try {
-      const payload = new newnewapi.GetRelatedToMePostsRequest({
-        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
-        statusFilter,
-        paging: {
-          ...(nextPageToken ? { pageToken: nextPageToken } : {}),
-        },
-        ...(statusFilter
-          ? {}
-          : { sorting: newnewapi.PostSorting.ACTIVE_FIRST }),
-      });
+  const fetchCreatorPosts = useCallback(
+    async (abortController?: AbortController) => {
+      try {
+        const payload = new newnewapi.GetRelatedToMePostsRequest({
+          relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
+          statusFilter,
+          paging: {
+            ...(nextPageToken ? { pageToken: nextPageToken } : {}),
+          },
+          ...(statusFilter
+            ? {}
+            : { sorting: newnewapi.PostSorting.ACTIVE_FIRST }),
+        });
 
-      const postsResponse = await getMyPosts(payload);
+        const postsResponse = await getMyPosts(
+          payload,
+          abortController?.signal
+        );
 
-      if (postsResponse.data && postsResponse.data.posts) {
-        setPosts((curr) => [
-          ...(nextPageToken ? curr : []),
-          ...(postsResponse.data?.posts as newnewapi.Post[]),
-        ]);
-        setNextPageToken(postsResponse.data.paging?.nextPageToken);
-      } else {
-        throw new Error('Request failed');
+        if (postsResponse.data && postsResponse.data.posts) {
+          setPosts((curr) => [
+            ...(nextPageToken ? curr : []),
+            ...(postsResponse.data?.posts as newnewapi.Post[]),
+          ]);
+          setNextPageToken(postsResponse.data.paging?.nextPageToken);
+        } else {
+          throw new Error('Request failed');
+        }
+      } catch (err: any) {
+        console.error(err);
+        setIsError(err.message);
+      } finally {
+        isPostsRequested.current = true;
       }
-    } catch (err: any) {
-      console.error(err);
-      setIsError(err.message);
-    } finally {
-      isPostsRequested.current = true;
-    }
-  }, [statusFilter, nextPageToken]);
+    },
+    [statusFilter, nextPageToken]
+  );
 
   const initialFetch = useCallback(async () => {
+    const abortController = new AbortController();
     setIsLoading(true);
-    await fetchCreatorPosts();
+    await fetchCreatorPosts(abortController);
     setIsLoading(false);
+
+    return () => {
+      abortController.abort();
+    };
   }, [fetchCreatorPosts]);
 
   useEffect(() => {
@@ -101,10 +113,10 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
   ) {
     return (
       <SCreateFirstContainer>
-        <SHeadline>Post your first Bid or Superpoll</SHeadline>
+        <SHeadline>{t('createFirstPost.title')}</SHeadline>
         <Link href='/creation'>
           <a>
-            <Button>{t('button.createDecision')}</Button>
+            <Button>{tCommon('button.createDecision')}</Button>
           </a>
         </Link>
       </SCreateFirstContainer>
@@ -126,7 +138,7 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
           }
           view='secondary'
         >
-          Active
+          {t('createFirstPost.filter.active')}
         </FilterButton>
         <FilterButton
           active={
@@ -140,7 +152,7 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
           }
           view='secondary'
         >
-          Ended
+          {t('createFirstPost.filter.ended')}
         </FilterButton>
       </SFilterContainer>
       {!isError && (

@@ -333,7 +333,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             {!loading ? (
               collectionToRender?.map(renderItem)
             ) : (
-              <CardSkeletonSection count={!isMobile ? 5 : 1} />
+              <SCardSkeletonSection count={!isMobile ? 5 : 1} />
             )}
             {(!loading && collection?.length === 0) || !collection ? (
               <SItemWrapper
@@ -459,6 +459,29 @@ const SListWrapper = styled.div`
     left: -16px;
     width: calc(100% + 32px);
     padding: 32px 0 0 0;
+  }
+`;
+
+const SCardSkeletonSection = styled(CardSkeletonSection)`
+  &&& {
+    & > span {
+      gap: 16px;
+
+      ${({ theme }) => theme.media.laptop} {
+        gap: 32px;
+      }
+    }
+  }
+
+  & > span > div {
+    ${({ theme }) => theme.media.tablet} {
+      height: 410px;
+      width: 214px;
+    }
+
+    /* ${({ theme }) => theme.media.mobileL} {
+      width: 224px;
+    } */
   }
 `;
 

@@ -17,6 +17,10 @@
       "creatorOnTheRise": "冉冉上升"
     }
   },
+  "section_NEED_TRANSLATION": {
+    "your": "Your posts",
+    "explore": "Explore"
+  },
   "tutorial": {
     "ac": {
       "title": "Bids",
@@ -29,6 +33,14 @@
     "cf": {
       "title": "Goals",
       "caption": "與其他人集資，支持你喜歡的創作者的Goal。如果支持這個Goal的人足夠多，你就會看著創作者照做。"
+    },
+    "for-you": {
+      "title": "為你而設",
+      "caption_NEED_TRANSLATION": "This section will display posts recommended to you."
+    },
+    "biggest": {
+      "title": "史上最棒",
+      "caption_NEED_TRANSLATION": "This section will display the greatest of all time posts."
     }
   },
   "faq_NEED_TRANSLATION": {
@@ -63,5 +75,12 @@
   },
   "becomeCreator_NEED_TRANSLATION": {
     "title": "Ready to create?"
+  },
+  "createFirstPost_NEED_TRANSLATION": {
+    "title": "Post your first Bid or Superpoll",
+    "filter": {
+      "active": "Active",
+      "ended": "Ended"
+    }
   }
 }

@@ -17,6 +17,10 @@
       "creatorOnTheRise": "En ascenso"
     }
   },
+  "section_NEED_TRANSLATION": {
+    "your": "Your posts",
+    "explore": "Explore"
+  },
   "tutorial": {
     "ac": {
       "title": "Bids",
@@ -29,6 +33,14 @@
     "cf": {
       "title": "Goals",
       "caption": "Reúne dinero con otros para respaldar los objetivos de tus creadores favoritos. Si un número suficiente de personas respalda el Goal, verás cómo el creador lo realiza."
+    },
+    "for-you": {
+      "title": "Para ti",
+      "caption_NEED_TRANSLATION": "This section will display posts recommended to you."
+    },
+    "biggest": {
+      "title": "Lo mejor de todos los tiempos",
+      "caption_NEED_TRANSLATION": "This section will display the greatest of all time posts."
     }
   },
   "faq_NEED_TRANSLATION": {
@@ -63,5 +75,12 @@
   },
   "becomeCreator_NEED_TRANSLATION": {
     "title": "Ready to create?"
+  },
+  "createFirstPost_NEED_TRANSLATION": {
+    "title": "Post your first Bid or Superpoll",
+    "filter": {
+      "active": "Active",
+      "ended": "Ended"
+    }
   }
 }

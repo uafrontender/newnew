@@ -17,6 +17,10 @@
       "creatorOnTheRise": "On the Rise"
     }
   },
+  "section": {
+    "your": "Your posts",
+    "explore": "Explore"
+  },
   "tutorial": {
     "ac": {
       "title": "Bids",
@@ -29,6 +33,14 @@
     "cf": {
       "title": "Goals",
       "caption": "Pool money with others to back the goals made by your favorite creators. If enough people back the goal, you'll watch the creator do it."
+    },
+    "for-you": {
+      "title": "For you",
+      "caption": "This section will display posts recommended to you."
+    },
+    "biggest": {
+      "title": "Greatest of All Time",
+      "caption": "This section will display the greatest of all time posts."
     }
   },
   "faq": {
@@ -63,5 +75,12 @@
   },
   "becomeCreator": {
     "title": "Ready to create?"
+  },
+  "createFirstPost": {
+    "title": "Post your first Bid or Superpoll",
+    "filter": {
+      "active": "Active",
+      "ended": "Ended"
+    }
   }
 }
