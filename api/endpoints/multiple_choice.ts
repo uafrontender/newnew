@@ -85,7 +85,7 @@ export const voteOnPost = (
     signal ?? undefined
   );
 
-export const doFreeVote = (
+export const addNewOption = (
   payload: newnewapi.VoteOnPostRequest,
   signal?: RequestInit['signal']
 ) =>

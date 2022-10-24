@@ -23,7 +23,7 @@ import {
 import { validateText } from '../../../../../api/endpoints/infrastructure';
 // import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
 import {
-  doFreeVote,
+  addNewOption,
   voteWithBundleVotes,
 } from '../../../../../api/endpoints/multiple_choice';
 
@@ -184,7 +184,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     [setNewOptionText, validateTextViaAPIDebounced]
   );
 
-  const handleVoteForFree = useCallback(async () => {
+  const handleAddNewOption = useCallback(async () => {
     setUseFreeVoteModalOpen(false);
     setLoadingModalOpen(true);
     Mixpanel.track('Vote For Free', {
@@ -199,7 +199,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         postUuid: post.postUuid,
       });
 
-      const res = await doFreeVote(payload);
+      const res = await addNewOption(payload);
 
       if (
         !res.data ||
@@ -212,7 +212,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       const optionFromResponse = (res.data
         .option as newnewapi.MultipleChoice.Option)!!;
       optionFromResponse.isSupportedByMe = true;
-      // optionFromResponse.isCreatedBySubscriber = true;
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
       setNewOptionText('');
       setSuggestNewMobileOpen(false);
@@ -570,7 +569,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {/* Use Free vote modal */}
       <McConfirmUseFreeVoteModal
         isVisible={useFreeVoteModalOpen}
-        handleMakeFreeVote={handleVoteForFree}
+        handleMakeFreeVote={handleAddNewOption}
         closeModal={() => setUseFreeVoteModalOpen(false)}
       />
       {/* Use bundle vote modal */}
