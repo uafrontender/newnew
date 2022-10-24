@@ -18,7 +18,7 @@ import Text from '../components/atoms/Text';
 import { useAppSelector } from '../redux-store/store';
 import {
   fetchPostByUUID,
-  fetchForYouPosts,
+  // fetchForYouPosts,
   fetchCuratedPosts,
   fetchBiggestPosts,
 } from '../api/endpoints/post';
@@ -167,41 +167,41 @@ const Home: NextPage<IHome> = ({
 
   // Fetch top posts of various types
   // FY posts
-  useEffect(() => {
-    async function fetchFYPosts() {
-      try {
-        setCollectionFYInitialLoading(true);
+  // useEffect(() => {
+  //   async function fetchFYPosts() {
+  //     try {
+  //       setCollectionFYInitialLoading(true);
 
-        const fyPayload = new newnewapi.PagedRequest({
-          paging: {
-            limit: 10,
-          },
-        });
+  //       const fyPayload = new newnewapi.PagedRequest({
+  //         paging: {
+  //           limit: 10,
+  //         },
+  //       });
 
-        const resFY = await fetchForYouPosts(fyPayload);
+  //       const resFY = await fetchForYouPosts(fyPayload);
 
-        if (resFY) {
-          setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
-          setCollectionFYInitialLoading(false);
-        } else {
-          throw new Error('Request failed');
-        }
-      } catch (err) {
-        setCollectionFYInitialLoading(false);
-        setCollectionFYError(true);
-      }
-    }
+  //       if (resFY) {
+  //         setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
+  //         setCollectionFYInitialLoading(false);
+  //       } else {
+  //         throw new Error('Request failed');
+  //       }
+  //     } catch (err) {
+  //       setCollectionFYInitialLoading(false);
+  //       setCollectionFYError(true);
+  //     }
+  //   }
 
-    if (user.loggedIn) {
-      fetchFYPosts();
-    }
+  //   if (user.loggedIn) {
+  //     fetchFYPosts();
+  //   }
 
-    return () => {
-      setPostModalOpen(false);
-      setDisplayedPost(undefined);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //   return () => {
+  //     setPostModalOpen(false);
+  //     setDisplayedPost(undefined);
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   // Live Auctions posts
   // useEffect(() => {
