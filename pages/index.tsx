@@ -6,27 +6,27 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import { useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
+import FaqSection from '../components/organisms/home/FaqSection';
+import PostTypeSection from '../components/organisms/home/PostTypeSection';
+import BecomeCreatorSection from '../components/organisms/home/BecomeCreatorSection';
+
 import { useAppSelector } from '../redux-store/store';
 import {
-  fetchForYouPosts,
+  fetchPostByUUID,
+  // fetchForYouPosts,
   fetchCuratedPosts,
   fetchBiggestPosts,
-  fetchFeaturedCreatorPosts,
 } from '../api/endpoints/post';
 import { fetchLiveAuctions } from '../api/endpoints/auction';
 // import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
-
 import switchPostType from '../utils/switchPostType';
 import assets from '../constants/assets';
 
-const TopSection = dynamic(
-  () => import('../components/organisms/home/TopSection')
-);
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
 );
@@ -50,24 +50,24 @@ const Home: NextPage<IHome> = ({ top10posts, assumeLoggedIn }) => {
 
   // Posts
   // Top section/Curated posts
-  const [topSectionCollection, setTopSectionCollection] = useState<
-    newnewapi.Post[]
-  >((top10posts?.posts as newnewapi.Post[]) ?? []);
+  // const [topSectionCollection, setTopSectionCollection] = useState<
+  //   newnewapi.Post[]
+  // >((top10posts?.posts as newnewapi.Post[]) ?? []);
   // For you - authenticated users only
-  const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
-  const [collectionFYInitialLoading, setCollectionFYInitialLoading] =
-    useState(false);
-  const [collectionFYError, setCollectionFYError] = useState(false);
+  // const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
+  // const [collectionFYInitialLoading, setCollectionFYInitialLoading] =
+  // useState(false);
+  // const [collectionFYError, setCollectionFYError] = useState(false);
   // Auctions
   const [collectionAC, setCollectionAC] = useState<newnewapi.Post[]>([]);
   const [collectionACInitialLoading, setCollectionACInitialLoading] =
     useState(true);
-  const [collectionACError, setCollectionACError] = useState(false);
+  const [, setCollectionACError] = useState(false);
   // Multiple choice
   const [collectionMC, setCollectionMC] = useState<newnewapi.Post[]>([]);
   const [collectionMCInitialLoading, setCollectionMCInitialLoading] =
     useState(true);
-  const [collectionMCError, setCollectionMCError] = useState(false);
+  const [, setCollectionMCError] = useState(false);
   // Crowdfunding
   // const [collectionCF, setCollectionCF] = useState<newnewapi.Post[]>([]);
   // const [collectionCFInitialLoading, setCollectionCFInitialLoading] =
@@ -80,48 +80,44 @@ const Home: NextPage<IHome> = ({ top10posts, assumeLoggedIn }) => {
   const [collectionBiggestInitialLoading, setCollectionBiggestInitialLoading] =
     useState(false);
   const [collectionBiggestError, setCollectionBiggestError] = useState(false);
-  // Creator on the rise
-  const [collectionCreator, setCollectionCreator] = useState<newnewapi.Post[]>(
-    []
-  );
-  const [collectionCreatorInitialLoading, setCollectionCreatorInitialLoading] =
-    useState(false);
-  const [collectionCreatorError, setCollectionCreatorError] = useState(false);
 
   // Fetch top posts of various types
   // FY posts
-  useEffect(() => {
-    async function fetchFYPosts() {
-      try {
-        setCollectionFYInitialLoading(true);
+  // useEffect(() => {
+  //   async function fetchFYPosts() {
+  //     try {
+  //       setCollectionFYInitialLoading(true);
 
-        const fyPayload = new newnewapi.PagedRequest({
-          paging: {
-            limit: 10,
-          },
-        });
+  //       const fyPayload = new newnewapi.PagedRequest({
+  //         paging: {
+  //           limit: 10,
+  //         },
+  //       });
 
-        const resFY = await fetchForYouPosts(fyPayload);
+  //       const resFY = await fetchForYouPosts(fyPayload);
 
-        if (resFY) {
-          setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
-          setCollectionFYInitialLoading(false);
-        } else {
-          throw new Error('Request failed');
-        }
-      } catch (err) {
-        setCollectionFYInitialLoading(false);
-        setCollectionFYError(true);
-      }
-    }
+  //       if (resFY) {
+  //         setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
+  //         setCollectionFYInitialLoading(false);
+  //       } else {
+  //         throw new Error('Request failed');
+  //       }
+  //     } catch (err) {
+  //       setCollectionFYInitialLoading(false);
+  //       setCollectionFYError(true);
+  //     }
+  //   }
 
-    if (user.loggedIn) {
-      fetchFYPosts();
-    }
+  //   if (user.loggedIn) {
+  //     fetchFYPosts();
+  //   }
 
-    return () => {};
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //   return () => {
+  //     setPostModalOpen(false);
+  //     setDisplayedPost(undefined);
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   // Live Auctions posts
   useEffect(() => {
@@ -234,34 +230,6 @@ const Home: NextPage<IHome> = ({ top10posts, assumeLoggedIn }) => {
     fetchBiggest();
   }, []);
 
-  // Creator on the rise
-  useEffect(() => {
-    async function fetchCreatorOnRise() {
-      try {
-        setCollectionCreatorInitialLoading(true);
-        const creatorOnRisePayload = new newnewapi.EmptyRequest({});
-
-        const resCreatorOnRisePayload = await fetchFeaturedCreatorPosts(
-          creatorOnRisePayload
-        );
-
-        if (resCreatorOnRisePayload) {
-          setCollectionCreator(
-            () => resCreatorOnRisePayload.data?.posts as newnewapi.Post[]
-          );
-          setCollectionCreatorInitialLoading(false);
-        } else {
-          throw new Error('Request failed');
-        }
-      } catch (err) {
-        setCollectionCreatorInitialLoading(false);
-        setCollectionCreatorError(true);
-      }
-    }
-
-    fetchCreatorOnRise();
-  }, []);
-
   return (
     <>
       <Head>
@@ -271,127 +239,50 @@ const Home: NextPage<IHome> = ({ top10posts, assumeLoggedIn }) => {
         <meta property='og:description' content={t('meta.description')} />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      {(!user.loggedIn || !assumeLoggedIn) && <HeroSection />}
-      {topSectionCollection?.length > 0 && (
-        <TopSection collection={topSectionCollection} />
-      )}
-      {user.loggedIn &&
-        !collectionFYError &&
-        (collectionFYInitialLoading || collectionFY?.length > 0) && (
-          <CardsSection
-            title={t('cardsSection.title.for-you')}
-            category='for-you'
-            collection={collectionFY}
-            loading={collectionFYInitialLoading}
-          />
-        )}
-      {!collectionMCError && (
-        <CardsSection
-          title={t('cardsSection.title.mc')}
-          category='mc'
-          collection={collectionMC}
-          loading={collectionMCInitialLoading}
-          tutorialCard={
-            !collectionMCInitialLoading &&
-            (!user.loggedIn ||
-              !assumeLoggedIn ||
-              collectionMC?.length === 0) ? (
-              <TutorialCard
-                image={
-                  theme.name === 'light'
-                    ? assets.creation.lightMcAnimated
-                    : assets.creation.darkMcAnimated
-                }
-                title={t('tutorial.mc.title')}
-                caption={t('tutorial.mc.caption')}
-              />
-            ) : undefined
-          }
-        />
-      )}
-      {!collectionACError && (
-        <CardsSection
-          title={t('cardsSection.title.ac')}
-          category='ac'
-          collection={collectionAC}
-          loading={collectionACInitialLoading}
-          tutorialCard={
-            !collectionACInitialLoading &&
-            (!user.loggedIn ||
-              !assumeLoggedIn ||
-              collectionAC?.length === 0) ? (
-              <TutorialCard
-                image={
-                  theme.name === 'light'
-                    ? assets.creation.lightAcAnimated
-                    : assets.creation.darkAcAnimated
-                }
-                title={t('tutorial.ac.title')}
-                caption={t('tutorial.ac.caption')}
-                imageStyle={{
-                  position: 'relative',
-                  left: '10%',
-                  bottom: '6px',
-                }}
-              />
-            ) : undefined
-          }
-        />
-      )}
-      {/* !collectionCFError && (
-        <CardsSection
-          title={t('cardsSection.title.cf')}
-          category='cf'
-          collection={collectionCF}
-          loading={collectionCFInitialLoading}
-          handlePostClicked={handleOpenPostModal}
-          tutorialCard={
-            !collectionCFInitialLoading &&
-            (!user.loggedIn ||
-              !assumeLoggedIn ||
-              collectionCF?.length === 0) ? (
-              <TutorialCard
-                image={
-                  theme.name === 'light'
-                    ? assets.creation.lightCfAnimated
-                    : assets.creation.darkCfAnimated
-                }
-                title={t('tutorial.cf.title')}
-                caption={t('tutorial.cf.caption')}
-                imageStyle={{
-                  position: 'relative',
-                  left: '5%',
-                }}
-              />
-            ) : undefined
-          }
-        />
-        ) */}
+      <HeroSection />
+
+      {/* MC posts */}
+      <PostTypeSection
+        headingPosition='right'
+        title={t('tutorial.mc.title')}
+        caption={t('tutorial.mc.caption')}
+        iconSrc={
+          theme.name === 'light'
+            ? assets.creation.lightMcAnimated
+            : assets.creation.darkMcAnimated
+        }
+        posts={collectionMC.slice(0, 3)}
+        loading={collectionMCInitialLoading}
+      />
+
+      {/* AC posts */}
+      <PostTypeSection
+        headingPosition='left'
+        title={t('tutorial.ac.title')}
+        caption={t('tutorial.ac.caption')}
+        iconSrc={
+          theme.name === 'light'
+            ? assets.creation.lightAcAnimated
+            : assets.creation.darkAcAnimated
+        }
+        posts={collectionAC.slice(0, 3)}
+        loading={collectionACInitialLoading}
+      />
+
+      {/* Greatest of all time posts */}
       {!collectionBiggestError &&
-      collectionBiggestInitialLoading &&
-      collectionBiggest?.length > 0 ? (
-        <CardsSection
+      (collectionBiggestInitialLoading || collectionBiggest?.length > 0) ? (
+        <SCardsSection
           title={t('cardsSection.title.biggest')}
           category='biggest'
           collection={collectionBiggest}
           loading={collectionBiggestInitialLoading}
         />
       ) : null}
-      {!collectionCreatorInitialLoading && collectionCreator?.length > 0 ? (
-        <CardsSection
-          user={{
-            avatarUrl:
-              switchPostType(collectionCreator[0])[0].creator?.avatarUrl ?? '',
-            username: switchPostType(collectionCreator[0])[0].creator
-              ?.username!!,
-          }}
-          type='creator'
-          category={`/${
-            switchPostType(collectionCreator[0])[0].creator?.username as string
-          }`}
-          collection={collectionCreator}
-        />
-      ) : null}
+
+      <FaqSection />
+
+      {!user.userData?.options?.isCreator && <BecomeCreatorSection />}
     </>
   );
 };
@@ -399,6 +290,12 @@ const Home: NextPage<IHome> = ({ top10posts, assumeLoggedIn }) => {
 (Home as NextPageWithLayout).getLayout = (page: ReactElement) => (
   <HomeLayout>{page}</HomeLayout>
 );
+
+const SCardsSection = styled(CardsSection)`
+  ${({ theme }) => theme.media.laptop} {
+    margin-top: 12px;
+  }
+`;
 
 export default Home;
 
