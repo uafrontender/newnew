@@ -93,7 +93,7 @@ const FaqSection = () => {
           // @ts-ignore
           components={[
             <SLink
-              href='https://intercom.help/newnew-e1a1ca1980f5/en'
+              href='https://intercom.help/NewNewHelpCenter/en'
               target='_blank'
             />,
           ]}
