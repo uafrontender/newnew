@@ -174,6 +174,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         _stage: 'Post',
         _postUuid: post.postUuid,
         _component: 'CfPledgeLevelsModal',
+        _paymentMethod: cardUuid ? 'Primary card' : 'New card',
       });
 
       try {

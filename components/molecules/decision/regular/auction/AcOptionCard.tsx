@@ -299,6 +299,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         _stage: 'Post',
         _postUuid: postId,
         _component: 'AcOptionsCard',
+        _paymentMethod: cardUuid ? 'Primary card' : 'New card',
       });
 
       try {
