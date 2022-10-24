@@ -30,6 +30,7 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
   const [usersBlockedMe, setUsersBlockedMe] = useState<string[]>([]);
   const [usersIBlocked, setUsersIBlocked] = useState<string[]>([]);
   const [usersBlockedLoading, setUsersBlockedLoading] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { removeSubscriber } = useGetSubscriptions();
 
   const blockUser = (uuid: string) => {
