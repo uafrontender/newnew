@@ -38,12 +38,10 @@ const getSmsNotificationSubscriptionErrorMessage = (
 
 interface ISmsNotificationsButton {
   subscription: SubscriptionToCreator;
-  isMobile?: boolean;
 }
 
 const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   subscription,
-  isMobile,
 }) => {
   const { t } = useTranslation('page-Profile');
   const theme = useTheme();
@@ -204,6 +202,10 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   ]);
 
   useEffect(() => {
+    if (!currentUser._persist?.rehydrated) {
+      return () => {};
+    }
+
     if (!currentUser.loggedIn) {
       const pollGuestSmsSubscriptionStatus = async () => {
         const guestId = getGuestId();
@@ -255,7 +257,13 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
     }
 
     return () => {};
-  }, [currentUser.loggedIn, subscription.userId, t, getGuestId]);
+  }, [
+    currentUser._persist?.rehydrated,
+    currentUser.loggedIn,
+    subscription.userId,
+    t,
+    getGuestId,
+  ]);
 
   useEffect(() => {
     const handleSubscribedToSms = async (data: any) => {
@@ -313,52 +321,50 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
 
   return (
     <>
-      {isMobile ? (
-        <SIconButton
-          active={subscribedToSmsNotifications}
-          onClick={handleSmsNotificationButtonClicked}
-        >
-          <InlineSvg
-            svg={
-              subscribedToSmsNotifications
-                ? NotificationsIconFilled
-                : NotificationsIconOutlined
-            }
-            fill={
-              subscribedToSmsNotifications
-                ? theme.colors.white
-                : theme.colorsThemed.text.primary
-            }
-            width='24px'
-            height='24px'
-          />
-        </SIconButton>
-      ) : (
-        <SIconButtonWithText
-          active={subscribedToSmsNotifications}
-          onClick={handleSmsNotificationButtonClicked}
-        >
-          <InlineSvg
-            svg={
-              subscribedToSmsNotifications
-                ? NotificationsIconFilled
-                : NotificationsIconOutlined
-            }
-            fill={
-              subscribedToSmsNotifications
-                ? theme.colors.white
-                : theme.colorsThemed.text.primary
-            }
-            width='24px'
-            height='24px'
-          />
-          {t(
+      <SMobileIconButton
+        active={subscribedToSmsNotifications}
+        onClick={handleSmsNotificationButtonClicked}
+      >
+        <InlineSvg
+          svg={
             subscribedToSmsNotifications
-              ? 'profileLayout.buttons.disableSmsNotifications'
-              : 'profileLayout.buttons.enableSmsNotifications'
-          )}
-        </SIconButtonWithText>
-      )}
+              ? NotificationsIconFilled
+              : NotificationsIconOutlined
+          }
+          fill={
+            subscribedToSmsNotifications
+              ? theme.colors.white
+              : theme.colorsThemed.text.primary
+          }
+          width='24px'
+          height='24px'
+        />
+      </SMobileIconButton>
+      {/* Tablet and Desktop */}
+      <SIconButtonWithText
+        active={subscribedToSmsNotifications}
+        onClick={handleSmsNotificationButtonClicked}
+      >
+        <InlineSvg
+          svg={
+            subscribedToSmsNotifications
+              ? NotificationsIconFilled
+              : NotificationsIconOutlined
+          }
+          fill={
+            subscribedToSmsNotifications
+              ? theme.colors.white
+              : theme.colorsThemed.text.primary
+          }
+          width='24px'
+          height='24px'
+        />
+        {t(
+          subscribedToSmsNotifications
+            ? 'profileLayout.buttons.disableSmsNotifications'
+            : 'profileLayout.buttons.enableSmsNotifications'
+        )}
+      </SIconButtonWithText>
       <SmsNotificationModal
         show={smsNotificationModalOpen}
         subscription={subscription}
@@ -395,10 +401,21 @@ const SIconButton = styled.div<{
   // TODO: add hover/active effects
 `;
 
+const SMobileIconButton = styled(SIconButton)`
+  ${({ theme }) => theme.media.tablet} {
+    display: none;
+  }
+`;
+
 const SIconButtonWithText = styled(SIconButton)`
   gap: 12px;
   padding: 12px 24px;
   font-weight: 700;
   font-size: 14px;
   line-height: 24px;
+  display: none;
+
+  ${({ theme }) => theme.media.tablet} {
+    display: flex;
+  }
 `;
