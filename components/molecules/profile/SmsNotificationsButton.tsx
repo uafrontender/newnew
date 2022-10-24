@@ -202,6 +202,10 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   ]);
 
   useEffect(() => {
+    if (!currentUser._persist?.rehydrated) {
+      return () => {};
+    }
+
     if (!currentUser.loggedIn) {
       const pollGuestSmsSubscriptionStatus = async () => {
         const guestId = getGuestId();
@@ -253,7 +257,13 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
     }
 
     return () => {};
-  }, [currentUser.loggedIn, subscription.userId, t, getGuestId]);
+  }, [
+    currentUser._persist?.rehydrated,
+    currentUser.loggedIn,
+    subscription.userId,
+    t,
+    getGuestId,
+  ]);
 
   useEffect(() => {
     const handleSubscribedToSms = async (data: any) => {
