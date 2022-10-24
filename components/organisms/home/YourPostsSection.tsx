@@ -69,21 +69,24 @@ const YourPostsSection = ({ onPostOpen }: IYourPostsSection) => {
     [statusFilter, nextPageToken]
   );
 
-  const initialFetch = useCallback(async () => {
+  const initialFetch = useCallback(
+    async (abortController: AbortController) => {
+      setIsLoading(true);
+      await fetchCreatorPosts(abortController);
+      setIsLoading(false);
+    },
+    [fetchCreatorPosts]
+  );
+
+  useEffect(() => {
     const abortController = new AbortController();
-    setIsLoading(true);
-    await fetchCreatorPosts(abortController);
-    setIsLoading(false);
+    if (posts.length === 0) {
+      initialFetch(abortController);
+    }
 
     return () => {
       abortController.abort();
     };
-  }, [fetchCreatorPosts]);
-
-  useEffect(() => {
-    if (posts.length === 0) {
-      initialFetch();
-    }
   }, [initialFetch, posts.length, nextPageToken]);
 
   const loadMorePosts = useCallback(() => {
