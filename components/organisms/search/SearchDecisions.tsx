@@ -12,14 +12,10 @@ import Button from '../../atoms/Button';
 import Sorting from '../Sorting';
 
 import { searchPosts } from '../../../api/endpoints/search';
-import isBrowser from '../../../utils/isBrowser';
-import switchPostType from '../../../utils/switchPostType';
-import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppSelector } from '../../../redux-store/store';
 import SortOption from '../../atoms/SortOption';
 
 const PostList = dynamic(() => import('./PostList'));
-const PostModal = dynamic(() => import('../decision'));
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
 
 interface ISearchDecisions {
@@ -95,32 +91,6 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-
-  // Display post
-  const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<
-    newnewapi.IPost | undefined
-  >();
-
-  const handleOpenPostModal = (post: newnewapi.IPost) => {
-    Mixpanel.track('Open Post Modal', {
-      _stage: 'Search Page',
-      _postUuid: switchPostType(post)[0].postUuid,
-    });
-    setDisplayedPost(post);
-    setPostModalOpen(true);
-  };
-  const handleClosePostModal = () => {
-    Mixpanel.track('Close Post Modal', {
-      _stage: 'Search Page',
-    });
-    setPostModalOpen(false);
-    setDisplayedPost(undefined);
-  };
-
-  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-  }, []);
 
   // Loading state
   const { ref: loadingRef, inView } = useInView();
@@ -208,15 +178,6 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
 
     [postSorting, query, type, initialLoad, activeTabs, hasNoResults]
   );
-
-  const handleRemovePostFromState = (postUuid: string) => {
-    setResultsPosts((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-  };
 
   useEffect(() => {
     setPostsRoomsNextPageToken(null);
@@ -371,28 +332,11 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
       )}
 
       <SCardsSection>
-        <PostList
-          loading={loadingPosts}
-          collection={resultsPosts}
-          handlePostClicked={handleOpenPostModal}
-        />
+        <PostList loading={loadingPosts} collection={resultsPosts} />
       </SCardsSection>
       {postsNextPageToken && !loadingPosts && (
         <SRef ref={loadingRef}>Loading...</SRef>
       )}
-      {displayedPost && postModalOpen && (
-        <PostModal
-          isOpen={postModalOpen}
-          post={displayedPost}
-          manualCurrLocation={isBrowser() ? window.location.href : ''}
-          handleClose={() => handleClosePostModal()}
-          handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemoveFromStateDeleted={() =>
-            handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
-          }
-        />
-      )}
-
       {hasNoResults && initialLoad && (
         <SNoResults>
           <NoResults />

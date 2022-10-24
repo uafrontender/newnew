@@ -28,11 +28,10 @@ const SCROLL_STEP = {
 
 interface ITopSection {
   collection: newnewapi.Post[];
-  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
 export const TopSection: React.FC<ITopSection> = React.memo(
-  ({ collection, handlePostClicked }) => {
+  ({ collection }) => {
     const router = useRouter();
     const { t } = useTranslation('common');
     const ref: any = useRef();

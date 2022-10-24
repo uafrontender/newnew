@@ -3,7 +3,6 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
-import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 
 import PostCard from '../../molecules/PostCard';
@@ -21,7 +20,6 @@ interface IList {
   loading: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
-  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
 export const PostList: React.FC<IList> = ({
@@ -29,7 +27,6 @@ export const PostList: React.FC<IList> = ({
   loading,
   skeletonsBgColor,
   skeletonsHighlightColor,
-  handlePostClicked,
 }) => {
   const router = useRouter();
   const { postOverlayOpen } = usePostModalState();

@@ -12,7 +12,6 @@ import { NextPageWithLayout } from '../_app';
 import { getUserByUsername } from '../../api/endpoints/user';
 import { fetchUsersPosts } from '../../api/endpoints/post';
 
-import PostModal from '../../components/organisms/decision';
 import PostList from '../../components/organisms/see-more/PostList';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import Text from '../../components/atoms/Text';
@@ -20,8 +19,6 @@ import InlineSvg from '../../components/atoms/InlineSVG';
 import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
-import switchPostType from '../../utils/switchPostType';
-import { Mixpanel } from '../../utils/mixpanel';
 
 interface IUserPageActivity {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -53,37 +50,10 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
 
-  // Display post
-  const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<
-    newnewapi.IPost | undefined
-  >();
-
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
   const [triedLoading, setTriedLoading] = useState(false);
-
-  const handleOpenPostModal = (post: newnewapi.IPost) => {
-    Mixpanel.track('Open Post Modal', {
-      _stage: 'Profile Page',
-      _postUuid: switchPostType(post)[0].postUuid,
-    });
-    setDisplayedPost(post);
-    setPostModalOpen(true);
-  };
-
-  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-  }, []);
-
-  const handleClosePostModal = () => {
-    Mixpanel.track('Close Post Modal', {
-      _stage: 'Profile Page',
-    });
-    setPostModalOpen(false);
-    setDisplayedPost(undefined);
-  };
 
   const loadPosts = useCallback(
     async (token?: string, needCount?: boolean) => {
@@ -189,7 +159,6 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
                 wrapperStyle={{
                   left: 0,
                 }}
-                handlePostClicked={handleOpenPostModal}
               />
             )}
             {posts && posts.length === 0 && !isLoading && (
@@ -202,14 +171,6 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
           </SCardsSection>
           <div ref={loadingRef} />
         </SMain>
-      )}
-      {displayedPost && (
-        <PostModal
-          isOpen={postModalOpen}
-          post={displayedPost}
-          handleClose={() => handleClosePostModal()}
-          handleOpenAnotherPost={handleSetDisplayedPost}
-        />
       )}
     </div>
   );

@@ -40,20 +40,10 @@ interface ICardSection {
   collection: newnewapi.Post[];
   loading?: boolean;
   tutorialCard?: ReactElement;
-  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
 export const CardsSection: React.FC<ICardSection> = React.memo(
-  ({
-    user,
-    type,
-    title,
-    category,
-    collection,
-    loading,
-    tutorialCard,
-    handlePostClicked,
-  }) => {
+  ({ user, type, title, category, collection, loading, tutorialCard }) => {
     const { t } = useTranslation('page-Home');
     const router = useRouter();
     const ref: any = useRef();

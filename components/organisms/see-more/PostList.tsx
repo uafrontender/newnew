@@ -3,7 +3,6 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
-import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
@@ -24,9 +23,6 @@ interface IList {
   wrapperStyle?: React.CSSProperties;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
-  handlePostClicked: (post: newnewapi.Post) => void;
-  handleRemovePostFromState?: (uuid: string) => void;
-  handleAddPostToState?: (post: newnewapi.Post) => void;
 }
 
 export const PostList: React.FC<IList> = ({
@@ -36,9 +32,6 @@ export const PostList: React.FC<IList> = ({
   wrapperStyle,
   skeletonsBgColor,
   skeletonsHighlightColor,
-  handlePostClicked,
-  handleRemovePostFromState,
-  handleAddPostToState,
 }) => {
   const { postOverlayOpen } = usePostModalState();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -64,12 +57,6 @@ export const PostList: React.FC<IList> = ({
           width='100%'
           height={isMobile ? '564px' : '336px'}
           shouldStop={postOverlayOpen}
-          handleRemovePostFromState={() =>
-            handleRemovePostFromState?.(switchPostType(item)[0].postUuid)
-          }
-          handleAddPostToState={() =>
-            handleAddPostToState?.(switchPostType(item)[0])
-          }
         />
       </SItemWrapper>
     );
@@ -119,7 +106,6 @@ PostList.defaultProps = {
   wrapperStyle: {},
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
-  handleRemovePostFromState: () => {},
 };
 
 export default PostList;

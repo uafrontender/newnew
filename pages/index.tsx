@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ReactElement, useCallback, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -13,7 +12,6 @@ import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
 import { useAppSelector } from '../redux-store/store';
 import {
-  fetchPostByUUID,
   fetchForYouPosts,
   fetchCuratedPosts,
   fetchBiggestPosts,
@@ -24,9 +22,7 @@ import { fetchLiveAuctions } from '../api/endpoints/auction';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 
 import switchPostType from '../utils/switchPostType';
-import isBrowser from '../utils/isBrowser';
 import assets from '../constants/assets';
-import { Mixpanel } from '../utils/mixpanel';
 
 const TopSection = dynamic(
   () => import('../components/organisms/home/TopSection')
@@ -37,23 +33,17 @@ const HeroSection = dynamic(
 const CardsSection = dynamic(
   () => import('../components/organisms/home/CardsSection')
 );
-const PostModal = dynamic(() => import('../components/organisms/decision'));
 const TutorialCard = dynamic(
   () => import('../components/molecules/TutorialCard')
 );
 
 interface IHome {
   top10posts: newnewapi.NonPagedPostsResponse;
-  postFromQuery?: newnewapi.Post;
   assumeLoggedIn?: boolean;
 }
 
 // No sense to memorize
-const Home: NextPage<IHome> = ({
-  top10posts,
-  postFromQuery,
-  assumeLoggedIn,
-}) => {
+const Home: NextPage<IHome> = ({ top10posts, assumeLoggedIn }) => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
@@ -98,82 +88,6 @@ const Home: NextPage<IHome> = ({
     useState(false);
   const [collectionCreatorError, setCollectionCreatorError] = useState(false);
 
-  // Display post
-  // const [postModalOpen, setPostModalOpen] = useState(!!postFromQuery);
-  const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<
-    newnewapi.IPost | undefined
-  >(postFromQuery ?? undefined);
-
-  const handleOpenPostModal = useCallback(
-    (post: newnewapi.IPost) => {
-      Mixpanel.track('Open Post Modal', {
-        _stage: 'Home Page',
-        _postUuid: switchPostType(post)[0].postUuid,
-      });
-      setDisplayedPost(post);
-      setPostModalOpen(true);
-    },
-    [setDisplayedPost, setPostModalOpen]
-  );
-
-  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-  }, []);
-
-  const handleClosePostModal = useCallback(() => {
-    Mixpanel.track('Close Post Modal', {
-      _stage: 'Home Page',
-    });
-    setPostModalOpen(false);
-    setDisplayedPost(undefined);
-  }, []);
-
-  const handleRemovePostFromState = (postUuid: string) => {
-    setTopSectionCollection((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-    setCollectionFY((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-    setCollectionAC((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-    setCollectionMC((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-    // setCollectionCF((curr) => {
-    //   const updated = curr.filter(
-    //     (post) => switchPostType(post)[0].postUuid !== postUuid
-    //   );
-    //   return updated;
-    // });
-    setCollectionBiggest((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-    setCollectionCreator((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-  };
-
   // Fetch top posts of various types
   // FY posts
   useEffect(() => {
@@ -205,10 +119,7 @@ const Home: NextPage<IHome> = ({
       fetchFYPosts();
     }
 
-    return () => {
-      setPostModalOpen(false);
-      setDisplayedPost(undefined);
-    };
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -362,10 +273,7 @@ const Home: NextPage<IHome> = ({
       </Head>
       {(!user.loggedIn || !assumeLoggedIn) && <HeroSection />}
       {topSectionCollection?.length > 0 && (
-        <TopSection
-          collection={topSectionCollection}
-          handlePostClicked={handleOpenPostModal}
-        />
+        <TopSection collection={topSectionCollection} />
       )}
       {user.loggedIn &&
         !collectionFYError &&
@@ -375,7 +283,6 @@ const Home: NextPage<IHome> = ({
             category='for-you'
             collection={collectionFY}
             loading={collectionFYInitialLoading}
-            handlePostClicked={handleOpenPostModal}
           />
         )}
       {!collectionMCError && (
@@ -384,7 +291,6 @@ const Home: NextPage<IHome> = ({
           category='mc'
           collection={collectionMC}
           loading={collectionMCInitialLoading}
-          handlePostClicked={handleOpenPostModal}
           tutorialCard={
             !collectionMCInitialLoading &&
             (!user.loggedIn ||
@@ -409,7 +315,6 @@ const Home: NextPage<IHome> = ({
           category='ac'
           collection={collectionAC}
           loading={collectionACInitialLoading}
-          handlePostClicked={handleOpenPostModal}
           tutorialCard={
             !collectionACInitialLoading &&
             (!user.loggedIn ||
@@ -470,7 +375,6 @@ const Home: NextPage<IHome> = ({
           category='biggest'
           collection={collectionBiggest}
           loading={collectionBiggestInitialLoading}
-          handlePostClicked={handleOpenPostModal}
         />
       ) : null}
       {!collectionCreatorInitialLoading && collectionCreator?.length > 0 ? (
@@ -486,21 +390,8 @@ const Home: NextPage<IHome> = ({
             switchPostType(collectionCreator[0])[0].creator?.username as string
           }`}
           collection={collectionCreator}
-          handlePostClicked={handleOpenPostModal}
         />
       ) : null}
-      {displayedPost && (
-        <PostModal
-          isOpen={postModalOpen}
-          post={displayedPost}
-          manualCurrLocation={isBrowser() ? window.location.pathname : ''}
-          handleClose={handleClosePostModal}
-          handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemoveFromStateDeleted={() =>
-            handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
-          }
-        />
-      )}
     </>
   );
 };
@@ -512,7 +403,6 @@ const Home: NextPage<IHome> = ({
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { post } = context.query;
   const { req } = context;
   const accessToken = req.cookies?.accessToken;
 
@@ -531,31 +421,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const top10payload = new newnewapi.EmptyRequest({});
 
   const resTop10 = await fetchCuratedPosts(top10payload);
-
-  if (post || !Array.isArray(post)) {
-    const getPostPayload = new newnewapi.GetPostRequest({
-      postUuid: post as string,
-    });
-
-    const res = await fetchPostByUUID(getPostPayload);
-
-    // NB! Need to tackle toJSON() method
-
-    if (res.data && !res.error) {
-      return {
-        props: {
-          ...(resTop10.data
-            ? {
-                top10posts: resTop10.data.toJSON(),
-              }
-            : {}),
-          postFromQuery: res.data.toJSON(),
-          assumeLoggedIn,
-          ...translationContext,
-        },
-      };
-    }
-  }
 
   return {
     props: {
