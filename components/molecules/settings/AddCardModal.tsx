@@ -108,10 +108,6 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
           terms: {
             card: 'never',
           },
-          wallets: {
-            googlePay: 'never',
-            applePay: 'never',
-          },
         }}
       />
       {isRecaptchaV2Required && (
@@ -265,9 +261,6 @@ AddCardModal.defaultProps = {};
 
 const SModalPaper = styled(ModalPaper)`
   min-height: 200px;
-  & > div {
-    overflow-x: hidden;
-  }
 `;
 
 const SRecaptchaWrapper = styled.div`

@@ -192,7 +192,6 @@ const CfPledgeLevelsSection: React.FunctionComponent<
         _stage: 'Post',
         _postUuid: post.postUuid,
         _component: 'CfPledgeLevelsSection',
-        _paymentMethod: cardUuid ? 'Primary card' : 'New card',
       });
 
       try {
