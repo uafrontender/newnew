@@ -131,7 +131,7 @@ export const CardSkeletonSection: React.FunctionComponent<
             : isTablet
             ? '200px'
             : isLaptop
-            ? '215px'
+            ? '224px'
             : isDesktop
             ? '15vw'
             : '13vw'

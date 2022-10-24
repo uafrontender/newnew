@@ -125,9 +125,6 @@ export default function switchPostStatus(
       case newnewapi.MultipleChoice.Status.DELETED_BY_CREATOR: {
         return 'deleted_by_creator';
       }
-      case newnewapi.MultipleChoice.Status.DELETED_BY_ADMIN: {
-        return 'deleted_by_admin';
-      }
       case newnewapi.MultipleChoice.Status.ANNOUNCE_FLAGGED: {
         return 'flagged';
       }

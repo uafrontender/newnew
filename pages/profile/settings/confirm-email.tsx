@@ -1,5 +1,11 @@
 /* eslint-disable camelcase */
-import React, { ReactElement, useEffect, useCallback, useState } from 'react';
+import React, {
+  ReactElement,
+  useEffect,
+  useCallback,
+  useState,
+  useRef,
+} from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
@@ -38,6 +44,7 @@ const ConfirmEmail: NextPage<IConfirmEmail> = ({ email_address, token }) => {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const isSubmitted = useRef(false);
 
   useUpdateEffect(() => {
     if (!loggedIn && _persist?.rehydrated) {
@@ -64,57 +71,49 @@ const ConfirmEmail: NextPage<IConfirmEmail> = ({ email_address, token }) => {
     router.prefetch('/profile/settings');
   }, [router]);
 
-  const handleConfirmMyEmail = useCallback(
-    async (controller: AbortController) => {
-      try {
-        setIsLoading(true);
+  const handleConfirmMyEmail = useCallback(async () => {
+    try {
+      setIsLoading(true);
 
-        const confirmMyEmailPayload = new newnewapi.ConfirmMyEmailRequest({
-          token: tokenValue as string,
-        });
+      const confirmMyEmailPayload = new newnewapi.ConfirmMyEmailRequest({
+        token: tokenValue as string,
+      });
 
-        const { data, error } = await confirmMyEmail(
-          confirmMyEmailPayload,
-          controller.signal
-        );
+      const { data, error } = await confirmMyEmail(confirmMyEmailPayload);
 
-        if (data?.status === newnewapi.ConfirmMyEmailResponse.Status.SUCCESS) {
-          router.replace(
-            '/profile/settings?editEmail=true&step=1',
-            '/profile/settings/edit-email'
-          );
-        }
-
-        if (
-          data?.status === newnewapi.ConfirmMyEmailResponse.Status.AUTH_FAILURE
-        ) {
-          setErrorMessage(tVerifyEmail('error.invalidCode'));
-          throw new Error('Invalid code');
-        }
-
-        if (error && (error as any)?.code !== 20) {
-          setErrorMessage(error?.message ?? 'Request failed');
-          throw new Error(error?.message ?? 'Request failed');
-        }
-      } catch (err: any) {
-        console.error(err);
-        setIsLoading(false);
+      if (
+        data?.status === newnewapi.ConfirmMyEmailResponse.Status.AUTH_FAILURE
+      ) {
+        setErrorMessage(tVerifyEmail('error.invalidCode'));
+        throw new Error('Invalid code');
       }
-    },
-    [tVerifyEmail, tokenValue, router]
-  );
+
+      if (
+        data?.status !== newnewapi.ConfirmMyEmailResponse.Status.SUCCESS ||
+        error
+      ) {
+        setErrorMessage(error?.message ?? 'Request failed');
+        throw new Error(error?.message ?? 'Request failed');
+      }
+
+      router.replace(
+        '/profile/settings?editEmail=true&step=1',
+        '/profile/settings/edit-email'
+      );
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      isSubmitted.current = true;
+      setIsLoading(false);
+    }
+  }, [tVerifyEmail, tokenValue, router]);
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    if (tokenValue && emailAddress) {
-      handleConfirmMyEmail(controller);
+    if (tokenValue && emailAddress && !isSubmitted.current && !isLoading) {
+      setIsLoading(true);
+      handleConfirmMyEmail();
     }
-
-    return () => {
-      controller.abort();
-    };
-  }, [tokenValue, emailAddress, handleConfirmMyEmail]);
+  }, [tokenValue, emailAddress, handleConfirmMyEmail, isSubmitted, isLoading]);
 
   if (!isBrowser()) {
     return <div />;

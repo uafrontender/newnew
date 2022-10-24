@@ -190,6 +190,10 @@ const SCard = styled.div<{
   background: ${({ background }) => `url(${background})`};
   background-repeat: no-repeat;
   background-size: cover;
+
+  ${({ theme }) => theme.media.mobileM} {
+    min-width: 320px;
+  }
 `;
 
 const SLabel = styled.div`
