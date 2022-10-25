@@ -6,13 +6,13 @@ import { useRouter } from 'next/router';
 
 import Text from '../atoms/Text';
 import InlineSvg from '../atoms/InlineSVG';
-import Indicator from '../atoms/Indicator';
+// import Indicator from '../atoms/Indicator';
 
-import { useGetChats } from '../../contexts/chatContext';
+// import { useGetChats } from '../../contexts/chatContext';
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
-import ChatIconFilled from '../../public/images/svg/icons/filled/Chat.svg';
+// import ChatIconFilled from '../../public/images/svg/icons/filled/Chat.svg';
 import ShareIcon from '../../public/images/svg/icons/filled/Share.svg';
 import ShareMenu from './ShareMenu';
 
@@ -32,14 +32,14 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
 
   const handleShareMenuClick = () => setShareMenuOpen(!shareMenuOpen);
-  const { unreadCount } = useGetChats();
+  // const { unreadCount } = useGetChats();
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
 
-  const handleClick = (url: string) => {
+  /* const handleClick = (url: string) => {
     router.push(`/${url}`);
-  };
+  }; */
 
   const handleCloseShareMenu = () => {
     setShareMenuOpen(false);
@@ -59,7 +59,9 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
         >
           {!shareMenuOpen ? (
             <>
-              <SButton
+              {
+                // TODO: re-enable, repurpose for bundles
+                /* <SButton
                 onClick={() =>
                   router.route.includes('direct-messages')
                     ? handleClose()
@@ -85,7 +87,8 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
                   width='24px'
                   height='24px'
                 />
-              </SButton>
+              </SButton> */
+              }
               <SButton onClick={handleShareMenuClick}>
                 <SText variant={2} active={router.route.includes('share')}>
                   {t('mobileBottomNavigation.share')}

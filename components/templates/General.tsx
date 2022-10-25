@@ -54,7 +54,8 @@ export const General: React.FC<IGeneral> = (props) => {
   const [cookies] = useCookies();
   const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
-  const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
+  const { /* unreadCount, */ setMobileChatOpened, mobileChatOpened } =
+    useGetChats();
   const { postOverlayOpen } = usePostModalState();
 
   const hasMounted = useHasMounted();
@@ -121,12 +122,13 @@ export const General: React.FC<IGeneral> = (props) => {
             width: '33%',
             counter: unreadNotificationCount,
           },
-          {
+          // TODO: re-enable, repurpose for bundles
+          /* {
             key: 'dms',
             url: '/direct-messages',
             width: '33%',
             counter: unreadCount,
-          },
+          }, */
         ];
       }
     }
@@ -136,7 +138,7 @@ export const General: React.FC<IGeneral> = (props) => {
     user.loggedIn,
     unreadNotificationCount,
     user.userData?.options?.isCreator,
-    unreadCount,
+    // unreadCount,
   ]);
 
   useScrollPosition();

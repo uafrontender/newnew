@@ -10,7 +10,7 @@ import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/search/SearchInput';
 import Text from '../../atoms/Text';
 import NavigationItem from '../NavigationItem';
-import { useGetChats } from '../../../contexts/chatContext';
+// import { useGetChats } from '../../../contexts/chatContext';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -24,7 +24,7 @@ interface ITablet {}
 export const Tablet: React.FC<ITablet> = React.memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { unreadCount } = useGetChats();
+  // const { unreadCount } = useGetChats();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
@@ -50,7 +50,10 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 </a>
               </Link>
             )}
-            <SItemWithMargin>
+            {
+              // TODO: re-enable, repurpose for bundles
+              /*
+              <SItemWithMargin>
               <NavigationItem
                 item={{
                   url: '/direct-messages',
@@ -58,7 +61,8 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                   counter: unreadCount,
                 }}
               />
-            </SItemWithMargin>
+              </SItemWithMargin> */
+            }
             <SItemWithMargin>
               <NavigationItem
                 item={{
