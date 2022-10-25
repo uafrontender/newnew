@@ -487,7 +487,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         {post.creator?.options?.isOfferingBundles && (
           <SBundlesContainer highlighted={bundle?.votesLeft === 0}>
             {bundle?.votesLeft === 0 && (
-              <STicketSet numberOFTickets={2} size={36} shift={11} />
+              <STicketSet numberOFTickets={3} size={36} shift={11} />
             )}
             <SBundlesText>
               {t('mcPost.optionsTab.actionSection.offersBundles', {
