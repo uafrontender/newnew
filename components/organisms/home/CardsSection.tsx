@@ -122,7 +122,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
         offset: -32,
         smooth: 'easeOutQuad',
-        duration: SCROLL_CARDS_SECTIONS,
+        duration:
+          SCROLL_CARDS_SECTIONS *
+          (collection.length > 30 ? Math.round(collection.length / 30) : 1),
         horizontal: true,
         containerId: `${category}-scrollContainer`,
       });

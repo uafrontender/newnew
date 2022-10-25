@@ -34,7 +34,11 @@ const YourPostsSection = ({
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const [statusFilter, setStatusFilter] =
-    useState<newnewapi.GetRelatedToMePostsRequest.StatusFilter | null>(null);
+    useState<newnewapi.GetRelatedToMePostsRequest.StatusFilter>(
+      newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL
+    );
+
+  const prevStatusFilter = useRef(statusFilter);
 
   const [nextPageToken, setNextPageToken] = useState<
     string | undefined | null
@@ -43,6 +47,7 @@ const YourPostsSection = ({
   const fetchCreatorPosts = useCallback(
     async (abortController?: AbortController) => {
       try {
+        setIsError(false);
         setIsLoadingMore(true);
         const payload = new newnewapi.GetRelatedToMePostsRequest({
           relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
@@ -51,9 +56,9 @@ const YourPostsSection = ({
             ...(nextPageToken ? { pageToken: nextPageToken } : {}),
             limit: 10,
           },
-          ...(statusFilter
-            ? { sorting: newnewapi.PostSorting.NEWEST_FIRST }
-            : {}),
+          // ...(statusFilterValue
+          //   ? { sorting: newnewapi.PostSorting.NEWEST_FIRST }
+          //   : {}),
         });
 
         const postsResponse = await getMyPosts(
@@ -67,7 +72,8 @@ const YourPostsSection = ({
             ...(postsResponse.data?.posts as newnewapi.Post[]),
           ]);
           setNextPageToken(postsResponse.data.paging?.nextPageToken);
-        } else {
+        } else if ((postsResponse?.error as any)?.code !== 20) {
+          setPosts([]);
           throw new Error('Request failed');
         }
       } catch (err: any) {
@@ -78,11 +84,11 @@ const YourPostsSection = ({
         isPostsRequested.current = true;
       }
     },
-    [statusFilter, nextPageToken]
+    [nextPageToken, statusFilter]
   );
 
   const initialFetch = useCallback(
-    async (abortController: AbortController) => {
+    async (abortController?: AbortController) => {
       setIsLoading(true);
       await fetchCreatorPosts(abortController);
       setIsLoading(false);
@@ -111,15 +117,21 @@ const YourPostsSection = ({
     newStatusFilter: newnewapi.GetRelatedToMePostsRequest.StatusFilter
   ) => {
     if (statusFilter === newStatusFilter) {
-      setStatusFilter(null);
+      setStatusFilter(newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL);
     } else {
       setStatusFilter(newStatusFilter);
     }
 
     setNextPageToken(null);
     setPosts([]);
-    isPostsRequested.current = false;
   };
+
+  useEffect(() => {
+    if (prevStatusFilter.current !== statusFilter) {
+      initialFetch();
+      prevStatusFilter.current = statusFilter;
+    }
+  }, [statusFilter, initialFetch]);
 
   useEffect(() => {
     if (postToRemove) {
@@ -161,7 +173,9 @@ const YourPostsSection = ({
   }
 
   return (
-    <SContainer style={{ paddingTop: posts.length === 0 ? '62px' : 0 }}>
+    <SContainer
+      style={{ paddingTop: posts.length === 0 && !isLoading ? '62px' : 0 }}
+    >
       <SFilterContainer>
         <FilterButton
           active={
@@ -194,7 +208,7 @@ const YourPostsSection = ({
       </SFilterContainer>
       {!isError && (posts.length || isLoading) && (
         <SCardsSection
-          category='biggest'
+          category='my-posts'
           collection={posts}
           loading={isLoading}
           handlePostClicked={onPostOpen}
@@ -293,6 +307,7 @@ const SHeadline = styled(Headline)`
 
 const SFilterContainer = styled.div`
   display: flex;
+  z-index: 1;
 
   margin-bottom: 8px;
 
