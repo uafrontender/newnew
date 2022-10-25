@@ -101,13 +101,13 @@ const SContainer = styled.section`
   }
 
   ${({ theme }) => theme.media.tablet} {
-    margin: 55px -32px 15px;
+    margin: 55px -32px 0;
     padding: 35px 0;
   }
 
   ${({ theme }) => theme.media.laptop} {
     padding: 60px 0;
-    margin: 15px -96px 34px;
+    margin: 15px -96px 0;
   }
 `;
 
