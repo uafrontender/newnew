@@ -13,7 +13,6 @@ import NavigationItem from '../NavigationItem';
 import { useAppSelector } from '../../../redux-store/store';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useNotifications } from '../../../contexts/notificationsContext';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 export const Desktop: React.FC = React.memo(() => {
@@ -23,7 +22,6 @@ export const Desktop: React.FC = React.memo(() => {
   const { unreadCount } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const { globalSearchActive } = useAppSelector((state) => state.ui);
-  const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
@@ -66,19 +64,15 @@ export const Desktop: React.FC = React.memo(() => {
                 </SNavText>
               </SItemWithMargin>
             )}
-            {((user.userData?.options?.isOfferingSubscription &&
-              mySubscribersTotal > 0) ||
-              creatorsImSubscribedTo.length > 0) && (
-              <SItemWithMargin>
-                <NavigationItem
-                  item={{
-                    url: '/direct-messages',
-                    key: 'directMessages',
-                    counter: unreadCount,
-                  }}
-                />
-              </SItemWithMargin>
-            )}
+            <SItemWithMargin>
+              <NavigationItem
+                item={{
+                  url: '/direct-messages',
+                  key: 'directMessages',
+                  counter: unreadCount,
+                }}
+              />
+            </SItemWithMargin>
             <SItemWithMargin>
               <NavigationItem
                 item={{

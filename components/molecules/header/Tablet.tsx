@@ -17,7 +17,6 @@ import { useAppSelector } from '../../../redux-store/store';
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
 import { useNotifications } from '../../../contexts/notificationsContext';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 interface ITablet {}
@@ -29,7 +28,6 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
-  const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
@@ -52,19 +50,15 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 </a>
               </Link>
             )}
-            {((user.userData?.options?.isOfferingSubscription &&
-              mySubscribersTotal > 0) ||
-              creatorsImSubscribedTo.length > 0) && (
-              <SItemWithMargin>
-                <NavigationItem
-                  item={{
-                    url: '/direct-messages',
-                    key: 'directMessages',
-                    counter: unreadCount,
-                  }}
-                />
-              </SItemWithMargin>
-            )}
+            <SItemWithMargin>
+              <NavigationItem
+                item={{
+                  url: '/direct-messages',
+                  key: 'directMessages',
+                  counter: unreadCount,
+                }}
+              />
+            </SItemWithMargin>
             <SItemWithMargin>
               <NavigationItem
                 item={{
