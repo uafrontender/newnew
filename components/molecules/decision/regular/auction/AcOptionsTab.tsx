@@ -284,7 +284,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         _stage: 'Post',
         _postUuid: postId,
         _component: 'AcOptionsTab',
-        _paymentMethod: cardUuid ? 'Primary card' : 'New card',
       });
 
       try {

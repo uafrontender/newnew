@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable prefer-template */
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -80,19 +82,22 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   };
 
   const getAmountValue = (
+    postType: string,
     data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice
   ) => {
     let centsQty = 0;
 
-    const localData = data as
-      | newnewapi.MultipleChoice
-      | newnewapi.Crowdfunding
-      | newnewapi.Auction;
-
-    if (localData.totalAmount?.usdCents) {
-      centsQty = localData.totalAmount.usdCents;
+    if (postType === 'multipleChoice') {
+      const localData = data as newnewapi.MultipleChoice;
+      if (localData.votePrice?.usdCents) {
+        centsQty = localData.totalVotes * localData.votePrice.usdCents;
+      }
+    } else {
+      const localData = data as newnewapi.Crowdfunding | newnewapi.Auction;
+      if (localData.totalAmount?.usdCents) {
+        centsQty = localData.totalAmount.usdCents;
+      }
     }
-
     return `$${formatNumber(centsQty / 100 ?? 0, false)}`;
   };
 
@@ -121,7 +126,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
       };
 
       const countdownsrt = getCountdown(data);
-      const money = getAmountValue(data);
+      const money = getAmountValue(postType, data);
 
       return (
         <SListItemWrapper key={data.postUuid}>

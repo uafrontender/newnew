@@ -459,10 +459,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
           <SSideButtons>
             {user.options?.isCreator ? (
-              <SmsNotificationsButton
-                subscription={subscription}
-                isMobile={isMobile}
-              />
+              <SmsNotificationsButton subscription={subscription} />
             ) : (
               <div />
             )}

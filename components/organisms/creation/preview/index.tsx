@@ -72,6 +72,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     fileProcessing,
     customCoverImageUrl,
   } = useAppSelector((state) => state.creation);
+  const { userData } = useAppSelector((state) => state.user);
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
       let error = minLength(tCommon, text, min);
@@ -373,6 +374,17 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             }`
           ),
         },
+        tab === 'multiple-choice' &&
+          userData?.options?.isOfferingSubscription && {
+            key: 'allowSuggestions',
+            value: t(
+              `preview.values.${
+                multiplechoice.options.allowSuggestions
+                  ? 'allowSuggestions-allowed'
+                  : 'allowSuggestions-forbidden'
+              }`
+            ),
+          },
       ]),
     [
       t,
@@ -381,6 +393,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       post.options.commentsEnabled,
       auction.minimalBid,
       crowdfunding.targetBackerCount,
+      multiplechoice?.options?.allowSuggestions,
+      userData?.options?.isOfferingSubscription,
       formatExpiresAt,
     ]
   );
