@@ -33,6 +33,7 @@ import YourPostsSection from '../components/organisms/home/YourPostsSection';
 import Headline from '../components/atoms/Headline';
 import { TStaticPost } from '../components/molecules/home/StaticPostCard';
 import TutorialCard from '../components/molecules/TutorialCard';
+import { getMyPosts } from '../api/endpoints/user';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -68,10 +69,10 @@ const Home: NextPage<IHome> = ({
   //   newnewapi.Post[]
   // >((top10posts?.posts as newnewapi.Post[]) ?? []);
   // For you - authenticated users only
-  const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
-  const [collectionFYInitialLoading, setCollectionFYInitialLoading] =
-    useState(false);
-  const [collectionFYError, setCollectionFYError] = useState(false);
+  // const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
+  // const [collectionFYInitialLoading, setCollectionFYInitialLoading] =
+  //   useState(false);
+  // const [collectionFYError, setCollectionFYError] = useState(false);
   // Auctions
   // const [collectionAC, setCollectionAC] = useState<newnewapi.Post[]>([]);
   // const [collectionACInitialLoading, setCollectionACInitialLoading] =
@@ -94,6 +95,12 @@ const Home: NextPage<IHome> = ({
   // const [collectionBiggestInitialLoading, setCollectionBiggestInitialLoading] =
   //   useState(false);
   // const [collectionBiggestError, setCollectionBiggestError] = useState(false);
+
+  // Recent activity
+  const [collectionRA, setCollectionRA] = useState<newnewapi.Post[]>([]);
+  const [collectionRAInitialLoading, setCollectionRAInitialLoading] =
+    useState(false);
+  const [collectionRAError, setCollectionRAError] = useState(false);
 
   // Display post
   // const [postModalOpen, setPostModalOpen] = useState(!!postFromQuery);
@@ -141,7 +148,7 @@ const Home: NextPage<IHome> = ({
     // });
     setPostToRemove(postUuid);
 
-    setCollectionFY((curr) => {
+    setCollectionRA((curr) => {
       const updated = curr.filter(
         (post) => switchPostType(post)[0].postUuid !== postUuid
       );
@@ -175,41 +182,41 @@ const Home: NextPage<IHome> = ({
 
   // Fetch top posts of various types
   // FY posts
-  useEffect(() => {
-    async function fetchFYPosts() {
-      try {
-        setCollectionFYInitialLoading(true);
+  // useEffect(() => {
+  //   async function fetchFYPosts() {
+  //     try {
+  //       setCollectionFYInitialLoading(true);
 
-        const fyPayload = new newnewapi.PagedRequest({
-          paging: {
-            limit: 10,
-          },
-        });
+  //       const fyPayload = new newnewapi.PagedRequest({
+  //         paging: {
+  //           limit: 10,
+  //         },
+  //       });
 
-        const resFY = await fetchForYouPosts(fyPayload);
+  //       const resFY = await fetchForYouPosts(fyPayload);
 
-        if (resFY) {
-          setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
-          setCollectionFYInitialLoading(false);
-        } else {
-          throw new Error('Request failed');
-        }
-      } catch (err) {
-        setCollectionFYInitialLoading(false);
-        setCollectionFYError(true);
-      }
-    }
+  //       if (resFY) {
+  //         setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
+  //         setCollectionFYInitialLoading(false);
+  //       } else {
+  //         throw new Error('Request failed');
+  //       }
+  //     } catch (err) {
+  //       setCollectionFYInitialLoading(false);
+  //       setCollectionFYError(true);
+  //     }
+  //   }
 
-    if (user.loggedIn) {
-      fetchFYPosts();
-    }
+  //   if (user.loggedIn) {
+  //     fetchFYPosts();
+  //   }
 
-    return () => {
-      setPostModalOpen(false);
-      setDisplayedPost(undefined);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //   return () => {
+  //     setPostModalOpen(false);
+  //     setDisplayedPost(undefined);
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   // Live Auctions posts
   // useEffect(() => {
@@ -322,6 +329,40 @@ const Home: NextPage<IHome> = ({
   //   fetchBiggest();
   // }, []);
 
+  // Resent activity
+  useEffect(() => {
+    async function fetchFYPosts() {
+      try {
+        setCollectionRAInitialLoading(true);
+
+        const payload = new newnewapi.GetRelatedToMePostsRequest({
+          relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
+        });
+        const postsResponse = await getMyPosts(payload);
+
+        if (payload) {
+          setCollectionRA(() => postsResponse.data?.posts as newnewapi.Post[]);
+          setCollectionRAInitialLoading(false);
+        } else {
+          throw new Error('Request failed');
+        }
+      } catch (err) {
+        setCollectionRAInitialLoading(false);
+        setCollectionRAError(true);
+      }
+    }
+
+    if (user.loggedIn) {
+      fetchFYPosts();
+    }
+
+    return () => {
+      setPostModalOpen(false);
+      setDisplayedPost(undefined);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <Head>
@@ -357,15 +398,16 @@ const Home: NextPage<IHome> = ({
               </SSubtitle> */}
             </SHeading>
           )}
-          {/* For you */}
-          {!collectionFYError &&
-          (collectionFYInitialLoading || collectionFY?.length > 0) ? (
+          {/* Recent activity */}
+          {!collectionRAError &&
+          (collectionRAInitialLoading || collectionRA?.length > 0) ? (
             <CardsSection
-              title={t('cardsSection.title.for-you')}
-              category='for-you'
-              collection={collectionFY}
-              loading={collectionFYInitialLoading}
+              title={t('cardsSection.title.recent-activity')}
+              category='recent-activity'
+              collection={collectionRA}
+              loading={collectionRAInitialLoading}
               handlePostClicked={handleOpenPostModal}
+              seeMoreLink='/profile/purchases'
               tutorialCard={
                 user.loggedIn ? (
                   <STutorialCard
@@ -374,8 +416,8 @@ const Home: NextPage<IHome> = ({
                         ? assets.common.darkAnimatedLogo
                         : assets.common.lightAnimatedLogo
                     }
-                    title={t('tutorial.for-you.title')}
-                    caption={t('tutorial.for-you.caption')}
+                    title={t('tutorial.recent-activity.title')}
+                    caption={t('tutorial.recent-activity.caption')}
                   />
                 ) : undefined
               }
