@@ -88,12 +88,12 @@ const Home: NextPage<IHome> = ({
   //   useState(true);
   // const [collectionCFError, setCollectionCFError] = useState(false);
   // Biggest of all time
-  const [collectionBiggest, setCollectionBiggest] = useState<newnewapi.Post[]>(
-    []
-  );
-  const [collectionBiggestInitialLoading, setCollectionBiggestInitialLoading] =
-    useState(false);
-  const [collectionBiggestError, setCollectionBiggestError] = useState(false);
+  // const [collectionBiggest, setCollectionBiggest] = useState<newnewapi.Post[]>(
+  //   []
+  // );
+  // const [collectionBiggestInitialLoading, setCollectionBiggestInitialLoading] =
+  //   useState(false);
+  // const [collectionBiggestError, setCollectionBiggestError] = useState(false);
 
   // Display post
   // const [postModalOpen, setPostModalOpen] = useState(!!postFromQuery);
@@ -126,6 +126,12 @@ const Home: NextPage<IHome> = ({
     setDisplayedPost(undefined);
   }, []);
 
+  const [postToRemove, setPostToRemove] = useState('');
+
+  const resetPostToRemove = useCallback(() => {
+    setPostToRemove('');
+  }, []);
+
   const handleRemovePostFromState = (postUuid: string) => {
     // setTopSectionCollection((curr) => {
     //   const updated = curr.filter(
@@ -133,6 +139,8 @@ const Home: NextPage<IHome> = ({
     //   );
     //   return updated;
     // });
+    setPostToRemove(postUuid);
+
     setCollectionFY((curr) => {
       const updated = curr.filter(
         (post) => switchPostType(post)[0].postUuid !== postUuid
@@ -157,12 +165,12 @@ const Home: NextPage<IHome> = ({
     //   );
     //   return updated;
     // });
-    setCollectionBiggest((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
+    // setCollectionBiggest((curr) => {
+    //   const updated = curr.filter(
+    //     (post) => switchPostType(post)[0].postUuid !== postUuid
+    //   );
+    //   return updated;
+    // });
   };
 
   // Fetch top posts of various types
@@ -289,30 +297,30 @@ const Home: NextPage<IHome> = ({
   // }, []);
 
   // Biggest of all time
-  useEffect(() => {
-    async function fetchBiggest() {
-      try {
-        setCollectionBiggestInitialLoading(true);
-        const biggestPayload = new newnewapi.PagedRequest({});
+  // useEffect(() => {
+  //   async function fetchBiggest() {
+  //     try {
+  //       setCollectionBiggestInitialLoading(true);
+  //       const biggestPayload = new newnewapi.PagedRequest({});
 
-        const resBiggest = await fetchBiggestPosts(biggestPayload);
+  //       const resBiggest = await fetchBiggestPosts(biggestPayload);
 
-        if (resBiggest) {
-          setCollectionBiggest(
-            () => resBiggest.data?.posts as newnewapi.Post[]
-          );
-          setCollectionBiggestInitialLoading(false);
-        } else {
-          throw new Error('Request failed');
-        }
-      } catch (err) {
-        setCollectionBiggestInitialLoading(false);
-        setCollectionBiggestError(true);
-      }
-    }
+  //       if (resBiggest) {
+  //         setCollectionBiggest(
+  //           () => resBiggest.data?.posts as newnewapi.Post[]
+  //         );
+  //         setCollectionBiggestInitialLoading(false);
+  //       } else {
+  //         throw new Error('Request failed');
+  //       }
+  //     } catch (err) {
+  //       setCollectionBiggestInitialLoading(false);
+  //       setCollectionBiggestError(true);
+  //     }
+  //   }
 
-    fetchBiggest();
-  }, []);
+  //   fetchBiggest();
+  // }, []);
 
   return (
     <>
@@ -330,7 +338,11 @@ const Home: NextPage<IHome> = ({
           <SHeading style={{ marginBottom: '48px' }}>
             <SHeadline>{t('section.your')}</SHeadline>
           </SHeading>
-          <YourPostsSection onPostOpen={handleOpenPostModal} />
+          <YourPostsSection
+            onPostOpen={handleOpenPostModal}
+            postToRemove={postToRemove}
+            resetPostToRemove={resetPostToRemove}
+          />
         </>
       )}
 
@@ -408,7 +420,7 @@ const Home: NextPage<IHome> = ({
       />
 
       {/* Greatest of all time posts */}
-      {!collectionBiggestError &&
+      {/* {!collectionBiggestError &&
       (collectionBiggestInitialLoading || collectionBiggest?.length > 0) ? (
         <SCardsSection
           title={t('cardsSection.title.biggest')}
@@ -431,7 +443,7 @@ const Home: NextPage<IHome> = ({
           }
           padding={user.loggedIn ? 'small' : 'large'}
         />
-      ) : null}
+      ) : null} */}
 
       {(!user.loggedIn || !user.userData?.options?.isCreator) && <FaqSection />}
 
@@ -461,6 +473,22 @@ const Home: NextPage<IHome> = ({
 const SCardsSection = styled(CardsSection)`
   ${({ theme }) => theme.media.laptop} {
     margin-top: 12px;
+  }
+
+  &:last-child {
+    padding-bottom: 40px;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    &:last-child {
+      padding-bottom: 60px;
+    }
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    &:last-child {
+      padding-bottom: 80px;
+    }
   }
 `;
 

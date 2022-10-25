@@ -149,7 +149,7 @@ const SWrapper = styled(motion.section)`
 
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
-    height: calc(100vh - 80px); // 80px - visible header height
+    padding-bottom: 60px;
     margin: -40px auto 0;
   }
 
@@ -169,10 +169,6 @@ const SContentWrapper = styled.div`
   ${(props) => props.theme.media.tablet} {
     flex-direction: row;
     justify-content: flex-end;
-  }
-
-  @media (min-width: 1441px) {
-    margin-top: -120px;
   }
 `;
 

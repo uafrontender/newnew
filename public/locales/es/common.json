@@ -191,5 +191,12 @@
     "error": {
       "requestFailed": "Request failed"
     }
+  },
+  "colorModeSwitch": {
+    "options": {
+      "light": "Luz",
+      "dark": "Oscuro",
+      "auto": "Automático"
+    }
   }
 }
