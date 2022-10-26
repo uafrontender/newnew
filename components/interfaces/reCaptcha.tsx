@@ -4,5 +4,4 @@ export interface IReCaptchaRes {
   hostname?: string;
   score?: number;
   errors?: Array<string> | string;
-  'error-codes'?: Array<string> | string;
 }

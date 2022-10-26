@@ -5,7 +5,7 @@ import {
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
 
-const BASE_URL_REWARD = `${BASE_URL}/phone`;
+const BASE_URL_PHONE = `${BASE_URL}/phone`;
 
 export const subscribeToCreatorSmsNotifications = (
   creatorUuid: string,
@@ -25,7 +25,7 @@ export const subscribeToCreatorSmsNotifications = (
   >(
     newnewapi.SubscribeSmsNotificationsRequest,
     newnewapi.SubscribeSmsNotificationsResponse,
-    `${BASE_URL_REWARD}/subscribe_sms_notifications`,
+    `${BASE_URL_PHONE}/subscribe_sms_notifications`,
     'post',
     payload,
     signal ?? undefined
@@ -48,7 +48,7 @@ export const unsubscribeFromCreatorSmsNotifications = (
   >(
     newnewapi.UnsubscribeSmsNotificationsRequest,
     newnewapi.EmptyResponse,
-    `${BASE_URL_REWARD}/unsubscribe_sms_notifications`,
+    `${BASE_URL_PHONE}/unsubscribe_sms_notifications`,
     'post',
     payload,
     signal ?? undefined
@@ -71,7 +71,7 @@ export const getSmsNotificationsSubscriptionToCreatorStatus = (
   >(
     newnewapi.GetSmsNotificationsStatusRequest,
     newnewapi.GetSmsNotificationsStatusResponse,
-    `${BASE_URL_REWARD}/get_sms_notifications_status`,
+    `${BASE_URL_PHONE}/get_sms_notifications_status`,
     'post',
     payload,
     signal ?? undefined
@@ -99,7 +99,7 @@ export const subscribeGuestToCreatorSmsNotifications = (
   >(
     newnewapi.SubscribeSmsNotificationsRequest,
     newnewapi.SubscribeSmsNotificationsResponse,
-    `${BASE_URL_REWARD}/subscribe_sms_notifications`,
+    `${BASE_URL_PHONE}/subscribe_sms_notifications`,
     'post',
     payload,
     signal ?? undefined
@@ -124,7 +124,7 @@ export const unsubscribeGuestFromCreatorSmsNotifications = (
   >(
     newnewapi.UnsubscribeSmsNotificationsRequest,
     newnewapi.EmptyResponse,
-    `${BASE_URL_REWARD}/unsubscribe_sms_notifications`,
+    `${BASE_URL_PHONE}/unsubscribe_sms_notifications`,
     'post',
     payload,
     signal ?? undefined
@@ -149,7 +149,7 @@ export const getGuestSmsNotificationsSubscriptionToCreatorStatus = (
   >(
     newnewapi.GetSmsNotificationsStatusRequest,
     newnewapi.GetSmsNotificationsStatusResponse,
-    `${BASE_URL_REWARD}/get_sms_notifications_status`,
+    `${BASE_URL_PHONE}/get_sms_notifications_status`,
     'post',
     payload,
     signal ?? undefined
