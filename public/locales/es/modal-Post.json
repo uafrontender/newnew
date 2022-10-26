@@ -583,7 +583,7 @@
   },
   "acPostSuccess": {
     "heroText": "¡Este Bid ha terminado!",
-    "wantsToKnow": "{{creator}} quiere saber...",
+    "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalBids": "ofertas en total",
     "others": "otros",
     "bid": "oferta",
@@ -595,7 +595,7 @@
   },
   "mcPostSuccess": {
     "heroText": "¡Esta Superpoll ha terminado!",
-    "wantsToKnow": "{{creator}} quiere saber...",
+    "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalVotes": "votos en total",
     "others": "otros",
     "voted": "votaron",
@@ -609,7 +609,7 @@
   },
   "cfPostSuccess": {
     "heroText": "¡Este Goal ha terminado!",
-    "wantsToKnow": "El Goal de {{creator}}",
+    "wantsToKnow": "El Goal de {{creator}}<0/>",
     "creatorsBackers": "Los patrocinadores de {{creator}}",
     "ofTargetBackers": "de {{target_count}} patrocinadores",
     "youBackedFor": "Patrocinaste por"
@@ -625,7 +625,7 @@
         "seconds": "segundos"
       }
     },
-    "wantsToKnow": "{{creator}} quiere saber...",
+    "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalBids": "en ofertas totales",
     "others": "otros",
     "bid": "oferta",
@@ -645,7 +645,7 @@
         "seconds": "segundos"
       }
     },
-    "wantsToKnow": "{{creator}} quiere saber...",
+    "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalVotes": "votos en total",
     "others": "otros",
     "voted": "votó",
@@ -668,7 +668,7 @@
         "seconds": "segundos"
       }
     },
-    "wantsToKnow": "El Goal de {{creator}}",
+    "wantsToKnow": "El Goal de {{creator}}<0/>",
     "creatorsBackers": "Los patrocinadores de {{creator}}",
     "ofTargetBackers": "de {{target_count}} patrocinadores",
     "youBackedFor": "Patrocinaste por"

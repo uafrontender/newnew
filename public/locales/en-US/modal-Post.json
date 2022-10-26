@@ -581,7 +581,7 @@
   },
   "acPostSuccess": {
     "heroText": "This Bid has ended!",
-    "wantsToKnow": "{{creator}} wants to know...",
+    "wantsToKnow": "{{creator}}<0/> wants to know...",
     "inTotalBids": "in total bids",
     "others": "others",
     "bid": "bid",
@@ -593,7 +593,7 @@
   },
   "mcPostSuccess": {
     "heroText": "This Superpoll has ended!",
-    "wantsToKnow": "{{creator}} wants to know...",
+    "wantsToKnow": "{{creator}}<0/> wants to know...",
     "inTotalVotes": "total votes",
     "others": "others",
     "voted": "voted",
@@ -607,7 +607,7 @@
   },
   "cfPostSuccess": {
     "heroText": "This Goal has ended!",
-    "wantsToKnow": "{{creator}}'s Goal",
+    "wantsToKnow": "{{creator}}'s<0/> Goal",
     "creatorsBackers": "{{creator}}'s backers",
     "ofTargetBackers": "of {{target_count}} backers",
     "youBackedFor": "You backed it for"
@@ -623,7 +623,7 @@
         "seconds": "seconds"
       }
     },
-    "wantsToKnow": "{{creator}} wants to know...",
+    "wantsToKnow": "{{creator}}<0/> wants to know...",
     "inTotalBids": "in total bids",
     "others": "others",
     "bid": "bid",
@@ -643,7 +643,7 @@
         "seconds": "seconds"
       }
     },
-    "wantsToKnow": "{{creator}} wants to know...",
+    "wantsToKnow": "{{creator}}<0/> wants to know...",
     "inTotalVotes": "total votes",
     "others": "others",
     "voted": "voted",
@@ -666,7 +666,7 @@
         "seconds": "seconds"
       }
     },
-    "wantsToKnow": "{{creator}}'s Goal",
+    "wantsToKnow": "{{creator}}'s<0/> Goal",
     "creatorsBackers": "{{creator}}'s backers",
     "ofTargetBackers": "of {{target_count}} backers",
     "youBackedFor": "You backed it for"

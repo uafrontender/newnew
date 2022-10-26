@@ -730,7 +730,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           handleToggleMuted={() => handleToggleMutedMode()}
         />
         <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
-        <SActivitesContainer
+        <SActivitiesContainer
           shorterSection={
             postStatus === 'failed' ||
             (post.isSuggestionsAllowed &&
@@ -775,7 +775,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             }
             handleRemoveOption={handleRemoveOption}
           />
-        </SActivitesContainer>
+        </SActivitiesContainer>
         {/* Loading Modal */}
         {loadingModalOpen && (
           <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
@@ -891,7 +891,7 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div<{
+const SActivitiesContainer = styled.div<{
   shorterSection: boolean;
 }>`
   grid-area: activities;

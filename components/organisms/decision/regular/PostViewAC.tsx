@@ -700,7 +700,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           amountInBids={totalAmount}
           hasWinner={!!post.winningOptionId}
         />
-        <SActivitesContainer
+        <SActivitiesContainer
           decisionFailed={postStatus === 'failed'}
           showSelectingWinnerOption={showSelectingWinnerOption}
         >
@@ -736,7 +736,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             }
             handleRemoveOption={handleRemoveOption}
           />
-        </SActivitesContainer>
+        </SActivitiesContainer>
 
         {/* Loading Modal */}
         {loadingModalOpen && (
@@ -854,7 +854,7 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div<{
+const SActivitiesContainer = styled.div<{
   showSelectingWinnerOption: boolean;
   decisionFailed: boolean;
 }>`
