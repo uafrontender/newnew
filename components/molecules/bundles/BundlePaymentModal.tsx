@@ -38,14 +38,31 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
+  const paymentAmountInCents = useMemo(
+    () => bundleOffer.price!.usdCents!,
+    [bundleOffer]
+  );
+
+  const paymentFeeInCents = useMemo(
+    () =>
+      getCustomerPaymentFee(
+        paymentAmountInCents,
+        parseFloat(appConstants.customerFee)
+      ),
+    [paymentAmountInCents, appConstants.customerFee]
+  );
+
   const voteOnPostRequest = useMemo(
     () =>
       new newnewapi.BuyCreatorsBundle({
         creatorUuid: creator.uuid,
         bundleUuid: bundleOffer.bundleUuid,
         amount: bundleOffer.price,
+        customerFee: new newnewapi.MoneyAmount({
+          usdCents: paymentFeeInCents,
+        }),
       }),
-    [creator, bundleOffer]
+    [creator, bundleOffer, paymentFeeInCents]
   );
 
   // TODO: Fix setup intent
@@ -110,20 +127,6 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
       }
     },
     [setupIntent, router, t, setPaymentSuccessModalOpen, onClose]
-  );
-
-  const paymentAmountInCents = useMemo(
-    () => bundleOffer.price!.usdCents!,
-    [bundleOffer]
-  );
-
-  const paymentFeeInCents = useMemo(
-    () =>
-      getCustomerPaymentFee(
-        paymentAmountInCents,
-        parseFloat(appConstants.customerFee)
-      ),
-    [paymentAmountInCents, appConstants.customerFee]
   );
 
   const paymentWithFeeInCents = useMemo(

@@ -1,7 +1,7 @@
 import { newnewapi } from 'newnew-api';
 import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 
-const BASE_URL_BUNDLE = `${BASE_URL}/pack`;
+const BASE_URL_BUNDLE = `${BASE_URL}/bundle`;
 
 export const getMyBundles = (
   payload: newnewapi.EmptyRequest,
