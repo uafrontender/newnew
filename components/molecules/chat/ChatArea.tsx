@@ -91,6 +91,7 @@ const ChatArea: React.FC<IChatData> = ({
   const [newMessage, setNewMessage] = useState<
     newnewapi.IChatMessage | null | undefined
   >();
+  // TODO: replace or abandon
   const { mySubscribers } = useGetSubscriptions();
 
   const [localUserData, setLocalUserData] = useState({
@@ -140,6 +141,7 @@ const ChatArea: React.FC<IChatData> = ({
       if (chatRoom.myRole === 1) {
         fetchIsSubscribed();
       } else {
+        // TODO: Load active sold bundles? Or abandon?
         const isMyActiveSub = mySubscribers.find(
           (sub) => sub.user?.uuid === chatRoom.visavis?.uuid
         );

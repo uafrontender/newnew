@@ -14,6 +14,7 @@ import {
 import { useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
 
+// TODO: Remove
 const SubscriptionsContext = createContext({
   mySubscribers: [] as newnewapi.ISubscriber[],
   addSubscriber: (subscriber: newnewapi.ISubscriber) => {},

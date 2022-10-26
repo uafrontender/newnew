@@ -56,8 +56,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
   const { bundles } = useBundles();
-  const { /* unreadCount, */ setMobileChatOpened, mobileChatOpened } =
-    useGetChats();
+  const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
   const { postOverlayOpen } = usePostModalState();
 
   const hasMounted = useHasMounted();
@@ -125,13 +124,17 @@ export const General: React.FC<IGeneral> = (props) => {
                 url: '/notifications',
                 counter: unreadNotificationCount,
               },
-          // TODO: re-enable, repurpose for bundles
-          /* {
-            key: 'dms',
-            url: '/direct-messages',
-            counter: unreadCount,
-          }, */
-        ];
+        ].concat(
+          user.userData?.options?.isCreator || (bundles && bundles.length > 0)
+            ? [
+                {
+                  key: 'dms',
+                  url: '/direct-messages',
+                  counter: unreadCount,
+                },
+              ]
+            : []
+        );
       }
     }
 
@@ -140,7 +143,7 @@ export const General: React.FC<IGeneral> = (props) => {
     user.loggedIn,
     unreadNotificationCount,
     user.userData?.options?.isCreator,
-    // unreadCount,
+    unreadCount,
     bundles,
   ]);
 

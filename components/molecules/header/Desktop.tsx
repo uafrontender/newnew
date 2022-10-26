@@ -8,11 +8,11 @@ import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/search/SearchInput';
-// import NavigationItem from '../NavigationItem';
+import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
-// import { useGetChats } from '../../../contexts/chatContext';
-// import { useNotifications } from '../../../contexts/notificationsContext';
+import { useGetChats } from '../../../contexts/chatContext';
+import { useNotifications } from '../../../contexts/notificationsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useBundles } from '../../../contexts/bundlesContext';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
@@ -23,8 +23,8 @@ export const Desktop: React.FC = React.memo(() => {
   const user = useAppSelector((state) => state.user);
   const theme = useTheme();
 
-  // const { unreadCount } = useGetChats();
-  // const { unreadNotificationCount } = useNotifications();
+  const { unreadCount } = useGetChats();
+  const { unreadNotificationCount } = useNotifications();
   const { bundles } = useBundles();
   const { globalSearchActive } = useAppSelector((state) => state.ui);
 
@@ -69,18 +69,18 @@ export const Desktop: React.FC = React.memo(() => {
                 </SNavText>
               </SItemWithMargin>
             )}
-            {
-              // TODO: re-enable, repurpose for bundles
-              /*
+            {(user.userData?.options?.isCreator ||
+              (bundles && bundles?.length > 0)) && (
               <SItemWithMargin>
-              <NavigationItem
-                item={{
-                  url: '/direct-messages',
-                  key: 'directMessages',
-                  counter: unreadCount,
-                }}
-              />
-            </SItemWithMargin>
+                <NavigationItem
+                  item={{
+                    url: '/direct-messages',
+                    key: 'directMessages',
+                    counter: unreadCount,
+                  }}
+                />
+              </SItemWithMargin>
+            )}
             <SItemWithMargin>
               <NavigationItem
                 item={{
@@ -89,8 +89,7 @@ export const Desktop: React.FC = React.memo(() => {
                   counter: unreadNotificationCount,
                 }}
               />
-            </SItemWithMargin> */
-            }
+            </SItemWithMargin>
           </>
         )}
         <SItemWithMargin>
