@@ -21,12 +21,12 @@ import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.user);
+  const { globalSearchActive } = useAppSelector((state) => state.ui);
   const theme = useTheme();
 
   const { unreadCount } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const { bundles } = useBundles();
-  const { globalSearchActive } = useAppSelector((state) => state.ui);
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
