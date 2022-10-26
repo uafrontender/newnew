@@ -16,7 +16,7 @@ const basicTheme: Omit<
     black: '#000000',
     blue: '#2955EC',
     dark: '#0B0A13',
-    darkGray: '#2C2C33', 
+    darkGray: '#2C2C33',
   },
   borderRadius: {
     small: '8px',
@@ -145,7 +145,7 @@ export const lightTheme: DefaultTheme = {
         tertiary: '#FFFFFF',
         quaternary: 'rgba(0, 21, 128, 0.06)',
         transparent: 'rgba(11, 10, 19, 0.2)',
-        changeLanguage: '#FFFFFF',
+        changeLanguage: 'rgba(0, 21, 128, 0.06)',
         danger: '#F12C46',
       },
       hover: {

@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-no-target-blank */
-import React from 'react';
+import React, { useCallback } from 'react';
 import Link from 'next/link';
 import { animateScroll } from 'react-scroll';
 import { useRouter } from 'next/router';
@@ -12,8 +12,9 @@ import Caption from '../atoms/Caption';
 import Container from '../atoms/Grid/Container';
 import InlineSvg from '../atoms/InlineSVG';
 import ChangeLanguage from '../atoms/ChangeLanguage';
+import SettingsColorModeSwitch from '../molecules/profile/SettingsColorModeSwitch';
 
-import { useAppSelector } from '../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 
 import mobileLogo from '../../public/images/svg/mobile-logo.svg';
 // import twitterIcon from '../../public/images/svg/icons/filled/Twitter.svg';
@@ -21,6 +22,10 @@ import mobileLogo from '../../public/images/svg/mobile-logo.svg';
 // import instagramIcon from '../../public/images/svg/icons/filled/Insragram.svg';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
+import {
+  setColorMode,
+  TColorMode,
+} from '../../redux-store/slices/uiStateSlice';
 
 interface IFooter {}
 
@@ -34,9 +39,11 @@ type TItem = {
 
 export const Footer: React.FC<IFooter> = React.memo(() => {
   const { t } = useTranslation();
+  const { t: tCommon } = useTranslation('common');
   const theme = useTheme();
   const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const dispatch = useAppDispatch();
+  const { resizeMode, colorMode } = useAppSelector((state) => state.ui);
 
   const topItems: TItem[] = [
     // TODO: return about link later when we have a page for it
@@ -91,6 +98,14 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
       router.push('/', '/');
     }
   };
+
+  const handleSetColorMode = useCallback(
+    (mode: TColorMode) => {
+      dispatch(setColorMode(mode));
+    },
+    [dispatch]
+  );
+
   const renderItem = (item: TItem) => {
     if (item.external) {
       return (
@@ -199,6 +214,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
                     </Link>
                   </SBlockRow>
                 </SBlock> */}
+                {!isMobile && <SChangeLanguage />}
               </STopContent>
               <SSeparator />
               <SBlockBottomRow>
@@ -221,8 +237,25 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
                 </SLeftBlock>
                 <SRightBlock>
                   <SRightBlockItemHolder>
-                    <ChangeLanguage />
+                    <SettingsColorModeSwitch
+                      theme={theme}
+                      currentlySelectedMode={colorMode}
+                      variant='horizontal'
+                      isMobile
+                      buttonsCaptions={{
+                        light: tCommon('colorModeSwitch.options.light'),
+                        dark: tCommon('colorModeSwitch.options.dark'),
+                        auto: tCommon('colorModeSwitch.options.auto'),
+                      }}
+                      handleSetColorMode={handleSetColorMode}
+                      backgroundColor={
+                        theme.name === 'light'
+                          ? theme.colorsThemed.button.background.changeLanguage
+                          : ''
+                      }
+                    />
                   </SRightBlockItemHolder>
+                  {isMobile && <ChangeLanguage />}
                 </SRightBlock>
               </SBlockBottomRow>
             </SContent>
@@ -250,6 +283,7 @@ const SContent = styled.div`
 const STopContent = styled.div`
   display: flex;
   flex-direction: column;
+  position: relative;
 
   ${(props) => props.theme.media.tablet} {
     flex-direction: row;
@@ -298,6 +332,12 @@ const SBlockOption = styled.a`
   &:hover {
     color: ${(props) => props.theme.colorsThemed.text.primary};
   }
+`;
+
+const SChangeLanguage = styled(ChangeLanguage)`
+  position: absolute;
+  right: 0;
+  bottom: 0;
 `;
 
 // const SBlockRow = styled.div`
@@ -376,6 +416,8 @@ const SLeftBlock = styled.div`
 const SRightBlock = styled.div`
   order: 1;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
 
   ${(props) => props.theme.media.tablet} {
