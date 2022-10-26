@@ -9,7 +9,6 @@ import React, {
 import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
 import { getMyBlockedUsers } from '../api/endpoints/user';
-import { useGetSubscriptions } from './subscriptionsContext';
 
 const BlockedUsersContext = createContext({
   usersBlockedMe: [] as string[],
@@ -30,7 +29,6 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
   const [usersBlockedMe, setUsersBlockedMe] = useState<string[]>([]);
   const [usersIBlocked, setUsersIBlocked] = useState<string[]>([]);
   const [usersBlockedLoading, setUsersBlockedLoading] = useState(false);
-  const { removeSubscriber } = useGetSubscriptions();
 
   const blockUser = (uuid: string) => {
     setUsersIBlocked((curr) => [...curr, uuid]);

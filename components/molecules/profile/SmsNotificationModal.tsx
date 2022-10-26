@@ -342,6 +342,7 @@ const STosText = styled.div`
   line-height: 16px;
   font-weight: 600;
   margin-bottom: 32px;
+  text-align: center;
 `;
 
 const STosLink = styled.a`
