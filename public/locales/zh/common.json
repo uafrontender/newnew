@@ -191,5 +191,12 @@
     "error": {
       "requestFailed": "Request failed"
     }
+  },
+  "colorModeSwitch": {
+    "options": {
+      "light": "淺色",
+      "dark": "深色",
+      "auto": "自動"
+    }
   }
 }

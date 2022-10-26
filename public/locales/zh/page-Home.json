@@ -9,7 +9,8 @@
       "for-you": "為你而設",
       "ac": "超大Bid",
       "mc": "熱門Superpoll",
-      "cf": "熱門Goal"
+      "cf": "熱門Goal",
+      "recent-activity_NEED_TRANSLATION": "Recent Activity"
     },
     "button": {
       "showMore": "查看更多",
@@ -41,6 +42,10 @@
     "biggest": {
       "title": "史上最棒",
       "caption_NEED_TRANSLATION": "This section will display the greatest of all time posts."
+    },
+    "recent-activity_NEED_TRANSLATION": {
+      "title": "Recent Activity",
+      "caption": "This section will display posts you are participating in"
     }
   },
   "faq_NEED_TRANSLATION": {
