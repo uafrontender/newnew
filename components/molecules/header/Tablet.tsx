@@ -10,14 +10,13 @@ import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/search/SearchInput';
 import Text from '../../atoms/Text';
 import NavigationItem from '../NavigationItem';
-import { useGetChats } from '../../../contexts/chatContext';
+// import { useGetChats } from '../../../contexts/chatContext';
 
 import { useAppSelector } from '../../../redux-store/store';
 
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
 import { useNotifications } from '../../../contexts/notificationsContext';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useBundles } from '../../../contexts/bundlesContext';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
@@ -28,12 +27,12 @@ interface ITablet {}
 export const Tablet: React.FC<ITablet> = React.memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { unreadCount } = useGetChats();
+  // const { unreadCount } = useGetChats();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
   const { bundles } = useBundles();
-  const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
+  // const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
@@ -87,20 +86,19 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 </Link>
               </SItemWithMargin>
             )}
-
-            {((user.userData?.options?.isOfferingSubscription &&
-              mySubscribersTotal > 0) ||
-              creatorsImSubscribedTo.length > 0) && (
+            {
+              // TODO: re-enable, repurpose for bundles
+              /*
               <SItemWithMargin>
-                <NavigationItem
-                  item={{
-                    url: '/direct-messages',
-                    key: 'directMessages',
-                    counter: unreadCount,
-                  }}
-                />
-              </SItemWithMargin>
-            )}
+              <NavigationItem
+                item={{
+                  url: '/direct-messages',
+                  key: 'directMessages',
+                  counter: unreadCount,
+                }}
+              />
+              </SItemWithMargin> */
+            }
             <SItemWithMargin>
               <NavigationItem
                 item={{

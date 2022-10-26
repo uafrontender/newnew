@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "NewNew - Haz ofertas y vota decisiones ajenas",
+    "title": "NewNew",
     "description": "Decide qué será lo siguiente que las personas harán con sus vidas. Vota, haz ofertas y coopera con la comunidad en NewNew para ver a personas hacer cosas en la vida real"
   },
   "cardsSection": {
@@ -9,7 +9,8 @@
       "for-you": "Para ti",
       "ac": "Los Bids más grandes",
       "mc": "Superpolls populares",
-      "cf": "Goals populares"
+      "cf": "Goals populares",
+      "recent-activity_NEED_TRANSLATION": "Recent Activity"
     },
     "button": {
       "showMore": "Ver más",
@@ -41,6 +42,10 @@
     "biggest": {
       "title": "Lo mejor de todos los tiempos",
       "caption_NEED_TRANSLATION": "This section will display the greatest of all time posts."
+    },
+    "recent-activity_NEED_TRANSLATION": {
+      "title": "Recent Activity",
+      "caption": "This section will display posts you are participating in"
     }
   },
   "faq_NEED_TRANSLATION": {

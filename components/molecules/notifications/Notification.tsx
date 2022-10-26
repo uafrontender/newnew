@@ -43,8 +43,10 @@ const Notification: React.FC<newnewapi.INotification> = ({
       if (target.creatorDashboard && target?.creatorDashboard.section === 1)
         setUrl('/creator/subscribers');
 
-      if (target.userProfile && target?.userProfile.userUsername)
-        setUrl(`/direct-messages/${target.userProfile.userUsername}`);
+      if (target.userProfile && target?.userProfile.userUsername) {
+        // TODO: re-enable, repurpose for bundles
+        // setUrl(`/direct-messages/${target.userProfile.userUsername}`);
+      }
 
       if (target.postResponse && target?.postResponse.postUuid)
         setUrl(`/post/${target.postResponse.postUuid}`);

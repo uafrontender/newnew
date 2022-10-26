@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "NewNew - Bid & Vote Posts",
+    "title": "NewNew",
     "description": "Decide what people do next. Vote, bid and crowdfund with the community to watch people do things IRL on NewNew"
   },
   "cardsSection": {
@@ -9,7 +9,8 @@
       "for-you": "For you",
       "ac": "Biggest Bids",
       "mc": "Top Superpolls",
-      "cf": "Popular Goals"
+      "cf": "Popular Goals",
+      "recent-activity": "Recent Activity"
     },
     "button": {
       "showMore": "See more",
@@ -41,6 +42,10 @@
     "biggest": {
       "title": "Greatest of All Time",
       "caption": "This section will display the greatest of all time posts."
+    },
+    "recent-activity": {
+      "title": "Recent Activity",
+      "caption": "This section will display posts you are participating in"
     }
   },
   "faq": {

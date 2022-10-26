@@ -27,7 +27,6 @@ import { useGetChats } from '../../contexts/chatContext';
 import ReportBugButton from '../molecules/ReportBugButton';
 import { usePostModalState } from '../../contexts/postModalContext';
 import useHasMounted from '../../utils/hooks/useHasMounted';
-import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
 import { useBundles } from '../../contexts/bundlesContext';
@@ -57,9 +56,9 @@ export const General: React.FC<IGeneral> = (props) => {
   const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
   const { bundles } = useBundles();
-  const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
+  const { /* unreadCount, */ setMobileChatOpened, mobileChatOpened } =
+    useGetChats();
   const { postOverlayOpen } = usePostModalState();
-  const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   const hasMounted = useHasMounted();
 
@@ -126,19 +125,13 @@ export const General: React.FC<IGeneral> = (props) => {
                 url: '/notifications',
                 counter: unreadNotificationCount,
               },
-        ].concat(
-          (user.userData?.options?.isOfferingSubscription &&
-            mySubscribersTotal > 0) ||
-            creatorsImSubscribedTo.length > 0
-            ? [
-                {
-                  key: 'dms',
-                  url: '/direct-messages',
-                  counter: unreadCount,
-                },
-              ]
-            : []
-        );
+          // TODO: re-enable, repurpose for bundles
+          /* {
+            key: 'dms',
+            url: '/direct-messages',
+            counter: unreadCount,
+          }, */
+        ];
       }
     }
 
@@ -147,10 +140,7 @@ export const General: React.FC<IGeneral> = (props) => {
     user.loggedIn,
     unreadNotificationCount,
     user.userData?.options?.isCreator,
-    user.userData?.options?.isOfferingSubscription,
-    unreadCount,
-    creatorsImSubscribedTo.length,
-    mySubscribersTotal,
+    // unreadCount,
     bundles,
   ]);
 

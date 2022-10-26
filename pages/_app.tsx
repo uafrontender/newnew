@@ -20,6 +20,7 @@ import * as Sentry from '@sentry/browser';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import countries from 'i18n-iso-countries';
 
 // Custom error page
 import Error from './_error';
@@ -104,19 +105,25 @@ const MyApp = (props: IMyApp): ReactElement => {
   }, [store]);
 
   useEffect(() => {
-    // Imported one by one not to reak import\no-dynamic-require
+    // Imported one by one not to break import\no-dynamic-require rule
     if (locale === 'zh') {
       // eslint-disable-next-line global-require
       require('moment/locale/zh-tw');
       moment.locale('zh-tw');
+      // eslint-disable-next-line global-require
+      countries.registerLocale(require('i18n-iso-countries/langs/zh.json'));
     } else if (locale === 'es') {
       // eslint-disable-next-line global-require
       require('moment/locale/es');
       moment.locale('es');
+      // eslint-disable-next-line global-require
+      countries.registerLocale(require('i18n-iso-countries/langs/es.json'));
     } else if (locale === 'en-US') {
       moment.locale('en-US');
+      // eslint-disable-next-line global-require
+      countries.registerLocale(require('i18n-iso-countries/langs/en.json'));
     }
-  });
+  }, [locale]);
 
   useEffect(() => {
     const hotjarIdVariable = process.env.NEXT_PUBLIC_HOTJAR_ID;
