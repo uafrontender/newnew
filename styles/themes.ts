@@ -145,7 +145,7 @@ export const lightTheme: DefaultTheme = {
         tertiary: '#FFFFFF',
         quaternary: 'rgba(0, 21, 128, 0.06)',
         transparent: 'rgba(11, 10, 19, 0.2)',
-        changeLanguage: '#FFFFFF',
+        changeLanguage: 'rgba(0, 21, 128, 0.06)',
         danger: '#F12C46',
       },
       hover: {

@@ -111,19 +111,20 @@
     "buttonTurnOff": "Turn off bundles",
     "earnings": {
       "title": "Bundles Earnings",
-      "payPeriod": "This pay period",
+      "payPeriod": "this pay period",
       "unitName": "bundle",
       "earned": "earned",
       "noSoldYet": "No bundles sold yet"
     },
     "bundlesSet": {
       "title": "Superpoll Bundles",
-      "subTitle": "Make more money. Have more fun.",
+      "subTitle": "Offer Superpoll bundles to increase your earnings and get closer to your audience. ",
       "votes": "votes",
       "description": "plus people get {{duration}} months of:",
       "descriptionSingular": "plus people get 1 month of:",
       "firstOption": "adding custom options to your Superpolls",
-      "secondOption": "sending you private chats"
+      "secondOption": "sending you private chats",
+      "perBundle": "per bundle"
     }
   },
   "getPaid": {

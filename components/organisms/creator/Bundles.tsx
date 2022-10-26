@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -24,6 +25,7 @@ interface ISuperpollBundle {
   votes: string;
   months: string;
   price: string;
+  isBundlesEnabled?: boolean;
 }
 
 export const Bundles: React.FC = React.memo(() => {
@@ -34,7 +36,7 @@ export const Bundles: React.FC = React.memo(() => {
     resizeMode
   );
 
-  const [isBundlesEnabled, setIsBundlesEnabled] = useState<boolean>(false);
+  const [isBundlesEnabled, setIsBundlesEnabled] = useState<boolean>(true);
 
   const toggleBundlesEnabled = useCallback(() => {
     setIsBundlesEnabled((prevState) => !prevState);
@@ -64,7 +66,7 @@ export const Bundles: React.FC = React.memo(() => {
         id: 4,
         votes: '20,000',
         months: '12',
-        price: '575',
+        price: '75',
       },
     ],
     []
@@ -78,9 +80,10 @@ export const Bundles: React.FC = React.memo(() => {
         votes={item.votes}
         months={item.months}
         price={item.price}
+        isBundlesEnabled={isBundlesEnabled}
       />
     ),
-    []
+    [isBundlesEnabled]
   );
 
   return (
@@ -91,7 +94,9 @@ export const Bundles: React.FC = React.memo(() => {
           <STitle variant={4}>{t('myBundles.title')}</STitle>
           {!isMobile && <DynamicSection />}
         </STitleBlock>
-        {isBundlesEnabled && <BundlesEarnings />}
+        {isBundlesEnabled && (
+          <BundlesEarnings isBundlesEnabled={isBundlesEnabled} />
+        )}
         <SBlock>
           <SHeaderLine>
             <STextHolder>
@@ -104,9 +109,11 @@ export const Bundles: React.FC = React.memo(() => {
                 : t('myBundles.buttonTurnOn')}
             </SButton>
           </SHeaderLine>
-          {collection.map(renderListItem)}
+          <SBundles>{collection.map(renderListItem)}</SBundles>
         </SBlock>
-        {!isBundlesEnabled && <BundlesEarnings />}
+        {!isBundlesEnabled && (
+          <BundlesEarnings isBundlesEnabled={isBundlesEnabled} />
+        )}
       </SContent>
     </SContainer>
   );
@@ -163,7 +170,10 @@ interface ISBlock {
 }
 
 const SBlock = styled.section<ISBlock>`
-  background: ${(props) => props.theme.colorsThemed.background.secondary};
+  background: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colorsThemed.background.primary
+      : theme.colorsThemed.background.secondary};
   padding: 24px;
   border-radius: ${(props) => props.theme.borderRadius.large};
   ${(props) =>
@@ -183,11 +193,13 @@ const SHeaderLine = styled.div`
   display: flex;
   align-items: center;
   flex-direction: row;
-  justify-content: space-between;
-  padding-bottom: 24px;
+  flex-direction: column;
+  margin-bottom: 24px;
 
   ${(props) => props.theme.media.tablet} {
     margin-bottom: 14px;
+    flex-direction: row;
+    justify-content: space-between;
   }
 
   ${(props) => props.theme.media.laptop} {
@@ -198,6 +210,10 @@ const SHeaderLine = styled.div`
 const STextHolder = styled.div`
   display: flex;
   flex-direction: column;
+  margin-bottom: 16px;
+  ${(props) => props.theme.media.tablet} {
+    margin-bottom: 0;
+  }
 `;
 
 interface ISButton {
@@ -205,17 +221,23 @@ interface ISButton {
 }
 const SButton = styled(Button)<ISButton>`
   width: 100%;
+  margin-left: 0;
   padding: 16px 20px;
   background: ${(props) =>
     !props.enabled
       ? props.theme.colorsThemed.accent.yellow
       : props.theme.colorsThemed.background.tertiary};
   color: ${(props) =>
-    !props.enabled ? props.theme.colors.darkGray : props.theme.colors.white};
+    !props.enabled
+      ? props.theme.colors.darkGray
+      : props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
 
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
+    margin-left: 10px;
   }
   &:focus,
   &:active,
@@ -227,6 +249,15 @@ const SButton = styled(Button)<ISButton>`
     color: ${(props) =>
       !props.enabled
         ? props.theme.colors.darkGray
+        : props.theme.name === 'light'
+        ? props.theme.colorsThemed.text.primary
         : props.theme.colors.white} !important;
   }
+`;
+
+const SBundles = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: -16px;
 `;
