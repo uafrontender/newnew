@@ -93,7 +93,7 @@ const FaqSection = () => {
           // @ts-ignore
           components={[
             <SLink
-              href='https://intercom.help/newnew-e1a1ca1980f5/en'
+              href='https://intercom.help/NewNewHelpCenter/en'
               target='_blank'
             />,
           ]}
@@ -252,7 +252,7 @@ const SFloatingImage = styled.img`
 `;
 
 const SSubImageLeftTop = styled(SFloatingImage)`
-  width: 41px;
+  width: ${({ theme }) => (theme.name === 'dark' ? '70px' : '33px')};
   height: 41px;
   left: -2.3%;
   top: -3.2%;
@@ -269,7 +269,7 @@ const SSubImageLeftTop = styled(SFloatingImage)`
 `;
 
 const SSubImageLeftMiddle = styled(SFloatingImage)`
-  width: 19px;
+  width: ${({ theme }) => (theme.name === 'dark' ? '19px' : '16px')};
   height: 19px;
   top: 15.5%;
   left: 2.5%;
@@ -286,7 +286,7 @@ const SSubImageLeftMiddle = styled(SFloatingImage)`
 `;
 
 const SSubImageLeftBottom = styled(SFloatingImage)`
-  width: 26px;
+  width: ${({ theme }) => (theme.name === 'dark' ? '26px' : '21px')};
   height: 26px;
   bottom: 1%;
   left: -2.7%;
@@ -302,7 +302,7 @@ const SSubImageLeftBottom = styled(SFloatingImage)`
 `;
 
 const SSubImageRightTop = styled(SFloatingImage)`
-  width: 70px;
+  width: ${({ theme }) => (theme.name === 'dark' ? '70px' : '56px')};
   height: 70px;
   right: -4%;
   top: 0;
@@ -318,7 +318,7 @@ const SSubImageRightTop = styled(SFloatingImage)`
 `;
 
 const SSubImageRightMiddle = styled(SFloatingImage)`
-  width: 19px;
+  width: ${({ theme }) => (theme.name === 'dark' ? '19px' : '16px')};
   height: 19px;
   top: 15%;
   right: 5%;
@@ -335,7 +335,7 @@ const SSubImageRightMiddle = styled(SFloatingImage)`
 `;
 
 const SSubImageRightBottom = styled(SFloatingImage)`
-  width: 26.23px;
+  width: ${({ theme }) => (theme.name === 'dark' ? '26.23px' : '22.23px')};
   height: 26.03px;
   bottom: 1%;
   right: 2%;

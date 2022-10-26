@@ -95,6 +95,7 @@ const ChatList: React.FC<IFunctionProps> = ({
 
   const tabTypes = useMemo(
     () => [
+      // TODO: integrate with bundles. Need to see chats with bundle owners
       {
         id: 'chatRoomsSubs',
         title: t('userTypes.subscribers'),

@@ -291,14 +291,10 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   // CoR
   const countries = useMemo(
-    () =>
-      availableCountries.map((o, i) => ({
-        name: o.name,
-        value: o.code,
-      })),
+    () => availableCountries.map((o) => o.code),
     [availableCountries]
   );
-  const [selectedCountry, setSelectedCountry] = useState(countries[0].value);
+  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
 
   // Birthdate
   const [dateInEdit, setDateInEdit] = useState<newnewapi.IDateComponents>(
@@ -830,15 +826,11 @@ const OnboardingSectionDetails: React.FunctionComponent<
               }
               onChange={handleEmailInput}
             />
-            <OnboardingCountrySelect<string>
-              label={
-                countries[
-                  countries.findIndex((o) => o.value === selectedCountry)
-                ].name
-              }
+            <OnboardingCountrySelect
               width='100%'
               selected={selectedCountry}
               options={countries}
+              locale={router.locale}
               onSelect={(val) => setSelectedCountry(val)}
               closeOnSelect
             />

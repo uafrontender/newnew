@@ -243,7 +243,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       try {
         const payload = new newnewapi.ValidateTextRequest({
           kind,
-          text: text.trim(),
+          text,
         });
 
         const res = await validateText(payload);
@@ -265,20 +265,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             });
           }
         } else if (kind === newnewapi.ValidateTextRequest.Kind.USER_BIO) {
-          if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-            setFormErrors((errors) => {
-              const errorsWorking = { ...errors };
-              errorsWorking.bioError = errorSwitch(res.data?.status!!);
-              return errorsWorking;
-            });
-          } else {
-            setFormErrors((errors) => {
-              const errorsWorking = { ...errors };
-              errorsWorking.bioError = '';
-              return errorsWorking;
-            });
-          }
-        } else if (kind === newnewapi.ValidateTextRequest.Kind.CREATOR_BIO) {
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
             setFormErrors((errors) => {
               const errorsWorking = { ...errors };
@@ -354,19 +340,18 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         }
       } else if (key === 'bio') {
         validateTextViaAPIDebounced(
-          user.userData?.options?.isCreator
-            ? newnewapi.ValidateTextRequest.Kind.CREATOR_BIO
-            : newnewapi.ValidateTextRequest.Kind.USER_BIO,
+          newnewapi.ValidateTextRequest.Kind.USER_BIO,
           value as ModalMenuUserData['bio']
         );
       }
     },
     [
       dataInEdit,
-      validateTextViaAPIDebounced,
       user.userData?.username,
-      user.userData?.options?.isCreator,
+      setDataInEdit,
+      validateTextViaAPIDebounced,
       validateUsernameViaAPIDebounced,
+      setIsDataValid,
     ]
   );
 

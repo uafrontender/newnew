@@ -5,6 +5,8 @@ import { useRouter } from 'next/router';
 
 import Headline from '../../atoms/Headline';
 import PostCard from '../../molecules/PostCard';
+import StaticPostCard from '../../molecules/home/StaticPostCard';
+import type { TStaticPost } from '../../molecules/home/StaticPostCard';
 import Text from '../../atoms/Text';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 
@@ -13,12 +15,14 @@ import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 
 interface IPostTypeSectionProps {
-  posts: newnewapi.Post[];
+  posts: newnewapi.Post[] | TStaticPost[];
   title: string;
   caption: string;
   iconSrc: string;
   headingPosition: 'right' | 'left';
   loading?: boolean;
+  isStatic?: boolean;
+  padding?: 'small' | 'large';
 }
 
 const PostTypeSection = ({
@@ -28,6 +32,8 @@ const PostTypeSection = ({
   iconSrc,
   headingPosition,
   loading,
+  isStatic,
+  padding,
 }: IPostTypeSectionProps) => {
   const router = useRouter();
   const { postOverlayOpen } = usePostModalState();
@@ -59,8 +65,18 @@ const PostTypeSection = ({
     );
   };
 
+  const renderStaticPosts = (post: TStaticPost, index: number) => (
+    <SItemWrapper index={index} key={post.title}>
+      <StaticPostCard
+        staticPost={post}
+        width={isDesktop ? '204px' : '100%'}
+        maxWidthTablet='100%'
+      />
+    </SItemWrapper>
+  );
+
   return (
-    <SContainer headingPosition={headingPosition}>
+    <SContainer headingPosition={headingPosition} padding={padding}>
       <SHeading>
         <SIconHolder>
           <img src={iconSrc} alt={title} draggable={false} />
@@ -71,7 +87,13 @@ const PostTypeSection = ({
         </SCaption>
       </SHeading>
       {!loading && (
-        <SPosts>{posts.map((post, index) => renderPosts(post, index))}</SPosts>
+        <SPosts>
+          {posts.map((post, index) =>
+            isStatic
+              ? renderStaticPosts(post as TStaticPost, index)
+              : renderPosts(post as newnewapi.Post, index)
+          )}
+        </SPosts>
       )}
       {loading && <SCardSkeletonSection count={isMobile ? 1 : 3} />}
     </SContainer>
@@ -80,16 +102,17 @@ const PostTypeSection = ({
 
 const SContainer = styled.section<{
   headingPosition: 'right' | 'left';
+  padding?: 'small' | 'large';
 }>`
   display: flex;
   flex-direction: column;
   padding: 20px 0;
 
   ${(props) => props.theme.media.laptop} {
-    padding: 60px 0;
+    padding: ${({ padding }) => (padding === 'small' ? '40px 0' : '60px 0')};
   }
 
-  ${({ theme }) => theme.media.laptopM} {
+  ${({ theme }) => theme.media.laptopL} {
     margin: 0 auto;
     max-width: 1248px;
 
@@ -122,7 +145,7 @@ const SHeading = styled.div`
     margin-bottom: 40px;
   }
 
-  ${({ theme }) => theme.media.laptopM} {
+  ${({ theme }) => theme.media.laptopL} {
     align-items: flex-start;
     align-self: unset;
     margin-top: 28px;
@@ -159,7 +182,7 @@ const SHeadline = styled(Headline)`
   font-size: 36px;
   line-height: 44px;
 
-  ${({ theme }) => theme.media.laptopM} {
+  ${({ theme }) => theme.media.laptopL} {
     margin-bottom: 24px;
     font-size: 80px;
     line-height: 86px;
@@ -174,7 +197,7 @@ const SCaption = styled(Text)`
   line-height: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-  ${({ theme }) => theme.media.laptopM} {
+  ${({ theme }) => theme.media.laptopL} {
     padding: 0;
     text-align: left;
     font-size: 16px;
@@ -196,7 +219,7 @@ const SPosts = styled.div`
     gap: 32px;
   }
 
-  ${(props) => props.theme.media.laptopM} {
+  ${(props) => props.theme.media.laptopL} {
     flex-direction: row;
     height: 482px;
   }
@@ -218,7 +241,7 @@ const SItemWrapper = styled.div<{ index: number }>`
     }
   }
 
-  ${(props) => props.theme.media.laptopM} {
+  ${(props) => props.theme.media.laptopL} {
     transform: ${({ index }) => (index !== 1 ? `translateY(25%)` : 0)};
     height: 386px;
 
@@ -231,10 +254,6 @@ const SItemWrapper = styled.div<{ index: number }>`
         theme.name === 'dark'
           ? theme.colorsThemed.background.backgroundDD
           : theme.colorsThemed.background.outlines1};
-    }
-
-    & > div > div:first-child {
-      padding: 60% 0px;
     }
   }
 `;
@@ -275,7 +294,7 @@ const SCardSkeletonSection = styled(CardSkeletonSection)`
       }
     }
 
-    ${({ theme }) => theme.media.laptopM} {
+    ${({ theme }) => theme.media.laptopL} {
       height: 482px;
       width: auto;
 

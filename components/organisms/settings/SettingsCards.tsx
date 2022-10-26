@@ -336,7 +336,6 @@ const SCardListItem = styled.li`
     margin-right: 8px;
     margin-bottom: 0;
     max-width: 320px;
-    min-width: 320px;
 
     &:last-child {
       margin-right: 24px;

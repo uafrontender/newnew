@@ -42,6 +42,20 @@ const assets = {
     lightLandingStatic: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Hold-Frame-Light.webp`,
     lightMobileLandingAnimated: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Mobile-Light.mp4`,
     lightMobileLandingStatic: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Mobile-Light-Hold-Frame.webp`,
+
+    mcExampleThumb1: `${APP_ASSETS_ORIGIN}/home/mc-example-thumb-1.png`,
+    mcExampleThumb2: `${APP_ASSETS_ORIGIN}/home/mc-example-thumb-2.png`,
+    mcExampleThumb3: `${APP_ASSETS_ORIGIN}/home/mc-example-thumb-3.png`,
+    mcExampleAvatar1: `${APP_ASSETS_ORIGIN}/home/mc-example-avatar-1.png`,
+    mcExampleAvatar2: `${APP_ASSETS_ORIGIN}/home/mc-example-avatar-2.png`,
+    mcExampleAvatar3: `${APP_ASSETS_ORIGIN}/home/mc-example-avatar-3.png`,
+
+    acExampleThumb1: `${APP_ASSETS_ORIGIN}/home/ac-example-thumb-1.png`,
+    acExampleThumb2: `${APP_ASSETS_ORIGIN}/home/ac-example-thumb-2.png`,
+    acExampleThumb3: `${APP_ASSETS_ORIGIN}/home/ac-example-thumb-3.png`,
+    acExampleAvatar1: `${APP_ASSETS_ORIGIN}/home/ac-example-avatar-1.png`,
+    acExampleAvatar2: `${APP_ASSETS_ORIGIN}/home/ac-example-avatar-2.png`,
+    acExampleAvatar3: `${APP_ASSETS_ORIGIN}/home/ac-example-avatar-3.png`,
   },
   floatingAssets: {
     darkBottomGlassSphere: `${APP_ASSETS_ORIGIN}/floating-assets/bottom-glass-sphere.png`,

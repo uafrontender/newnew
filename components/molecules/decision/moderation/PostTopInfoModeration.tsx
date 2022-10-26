@@ -128,13 +128,7 @@ const PostTopInfoModeration: React.FunctionComponent<
             <SText variant={3}>
               {t('acPostModeration.postTopInfo.selectWinner.body')}
             </SText>
-            <STrophyImg
-              src={
-                theme.name === 'light'
-                  ? assets.decision.lightHourglassAnimated
-                  : assets.decision.darkHourglassAnimated
-              }
-            />
+            <STrophyImg src={assets.decision.trophy} />
           </SSelectWinnerOption>
         ) : null}
       </SWrapper>
@@ -316,7 +310,6 @@ const STrophyImg = styled.img`
   position: absolute;
   right: -16px;
   top: 8px;
-  height: 106px;
 `;
 
 const SHeadline = styled(Headline)`

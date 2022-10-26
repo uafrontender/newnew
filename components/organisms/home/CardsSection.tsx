@@ -40,6 +40,9 @@ interface ICardSection {
   collection: newnewapi.Post[];
   loading?: boolean;
   tutorialCard?: ReactElement;
+  seeMoreLink?: string;
+  padding?: 'small' | 'large';
+  onReachEnd?: () => void;
 }
 
 export const CardsSection: React.FC<ICardSection> = React.memo(
@@ -51,6 +54,8 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     collection,
     loading,
     tutorialCard,
+    seeMoreLink,
+    onReachEnd,
     ...restProps
   }) => {
     const { t } = useTranslation('page-Home');
@@ -115,7 +120,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
         offset: -32,
         smooth: 'easeOutQuad',
-        duration: SCROLL_CARDS_SECTIONS,
+        duration:
+          SCROLL_CARDS_SECTIONS *
+          (collection.length > 30 ? Math.round(collection.length / 30) : 1),
         horizontal: true,
         containerId: `${category}-scrollContainer`,
       });
@@ -216,13 +223,13 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     const handleSeeMoreClick = () => {
       Mixpanel.track('See More in Category Clicked');
       if (type === 'default') {
-        router.push(`/see-more?category=${category}`);
+        router.push(seeMoreLink || `/see-more?category=${category}`);
       }
     };
 
     // Try to pre-fetch the content
     useEffect(() => {
-      router.prefetch(`/see-more?category=${category}`);
+      router.prefetch(seeMoreLink || `/see-more?category=${category}`);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -263,6 +270,12 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             scrollStep
       );
     }, [visibleListItem, collection, scrollStep]);
+
+    useEffect(() => {
+      if (!canScrollRight && collection.length > 0 && onReachEnd) {
+        onReachEnd();
+      }
+    }, [canScrollRight, onReachEnd, collection.length]);
 
     return (
       <SWrapper name={category} {...restProps}>
@@ -320,7 +333,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             {!loading ? (
               collectionToRender?.map(renderItem)
             ) : (
-              <CardSkeletonSection count={!isMobile ? 5 : 1} />
+              <SCardSkeletonSection count={!isMobile ? 5 : 1} />
             )}
             {(!loading && collection?.length === 0) || !collection ? (
               <SItemWrapper
@@ -382,9 +395,10 @@ CardsSection.defaultProps = {
 
 interface ISWrapper {
   name: string;
+  padding?: 'small' | 'large';
 }
 
-const SWrapper = styled.div<ISWrapper>`
+const SWrapper = styled.section<ISWrapper>`
   padding: 20px 0;
 
   /* No select */
@@ -401,7 +415,7 @@ const SWrapper = styled.div<ISWrapper>`
   }
 
   ${(props) => props.theme.media.laptop} {
-    padding: 60px 0;
+    padding: ${({ padding }) => (padding === 'small' ? '40px 0' : '60px 0')};
     margin: 0;
   }
 
@@ -448,6 +462,29 @@ const SListWrapper = styled.div`
   }
 `;
 
+const SCardSkeletonSection = styled(CardSkeletonSection)`
+  &&& {
+    & > span {
+      gap: 16px;
+
+      ${({ theme }) => theme.media.laptop} {
+        gap: 32px;
+      }
+    }
+  }
+
+  & > span > div {
+    ${({ theme }) => theme.media.tablet} {
+      height: 410px;
+      width: 214px;
+    }
+
+    /* ${({ theme }) => theme.media.mobileL} {
+      width: 224px;
+    } */
+  }
+`;
+
 interface ISItemWrapper {
   name: string;
 }
@@ -460,6 +497,14 @@ const SItemWrapper = styled.div<ISItemWrapper>`
 
     & > div > div:first-child {
       padding: 60% 0px;
+    }
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin: 0 8px;
+
+    & > div > div:first-child {
+      padding: 70% 0px;
     }
   }
 
