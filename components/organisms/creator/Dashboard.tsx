@@ -159,7 +159,8 @@ export const Dashboard: React.FC = React.memo(() => {
             />
           </SBlock>
         ) : (
-          !isToDosCompleted && (
+          !isToDosCompleted &&
+          !user.userData?.options?.isWhiteListed && (
             <SBlock name='your-todos'>
               <YourToDos />
             </SBlock>
@@ -184,13 +185,25 @@ export const Dashboard: React.FC = React.memo(() => {
             </SBlock>
           )
         )}
-        <SBlock>
-          {!isEarningsLoading ? (
-            isToDosCompleted !== undefined ? (
-              isToDosCompleted ? (
-                <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
+        {!user.userData?.options?.isWhiteListed && (
+          <SBlock>
+            {!isEarningsLoading ? (
+              isToDosCompleted !== undefined ? (
+                isToDosCompleted ? (
+                  <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
+                ) : (
+                  <FinishProfileSetup />
+                )
               ) : (
-                <FinishProfileSetup />
+                <Lottie
+                  width={64}
+                  height={64}
+                  options={{
+                    loop: true,
+                    autoplay: true,
+                    animationData: loadingAnimation,
+                  }}
+                />
               )
             ) : (
               <Lottie
@@ -202,19 +215,9 @@ export const Dashboard: React.FC = React.memo(() => {
                   animationData: loadingAnimation,
                 }}
               />
-            )
-          ) : (
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
-              }}
-            />
-          )}
-        </SBlock>
+            )}
+          </SBlock>
+        )}
       </SContent>
     </SContainer>
   );
