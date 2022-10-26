@@ -34,9 +34,7 @@ const YourPostsSection = ({
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const [statusFilter, setStatusFilter] =
-    useState<newnewapi.GetRelatedToMePostsRequest.StatusFilter>(
-      newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL
-    );
+    useState<newnewapi.GetRelatedToMePostsRequest.StatusFilter | null>(null);
 
   const prevStatusFilter = useRef(statusFilter);
 
@@ -51,7 +49,9 @@ const YourPostsSection = ({
         setIsLoadingMore(true);
         const payload = new newnewapi.GetRelatedToMePostsRequest({
           relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
-          statusFilter,
+          statusFilter:
+            statusFilter ||
+            newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL,
           paging: {
             ...(nextPageToken ? { pageToken: nextPageToken } : {}),
             limit: 10,
@@ -117,7 +117,7 @@ const YourPostsSection = ({
     newStatusFilter: newnewapi.GetRelatedToMePostsRequest.StatusFilter
   ) => {
     if (statusFilter === newStatusFilter) {
-      setStatusFilter(newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL);
+      setStatusFilter(null);
     } else {
       setStatusFilter(newStatusFilter);
     }
