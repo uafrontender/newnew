@@ -8,11 +8,11 @@ import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/search/SearchInput';
-// import NavigationItem from '../NavigationItem';
+import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
 // import { useGetChats } from '../../../contexts/chatContext';
-// import { useNotifications } from '../../../contexts/notificationsContext';
+import { useNotifications } from '../../../contexts/notificationsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 export const Desktop: React.FC = React.memo(() => {
@@ -20,7 +20,7 @@ export const Desktop: React.FC = React.memo(() => {
   const user = useAppSelector((state) => state.user);
 
   // const { unreadCount } = useGetChats();
-  // const { unreadNotificationCount } = useNotifications();
+  const { unreadNotificationCount } = useNotifications();
   const { globalSearchActive } = useAppSelector((state) => state.ui);
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -75,16 +75,16 @@ export const Desktop: React.FC = React.memo(() => {
                   counter: unreadCount,
                 }}
               />
-            </SItemWithMargin>
-            <SItemWithMargin>
-              <NavigationItem
-                item={{
-                  url: '/notifications',
-                  key: 'notifications',
-                  counter: unreadNotificationCount,
-                }}
-              />
             </SItemWithMargin> */
+              <SItemWithMargin>
+                <NavigationItem
+                  item={{
+                    url: '/notifications',
+                    key: 'notifications',
+                    counter: unreadNotificationCount,
+                  }}
+                />
+              </SItemWithMargin>
             }
           </>
         )}
