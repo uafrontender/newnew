@@ -22,12 +22,11 @@ import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
 import { useAppSelector } from '../../../../redux-store/store';
 
-import chatIcon from '../../../../public/images/svg/icons/filled/Chat.svg';
+// import chatIcon from '../../../../public/images/svg/icons/filled/Chat.svg';
 import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessage.svg';
 import notificationsIcon from '../../../../public/images/svg/icons/filled/Notifications.svg';
-import { useGetChats } from '../../../../contexts/chatContext';
+// import { useGetChats } from '../../../../contexts/chatContext';
 import { useNotifications } from '../../../../contexts/notificationsContext';
-import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 
 const NewMessageModal = dynamic(() => import('./NewMessageModal'));
@@ -47,11 +46,10 @@ export const DynamicSection = () => {
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState<TElementAnimations>('o-12');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const { unreadCountForCreator } = useGetChats();
+  // const { unreadCountForCreator } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
   const [markReadNotifications, setMarkReadNotifications] = useState(false);
-  const { mySubscribersTotal } = useGetSubscriptions();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -76,30 +74,21 @@ export const DynamicSection = () => {
         counter: unreadNotificationCount,
         nameToken: 'notifications',
       },
-      {
+      // TODO: re-enable, repurpose for bundles
+      /* {
         url: '/creator/dashboard?tab=chat',
         counter: unreadCountForCreator,
         nameToken: 'chat',
-      },
+      }, */
     ],
-    [unreadCountForCreator, unreadNotificationCount]
+    [/* unreadCountForCreator, */ unreadNotificationCount]
   );
 
-  const tabNotification: Tab[] = useMemo(
-    () => [
-      {
-        url: '/creator/dashboard?tab=notifications',
-        counter: unreadNotificationCount,
-        nameToken: 'notifications',
-      },
-    ],
-    [unreadNotificationCount]
-  );
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
 
-  const handleChatClick = useCallback(() => {
+  /* const handleChatClick = useCallback(() => {
     router.push('/creator/dashboard?tab=chat');
-  }, [router]);
+  }, [router]); */
   const handleNotificationsClick = useCallback(() => {
     router.push('/creator/dashboard?tab=notifications');
   }, [router]);
@@ -172,28 +161,31 @@ export const DynamicSection = () => {
             </SIconHolder>
             {t('dashboard.button.notifications')}
           </SButton>
-          {user.userData?.options?.isOfferingSubscription && (
-            <SButton view='secondary' onClick={handleChatClick}>
-              <SIconHolder>
-                <SInlineSVG
-                  svg={chatIcon}
-                  fill={
-                    theme.name === 'light'
-                      ? theme.colors.black
-                      : theme.colors.white
-                  }
-                  width='24px'
-                  height='24px'
-                />
-                {unreadCountForCreator > 0 && (
-                  <SIndicatorContainer>
-                    <SIndicator minified />
-                  </SIndicatorContainer>
-                )}
-              </SIconHolder>
-              {t('dashboard.button.directMessages')}
-            </SButton>
-          )}
+          {
+            // TODO: re-enable, repurpose for bundles
+            /*
+          <SButton view='secondary' onClick={handleChatClick}>
+            <SIconHolder>
+              <SInlineSVG
+                svg={chatIcon}
+                fill={
+                  theme.name === 'light'
+                    ? theme.colors.black
+                    : theme.colors.white
+                }
+                width='24px'
+                height='24px'
+              />
+              {unreadCountForCreator > 0 && (
+                <SIndicatorContainer>
+                  <SIndicator minified />
+                </SIndicatorContainer>
+              )}
+            </SIconHolder>
+            {t('dashboard.button.directMessages')}
+          </SButton> 
+          */
+          }
         </>
       )}
       <AnimatedPresence
@@ -217,22 +209,12 @@ export const DynamicSection = () => {
             <>
               <SSectionTopLine tab={tab as string}>
                 <STabsWrapper>
-                  {user.userData?.options?.isOfferingSubscription &&
-                  mySubscribersTotal > 0 ? (
-                    <Tabs
-                      t={t}
-                      tabs={tabs}
-                      draggable={false}
-                      activeTabIndex={activeTabIndex}
-                    />
-                  ) : (
-                    <Tabs
-                      t={t}
-                      tabs={tabNotification}
-                      draggable={false}
-                      activeTabIndex={0}
-                    />
-                  )}
+                  <Tabs
+                    t={t}
+                    tabs={tabs}
+                    draggable={false}
+                    activeTabIndex={activeTabIndex}
+                  />
                 </STabsWrapper>
                 <SSectionTopLineButtons>
                   {tab === 'notifications' ||

@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-boolean-value */
 import React from 'react';
 import { LayoutGroup } from 'framer-motion';
+import styled from 'styled-components';
 
 import GeneralTemplate from './General';
 
@@ -14,13 +15,20 @@ const HomeLayout: React.FC<IHomeLayout> = (props) => {
   // TODO: fix Error boundary issue (not on top)
   return (
     <LayoutGroup>
-      <GeneralTemplate
+      <SGeneralTemplate
+
       // restrictMaxWidth={true}
       >
         {children}
-      </GeneralTemplate>
+      </SGeneralTemplate>
     </LayoutGroup>
   );
 };
+
+const SGeneralTemplate = styled(GeneralTemplate)`
+  & > main {
+    padding-bottom: 0;
+  }
+`;
 
 export default HomeLayout;

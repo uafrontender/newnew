@@ -37,7 +37,7 @@ export const Mobile: React.FC = React.memo(() => {
             </a>
           </Link>
         </SItemWithMargin>
-        {user.loggedIn ? (
+        {user.loggedIn && (
           <>
             {user.userData?.options?.isCreator ? (
               <SItemWithMargin>
@@ -70,28 +70,6 @@ export const Mobile: React.FC = React.memo(() => {
                 </Link>
               </SItemWithMargin>
             )}
-          </>
-        ) : (
-          <>
-            <SItemWithMargin>
-              <Link href='/sign-up?to=create'>
-                <a>
-                  <SButton
-                    view='primaryGrad'
-                    withDim
-                    withShrink
-                    withShadow
-                    onClick={() => {
-                      Mixpanel.track('Navigation Item Clicked', {
-                        _button: 'Create now',
-                      });
-                    }}
-                  >
-                    {t('button.createOnNewnew')}
-                  </SButton>
-                </a>
-              </Link>
-            </SItemWithMargin>
           </>
         )}
       </SRightBlock>

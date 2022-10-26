@@ -29,7 +29,7 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
 // import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 // import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
-import { getSubscriptionStatus } from '../../api/endpoints/subscription';
+// import { getSubscriptionStatus } from '../../api/endpoints/subscription';
 // import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
 
@@ -44,8 +44,8 @@ import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
 import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
-import CustomLink from '../atoms/CustomLink';
-import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+// import CustomLink from '../atoms/CustomLink';
+// import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 import SmsNotificationsButton from '../molecules/profile/SmsNotificationsButton';
 import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
 
@@ -94,8 +94,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
-  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
-  const [wasSubscribed, setWasSubscribed] = useState<boolean | null>(null);
+  // const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
+  // const [wasSubscribed, setWasSubscribed] = useState<boolean | null>(null);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
   // Share
@@ -203,7 +203,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     postsCachedActivityCount
   );
 
-  const { creatorsImSubscribedTo } = useGetSubscriptions();
+  // const { creatorsImSubscribedTo } = useGetSubscriptions();
 
   const handleSetPostsCreatorsDecisions: React.Dispatch<
     React.SetStateAction<newnewapi.Post[]>
@@ -417,7 +417,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     user.uuid,
   ]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     async function fetchIsSubscribed() {
       try {
         const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
@@ -450,7 +450,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     //   isSub = creatorsImSubscribedTo.find((cr) => cr.uuid === user.uuid);
     // }
     // isSub ? setIsSubscribed(true) : setIsSubscribed(false);
-  }, [creatorsImSubscribedTo, user.uuid]);
+  }, [creatorsImSubscribedTo, user.uuid]); */
 
   const moreButtonRef = useRef() as any;
 
@@ -493,10 +493,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
           <SSideButtons>
             {user.options?.isCreator ? (
-              <SmsNotificationsButton
-                subscription={subscription}
-                isMobile={isMobile}
-              />
+              <SmsNotificationsButton subscription={subscription} />
             ) : (
               <div />
             )}
@@ -599,7 +596,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 )}
               </SShareButton>
             </SShareDiv>
-            {user.options?.isOfferingSubscription &&
+            {
+              // TODO: re-enable, repurpose for bundles (or remove it?)
+              /* user.options?.isOfferingSubscription &&
               user.uuid !== currentUser.userData?.userUuid &&
               (isSubscribed || wasSubscribed) && (
                 <CustomLink
@@ -610,7 +609,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                     {t('profileLayout.buttons.sendMessage')}
                   </SSendButton>
                 </CustomLink>
-              )}
+              ) */
+            }
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
           </SUserData>
           {/* Temp, all creactors for now */}
@@ -741,7 +741,7 @@ const SShareButton = styled(Button)`
   }
 `;
 
-const SSendButton = styled(Button)`
+/* const SSendButton = styled(Button)`
   margin: 0 auto 16px;
   background: ${(props) => props.theme.colorsThemed.accent.yellow};
   color: #2c2c33;
@@ -754,7 +754,7 @@ const SSendButton = styled(Button)`
     background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
     box-shadow: none !important;
   }
-`;
+`; */
 
 const SBioText = styled(Text)`
   text-align: center;

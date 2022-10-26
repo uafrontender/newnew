@@ -40,7 +40,10 @@ interface ICardSection {
   collection: newnewapi.Post[];
   loading?: boolean;
   tutorialCard?: ReactElement;
+  seeMoreLink?: string;
+  padding?: 'small' | 'large';
   handlePostClicked: (post: newnewapi.Post) => void;
+  onReachEnd?: () => void;
 }
 
 export const CardsSection: React.FC<ICardSection> = React.memo(
@@ -52,7 +55,10 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     collection,
     loading,
     tutorialCard,
+    seeMoreLink,
+    onReachEnd,
     handlePostClicked,
+    ...restProps
   }) => {
     const { t } = useTranslation('page-Home');
     const router = useRouter();
@@ -116,7 +122,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
         offset: -32,
         smooth: 'easeOutQuad',
-        duration: SCROLL_CARDS_SECTIONS,
+        duration:
+          SCROLL_CARDS_SECTIONS *
+          (collection.length > 30 ? Math.round(collection.length / 30) : 1),
         horizontal: true,
         containerId: `${category}-scrollContainer`,
       });
@@ -185,8 +193,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
                 item={item}
                 shouldStop={postOverlayOpen}
                 index={tutorialCard !== undefined ? index + 1 : index}
-                width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
-                height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
+                width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
+                height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
+                maxWidthTablet='224px'
               />
             </SItemWrapper>
           </React.Fragment>
@@ -205,8 +214,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             item={item}
             shouldStop={postOverlayOpen}
             index={tutorialCard !== undefined ? index + 1 : index}
-            width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
-            height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
+            width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
+            height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
+            maxWidthTablet='224px'
           />
         </SItemWrapper>
       );
@@ -215,13 +225,13 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     const handleSeeMoreClick = () => {
       Mixpanel.track('See More in Category Clicked');
       if (type === 'default') {
-        router.push(`/see-more?category=${category}`);
+        router.push(seeMoreLink || `/see-more?category=${category}`);
       }
     };
 
     // Try to pre-fetch the content
     useEffect(() => {
-      router.prefetch(`/see-more?category=${category}`);
+      router.prefetch(seeMoreLink || `/see-more?category=${category}`);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -263,8 +273,14 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       );
     }, [visibleListItem, collection, scrollStep]);
 
+    useEffect(() => {
+      if (!canScrollRight && collection.length > 0 && onReachEnd) {
+        onReachEnd();
+      }
+    }, [canScrollRight, onReachEnd, collection.length]);
+
     return (
-      <SWrapper name={category}>
+      <SWrapper name={category} {...restProps}>
         <STopWrapper>
           {type === 'default' ? (
             <Headline variant={4} animation='t-01'>
@@ -319,7 +335,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             {!loading ? (
               collectionToRender?.map(renderItem)
             ) : (
-              <CardSkeletonSection count={!isMobile ? 5 : 1} />
+              <SCardSkeletonSection count={!isMobile ? 5 : 1} />
             )}
             {(!loading && collection?.length === 0) || !collection ? (
               <SItemWrapper
@@ -330,7 +346,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
               </SItemWrapper>
             ) : null}
           </SListWrapper>
-          {!isMobile && (
+          {!isMobile && !isTablet && (
             <>
               {!isDragging && canScrollLeft && (
                 <ScrollArrowPermanent
@@ -381,10 +397,11 @@ CardsSection.defaultProps = {
 
 interface ISWrapper {
   name: string;
+  padding?: 'small' | 'large';
 }
 
-const SWrapper = styled.div<ISWrapper>`
-  padding: 24px 0;
+const SWrapper = styled.section<ISWrapper>`
+  padding: 20px 0;
 
   /* No select */
   -webkit-touch-callout: none;
@@ -395,18 +412,18 @@ const SWrapper = styled.div<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 32px 0;
-
-    margin: 0 auto;
-    max-width: 696px;
+    padding: 52px 0 50px;
+    margin: 0 -32px;
   }
 
   ${(props) => props.theme.media.laptop} {
-    padding: 40px 0;
+    padding: ${({ padding }) => (padding === 'small' ? '40px 0' : '60px 0')};
+    margin: 0;
   }
 
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
+    margin: 0 auto;
   }
 `;
 
@@ -432,10 +449,10 @@ const SListWrapper = styled.div`
   -ms-overflow-style: none;
 
   ${(props) => props.theme.media.tablet} {
-    left: 32px;
     /* padding: 24px 24px 0 24px; */
     /* padding: 32px 56px 0 64px; */
-    width: calc(100% - 64px);
+    padding: 24px 32px 0;
+    left: -8px;
 
     flex-direction: row;
   }
@@ -444,6 +461,29 @@ const SListWrapper = styled.div`
     left: -16px;
     width: calc(100% + 32px);
     padding: 32px 0 0 0;
+  }
+`;
+
+const SCardSkeletonSection = styled(CardSkeletonSection)`
+  &&& {
+    & > span {
+      gap: 16px;
+
+      ${({ theme }) => theme.media.laptop} {
+        gap: 32px;
+      }
+    }
+  }
+
+  & > span > div {
+    ${({ theme }) => theme.media.tablet} {
+      height: 410px;
+      width: 214px;
+    }
+
+    /* ${({ theme }) => theme.media.mobileL} {
+      width: 224px;
+    } */
   }
 `;
 
@@ -456,6 +496,18 @@ const SItemWrapper = styled.div<ISItemWrapper>`
 
   ${(props) => props.theme.media.tablet} {
     margin: 0 8px;
+
+    & > div > div:first-child {
+      padding: 60% 0px;
+    }
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin: 0 8px;
+
+    & > div > div:first-child {
+      padding: 70% 0px;
+    }
   }
 
   ${(props) => props.theme.media.laptop} {
@@ -480,10 +532,8 @@ const STopWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  margin-bottom: 16px;
-
   ${(props) => props.theme.media.tablet} {
-    padding: 0px 32px;
+    padding: 0 32px;
   }
 
   ${(props) => props.theme.media.laptop} {
