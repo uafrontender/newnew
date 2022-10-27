@@ -1,12 +1,10 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable react/no-array-index-key */
-import React, { useCallback } from 'react';
+import React from 'react';
 import styled, { css, useTheme } from 'styled-components';
-import Image from 'next/image';
 import { useTranslation } from 'next-i18next';
 import Text from '../../../atoms/Text';
-import smallvote from '../../../../public/images/dashboard/votes-small.png';
 import BulletCheckmark from '../../../atoms/BulletCheckmark';
+import TicketSet from '../../../atoms/bundles/TicketSet';
 
 interface IFunctionProps {
   id: number;
@@ -26,25 +24,6 @@ export const SuperpollBundle: React.FC<IFunctionProps> = ({
   const { t } = useTranslation('page-Creator');
   const theme = useTheme();
 
-  const renderIco = useCallback(
-    () =>
-      [...Array(id)].map((e, i) => (
-        <SIco
-          index={i}
-          className='busterCards'
-          key={`bundle-votes-${i}-${months}`}
-        >
-          <Image
-            src={smallvote}
-            alt={`${votes} ${t('myBundles.bundlesSet.votes')}`}
-            width={36}
-            height={36}
-          />
-        </SIco>
-      )),
-    [id, months, votes, t]
-  );
-
   return (
     <SContainer>
       <SHeader>
@@ -52,7 +31,7 @@ export const SuperpollBundle: React.FC<IFunctionProps> = ({
           <SVotesQty isBundlesEnabled={isBundlesEnabled}>{votes}</SVotesQty>{' '}
           {t('myBundles.bundlesSet.votes')}
         </SVotes>
-        <SIcos>{renderIco()}</SIcos>
+        <TicketSet size={36} shift={11} numberOFTickets={id} />
       </SHeader>
       {months === '1' ? (
         <SText variant={3}>
@@ -145,22 +124,6 @@ const SVotesQty = styled.strong<ISSVotesQty>`
       : props.isBundlesEnabled
       ? props.theme.colorsThemed.text.primary
       : props.theme.colorsThemed.accent.yellow};
-`;
-
-const SIcos = styled.div`
-  position: relative;
-  height: 36px;
-`;
-
-interface ISIco {
-  index: number;
-}
-const SIco = styled.div<ISIco>`
-  position: absolute;
-  right: ${(props) => props.index * 11}px;
-  top: 0;
-  width: 36px;
-  height: 36px;
 `;
 
 interface ISText {

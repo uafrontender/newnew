@@ -137,9 +137,9 @@ export const Bundles = () => {
 
           {!isMobile &&
             bundles &&
-            Array.from(
-              'x'.repeat(Math.max(visibleBundlesNumber - bundles.length, 0))
-            ).map((v, index) => <BundleCard key={`${index}-holder`} />)}
+            [...Array(Math.max(visibleBundlesNumber - bundles.length, 0))].map(
+              (v, index) => <BundleCard key={`${index}-holder`} />
+            )}
         </SBundlesContainer>
         <SectionTitle>{t('search.title')}</SectionTitle>
         <SInputWrapper>

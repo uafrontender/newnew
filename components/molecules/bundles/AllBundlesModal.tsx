@@ -69,7 +69,7 @@ const AllBundlesModal: React.FC<IAllBundlesModal> = React.memo(
                   creatorBundle={bundle}
                 />
               ))}
-              {Array.from('x'.repeat(setSize - set.length)).map((v, index) => (
+              {[...Array(setSize - set.length)].map((v, index) => (
                 <BundleCard key={`${setIndex}-${index}-holder`} small />
               ))}
             </SBundleSetContainer>

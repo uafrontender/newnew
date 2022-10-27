@@ -25,7 +25,7 @@ const TicketSet: React.FC<ITicketSet> = ({
       size={size}
       shift={shift}
     >
-      {Array.from('x'.repeat(numberOFTickets)).map((v, index) => (
+      {[...Array(numberOFTickets)].map((v, index) => (
         <SIcon
           key={index}
           src={theme.name === 'light' ? VoteIconLight.src : VoteIconDark.src}
@@ -59,4 +59,5 @@ const SIcon = styled.img<{ index: number; size: number; shift: number }>`
   height: ${({ size }) => `${size}px`};
   position: absolute;
   left: ${({ index, shift }) => `${shift * index}px`};
+  z-index: ${({ index }) => 1000 - index};
 `;
