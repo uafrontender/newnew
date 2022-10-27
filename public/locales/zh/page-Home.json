@@ -87,5 +87,7 @@
       "active": "Active",
       "ended": "Ended"
     }
-  }
+  },
+  "ooops_NEED_TRANSLATION": "Ooops!",
+  "noPosts_NEED_TRANSLATION": "No posts found"
 }
