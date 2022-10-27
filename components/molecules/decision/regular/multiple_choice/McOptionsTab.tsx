@@ -200,7 +200,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       });
 
       const res = await addNewOption(payload);
-      console.log(res);
+
       if (
         !res.data ||
         res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
