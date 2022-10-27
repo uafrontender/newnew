@@ -522,7 +522,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                     height='20px'
                   />
                 </SButtonIcon>
-                {!isMobile && (
+                {!isMobile && isEllipseMenuOpen && (
                   <PostCardEllipseMenu
                     postUuid={postParsed.postUuid}
                     postType={typeOfPost as string}
@@ -561,7 +561,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               onClose={handleReportClose}
             />
           )}
-          {isMobile && (
+          {isMobile && isEllipseMenuOpen && (
             <PostCardEllipseModal
               isOpen={isEllipseMenuOpen}
               zIndex={11}

@@ -166,7 +166,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           }
         }
 
-        if (user.loggedIn) {
+        if (user.loggedIn && isVisible) {
           // setTimeout used to fix the React memory leak warning
           const timer = setTimeout(() => {
             fetchIsFollowing();
@@ -175,7 +175,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
             clearTimeout(timer);
           };
         }
-      }, [user.loggedIn, postUuid]);
+      }, [user.loggedIn, postUuid, isVisible]);
 
       return (
         <SEllipseMenu
@@ -202,7 +202,8 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
                 <Skeleton
                   count={1}
                   height='100%'
-                  width='100px'
+                  width='120px'
+                  wrapper={SSkeletonWrapper}
                   highlightColor={theme.colorsThemed.background.primary}
                 />
               )}
@@ -235,4 +236,10 @@ const SEllipseMenu = styled(EllipseMenu)`
 
 const SEllipseMenuButton = styled(EllipseMenuButton)`
   text-align: right;
+`;
+
+const SSkeletonWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  padding: 8px;
 `;
