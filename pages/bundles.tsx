@@ -243,6 +243,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: flex-start;
   padding-top: 4px;
+  padding-bottom: 24px;
   background: url(${assets.bundles.votesBackgroundSmall});
   background-size: contain;
   background-repeat: no-repeat;
@@ -389,7 +390,10 @@ const SLeftInlineSVG = styled(InlineSvg)`
 `;
 
 const SearchResultsTitle = styled.h4`
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
+  color: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colorsThemed.text.primary
+      : theme.colorsThemed.text.secondary};
   font-weight: 700;
   font-size: 24px;
   line-height: 32px;
