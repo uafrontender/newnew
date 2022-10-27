@@ -87,7 +87,7 @@ const PostPage: NextPage<IPostPage> = ({
 export default PostPage;
 
 (PostPage as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <GeneralLayout>{page}</GeneralLayout>
+  <GeneralLayout noMobieNavigation>{page}</GeneralLayout>
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
