@@ -244,6 +244,7 @@
   "tabs": {
     "comments": "Commentarios",
     "bids": "Ofertas",
+    "bids_singular": "Oferta",
     "options": "Opciones",
     "backers": "Patrocinadores",
     "winner": "Ganador",

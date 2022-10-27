@@ -707,7 +707,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           <PostVotingTab>
             {`${
               !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
-            } ${t('tabs.bids')}`}
+            } ${
+              numberOfOptions === 1 ? t('tabs.bids_singular') : t('tabs.bids')
+            }`}
           </PostVotingTab>
           <AcOptionsTab
             postId={post.postUuid}
