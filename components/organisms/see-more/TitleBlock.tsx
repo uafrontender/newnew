@@ -51,12 +51,12 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   );
   const collectionTypeOptions: any = useMemo(
     () => [
-      {
-        key: 'ac',
-      },
-      {
-        key: 'mc',
-      },
+      // {
+      //   key: 'ac',
+      // },
+      // {
+      //   key: 'mc',
+      // },
       // {
       //   key: 'cf',
       // },
@@ -65,8 +65,11 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
       // },
       ...(authenticated
         ? [
+            // {
+            //   key: 'for-you',
+            // },
             {
-              key: 'for-you',
+              key: 'recent-activity',
             },
           ]
         : []),
