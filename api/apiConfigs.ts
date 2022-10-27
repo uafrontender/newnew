@@ -10,7 +10,8 @@ export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 // Initialize global Cookies instance available throughout the whole app
 export const cookiesInstance = new Cookies();
 
-let fetchInitialized = false;
+// eslint-disable-next-line import/no-mutable-exports
+export let fetchInitialized = false;
 let fetchInitializationTriggered = false;
 
 // eslint-disable-next-line no-async-promise-executor
