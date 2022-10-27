@@ -87,5 +87,7 @@
       "active": "Active",
       "ended": "Ended"
     }
-  }
+  },
+  "ooops": "Ooops!",
+  "noPosts": "No posts found"
 }
