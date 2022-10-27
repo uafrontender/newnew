@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import { getMyBundles } from '../api/endpoints/bundles';
 import { useAppSelector } from '../redux-store/store';
-import dateToTimestamp from '../utils/dateToTimestamp';
 import { SocketContext } from './socketContext';
 
 export const BundlesContext = createContext<{
@@ -54,73 +53,6 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
     [bundles, isLoading, handleSetBundles]
   );
 
-  // TODO: Remove test data
-  /* useEffect(() => {
-    setBundles([
-      new newnewapi.CreatorBundle({
-        creator: new newnewapi.User({
-          uuid: '3d537e81-d2dc-4bb3-9698-39152a817ab5',
-          avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-          nickname: 'CreatorDisplayName',
-          username: 'username',
-        }),
-        bundle: new newnewapi.Bundle({
-          accessExpiresAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-          votesLeft: 4,
-        }),
-      }),
-      new newnewapi.CreatorBundle({
-        creator: new newnewapi.User({
-          uuid: 'c82f8990-5ef3-4a6f-b289-b14117a1094a',
-          avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-          nickname: 'CreatorDisplayName',
-          username: 'username',
-        }),
-        bundle: new newnewapi.Bundle({
-          accessExpiresAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-          votesLeft: 4200,
-        }),
-      }),
-      new newnewapi.CreatorBundle({
-        creator: new newnewapi.User({
-          uuid: '9972ee11-beba-418e-980a-1d115e691116',
-          avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-          nickname: 'CreatorDisplayName',
-          username: 'username',
-        }),
-        bundle: new newnewapi.Bundle({
-          accessExpiresAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-          votesLeft: 0,
-        }),
-      }),
-      new newnewapi.CreatorBundle({
-        creator: new newnewapi.User({
-          uuid: '4590b3a8-1610-4ba5-b82f-894fd5e89aa0',
-          avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-          nickname: 'CreatorDisplayName',
-          username: 'username',
-        }),
-        bundle: new newnewapi.Bundle({
-          accessExpiresAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-          votesLeft: 342,
-        }),
-      }),
-      new newnewapi.CreatorBundle({
-        creator: new newnewapi.User({
-          uuid: '5f3c11d0-082c-45b4-aeb5-51e97f85111b',
-          avatarUrl: 'https://www.w3schools.com/howto/img_avatar.png',
-          nickname: 'CreatorDisplayName',
-          username: 'username',
-        }),
-        bundle: new newnewapi.Bundle({
-          accessExpiresAt: dateToTimestamp(new Date(Date.now() + 5356800000)),
-          votesLeft: 123,
-        }),
-      }),
-    ]);
-  }, []); */
-
-  // TODO: Integrate bundle loading
   // Load bundles
   useEffect(() => {
     async function fetchBundles() {
@@ -170,7 +102,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
       });
     };
 
-    const handlePackChanged = async (data: any) => {
+    const handleBundleChanged = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.CreatorBundleChanged.decode(arr);
 
@@ -201,13 +133,13 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
 
     if (socketConnection && user.loggedIn) {
       socketConnection?.on('CreatorBundleCreated', handlerBundleCreated);
-      socketConnection?.on('CreatorBundleChanged', handlePackChanged);
+      socketConnection?.on('CreatorBundleChanged', handleBundleChanged);
     }
 
     return () => {
       if (socketConnection && socketConnection?.connected && user.loggedIn) {
         socketConnection?.off('CreatorBundleCreated', handlerBundleCreated);
-        socketConnection?.off('CreatorBundleChanged', handlePackChanged);
+        socketConnection?.off('CreatorBundleChanged', handleBundleChanged);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

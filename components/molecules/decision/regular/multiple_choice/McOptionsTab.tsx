@@ -200,7 +200,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       });
 
       const res = await addNewOption(payload);
-
+      console.log(res);
       if (
         !res.data ||
         res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
@@ -848,7 +848,10 @@ const SBundlesContainer = styled.div<{ highlighted: boolean }>`
   border-color: ${({ theme, highlighted }) =>
     highlighted
       ? theme.colorsThemed.accent.yellow
-      : theme.colorsThemed.tag.color.primary};
+      : // TODO: standardize color
+      theme.name === 'light'
+      ? '#E5E9F1'
+      : '#2C2C33'};
   margin-top: 32px;
 
   ${({ theme }) => theme.media.tablet} {
