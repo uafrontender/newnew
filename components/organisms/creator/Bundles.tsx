@@ -3,11 +3,13 @@ import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
+import { newnewapi } from 'newnew-api';
 
 import Headline from '../../atoms/Headline';
 import { useAppSelector } from '../../../redux-store/store';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
+import { setBundleStatus } from '../../../api/endpoints/bundles';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -38,8 +40,19 @@ export const Bundles: React.FC = React.memo(() => {
 
   const [isBundlesEnabled, setIsBundlesEnabled] = useState<boolean>(true);
 
-  const toggleBundlesEnabled = useCallback(() => {
-    setIsBundlesEnabled((prevState) => !prevState);
+  const toggleBundlesEnabled = useCallback(async (enabled: boolean) => {
+    const payload = new newnewapi.SetBundleStatusRequest({
+      bundleStatus: enabled
+        ? newnewapi.CreatorBundleStatus.ENABLED
+        : newnewapi.CreatorBundleStatus.DISABLED,
+    });
+
+    const res = await setBundleStatus(payload);
+
+    // TODO: add translation
+    if (!res.data || res.error) throw new Error('Request failed');
+
+    setIsBundlesEnabled(enabled);
   }, []);
 
   const collection: ISuperpollBundle[] = useMemo(
@@ -103,7 +116,10 @@ export const Bundles: React.FC = React.memo(() => {
               <STitle variant={6}>{t('myBundles.bundlesSet.title')}</STitle>
               <SText variant={3}>{t('myBundles.bundlesSet.subTitle')}</SText>
             </STextHolder>
-            <SButton onClick={toggleBundlesEnabled} enabled={isBundlesEnabled}>
+            <SButton
+              onClick={() => toggleBundlesEnabled(!isBundlesEnabled)}
+              enabled={isBundlesEnabled}
+            >
               {isBundlesEnabled
                 ? t('myBundles.buttonTurnOff')
                 : t('myBundles.buttonTurnOn')}
