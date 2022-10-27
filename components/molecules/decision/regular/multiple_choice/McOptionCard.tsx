@@ -562,6 +562,16 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                     ? (option.firstVoter.username as string)
                     : undefined
                 }
+                whiteListedSupporter={
+                  option.whitelistSupporter
+                    ? getDisplayname(option.whitelistSupporter)
+                    : undefined
+                }
+                whiteListedSupporterUsername={
+                  option.whitelistSupporter
+                    ? (option.whitelistSupporter.username as string)
+                    : undefined
+                }
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubtracted}
                 amISubscribed={amISubscribed}
@@ -808,6 +818,16 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                       ? (option.firstVoter.username as string)
                       : undefined
                   }
+                  whiteListedSupporter={
+                    option.whitelistSupporter
+                      ? getDisplayname(option.whitelistSupporter)
+                      : undefined
+                  }
+                  whiteListedSupporterUsername={
+                    option.whitelistSupporter
+                      ? (option.whitelistSupporter.username as string)
+                      : undefined
+                  }
                   supporterCount={option.supporterCount}
                   supporterCountSubtracted={supporterCountSubtracted}
                   amISubscribed={amISubscribed}
@@ -894,6 +914,8 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   optionCreatorUsername?: string;
   firstVoter?: string;
   firstVoterUsername?: string;
+  whiteListedSupporter?: string;
+  whiteListedSupporterUsername?: string;
   amISubscribed?: boolean;
 }> = ({
   isCreatorsBid,
@@ -905,6 +927,8 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   optionCreatorUsername,
   firstVoter,
   firstVoterUsername,
+  whiteListedSupporter,
+  whiteListedSupporterUsername,
   amISubscribed,
 }) => {
   const theme = useTheme();
@@ -915,7 +939,19 @@ export const RenderSupportersInfo: React.FunctionComponent<{
       <>
         {supporterCount > 0 ? (
           <>
-            {firstVoter && (
+            {whiteListedSupporter ? (
+              <Link href={`/${whiteListedSupporterUsername}`}>
+                <SSpanBiddersHighlighted
+                  onClick={(e) => e.stopPropagation()}
+                  className='spanHighlighted'
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                >
+                  {whiteListedSupporter}
+                </SSpanBiddersHighlighted>
+              </Link>
+            ) : firstVoter ? (
               <Link href={`/${firstVoterUsername}`}>
                 <SSpanBiddersHighlighted
                   onClick={(e) => e.stopPropagation()}
@@ -927,7 +963,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   {firstVoter}
                 </SSpanBiddersHighlighted>
               </Link>
-            )}
+            ) : null}
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>
@@ -945,6 +981,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
       </>
     );
   }
+
   if (isCreatorsBid && isSupportedByMe) {
     return (
       <>
@@ -960,7 +997,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   : {}),
               }}
             >
-              {supporterCount > 1 ? t('me') : t('I')}
+              {supporterCountSubtracted > 0 ? t('me') : t('I')}
             </SSpanBiddersHighlighted>
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
@@ -983,23 +1020,43 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && !isSuggestedByMe && !isSupportedByMe) {
     return (
       <>
-        <Link href={`/${optionCreatorUsername}`}>
-          <SSpanBiddersHighlighted
-            className='spanHighlighted'
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            style={{
-              color:
-                theme.name === 'dark'
-                  ? theme.colorsThemed.accent.yellow
-                  : theme.colors.dark,
-              cursor: 'pointer',
-            }}
-          >
-            {optionCreator}
-          </SSpanBiddersHighlighted>
-        </Link>
+        {!whiteListedSupporter ? (
+          <Link href={`/${optionCreatorUsername}`}>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              style={{
+                color:
+                  theme.name === 'dark'
+                    ? theme.colorsThemed.accent.yellow
+                    : theme.colors.dark,
+                cursor: 'pointer',
+              }}
+            >
+              {optionCreator}
+            </SSpanBiddersHighlighted>
+          </Link>
+        ) : (
+          <Link href={`/${whiteListedSupporterUsername}`}>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              style={{
+                color:
+                  theme.name === 'dark'
+                    ? theme.colorsThemed.accent.yellow
+                    : theme.colors.dark,
+                cursor: 'pointer',
+              }}
+            >
+              {whiteListedSupporter}
+            </SSpanBiddersHighlighted>
+          </Link>
+        )}
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubtracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
@@ -1021,6 +1078,37 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && !isSuggestedByMe && isSupportedByMe) {
     return (
       <>
+        {!whiteListedSupporter ? (
+          <Link href={`/${optionCreatorUsername}`}>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              style={{
+                color: theme.colorsThemed.accent.yellow,
+                cursor: 'pointer',
+              }}
+            >
+              {optionCreator}
+            </SSpanBiddersHighlighted>
+          </Link>
+        ) : (
+          <Link href={`/${whiteListedSupporterUsername}`}>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              style={{
+                color: theme.colorsThemed.accent.yellow,
+                cursor: 'pointer',
+              }}
+            >
+              {whiteListedSupporter}
+            </SSpanBiddersHighlighted>
+          </Link>
+        )}
         <Link href={`/${optionCreatorUsername}`}>
           <SSpanBiddersHighlighted
             className='spanHighlighted'
