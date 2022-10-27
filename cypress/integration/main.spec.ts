@@ -239,9 +239,14 @@ context('Main flow', () => {
     });*/
 
     it('can enable bundles', () => {
-      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/dashboard`);
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creator/dashboard`);
+      // Waiting for an element to be attached to the DOM
+      cy.wait(2000);
+      cy.get('#bundles-navigation').click();
+      cy.url().should('include', '/creator/bundles');
 
-      // Enable bundles
+      cy.contains('Turn on bundles').click();
+      cy.contains('Turn off bundles');
     });
   });
 

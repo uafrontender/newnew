@@ -35,6 +35,22 @@ export const buyCreatorsBundles = (
     signal ?? undefined
   );
 
+export const getBundleStatus = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.GetBundleStatusResponse
+  >(
+    newnewapi.EmptyRequest,
+    newnewapi.GetBundleStatusResponse,
+    `${BASE_URL_BUNDLE}/get_bundle_status`,
+    'post',
+    payload,
+    signal ?? undefined
+  );
+
 export const setBundleStatus = (
   payload: newnewapi.SetBundleStatusRequest,
   signal?: RequestInit['signal']

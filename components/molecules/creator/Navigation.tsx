@@ -16,6 +16,7 @@ import Button from '../../atoms/Button';
 import { useAppSelector } from '../../../redux-store/store';
 
 interface NavigationItem {
+  id?: string;
   url: string;
   label: string;
   iconFilled: any;
@@ -37,6 +38,7 @@ export const Navigation = () => {
         iconOutlined: dashboardOutlinedIcon,
       },
       {
+        id: 'bundles-navigation',
         url: '/creator/bundles',
         label: t('navigation.bundles'),
         iconFilled: bundlesFilledIcon,
@@ -60,7 +62,11 @@ export const Navigation = () => {
       const active = router.route.includes(item.url);
       return (
         <Link href={item.url} key={item.url}>
-          <SItem active={active} isfill={item.url !== '/creator/bundles'}>
+          <SItem
+            id={item.id}
+            active={active}
+            isfill={item.url !== '/creator/bundles'}
+          >
             <SInlineSVG
               svg={active ? item.iconFilled : item.iconOutlined}
               fill={

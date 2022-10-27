@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
@@ -9,7 +9,10 @@ import Headline from '../../atoms/Headline';
 import { useAppSelector } from '../../../redux-store/store';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
-import { setBundleStatus } from '../../../api/endpoints/bundles';
+import {
+  getBundleStatus,
+  setBundleStatus,
+} from '../../../api/endpoints/bundles';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -38,7 +41,9 @@ export const Bundles: React.FC = React.memo(() => {
     resizeMode
   );
 
-  const [isBundlesEnabled, setIsBundlesEnabled] = useState<boolean>(true);
+  const [isBundlesEnabled, setIsBundlesEnabled] = useState<boolean | undefined>(
+    undefined
+  );
 
   const toggleBundlesEnabled = useCallback(async (enabled: boolean) => {
     const payload = new newnewapi.SetBundleStatusRequest({
@@ -93,11 +98,28 @@ export const Bundles: React.FC = React.memo(() => {
         votes={item.votes}
         months={item.months}
         price={item.price}
-        isBundlesEnabled={isBundlesEnabled}
+        isBundlesEnabled={!!isBundlesEnabled}
       />
     ),
     [isBundlesEnabled]
   );
+
+  const fetchBundleStatus = useCallback(async () => {
+    const payload = new newnewapi.EmptyRequest();
+
+    const res = await getBundleStatus(payload);
+
+    // TODO: add translation
+    if (!res.data || res.error) throw new Error('Request failed');
+
+    setIsBundlesEnabled(
+      res.data.bundleStatus === newnewapi.CreatorBundleStatus.ENABLED
+    );
+  }, []);
+
+  useEffect(() => {
+    fetchBundleStatus();
+  }, [fetchBundleStatus]);
 
   return (
     <SContainer>
@@ -107,28 +129,43 @@ export const Bundles: React.FC = React.memo(() => {
           <STitle variant={4}>{t('myBundles.title')}</STitle>
           {!isMobile && <DynamicSection />}
         </STitleBlock>
-        {isBundlesEnabled && (
-          <BundlesEarnings isBundlesEnabled={isBundlesEnabled} />
-        )}
-        <SBlock>
-          <SHeaderLine>
-            <STextHolder>
-              <STitle variant={6}>{t('myBundles.bundlesSet.title')}</STitle>
-              <SText variant={3}>{t('myBundles.bundlesSet.subTitle')}</SText>
-            </STextHolder>
-            <SButton
-              onClick={() => toggleBundlesEnabled(!isBundlesEnabled)}
-              enabled={isBundlesEnabled}
-            >
-              {isBundlesEnabled
-                ? t('myBundles.buttonTurnOff')
-                : t('myBundles.buttonTurnOn')}
-            </SButton>
-          </SHeaderLine>
-          <SBundles>{collection.map(renderListItem)}</SBundles>
-        </SBlock>
-        {!isBundlesEnabled && (
-          <BundlesEarnings isBundlesEnabled={isBundlesEnabled} />
+        {isBundlesEnabled === undefined ? (
+          // TODO: add a spinner
+          <div>Loading</div>
+        ) : (
+          <>
+            {isBundlesEnabled && (
+              <BundlesEarnings isBundlesEnabled={isBundlesEnabled} />
+            )}
+            <SBlock>
+              <SHeaderLine>
+                <STextHolder>
+                  <STitle variant={6}>{t('myBundles.bundlesSet.title')}</STitle>
+                  <SText variant={3}>
+                    {t('myBundles.bundlesSet.subTitle')}
+                  </SText>
+                </STextHolder>
+                <SButton
+                  onClick={() => {
+                    if (isBundlesEnabled === undefined) {
+                      return;
+                    }
+                    toggleBundlesEnabled(!isBundlesEnabled);
+                  }}
+                  enabled={isBundlesEnabled}
+                  disabled={isBundlesEnabled === undefined}
+                >
+                  {isBundlesEnabled
+                    ? t('myBundles.buttonTurnOff')
+                    : t('myBundles.buttonTurnOn')}
+                </SButton>
+              </SHeaderLine>
+              <SBundles>{collection.map(renderListItem)}</SBundles>
+            </SBlock>
+            {!isBundlesEnabled && (
+              <BundlesEarnings isBundlesEnabled={isBundlesEnabled} />
+            )}
+          </>
         )}
       </SContent>
     </SContainer>
