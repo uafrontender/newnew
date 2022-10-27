@@ -580,7 +580,7 @@
     }
   },
   "acPostSuccess": {
-    "heroText": "本次Bid已結束！",
+    "heroText": "看它發生！",
     "wantsToKnow": "{{creator}}想知道......",
     "inTotalBids": "在總的出價中",
     "others": "其他",
@@ -592,7 +592,7 @@
     }
   },
   "mcPostSuccess": {
-    "heroText": "本次Superpoll已結束！",
+    "heroText": "看它發生！",
     "wantsToKnow": "{{creator}}想知道......",
     "inTotalVotes": "總票數",
     "others": "其他",
@@ -606,7 +606,7 @@
     }
   },
   "cfPostSuccess": {
-    "heroText": "本次Goal已結束！",
+    "heroText": "看它發生！",
     "wantsToKnow": "{{creator}}的Goal",
     "creatorsBackers": "{{creator}}的支持者",
     "ofTargetBackers": "共需 {{target_count}}支持者",

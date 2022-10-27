@@ -176,6 +176,16 @@ const McOptionCardModeration: React.FunctionComponent<
                     ? (option.firstVoter.username as string)
                     : undefined
                 }
+                whiteListedSupporter={
+                  option.whitelistSupporter
+                    ? getDisplayname(option.whitelistSupporter)
+                    : undefined
+                }
+                whiteListedSupporterUsername={
+                  option.whitelistSupporter
+                    ? (option.whitelistSupporter.username as string)
+                    : undefined
+                }
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubstracted}
               />

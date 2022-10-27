@@ -163,6 +163,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
     post.optionCount ?? ''
   );
@@ -739,11 +740,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
               postStatus === 'voting')
           }
         >
-          <PostVotingTab>
-            {`${t('tabs.options')} ${
-              !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
-            }`}
-          </PostVotingTab>
+          <PostVotingTab>{`${t('tabs.options')}`}</PostVotingTab>
           <McOptionsTab
             post={post}
             postLoading={postLoading}

@@ -151,8 +151,47 @@ const AcOptionCardModeration: React.FunctionComponent<
               {option.title}
             </SOptionInfo>
             <SBiddersInfo variant={3}>
-              {option.creator?.username ? (
-                <Link href={`/${option.creator?.username}`}>
+              {!option.whitelistSupporter ? (
+                option.creator?.username ? (
+                  <Link href={`/${option.creator?.username}`}>
+                    <SSpanBiddersHighlighted
+                      className='spanHighlighted'
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        ...(!isWinner && option.isCreatedBySubscriber
+                          ? {
+                              color:
+                                theme.name === 'dark'
+                                  ? theme.colorsThemed.accent.yellow
+                                  : theme.colors.dark,
+                              cursor: 'pointer',
+                            }
+                          : {}),
+                      }}
+                    >
+                      {getDisplayname(option.creator!!)}
+                    </SSpanBiddersHighlighted>
+                  </Link>
+                ) : (
+                  <SSpanBiddersHighlighted
+                    className='spanHighlighted'
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      ...(!isWinner && option.isCreatedBySubscriber
+                        ? {
+                            color:
+                              theme.name === 'dark'
+                                ? theme.colorsThemed.accent.yellow
+                                : theme.colors.dark,
+                          }
+                        : {}),
+                    }}
+                  >
+                    {getDisplayname(option.creator!!)}
+                  </SSpanBiddersHighlighted>
+                )
+              ) : (
+                <Link href={`/${option.whitelistSupporter?.username}`}>
                   <SSpanBiddersHighlighted
                     className='spanHighlighted'
                     onClick={(e) => e.stopPropagation()}
@@ -168,26 +207,9 @@ const AcOptionCardModeration: React.FunctionComponent<
                         : {}),
                     }}
                   >
-                    {option.creator?.nickname ?? option.creator?.username}
+                    {getDisplayname(option.whitelistSupporter!!)}
                   </SSpanBiddersHighlighted>
                 </Link>
-              ) : (
-                <SSpanBiddersHighlighted
-                  className='spanHighlighted'
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    ...(!isWinner && option.isCreatedBySubscriber
-                      ? {
-                          color:
-                            theme.name === 'dark'
-                              ? theme.colorsThemed.accent.yellow
-                              : theme.colors.dark,
-                        }
-                      : {}),
-                  }}
-                >
-                  {option.creator?.nickname ?? option.creator?.username}
-                </SSpanBiddersHighlighted>
               )}
               {option.supporterCount > 1 ? (
                 <>
