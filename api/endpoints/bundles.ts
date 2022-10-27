@@ -66,3 +66,19 @@ export const setBundleStatus = (
     payload,
     signal ?? undefined
   );
+
+export const GetMyBundleEarnings = (
+  payload: newnewapi.GetMyBundleEarningsRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.GetMyBundleEarningsRequest,
+    newnewapi.GetMyBundleEarningsResponse
+  >(
+    newnewapi.GetMyBundleEarningsRequest,
+    newnewapi.GetMyBundleEarningsResponse,
+    `${BASE_URL_BUNDLE}/get_my_bundle_earnings`,
+    'post',
+    payload,
+    signal ?? undefined
+  );
