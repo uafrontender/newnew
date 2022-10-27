@@ -580,7 +580,7 @@
     }
   },
   "acPostSuccess": {
-    "heroText": "This Bid has ended!",
+    "heroText": "Watch it happen!",
     "wantsToKnow": "{{creator}} wants to know...",
     "inTotalBids": "in total bids",
     "others": "others",
@@ -592,7 +592,7 @@
     }
   },
   "mcPostSuccess": {
-    "heroText": "This Superpoll has ended!",
+    "heroText": "Watch it happen!",
     "wantsToKnow": "{{creator}} wants to know...",
     "inTotalVotes": "total votes",
     "others": "others",
@@ -606,7 +606,7 @@
     }
   },
   "cfPostSuccess": {
-    "heroText": "This Goal has ended!",
+    "heroText": "Watch it happen!",
     "wantsToKnow": "{{creator}}'s Goal",
     "creatorsBackers": "{{creator}}'s backers",
     "ofTargetBackers": "of {{target_count}} backers",

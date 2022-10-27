@@ -138,6 +138,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
 
     // Options
     const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
       post.optionCount ?? ''
     );
@@ -623,13 +624,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             <SActivitesContainer decisionFailed={postStatus === 'failed'}>
               {openedTab === 'announcement' ? (
                 <>
-                  <PostVotingTab>
-                    {`${t('tabs.options')} ${
-                      !!numberOfOptions && numberOfOptions > 0
-                        ? numberOfOptions
-                        : ''
-                    }`}
-                  </PostVotingTab>
+                  <PostVotingTab>{`${t('tabs.options')}`}</PostVotingTab>
                   <McOptionsTabModeration
                     post={post}
                     options={options}
