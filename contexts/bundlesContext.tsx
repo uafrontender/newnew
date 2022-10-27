@@ -55,7 +55,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
   );
 
   // TODO: Remove test data
-  useEffect(() => {
+  /* useEffect(() => {
     setBundles([
       new newnewapi.CreatorBundle({
         creator: new newnewapi.User({
@@ -118,7 +118,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
         }),
       }),
     ]);
-  }, []);
+  }, []); */
 
   // TODO: Integrate bundle loading
   // Load bundles
@@ -147,7 +147,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
       }
     }
 
-    // fetchBundles();
+    fetchBundles();
   }, [user.loggedIn]);
 
   // TODO: Integrate bundle updates

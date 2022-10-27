@@ -13,7 +13,7 @@ export const getMyBundles = (
   >(
     newnewapi.EmptyRequest,
     newnewapi.GetMyBundlesResponse,
-    `${BASE_URL_BUNDLE}/get_my_packs`,
+    `${BASE_URL_BUNDLE}/get_my_bundles`,
     'post',
     payload,
     signal ?? undefined
@@ -29,7 +29,7 @@ export const buyCreatorsBundles = (
   >(
     newnewapi.StripeContributionRequest,
     newnewapi.BuyCreatorsBundleResponse,
-    `${BASE_URL_BUNDLE}/buy_creators_pack`,
+    `${BASE_URL_BUNDLE}/buy_creators_bundle`,
     'post',
     payload,
     signal ?? undefined
