@@ -185,8 +185,8 @@ const YourPostsSection = () => {
       )}
       {!isLoading && posts.length === 0 && (
         <SNoPostsView>
-          <Headline variant={4}>Ooops!</Headline>
-          <SHint variant='subtitle'>No posts found</SHint>
+          <Headline variant={4}>{t('ooops')}</Headline>
+          <SHint variant='subtitle'>{t('noPosts')}</SHint>
           <Link href='/creation'>
             <a>
               <Button>{tCommon('button.createDecision')}</Button>

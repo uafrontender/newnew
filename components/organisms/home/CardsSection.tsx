@@ -99,7 +99,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       router.push(`/${username}`);
     };
     const handleLeftClick = () => {
-      scrollListTo(visibleListItem - scrollStep - 1);
+      scrollListTo(visibleListItem - scrollStep);
     };
     const handleRightClick = () => {
       scrollListTo(visibleListItem + scrollStep);
@@ -118,11 +118,11 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       }
 
       scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
-        offset: -32,
+        offset: -16,
         smooth: 'easeOutQuad',
         duration:
-          SCROLL_CARDS_SECTIONS *
-          (collection.length > 30 ? Math.round(collection.length / 30) : 1),
+          SCROLL_CARDS_SECTIONS +
+          ((SCROLL_CARDS_SECTIONS / 10) * collection.length) / 40,
         horizontal: true,
         containerId: `${category}-scrollContainer`,
       });
@@ -239,7 +239,6 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
           return;
         }
 
-        const currentScrollPosition = scrollContainerRef.current.scrollLeft;
         const { firstChild } = scrollContainerRef.current;
 
         if (!firstChild) {
@@ -248,10 +247,19 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
 
         // Add margin to the equation
         const childWidth =
-          (firstChild as Element).getBoundingClientRect().width + 16;
+          (firstChild as Element).getBoundingClientRect().width + 32;
+
+        const currentScrollPosition =
+          scrollContainerRef.current.scrollLeft > childWidth
+            ? scrollContainerRef.current.scrollLeft - 16
+            : scrollContainerRef.current.scrollLeft;
 
         // setVisibleListItem(+(currentScrollPosition / childWidth).toFixed(0));
-        setVisibleListItem(+Math.floor(currentScrollPosition / childWidth));
+        setVisibleListItem(
+          +Math.floor(currentScrollPosition / childWidth) > 0
+            ? +Math.floor(currentScrollPosition / childWidth) + 1
+            : +Math.floor(currentScrollPosition / childWidth)
+        );
       }
 
       const scrollContainerElement = scrollContainerRef.current;
@@ -265,17 +273,17 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       setCanScrollLeft(visibleListItem !== 0);
 
       setCanScrollRight(
-        visibleListItem + 1 <=
+        visibleListItem <
           (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) -
             scrollStep
       );
     }, [visibleListItem, collection, scrollStep]);
 
     useEffect(() => {
-      if (!canScrollRight && collection.length > 0 && onReachEnd) {
+      if (!canScrollRight && collection?.length > 0 && onReachEnd) {
         onReachEnd();
       }
-    }, [canScrollRight, onReachEnd, collection.length]);
+    }, [canScrollRight, onReachEnd, collection?.length]);
 
     return (
       <SWrapper name={category} {...restProps}>
