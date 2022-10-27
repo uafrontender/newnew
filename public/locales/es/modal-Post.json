@@ -244,6 +244,7 @@
   "tabs": {
     "comments": "Commentarios",
     "bids": "Ofertas",
+    "bids_singular": "Oferta",
     "options": "Opciones",
     "backers": "Patrocinadores",
     "winner": "Ganador",
@@ -590,7 +591,7 @@
     }
   },
   "acPostSuccess": {
-    "heroText": "¡Este Bid ha terminado!",
+    "heroText": "¡Velo suceder!",
     "wantsToKnow": "{{creator}} quiere saber...",
     "inTotalBids": "ofertas en total",
     "others": "otros",
@@ -602,7 +603,7 @@
     }
   },
   "mcPostSuccess": {
-    "heroText": "¡Esta Superpoll ha terminado!",
+    "heroText": "¡Velo suceder!",
     "wantsToKnow": "{{creator}} quiere saber...",
     "inTotalVotes": "votos en total",
     "others": "otros",
@@ -616,7 +617,7 @@
     }
   },
   "cfPostSuccess": {
-    "heroText": "¡Este Goal ha terminado!",
+    "heroText": "¡Velo suceder!",
     "wantsToKnow": "El Goal de {{creator}}",
     "creatorsBackers": "Los patrocinadores de {{creator}}",
     "ofTargetBackers": "de {{target_count}} patrocinadores",

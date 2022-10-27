@@ -168,8 +168,13 @@ const SContainer = styled.section`
   position: relative;
   padding: 20px 0;
 
+  ${(props) => props.theme.media.tablet} {
+    margin-top: 50px;
+  }
+
   ${(props) => props.theme.media.laptop} {
     padding: 60px 128px;
+    margin-top: 0;
   }
 
   ${(props) => props.theme.media.laptopM} {
@@ -246,7 +251,7 @@ const SFloatingImage = styled.img`
 
   visibility: hidden;
 
-  ${({ theme }) => theme.media.tablet} {
+  ${({ theme }) => theme.media.laptop} {
     visibility: visible;
   }
 `;
@@ -258,6 +263,10 @@ const SSubImageLeftTop = styled(SFloatingImage)`
   top: -3.2%;
   transform: rotate(19deg);
   opacity: 0.8;
+
+  ${({ theme }) => theme.media.tablet} {
+    visibility: visible;
+  }
 
   ${({ theme }) => theme.media.laptop} {
     width: ${({ theme }) => (theme.name === 'dark' ? '86px' : '42px')};
@@ -307,6 +316,10 @@ const SSubImageRightTop = styled(SFloatingImage)`
   right: -4%;
   top: 0;
   transform: scaleX(-1) rotate(17deg);
+
+  ${({ theme }) => theme.media.tablet} {
+    visibility: visible;
+  }
 
   ${({ theme }) => theme.media.laptop} {
     width: ${({ theme }) => (theme.name === 'dark' ? '112px' : '56px')};

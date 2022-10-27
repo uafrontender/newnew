@@ -157,6 +157,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
                 isOfferingSubscription: data.me.options?.isOfferingSubscription,
                 isOfferingBundles: data.me.options?.isOfferingBundles,
                 isPhoneNumberConfirmed: data.me.options?.isPhoneNumberConfirmed,
+                isWhiteListed: data.me.options?.isWhiteListed,
               },
             } as TUserData)
           );

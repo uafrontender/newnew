@@ -456,8 +456,71 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             {option.title}
           </SOptionInfo>
           <SBiddersInfo onClick={(e) => e.preventDefault()} variant={3}>
-            {option.creator?.username ? (
-              <Link href={`/${option.creator?.username}`}>
+            {!option.whitelistSupporter ? (
+              option.creator?.username ? (
+                <Link href={`/${option.creator?.username}`}>
+                  <SSpanBiddersHighlighted
+                    className='spanHighlighted'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    style={{
+                      ...(!isMyBid && option.isCreatedBySubscriber
+                        ? {
+                            color:
+                              theme.name === 'dark'
+                                ? theme.colorsThemed.accent.yellow
+                                : theme.colors.dark,
+                          }
+                        : isMyBid && option.isCreatedBySubscriber
+                        ? {
+                            color: theme.colorsThemed.accent.yellow,
+                          }
+                        : {}),
+                      ...(!isMyBid
+                        ? {
+                            cursor: 'pointer',
+                          }
+                        : {}),
+                    }}
+                  >
+                    {isMyBid
+                      ? option.supporterCount > 1
+                        ? t('me')
+                        : t('my')
+                      : getDisplayname(option.creator!!)}
+                  </SSpanBiddersHighlighted>
+                </Link>
+              ) : (
+                <SSpanBiddersHighlighted
+                  className='spanHighlighted'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  style={{
+                    ...(!isMyBid && option.isCreatedBySubscriber
+                      ? {
+                          color:
+                            theme.name === 'dark'
+                              ? theme.colorsThemed.accent.yellow
+                              : theme.colors.dark,
+                        }
+                      : isMyBid && option.isCreatedBySubscriber
+                      ? {
+                          color: theme.colorsThemed.accent.yellow,
+                        }
+                      : {}),
+                  }}
+                >
+                  {isMyBid
+                    ? option.supporterCount > 1
+                      ? t('me')
+                      : t('my')
+                    : getDisplayname(option.creator!!)}
+                </SSpanBiddersHighlighted>
+              )
+            ) : (
+              <Link href={`/${option.whitelistSupporter?.username}`}>
                 <SSpanBiddersHighlighted
                   className='spanHighlighted'
                   onClick={(e) => {
@@ -484,39 +547,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                   }}
                 >
                   {isMyBid
-                    ? option.supporterCount > 2
+                    ? option.supporterCount > 1
                       ? t('me')
                       : t('my')
-                    : getDisplayname(option.creator!!)}
+                    : getDisplayname(option.whitelistSupporter!!)}
                 </SSpanBiddersHighlighted>
               </Link>
-            ) : (
-              <SSpanBiddersHighlighted
-                className='spanHighlighted'
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                style={{
-                  ...(!isMyBid && option.isCreatedBySubscriber
-                    ? {
-                        color:
-                          theme.name === 'dark'
-                            ? theme.colorsThemed.accent.yellow
-                            : theme.colors.dark,
-                      }
-                    : isMyBid && option.isCreatedBySubscriber
-                    ? {
-                        color: theme.colorsThemed.accent.yellow,
-                      }
-                    : {}),
-                }}
-              >
-                {isMyBid
-                  ? option.supporterCount > 2
-                    ? t('me')
-                    : t('my')
-                  : getDisplayname(option.creator!!)}
-              </SSpanBiddersHighlighted>
             )}
             {isSupportedByMe && !isMyBid ? (
               <SSpanBiddersHighlighted className='spanHighlighted'>{`, ${t(

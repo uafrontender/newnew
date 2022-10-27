@@ -9,7 +9,7 @@ import React, {
   useState,
 } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { css }  from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
@@ -163,9 +163,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
-  const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
-    post.optionCount ?? ''
-  );
   const [optionsNextPageToken, setOptionsNextPageToken] = useState<
     string | undefined | null
   >('');
@@ -348,8 +345,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         throw new Error(res.error?.message ?? 'Request failed');
       }
       setTotalVotes(res.data.multipleChoice?.totalVotes as number);
-      setNumberOfOptions(res.data.multipleChoice?.optionCount as number);
-      if (res.data.multipleChoice?.status)
+        if (res.data.multipleChoice?.status)
         handleUpdatePostStatus(res.data.multipleChoice?.status);
 
       setPostLoading(false);
@@ -478,8 +474,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       if (decodedParsed.postUuid === post.postUuid) {
         if (decoded.post?.multipleChoice?.totalVotes)
           setTotalVotes(decoded.post?.multipleChoice?.totalVotes);
-        if (decoded.post?.multipleChoice?.optionCount)
-          setNumberOfOptions(decoded.post?.multipleChoice?.optionCount);
       }
     };
 
@@ -712,14 +706,15 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           handleToggleMuted={() => handleToggleMutedMode()}
         />
         <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
-        <SActivitiesContainer>
-          <PostVotingTab
-            bundleVotes={creatorsBundle?.bundle?.votesLeft ?? undefined}
-          >
-            {`${t('tabs.options')} ${
-              !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
-            }`}
-          </PostVotingTab>
+        <SActivitiesContainer
+          shorterSection={
+            postStatus === 'failed' ||
+            (post.isSuggestionsAllowed &&
+              !hasVotedOptionId &&
+              postStatus === 'voting')
+          }
+        >
+          <PostVotingTab bundleVotes={creatorsBundle?.bundle?.votesLeft ?? undefined}>{`${t('tabs.options')}`}</PostVotingTab>
           <McOptionsTab
             post={post}
             postLoading={postLoading}
@@ -859,7 +854,9 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitiesContainer = styled.div`
+const SActivitiesContainer = styled.div<{
+  shorterSection: boolean;
+}>`
   grid-area: activities;
 
   display: flex;
@@ -873,7 +870,19 @@ const SActivitiesContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
     max-height: calc(452px);
   }
+
+  ${({ theme }) => theme.media.laptop} {
+    ${({ shorterSection }) =>
+      !shorterSection
+        ? css`
+            max-height: 500px;
+          `
+        : css`
+            max-height: calc(580px - 120px);
+          `}
+  }
 `;
+
 
 // Comments
 const SCommentsHeadline = styled(Headline)`
