@@ -29,6 +29,9 @@ const Earnings = dynamic(
 const YourToDos = dynamic(
   () => import('../../molecules/creator/dashboard/YourToDos')
 );
+const AboutBundles = dynamic(
+  () => import('../../molecules/creator/dashboard/AboutBundles')
+);
 
 export const Dashboard: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
@@ -214,6 +217,9 @@ export const Dashboard: React.FC = React.memo(() => {
               }}
             />
           )}
+        </SBlock>
+        <SBlock noMargin>
+          <AboutBundles />
         </SBlock>
       </SContent>
     </SContainer>
