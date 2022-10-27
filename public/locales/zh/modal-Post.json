@@ -244,6 +244,7 @@
   "tabs": {
     "comments": "評論",
     "bids": "出價",
+    "bids_singular": "出價",
     "options": "選項",
     "backers": "支持者",
     "winner": "贏家",

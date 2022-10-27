@@ -650,7 +650,11 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                       !!numberOfOptions && numberOfOptions > 0
                         ? numberOfOptions
                         : ''
-                    } ${t('tabs.bids')}`}
+                    } ${
+                      numberOfOptions === 1
+                        ? t('tabs.bids_singular')
+                        : t('tabs.bids')
+                    }`}
                   </PostVotingTab>
                   <AcOptionsTabModeration
                     postId={post.postUuid}

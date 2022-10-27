@@ -244,6 +244,7 @@
   "tabs": {
     "comments": "Comments",
     "bids": "Bids",
+    "bids_singular": "Bid",
     "options": "Options",
     "backers": "Backers",
     "winner": "Winner",
