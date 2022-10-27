@@ -33,17 +33,25 @@ export const Navigation = () => {
         iconFilled: dashboardFilledIcon,
         iconOutlined: dashboardOutlinedIcon,
       },
-      {
-        url: '/creator/get-paid',
-        label:
-          user.creatorData?.options?.isCreatorConnectedToStripe === true
-            ? t('navigation.getPaidEdit')
-            : t('navigation.getPaid'),
-        iconFilled: walletFilledIcon,
-        iconOutlined: walletOutlinedIcon,
-      },
+      ...(!user.userData?.options?.isWhiteListed
+        ? [
+            {
+              url: '/creator/get-paid',
+              label:
+                user.creatorData?.options?.isCreatorConnectedToStripe === true
+                  ? t('navigation.getPaidEdit')
+                  : t('navigation.getPaid'),
+              iconFilled: walletFilledIcon,
+              iconOutlined: walletOutlinedIcon,
+            },
+          ]
+        : []),
     ],
-    [t, user.creatorData]
+    [
+      t,
+      user.creatorData?.options?.isCreatorConnectedToStripe,
+      user.userData?.options?.isWhiteListed,
+    ]
   );
 
   const renderItem = useCallback(

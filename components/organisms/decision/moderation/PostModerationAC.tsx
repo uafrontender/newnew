@@ -646,11 +646,11 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
               {openedTab === 'announcement' ? (
                 <>
                   <PostVotingTab>
-                    {`${t('tabs.bids')} ${
+                    {`${
                       !!numberOfOptions && numberOfOptions > 0
                         ? numberOfOptions
                         : ''
-                    }`}
+                    } ${t('tabs.bids')}`}
                   </PostVotingTab>
                   <AcOptionsTabModeration
                     postId={post.postUuid}
