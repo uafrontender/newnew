@@ -11,34 +11,7 @@ import UserAvatar from '../UserAvatar';
 import BundleOfferCard from './BunldeOfferCard';
 import { useAppSelector } from '../../../redux-store/store';
 import BundlePaymentModal from './BundlePaymentModal';
-
-// Load from app constants
-const OFFERED_BUNDLES: newnewapi.BundleOffer[] = [
-  new newnewapi.BundleOffer({
-    bundleUuid: '1',
-    price: new newnewapi.MoneyAmount({ usdCents: 500 }),
-    votesAmount: 100,
-    accessDurationInSeconds: 60 * 60 * 24 * 30,
-  }),
-  new newnewapi.BundleOffer({
-    bundleUuid: '2',
-    price: new newnewapi.MoneyAmount({ usdCents: 2500 }),
-    votesAmount: 4500,
-    accessDurationInSeconds: 60 * 60 * 24 * 30 * 3,
-  }),
-  new newnewapi.BundleOffer({
-    bundleUuid: '3',
-    price: new newnewapi.MoneyAmount({ usdCents: 5000 }),
-    votesAmount: 10000,
-    accessDurationInSeconds: 60 * 60 * 24 * 30 * 6,
-  }),
-  new newnewapi.BundleOffer({
-    bundleUuid: '4',
-    price: new newnewapi.MoneyAmount({ usdCents: 7500 }),
-    votesAmount: 20000,
-    accessDurationInSeconds: 60 * 60 * 24 * 30 * 12,
-  }),
-];
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 interface IBuyBundleModal {
   show: boolean;
@@ -50,6 +23,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
   ({ show, creator, onClose }) => {
     const { t } = useTranslation('common');
     const { resizeMode } = useAppSelector((state) => state.ui);
+    const { appConstants } = useGetAppConstants();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -75,12 +49,12 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
               <SUserAvatar avatarUrl={creator.avatarUrl ?? ''} />
               <SUsername>{creator.username}</SUsername>
               <SOfferedBundleList>
-                {OFFERED_BUNDLES.map((bundle, index) => (
+                {appConstants.bundleOffers?.map((bundleOffer, index) => (
                   <SBundleOfferCard
-                    key={bundle.bundleUuid}
+                    key={bundleOffer.bundleUuid}
                     bundleLevel={index}
-                    bundleOffer={bundle}
-                    onClick={() => setBundleToBuy(bundle)}
+                    bundleOffer={bundleOffer}
+                    onClick={() => setBundleToBuy(bundleOffer)}
                   />
                 ))}
               </SOfferedBundleList>
