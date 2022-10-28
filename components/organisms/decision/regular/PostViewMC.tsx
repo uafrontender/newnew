@@ -37,6 +37,7 @@ import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 
 // Utils
 import switchPostType from '../../../../utils/switchPostType';
+import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
@@ -116,6 +117,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
+  const { appConstants } = useGetAppConstants();
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
@@ -161,6 +163,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
     post.optionCount ?? ''
   );
@@ -737,11 +740,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
               postStatus === 'voting')
           }
         >
-          <PostVotingTab>
-            {`${t('tabs.options')} ${
-              !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
-            }`}
-          </PostVotingTab>
+          <PostVotingTab>{`${t('tabs.options')}`}</PostVotingTab>
           <McOptionsTab
             post={post}
             postLoading={postLoading}
@@ -757,6 +756,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             options={options}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
+            minAmount={appConstants?.minMcVotes ?? 2}
+            votePrice={
+              appConstants?.mcVotePrice
+                ? Math.floor(appConstants?.mcVotePrice)
+                : 1
+            }
             canSubscribe={!!canSubscribe}
             canVoteForFree={hasFreeVote}
             hasVotedOptionId={(hasVotedOptionId as number) ?? undefined}

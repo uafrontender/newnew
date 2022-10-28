@@ -195,7 +195,7 @@ context('Main flow', () => {
         });
     });
 
-    /* it('can create a crowdfunding', () => {
+    /*it('can create a crowdfunding', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creation`);
 
       // Waiting for an element to be attached to the DOM
