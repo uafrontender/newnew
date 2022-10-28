@@ -2,7 +2,7 @@
   "welcome": "Bienvenido a {{NEXT_PUBLIC_APP_NAME}}!",
   "topSectionTitle": "Top 10 en {{country}}",
   "heroSection": {
-    "title": "¡Únete y \nmoldea la realidad!",
+    "title": "¡Únete y moldea\nla realidad!",
     "subTitle": "Haz ofertas y vota por lo que sucederá a continuación en el mundo",
     "signIn": "Iniciar sesión",
     "explore": "Explorar Ahora",
