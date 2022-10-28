@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
@@ -51,12 +52,12 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   );
   const collectionTypeOptions: any = useMemo(
     () => [
-      {
-        key: 'ac',
-      },
-      {
-        key: 'mc',
-      },
+      // {
+      //   key: 'ac',
+      // },
+      // {
+      //   key: 'mc',
+      // },
       // {
       //   key: 'cf',
       // },
@@ -65,8 +66,11 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
       // },
       ...(authenticated
         ? [
+            // {
+            //   key: 'for-you',
+            // },
             {
-              key: 'for-you',
+              key: 'recent-activity',
             },
           ]
         : []),
@@ -132,14 +136,16 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
           disabled={disabled}
           onChange={handleCollectionTypeChange}
         />
-        {category !== 'biggest' && category !== 'for-you' && (
-          <Sorting
-            category={category}
-            options={sortOptions}
-            selected={sorts}
-            onChange={handleSortChange}
-          />
-        )}
+        {/* {category !== 'biggest' &&
+          category !== 'for-you' &&
+          category !== 'recent-activity' && (
+            <Sorting
+              category={category}
+              options={sortOptions}
+              selected={sorts}
+              onChange={handleSortChange}
+            />
+          )} */}
       </SWrapper>
       {sorts && !isMobile && (
         <SSortOption

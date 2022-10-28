@@ -407,7 +407,6 @@ const Home: NextPage<IHome> = ({
               collection={collectionRA}
               loading={collectionRAInitialLoading}
               handlePostClicked={handleOpenPostModal}
-              seeMoreLink='/profile/purchases'
               tutorialCard={
                 user.loggedIn ? (
                   <STutorialCard
