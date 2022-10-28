@@ -23,7 +23,6 @@ const SearchInput: React.FC<ISearchInput> = React.memo(({ passInputValue }) => {
   const [isSearchActive, setIsSearchActive] = useState(false);
 
   const handleSearchClick = useCallback(() => {
-    console.log('open');
     setIsSearchActive((prevState) => !prevState);
   }, []);
 
