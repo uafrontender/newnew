@@ -23,12 +23,14 @@ interface IBundlePaymentModal {
   creator: newnewapi.IUser;
   bundleOffer: newnewapi.IBundleOffer;
   onClose: () => void;
+  onCloseSuccessModal?: () => void;
 }
 
 const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   creator,
   bundleOffer,
   onClose,
+  onCloseSuccessModal,
 }) => {
   const { t } = useTranslation('common');
   const router = useRouter();
@@ -117,7 +119,6 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         }
 
         setPaymentSuccessModalOpen(true);
-        onClose();
       } catch (err: any) {
         console.error(err);
         toast.error(err.message);
@@ -126,7 +127,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         setupIntent.destroy();
       }
     },
-    [setupIntent, router, t, setPaymentSuccessModalOpen, onClose]
+    [setupIntent, router, t, setPaymentSuccessModalOpen]
   );
 
   const paymentWithFeeInCents = useMemo(
@@ -208,6 +209,10 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
           onClose={() => {
             setPaymentSuccessModalOpen(false);
             onClose();
+
+            if (onCloseSuccessModal) {
+              onCloseSuccessModal();
+            }
           }}
         />
       )}
