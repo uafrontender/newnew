@@ -172,6 +172,10 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const paymentElementOptions: StripePaymentElementOptions = useMemo(
     () => ({
       terms: { card: 'never' },
+      wallets: {
+        googlePay: 'never',
+        applePay: 'never',
+      },
     }),
     []
   );

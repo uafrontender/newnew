@@ -1198,6 +1198,7 @@ const SUsernameContainer = styled.div`
   flex-shrink: 1;
   flex-grow: 1;
   overflow: hidden;
+  margin-right: 2px;
 `;
 
 const SUsername = styled(Text)`
