@@ -177,7 +177,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           {isError && (
             <SContentWrapper>
               <SEmoji src={pensiveIcon.src} alt='Pensive' />
-              <Headline variant={6}>Ooops!</Headline>
+              <SHeadline variant={6}>Ooops!</SHeadline>
               <SText variant={2} weight={600}>
                 {message}
               </SText>
@@ -241,10 +241,6 @@ const SModalContent = styled.div`
   justify-content: center;
   flex: 1;
   height: 100%;
-
-  ${({ theme }) => theme.media.tablet} {
-    justify-content: flex-start;
-  }
 `;
 
 const SLogo = styled.img`
@@ -255,6 +251,7 @@ const SLogo = styled.img`
 
 const SText = styled(Text)`
   margin-top: 8px;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
   ${({ theme }) => theme.media.tablet} {
     margin-top: 16px;
@@ -265,6 +262,17 @@ const SEmoji = styled.img`
   width: 64px;
   height: 64px;
   margin-bottom: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 16px;
+  }
+`;
+
+const SHeadline = styled(Headline)`
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 32px;
+    line-height: 40px;
+  }
 `;
 
 const SButton = styled(Button)`
