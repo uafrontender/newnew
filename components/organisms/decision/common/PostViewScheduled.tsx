@@ -48,7 +48,6 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
       typeOfPost,
       handleGoBackInsidePost,
       handleUpdatePostStatus,
-      handleRemoveFromStateUnfavorited,
     } = usePostModalInnerState();
     const post = useMemo(
       () =>
@@ -91,10 +90,6 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
 
         if (!res.error) {
           setIsFollowing(!isFollowing);
-
-          if (isFollowing) {
-            handleRemoveFromStateUnfavorited?.();
-          }
         }
       } catch (err) {
         console.error(err);
