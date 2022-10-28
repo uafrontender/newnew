@@ -37,6 +37,7 @@ interface IGeneral {
   specialStatusBarColor?: string;
   restrictMaxWidth?: boolean;
   noMobieNavigation?: boolean;
+  noPaddingMobile?: boolean;
   children: React.ReactNode;
 }
 
@@ -47,6 +48,7 @@ export const General: React.FC<IGeneral> = (props) => {
     specialStatusBarColor,
     restrictMaxWidth,
     noMobieNavigation,
+    noPaddingMobile,
     children,
   } = props;
   const user = useAppSelector((state) => state.user);
@@ -206,8 +208,8 @@ export const General: React.FC<IGeneral> = (props) => {
                   noMaxContent: true,
                 })}
           >
-            <Row>
-              <Col>{children}</Col>
+            <Row noPaddingMobile={noPaddingMobile}>
+              <Col noPaddingMobile={noPaddingMobile}>{children}</Col>
             </Row>
           </Container>
         </SContent>

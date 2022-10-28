@@ -149,11 +149,6 @@ const SPostModalContainer = styled.div<{
   isMyPost: boolean;
   loaded: boolean;
 }>`
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  z-index: 1;
-  overscroll-behavior: none;
-
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
   height: 100%;
