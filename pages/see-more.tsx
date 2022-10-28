@@ -23,6 +23,7 @@ import {
   fetchCuratedPosts,
   fetchForYouPosts,
 } from '../api/endpoints/post';
+import { getMyPosts } from '../api/endpoints/user';
 import { APIResponse } from '../api/apiConfigs';
 import { fetchLiveAuctions } from '../api/endpoints/auction';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
@@ -33,7 +34,12 @@ const TopSection = dynamic(
   () => import('../components/organisms/home/TopSection')
 );
 
-export type TCollectionType = 'ac' | 'mc' /* | 'cf' */ | 'biggest' | 'for-you';
+export type TCollectionType =
+  | 'ac'
+  | 'mc' /* | 'cf' */
+  | 'biggest'
+  | 'for-you'
+  | 'recent-activity';
 export type TSortingType = 'all' | 'num_bids' | 'newest';
 
 interface ISearch {
@@ -240,6 +246,40 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
             setCollectionLoaded((curr) => [
               ...curr,
               ...((res.data as newnewapi.PagedPostsResponse)
+                .posts as newnewapi.Post[]),
+            ]);
+            setNextPageToken(res.data.paging?.nextPageToken);
+            setIsCollectionLoading(false);
+            return;
+          }
+          throw new Error('Request failed');
+        }
+
+        if (categoryToFetch === 'recent-activity') {
+          const biggestPayload = new newnewapi.GetRelatedToMePostsRequest({
+            ...(pageToken
+              ? {
+                  paging: {
+                    pageToken,
+                  },
+                }
+              : {}),
+            ...(sorting
+              ? {
+                  sorting,
+                }
+              : {}),
+          });
+
+          res = await getMyPosts(biggestPayload);
+
+          if (
+            res.data &&
+            (res.data as newnewapi.PagedCountedPostsResponse)?.posts
+          ) {
+            setCollectionLoaded((curr) => [
+              ...curr,
+              ...((res.data as newnewapi.PagedCountedPostsResponse)
                 .posts as newnewapi.Post[]),
             ]);
             setNextPageToken(res.data.paging?.nextPageToken);

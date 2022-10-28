@@ -381,8 +381,10 @@ const SPoint = styled.span<{ variant: 1 | 2 }>`
             align-items: center;
             justify-content: center;
             margin-right: 8px;
-            width: 12px;
-            height: 12px;
+            max-width: 12px;
+            max-height: 12px;
+            min-width: 12px;
+            min-height: 12px;
             border-radius: 50%;
             background-color: ${({ theme }) =>
               theme.colorsThemed.accent.yellow};

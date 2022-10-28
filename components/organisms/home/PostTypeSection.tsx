@@ -243,12 +243,12 @@ const SItemWrapper = styled.div<{ index: number }>`
 
   ${(props) => props.theme.media.laptopL} {
     transform: ${({ index }) => (index !== 1 ? `translateY(25%)` : 0)};
-    height: 386px;
+    height: 390px;
 
     & > div {
       min-width: 204px;
       max-width: 204px;
-      height: 386px;
+      height: 390px;
       background: ${({ theme }) => theme.colorsThemed.background.backgroundDD};
       border-color: ${({ theme }) =>
         theme.name === 'dark'
@@ -301,7 +301,7 @@ const SCardSkeletonSection = styled(CardSkeletonSection)`
       & > span > div {
         min-width: 204px;
         max-width: 204px;
-        height: 386px;
+        height: 390px;
 
         &:not(:nth-child(2)) {
           transform: translateY(25%);
