@@ -217,18 +217,14 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         }
       }
 
-      document
-        ?.getElementById('post-modal-container')
-        ?.addEventListener('scroll', handleScroll);
+      document?.addEventListener('scroll', handleScroll);
     }
 
     return () => {
       setBottomOffset(undefined);
 
       if (isBrowser() && !isMobileOrTablet) {
-        document
-          ?.getElementById('post-modal-container')
-          ?.removeEventListener('scroll', handleScroll);
+        document?.removeEventListener('scroll', handleScroll);
       }
     };
   }, [isMobileOrTablet, postId]);

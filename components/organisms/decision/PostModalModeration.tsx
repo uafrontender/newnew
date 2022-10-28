@@ -8,14 +8,13 @@ import styled, { useTheme } from 'styled-components';
 
 import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
 import { Mixpanel } from '../../../utils/mixpanel';
-import { useAppSelector } from '../../../redux-store/store';
 
 import ModerationView from './moderation';
-import PostModerationControls from '../../molecules/decision/moderation/PostModerationControls';
-import PostSuccessAnimationBackground from '../../molecules/decision/success/PostSuccessAnimationBackground';
 
 // Icons
 import assets from '../../../constants/assets';
+import GoBackButton from '../../molecules/GoBackButton';
+import { useAppSelector } from '../../../redux-store/store';
 
 const PostFailedBox = dynamic(
   () => import('../../molecules/decision/common/PostFailedBox')
@@ -54,23 +53,10 @@ const PostModalModeration: React.FunctionComponent<
     postStatus,
     deletedByCreator,
     recommendedPosts,
-    shareMenuOpen,
-    deletePostOpen,
-    ellipseMenuOpen,
-    handleDeletePost,
-    handleEllipseMenuClose,
-    handleOpenDeletePostModal,
-    handleShareClose,
-    handleOpenShareMenu,
-    handleOpenEllipseMenu,
-    handleCloseDeletePostModal,
-    handleCloseAndGoBack,
   } = usePostModalInnerState();
 
   return (
     <>
-      {(postStatus === 'succeeded' || postStatus === 'waiting_for_response') &&
-        !isMobile && <PostSuccessAnimationBackground />}
       <Head>
         <title>{t(`meta.${typeOfPost}.title`)}</title>
         <meta
@@ -84,23 +70,9 @@ const PostModalModeration: React.FunctionComponent<
         />
       </Head>
       {!isMobile && (
-        <PostModerationControls
-          isMobile={isMobile}
-          postUuid={postParsed?.postUuid ?? ''}
-          postStatus={postStatus}
-          shareMenuOpen={shareMenuOpen}
-          typeOfPost={typeOfPost ?? 'ac'}
-          deletePostOpen={deletePostOpen}
-          ellipseMenuOpen={ellipseMenuOpen}
-          handleCloseAndGoBack={handleCloseAndGoBack}
-          handleDeletePost={handleDeletePost}
-          handleEllipseMenuClose={handleEllipseMenuClose}
-          handleOpenDeletePostModal={handleOpenDeletePostModal}
-          handleShareClose={handleShareClose}
-          handleOpenShareMenu={handleOpenShareMenu}
-          handleOpenEllipseMenu={handleOpenEllipseMenu}
-          handleCloseDeletePostModal={handleCloseDeletePostModal}
-        />
+        <SGoBackButton longArrow onClick={() => router.back()}>
+          Back
+        </SGoBackButton>
       )}
       {postParsed && typeOfPost ? (
         <SPostModalContainer
@@ -141,25 +113,6 @@ const PostModalModeration: React.FunctionComponent<
                 });
                 router.push('/creation');
               }}
-            />
-          )}
-          {isMobile && (
-            <PostModerationControls
-              isMobile={isMobile}
-              postUuid={postParsed?.postUuid ?? ''}
-              postStatus={postStatus}
-              shareMenuOpen={shareMenuOpen}
-              typeOfPost={typeOfPost ?? 'ac'}
-              deletePostOpen={deletePostOpen}
-              ellipseMenuOpen={ellipseMenuOpen}
-              handleCloseAndGoBack={handleCloseAndGoBack}
-              handleDeletePost={handleDeletePost}
-              handleEllipseMenuClose={handleEllipseMenuClose}
-              handleOpenDeletePostModal={handleOpenDeletePostModal}
-              handleShareClose={handleShareClose}
-              handleOpenShareMenu={handleOpenShareMenu}
-              handleOpenEllipseMenu={handleOpenEllipseMenu}
-              handleCloseDeletePostModal={handleCloseDeletePostModal}
             />
           )}
         </SPostModalContainer>
@@ -215,5 +168,13 @@ const SPostModalContainer = styled.div<{
 
     padding: 24px;
     padding-bottom: 24px;
+  }
+`;
+
+const SGoBackButton = styled(GoBackButton)`
+  padding-left: 16px;
+
+  ${({ theme }) => theme.media.laptopM} {
+    padding-left: 24px;
   }
 `;

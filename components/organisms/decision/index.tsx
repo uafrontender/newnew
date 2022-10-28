@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-alert */
 /* eslint-disable arrow-body-style */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
@@ -23,7 +21,6 @@ import switchPostStatus, {
   TPostStatusStringified,
 } from '../../../utils/switchPostStatus';
 import switchPostStatusString from '../../../utils/switchPostStatusString';
-import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
 
 import {
@@ -50,9 +47,6 @@ interface IPostModal {
   saveCardFromRedirect?: boolean;
   commentIdFromUrl?: string;
   commentContentFromUrl?: string;
-  handleRemoveFromStateDeleted?: () => void;
-  handleRemoveFromStateUnfavorited?: () => void;
-  handleAddPostToStateFavorited?: () => void;
 }
 
 // Memorization does not work
@@ -62,18 +56,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   saveCardFromRedirect,
   commentIdFromUrl,
   commentContentFromUrl,
-  handleRemoveFromStateDeleted,
-  handleRemoveFromStateUnfavorited,
-  handleAddPostToStateFavorited,
 }) => {
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
 
-  const { handleSetPostOverlayOpen, isConfirmToClosePost } =
-    usePostModalState();
-  const { syncedHistoryPushState, syncedHistoryReplaceState } =
-    useSynchronizedHistory();
+  const { isConfirmToClosePost } = usePostModalState();
 
   useLeavePageConfirm(
     isConfirmToClosePost,
@@ -140,12 +128,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
       if (!res.error) {
         setIsFollowingDecision((currentValue) => !currentValue);
-        // TODO: separate onDelete and onUnsubscribe callbacks to prevent possible bugs
-        if (isFollowingDecision) {
-          handleRemoveFromStateUnfavorited?.();
-        } else {
-          handleAddPostToStateFavorited?.();
-        }
       }
     } catch (err) {
       console.error(err);
@@ -156,8 +138,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     user._persist?.rehydrated,
     isFollowingDecision,
     router,
-    handleRemoveFromStateUnfavorited,
-    handleAddPostToStateFavorited,
   ]);
 
   const handleUpdatePostStatus = useCallback(
@@ -212,7 +192,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
       if (!res.error) {
         handleUpdatePostStatus('DELETED_BY_CREATOR');
-        handleRemoveFromStateDeleted?.();
         handleCloseDeletePostModal();
       }
     } catch (err) {
@@ -220,7 +199,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     }
   }, [
     handleCloseDeletePostModal,
-    handleRemoveFromStateDeleted,
     handleUpdatePostStatus,
     postParsed?.postUuid,
   ]);
@@ -230,12 +208,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     setSaveCard(false);
   }, []);
 
-  const [open, setOpen] = useState(false);
-
   const modalContainerRef = useRef<HTMLDivElement>();
 
   // Recommendations (with infinite scroll)
-  const innerHistoryStack = useRef<newnewapi.Post[]>([]);
   const [recommendedPosts, setRecommendedPosts] = useState<newnewapi.Post[]>(
     []
   );
@@ -345,55 +320,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, commentContentFromUrl]);
 
-  // // Additional hash
-  // useEffect(() => {
-  //   if (isOpen && postParsed) {
-  //     let additionalHash;
-  //     if (window?.location?.hash === '#comments') {
-  //       additionalHash = '#comments';
-  //     } else if (window?.location?.hash === '#winner') {
-  //       additionalHash = '#winner';
-  //     }
-  //     setOpen(true);
-
-  //     // Push if opening fresh
-  //     // Replace if coming back from a different page
-  //     const isFromPostPage = !!router?.query?.post_uuid;
-  //     if (!isFromPostPage) {
-  //       syncedHistoryPushState(
-  //         {
-  //           postId: postParsed.postUuid,
-  //         },
-  //         `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-  //           postParsed.postUuid
-  //         }${additionalHash ?? ''}`
-  //       );
-  //     } else {
-  //       syncedHistoryReplaceState(
-  //         {
-  //           postId: postParsed.postUuid,
-  //         },
-  //         `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-  //           postParsed.postUuid
-  //         }${additionalHash ?? ''}`
-  //       );
-  //     }
-
-  //     setTimeout(() => {
-  //       handleSetPostOverlayOpen(true);
-  //     }, 400);
-  //   }
-
-  //   return () => {
-  //     setOpen(false);
-  //     handleSetPostOverlayOpen(false);
-  //     innerHistoryStack.current = [];
-  //     // eslint-disable-next-line no-useless-return
-  //     return;
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [router.locale]);
-
   // Fetch whether or not the Post is favorited
   useEffect(() => {
     async function fetchIsFavorited() {
@@ -461,7 +387,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   return (
     <PostModalInnerContextProvider
-      open={open}
       postParsed={postParsed}
       typeOfPost={typeOfPost}
       postStatus={postStatus}
@@ -482,8 +407,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       isFollowingDecision={isFollowingDecision}
       handleFollowDecision={handleFollowDecision}
       handleSetIsFollowingDecision={handleSetIsFollowingDecision}
-      handleRemoveFromStateUnfavorited={handleRemoveFromStateUnfavorited}
-      handleAddPostToStateFavorited={handleAddPostToStateFavorited}
       deletePostOpen={deletePostOpen}
       handleDeletePost={handleDeletePost}
       handleOpenDeletePostModal={handleOpenDeletePostModal}
@@ -505,9 +428,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
 PostModal.defaultProps = {
   post: undefined,
-  handleRemoveFromStateDeleted: () => {},
-  handleRemoveFromStateUnfavorited: () => {},
-  handleAddPostToStateFavorited: () => {},
 };
 
 export default (props: IPostModal) => (

@@ -72,15 +72,13 @@ const PostPage: NextPage<IPostPage> = ({
           content={postParsed?.announcement?.thumbnailImageUrl ?? ''}
         />
       </Head>
-      {post && (
-        <PostModal
-          post={post}
-          stripeSetupIntentClientSecretFromRedirect={setup_intent_client_secret}
-          saveCardFromRedirect={save_card}
-          commentIdFromUrl={comment_id}
-          commentContentFromUrl={comment_content}
-        />
-      )}
+      <PostModal
+        post={post}
+        stripeSetupIntentClientSecretFromRedirect={setup_intent_client_secret}
+        saveCardFromRedirect={save_card}
+        commentIdFromUrl={comment_id}
+        commentContentFromUrl={comment_content}
+      />
     </>
   );
 };

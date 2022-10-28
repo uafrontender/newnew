@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -15,6 +15,18 @@ import PostFailedBox from '../common/PostFailedBox';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 
 import assets from '../../../../constants/assets';
+import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
+import MoreIconFilled from '../../../../public/images/svg/icons/filled/More.svg';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+
+import PostEllipseModalModeration from './PostEllipseModalModeration';
+import PostEllipseMenuModeration from './PostEllipseMenuModeration';
+import PostShareEllipseModal from '../common/PostShareEllipseModal';
+import Button from '../../../atoms/Button';
+import InlineSvg from '../../../atoms/InlineSVG';
+import PostShareEllipseMenu from '../common/PostShareEllipseMenu';
+import { useAppSelector } from '../../../../redux-store/store';
+import PostConfirmDeleteModal from './PostConfirmDeleteModal';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -50,11 +62,30 @@ const PostTopInfoModeration: React.FunctionComponent<
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const { postParsed, typeOfPost, postStatus } = usePostModalInnerState();
+  const {
+    postParsed,
+    typeOfPost,
+    postStatus,
+    ellipseMenuOpen,
+    shareMenuOpen,
+    deletePostOpen,
+    handleEllipseMenuClose,
+    handleShareClose,
+    handleDeletePost,
+    handleOpenShareMenu,
+    handleOpenEllipseMenu,
+    handleOpenDeletePostModal,
+    handleCloseDeletePostModal,
+  } = usePostModalInnerState();
 
   const postId = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
   const title = useMemo(() => postParsed?.title ?? '', [postParsed]);
+  const creator = useMemo(() => postParsed?.creator ?? {}, [postParsed]);
   const postType = useMemo(() => typeOfPost ?? 'ac', [typeOfPost]);
 
   const failureReason = useMemo(() => {
@@ -96,6 +127,8 @@ const PostTopInfoModeration: React.FunctionComponent<
     () => postType === 'ac' && postStatus === 'waiting_for_decision',
     [postType, postStatus]
   );
+  const moreButtonRef: any = useRef();
+  const shareButtonRef: any = useRef();
 
   if (hidden) return null;
 
@@ -116,7 +149,119 @@ const PostTopInfoModeration: React.FunctionComponent<
               : t('mcPost.postTopInfo.vote')}
           </SBidsAmount>
         ) : null}
-        <SActionsDiv />
+        <SCreatorCard>
+          <a
+            href={`${
+              router.locale !== 'en-US' ? `/${router.locale}` : ''
+            }/profile/my-posts`}
+            onClickCapture={() => {
+              Mixpanel.track('Click on own avatar', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'PostTopInfo',
+              });
+            }}
+          >
+            <SAvatarArea>
+              <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
+            </SAvatarArea>
+          </a>
+          <a
+            href={`${
+              router.locale !== 'en-US' ? `/${router.locale}` : ''
+            }/profile/my-posts`}
+            onClickCapture={() => {
+              Mixpanel.track('Click on own username', {
+                _stage: 'Post',
+                _postUuid: postId,
+                _component: 'PostTopInfo',
+              });
+            }}
+          >
+            <SUsername className='username'>
+              {t('me')}
+              {creator.options?.isVerified && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                  fill='none'
+                />
+              )}
+            </SUsername>
+          </a>
+        </SCreatorCard>
+        <SActionsDiv>
+          <SShareButton
+            view='transparent'
+            iconOnly
+            withDim
+            withShrink
+            style={{
+              padding: '8px',
+            }}
+            onClick={() => handleOpenShareMenu()}
+            ref={shareButtonRef}
+          >
+            <InlineSvg
+              svg={ShareIconFilled}
+              fill={theme.colorsThemed.text.secondary}
+              width='20px'
+              height='20px'
+            />
+          </SShareButton>
+          <SMoreButton
+            view='transparent'
+            iconOnly
+            onClick={() => handleOpenEllipseMenu()}
+            ref={moreButtonRef}
+          >
+            <InlineSvg
+              svg={MoreIconFilled}
+              fill={theme.colorsThemed.text.secondary}
+              width='20px'
+              height='20px'
+            />
+          </SMoreButton>
+          {/* Share menu */}
+          {!isMobile && (
+            <PostShareEllipseMenu
+              postId={postId}
+              isVisible={shareMenuOpen}
+              onClose={handleShareClose}
+              anchorElement={shareButtonRef.current}
+            />
+          )}
+          {isMobile && shareMenuOpen ? (
+            <PostShareEllipseModal
+              isOpen={shareMenuOpen}
+              zIndex={11}
+              postId={postId}
+              onClose={handleShareClose}
+            />
+          ) : null}
+          {/* Ellipse menu */}
+          {!isMobile && (
+            <PostEllipseMenuModeration
+              postType={typeOfPost as string}
+              isVisible={ellipseMenuOpen}
+              canDeletePost={postStatus !== 'succeeded'}
+              handleClose={handleEllipseMenuClose}
+              handleOpenDeletePostModal={handleOpenDeletePostModal}
+              anchorElement={moreButtonRef.current}
+            />
+          )}
+          {isMobile && ellipseMenuOpen ? (
+            <PostEllipseModalModeration
+              postType={typeOfPost as string}
+              zIndex={11}
+              canDeletePost={postStatus !== 'succeeded'}
+              isOpen={ellipseMenuOpen}
+              onClose={handleEllipseMenuClose}
+              handleOpenDeletePostModal={handleOpenDeletePostModal}
+            />
+          ) : null}
+        </SActionsDiv>
         <SPostTitle variant={5}>
           <PostTitleContent>{title}</PostTitleContent>
         </SPostTitle>
@@ -165,6 +310,13 @@ const PostTopInfoModeration: React.FunctionComponent<
           }}
         />
       )}
+      {/* Confirm delete post */}
+      <PostConfirmDeleteModal
+        postType={typeOfPost as string}
+        isVisible={deletePostOpen}
+        closeModal={handleCloseDeletePostModal}
+        handleConfirmDelete={handleDeletePost}
+      />
     </SContainer>
   );
 };
@@ -193,13 +345,16 @@ const SWrapper = styled.div<{
     showWinnerOption
       ? css`
           grid-template-areas:
+            'userCard userCard actions'
             'title title title'
-            'stats stats actions';
+            'stats stats stats'
+            'selectWinner selectWinner selectWinner';
         `
       : css`
           grid-template-areas:
+            'userCard userCard actions'
             'title title title'
-            'stats stats actions';
+            'stats stats stats';
         `}
 
   height: fit-content;
@@ -213,13 +368,13 @@ const SWrapper = styled.div<{
       showWinnerOption
         ? css`
             grid-template-areas:
-              'stats stats actions'
+              'userCard stats actions'
               'title title title'
               'selectWinner selectWinner selectWinner';
           `
         : css`
             grid-template-areas:
-              'stats stats actions'
+              'userCard stats actions'
               'title title title';
           `}
     grid-template-rows: 40px;
@@ -234,15 +389,6 @@ const SPostTitle = styled(Headline)`
   grid-area: title;
   white-space: pre-wrap;
   word-break: break-word;
-`;
-
-// Action buttons
-const SActionsDiv = styled.div`
-  position: relative;
-  grid-area: actions;
-
-  display: flex;
-  justify-content: flex-end;
 `;
 
 // Auction
@@ -318,4 +464,98 @@ const SHeadline = styled(Headline)`
 
 const SText = styled(Text)`
   color: #ffffff;
+`;
+
+// Creator card
+const SCreatorCard = styled.div`
+  grid-area: userCard;
+
+  display: grid;
+  align-items: center;
+  grid-template-areas: 'avatar username';
+  grid-template-columns: 36px 1fr;
+
+  height: 36px;
+
+  cursor: pointer;
+
+  padding-right: 8px;
+
+  .username {
+    transition: 0.2s linear;
+  }
+
+  &:hover {
+    .username {
+      color: ${({ theme }) => theme.colorsThemed.text.primary};
+    }
+  }
+`;
+
+const SAvatarArea = styled.div`
+  grid-area: avatar;
+
+  align-self: center;
+
+  overflow: hidden;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    display: block;
+    width: 24px;
+    height: 24px;
+  }
+`;
+
+const SUsername = styled.div`
+  grid-area: username;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 24px;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+// Action buttons
+const SActionsDiv = styled.div`
+  position: relative;
+  grid-area: actions;
+
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const SShareButton = styled(Button)`
+  background: none;
+  padding: 0px;
+  &:focus:enabled {
+    background: ${({ theme, view }) =>
+      view ? theme.colorsThemed.button.background[view] : ''};
+  }
+`;
+
+const SMoreButton = styled(Button)`
+  background: none;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  padding: 8px;
+
+  span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  margin-left: 2px;
 `;

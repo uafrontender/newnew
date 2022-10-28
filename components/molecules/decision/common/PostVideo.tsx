@@ -116,18 +116,14 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         }
       }
 
-      document
-        ?.getElementById('post-modal-container')
-        ?.addEventListener('scroll', handleScroll);
+      document?.addEventListener('scroll', handleScroll);
     }
 
     return () => {
       setSoundBtnBottomOverriden(undefined);
 
       if (isBrowser() && !isMobileOrTablet) {
-        document
-          ?.getElementById('post-modal-container')
-          ?.removeEventListener('scroll', handleScroll);
+        document?.removeEventListener('scroll', handleScroll);
       }
     };
   }, [isMobileOrTablet, postId]);

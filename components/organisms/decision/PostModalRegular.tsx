@@ -4,19 +4,18 @@ import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import { useRouter } from 'next/router';
 
 import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
 import { useAppSelector } from '../../../redux-store/store';
 import getDisplayname from '../../../utils/getDisplayname';
 
 import RegularView from './regular';
-import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
-import InlineSvg from '../../atoms/InlineSVG';
 
 // Icons
 import assets from '../../../constants/assets';
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import GoBackButton from '../../molecules/GoBackButton';
 
 const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
 const PostFailedBox = dynamic(
@@ -40,6 +39,7 @@ interface IPostModalRegular {}
 
 const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -60,7 +60,6 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
     reportPostOpen,
     handleReportSubmit,
     handleReportClose,
-    handleCloseAndGoBack,
   } = usePostModalInnerState();
 
   return (
@@ -78,18 +77,9 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
         />
       </Head>
       {!isMobile && (
-        <SGoBackButtonDesktop
-          view='secondary'
-          iconOnly
-          onClick={handleCloseAndGoBack}
-        >
-          <InlineSvg
-            svg={CancelIcon}
-            fill={theme.colorsThemed.text.primary}
-            width='24px'
-            height='24px'
-          />
-        </SGoBackButtonDesktop>
+        <SGoBackButton longArrow onClick={() => router.back()}>
+          Back
+        </SGoBackButton>
       )}
       {postParsed && typeOfPost ? (
         <SPostModalContainer
@@ -237,29 +227,10 @@ const SRecommendationsSection = styled.div<{
   min-height: ${({ loaded }) => (loaded ? '600px' : '0')};
 `;
 
-const SGoBackButtonDesktop = styled(Button)`
-  position: absolute;
-  right: 0;
-  top: 0;
-
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-
-  border: transparent;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  font-size: 20px;
-  line-height: 28px;
-  font-weight: bold;
-  text-transform: capitalize;
-
-  cursor: pointer;
-
-  z-index: 2;
+const SGoBackButton = styled(GoBackButton)`
+  padding-left: 16px;
 
   ${({ theme }) => theme.media.laptopM} {
-    right: 24px;
-    top: 32px;
+    padding-left: 24px;
   }
 `;

@@ -4,6 +4,7 @@ import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import { useRouter } from 'next/router';
 
 import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
 import { useAppSelector } from '../../../redux-store/store';
@@ -12,11 +13,8 @@ import getDisplayname from '../../../utils/getDisplayname';
 import SuccessView from './success';
 import WaitingForResponseView from './awaiting';
 import PostSuccessOrWaitingControls from '../../molecules/decision/common/PostSuccessOrWaitingControls';
+import GoBackButton from '../../molecules/GoBackButton';
 
-const PostSuccessAnimationBackground = dynamic(
-  () =>
-    import('../../molecules/decision/success/PostSuccessAnimationBackground')
-);
 const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 
 interface IPostModalAwaitingSuccess {}
@@ -24,6 +22,7 @@ interface IPostModalAwaitingSuccess {}
 const PostModalAwaitingSuccess: React.FunctionComponent<
   IPostModalAwaitingSuccess
 > = () => {
+  const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -53,9 +52,6 @@ const PostModalAwaitingSuccess: React.FunctionComponent<
 
   return (
     <>
-      {postStatus === 'succeeded' && !isMobile && (
-        <PostSuccessAnimationBackground />
-      )}
       <Head>
         <title>{t(`meta.${typeOfPost}.title`)}</title>
         <meta
@@ -69,21 +65,9 @@ const PostModalAwaitingSuccess: React.FunctionComponent<
         />
       </Head>
       {!isMobile && (
-        <PostSuccessOrWaitingControls
-          ellipseMenuOpen={ellipseMenuOpen}
-          isFollowingDecision={isFollowingDecision}
-          isMobile={isMobile}
-          postUuid={postParsed?.postUuid ?? ''}
-          shareMenuOpen={shareMenuOpen}
-          typeOfPost={typeOfPost ?? 'ac'}
-          handleCloseAndGoBack={handleCloseAndGoBack}
-          handleEllipseMenuClose={handleEllipseMenuClose}
-          handleFollowDecision={handleFollowDecision}
-          handleReportOpen={handleReportOpen}
-          handleShareClose={handleShareClose}
-          handleOpenShareMenu={handleOpenShareMenu}
-          handleOpenEllipseMenu={handleOpenEllipseMenu}
-        />
+        <SGoBackButton longArrow onClick={() => router.back()}>
+          Back
+        </SGoBackButton>
       )}
       {postParsed && typeOfPost ? (
         <SPostModalContainer
@@ -190,5 +174,13 @@ const SPostModalContainer = styled.div<{
 
     padding: 24px;
     padding-bottom: 24px;
+  }
+`;
+
+const SGoBackButton = styled(GoBackButton)`
+  padding-left: 16px;
+
+  ${({ theme }) => theme.media.laptopM} {
+    padding-left: 24px;
   }
 `;
