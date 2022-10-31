@@ -312,8 +312,8 @@ const SFilterContainer = styled.div`
   margin-bottom: 8px;
 
   ${({ theme }) => theme.media.tablet} {
-    position: absolute;
-    top: -10px;
+    /* position: absolute;
+    top: -10px; */
 
     margin-bottom: 0;
   }

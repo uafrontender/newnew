@@ -59,7 +59,8 @@
     "signIn": "Iniciar sesión",
     "dashboard": "Panel",
     "createOnNewnew": "Crear ahora",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "takeMeHome_NEED_TRANSLATION": "Take me home"
   },
   "footer": {
     "topTitle": "NewNew",

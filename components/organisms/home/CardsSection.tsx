@@ -8,7 +8,7 @@ import { newnewapi } from 'newnew-api';
 
 import PostCard from '../../molecules/PostCard';
 import Button from '../../atoms/Button';
-import Caption from '../../atoms/Caption';
+// import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import UserAvatar from '../../molecules/UserAvatar';
 import ScrollArrowPermanent from '../../atoms/ScrollArrowPermanent';
@@ -230,10 +230,10 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     };
 
     // Try to pre-fetch the content
-    useEffect(() => {
-      router.prefetch(seeMoreLink || `/see-more?category=${category}`);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // useEffect(() => {
+    //   router.prefetch(seeMoreLink || `/see-more?category=${category}`);
+    //   // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
 
     useEffect(() => {
       function onScroll() {
@@ -320,7 +320,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
               </SHeadline>
             </AnimatedPresence>
           )}
-          {!isMobile && type === 'default' && (
+          {/* {!isMobile && type === 'default' && (
             <SCaption weight={700} onClick={handleSeeMoreClick}>
               {t(
                 type === 'default'
@@ -329,7 +329,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
                 { name: formatString(user?.username, true) }
               )}
             </SCaption>
-          )}
+          )} */}
         </STopWrapper>
         <SListContainer ref={ref}>
           <SListWrapper
@@ -550,15 +550,15 @@ const STopWrapper = styled.div`
   }
 `;
 
-const SCaption = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
-  cursor: pointer;
-  transition: color ease 0.5s;
+// const SCaption = styled(Caption)`
+//   color: ${(props) => props.theme.colorsThemed.text.secondary};
+//   cursor: pointer;
+//   transition: color ease 0.5s;
 
-  &:hover {
-    color: ${(props) => props.theme.colorsThemed.text.primary};
-  }
-`;
+//   &:hover {
+//     color: ${(props) => props.theme.colorsThemed.text.primary};
+//   }
+// `;
 
 const SHeadline = styled(Headline)`
   display: flex;
