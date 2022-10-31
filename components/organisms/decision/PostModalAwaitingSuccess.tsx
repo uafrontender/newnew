@@ -66,7 +66,7 @@ const PostModalAwaitingSuccess: React.FunctionComponent<
       </Head>
       {!isMobile && (
         <SGoBackButton longArrow onClick={() => router.back()}>
-          Back
+          {t('back')}
         </SGoBackButton>
       )}
       {postParsed && typeOfPost ? (

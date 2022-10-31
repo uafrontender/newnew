@@ -20,12 +20,11 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 
 interface IAcWaitingOptionsSection {
   post: newnewapi.Auction;
-  heightDelta: number;
 }
 
 const AcWaitingOptionsSection: React.FunctionComponent<
   IAcWaitingOptionsSection
-> = ({ post, heightDelta }) => {
+> = ({ post }) => {
   const { t } = useTranslation('modal-Post');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -190,10 +189,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<
   }, [inView, optionsNextPageToken, optionsLoading]);
 
   return (
-    <SWrapper
-      // heightDelta={isMobile ? 24 : 60}
-      heightDelta={isMobile ? 0 : heightDelta}
-    >
+    <SWrapper>
       {!isMobile ? (
         <>
           <GradientMask
@@ -256,12 +252,16 @@ const AcWaitingOptionsSection: React.FunctionComponent<
 
 export default AcWaitingOptionsSection;
 
-const SWrapper = styled.div<{
-  heightDelta: number;
-}>`
+const SWrapper = styled.div`
   position: relative;
-  height: 100%;
-  height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex: 1 1 auto;
+  }
 `;
 
 const SBidsContainer = styled.div`
@@ -277,10 +277,19 @@ const SBidsContainer = styled.div`
   padding-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+
+    padding-top: 0px;
     padding-right: 12px;
     margin-right: -14px;
     width: calc(100% + 14px);
+    height: initial;
+    flex: 1 1 auto;
 
     // Scrollbar
     &::-webkit-scrollbar {

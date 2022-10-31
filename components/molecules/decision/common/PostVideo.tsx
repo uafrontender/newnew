@@ -213,6 +213,8 @@ const SVideoWrapper = styled.div`
     height: 506px;
     margin-left: initial;
 
+    flex-shrink: 0;
+
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     video {

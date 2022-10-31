@@ -6,7 +6,6 @@ import { usePostModalInnerState } from '../../../../contexts/postModalInnerConte
 // Views
 const PostModerationAC = dynamic(() => import('./PostModerationAC'));
 const PostModerationMC = dynamic(() => import('./PostModerationMC'));
-const PostModerationCF = dynamic(() => import('./PostModerationCF'));
 const PostViewScheduled = dynamic(() => import('../common/PostViewScheduled'));
 const PostViewProcessingAnnouncement = dynamic(
   () => import('../common/PostViewProcessingAnnouncement')
@@ -36,10 +35,6 @@ const ModerationView: React.FunctionComponent<IModerationView> = () => {
 
   if (typeOfPost === 'ac' && postParsed) {
     return <PostModerationAC key={postParsed.postUuid} />;
-  }
-
-  if (typeOfPost === 'cf' && postParsed) {
-    return <PostModerationCF key={postParsed.postUuid} />;
   }
 
   return null;

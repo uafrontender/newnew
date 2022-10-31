@@ -7,7 +7,6 @@ import { TPostType } from '../../../../utils/switchPostType';
 // Views
 const PostSuccessAC = dynamic(() => import('./PostSuccessAC'));
 const PostSuccessMC = dynamic(() => import('./PostSuccessMC'));
-const PostSuccessCF = dynamic(() => import('./PostSuccessCF'));
 
 interface ISuccessView {
   postParsed:
@@ -35,15 +34,6 @@ const SuccessView: React.FunctionComponent<ISuccessView> = ({
       <PostSuccessAC
         key={postParsed.postUuid}
         post={postParsed as newnewapi.Auction}
-      />
-    );
-  }
-
-  if (typeOfPost === 'cf' && postParsed) {
-    return (
-      <PostSuccessCF
-        key={postParsed.postUuid}
-        post={postParsed as newnewapi.Crowdfunding}
       />
     );
   }

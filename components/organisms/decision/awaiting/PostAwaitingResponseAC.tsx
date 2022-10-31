@@ -41,8 +41,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
   React.memo(({ post }) => {
     const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
-    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-    const isTablet = ['tablet'].includes(resizeMode);
+    const { mutedMode } = useAppSelector((state) => state.ui);
     const router = useRouter();
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
@@ -153,52 +152,47 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
                 time: waitingTime,
               })}
             />
-            <SMainSectionWrapper>
-              <SCreatorInfoDiv>
-                <SCreator>
-                  <a href={`/${post.creator?.username}`}>
-                    <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                  </a>
-                  <a href={`/${post.creator?.username}`}>
-                    <SWantsToKnow>
-                      <Trans
-                        t={t}
-                        i18nKey='acPostAwaiting.wantsToKnow'
-                        // @ts-ignore
-                        components={[
-                          post.creator?.options?.isVerified ? (
-                            <SInlineSVG
-                              svg={VerificationCheckmark}
-                              width='16px'
-                              height='16px'
-                              fill='none'
-                            />
-                          ) : null,
-                          { creator: post.creator?.nickname },
-                        ]}
-                      />
-                    </SWantsToKnow>
-                  </a>
-                </SCreator>
-                {post.totalAmount?.usdCents && (
-                  <STotal>
-                    {`$${formatNumber(
-                      post.totalAmount.usdCents / 100 ?? 0,
-                      true
-                    )}`}{' '}
-                    <span>{t('acPostAwaiting.inTotalBids')}</span>
-                  </STotal>
-                )}
-              </SCreatorInfoDiv>
-              <SPostTitle variant={4}>
-                <PostTitleContent>{post.title}</PostTitleContent>
-              </SPostTitle>
-              <SSeparator />
-              <AcWaitingOptionsSection
-                post={post}
-                heightDelta={isTablet ? 142 : 182}
-              />
-            </SMainSectionWrapper>
+            <SCreatorInfoDiv>
+              <SCreator>
+                <a href={`/${post.creator?.username}`}>
+                  <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
+                </a>
+                <a href={`/${post.creator?.username}`}>
+                  <SWantsToKnow>
+                    <Trans
+                      t={t}
+                      i18nKey='acPostAwaiting.wantsToKnow'
+                      // @ts-ignore
+                      components={[
+                        post.creator?.options?.isVerified ? (
+                          <SInlineSVG
+                            svg={VerificationCheckmark}
+                            width='16px'
+                            height='16px'
+                            fill='none'
+                          />
+                        ) : null,
+                        { creator: post.creator?.nickname },
+                      ]}
+                    />
+                  </SWantsToKnow>
+                </a>
+              </SCreator>
+              {post.totalAmount?.usdCents && (
+                <STotal>
+                  {`$${formatNumber(
+                    post.totalAmount.usdCents / 100 ?? 0,
+                    true
+                  )}`}{' '}
+                  <span>{t('acPostAwaiting.inTotalBids')}</span>
+                </STotal>
+              )}
+            </SCreatorInfoDiv>
+            <SPostTitle variant={4}>
+              <PostTitleContent>{post.title}</PostTitleContent>
+            </SPostTitle>
+            <SSeparator />
+            <AcWaitingOptionsSection post={post} />
           </SActivitiesContainer>
         </SWrapper>
         {post.isCommentsAllowed && (
@@ -224,30 +218,23 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
+    display: flex;
+    gap: 16px;
+
+    height: 648px;
     min-height: 0;
-
-    display: inline-grid;
-    grid-template-areas: 'video activities';
-    grid-template-columns: 284px 1fr;
-    grid-template-rows: minmax(0, 1fr);
-
-    grid-column-gap: 16px;
-
     align-items: flex-start;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas: 'video activities';
-    grid-template-columns: 410px 1fr;
-    grid-column-gap: 32px;
+    display: flex;
+    gap: 32px;
   }
 `;
 
 const SActivitiesContainer = styled.div`
-  grid-area: activities;
-
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
   overflow: hidden;
   border-radius: 16px;
@@ -255,32 +242,21 @@ const SActivitiesContainer = styled.div`
   margin-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
+    display: flex;
+    flex-direction: column;
+
     margin-top: 0px;
     min-height: 506px;
 
     height: 506px;
 
-    background-color: ${({ theme }) =>
-      theme.name === 'dark'
-        ? theme.colorsThemed.background.secondary
-        : 'transparent'};
+    background-color: transparent;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    min-height: unset;
     height: 728px;
-  }
-`;
-
-const SMainSectionWrapper = styled.div`
-  padding-left: 16px;
-  padding-right: 16px;
-
-  ${({ theme }) => theme.media.tablet} {
-    padding-left: 16px;
-    padding-right: 16px;
-
-    height: calc(100% - 160px);
+    max-height: 728px;
+    width: 100%;
   }
 `;
 

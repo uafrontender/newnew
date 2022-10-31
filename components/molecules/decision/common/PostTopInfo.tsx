@@ -472,7 +472,7 @@ const SPostTitle = styled(Headline)`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    min-height: 64px;
+    /* min-height: 64px; */
   }
 `;
 

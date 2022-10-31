@@ -6,7 +6,6 @@ import { usePostModalInnerState } from '../../../../contexts/postModalInnerConte
 // Views
 const PostViewAC = dynamic(() => import('./PostViewAC'));
 const PostViewMC = dynamic(() => import('./PostViewMC'));
-const PostViewCF = dynamic(() => import('./PostViewCF'));
 const PostViewScheduled = dynamic(() => import('../common/PostViewScheduled'));
 const PostViewProcessingAnnouncement = dynamic(
   () => import('../common/PostViewProcessingAnnouncement')
@@ -36,10 +35,6 @@ const RegularView: React.FunctionComponent<IRegularView> = () => {
 
   if (typeOfPost === 'ac' && postParsed) {
     return <PostViewAC key={postParsed.postUuid} />;
-  }
-
-  if (typeOfPost === 'cf' && postParsed) {
-    return <PostViewCF key={postParsed.postUuid} />;
   }
 
   return null;

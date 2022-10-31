@@ -11,9 +11,6 @@ const PostAwaitingResponseAC = dynamic(
 const PostAwaitingResponseMC = dynamic(
   () => import('./PostAwaitingResponseMC')
 );
-const PostAwaitingResponseCF = dynamic(
-  () => import('./PostAwaitingResponseCF')
-);
 
 interface IWaitingForResponseView {
   postParsed:
@@ -40,15 +37,6 @@ const WaitingForResponseView: React.FunctionComponent<
       <PostAwaitingResponseMC
         key={postParsed.postUuid}
         post={postParsed as newnewapi.MultipleChoice}
-      />
-    );
-  }
-
-  if (typeOfPost === 'cf' && postParsed) {
-    return (
-      <PostAwaitingResponseCF
-        key={postParsed.postUuid}
-        post={postParsed as newnewapi.Crowdfunding}
       />
     );
   }
