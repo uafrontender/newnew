@@ -6,7 +6,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled, { useTheme } from 'styled-components';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -26,6 +26,8 @@ import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import InlineSvg from '../../../atoms/InlineSVG';
 
 const CommentsBottomSection = dynamic(
   () => import('../../../molecules/decision/common/CommentsBottomSection')
@@ -236,7 +238,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
-          <SActivitesContainer>
+          <SActivitiesContainer>
             <>
               <DecisionEndedBox
                 type='mc'
@@ -256,9 +258,22 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     </a>
                     <a href={`/${post.creator?.username}`}>
                       <SWantsToKnow>
-                        {t('cfPostSuccess.wantsToKnow', {
-                          creator: post.creator?.nickname,
-                        })}
+                        <Trans
+                          t={t}
+                          i18nKey='cfPostSuccess.wantsToKnow'
+                          // @ts-ignore
+                          components={[
+                            post.creator?.options?.isVerified ? (
+                              <SInlineSVG
+                                svg={VerificationCheckmark}
+                                width='16px'
+                                height='16px'
+                                fill='none'
+                              />
+                            ) : null,
+                            { creator: post.creator?.nickname },
+                          ]}
+                        />
                       </SWantsToKnow>
                     </a>
                   </SCreator>
@@ -354,7 +369,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                 </>
               ) : null}
             </>
-          </SActivitesContainer>
+          </SActivitiesContainer>
         </SWrapper>
         {post.isCommentsAllowed && (
           <SCommentsSection id='comments' ref={commentsSectionRef}>
@@ -401,7 +416,7 @@ const SWrapper = styled.div`
   }
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitiesContainer = styled.div`
   grid-area: activities;
 
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
@@ -493,6 +508,8 @@ const SCreatorImage = styled.img`
 
 const SWantsToKnow = styled.span`
   position: relative;
+  display: inline-flex;
+  align-items: center;
   top: -6px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
@@ -505,6 +522,10 @@ const SWantsToKnow = styled.span`
     font-size: 16px;
     line-height: 24px;
   }
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  margin-right: 2px;
 `;
 
 const STotal = styled.div`

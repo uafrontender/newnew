@@ -4,7 +4,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -23,6 +23,8 @@ import secondsToDHMS from '../../../../utils/secondsToDHMS';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import InlineSvg from '../../../atoms/InlineSVG';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -187,7 +189,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
-          <SActivitesContainer dimmedBackground={openedMainSection === 'main'}>
+          <SActivitiesContainer dimmedBackground={openedMainSection === 'main'}>
             {openedMainSection === 'main' ? (
               <>
                 <WaitingForResponseBox
@@ -205,9 +207,22 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                       </a>
                       <a href={`/${post.creator?.username}`}>
                         <SWantsToKnow>
-                          {t('mcPostSuccess.wantsToKnow', {
-                            creator: post.creator?.nickname,
-                          })}
+                          <Trans
+                            t={t}
+                            i18nKey='mcPostAwaiting.wantsToKnow'
+                            // @ts-ignore
+                            components={[
+                              post.creator?.options?.isVerified ? (
+                                <SInlineSVG
+                                  svg={VerificationCheckmark}
+                                  width='16px'
+                                  height='16px'
+                                  fill='none'
+                                />
+                              ) : null,
+                              { creator: post.creator?.nickname },
+                            ]}
+                          />
                         </SWantsToKnow>
                       </a>
                     </SCreator>
@@ -322,7 +337,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                 }}
               />
             )}
-          </SActivitesContainer>
+          </SActivitiesContainer>
         </SWrapper>
         {post.isCommentsAllowed && (
           <SCommentsSection id='comments' ref={commentsSectionRef}>
@@ -368,7 +383,7 @@ const SWrapper = styled.div`
   }
 `;
 
-const SActivitesContainer = styled.div<{
+const SActivitiesContainer = styled.div<{
   dimmedBackground: boolean;
 }>`
   grid-area: activities;
@@ -463,6 +478,8 @@ const SCreatorImage = styled.img`
 
 const SWantsToKnow = styled.span`
   position: relative;
+  display: inline-flex;
+  align-items: center;
   top: -6px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
@@ -475,6 +492,10 @@ const SWantsToKnow = styled.span`
     font-size: 16px;
     line-height: 24px;
   }
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  margin-right: 2px;
 `;
 
 const STotal = styled.div`

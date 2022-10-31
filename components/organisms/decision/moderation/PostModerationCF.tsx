@@ -563,7 +563,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
               targetPledges={post.targetBackerCount}
               hidden={openedTab === 'response'}
             />
-            <SActivitesContainer>
+            <SActivitiesContainer>
               {openedTab === 'announcement' ? (
                 <>
                   <PostVotingTab>{t('tabs.backers')}</PostVotingTab>
@@ -604,7 +604,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
                   moneyBacked={totalAmount as newnewapi.MoneyAmount}
                 />
               )}
-            </SActivitesContainer>
+            </SActivitiesContainer>
             {isPopupVisible && (
               <HeroPopup
                 isPopupVisible={isPopupVisible}
@@ -691,7 +691,7 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitiesContainer = styled.div`
   grid-area: activities;
 
   display: flex;

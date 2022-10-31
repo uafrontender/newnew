@@ -866,10 +866,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(() => {
           totalPledges={currentBackers}
           targetPledges={post.targetBackerCount}
         />
-        <SActivitesContainer>
+        <SActivitiesContainer>
           <PostVotingTab>{t('tabs.backers')}</PostVotingTab>
           {renderBackersSection()}
-        </SActivitesContainer>
+        </SActivitiesContainer>
         {/* Loading Modal */}
         {loadingModalOpen && (
           <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
@@ -1028,7 +1028,7 @@ const SActionButton = styled(Button)`
   left: 16px;
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitiesContainer = styled.div`
   grid-area: activities;
 
   display: flex;
