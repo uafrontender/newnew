@@ -61,7 +61,7 @@ const AllBundlesModal: React.FC<IAllBundlesModal> = React.memo(
         >
           {isMobile && <SMobileTitle>{t('bundlesModal.title')}</SMobileTitle>}
           {setsOfBundles.map((set, setIndex) => (
-            <SBundleSetContainer>
+            <SBundleSetContainer key={setIndex}>
               {set.map((bundle, index) => (
                 <SBundleCard
                   key={`${setIndex}-${index}`}
