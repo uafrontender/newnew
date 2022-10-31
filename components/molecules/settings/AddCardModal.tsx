@@ -108,6 +108,10 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
           terms: {
             card: 'never',
           },
+          wallets: {
+            googlePay: 'never',
+            applePay: 'never',
+          },
         }}
       />
       {isRecaptchaV2Required && (

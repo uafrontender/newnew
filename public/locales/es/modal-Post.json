@@ -592,7 +592,7 @@
   },
   "acPostSuccess": {
     "heroText": "¡Velo suceder!",
-    "wantsToKnow": "{{creator}} quiere saber...",
+    "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalBids": "ofertas en total",
     "others": "otros",
     "bid": "oferta",
@@ -604,7 +604,7 @@
   },
   "mcPostSuccess": {
     "heroText": "¡Velo suceder!",
-    "wantsToKnow": "{{creator}} quiere saber...",
+    "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalVotes": "votos en total",
     "others": "otros",
     "voted": "votaron",
@@ -618,7 +618,7 @@
   },
   "cfPostSuccess": {
     "heroText": "¡Velo suceder!",
-    "wantsToKnow": "El Goal de {{creator}}",
+    "wantsToKnow": "El Goal de {{creator}}<0/>",
     "creatorsBackers": "Los patrocinadores de {{creator}}",
     "ofTargetBackers": "de {{target_count}} patrocinadores",
     "youBackedFor": "Patrocinaste por"
@@ -634,7 +634,7 @@
         "seconds": "segundos"
       }
     },
-    "wantsToKnow": "{{creator}} quiere saber...",
+    "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalBids": "en ofertas totales",
     "others": "otros",
     "bid": "oferta",
@@ -654,7 +654,7 @@
         "seconds": "segundos"
       }
     },
-    "wantsToKnow": "{{creator}} quiere saber...",
+    "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalVotes": "votos en total",
     "others": "otros",
     "voted": "votó",
@@ -677,7 +677,7 @@
         "seconds": "segundos"
       }
     },
-    "wantsToKnow": "El Goal de {{creator}}",
+    "wantsToKnow": "El Goal de {{creator}}<0/>",
     "creatorsBackers": "Los patrocinadores de {{creator}}",
     "ofTargetBackers": "de {{target_count}} patrocinadores",
     "youBackedFor": "Patrocinaste por"

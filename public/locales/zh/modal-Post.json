@@ -592,7 +592,7 @@
   },
   "acPostSuccess": {
     "heroText": "看它發生！",
-    "wantsToKnow": "{{creator}}想知道......",
+    "wantsToKnow": "{{creator}}<0/>想知道......",
     "inTotalBids": "在總的出價中",
     "others": "其他",
     "bid": "出價",
@@ -604,7 +604,7 @@
   },
   "mcPostSuccess": {
     "heroText": "看它發生！",
-    "wantsToKnow": "{{creator}}想知道......",
+    "wantsToKnow": "{{creator}}<0/>想知道......",
     "inTotalVotes": "總票數",
     "others": "其他",
     "voted": "已投票",
@@ -618,7 +618,7 @@
   },
   "cfPostSuccess": {
     "heroText": "看它發生！",
-    "wantsToKnow": "{{creator}}的Goal",
+    "wantsToKnow": "{{creator}}的<0/>Goal",
     "creatorsBackers": "{{creator}}的支持者",
     "ofTargetBackers": "共需 {{target_count}}支持者",
     "youBackedFor": "你支持的金額是"
@@ -634,7 +634,7 @@
         "seconds": "秒"
       }
     },
-    "wantsToKnow": "{{creator}}想知道......",
+    "wantsToKnow": "{{creator}}<0/>想知道......",
     "inTotalBids": "在總的出價中",
     "others": "其他",
     "bid": "出價",
@@ -654,7 +654,7 @@
         "seconds": "秒"
       }
     },
-    "wantsToKnow": "{{creator}}想知道......",
+    "wantsToKnow": "{{creator}}<0/>想知道......",
     "inTotalVotes": "總票數",
     "others": "其他",
     "voted": "已投票",
@@ -677,7 +677,7 @@
         "seconds": "秒"
       }
     },
-    "wantsToKnow": "{{creator}}的Goal",
+    "wantsToKnow": "{{creator}}的<0/>Goal",
     "creatorsBackers": "{{creator}}的支持者",
     "ofTargetBackers": "共需{{target_count}}的支持者",
     "youBackedFor": "你的支持金額是"

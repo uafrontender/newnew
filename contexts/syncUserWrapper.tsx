@@ -115,8 +115,8 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    user.creatorData?.options.isCreatorConnectedToStripe,
-    user.creatorData?.options.stripeConnectStatus,
+    user.creatorData?.options?.isCreatorConnectedToStripe,
+    user.creatorData?.options?.stripeConnectStatus,
     user.creatorData?.options,
     socketConnection,
   ]);
