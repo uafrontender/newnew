@@ -85,23 +85,6 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
   // TODO: Integrate bundle updates
   // Listen for socket updates
   useEffect(() => {
-    const handlerBundleCreated = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.CreatorBundleCreated.decode(arr);
-
-      if (!decoded) {
-        return;
-      }
-
-      setBundles((curr) => {
-        if (curr && decoded.creatorBundle) {
-          return curr.concat(decoded.creatorBundle);
-        }
-
-        return curr;
-      });
-    };
-
     const handleBundleChanged = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.CreatorBundleChanged.decode(arr);
@@ -113,32 +96,32 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
       setBundles((curr) => {
         const updatedBundle = decoded.creatorBundle;
 
-        if (curr && updatedBundle) {
-          const bundleIndex = curr?.findIndex((bundle) => {
-            bundle.creator?.uuid === updatedBundle.creator?.uuid;
-          });
-
-          if (bundleIndex) {
-            return [
-              ...curr.slice(0, bundleIndex),
-              updatedBundle,
-              ...curr.slice(bundleIndex + 1),
-            ];
-          }
+        if (!curr || !updatedBundle) {
+          return curr;
         }
 
-        return curr;
+        const bundleIndex = curr?.findIndex((bundle) => {
+          bundle.creator?.uuid === updatedBundle.creator?.uuid;
+        });
+
+        if (bundleIndex > -1) {
+          return [
+            ...curr.slice(0, bundleIndex),
+            updatedBundle,
+            ...curr.slice(bundleIndex + 1),
+          ];
+        } else {
+          return curr.concat(updatedBundle);
+        }
       });
     };
 
     if (socketConnection && user.loggedIn) {
-      socketConnection?.on('CreatorBundleCreated', handlerBundleCreated);
       socketConnection?.on('CreatorBundleChanged', handleBundleChanged);
     }
 
     return () => {
       if (socketConnection && socketConnection?.connected && user.loggedIn) {
-        socketConnection?.off('CreatorBundleCreated', handlerBundleCreated);
         socketConnection?.off('CreatorBundleChanged', handleBundleChanged);
       }
     };
