@@ -1,9 +1,4 @@
-/* eslint-disable react/require-default-props */
 /* eslint-disable no-nested-ternary */
-/* eslint-disable quotes */
-/* eslint-disable react/jsx-indent */
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable arrow-body-style */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
@@ -59,6 +54,7 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
+import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -95,8 +91,6 @@ interface IMcOptionCard {
   postCreatorUuid: string;
   postText: string;
   index: number;
-  minAmount: number;
-  votePrice: number;
   noAction: boolean;
   votingAllowed: boolean;
   canVoteForFree: boolean;
@@ -119,8 +113,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   postCreatorUuid,
   postText,
   index,
-  minAmount,
-  votePrice,
   noAction,
   votingAllowed,
   canVoteForFree,
@@ -237,9 +229,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   >(undefined);
 
   const [isConfirmVoteModalOpen, setIsConfirmVoteModalOpen] = useState(false);
-  const [isAmountPredefined, setIsAmountPredefined] = useState(false);
 
-  const [supportBidAmount, setSupportBidAmount] = useState('');
+  const [supportVoteOffer, setSupportVoteOffer] =
+    useState<newnewapi.McVoteOffer | null>(null);
+
   const disabled =
     optionBeingSupported !== '' &&
     optionBeingSupported !== option.id.toString();
@@ -264,31 +257,47 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     setPaymentModalOpen(true);
   };
 
-  const handleOpenCustomAmountModal = () => {
-    setSupportBidAmount('');
-    setIsAmountPredefined(false);
-    setIsConfirmVoteModalOpen(true);
-  };
-
-  const handleSetAmountAndOpenModal = (newAmount: string) => {
-    setSupportBidAmount(newAmount);
-    setIsAmountPredefined(true);
+  const handleSetVoteOfferAndOpenModal = (
+    newVoteOffer: newnewapi.McVoteOffer
+  ) => {
+    setSupportVoteOffer(newVoteOffer);
     setIsConfirmVoteModalOpen(true);
   };
 
   const handleCloseConfirmVoteModal = () => {
     setIsConfirmVoteModalOpen(false);
-    setIsAmountPredefined(false);
   };
+
+  const paymentAmountInCents = useMemo(
+    () => supportVoteOffer?.price?.usdCents || 0,
+    [supportVoteOffer]
+  );
+
+  const paymentFeeInCents = useMemo(
+    () =>
+      getCustomerPaymentFee(
+        paymentAmountInCents,
+        parseFloat(appConstants.customerFee)
+      ),
+    [paymentAmountInCents, appConstants.customerFee]
+  );
+
+  const paymentWithFeeInCents = useMemo(
+    () => paymentAmountInCents + paymentFeeInCents,
+    [paymentAmountInCents, paymentFeeInCents]
+  );
 
   const voteOnPostRequest = useMemo(
     () =>
       new newnewapi.VoteOnPostRequest({
         postUuid: postId,
-        votesCount: parseInt(supportBidAmount),
+        votesCount: supportVoteOffer?.amountOfVotes,
+        customerFee: new newnewapi.MoneyAmount({
+          usdCents: paymentFeeInCents,
+        }),
         optionId: option.id,
       }),
-    [postId, supportBidAmount, option.id]
+    [postId, supportVoteOffer, option.id, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
@@ -355,7 +364,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         handleSetPaymentSuccessModalOpen(true);
         setPaymentModalOpen(false);
         handleSetSupportedBid('');
-        setSupportBidAmount('');
+        setSupportVoteOffer(null);
         setIsSupportMenuOpen(false);
       } catch (err: any) {
         console.error(err);
@@ -553,6 +562,16 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                     ? (option.firstVoter.username as string)
                     : undefined
                 }
+                whiteListedSupporter={
+                  option.whitelistSupporter
+                    ? getDisplayname(option.whitelistSupporter)
+                    : undefined
+                }
+                whiteListedSupporterUsername={
+                  option.whitelistSupporter
+                    ? (option.whitelistSupporter.username as string)
+                    : undefined
+                }
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubtracted}
                 amISubscribed={amISubscribed}
@@ -670,18 +689,14 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <McOptionConfirmVoteModal
             zIndex={11}
             isOpen={isConfirmVoteModalOpen}
-            predefinedAmount={isAmountPredefined}
-            supportVotesAmount={supportBidAmount}
+            supportVotesAmount={(
+              supportVoteOffer?.amountOfVotes || 0
+            ).toString()}
             postCreator={
               creator.nickname ? creator.nickname : creator.username ?? ''
             }
             optionText={option.text}
-            minAmount={minAmount}
-            votePrice={votePrice}
             onClose={() => handleCloseConfirmVoteModal()}
-            handleSetSupportVotesAmount={(newValue: string) =>
-              setSupportBidAmount(newValue)
-            }
             handleOpenPaymentModal={() => handleTogglePaymentModalOpen()}
           />
         ) : null}
@@ -696,27 +711,31 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <PaymentModal
             zIndex={12}
             isOpen={paymentModalOpen}
-            amount={(parseInt(supportBidAmount) || 0) * votePrice}
+            amount={paymentWithFeeInCents}
             setupIntent={setupIntent}
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCard={handlePayWithCard}
             redirectUrl={`post/${postId}`}
             bottomCaption={
-              <SPaymentSign variant='subtitle'>
-                {t('mcPost.paymentModalFooter.body', {
-                  creator: postCreator,
-                })}
-                *
-                <Link href='https://terms.newnew.co'>
-                  <SPaymentTermsLink
-                    href='https://terms.newnew.co'
-                    target='_blank'
-                  >
-                    {t('mcPost.paymentModalFooter.terms')}
-                  </SPaymentTermsLink>
-                </Link>{' '}
-                {t('mcPost.paymentModalFooter.apply')}
-              </SPaymentSign>
+              (!appConstants.minHoldAmount?.usdCents ||
+                paymentWithFeeInCents >
+                  appConstants.minHoldAmount?.usdCents) && (
+                <SPaymentSign variant='subtitle'>
+                  {t('mcPost.paymentModalFooter.body', {
+                    creator: postCreator,
+                  })}
+                  *
+                  <Link href='https://terms.newnew.co'>
+                    <SPaymentTermsLink
+                      href='https://terms.newnew.co'
+                      target='_blank'
+                    >
+                      {t('mcPost.paymentModalFooter.terms')}
+                    </SPaymentTermsLink>
+                  </Link>{' '}
+                  {t('mcPost.paymentModalFooter.apply')}
+                </SPaymentSign>
+              )
             }
           >
             <SPaymentModalHeader>
@@ -753,12 +772,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         <McOptionCardSelectVotesModal
           isVisible={isSupportMenuOpen}
           isSupportedByMe={!!option.isSupportedByMe}
-          availableVotes={appConstants.availableMcVoteAmountOptions}
+          availableVotes={appConstants.mcVoteOffers as newnewapi.McVoteOffer[]}
           handleClose={() => {
             handleCloseSupportForm();
           }}
-          handleOpenCustomAmountModal={handleOpenCustomAmountModal}
-          handleSetAmountAndOpenModal={handleSetAmountAndOpenModal}
+          handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
         >
           <SSelectVotesModalCard isBlue={isBlue}>
             <SBidDetails isBlue={isBlue} noAction={noAction}>
@@ -800,6 +818,16 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                       ? (option.firstVoter.username as string)
                       : undefined
                   }
+                  whiteListedSupporter={
+                    option.whitelistSupporter
+                      ? getDisplayname(option.whitelistSupporter)
+                      : undefined
+                  }
+                  whiteListedSupporterUsername={
+                    option.whitelistSupporter
+                      ? (option.whitelistSupporter.username as string)
+                      : undefined
+                  }
                   supporterCount={option.supporterCount}
                   supporterCountSubtracted={supporterCountSubtracted}
                   amISubscribed={amISubscribed}
@@ -815,13 +843,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           top={selectVotesMenuTop}
           isVisible={isSupportMenuOpen}
           isSupportedByMe={!!option.isSupportedByMe}
-          availableVotes={appConstants.availableMcVoteAmountOptions}
+          availableVotes={appConstants.mcVoteOffers as newnewapi.McVoteOffer[]}
           handleClose={() => {
             handleCloseSupportForm();
             setSelectVotesMenuTop(undefined);
           }}
-          handleOpenCustomAmountModal={handleOpenCustomAmountModal}
-          handleSetAmountAndOpenModal={handleSetAmountAndOpenModal}
+          handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
         />
       )}
       {/* Ellipse modal */}
@@ -887,6 +914,8 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   optionCreatorUsername?: string;
   firstVoter?: string;
   firstVoterUsername?: string;
+  whiteListedSupporter?: string;
+  whiteListedSupporterUsername?: string;
   amISubscribed?: boolean;
 }> = ({
   isCreatorsBid,
@@ -898,6 +927,8 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   optionCreatorUsername,
   firstVoter,
   firstVoterUsername,
+  whiteListedSupporter,
+  whiteListedSupporterUsername,
   amISubscribed,
 }) => {
   const theme = useTheme();
@@ -908,7 +939,19 @@ export const RenderSupportersInfo: React.FunctionComponent<{
       <>
         {supporterCount > 0 ? (
           <>
-            {firstVoter && (
+            {whiteListedSupporter ? (
+              <Link href={`/${whiteListedSupporterUsername}`}>
+                <SSpanBiddersHighlighted
+                  onClick={(e) => e.stopPropagation()}
+                  className='spanHighlighted'
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                >
+                  {whiteListedSupporter}
+                </SSpanBiddersHighlighted>
+              </Link>
+            ) : firstVoter ? (
               <Link href={`/${firstVoterUsername}`}>
                 <SSpanBiddersHighlighted
                   onClick={(e) => e.stopPropagation()}
@@ -920,7 +963,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   {firstVoter}
                 </SSpanBiddersHighlighted>
               </Link>
-            )}
+            ) : null}
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>
@@ -938,6 +981,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
       </>
     );
   }
+
   if (isCreatorsBid && isSupportedByMe) {
     return (
       <>
@@ -953,7 +997,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   : {}),
               }}
             >
-              {supporterCount > 1 ? t('me') : t('I')}
+              {supporterCountSubtracted > 0 ? t('me') : t('I')}
             </SSpanBiddersHighlighted>
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
@@ -976,23 +1020,43 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && !isSuggestedByMe && !isSupportedByMe) {
     return (
       <>
-        <Link href={`/${optionCreatorUsername}`}>
-          <SSpanBiddersHighlighted
-            className='spanHighlighted'
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            style={{
-              color:
-                theme.name === 'dark'
-                  ? theme.colorsThemed.accent.yellow
-                  : theme.colors.dark,
-              cursor: 'pointer',
-            }}
-          >
-            {optionCreator}
-          </SSpanBiddersHighlighted>
-        </Link>
+        {!whiteListedSupporter ? (
+          <Link href={`/${optionCreatorUsername}`}>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              style={{
+                color:
+                  theme.name === 'dark'
+                    ? theme.colorsThemed.accent.yellow
+                    : theme.colors.dark,
+                cursor: 'pointer',
+              }}
+            >
+              {optionCreator}
+            </SSpanBiddersHighlighted>
+          </Link>
+        ) : (
+          <Link href={`/${whiteListedSupporterUsername}`}>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              style={{
+                color:
+                  theme.name === 'dark'
+                    ? theme.colorsThemed.accent.yellow
+                    : theme.colors.dark,
+                cursor: 'pointer',
+              }}
+            >
+              {whiteListedSupporter}
+            </SSpanBiddersHighlighted>
+          </Link>
+        )}
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubtracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
@@ -1014,6 +1078,37 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && !isSuggestedByMe && isSupportedByMe) {
     return (
       <>
+        {!whiteListedSupporter ? (
+          <Link href={`/${optionCreatorUsername}`}>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              style={{
+                color: theme.colorsThemed.accent.yellow,
+                cursor: 'pointer',
+              }}
+            >
+              {optionCreator}
+            </SSpanBiddersHighlighted>
+          </Link>
+        ) : (
+          <Link href={`/${whiteListedSupporterUsername}`}>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              style={{
+                color: theme.colorsThemed.accent.yellow,
+                cursor: 'pointer',
+              }}
+            >
+              {whiteListedSupporter}
+            </SSpanBiddersHighlighted>
+          </Link>
+        )}
         <Link href={`/${optionCreatorUsername}`}>
           <SSpanBiddersHighlighted
             className='spanHighlighted'

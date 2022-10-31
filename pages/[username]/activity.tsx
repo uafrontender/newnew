@@ -329,7 +329,7 @@ const SMain = styled.main`
   min-height: 60vh;
 `;
 
-const SCardsSection = styled.div`
+const SCardsSection = styled.section`
   display: flex;
   flex-wrap: wrap;
 

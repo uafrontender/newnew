@@ -15,7 +15,7 @@ import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
 interface IChangeLanguage {}
 
-export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
+export const ChangeLanguage: React.FC<IChangeLanguage> = (props) => {
   const { t } = useTranslation('common');
   const ref: any = useRef();
   const { push, locale, asPath, pathname } = useRouter();
@@ -70,7 +70,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
   }
 
   return (
-    <SContainer ref={ref}>
+    <SContainer ref={ref} {...props}>
       <Button view='changeLanguage' onClick={handleChangeLanguageClick}>
         {t(`language.selectedLanguageTitle.${locale}`)}
       </Button>

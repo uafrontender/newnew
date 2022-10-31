@@ -163,6 +163,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
     post.optionCount ?? ''
   );
@@ -730,7 +731,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           handleToggleMuted={() => handleToggleMutedMode()}
         />
         <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
-        <SActivitesContainer
+        <SActivitiesContainer
           shorterSection={
             postStatus === 'failed' ||
             (post.isSuggestionsAllowed &&
@@ -739,11 +740,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
               postStatus === 'voting')
           }
         >
-          <PostVotingTab>
-            {`${t('tabs.options')} ${
-              !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
-            }`}
-          </PostVotingTab>
+          <PostVotingTab>{`${t('tabs.options')}`}</PostVotingTab>
           <McOptionsTab
             post={post}
             postLoading={postLoading}
@@ -775,7 +772,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             }
             handleRemoveOption={handleRemoveOption}
           />
-        </SActivitesContainer>
+        </SActivitiesContainer>
         {/* Loading Modal */}
         {loadingModalOpen && (
           <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
@@ -891,7 +888,7 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div<{
+const SActivitiesContainer = styled.div<{
   shorterSection: boolean;
 }>`
   grid-area: activities;

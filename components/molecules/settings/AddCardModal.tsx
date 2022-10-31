@@ -55,6 +55,10 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
       redirect: 'if_required',
     });
 
+    if (error && error.type === 'card_error') {
+      throw new Error(error.message);
+    }
+
     if (!error) {
       onSuccess(setupIntent);
     }
@@ -77,7 +81,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     submitWithRecaptchaProtection,
     isSubmitting,
     errorMessage: recaptchaErrorMessage,
-  } = useRecaptcha(handleSubmit, 0.5, 0.4, recaptchaRef);
+  } = useRecaptcha(handleSubmit, 0.5, 0.1, recaptchaRef);
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
@@ -103,6 +107,10 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
         options={{
           terms: {
             card: 'never',
+          },
+          wallets: {
+            googlePay: 'never',
+            applePay: 'never',
           },
         }}
       />

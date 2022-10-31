@@ -1,6 +1,7 @@
 import React, { useState, useRef, ReactElement, useEffect } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
+import countries from 'i18n-iso-countries';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -12,32 +13,27 @@ import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import ArrowDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
 import InlineSvg from '../../atoms/InlineSVG';
 
-export type TOnboardingCountrySelectItem<T> = {
-  name: string;
-  value: T;
-};
-
-interface IOnboardingCountrySelect<T> {
-  label: string;
-  selected?: T;
-  options: TOnboardingCountrySelectItem<T>[];
+interface IOnboardingCountrySelect {
+  selected: string;
+  options: string[];
+  locale: string | undefined;
   maxItems?: number;
   width?: string;
   disabled?: boolean;
   closeOnSelect?: boolean;
-  onSelect: (val: T) => void;
+  onSelect: (countryCode: string) => void;
 }
 
-const OnboardingCountrySelect = <T,>({
-  label,
+const OnboardingCountrySelect = ({
   selected,
   options,
   maxItems,
+  locale,
   width,
   disabled,
   closeOnSelect,
   onSelect,
-}: IOnboardingCountrySelect<T>): ReactElement => {
+}: IOnboardingCountrySelect): ReactElement => {
   const theme = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>();
@@ -60,14 +56,16 @@ const OnboardingCountrySelect = <T,>({
   useEffect(() => {
     if (isOpen && selected) {
       const itemTopPos =
-        optionsRefs.current[options.findIndex((o) => o.value === selected)]
-          .offsetTop;
+        optionsRefs.current[options.findIndex((o) => o === selected)].offsetTop;
 
       if (optionsContainerRef.current) {
         optionsContainerRef.current.scrollTop = itemTopPos;
       }
     }
   }, [selected, options, isOpen]);
+
+  // eslint-disable-next-line no-nested-ternary
+  const currentLocale = locale ? (locale === 'en-US' ? 'en' : locale) : 'en';
 
   return (
     <SFormItemContainer pushedUp={isMobile && isOpen}>
@@ -83,7 +81,7 @@ const OnboardingCountrySelect = <T,>({
             ...(width ? { width } : {}),
           }}
         >
-          <span>{label}</span>
+          <span> {countries.getName(selected, currentLocale)}</span>
           <SInlineSVG
             svg={ArrowDown}
             fill={theme.colorsThemed.text.quaternary}
@@ -112,17 +110,17 @@ const OnboardingCountrySelect = <T,>({
                 {options &&
                   options.map((o, i) => (
                     <SOption
-                      key={o.name}
+                      key={o}
                       ref={(el) => {
                         optionsRefs.current[i] = el!!;
                       }}
-                      selected={o.value === selected}
+                      selected={o === selected}
                       onClick={() => {
-                        onSelect(o.value);
+                        onSelect(o);
                         if (closeOnSelect) handleClose();
                       }}
                     >
-                      {o.name}
+                      {countries.getName(o, currentLocale)}
                     </SOption>
                   ))}
               </div>

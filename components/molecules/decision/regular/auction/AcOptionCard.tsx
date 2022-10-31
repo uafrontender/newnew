@@ -62,6 +62,8 @@ import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
+import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
+import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -124,6 +126,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { appConstants } = useGetAppConstants();
 
   // const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const isSupportedByMe = useMemo(
@@ -235,16 +238,38 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     setPaymentModalOpen(true);
   };
 
+  const paymentAmountInCents = useMemo(
+    () => parseInt(supportBidAmount) * 100,
+    [supportBidAmount]
+  );
+
+  const paymentFeeInCents = useMemo(
+    () =>
+      getCustomerPaymentFee(
+        paymentAmountInCents,
+        parseFloat(appConstants.customerFee)
+      ),
+    [paymentAmountInCents, appConstants.customerFee]
+  );
+
+  const paymentWithFeeInCents = useMemo(
+    () => paymentAmountInCents + paymentFeeInCents,
+    [paymentAmountInCents, paymentFeeInCents]
+  );
+
   const placeBidRequest = useMemo(
     () =>
       new newnewapi.PlaceBidRequest({
         postUuid: postId,
         amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(supportBidAmount) * 100,
+          usdCents: paymentAmountInCents,
+        }),
+        customerFee: new newnewapi.MoneyAmount({
+          usdCents: paymentFeeInCents,
         }),
         optionId: option.id,
       }),
-    [postId, supportBidAmount, option.id]
+    [postId, paymentAmountInCents, option.id, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
@@ -431,8 +456,71 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             {option.title}
           </SOptionInfo>
           <SBiddersInfo onClick={(e) => e.preventDefault()} variant={3}>
-            {option.creator?.username ? (
-              <Link href={`/${option.creator?.username}`}>
+            {!option.whitelistSupporter ? (
+              option.creator?.username ? (
+                <Link href={`/${option.creator?.username}`}>
+                  <SSpanBiddersHighlighted
+                    className='spanHighlighted'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    style={{
+                      ...(!isMyBid && option.isCreatedBySubscriber
+                        ? {
+                            color:
+                              theme.name === 'dark'
+                                ? theme.colorsThemed.accent.yellow
+                                : theme.colors.dark,
+                          }
+                        : isMyBid && option.isCreatedBySubscriber
+                        ? {
+                            color: theme.colorsThemed.accent.yellow,
+                          }
+                        : {}),
+                      ...(!isMyBid
+                        ? {
+                            cursor: 'pointer',
+                          }
+                        : {}),
+                    }}
+                  >
+                    {isMyBid
+                      ? option.supporterCount > 1
+                        ? t('me')
+                        : t('my')
+                      : getDisplayname(option.creator!!)}
+                  </SSpanBiddersHighlighted>
+                </Link>
+              ) : (
+                <SSpanBiddersHighlighted
+                  className='spanHighlighted'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  style={{
+                    ...(!isMyBid && option.isCreatedBySubscriber
+                      ? {
+                          color:
+                            theme.name === 'dark'
+                              ? theme.colorsThemed.accent.yellow
+                              : theme.colors.dark,
+                        }
+                      : isMyBid && option.isCreatedBySubscriber
+                      ? {
+                          color: theme.colorsThemed.accent.yellow,
+                        }
+                      : {}),
+                  }}
+                >
+                  {isMyBid
+                    ? option.supporterCount > 1
+                      ? t('me')
+                      : t('my')
+                    : getDisplayname(option.creator!!)}
+                </SSpanBiddersHighlighted>
+              )
+            ) : (
+              <Link href={`/${option.whitelistSupporter?.username}`}>
                 <SSpanBiddersHighlighted
                   className='spanHighlighted'
                   onClick={(e) => {
@@ -459,39 +547,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                   }}
                 >
                   {isMyBid
-                    ? option.supporterCount > 2
+                    ? option.supporterCount > 1
                       ? t('me')
                       : t('my')
-                    : getDisplayname(option.creator!!)}
+                    : getDisplayname(option.whitelistSupporter!!)}
                 </SSpanBiddersHighlighted>
               </Link>
-            ) : (
-              <SSpanBiddersHighlighted
-                className='spanHighlighted'
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                style={{
-                  ...(!isMyBid && option.isCreatedBySubscriber
-                    ? {
-                        color:
-                          theme.name === 'dark'
-                            ? theme.colorsThemed.accent.yellow
-                            : theme.colors.dark,
-                      }
-                    : isMyBid && option.isCreatedBySubscriber
-                    ? {
-                        color: theme.colorsThemed.accent.yellow,
-                      }
-                    : {}),
-                }}
-              >
-                {isMyBid
-                  ? option.supporterCount > 2
-                    ? t('me')
-                    : t('my')
-                  : getDisplayname(option.creator!!)}
-              </SSpanBiddersHighlighted>
             )}
             {isSupportedByMe && !isMyBid ? (
               <SSpanBiddersHighlighted className='spanHighlighted'>{`, ${t(
@@ -680,24 +741,27 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={parseInt(supportBidAmount) * 100 || 0}
+          amount={paymentWithFeeInCents || 0}
           setupIntent={setupIntent}
           redirectUrl={`post/${postId}`}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
           bottomCaption={
-            <SPaymentSign variant='subtitle'>
-              {t('acPost.paymentModalFooter.body', { creator: postCreator })}*
-              <Link href='https://terms.newnew.co'>
-                <SPaymentTermsLink
-                  href='https://terms.newnew.co'
-                  target='_blank'
-                >
-                  {t('acPost.paymentModalFooter.terms')}
-                </SPaymentTermsLink>
-              </Link>{' '}
-              {t('acPost.paymentModalFooter.apply')}
-            </SPaymentSign>
+            (!appConstants.minHoldAmount?.usdCents ||
+              paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
+              <SPaymentSign variant='subtitle'>
+                {t('acPost.paymentModalFooter.body', { creator: postCreator })}*
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('acPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
+                {t('acPost.paymentModalFooter.apply')}
+              </SPaymentSign>
+            )
           }
         >
           <SPaymentModalHeader>

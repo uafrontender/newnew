@@ -20,6 +20,7 @@ import * as Sentry from '@sentry/browser';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import countries from 'i18n-iso-countries';
 
 // Custom error page
 import Error from './_error';
@@ -103,19 +104,25 @@ const MyApp = (props: IMyApp): ReactElement => {
   }, [store]);
 
   useEffect(() => {
-    // Imported one by one not to reak import\no-dynamic-require
+    // Imported one by one not to break import\no-dynamic-require rule
     if (locale === 'zh') {
       // eslint-disable-next-line global-require
       require('moment/locale/zh-tw');
       moment.locale('zh-tw');
+      // eslint-disable-next-line global-require
+      countries.registerLocale(require('i18n-iso-countries/langs/zh.json'));
     } else if (locale === 'es') {
       // eslint-disable-next-line global-require
       require('moment/locale/es');
       moment.locale('es');
+      // eslint-disable-next-line global-require
+      countries.registerLocale(require('i18n-iso-countries/langs/es.json'));
     } else if (locale === 'en-US') {
       moment.locale('en-US');
+      // eslint-disable-next-line global-require
+      countries.registerLocale(require('i18n-iso-countries/langs/en.json'));
     }
-  });
+  }, [locale]);
 
   useEffect(() => {
     const hotjarIdVariable = process.env.NEXT_PUBLIC_HOTJAR_ID;
@@ -293,61 +300,61 @@ const PRE_FETCH_LINKS_COMMON = (
     {/* Sign up screen hero */}
     <link
       rel='prefetch'
-      href={assets.floatingAssets.bottomGlassSphere}
+      href={assets.floatingAssets.darkBottomGlassSphere}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.bottomSphere}
+      href={assets.floatingAssets.darkBottomSphere}
+      as='image'
+      media='(min-width: 760px)'
+    />
+    {/* <link
+      rel='prefetch'
+      href={assets.floatingAssets.darkCrowdfunding}
+      as='image'
+      media='(min-width: 760px)'
+    /> */}
+    <link
+      rel='prefetch'
+      href={assets.floatingAssets.darkLeftGlassSphere}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.crowdfunding}
+      href={assets.floatingAssets.darkSubMC}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.leftGlassSphere}
+      href={assets.floatingAssets.darkMultipleChoice}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.subMC}
+      href={assets.floatingAssets.darkRightGlassSphere}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.multipleChoice}
+      href={assets.floatingAssets.darkTopGlassSphere}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.rightGlassSphere}
+      href={assets.floatingAssets.darkTopMiddleSphere}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.floatingAssets.topGlassSphere}
-      as='image'
-      media='(min-width: 760px)'
-    />
-    <link
-      rel='prefetch'
-      href={assets.floatingAssets.topMiddleSphere}
-      as='image'
-      media='(min-width: 760px)'
-    />
-    <link
-      rel='prefetch'
-      href={assets.floatingAssets.votes}
+      href={assets.floatingAssets.darkVotes}
       as='image'
       media='(min-width: 760px)'
     />

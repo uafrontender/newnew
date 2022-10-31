@@ -159,7 +159,8 @@ export const Dashboard: React.FC = React.memo(() => {
             />
           </SBlock>
         ) : (
-          !isToDosCompleted && (
+          !isToDosCompleted &&
+          !user.userData?.options?.isWhiteListed && (
             <SBlock name='your-todos'>
               <YourToDos />
             </SBlock>
@@ -184,13 +185,25 @@ export const Dashboard: React.FC = React.memo(() => {
             </SBlock>
           )
         )}
-        <SBlock>
-          {!isEarningsLoading ? (
-            isToDosCompleted !== undefined ? (
-              isToDosCompleted ? (
-                <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
+        {!user.userData?.options?.isWhiteListed && (
+          <SBlock>
+            {!isEarningsLoading ? (
+              isToDosCompleted !== undefined ? (
+                isToDosCompleted ? (
+                  <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
+                ) : (
+                  <FinishProfileSetup />
+                )
               ) : (
-                <FinishProfileSetup />
+                <Lottie
+                  width={64}
+                  height={64}
+                  options={{
+                    loop: true,
+                    autoplay: true,
+                    animationData: loadingAnimation,
+                  }}
+                />
               )
             ) : (
               <Lottie
@@ -202,19 +215,9 @@ export const Dashboard: React.FC = React.memo(() => {
                   animationData: loadingAnimation,
                 }}
               />
-            )
-          ) : (
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
-              }}
-            />
-          )}
-        </SBlock>
+            )}
+          </SBlock>
+        )}
       </SContent>
     </SContainer>
   );
@@ -225,6 +228,7 @@ export default Dashboard;
 const SContainer = styled.div`
   position: relative;
   margin-top: -16px;
+  margin-bottom: -24px;
 
   ${(props) => props.theme.media.tablet} {
     margin-top: unset;
@@ -237,10 +241,9 @@ const SContainer = styled.div`
 `;
 
 const SContent = styled.div`
-  min-height: 840px;
-
   ${(props) => props.theme.media.tablet} {
     margin-left: 180px;
+    min-height: 840px;
   }
 
   ${(props) => props.theme.media.laptop} {

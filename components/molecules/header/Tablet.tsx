@@ -10,14 +10,13 @@ import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/search/SearchInput';
 import Text from '../../atoms/Text';
 import NavigationItem from '../NavigationItem';
-import { useGetChats } from '../../../contexts/chatContext';
+// import { useGetChats } from '../../../contexts/chatContext';
 
 import { useAppSelector } from '../../../redux-store/store';
 
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
 import { useNotifications } from '../../../contexts/notificationsContext';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 interface ITablet {}
@@ -25,11 +24,10 @@ interface ITablet {}
 export const Tablet: React.FC<ITablet> = React.memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { unreadCount } = useGetChats();
+  // const { unreadCount } = useGetChats();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
-  const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
@@ -52,19 +50,19 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 </a>
               </Link>
             )}
-            {((user.userData?.options?.isOfferingSubscription &&
-              mySubscribersTotal > 0) ||
-              creatorsImSubscribedTo.length > 0) && (
+            {
+              // TODO: re-enable, repurpose for bundles
+              /*
               <SItemWithMargin>
-                <NavigationItem
-                  item={{
-                    url: '/direct-messages',
-                    key: 'directMessages',
-                    counter: unreadCount,
-                  }}
-                />
-              </SItemWithMargin>
-            )}
+              <NavigationItem
+                item={{
+                  url: '/direct-messages',
+                  key: 'directMessages',
+                  counter: unreadCount,
+                }}
+              />
+              </SItemWithMargin> */
+            }
             <SItemWithMargin>
               <NavigationItem
                 item={{
@@ -212,8 +210,12 @@ const SRightBlock = styled.nav`
 `;
 
 const SItemWithMargin = styled.div`
-  margin-left: 16px;
+  margin-left: 9px;
   position: relative;
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-left: 16px;
+  }
 `;
 
 const SNavText = styled(Text)`

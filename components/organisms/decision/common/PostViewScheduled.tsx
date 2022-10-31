@@ -172,7 +172,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
         ) : (
           <PostTopInfoModeration hasWinner={false} />
         )}
-        <SActivitesContainer>
+        <SActivitiesContainer>
           <PostScheduledSection
             postType={postType}
             timestampSeconds={new Date(
@@ -182,7 +182,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
             variant={variant}
             handleFollowDecision={handleFollowDecision}
           />
-        </SActivitesContainer>
+        </SActivitiesContainer>
       </SWrapper>
     );
   });
@@ -237,7 +237,7 @@ const SExpiresSection = styled.div`
   }
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitiesContainer = styled.div`
   grid-area: activities;
 
   display: flex;
