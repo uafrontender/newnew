@@ -25,6 +25,7 @@ import InlineSVG from '../../../atoms/InlineSVG';
 import NewAnnouncement from '../../../atoms/dashboard/NewAnnouncement';
 import NoResults from '../../../atoms/chat/NoResults';
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 
 interface INewMessageModal {
   showModal: boolean;
@@ -198,6 +199,13 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
                 {chat.visavis?.nickname || chat.visavis?.username}
+                {chat.visavis?.options && chat.visavis?.options.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                  />
+                )}
               </SChatItemText>
               <SUserAlias>@{chat.visavis?.username}</SUserAlias>
             </SChatItemCenter>
