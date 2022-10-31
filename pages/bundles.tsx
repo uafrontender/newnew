@@ -228,6 +228,7 @@ export const getServerSideProps = async (context: NextPageContext) => {
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'page-Bundles',
+    'modal-PaymentModal',
   ]);
 
   return {
