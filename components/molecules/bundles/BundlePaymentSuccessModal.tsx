@@ -34,6 +34,7 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
         <SModal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
           <SModalPaper onClose={onClose}>
             <Content>
+              {/* TODO: add set of tickets (need bundles level in api interfaces) */}
               <BundleIcon src={assets.common.vote} alt='votes' />
               <SVotesAvailable>
                 <Trans

@@ -2,7 +2,6 @@
 /* eslint-disable consistent-return */
 import React, {
   useCallback,
-  // useContext,
   useEffect,
   useMemo,
   useRef,
@@ -21,11 +20,7 @@ import {
   useAppSelector,
 } from '../../../../../redux-store/store';
 import { validateText } from '../../../../../api/endpoints/infrastructure';
-// import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
-import {
-  addNewOption,
-  voteWithBundleVotes,
-} from '../../../../../api/endpoints/multiple_choice';
+import { createCustomOption } from '../../../../../api/endpoints/multiple_choice';
 
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
@@ -33,7 +28,6 @@ import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import Button from '../../../../atoms/Button';
 import McOptionCard from './McOptionCard';
 import SuggestionTextArea from '../../../../atoms/decision/SuggestionTextArea';
-// import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
 import LoadingModal from '../../../LoadingModal';
 import GradientMask from '../../../../atoms/GradientMask';
 import OptionActionMobileModal from '../../common/OptionActionMobileModal';
@@ -43,12 +37,10 @@ import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
-import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
-import UseBundleVotesModal from './UseBundleVotesModal';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import BuyBundleModal from '../../../bundles/BuyBundleModal';
-import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
+import McConfirmCustomOptionModal from './McConfirmCustomOptionModal';
 import HighlightedButton from '../../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../../atoms/bundles/TicketSet';
 
@@ -61,7 +53,6 @@ interface IMcOptionsTab {
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
-  hasVotedOptionId?: number;
   bundle?: newnewapi.IBundle;
   handleLoadOptions: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (
@@ -79,7 +70,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   options,
   optionsLoading,
   pagingToken,
-  hasVotedOptionId,
   bundle,
   handleLoadOptions,
   handleRemoveOption,
@@ -87,9 +77,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const dispatch = useAppDispatch();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -101,8 +91,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     'tablet',
   ].includes(resizeMode);
 
-  const { appConstants } = useGetAppConstants();
-
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
 
@@ -110,8 +98,16 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const { showTopGradient, showBottomGradient } =
     useScrollGradients(containerRef);
 
+  const optionCreatedByMe = useMemo(
+    () =>
+      options.find(
+        (option) => option.creator?.uuid === user.userData?.userUuid
+      ),
+    [options, user.userData?.userUuid]
+  );
+
   const [heightDelta, setHeightDelta] = useState(
-    !hasVotedOptionId &&
+    !optionCreatedByMe &&
       postStatus === 'voting' &&
       (post.creator?.options?.isOfferingBundles || bundle)
       ? 58 + 72
@@ -121,18 +117,17 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   const mainContainer = useRef<HTMLDivElement>();
 
-  const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
-
   // New option/bid
   const [newOptionText, setNewOptionText] = useState('');
   const [newOptionTextValid, setNewOptionTextValid] = useState(true);
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+
   // Mobile modal for new option
   const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
   // Payment modal
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [useFreeVoteModalOpen, setUseFreeVoteModalOpen] = useState(false);
-  const [useBundleVotesModalOpen, setUseBundleVotesModalOpen] = useState(false);
+  const [confirmCustomOptionModalOpen, setConfirmCustomOptionModalOpen] =
+    useState(false);
   const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
   // Bundle modal
@@ -185,29 +180,32 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   );
 
   const handleAddNewOption = useCallback(async () => {
-    setUseFreeVoteModalOpen(false);
+    setConfirmCustomOptionModalOpen(false);
     setLoadingModalOpen(true);
-    Mixpanel.track('Vote For Free', {
+    Mixpanel.track('Add Free Option', {
       _stage: 'Post',
       _postUuid: post.postUuid,
       _component: 'McOptionsTab',
     });
     try {
-      const payload = new newnewapi.VoteOnPostRequest({
-        votesCount: appConstants.mcFreeVoteCount,
-        optionText: newOptionText,
+      const payload = new newnewapi.CreateCustomMcOptionRequest({
         postUuid: post.postUuid,
+        optionText: newOptionText,
       });
 
-      const res = await addNewOption(payload);
+      const res = await createCustomOption(payload);
 
       if (
         !res.data ||
-        res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+        res.data.status !==
+          newnewapi.CreateCustomMcOptionResponse.Status.SUCCESS ||
         res.error
       ) {
         throw new Error(res.error?.message ?? 'Request failed');
       }
+      // TODO: fix a bug with response (returns no option)
+      console.log('HERE');
+      console.log(res.data);
 
       const optionFromResponse = (res.data
         .option as newnewapi.MultipleChoice.Option)!!;
@@ -222,59 +220,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       setLoadingModalOpen(false);
       toast.error('toastErrors.generic');
     }
-  }, [
-    newOptionText,
-    post.postUuid,
-    appConstants.mcFreeVoteCount,
-    handleAddOrUpdateOptionFromResponse,
-  ]);
-
-  const handleVoteWithBundleVotes = useCallback(async () => {
-    setUseBundleVotesModalOpen(false);
-    setLoadingModalOpen(true);
-    Mixpanel.track('Vote For Free', {
-      _stage: 'Post',
-      _postUuid: post.postUuid,
-      _component: 'McOptionsTab',
-    });
-    try {
-      const payload = new newnewapi.VoteOnPostRequest({
-        votesCount: appConstants.mcFreeVoteCount,
-        optionText: newOptionText,
-        postUuid: post.postUuid,
-      });
-
-      const res = await voteWithBundleVotes(payload);
-
-      if (
-        !res.data ||
-        res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
-        res.error
-      ) {
-        throw new Error(res.error?.message ?? 'Request failed');
-      }
-
-      const optionFromResponse = (res.data
-        .option as newnewapi.MultipleChoice.Option)!!;
-      optionFromResponse.isSupportedByMe = true;
-      // optionFromResponse.isCreatedBySubscriber = true;
-      handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
-      setNewOptionText('');
-      setSuggestNewMobileOpen(false);
-      setLoadingModalOpen(false);
-      setPaymentSuccessModalOpen(true);
-    } catch (err) {
-      console.error(err);
-      setLoadingModalOpen(false);
-      toast.error('toastErrors.generic');
-    }
-  }, [
-    newOptionText,
-    post.postUuid,
-    appConstants.mcFreeVoteCount,
-    handleAddOrUpdateOptionFromResponse,
-  ]);
+  }, [newOptionText, post.postUuid, handleAddOrUpdateOptionFromResponse]);
 
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
@@ -295,7 +241,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
     if (
       !postLoading &&
-      !hasVotedOptionId &&
+      !optionCreatedByMe &&
       postStatus === 'voting' &&
       (post.creator?.options?.isOfferingBundles || bundle) &&
       actionSectionContainer.current
@@ -309,7 +255,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       resizeObserver.disconnect();
     };
   }, [
-    hasVotedOptionId,
+    optionCreatedByMe,
     postLoading,
     postStatus,
     isMobileOrTablet,
@@ -375,24 +321,15 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               option={option as TMcOptionWithHighestField}
               creator={option.creator ?? post.creator!!}
               postCreatorName={postCreatorName}
-              postCreatorUuid={post.creator?.uuid ?? ''}
               postText={post.title}
               postId={post.postUuid}
               index={i}
-              optionBeingSupported={optionBeingSupported}
-              bundleVotesLeft={bundle ? bundle.votesLeft! : undefined}
-              votingAllowed={postStatus === 'voting'}
+              bundle={bundle}
               isCreatorsBid={
                 !option.creator || option.creator?.uuid === post.creator?.uuid
               }
-              noAction={
-                (hasVotedOptionId !== undefined &&
-                  hasVotedOptionId !== option.id) ||
-                postStatus === 'failed'
-              }
-              handleSetSupportedBid={(id: string) =>
-                setOptionBeingSupported(id)
-              }
+              // TODO: check the successful waiting for response statuses cases
+              noAction={postStatus === 'failed'}
               handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
                 setPaymentSuccessModalOpen(newValue)
               }
@@ -426,7 +363,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
-        {!hasVotedOptionId &&
+
+        {!optionCreatedByMe &&
           postStatus === 'voting' &&
           (post.creator?.options?.isOfferingBundles || bundle) && (
             <SActionSection
@@ -436,7 +374,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             >
               <SuggestionTextArea
                 value={newOptionText}
-                disabled={optionBeingSupported !== ''}
                 placeholder={t(
                   'mcPost.optionsTab.actionSection.suggestionPlaceholder'
                 )}
@@ -444,23 +381,20 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               />
               <SAddOptionButton
                 size='sm'
-                disabled={
-                  !newOptionText ||
-                  optionBeingSupported !== '' ||
-                  !newOptionTextValid
-                }
+                disabled={!newOptionText || !newOptionTextValid}
                 style={{
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
                 onClick={() => {
-                  // TODO: change event name?
+                  // TODO: check that it is not clickable when disabled
                   Mixpanel.track('Click Add Free Option', {
                     _stage: 'Post',
                     _postUuid: post.postUuid,
                     _component: 'McOptionsTab',
                   });
+
                   if (bundle) {
-                    setUseFreeVoteModalOpen(true);
+                    setConfirmCustomOptionModalOpen(true);
                   } else {
                     setBuyBundleModalOpen(true);
                   }
@@ -521,7 +455,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       </STabContainer>
       {/* Suggest new Modal */}
       {isMobile &&
-      !hasVotedOptionId &&
+      !optionCreatedByMe &&
+      postStatus === 'voting' &&
       (post.creator?.options?.isOfferingBundles || bundle) ? (
         <OptionActionMobileModal
           isOpen={suggestNewMobileOpen}
@@ -531,7 +466,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           <SSuggestNewContainer>
             <SuggestionTextArea
               value={newOptionText}
-              disabled={optionBeingSupported !== ''}
               autofocus={suggestNewMobileOpen}
               placeholder={t(
                 'mcPost.optionsTab.actionSection.suggestionPlaceholderDesktop'
@@ -540,22 +474,19 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             />
             <SAddOptionButton
               size='sm'
-              disabled={
-                !newOptionText ||
-                optionBeingSupported !== '' ||
-                !newOptionTextValid
-              }
+              disabled={!newOptionText || !newOptionTextValid}
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
               onClick={() => {
+                // TODO: check that it is not clickable when disabled
                 Mixpanel.track('Click Add Free Option', {
                   _stage: 'Post',
                   _postUuid: post.postUuid,
                   _component: 'McOptionsTab',
                 });
                 if (bundle) {
-                  setUseFreeVoteModalOpen(true);
+                  setConfirmCustomOptionModalOpen(true);
                 } else {
                   setBuyBundleModalOpen(true);
                 }
@@ -566,22 +497,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           </SSuggestNewContainer>
         </OptionActionMobileModal>
       ) : null}
-      {/* Use Free vote modal */}
-      <McConfirmUseFreeVoteModal
-        isVisible={useFreeVoteModalOpen}
-        handleMakeFreeVote={handleAddNewOption}
-        closeModal={() => setUseFreeVoteModalOpen(false)}
+      {/* Add a custom option Modal */}
+      <McConfirmCustomOptionModal
+        isVisible={confirmCustomOptionModalOpen}
+        handleAddCustomOption={handleAddNewOption}
+        closeModal={() => setConfirmCustomOptionModalOpen(false)}
       />
-      {/* Use bundle vote modal */}
-      {bundle && (
-        <UseBundleVotesModal
-          isVisible={useBundleVotesModalOpen}
-          optionText={optionBeingSupported}
-          bundleVotesLeft={bundle.votesLeft!}
-          handleVoteWithBundleVotes={handleVoteWithBundleVotes}
-          onClose={() => setUseBundleVotesModalOpen(false)}
-        />
-      )}
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}
@@ -598,7 +519,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {/* Mobile floating button */}
       {isMobile &&
       !suggestNewMobileOpen &&
-      !hasVotedOptionId &&
+      !optionCreatedByMe &&
       postStatus === 'voting' &&
       (post.creator?.options?.isOfferingBundles || bundle) ? (
         <>

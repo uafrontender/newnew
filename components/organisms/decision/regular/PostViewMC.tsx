@@ -9,7 +9,7 @@ import React, {
   useState,
 } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { css }  from 'styled-components';
+import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
@@ -169,12 +169,13 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
-  const hasVotedOptionId = useMemo(() => {
-    const supportedOption = options.find((o) => o.isSupportedByMe);
-
-    if (supportedOption) return supportedOption.id;
-    return undefined;
-  }, [options]);
+  const optionCreatedByMe = useMemo(
+    () =>
+      options.find(
+        (option) => option.creator?.uuid === user.userData?.userUuid
+      ),
+    [options, user.userData?.userUuid]
+  );
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -345,7 +346,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         throw new Error(res.error?.message ?? 'Request failed');
       }
       setTotalVotes(res.data.multipleChoice?.totalVotes as number);
-        if (res.data.multipleChoice?.status)
+      if (res.data.multipleChoice?.status)
         handleUpdatePostStatus(res.data.multipleChoice?.status);
 
       setPostLoading(false);
@@ -710,11 +711,13 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           shorterSection={
             postStatus === 'failed' ||
             (post.isSuggestionsAllowed &&
-              !hasVotedOptionId &&
+              !optionCreatedByMe &&
               postStatus === 'voting')
           }
         >
-          <PostVotingTab bundleVotes={creatorsBundle?.bundle?.votesLeft ?? undefined}>{`${t('tabs.options')}`}</PostVotingTab>
+          <PostVotingTab
+            bundleVotes={creatorsBundle?.bundle?.votesLeft ?? undefined}
+          >{`${t('tabs.options')}`}</PostVotingTab>
           <McOptionsTab
             post={post}
             postLoading={postLoading}
@@ -730,7 +733,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             options={options}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
-            hasVotedOptionId={(hasVotedOptionId as number) ?? undefined}
             bundle={creatorsBundle?.bundle ?? undefined}
             handleLoadOptions={fetchOptions}
             handleAddOrUpdateOptionFromResponse={
@@ -882,7 +884,6 @@ const SActivitiesContainer = styled.div<{
           `}
   }
 `;
-
 
 // Comments
 const SCommentsHeadline = styled(Headline)`

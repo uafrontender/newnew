@@ -151,11 +151,10 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         onClose={onClose}
         handlePayWithCard={handlePayWithCard}
         bottomCaption={
-          // TODO: fix capture texts
           (!appConstants.minHoldAmount?.usdCents ||
             paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
             <SPaymentSign variant='subtitle'>
-              {t('cfPost.paymentModalFooter.body', {
+              {t('modal.buyBundle.paymentModalFooter.body', {
                 creator: getDisplayname(creator),
               })}
               *
@@ -164,10 +163,10 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
                   href='https://terms.newnew.co'
                   target='_blank'
                 >
-                  {t('cfPost.paymentModalFooter.terms')}
+                  {t('modal.buyBundle.paymentModalFooter.terms')}
                 </SPaymentTermsLink>
               </Link>{' '}
-              {t('cfPost.paymentModalFooter.apply')}
+              {t('modal.buyBundle.paymentModalFooter.apply')}
             </SPaymentSign>
           )
         }
@@ -281,4 +280,8 @@ const BundleFeatures = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid;
+  border-color: rgba(255, 255, 255, 0.1);
+  margin-bottom: 8px;
 `;

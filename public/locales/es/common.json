@@ -146,6 +146,11 @@
       "payment": {
         "header": "{{creator}}'s Superpoll Bundle"
       },
+      "paymentModalFooter": {
+        "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el {{creator}} elige tu oferta.",
+        "terms": "Términos",
+        "apply": "aplicar"
+      },
       "error": {
         "requestFailed": "Request failed"
       }

@@ -6,24 +6,23 @@ import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
 import Modal from '../../../../organisms/Modal';
 
-interface IMcConfirmUseFreeVoteModal {
+interface IMcConfirmCustomOptionModal {
   isVisible: boolean;
-  handleMakeFreeVote: () => void;
+  handleAddCustomOption: () => void;
   closeModal: () => void;
 }
 
-const McConfirmUseFreeVoteModal: React.FC<IMcConfirmUseFreeVoteModal> = ({
+// TODO: change UI
+const McConfirmCustomOptionModal: React.FC<IMcConfirmCustomOptionModal> = ({
   isVisible,
-  handleMakeFreeVote,
+  handleAddCustomOption: handleMakeFreeVote,
   closeModal,
 }) => {
   const { t } = useTranslation('modal-Post');
 
   return (
     <Modal show={isVisible} additionalz={12} onClose={closeModal}>
-      <SContainer
-      // onClick={(e) => e.stopPropagation()}
-      >
+      <SContainer>
         <SModal>
           <STag>{t('mcPost.optionsTab.confirmUseFreeVoteModal.tag')}</STag>
           <SModalMessage>
@@ -46,7 +45,7 @@ const McConfirmUseFreeVoteModal: React.FC<IMcConfirmUseFreeVoteModal> = ({
   );
 };
 
-export default McConfirmUseFreeVoteModal;
+export default McConfirmCustomOptionModal;
 
 const SContainer = styled.div`
   display: flex;

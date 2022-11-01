@@ -85,17 +85,17 @@ export const voteOnPost = (
     signal ?? undefined
   );
 
-export const addNewOption = (
-  payload: newnewapi.VoteOnPostRequest,
+export const createCustomOption = (
+  payload: newnewapi.CreateCustomMcOptionRequest,
   signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
-    newnewapi.VoteOnPostRequest,
-    newnewapi.VoteOnPostResponse
+    newnewapi.CreateCustomMcOptionRequest,
+    newnewapi.CreateCustomMcOptionResponse
   >(
-    newnewapi.VoteOnPostRequest,
-    newnewapi.VoteOnPostResponse,
-    `${BASE_URL_MULTICHOICE}/do_free_vote`,
+    newnewapi.CreateCustomMcOptionRequest,
+    newnewapi.CreateCustomMcOptionResponse,
+    `${BASE_URL_MULTICHOICE}/create_custom_mc_option`,
     'post',
     payload,
     signal ?? undefined

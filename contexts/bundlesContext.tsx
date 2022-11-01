@@ -100,9 +100,9 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
           return curr;
         }
 
-        const bundleIndex = curr?.findIndex((bundle) => {
-          bundle.creator?.uuid === updatedBundle.creator?.uuid;
-        });
+        const bundleIndex = curr?.findIndex(
+          (bundle) => bundle.creator?.uuid === updatedBundle.creator?.uuid
+        );
 
         if (bundleIndex > -1) {
           return [

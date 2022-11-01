@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
@@ -52,7 +52,6 @@ import OptionEllipseModal from '../../common/OptionEllipseModal';
 import McConfirmDeleteOptionModal from '../../moderation/multiple_choice/McConfirmDeleteOptionModal';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
-import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 
@@ -88,15 +87,11 @@ interface IMcOptionCard {
   creator: newnewapi.IUser;
   postId: string;
   postCreatorName: string;
-  postCreatorUuid: string;
   postText: string;
   index: number;
   noAction: boolean;
-  votingAllowed: boolean;
   isCreatorsBid: boolean;
-  optionBeingSupported?: string;
-  bundleVotesLeft?: number;
-  handleSetSupportedBid: (id: string) => void;
+  bundle?: newnewapi.IBundle;
   handleSetPaymentSuccessModalOpen: (newValue: boolean) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
@@ -109,15 +104,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   creator,
   postId,
   postCreatorName,
-  postCreatorUuid,
   postText,
   index,
   noAction,
-  votingAllowed,
   isCreatorsBid,
-  optionBeingSupported,
-  bundleVotesLeft,
-  handleSetSupportedBid,
+  bundle,
   handleRemoveOption,
   handleSetPaymentSuccessModalOpen,
   handleAddOrUpdateOptionFromResponse,
@@ -133,8 +124,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   );
 
   const { appConstants } = useGetAppConstants();
-
-  const [amISubscribed, setAmISubscribed] = useState(false);
 
   const isSuggestedByMe = useMemo(
     () =>
@@ -231,18 +220,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const [supportVoteOffer, setSupportVoteOffer] =
     useState<newnewapi.McVoteOffer | null>(null);
 
-  const disabled =
-    optionBeingSupported !== '' &&
-    optionBeingSupported !== option.id.toString();
-
   const handleOpenSupportForm = () => {
     setIsSupportMenuOpen(true);
-    handleSetSupportedBid(option.id.toString());
   };
 
   const handleCloseSupportForm = () => {
     setIsSupportMenuOpen(false);
-    handleSetSupportedBid('');
   };
 
   // Payment and Loading modals
@@ -365,7 +348,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
         handleSetPaymentSuccessModalOpen(true);
         setPaymentModalOpen(false);
-        handleSetSupportedBid('');
         setSupportVoteOffer(null);
         setIsSupportMenuOpen(false);
       } catch (err: any) {
@@ -378,7 +360,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     },
     [
       handleSetPaymentSuccessModalOpen,
-      handleSetSupportedBid,
       handleAddOrUpdateOptionFromResponse,
       postId,
       setupIntent,
@@ -450,33 +431,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     }
   };
 
-  // Check if the user is subscribed
-  useEffect(() => {
-    async function checkAmISubscribed() {
-      try {
-        const payload = new newnewapi.SubscriptionStatusRequest({
-          creatorUuid: postCreatorUuid,
-        });
-
-        const res = await getSubscriptionStatus(payload);
-
-        if (
-          res.data &&
-          (res.data?.status?.activeRenewsAt ||
-            res.data?.status?.activeCancelsAt)
-        ) {
-          setAmISubscribed(true);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    if (option.isSupportedByMe) {
-      checkAmISubscribed();
-    }
-  }, [option.isSupportedByMe, postCreatorUuid]);
-
   return (
     <>
       <motion.div
@@ -501,10 +455,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             damping: 20,
             stiffness: 300,
           }}
-          $isDisabled={disabled && votingAllowed}
+          $isDisabled={false}
           $isBlue={isBlue}
           onClick={(e) => {
-            if (!isMobile && !disabled && !isEllipseMenuOpen) {
+            if (!isMobile && !isEllipseMenuOpen) {
               setIsEllipseMenuOpen(true);
 
               setOptionMenuXY({
@@ -577,7 +531,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 }
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubtracted}
-                amISubscribed={amISubscribed}
+                amISubscribed={!!bundle}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -585,7 +539,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             <>
               <SSupportButton
                 view='primary'
-                disabled={disabled}
                 isBlue={isBlue}
                 onClickCapture={() => {
                   Mixpanel.track('Vote Click', {
@@ -630,7 +583,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 id={`support-button-${isBlue ? 'supported' : index}`}
                 active={isSupportMenuOpen}
                 view='secondary'
-                disabled={disabled}
                 isBlue={isBlue}
                 onClickCapture={() => {
                   Mixpanel.track('Vote Click', {
@@ -672,6 +624,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             </>
           )}
         </SContainer>
+        {/* TODO: Move this modal one level above as it is unwise to render multiple instances of them */}
         {/* Confirm vote modal */}
         {isConfirmVoteModalOpen ? (
           <McOptionConfirmVoteModal
@@ -689,10 +642,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           />
         ) : null}
         {/* Use Bundle votes vote modal */}
-        {bundleVotesLeft ? (
+        {bundle?.votesLeft ? (
           <UseBundleVotesModal
             isVisible={bundleVotesModalOpen}
-            bundleVotesLeft={bundleVotesLeft}
+            bundleVotesLeft={bundle.votesLeft}
             optionText={option.text}
             handleVoteWithBundleVotes={handleVoteWithBundleVotes}
             onClose={() => setBundleVotesModalOpen(false)}
@@ -823,7 +776,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   }
                   supporterCount={option.supporterCount}
                   supporterCountSubtracted={supporterCountSubtracted}
-                  amISubscribed={amISubscribed}
+                  amISubscribed={!!bundle}
                 />
               </SBiddersInfo>
             </SBidDetails>
@@ -842,7 +795,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             setSelectVotesMenuTop(undefined);
           }}
           handleOpenBundleVotesModal={
-            bundleVotesLeft ? handleOpenBundleVotesModal : undefined
+            bundle?.votesLeft ? handleOpenBundleVotesModal : undefined
           }
           handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
         />
@@ -894,7 +847,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 };
 
 McOptionCard.defaultProps = {
-  optionBeingSupported: undefined,
   handleRemoveOption: undefined,
 };
 

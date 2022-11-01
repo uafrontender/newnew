@@ -245,16 +245,18 @@ const Container = styled.div`
   align-items: flex-start;
   padding-top: 4px;
   padding-bottom: 24px;
-  background: url(${assets.bundles.votesBackgroundSmall});
+  // TODO: Change BG for mobile
   background-size: contain;
   background-repeat: no-repeat;
 
   ${({ theme }) => theme.media.tablet} {
     padding-top: 4px;
+    // TODO: Change BG for mobile
   }
 
   ${({ theme }) => theme.media.laptop} {
     padding-top: 12px;
+    background: url(${assets.bundles.votesBackgroundSmall});
   }
 `;
 
