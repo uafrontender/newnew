@@ -361,9 +361,6 @@ const Home: NextPage<IHome> = ({
     loadMore,
   } = usePagination<newnewapi.IPost>(fetchRAPosts, 6);
 
-  console.log(collectionRA, 'collectionRA');
-  console.log(collectionRAInitialLoading, 'collectionRAInitialLoading');
-
   return (
     <>
       <Head>
