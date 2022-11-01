@@ -37,7 +37,7 @@ interface ICardSection {
   type?: 'default' | 'creator';
   title?: string;
   category: string;
-  collection: newnewapi.Post[];
+  collection: newnewapi.IPost[];
   loading?: boolean;
   tutorialCard?: ReactElement;
   seeMoreLink?: string;
@@ -224,16 +224,18 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
 
     const handleSeeMoreClick = () => {
       Mixpanel.track('See More in Category Clicked');
-      if (type === 'default') {
-        router.push(seeMoreLink || `/see-more?category=${category}`);
+      if (type === 'default' && seeMoreLink) {
+        router.push(seeMoreLink);
       }
     };
 
     // Try to pre-fetch the content
-    // useEffect(() => {
-    //   router.prefetch(seeMoreLink || `/see-more?category=${category}`);
-    //   // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, []);
+    useEffect(() => {
+      if (seeMoreLink) {
+        router.prefetch(seeMoreLink);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
       function onScroll() {
