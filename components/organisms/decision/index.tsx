@@ -320,7 +320,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     //     behavior: 'smooth',
     //   });
     // } else {
-    if (router.route === '/') {
+    if (router.pathname === '/') {
       handleCloseAndGoBack();
     } else {
       router.push('/');

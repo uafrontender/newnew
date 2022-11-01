@@ -237,7 +237,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     //     behavior: 'smooth',
     //   });
     // } else {
-    if (router.route === '/') {
+    if (router.pathname === '/') {
       handleCloseAndGoBack();
     } else {
       router.push('/');
