@@ -373,7 +373,7 @@ export const webPush = (
     newnewapi.WebPushRequest,
     newnewapi.WebPushResponse,
     `${BASE_URL}/web_push/`,
-    'get',
+    'post',
     payload,
     signal ?? undefined
   );
