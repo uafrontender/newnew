@@ -361,3 +361,53 @@ export const deleteMyAccount = (
     payload,
     signal ?? undefined
   );
+
+export const webPush = (
+  payload: newnewapi.WebPushRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.WebPushRequest,
+    newnewapi.WebPushResponse
+  >(
+    newnewapi.WebPushRequest,
+    newnewapi.WebPushResponse,
+    `${BASE_URL}/web_push/`,
+    'get',
+    payload,
+    signal ?? undefined
+  );
+
+
+export const webPushRegister = (
+  payload: newnewapi.RegisterForWebPushRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.RegisterForWebPushRequest,
+    newnewapi.RegisterForWebPushResponse
+  >(
+    newnewapi.RegisterForWebPushRequest,
+    newnewapi.RegisterForWebPushResponse,
+    `${BASE_URL}/web_push/register`,
+    'put',
+    payload,
+    signal ?? undefined
+  );
+
+
+export const webPushUnRegister = (
+  payload: newnewapi.UnRegisterForWebPushRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.UnRegisterForWebPushRequest,
+    newnewapi.UnRegisterForWebPushResponse
+  >(
+    newnewapi.UnRegisterForWebPushRequest,
+    newnewapi.UnRegisterForWebPushResponse,
+    `${BASE_URL}/web_push/unregister`,
+    'delete',
+    payload,
+    signal ?? undefined
+  );

@@ -1,25 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
+import { newnewapi } from 'newnew-api';
+import { webPushRegister, webPushUnRegister } from '../../api/endpoints/user';
 
-const config = {
-  pushKey:
-    'BKEcrchnX1OcONiHmQ7yfdx5SUTamoO_mQ-FvucfYIq9TTr62b8EKkMwJ8Buo1dAzG1HjQ8uBlPneSziguKwilg',
-  appSyncUrl:
-    'https://vqhpvr754vhdzl7htowx2wdh7y.appsync-api.us-east-1.amazonaws.com/graphql',
-  appSyncApiKey: 'da2-yjr6wve3t5hhfohxdvbvdfqnry',
-};
-
-function urlB64ToUint8Array(base64String: string) {
-  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-
-  for (let i = 0; i < rawData.length; i += 1) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  return outputArray;
-}
 
 const usePushNotifications = () => {
   const [inSubscribed, setIsSubscribed] = useState(() => {
@@ -73,56 +55,78 @@ const usePushNotifications = () => {
           console.log(checkPermissionSafari, 'checkPermissionSafari');
           checkPermissionSafari(permissionData);
         } else {
-          Notification.requestPermission(async (result) => {
+          return Notification.requestPermission( async (result) => {
             if (result === 'granted') {
               const subscription = await swReg.pushManager.subscribe({
                 userVisibleOnly: true,
-                applicationServerKey: urlB64ToUint8Array(config.pushKey),
+                applicationServerKey: 'BKp2r28o7iFLHBIC23U1Sc2fLg7t9D1DOklKJ8fQofHzySrBUg-F54TUl_69AaikfoMmkbduiWipOJ1qeO-ioPU',
               });
+              const sub = subscription?.toJSON();
 
-              console.log(subscription, 'subscription');
+              if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
+                return null;
+              }
+
+              console.log(JSON.stringify({
+                action: 'register',
+                subscription
+              }));
 
               setIsSubscribed(true);
               onSuccess?.();
 
-              fetch(config.appSyncUrl, {
-                method: 'POST',
-                headers: { 'x-api-key': config.appSyncApiKey },
-                body: JSON.stringify({
-                  query: `mutation($topic: String, $subscription: String) {subscribe(topic: $topic, subscription: $subscription)}`,
-                  variables: {
-                    topic,
-                    subscription: JSON.stringify(subscription),
-                  },
-                }),
+              const payload = new newnewapi.RegisterForWebPushRequest({
+                name: navigator.userAgent,
+                expiration: `${sub.expirationTime}`,
+                endpoint: sub.endpoint,
+                p256dh: sub.keys.p256dh,
+                auth: sub.keys.auth,
               });
+
+              return webPushRegister(payload);
             }
+
+            return null;
           });
         }
       } catch (err) {
         console.error(err);
       }
+
+      return null;
     },
-    []
+    [checkPermissionSafari]
   );
 
   const unsubscribe = useCallback(async () => {
     try {
       const swReg = await navigator.serviceWorker.register('/sw.js');
       // console.log(window.safari.pushNotification, 'subscription');
-      swReg.pushManager.getSubscription().then((subscription) => {
+      swReg.pushManager.getSubscription().then(async (subscription) => {
         console.log(subscription, 'subscription 2');
-        if (subscription) {
-          subscription
-            .unsubscribe()
-            .then(() => {
-              setIsSubscribed(false);
-              // Unsubscribing
-            })
-            .catch((e) => {
-              // Unsubscribing failed
-            });
+        const sub = subscription?.toJSON();
+
+        if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
+          return null;
         }
+
+        try {
+          const payload = new newnewapi.UnRegisterForWebPushRequest({
+            endpoint: sub.endpoint,
+          });
+          await webPushUnRegister(payload);
+        } catch (e) {
+          console.log(e);
+        }
+
+        try {
+          await subscription?.unsubscribe();
+        } catch (e) {
+            console.log(e)
+        }
+              setIsSubscribed(false);
+
+        return null;
       });
     } catch (err) {
       console.error(err);
