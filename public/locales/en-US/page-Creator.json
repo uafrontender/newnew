@@ -125,6 +125,25 @@
       "firstOption": "adding custom options to your Superpolls",
       "secondOption": "sending you private chats",
       "perBundle": "per bundle"
+    },
+    "modals": {
+      "turnon": {
+        "title": "Turn On bundles",
+        "text": "Are you sure you want to activate bundles?"
+      },
+      "turnoff": {
+        "title": "Turn Off bundles",
+        "text": "Are you sure you want to deactivate bundles?"
+      },
+      "activated": {
+        "title": "Congratulations!",
+        "text": "You are successfully activated bundles"
+      },
+      "deactivated": {
+        "title": "So sad!",
+        "text": "But you can activate bundles at any time"
+      },
+      "button": "Sounds good!"
     }
   },
   "getPaid": {

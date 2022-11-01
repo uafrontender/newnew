@@ -9,10 +9,7 @@ import Headline from '../../atoms/Headline';
 import { useAppSelector } from '../../../redux-store/store';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
-import {
-  getBundleStatus,
-  setBundleStatus,
-} from '../../../api/endpoints/bundles';
+import { getBundleStatus } from '../../../api/endpoints/bundles';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -23,6 +20,12 @@ const BundlesEarnings = dynamic(
 );
 const SuperpollBundle = dynamic(
   () => import('../../molecules/creator/dashboard/SuperpollBundle')
+);
+const TurnBundleModal = dynamic(
+  () => import('../../molecules/creator/dashboard/TurnBundleModal')
+);
+const SuccessBundleModal = dynamic(
+  () => import('../../molecules/creator/dashboard/SuccessBundleModal')
 );
 
 interface ISuperpollBundle {
@@ -41,24 +44,25 @@ export const Bundles: React.FC = React.memo(() => {
     resizeMode
   );
 
+  const [turnBundleModalOpen, setTurnBundleModalOpen] = useState(false);
+  const [succesModalOpen, setSuccesModalOpen] = useState(false);
+
   const [isBundlesEnabled, setIsBundlesEnabled] = useState<boolean | undefined>(
     undefined
   );
 
-  const toggleBundlesEnabled = useCallback(async (enabled: boolean) => {
-    const payload = new newnewapi.SetBundleStatusRequest({
-      bundleStatus: enabled
-        ? newnewapi.CreatorBundleStatus.ENABLED
-        : newnewapi.CreatorBundleStatus.DISABLED,
-    });
-
-    const res = await setBundleStatus(payload);
-
-    // TODO: add translation
-    if (!res.data || res.error) throw new Error('Request failed');
-
-    setIsBundlesEnabled(enabled);
+  const toggleTurnBundleModalOpen = useCallback(() => {
+    setTurnBundleModalOpen((prevState) => !prevState);
   }, []);
+
+  const toggleIsBundlesEnabled = useCallback(() => {
+    if (isBundlesEnabled === undefined) {
+      return;
+    }
+    setIsBundlesEnabled((prevState) => !prevState);
+    setTurnBundleModalOpen(false);
+    setSuccesModalOpen(true);
+  }, [isBundlesEnabled]);
 
   const collection: ISuperpollBundle[] = useMemo(
     () => [
@@ -146,12 +150,7 @@ export const Bundles: React.FC = React.memo(() => {
                   </SText>
                 </STextHolder>
                 <SButton
-                  onClick={() => {
-                    if (isBundlesEnabled === undefined) {
-                      return;
-                    }
-                    toggleBundlesEnabled(!isBundlesEnabled);
-                  }}
+                  onClick={toggleTurnBundleModalOpen}
                   enabled={isBundlesEnabled}
                   disabled={isBundlesEnabled === undefined}
                 >
@@ -168,6 +167,23 @@ export const Bundles: React.FC = React.memo(() => {
           </>
         )}
       </SContent>
+      {turnBundleModalOpen && (
+        <TurnBundleModal
+          show
+          zIndex={1001}
+          isBundlesEnabled={isBundlesEnabled}
+          onBundlesStatusChange={toggleIsBundlesEnabled}
+          onClose={toggleTurnBundleModalOpen}
+        />
+      )}
+      {succesModalOpen && (
+        <SuccessBundleModal
+          show
+          zIndex={1002}
+          isBundlesEnabled={isBundlesEnabled}
+          onClose={() => setSuccesModalOpen(false)}
+        />
+      )}
     </SContainer>
   );
 });
