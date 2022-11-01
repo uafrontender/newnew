@@ -128,7 +128,7 @@
       "backToResponse": "Ver respuesta"
     },
     "reuploadButton": "Volver a subir",
-    "addVideoButton_NEED_TRANSLATION": "Add video",
+    "addVideoButton": "Agregar video",
     "cannotLeavePageMsg": "¿Estás seguro de que quieres cerrar esta página? El progreso de la carga se perderá",
     "floatingUploadResponseButton": "Hacer un video de respuesta",
     "setThumbnail": "Establecer una miniatura",
@@ -216,12 +216,12 @@
       "confirm": "Eliminar"
     }
   },
-  "deleteVideoModal_NEED_TRANSLATION": {
-    "title": "Delete video",
-    "body": "Are you sure you want to delete this video?",
+  "deleteVideoModal": {
+    "title": "Eliminar video",
+    "body": "¿Estás seguro de que quieres eliminar este video?",
     "button": {
-      "cancel": "Cancel",
-      "confirm": "Delete"
+      "cancel": "Cancelar",
+      "confirm": "Eliminar"
     }
   },
   "deleteCommentModal": {
@@ -251,7 +251,7 @@
     "history": "Historial"
   },
   "optionsTabLine": {
-    "bundleVotes_NEED_TRANSLATION": "You have <0>{{amount}} votes</0>"
+    "bundleVotes": "Tienes <0>{{amount}} votos</0>"
   },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
@@ -406,7 +406,7 @@
           "vote": "voto",
           "votes": "votos",
           "custom": "Votos personalizados",
-          "useVotes_NEED_TRANSLATION": "Use my votes"
+          "useVotes": "Usar mis votos"
         },
         "confirmVoteModal": {
           "vote": "voto",
@@ -426,10 +426,10 @@
         "line_3": "Siempre puedes comprar más votos después si quieres añadir aún más.",
         "useFreeVoteButton": "Usar mi voto gratis"
       },
-      "useBundleVotesModal_NEED_TRANSLATION": {
-        "votesAvailable": "<0>{{amount}}</0> votes available",
-        "optionTitle": "Superpoll option",
-        "button": "Vote"
+      "useBundleVotesModal": {
+        "votesAvailable": "<0>{{amount}}</0> votos disponibles",
+        "optionTitle": "Opción de Superpoll",
+        "button": "Votar"
       },
       "actionSection": {
         "votesAmount": {
@@ -441,8 +441,8 @@
         "suggestionPlaceholder": "Agregar tu propia opción...",
         "suggestionPlaceholderDesktop": "Agregar opción...",
         "placeABidButton": "Agregar mi opción",
-        "offersBundles_NEED_TRANSLATION": "{{creator}} offers Superpoll Bundles",
-        "viewBundles_NEED_TRANSLATION": "View Bundles"
+        "offersBundles": "{{creator}} ofrece Bundles de Superpoll",
+        "viewBundles": "Ver Bundles"
       }
     },
     "winnerTab": {
