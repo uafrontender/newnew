@@ -138,6 +138,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
 
     // Options
     const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
       post.optionCount ?? ''
     );
@@ -620,16 +621,10 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
               hasWinner={false}
               hidden={openedTab === 'response'}
             />
-            <SActivitesContainer decisionFailed={postStatus === 'failed'}>
+            <SActivitiesContainer decisionFailed={postStatus === 'failed'}>
               {openedTab === 'announcement' ? (
                 <>
-                  <PostVotingTab>
-                    {`${t('tabs.options')} ${
-                      !!numberOfOptions && numberOfOptions > 0
-                        ? numberOfOptions
-                        : ''
-                    }`}
-                  </PostVotingTab>
+                  <PostVotingTab>{`${t('tabs.options')}`}</PostVotingTab>
                   <McOptionsTabModeration
                     post={post}
                     options={options}
@@ -649,7 +644,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
                   winningOptionMc={winningOption}
                 />
               )}
-            </SActivitesContainer>
+            </SActivitiesContainer>
             {isPopupVisible && (
               <HeroPopup
                 isPopupVisible={isPopupVisible}
@@ -735,7 +730,7 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div<{
+const SActivitiesContainer = styled.div<{
   decisionFailed: boolean;
 }>`
   grid-area: activities;

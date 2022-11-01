@@ -639,17 +639,21 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
               hasWinner={!!winningOptionId}
               hidden={openedTab === 'response'}
             />
-            <SActivitesContainer
+            <SActivitiesContainer
               decisionFailed={postStatus === 'failed'}
               showSelectWinnerOption={showSelectWinnerOption}
             >
               {openedTab === 'announcement' ? (
                 <>
                   <PostVotingTab>
-                    {`${t('tabs.bids')} ${
+                    {`${
                       !!numberOfOptions && numberOfOptions > 0
                         ? numberOfOptions
                         : ''
+                    } ${
+                      numberOfOptions === 1
+                        ? t('tabs.bids_singular')
+                        : t('tabs.bids')
                     }`}
                   </PostVotingTab>
                   <AcOptionsTabModeration
@@ -674,7 +678,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                   winningOptionAc={winningOption}
                 />
               )}
-            </SActivitesContainer>
+            </SActivitiesContainer>
             {isPopupVisible && (
               <HeroPopup
                 isPopupVisible={isPopupVisible}
@@ -765,7 +769,7 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div<{
+const SActivitiesContainer = styled.div<{
   showSelectWinnerOption: boolean;
   decisionFailed: boolean;
 }>`

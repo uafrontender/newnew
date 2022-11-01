@@ -115,8 +115,8 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    user.creatorData?.options.isCreatorConnectedToStripe,
-    user.creatorData?.options.stripeConnectStatus,
+    user.creatorData?.options?.isCreatorConnectedToStripe,
+    user.creatorData?.options?.stripeConnectStatus,
     user.creatorData?.options,
     socketConnection,
   ]);
@@ -156,6 +156,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
                 birthDateUpdatesLeft: data.me?.options?.birthDateUpdatesLeft,
                 isOfferingSubscription: data.me.options?.isOfferingSubscription,
                 isPhoneNumberConfirmed: data.me.options?.isPhoneNumberConfirmed,
+                isWhiteListed: data.me.options?.isWhiteListed,
               },
             } as TUserData)
           );

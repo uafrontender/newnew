@@ -175,11 +175,11 @@
     "generic": "An error occurred, please try again later"
   },
   "smsNotifications": {
-    "title": "Enter your phone number",
+    "title": "What's your number?",
     "success": "Success",
-    "description": "With it, we will notify you about the <0>{{subject}}</0> updates.",
+    "description": "This way, we can send you new updates from <0>{{subject}}</0>!",
     "confirmation": "Confirmation SMS was sent to {{phoneNumber}} number.",
-    "tos": "I accept the <0>NewNew’s Terms of Service</0> & have read the <1>NewNew’s Privacy Statement</1>. I would like to receive newsletters and updates about  NewNew products at the phone number provided. One message per month. Message and data rates may apply. ",
+    "tos": "I accept NewNew’s <0>Terms</0> & <1>Privacy</1>. I opt-in and agree to receive updates from NewNew at the phone number provided. SMS and data rates may apply.",
     "button": { "continue": "Continue", "close": "Cool!" },
     "phoneError": {
       "0": "Invalid phone number",
@@ -190,6 +190,13 @@
     },
     "error": {
       "requestFailed": "Request failed"
+    }
+  },
+  "colorModeSwitch": {
+    "options": {
+      "light": "Light",
+      "dark": "Dark",
+      "auto": "Auto"
     }
   }
 }

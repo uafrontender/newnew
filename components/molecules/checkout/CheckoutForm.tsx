@@ -58,7 +58,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
-  const { loggedIn } = useAppSelector((state) => state.user);
+  const { loggedIn, userData } = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
 
   const [isStripeReady, setIsStripeReady] = useState(false);
@@ -193,13 +193,15 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             selected={selectedPaymentMethod === PaymentMethodTypes.PrimaryCard}
             label={`${t('primaryCard')} **** ${primaryCard.last4}`}
           />
-          <OptionCard
-            handleClick={() =>
-              setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
-            }
-            selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
-            label={t('newCard')}
-          />
+          {!userData?.options?.isWhiteListed && (
+            <OptionCard
+              handleClick={() =>
+                setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
+              }
+              selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
+              label={t('newCard')}
+            />
+          )}
         </>
       )}
 
@@ -343,7 +345,6 @@ const SEmailInput = styled(Input)`
 
 const SRecaptchaWrapper = styled.div`
   margin-top: 20px;
-  z-index: 20;
 `;
 
 const SPayButtonDiv = styled.div`

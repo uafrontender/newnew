@@ -29,7 +29,7 @@ export const CreatorsList: React.FC<IList> = ({
   skeletonsHighlightColor,
   withEllipseMenu = false,
 }) => {
-  const renderItem = ({ creator }: { creator: newnewapi.IUser }) => {
+  const renderItem = (creator: newnewapi.IUser) => {
     const handleItemClick = () => {
       router.push(`/${creator.username}`);
     };

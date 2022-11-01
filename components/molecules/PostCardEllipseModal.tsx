@@ -3,6 +3,9 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
+import { useTheme } from 'styled-components';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 import switchPostType from '../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
@@ -34,6 +37,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   handleAddPostToState,
 }) => {
   const router = useRouter();
+  const theme = useTheme();
   const { t } = useTranslation('common');
   const user = useAppSelector((state) => state.user);
 
@@ -141,10 +145,10 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
       }
     }
 
-    if (user.loggedIn) {
+    if (user.loggedIn && isOpen) {
       fetchIsFollowing();
     }
-  }, [user.loggedIn, postUuid]);
+  }, [user.loggedIn, postUuid, isOpen]);
 
   return (
     <EllipseModal show={isOpen} zIndex={zIndex} onClose={onClose}>
@@ -155,15 +159,20 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
         <EllipseModalButton onClick={handleFollowDecision}>
           {
             // eslint-disable-next-line no-nested-ternary
-            isFollowingLoading
-              ? ''
-              : !isFollowingDecision
-              ? t('ellipse.followDecision', {
-                  postType: t(`postType.${postType}`),
-                })
-              : t('ellipse.unFollowDecision', {
-                  postType: t(`postType.${postType}`),
-                })
+            isFollowingLoading ? (
+              <Skeleton
+                highlightColor={theme.colorsThemed.background.primary}
+                baseColor={theme.colorsThemed.background.secondary}
+              />
+            ) : !isFollowingDecision ? (
+              t('ellipse.followDecision', {
+                postType: t(`postType.${postType}`),
+              })
+            ) : (
+              t('ellipse.unFollowDecision', {
+                postType: t(`postType.${postType}`),
+              })
+            )
           }
         </EllipseModalButton>
       )}

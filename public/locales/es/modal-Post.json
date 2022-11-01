@@ -128,7 +128,7 @@
       "backToResponse": "Ver respuesta"
     },
     "reuploadButton": "Volver a subir",
-    "addVideoButton_NEED_TRANSLATION": "Add video",
+    "addVideoButton": "Agregar video",
     "cannotLeavePageMsg": "¿Estás seguro de que quieres cerrar esta página? El progreso de la carga se perderá",
     "floatingUploadResponseButton": "Hacer un video de respuesta",
     "setThumbnail": "Establecer una miniatura",
@@ -216,12 +216,12 @@
       "confirm": "Eliminar"
     }
   },
-  "deleteVideoModal_NEED_TRANSLATION": {
-    "title": "Delete video",
-    "body": "Are you sure you want to delete this video?",
+  "deleteVideoModal": {
+    "title": "Eliminar video",
+    "body": "¿Estás seguro de que quieres eliminar este video?",
     "button": {
-      "cancel": "Cancel",
-      "confirm": "Delete"
+      "cancel": "Cancelar",
+      "confirm": "Eliminar"
     }
   },
   "deleteCommentModal": {
@@ -244,10 +244,14 @@
   "tabs": {
     "comments": "Commentarios",
     "bids": "Ofertas",
+    "bids_singular": "Oferta",
     "options": "Opciones",
     "backers": "Patrocinadores",
     "winner": "Ganador",
     "history": "Historial"
+  },
+  "optionsTabLine": {
+    "bundleVotes": "Tienes <0>{{amount}} votos</0>"
   },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
@@ -390,12 +394,9 @@
         "others": "otros",
         "voters": "votantes",
         "voted": "votaron",
-        "freeVoteButton": "Voto \ngratis",
         "supportButton": "Votar",
         "supportAgainButton": "Votar \nde nuevo",
         "raiseBidButton": "Votar",
-        "doubleMyVoteCaption": "Si quieres que esta opción gane, ¡aumenta tus posibilidades de éxito y duplica tu oferta!",
-        "doubleMyVoteButton": "Duplica mi voto",
         "placeABidButton": "Votar",
         "cancelButton": "Cancelar",
         "moreButton": "Más",
@@ -404,7 +405,8 @@
           "titleMoreVotes": "Comprar más votos",
           "vote": "voto",
           "votes": "votos",
-          "custom": "Votos personalizados"
+          "custom": "Votos personalizados",
+          "useVotes": "Usar mis votos"
         },
         "confirmVoteModal": {
           "vote": "voto",
@@ -424,6 +426,11 @@
         "line_3": "Siempre puedes comprar más votos después si quieres añadir aún más.",
         "useFreeVoteButton": "Usar mi voto gratis"
       },
+      "useBundleVotesModal": {
+        "votesAvailable": "<0>{{amount}}</0> votos disponibles",
+        "optionTitle": "Opción de Superpoll",
+        "button": "Votar"
+      },
       "actionSection": {
         "votesAmount": {
           "placeholder": {
@@ -433,7 +440,9 @@
         },
         "suggestionPlaceholder": "Agregar tu propia opción...",
         "suggestionPlaceholderDesktop": "Agregar opción...",
-        "placeABidButton": "Agregar mi opción"
+        "placeABidButton": "Agregar mi opción",
+        "offersBundles": "{{creator}} ofrece Bundles de Superpoll",
+        "viewBundles": "Ver Bundles"
       }
     },
     "winnerTab": {
@@ -582,8 +591,8 @@
     }
   },
   "acPostSuccess": {
-    "heroText": "¡Este Bid ha terminado!",
-    "wantsToKnow": "{{creator}} quiere saber...",
+    "heroText": "¡Velo suceder!",
+    "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalBids": "ofertas en total",
     "others": "otros",
     "bid": "oferta",
@@ -594,8 +603,8 @@
     }
   },
   "mcPostSuccess": {
-    "heroText": "¡Esta Superpoll ha terminado!",
-    "wantsToKnow": "{{creator}} quiere saber...",
+    "heroText": "¡Velo suceder!",
+    "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalVotes": "votos en total",
     "others": "otros",
     "voted": "votaron",
@@ -608,8 +617,8 @@
     }
   },
   "cfPostSuccess": {
-    "heroText": "¡Este Goal ha terminado!",
-    "wantsToKnow": "El Goal de {{creator}}",
+    "heroText": "¡Velo suceder!",
+    "wantsToKnow": "El Goal de {{creator}}<0/>",
     "creatorsBackers": "Los patrocinadores de {{creator}}",
     "ofTargetBackers": "de {{target_count}} patrocinadores",
     "youBackedFor": "Patrocinaste por"
@@ -625,7 +634,7 @@
         "seconds": "segundos"
       }
     },
-    "wantsToKnow": "{{creator}} quiere saber...",
+    "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalBids": "en ofertas totales",
     "others": "otros",
     "bid": "oferta",
@@ -645,7 +654,7 @@
         "seconds": "segundos"
       }
     },
-    "wantsToKnow": "{{creator}} quiere saber...",
+    "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalVotes": "votos en total",
     "others": "otros",
     "voted": "votó",
@@ -668,7 +677,7 @@
         "seconds": "segundos"
       }
     },
-    "wantsToKnow": "El Goal de {{creator}}",
+    "wantsToKnow": "El Goal de {{creator}}<0/>",
     "creatorsBackers": "Los patrocinadores de {{creator}}",
     "ofTargetBackers": "de {{target_count}} patrocinadores",
     "youBackedFor": "Patrocinaste por"

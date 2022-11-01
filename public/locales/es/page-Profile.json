@@ -97,8 +97,10 @@
     },
     "buttons": {
       "favorites": "Favoritos",
-      "enableSmsNotifications_NEED_TRANSLATION": "Notify me",
-      "disableSmsNotifications_NEED_TRANSLATION": "Notifications ON",
+      "enableSmsNotifications": "Notificarme",
+      "disableSmsNotifications": "Notificaciones ACTIVAS",
+      "buyBundles": "Comprar Bundles",
+      "votesLeft": "Quedan {{amount}} votos",
       "sendMessage": "Escribir mensaje",
       "copied": "¡Enlace copiado!"
     }
@@ -205,12 +207,12 @@
           "makePrimary": "Convertir en primaria",
           "removeCard": "Remover tarjeta"
         },
-        "status_NEED_TRANSLATION": {
-          "added": "Success! Your card has been saved",
-          "cannotBeAdded": "Failure! Your card cannot be saved",
-          "duplicate": "This card has been already saved in your profile",
-          "inProgress": "Saving your card. Please wait",
-          "requestFailed": "Something went wrong"
+        "status": {
+          "added": "¡Éxito! Tu tarjeta ha sido guardada",
+          "cannotBeAdded": "¡Error! Tu tarjeta no se ha podido guardar",
+          "duplicate": "Esta tarjeta ya se ha guardado en tu perfil anteriormente",
+          "inProgress": "Guardando tu tarjeta. Por favor, espera",
+          "requestFailed": "Algo salió mal"
         }
       },
       "personalInformation": {

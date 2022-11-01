@@ -700,13 +700,15 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           amountInBids={totalAmount}
           hasWinner={!!post.winningOptionId}
         />
-        <SActivitesContainer
+        <SActivitiesContainer
           decisionFailed={postStatus === 'failed'}
           showSelectingWinnerOption={showSelectingWinnerOption}
         >
           <PostVotingTab>
-            {`${t('tabs.bids')} ${
+            {`${
               !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
+            } ${
+              numberOfOptions === 1 ? t('tabs.bids_singular') : t('tabs.bids')
             }`}
           </PostVotingTab>
           <AcOptionsTab
@@ -736,7 +738,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             }
             handleRemoveOption={handleRemoveOption}
           />
-        </SActivitesContainer>
+        </SActivitiesContainer>
 
         {/* Loading Modal */}
         {loadingModalOpen && (
@@ -854,7 +856,7 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div<{
+const SActivitiesContainer = styled.div<{
   showSelectingWinnerOption: boolean;
   decisionFailed: boolean;
 }>`

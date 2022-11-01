@@ -3,7 +3,10 @@ import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
 const BASE_URL_INFRASTRUCTURE = `${BASE_URL}/infrastructure`;
 
-export const validateText = (payload: newnewapi.ValidateTextRequest, signal?: RequestInit['signal']) =>
+export const validateText = (
+  payload: newnewapi.ValidateTextRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.ValidateTextRequest, newnewapi.ValidateTextResponse>(
     newnewapi.ValidateTextRequest,
     newnewapi.ValidateTextResponse,
@@ -13,10 +16,13 @@ export const validateText = (payload: newnewapi.ValidateTextRequest, signal?: Re
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const getAppConstants = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
+export const getAppConstants = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.EmptyRequest, newnewapi.GetAppConstantsResponse>(
     newnewapi.EmptyRequest,
     newnewapi.GetAppConstantsResponse,
@@ -26,5 +32,5 @@ export const getAppConstants = (payload: newnewapi.EmptyRequest, signal?: Reques
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
