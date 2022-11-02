@@ -43,7 +43,6 @@ import { cookiesInstance } from '../api/apiConfigs';
 
 import 'react-toastify/dist/ReactToastify.css';
 import ChannelsContextProvider from '../contexts/channelsContext';
-import { SubscriptionsProvider } from '../contexts/subscriptionsContext';
 import FollowingsContextProvider from '../contexts/followingContext';
 import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
@@ -227,45 +226,41 @@ const MyApp = (props: IMyApp): ReactElement => {
                         <BlockedUsersProvider>
                           <FollowingsContextProvider>
                             <CardsContextProvider>
-                              <SubscriptionsProvider>
-                                <BundlesContextProvider>
-                                  <ChatsProvider>
-                                    <OverlayModeProvider>
-                                      <ResizeMode>
-                                        <PostModalContextProvider>
-                                          <GlobalTheme initialTheme={colorMode}>
-                                            <>
-                                              <ToastContainer containerId='toast-container' />
-                                              <VideoProcessingWrapper>
-                                                <ErrorBoundary>
-                                                  {!pageProps.error ? (
-                                                    getLayout(
-                                                      <Component
-                                                        {...pageProps}
-                                                      />
-                                                    )
-                                                  ) : (
-                                                    <Error
-                                                      title={
-                                                        pageProps.error?.message
-                                                      }
-                                                      statusCode={
-                                                        pageProps.error
-                                                          ?.statusCode ?? 500
-                                                      }
-                                                    />
-                                                  )}
-                                                </ErrorBoundary>
-                                              </VideoProcessingWrapper>
-                                              <ReCaptchaBadgeModal />
-                                            </>
-                                          </GlobalTheme>
-                                        </PostModalContextProvider>
-                                      </ResizeMode>
-                                    </OverlayModeProvider>
-                                  </ChatsProvider>
-                                </BundlesContextProvider>
-                              </SubscriptionsProvider>
+                              <BundlesContextProvider>
+                                <ChatsProvider>
+                                  <OverlayModeProvider>
+                                    <ResizeMode>
+                                      <PostModalContextProvider>
+                                        <GlobalTheme initialTheme={colorMode}>
+                                          <>
+                                            <ToastContainer containerId='toast-container' />
+                                            <VideoProcessingWrapper>
+                                              <ErrorBoundary>
+                                                {!pageProps.error ? (
+                                                  getLayout(
+                                                    <Component {...pageProps} />
+                                                  )
+                                                ) : (
+                                                  <Error
+                                                    title={
+                                                      pageProps.error?.message
+                                                    }
+                                                    statusCode={
+                                                      pageProps.error
+                                                        ?.statusCode ?? 500
+                                                    }
+                                                  />
+                                                )}
+                                              </ErrorBoundary>
+                                            </VideoProcessingWrapper>
+                                            <ReCaptchaBadgeModal />
+                                          </>
+                                        </GlobalTheme>
+                                      </PostModalContextProvider>
+                                    </ResizeMode>
+                                  </OverlayModeProvider>
+                                </ChatsProvider>
+                              </BundlesContextProvider>
                             </CardsContextProvider>
                           </FollowingsContextProvider>
                         </BlockedUsersProvider>

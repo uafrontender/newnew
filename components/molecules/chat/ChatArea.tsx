@@ -37,7 +37,6 @@ import { reportUser } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
 import isBrowser from '../../../utils/isBrowser';
 import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import validateInputText from '../../../utils/validateMessageText';
 
 const UserAvatar = dynamic(() => import('../UserAvatar'));
@@ -92,7 +91,7 @@ const ChatArea: React.FC<IChatData> = ({
     newnewapi.IChatMessage | null | undefined
   >();
   // TODO: replace or abandon
-  const { mySubscribers } = useGetSubscriptions();
+  const mySubscribers: any[] = [];
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
