@@ -144,6 +144,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
       }
       if (decoded.cardStatus === newnewapi.CardStatus.ADDED && decoded.card) {
         handleSetCard(decoded.card);
+        setIsCardAdded(true);
       }
     };
 
