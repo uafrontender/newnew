@@ -112,11 +112,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
 
   const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
-  const showSelectingWinnerOption = useMemo(
-    () => postStatus === 'waiting_for_decision',
-    [postStatus]
-  );
-
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
@@ -747,10 +742,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             hasWinner={!!post.winningOptionId}
           />
         )}
-        <SActivitiesContainer
-          decisionFailed={postStatus === 'failed'}
-          showSelectingWinnerOption={showSelectingWinnerOption}
-        >
+        <SActivitiesContainer>
           <div
             style={{
               flex: '0 0 auto',
@@ -960,10 +952,7 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitiesContainer = styled.div<{
-  showSelectingWinnerOption: boolean;
-  decisionFailed: boolean;
-}>`
+const SActivitiesContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
     align-items: flex-start;
 

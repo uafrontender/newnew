@@ -162,12 +162,26 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
           isMuted={mutedMode}
           handleToggleMuted={() => handleToggleMutedMode()}
         />
-        {variant === 'decision' ? (
-          <PostTopInfo hasWinner={false} />
-        ) : (
-          <PostTopInfoModeration hasWinner={false} />
-        )}
+        {isMobile &&
+          (variant === 'decision' ? (
+            <PostTopInfo hasWinner={false} />
+          ) : (
+            <PostTopInfoModeration hasWinner={false} />
+          ))}
         <SActivitiesContainer>
+          <div
+            style={{
+              flex: '0 0 auto',
+              width: '100%',
+            }}
+          >
+            {!isMobile &&
+              (variant === 'decision' ? (
+                <PostTopInfo hasWinner={false} />
+              ) : (
+                <PostTopInfoModeration hasWinner={false} />
+              ))}
+          </div>
           <PostScheduledSection
             postType={postType}
             timestampSeconds={new Date(
@@ -185,33 +199,24 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
 export default PostViewScheduled;
 
 const SWrapper = styled.div`
-  display: grid;
-
-  grid-template-areas:
-    'expires'
-    'video'
-    'title'
-    'activities';
+  width: 100%;
 
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    grid-template-areas:
-      'title title'
-      'video activities';
-    grid-template-columns: 284px 1fr;
-    grid-template-rows: min-content 1fr;
-    grid-column-gap: 16px;
-
+    height: 648px;
+    min-height: 0;
     align-items: flex-start;
+
+    display: flex;
+    gap: 16px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    grid-template-areas:
-      'video title'
-      'video activities'
-      'video activities';
-    grid-template-columns: 410px 538px;
+    height: 728px;
+
+    display: flex;
+    gap: 32px;
   }
 `;
 
@@ -233,25 +238,21 @@ const SExpiresSection = styled.div`
 `;
 
 const SActivitiesContainer = styled.div`
-  grid-area: activities;
-
-  display: flex;
-  flex-direction: column;
-
-  align-self: bottom;
-
-  height: 100%;
-
   ${({ theme }) => theme.media.tablet} {
-    min-height: initial;
-    max-height: calc(728px - 46px - 64px - 40px - 72px);
+    align-items: flex-start;
 
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+
+    height: 506px;
+    max-height: 506px;
+    width: 100%;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    max-height: calc(728px - 46px - 64px);
+    height: 728px;
+    max-height: 728px;
+    width: 100%;
   }
 `;
