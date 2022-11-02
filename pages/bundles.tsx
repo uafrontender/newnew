@@ -246,17 +246,23 @@ const Container = styled.div`
   padding-top: 4px;
   padding-bottom: 24px;
   // TODO: Change BG for mobile
-  background-size: contain;
-  background-repeat: no-repeat;
+  // background: url(${assets.bundles.votesBackgroundSmall});
+  // background-size: contain;
+  // background-repeat: no-repeat;
 
   ${({ theme }) => theme.media.tablet} {
     padding-top: 4px;
-    // TODO: Change BG for mobile
+    // TODO: Change BG for tablet
+    // background: url(${assets.bundles.votesBackgroundSmall});
+    // background-size: contain;
+    // background-repeat: no-repeat;
   }
 
   ${({ theme }) => theme.media.laptop} {
     padding-top: 12px;
     background: url(${assets.bundles.votesBackgroundSmall});
+    background-size: contain;
+    background-repeat: no-repeat;
   }
 `;
 
