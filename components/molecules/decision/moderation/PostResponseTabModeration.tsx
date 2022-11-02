@@ -583,11 +583,13 @@ const SSucceededContainer = styled.div<{
   dimmed?: boolean;
 }>`
   height: 100%;
+  width: 100%;
 
   opacity: ${({ dimmed }) => (dimmed ? 0.3 : 1)};
 
   ${({ theme }) => theme.media.tablet} {
     display: grid;
+    flex: 1 1 auto;
   }
 `;
 
