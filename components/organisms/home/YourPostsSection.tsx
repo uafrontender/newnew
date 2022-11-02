@@ -312,8 +312,8 @@ const SFilterContainer = styled.div`
   margin-bottom: 8px;
 
   ${({ theme }) => theme.media.tablet} {
-    position: absolute;
-    top: -10px;
+    /* position: absolute;
+    top: -10px; */
 
     margin-bottom: 0;
   }
@@ -325,6 +325,7 @@ const SNoPostsView = styled.div`
   align-items: center;
   justify-content: center;
   height: 198px;
+  margin-top: 32px;
 
   border: 2px solid
     ${({ theme }) =>
@@ -335,10 +336,12 @@ const SNoPostsView = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     height: 280px;
+    margin-top: 24px;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: 364px;
+    margin-top: 32px;
   }
 `;
 
