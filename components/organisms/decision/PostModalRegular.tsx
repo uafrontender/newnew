@@ -40,6 +40,7 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
+  const { t: tCommon } = useTranslation('common');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -97,9 +98,7 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
                       postType: t(`postType.${typeOfPost}`),
                     })
               }
-              buttonCaption={t('postDeleted.buttonText', {
-                postTypeMultiple: t(`postType.multiple.${typeOfPost}`),
-              })}
+              buttonCaption={tCommon('button.takeMeHome')}
               imageSrc={
                 theme.name === 'light'
                   ? LIGHT_IMAGES[typeOfPost]

@@ -32,6 +32,10 @@ import YourPostsSection from '../components/organisms/home/YourPostsSection';
 import Headline from '../components/atoms/Headline';
 import { TStaticPost } from '../components/molecules/home/StaticPostCard';
 import { getMyPosts } from '../api/endpoints/user';
+import usePagination, {
+  PaginatedResponse,
+  Paging,
+} from '../utils/hooks/usePagination';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -95,10 +99,10 @@ const Home: NextPage<IHome> = ({
   // const [collectionBiggestError, setCollectionBiggestError] = useState(false);
 
   // Recent activity
-  const [collectionRA, setCollectionRA] = useState<newnewapi.Post[]>([]);
-  const [collectionRAInitialLoading, setCollectionRAInitialLoading] =
-    useState(false);
-  const [collectionRAError, setCollectionRAError] = useState(false);
+  // const [collectionRA, setCollectionRA] = useState<newnewapi.Post[]>([]);
+  // const [collectionRAInitialLoading, setCollectionRAInitialLoading] =
+  //   useState(false);
+  // const [collectionRAError, setCollectionRAError] = useState(false);
 
   // Fetch top posts of various types
   // FY posts
@@ -250,35 +254,38 @@ const Home: NextPage<IHome> = ({
   // }, []);
 
   // Resent activity
-  useEffect(() => {
-    async function fetchFYPosts() {
-      try {
-        setCollectionRAInitialLoading(true);
-
-        const payload = new newnewapi.GetRelatedToMePostsRequest({
-          relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
-        });
-        const postsResponse = await getMyPosts(payload);
-
-        if (payload) {
-          setCollectionRA(() => postsResponse.data?.posts as newnewapi.Post[]);
-          setCollectionRAInitialLoading(false);
-        } else {
-          throw new Error('Request failed');
-        }
-      } catch (err) {
-        setCollectionRAInitialLoading(false);
-        setCollectionRAError(true);
+  const fetchRAPosts = useCallback(
+    async (paging: Paging): Promise<PaginatedResponse<newnewapi.IPost>> => {
+      if (!user.loggedIn) {
+        return {
+          nextData: [],
+          nextPageToken: undefined,
+        };
       }
-    }
 
-    if (user.loggedIn) {
-      fetchFYPosts();
-    }
+      const payload = new newnewapi.GetRelatedToMePostsRequest({
+        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
+        paging,
+      });
+      const postsResponse = await getMyPosts(payload);
 
-    return () => {};
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      if (!postsResponse.data || postsResponse.error) {
+        throw new Error('Request failed');
+      }
+
+      return {
+        nextData: postsResponse.data.posts,
+        nextPageToken: postsResponse.data.paging?.nextPageToken,
+      };
+    },
+    [user.loggedIn]
+  );
+
+  const {
+    data: collectionRA,
+    initialLoadDone: collectionRAInitialLoading,
+    loadMore,
+  } = usePagination<newnewapi.IPost>(fetchRAPosts, 6);
 
   return (
     <>
@@ -302,7 +309,7 @@ const Home: NextPage<IHome> = ({
 
       {user.loggedIn && (
         <>
-          {user.userData?.options?.isCreator && (
+          {user.userData?.options?.isCreator && collectionRA?.length > 0 && (
             <SHeading>
               <SHeadline>{t('section.explore')}</SHeadline>
               {/* <SSubtitle variant='subtitle'>
@@ -312,14 +319,12 @@ const Home: NextPage<IHome> = ({
             </SHeading>
           )}
           {/* Recent activity */}
-          {!collectionRAError &&
-          (collectionRAInitialLoading || collectionRA?.length > 0) ? (
+          {collectionRAInitialLoading || collectionRA?.length > 0 ? (
             <CardsSection
               title={t('cardsSection.title.recent-activity')}
               category='recent-activity'
               collection={collectionRA}
-              loading={collectionRAInitialLoading}
-              seeMoreLink='/profile/purchases'
+              loading={!collectionRAInitialLoading}
               tutorialCard={
                 user.loggedIn ? (
                   <STutorialCard
@@ -334,6 +339,7 @@ const Home: NextPage<IHome> = ({
                 ) : undefined
               }
               padding={user.loggedIn ? 'small' : 'large'}
+              onReachEnd={loadMore}
             />
           ) : null}
         </>

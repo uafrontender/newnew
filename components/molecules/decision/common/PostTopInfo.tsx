@@ -71,6 +71,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
+  const { t: tCommon } = useTranslation('common');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -85,6 +86,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     hasRecommendations,
     handleReportOpen,
     handleSetIsFollowingDecision,
+    handleCloseAndGoBack,
   } = usePostModalInnerState();
 
   const postId = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
@@ -218,16 +220,20 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       _postUuid: postId,
       _component: 'PostTopInfo',
     });
-    if (hasRecommendations) {
-      document.getElementById('post-modal-container')?.scrollTo({
-        top: document.getElementById('recommendations-section-heading')
-          ?.offsetTop,
-        behavior: 'smooth',
-      });
+    // if (hasRecommendations) {
+    //   document.getElementById('post-modal-container')?.scrollTo({
+    //     top: document.getElementById('recommendations-section-heading')
+    //       ?.offsetTop,
+    //     behavior: 'smooth',
+    //   });
+    // } else {
+    if (router.pathname === '/') {
+      handleCloseAndGoBack();
     } else {
-      router.push(`/see-more?category=${postType}`);
+      router.push('/');
     }
-  }, [hasRecommendations, postType, router, postId]);
+    // }
+  }, [router, postId, handleCloseAndGoBack]);
 
   const moreButtonRef: any = useRef();
   const shareButtonRef: any = useRef();
@@ -387,9 +393,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           body={t(`postFailedBox.reason.${failureReason}`, {
             creator: getDisplayname(creator),
           })}
-          buttonCaption={t('postFailedBox.buttonText', {
-            postTypeMultiple: t(`postType.multiple.${postType}`),
-          })}
+          buttonCaption={tCommon('button.takeMeHome')}
           imageSrc={
             postType
               ? theme.name === 'light'
