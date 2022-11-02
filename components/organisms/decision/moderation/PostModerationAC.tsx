@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
@@ -8,13 +9,14 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
+import moment from 'moment';
 
 import { SocketContext } from '../../../../contexts/socketContext';
 import { ChannelsContext } from '../../../../contexts/channelsContext';
@@ -74,6 +76,14 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+    const isTablet = ['tablet'].includes(resizeMode);
+    const isMobileOrTablet = [
+      'mobile',
+      'mobileS',
+      'mobileM',
+      'mobileL',
+      'tablet',
+    ].includes(resizeMode);
     const router = useRouter();
 
     const {
@@ -85,11 +95,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     const post = useMemo(() => postParsed as newnewapi.Auction, [postParsed]);
 
     const { syncedHistoryReplaceState } = useSynchronizedHistory();
-
-    const showSelectWinnerOption = useMemo(
-      () => postStatus === 'waiting_for_decision',
-      [postStatus]
-    );
 
     // Additional responses
     const [
@@ -380,7 +385,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       setOptions([]);
       setOptionsNextPageToken('');
       fetchBids();
-      fetchPostLatestData();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [post.postUuid]);
 
@@ -581,22 +585,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
 
     return (
       <>
-        <SWrapper>
-          <PostModerationResponsesContextProvider
-            openedTab={openedTab}
-            handleChangeTab={handleChangeTab}
-            coreResponseInitial={post.response ?? undefined}
-            additionalResponsesInitial={additionalResponsesFreshlyLoaded}
-          >
+        {isTablet && (
+          <>
             <SExpiresSection>
-              {isMobile && (
-                <SGoBackButton
-                  style={{
-                    gridArea: 'closeBtnMobile',
-                  }}
-                  onClick={handleGoBackInsidePost}
-                />
-              )}
               {postStatus === 'waiting_for_response' ||
               postStatus === 'waiting_for_decision' ? (
                 <ResponseTimer
@@ -613,16 +604,81 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                   postType='ac'
                 />
               ) : (
-                <PostTimer
-                  timestampSeconds={new Date(
-                    (post.expiresAt?.seconds as number) * 1000
-                  ).getTime()}
-                  postType='ac'
-                  isTutorialVisible={options.length > 0}
-                  onTimeExpired={handleOnVotingTimeExpired}
-                />
+                <>
+                  <PostTimer
+                    timestampSeconds={new Date(
+                      (post.expiresAt?.seconds as number) * 1000
+                    ).getTime()}
+                    postType='ac'
+                    isTutorialVisible={options.length > 0}
+                    onTimeExpired={handleOnVotingTimeExpired}
+                  />
+                  <SEndDate>
+                    {t('expires.end_date')}{' '}
+                    {moment((post.expiresAt?.seconds as number) * 1000).format(
+                      'DD MMM YYYY [at] hh:mm A'
+                    )}
+                  </SEndDate>
+                </>
               )}
             </SExpiresSection>
+            <PostTopInfoModeration
+              amountInBids={totalAmount}
+              hasWinner={!!winningOptionId}
+              hidden={openedTab === 'response'}
+            />
+          </>
+        )}
+        <SWrapper>
+          <PostModerationResponsesContextProvider
+            openedTab={openedTab}
+            handleChangeTab={handleChangeTab}
+            coreResponseInitial={post.response ?? undefined}
+            additionalResponsesInitial={additionalResponsesFreshlyLoaded}
+          >
+            {isMobile && (
+              <SExpiresSection>
+                <SGoBackButton
+                  style={{
+                    gridArea: 'closeBtnMobile',
+                  }}
+                  onClick={handleGoBackInsidePost}
+                />
+                {postStatus === 'waiting_for_response' ||
+                postStatus === 'waiting_for_decision' ? (
+                  <ResponseTimer
+                    timestampSeconds={new Date(
+                      (post.responseUploadDeadline?.seconds as number) * 1000
+                    ).getTime()}
+                    onTimeExpired={handleOnResponseTimeExpired}
+                  />
+                ) : Date.now() > (post.expiresAt?.seconds as number) * 1000 ? (
+                  <PostTimerEnded
+                    timestampSeconds={new Date(
+                      (post.expiresAt?.seconds as number) * 1000
+                    ).getTime()}
+                    postType='ac'
+                  />
+                ) : (
+                  <>
+                    <PostTimer
+                      timestampSeconds={new Date(
+                        (post.expiresAt?.seconds as number) * 1000
+                      ).getTime()}
+                      postType='ac'
+                      isTutorialVisible={options.length > 0}
+                      onTimeExpired={handleOnVotingTimeExpired}
+                    />
+                    <SEndDate>
+                      {t('expires.end_date')}{' '}
+                      {moment(
+                        (post.expiresAt?.seconds as number) * 1000
+                      ).format('DD MMM YYYY [at] hh:mm A')}
+                    </SEndDate>
+                  </>
+                )}
+              </SExpiresSection>
+            )}
             <PostVideoModeration
               key={`key_${announcement?.coverImageUrl}`}
               postId={post.postUuid}
@@ -634,28 +690,80 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
               isMuted={mutedMode}
               handleToggleMuted={() => handleToggleMutedMode()}
             />
-            <PostTopInfoModeration
-              amountInBids={totalAmount}
-              hasWinner={!!winningOptionId}
-              hidden={openedTab === 'response'}
-            />
-            <SActivitiesContainer
-              decisionFailed={postStatus === 'failed'}
-              showSelectWinnerOption={showSelectWinnerOption}
-            >
+            {isMobile && (
+              <PostTopInfoModeration
+                amountInBids={totalAmount}
+                hasWinner={!!winningOptionId}
+                hidden={openedTab === 'response'}
+              />
+            )}
+            <SActivitiesContainer>
               {openedTab === 'announcement' ? (
                 <>
-                  <PostVotingTab>
-                    {`${
-                      !!numberOfOptions && numberOfOptions > 0
-                        ? numberOfOptions
-                        : ''
-                    } ${
-                      numberOfOptions === 1
-                        ? t('tabs.bids_singular')
-                        : t('tabs.bids')
-                    }`}
-                  </PostVotingTab>
+                  <div
+                    style={{
+                      flex: '0 0 auto',
+                      width: '100%',
+                    }}
+                  >
+                    {!isMobileOrTablet && (
+                      <>
+                        <SExpiresSection>
+                          {postStatus === 'waiting_for_response' ||
+                          postStatus === 'waiting_for_decision' ? (
+                            <ResponseTimer
+                              timestampSeconds={new Date(
+                                (post.responseUploadDeadline
+                                  ?.seconds as number) * 1000
+                              ).getTime()}
+                              onTimeExpired={handleOnResponseTimeExpired}
+                            />
+                          ) : Date.now() >
+                            (post.expiresAt?.seconds as number) * 1000 ? (
+                            <PostTimerEnded
+                              timestampSeconds={new Date(
+                                (post.expiresAt?.seconds as number) * 1000
+                              ).getTime()}
+                              postType='ac'
+                            />
+                          ) : (
+                            <>
+                              <PostTimer
+                                timestampSeconds={new Date(
+                                  (post.expiresAt?.seconds as number) * 1000
+                                ).getTime()}
+                                postType='ac'
+                                isTutorialVisible={options.length > 0}
+                                onTimeExpired={handleOnVotingTimeExpired}
+                              />
+                              <SEndDate>
+                                {t('expires.end_date')}{' '}
+                                {moment(
+                                  (post.expiresAt?.seconds as number) * 1000
+                                ).format('DD MMM YYYY [at] hh:mm A')}
+                              </SEndDate>
+                            </>
+                          )}
+                        </SExpiresSection>
+
+                        <PostTopInfoModeration
+                          amountInBids={totalAmount}
+                          hasWinner={!!winningOptionId}
+                        />
+                      </>
+                    )}
+                    <PostVotingTab>
+                      {`${
+                        !!numberOfOptions && numberOfOptions > 0
+                          ? numberOfOptions
+                          : ''
+                      } ${
+                        numberOfOptions === 1
+                          ? t('tabs.bids_singular')
+                          : t('tabs.bids')
+                      }`}
+                    </PostVotingTab>
+                  </div>
                   <AcOptionsTabModeration
                     postId={post.postUuid}
                     postStatus={postStatus}
@@ -717,40 +825,28 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    display: inline-grid;
-    grid-template-areas:
-      'expires expires'
-      'title title'
-      'video activities';
-    grid-template-columns: 284px 1fr;
-    grid-template-rows: max-content max-content minmax(0, 1fr);
-
-    grid-column-gap: 16px;
-
+    height: 648px;
+    min-height: 0;
     align-items: flex-start;
 
-    padding-bottom: 24px;
+    display: flex;
+    gap: 16px;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas:
-      'video expires'
-      'video title'
-      'video activities';
-    grid-template-columns: 410px 1fr;
-    grid-column-gap: 32px;
+    display: flex;
+    gap: 32px;
   }
 `;
 
 const SExpiresSection = styled.div`
-  grid-area: expires;
-
   position: relative;
 
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 
   width: 100%;
   margin-bottom: 6px;
@@ -762,54 +858,40 @@ const SExpiresSection = styled.div`
   }
 `;
 
+const SEndDate = styled.div`
+  width: 100%;
+  text-align: center;
+  padding: 8px 0px;
+
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.quaternary};
+`;
+
 const SGoBackButton = styled(GoBackButton)`
   position: absolute;
   left: 0;
   top: 4px;
 `;
 
-const SActivitiesContainer = styled.div<{
-  showSelectWinnerOption: boolean;
-  decisionFailed: boolean;
-}>`
-  grid-area: activities;
-
-  display: flex;
-  flex-direction: column;
-
-  align-self: bottom;
-
-  height: 100%;
-  width: 100%;
-
+const SActivitiesContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
-    ${({ showSelectWinnerOption, decisionFailed }) =>
-      showSelectWinnerOption
-        ? css`
-            max-height: 500px;
-          `
-        : !decisionFailed
-        ? css`
-            max-height: 500px;
-          `
-        : css`
-            max-height: 500px;
-          `}
+    align-items: flex-start;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    height: 506px;
+    max-height: 506px;
+    width: 100%;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    ${({ showSelectWinnerOption, decisionFailed }) =>
-      showSelectWinnerOption
-        ? css`
-            max-height: calc(580px - 130px);
-          `
-        : !decisionFailed
-        ? css`
-            max-height: unset;
-          `
-        : css`
-            max-height: calc(580px - 120px);
-          `}
+    height: 728px;
+    max-height: 728px;
+    width: 100%;
   }
 `;
 
