@@ -1,11 +1,10 @@
 /* eslint-disable no-nested-ternary */
 import React, { useEffect, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/router';
 
 import {
   useAppDispatch,
@@ -13,22 +12,24 @@ import {
 } from '../../../../../redux-store/store';
 
 import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
+import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
-
-import Text from '../../../../atoms/Text';
-import Button from '../../../../atoms/Button';
-import AcOptionCard from './AcOptionCard';
-import GradientMask from '../../../../atoms/GradientMask';
-
-import NoContentYetImg from '../../../../../public/images/decision/no-content-yet-mock.png';
-import TutorialTooltip, {
-  DotPositionEnum,
-} from '../../../../atoms/decision/TutorialTooltip';
-import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import { Mixpanel } from '../../../../../utils/mixpanel';
+
+import Text from '../../../../atoms/Text';
+import Button from '../../../../atoms/Button';
+import Lottie from '../../../../atoms/Lottie';
+import GradientMask from '../../../../atoms/GradientMask';
+import TutorialTooltip, {
+  DotPositionEnum,
+} from '../../../../atoms/decision/TutorialTooltip';
+import AcOptionCard from './AcOptionCard';
+
+import NoContentYetImg from '../../../../../public/images/decision/no-content-yet-mock.png';
+import loadingAnimation from '../../../../../public/animations/logo-loading-blue.json';
 
 interface IAcOptionsTab {
   postId: string;
@@ -39,7 +40,6 @@ interface IAcOptionsTab {
   options: newnewapi.Auction.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
-  minAmount: number;
   handleLoadBids: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.Auction.Option
@@ -56,14 +56,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   options,
   optionsLoading,
   pagingToken,
-  minAmount,
   handleLoadBids,
   handleAddOrUpdateOptionFromResponse,
   handleRemoveOption,
 }) => {
-  const theme = useTheme();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -74,12 +70,18 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   const { appConstants } = useGetAppConstants();
 
+  // Scroll block
+  const [isScrollBlocked, setIsScrollBlocked] = useState(false);
+
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
+  const [triedLoading, setTriedLoading] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>();
-  const { showTopGradient, showBottomGradient } =
-    useScrollGradients(containerRef);
+  const { showTopGradient, showBottomGradient } = useScrollGradients(
+    containerRef,
+    options.length > 0
+  );
 
   const mainContainer = useRef<HTMLDivElement>();
 
@@ -104,8 +106,26 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   };
 
   useEffect(() => {
+    if (optionBeingSupported && containerRef.current && !isMobile) {
+      let optIdx = options.findIndex(
+        (o) => o.id.toString() === optionBeingSupported
+      );
+      optIdx += 2;
+      const childDiv = containerRef.current.children[optIdx];
+
+      if (childDiv) {
+        childDiv.scrollIntoView({
+          block: 'nearest',
+          behavior: 'smooth',
+        });
+      }
+    }
+  }, [options, optionBeingSupported, isMobile]);
+
+  useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
       handleLoadBids(pagingToken);
+      setTriedLoading(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pagingToken, optionsLoading]);
@@ -118,10 +138,13 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           mainContainer.current = el!!;
         }}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        animate={{ opacity: 1, speed: 0.4 }}
         exit={{ opacity: 0 }}
       >
-        {options.length === 0 && !optionsLoading && postStatus !== 'failed' ? (
+        {options.length === 0 &&
+        !optionsLoading &&
+        postStatus !== 'failed' &&
+        triedLoading ? (
           <SNoOptionsYet>
             <SNoOptionsImgContainer>
               <img src={NoContentYetImg.src} alt='No content yet' />
@@ -134,15 +157,31 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             </SNoOptionsCaption>
           </SNoOptionsYet>
         ) : null}
-        {!isMobile ? (
+        {options.length === 0 &&
+        optionsLoading &&
+        postStatus !== 'failed' &&
+        !triedLoading ? (
+          <SNoOptionsYet>
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
+              }}
+            />
+          </SNoOptionsYet>
+        ) : null}
+        {!isMobile && !optionBeingSupported ? (
           <>
             <GradientMask
-              gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+              gradientType='primary'
               positionTop
               active={showTopGradient}
             />
             <GradientMask
-              gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+              gradientType='primary'
               positionBottom={0}
               active={showBottomGradient}
             />
@@ -152,12 +191,19 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           ref={(el) => {
             containerRef.current = el!!;
           }}
+          style={{
+            ...(isScrollBlocked
+              ? {
+                  overflow: 'hidden',
+                  width: 'calc(100% + 10px)',
+                }
+              : {}),
+          }}
         >
           {options.map((option, i) => (
             <AcOptionCard
               key={option.id.toString()}
               option={option as TAcOptionWithHighestField}
-              // shouldAnimate={optionToAnimate === option.id.toString()}
               postId={postId}
               postCreator={postCreator}
               postDeadline={postDeadline}
@@ -180,6 +226,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
                 });
                 handleRemoveOption(option);
               }}
+              handleSetScrollBlocked={() => setIsScrollBlocked(true)}
+              handleUnsetScrollBlocked={() => setIsScrollBlocked(false)}
             />
           ))}
           {!isMobile ? (
@@ -222,9 +270,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   );
 };
 
-AcOptionsTab.defaultProps = {
-  // optionToAnimate: undefined,
-};
+AcOptionsTab.defaultProps = {};
 
 export default AcOptionsTab;
 
@@ -292,9 +338,6 @@ const SBidsContainer = styled.div`
         background: ${({ theme }) => theme.colorsThemed.background.outlines2};
       }
     }
-  }
-
-  ${({ theme }) => theme.media.laptop} {
   }
 `;
 

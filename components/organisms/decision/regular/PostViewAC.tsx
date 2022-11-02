@@ -414,7 +414,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       setOptions([]);
       setOptionsNextPageToken('');
       fetchBids();
-      fetchPostLatestData();
     });
     return () => {
       clearTimeout(timer);
@@ -813,14 +812,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
               .subtract(3, 'days')
               .calendar()}
             options={options}
-            // optionToAnimate={optionToAnimate}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
-            minAmount={
-              post.minimalBid?.usdCents
-                ? parseInt((post.minimalBid?.usdCents / 100).toFixed(0))
-                : 5
-            }
             handleLoadBids={fetchBids}
             handleAddOrUpdateOptionFromResponse={
               handleAddOrUpdateOptionFromResponse

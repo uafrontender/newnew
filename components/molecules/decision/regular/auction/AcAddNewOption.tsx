@@ -13,7 +13,6 @@ import {
 } from '../../../../../redux-store/store';
 import { validateText } from '../../../../../api/endpoints/infrastructure';
 import { placeBidOnAuction } from '../../../../../api/endpoints/auction';
-
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 
 import Text from '../../../../atoms/Text';
@@ -289,7 +288,6 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         <SuggestionTextArea
           id='text-input'
           value={newBidText}
-          // disabled={optionBeingSupported !== ''}
           placeholder={t(
             'acPost.optionsTab.actionSection.suggestionPlaceholderDesktop',
             { username: postCreator }
@@ -300,7 +298,6 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
           id='bid-input'
           value={newBidAmount}
           inputAlign='center'
-          // disabled={optionBeingSupported !== ''}
           onChange={(newValue: string) => setNewBidAmount(newValue)}
           minAmount={minAmount}
           placeholder={t(
@@ -404,7 +401,6 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
           <SSuggestNewContainer>
             <SuggestionTextArea
               value={newBidText}
-              // disabled={optionBeingSupported !== ''}
               autofocus={suggestNewMobileOpen}
               placeholder={t(
                 'acPost.optionsTab.actionSection.suggestionPlaceholder'
@@ -414,7 +410,6 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
             <BidAmountTextInput
               value={newBidAmount}
               inputAlign='left'
-              // disabled={optionBeingSupported !== ''}
               style={{
                 textAlign: 'center',
                 paddingLeft: '12px',

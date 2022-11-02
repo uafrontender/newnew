@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 import React from 'react';
-import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -64,18 +63,6 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
 
   return (
     <>
-      <Head>
-        <title>{t(`meta.${typeOfPost}.title`)}</title>
-        <meta
-          name='description'
-          content={t(`meta.${typeOfPost}.description`)}
-        />
-        <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-        <meta
-          property='og:description'
-          content={t(`meta.${typeOfPost}.description`)}
-        />
-      </Head>
       {!isMobile && (
         <SGoBackButton longArrow onClick={() => router.back()}>
           {t('back')}
@@ -192,29 +179,17 @@ const SPostModalContainer = styled.div<{
   -ms-user-select: none;
   user-select: none;
 
-  /* Hide scrollbar */
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
   ${({ theme }) => theme.media.tablet} {
+    width: 100%;
     padding-bottom: 16px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
-    width: 100%;
-    /* height: calc(100% - 64px); */
   }
 
   ${({ theme }) => theme.media.laptopM} {
-    top: 32px;
-    left: calc(50% - 496px);
     max-width: 1440px;
     margin-left: auto;
     margin-right: auto;
-
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 24px;
     padding-bottom: 24px;
@@ -232,5 +207,9 @@ const SGoBackButton = styled(GoBackButton)`
 
   ${({ theme }) => theme.media.laptopM} {
     padding-left: 24px;
+    width: 100%;
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
   }
 `;

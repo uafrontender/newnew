@@ -224,6 +224,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const handleCloseAndGoBack = useCallback(() => {
     if (
       isConfirmToClosePost &&
+      // eslint-disable-next-line no-alert
       !window.confirm(t('postVideo.cannotLeavePageMsg'))
     ) {
       return;
