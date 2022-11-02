@@ -221,6 +221,7 @@ const SCard = styled.div`
   align-items: center;
   border: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
   position: relative;
   height: auto;
   cursor: pointer;
