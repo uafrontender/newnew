@@ -1,10 +1,12 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import Headline from '../../../atoms/Headline';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
+import { getMyBundleEarnings } from '../../../../api/endpoints/bundles';
 
 interface IFunctionProps {
   isBundlesEnabled: boolean;
@@ -16,9 +18,37 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [totalEarned, setTotalEarned] = useState<string>('1,825');
     const [hasEarnings, setHasEarnings] = useState<boolean>(true);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [isLoading, setIsLoading] = useState<boolean | null>(null);
+    const [myEarnings, setMyEarnings] = useState<
+      newnewapi.GetMyBundleEarningsResponse | undefined
+    >();
     const toggleHasEarnings = useCallback(() => {
       setHasEarnings((prevState) => !prevState);
     }, []);
+
+    useEffect(() => {
+      async function fetchMyEarnings() {
+        try {
+          setIsLoading(true);
+          const payload = new newnewapi.GetMyBundleEarningsRequest();
+          const res = await getMyBundleEarnings(payload);
+          console.log(res.data);
+
+          if (!res.data || res.error)
+            throw new Error(res.error?.message ?? 'Request failed');
+          setMyEarnings(res.data);
+
+          setIsLoading(false);
+        } catch (err) {
+          console.error(err);
+          setIsLoading(null);
+        }
+      }
+      if (myEarnings === undefined) {
+        fetchMyEarnings();
+      }
+    }, [myEarnings]);
 
     interface IBundleEarnings {
       id: number;

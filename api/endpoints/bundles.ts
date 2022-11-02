@@ -67,7 +67,7 @@ export const setBundleStatus = (
     signal ?? undefined
   );
 
-export const GetMyBundleEarnings = (
+export const getMyBundleEarnings = (
   payload: newnewapi.GetMyBundleEarningsRequest,
   signal?: RequestInit['signal']
 ) =>
