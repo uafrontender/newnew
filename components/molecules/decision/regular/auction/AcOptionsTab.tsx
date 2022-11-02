@@ -195,7 +195,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             ...(isScrollBlocked
               ? {
                   overflow: 'hidden',
-                  width: 'calc(100% + 10px)',
+                  width:
+                    options.length > 4
+                      ? 'calc(100% + 10px)'
+                      : 'calc(100% + 14px)',
                 }
               : {}),
           }}

@@ -927,12 +927,6 @@ const SExpiresSection = styled.div`
 
   width: 100%;
   margin-bottom: 6px;
-
-  padding-left: 24px;
-
-  ${({ theme }) => theme.media.tablet} {
-    padding-left: initial;
-  }
 `;
 
 const SEndDate = styled.div`

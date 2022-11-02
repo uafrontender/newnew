@@ -103,6 +103,8 @@ interface IMcOptionCard {
     newOption: newnewapi.MultipleChoice.Option
   ) => void;
   handleRemoveOption?: () => void;
+  handleSetScrollBlocked?: () => void;
+  handleUnsetScrollBlocked?: () => void;
 }
 
 const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
@@ -123,6 +125,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   handleRemoveOption,
   handleSetPaymentSuccessModalOpen,
   handleAddOrUpdateOptionFromResponse,
+  handleSetScrollBlocked,
+  handleUnsetScrollBlocked,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -503,6 +507,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           onClick={(e) => {
             if (!isMobile && !disabled && !isEllipseMenuOpen) {
               setIsEllipseMenuOpen(true);
+              handleSetScrollBlocked?.();
 
               setOptionMenuXY({
                 x: e.clientX,
@@ -873,7 +878,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           optionType='mc'
           optionId={option.id as number}
           optionCreatorUuid={option.creator?.uuid ?? ''}
-          handleClose={() => setIsEllipseMenuOpen(false)}
+          handleClose={() => {
+            setIsEllipseMenuOpen(false);
+            handleUnsetScrollBlocked?.();
+          }}
           handleOpenReportOptionModal={() => handleOpenReportForm()}
           handleOpenRemoveOptionModal={() => handleOpenRemoveForm()}
         />

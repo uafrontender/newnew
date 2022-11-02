@@ -9,7 +9,7 @@ import React, {
   useState,
 } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
@@ -99,6 +99,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
   const router = useRouter();
 
   const {
@@ -694,33 +702,67 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   return (
     <>
+      {isTablet && (
+        <>
+          <SExpiresSection>
+            {postStatus === 'voting' ? (
+              <>
+                <PostTimer
+                  timestampSeconds={new Date(
+                    (post.expiresAt?.seconds as number) * 1000
+                  ).getTime()}
+                  postType='mc'
+                  onTimeExpired={handleOnVotingTimeExpired}
+                />
+                <SEndDate>
+                  {t('expires.end_date')}{' '}
+                  {moment((post.expiresAt?.seconds as number) * 1000).format(
+                    'DD MMM YYYY [at] hh:mm A'
+                  )}
+                </SEndDate>
+              </>
+            ) : (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='mc'
+              />
+            )}
+          </SExpiresSection>
+          <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
+        </>
+      )}
       <SWrapper>
-        <SExpiresSection>
-          {isMobile && (
-            <SGoBackButton
-              style={{
-                gridArea: 'closeBtnMobile',
-              }}
-              onClick={handleGoBackInsidePost}
-            />
-          )}
-          {postStatus === 'voting' ? (
-            <PostTimer
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='mc'
-              onTimeExpired={handleOnVotingTimeExpired}
-            />
-          ) : (
-            <PostTimerEnded
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='mc'
-            />
-          )}
-        </SExpiresSection>
+        {isMobile && (
+          <SExpiresSection>
+            <SGoBackButton onClick={handleGoBackInsidePost} />
+            {postStatus === 'voting' ? (
+              <>
+                <PostTimer
+                  timestampSeconds={new Date(
+                    (post.expiresAt?.seconds as number) * 1000
+                  ).getTime()}
+                  postType='mc'
+                  onTimeExpired={handleOnVotingTimeExpired}
+                />
+                <SEndDate>
+                  {t('expires.end_date')}{' '}
+                  {moment((post.expiresAt?.seconds as number) * 1000).format(
+                    'DD MMM YYYY [at] hh:mm A'
+                  )}
+                </SEndDate>
+              </>
+            ) : (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='mc'
+              />
+            )}
+          </SExpiresSection>
+        )}
         <PostVideo
           postId={post.postUuid}
           announcement={post.announcement!!}
@@ -730,17 +772,47 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           isMuted={mutedMode}
           handleToggleMuted={() => handleToggleMutedMode()}
         />
-        <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
-        <SActivitiesContainer
-          shorterSection={
-            postStatus === 'failed' ||
-            (post.isSuggestionsAllowed &&
-              !hasVotedOptionId &&
-              hasFreeVote &&
-              postStatus === 'voting')
-          }
-        >
-          <PostVotingTab>{`${t('tabs.options')}`}</PostVotingTab>
+        {isMobile && <PostTopInfo totalVotes={totalVotes} hasWinner={false} />}
+        <SActivitiesContainer>
+          <div
+            style={{
+              flex: '0 0 auto',
+              width: '100%',
+            }}
+          >
+            {!isMobileOrTablet && (
+              <>
+                <SExpiresSection>
+                  {postStatus === 'voting' ? (
+                    <>
+                      <PostTimer
+                        timestampSeconds={new Date(
+                          (post.expiresAt?.seconds as number) * 1000
+                        ).getTime()}
+                        postType='mc'
+                        onTimeExpired={handleOnVotingTimeExpired}
+                      />
+                      <SEndDate>
+                        {t('expires.end_date')}{' '}
+                        {moment(
+                          (post.expiresAt?.seconds as number) * 1000
+                        ).format('DD MMM YYYY [at] hh:mm A')}
+                      </SEndDate>
+                    </>
+                  ) : (
+                    <PostTimerEnded
+                      timestampSeconds={new Date(
+                        (post.expiresAt?.seconds as number) * 1000
+                      ).getTime()}
+                      postType='mc'
+                    />
+                  )}
+                </SExpiresSection>
+                <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
+              </>
+            )}
+            <PostVotingTab>{`${t('tabs.options')}`}</PostVotingTab>
+          </div>
           <McOptionsTab
             post={post}
             postLoading={postLoading}
@@ -839,48 +911,41 @@ const SWrapper = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     height: 648px;
-
-    display: grid;
-    grid-template-areas:
-      'expires expires'
-      'title title'
-      'video activities';
-    grid-template-columns: 284px 1fr;
-    grid-template-rows: max-content max-content minmax(0, 1fr);
-
-    grid-column-gap: 16px;
-
+    min-height: 0;
     align-items: flex-start;
+
+    display: flex;
+    gap: 16px;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas:
-      'video expires'
-      'video title'
-      'video activities';
-    grid-template-columns: 410px 1fr;
-    grid-column-gap: 32px;
+    display: flex;
+    gap: 32px;
   }
 `;
 
 const SExpiresSection = styled.div`
-  grid-area: expires;
-
   position: relative;
 
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 
   width: 100%;
   margin-bottom: 6px;
+`;
 
-  padding-left: 24px;
+const SEndDate = styled.div`
+  width: 100%;
+  text-align: center;
+  padding: 8px 0px;
 
-  ${({ theme }) => theme.media.tablet} {
-    padding-left: initial;
-  }
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.quaternary};
 `;
 
 const SGoBackButton = styled(GoBackButton)`
@@ -889,32 +954,23 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitiesContainer = styled.div<{
-  shorterSection: boolean;
-}>`
-  grid-area: activities;
-
-  display: flex;
-  flex-direction: column;
-
-  align-self: bottom;
-
-  height: 100%;
-  width: 100%;
-
+const SActivitiesContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
-    max-height: calc(452px);
+    align-items: flex-start;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    height: 506px;
+    max-height: 506px;
+    width: 100%;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    ${({ shorterSection }) =>
-      !shorterSection
-        ? css`
-            max-height: 500px;
-          `
-        : css`
-            max-height: calc(580px - 120px);
-          `}
+    height: 728px;
+    max-height: 728px;
+    width: 100%;
   }
 `;
 
