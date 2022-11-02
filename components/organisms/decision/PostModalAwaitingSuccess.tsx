@@ -182,5 +182,9 @@ const SGoBackButton = styled(GoBackButton)`
 
   ${({ theme }) => theme.media.laptopM} {
     padding-left: 24px;
+    width: 100%;
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
   }
 `;
