@@ -2,12 +2,10 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
@@ -15,7 +13,6 @@ import { formatNumber } from '../../../../utils/format';
 import secondsToDHMS from '../../../../utils/secondsToDHMS';
 import Headline from '../../../atoms/Headline';
 import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
-import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -42,9 +39,6 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
     const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
     const { mutedMode } = useAppSelector((state) => state.ui);
-    const router = useRouter();
-
-    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     const waitingTime = useMemo(() => {
       const end = (post.responseUploadDeadline?.seconds as number) * 1000;
@@ -88,11 +82,6 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
       dispatch(toggleMutedMode(''));
     }, [dispatch]);
 
-    // Comments
-    const { ref: commentsSectionRef, inView } = useInView({
-      threshold: 0.8,
-    });
-
     // Scroll to comments if hash is present
     useEffect(() => {
       const handleCommentsInitialHash = () => {
@@ -109,26 +98,6 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
 
       handleCommentsInitialHash();
     }, []);
-
-    // Replace hash once scrolled to comments
-    useEffect(() => {
-      if (inView) {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#comments`
-        );
-      } else {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }`
-        );
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid, router.locale]);
 
     return (
       <>
@@ -196,7 +165,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
           </SActivitiesContainer>
         </SWrapper>
         {post.isCommentsAllowed && (
-          <SCommentsSection id='comments' ref={commentsSectionRef}>
+          <SCommentsSection id='comments'>
             <SCommentsHeadline variant={4}>
               {t('successCommon.comments.heading')}
             </SCommentsHeadline>

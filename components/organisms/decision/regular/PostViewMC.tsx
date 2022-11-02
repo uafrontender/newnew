@@ -14,7 +14,6 @@ import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
-import { useInView } from 'react-intersection-observer';
 import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
@@ -41,7 +40,6 @@ import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
-import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 
@@ -123,8 +121,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     [postParsed]
   );
 
-  const { syncedHistoryReplaceState } = useSynchronizedHistory();
-
   const { appConstants } = useGetAppConstants();
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -134,11 +130,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const [responseViewed, setResponseViewed] = useState(
     post.isResponseViewedByMe ?? false
   );
-
-  // Comments
-  const { ref: commentsSectionRef, inView } = useInView({
-    threshold: 0.8,
-  });
 
   const handleCommentFocus = () => {
     if (isMobile && !!document.getElementById('action-button-mobile')) {
@@ -680,26 +671,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     handleCommentsInitialHash();
   }, []);
 
-  // Replace hash once scrolled to comments
-  useEffect(() => {
-    if (inView) {
-      syncedHistoryReplaceState(
-        {},
-        `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-          post.postUuid
-        }#comments`
-      );
-    } else {
-      syncedHistoryReplaceState(
-        {},
-        `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-          post.postUuid
-        }`
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, post.postUuid, router.locale]);
-
   return (
     <>
       {isTablet && (
@@ -882,7 +853,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         )}
       </SWrapper>
       {post.isCommentsAllowed && (
-        <SCommentsSection id='comments' ref={commentsSectionRef}>
+        <SCommentsSection id='comments'>
           <SCommentsHeadline variant={4}>
             {t('successCommon.comments.heading')}
           </SCommentsHeadline>

@@ -1,16 +1,12 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, { useCallback, useEffect, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
 import styled, { useTheme } from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
@@ -24,7 +20,6 @@ import { formatNumber } from '../../../../utils/format';
 import getDisplayname from '../../../../utils/getDisplayname';
 import assets from '../../../../constants/assets';
 import { fetchPostByUUID } from '../../../../api/endpoints/post';
-import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
@@ -57,9 +52,6 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
-    const router = useRouter();
-
-    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
@@ -105,11 +97,6 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
       'main' | 'options'
     >('main');
 
-    // Comments
-    const { ref: commentsSectionRef, inView } = useInView({
-      threshold: 0.8,
-    });
-
     // Check if the response has been viewed
     useEffect(() => {
       fetchPostLatestData();
@@ -132,26 +119,6 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
 
       handleCommentsInitialHash();
     }, []);
-
-    // Replace hash once scrolled to comments
-    useEffect(() => {
-      if (inView) {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#comments`
-        );
-      } else {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }`
-        );
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid, router.locale]);
 
     // Load winning option
     useEffect(() => {
@@ -398,7 +365,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
           </SActivitiesContainer>
         </SWrapper>
         {post.isCommentsAllowed && (
-          <SCommentsSection id='comments' ref={commentsSectionRef}>
+          <SCommentsSection id='comments'>
             <SCommentsHeadline variant={4}>
               {t('successCommon.comments.heading')}
             </SCommentsHeadline>

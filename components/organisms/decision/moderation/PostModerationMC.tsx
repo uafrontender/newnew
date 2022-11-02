@@ -11,8 +11,6 @@ import React, {
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
-import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import moment from 'moment';
 
@@ -28,7 +26,6 @@ import { SocketContext } from '../../../../contexts/socketContext';
 import { ChannelsContext } from '../../../../contexts/channelsContext';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
-import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 
 import PostVideoModeration from '../../../molecules/decision/moderation/PostVideoModeration';
 import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTopInfoModeration';
@@ -82,7 +79,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       'mobileL',
       'tablet',
     ].includes(resizeMode);
-    const router = useRouter();
 
     const {
       postParsed,
@@ -94,8 +90,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       () => postParsed as newnewapi.MultipleChoice,
       [postParsed]
     );
-
-    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     // Additional responses
     const [
@@ -109,11 +103,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
 
     // Announcement
     const [announcement, setAnnouncement] = useState(post.announcement);
-
-    // Comments
-    const { ref: commentsSectionRef, inView } = useInView({
-      threshold: 0.8,
-    });
 
     const handleCommentFocus = () => {
       if (isMobile && !!document.getElementById('action-button-mobile')) {
@@ -552,26 +541,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       handleCommentsInitialHash();
     }, []);
 
-    // Replace hash once scrolled to comments
-    useEffect(() => {
-      if (inView) {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#comments`
-        );
-      } else {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }`
-        );
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid, router.locale]);
-
     return (
       <>
         {isTablet && (
@@ -772,7 +741,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           </PostModerationResponsesContextProvider>
         </SWrapper>
         {post.isCommentsAllowed && (
-          <SCommentsSection id='comments' ref={commentsSectionRef}>
+          <SCommentsSection id='comments'>
             <SCommentsHeadline variant={4}>
               {t('successCommon.comments.heading')}
             </SCommentsHeadline>

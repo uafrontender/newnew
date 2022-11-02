@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
@@ -13,9 +12,7 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import { useInView } from 'react-intersection-observer';
 import moment from 'moment';
 
 import { SocketContext } from '../../../../contexts/socketContext';
@@ -39,7 +36,6 @@ import switchPostType from '../../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
-import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 import PostModerationResponsesContextProvider from '../../../../contexts/postModerationResponsesContext';
@@ -84,7 +80,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       'mobileL',
       'tablet',
     ].includes(resizeMode);
-    const router = useRouter();
 
     const {
       postParsed,
@@ -93,8 +88,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       handleUpdatePostStatus,
     } = usePostModalInnerState();
     const post = useMemo(() => postParsed as newnewapi.Auction, [postParsed]);
-
-    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     // Additional responses
     const [
@@ -112,11 +105,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
 
     // Announcement
     const [announcement, setAnnouncement] = useState(post.announcement);
-
-    // Comments
-    const { ref: commentsSectionRef, inView } = useInView({
-      threshold: 0.8,
-    });
 
     const handleCommentFocus = () => {
       if (isMobile && !!document.getElementById('action-button-mobile')) {
@@ -303,6 +291,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       [post, setOptions, sortOptions, optionsLoading]
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const fetchPostLatestData = useCallback(async () => {
       try {
         const fetchPostPayload = new newnewapi.GetPostRequest({
@@ -563,26 +552,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       handleCommentsInitialHash();
     }, []);
 
-    // Replace hash once scrolled to comments
-    useEffect(() => {
-      if (inView) {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#comments`
-        );
-      } else {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }`
-        );
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid, router.locale]);
-
     return (
       <>
         {isTablet && (
@@ -796,7 +765,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           </PostModerationResponsesContextProvider>
         </SWrapper>
         {post.isCommentsAllowed && (
-          <SCommentsSection id='comments' ref={commentsSectionRef}>
+          <SCommentsSection id='comments'>
             <SCommentsHeadline variant={4}>
               {t('successCommon.comments.heading')}
             </SCommentsHeadline>
