@@ -313,16 +313,20 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     Mixpanel.track('Post Failed Button Click', {
       _stage: 'Post',
     });
-    if (recommendedPosts.length > 0) {
-      document.getElementById('post-modal-container')?.scrollTo({
-        top: document.getElementById('recommendations-section-heading')
-          ?.offsetTop,
-        behavior: 'smooth',
-      });
+    // if (recommendedPosts.length > 0) {
+    //   document.getElementById('post-modal-container')?.scrollTo({
+    //     top: document.getElementById('recommendations-section-heading')
+    //       ?.offsetTop,
+    //     behavior: 'smooth',
+    //   });
+    // } else {
+    if (router.pathname === '/') {
+      handleCloseAndGoBack();
     } else {
-      router.push(`/see-more?category=${typeOfPost}`);
+      router.push('/');
     }
-  }, [recommendedPosts, router, typeOfPost]);
+    // }
+  }, [router, handleCloseAndGoBack]);
 
   const handleOpenRecommendedPost = useCallback(
     (newPost: newnewapi.Post) => {

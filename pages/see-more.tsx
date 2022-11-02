@@ -485,31 +485,38 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
 export default Search;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-SeeMore',
-    'component-PostCard',
-    'modal-Post',
-    'modal-PaymentModal',
-    'modal-ResponseSuccessModal',
-  ]);
+// TODO: remove redirect and comment out code when see-more returns
+export const getServerSideProps: GetServerSideProps = async () => ({
+  redirect: {
+    permanent: false,
+    destination: '/',
+  },
+});
 
-  const top10payload = new newnewapi.EmptyRequest({});
+// const translationContext = await serverSideTranslations(context.locale!!, [
+//   'common',
+//   'page-SeeMore',
+//   'component-PostCard',
+//   'modal-Post',
+//   'modal-PaymentModal',
+//   'modal-ResponseSuccessModal',
+// ]);
 
-  const resTop10 = await fetchCuratedPosts(top10payload);
+// const top10payload = new newnewapi.EmptyRequest({});
 
-  return {
-    props: {
-      ...(resTop10.data
-        ? {
-            top10posts: resTop10.data.toJSON(),
-          }
-        : {}),
-      ...translationContext,
-    },
-  };
-};
+// const resTop10 = await fetchCuratedPosts(top10payload);
+
+// return {
+//   props: {
+//     ...(resTop10.data
+//       ? {
+//           top10posts: resTop10.data.toJSON(),
+//         }
+//       : {}),
+//     ...translationContext,
+//   },
+// };
+// };
 
 interface ISWrapper {
   name: string;
