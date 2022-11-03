@@ -61,7 +61,8 @@
     "signIn": "Sign in",
     "dashboard": "Dashboard",
     "createOnNewnew": "Create now",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "takeMeHome": "Take me home"
   },
   "footer": {
     "topTitle": "NewNew",
