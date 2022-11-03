@@ -32,6 +32,8 @@
       },
       "toDosIssue": {
         "text": "Add a bio and your bank info to withdraw your earnings",
+        "textBio": "Add a bio to withdraw your earnings",
+        "textBank": "Add your bank info to withdraw your earnings",
         "button": "Add"
       },
       "makeDecision": {
