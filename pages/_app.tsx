@@ -51,6 +51,7 @@ import SyncUserWrapper from '../contexts/syncUserWrapper';
 import AppConstantsContextProvider from '../contexts/appConstantsContext';
 import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
 import CardsContextProvider from '../contexts/cardsContext';
+import PushNotificationContextProvider from '../contexts/pushNotificationsContext';
 
 // Images to be prefetched
 import assets from '../constants/assets';
@@ -65,6 +66,7 @@ import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
 import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
+import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -223,47 +225,52 @@ const MyApp = (props: IMyApp): ReactElement => {
                   <SyncUserWrapper>
                     <NotificationsProvider>
                       <ModalNotificationsContextProvider>
-                        <BlockedUsersProvider>
-                          <FollowingsContextProvider>
-                            <CardsContextProvider>
-                              <SubscriptionsProvider>
-                                <ChatsProvider>
-                                  <OverlayModeProvider>
-                                    <ResizeMode>
-                                      <PostModalContextProvider>
-                                        <GlobalTheme initialTheme={colorMode}>
-                                          <>
-                                            <ToastContainer containerId='toast-container' />
-                                            <VideoProcessingWrapper>
-                                              <ErrorBoundary>
-                                                {!pageProps.error ? (
-                                                  getLayout(
-                                                    <Component {...pageProps} />
-                                                  )
-                                                ) : (
-                                                  <Error
-                                                    title={
-                                                      pageProps.error?.message
-                                                    }
-                                                    statusCode={
-                                                      pageProps.error
-                                                        ?.statusCode ?? 500
-                                                    }
-                                                  />
-                                                )}
-                                              </ErrorBoundary>
-                                            </VideoProcessingWrapper>
-                                            <ReCaptchaBadgeModal />
-                                          </>
-                                        </GlobalTheme>
-                                      </PostModalContextProvider>
-                                    </ResizeMode>
-                                  </OverlayModeProvider>
-                                </ChatsProvider>
-                              </SubscriptionsProvider>
-                            </CardsContextProvider>
-                          </FollowingsContextProvider>
-                        </BlockedUsersProvider>
+                        <PushNotificationContextProvider>
+                          <BlockedUsersProvider>
+                            <FollowingsContextProvider>
+                              <CardsContextProvider>
+                                <SubscriptionsProvider>
+                                  <ChatsProvider>
+                                    <OverlayModeProvider>
+                                      <ResizeMode>
+                                        <PostModalContextProvider>
+                                          <GlobalTheme initialTheme={colorMode}>
+                                            <>
+                                              <ToastContainer containerId='toast-container' />
+                                              <PushNotificationModalContainer />
+                                              <VideoProcessingWrapper>
+                                                <ErrorBoundary>
+                                                  {!pageProps.error ? (
+                                                    getLayout(
+                                                      <Component
+                                                        {...pageProps}
+                                                      />
+                                                    )
+                                                  ) : (
+                                                    <Error
+                                                      title={
+                                                        pageProps.error?.message
+                                                      }
+                                                      statusCode={
+                                                        pageProps.error
+                                                          ?.statusCode ?? 500
+                                                      }
+                                                    />
+                                                  )}
+                                                </ErrorBoundary>
+                                              </VideoProcessingWrapper>
+                                              <ReCaptchaBadgeModal />
+                                            </>
+                                          </GlobalTheme>
+                                        </PostModalContextProvider>
+                                      </ResizeMode>
+                                    </OverlayModeProvider>
+                                  </ChatsProvider>
+                                </SubscriptionsProvider>
+                              </CardsContextProvider>
+                            </FollowingsContextProvider>
+                          </BlockedUsersProvider>
+                        </PushNotificationContextProvider>
                       </ModalNotificationsContextProvider>
                     </NotificationsProvider>
                   </SyncUserWrapper>

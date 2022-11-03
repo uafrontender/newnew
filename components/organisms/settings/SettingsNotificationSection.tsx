@@ -12,10 +12,8 @@ import Lottie from '../../atoms/Lottie';
 import Text from '../../atoms/Text';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import Toggle from '../../atoms/Toggle';
-import PushNotificationsRequestModal from '../PushNotificationsRequestModal';
-import PushNotificationsSuccessModal from '../PushNotificationsSuccessModal';
 
-import usePushNotifications from '../../../utils/hooks/usePushNotifications';
+import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 
 const SettingsNotificationsSection = () => {
   const { t } = useTranslation('page-Profile');
@@ -24,16 +22,8 @@ const SettingsNotificationsSection = () => {
     newnewapi.INotificationState[] | null
   >(null);
 
-  const { inSubscribed, subscribe, unsubscribe } = usePushNotifications();
-  const [
-    isPushNotificationRequestModalOpen,
-    setIsPushNotificationRequestModalOpen,
-  ] = useState(false);
-
-  const [
-    isPushNotificationSuccessModalOpen,
-    setIsPushNotificationSuccessModalOpen,
-  ] = useState(false);
+  const { inSubscribed, showPermissionRequestModal, unsubscribe } =
+    usePushNotifications();
 
   const fetchMyNotificationState = async () => {
     if (isLoading) return;
@@ -90,13 +80,6 @@ const SettingsNotificationsSection = () => {
     });
   };
 
-  const acceptPushNotification = () => {
-    setIsPushNotificationRequestModalOpen(false);
-    subscribe('news', () => {
-      setIsPushNotificationSuccessModalOpen(true);
-    });
-  };
-
   return (
     <SWrapper>
       {isLoading !== false ? (
@@ -141,26 +124,9 @@ const SettingsNotificationsSection = () => {
         <Toggle
           title={t('Settings.sections.notifications.push')}
           checked={inSubscribed}
-          onChange={
-            inSubscribed
-              ? () => unsubscribe()
-              : () => setIsPushNotificationRequestModalOpen(true)
-          }
+          onChange={inSubscribed ? unsubscribe : showPermissionRequestModal}
         />
       </SSubsection>
-      {isPushNotificationRequestModalOpen && (
-        <PushNotificationsRequestModal
-          isOpen={isPushNotificationRequestModalOpen}
-          onClose={() => setIsPushNotificationRequestModalOpen(false)}
-          onConfirm={acceptPushNotification}
-        />
-      )}
-      {isPushNotificationSuccessModalOpen && (
-        <PushNotificationsSuccessModal
-          isOpen={isPushNotificationSuccessModalOpen}
-          onClose={() => setIsPushNotificationSuccessModalOpen(false)}
-        />
-      )}
     </SWrapper>
   );
 };
