@@ -203,9 +203,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       ) {
         throw new Error(res.error?.message ?? 'Request failed');
       }
-      // TODO: fix a bug with response (returns no option)
-      console.log('HERE');
-      console.log(res.data);
 
       const optionFromResponse = (res.data
         .option as newnewapi.MultipleChoice.Option)!!;

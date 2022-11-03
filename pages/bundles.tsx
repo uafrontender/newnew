@@ -29,6 +29,7 @@ import BackButton from '../components/molecules/profile/BackButton';
 import AllBundlesModal from '../components/molecules/bundles/AllBundlesModal';
 import { useBundles } from '../contexts/bundlesContext';
 import CreatorsBundleModal from '../components/molecules/bundles/CreatorsBundleModal';
+import VoteAnimationBackground from '../components/atoms/VoteAnimationBackground';
 
 export const Bundles = () => {
   const router = useRouter();
@@ -104,6 +105,7 @@ export const Bundles = () => {
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <Container>
+        <SVoteAnimationBackground />
         <SubNavigation>
           {isMobile ? (
             <SBackButton onClick={() => router.back()} />
@@ -239,31 +241,25 @@ export const getServerSideProps = async (context: NextPageContext) => {
 };
 
 const Container = styled.div`
+  position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   padding-top: 4px;
   padding-bottom: 24px;
-  // TODO: Change BG for mobile
-  // background: url(${assets.bundles.votesBackgroundSmall});
-  // background-size: contain;
-  // background-repeat: no-repeat;
 
   ${({ theme }) => theme.media.tablet} {
     padding-top: 4px;
-    // TODO: Change BG for tablet
-    // background: url(${assets.bundles.votesBackgroundSmall});
-    // background-size: contain;
-    // background-repeat: no-repeat;
   }
 
   ${({ theme }) => theme.media.laptop} {
     padding-top: 12px;
-    background: url(${assets.bundles.votesBackgroundSmall});
-    background-size: contain;
-    background-repeat: no-repeat;
   }
+`;
+
+const SVoteAnimationBackground = styled(VoteAnimationBackground)`
+  z-index: -1;
 `;
 
 const SubNavigation = styled.div`
