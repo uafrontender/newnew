@@ -2,6 +2,7 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { PostSkeletonView } from '../PostSkeleton';
 
 // Views
 const PostModerationAC = dynamic(() => import('./PostModerationAC'));
@@ -37,7 +38,7 @@ const ModerationView: React.FunctionComponent<IModerationView> = () => {
     return <PostModerationAC key={postParsed.postUuid} />;
   }
 
-  return null;
+  return <PostSkeletonView />;
 };
 
 export default ModerationView;

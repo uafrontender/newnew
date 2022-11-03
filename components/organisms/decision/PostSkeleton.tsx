@@ -68,6 +68,55 @@ const PostSkeleton = () => {
 
 export default PostSkeleton;
 
+export const PostSkeletonView = () => {
+  const theme = useTheme();
+  const router = useRouter();
+
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+
+  return (
+    <>
+      <SWrapper>
+        {isMobile && <SGoBackButtonMobile onClick={() => router.back()} />}
+        <SVideoSkeletonWrapper className='videoSkeletonContainer'>
+          <Skeleton
+            count={1}
+            borderRadius={16}
+            duration={2}
+            className='videoSkeleton'
+            containerClassName='videoSkeletonContainer'
+            baseColor={theme.colorsThemed.background.secondary}
+            highlightColor={theme.colorsThemed.background.quaternary}
+          />
+        </SVideoSkeletonWrapper>
+        <SActivitiesContainer>
+          <Skeleton
+            count={1}
+            borderRadius={16}
+            duration={2}
+            className='headingSkeleton'
+            containerClassName='headingSkeletonContainer'
+            baseColor={theme.colorsThemed.background.quaternary}
+            highlightColor={theme.colorsThemed.background.secondary}
+          />
+          <Skeleton
+            count={1}
+            borderRadius={16}
+            duration={2}
+            className='activitiesSkeleton'
+            containerClassName='activitiesSkeletonContainer'
+            baseColor={theme.colorsThemed.background.quaternary}
+            highlightColor={theme.colorsThemed.background.primary}
+          />
+        </SActivitiesContainer>
+      </SWrapper>
+    </>
+  );
+};
+
 const SGoBackButton = styled(GoBackButton)`
   padding-left: 16px;
 

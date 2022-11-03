@@ -125,19 +125,15 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
 
           const res = await getMcOption(payload);
 
-          console.log(res);
-
           if (res.data?.option) {
             setWinningOption(
               res.data.option as newnewapi.MultipleChoice.Option
             );
           }
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       }
-
-      console.log(post.winningOptionId);
 
       if (post.winningOptionId) {
         fetchAndSetWinningOption(post.winningOptionId as number);

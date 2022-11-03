@@ -1117,20 +1117,6 @@ export const RenderSupportersInfo: React.FunctionComponent<{
             </SSpanBiddersHighlighted>
           </Link>
         )}
-        <Link href={`/${optionCreatorUsername}`}>
-          <SSpanBiddersHighlighted
-            className='spanHighlighted'
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            style={{
-              color: theme.colorsThemed.accent.yellow,
-              cursor: 'pointer',
-            }}
-          >
-            {optionCreator}
-          </SSpanBiddersHighlighted>
-        </Link>
         <SSpanBiddersHighlighted className='spanHighlighted'>
           {', '}
           {`${t('me')}`}

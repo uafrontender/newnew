@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 
 import { TPostType } from '../../../../utils/switchPostType';
+import { PostSkeletonView } from '../PostSkeleton';
 
 // Views
 const PostSuccessAC = dynamic(() => import('./PostSuccessAC'));
@@ -38,7 +39,7 @@ const SuccessView: React.FunctionComponent<ISuccessView> = ({
     );
   }
 
-  return null;
+  return <PostSkeletonView />;
 };
 
 export default SuccessView;

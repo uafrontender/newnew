@@ -2,6 +2,7 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { PostSkeletonView } from '../PostSkeleton';
 
 // Views
 const PostViewAC = dynamic(() => import('./PostViewAC'));
@@ -37,7 +38,7 @@ const RegularView: React.FunctionComponent<IRegularView> = () => {
     return <PostViewAC key={postParsed.postUuid} />;
   }
 
-  return null;
+  return <PostSkeletonView />;
 };
 
 export default RegularView;

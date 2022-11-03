@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 
 import { TPostType } from '../../../../utils/switchPostType';
+import { PostSkeletonView } from '../PostSkeleton';
 
 // Views
 const PostAwaitingResponseAC = dynamic(
@@ -41,7 +42,7 @@ const WaitingForResponseView: React.FunctionComponent<
     );
   }
 
-  return null;
+  return <PostSkeletonView />;
 };
 
 export default WaitingForResponseView;
