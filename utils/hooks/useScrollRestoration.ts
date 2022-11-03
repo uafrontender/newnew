@@ -9,6 +9,10 @@ import { useEffect, useRef } from "react"
   const isBack = useRef(false)
 
   useEffect(() => {
+    if (window && 'scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
     router.beforePopState(() => {
       isBack.current = true
       return true
