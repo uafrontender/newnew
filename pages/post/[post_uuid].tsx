@@ -127,7 +127,7 @@ const PostPage: NextPage<IPostPage> = ({
     }
 
     if (!post) {
-      console.log('fetching post');
+      // console.log('Fetching post');
       fetchPost();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -454,6 +454,7 @@ const PostPage: NextPage<IPostPage> = ({
   return (
     <>
       <PostModalInnerContextProvider
+        key={postUuid}
         postParsed={postParsed}
         typeOfPost={typeOfPost}
         postStatus={postStatus}
@@ -510,7 +511,7 @@ const PostPage: NextPage<IPostPage> = ({
 export default PostPage;
 
 (PostPage as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <GeneralLayout noMobieNavigation noPaddingMobile>
+  <GeneralLayout key={page.props.postUuid} noMobieNavigation noPaddingMobile>
     <CommentFromUrlContextProvider>{page}</CommentFromUrlContextProvider>
   </GeneralLayout>
 );
@@ -541,7 +542,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   if (!context.req.url?.startsWith('/_next')) {
-    console.log('I am from direct link, making SSR request');
+    // console.log('I am from direct link, making SSR request');
 
     const getPostPayload = new newnewapi.GetPostRequest({
       postUuid: post_uuid,
@@ -587,7 +588,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  console.log('I am from next router, no SSR needed');
+  // console.log('I am from next router, no SSR needed');
 
   return {
     props: {
