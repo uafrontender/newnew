@@ -49,6 +49,7 @@ import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -128,6 +129,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(() => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
@@ -391,6 +394,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(() => {
       const res = await markPost(markAsFavoritePayload);
 
       if (res.error) throw new Error('Failed to mark post as favorite');
+
+      if (!isFollowingDecision) {
+        promptUserWithPushNotificationsPermissionModal();
+      }
     } catch (err) {
       console.error(err);
     }
@@ -400,6 +407,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(() => {
     router,
     user.loggedIn,
     user._persist?.rehydrated,
+    promptUserWithPushNotificationsPermissionModal,
   ]);
 
   // Render functions
@@ -878,7 +886,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(() => {
         <PaymentSuccessModal
           postType='cf'
           isVisible={paymentSuccessModalOpen}
-          closeModal={() => setPaymentSuccessModalOpen(false)}
+          closeModal={() => {
+            setPaymentSuccessModalOpen(false);
+            promptUserWithPushNotificationsPermissionModal();
+          }}
         >
           {t('paymentSuccessModal.cf', {
             postCreator:

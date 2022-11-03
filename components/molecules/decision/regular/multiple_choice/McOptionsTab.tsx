@@ -44,6 +44,7 @@ import { useGetAppConstants } from '../../../../../contexts/appConstantsContext'
 import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../../utils/mixpanel';
+import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -103,6 +104,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   ].includes(resizeMode);
 
   const { appConstants } = useGetAppConstants();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
@@ -500,7 +503,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       <PaymentSuccessModal
         postType='mc'
         isVisible={paymentSuccessModalOpen}
-        closeModal={() => setPaymentSuccessModalOpen(false)}
+        closeModal={() => {
+          setPaymentSuccessModalOpen(false);
+          promptUserWithPushNotificationsPermissionModal();
+        }}
       >
         {t('paymentSuccessModal.mc', {
           postCreator,

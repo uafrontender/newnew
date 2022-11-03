@@ -43,6 +43,7 @@ import PostModalInnerContextProvider from '../../../contexts/postModalInnerConte
 import PostModalRegular from './PostModalRegular';
 import PostModalModeration from './PostModalModeration';
 import PostModalAwaitingSuccess from './PostModalAwaitingSuccess';
+import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 
 interface IPostModal {
   isOpen: boolean;
@@ -77,6 +78,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const { handleSetPostOverlayOpen, isConfirmToClosePost } =
     usePostModalState();
@@ -148,11 +151,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
       if (!res.error) {
         setIsFollowingDecision((currentValue) => !currentValue);
+
         // TODO: separate onDelete and onUnsubscribe callbacks to prevent possible bugs
         if (isFollowingDecision) {
           handleRemoveFromStateUnfavorited?.();
         } else {
           handleAddPostToStateFavorited?.();
+          promptUserWithPushNotificationsPermissionModal();
         }
       }
     } catch (err) {
@@ -166,6 +171,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     router,
     handleRemoveFromStateUnfavorited,
     handleAddPostToStateFavorited,
+    promptUserWithPushNotificationsPermissionModal,
   ]);
 
   const handleUpdatePostStatus = useCallback(

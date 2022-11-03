@@ -12,6 +12,7 @@ import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
 import { useAppSelector } from '../../redux-store/store';
 import EllipseModal, { EllipseModalButton } from '../atoms/EllipseModal';
 import { Mixpanel } from '../../utils/mixpanel';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 interface IPostCardEllipseModal {
   isOpen: boolean;
@@ -40,6 +41,8 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   const theme = useTheme();
   const { t } = useTranslation('common');
   const user = useAppSelector((state) => state.user);
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   // Share
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -109,6 +112,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
           handleRemovePostFromState?.();
         } else {
           handleAddPostToState?.();
+          promptUserWithPushNotificationsPermissionModal();
         }
       }
     } catch (err) {
@@ -118,6 +122,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   }, [
     handleAddPostToState,
     handleRemovePostFromState,
+    promptUserWithPushNotificationsPermissionModal,
     isFollowingDecision,
     postUuid,
     router,

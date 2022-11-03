@@ -42,6 +42,7 @@ import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -89,6 +90,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     resizeMode
   );
   const router = useRouter();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const {
     postParsed,
@@ -755,6 +758,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                 _post: post.postUuid,
               });
               setPaymentSuccessModalOpen(false);
+              promptUserWithPushNotificationsPermissionModal();
             }}
           >
             {t('paymentSuccessModal.ac', {

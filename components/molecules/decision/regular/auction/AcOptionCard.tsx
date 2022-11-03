@@ -64,6 +64,7 @@ import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -127,6 +128,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     resizeMode
   );
   const { appConstants } = useGetAppConstants();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   // const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const isSupportedByMe = useMemo(
@@ -795,7 +798,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       <PaymentSuccessModal
         postType='ac'
         isVisible={paymentSuccessModalOpen}
-        closeModal={() => setPaymentSuccessModalOpen(false)}
+        closeModal={() => {
+          setPaymentSuccessModalOpen(false);
+          promptUserWithPushNotificationsPermissionModal();
+        }}
       >
         {t('paymentSuccessModal.ac', {
           postCreator,

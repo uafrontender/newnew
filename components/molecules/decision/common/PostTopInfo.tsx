@@ -40,6 +40,7 @@ import assets from '../../../../constants/assets';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -77,6 +78,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const {
     postParsed,
@@ -208,6 +211,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           handleRemoveFromStateUnfavorited?.();
         } else {
           handleAddPostToStateFavorited?.();
+          promptUserWithPushNotificationsPermissionModal();
         }
       }
     } catch (err) {
@@ -217,6 +221,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     handleAddPostToStateFavorited,
     handleRemoveFromStateUnfavorited,
     handleSetIsFollowingDecision,
+    promptUserWithPushNotificationsPermissionModal,
     isFollowingDecision,
     postId,
     router,

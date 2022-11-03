@@ -21,6 +21,7 @@ import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
 import PostScheduledSection from '../../../molecules/decision/common/PostScheduledSection';
+import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const PostTopInfo = dynamic(
@@ -42,6 +43,8 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+    const { promptUserWithPushNotificationsPermissionModal } =
+      usePushNotifications();
 
     const {
       postParsed,
@@ -91,6 +94,9 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
 
         if (!res.error) {
           setIsFollowing(!isFollowing);
+          if (!isFollowing) {
+            promptUserWithPushNotificationsPermissionModal();
+          }
 
           if (isFollowing) {
             handleRemoveFromStateUnfavorited?.();

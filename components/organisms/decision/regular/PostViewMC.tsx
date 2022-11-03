@@ -44,6 +44,7 @@ import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -100,6 +101,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     resizeMode
   );
   const router = useRouter();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const {
     postParsed,
@@ -788,6 +791,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                 _post: post.postUuid,
               });
               setPaymentSuccessModalOpen(false);
+              promptUserWithPushNotificationsPermissionModal();
             }}
           >
             {t('paymentSuccessModal.mc', {

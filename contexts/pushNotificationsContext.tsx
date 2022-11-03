@@ -17,6 +17,7 @@ export const PushNotificationsContext = createContext<{
   unsubscribe: () => void;
   showPermissionRequestModal: () => void;
   closePermissionRequestModal: () => void;
+  promptUserWithPushNotificationsPermissionModal: () => void;
 }>({
   inSubscribed: false,
   isPermissionRequestModalOpen: false,
@@ -24,6 +25,7 @@ export const PushNotificationsContext = createContext<{
   unsubscribe: () => {},
   showPermissionRequestModal: () => {},
   closePermissionRequestModal: () => {},
+  promptUserWithPushNotificationsPermissionModal: () => {},
 });
 
 interface IPushNotificationsContextProvider {
@@ -84,6 +86,16 @@ const PushNotificationsContextProvider: React.FC<
   const closePermissionRequestModal = useCallback(() => {
     setIsPermissionRequestModalOpen(false);
   }, []);
+
+  const promptUserWithPushNotificationsPermissionModal = useCallback(() => {
+    console.log('HERE');
+    const WEB_PUSH_PROMPT_KEY =
+      'isUserPromptedWithPushNotificationsPermissionModal';
+    if (localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true') {
+      localStorage.setItem(WEB_PUSH_PROMPT_KEY, 'true');
+      showPermissionRequestModal();
+    }
+  }, [showPermissionRequestModal]);
 
   const checkPermissionSafari = useCallback((permissionData: any) => {
     console.log(permissionData, 'permissionData');
@@ -213,6 +225,7 @@ const PushNotificationsContextProvider: React.FC<
       unsubscribe,
       showPermissionRequestModal,
       closePermissionRequestModal,
+      promptUserWithPushNotificationsPermissionModal,
     }),
     [
       inSubscribed,
@@ -221,6 +234,7 @@ const PushNotificationsContextProvider: React.FC<
       closePermissionRequestModal,
       subscribe,
       unsubscribe,
+      promptUserWithPushNotificationsPermissionModal,
     ]
   );
 
