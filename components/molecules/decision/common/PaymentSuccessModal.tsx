@@ -9,6 +9,7 @@ import Headline from '../../../atoms/Headline';
 import { TPostType } from '../../../../utils/switchPostType';
 
 import assets from '../../../../constants/assets';
+import VoteAnimationBackground from '../../../atoms/VoteAnimationBackground';
 
 const DARK_IMAGES: any = {
   ac: assets.creation.darkAcStatic,
@@ -39,6 +40,8 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
 
   return (
     <Modal show={isVisible} additionalz={14} onClose={closeModal}>
+      {/* TODO: add animation for bids as well? */}
+      {postType === 'mc' ? <VoteAnimationBackground /> : null}
       <SContainer onClick={(e) => e.stopPropagation()}>
         <SModal>
           <SImageWrapper>
