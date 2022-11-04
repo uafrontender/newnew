@@ -76,7 +76,7 @@ const getPayWithCardErrorMessage = (
 
 interface IAcOptionsTab {
   postId: string;
-  postCreator: string;
+  postCreatorName: string;
   postText: string;
   postDeadline: string;
   postStatus: TPostStatusStringified;
@@ -94,7 +94,7 @@ interface IAcOptionsTab {
 
 const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   postId,
-  postCreator,
+  postCreatorName,
   postText,
   postDeadline,
   postStatus,
@@ -428,7 +428,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               option={option as TAcOptionWithHighestField}
               // shouldAnimate={optionToAnimate === option.id.toString()}
               postId={postId}
-              postCreator={postCreator}
+              postCreatorName={postCreatorName}
               postDeadline={postDeadline}
               postText={postText}
               index={i}
@@ -481,7 +481,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               disabled={optionBeingSupported !== ''}
               placeholder={t(
                 'acPost.optionsTab.actionSection.suggestionPlaceholderDesktop',
-                { username: postCreator }
+                { username: postCreatorName }
               )}
               onChange={handleUpdateNewOptionText}
             />
@@ -635,7 +635,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             (!appConstants.minHoldAmount?.usdCents ||
               paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
               <SPaymentSign variant='subtitle'>
-                {t('acPost.paymentModalFooter.body', { creator: postCreator })}*
+                {t('acPost.paymentModalFooter.body', {
+                  creator: postCreatorName,
+                })}
+                *
                 <Link href='https://terms.newnew.co'>
                   <SPaymentTermsLink
                     href='https://terms.newnew.co'
@@ -661,7 +664,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
                 />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
-                {t('acPost.paymentModalHeader.title', { creator: postCreator })}
+                {t('acPost.paymentModalHeader.title', {
+                  creator: postCreatorName,
+                })}
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
@@ -685,7 +690,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         closeModal={() => setPaymentSuccessModalOpen(false)}
       >
         {t('paymentSuccessModal.ac', {
-          postCreator,
+          postCreator: postCreatorName,
           postDeadline,
         })}
       </PaymentSuccessModal>

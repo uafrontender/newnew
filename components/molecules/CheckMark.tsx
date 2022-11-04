@@ -4,7 +4,7 @@ import InlineSvg from '../atoms/InlineSVG';
 
 import Text from '../atoms/Text';
 
-import CheckmarkIcon from '../../public/images/svg/icons/filled/Checkmark.svg';
+import CheckmarkIcon from '../../public/images/svg/icons/outlined/Checkmark.svg';
 
 interface ICheckMark {
   id?: string;

@@ -13,7 +13,7 @@ import Header from '../organisms/Header';
 import Cookie from '../molecules/Cookie';
 import Container from '../atoms/Grid/Container';
 import BottomNavigation from '../organisms/BottomNavigation';
-// import FloatingMessages from '../molecules/creator/dashboard/FloatingMessages';
+import FloatingMessages from '../molecules/creator/dashboard/FloatingMessages';
 
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
 import { useAppSelector } from '../../redux-store/store';
@@ -21,7 +21,7 @@ import useScrollDirection from '../../utils/hooks/useScrollDirection';
 // import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
-// import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
+import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
 import { useNotifications } from '../../contexts/notificationsContext';
 import { useGetChats } from '../../contexts/chatContext';
 import ReportBugButton from '../molecules/ReportBugButton';
@@ -29,6 +29,7 @@ import { usePostModalState } from '../../contexts/postModalContext';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
+import { useBundles } from '../../contexts/bundlesContext';
 
 interface IGeneral {
   className?: string;
@@ -41,7 +42,7 @@ interface IGeneral {
 export const General: React.FC<IGeneral> = (props) => {
   const {
     className,
-    // withChat,
+    withChat,
     specialStatusBarColor,
     restrictMaxWidth,
     children,
@@ -54,8 +55,8 @@ export const General: React.FC<IGeneral> = (props) => {
   const [cookies] = useCookies();
   const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
-  const { /* unreadCount, setMobileChatOpened, */ mobileChatOpened } =
-    useGetChats();
+  const { bundles } = useBundles();
+  const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
   const { postOverlayOpen } = usePostModalState();
 
   const hasMounted = useHasMounted();
@@ -64,12 +65,11 @@ export const General: React.FC<IGeneral> = (props) => {
 
   // TODO: fix an issue when scroll position is set before resizing of the wrapper
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const bottomNavigation = useMemo(() => {
+  const bottomNavigation: TBottomNavigationItem[] = useMemo(() => {
     let bottomNavigationShadow: TBottomNavigationItem[] = [
       {
         key: 'home',
         url: '/',
-        width: '100%',
       },
     ];
 
@@ -79,28 +79,28 @@ export const General: React.FC<IGeneral> = (props) => {
           {
             key: 'home',
             url: '/',
-            width: '20%',
           },
           {
             key: 'dashboard',
             url: '/creator/dashboard',
-            width: '20%',
           },
           {
             key: 'add',
             url: '/creation',
-            width: '20%',
           },
-          {
-            key: 'notifications',
-            url: '/notifications',
-            width: '20%',
-            counter: unreadNotificationCount,
-          },
+          bundles && bundles.length > 0
+            ? {
+                key: 'bundles',
+                url: '/bundles',
+              }
+            : {
+                key: 'notifications',
+                url: '/notifications',
+                counter: unreadNotificationCount,
+              },
           {
             key: 'more',
             url: '/more',
-            width: '20%',
             actionHandler: () => setMoreMenuMobileOpen(true),
           },
         ];
@@ -109,27 +109,32 @@ export const General: React.FC<IGeneral> = (props) => {
           {
             key: 'home',
             url: '/',
-            width: '33%',
           },
           {
             key: 'add',
             url: '/creator-onboarding',
-            width: '33%',
           },
-          {
-            key: 'notifications',
-            url: '/notifications',
-            width: '33%',
-            counter: unreadNotificationCount,
-          },
-          // TODO: re-enable, repurpose for bundles
-          /* {
-            key: 'dms',
-            url: '/direct-messages',
-            width: '33%',
-            counter: unreadCount,
-          }, */
-        ];
+          bundles && bundles.length > 0
+            ? {
+                key: 'bundles',
+                url: '/bundles',
+              }
+            : {
+                key: 'notifications',
+                url: '/notifications',
+                counter: unreadNotificationCount,
+              },
+        ].concat(
+          user.userData?.options?.isCreator || (bundles && bundles.length > 0)
+            ? [
+                {
+                  key: 'dms',
+                  url: '/direct-messages',
+                  counter: unreadCount,
+                },
+              ]
+            : []
+        );
       }
     }
 
@@ -138,7 +143,8 @@ export const General: React.FC<IGeneral> = (props) => {
     user.loggedIn,
     unreadNotificationCount,
     user.userData?.options?.isCreator,
-    // unreadCount,
+    unreadCount,
+    bundles,
   ]);
 
   useScrollPosition();
@@ -156,7 +162,7 @@ export const General: React.FC<IGeneral> = (props) => {
     'tablet',
   ].includes(resizeMode);
 
-  /* const openChat = () => {
+  const openChat = () => {
     setMobileChatOpened(true);
   };
 
@@ -165,7 +171,7 @@ export const General: React.FC<IGeneral> = (props) => {
   };
 
   const chatButtonVisible =
-    isMobile && withChat && user.userData?.options?.isOfferingSubscription; */
+    isMobile && withChat && user.userData?.options?.isOfferingSubscription;
 
   const mobileNavigationVisible = isMobile && scrollDirection !== 'down';
 
@@ -228,10 +234,7 @@ export const General: React.FC<IGeneral> = (props) => {
             </CookieContainer>
           </>
         )}
-
-        {
-          // TODO: re-enable what bundles are in use
-          /* chatButtonVisible && (
+        {chatButtonVisible && (
           <ChatContainer
             bottomNavigationVisible={mobileNavigationVisible}
             zIndex={moreMenuMobileOpen ? 9 : 10}
@@ -242,8 +245,7 @@ export const General: React.FC<IGeneral> = (props) => {
               <MobileDashBoardChat closeChat={closeChat} />
             )}
           </ChatContainer>
-            ) */
-        }
+        )}
         {!isMobileOrTablet && !router.route.includes('direct-messages') && (
           <ReportBugButton
             bottom={
@@ -252,9 +254,8 @@ export const General: React.FC<IGeneral> = (props) => {
               (mobileNavigationVisible || postOverlayOpen) &&
               !mobileChatOpened
                 ? 56
-                : 0)
-              // TODO: re-enable what bundles are in use
-              // + (chatButtonVisible && !mobileChatOpened ? 72 : 0) */
+                : 0) +
+              (chatButtonVisible && !mobileChatOpened ? 72 : 0)
             }
             right={4}
             zIndex={moreMenuMobileOpen ? 9 : undefined}
@@ -333,7 +334,7 @@ const CookieContainer = styled.div<ICookieContainer>`
   }
 `;
 
-/* interface IChatContainer {
+interface IChatContainer {
   bottomNavigationVisible: boolean;
   zIndex: number;
 }
@@ -344,7 +345,7 @@ const ChatContainer = styled.div<IChatContainer>`
   z-index: ${(props) => props.zIndex};
   position: fixed;
   transition: bottom ease 0.5s;
-`; */
+`;
 
 interface ISortingContainer {
   withCookie: boolean;

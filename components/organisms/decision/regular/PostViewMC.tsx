@@ -37,13 +37,12 @@ import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 
 // Utils
 import switchPostType from '../../../../utils/switchPostType';
-import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
-import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { useBundles } from '../../../../contexts/bundlesContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -117,10 +116,19 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
-  const { appConstants } = useGetAppConstants();
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
+
+  // Bundle
+  const { bundles } = useBundles();
+  const creatorsBundle = useMemo(
+    () =>
+      bundles?.find(
+        (bundle) => bundle.creator?.uuid === postParsed?.creator?.uuid
+      ),
+    [bundles, postParsed?.creator?.uuid]
+  );
 
   // Response viewed
   const [responseViewed, setResponseViewed] = useState(
@@ -153,32 +161,21 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   // Total votes
   const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
 
-  // Free votes
-  const [hasFreeVote, setHasFreeVote] = useState(post.canVoteForFree ?? false);
-  const handleResetFreeVote = () => setHasFreeVote(false);
-
-  const [canSubscribe, setCanSubscribe] = useState(
-    post.creator?.options?.isOfferingSubscription
-  );
-
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
-    post.optionCount ?? ''
-  );
   const [optionsNextPageToken, setOptionsNextPageToken] = useState<
     string | undefined | null
   >('');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
-  const hasVotedOptionId = useMemo(() => {
-    const supportedOption = options.find((o) => o.isSupportedByMe);
-
-    if (supportedOption) return supportedOption.id;
-    return undefined;
-  }, [options]);
+  const optionCreatedByMe = useMemo(
+    () =>
+      options.find(
+        (option) => option.creator?.uuid === user.userData?.userUuid
+      ),
+    [options, user.userData?.userUuid]
+  );
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -348,27 +345,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
       }
-
-      setHasFreeVote(res.data.multipleChoice?.canVoteForFree ?? false);
       setTotalVotes(res.data.multipleChoice?.totalVotes as number);
-      setNumberOfOptions(res.data.multipleChoice?.optionCount as number);
       if (res.data.multipleChoice?.status)
         handleUpdatePostStatus(res.data.multipleChoice?.status);
-
-      if (user.loggedIn && post.creator?.options?.isOfferingSubscription) {
-        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-          creatorUuid: post.creator?.uuid,
-        });
-
-        const responseSubStatus = await getSubscriptionStatus(getStatusPayload);
-
-        if (
-          responseSubStatus.data?.status?.activeRenewsAt ||
-          responseSubStatus.data?.status?.activeCancelsAt
-        ) {
-          setCanSubscribe(false);
-        }
-      }
 
       setPostLoading(false);
     } catch (err) {
@@ -496,8 +475,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       if (decodedParsed.postUuid === post.postUuid) {
         if (decoded.post?.multipleChoice?.totalVotes)
           setTotalVotes(decoded.post?.multipleChoice?.totalVotes);
-        if (decoded.post?.multipleChoice?.optionCount)
-          setNumberOfOptions(decoded.post?.multipleChoice?.optionCount);
       }
     };
 
@@ -598,7 +575,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         await fetchPostLatestData();
 
         setLoadingModalOpen(false);
-        handleResetFreeVote();
         setPaymentSuccessModalOpen(true);
       } catch (err: any) {
         console.error(err);
@@ -735,17 +711,18 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           shorterSection={
             postStatus === 'failed' ||
             (post.isSuggestionsAllowed &&
-              !hasVotedOptionId &&
-              hasFreeVote &&
+              !optionCreatedByMe &&
               postStatus === 'voting')
           }
         >
-          <PostVotingTab>{`${t('tabs.options')}`}</PostVotingTab>
+          <PostVotingTab
+            bundleVotes={creatorsBundle?.bundle?.votesLeft ?? undefined}
+          >{`${t('tabs.options')}`}</PostVotingTab>
           <McOptionsTab
             post={post}
             postLoading={postLoading}
             postStatus={postStatus}
-            postCreator={
+            postCreatorName={
               (post.creator?.nickname as string) ?? post.creator?.username
             }
             postDeadline={moment(
@@ -756,17 +733,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             options={options}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
-            minAmount={appConstants?.minMcVotes ?? 2}
-            votePrice={
-              appConstants?.mcVotePrice
-                ? Math.floor(appConstants?.mcVotePrice)
-                : 1
-            }
-            canSubscribe={!!canSubscribe}
-            canVoteForFree={hasFreeVote}
-            hasVotedOptionId={(hasVotedOptionId as number) ?? undefined}
+            bundle={creatorsBundle?.bundle ?? undefined}
             handleLoadOptions={fetchOptions}
-            handleResetFreeVote={handleResetFreeVote}
             handleAddOrUpdateOptionFromResponse={
               handleAddOrUpdateOptionFromResponse
             }

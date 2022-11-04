@@ -37,7 +37,6 @@ import { reportUser } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
 import isBrowser from '../../../utils/isBrowser';
 import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import validateInputText from '../../../utils/validateMessageText';
 
 const UserAvatar = dynamic(() => import('../UserAvatar'));
@@ -91,7 +90,8 @@ const ChatArea: React.FC<IChatData> = ({
   const [newMessage, setNewMessage] = useState<
     newnewapi.IChatMessage | null | undefined
   >();
-  const { mySubscribers } = useGetSubscriptions();
+  // TODO: replace or abandon
+  const mySubscribers: any[] = [];
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
@@ -140,6 +140,7 @@ const ChatArea: React.FC<IChatData> = ({
       if (chatRoom.myRole === 1) {
         fetchIsSubscribed();
       } else {
+        // TODO: Load active sold bundles? Or abandon?
         const isMyActiveSub = mySubscribers.find(
           (sub) => sub.user?.uuid === chatRoom.visavis?.uuid
         );

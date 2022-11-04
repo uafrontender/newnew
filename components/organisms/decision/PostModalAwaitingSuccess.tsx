@@ -13,10 +13,10 @@ import Modal from '../Modal';
 import SuccessView from './success';
 import WaitingForResponseView from './awaiting';
 import PostSuccessOrWaitingControls from '../../molecules/decision/common/PostSuccessOrWaitingControls';
+import assets from '../../../constants/assets';
 
-const PostSuccessAnimationBackground = dynamic(
-  () =>
-    import('../../molecules/decision/success/PostSuccessAnimationBackground')
+const AnimationBackground = dynamic(
+  () => import('../../atoms/AnimationBackground')
 );
 const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 
@@ -57,7 +57,7 @@ const PostModalAwaitingSuccess: React.FunctionComponent<
     <>
       <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
         {postStatus === 'succeeded' && !isMobile && (
-          <PostSuccessAnimationBackground />
+          <AnimationBackground src={assets.decision.gold} alt='coin' />
         )}
         <Head>
           <title>{t(`meta.${typeOfPost}.title`)}</title>
