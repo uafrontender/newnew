@@ -2,6 +2,7 @@
 import { newnewapi } from 'newnew-api';
 import * as $protobuf from 'protobufjs';
 import { Cookies } from 'react-cookie';
+import isBrowser from '../utils/isBrowser';
 
 const logsOn = process.env.NEXT_PUBLIC_PROTOBUF_LOGS === 'true';
 
@@ -134,6 +135,9 @@ export async function fetchProtobuf<
       method,
       headers: {
         'Content-type': 'application/x-protobuf',
+        ...(!isBrowser() ? {
+          'x-from': 'web',
+        } : {}),
         ...headers,
       },
       mode,
