@@ -5,7 +5,6 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import Headline from '../../../atoms/Headline';
 import Text from '../../../atoms/Text';
-import Button from '../../../atoms/Button';
 import { getMyBundleEarnings } from '../../../../api/endpoints/bundles';
 
 interface IFunctionProps {
@@ -17,15 +16,12 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
     const { t } = useTranslation('page-Creator');
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [totalEarned, setTotalEarned] = useState<string>('1,825');
-    const [hasEarnings, setHasEarnings] = useState<boolean>(true);
+    // const [hasEarnings, setHasEarnings] = useState<boolean>(true);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isLoading, setIsLoading] = useState<boolean | null>(null);
     const [myEarnings, setMyEarnings] = useState<
       newnewapi.GetMyBundleEarningsResponse | undefined
     >();
-    const toggleHasEarnings = useCallback(() => {
-      setHasEarnings((prevState) => !prevState);
-    }, []);
 
     useEffect(() => {
       async function fetchMyEarnings() {
@@ -56,6 +52,7 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
       earnedAmount: string;
     }
 
+    // TODO: use real data
     const collection: IBundleEarnings[] = useMemo(
       () => [
         {
@@ -103,11 +100,8 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
       <SBlock>
         <SHeaderLine>
           <STitle variant={6}>{t('myBundles.earnings.title')}</STitle>
-          <SButton onClick={toggleHasEarnings} enabled={hasEarnings}>
-            {hasEarnings ? 'Turn Off' : 'Turn On'}
-          </SButton>
         </SHeaderLine>
-        {!hasEarnings ? (
+        {!myEarnings?.soldBundles ? (
           <SNoEarnings>
             <SText variant={3}>{t('myBundles.earnings.noSoldYet')}</SText>
           </SNoEarnings>
@@ -173,43 +167,6 @@ const SHeaderLine = styled.div`
 `;
 
 const STitle = styled(Headline)``;
-
-interface ISButton {
-  enabled?: boolean;
-}
-const SButton = styled(Button)<ISButton>`
-  width: 100%;
-  padding: 16px 20px;
-  background: ${(props) =>
-    !props.enabled
-      ? props.theme.colorsThemed.accent.yellow
-      : props.theme.colorsThemed.background.tertiary};
-  color: ${(props) =>
-    !props.enabled
-      ? props.theme.colors.darkGray
-      : props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
-
-  ${(props) => props.theme.media.tablet} {
-    width: unset;
-    padding: 12px 24px;
-  }
-  &:focus,
-  &:active,
-  &:hover {
-    background: ${(props) =>
-      !props.enabled
-        ? props.theme.colorsThemed.accent.yellow
-        : props.theme.colorsThemed.background.tertiary} !important;
-    color: ${(props) =>
-      !props.enabled
-        ? props.theme.colors.darkGray
-        : props.theme.name === 'light'
-        ? props.theme.colorsThemed.text.primary
-        : props.theme.colors.white} !important;
-  }
-`;
 
 const SNoEarnings = styled.div`
   display: flex;
