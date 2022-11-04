@@ -6,6 +6,7 @@ import { useTranslation } from 'next-i18next';
 import Headline from '../../../atoms/Headline';
 import Text from '../../../atoms/Text';
 import { getMyBundleEarnings } from '../../../../api/endpoints/bundles';
+import dateToTimestamp from '../../../../utils/dateToTimestamp';
 
 interface IFunctionProps {
   isBundlesEnabled: boolean;
@@ -27,9 +28,12 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
       async function fetchMyEarnings() {
         try {
           setIsLoading(true);
-          const payload = new newnewapi.GetMyBundleEarningsRequest();
+          const payload = new newnewapi.GetMyBundleEarningsRequest({
+            beginDate: dateToTimestamp(new Date('November 1, 2022 00:0:00')),
+            endDate: dateToTimestamp(new Date()),
+          });
           const res = await getMyBundleEarnings(payload);
-          console.log(res.data);
+          console.log(payload, res.data);
 
           if (!res.data || res.error)
             throw new Error(res.error?.message ?? 'Request failed');

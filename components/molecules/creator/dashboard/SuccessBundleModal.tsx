@@ -22,7 +22,13 @@ const TurnBundleModal: React.FC<IFunction> = React.memo(
     const { t } = useTranslation('page-Creator');
     return (
       <>
-        <SModal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
+        <SModal
+          show={show}
+          additionalz={zIndex}
+          onClose={onClose}
+          overlaydim
+          isBundlesEnabled={isBundlesEnabled || false}
+        >
           <SModalPaper onClose={onClose}>
             <Content>
               <SImgHolder>
@@ -51,10 +57,18 @@ const TurnBundleModal: React.FC<IFunction> = React.memo(
 
 export default TurnBundleModal;
 
-const SModal = styled(Modal)`
-  background: url(${assets.bundles.votesBackground});
+interface ISModal {
+  isBundlesEnabled: boolean;
+}
+const SModal = styled(Modal)<ISModal>`
+  background: ${(props) =>
+    props.isBundlesEnabled ? `url(${assets.bundles.votesBackground})` : ''};
   background-size: cover;
   background-repeat: no-repeat;
+  &:before {
+    backdrop-filter: blur(100px);
+    -webkit-backdrop-filter: blur(100px);
+  }
 `;
 
 const SModalPaper = styled(ModalPaper)`

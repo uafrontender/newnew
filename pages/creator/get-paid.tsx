@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { GetServerSideProps } from 'next';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import loadingAnimation from '../../public/animations/logo-loading-blue.json';
@@ -89,18 +90,29 @@ const GetPaid = () => {
 
 export default GetPaid;
 
-export async function getStaticProps(context: {
-  locale: string;
-}): Promise<any> {
-  const translationContext = await serverSideTranslations(context.locale, [
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'page-Creator',
     'page-Chat',
   ]);
+
+  const { req } = context;
+
+  const accessToken = req.cookies?.accessToken;
+
+  if (!accessToken) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/',
+      },
+    };
+  }
 
   return {
     props: {
       ...translationContext,
     },
   };
-}
+};
