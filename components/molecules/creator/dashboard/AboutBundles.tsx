@@ -5,28 +5,14 @@ import Link from 'next/link';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
+import TicketSet from '../../../atoms/bundles/TicketSet';
 
-import votesSmall from '../../../../public/images/dashboard/votes-small.png';
-
-export const AboutBundles = () => {
+export const AboutBundles: React.FC = () => {
   const { t } = useTranslation('page-Creator');
 
   return (
     <SContainer>
-      <SImgHolder>
-        <img
-          src={votesSmall.src}
-          alt={t('dashboard.aboutBundles.title')}
-          width={100}
-          height={100}
-        />
-        <img
-          src={votesSmall.src}
-          alt={t('dashboard.aboutBundles.title')}
-          width={100}
-          height={100}
-        />
-      </SImgHolder>
+      <STicketSet size={100} shift={30} numberOFTickets={2} />
       <SContent>
         <STitle variant={6}>{t('dashboard.aboutBundles.title')}</STitle>
         <SDescriptionWrapper>
@@ -66,24 +52,12 @@ const SContainer = styled.div`
   }
 `;
 
-const SImgHolder = styled.div`
-  width: 130px;
-  height: 100px;
-  position: relative;
-  img {
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 1;
-    &:last-child {
-      left: 30px;
-      z-index: 0;
-    }
-  }
+const STicketSet = styled(TicketSet)`
   ${(props) => props.theme.media.tablet} {
     margin-left: auto;
   }
 `;
+
 const SContent = styled.div`
   margin-right: auto;
   ${(props) => props.theme.media.tablet} {
