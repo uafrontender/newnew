@@ -56,7 +56,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
     [paymentAmountInCents, appConstants.customerFee]
   );
 
-  const voteOnPostRequest = useMemo(
+  const buyCreatorsBundleRequest = useMemo(
     () =>
       new newnewapi.BuyCreatorsBundle({
         creatorUuid: creator.uuid,
@@ -70,7 +70,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   );
 
   const setupIntent = useStripeSetupIntent({
-    purpose: voteOnPostRequest,
+    purpose: buyCreatorsBundleRequest,
     isGuest: !user.loggedIn,
     successUrl,
   });
