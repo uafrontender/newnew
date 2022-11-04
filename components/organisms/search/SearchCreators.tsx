@@ -92,12 +92,7 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
       ) : (
         <>
           <SCardsSection>
-            <CreatorsList
-              loading={loading}
-              collection={data}
-              withEllipseMenu
-              subscribedTo
-            />
+            <CreatorsList loading={loading} collection={data} withEllipseMenu />
           </SCardsSection>
           {hasMore && !loading && <SRef ref={loadingRef}>Loading...</SRef>}
         </>

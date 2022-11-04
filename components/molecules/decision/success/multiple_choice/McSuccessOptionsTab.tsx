@@ -207,18 +207,13 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
             option={option as TMcOptionWithHighestField}
             creator={option.creator ?? post.creator!!}
             postId={post.postUuid}
-            votingAllowed={false}
-            canVoteForFree={false}
             isCreatorsBid={
               !option.creator || option.creator?.uuid === post.creator?.uuid
             }
-            postCreator=''
-            postCreatorUuid={post.creator?.uuid ?? ''}
+            postCreatorName=''
             postText=''
             index={i}
             noAction
-            handleResetFreeVote={() => {}}
-            handleSetSupportedBid={() => {}}
             handleSetPaymentSuccessModalOpen={() => {}}
             handleAddOrUpdateOptionFromResponse={() => {}}
           />

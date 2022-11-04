@@ -2,7 +2,6 @@
 /* eslint-disable consistent-return */
 import React, {
   useCallback,
-  // useContext,
   useEffect,
   useMemo,
   useRef,
@@ -21,8 +20,7 @@ import {
   useAppSelector,
 } from '../../../../../redux-store/store';
 import { validateText } from '../../../../../api/endpoints/infrastructure';
-// import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
-import { doFreeVote } from '../../../../../api/endpoints/multiple_choice';
+import { createCustomOption } from '../../../../../api/endpoints/multiple_choice';
 
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
@@ -30,7 +28,6 @@ import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import Button from '../../../../atoms/Button';
 import McOptionCard from './McOptionCard';
 import SuggestionTextArea from '../../../../atoms/decision/SuggestionTextArea';
-// import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
 import LoadingModal from '../../../LoadingModal';
 import GradientMask from '../../../../atoms/GradientMask';
 import OptionActionMobileModal from '../../common/OptionActionMobileModal';
@@ -40,26 +37,23 @@ import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
-import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
-import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../../utils/mixpanel';
+import BuyBundleModal from '../../../bundles/BuyBundleModal';
+import McConfirmCustomOptionModal from './McConfirmCustomOptionModal';
+import HighlightedButton from '../../../../atoms/bundles/HighlightedButton';
+import TicketSet from '../../../../atoms/bundles/TicketSet';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
   postLoading: boolean;
   postStatus: TPostStatusStringified;
-  postCreator: string;
+  postCreatorName: string;
   postDeadline: string;
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
-  minAmount: number;
-  votePrice: number;
-  canVoteForFree: boolean;
-  hasVotedOptionId?: number;
-  canSubscribe: boolean;
-  handleResetFreeVote: () => void;
+  bundle?: newnewapi.IBundle;
   handleLoadOptions: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
@@ -71,26 +65,21 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   post,
   postLoading,
   postStatus,
-  postCreator,
+  postCreatorName,
   postDeadline,
   options,
   optionsLoading,
   pagingToken,
-  minAmount,
-  votePrice,
-  canVoteForFree,
-  hasVotedOptionId,
-  canSubscribe,
+  bundle,
   handleLoadOptions,
-  handleResetFreeVote,
   handleRemoveOption,
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const dispatch = useAppDispatch();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -102,8 +91,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     'tablet',
   ].includes(resizeMode);
 
-  const { appConstants } = useGetAppConstants();
-
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
 
@@ -111,27 +98,40 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const { showTopGradient, showBottomGradient } =
     useScrollGradients(containerRef);
 
+  const optionCreatedByMe = useMemo(
+    () =>
+      options.find(
+        (option) => option.creator?.uuid === user.userData?.userUuid
+      ),
+    [options, user.userData?.userUuid]
+  );
+
   const [heightDelta, setHeightDelta] = useState(
-    post.isSuggestionsAllowed && !hasVotedOptionId && postStatus === 'voting'
-      ? 56
+    !optionCreatedByMe &&
+      postStatus === 'voting' &&
+      (post.creator?.options?.isOfferingBundles || bundle)
+      ? 58 + 72
       : 0
   );
   const actionSectionContainer = useRef<HTMLDivElement>();
 
   const mainContainer = useRef<HTMLDivElement>();
 
-  const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
-
   // New option/bid
   const [newOptionText, setNewOptionText] = useState('');
   const [newOptionTextValid, setNewOptionTextValid] = useState(true);
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+
   // Mobile modal for new option
   const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
   // Payment modal
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [useFreeVoteModalOpen, setUseFreeVoteModalOpen] = useState(false);
+  const [confirmCustomOptionModalOpen, setConfirmCustomOptionModalOpen] =
+    useState(false);
   const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
+
+  // Bundle modal
+  const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
 
   // Handlers
   const validateTextViaAPI = useCallback(async (text: string) => {
@@ -179,26 +179,26 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     [setNewOptionText, validateTextViaAPIDebounced]
   );
 
-  const handleVoteForFree = useCallback(async () => {
-    setUseFreeVoteModalOpen(false);
+  const handleAddNewOption = useCallback(async () => {
+    setConfirmCustomOptionModalOpen(false);
     setLoadingModalOpen(true);
-    Mixpanel.track('Vote For Free', {
+    Mixpanel.track('Add Free Option', {
       _stage: 'Post',
       _postUuid: post.postUuid,
       _component: 'McOptionsTab',
     });
     try {
-      const payload = new newnewapi.VoteOnPostRequest({
-        votesCount: appConstants.mcFreeVoteCount,
-        optionText: newOptionText,
+      const payload = new newnewapi.CreateCustomMcOptionRequest({
         postUuid: post.postUuid,
+        optionText: newOptionText,
       });
 
-      const res = await doFreeVote(payload);
+      const res = await createCustomOption(payload);
 
       if (
         !res.data ||
-        res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+        res.data.status !==
+          newnewapi.CreateCustomMcOptionResponse.Status.SUCCESS ||
         res.error
       ) {
         throw new Error(res.error?.message ?? 'Request failed');
@@ -207,26 +207,17 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       const optionFromResponse = (res.data
         .option as newnewapi.MultipleChoice.Option)!!;
       optionFromResponse.isSupportedByMe = true;
-      // optionFromResponse.isCreatedBySubscriber = true;
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
       setNewOptionText('');
       setSuggestNewMobileOpen(false);
       setLoadingModalOpen(false);
-      handleResetFreeVote();
       setPaymentSuccessModalOpen(true);
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
       toast.error('toastErrors.generic');
     }
-  }, [
-    newOptionText,
-    post.postUuid,
-    appConstants.mcFreeVoteCount,
-    handleResetFreeVote,
-    handleAddOrUpdateOptionFromResponse,
-  ]);
+  }, [newOptionText, post.postUuid, handleAddOrUpdateOptionFromResponse]);
 
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
@@ -241,15 +232,15 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         ? entry[0]?.borderBoxSize[0]?.blockSize
         : entry[0]?.contentRect.height;
       if (size) {
-        setHeightDelta(size);
+        setHeightDelta(size + 57);
       }
     });
 
     if (
-      post.isSuggestionsAllowed &&
       !postLoading &&
-      !hasVotedOptionId &&
+      !optionCreatedByMe &&
       postStatus === 'voting' &&
+      (post.creator?.options?.isOfferingBundles || bundle) &&
       actionSectionContainer.current
     ) {
       resizeObserver.observe(actionSectionContainer.current!!);
@@ -261,11 +252,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       resizeObserver.disconnect();
     };
   }, [
-    hasVotedOptionId,
+    optionCreatedByMe,
     postLoading,
-    post.isSuggestionsAllowed,
     postStatus,
     isMobileOrTablet,
+    bundle,
+    post.creator?.options?.isOfferingBundles,
   ]);
 
   const goToNextStep = () => {
@@ -325,26 +317,15 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               key={option.id.toString()}
               option={option as TMcOptionWithHighestField}
               creator={option.creator ?? post.creator!!}
-              postCreator={postCreator}
-              postCreatorUuid={post.creator?.uuid ?? ''}
+              postCreatorName={postCreatorName}
               postText={post.title}
               postId={post.postUuid}
               index={i}
-              optionBeingSupported={optionBeingSupported}
-              votingAllowed={postStatus === 'voting'}
-              canVoteForFree={canVoteForFree}
+              bundle={bundle}
               isCreatorsBid={
                 !option.creator || option.creator?.uuid === post.creator?.uuid
               }
-              handleResetFreeVote={handleResetFreeVote}
-              noAction={
-                (hasVotedOptionId !== undefined &&
-                  hasVotedOptionId !== option.id) ||
-                postStatus === 'failed'
-              }
-              handleSetSupportedBid={(id: string) =>
-                setOptionBeingSupported(id)
-              }
+              noAction={postStatus === 'failed'}
               handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
                 setPaymentSuccessModalOpen(newValue)
               }
@@ -378,10 +359,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
-        {post.isSuggestionsAllowed &&
-          !hasVotedOptionId &&
-          canVoteForFree &&
-          postStatus === 'voting' && (
+
+        {!optionCreatedByMe &&
+          postStatus === 'voting' &&
+          (post.creator?.options?.isOfferingBundles || bundle) && (
             <SActionSection
               ref={(el) => {
                 actionSectionContainer.current = el!!;
@@ -389,19 +370,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             >
               <SuggestionTextArea
                 value={newOptionText}
-                disabled={optionBeingSupported !== ''}
                 placeholder={t(
                   'mcPost.optionsTab.actionSection.suggestionPlaceholder'
                 )}
                 onChange={handleUpdateNewOptionText}
               />
-              <SAddFreeVoteButton
+              <SAddOptionButton
                 size='sm'
-                disabled={
-                  !newOptionText ||
-                  optionBeingSupported !== '' ||
-                  !newOptionTextValid
-                }
+                disabled={!newOptionText || !newOptionTextValid}
                 style={{
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
@@ -411,11 +387,16 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                     _postUuid: post.postUuid,
                     _component: 'McOptionsTab',
                   });
-                  setUseFreeVoteModalOpen(true);
+
+                  if (bundle) {
+                    setConfirmCustomOptionModalOpen(true);
+                  } else {
+                    setBuyBundleModalOpen(true);
+                  }
                 }}
               >
                 {t('mcPost.optionsTab.actionSection.placeABidButton')}
-              </SAddFreeVoteButton>
+              </SAddOptionButton>
               {user.userTutorialsProgress.remainingMcSteps && (
                 <STutorialTooltipTextAreaHolder>
                   <TutorialTooltip
@@ -432,6 +413,26 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               )}
             </SActionSection>
           )}
+        {post.creator?.options?.isOfferingBundles && (
+          <SBundlesContainer highlighted={bundle?.votesLeft === 0}>
+            {bundle?.votesLeft === 0 && (
+              <STicketSet numberOFTickets={3} size={36} shift={11} />
+            )}
+            <SBundlesText>
+              {t('mcPost.optionsTab.actionSection.offersBundles', {
+                creator: postCreatorName,
+              })}
+            </SBundlesText>
+            <SHighlightedButton
+              size='small'
+              onClick={() => {
+                setBuyBundleModalOpen(true);
+              }}
+            >
+              {t('mcPost.optionsTab.actionSection.viewBundles')}
+            </SHighlightedButton>
+          </SBundlesContainer>
+        )}
         {user.userTutorialsProgress.remainingMcSteps && (
           <STutorialTooltipHolder>
             <TutorialTooltip
@@ -448,7 +449,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         )}
       </STabContainer>
       {/* Suggest new Modal */}
-      {isMobile && !hasVotedOptionId ? (
+      {isMobile &&
+      !optionCreatedByMe &&
+      postStatus === 'voting' &&
+      (post.creator?.options?.isOfferingBundles || bundle) ? (
         <OptionActionMobileModal
           isOpen={suggestNewMobileOpen}
           onClose={() => setSuggestNewMobileOpen(false)}
@@ -457,20 +461,15 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           <SSuggestNewContainer>
             <SuggestionTextArea
               value={newOptionText}
-              disabled={optionBeingSupported !== ''}
               autofocus={suggestNewMobileOpen}
               placeholder={t(
                 'mcPost.optionsTab.actionSection.suggestionPlaceholderDesktop'
               )}
               onChange={handleUpdateNewOptionText}
             />
-            <SAddFreeVoteButton
+            <SAddOptionButton
               size='sm'
-              disabled={
-                !newOptionText ||
-                optionBeingSupported !== '' ||
-                !newOptionTextValid
-              }
+              disabled={!newOptionText || !newOptionTextValid}
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
@@ -480,19 +479,23 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   _postUuid: post.postUuid,
                   _component: 'McOptionsTab',
                 });
-                setUseFreeVoteModalOpen(true);
+                if (bundle) {
+                  setConfirmCustomOptionModalOpen(true);
+                } else {
+                  setBuyBundleModalOpen(true);
+                }
               }}
             >
               {t('mcPost.optionsTab.actionSection.placeABidButton')}
-            </SAddFreeVoteButton>
+            </SAddOptionButton>
           </SSuggestNewContainer>
         </OptionActionMobileModal>
       ) : null}
-      {/* Use Free vote modal */}
-      <McConfirmUseFreeVoteModal
-        isVisible={useFreeVoteModalOpen}
-        handleMakeFreeVote={handleVoteForFree}
-        closeModal={() => setUseFreeVoteModalOpen(false)}
+      {/* Add a custom option Modal */}
+      <McConfirmCustomOptionModal
+        isVisible={confirmCustomOptionModalOpen}
+        handleAddCustomOption={handleAddNewOption}
+        closeModal={() => setConfirmCustomOptionModalOpen(false)}
       />
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
@@ -503,17 +506,16 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         closeModal={() => setPaymentSuccessModalOpen(false)}
       >
         {t('paymentSuccessModal.mc', {
-          postCreator,
+          postCreator: postCreatorName,
           postDeadline,
         })}
       </PaymentSuccessModal>
       {/* Mobile floating button */}
       {isMobile &&
       !suggestNewMobileOpen &&
-      !hasVotedOptionId &&
+      !optionCreatedByMe &&
       postStatus === 'voting' &&
-      post.isSuggestionsAllowed &&
-      canVoteForFree ? (
+      (post.creator?.options?.isOfferingBundles || bundle) ? (
         <>
           <SActionButton
             id='action-button-mobile'
@@ -545,6 +547,16 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           )}
         </>
       ) : null}
+      {buyBundleModalOpen && post.creator && (
+        <BuyBundleModal
+          show
+          creator={post.creator}
+          successUrl={`${process.env.NEXT_PUBLIC_APP_URL}/post/${post.postUuid}`}
+          onClose={() => {
+            setBuyBundleModalOpen(false);
+          }}
+        />
+      )}
     </>
   );
 };
@@ -647,16 +659,16 @@ const SSuggestNewContainer = styled.div`
   }
 `;
 
-const SAddFreeVoteButton = styled(Button)`
+const SAddOptionButton = styled(Button)`
   width: 100%;
 
-  color: ${({ theme }) => theme.colors.dark};
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+  color: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colorsThemed.accent.blue};
 
   &:active:enabled,
   &:hover:enabled,
   &:focus:enabled {
-    background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+    background: ${({ theme }) => theme.colorsThemed.accent.blue};
   }
 `;
 
@@ -738,4 +750,59 @@ const STutorialTooltipTextAreaHolder = styled.div`
   div {
     width: 190px;
   }
+`;
+
+const SBundlesContainer = styled.div<{ highlighted: boolean }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: ${({ theme, highlighted }) =>
+    highlighted
+      ? theme.colorsThemed.accent.yellow
+      : // TODO: standardize color
+      theme.name === 'light'
+      ? '#E5E9F1'
+      : '#2C2C33'};
+  margin-top: 32px;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex-direction: row;
+    margin-top: 24px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-top: 32px;
+  }
+`;
+
+const STicketSet = styled(TicketSet)`
+  margin-right: 8px;
+`;
+
+const SBundlesText = styled.p`
+  flex-grow: 1;
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  font-weight: 600;
+  text-align: center;
+  font-size: 16px;
+  line-height: 24px;
+  margin-bottom: 16px;
+  margin-right: 8px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 0px;
+    text-align: start;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+`;
+
+const SHighlightedButton = styled(HighlightedButton)`
+  width: auto;
 `;

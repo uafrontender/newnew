@@ -43,7 +43,6 @@ import { cookiesInstance } from '../api/apiConfigs';
 
 import 'react-toastify/dist/ReactToastify.css';
 import ChannelsContextProvider from '../contexts/channelsContext';
-import { SubscriptionsProvider } from '../contexts/subscriptionsContext';
 import FollowingsContextProvider from '../contexts/followingContext';
 import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
@@ -65,6 +64,7 @@ import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
 import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
+import { BundlesContextProvider } from '../contexts/bundlesContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -226,7 +226,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                         <BlockedUsersProvider>
                           <FollowingsContextProvider>
                             <CardsContextProvider>
-                              <SubscriptionsProvider>
+                              <BundlesContextProvider>
                                 <ChatsProvider>
                                   <OverlayModeProvider>
                                     <ResizeMode>
@@ -260,7 +260,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                                     </ResizeMode>
                                   </OverlayModeProvider>
                                 </ChatsProvider>
-                              </SubscriptionsProvider>
+                              </BundlesContextProvider>
                             </CardsContextProvider>
                           </FollowingsContextProvider>
                         </BlockedUsersProvider>
@@ -358,6 +358,8 @@ const PRE_FETCH_LINKS_COMMON = (
       as='image'
       media='(min-width: 760px)'
     />
+    {/* Common */}
+    <link rel='prefetch' href={assets.common.vote} as='image' />
   </>
 );
 
