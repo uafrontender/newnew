@@ -52,6 +52,7 @@ const SContainer = styled.div<{
   display: flex;
   flex-direction: row;
   overflow: hidden;
+  z-index: 1;
 `;
 
 const SIcon = styled.img<{ index: number; size: number; shift: number }>`
