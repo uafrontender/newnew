@@ -28,7 +28,22 @@ const PostSkeleton = () => {
       )}
       <SPostModalContainer>
         <SWrapper>
-          {isMobile && <SGoBackButtonMobile onClick={() => router.back()} />}
+          {isMobile && (
+            <>
+              <SExpiresSection>
+                <SGoBackButtonMobile onClick={() => router.back()} />
+                <Skeleton
+                  count={1}
+                  borderRadius={16}
+                  duration={2}
+                  className='expiresSkeleton'
+                  containerClassName='expiresSkeletonContainer'
+                  baseColor={theme.colorsThemed.background.secondary}
+                  highlightColor={theme.colorsThemed.background.quaternary}
+                />
+              </SExpiresSection>
+            </>
+          )}
           <SVideoSkeletonWrapper className='videoSkeletonContainer'>
             <Skeleton
               count={1}
@@ -41,6 +56,19 @@ const PostSkeleton = () => {
             />
           </SVideoSkeletonWrapper>
           <SActivitiesContainer>
+            {!isMobile && (
+              <SExpiresSection>
+                <Skeleton
+                  count={1}
+                  borderRadius={16}
+                  duration={2}
+                  className='expiresSkeleton'
+                  containerClassName='expiresSkeletonContainer'
+                  baseColor={theme.colorsThemed.background.secondary}
+                  highlightColor={theme.colorsThemed.background.quaternary}
+                />
+              </SExpiresSection>
+            )}
             <Skeleton
               count={1}
               borderRadius={16}
@@ -80,7 +108,22 @@ export const PostSkeletonView = () => {
   return (
     <>
       <SWrapper>
-        {isMobile && <SGoBackButtonMobile onClick={() => router.back()} />}
+        {isMobile && (
+          <>
+            <SExpiresSection>
+              <SGoBackButtonMobile onClick={() => router.back()} />
+              <Skeleton
+                count={1}
+                borderRadius={16}
+                duration={2}
+                className='expiresSkeleton'
+                containerClassName='expiresSkeletonContainer'
+                baseColor={theme.colorsThemed.background.secondary}
+                highlightColor={theme.colorsThemed.background.quaternary}
+              />
+            </SExpiresSection>
+          </>
+        )}
         <SVideoSkeletonWrapper className='videoSkeletonContainer'>
           <Skeleton
             count={1}
@@ -93,6 +136,19 @@ export const PostSkeletonView = () => {
           />
         </SVideoSkeletonWrapper>
         <SActivitiesContainer>
+          {!isMobile && (
+            <SExpiresSection>
+              <Skeleton
+                count={1}
+                borderRadius={16}
+                duration={2}
+                className='expiresSkeleton'
+                containerClassName='expiresSkeletonContainer'
+                baseColor={theme.colorsThemed.background.secondary}
+                highlightColor={theme.colorsThemed.background.quaternary}
+              />
+            </SExpiresSection>
+          )}
           <Skeleton
             count={1}
             borderRadius={16}
@@ -208,7 +264,6 @@ const SVideoSkeletonWrapper = styled.div`
   overflow: hidden;
 
   margin-left: -16px;
-  margin-top: 32px;
   width: 100vw;
   height: calc(100vh - 72px);
 
@@ -224,6 +279,8 @@ const SVideoSkeletonWrapper = styled.div`
     width: 100%;
     height: 100%;
 
+    border-radius: unset !important;
+
     &:after {
       width: 200%;
       height: 200%;
@@ -236,7 +293,6 @@ const SVideoSkeletonWrapper = styled.div`
     width: 284px;
     height: 506px;
     margin-left: initial;
-    margin-top: initial;
 
     flex-shrink: 0;
 
@@ -245,12 +301,50 @@ const SVideoSkeletonWrapper = styled.div`
     .videoSkeleton {
       width: initial;
       height: 100%;
+      border-radius: initial;
     }
   }
 
   ${({ theme }) => theme.media.laptop} {
     width: 410px;
     height: 728px;
+  }
+`;
+
+const SExpiresSection = styled.div`
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  width: 100%;
+  margin-bottom: 6px;
+
+  .expiresSkeletonContainer {
+    display: block;
+
+    width: 60%;
+    height: 40px;
+  }
+
+  .expiresSkeleton {
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    &:after {
+      width: 200%;
+      height: 200%;
+
+      animation-name: ${SkeletonDiagonal};
+    }
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    .expiresSkeletonContainer {
+      width: 220px;
+    }
   }
 `;
 

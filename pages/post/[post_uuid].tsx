@@ -16,6 +16,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
 import {
@@ -51,6 +52,7 @@ interface IPostPage {
   comment_id?: string;
   comment_content?: string;
   save_card?: boolean;
+  isServerSide?: boolean;
 }
 
 const PostPage: NextPage<IPostPage> = ({
@@ -60,10 +62,15 @@ const PostPage: NextPage<IPostPage> = ({
   comment_id,
   comment_content,
   save_card,
+  isServerSide,
 }) => {
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
-  const user = useAppSelector((state) => state.user);
+  const { user, ui } = useAppSelector((state) => state);
+
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    ui.resizeMode
+  );
 
   const stripeSetupIntentClientSecretFromRedirect = useMemo(
     () => setup_intent_client_secret,
@@ -290,8 +297,15 @@ const PostPage: NextPage<IPostPage> = ({
     ) {
       return;
     }
-    router.back();
-  }, [isConfirmToClosePost, router, t]);
+
+    console.log(window.history.state && window.history.state.idx > 0);
+
+    if (window.history.state && window.history.state.idx > 0) {
+      router.back();
+    } else {
+      router.push(`/${postParsed?.creator?.username}`);
+    }
+  }, [isConfirmToClosePost, postParsed?.creator?.username, router, t]);
 
   const handleGoBackInsidePost = useCallback(() => {
     Mixpanel.track('Go Back Inside Post', {
@@ -303,8 +317,12 @@ const PostPage: NextPage<IPostPage> = ({
     ) {
       return;
     }
-    router.back();
-  }, [isConfirmToClosePost, router, t]);
+    if (window.history.state && window.history.state.idx > 0) {
+      router.back();
+    } else {
+      router.push(`/${postParsed?.creator?.username}`);
+    }
+  }, [isConfirmToClosePost, postParsed?.creator?.username, router, t]);
 
   const handleSeeNewDeletedBox = useCallback(() => {
     Mixpanel.track('Post Failed Button Click', {
@@ -452,7 +470,29 @@ const PostPage: NextPage<IPostPage> = ({
   }, []);
 
   return (
-    <>
+    <motion.div
+      key={postUuid}
+      initial={{
+        x: isMobile && !isServerSide ? 500 : 0,
+        y: 0,
+        opacity: 0,
+      }}
+      exit={{
+        x: isMobile && !isServerSide ? 500 : 0,
+        opacity: 0,
+        transition: {
+          duration: isMobile ? 0.3 : 0.3,
+        },
+      }}
+      animate={{
+        x: 0,
+        y: 0,
+        opacity: 1,
+        transition: {
+          duration: isMobile ? 0.6 : 0.4,
+        },
+      }}
+    >
       <PostModalInnerContextProvider
         key={postUuid}
         postParsed={postParsed}
@@ -496,23 +536,74 @@ const PostPage: NextPage<IPostPage> = ({
             content={postParsed?.announcement?.thumbnailImageUrl ?? ''}
           />
         </Head>
-        {!isPostLoading ? (
-          <PostModal
-            isMyPost={isMyPost}
-            shouldRenderVotingFinishedModal={shouldRenderVotingFinishedModal}
-          />
-        ) : (
-          <PostSkeleton />
-        )}
+        <AnimatePresence exitBeforeEnter>
+          {isPostLoading || !postParsed ? (
+            <motion.div
+              key='loading'
+              initial={{
+                opacity: 0,
+              }}
+              exit={{
+                opacity: 0,
+                transition: {
+                  duration: 0.1,
+                },
+              }}
+              animate={{
+                opacity: 1,
+                transition: {
+                  duration: 0.2,
+                },
+              }}
+            >
+              <PostSkeleton />
+            </motion.div>
+          ) : (
+            <motion.div
+              key='loaded'
+              initial={{
+                opacity: 0,
+              }}
+              exit={{
+                opacity: 0,
+                transition: {
+                  duration: 0.1,
+                },
+              }}
+              animate={{
+                opacity: 1,
+                transition: {
+                  duration: 0.2,
+                },
+              }}
+            >
+              <PostModal
+                isMyPost={isMyPost}
+                shouldRenderVotingFinishedModal={
+                  shouldRenderVotingFinishedModal
+                }
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </PostModalInnerContextProvider>
-    </>
+    </motion.div>
   );
 };
 export default PostPage;
 
 (PostPage as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <GeneralLayout key={page.props.postUuid} noMobieNavigation noPaddingMobile>
-    <CommentFromUrlContextProvider>{page}</CommentFromUrlContextProvider>
+  <GeneralLayout noMobieNavigation noPaddingMobile>
+    <CommentFromUrlContextProvider>
+      <AnimatePresence
+        // exitBeforeEnter
+        onExitComplete={() => {
+          console.log('EXIT COMPLETE');
+        }}
+      >
+        <React.Fragment key={page.props.postUuid}>{page}</React.Fragment>
+      </AnimatePresence>
+    </CommentFromUrlContextProvider>
   </GeneralLayout>
 );
 
@@ -562,6 +653,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
       props: {
         postUuid: post_uuid,
+        isServerSide: true,
         post: res.data.toJSON(),
         ...(setup_intent_client_secret
           ? {
@@ -593,6 +685,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       postUuid: post_uuid,
+      isServerSide: false,
       ...(setup_intent_client_secret
         ? {
             setup_intent_client_secret,

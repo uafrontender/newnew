@@ -108,18 +108,24 @@ const SListPostModalWrapper = styled.div`
 
   .skeletonsContainer {
     display: block;
-    height: 400px;
+    height: 100vh;
 
     width: 100vw;
     margin: 16px 0;
 
     ${(props) => props.theme.media.tablet} {
+      height: 400px;
       width: calc(33% - 16px);
       margin: 0 8px 24px 8px;
     }
 
     ${(props) => props.theme.media.laptop} {
       width: calc(25% - 32px);
+      margin: 0 16px 32px 16px;
+    }
+
+    ${(props) => props.theme.media.laptopM} {
+      width: calc(20% - 32px);
       margin: 0 16px 32px 16px;
     }
 

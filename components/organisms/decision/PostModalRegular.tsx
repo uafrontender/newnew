@@ -3,7 +3,6 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
-import { useRouter } from 'next/router';
 
 import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
 import { useAppSelector } from '../../../redux-store/store';
@@ -38,7 +37,6 @@ interface IPostModalRegular {}
 
 const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
   const theme = useTheme();
-  const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const { t: tCommon } = useTranslation('common');
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -60,12 +58,13 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
     reportPostOpen,
     handleReportSubmit,
     handleReportClose,
+    handleCloseAndGoBack,
   } = usePostModalInnerState();
 
   return (
     <>
       {!isMobile && (
-        <SGoBackButton longArrow onClick={() => router.back()}>
+        <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
           {t('back')}
         </SGoBackButton>
       )}

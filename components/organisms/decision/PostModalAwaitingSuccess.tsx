@@ -4,7 +4,6 @@ import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
 
 import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
 import { useAppSelector } from '../../../redux-store/store';
@@ -22,7 +21,6 @@ interface IPostModalAwaitingSuccess {}
 const PostModalAwaitingSuccess: React.FunctionComponent<
   IPostModalAwaitingSuccess
 > = () => {
-  const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -65,7 +63,7 @@ const PostModalAwaitingSuccess: React.FunctionComponent<
         />
       </Head>
       {!isMobile && (
-        <SGoBackButton longArrow onClick={() => router.back()}>
+        <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
           {t('back')}
         </SGoBackButton>
       )}

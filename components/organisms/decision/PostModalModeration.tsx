@@ -53,6 +53,7 @@ const PostModalModeration: React.FunctionComponent<
     postStatus,
     deletedByCreator,
     recommendedPosts,
+    handleCloseAndGoBack,
   } = usePostModalInnerState();
 
   return (
@@ -70,7 +71,7 @@ const PostModalModeration: React.FunctionComponent<
         />
       </Head>
       {!isMobile && (
-        <SGoBackButton longArrow onClick={() => router.back()}>
+        <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
           {t('back')}
         </SGoBackButton>
       )}
