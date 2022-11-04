@@ -4,7 +4,7 @@ import Head from 'next/head';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { GetServerSideProps } from 'next';
-// import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useEffectOnce, useUpdateEffect } from 'react-use';
@@ -126,11 +126,11 @@ export const Chat = () => {
 export default Chat;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  /* const translationContext = await serverSideTranslations(context.locale!!, [
+  const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
     'page-Chat',
     'modal-PaymentModal',
-  ]); */
+  ]);
 
   const { req } = context;
 
@@ -145,20 +145,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  // TODO: remove when bundles are added
-  // No entry until bundles are up and running
   return {
-    redirect: {
-      permanent: false,
-      destination: '/',
-    },
-  };
-  // TODO: re-enable, repurpose for bundles
-  /* return {
     props: {
       ...translationContext,
     },
-  }; */
+  };
 };
 
 const SGeneral = styled(General)`

@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
@@ -14,7 +14,7 @@ import {
 } from '../../../../../redux-store/store';
 import {
   deleteMcOption,
-  doFreeVote,
+  voteWithBundleVotes,
   voteOnPost,
 } from '../../../../../api/endpoints/multiple_choice';
 
@@ -35,7 +35,7 @@ import McOptionCardSelectVotesMenu from './McOptionCardSelectVotesMenu';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import McOptionCardSelectVotesModal from './McOptionCardSelectVotesModal';
 import getDisplayname from '../../../../../utils/getDisplayname';
-import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
+import UseBundleVotesModal from './UseBundleVotesModal';
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../../atoms/decision/TutorialTooltip';
@@ -52,7 +52,6 @@ import OptionEllipseModal from '../../common/OptionEllipseModal';
 import McConfirmDeleteOptionModal from '../../moderation/multiple_choice/McConfirmDeleteOptionModal';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
-import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 
@@ -87,17 +86,12 @@ interface IMcOptionCard {
   option: TMcOptionWithHighestField;
   creator: newnewapi.IUser;
   postId: string;
-  postCreator: string;
-  postCreatorUuid: string;
+  postCreatorName: string;
   postText: string;
   index: number;
   noAction: boolean;
-  votingAllowed: boolean;
-  canVoteForFree: boolean;
   isCreatorsBid: boolean;
-  optionBeingSupported?: string;
-  handleResetFreeVote: () => void;
-  handleSetSupportedBid: (id: string) => void;
+  bundle?: newnewapi.IBundle;
   handleSetPaymentSuccessModalOpen: (newValue: boolean) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
@@ -109,17 +103,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   option,
   creator,
   postId,
-  postCreator,
-  postCreatorUuid,
+  postCreatorName,
   postText,
   index,
   noAction,
-  votingAllowed,
-  canVoteForFree,
   isCreatorsBid,
-  optionBeingSupported,
-  handleResetFreeVote,
-  handleSetSupportedBid,
+  bundle,
   handleRemoveOption,
   handleSetPaymentSuccessModalOpen,
   handleAddOrUpdateOptionFromResponse,
@@ -135,8 +124,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   );
 
   const { appConstants } = useGetAppConstants();
-
-  const [amISubscribed, setAmISubscribed] = useState(false);
 
   const isSuggestedByMe = useMemo(
     () =>
@@ -233,28 +220,26 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const [supportVoteOffer, setSupportVoteOffer] =
     useState<newnewapi.McVoteOffer | null>(null);
 
-  const disabled =
-    optionBeingSupported !== '' &&
-    optionBeingSupported !== option.id.toString();
-
   const handleOpenSupportForm = () => {
     setIsSupportMenuOpen(true);
-    handleSetSupportedBid(option.id.toString());
   };
 
   const handleCloseSupportForm = () => {
     setIsSupportMenuOpen(false);
-    handleSetSupportedBid('');
   };
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [useFreeVoteModalOpen, setUseFreeVoteModalOpen] = useState(false);
+  const [bundleVotesModalOpen, setBundleVotesModalOpen] = useState(false);
 
   // Handlers
   const handleTogglePaymentModalOpen = () => {
     setPaymentModalOpen(true);
+  };
+
+  const handleOpenBundleVotesModal = () => {
+    setBundleVotesModalOpen(true);
   };
 
   const handleSetVoteOfferAndOpenModal = (
@@ -363,7 +348,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
         handleSetPaymentSuccessModalOpen(true);
         setPaymentModalOpen(false);
-        handleSetSupportedBid('');
         setSupportVoteOffer(null);
         setIsSupportMenuOpen(false);
       } catch (err: any) {
@@ -376,7 +360,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     },
     [
       handleSetPaymentSuccessModalOpen,
-      handleSetSupportedBid,
       handleAddOrUpdateOptionFromResponse,
       postId,
       setupIntent,
@@ -385,46 +368,47 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     ]
   );
 
-  const handleVoteForFree = useCallback(async () => {
-    setUseFreeVoteModalOpen(false);
-    setLoadingModalOpen(true);
-    try {
-      const payload = new newnewapi.VoteOnPostRequest({
-        votesCount: appConstants.mcFreeVoteCount,
-        optionId: option.id,
-        postUuid: postId,
-      });
+  const handleVoteWithBundleVotes = useCallback(
+    async (votesCount: number) => {
+      setBundleVotesModalOpen(false);
+      setLoadingModalOpen(true);
 
-      const res = await doFreeVote(payload);
+      try {
+        const payload = new newnewapi.VoteOnPostRequest({
+          votesCount,
+          optionId: option.id,
+          postUuid: postId,
+        });
 
-      if (
-        !res.data ||
-        res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
-        res.error
-      ) {
-        throw new Error(res.error?.message ?? 'Request failed');
+        const res = await voteWithBundleVotes(payload);
+
+        if (
+          !res.data ||
+          res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+          res.error
+        ) {
+          throw new Error(res.error?.message ?? 'Request failed');
+        }
+
+        const optionFromResponse = res.data
+          .option as newnewapi.MultipleChoice.Option;
+        optionFromResponse.isSupportedByMe = true;
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        setLoadingModalOpen(false);
+        handleSetPaymentSuccessModalOpen(true);
+      } catch (err) {
+        console.error(err);
+        setLoadingModalOpen(false);
+        toast.error('toastErrors.generic');
       }
-
-      const optionFromResponse = res.data
-        .option as newnewapi.MultipleChoice.Option;
-      optionFromResponse.isSupportedByMe = true;
-      handleAddOrUpdateOptionFromResponse(optionFromResponse);
-      setLoadingModalOpen(false);
-      handleResetFreeVote();
-      handleSetPaymentSuccessModalOpen(true);
-    } catch (err) {
-      console.error(err);
-      setLoadingModalOpen(false);
-      toast.error('toastErrors.generic');
-    }
-  }, [
-    postId,
-    option.id,
-    appConstants.mcFreeVoteCount,
-    handleAddOrUpdateOptionFromResponse,
-    handleSetPaymentSuccessModalOpen,
-    handleResetFreeVote,
-  ]);
+    },
+    [
+      postId,
+      option.id,
+      handleAddOrUpdateOptionFromResponse,
+      handleSetPaymentSuccessModalOpen,
+    ]
+  );
 
   const goToNextStep = () => {
     if (
@@ -446,33 +430,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       );
     }
   };
-
-  // Check if the user is subscribed
-  useEffect(() => {
-    async function checkAmISubscribed() {
-      try {
-        const payload = new newnewapi.SubscriptionStatusRequest({
-          creatorUuid: postCreatorUuid,
-        });
-
-        const res = await getSubscriptionStatus(payload);
-
-        if (
-          res.data &&
-          (res.data?.status?.activeRenewsAt ||
-            res.data?.status?.activeCancelsAt)
-        ) {
-          setAmISubscribed(true);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    if (option.isSupportedByMe) {
-      checkAmISubscribed();
-    }
-  }, [option.isSupportedByMe, postCreatorUuid]);
 
   return (
     <>
@@ -498,10 +455,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             damping: 20,
             stiffness: 300,
           }}
-          $isDisabled={disabled && votingAllowed}
+          $isDisabled={false}
           $isBlue={isBlue}
           onClick={(e) => {
-            if (!isMobile && !disabled && !isEllipseMenuOpen) {
+            if (!isMobile && !isEllipseMenuOpen) {
               setIsEllipseMenuOpen(true);
 
               setOptionMenuXY({
@@ -574,7 +531,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 }
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubtracted}
-                amISubscribed={amISubscribed}
+                amISubscribed={!!bundle}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -582,9 +539,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             <>
               <SSupportButton
                 view='primary'
-                disabled={disabled}
                 isBlue={isBlue}
-                canVoteForFree={canVoteForFree}
                 onClickCapture={() => {
                   Mixpanel.track('Vote Click', {
                     _stage: 'Post',
@@ -594,17 +549,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (canVoteForFree) {
-                    setUseFreeVoteModalOpen(true);
-                  } else {
-                    handleOpenSupportForm();
-                  }
+                  handleOpenSupportForm();
                 }}
               >
                 <div>
-                  {canVoteForFree
-                    ? t('mcPost.optionsTab.optionCard.freeVoteButton')
-                    : isBlue
+                  {isBlue
                     ? t('mcPost.optionsTab.optionCard.supportAgainButton')
                     : t('mcPost.optionsTab.optionCard.raiseBidButton')}
                 </div>
@@ -633,9 +582,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
               <SSupportButtonDesktop
                 id={`support-button-${isBlue ? 'supported' : index}`}
                 active={isSupportMenuOpen}
-                canVoteForFree={canVoteForFree}
                 view='secondary'
-                disabled={disabled}
                 isBlue={isBlue}
                 onClickCapture={() => {
                   Mixpanel.track('Vote Click', {
@@ -647,19 +594,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   if (!isSupportMenuOpen) {
-                    if (canVoteForFree) {
-                      setUseFreeVoteModalOpen(true);
-                      e.stopPropagation();
-                    } else {
-                      setSelectVotesMenuTop(e.clientY);
-                      handleOpenSupportForm();
-                    }
+                    setSelectVotesMenuTop(e.clientY);
+                    handleOpenSupportForm();
                   }
                 }}
               >
-                {canVoteForFree
-                  ? t('mcPost.optionsTab.optionCard.freeVoteButton')
-                  : !isBlue
+                {!isBlue
                   ? t('mcPost.optionsTab.optionCard.supportButton')
                   : t('mcPost.optionsTab.optionCard.supportAgainButton')}
               </SSupportButtonDesktop>
@@ -684,6 +624,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             </>
           )}
         </SContainer>
+        {/* TODO: Move these modals one level above as it is unwise to render multiple instances of them */}
         {/* Confirm vote modal */}
         {isConfirmVoteModalOpen ? (
           <McOptionConfirmVoteModal
@@ -692,7 +633,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             supportVotesAmount={(
               supportVoteOffer?.amountOfVotes || 0
             ).toString()}
-            postCreator={
+            postCreatorName={
               creator.nickname ? creator.nickname : creator.username ?? ''
             }
             optionText={option.text}
@@ -700,12 +641,16 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             handleOpenPaymentModal={() => handleTogglePaymentModalOpen()}
           />
         ) : null}
-        {/* Use Free vote modal */}
-        <McConfirmUseFreeVoteModal
-          isVisible={useFreeVoteModalOpen}
-          handleMakeFreeVote={handleVoteForFree}
-          closeModal={() => setUseFreeVoteModalOpen(false)}
-        />
+        {/* Use Bundle votes vote modal */}
+        {bundle?.votesLeft ? (
+          <UseBundleVotesModal
+            isVisible={bundleVotesModalOpen}
+            bundleVotesLeft={bundle.votesLeft}
+            optionText={option.text}
+            handleVoteWithBundleVotes={handleVoteWithBundleVotes}
+            onClose={() => setBundleVotesModalOpen(false)}
+          />
+        ) : null}
         {/* Payment Modal */}
         {paymentModalOpen ? (
           <PaymentModal
@@ -722,7 +667,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   appConstants.minHoldAmount?.usdCents) && (
                 <SPaymentSign variant='subtitle'>
                   {t('mcPost.paymentModalFooter.body', {
-                    creator: postCreator,
+                    creator: postCreatorName,
                   })}
                   *
                   <Link href='https://terms.newnew.co'>
@@ -747,7 +692,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 </SPaymentModalHeadingPostSymbol>
                 <SPaymentModalHeadingPostCreator variant={3}>
                   {t('mcPost.paymentModalHeader.title', {
-                    creator: postCreator,
+                    creator: postCreatorName,
                   })}
                 </SPaymentModalHeadingPostCreator>
               </SPaymentModalHeading>
@@ -777,6 +722,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             handleCloseSupportForm();
           }}
           handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
+          handleOpenBundleVotesModal={handleOpenBundleVotesModal}
         >
           <SSelectVotesModalCard isBlue={isBlue}>
             <SBidDetails isBlue={isBlue} noAction={noAction}>
@@ -830,7 +776,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   }
                   supporterCount={option.supporterCount}
                   supporterCountSubtracted={supporterCountSubtracted}
-                  amISubscribed={amISubscribed}
+                  amISubscribed={!!bundle}
                 />
               </SBiddersInfo>
             </SBidDetails>
@@ -848,6 +794,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             handleCloseSupportForm();
             setSelectVotesMenuTop(undefined);
           }}
+          handleOpenBundleVotesModal={
+            bundle?.votesLeft ? handleOpenBundleVotesModal : undefined
+          }
           handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
         />
       )}
@@ -898,7 +847,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 };
 
 McOptionCard.defaultProps = {
-  optionBeingSupported: undefined,
   handleRemoveOption: undefined,
 };
 
@@ -1334,7 +1282,6 @@ const SSpanBiddersRegular = styled.span`
 
 const SSupportButton = styled(Button)<{
   isBlue: boolean;
-  canVoteForFree: boolean;
 }>`
   width: 100%;
 
@@ -1364,20 +1311,11 @@ const SSupportButton = styled(Button)<{
           background: #ffffff;
         `
       : null}
-
-  ${({ canVoteForFree }) =>
-    canVoteForFree
-      ? css`
-          color: ${({ theme }) => theme.colors.dark};
-          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-        `
-      : null}
 `;
 
 const SSupportButtonDesktop = styled(Button)<{
   isBlue: boolean;
   active: boolean;
-  canVoteForFree: boolean;
 }>`
   height: 100%;
   width: 60px;
@@ -1420,14 +1358,6 @@ const SSupportButtonDesktop = styled(Button)<{
       ? css`
           color: ${({ theme }) => theme.colors.dark};
           background: #ffffff;
-        `
-      : null}
-
-  ${({ canVoteForFree }) =>
-    canVoteForFree
-      ? css`
-          color: ${({ theme }) => theme.colors.dark};
-          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
         `
       : null}
 `;

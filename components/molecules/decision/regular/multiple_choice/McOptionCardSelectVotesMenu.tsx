@@ -19,6 +19,7 @@ interface IMcOptionCardSelectVotesMenu {
   top?: number;
   handleClose: () => void;
   handleSetVoteOfferAndOpenModal: (voteOffer: newnewapi.McVoteOffer) => void;
+  handleOpenBundleVotesModal?: () => void;
 }
 
 const McOptionCardSelectVotesMenu: React.FunctionComponent<
@@ -29,6 +30,7 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
   isSupportedByMe,
   availableVotes,
   handleClose,
+  handleOpenBundleVotesModal,
   handleSetVoteOfferAndOpenModal,
 }) => {
   const { t } = useTranslation('modal-Post');
@@ -127,6 +129,23 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
                 </Text>
               </SButton>
             ))}
+            {handleOpenBundleVotesModal && (
+              <SUseVotesContainer>
+                <SUseVotesButton
+                  onClickCapture={() => {
+                    Mixpanel.track('Open Bundle Votes', {
+                      _stage: 'Post',
+                      _component: 'McOptionCardSelectVotesMenu',
+                    });
+                  }}
+                  onClick={() => handleOpenBundleVotesModal()}
+                >
+                  <Text variant={3}>
+                    {t('mcPost.optionsTab.optionCard.selectVotesMenu.useVotes')}
+                  </Text>
+                </SUseVotesButton>
+              </SUseVotesContainer>
+            )}
           </SContainer>
         </AnimatePresence>
       </StyledModalOverlay>,
@@ -153,7 +172,7 @@ const SContainer = styled(motion.div)`
   padding: 16px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   ${({ theme }) => theme.media.laptopL} {
     right: initial;
@@ -210,4 +229,35 @@ const StyledModalOverlay = styled(motion.div)`
   position: fixed;
 
   background-color: transparent;
+`;
+
+const SUseVotesContainer = styled.div`
+  width: 100%;
+  border-top: 1px solid;
+  border-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+`;
+
+const SUseVotesButton = styled.button`
+  background: none;
+  border: transparent;
+
+  cursor: pointer;
+
+  color: ${({ theme }) => theme.colors.black};
+  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+
+  width: 100%;
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: 12px;
+
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+
+  &:focus,
+  &:hover,
+  &:active {
+    outline: none;
+  }
 `;

@@ -287,7 +287,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               text: choice.text,
             })
           ),
-          isSuggestionsAllowed: multiplechoice.options.allowSuggestions,
+          // TODO: remove as unused
+          isSuggestionsAllowed: userData?.options?.isOfferingBundles,
         };
       } else if (tab === 'crowdfunding') {
         body.crowdfunding = {
@@ -324,6 +325,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     post.thumbnailParameters.startTime,
     post.thumbnailParameters.endTime,
     post.announcementVideoUrl,
+    userData?.options?.isOfferingBundles,
     loading,
     tab,
     router,
@@ -375,15 +377,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           ),
         },
         tab === 'multiple-choice' &&
-          userData?.options?.isOfferingSubscription && {
+          userData?.options?.isOfferingBundles && {
             key: 'allowSuggestions',
-            value: t(
-              `preview.values.${
-                multiplechoice.options.allowSuggestions
-                  ? 'allowSuggestions-allowed'
-                  : 'allowSuggestions-forbidden'
-              }`
-            ),
+            value: t(`preview.values.allowSuggestions-allowed`),
           },
       ]),
     [
@@ -393,8 +389,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       post.options.commentsEnabled,
       auction.minimalBid,
       crowdfunding.targetBackerCount,
-      multiplechoice?.options?.allowSuggestions,
-      userData?.options?.isOfferingSubscription,
+      userData?.options?.isOfferingBundles,
       formatExpiresAt,
     ]
   );

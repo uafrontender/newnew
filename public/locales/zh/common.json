@@ -47,13 +47,15 @@
     "share": "分享",
     "dashboard": "儀錶板",
     "dms": "私訊",
-    "notifications": "通知"
+    "notifications": "通知",
+    "bundles_NEED_TRANSLATION": "Bundles"
   },
   "mobileTopNavigation": {
     "myBalance": "我的餘額以${{value}}",
     "profile": "個人資料"
   },
   "button": {
+    "bundles_NEED_TRANSLATION": "Bundles",
     "createDecision": "新帖子",
     "create": "創建",
     "signIn": "登入",
@@ -129,6 +131,44 @@
       "title": "我們馬上處理！",
       "subtitle": "感謝告知,我們會儘快調查此事，並採取適當的措施，確保每個人的安全。",
       "button": "知道了"
+    },
+    "buyBundle_NEED_TRANSLATION": {
+      "title": "Buy a Superpoll bundle for:",
+      "votes": "<0>{{amount}}</0> votes",
+      "access": "plus get {{amount}} {{unit}} of:",
+      "customOptions": "adding custom options to any Superpoll",
+      "chat": "1-on-1 private chat",
+      "buy": "Buy for ${{amount}}",
+      "terms": "*votes in a bundle never expire",
+      "unit": {
+        "month": "month",
+        "months": "months"
+      },
+      "payment": {
+        "header": "{{creator}}'s Superpoll Bundle"
+      },
+      "paymentModalFooter": {
+        "body": "你的銀行卡信息將被暫時保留。只有當{{creator}}選擇了你的出價時，你才會被扣款。",
+        "terms": "條款",
+        "apply": "適用"
+      },
+      "error": {
+        "requestFailed": "Request failed"
+      }
+    },
+    "creatorsBundleModal_NEED_TRANSLATION": {
+      "votesLeft": "<0>{{amount}}</0> votes left",
+      "for": "for <0>{{creator}}</0>",
+      "access": "{{amount}} {{unit}} left of:",
+      "customOptions": "adding custom options to any Superpoll",
+      "chat": "1-on-1 private chat",
+      "buyButton": "Buy more votes",
+      "unit": {
+        "day": "day",
+        "days": "days",
+        "month": "month",
+        "months": "months"
+      }
     }
   },
   "myLink": {
@@ -192,6 +232,10 @@
     "error": {
       "requestFailed": "Request failed"
     }
+  },
+  "creatorCard_NEED_TRANSLATION": {
+    "buyBundle": "Buy Bundle",
+    "purchasedVotes": "{{value}} votes"
   },
   "colorModeSwitch": {
     "options": {
