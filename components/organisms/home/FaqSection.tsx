@@ -10,7 +10,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 import { useAppSelector } from '../../../redux-store/store';
 import assets from '../../../constants/assets';
 
-import CheckmarkIcon from '../../../public/images/svg/icons/filled/Checkmark.svg';
+import CheckmarkIcon from '../../../public/images/svg/icons/outlined/Checkmark.svg';
 import PlayIcon from '../../../public/images/svg/icons/filled/Play.svg';
 
 interface IEmbedLink {

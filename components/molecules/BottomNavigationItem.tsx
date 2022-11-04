@@ -21,6 +21,8 @@ import dashboardIconOutlined from '../../public/images/svg/icons/outlined/Earnin
 import notificationsIconFilled from '../../public/images/svg/icons/filled/Notifications.svg';
 import notificationsIconOutlined from '../../public/images/svg/icons/outlined/Notifications.svg';
 import iconDirectMessages from '../../public/images/svg/icons/outlined/Comments.svg';
+import iconBundlesOutlined from '../../public/images/svg/icons/outlined/Bundles.svg';
+import iconBundlesFilled from '../../public/images/svg/icons/filled/Bundles.svg';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
 import { Mixpanel } from '../../utils/mixpanel';
@@ -34,6 +36,7 @@ const icons: any = {
     dashboard: dashboardIconOutlined,
     notifications: notificationsIconOutlined,
     dms: iconDirectMessages,
+    bundles: iconBundlesOutlined,
   },
   filled: {
     add: addIconFilled,
@@ -43,23 +46,24 @@ const icons: any = {
     dashboard: dashboardIconFilled,
     notifications: notificationsIconFilled,
     dms: iconDirectMessages,
+    bundles: iconBundlesFilled,
   },
 };
 
 export type TBottomNavigationItem = {
   key: string;
   url: string;
-  width: string;
   counter?: number;
   actionHandler?: () => void;
 };
 
 interface IBottomNavigationItem {
   item: TBottomNavigationItem;
+  width: string;
 }
 
 const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
-  const { item } = props;
+  const { item, width } = props;
   const theme = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
@@ -82,7 +86,7 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
   };
 
   return item?.actionHandler ? (
-    <SContainer width={item.width} onClick={item?.actionHandler}>
+    <SContainer width={width} onClick={item?.actionHandler}>
       <SSVGContainer>
         <InlineSVG
           key={item.key}
@@ -106,7 +110,7 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
       </SCaption>
     </SContainer>
   ) : (
-    <SContainer width={item.width} onClick={() => handleClick(item)}>
+    <SContainer width={width} onClick={() => handleClick(item)}>
       <Link href={item.url}>
         <a>
           <SSVGContainer>

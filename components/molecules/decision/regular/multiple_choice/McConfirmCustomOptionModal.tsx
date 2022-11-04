@@ -5,40 +5,42 @@ import styled from 'styled-components';
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
 import Modal from '../../../../organisms/Modal';
+import Headline from '../../../../atoms/Headline';
 
-interface IMcConfirmUseFreeVoteModal {
+interface IMcConfirmCustomOptionModal {
   isVisible: boolean;
-  handleMakeFreeVote: () => void;
+  handleAddCustomOption: () => void;
   closeModal: () => void;
 }
 
-const McConfirmUseFreeVoteModal: React.FC<IMcConfirmUseFreeVoteModal> = ({
+// TODO: Change UI
+const McConfirmCustomOptionModal: React.FC<IMcConfirmCustomOptionModal> = ({
   isVisible,
-  handleMakeFreeVote,
+  handleAddCustomOption,
   closeModal,
 }) => {
   const { t } = useTranslation('modal-Post');
 
   return (
     <Modal show={isVisible} additionalz={12} onClose={closeModal}>
-      <SContainer
-      // onClick={(e) => e.stopPropagation()}
-      >
+      <SContainer>
         <SModal>
-          <STag>{t('mcPost.optionsTab.confirmUseFreeVoteModal.tag')}</STag>
+          <SHeadline variant={5}>
+            {t('mcPost.optionsTab.confirmCustomOptionModal.title')}
+          </SHeadline>
           <SModalMessage>
             <Text variant={2}>
-              {t('mcPost.optionsTab.confirmUseFreeVoteModal.line_1')}
+              {t('mcPost.optionsTab.confirmCustomOptionModal.line_1')}
             </Text>
             <Text variant={2}>
-              {t('mcPost.optionsTab.confirmUseFreeVoteModal.line_2')}
-            </Text>
-            <Text variant={2}>
-              {t('mcPost.optionsTab.confirmUseFreeVoteModal.line_3')}
+              {t('mcPost.optionsTab.confirmCustomOptionModal.line_2')}
             </Text>
           </SModalMessage>
-          <SDoneButton view='primaryGrad' onClick={() => handleMakeFreeVote()}>
-            {t('mcPost.optionsTab.confirmUseFreeVoteModal.useFreeVoteButton')}
+          <SDoneButton
+            view='primaryGrad'
+            onClick={() => handleAddCustomOption()}
+          >
+            {t('mcPost.optionsTab.confirmCustomOptionModal.useFreeVoteButton')}
           </SDoneButton>
         </SModal>
       </SContainer>
@@ -46,7 +48,7 @@ const McConfirmUseFreeVoteModal: React.FC<IMcConfirmUseFreeVoteModal> = ({
   );
 };
 
-export default McConfirmUseFreeVoteModal;
+export default McConfirmCustomOptionModal;
 
 const SContainer = styled.div`
   display: flex;
@@ -76,23 +78,9 @@ const SModal = styled.div`
   line-height: 24px;
 `;
 
-const STag = styled.div`
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 24px;
-
-  padding: 11px;
-
-  border-radius: 36px;
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
+const SHeadline = styled(Headline)`
   text-align: center;
-  color: ${({ theme }) => theme.colors.dark};
-
-  box-shadow: 0px 20px 90px -3px ${({ theme }) => theme.colorsThemed.accent.yellow};
+  margin-bottom: 18px;
 `;
 
 const SModalMessage = styled.p`

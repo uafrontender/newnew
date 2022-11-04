@@ -419,12 +419,11 @@
           "voteButton": "Votar"
         }
       },
-      "confirmUseFreeVoteModal": {
-        "tag": "Voto gratis",
-        "line_1": "¿Estás listo para usar tu voto gratis en esta opción?",
-        "line_2": "Una vez que lo hagas, no podrás cambiar el voto.",
-        "line_3": "Siempre puedes comprar más votos después si quieres añadir aún más.",
-        "useFreeVoteButton": "Usar mi voto gratis"
+      "confirmCustomOptionModal_NEED_TRANSLATION": {
+        "title": "Add your custom option",
+        "line_1": "Ready to add your free custom option to this post?",
+        "line_2": "Once you do, you won't be able to add another one.",
+        "useFreeVoteButton": "Add custom option"
       },
       "useBundleVotesModal": {
         "votesAvailable": "<0>{{amount}}</0> votos disponibles",

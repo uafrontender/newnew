@@ -1,19 +1,23 @@
 /* eslint-disable react/require-default-props */
 import React, { useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
-import assets from '../../../../constants/assets';
 
-const PostSuccessAnimationBackground: React.FunctionComponent<{
+const AnimatedBackground: React.FunctionComponent<{
+  className?: string;
+  src: string;
+  alt: string;
   noBlur?: boolean;
-}> = React.memo(({ noBlur }) => {
+}> = React.memo(({ className, src, alt, noBlur }) => {
   const elements = useMemo(() => [1, 2, 3], []);
 
   return (
-    <SContainer>
+    <SContainer className={className}>
       {elements.map((el, i) => (
-        <GoldCoin
+        <FloatingAsset
           key={el + 1}
           index={i}
+          src={src}
+          alt={alt}
           delay={0}
           top={-200 - i * 60}
           {...(i % 2 === 0
@@ -27,9 +31,11 @@ const PostSuccessAnimationBackground: React.FunctionComponent<{
         />
       ))}
       {elements.map((el, i) => (
-        <GoldCoin
+        <FloatingAsset
           key={el + 2}
           index={i}
+          src={src}
+          alt={alt}
           delay={2}
           top={-200 - i * 50}
           {...(i % 2 !== 0
@@ -43,9 +49,11 @@ const PostSuccessAnimationBackground: React.FunctionComponent<{
         />
       ))}
       {elements.map((el, i) => (
-        <GoldCoin
+        <FloatingAsset
           key={el + 3}
           index={i}
+          src={src}
+          alt={alt}
           delay={3}
           top={-200 - i * 50}
           {...(i % 2 === 0
@@ -59,9 +67,11 @@ const PostSuccessAnimationBackground: React.FunctionComponent<{
         />
       ))}
       {elements.map((el, i) => (
-        <GoldCoin
+        <FloatingAsset
           key={el + 4}
           index={i}
+          src={src}
+          alt={alt}
           delay={5}
           top={-200 - i * 50}
           {...(i % 2 !== 0
@@ -75,9 +85,11 @@ const PostSuccessAnimationBackground: React.FunctionComponent<{
         />
       ))}
       {elements.map((el, i) => (
-        <GoldCoin
+        <FloatingAsset
           key={el + 5}
           index={i}
+          src={src}
+          alt={alt}
           delay={8}
           top={-200 - i * 50}
           {...(i % 2 === 0
@@ -94,17 +106,20 @@ const PostSuccessAnimationBackground: React.FunctionComponent<{
   );
 });
 
-export default PostSuccessAnimationBackground;
+export default AnimatedBackground;
 
 const SContainer = styled.div`
   position: absolute;
   /* background-color: blue; */
   width: 100vw;
-  height: 100vh;
+  height: 100%;
+  min-height: 100vh;
 `;
 
-interface IGoldCoin {
+interface IFloatingAsset {
   index: number;
+  alt: string;
+  src: string;
   top: number;
   left?: number;
   right?: number;
@@ -112,8 +127,10 @@ interface IGoldCoin {
   noBlur?: boolean;
 }
 
-const GoldCoin: React.FunctionComponent<IGoldCoin> = ({
+const FloatingAsset: React.FunctionComponent<IFloatingAsset> = ({
   index,
+  alt,
+  src,
   top,
   left,
   right,
@@ -125,7 +142,7 @@ const GoldCoin: React.FunctionComponent<IGoldCoin> = ({
   const speed = useMemo(() => Math.random() * index + 1 * 8, [index]);
 
   return (
-    <SGoldIcon
+    <SIcon
       index={index}
       delay={delay}
       speed={speed}
@@ -143,21 +160,23 @@ const GoldCoin: React.FunctionComponent<IGoldCoin> = ({
       }}
       noBlur={noBlur}
     >
-      <img src={assets.decision.gold} alt='coin' draggable={false} />
-    </SGoldIcon>
+      <img src={src} alt={alt} draggable={false} />
+    </SIcon>
   );
 };
 
 const RainingAnimation = (transform: string) => keyframes`
   0% {
-    transform: ${transform} translateY(-100px);
+    top: -300px;
+    transform: ${transform};// translateY(-100px);
   }
   100% {
-    transform: ${transform} translateY(140vh);
+    top: 100%;
+    transform: ${transform};// translateY(140vh);
   }
 `;
 
-const SGoldIcon = styled.div<{
+const SIcon = styled.div<{
   index: number;
   delay: number;
   transform: string;
