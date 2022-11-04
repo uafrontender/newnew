@@ -52,6 +52,7 @@ const TurnBundleModal: React.FC<IFunction> = React.memo(
 export default TurnBundleModal;
 
 const SModal = styled(Modal)`
+  // TODO: replace with animated background?
   background: url(${assets.bundles.votesBackground});
   background-size: cover;
   background-repeat: no-repeat;
