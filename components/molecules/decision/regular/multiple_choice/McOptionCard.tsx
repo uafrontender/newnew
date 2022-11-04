@@ -624,7 +624,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             </>
           )}
         </SContainer>
-        {/* TODO: Move this modal one level above as it is unwise to render multiple instances of them */}
+        {/* TODO: Move these modals one level above as it is unwise to render multiple instances of them */}
         {/* Confirm vote modal */}
         {isConfirmVoteModalOpen ? (
           <McOptionConfirmVoteModal

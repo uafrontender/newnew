@@ -325,7 +325,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               isCreatorsBid={
                 !option.creator || option.creator?.uuid === post.creator?.uuid
               }
-              // TODO: check the successful waiting for response statuses cases
               noAction={postStatus === 'failed'}
               handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
                 setPaymentSuccessModalOpen(newValue)
@@ -383,7 +382,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
                 onClick={() => {
-                  // TODO: check that it is not clickable when disabled
                   Mixpanel.track('Click Add Free Option', {
                     _stage: 'Post',
                     _postUuid: post.postUuid,
@@ -476,7 +474,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
               onClick={() => {
-                // TODO: check that it is not clickable when disabled
                 Mixpanel.track('Click Add Free Option', {
                   _stage: 'Post',
                   _postUuid: post.postUuid,

@@ -139,7 +139,6 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   const monthsOfAccess = Math.floor(daysOfAccess / 30);
   const unitOfTimeLeft = monthsOfAccess > 1 ? 'months' : 'month';
 
-  // TODO: Handle redirect
   return (
     <>
       <PaymentModal
@@ -198,7 +197,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
       </PaymentModal>
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
-      {/* TODO: Add success modal */}
+      {/* Success modal */}
       {paymentSuccessModalOpen && (
         <BundlePaymentSuccessModal
           show

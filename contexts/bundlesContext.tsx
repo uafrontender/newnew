@@ -82,7 +82,6 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
     fetchBundles();
   }, [user.loggedIn]);
 
-  // TODO: Integrate bundle updates
   // Listen for socket updates
   useEffect(() => {
     const handleBundleChanged = async (data: any) => {
