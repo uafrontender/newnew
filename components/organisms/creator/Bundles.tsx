@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
@@ -10,6 +10,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import { getBundleStatus } from '../../../api/endpoints/bundles';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -28,24 +29,17 @@ const SuccessBundleModal = dynamic(
   () => import('../../molecules/creator/dashboard/SuccessBundleModal')
 );
 
-interface ISuperpollBundle {
-  id: number;
-  votes: string;
-  months: string;
-  price: string;
-  isBundlesEnabled?: boolean;
-}
-
 export const Bundles: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const { appConstants } = useGetAppConstants();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
 
   const [turnBundleModalOpen, setTurnBundleModalOpen] = useState(false);
-  const [succesModalOpen, setSuccesModalOpen] = useState(false);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
 
   const [isBundlesEnabled, setIsBundlesEnabled] = useState<boolean | undefined>(
     undefined
@@ -61,47 +55,15 @@ export const Bundles: React.FC = React.memo(() => {
     }
     setIsBundlesEnabled((prevState) => !prevState);
     setTurnBundleModalOpen(false);
-    setSuccesModalOpen(true);
+    setSuccessModalOpen(true);
   }, [isBundlesEnabled]);
 
-  const collection: ISuperpollBundle[] = useMemo(
-    () => [
-      {
-        id: 1,
-        votes: '100',
-        months: '1',
-        price: '5',
-      },
-      {
-        id: 2,
-        votes: '4,500',
-        months: '3',
-        price: '25',
-      },
-      {
-        id: 3,
-        votes: '10,000',
-        months: '6',
-        price: '50',
-      },
-      {
-        id: 4,
-        votes: '20,000',
-        months: '12',
-        price: '75',
-      },
-    ],
-    []
-  );
-
   const renderListItem = useCallback(
-    (item: ISuperpollBundle) => (
+    (item: newnewapi.IBundleOffer, index: number) => (
       <SuperpollBundle
-        key={`superpoll-bundle-${item.id}`}
-        id={item.id}
-        votes={item.votes}
-        months={item.months}
-        price={item.price}
+        key={`superpoll-bundle-${index + 1}`}
+        id={index + 1}
+        bundleOffer={item}
         isBundlesEnabled={!!isBundlesEnabled}
       />
     ),
@@ -159,7 +121,9 @@ export const Bundles: React.FC = React.memo(() => {
                     : t('myBundles.buttonTurnOn')}
                 </SButton>
               </SHeaderLine>
-              <SBundles>{collection.map(renderListItem)}</SBundles>
+              <SBundles>
+                {appConstants.bundleOffers.map(renderListItem)}
+              </SBundles>
             </SBlock>
             {!isBundlesEnabled && (
               <BundlesEarnings isBundlesEnabled={isBundlesEnabled} />
@@ -176,12 +140,12 @@ export const Bundles: React.FC = React.memo(() => {
           onClose={toggleTurnBundleModalOpen}
         />
       )}
-      {succesModalOpen && (
+      {successModalOpen && (
         <SuccessBundleModal
           show
           zIndex={1002}
           isBundlesEnabled={isBundlesEnabled}
-          onClose={() => setSuccesModalOpen(false)}
+          onClose={() => setSuccessModalOpen(false)}
         />
       )}
     </SContainer>
