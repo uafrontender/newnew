@@ -16,11 +16,12 @@ import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 interface IBuyBundleModal {
   show: boolean;
   creator: newnewapi.IUser;
+  successUrl: string;
   onClose: () => void;
 }
 
 const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
-  ({ show, creator, onClose }) => {
+  ({ show, creator, successUrl, onClose }) => {
     const { t } = useTranslation('common');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const { appConstants } = useGetAppConstants();
@@ -66,6 +67,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
           <BundlePaymentModal
             creator={creator}
             bundleOffer={bundleToBuy}
+            successUrl={successUrl}
             onClose={() => setBundleToBuy(undefined)}
             onCloseSuccessModal={() => onClose()}
           />

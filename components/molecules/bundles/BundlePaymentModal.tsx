@@ -22,6 +22,7 @@ import BundlePaymentSuccessModal from './BundlePaymentSuccessModal';
 interface IBundlePaymentModal {
   creator: newnewapi.IUser;
   bundleOffer: newnewapi.IBundleOffer;
+  successUrl: string;
   onClose: () => void;
   onCloseSuccessModal?: () => void;
 }
@@ -29,6 +30,7 @@ interface IBundlePaymentModal {
 const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   creator,
   bundleOffer,
+  successUrl,
   onClose,
   onCloseSuccessModal,
 }) => {
@@ -67,12 +69,10 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
     [creator, bundleOffer, paymentFeeInCents]
   );
 
-  // TODO: Fix setup intent
   const setupIntent = useStripeSetupIntent({
     purpose: voteOnPostRequest,
     isGuest: !user.loggedIn,
-    // TODO: Fix redirect
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/bundles`,
+    successUrl,
   });
 
   const handlePayWithCard = useCallback(

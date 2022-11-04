@@ -198,6 +198,7 @@ export const Bundles = () => {
         <BuyBundleModal
           show
           creator={offeredCreator}
+          successUrl={`${process.env.NEXT_PUBLIC_APP_URL}/bundles`}
           onClose={() => {
             setOfferedCreator(undefined);
             setShownCreatorBundle(undefined);
