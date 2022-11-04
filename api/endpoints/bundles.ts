@@ -19,7 +19,7 @@ export const getMyBundles = (
     signal ?? undefined
   );
 
-export const buyCreatorsBundles = (
+export const buyCreatorsBundle = (
   payload: newnewapi.StripeContributionRequest,
   signal?: RequestInit['signal']
 ) =>

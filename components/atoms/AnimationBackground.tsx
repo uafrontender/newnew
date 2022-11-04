@@ -1,21 +1,23 @@
 /* eslint-disable react/require-default-props */
 import React, { useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
-import assets from '../../constants/assets';
 
-// TODO: Unify with PostSuccessAnimationBackground.tsx
-const VoteAnimationBackground: React.FunctionComponent<{
+const AnimatedBackground: React.FunctionComponent<{
   className?: string;
+  src: string;
+  alt: string;
   noBlur?: boolean;
-}> = React.memo(({ className, noBlur }) => {
+}> = React.memo(({ className, src, alt, noBlur }) => {
   const elements = useMemo(() => [1, 2, 3], []);
 
   return (
     <SContainer className={className}>
       {elements.map((el, i) => (
-        <Vote
+        <FloatingAsset
           key={el + 1}
           index={i}
+          src={src}
+          alt={alt}
           delay={0}
           top={-200 - i * 60}
           {...(i % 2 === 0
@@ -29,9 +31,11 @@ const VoteAnimationBackground: React.FunctionComponent<{
         />
       ))}
       {elements.map((el, i) => (
-        <Vote
+        <FloatingAsset
           key={el + 2}
           index={i}
+          src={src}
+          alt={alt}
           delay={2}
           top={-200 - i * 50}
           {...(i % 2 !== 0
@@ -45,9 +49,11 @@ const VoteAnimationBackground: React.FunctionComponent<{
         />
       ))}
       {elements.map((el, i) => (
-        <Vote
+        <FloatingAsset
           key={el + 3}
           index={i}
+          src={src}
+          alt={alt}
           delay={3}
           top={-200 - i * 50}
           {...(i % 2 === 0
@@ -61,9 +67,11 @@ const VoteAnimationBackground: React.FunctionComponent<{
         />
       ))}
       {elements.map((el, i) => (
-        <Vote
+        <FloatingAsset
           key={el + 4}
           index={i}
+          src={src}
+          alt={alt}
           delay={5}
           top={-200 - i * 50}
           {...(i % 2 !== 0
@@ -77,9 +85,11 @@ const VoteAnimationBackground: React.FunctionComponent<{
         />
       ))}
       {elements.map((el, i) => (
-        <Vote
+        <FloatingAsset
           key={el + 5}
           index={i}
+          src={src}
+          alt={alt}
           delay={8}
           top={-200 - i * 50}
           {...(i % 2 === 0
@@ -96,7 +106,7 @@ const VoteAnimationBackground: React.FunctionComponent<{
   );
 });
 
-export default VoteAnimationBackground;
+export default AnimatedBackground;
 
 const SContainer = styled.div`
   position: absolute;
@@ -106,8 +116,10 @@ const SContainer = styled.div`
   min-height: 100vh;
 `;
 
-interface IVote {
+interface IFloatingAsset {
   index: number;
+  alt: string;
+  src: string;
   top: number;
   left?: number;
   right?: number;
@@ -115,8 +127,10 @@ interface IVote {
   noBlur?: boolean;
 }
 
-const Vote: React.FunctionComponent<IVote> = ({
+const FloatingAsset: React.FunctionComponent<IFloatingAsset> = ({
   index,
+  alt,
+  src,
   top,
   left,
   right,
@@ -128,7 +142,7 @@ const Vote: React.FunctionComponent<IVote> = ({
   const speed = useMemo(() => Math.random() * index + 1 * 8, [index]);
 
   return (
-    <SVoteIcon
+    <SIcon
       index={index}
       delay={delay}
       speed={speed}
@@ -146,8 +160,8 @@ const Vote: React.FunctionComponent<IVote> = ({
       }}
       noBlur={noBlur}
     >
-      <img src={assets.common.vote} alt='vote' draggable={false} />
-    </SVoteIcon>
+      <img src={src} alt={alt} draggable={false} />
+    </SIcon>
   );
 };
 
@@ -162,7 +176,7 @@ const RainingAnimation = (transform: string) => keyframes`
   }
 `;
 
-const SVoteIcon = styled.div<{
+const SIcon = styled.div<{
   index: number;
   delay: number;
   transform: string;

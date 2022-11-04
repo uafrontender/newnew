@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
-import { buyCreatorsBundles } from '../../../api/endpoints/bundles';
+import { buyCreatorsBundle } from '../../../api/endpoints/bundles';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { useAppSelector } from '../../../redux-store/store';
 import { formatNumber } from '../../../utils/format';
@@ -106,7 +106,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
               : {}),
           });
 
-        const res = await buyCreatorsBundles(stripeContributionRequest);
+        const res = await buyCreatorsBundle(stripeContributionRequest);
 
         if (
           !res.data ||

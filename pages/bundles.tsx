@@ -29,7 +29,7 @@ import BackButton from '../components/molecules/profile/BackButton';
 import AllBundlesModal from '../components/molecules/bundles/AllBundlesModal';
 import { useBundles } from '../contexts/bundlesContext';
 import CreatorsBundleModal from '../components/molecules/bundles/CreatorsBundleModal';
-import VoteAnimationBackground from '../components/atoms/VoteAnimationBackground';
+import AnimatedBackground from '../components/atoms/AnimationBackground';
 
 export const Bundles = () => {
   const router = useRouter();
@@ -105,7 +105,7 @@ export const Bundles = () => {
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <Container>
-        <SVoteAnimationBackground />
+        <SAnimationBackground src={assets.common.vote} alt='vote' />
         <SubNavigation>
           {isMobile ? (
             <SBackButton onClick={() => router.back()} />
@@ -258,7 +258,7 @@ const Container = styled.div`
   }
 `;
 
-const SVoteAnimationBackground = styled(VoteAnimationBackground)`
+const SAnimationBackground = styled(AnimatedBackground)`
   z-index: -1;
 `;
 

@@ -11,7 +11,7 @@ import assets from '../../../constants/assets';
 import { formatNumber } from '../../../utils/format';
 import BulletLine from './BulletLine';
 import Button from '../../atoms/Button';
-import VoteAnimationBackground from '../../atoms/VoteAnimationBackground';
+import AnimatedBackground from '../../atoms/AnimationBackground';
 
 interface IBuyBundleModal {
   show: boolean;
@@ -33,7 +33,7 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
     return (
       <>
         <Modal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
-          <VoteAnimationBackground />
+          <AnimatedBackground src={assets.common.vote} alt='vote' />
           <SModalPaper onClose={onClose}>
             <Content>
               {/* TODO: add set of tickets (need bundles level in api interfaces) */}

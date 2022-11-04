@@ -13,10 +13,10 @@ import { useAppSelector } from '../../../redux-store/store';
 import Modal from '../Modal';
 import ModerationView from './moderation';
 import PostModerationControls from '../../molecules/decision/moderation/PostModerationControls';
-import PostSuccessAnimationBackground from '../../molecules/decision/success/PostSuccessAnimationBackground';
 
 // Icons
 import assets from '../../../constants/assets';
+import AnimatedBackground from '../../atoms/AnimationBackground';
 
 const PostFailedBox = dynamic(
   () => import('../../molecules/decision/common/PostFailedBox')
@@ -74,7 +74,9 @@ const PostModalModeration: React.FunctionComponent<
       <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
         {(postStatus === 'succeeded' ||
           postStatus === 'waiting_for_response') &&
-          !isMobile && <PostSuccessAnimationBackground />}
+          !isMobile && (
+            <AnimatedBackground src={assets.decision.gold} alt='coin' />
+          )}
         <Head>
           <title>{t(`meta.${typeOfPost}.title`)}</title>
           <meta

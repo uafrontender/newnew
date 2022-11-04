@@ -10,10 +10,10 @@ import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 import InlineSvg from '../../../atoms/InlineSVG';
 import Modal from '../../../organisms/Modal';
-import PostSuccessAnimationBackground from '../success/PostSuccessAnimationBackground';
 
 import assets from '../../../../constants/assets';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+import AnimatedBackground from '../../../atoms/AnimationBackground';
 
 interface IPostResponseSuccessModal {
   isOpen: boolean;
@@ -37,7 +37,9 @@ const PostResponseSuccessModal: React.FunctionComponent<
 
   return (
     <Modal show={isOpen} additionalz={zIndex}>
-      {!isMobile && <PostSuccessAnimationBackground noBlur />}
+      {!isMobile && (
+        <AnimatedBackground src={assets.decision.gold} alt='coin' noBlur />
+      )}
       {!isMobile && (
         <SCloseButton
           view='secondary'
