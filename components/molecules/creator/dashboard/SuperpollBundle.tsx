@@ -2,44 +2,48 @@
 import React from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
+
 import Text from '../../../atoms/Text';
 import BulletCheckmark from '../../../atoms/BulletCheckmark';
 import TicketSet from '../../../atoms/bundles/TicketSet';
+import { formatNumber } from '../../../../utils/format';
 
 interface IFunctionProps {
   id: number;
-  votes: string;
-  months: string;
-  price: string;
+  bundleOffer: newnewapi.IBundleOffer;
   isBundlesEnabled: boolean;
 }
 
 export const SuperpollBundle: React.FC<IFunctionProps> = ({
   id,
-  votes,
-  months,
-  price,
+  bundleOffer,
   isBundlesEnabled,
 }) => {
   const { t } = useTranslation('page-Creator');
   const theme = useTheme();
 
+  const daysOfAccess = bundleOffer.accessDurationInSeconds! / 60 / 60 / 24;
+  const monthsOfAccess = Math.floor(daysOfAccess / 30);
+
   return (
     <SContainer>
       <SHeader>
         <SVotes>
-          <SVotesQty isBundlesEnabled={isBundlesEnabled}>{votes}</SVotesQty>{' '}
+          <SVotesQty isBundlesEnabled={isBundlesEnabled}>
+            {formatNumber(bundleOffer.votesAmount!, true)}
+          </SVotesQty>{' '}
           {t('myBundles.bundlesSet.votes')}
         </SVotes>
         <TicketSet size={36} shift={11} numberOFTickets={id} />
       </SHeader>
-      {months === '1' ? (
+      {monthsOfAccess === 1 ? (
         <SText variant={3}>
           {t('myBundles.bundlesSet.descriptionSingular')}
         </SText>
       ) : (
         <SText variant={3}>
-          {t('myBundles.bundlesSet.description', { duration: months })}
+          {t('myBundles.bundlesSet.description', { duration: monthsOfAccess })}
         </SText>
       )}
       <SBundlesList>
@@ -80,7 +84,8 @@ export const SuperpollBundle: React.FC<IFunctionProps> = ({
       </SBundlesList>
       <SFooter>
         <SText variant={3} noMargin>
-          <SPrice>${price}</SPrice> / {t('myBundles.bundlesSet.perBundle')}
+          <SPrice>${(bundleOffer.price?.usdCents as number) / 100}</SPrice> /{' '}
+          {t('myBundles.bundlesSet.perBundle')}
         </SText>
       </SFooter>
     </SContainer>

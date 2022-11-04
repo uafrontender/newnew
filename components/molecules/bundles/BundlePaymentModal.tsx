@@ -281,6 +281,9 @@ const BundleFeatures = styled.div`
   gap: 8px;
   padding-bottom: 16px;
   border-bottom: 1px solid;
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: ${({ theme }) =>
+    theme.name === 'light'
+      ? 'rgba(0, 21, 128, 0.1)'
+      : 'rgba(255, 255, 255, 0.1)'};
   margin-bottom: 8px;
 `;

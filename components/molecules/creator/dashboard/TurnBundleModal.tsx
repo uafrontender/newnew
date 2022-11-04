@@ -44,6 +44,7 @@ const TurnBundleModal: React.FC<ITurnBundleModal> = React.memo(
         <Modal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
           <SModalPaper onClose={onClose} isCloseButton>
             <Content>
+              {/* TODO: replace with TicketSet component, remove icon */}
               <SImgHolder>
                 <img
                   src={votes.src}
