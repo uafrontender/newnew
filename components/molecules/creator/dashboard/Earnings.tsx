@@ -226,7 +226,15 @@ export const Earnings: React.FC<IFunctionProps> = ({
           <STotalText weight={600}>{splitPeriod()}</STotalText>
         </STotalTextWrapper>
       </STotalLine>
-      <SListHolder>{collection.map(renderListItem)}</SListHolder>
+      <SListHolder>
+        {collection.map(renderListItem)}
+        <SListItem key='list-item-earnings-bundles'>
+          <SListItemTitle variant={2} weight={700}>
+            {t(`dashboard.earnings.list.bundles`)}
+          </SListItemTitle>
+          <SListItemValue variant={6}>$0.00</SListItemValue>
+        </SListItem>
+      </SListHolder>
       {isLoading || initialLoad ? (
         <Lottie
           width={64}

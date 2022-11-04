@@ -48,7 +48,6 @@ import {
   setCreationFileUploadError,
   setCreationVideoThumbnails,
   setCreationVideoProcessing,
-  setCreationAllowSuggestions,
   setCreationTargetBackerCount,
   setCreationFileUploadLoading,
   setCreationFileUploadProgress,
@@ -565,12 +564,6 @@ export const CreationSecondStepContent: React.FC<
           _value: value,
         });
         dispatch(setCreationComments(value));
-      } else if (key === 'allowSuggestions') {
-        Mixpanel.track('Post Allow Suggestions Change', {
-          _stage: 'Creation',
-          _value: value,
-        });
-        dispatch(setCreationAllowSuggestions(value));
       } else if (key === 'expiresAt') {
         Mixpanel.track('Post expiresAt Change', {
           _stage: 'Creation',
@@ -825,17 +818,6 @@ export const CreationSecondStepContent: React.FC<
             <SSeparator margin='16px 0' />
           </>
         )}
-        {tab === 'multiple-choice' &&
-          user?.userData?.options?.isOfferingSubscription && (
-            <SMobileFieldWrapper>
-              <MobileField
-                id='allowSuggestions'
-                type='toggle'
-                value={multiplechoice.options.allowSuggestions}
-                onChange={handleItemChange}
-              />
-            </SMobileFieldWrapper>
-          )}
         <MobileField
           id='comments'
           type='toggle'
@@ -858,8 +840,6 @@ export const CreationSecondStepContent: React.FC<
       t,
       formatExpiresAt,
       formatStartsAt,
-      user?.userData?.options?.isOfferingSubscription,
-      multiplechoice.options.allowSuggestions,
     ]
   );
 
@@ -1072,13 +1052,6 @@ export const CreationSecondStepContent: React.FC<
     if (payload) markTutorialStepAsCompleted(payload);
     setIsTutorialVisible(false);
   };
-
-  useEffect(() => {
-    if (!user?.userData?.options?.isOfferingSubscription) {
-      dispatch(setCreationAllowSuggestions(false));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.userData?.options?.isOfferingSubscription]);
 
   // This effect results in the form re-rendering every second
   // However, it re renders after every letter typed anyway
@@ -1466,10 +1439,6 @@ const SListWrapper = styled.div`
 const SFieldWrapper = styled.div`
   width: calc(50% - 16px);
   margin: 8px;
-`;
-
-const SMobileFieldWrapper = styled.div`
-  margin-bottom: 16px;
 `;
 
 const SButtonWrapper = styled.div`

@@ -54,6 +54,8 @@ const SFailedBox = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     padding: 24px;
+
+    margin-top: 16px;
   }
 `;
 

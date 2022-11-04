@@ -33,7 +33,7 @@ import loadingAnimation from '../../../../../public/animations/logo-loading-blue
 
 interface IAcOptionsTab {
   postId: string;
-  postCreator: string;
+  postCreatorName: string;
   postText: string;
   postDeadline: string;
   postStatus: TPostStatusStringified;
@@ -49,7 +49,7 @@ interface IAcOptionsTab {
 
 const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   postId,
-  postCreator,
+  postCreatorName,
   postText,
   postDeadline,
   postStatus,
@@ -208,7 +208,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               key={option.id.toString()}
               option={option as TAcOptionWithHighestField}
               postId={postId}
-              postCreator={postCreator}
+              postCreatorName={postCreatorName}
               postDeadline={postDeadline}
               postText={postText}
               index={i}

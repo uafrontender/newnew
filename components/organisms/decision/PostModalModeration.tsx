@@ -12,9 +12,11 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import ModerationView from './moderation';
 
 // Icons
-import assets from '../../../constants/assets';
 import GoBackButton from '../../molecules/GoBackButton';
 import { useAppSelector } from '../../../redux-store/store';
+
+// Icons
+import assets from '../../../constants/assets';
 
 const PostFailedBox = dynamic(
   () => import('../../molecules/decision/common/PostFailedBox')

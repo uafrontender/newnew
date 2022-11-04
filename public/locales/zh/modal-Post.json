@@ -252,6 +252,9 @@
     "winner": "贏家",
     "history": "歷史"
   },
+  "optionsTabLine": {
+    "bundleVotes_NEED_TRANSLATION": "You have <0>{{amount}} votes</0>"
+  },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
       "ac": "這個 Bid 將在\n視頻處理完成後開始",
@@ -393,7 +396,6 @@
         "others": "其他",
         "voters": "投票者",
         "voted": "投票",
-        "freeVoteButton": "免費\n投票",
         "supportButton": "投票",
         "supportAgainButton": "再次\n投票",
         "raiseBidButton": "投票",
@@ -405,7 +407,8 @@
           "titleMoreVotes": "購買更多的投票",
           "vote": "票",
           "votes": "票",
-          "custom": "自定義票數"
+          "custom": "自定義票數",
+          "useVotes_NEED_TRANSLATION": "Use my votes"
         },
         "confirmVoteModal": {
           "vote": "票",
@@ -418,12 +421,16 @@
           "voteButton": "投票"
         }
       },
-      "confirmUseFreeVoteModal": {
-        "tag": "免費投票",
-        "line_1": "準備對這個選項使用你的免費投票嗎？",
-        "line_2": "使用後將不能再改變投票。",
-        "line_3": "如果想增加更多的票數，以後總能買到更多的投票！",
-        "useFreeVoteButton": "使用我的免費投票"
+      "confirmCustomOptionModal_NEED_TRANSLATION": {
+        "title": "Add your custom option",
+        "line_1": "Ready to add your free custom option to this post?",
+        "line_2": "Once you do, you won't be able to add another one.",
+        "useFreeVoteButton": "Add custom option"
+      },
+      "useBundleVotesModal_NEED_TRANSLATION": {
+        "votesAvailable": "<0>{{amount}}</0> votes available",
+        "optionTitle": "Superpoll option",
+        "button": "Vote"
       },
       "actionSection": {
         "votesAmount": {
@@ -434,7 +441,9 @@
         },
         "suggestionPlaceholder": "添加你自己的選項……",
         "suggestionPlaceholderDesktop": "添加選……",
-        "placeABidButton": "添加我的選項"
+        "placeABidButton": "添加我的選項",
+        "offersBundles_NEED_TRANSLATION": "{{creator}} offers Superpoll Bundles",
+        "viewBundles_NEED_TRANSLATION": "View Bundles"
       }
     },
     "winnerTab": {

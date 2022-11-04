@@ -252,6 +252,9 @@
     "winner": "Winner",
     "history": "History"
   },
+  "optionsTabLine": {
+    "bundleVotes": "You have <0>{{amount}} votes</0>"
+  },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
       "ac": "This Bid will begin once the video \nhas been processed",
@@ -393,7 +396,6 @@
         "others": "others",
         "voters": "voters",
         "voted": "voted",
-        "freeVoteButton": "Free \nvote",
         "supportButton": "Vote",
         "supportAgainButton": "Vote \nagain",
         "raiseBidButton": "Vote",
@@ -405,7 +407,8 @@
           "titleMoreVotes": "Buy more votes",
           "vote": "vote",
           "votes": "votes",
-          "custom": "Custom votes"
+          "custom": "Custom votes",
+          "useVotes": "Use my votes"
         },
         "confirmVoteModal": {
           "vote": "vote",
@@ -418,12 +421,16 @@
           "voteButton": "Vote"
         }
       },
-      "confirmUseFreeVoteModal": {
-        "tag": "Free vote",
-        "line_1": "Ready to use your free vote on this option?",
-        "line_2": "Once you do, you won't be able to change the vote.",
-        "line_3": "You can always buy more votes later if you want to add even more!",
-        "useFreeVoteButton": "Use my free vote"
+      "confirmCustomOptionModal": {
+        "title": "Add your custom option",
+        "line_1": "Ready to add your free custom option to this post?",
+        "line_2": "Once you do, you won't be able to add another one.",
+        "useFreeVoteButton": "Add custom option"
+      },
+      "useBundleVotesModal": {
+        "votesAvailable": "<0>{{amount}}</0> votes available",
+        "optionTitle": "Superpoll option",
+        "button": "Vote"
       },
       "actionSection": {
         "votesAmount": {
@@ -434,7 +441,9 @@
         },
         "suggestionPlaceholder": "Add your own option...",
         "suggestionPlaceholderDesktop": "Add an option ...",
-        "placeABidButton": "Add my option"
+        "placeABidButton": "Add my option",
+        "offersBundles": "{{creator}} offers Superpoll Bundles",
+        "viewBundles": "View Bundles"
       }
     },
     "winnerTab": {

@@ -29,7 +29,6 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
 // import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 // import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
-// import { getSubscriptionStatus } from '../../api/endpoints/subscription';
 // import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
 
@@ -44,10 +43,11 @@ import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
 import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
-// import CustomLink from '../atoms/CustomLink';
-// import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+import CustomLink from '../atoms/CustomLink';
 import SmsNotificationsButton from '../molecules/profile/SmsNotificationsButton';
 import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
+import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
+import { useBundles } from '../../contexts/bundlesContext';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -94,9 +94,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
-  // const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
-  // const [wasSubscribed, setWasSubscribed] = useState<boolean | null>(null);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
+  const { bundles } = useBundles();
+  const creatorsBundle = useMemo(
+    () => bundles?.find((bundle) => bundle.creator?.uuid === user.uuid),
+    [bundles, user.uuid]
+  );
 
   // Share
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -202,8 +205,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const [activityDecisionsCount, setActivityDecisionsCount] = useState(
     postsCachedActivityCount
   );
-
-  // const { creatorsImSubscribedTo } = useGetSubscriptions();
 
   const handleSetPostsCreatorsDecisions: React.Dispatch<
     React.SetStateAction<newnewapi.Post[]>
@@ -497,18 +498,23 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             ) : (
               <div />
             )}
-            <SIconButton
-              active={ellipseMenuOpen}
-              ref={moreButtonRef}
-              onClick={() => setIsEllipseMenuOpen(true)}
-            >
-              <InlineSvg
-                svg={MoreIconFilled}
-                fill={theme.colorsThemed.text.primary}
-                width='24px'
-                height='24px'
-              />
-            </SIconButton>
+            <RightSideButtons>
+              {!isMobile && (
+                <SSeeBundleButton user={user} creatorBundle={creatorsBundle} />
+              )}
+              <SIconButton
+                active={ellipseMenuOpen}
+                ref={moreButtonRef}
+                onClick={() => setIsEllipseMenuOpen(true)}
+              >
+                <InlineSvg
+                  svg={MoreIconFilled}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </SIconButton>
+            </RightSideButtons>
           </SSideButtons>
           {!isMobile && (
             <UserEllipseMenu
@@ -596,22 +602,21 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 )}
               </SShareButton>
             </SShareDiv>
-            {
-              // TODO: re-enable, repurpose for bundles (or remove it?)
-              /* user.options?.isOfferingSubscription &&
-              user.uuid !== currentUser.userData?.userUuid &&
-              (isSubscribed || wasSubscribed) && (
-                <CustomLink
-                  href={`/direct-messages/${user.username}-cr`}
-                  disabled={isSubscribed === null || wasSubscribed === null}
-                >
-                  <SSendButton withShadow view='primaryGrad'>
-                    {t('profileLayout.buttons.sendMessage')}
-                  </SSendButton>
-                </CustomLink>
-              ) */
-            }
+
+            {creatorsBundle && (
+              <CustomLink href={`/direct-messages/${user.username}-cr`}>
+                <SSendButton withShadow view='primaryGrad'>
+                  {t('profileLayout.buttons.sendMessage')}
+                </SSendButton>
+              </CustomLink>
+            )}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
+            {isMobile && (
+              <SMobileSeeBundleButton
+                user={user}
+                creatorBundle={creatorsBundle}
+              />
+            )}
           </SUserData>
           {/* Temp, all creactors for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
@@ -702,6 +707,7 @@ const SUserData = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
+  margin-bottom: 36px;
 `;
 
 const SUsernameWrapper = styled.div`
@@ -760,7 +766,7 @@ const SShareButton = styled(Button)`
   }
 `;
 
-/* const SSendButton = styled(Button)`
+const SSendButton = styled(Button)`
   margin: 0 auto 16px;
   background: ${(props) => props.theme.colorsThemed.accent.yellow};
   color: #2c2c33;
@@ -773,7 +779,7 @@ const SShareButton = styled(Button)`
     background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
     box-shadow: none !important;
   }
-`; */
+`;
 
 const SBioText = styled(Text)`
   text-align: center;
@@ -781,11 +787,26 @@ const SBioText = styled(Text)`
 
   padding-left: 16px;
   padding-right: 16px;
-  margin: 0 auto 54px;
+  margin: 0 auto 16px;
   width: 100%;
   max-width: 480px;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+const RightSideButtons = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+`;
+
+const SSeeBundleButton = styled(SeeBundlesButton)`
+  margin-right: 16px;
+`;
+
+const SMobileSeeBundleButton = styled(SeeBundlesButton)`
+  margin: auto;
+  margin-bottom: 16px;
 `;
 
 const SIconButton = styled.div<{

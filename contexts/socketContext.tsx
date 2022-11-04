@@ -20,7 +20,6 @@ const SocketContextProvider: React.FC<ISocketContextProvider> = ({
   // Will use access token if it is available to connect to socket.io
   useEffect(() => {
     let socketConnected = {} as Socket;
-    // console.log(fetchInitialized);
 
     if (fetchInitialized) {
       socketConnected = io(ENDPOINT, {
@@ -37,8 +36,6 @@ const SocketContextProvider: React.FC<ISocketContextProvider> = ({
 
       setSocket(() => socketConnected);
     }
-
-    // console.log(socketConnected);
 
     function cleanup() {
       socketConnected?.disconnect?.();

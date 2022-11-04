@@ -766,7 +766,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             postId={post.postUuid}
             postStatus={postStatus}
             postText={post.title}
-            postCreator={
+            postCreatorName={
               (post.creator?.nickname as string) ?? post.creator?.username
             }
             postDeadline={moment(
