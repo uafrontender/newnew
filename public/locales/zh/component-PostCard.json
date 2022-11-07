@@ -18,11 +18,11 @@
     }
   },
   "timer": {
-    "timeLeft": "剩餘{{time}}",
-    "daysLeft": "d",
-    "hoursLeft": "h",
-    "minutesLeft": "m",
-    "secondsLeft_NEED_TRANSLATION": "s",
+    "timeLeft": "{{time}}",
+    "daysLeft": "天",
+    "hoursLeft": "小時",
+    "minutesLeft": "分鐘",
+    "secondsLeft": "秒",
     "endedOn": "結束於",
     "soon": "即將開始"
   }
