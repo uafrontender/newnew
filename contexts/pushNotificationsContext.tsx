@@ -8,7 +8,11 @@ import React, {
 } from 'react';
 import { newnewapi } from 'newnew-api';
 
-import { webPushRegister, webPushUnRegister } from '../api/endpoints/user';
+import {
+  webPushConfig,
+  webPushRegister,
+  webPushUnRegister,
+} from '../api/endpoints/user';
 
 export const PushNotificationsContext = createContext<{
   inSubscribed: boolean;
@@ -39,6 +43,23 @@ const PushNotificationsContextProvider: React.FC<
     useState<boolean>(false);
 
   const [inSubscribed, setIsSubscribed] = useState(false);
+  const [publicKey, setPublicKey] = useState('');
+
+  useEffect(() => {
+    const getWebConfig = async () => {
+      try {
+        const payload = new newnewapi.EmptyRequest({});
+
+        const response = await webPushConfig(payload);
+
+        setPublicKey(response.data?.publicKey || '');
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    getWebConfig();
+  }, []);
 
   useEffect(() => {
     const checkSubscription = async () => {
@@ -103,7 +124,7 @@ const PushNotificationsContextProvider: React.FC<
       console.log('here');
       // This is a new web service URL and its validity is unknown.
       (window as any).safari.pushNotification.requestPermission(
-        process.env.NEXT_PUBLIC_APP_URL,
+        `${process.env.NEXT_PUBLIC_APP_URL}/api`,
         process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID,
         {}, // Data that you choose to send to your server to help you identify the user.
         checkPermissionSafari
@@ -143,8 +164,7 @@ const PushNotificationsContextProvider: React.FC<
             try {
               const subscription = await swReg.pushManager.subscribe({
                 userVisibleOnly: true,
-                applicationServerKey:
-                  process.env.NEXT_PUBLIC_APPLICATION_SERVER_KEY,
+                applicationServerKey: publicKey,
               });
               const sub = subscription?.toJSON();
 
@@ -180,7 +200,7 @@ const PushNotificationsContextProvider: React.FC<
         console.error(err);
       }
     },
-    [checkPermissionSafari]
+    [checkPermissionSafari, publicKey]
   );
 
   const unsubscribe = useCallback(async () => {

@@ -378,23 +378,21 @@ export const webPush = (
     signal ?? undefined
   );
 
-
 export const webPushRegister = (
   payload: newnewapi.RegisterForWebPushRequest,
   signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.RegisterForWebPushRequest,
-    newnewapi.RegisterForWebPushResponse
+    newnewapi.EmptyResponse
   >(
     newnewapi.RegisterForWebPushRequest,
-    newnewapi.RegisterForWebPushResponse,
+    newnewapi.EmptyResponse,
     `${BASE_URL}/web_push/register`,
     'put',
     payload,
     signal ?? undefined
   );
-
 
 export const webPushUnRegister = (
   payload: newnewapi.UnRegisterForWebPushRequest,
@@ -402,12 +400,28 @@ export const webPushUnRegister = (
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.UnRegisterForWebPushRequest,
-    newnewapi.UnRegisterForWebPushResponse
+    newnewapi.EmptyResponse
   >(
     newnewapi.UnRegisterForWebPushRequest,
-    newnewapi.UnRegisterForWebPushResponse,
+    newnewapi.EmptyResponse,
     `${BASE_URL}/web_push/unregister`,
     'delete',
+    payload,
+    signal ?? undefined
+  );
+
+export const webPushConfig = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.ConfigForWebPushResponse
+  >(
+    newnewapi.EmptyRequest,
+    newnewapi.ConfigForWebPushResponse,
+    `${BASE_URL}/web_push/config`,
+    'post',
     payload,
     signal ?? undefined
   );
