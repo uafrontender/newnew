@@ -35,5 +35,8 @@
   },
   "button": {
     "back": "Back"
+  },
+  "error": {
+    "requestFailed": "請求失敗"
   }
 }

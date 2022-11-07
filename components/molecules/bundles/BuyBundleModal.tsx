@@ -12,16 +12,17 @@ import BundleOfferCard from './BunldeOfferCard';
 import { useAppSelector } from '../../../redux-store/store';
 import BundlePaymentModal from './BundlePaymentModal';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import InlineSvg from '../../atoms/InlineSVG';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 interface IBuyBundleModal {
   show: boolean;
   creator: newnewapi.IUser;
-  successUrl: string;
   onClose: () => void;
 }
 
 const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
-  ({ show, creator, successUrl, onClose }) => {
+  ({ show, creator, onClose }) => {
     const { t } = useTranslation('common');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const { appConstants } = useGetAppConstants();
@@ -48,7 +49,17 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
                 <SMobileTitle>{t('modal.buyBundle.title')}</SMobileTitle>
               )}
               <SUserAvatar avatarUrl={creator.avatarUrl ?? ''} />
-              <SUsername>{creator.username}</SUsername>
+              <SUserData>
+                <SUsername>{creator.username}</SUsername>
+                {creator.options?.isVerified && (
+                  <InlineSvg
+                    svg={VerificationCheckmark}
+                    width='24px'
+                    height='24px'
+                    fill='none'
+                  />
+                )}
+              </SUserData>
               <SOfferedBundleList>
                 {appConstants.bundleOffers?.map((bundleOffer, index) => (
                   <SBundleOfferCard
@@ -67,7 +78,6 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
           <BundlePaymentModal
             creator={creator}
             bundleOffer={bundleToBuy}
-            successUrl={successUrl}
             onClose={() => setBundleToBuy(undefined)}
             onCloseSuccessModal={() => onClose()}
           />
@@ -119,17 +129,26 @@ const SUserAvatar = styled(UserAvatar)`
   }
 `;
 
+const SUserData = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-bottom: 24px;
+  }
+`;
+
 const SUsername = styled.h4`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: 700;
   font-size: 20px;
   line-height: 28px;
-  margin-bottom: 16px;
 
   ${({ theme }) => theme.media.laptop} {
     font-size: 24px;
     line-height: 32px;
-    margin-bottom: 24px;
   }
 `;
 

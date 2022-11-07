@@ -551,7 +551,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <BuyBundleModal
           show
           creator={post.creator}
-          successUrl={`${process.env.NEXT_PUBLIC_APP_URL}/post/${post.postUuid}`}
           onClose={() => {
             setBuyBundleModalOpen(false);
           }}
