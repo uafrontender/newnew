@@ -35,5 +35,8 @@
   },
   "button": {
     "back": "Back"
+  },
+  "error": {
+    "requestFailed": "Request failed"
   }
 }
