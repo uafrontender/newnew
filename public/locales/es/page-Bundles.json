@@ -1,40 +1,40 @@
 {
   "meta": {
-    "title": "Superpoll Bundles",
+    "title": "Bundles de Superpoll",
     "description": ""
   },
   "header": {
-    "title": "Superpoll Bundles"
+    "title": "Bundles de Superpoll"
   },
   "bundlesSection": {
-    "title": "Your current bundles",
-    "seeAll": "See all",
-    "noBundles": "You have no bundles. Try searching for creator or buy bundle",
-    "search": "Search"
+    "title": "Tus bundles actuales",
+    "seeAll": "Ver todos",
+    "noBundles": "Ni tienes ningún bundle. Intenta buscar por creador o compra un bundle",
+    "search": "Buscar"
   },
   "bundlesModal": {
-    "title": "Your current bundles"
+    "title": "Tus bundles actuales"
   },
   "bundle": {
-    "votesLeft": "<0>{{amount}}</0> votes left",
-    "access": "plus {{amount}} {{unit}} of:",
-    "customOptions": "adding custom superpoll options",
-    "chat": "1-on-1 private chat",
-    "expiation": "votes never expire",
+    "votesLeft": "Quedan <0>{{amount}}</0> votos",
+    "access": "y {{amount}} {{unit}} de:",
+    "customOptions": "añadir opciones personalizadas a las superpolls",
+    "chat": "chat privado 1 a 1",
+    "expiation": "los votos nunca caducan",
     "unit": {
-      "day": "day",
-      "days": "days",
-      "month": "month",
-      "months": "months"
+      "day": "día",
+      "days": "días",
+      "month": "mes",
+      "months": "meses"
     }
   },
   "search": {
-    "title": "Search creators offering Bundles",
-    "searchInputPlaceholder": "Search creators",
-    "resultsTitle": "Top Creators"
+    "title": "Buscar creadores que ofrezcan Bundles",
+    "searchInputPlaceholder": "Buscar creadores",
+    "resultsTitle": "Creadores destacados"
   },
   "button": {
-    "back": "Back"
+    "back": "Regresar"
   },
   "error": {
     "requestFailed": "La solicitud ha fallado"

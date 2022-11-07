@@ -97,10 +97,10 @@
     },
     "buttons": {
       "favorites": "收藏",
-      "enableSmsNotifications_NEED_TRANSLATION": "Notify me",
-      "disableSmsNotifications_NEED_TRANSLATION": "Notifications ON",
-      "buyBundles_NEED_TRANSLATION": "Buy Bundles",
-      "votesLeft_NEED_TRANSLATION": "{{amount}} votes left",
+      "enableSmsNotifications": "通知我",
+      "disableSmsNotifications": "開啟通知",
+      "buyBundles": "購買Bundle",
+      "votesLeft": "剩餘{{amount}} 票",
       "sendMessage": "發送消息",
       "copied": "連結已複製！"
     }
@@ -271,11 +271,11 @@
         "privacySubsections": {
           "spendings": {
             "title": "不讓別人查看我的消費",
-            "caption_NEED_TRANSLATION": "People will not be able to see how much you spent on bids and superpolls"
+            "caption": "其他人看不到你為出價或Superpoll上花了多少錢"
           },
           "private": {
             "title": "將我的活動設為隱秘",
-            "caption_NEED_TRANSLATION": "People will not be able to see any of your activity on bids and superpolls"
+            "caption": "其他人看不到你在出價或Superpoll上的活動"
           }
         },
         "blockedUsers": {
