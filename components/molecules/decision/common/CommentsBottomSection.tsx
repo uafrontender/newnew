@@ -39,7 +39,6 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import isBrowser from '../../../../utils/isBrowser';
 
 interface ICommentsBottomSection {
   postUuid: string;
@@ -625,7 +624,7 @@ const CommentsBottomSection: React.FunctionComponent<
           }
           positionTop={heightDelta}
           active={showTopGradient}
-          width='calc(100% - 16px)'
+          width='calc(100% - 4px)'
         />
         <GradientMask
           gradientType={
@@ -636,7 +635,7 @@ const CommentsBottomSection: React.FunctionComponent<
               : 'primary'
           }
           active={showBottomGradient}
-          width='calc(100% - 16px)'
+          width='calc(100% - 4px)'
         />
       </STabContainer>
     </>
