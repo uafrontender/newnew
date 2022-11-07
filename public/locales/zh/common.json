@@ -48,14 +48,14 @@
     "dashboard": "儀錶板",
     "dms": "私訊",
     "notifications": "通知",
-    "bundles_NEED_TRANSLATION": "Bundles"
+    "bundles": "Bundles"
   },
   "mobileTopNavigation": {
     "myBalance": "我的餘額以${{value}}",
     "profile": "個人資料"
   },
   "button": {
-    "bundles_NEED_TRANSLATION": "Bundles",
+    "bundles": "Bundles",
     "createDecision": "新帖子",
     "create": "創建",
     "signIn": "登入",
