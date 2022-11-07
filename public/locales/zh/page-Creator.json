@@ -32,8 +32,8 @@
       },
       "toDosIssue": {
         "text": "添加個人簡介和銀行資訊以支取你的收入",
-        "textBio_NEED_TRANSLATION": "添加個人簡介和銀行資訊以支取你的收入",
-        "textBank_NEED_TRANSLATION": "添加個人簡介和銀行資訊以支取你的收入",
+        "textBio": "添加個人簡介和銀行資訊以支取你的收入",
+        "textBank": "添加個人簡介和銀行資訊以支取你的收入",
         "button": "添加"
       },
       "makeDecision": {
@@ -92,7 +92,7 @@
       "addCashOutMethodButton": "添加"
     },
     "aboutBundles": {
-      "title_NEED_TRANSLATION": "Superpoll Bundles",
+      "title": "Superpoll Bundles",
       "text_NEED_TRANSLATION": "Make more money. Have more fun.\nSuperpoll Bundles are a win-win for everyone!",
       "button_NEED_TRANSLATION": "Tell me more!"
     }
