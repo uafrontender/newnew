@@ -474,10 +474,6 @@ const SPostTitle = styled(Headline)`
     margin-top: initial;
     margin-bottom: initial;
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    /* min-height: 64px; */
-  }
 `;
 
 // Creator card
