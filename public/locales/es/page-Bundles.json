@@ -35,5 +35,8 @@
   },
   "button": {
     "back": "Back"
+  },
+  "error": {
+    "requestFailed": "La solicitud ha fallado"
   }
 }

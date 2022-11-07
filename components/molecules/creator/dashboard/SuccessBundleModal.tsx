@@ -60,9 +60,11 @@ export default TurnBundleModal;
 interface ISModal {
   isBundlesEnabled: boolean;
 }
+
 const SModal = styled(Modal)<ISModal>`
+  // TODO: replace with animated background?
   background: ${(props) =>
-    props.isBundlesEnabled ? `url(${assets.bundles.votesBackground})` : ''};
+    props.isBundlesEnabled ? `url(${assets.bundles.votesBackground})` : 'none'};
   background-size: cover;
   background-repeat: no-repeat;
   &:before {

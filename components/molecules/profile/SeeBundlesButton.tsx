@@ -74,7 +74,6 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
       <BuyBundleModal
         show={buyBundleModalOpen}
         creator={user}
-        successUrl={`${process.env.NEXT_PUBLIC_APP_URL}/${user.username}`}
         onClose={() => {
           setBuyBundleModalOpen(false);
           setCreatorsBundleModalOpen(false);
