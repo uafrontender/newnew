@@ -1,16 +1,13 @@
 import React from 'react';
-import dynamic from 'next/dynamic';
 
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
-import { PostSkeletonView } from '../PostSkeleton';
 
 // Views
-const PostModerationAC = dynamic(() => import('./PostModerationAC'));
-const PostModerationMC = dynamic(() => import('./PostModerationMC'));
-const PostViewScheduled = dynamic(() => import('../common/PostViewScheduled'));
-const PostViewProcessingAnnouncement = dynamic(
-  () => import('../common/PostViewProcessingAnnouncement')
-);
+import { PostSkeletonView } from '../PostSkeleton';
+import PostModerationMC from './PostModerationMC';
+import PostModerationAC from './PostModerationAC';
+import PostViewScheduled from '../common/PostViewScheduled';
+import PostViewProcessingAnnouncement from '../common/PostViewProcessingAnnouncement';
 
 interface IModerationView {}
 

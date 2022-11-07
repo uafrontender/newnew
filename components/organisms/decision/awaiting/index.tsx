@@ -1,17 +1,12 @@
 import React from 'react';
-import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 
 import { TPostType } from '../../../../utils/switchPostType';
-import { PostSkeletonView } from '../PostSkeleton';
 
 // Views
-const PostAwaitingResponseAC = dynamic(
-  () => import('./PostAwaitingResponseAC')
-);
-const PostAwaitingResponseMC = dynamic(
-  () => import('./PostAwaitingResponseMC')
-);
+import { PostSkeletonView } from '../PostSkeleton';
+import PostAwaitingResponseAC from './PostAwaitingResponseAC';
+import PostAwaitingResponseMC from './PostAwaitingResponseMC';
 
 interface IWaitingForResponseView {
   postParsed:

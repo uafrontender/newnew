@@ -11,7 +11,6 @@ import React, {
 } from 'react';
 import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
-import dynamic from 'next/dynamic';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
@@ -42,8 +41,7 @@ import CommentFromUrlContextProvider, {
   CommentFromUrlContext,
 } from '../../contexts/commentFromUrlContext';
 import PostModalInnerContextProvider from '../../contexts/postModalInnerContext';
-
-const PostModal = dynamic(() => import('../../components/organisms/decision'));
+import PostModal from '../../components/organisms/decision';
 
 interface IPostPage {
   postUuid: string;

@@ -1,13 +1,12 @@
 import React from 'react';
-import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 
 import { TPostType } from '../../../../utils/switchPostType';
-import { PostSkeletonView } from '../PostSkeleton';
 
 // Views
-const PostSuccessAC = dynamic(() => import('./PostSuccessAC'));
-const PostSuccessMC = dynamic(() => import('./PostSuccessMC'));
+import PostSuccessMC from './PostSuccessMC';
+import PostSuccessAC from './PostSuccessAC';
+import { PostSkeletonView } from '../PostSkeleton';
 
 interface ISuccessView {
   postParsed:
