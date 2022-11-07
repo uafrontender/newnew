@@ -7,6 +7,7 @@ const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<any>,
 ): Promise<any> => {
+  console.log({ body: req.body })
   if (req.method === 'POST') {
     try {
       const filePath = path.join(

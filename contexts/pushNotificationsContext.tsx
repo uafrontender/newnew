@@ -118,17 +118,18 @@ const PushNotificationsContextProvider: React.FC<
     }
   }, [showPermissionRequestModal]);
 
-  const checkPermissionSafari = useCallback((permissionData: any) => {
+  const checkPermissionSafari = useCallback(async (permissionData: any) => {
     console.log(permissionData, 'permissionData');
     if (permissionData.permission === 'default') {
-      console.log('here');
+      console.log('here', process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID, process.env.NEXT_PUBLIC_APP_URL);
       // This is a new web service URL and its validity is unknown.
-      (window as any).safari.pushNotification.requestPermission(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api`,
-        process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID,
-        {}, // Data that you choose to send to your server to help you identify the user.
+      const perm = await (window as any).safari.pushNotification.requestPermission(
+        `https://ldev.cloud/v1/web_push/safari`,
+        'web.development.newnew.co',
+        { publicKey }, // Data that you choose to send to your server to help you identify the user.
         checkPermissionSafari
       );
+      console.log({ perm })
     } else if (permissionData.permission === 'denied') {
       // The user said no.
     } else if (permissionData.permission === 'granted') {
@@ -137,7 +138,7 @@ const PushNotificationsContextProvider: React.FC<
 
       console.log(permissionData, 'permissionData');
     }
-  }, []);
+  }, [publicKey]);
 
   const subscribe = useCallback(
     async (onSuccess?: () => void) => {
@@ -151,6 +152,7 @@ const PushNotificationsContextProvider: React.FC<
           const permissionData = (
             window as any
           ).safari.pushNotification.permission(
+            `https://ldev.cloud/v1/web_push/safari`,
             process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
           );
 
