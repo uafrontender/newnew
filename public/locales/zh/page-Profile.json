@@ -99,6 +99,8 @@
       "favorites": "收藏",
       "enableSmsNotifications_NEED_TRANSLATION": "Notify me",
       "disableSmsNotifications_NEED_TRANSLATION": "Notifications ON",
+      "buyBundles_NEED_TRANSLATION": "Buy Bundles",
+      "votesLeft_NEED_TRANSLATION": "{{amount}} votes left",
       "sendMessage": "發送消息",
       "copied": "連結已複製！"
     }

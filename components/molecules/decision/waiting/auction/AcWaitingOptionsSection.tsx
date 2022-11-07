@@ -218,7 +218,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<
             key={option.id.toString()}
             option={option as TAcOptionWithHighestField}
             postId={post.postUuid}
-            postCreator={
+            postCreatorName={
               post.creator?.nickname
                 ? post.creator?.nickname
                 : post.creator?.username ?? ''
