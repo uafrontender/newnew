@@ -52,20 +52,42 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
       const dhms = secondsToDHMS(parsed);
 
       let countdownsrt = `${dhms.days} ${t(
-        'acPostAwaiting.hero.expires.days'
-      )} ${dhms.hours} ${t('acPostAwaiting.hero.expires.hours')}`;
+        dhms.days === '1'
+          ? 'mcPostAwaiting.hero.expires.days_singular'
+          : 'mcPostAwaiting.hero.expires.days'
+      )} ${dhms.hours !== '0' ? dhms.hours : ''} ${t(
+        dhms.hours !== '0'
+          ? dhms.hours === '1'
+            ? 'mcPostAwaiting.hero.expires.hours_singular'
+            : 'mcPostAwaiting.hero.expires.hours'
+          : ''
+      )}`;
 
       if (dhms.days === '0') {
         countdownsrt = `${dhms.hours} ${t(
-          'acPostAwaiting.hero.expires.hours'
-        )} ${dhms.minutes} ${t('acPostAwaiting.hero.expires.minutes')}`;
+          dhms.hours === '1'
+            ? 'mcPostAwaiting.hero.expires.hours_singular'
+            : 'mcPostAwaiting.hero.expires.hours'
+        )} ${dhms.minutes} ${t(
+          dhms.minutes === '1'
+            ? 'mcPostAwaiting.hero.expires.minutes_singular'
+            : 'mcPostAwaiting.hero.expires.minutes'
+        )}`;
         if (dhms.hours === '0') {
           countdownsrt = `${dhms.minutes} ${t(
-            'acPostAwaiting.hero.expires.minutes'
-          )} ${dhms.seconds} ${t('acPostAwaiting.hero.expires.seconds')}`;
+            dhms.minutes === '1'
+              ? 'mcPostAwaiting.hero.expires.minutes_singular'
+              : 'mcPostAwaiting.hero.expires.minutes'
+          )} ${dhms.seconds} ${t(
+            dhms.seconds === '1'
+              ? 'mcPostAwaiting.hero.expires.seconds_singular'
+              : 'mcPostAwaiting.hero.expires.seconds'
+          )}`;
           if (dhms.minutes === '0') {
             countdownsrt = `${dhms.seconds} ${t(
-              'acPostAwaiting.hero.expires.seconds'
+              dhms.seconds === '1'
+                ? 'mcPostAwaiting.hero.expires.seconds_singular'
+                : 'mcPostAwaiting.hero.expires.seconds'
             )}`;
           }
         }

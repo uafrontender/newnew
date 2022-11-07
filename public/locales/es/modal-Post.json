@@ -630,9 +630,13 @@
       "body": "¡{{creator}} tiene {{time}} para seleccionar y realizar su oferta favorita!",
       "expires": {
         "days": "días",
+        "days_singular": "día",
         "hours": "horas",
+        "hours_singular": "hora",
         "minutes": "minutos",
-        "seconds": "segundos"
+        "minutes_singular": "minuto",
+        "seconds": "segundos",
+        "seconds_singular": "segundo"
       }
     },
     "wantsToKnow": "{{creator}}<0/> quiere saber...",
@@ -650,9 +654,13 @@
       "body": "{{creator}} tiene {{time}} para realizar esta opción. ¡Mantente atento!",
       "expires": {
         "days": "días",
+        "days_singular": "día",
         "hours": "horas",
+        "hours_singular": "hora",
         "minutes": "minutos",
-        "seconds": "segundos"
+        "minutes_singular": "minuto",
+        "seconds": "segundos",
+        "seconds_singular": "segundo"
       }
     },
     "wantsToKnow": "{{creator}}<0/> quiere saber...",
@@ -666,22 +674,6 @@
     "optionsTab": {
       "backButton": "Regresar"
     }
-  },
-  "cfPostAwaiting": {
-    "hero": {
-      "title": "¡Ya es realidad!",
-      "body": "{{creator}} tiene {{time}} para mostrarte este Goal. ¡Mantente atento!",
-      "expires": {
-        "days": "días",
-        "hours": "horas",
-        "minutes": "minutos",
-        "seconds": "segundos"
-      }
-    },
-    "wantsToKnow": "El Goal de {{creator}}<0/>",
-    "creatorsBackers": "Los patrocinadores de {{creator}}",
-    "ofTargetBackers": "de {{target_count}} patrocinadores",
-    "youBackedFor": "Patrocinaste por"
   },
   "recommendationsSection": {
     "heading": "Más como esta publicación"

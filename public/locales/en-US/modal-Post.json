@@ -630,9 +630,13 @@
       "body": "{{creator}} has {{time}} to select and do their favorite bid!",
       "expires": {
         "days": "days",
+        "days_singular": "day",
         "hours": "hours",
+        "hours_singular": "hour",
         "minutes": "minutes",
-        "seconds": "seconds"
+        "minutes_singular": "minute",
+        "seconds": "seconds",
+        "seconds_singular": "second"
       }
     },
     "wantsToKnow": "{{creator}}<0/> wants to know...",
@@ -650,9 +654,13 @@
       "body": "{{creator}} has {{time}} to do this option. Stay tuned!",
       "expires": {
         "days": "days",
+        "days_singular": "day",
         "hours": "hours",
+        "hours_singular": "hour",
         "minutes": "minutes",
-        "seconds": "seconds"
+        "minutes_singular": "minute",
+        "seconds": "seconds",
+        "seconds_singular": "second"
       }
     },
     "wantsToKnow": "{{creator}}<0/> wants to know...",
@@ -666,22 +674,6 @@
     "optionsTab": {
       "backButton": "Back"
     }
-  },
-  "cfPostAwaiting": {
-    "hero": {
-      "title": "It's happening!",
-      "body": "{{creator}} has {{time}} to show you this Goal. Stay tuned!",
-      "expires": {
-        "days": "days",
-        "hours": "hours",
-        "minutes": "minutes",
-        "seconds": "seconds"
-      }
-    },
-    "wantsToKnow": "{{creator}}'s<0/> Goal",
-    "creatorsBackers": "{{creator}}'s backers",
-    "ofTargetBackers": "of {{target_count}} backers",
-    "youBackedFor": "You backed it for"
   },
   "recommendationsSection": {
     "heading": "More like this"
