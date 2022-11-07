@@ -70,6 +70,13 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+    const isMobileOrTablet = [
+      'mobile',
+      'mobileS',
+      'mobileM',
+      'mobileL',
+      'tablet',
+    ].includes(resizeMode);
 
     // Comment content from URL
     const { newCommentContentFromUrl, handleResetNewCommentContentFromUrl } =
@@ -206,8 +213,14 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         position={position}
         zIndex={zIndex}
         onKeyDown={(e) => {
-          if (e.shiftKey && e.key === 'Enter') {
-            handleSubmit(e);
+          if (!isMobileOrTablet) {
+            if (e.shiftKey && e.key === 'Enter' && commentText.length > 0) {
+              if (commentText.charCodeAt(commentText.length - 1) === 10) {
+                setCommentText((curr) => curr.slice(0, -1));
+              }
+            } else if (e.key === 'Enter') {
+              handleSubmit(e);
+            }
           }
         }}
       >
