@@ -23,6 +23,7 @@ import loadingAnimation from '../../../../public/animations/logo-loading-blue.js
 import { useNotifications } from '../../../../contexts/notificationsContext';
 import mobileLogo from '../../../../public/images/svg/mobile-logo.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 
 interface IFunction {
   markReadNotifications: boolean;
@@ -183,47 +184,100 @@ export const NotificationsList: React.FC<IFunction> = ({
     return '/direct-messages';
   };
 
-  const renderNotificationItem = useCallback(
-    (item: newnewapi.INotification) => (
-      <Link href={getUrl(item.target)} key={item.id as number}>
-        <a>
-          <SNotificationItem key={`notification-item-${item.id}`}>
-            {item.content?.relatedUser?.uuid !== user.userData?.userUuid ? (
-              <SNotificationItemAvatar
-                withClick
-                avatarUrl={item.content?.relatedUser?.thumbnailAvatarUrl ?? ''}
+  const getEnrichedNotificationMessage = useCallback(
+    (notification: newnewapi.INotification) => {
+      if (!notification.content?.message) {
+        return undefined;
+      }
+
+      if (
+        notification.content.relatedUser &&
+        notification.content.relatedUser.nicknameOrUsername &&
+        notification.content.relatedUser.isVerified
+      ) {
+        const usernameIndex = notification.content.message.indexOf(
+          notification.content.relatedUser.nicknameOrUsername
+        );
+        if (usernameIndex > -1) {
+          const beforeName = notification.content.message.slice(
+            0,
+            usernameIndex
+          );
+          const afterName = notification.content.message.slice(
+            usernameIndex +
+              notification.content.relatedUser.nicknameOrUsername.length
+          );
+          return (
+            <>
+              {beforeName}
+              {notification.content.relatedUser.nicknameOrUsername}
+              <SInlineSvg
+                svg={VerificationCheckmark}
+                width='16px'
+                height='16px'
               />
-            ) : (
-              <SIconHolder>
-                <InlineSvg
-                  clickable
-                  svg={mobileLogo}
-                  fill='#fff'
-                  width='24px'
-                  height='24px'
+              {afterName}
+            </>
+          );
+        }
+      }
+
+      return notification.content.message;
+    },
+    []
+  );
+
+  const renderNotificationItem = useCallback(
+    (item: newnewapi.INotification) => {
+      const message = getEnrichedNotificationMessage(item);
+
+      return (
+        <Link href={getUrl(item.target)} key={item.id as number}>
+          <a>
+            <SNotificationItem key={`notification-item-${item.id}`}>
+              {item.content?.relatedUser?.uuid !== user.userData?.userUuid ? (
+                <SNotificationItemAvatar
+                  withClick
+                  avatarUrl={
+                    item.content?.relatedUser?.thumbnailAvatarUrl ?? ''
+                  }
                 />
-              </SIconHolder>
-            )}
-            <SNotificationItemCenter>
-              {item.content && (
-                <SNotificationItemText variant={3} weight={600}>
-                  {item.content.message}
-                </SNotificationItemText>
+              ) : (
+                <SIconHolder>
+                  <InlineSvg
+                    clickable
+                    svg={mobileLogo}
+                    fill='#fff'
+                    width='24px'
+                    height='24px'
+                  />
+                </SIconHolder>
               )}
-              <SNotificationItemTime variant={2} weight={600}>
-                {moment((item.createdAt?.seconds as number) * 1000).fromNow()}
-              </SNotificationItemTime>
-            </SNotificationItemCenter>
-            {unreadNotifications &&
-              unreadNotifications.length > 0 &&
-              unreadNotifications.findIndex(
-                (unreadNotificationId) => unreadNotificationId === item.id
-              ) > -1 && <SNotificationItemIndicator minified />}
-          </SNotificationItem>
-        </a>
-      </Link>
-    ),
-    [unreadNotifications, user.userData?.userUuid]
+              <SNotificationItemCenter>
+                {message && (
+                  <SNotificationItemText variant={3} weight={600}>
+                    {message}
+                  </SNotificationItemText>
+                )}
+                <SNotificationItemTime variant={2} weight={600}>
+                  {moment((item.createdAt?.seconds as number) * 1000).fromNow()}
+                </SNotificationItemTime>
+              </SNotificationItemCenter>
+              {unreadNotifications &&
+                unreadNotifications.length > 0 &&
+                unreadNotifications.findIndex(
+                  (unreadNotificationId) => unreadNotificationId === item.id
+                ) > -1 && <SNotificationItemIndicator minified />}
+            </SNotificationItem>
+          </a>
+        </Link>
+      );
+    },
+    [
+      unreadNotifications,
+      user.userData?.userUuid,
+      getEnrichedNotificationMessage,
+    ]
   );
 
   return (
@@ -336,6 +390,7 @@ const SNotificationItemCenter = styled.div`
 `;
 
 const SNotificationItemText = styled(Text)`
+  display: inline;
   margin-bottom: 4px;
 `;
 
@@ -359,4 +414,9 @@ const SRef = styled.span`
   overflow: hidden;
   text-align: center;
   flex-shrink: 0;
+`;
+
+const SInlineSvg = styled(InlineSvg)`
+  display: inline-flex;
+  transform: translateY(4px);
 `;
