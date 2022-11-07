@@ -238,6 +238,8 @@ export const Bundles: NextPage<IBundlesPage> = ({
         </SInputWrapper>
         <SearchResultsTitle>{t('search.resultsTitle')}</SearchResultsTitle>
         <SCardsSection>
+          {/* Changes in number of Creators in the search result causes change in page height (Fix?) */}
+          {/* TODO: add no results message (otherwise there is an empty space) */}
           <CreatorsList
             loading={paginatedCreators.loading}
             collection={paginatedCreators.data}
@@ -253,10 +255,10 @@ export const Bundles: NextPage<IBundlesPage> = ({
               }
             }}
           />
+          {paginatedCreators.hasMore && !paginatedCreators.loading && (
+            <SRef ref={loadingRef}>Loading...</SRef>
+          )}
         </SCardsSection>
-        {paginatedCreators.hasMore && !paginatedCreators.loading && (
-          <SRef ref={loadingRef}>Loading...</SRef>
-        )}
       </Container>
       {bundles && (
         <AllBundlesModal
@@ -506,4 +508,5 @@ const SCardsSection = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+  min-height: 280px;
 `;
