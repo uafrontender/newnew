@@ -461,11 +461,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                             color: theme.colorsThemed.accent.yellow,
                           }
                         : {}),
-                      ...(!isMyBid
-                        ? {
-                            cursor: 'pointer',
-                          }
-                        : {}),
+                      cursor: 'pointer',
                     }}
                   >
                     {isMyBid
@@ -523,11 +519,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                           color: theme.colorsThemed.accent.yellow,
                         }
                       : {}),
-                    ...(!isMyBid
-                      ? {
-                          cursor: 'pointer',
-                        }
-                      : {}),
+                    cursor: 'pointer',
                   }}
                 >
                   {isMyBid
