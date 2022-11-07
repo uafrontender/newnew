@@ -11,6 +11,7 @@ import MessageCircle from '../../../public/images/svg/icons/filled/MessageCircle
 import NotificationsIcon from '../../../public/images/svg/icons/filled/Notifications.svg';
 import { useAppSelector } from '../../../redux-store/store';
 import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
   if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
@@ -94,7 +95,14 @@ const Notification: React.FC<newnewapi.INotification> = ({
           )}
           <SText>
             <STitle>
-              {content?.relatedUser?.nicknameOrUsername}{' '}
+              {content?.relatedUser?.nicknameOrUsername}
+              {content?.relatedUser?.isVerified && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                />
+              )}{' '}
               {!isRead && <SBullet />}
             </STitle>
             <p>{content?.message}</p>
