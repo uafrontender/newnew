@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -27,6 +27,7 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import PostShareEllipseMenu from '../common/PostShareEllipseMenu';
 import { useAppSelector } from '../../../../redux-store/store';
 import PostConfirmDeleteModal from './PostConfirmDeleteModal';
+import isBrowser from '../../../../utils/isBrowser';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -129,6 +130,29 @@ const PostTopInfoModeration: React.FunctionComponent<
   );
   const moreButtonRef: any = useRef();
   const shareButtonRef: any = useRef();
+
+  const [isScrolledDown, setIsScrolledDown] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = document?.documentElement?.scrollTop;
+      if (scrollTop && scrollTop > 200) {
+        setIsScrolledDown(true);
+      } else {
+        setIsScrolledDown(false);
+      }
+    };
+
+    if (isBrowser()) {
+      document?.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (isBrowser()) {
+        document?.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
 
   if (hidden) return null;
 
@@ -266,7 +290,7 @@ const PostTopInfoModeration: React.FunctionComponent<
           <PostTitleContent>{title}</PostTitleContent>
         </SPostTitle>
         {showWinnerOption ? (
-          <SSelectWinnerOption>
+          <SSelectWinnerOption isScrolledDown={isScrolledDown}>
             <SHeadline variant={4}>
               {t('acPostModeration.postTopInfo.selectWinner.title')}
             </SHeadline>
@@ -416,10 +440,25 @@ const SBidsAmount = styled.div`
 `;
 
 // Winner option
-const SSelectWinnerOption = styled.div`
-  position: fixed;
-  bottom: 16px;
-  left: 16;
+const SSelectWinnerOption = styled.div<{
+  isScrolledDown: boolean;
+}>`
+  grid-area: selectWinner;
+
+  ${({ isScrolledDown }) =>
+    !isScrolledDown
+      ? css`
+          position: fixed;
+          bottom: 16px;
+          left: 16;
+          width: calc(100% - 48px);
+        `
+      : css`
+          position: relative;
+          margin-top: 16px;
+          margin-bottom: 16px;
+          width: 100%;
+        `};
 
   display: flex;
   flex-direction: column;
@@ -428,7 +467,6 @@ const SSelectWinnerOption = styled.div`
   z-index: 20;
 
   height: 130px;
-  width: calc(100% - 48px);
 
   padding: 24px 16px;
   padding-right: 134px;
@@ -443,6 +481,8 @@ const SSelectWinnerOption = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     grid-area: selectWinner;
+
+    z-index: initial;
 
     position: relative;
 
