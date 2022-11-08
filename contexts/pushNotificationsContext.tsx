@@ -14,6 +14,7 @@ import {
   webPushUnRegister,
 } from '../api/endpoints/user';
 import { cookiesInstance } from '../api/apiConfigs';
+import { useAppSelector } from '../redux-store/store';
 
 export const PushNotificationsContext = createContext<{
   inSubscribed: boolean;
@@ -37,14 +38,20 @@ interface IPushNotificationsContextProvider {
   children: React.ReactNode;
 }
 
+const WEB_PUSH_PROMPT_KEY =
+  'isUserPromptedWithPushNotificationsPermissionModal';
+
 const PushNotificationsContextProvider: React.FC<
   IPushNotificationsContextProvider
 > = ({ children }) => {
+  const user = useAppSelector((state) => state.user);
+
   const [isPermissionRequestModalOpen, setIsPermissionRequestModalOpen] =
     useState<boolean>(false);
 
   const [inSubscribed, setIsSubscribed] = useState(false);
   const [publicKey, setPublicKey] = useState('');
+  const [hasWebPush, setHasWebPush] = useState(false);
 
   useEffect(() => {
     const getWebConfig = async () => {
@@ -54,6 +61,7 @@ const PushNotificationsContextProvider: React.FC<
         const response = await webPushConfig(payload);
 
         setPublicKey(response.data?.publicKey || '');
+        setHasWebPush(response.data?.hasWebPush || false);
       } catch (err) {
         console.error(err);
       }
@@ -79,28 +87,23 @@ const PushNotificationsContextProvider: React.FC<
             process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
           );
 
-          // TODO: check existing subscription
-          console.log(permissionData.permission, 'permissionData.permission');
           if (permissionData.permission === 'granted') {
-            setIsSubscribed(true);
+            setIsSubscribed(hasWebPush);
           }
         } else if (Notification.permission === 'granted') {
-          console.log('subscribe');
           const subscription = await swReg.pushManager.getSubscription();
 
           if (subscription) {
-            setIsSubscribed(true);
+            setIsSubscribed(hasWebPush);
           } else {
             setIsSubscribed(false);
           }
-        } else {
-          setIsSubscribed(false);
         }
       }
     };
 
     checkSubscription();
-  }, []);
+  }, [hasWebPush]);
 
   const showPermissionRequestModal = useCallback(() => {
     setIsPermissionRequestModalOpen(true);
@@ -111,41 +114,43 @@ const PushNotificationsContextProvider: React.FC<
   }, []);
 
   const promptUserWithPushNotificationsPermissionModal = useCallback(() => {
-    console.log('HERE');
-    const WEB_PUSH_PROMPT_KEY =
-      'isUserPromptedWithPushNotificationsPermissionModal';
     if (localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true') {
       localStorage.setItem(WEB_PUSH_PROMPT_KEY, 'true');
       showPermissionRequestModal();
     }
   }, [showPermissionRequestModal]);
 
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    // TODO: check tab focus
+    if (localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' && user.loggedIn) {
+      timeoutId = setTimeout(
+        promptUserWithPushNotificationsPermissionModal,
+        240000
+      );
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [promptUserWithPushNotificationsPermissionModal, user.loggedIn]);
+
   const checkPermissionSafari = useCallback(
     async (permissionData: any) => {
-      console.log(permissionData, 'permissionData');
       if (permissionData.permission === 'default') {
-        console.log(
-          'here',
+        (window as any).safari.pushNotification.requestPermission(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari`,
           process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID,
-          process.env.NEXT_PUBLIC_APP_URL
-        );
-        // This is a new web service URL and its validity is unknown.
-        const perm = await (
-          window as any
-        ).safari.pushNotification.requestPermission(
-          `https://ldev.cloud/v1/web_push/safari`,
-          'web.development.newnew.co',
-          { publicKey, access_token: cookiesInstance.get('accessToken') }, // Data that you choose to send to your server to help you identify the user.
+          { publicKey, access_token: cookiesInstance.get('accessToken') },
           checkPermissionSafari
         );
-        console.log({ perm });
       } else if (permissionData.permission === 'denied') {
         // The user said no.
       } else if (permissionData.permission === 'granted') {
-        // The web service URL is a valid push provider, and the user said yes.
-        // permissionData.deviceToken is now available to use.
-
-        console.log(permissionData, 'permissionData');
+        setIsSubscribed(true);
       }
     },
     [publicKey]
@@ -163,7 +168,7 @@ const PushNotificationsContextProvider: React.FC<
           const permissionData = (
             window as any
           ).safari.pushNotification.permission(
-            `https://ldev.cloud/v1/web_push/safari`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari`,
             process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
           );
 
@@ -184,13 +189,6 @@ const PushNotificationsContextProvider: React.FC<
               if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
                 throw new Error('Something goes wrong');
               }
-
-              console.log(
-                JSON.stringify({
-                  action: 'register',
-                  subscription,
-                })
-              );
 
               const payload = new newnewapi.RegisterForWebPushRequest({
                 name: navigator.userAgent,
@@ -219,31 +217,30 @@ const PushNotificationsContextProvider: React.FC<
   const unsubscribe = useCallback(async () => {
     try {
       const swReg = await navigator.serviceWorker.register('/sw.js');
-      // console.log(window.safari.pushNotification, 'subscription');
+
+      if (
+        'safari' in window &&
+        !swReg.pushManager &&
+        'pushNotification' in (window as any).safari
+      ) {
+        setIsSubscribed(false);
+        return;
+      }
 
       const subscription = await swReg.pushManager.getSubscription();
       const sub = subscription?.toJSON();
-
-      console.log(subscription, 'unsubscribe');
 
       if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
         throw new Error('No active subscription');
       }
 
-      try {
-        const payload = new newnewapi.UnRegisterForWebPushRequest({
-          endpoint: sub.endpoint,
-        });
-        await webPushUnRegister(payload);
-      } catch (e) {
-        console.error(e);
-      }
+      const payload = new newnewapi.UnRegisterForWebPushRequest({
+        endpoint: sub.endpoint,
+      });
+      await webPushUnRegister(payload);
 
-      try {
-        await subscription?.unsubscribe();
-      } catch (e) {
-        console.error(e);
-      }
+      await subscription?.unsubscribe();
+
       setIsSubscribed(false);
     } catch (err) {
       console.error(err);

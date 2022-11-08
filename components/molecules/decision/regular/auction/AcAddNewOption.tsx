@@ -36,6 +36,7 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -91,6 +92,8 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   );
 
   const { appConstants } = useGetAppConstants();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   // New option/bid
   const [newBidText, setNewBidText] = useState('');
@@ -503,7 +506,10 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
       <PaymentSuccessModal
         postType='ac'
         isVisible={paymentSuccessModalOpen}
-        closeModal={() => setPaymentSuccessModalOpen(false)}
+        closeModal={() => {
+          setPaymentSuccessModalOpen(false);
+          promptUserWithPushNotificationsPermissionModal();
+        }}
       >
         {t('paymentSuccessModal.ac', {
           postCreator,

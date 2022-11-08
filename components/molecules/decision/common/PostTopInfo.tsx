@@ -206,7 +206,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         handleSetIsFollowingDecision(!isFollowingDecision);
       }
 
-      promptUserWithPushNotificationsPermissionModal();
+      if (!isFollowingDecision) {
+        promptUserWithPushNotificationsPermissionModal();
+      }
     } catch (err) {
       console.error(err);
     }

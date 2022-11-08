@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { buyCreatorsBundle } from '../../../api/endpoints/bundles';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 import { useAppSelector } from '../../../redux-store/store';
 import { formatNumber } from '../../../utils/format';
 import getCustomerPaymentFee from '../../../utils/getCustomerPaymentFee';
@@ -36,6 +37,8 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   const router = useRouter();
   const { appConstants } = useGetAppConstants();
   const user = useAppSelector((state) => state.user);
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
@@ -210,6 +213,8 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
             if (onCloseSuccessModal) {
               onCloseSuccessModal();
             }
+
+            promptUserWithPushNotificationsPermissionModal();
           }}
         />
       )}

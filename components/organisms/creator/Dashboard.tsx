@@ -15,6 +15,7 @@ import { getMyUrgentPosts } from '../../../api/endpoints/post';
 import FinishProfileSetup from '../../atoms/creator/FinishProfileSetup';
 import { getMyEarnings } from '../../../api/endpoints/payments';
 import dateToTimestamp from '../../../utils/dateToTimestamp';
+import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -40,6 +41,8 @@ export const Dashboard: React.FC = React.memo(() => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const [isToDosCompleted, setIsToDosCompleted] = useState<boolean | undefined>(
     undefined
@@ -54,6 +57,10 @@ export const Dashboard: React.FC = React.memo(() => {
   const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] =
     useState(true);
   const [hasMyPosts, setHasMyPosts] = useState(false);
+
+  useEffect(() => {
+    promptUserWithPushNotificationsPermissionModal();
+  }, [promptUserWithPushNotificationsPermissionModal]);
 
   useEffect(() => {
     if (user.creatorData?.isLoaded) {

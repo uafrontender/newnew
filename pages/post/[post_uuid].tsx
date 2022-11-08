@@ -42,6 +42,7 @@ import CommentFromUrlContextProvider, {
 } from '../../contexts/commentFromUrlContext';
 import PostModalInnerContextProvider from '../../contexts/postModalInnerContext';
 import PostModal from '../../components/organisms/decision';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 interface IPostPage {
   postUuid: string;
@@ -65,6 +66,8 @@ const PostPage: NextPage<IPostPage> = ({
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const { user, ui } = useAppSelector((state) => state);
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     ui.resizeMode
@@ -195,6 +198,10 @@ const PostPage: NextPage<IPostPage> = ({
       if (!res.error) {
         setIsFollowingDecision((currentValue) => !currentValue);
       }
+
+      if (!isFollowingDecision) {
+        promptUserWithPushNotificationsPermissionModal();
+      }
     } catch (err) {
       console.error(err);
     }
@@ -204,6 +211,7 @@ const PostPage: NextPage<IPostPage> = ({
     user._persist?.rehydrated,
     isFollowingDecision,
     router,
+    promptUserWithPushNotificationsPermissionModal,
   ]);
 
   const handleUpdatePostStatus = useCallback(

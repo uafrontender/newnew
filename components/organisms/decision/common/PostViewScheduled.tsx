@@ -95,7 +95,9 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
           setIsFollowing(!isFollowing);
         }
 
-        promptUserWithPushNotificationsPermissionModal();
+        if (!isFollowing) {
+          promptUserWithPushNotificationsPermissionModal();
+        }
       } catch (err) {
         console.error(err);
       }
