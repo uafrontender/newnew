@@ -82,15 +82,15 @@ const CashOut: React.FC<ICashOut> = ({
         <SDescriptionWrapper>
           {nextCashOutAmount && nextCashOutAmount.usdCents ? (
             <SStripeBlock>
-              <Text variant={2} weight={600}>
+              <SStripeBlockText variant={2} weight={600}>
                 {`${t('dashboard.earnings.cashOut.amount')} $${formatNumber(
                   nextCashOutAmount?.usdCents / 100 ?? 0,
                   false
                 )}`}
-              </Text>
-              <Text variant={2} weight={600}>
+              </SStripeBlockText>
+              <SStripeBlockText variant={2} weight={600}>
                 {t('dashboard.earnings.cashOut.amountSecondLine')}
-              </Text>
+              </SStripeBlockText>
               <SButtons>
                 {stripeLink?.link && (
                   <a href={stripeLink.link} target='_blank'>
@@ -238,6 +238,10 @@ const SStripeBlock = styled.div`
     text-align: left;
     padding-left: 20px;
   }
+`;
+
+const SStripeBlockText = styled(Text)`
+  color: #ffffff;
 `;
 
 const SButtons = styled.div`
