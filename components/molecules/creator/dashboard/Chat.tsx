@@ -381,7 +381,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     ]
   );
 
-  // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
+  // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, !!messages, true);
 
   const handleUserClick = useCallback(() => {
     if (chatRoom?.visavis?.username) {

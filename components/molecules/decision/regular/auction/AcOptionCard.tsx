@@ -1,19 +1,11 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable quotes */
-/* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, {
-  useCallback,
-  // useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
@@ -87,7 +79,6 @@ const getPayWithCardErrorMessage = (
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
-  // shouldAnimate: boolean;
   votingAllowed: boolean;
   postId: string;
   postCreatorName: string;
@@ -101,11 +92,12 @@ interface IAcOptionCard {
     newOption: newnewapi.Auction.Option
   ) => void;
   handleRemoveOption?: () => void;
+  handleSetScrollBlocked?: () => void;
+  handleUnsetScrollBlocked?: () => void;
 }
 
 const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   option,
-  // shouldAnimate,
   votingAllowed,
   postId,
   postCreatorName,
@@ -117,6 +109,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   handleSetSupportedBid,
   handleAddOrUpdateOptionFromResponse,
   handleRemoveOption,
+  handleSetScrollBlocked,
+  handleUnsetScrollBlocked,
 }) => {
   const router = useRouter();
   const theme = useTheme();
@@ -146,9 +140,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     () => isSupportedByMe || isMyBid,
     [isSupportedByMe, isMyBid]
   );
-
-  // Tutorials
-  // const [isTooltipVisible, setIsTooltipVisible] = useState(true);
 
   // Ellipse menu
   const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
@@ -404,8 +395,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         $isDisabled={disabled && votingAllowed}
         $isBlue={isBlue}
         onClick={(e) => {
-          if (!isMobile && !isEllipseMenuOpen) {
+          if (
+            !isMobile &&
+            !isEllipseMenuOpen &&
+            !disabled &&
+            !isSupportFormOpen
+          ) {
             setIsEllipseMenuOpen(true);
+            handleSetScrollBlocked?.();
 
             setOptionMenuXY({
               x: e.clientX,
@@ -429,19 +426,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           active={!!optionBeingSupported && !disabled}
           noAction={!votingAllowed}
         >
-          <SLottieAnimationContainer>
-            {/* {shouldAnimate ? (
-              <Lottie
-                width={80}
-                height={80}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: highest ? CoinsSampleAnimation : HeartsSampleAnimation,
-                }}
-              />
-            ) : null} */}
-          </SLottieAnimationContainer>
           <SBidAmount isWhite={isSupportedByMe || isMyBid}>
             <OptionActionIcon
               src={theme.name === 'light' ? BidIconLight.src : BidIconDark.src}
@@ -480,11 +464,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                             color: theme.colorsThemed.accent.yellow,
                           }
                         : {}),
-                      ...(!isMyBid
-                        ? {
-                            cursor: 'pointer',
-                          }
-                        : {}),
+                      cursor: 'pointer',
                     }}
                   >
                     {isMyBid
@@ -542,11 +522,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                           color: theme.colorsThemed.accent.yellow,
                         }
                       : {}),
-                    ...(!isMyBid
-                      ? {
-                          cursor: 'pointer',
-                        }
-                      : {}),
+                    cursor: 'pointer',
                   }}
                 >
                   {isMyBid
@@ -824,7 +800,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           optionType='ac'
           optionId={option.id as number}
           optionCreatorUuid={option.creator?.uuid ?? ''}
-          onClose={() => setIsEllipseMenuOpen(false)}
+          onClose={() => {
+            setIsEllipseMenuOpen(false);
+            handleUnsetScrollBlocked?.();
+          }}
           handleOpenReportOptionModal={() => handleOpenReportForm()}
           handleOpenRemoveOptionModal={() => handleOpenRemoveForm()}
         />
@@ -837,7 +816,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           optionType='ac'
           optionId={option.id as number}
           optionCreatorUuid={option.creator?.uuid ?? ''}
-          handleClose={() => setIsEllipseMenuOpen(false)}
+          handleClose={() => {
+            setIsEllipseMenuOpen(false);
+            handleUnsetScrollBlocked?.();
+          }}
           handleOpenReportOptionModal={() => handleOpenReportForm()}
           handleOpenRemoveOptionModal={() => handleOpenRemoveForm()}
         />
@@ -1031,14 +1013,6 @@ const SSpanBiddersHighlighted = styled.span`
 
 const SSpanBiddersRegular = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-`;
-
-const SLottieAnimationContainer = styled.div`
-  position: absolute;
-  top: -29px;
-  left: -20px;
-
-  z-index: 100;
 `;
 
 const SSupportButton = styled(Button)<{

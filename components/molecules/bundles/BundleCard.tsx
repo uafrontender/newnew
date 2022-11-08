@@ -6,6 +6,8 @@ import UserAvatar from '../UserAvatar';
 import formatTimeLeft from '../../../utils/formatTimeLeft';
 import BulletLine from './BulletLine';
 import { formatNumber } from '../../../utils/format';
+import InlineSvg from '../../atoms/InlineSVG';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 interface IBundleCard {
   className?: string;
@@ -37,7 +39,17 @@ const BundleCard: React.FC<IBundleCard> = ({
           avatarUrl={creatorBundle.creator?.avatarUrl || undefined}
         />
         <SUserData>
-          <SDisplayName>{creatorBundle.creator?.nickname}</SDisplayName>
+          <SDisplayNameContainer>
+            <SDisplayName>{creatorBundle.creator?.nickname}</SDisplayName>
+            {creatorBundle.creator.options?.isVerified && (
+              <SInlineSvg
+                svg={VerificationCheckmark}
+                width='24px'
+                height='24px'
+                fill='none'
+              />
+            )}
+          </SDisplayNameContainer>
           <SUserName>@{creatorBundle.creator?.username}</SUserName>
         </SUserData>
       </SUserInfo>
@@ -112,19 +124,30 @@ const SUserData = styled.div`
   overflow: hidden;
 `;
 
-const SDisplayName = styled.p`
-  font-weight: 600;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  font-size: 14px;
-  line-height: 20px;
-
+const SDisplayNameContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   margin-bottom: 5px;
-
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+`;
+
+const SDisplayName = styled.p`
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+`;
+
+const SInlineSvg = styled(InlineSvg)`
+  flex-shrink: 0;
 `;
 
 const SUserName = styled.p`

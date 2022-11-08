@@ -87,8 +87,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     postStatus,
     isFollowingDecision,
     hasRecommendations,
-    handleRemoveFromStateUnfavorited,
-    handleAddPostToStateFavorited,
     handleReportOpen,
     handleSetIsFollowingDecision,
     handleCloseAndGoBack,
@@ -206,20 +204,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
       if (!res.error) {
         handleSetIsFollowingDecision(!isFollowingDecision);
-
-        if (isFollowingDecision) {
-          handleRemoveFromStateUnfavorited?.();
-        } else {
-          handleAddPostToStateFavorited?.();
-          promptUserWithPushNotificationsPermissionModal();
-        }
       }
+
+      promptUserWithPushNotificationsPermissionModal();
     } catch (err) {
       console.error(err);
     }
   }, [
-    handleAddPostToStateFavorited,
-    handleRemoveFromStateUnfavorited,
     handleSetIsFollowingDecision,
     promptUserWithPushNotificationsPermissionModal,
     isFollowingDecision,
@@ -270,7 +261,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               : t('mcPost.postTopInfo.vote')}
           </SBidsAmount>
         ) : null}
-        <CreatorCard>
+        <SCreatorCard>
           <a
             href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
               creator.username
@@ -311,7 +302,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               )}
             </SUsername>
           </a>
-        </CreatorCard>
+        </SCreatorCard>
         <SActionsDiv>
           <SShareButton
             view='transparent'
@@ -489,14 +480,10 @@ const SPostTitle = styled(Headline)`
     margin-top: initial;
     margin-bottom: initial;
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    min-height: 64px;
-  }
 `;
 
 // Creator card
-const CreatorCard = styled.div`
+const SCreatorCard = styled.div`
   grid-area: userCard;
 
   display: grid;

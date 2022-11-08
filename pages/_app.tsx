@@ -65,6 +65,7 @@ import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
 import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
+import useScrollRestoration from '../utils/hooks/useScrollRestoration';
 import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
 
@@ -85,6 +86,8 @@ const MyApp = (props: IMyApp): ReactElement => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
+
+  useScrollRestoration();
 
   // Shared layouts
   const getLayout = useMemo(

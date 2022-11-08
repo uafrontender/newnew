@@ -33,7 +33,11 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
   }, [value]);
 
   useEffect(() => {
-    if (autofocus) textareaRef.current?.focus();
+    if (autofocus) {
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
+    }
   }, [autofocus]);
 
   return (

@@ -133,7 +133,7 @@
       "button": "Aceptar"
     },
     "buyBundle": {
-      "title": "Comprar un paquete de Superpoll por:",
+      "title": "Comprar un bundle de Superpoll por:",
       "votes": "<0>{{amount}}</0> votos",
       "access": "además obtén {{amount}} {{unit}} de:",
       "customOptions": "agregar opciones personalizadas a cualquier Superpoll",
@@ -145,7 +145,7 @@
         "months": "meses"
       },
       "payment": {
-        "header": "Paquete de Superpoll de {{creator}}"
+        "header": "Bundle de Superpoll de {{creator}}"
       },
       "paymentModalFooter": {
         "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el {{creator}} elige tu oferta.",
@@ -234,7 +234,7 @@
     }
   },
   "creatorCard": {
-    "buyBundle": "Comprar paquete",
+    "buyBundle": "Comprar bundle",
     "purchasedVotes": "{{value}} votos"
   },
   "colorModeSwitch": {

@@ -1,9 +1,10 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unneeded-ternary */
 import React, { useRef, useMemo, useState } from 'react';
 import Head from 'next/head';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 
 import Row from '../atoms/Grid/Row';
@@ -36,6 +37,8 @@ interface IGeneral {
   withChat?: boolean;
   specialStatusBarColor?: string;
   restrictMaxWidth?: boolean;
+  noMobieNavigation?: boolean;
+  noPaddingMobile?: boolean;
   children: React.ReactNode;
 }
 
@@ -45,6 +48,8 @@ export const General: React.FC<IGeneral> = (props) => {
     withChat,
     specialStatusBarColor,
     restrictMaxWidth,
+    noMobieNavigation,
+    noPaddingMobile,
     children,
   } = props;
   const user = useAppSelector((state) => state.user);
@@ -173,7 +178,8 @@ export const General: React.FC<IGeneral> = (props) => {
   const chatButtonVisible =
     isMobile && withChat && user.userData?.options?.isOfferingSubscription;
 
-  const mobileNavigationVisible = isMobile && scrollDirection !== 'down';
+  const mobileNavigationVisible =
+    isMobile && scrollDirection !== 'down' && !noMobieNavigation;
 
   return (
     <SBaseLayout
@@ -181,6 +187,7 @@ export const General: React.FC<IGeneral> = (props) => {
       className={className}
       containerRef={wrapperRef}
       withBanner={!!banner?.show}
+      noPaddingTop={!!noMobieNavigation}
     >
       <SkeletonTheme
         baseColor={theme.colorsThemed.background.secondary}
@@ -199,7 +206,7 @@ export const General: React.FC<IGeneral> = (props) => {
         <Header
           visible={!isMobile || mobileNavigationVisible || globalSearchActive}
         />
-        <SContent>
+        <SContent noPaddingTop={!!noMobieNavigation}>
           <Container
             {...(restrictMaxWidth
               ? {}
@@ -207,8 +214,8 @@ export const General: React.FC<IGeneral> = (props) => {
                   noMaxContent: true,
                 })}
           >
-            <Row>
-              <Col>{children}</Col>
+            <Row noPaddingMobile={noPaddingMobile}>
+              <Col noPaddingMobile={noPaddingMobile}>{children}</Col>
             </Row>
           </Container>
         </SContent>
@@ -277,12 +284,14 @@ General.defaultProps = {
 
 interface ISWrapper {
   withBanner: boolean;
+  noPaddingTop: boolean;
 }
 
 const SBaseLayout = styled(BaseLayout)<ISWrapper>`
   display: flex;
   transition: padding ease 0.5s;
-  padding-top: ${(props) => (props.withBanner ? 96 : 56)}px;
+  padding-top: ${(props) =>
+    !props.noPaddingTop ? (props.withBanner ? 96 : 56) : 0}px;
   padding-bottom: 56px;
   flex-direction: column;
   justify-content: space-between;
@@ -303,8 +312,17 @@ const SBaseLayout = styled(BaseLayout)<ISWrapper>`
   }
 `;
 
-const SContent = styled.main`
+const SContent = styled.main<{
+  noPaddingTop?: boolean;
+}>`
   padding: 40px 0;
+
+  ${({ noPaddingTop }) =>
+    noPaddingTop
+      ? css`
+          padding-top: 0;
+        `
+      : null}
 
   ${(props) => props.theme.media.tablet} {
     padding: 32px 0;
