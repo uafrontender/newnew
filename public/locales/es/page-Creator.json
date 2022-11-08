@@ -25,7 +25,9 @@
       "insights": "Estadísticas",
       "insightsTablet": "Ir a estadísticas",
       "cashOut": {
-        "amount": "Tu próximo pago de",
+        "amount_NEED_TRANSLATION": "Your Stripe earning are",
+        "amountSecondLine_NEED_TRANSLATION": "Manage your balance on Stripe.",
+        "stripeButton_NEED_TRANSLATION": "Take me to Stripe",
         "date": "se enviará automáticamente el {{date}}.",
         "submit": "Más información",
         "noPayouts": "No tienes ningún pago pendiente"
