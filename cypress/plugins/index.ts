@@ -16,7 +16,11 @@ module.exports = (on, config) => {
   // `config` is the resolved Cypress config
 
   // copy any needed variables from process.env to config.env
-  ['NEXT_PUBLIC_APP_NAME', 'NEXT_PUBLIC_APP_URL'].forEach((envKey) => {
+  [
+    'NEXT_PUBLIC_APP_NAME',
+    'NEXT_PUBLIC_APP_URL',
+    'NEXT_PUBLIC_X_FROM_HEADER',
+  ].forEach((envKey) => {
     config.env[envKey] = process.env[envKey];
   });
 

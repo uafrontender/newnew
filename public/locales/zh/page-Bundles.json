@@ -7,33 +7,36 @@
     "title": "Superpoll Bundles"
   },
   "bundlesSection": {
-    "title": "Your current bundles",
-    "seeAll": "See all",
-    "noBundles": "You have no bundles. Try searching for creator or buy bundle",
-    "search": "Search"
+    "title": "你當前的bundle",
+    "seeAll": "查看所有",
+    "noBundles": "你沒有bundle。請嘗試搜尋創作者，會購買bundle",
+    "search": "搜索 "
   },
   "bundlesModal": {
-    "title": "Your current bundles"
+    "title": "你當前的bundle"
   },
   "bundle": {
-    "votesLeft": "<0>{{amount}}</0> votes left",
-    "access": "plus {{amount}} {{unit}} of:",
-    "customOptions": "adding custom superpoll options",
-    "chat": "1-on-1 private chat",
-    "expiation": "votes never expire",
+    "votesLeft": "剩餘<0>{{amount}}</0> 票",
+    "access": "另有{{amount}} {{unit}} ：",
+    "customOptions": "添加定制Superpoll選項",
+    "chat": "一對一私聊",
+    "expiation": "投票永不過期",
     "unit": {
-      "day": "day",
-      "days": "days",
-      "month": "month",
-      "months": "months"
+      "day": "天",
+      "days": "天",
+      "month": "月",
+      "months": "月"
     }
   },
   "search": {
-    "title": "Search creators offering Bundles",
-    "searchInputPlaceholder": "Search creators",
-    "resultsTitle": "Top Creators"
+    "title": "查找提供Bundle的創作者",
+    "searchInputPlaceholder": "查找創作者",
+    "resultsTitle": "熱門創作者"
   },
   "button": {
-    "back": "Back"
+    "back": "返回"
+  },
+  "error": {
+    "requestFailed": "請求失敗"
   }
 }

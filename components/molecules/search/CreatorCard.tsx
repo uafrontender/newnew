@@ -20,6 +20,7 @@ import { markUser } from '../../../api/endpoints/user';
 import UserEllipseModal from '../profile/UserEllipseModal';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { useBundles } from '../../../contexts/bundlesContext';
+import { formatNumber } from '../../../utils/format';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
@@ -166,7 +167,10 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         >
           {creatorsBundle
             ? t('creatorCard.purchasedVotes', {
-                value: creatorsBundle.bundle?.votesLeft,
+                value: formatNumber(
+                  creatorsBundle.bundle?.votesLeft || 0,
+                  true
+                ),
               })
             : t('creatorCard.buyBundle')}
         </SButton>

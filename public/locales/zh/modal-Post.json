@@ -130,7 +130,7 @@
       "backToResponse": "觀看回應"
     },
     "reuploadButton": "重新上傳",
-    "addVideoButton_NEED_TRANSLATION": "Add video",
+    "addVideoButton": "添加視頻",
     "cannotLeavePageMsg": "你確定要關閉這個頁面嗎？上傳進度會丟失",
     "floatingUploadResponseButton": "製作回應視頻",
     "setThumbnail": "設置縮略圖",
@@ -218,12 +218,12 @@
       "confirm": "刪除"
     }
   },
-  "deleteVideoModal_NEED_TRANSLATION": {
-    "title": "Delete video",
-    "body": "Are you sure you want to delete this video?",
+  "deleteVideoModal": {
+    "title": "刪除視頻",
+    "body": "確定要刪除視頻嗎？",
     "button": {
-      "cancel": "Cancel",
-      "confirm": "Delete"
+      "cancel": "取消",
+      "confirm": "刪除"
     }
   },
   "deleteCommentModal": {
@@ -253,11 +253,11 @@
     "history": "歷史"
   },
   "optionsTabLine": {
-    "bundleVotes_NEED_TRANSLATION": "You have <0>{{amount}} votes</0>"
+    "bundleVotes": "你有<0>{{amount}} 投票</0>"
   },
   "postViewProcessingAnnouncement": {
     "stayTuned": {
-      "ac": "這個 Bid 將在\n視頻處理完成後開始",
+      "ac": "這個Bid將在\n視頻處理完成後開始",
       "mc": "這個Superpoll將在\n視頻處理後開始",
       "cf": "這個Goal將在\n視頻處理後開始"
     },
@@ -408,7 +408,7 @@
           "vote": "票",
           "votes": "票",
           "custom": "自定義票數",
-          "useVotes_NEED_TRANSLATION": "Use my votes"
+          "useVotes": "使用我的投票"
         },
         "confirmVoteModal": {
           "vote": "票",
@@ -427,10 +427,10 @@
         "line_2": "Once you do, you won't be able to add another one.",
         "useFreeVoteButton": "Add custom option"
       },
-      "useBundleVotesModal_NEED_TRANSLATION": {
-        "votesAvailable": "<0>{{amount}}</0> votes available",
-        "optionTitle": "Superpoll option",
-        "button": "Vote"
+      "useBundleVotesModal": {
+        "votesAvailable": "還有<0>{{amount}}</0> 票",
+        "optionTitle": "Superpoll選項",
+        "button": "投票"
       },
       "actionSection": {
         "votesAmount": {
@@ -442,8 +442,8 @@
         "suggestionPlaceholder": "添加你自己的選項……",
         "suggestionPlaceholderDesktop": "添加選……",
         "placeABidButton": "添加我的選項",
-        "offersBundles_NEED_TRANSLATION": "{{creator}} offers Superpoll Bundles",
-        "viewBundles_NEED_TRANSLATION": "View Bundles"
+        "offersBundles": "{{creator}} 提供Superpoll Bundle",
+        "viewBundles": "查看Bundle"
       }
     },
     "winnerTab": {
