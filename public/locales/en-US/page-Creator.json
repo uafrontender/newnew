@@ -118,7 +118,8 @@
       "payPeriod": "this pay period",
       "unitName": "bundle",
       "earned": "earned",
-      "noSoldYet": "No bundles sold yet"
+      "noSoldYet": "No bundles sold yet",
+      "sold": "sold"
     },
     "bundlesSet": {
       "title": "Superpoll Bundles",
