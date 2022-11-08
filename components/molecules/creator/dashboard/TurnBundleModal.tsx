@@ -64,6 +64,7 @@ const TurnBundleModal: React.FC<ITurnBundleModal> = React.memo(
                   : t('myBundles.modals.turnon.text')}
               </SText>
               <SButton
+                id='turn-on-bundles-modal-button'
                 onClick={toggleBundlesEnabled}
                 enabled={isBundlesEnabled}
                 disabled={isBundlesEnabled === undefined}

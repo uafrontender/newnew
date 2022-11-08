@@ -248,8 +248,9 @@ context('Main flow', () => {
       cy.get('#bundles-navigation').click();
       cy.url().should('include', '/creator/bundles');
 
-      cy.contains('Turn on bundles').click();
-      cy.contains('Turn off bundles');
+      cy.get('#turn-on-bundles-button').click();
+      cy.get('#turn-on-bundles-modal-button').click();
+      cy.get('#success-bundle-modal').should('be.visible');
     });
   });
 

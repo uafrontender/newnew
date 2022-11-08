@@ -16,8 +16,9 @@ export let fetchInitialized = false;
 let fetchInitializationTriggered = false;
 
 // eslint-disable-next-line no-async-promise-executor
-const customFetch = async (...args: any): Promise<any> => new Promise(async (resolve) => {
-    const [ resource, config ] = args;
+const customFetch = async (...args: any): Promise<any> =>
+  new Promise(async (resolve) => {
+    const [resource, config] = args;
 
     // request interceptor starts
     if (!fetchInitialized) {
@@ -26,7 +27,7 @@ const customFetch = async (...args: any): Promise<any> => new Promise(async (res
           fetchInitializationTriggered = true;
           await fetch(process.env.NEXT_PUBLIC_SOCKET_URL!!);
         } catch (err) {
-          console.error(err)
+          console.error(err);
         } finally {
           // set global state
           fetchInitialized = true;
@@ -40,7 +41,7 @@ const customFetch = async (...args: any): Promise<any> => new Promise(async (res
       try {
         resolve(await fetch(resource, config));
       } catch (err) {
-        console.error(err)
+        console.error(err);
       }
     }
   });
@@ -135,9 +136,12 @@ export async function fetchProtobuf<
       method,
       headers: {
         'Content-type': 'application/x-protobuf',
-        ...(!isBrowser() ? {
-          'x-from': 'web',
-        } : {}),
+        ...(!isBrowser() || process.env.NEXT_PUBLIC_ENVIRONMENT === 'test'
+          ? {
+              // TODO: should it come from env var and be a secret?
+              'x-from': 'web',
+            }
+          : {}),
         ...headers,
       },
       mode,
