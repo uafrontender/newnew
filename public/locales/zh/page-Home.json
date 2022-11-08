@@ -73,8 +73,12 @@
         "answer": "創作者可以為他們的Superpoll提供優惠的捆綁服務。購買Bundle產品是可選的，但如果你購買了Bundle產品，你可以享受的是：<2>票數上的巨大折扣+更多的投票，並可以在即將到來的Superpoll中使用</2> <2>可以在創作者的Superpoll中添加你的自訂選項</2> <2>與創作者進行1對1的交流</2>"
       },
       {
+        "question_NEED_TRANSLATION": "Can brands use NewNew?",
+        "answer_NEED_TRANSLATION": "Yes! Brands are creators too. NewNew is a great place to engage with your customers on a hyper-interactive level. Your customers can help make major decisions for your brand and feel included and heard in the process of your next big product, launch etc. Besides, there’s no one better to get feedback from than those who are invested in your brand."
+      },
+      {
         "question": "如果創作者不按照出價選出的選項執行怎麼辦？",
-        "answer": "如果有以下情況，不會向你收費。<1>創作者未向Superpoll或出價競標上傳回應視頻</1> <1>創作者沒有選擇你的出價</1> <1>創作者沒有在Superpoll中選擇你所投票的選項</1>"
+        "answer": "如果有以下情況，不會向你收費。<1>創作者未向Superpoll或出價競標上傳回應視頻</1> <1>創作者沒有選擇你的出價</1>"
       }
     ]
   },
