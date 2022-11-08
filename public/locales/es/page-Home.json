@@ -73,8 +73,12 @@
         "answer": "Los creadores pueden ofrecer Bundles con descuento para sus Superpolls. La compra de un bundle es opcional, pero con la compra de un bundle obtienes <2>Un gran descuento en la compra de votos + más poder de voto para usar en las próximas Superpolls</2> <2>La posibilidad de añadir tu propia opción personalizada a las Superpolls del creador</2> <2>Mensajes 1 a 1 con el creador</2>"
       },
       {
+        "question_NEED_TRANSLATION": "Can brands use NewNew?",
+        "answer_NEED_TRANSLATION": "Yes! Brands are creators too. NewNew is a great place to engage with your customers on a hyper-interactive level. Your customers can help make major decisions for your brand and feel included and heard in the process of your next big product, launch etc. Besides, there’s no one better to get feedback from than those who are invested in your brand."
+      },
+      {
         "question": "¿Y si el creador no hace por lo que se ha votado u ofertado?",
-        "answer": "No se te cobrará si <1>El creador nunca sube un video de respuesta a una Superencuesta o Oferta</1> <1>El creador no elige tu Oferta en específico</1> <1>El creador no elige la opción que votaste en una Superencuesta</1>"
+        "answer": "No se te cobrará si <1>El creador nunca sube un video de respuesta a una Superpoll o Bid</1> <1>El creador no elige tu Bid en específico</1>"
       }
     ]
   },
