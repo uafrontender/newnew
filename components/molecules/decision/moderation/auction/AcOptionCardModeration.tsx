@@ -44,6 +44,8 @@ interface IAcOptionCardModeration {
   isWinner?: boolean;
   handleConfirmWinningOption: () => void;
   handleRemoveOption: (optionToDelete: newnewapi.Auction.Option) => void;
+  handleSetScrollBlocked?: () => void;
+  handleUnsetScrollBlocked?: () => void;
 }
 
 const AcOptionCardModeration: React.FunctionComponent<
@@ -55,6 +57,8 @@ const AcOptionCardModeration: React.FunctionComponent<
   isWinner,
   handleConfirmWinningOption,
   handleRemoveOption,
+  handleSetScrollBlocked,
+  handleUnsetScrollBlocked,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
@@ -99,26 +103,6 @@ const AcOptionCardModeration: React.FunctionComponent<
   }, []);
 
   const ellipseButtonRef: any = useRef();
-
-  useEffect(() => {
-    if (isBrowser()) {
-      const scrollArea = document.getElementById(
-        'acOptionsTabModeration__bidsContainer'
-      );
-      if (isEllipseMenuOpen && scrollArea) {
-        scrollArea.style.overflow = 'hidden';
-      } else if (scrollArea) {
-        scrollArea.style.overflow = 'auto';
-      }
-    }
-
-    return () => {
-      const scrollArea = document.getElementById(
-        'acOptionsTabModeration__bidsContainer'
-      );
-      if (scrollArea) scrollArea.style.overflow = 'auto';
-    };
-  }, [isEllipseMenuOpen]);
 
   return (
     <>
@@ -242,7 +226,10 @@ const AcOptionCardModeration: React.FunctionComponent<
                     : t('acPostModeration.optionsTab.optionCard.pickButton')}
                 </SPickOptionButton>
                 <SDropdownButton
-                  onClick={() => setIsEllipseMenuOpen(true)}
+                  onClick={() => {
+                    setIsEllipseMenuOpen(true);
+                    handleSetScrollBlocked?.();
+                  }}
                   ref={ellipseButtonRef}
                 >
                   <InlineSvg
@@ -278,7 +265,10 @@ const AcOptionCardModeration: React.FunctionComponent<
             )
           ) : !isMobile ? (
             <SEllipseButton
-              onClick={() => setIsEllipseMenuOpen(true)}
+              onClick={() => {
+                setIsEllipseMenuOpen(true);
+                handleSetScrollBlocked?.();
+              }}
               ref={ellipseButtonRef}
             >
               <InlineSvg
@@ -297,7 +287,10 @@ const AcOptionCardModeration: React.FunctionComponent<
             <AcOptionCardModerationEllipseMenu
               isVisible={isEllipseMenuOpen}
               canDeleteOption={!isWinner}
-              handleClose={() => setIsEllipseMenuOpen(false)}
+              handleClose={() => {
+                setIsEllipseMenuOpen(false);
+                handleUnsetScrollBlocked?.();
+              }}
               handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
               handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
               handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}

@@ -2,13 +2,11 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
@@ -20,7 +18,6 @@ import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSucce
 import { formatNumber } from '../../../../utils/format';
 import getDisplayname from '../../../../utils/getDisplayname';
 import secondsToDHMS from '../../../../utils/secondsToDHMS';
-import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
@@ -48,9 +45,6 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { mutedMode } = useAppSelector((state) => state.ui);
-    const router = useRouter();
-
-    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     const waitingTime = useMemo(() => {
       const end = (post.responseUploadDeadline?.seconds as number) * 1000;
@@ -58,20 +52,42 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
       const dhms = secondsToDHMS(parsed);
 
       let countdownsrt = `${dhms.days} ${t(
-        'acPostAwaiting.hero.expires.days'
-      )} ${dhms.hours} ${t('acPostAwaiting.hero.expires.hours')}`;
+        dhms.days === '1'
+          ? 'mcPostAwaiting.hero.expires.days_singular'
+          : 'mcPostAwaiting.hero.expires.days'
+      )} ${dhms.hours !== '0' ? dhms.hours : ''} ${t(
+        dhms.hours !== '0'
+          ? dhms.hours === '1'
+            ? 'mcPostAwaiting.hero.expires.hours_singular'
+            : 'mcPostAwaiting.hero.expires.hours'
+          : ''
+      )}`;
 
       if (dhms.days === '0') {
         countdownsrt = `${dhms.hours} ${t(
-          'acPostAwaiting.hero.expires.hours'
-        )} ${dhms.minutes} ${t('acPostAwaiting.hero.expires.minutes')}`;
+          dhms.hours === '1'
+            ? 'mcPostAwaiting.hero.expires.hours_singular'
+            : 'mcPostAwaiting.hero.expires.hours'
+        )} ${dhms.minutes} ${t(
+          dhms.minutes === '1'
+            ? 'mcPostAwaiting.hero.expires.minutes_singular'
+            : 'mcPostAwaiting.hero.expires.minutes'
+        )}`;
         if (dhms.hours === '0') {
           countdownsrt = `${dhms.minutes} ${t(
-            'acPostAwaiting.hero.expires.minutes'
-          )} ${dhms.seconds} ${t('acPostAwaiting.hero.expires.seconds')}`;
+            dhms.minutes === '1'
+              ? 'mcPostAwaiting.hero.expires.minutes_singular'
+              : 'mcPostAwaiting.hero.expires.minutes'
+          )} ${dhms.seconds} ${t(
+            dhms.seconds === '1'
+              ? 'mcPostAwaiting.hero.expires.seconds_singular'
+              : 'mcPostAwaiting.hero.expires.seconds'
+          )}`;
           if (dhms.minutes === '0') {
             countdownsrt = `${dhms.seconds} ${t(
-              'acPostAwaiting.hero.expires.seconds'
+              dhms.seconds === '1'
+                ? 'mcPostAwaiting.hero.expires.seconds_singular'
+                : 'mcPostAwaiting.hero.expires.seconds'
             )}`;
           }
         }
@@ -104,11 +120,6 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
       'main' | 'options'
     >('main');
 
-    // Comments
-    const { ref: commentsSectionRef, inView } = useInView({
-      threshold: 0.8,
-    });
-
     // Scroll to comments if hash is present
     useEffect(() => {
       const handleCommentsInitialHash = () => {
@@ -126,26 +137,6 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
       handleCommentsInitialHash();
     }, []);
 
-    // Replace hash once scrolled to comments
-    useEffect(() => {
-      if (inView) {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#comments`
-        );
-      } else {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }`
-        );
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid, router.locale]);
-
     // Load winning option
     useEffect(() => {
       async function fetchAndSetWinningOption(id: number) {
@@ -156,19 +147,15 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
 
           const res = await getMcOption(payload);
 
-          console.log(res);
-
           if (res.data?.option) {
             setWinningOption(
               res.data.option as newnewapi.MultipleChoice.Option
             );
           }
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       }
-
-      console.log(post.winningOptionId);
 
       if (post.winningOptionId) {
         fetchAndSetWinningOption(post.winningOptionId as number);
@@ -340,7 +327,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
           </SActivitiesContainer>
         </SWrapper>
         {post.isCommentsAllowed && (
-          <SCommentsSection id='comments' ref={commentsSectionRef}>
+          <SCommentsSection id='comments'>
             <SCommentsHeadline variant={4}>
               {t('successCommon.comments.heading')}
             </SCommentsHeadline>
@@ -379,6 +366,7 @@ const SWrapper = styled.div`
 
     grid-template-areas: 'video activities';
     grid-template-columns: 410px 1fr;
+    grid-column-gap: 32px;
   }
 `;
 

@@ -8,15 +8,15 @@ import styled, { useTheme } from 'styled-components';
 
 import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
 import { Mixpanel } from '../../../utils/mixpanel';
-import { useAppSelector } from '../../../redux-store/store';
 
-import Modal from '../Modal';
 import ModerationView from './moderation';
-import PostModerationControls from '../../molecules/decision/moderation/PostModerationControls';
+
+// Icons
+import GoBackButton from '../../molecules/GoBackButton';
+import { useAppSelector } from '../../../redux-store/store';
 
 // Icons
 import assets from '../../../constants/assets';
-import AnimatedBackground from '../../atoms/AnimationBackground';
 
 const PostFailedBox = dynamic(
   () => import('../../molecules/decision/common/PostFailedBox')
@@ -48,7 +48,6 @@ const PostModalModeration: React.FunctionComponent<
   );
 
   const {
-    open,
     modalContainerRef,
     isMyPost,
     postParsed,
@@ -56,121 +55,71 @@ const PostModalModeration: React.FunctionComponent<
     postStatus,
     deletedByCreator,
     recommendedPosts,
-    shareMenuOpen,
-    deletePostOpen,
-    ellipseMenuOpen,
-    handleDeletePost,
-    handleEllipseMenuClose,
-    handleOpenDeletePostModal,
-    handleShareClose,
-    handleOpenShareMenu,
-    handleOpenEllipseMenu,
-    handleCloseDeletePostModal,
     handleCloseAndGoBack,
   } = usePostModalInnerState();
 
   return (
     <>
-      <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
-        {(postStatus === 'succeeded' ||
-          postStatus === 'waiting_for_response') &&
-          !isMobile && (
-            <AnimatedBackground src={assets.decision.gold} alt='coin' />
+      <Head>
+        <title>{t(`meta.${typeOfPost}.title`)}</title>
+        <meta
+          name='description'
+          content={t(`meta.${typeOfPost}.description`)}
+        />
+        <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
+        <meta
+          property='og:description'
+          content={t(`meta.${typeOfPost}.description`)}
+        />
+      </Head>
+      {!isMobile && (
+        <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
+          {t('back')}
+        </SGoBackButton>
+      )}
+      {postParsed && typeOfPost ? (
+        <SPostModalContainer
+          loaded={recommendedPosts && recommendedPosts.length > 0}
+          id='post-modal-container'
+          isMyPost={isMyPost}
+          onClick={(e) => e.stopPropagation()}
+          ref={(el) => {
+            modalContainerRef.current = el!!;
+          }}
+        >
+          {postStatus !== 'deleted_by_admin' &&
+          postStatus !== 'deleted_by_creator' ? (
+            <ModerationView />
+          ) : (
+            <PostFailedBox
+              title={t('postDeletedByMe.title', {
+                postType: t(`postType.${typeOfPost}`),
+              })}
+              body={
+                deletedByCreator
+                  ? t('postDeletedByMe.body.byCreator', {
+                      postType: t(`postType.${typeOfPost}`),
+                    })
+                  : t('postDeletedByMe.body.byAdmin', {
+                      postType: t(`postType.${typeOfPost}`),
+                    })
+              }
+              imageSrc={
+                theme.name === 'light'
+                  ? LIGHT_IMAGES[typeOfPost]
+                  : DARK_IMAGES[typeOfPost]
+              }
+              buttonCaption={t('postDeletedByMe.buttonText')}
+              handleButtonClick={() => {
+                Mixpanel.track('Post Failed Redirect to Creation', {
+                  _stage: 'Post',
+                });
+                router.push('/creation');
+              }}
+            />
           )}
-        <Head>
-          <title>{t(`meta.${typeOfPost}.title`)}</title>
-          <meta
-            name='description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-          <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-          <meta
-            property='og:description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-        </Head>
-        {!isMobile && (
-          <PostModerationControls
-            isMobile={isMobile}
-            postUuid={postParsed?.postUuid ?? ''}
-            postStatus={postStatus}
-            shareMenuOpen={shareMenuOpen}
-            typeOfPost={typeOfPost ?? 'ac'}
-            deletePostOpen={deletePostOpen}
-            ellipseMenuOpen={ellipseMenuOpen}
-            handleCloseAndGoBack={handleCloseAndGoBack}
-            handleDeletePost={handleDeletePost}
-            handleEllipseMenuClose={handleEllipseMenuClose}
-            handleOpenDeletePostModal={handleOpenDeletePostModal}
-            handleShareClose={handleShareClose}
-            handleOpenShareMenu={handleOpenShareMenu}
-            handleOpenEllipseMenu={handleOpenEllipseMenu}
-            handleCloseDeletePostModal={handleCloseDeletePostModal}
-          />
-        )}
-        {postParsed && typeOfPost ? (
-          <SPostModalContainer
-            loaded={recommendedPosts && recommendedPosts.length > 0}
-            id='post-modal-container'
-            isMyPost={isMyPost}
-            onClick={(e) => e.stopPropagation()}
-            ref={(el) => {
-              modalContainerRef.current = el!!;
-            }}
-          >
-            {postStatus !== 'deleted_by_admin' &&
-            postStatus !== 'deleted_by_creator' ? (
-              <ModerationView />
-            ) : (
-              <PostFailedBox
-                title={t('postDeletedByMe.title', {
-                  postType: t(`postType.${typeOfPost}`),
-                })}
-                body={
-                  deletedByCreator
-                    ? t('postDeletedByMe.body.byCreator', {
-                        postType: t(`postType.${typeOfPost}`),
-                      })
-                    : t('postDeletedByMe.body.byAdmin', {
-                        postType: t(`postType.${typeOfPost}`),
-                      })
-                }
-                imageSrc={
-                  theme.name === 'light'
-                    ? LIGHT_IMAGES[typeOfPost]
-                    : DARK_IMAGES[typeOfPost]
-                }
-                buttonCaption={t('postDeletedByMe.buttonText')}
-                handleButtonClick={() => {
-                  Mixpanel.track('Post Failed Redirect to Creation', {
-                    _stage: 'Post',
-                  });
-                  router.push('/creation');
-                }}
-              />
-            )}
-            {isMobile && (
-              <PostModerationControls
-                isMobile={isMobile}
-                postUuid={postParsed?.postUuid ?? ''}
-                postStatus={postStatus}
-                shareMenuOpen={shareMenuOpen}
-                typeOfPost={typeOfPost ?? 'ac'}
-                deletePostOpen={deletePostOpen}
-                ellipseMenuOpen={ellipseMenuOpen}
-                handleCloseAndGoBack={handleCloseAndGoBack}
-                handleDeletePost={handleDeletePost}
-                handleEllipseMenuClose={handleEllipseMenuClose}
-                handleOpenDeletePostModal={handleOpenDeletePostModal}
-                handleShareClose={handleShareClose}
-                handleOpenShareMenu={handleOpenShareMenu}
-                handleOpenEllipseMenu={handleOpenEllipseMenu}
-                handleCloseDeletePostModal={handleCloseDeletePostModal}
-              />
-            )}
-          </SPostModalContainer>
-        ) : null}
-      </Modal>
+        </SPostModalContainer>
+      ) : null}
     </>
   );
 };
@@ -181,15 +130,6 @@ const SPostModalContainer = styled.div<{
   isMyPost: boolean;
   loaded: boolean;
 }>`
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  z-index: 1;
-  overscroll-behavior: none;
-
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
   height: 100%;
@@ -205,39 +145,31 @@ const SPostModalContainer = styled.div<{
   -ms-user-select: none;
   user-select: none;
 
-  /* Hide scrollbar */
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
   ${({ theme }) => theme.media.tablet} {
-    top: 64px;
-    /*transform: none; */
-    /* top: 50%; */
-    /* transform: translateY(-50%); */
+    width: 100%;
     padding-bottom: 16px;
 
-    background-color: ${({ theme }) =>
-      theme.name === 'dark'
-        ? theme.colorsThemed.background.secondary
-        : theme.colorsThemed.background.primary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
-    width: 100%;
-    height: calc(100% - 64px);
   }
 
   ${({ theme }) => theme.media.laptopM} {
-    top: 32px;
-    left: calc(50% - 496px);
-    width: 992px;
-    height: calc(100% - 64px);
-    max-height: ${({ loaded }) => (loaded ? 'unset' : '840px')};
-
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
 
     padding: 24px;
     padding-bottom: 24px;
+  }
+`;
+
+const SGoBackButton = styled(GoBackButton)`
+  padding-left: 16px;
+
+  ${({ theme }) => theme.media.laptopM} {
+    padding-left: 24px;
+    width: 100%;
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
   }
 `;

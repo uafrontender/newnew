@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -9,23 +7,25 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../../../redux-store/store';
-import GoBackButton from '../../../GoBackButton';
 import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
 import { fetchCurrentBidsForPost } from '../../../../../api/endpoints/auction';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
-import AcOptionCard from '../../regular/auction/AcOptionCard';
-import Button from '../../../../atoms/Button';
-import GradientMask from '../../../../atoms/GradientMask';
 import { Mixpanel } from '../../../../../utils/mixpanel';
+
+import Button from '../../../../atoms/Button';
+import Lottie from '../../../../atoms/Lottie';
+import AcOptionCard from '../../regular/auction/AcOptionCard';
+import GradientMask from '../../../../atoms/GradientMask';
+
+import loadingAnimation from '../../../../../public/animations/logo-loading-blue.json';
 
 interface IAcWaitingOptionsSection {
   post: newnewapi.Auction;
-  heightDelta: number;
 }
 
 const AcWaitingOptionsSection: React.FunctionComponent<
   IAcWaitingOptionsSection
-> = ({ post, heightDelta }) => {
+> = ({ post }) => {
   const { t } = useTranslation('modal-Post');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -39,14 +39,19 @@ const AcWaitingOptionsSection: React.FunctionComponent<
     string | undefined | null
   >('');
   const [optionsLoading, setOptionsLoading] = useState(false);
-  const [loadingOptionsError, setLoadingOptionsError] = useState('');
+  const [, setLoadingOptionsError] = useState('');
+
+  // Scroll block
+  const [isScrollBlocked, setIsScrollBlocked] = useState(false);
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
 
   const containerRef = useRef<HTMLDivElement>();
-  const { showTopGradient, showBottomGradient } =
-    useScrollGradients(containerRef);
+  const { showTopGradient, showBottomGradient } = useScrollGradients(
+    containerRef,
+    options.length > 0
+  );
 
   const sortOptions = useCallback(
     (unsortedArr: TAcOptionWithHighestField[]) => {
@@ -175,6 +180,19 @@ const AcWaitingOptionsSection: React.FunctionComponent<
     [post, setOptions, sortOptions, optionsLoading]
   );
 
+  const handleRemoveOption = useCallback(
+    (optionToRemove: newnewapi.Auction.Option) => {
+      setOptions((curr) => {
+        const workingArr = [...curr];
+        const workingArrUnsorted = [
+          ...workingArr.filter((o) => o.id !== optionToRemove.id),
+        ];
+        return sortOptions(workingArrUnsorted);
+      });
+    },
+    [setOptions, sortOptions]
+  );
+
   useEffect(() => {
     setOptions([]);
     setOptionsNextPageToken('');
@@ -190,10 +208,20 @@ const AcWaitingOptionsSection: React.FunctionComponent<
   }, [inView, optionsNextPageToken, optionsLoading]);
 
   return (
-    <SWrapper
-      // heightDelta={isMobile ? 24 : 60}
-      heightDelta={isMobile ? 0 : heightDelta}
-    >
+    <SWrapper>
+      {options.length === 0 && optionsLoading && (
+        <SLoadingSpinnerDiv>
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        </SLoadingSpinnerDiv>
+      )}
       {!isMobile ? (
         <>
           <GradientMask
@@ -212,11 +240,23 @@ const AcWaitingOptionsSection: React.FunctionComponent<
         ref={(el) => {
           containerRef.current = el!!;
         }}
+        style={{
+          ...(isScrollBlocked
+            ? {
+                overflow: 'hidden',
+                width:
+                  options.length > 4
+                    ? 'calc(100% + 10px)'
+                    : 'calc(100% + 14px)',
+              }
+            : {}),
+        }}
       >
         {options.map((option, i) => (
           <AcOptionCard
             key={option.id.toString()}
             option={option as TAcOptionWithHighestField}
+            optionBeingSupported=''
             postId={post.postUuid}
             postCreatorName={
               post.creator?.nickname
@@ -230,6 +270,16 @@ const AcWaitingOptionsSection: React.FunctionComponent<
             votingAllowed={false}
             handleSetSupportedBid={() => {}}
             handleAddOrUpdateOptionFromResponse={() => {}}
+            handleRemoveOption={() => {
+              Mixpanel.track('Removed Option', {
+                _stage: 'Post',
+                _postUuid: post.postUuid,
+                _component: 'AcOptionsTab',
+              });
+              handleRemoveOption(option);
+            }}
+            handleSetScrollBlocked={() => setIsScrollBlocked(true)}
+            handleUnsetScrollBlocked={() => setIsScrollBlocked(false)}
           />
         ))}
         {!isMobile ? (
@@ -256,12 +306,16 @@ const AcWaitingOptionsSection: React.FunctionComponent<
 
 export default AcWaitingOptionsSection;
 
-const SWrapper = styled.div<{
-  heightDelta: number;
-}>`
+const SWrapper = styled.div`
   position: relative;
-  height: 100%;
-  height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex: 1 1 auto;
+  }
 `;
 
 const SBidsContainer = styled.div`
@@ -277,10 +331,19 @@ const SBidsContainer = styled.div`
   padding-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+
+    padding-top: 0px;
     padding-right: 12px;
     margin-right: -14px;
     width: calc(100% + 14px);
+    height: initial;
+    flex: 1 1 auto;
 
     // Scrollbar
     &::-webkit-scrollbar {
@@ -318,4 +381,14 @@ const SLoaderDiv = styled.div`
 const SLoadMoreBtn = styled(Button)`
   width: 100%;
   height: 56px;
+`;
+
+const SLoadingSpinnerDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: absolute;
+  top: calc(50% - 32px);
+  left: calc(50% - 32px);
 `;

@@ -11,19 +11,8 @@ import FilterButton from '../../atoms/FilterButton';
 import Text from '../../atoms/Text';
 
 import { getMyPosts } from '../../../api/endpoints/user';
-import switchPostType from '../../../utils/switchPostType';
 
-interface IYourPostsSection {
-  onPostOpen: (post: newnewapi.Post) => void;
-  postToRemove?: string;
-  resetPostToRemove?: () => void;
-}
-
-const YourPostsSection = ({
-  onPostOpen,
-  postToRemove,
-  resetPostToRemove,
-}: IYourPostsSection) => {
+const YourPostsSection = () => {
   const { t: tCommon } = useTranslation('common');
   const { t } = useTranslation('page-Home');
 
@@ -133,27 +122,6 @@ const YourPostsSection = ({
     }
   }, [statusFilter, initialFetch]);
 
-  useEffect(() => {
-    if (postToRemove) {
-      let isPostFounded = false;
-      setPosts((curr) => {
-        const updated = curr.filter((post) => {
-          if (switchPostType(post)[0].postUuid !== postToRemove) {
-            return true;
-          }
-
-          isPostFounded = true;
-          return false;
-        });
-        return updated;
-      });
-
-      if (isPostFounded) {
-        resetPostToRemove?.();
-      }
-    }
-  }, [postToRemove, resetPostToRemove]);
-
   if (
     isPostsRequested.current &&
     posts.length === 0 &&
@@ -211,7 +179,6 @@ const YourPostsSection = ({
           category='my-posts'
           collection={posts}
           loading={isLoading}
-          handlePostClicked={onPostOpen}
           onReachEnd={loadMorePosts}
           seeMoreLink='/profile/my-posts'
         />
