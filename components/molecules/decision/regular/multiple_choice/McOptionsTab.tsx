@@ -326,6 +326,20 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
+        {user.userTutorialsProgress.remainingMcSteps && (
+          <STutorialTooltipHolder>
+            <TutorialTooltip
+              isTooltipVisible={
+                user.userTutorialsProgress.remainingMcSteps[0] ===
+                newnewapi.McTutorialStep.MC_ALL_OPTIONS
+              }
+              closeTooltip={goToNextStep}
+              title={t('tutorials.mc.peopleBids.title')}
+              text={t('tutorials.mc.peopleBids.text')}
+              dotPosition={DotPositionEnum.BottomLeft}
+            />
+          </STutorialTooltipHolder>
+        )}
       </STabContainer>
       {/* Suggest new form */}
       {!optionCreatedByMe &&
@@ -396,20 +410,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             {t('mcPost.optionsTab.actionSection.viewBundles')}
           </SHighlightedButton>
         </SBundlesContainer>
-      )}
-      {user.userTutorialsProgress.remainingMcSteps && (
-        <STutorialTooltipHolder>
-          <TutorialTooltip
-            isTooltipVisible={
-              user.userTutorialsProgress.remainingMcSteps[0] ===
-              newnewapi.McTutorialStep.MC_ALL_OPTIONS
-            }
-            closeTooltip={goToNextStep}
-            title={t('tutorials.mc.peopleBids.title')}
-            text={t('tutorials.mc.peopleBids.text')}
-            dotPosition={DotPositionEnum.BottomLeft}
-          />
-        </STutorialTooltipHolder>
       )}
       {/* Suggest new Modal */}
       {isMobile &&
@@ -688,8 +688,8 @@ const SActionSection = styled.div`
 
 const STutorialTooltipHolder = styled.div`
   position: absolute;
-  left: 40%;
-  bottom: 90%;
+  left: 25%;
+  bottom: 120%;
   text-align: left;
   div {
     width: 190px;
