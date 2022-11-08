@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 
 import Headline from '../../atoms/Headline';
 import PostCard from '../../molecules/PostCard';
@@ -22,7 +23,6 @@ interface IPostTypeSectionProps {
   loading?: boolean;
   isStatic?: boolean;
   padding?: 'small' | 'large';
-  openPostModal: (post: newnewapi.Post) => void;
 }
 
 const PostTypeSection = ({
@@ -34,8 +34,8 @@ const PostTypeSection = ({
   loading,
   isStatic,
   padding,
-  openPostModal,
 }: IPostTypeSectionProps) => {
+  const router = useRouter();
   const { postOverlayOpen } = usePostModalState();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -46,7 +46,7 @@ const PostTypeSection = ({
 
   const renderPosts = (post: newnewapi.Post, index: number) => {
     const handleOpenPostModal = () => {
-      openPostModal(post);
+      router.push(`/post/${switchPostType(post)[0].postUuid}`);
     };
     return (
       <SItemWrapper

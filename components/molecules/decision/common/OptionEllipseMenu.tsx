@@ -95,40 +95,43 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
   if (!isVisible) return null;
 
   return (
-    <SEllipseMenu
-      isOpen={isVisible}
-      onClose={handleClose}
-      style={{
-        left: `${xy.x}px`,
-        top: `${xy.y}px`,
-      }}
-    >
-      {isMyOption && (
-        <SEllipseMenuButton
-          variant={3}
-          tone='error'
-          onClick={() => {
-            handleOpenRemoveOptionModal?.();
-            handleClose();
-          }}
-          disabled={!canDeleteOption || isCanDeleteOptionLoading}
-        >
-          {t('ellipse.delete')}
-        </SEllipseMenuButton>
-      )}
-      {!isMyOption && (
-        <SEllipseMenuButton
-          variant={3}
-          tone='error'
-          onClick={() => {
-            handleOpenReportOptionModal();
-            handleClose();
-          }}
-        >
-          {t('ellipse.report')}
-        </SEllipseMenuButton>
-      )}
-    </SEllipseMenu>
+    <>
+      <SBgDiv />
+      <SEllipseMenu
+        isOpen={isVisible}
+        onClose={handleClose}
+        style={{
+          left: `${xy.x}px`,
+          top: `${xy.y}px`,
+        }}
+      >
+        {isMyOption && (
+          <SEllipseMenuButton
+            variant={3}
+            tone='error'
+            onClick={() => {
+              handleOpenRemoveOptionModal?.();
+              handleClose();
+            }}
+            disabled={!canDeleteOption || isCanDeleteOptionLoading}
+          >
+            {t('ellipse.delete')}
+          </SEllipseMenuButton>
+        )}
+        {!isMyOption && (
+          <SEllipseMenuButton
+            variant={3}
+            tone='error'
+            onClick={() => {
+              handleOpenReportOptionModal();
+              handleClose();
+            }}
+          >
+            {t('ellipse.report')}
+          </SEllipseMenuButton>
+        )}
+      </SEllipseMenu>
+    </>
   );
 };
 
@@ -152,4 +155,12 @@ const SEllipseMenuButton = styled(EllipseMenuButton)`
     opacity: 0.5;
     cursor: default;
   }
+`;
+
+const SBgDiv = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 `;

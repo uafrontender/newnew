@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Head from 'next/head';
@@ -29,11 +28,8 @@ import { APIResponse } from '../api/apiConfigs';
 import { fetchLiveAuctions } from '../api/endpoints/auction';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 // import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
-import switchPostType from '../utils/switchPostType';
 import assets from '../constants/assets';
-import { Mixpanel } from '../utils/mixpanel';
 
-const PostModal = dynamic(() => import('../components/organisms/decision'));
 const TopSection = dynamic(
   () => import('../components/organisms/home/TopSection')
 );
@@ -301,48 +297,6 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     [setCollectionLoaded, loggedIn, isCollectionLoading]
   );
 
-  // Display post
-  const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<
-    newnewapi.IPost | undefined
-  >(undefined);
-
-  const handleOpenPostModal = (post: newnewapi.IPost) => {
-    Mixpanel.track('Open Post Modal', {
-      _stage: 'See More Page',
-      _postUuid: switchPostType(post)[0].postUuid,
-    });
-    setDisplayedPost(post);
-    setPostModalOpen(true);
-  };
-
-  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-  }, []);
-
-  const handleClosePostModal = () => {
-    Mixpanel.track('Close Post Modal', {
-      _stage: 'See More Page',
-    });
-    setPostModalOpen(false);
-    setDisplayedPost(undefined);
-  };
-
-  const handleRemovePostFromState = (postUuid: string) => {
-    setCollectionLoaded((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-    setTopSectionCollection((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-  };
-
   // Scroll to top once category changed
   useEffect(() => {
     const category = router.query.category?.toString() ?? '';
@@ -443,10 +397,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       {topSectionCollection?.length > 0 && (
-        <TopSection
-          collection={topSectionCollection}
-          handlePostClicked={handleOpenPostModal}
-        />
+        <TopSection collection={topSectionCollection} />
       )}
       <SWrapper name={router.query.category?.toString() ?? ''}>
         <TitleBlock
@@ -459,22 +410,10 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
             category={router.query.category?.toString() ?? ''}
             collection={collectionLoaded}
             loading={isCollectionLoading}
-            handlePostClicked={handleOpenPostModal}
           />
         </SListContainer>
         <div ref={loadingRef} />
       </SWrapper>
-      {displayedPost && (
-        <PostModal
-          isOpen={postModalOpen}
-          post={displayedPost}
-          handleClose={() => handleClosePostModal()}
-          handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemoveFromStateDeleted={() =>
-            handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
-          }
-        />
-      )}
     </>
   );
 };
