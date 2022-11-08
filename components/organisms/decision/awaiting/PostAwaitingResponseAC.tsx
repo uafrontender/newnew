@@ -2,12 +2,10 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
@@ -15,7 +13,6 @@ import { formatNumber } from '../../../../utils/format';
 import secondsToDHMS from '../../../../utils/secondsToDHMS';
 import Headline from '../../../atoms/Headline';
 import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
-import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -41,11 +38,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
   React.memo(({ post }) => {
     const { t } = useTranslation('modal-Post');
     const dispatch = useAppDispatch();
-    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-    const isTablet = ['tablet'].includes(resizeMode);
-    const router = useRouter();
-
-    const { syncedHistoryReplaceState } = useSynchronizedHistory();
+    const { mutedMode } = useAppSelector((state) => state.ui);
 
     const waitingTime = useMemo(() => {
       const end = (post.responseUploadDeadline?.seconds as number) * 1000;
@@ -53,20 +46,42 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
       const dhms = secondsToDHMS(parsed);
 
       let countdownsrt = `${dhms.days} ${t(
-        'acPostAwaiting.hero.expires.days'
-      )} ${dhms.hours} ${t('acPostAwaiting.hero.expires.hours')}`;
+        dhms.days === '1'
+          ? 'acPostAwaiting.hero.expires.days_singular'
+          : 'acPostAwaiting.hero.expires.days'
+      )} ${dhms.hours !== '0' ? dhms.hours : ''} ${t(
+        dhms.hours !== '0'
+          ? dhms.hours === '1'
+            ? 'acPostAwaiting.hero.expires.hours_singular'
+            : 'acPostAwaiting.hero.expires.hours'
+          : ''
+      )}`;
 
       if (dhms.days === '0') {
         countdownsrt = `${dhms.hours} ${t(
-          'acPostAwaiting.hero.expires.hours'
-        )} ${dhms.minutes} ${t('acPostAwaiting.hero.expires.minutes')}`;
+          dhms.hours === '1'
+            ? 'acPostAwaiting.hero.expires.hours_singular'
+            : 'acPostAwaiting.hero.expires.hours'
+        )} ${dhms.minutes} ${t(
+          dhms.minutes === '1'
+            ? 'acPostAwaiting.hero.expires.minutes_singular'
+            : 'acPostAwaiting.hero.expires.minutes'
+        )}`;
         if (dhms.hours === '0') {
           countdownsrt = `${dhms.minutes} ${t(
-            'acPostAwaiting.hero.expires.minutes'
-          )} ${dhms.seconds} ${t('acPostAwaiting.hero.expires.seconds')}`;
+            dhms.minutes === '1'
+              ? 'acPostAwaiting.hero.expires.minutes_singular'
+              : 'acPostAwaiting.hero.expires.minutes'
+          )} ${dhms.seconds} ${t(
+            dhms.seconds === '1'
+              ? 'acPostAwaiting.hero.expires.seconds_singular'
+              : 'acPostAwaiting.hero.expires.seconds'
+          )}`;
           if (dhms.minutes === '0') {
             countdownsrt = `${dhms.seconds} ${t(
-              'acPostAwaiting.hero.expires.seconds'
+              dhms.seconds === '1'
+                ? 'acPostAwaiting.hero.expires.seconds_singular'
+                : 'acPostAwaiting.hero.expires.seconds'
             )}`;
           }
         }
@@ -89,11 +104,6 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
       dispatch(toggleMutedMode(''));
     }, [dispatch]);
 
-    // Comments
-    const { ref: commentsSectionRef, inView } = useInView({
-      threshold: 0.8,
-    });
-
     // Scroll to comments if hash is present
     useEffect(() => {
       const handleCommentsInitialHash = () => {
@@ -110,26 +120,6 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
 
       handleCommentsInitialHash();
     }, []);
-
-    // Replace hash once scrolled to comments
-    useEffect(() => {
-      if (inView) {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#comments`
-        );
-      } else {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }`
-        );
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid, router.locale]);
 
     return (
       <>
@@ -153,56 +143,51 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
                 time: waitingTime,
               })}
             />
-            <SMainSectionWrapper>
-              <SCreatorInfoDiv>
-                <SCreator>
-                  <a href={`/${post.creator?.username}`}>
-                    <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                  </a>
-                  <a href={`/${post.creator?.username}`}>
-                    <SWantsToKnow>
-                      <Trans
-                        t={t}
-                        i18nKey='acPostAwaiting.wantsToKnow'
-                        // @ts-ignore
-                        components={[
-                          post.creator?.options?.isVerified ? (
-                            <SInlineSVG
-                              svg={VerificationCheckmark}
-                              width='16px'
-                              height='16px'
-                              fill='none'
-                            />
-                          ) : null,
-                          { creator: post.creator?.nickname },
-                        ]}
-                      />
-                    </SWantsToKnow>
-                  </a>
-                </SCreator>
-                {post.totalAmount?.usdCents && (
-                  <STotal>
-                    {`$${formatNumber(
-                      post.totalAmount.usdCents / 100 ?? 0,
-                      true
-                    )}`}{' '}
-                    <span>{t('acPostAwaiting.inTotalBids')}</span>
-                  </STotal>
-                )}
-              </SCreatorInfoDiv>
-              <SPostTitle variant={4}>
-                <PostTitleContent>{post.title}</PostTitleContent>
-              </SPostTitle>
-              <SSeparator />
-              <AcWaitingOptionsSection
-                post={post}
-                heightDelta={isTablet ? 142 : 182}
-              />
-            </SMainSectionWrapper>
+            <SCreatorInfoDiv>
+              <SCreator>
+                <a href={`/${post.creator?.username}`}>
+                  <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
+                </a>
+                <a href={`/${post.creator?.username}`}>
+                  <SWantsToKnow>
+                    <Trans
+                      t={t}
+                      i18nKey='acPostAwaiting.wantsToKnow'
+                      // @ts-ignore
+                      components={[
+                        post.creator?.options?.isVerified ? (
+                          <SInlineSVG
+                            svg={VerificationCheckmark}
+                            width='16px'
+                            height='16px'
+                            fill='none'
+                          />
+                        ) : null,
+                        { creator: post.creator?.nickname },
+                      ]}
+                    />
+                  </SWantsToKnow>
+                </a>
+              </SCreator>
+              {post.totalAmount?.usdCents && (
+                <STotal>
+                  {`$${formatNumber(
+                    post.totalAmount.usdCents / 100 ?? 0,
+                    true
+                  )}`}{' '}
+                  <span>{t('acPostAwaiting.inTotalBids')}</span>
+                </STotal>
+              )}
+            </SCreatorInfoDiv>
+            <SPostTitle variant={4}>
+              <PostTitleContent>{post.title}</PostTitleContent>
+            </SPostTitle>
+            <SSeparator />
+            <AcWaitingOptionsSection post={post} />
           </SActivitiesContainer>
         </SWrapper>
         {post.isCommentsAllowed && (
-          <SCommentsSection id='comments' ref={commentsSectionRef}>
+          <SCommentsSection id='comments'>
             <SCommentsHeadline variant={4}>
               {t('successCommon.comments.heading')}
             </SCommentsHeadline>
@@ -224,29 +209,23 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
+    display: flex;
+    gap: 16px;
+
+    height: 648px;
     min-height: 0;
-
-    display: inline-grid;
-    grid-template-areas: 'video activities';
-    grid-template-columns: 284px 1fr;
-    grid-template-rows: minmax(0, 1fr);
-
-    grid-column-gap: 16px;
-
     align-items: flex-start;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas: 'video activities';
-    grid-template-columns: 410px 1fr;
+    display: flex;
+    gap: 32px;
   }
 `;
 
 const SActivitiesContainer = styled.div`
-  grid-area: activities;
-
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
   overflow: hidden;
   border-radius: 16px;
@@ -254,32 +233,21 @@ const SActivitiesContainer = styled.div`
   margin-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
+    display: flex;
+    flex-direction: column;
+
     margin-top: 0px;
     min-height: 506px;
 
     height: 506px;
 
-    background-color: ${({ theme }) =>
-      theme.name === 'dark'
-        ? theme.colorsThemed.background.secondary
-        : 'transparent'};
+    background-color: transparent;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    min-height: unset;
     height: 728px;
-  }
-`;
-
-const SMainSectionWrapper = styled.div`
-  padding-left: 16px;
-  padding-right: 16px;
-
-  ${({ theme }) => theme.media.tablet} {
-    padding-left: 16px;
-    padding-right: 16px;
-
-    height: calc(100% - 160px);
+    max-height: 728px;
+    width: 100%;
   }
 `;
 

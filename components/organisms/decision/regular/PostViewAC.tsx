@@ -8,13 +8,12 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
-import { useInView } from 'react-intersection-observer';
 import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
@@ -39,9 +38,9 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
 import Headline from '../../../atoms/Headline';
 import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
-import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import AcAddNewOption from '../../../molecules/decision/regular/auction/AcAddNewOption';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -88,6 +87,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
   const router = useRouter();
 
   const {
@@ -101,13 +108,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   } = usePostModalInnerState();
   const post = useMemo(() => postParsed as newnewapi.Auction, [postParsed]);
 
-  const { syncedHistoryReplaceState } = useSynchronizedHistory();
-
-  const showSelectingWinnerOption = useMemo(
-    () => postStatus === 'waiting_for_decision',
-    [postStatus]
-  );
-
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
@@ -116,11 +116,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const [responseViewed, setResponseViewed] = useState(
     post.isResponseViewedByMe ?? false
   );
-
-  // Comments
-  const { ref: commentsSectionRef, inView } = useInView({
-    threshold: 0.8,
-  });
 
   const handleCommentFocus = () => {
     if (isMobile && !!document.getElementById('action-button-mobile')) {
@@ -405,7 +400,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       setOptions([]);
       setOptionsNextPageToken('');
       fetchBids();
-      fetchPostLatestData();
     });
     return () => {
       clearTimeout(timer);
@@ -638,55 +632,72 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     handleCommentsInitialHash();
   }, []);
 
-  // Replace hash once scrolled to comments
-  useEffect(() => {
-    if (inView) {
-      syncedHistoryReplaceState(
-        {},
-        `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-          post.postUuid
-        }#comments`
-      );
-    } else {
-      syncedHistoryReplaceState(
-        {},
-        `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-          post.postUuid
-        }`
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, post.postUuid, router.locale]);
-
   return (
     <>
+      {isTablet && (
+        <>
+          <SExpiresSection>
+            {postStatus === 'voting' ? (
+              <>
+                <PostTimer
+                  timestampSeconds={new Date(
+                    (post.expiresAt?.seconds as number) * 1000
+                  ).getTime()}
+                  postType='ac'
+                  onTimeExpired={handleOnVotingTimeExpired}
+                />
+                <SEndDate>
+                  {t('expires.end_date')}{' '}
+                  {moment((post.expiresAt?.seconds as number) * 1000).format(
+                    'DD MMM YYYY [at] hh:mm A'
+                  )}
+                </SEndDate>
+              </>
+            ) : (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='ac'
+              />
+            )}
+          </SExpiresSection>
+          <PostTopInfo
+            amountInBids={totalAmount}
+            hasWinner={!!post.winningOptionId}
+          />
+        </>
+      )}
       <SWrapper>
-        <SExpiresSection>
-          {isMobile && (
-            <SGoBackButton
-              style={{
-                gridArea: 'closeBtnMobile',
-              }}
-              onClick={handleGoBackInsidePost}
-            />
-          )}
-          {postStatus === 'voting' ? (
-            <PostTimer
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='ac'
-              onTimeExpired={handleOnVotingTimeExpired}
-            />
-          ) : (
-            <PostTimerEnded
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='ac'
-            />
-          )}
-        </SExpiresSection>
+        {isMobile && (
+          <SExpiresSection>
+            <SGoBackButton onClick={handleGoBackInsidePost} />
+            {postStatus === 'voting' ? (
+              <>
+                <PostTimer
+                  timestampSeconds={new Date(
+                    (post.expiresAt?.seconds as number) * 1000
+                  ).getTime()}
+                  postType='ac'
+                  onTimeExpired={handleOnVotingTimeExpired}
+                />
+                <SEndDate>
+                  {t('expires.end_date')}{' '}
+                  {moment((post.expiresAt?.seconds as number) * 1000).format(
+                    'DD MMM YYYY [at] hh:mm A'
+                  )}
+                </SEndDate>
+              </>
+            ) : (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='ac'
+              />
+            )}
+          </SExpiresSection>
+        )}
         <PostVideo
           postId={post.postUuid}
           announcement={post.announcement!!}
@@ -696,21 +707,61 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           isMuted={mutedMode}
           handleToggleMuted={() => handleToggleMutedMode()}
         />
-        <PostTopInfo
-          amountInBids={totalAmount}
-          hasWinner={!!post.winningOptionId}
-        />
-        <SActivitiesContainer
-          decisionFailed={postStatus === 'failed'}
-          showSelectingWinnerOption={showSelectingWinnerOption}
-        >
-          <PostVotingTab>
-            {`${
-              !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
-            } ${
-              numberOfOptions === 1 ? t('tabs.bids_singular') : t('tabs.bids')
-            }`}
-          </PostVotingTab>
+        {isMobile && (
+          <PostTopInfo
+            amountInBids={totalAmount}
+            hasWinner={!!post.winningOptionId}
+          />
+        )}
+        <SActivitiesContainer>
+          <div
+            style={{
+              flex: '0 0 auto',
+              width: '100%',
+            }}
+          >
+            {!isMobileOrTablet && (
+              <>
+                <SExpiresSection>
+                  {postStatus === 'voting' ? (
+                    <>
+                      <PostTimer
+                        timestampSeconds={new Date(
+                          (post.expiresAt?.seconds as number) * 1000
+                        ).getTime()}
+                        postType='ac'
+                        onTimeExpired={handleOnVotingTimeExpired}
+                      />
+                      <SEndDate>
+                        {t('expires.end_date')}{' '}
+                        {moment(
+                          (post.expiresAt?.seconds as number) * 1000
+                        ).format('DD MMM YYYY [at] hh:mm A')}
+                      </SEndDate>
+                    </>
+                  ) : (
+                    <PostTimerEnded
+                      timestampSeconds={new Date(
+                        (post.expiresAt?.seconds as number) * 1000
+                      ).getTime()}
+                      postType='ac'
+                    />
+                  )}
+                </SExpiresSection>
+                <PostTopInfo
+                  amountInBids={totalAmount}
+                  hasWinner={!!post.winningOptionId}
+                />
+              </>
+            )}
+            <PostVotingTab>
+              {`${
+                !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
+              } ${
+                numberOfOptions === 1 ? t('tabs.bids_singular') : t('tabs.bids')
+              }`}
+            </PostVotingTab>
+          </div>
           <AcOptionsTab
             postId={post.postUuid}
             postStatus={postStatus}
@@ -724,22 +775,39 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
               .subtract(3, 'days')
               .calendar()}
             options={options}
-            // optionToAnimate={optionToAnimate}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
-            minAmount={
-              post.minimalBid?.usdCents
-                ? parseInt((post.minimalBid?.usdCents / 100).toFixed(0))
-                : 5
-            }
             handleLoadBids={fetchBids}
             handleAddOrUpdateOptionFromResponse={
               handleAddOrUpdateOptionFromResponse
             }
             handleRemoveOption={handleRemoveOption}
           />
+          {postStatus === 'voting' && (
+            <AcAddNewOption
+              postId={post.postUuid}
+              postStatus={postStatus}
+              postText={post.title}
+              postCreator={
+                (post.creator?.nickname as string) ?? post.creator?.username
+              }
+              postDeadline={moment(
+                (post.responseUploadDeadline?.seconds as number) * 1000
+              )
+                .subtract(3, 'days')
+                .calendar()}
+              options={options}
+              minAmount={
+                post.minimalBid?.usdCents
+                  ? parseInt((post.minimalBid?.usdCents / 100).toFixed(0))
+                  : 5
+              }
+              handleAddOrUpdateOptionFromResponse={
+                handleAddOrUpdateOptionFromResponse
+              }
+            />
+          )}
         </SActivitiesContainer>
-
         {/* Loading Modal */}
         {loadingModalOpen && (
           <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
@@ -777,7 +845,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         )}
       </SWrapper>
       {post.isCommentsAllowed && (
-        <SCommentsSection id='comments' ref={commentsSectionRef}>
+        <SCommentsSection id='comments'>
           <SCommentsHeadline variant={4}>
             {t('successCommon.comments.heading')}
           </SCommentsHeadline>
@@ -807,47 +875,40 @@ const SWrapper = styled.div`
   ${({ theme }) => theme.media.tablet} {
     height: 648px;
     min-height: 0;
-
-    display: inline-grid;
-    grid-template-areas:
-      'expires expires'
-      'title title'
-      'video activities';
-    grid-template-columns: 284px 1fr;
-    grid-template-rows: max-content max-content minmax(0, 1fr);
-
-    grid-column-gap: 16px;
-
     align-items: flex-start;
+
+    display: flex;
+    gap: 16px;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas:
-      'video expires'
-      'video title'
-      'video activities';
-    grid-template-columns: 410px 1fr;
+    display: flex;
+    gap: 32px;
   }
 `;
 
 const SExpiresSection = styled.div`
-  grid-area: expires;
-
   position: relative;
 
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 
   width: 100%;
   margin-bottom: 6px;
+`;
 
-  padding-left: 24px;
+const SEndDate = styled.div`
+  width: 100%;
+  text-align: center;
+  padding: 8px 0px;
 
-  ${({ theme }) => theme.media.tablet} {
-    padding-left: initial;
-  }
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.quaternary};
 `;
 
 const SGoBackButton = styled(GoBackButton)`
@@ -856,37 +917,23 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitiesContainer = styled.div<{
-  showSelectingWinnerOption: boolean;
-  decisionFailed: boolean;
-}>`
-  grid-area: activities;
-
-  display: flex;
-  flex-direction: column;
-
-  align-self: bottom;
-
-  height: 100%;
-  width: 100%;
-
+const SActivitiesContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
-    max-height: calc(500px);
+    align-items: flex-start;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    height: 506px;
+    max-height: 506px;
+    width: 100%;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    ${({ showSelectingWinnerOption, decisionFailed }) =>
-      showSelectingWinnerOption
-        ? css`
-            max-height: calc(580px - 130px);
-          `
-        : !decisionFailed
-        ? css`
-            max-height: 580px;
-          `
-        : css`
-            max-height: calc(580px - 120px);
-          `}
+    height: 728px;
+    max-height: 728px;
+    width: 100%;
   }
 `;
 

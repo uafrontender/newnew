@@ -25,7 +25,9 @@
       "insights": "Insights",
       "insightsTablet": "Go to insights",
       "cashOut": {
-        "amount": "Your next payout of",
+        "amount": "Your Stripe earning are",
+        "amountSecondLine": "Manage your balance on Stripe.",
+        "stripeButton": "Take me to Stripe",
         "date": "will automatically be sent on {{date}}.",
         "submit": "Learn More",
         "noPayouts": "You don’t have any upcoming payouts"

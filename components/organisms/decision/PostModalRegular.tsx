@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 import React from 'react';
-import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -9,15 +8,12 @@ import { usePostModalInnerState } from '../../../contexts/postModalInnerContext'
 import { useAppSelector } from '../../../redux-store/store';
 import getDisplayname from '../../../utils/getDisplayname';
 
-import Modal from '../Modal';
 import RegularView from './regular';
-import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
-import InlineSvg from '../../atoms/InlineSVG';
 
 // Icons
 import assets from '../../../constants/assets';
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import GoBackButton from '../../molecules/GoBackButton';
 
 const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
 const PostFailedBox = dynamic(
@@ -48,7 +44,6 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
     resizeMode
   );
   const {
-    open,
     modalContainerRef,
     isMyPost,
     postParsed,
@@ -68,110 +63,87 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
 
   return (
     <>
-      <Modal show={open} overlaydim onClose={() => handleCloseAndGoBack()}>
-        <Head>
-          <title>{t(`meta.${typeOfPost}.title`)}</title>
-          <meta
-            name='description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-          <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-          <meta
-            property='og:description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-        </Head>
-        {!isMobile && (
-          <SGoBackButtonDesktop
-            view='secondary'
-            iconOnly
-            onClick={handleCloseAndGoBack}
-          >
-            <InlineSvg
-              svg={CancelIcon}
-              fill={theme.colorsThemed.text.primary}
-              width='24px'
-              height='24px'
+      {!isMobile && (
+        <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
+          {t('back')}
+        </SGoBackButton>
+      )}
+      {postParsed && typeOfPost ? (
+        <SPostModalContainer
+          loaded={recommendedPosts && recommendedPosts.length > 0}
+          id='post-modal-container'
+          isMyPost={isMyPost}
+          onClick={(e) => e.stopPropagation()}
+          ref={(el) => {
+            modalContainerRef.current = el!!;
+          }}
+        >
+          {postStatus !== 'deleted_by_admin' &&
+          postStatus !== 'deleted_by_creator' ? (
+            <RegularView />
+          ) : (
+            <PostFailedBox
+              title={t('postDeleted.title', {
+                postType: t(`postType.${typeOfPost}`),
+              })}
+              body={
+                deletedByCreator
+                  ? t('postDeleted.body.byCreator', {
+                      creator: getDisplayname(postParsed.creator!!),
+                      postType: t(`postType.${typeOfPost}`),
+                    })
+                  : t('postDeleted.body.byAdmin', {
+                      creator: getDisplayname(postParsed.creator!!),
+                      postType: t(`postType.${typeOfPost}`),
+                    })
+              }
+              buttonCaption={tCommon('button.takeMeHome')}
+              imageSrc={
+                theme.name === 'light'
+                  ? LIGHT_IMAGES[typeOfPost]
+                  : DARK_IMAGES[typeOfPost]
+              }
+              style={{
+                marginBottom: '24px',
+              }}
+              handleButtonClick={handleSeeNewDeletedBox}
             />
-          </SGoBackButtonDesktop>
-        )}
-        {postParsed && typeOfPost ? (
-          <SPostModalContainer
+          )}
+          <SRecommendationsSection
+            id='recommendations-section-heading'
             loaded={recommendedPosts && recommendedPosts.length > 0}
-            id='post-modal-container'
-            isMyPost={isMyPost}
-            onClick={(e) => e.stopPropagation()}
-            ref={(el) => {
-              modalContainerRef.current = el!!;
-            }}
           >
-            {postStatus !== 'deleted_by_admin' &&
-            postStatus !== 'deleted_by_creator' ? (
-              <RegularView />
-            ) : (
-              <PostFailedBox
-                title={t('postDeleted.title', {
-                  postType: t(`postType.${typeOfPost}`),
-                })}
-                body={
-                  deletedByCreator
-                    ? t('postDeleted.body.byCreator', {
-                        creator: getDisplayname(postParsed.creator!!),
-                        postType: t(`postType.${typeOfPost}`),
-                      })
-                    : t('postDeleted.body.byAdmin', {
-                        creator: getDisplayname(postParsed.creator!!),
-                        postType: t(`postType.${typeOfPost}`),
-                      })
+            <Headline variant={4}>
+              {recommendedPosts.length > 0
+                ? t('recommendationsSection.heading')
+                : null}
+            </Headline>
+            {recommendedPosts && (
+              <ListPostModal
+                loading={recommendedPostsLoading}
+                collection={recommendedPosts}
+                skeletonsBgColor={theme.colorsThemed.background.tertiary}
+                skeletonsHighlightColor={
+                  theme.colorsThemed.background.secondary
                 }
-                buttonCaption={tCommon('button.takeMeHome')}
-                imageSrc={
-                  theme.name === 'light'
-                    ? LIGHT_IMAGES[typeOfPost]
-                    : DARK_IMAGES[typeOfPost]
-                }
-                style={{
-                  marginBottom: '24px',
-                }}
-                handleButtonClick={handleSeeNewDeletedBox}
+                handlePostClicked={handleOpenRecommendedPost}
               />
             )}
-            <SRecommendationsSection
-              id='recommendations-section-heading'
-              loaded={recommendedPosts && recommendedPosts.length > 0}
-            >
-              <Headline variant={4}>
-                {recommendedPosts.length > 0
-                  ? t('recommendationsSection.heading')
-                  : null}
-              </Headline>
-              {recommendedPosts && (
-                <ListPostModal
-                  loading={recommendedPostsLoading}
-                  collection={recommendedPosts}
-                  skeletonsBgColor={theme.colorsThemed.background.tertiary}
-                  skeletonsHighlightColor={
-                    theme.colorsThemed.background.secondary
-                  }
-                  handlePostClicked={handleOpenRecommendedPost}
-                />
-              )}
-              <div
-                ref={loadingRef}
-                style={{
-                  position: 'relative',
-                  bottom: '10px',
-                  ...(recommendedPostsLoading
-                    ? {
-                        display: 'none',
-                      }
-                    : {}),
-                }}
-              />
-            </SRecommendationsSection>
-          </SPostModalContainer>
-        ) : null}
-      </Modal>
+            <div
+              ref={loadingRef}
+              style={{
+                position: 'relative',
+                bottom: '10px',
+                ...(recommendedPostsLoading
+                  ? {
+                      display: 'none',
+                    }
+                  : {}),
+              }}
+            />
+          </SRecommendationsSection>
+        </SPostModalContainer>
+      ) : null}
       {postParsed?.creator && reportPostOpen && (
         <ReportModal
           show={reportPostOpen}
@@ -190,15 +162,6 @@ const SPostModalContainer = styled.div<{
   isMyPost: boolean;
   loaded: boolean;
 }>`
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  z-index: 1;
-  overscroll-behavior: none;
-
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
   height: 100%;
@@ -214,37 +177,17 @@ const SPostModalContainer = styled.div<{
   -ms-user-select: none;
   user-select: none;
 
-  /* Hide scrollbar */
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
   ${({ theme }) => theme.media.tablet} {
-    top: 64px;
-    /*transform: none; */
-    /* top: 50%; */
-    /* transform: translateY(-50%); */
+    width: 100%;
     padding-bottom: 16px;
 
-    background-color: ${({ theme }) =>
-      theme.name === 'dark'
-        ? theme.colorsThemed.background.secondary
-        : theme.colorsThemed.background.primary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
-    width: 100%;
-    height: calc(100% - 64px);
   }
 
   ${({ theme }) => theme.media.laptopM} {
-    top: 32px;
-    left: calc(50% - 496px);
-    width: 992px;
-    height: calc(100% - 64px);
-    max-height: ${({ loaded }) => (loaded ? 'unset' : '840px')};
-
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
 
     padding: 24px;
     padding-bottom: 24px;
@@ -257,29 +200,14 @@ const SRecommendationsSection = styled.div<{
   min-height: ${({ loaded }) => (loaded ? '600px' : '0')};
 `;
 
-const SGoBackButtonDesktop = styled(Button)`
-  position: absolute;
-  right: 0;
-  top: 0;
-
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-
-  border: transparent;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  font-size: 20px;
-  line-height: 28px;
-  font-weight: bold;
-  text-transform: capitalize;
-
-  cursor: pointer;
-
-  z-index: 2;
+const SGoBackButton = styled(GoBackButton)`
+  padding-left: 16px;
 
   ${({ theme }) => theme.media.laptopM} {
-    right: 24px;
-    top: 32px;
+    padding-left: 24px;
+    width: 100%;
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
   }
 `;

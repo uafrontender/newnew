@@ -43,6 +43,8 @@ interface IMcOptionCardModeration {
   isCreatorsBid: boolean;
   isWinner?: boolean;
   handleRemoveOption?: () => void;
+  handleSetScrollBlocked?: () => void;
+  handleUnsetScrollBlocked?: () => void;
 }
 
 const McOptionCardModeration: React.FunctionComponent<
@@ -55,6 +57,8 @@ const McOptionCardModeration: React.FunctionComponent<
   isCreatorsBid,
   isWinner,
   handleRemoveOption,
+  handleSetScrollBlocked,
+  handleUnsetScrollBlocked,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
@@ -193,7 +197,10 @@ const McOptionCardModeration: React.FunctionComponent<
           </SBidDetails>
           {!isMobile ? (
             <SEllipseButton
-              onClick={() => setIsEllipseMenuOpen(true)}
+              onClick={() => {
+                setIsEllipseMenuOpen(true);
+                handleSetScrollBlocked?.();
+              }}
               ref={ellipseMenuButton}
             >
               <InlineSvg
@@ -216,7 +223,10 @@ const McOptionCardModeration: React.FunctionComponent<
               isVisible={isEllipseMenuOpen}
               isBySubscriber={!isCreatorsBid}
               canBeDeleted={canBeDeleted && !isWinner}
-              handleClose={() => setIsEllipseMenuOpen(false)}
+              handleClose={() => {
+                setIsEllipseMenuOpen(false);
+                handleUnsetScrollBlocked?.();
+              }}
               handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
               handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
               handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}

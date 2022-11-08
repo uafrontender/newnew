@@ -137,11 +137,15 @@ const Comment: React.FC<IComment> = ({
               <SNickname noHover>{t('comments.commentDeleted')}</SNickname>
             )}
             <SBid> </SBid>
-            <SDate>
-              {/* &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')} */}
-              &bull;{' '}
-              {moment((comment.createdAt?.seconds as number) * 1000).fromNow()}
-            </SDate>
+            {!comment.isDeleted && (
+              <SDate>
+                {/* &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')} */}
+                &bull;{' '}
+                {moment(
+                  (comment.createdAt?.seconds as number) * 1000
+                ).fromNow()}
+              </SDate>
+            )}
             <SActionsDiv>
               {!comment.isDeleted && (
                 <SMoreButton
@@ -377,12 +381,17 @@ const SDate = styled.span`
   font-size: 12px;
 `;
 
-const SText = styled.p`
+const SText = styled.div`
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
   margin-bottom: 14px;
   cursor: text;
+
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-all;
+  user-select: text;
 `;
 
 const SReply = styled.div`
