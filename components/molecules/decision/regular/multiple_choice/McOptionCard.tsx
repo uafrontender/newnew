@@ -97,6 +97,8 @@ interface IMcOptionCard {
     newOption: newnewapi.MultipleChoice.Option
   ) => void;
   handleRemoveOption?: () => void;
+  handleSetScrollBlocked?: () => void;
+  handleUnsetScrollBlocked?: () => void;
 }
 
 const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
@@ -112,6 +114,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   handleRemoveOption,
   handleSetPaymentSuccessModalOpen,
   handleAddOrUpdateOptionFromResponse,
+  handleSetScrollBlocked,
+  handleUnsetScrollBlocked,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -460,6 +464,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           onClick={(e) => {
             if (!isMobile && !isEllipseMenuOpen) {
               setIsEllipseMenuOpen(true);
+              handleSetScrollBlocked?.();
 
               setOptionMenuXY({
                 x: e.clientX,
@@ -822,7 +827,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           optionType='mc'
           optionId={option.id as number}
           optionCreatorUuid={option.creator?.uuid ?? ''}
-          handleClose={() => setIsEllipseMenuOpen(false)}
+          handleClose={() => {
+            setIsEllipseMenuOpen(false);
+            handleUnsetScrollBlocked?.();
+          }}
           handleOpenReportOptionModal={() => handleOpenReportForm()}
           handleOpenRemoveOptionModal={() => handleOpenRemoveForm()}
         />
@@ -1057,20 +1065,6 @@ export const RenderSupportersInfo: React.FunctionComponent<{
             </SSpanBiddersHighlighted>
           </Link>
         )}
-        <Link href={`/${optionCreatorUsername}`}>
-          <SSpanBiddersHighlighted
-            className='spanHighlighted'
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            style={{
-              color: theme.colorsThemed.accent.yellow,
-              cursor: 'pointer',
-            }}
-          >
-            {optionCreator}
-          </SSpanBiddersHighlighted>
-        </Link>
         <SSpanBiddersHighlighted className='spanHighlighted'>
           {', '}
           {`${t('me')}`}

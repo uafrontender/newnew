@@ -682,6 +682,25 @@ const SGeneral = styled(General)`
   header {
     z-index: 6;
   }
+
+  @media (max-width: 768px) {
+    main {
+      > div:first-child {
+        padding-left: 0;
+        padding-right: 0;
+
+        > div:first-child {
+          padding-left: 0;
+          padding-right: 0;
+
+          > div:first-child {
+            padding-left: 0;
+            padding-right: 0;
+          }
+        }
+      }
+    }
+  }
 `;
 
 const SUserData = styled.div`
