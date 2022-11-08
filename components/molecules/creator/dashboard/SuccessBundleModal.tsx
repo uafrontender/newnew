@@ -17,7 +17,7 @@ interface IFunction {
   onClose: () => void;
 }
 
-const TurnBundleModal: React.FC<IFunction> = React.memo(
+const SuccessBundleModal: React.FC<IFunction> = React.memo(
   ({ show, isBundlesEnabled, zIndex, onClose }) => {
     const { t } = useTranslation('page-Creator');
     return (
@@ -30,7 +30,7 @@ const TurnBundleModal: React.FC<IFunction> = React.memo(
           isBundlesEnabled={isBundlesEnabled || false}
         >
           <SModalPaper onClose={onClose}>
-            <Content>
+            <Content id='success-bundle-modal'>
               <SImgHolder>
                 <img src={logo.src} alt={t('dashboard.aboutBundles.title')} />
               </SImgHolder>
@@ -55,7 +55,7 @@ const TurnBundleModal: React.FC<IFunction> = React.memo(
   }
 );
 
-export default TurnBundleModal;
+export default SuccessBundleModal;
 
 interface ISModal {
   isBundlesEnabled: boolean;
