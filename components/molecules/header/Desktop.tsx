@@ -117,7 +117,7 @@ export const Desktop: React.FC = React.memo(() => {
             )}
             {bundles && bundles.length > 0 && (
               <SItemWithMargin>
-                <Link href='bundles'>
+                <Link href='/bundles'>
                   <a>
                     <SButton
                       view='quaternary'
