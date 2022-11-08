@@ -118,7 +118,8 @@
       "payPeriod_NEED_TRANSLATION": "this pay period",
       "unitName_NEED_TRANSLATION": "bundle",
       "earned_NEED_TRANSLATION": "earned",
-      "noSoldYet_NEED_TRANSLATION": "No bundles sold yet"
+      "noSoldYet_NEED_TRANSLATION": "No bundles sold yet",
+      "sold_NEED_TRANSLATION": "sold"
     },
     "bundlesSet": {
       "title_NEED_TRANSLATION": "Superpoll Bundles",
