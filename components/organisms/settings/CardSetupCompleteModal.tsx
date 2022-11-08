@@ -1,22 +1,24 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 // Components
 import Modal from '../Modal';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
-import Lottie from '../../atoms/Lottie';
 import ModalPaper from '../ModalPaper';
 
 // Assets
-import logoAnimation from '../../../public/animations/mobile_logo.json';
+import pensiveIcon from '../../../public/images/png/emoji/pensive.png';
+import partingIcon from '../../../public/images/png/emoji/partying.png';
 
 // Utils
 import { SocketContext } from '../../../contexts/socketContext';
 import { checkCardStatus } from '../../../api/endpoints/card';
 import { useCards } from '../../../contexts/cardsContext';
+import assets from '../../../constants/assets';
+import Headline from '../../atoms/Headline';
 
 const getCardStatusMessage = (cardStatus: newnewapi.CardStatus) => {
   switch (cardStatus) {
@@ -49,11 +51,13 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
   const { t: tCommon } = useTranslation('common');
   const { handleSetCard } = useCards();
   const socketConnection = useContext(SocketContext);
+  const theme = useTheme();
 
-  const [message, setMessage] = useState('Saving your card. Please wait');
+  const [message, setMessage] = useState('');
   const [isProcessing, setIsProcessing] = useState(true);
   const [isError, setIsError] = useState(false);
   const [isStatusChecked, setIsStatusChecked] = useState(false);
+  const [isCardAdded, setIsCardAdded] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -75,7 +79,12 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
         const response = await checkCardStatus(payload, controller.signal);
 
         if (!response.data || response.error) {
-          throw new Error(response.error?.message || 'An error occurred');
+          // skip abort request error
+          if (response.error && (response.error as any)?.code !== 20) {
+            throw new Error(response.error?.message || 'An error occurred');
+          }
+
+          return;
         }
 
         if (response.data.cardStatus !== newnewapi.CardStatus.IN_PROGRESS) {
@@ -95,6 +104,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           response.data.card
         ) {
           handleSetCard(response.data.card);
+          setIsCardAdded(true);
         }
 
         setMessage(t(getCardStatusMessage(response.data.cardStatus)));
@@ -134,6 +144,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
       }
       if (decoded.cardStatus === newnewapi.CardStatus.ADDED && decoded.card) {
         handleSetCard(decoded.card);
+        setIsCardAdded(true);
       }
     };
 
@@ -151,36 +162,60 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
 
   return (
     <Modal show={show} onClose={closeModal} overlaydim>
-      <ModalPaper
-        title={t('Settings.sections.cards.button.addNewCard')}
-        onClose={closeModal}
-        isCloseButton
-        isMobileFullScreen
-      >
+      <SModalPaper onClose={closeModal} isCloseButton isMobileFullScreen>
         <SModalContent>
-          <SText variant={2} weight={600} $isError={isError}>
-            {message}
-          </SText>
+          {/* Loading view */}
           {isProcessing && (
-            <SLoader>
-              <Lottie
-                width={50}
-                height={50}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: logoAnimation,
-                }}
+            <SContentWrapper>
+              <SLogo
+                src={
+                  theme.name === 'light'
+                    ? assets.common.lightAnimatedLogo
+                    : assets.common.darkAnimatedLogo
+                }
+                alt='NewNew logo'
               />
-            </SLoader>
+              <Headline variant={6}>Adding a new card...</Headline>
+            </SContentWrapper>
           )}
+
+          {/* Error view */}
+          {isError && (
+            <SContentWrapper>
+              <SEmoji src={pensiveIcon.src} alt='Pensive' />
+              <SHeadline variant={6}>Ooops!</SHeadline>
+              <SText variant={2} weight={600}>
+                {message}
+              </SText>
+            </SContentWrapper>
+          )}
+
+          {/* Success view */}
+          {isCardAdded && (
+            <SContentWrapper>
+              <SEmoji
+                src={partingIcon.src}
+                alt='Parting'
+                style={{ width: '77px' }}
+              />
+              <Headline variant={6}>Congratulations!</Headline>
+              <SText variant={2} weight={600}>
+                {message}
+              </SText>
+            </SContentWrapper>
+          )}
+
           {!isProcessing && (
-            <SButton id='add-card-success' view='primary' onClick={closeModal}>
+            <SButton
+              id='add-card-success'
+              view='primaryGrad'
+              onClick={closeModal}
+            >
               {tCommon('gotIt')}
             </SButton>
           )}
         </SModalContent>
-      </ModalPaper>
+      </SModalPaper>
     </Modal>
   );
 };
@@ -189,32 +224,79 @@ export default CardSetupCompleteModal;
 
 CardSetupCompleteModal.defaultProps = {};
 
+const SModalPaper = styled(ModalPaper)`
+  & > div:not(:first-child) {
+    height: 100%;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 493px;
+    height: 344px;
+    padding: 52px;
+
+    & > div {
+      height: 100%;
+    }
+  }
+`;
+
 const SModalContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   flex: 1;
-  min-height: 100px;
+  height: 100%;
 `;
 
-const SText = styled(Text)<{
-  $isError: boolean;
-}>`
-  margin-bottom: 10px;
-  color: ${({ theme, $isError }) =>
-    !$isError
-      ? theme.colorsThemed.text.secondary
-      : theme.colorsThemed.accent.error};
+const SLogo = styled.img`
+  width: 99px;
+  height: 74px;
+  margin-bottom: 16px;
+`;
+
+const SText = styled(Text)`
+  margin-top: 8px;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 16px;
+  }
+`;
+
+const SEmoji = styled.img`
+  width: 64px;
+  height: 64px;
+  margin-bottom: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 16px;
+  }
+`;
+
+const SHeadline = styled(Headline)`
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 32px;
+    line-height: 40px;
+  }
 `;
 
 const SButton = styled(Button)`
-  margin-top: 30px;
+  width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
+    width: auto;
     margin-top: auto;
   }
 `;
 
-const SLoader = styled.div`
-  margin-top: 20px;
+const SContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto 0;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin: 0;
+  }
 `;
