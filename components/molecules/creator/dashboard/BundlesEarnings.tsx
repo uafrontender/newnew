@@ -115,13 +115,6 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
             <SBundles>
               {appConstants.bundleOffers?.map(renderListItem)}
             </SBundles>
-            {/* {myEarnings &&
-              myEarnings.soldBundles &&
-              myEarnings.soldBundles.length > 0 && (
-                <SBundles>
-                  {myEarnings.soldBundles.map(renderListItem)}
-                </SBundles>
-              )} */}
           </>
         )}
       </SBlock>
