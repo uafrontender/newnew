@@ -54,7 +54,7 @@ const FaqSection = () => {
     <SContainer>
       <SHeadline variant={4}>{t('faq.title')}</SHeadline>
       <SList>
-        {new Array(6).fill('').map((_, i) => (
+        {new Array(7).fill('').map((_, i) => (
           <SListItem key={t(`faq.items.${i}.question`)}>
             <STitle variant={2} weight={600}>
               {t(`faq.items.${i}.question`)}
