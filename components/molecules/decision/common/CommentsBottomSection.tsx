@@ -535,6 +535,7 @@ const CommentsBottomSection: React.FunctionComponent<
         exit={{ opacity: 0 }}
       >
         <SActionSection
+          id='comments-scrolling-container'
           ref={(el) => {
             scrollRef.current = el!!;
           }}
@@ -615,25 +616,13 @@ const CommentsBottomSection: React.FunctionComponent<
           </SCommentsWrapper>
         </SActionSection>
         <GradientMask
-          gradientType={
-            isMobile
-              ? 'primary'
-              : theme.name === 'dark'
-              ? 'secondary'
-              : 'primary'
-          }
+          gradientType='primary'
           positionTop={heightDelta}
           active={showTopGradient}
           width='calc(100% - 4px)'
         />
         <GradientMask
-          gradientType={
-            isMobile
-              ? 'primary'
-              : theme.name === 'dark'
-              ? 'secondary'
-              : 'primary'
-          }
+          gradientType='primary'
           active={showBottomGradient}
           width='calc(100% - 4px)'
         />
