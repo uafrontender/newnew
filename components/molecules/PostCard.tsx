@@ -440,6 +440,11 @@ export const PostCard: React.FC<ICard> = React.memo(
       };
     }, []);
 
+    useEffect(() => {
+      router.prefetch(`/post/${switchPostType(item)[0].postUuid}`);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const moreButtonInsideRef: any = useRef();
     const moreButtonRef: any = useRef();
 

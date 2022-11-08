@@ -571,9 +571,11 @@ const SCreatorLink = styled.a`
 
 const SContainer = styled.div`
   height: 100%;
+  width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
     display: grid;
+    flex: 1 1 auto;
   }
 `;
 
@@ -581,11 +583,13 @@ const SSucceededContainer = styled.div<{
   dimmed?: boolean;
 }>`
   height: 100%;
+  width: 100%;
 
   opacity: ${({ dimmed }) => (dimmed ? 0.3 : 1)};
 
   ${({ theme }) => theme.media.tablet} {
     display: grid;
+    flex: 1 1 auto;
   }
 `;
 
@@ -759,6 +763,10 @@ const SUploadButton = styled(Button)`
     align-self: end;
     position: relative;
     width: 100%;
+
+    bottom: 1px;
+
+    z-index: initial;
 
     &:disabled {
       opacity: 0.5;

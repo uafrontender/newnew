@@ -3,7 +3,7 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
-import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 
 import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
@@ -20,7 +20,6 @@ interface IList {
   loading: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
-  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
 export const PostList: React.FC<IList> = ({
@@ -28,8 +27,8 @@ export const PostList: React.FC<IList> = ({
   loading,
   skeletonsBgColor,
   skeletonsHighlightColor,
-  handlePostClicked,
 }) => {
+  const router = useRouter();
   const { postOverlayOpen } = usePostModalState();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -45,7 +44,7 @@ export const PostList: React.FC<IList> = ({
 
   const renderItem = (item: any, index: number) => {
     const handleItemClick = () => {
-      handlePostClicked(item);
+      router.push(`/post/${switchPostType(item)[0].postUuid}`);
     };
 
     return (

@@ -1,16 +1,13 @@
 import React from 'react';
-import dynamic from 'next/dynamic';
 
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 
 // Views
-const PostViewAC = dynamic(() => import('./PostViewAC'));
-const PostViewMC = dynamic(() => import('./PostViewMC'));
-const PostViewCF = dynamic(() => import('./PostViewCF'));
-const PostViewScheduled = dynamic(() => import('../common/PostViewScheduled'));
-const PostViewProcessingAnnouncement = dynamic(
-  () => import('../common/PostViewProcessingAnnouncement')
-);
+import { PostSkeletonView } from '../PostSkeleton';
+import PostViewMC from './PostViewMC';
+import PostViewAC from './PostViewAC';
+import PostViewScheduled from '../common/PostViewScheduled';
+import PostViewProcessingAnnouncement from '../common/PostViewProcessingAnnouncement';
 
 interface IRegularView {}
 
@@ -38,11 +35,7 @@ const RegularView: React.FunctionComponent<IRegularView> = () => {
     return <PostViewAC key={postParsed.postUuid} />;
   }
 
-  if (typeOfPost === 'cf' && postParsed) {
-    return <PostViewCF key={postParsed.postUuid} />;
-  }
-
-  return null;
+  return <PostSkeletonView />;
 };
 
 export default RegularView;

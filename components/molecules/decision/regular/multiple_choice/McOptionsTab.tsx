@@ -30,7 +30,6 @@ import McOptionCard from './McOptionCard';
 import SuggestionTextArea from '../../../../atoms/decision/SuggestionTextArea';
 import LoadingModal from '../../../LoadingModal';
 import GradientMask from '../../../../atoms/GradientMask';
-import OptionActionMobileModal from '../../common/OptionActionMobileModal';
 import PaymentSuccessModal from '../../common/PaymentSuccessModal';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import TutorialTooltip, {
@@ -43,6 +42,7 @@ import BuyBundleModal from '../../../bundles/BuyBundleModal';
 import McConfirmCustomOptionModal from './McConfirmCustomOptionModal';
 import HighlightedButton from '../../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../../atoms/bundles/TicketSet';
+import OptionActionMobileModal from '../../common/OptionActionMobileModal';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -83,20 +83,18 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
+
+  // Scroll block
+  const [isScrollBlocked, setIsScrollBlocked] = useState(false);
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
 
   const containerRef = useRef<HTMLDivElement>();
-  const { showTopGradient, showBottomGradient } =
-    useScrollGradients(containerRef);
+  const { showTopGradient, showBottomGradient } = useScrollGradients(
+    containerRef,
+    options.length > 0
+  );
 
   const optionCreatedByMe = useMemo(
     () =>
@@ -105,15 +103,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       ),
     [options, user.userData?.userUuid]
   );
-
-  const [heightDelta, setHeightDelta] = useState(
-    !optionCreatedByMe &&
-      postStatus === 'voting' &&
-      (post.creator?.options?.isOfferingBundles || bundle)
-      ? 58 + 72
-      : 0
-  );
-  const actionSectionContainer = useRef<HTMLDivElement>();
 
   const mainContainer = useRef<HTMLDivElement>();
 
@@ -226,40 +215,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pagingToken, optionsLoading]);
 
-  useEffect(() => {
-    const resizeObserver = new ResizeObserver((entry: any) => {
-      const size = entry[0]?.borderBoxSize
-        ? entry[0]?.borderBoxSize[0]?.blockSize
-        : entry[0]?.contentRect.height;
-      if (size) {
-        setHeightDelta(size + 57);
-      }
-    });
-
-    if (
-      !postLoading &&
-      !optionCreatedByMe &&
-      postStatus === 'voting' &&
-      (post.creator?.options?.isOfferingBundles || bundle) &&
-      actionSectionContainer.current
-    ) {
-      resizeObserver.observe(actionSectionContainer.current!!);
-    } else {
-      setHeightDelta(0);
-    }
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [
-    optionCreatedByMe,
-    postLoading,
-    postStatus,
-    isMobileOrTablet,
-    bundle,
-    post.creator?.options?.isOfferingBundles,
-  ]);
-
   const goToNextStep = () => {
     if (
       user.userTutorialsProgress.remainingMcSteps &&
@@ -292,26 +247,36 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
+        {!isMobile ? (
+          <>
+            <GradientMask
+              gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+              positionTop
+              active={showTopGradient}
+            />
+            <GradientMask
+              gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+              positionBottom={0}
+              active={showBottomGradient}
+            />
+          </>
+        ) : null}
         <SBidsContainer
           ref={(el) => {
             containerRef.current = el!!;
           }}
-          heightDelta={heightDelta}
+          style={{
+            ...(isScrollBlocked
+              ? {
+                  overflow: 'hidden',
+                  width:
+                    options.length > 4
+                      ? 'calc(100% + 10px)'
+                      : 'calc(100% + 14px)',
+                }
+              : {}),
+          }}
         >
-          {!isMobile ? (
-            <>
-              <GradientMask
-                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                positionTop
-                active={showTopGradient}
-              />
-              <GradientMask
-                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                positionBottom={heightDelta}
-                active={showBottomGradient}
-              />
-            </>
-          ) : null}
           {options.map((option, i) => (
             <McOptionCard
               key={option.id.toString()}
@@ -340,6 +305,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 });
                 handleRemoveOption(option);
               }}
+              handleSetScrollBlocked={() => setIsScrollBlocked(true)}
+              handleUnsetScrollBlocked={() => setIsScrollBlocked(false)}
             />
           ))}
           {!isMobile ? (
@@ -359,80 +326,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
-
-        {!optionCreatedByMe &&
-          postStatus === 'voting' &&
-          (post.creator?.options?.isOfferingBundles || bundle) && (
-            <SActionSection
-              ref={(el) => {
-                actionSectionContainer.current = el!!;
-              }}
-            >
-              <SuggestionTextArea
-                value={newOptionText}
-                placeholder={t(
-                  'mcPost.optionsTab.actionSection.suggestionPlaceholder'
-                )}
-                onChange={handleUpdateNewOptionText}
-              />
-              <SAddOptionButton
-                size='sm'
-                disabled={!newOptionText || !newOptionTextValid}
-                style={{
-                  ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-                }}
-                onClick={() => {
-                  Mixpanel.track('Click Add Free Option', {
-                    _stage: 'Post',
-                    _postUuid: post.postUuid,
-                    _component: 'McOptionsTab',
-                  });
-
-                  if (bundle) {
-                    setConfirmCustomOptionModalOpen(true);
-                  } else {
-                    setBuyBundleModalOpen(true);
-                  }
-                }}
-              >
-                {t('mcPost.optionsTab.actionSection.placeABidButton')}
-              </SAddOptionButton>
-              {user.userTutorialsProgress.remainingMcSteps && (
-                <STutorialTooltipTextAreaHolder>
-                  <TutorialTooltip
-                    isTooltipVisible={
-                      user.userTutorialsProgress.remainingMcSteps[0] ===
-                      newnewapi.McTutorialStep.MC_TEXT_FIELD
-                    }
-                    closeTooltip={goToNextStep}
-                    title={t('tutorials.mc.createYourBid.title')}
-                    text={t('tutorials.mc.createYourBid.text')}
-                    dotPosition={DotPositionEnum.BottomRight}
-                  />
-                </STutorialTooltipTextAreaHolder>
-              )}
-            </SActionSection>
-          )}
-        {post.creator?.options?.isOfferingBundles && (
-          <SBundlesContainer highlighted={bundle?.votesLeft === 0}>
-            {bundle?.votesLeft === 0 && (
-              <STicketSet numberOFTickets={3} size={36} shift={11} />
-            )}
-            <SBundlesText>
-              {t('mcPost.optionsTab.actionSection.offersBundles', {
-                creator: postCreatorName,
-              })}
-            </SBundlesText>
-            <SHighlightedButton
-              size='small'
-              onClick={() => {
-                setBuyBundleModalOpen(true);
-              }}
-            >
-              {t('mcPost.optionsTab.actionSection.viewBundles')}
-            </SHighlightedButton>
-          </SBundlesContainer>
-        )}
         {user.userTutorialsProgress.remainingMcSteps && (
           <STutorialTooltipHolder>
             <TutorialTooltip
@@ -448,6 +341,76 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           </STutorialTooltipHolder>
         )}
       </STabContainer>
+      {/* Suggest new form */}
+      {!optionCreatedByMe &&
+        postStatus === 'voting' &&
+        (post.creator?.options?.isOfferingBundles || bundle) && (
+          <SActionSection>
+            <SuggestionTextArea
+              value={newOptionText}
+              placeholder={t(
+                'mcPost.optionsTab.actionSection.suggestionPlaceholder'
+              )}
+              onChange={handleUpdateNewOptionText}
+            />
+            <SAddOptionButton
+              size='sm'
+              disabled={!newOptionText || !newOptionTextValid}
+              style={{
+                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+              }}
+              onClick={() => {
+                Mixpanel.track('Click Add Free Option', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTab',
+                });
+
+                if (bundle) {
+                  setConfirmCustomOptionModalOpen(true);
+                } else {
+                  setBuyBundleModalOpen(true);
+                }
+              }}
+            >
+              {t('mcPost.optionsTab.actionSection.placeABidButton')}
+            </SAddOptionButton>
+            {user.userTutorialsProgress.remainingMcSteps && (
+              <STutorialTooltipTextAreaHolder>
+                <TutorialTooltip
+                  isTooltipVisible={
+                    user.userTutorialsProgress.remainingMcSteps[0] ===
+                    newnewapi.McTutorialStep.MC_TEXT_FIELD
+                  }
+                  closeTooltip={goToNextStep}
+                  title={t('tutorials.mc.createYourBid.title')}
+                  text={t('tutorials.mc.createYourBid.text')}
+                  dotPosition={DotPositionEnum.BottomRight}
+                />
+              </STutorialTooltipTextAreaHolder>
+            )}
+          </SActionSection>
+        )}
+      {post.creator?.options?.isOfferingBundles && (
+        <SBundlesContainer highlighted={bundle?.votesLeft === 0}>
+          {bundle?.votesLeft === 0 && (
+            <STicketSet numberOFTickets={3} size={36} shift={11} />
+          )}
+          <SBundlesText>
+            {t('mcPost.optionsTab.actionSection.offersBundles', {
+              creator: postCreatorName,
+            })}
+          </SBundlesText>
+          <SHighlightedButton
+            size='small'
+            onClick={() => {
+              setBuyBundleModalOpen(true);
+            }}
+          >
+            {t('mcPost.optionsTab.actionSection.viewBundles')}
+          </SHighlightedButton>
+        </SBundlesContainer>
+      )}
       {/* Suggest new Modal */}
       {isMobile &&
       !optionCreatedByMe &&
@@ -567,22 +530,17 @@ export default McOptionsTab;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  /* height: calc(100% - 50px); */
 
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
 
   ${({ theme }) => theme.media.tablet} {
-    display: initial;
-
-    height: calc(100% - 56px);
-    height: 100%;
+    flex: 1 1 auto;
   }
 `;
 
-const SBidsContainer = styled.div<{
-  heightDelta: number;
-}>`
+const SBidsContainer = styled.div`
   width: 100%;
   height: 100%;
   overflow-y: auto;
@@ -593,11 +551,19 @@ const SBidsContainer = styled.div<{
   padding-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+
     padding-top: 0px;
     padding-right: 12px;
     margin-right: -14px;
     width: calc(100% + 14px);
+    height: initial;
+    flex: 1 1 auto;
 
     // Scrollbar
     &::-webkit-scrollbar {
@@ -722,8 +688,8 @@ const SActionSection = styled.div`
 
 const STutorialTooltipHolder = styled.div`
   position: absolute;
-  left: 40%;
-  bottom: 90%;
+  left: 25%;
+  bottom: 120%;
   text-align: left;
   div {
     width: 190px;
@@ -771,11 +737,7 @@ const SBundlesContainer = styled.div<{ highlighted: boolean }>`
 
   ${({ theme }) => theme.media.tablet} {
     flex-direction: row;
-    margin-top: 24px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    margin-top: 32px;
+    margin-top: initial;
   }
 `;
 
