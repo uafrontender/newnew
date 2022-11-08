@@ -8,6 +8,7 @@ import Text from '../../../atoms/Text';
 import { getMyBundleEarnings } from '../../../../api/endpoints/bundles';
 import dateToTimestamp from '../../../../utils/dateToTimestamp';
 import { formatNumber } from '../../../../utils/format';
+import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 
 interface IFunctionProps {
   isBundlesEnabled: boolean;
@@ -18,6 +19,7 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
     const { t } = useTranslation('page-Creator');
     const [totalEarned, setTotalEarned] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean | null>(null);
+    const { appConstants } = useGetAppConstants();
     const [myEarnings, setMyEarnings] = useState<
       newnewapi.GetMyBundleEarningsResponse | undefined
     >();
@@ -49,35 +51,46 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
     }, [myEarnings, isLoading]);
 
     const renderListItem = useCallback(
-      (item: newnewapi.ISoldBundle) => (
-        <SBundle key={`superpoll-bundle-${item.pricePerUnit?.usdCents}`}>
-          <div>
-            {item.pricePerUnit?.usdCents && (
+      (item: newnewapi.IBundleOffer) => {
+        let soldBundle;
+        if (myEarnings?.soldBundles && myEarnings?.soldBundles.length > 0) {
+          soldBundle = myEarnings?.soldBundles.find(
+            (el) => el.pricePerUnit?.usdCents === item.price?.usdCents
+          );
+        }
+        const price = soldBundle?.pricePerUnit?.usdCents
+          ? soldBundle.pricePerUnit?.usdCents
+          : item.price?.usdCents!!;
+        const quantitySold = soldBundle?.quantitySold
+          ? soldBundle.quantitySold
+          : 0;
+        const totalEarnings = soldBundle?.totalEarnings?.usdCents
+          ? soldBundle.totalEarnings?.usdCents
+          : 0;
+
+        return (
+          <SBundle key={`superpoll-bundle-${price}`}>
+            <div>
               <SBundleTitle>
                 $
-                {`${formatNumber(
-                  item.pricePerUnit.usdCents / 100 ?? 0,
-                  true
-                )} ${t('myBundles.earnings.unitName')}`}
+                {`${formatNumber(price / 100 ?? 0, true)} ${t(
+                  'myBundles.earnings.unitName'
+                )}`}
               </SBundleTitle>
-            )}
-            {item.quantitySold && (
               <SText variant={3}>
-                {`${item.quantitySold} ${t('myBundles.earnings.sold')}`}
+                {`${quantitySold} ${t('myBundles.earnings.sold')}`}
               </SText>
-            )}
-          </div>
-          <div>
-            {item.totalEarnings?.usdCents && (
+            </div>
+            <div>
               <SBundlePrice isBundlesEnabled={isBundlesEnabled}>
-                ${formatNumber(item.totalEarnings.usdCents / 100 ?? 0, true)}
+                ${formatNumber(totalEarnings / 100 ?? 0, true)}
               </SBundlePrice>
-            )}
-            <SText variant={3}>{t('myBundles.earnings.earned')}</SText>
-          </div>
-        </SBundle>
-      ),
-      [isBundlesEnabled, t]
+              <SText variant={3}>{t('myBundles.earnings.earned')}</SText>
+            </div>
+          </SBundle>
+        );
+      },
+      [isBundlesEnabled, t, myEarnings?.soldBundles]
     );
 
     return (
@@ -99,13 +112,16 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
                 {t('myBundles.earnings.payPeriod')}
               </STotalEarnedText>
             </STotal>
-            {myEarnings &&
+            <SBundles>
+              {appConstants.bundleOffers?.map(renderListItem)}
+            </SBundles>
+            {/* {myEarnings &&
               myEarnings.soldBundles &&
               myEarnings.soldBundles.length > 0 && (
                 <SBundles>
                   {myEarnings.soldBundles.map(renderListItem)}
                 </SBundles>
-              )}
+              )} */}
           </>
         )}
       </SBlock>
@@ -141,7 +157,7 @@ const SBlock = styled.section<ISBlock>`
 
 const SHeaderLine = styled.div`
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   flex-direction: column;
   margin-bottom: 24px;
 
@@ -202,11 +218,12 @@ const SBundles = styled.div`
   display: flex;
   flex-wrap: wrap;
   margin-bottom: -16px;
+  justify-content: space-between;
 `;
 
 const SBundle = styled.div`
-  width: 100%;
-  margin: 0 10px 16px 0;
+  width: 49%;
+  margin: 0 0 16px 0;
   padding: 16px;
   border-radius: ${(props) => props.theme.borderRadius.medium};
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
