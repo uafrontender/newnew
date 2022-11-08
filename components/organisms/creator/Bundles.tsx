@@ -112,6 +112,7 @@ export const Bundles: React.FC = React.memo(() => {
                   </SText>
                 </STextHolder>
                 <SButton
+                  id='turn-on-bundles-button'
                   onClick={toggleTurnBundleModalOpen}
                   enabled={isBundlesEnabled}
                   disabled={isBundlesEnabled === undefined}
