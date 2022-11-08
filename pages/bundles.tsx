@@ -236,7 +236,10 @@ export const Bundles: NextPage<IBundlesPage> = ({
             placeholder={t('search.searchInputPlaceholder')}
           />
         </SInputWrapper>
-        <SearchResultsTitle>{t('search.resultsTitle')}</SearchResultsTitle>
+        <SearchResultsTitle>
+          {/* TODO: add search results for... line? */}
+          {searchValue === '' && t('search.resultsTitle')}
+        </SearchResultsTitle>
         <SCardsSection>
           {/* Changes in number of Creators in the search result causes change in page height (Fix?) */}
           {/* TODO: add no results message (otherwise there is an empty space) */}
