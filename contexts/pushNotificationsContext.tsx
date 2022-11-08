@@ -13,6 +13,7 @@ import {
   webPushRegister,
   webPushUnRegister,
 } from '../api/endpoints/user';
+import { cookiesInstance } from '../api/apiConfigs';
 
 export const PushNotificationsContext = createContext<{
   inSubscribed: boolean;
@@ -84,6 +85,7 @@ const PushNotificationsContextProvider: React.FC<
             setIsSubscribed(true);
           }
         } else if (Notification.permission === 'granted') {
+          console.log('subscribe');
           const subscription = await swReg.pushManager.getSubscription();
 
           if (subscription) {
@@ -118,27 +120,36 @@ const PushNotificationsContextProvider: React.FC<
     }
   }, [showPermissionRequestModal]);
 
-  const checkPermissionSafari = useCallback(async (permissionData: any) => {
-    console.log(permissionData, 'permissionData');
-    if (permissionData.permission === 'default') {
-      console.log('here', process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID, process.env.NEXT_PUBLIC_APP_URL);
-      // This is a new web service URL and its validity is unknown.
-      const perm = await (window as any).safari.pushNotification.requestPermission(
-        `https://ldev.cloud/v1/web_push/safari`,
-        'web.development.newnew.co',
-        { publicKey }, // Data that you choose to send to your server to help you identify the user.
-        checkPermissionSafari
-      );
-      console.log({ perm })
-    } else if (permissionData.permission === 'denied') {
-      // The user said no.
-    } else if (permissionData.permission === 'granted') {
-      // The web service URL is a valid push provider, and the user said yes.
-      // permissionData.deviceToken is now available to use.
-
+  const checkPermissionSafari = useCallback(
+    async (permissionData: any) => {
       console.log(permissionData, 'permissionData');
-    }
-  }, [publicKey]);
+      if (permissionData.permission === 'default') {
+        console.log(
+          'here',
+          process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID,
+          process.env.NEXT_PUBLIC_APP_URL
+        );
+        // This is a new web service URL and its validity is unknown.
+        const perm = await (
+          window as any
+        ).safari.pushNotification.requestPermission(
+          `https://ldev.cloud/v1/web_push/safari`,
+          'web.development.newnew.co',
+          { publicKey, access_token: cookiesInstance.get('accessToken') }, // Data that you choose to send to your server to help you identify the user.
+          checkPermissionSafari
+        );
+        console.log({ perm });
+      } else if (permissionData.permission === 'denied') {
+        // The user said no.
+      } else if (permissionData.permission === 'granted') {
+        // The web service URL is a valid push provider, and the user said yes.
+        // permissionData.deviceToken is now available to use.
+
+        console.log(permissionData, 'permissionData');
+      }
+    },
+    [publicKey]
+  );
 
   const subscribe = useCallback(
     async (onSuccess?: () => void) => {
