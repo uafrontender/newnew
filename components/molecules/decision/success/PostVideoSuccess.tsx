@@ -122,18 +122,14 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         }
       }
 
-      document
-        ?.getElementById('post-modal-container')
-        ?.addEventListener('scroll', handleScroll);
+      document?.addEventListener('scroll', handleScroll);
     }
 
     return () => {
       setSoundBtnBottomOverriden(undefined);
 
       if (isBrowser() && !isMobileOrTablet) {
-        document
-          ?.getElementById('post-modal-container')
-          ?.removeEventListener('scroll', handleScroll);
+        document?.removeEventListener('scroll', handleScroll);
       }
     };
   }, [isMobileOrTablet, postId]);
@@ -261,6 +257,8 @@ const SVideoWrapper = styled.div`
     width: 284px;
     height: 506px;
     margin-left: initial;
+
+    flex-shrink: 0;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 

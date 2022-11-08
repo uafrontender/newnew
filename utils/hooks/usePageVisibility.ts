@@ -32,7 +32,7 @@ function getBrowserDocumentHiddenProp() {
 
 function getIsDocumentHidden() {
   // @ts-ignore
-  return !document[getBrowserDocumentHiddenProp()]
+  return typeof document !== 'undefined' ? !document[getBrowserDocumentHiddenProp()] : false
 }
 
 export default function usePageVisibility() {

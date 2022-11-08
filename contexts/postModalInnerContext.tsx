@@ -17,7 +17,6 @@ import { TPostStatusStringified } from '../utils/switchPostStatus';
 import { TPostType } from '../utils/switchPostType';
 
 const PostModalInnerContext = createContext<{
-  open: boolean;
   modalContainerRef: MutableRefObject<HTMLDivElement | undefined>;
   isMyPost: boolean;
   postParsed:
@@ -43,8 +42,6 @@ const PostModalInnerContext = createContext<{
   handleSetIsFollowingDecision: (v: boolean) => void;
   handleGoBackInsidePost: () => void;
   handleUpdatePostStatus: (newStatus: number | string) => void;
-  handleRemoveFromStateUnfavorited: (() => void) | undefined;
-  handleAddPostToStateFavorited: (() => void) | undefined;
   handleReportOpen: () => void;
   resetSetupIntentClientSecret: () => void;
   handleCloseAndGoBack: () => void;
@@ -60,7 +57,6 @@ const PostModalInnerContext = createContext<{
   handleOpenEllipseMenu: () => void;
   handleCloseDeletePostModal: () => void;
 }>({
-  open: false,
   modalContainerRef: {} as MutableRefObject<HTMLDivElement | undefined>,
   isMyPost: false,
   postParsed: undefined,
@@ -85,8 +81,6 @@ const PostModalInnerContext = createContext<{
   handleSetIsFollowingDecision: (v: boolean) => {},
   handleGoBackInsidePost: () => {},
   handleUpdatePostStatus: (newStatus: number | string) => {},
-  handleRemoveFromStateUnfavorited: undefined,
-  handleAddPostToStateFavorited: undefined,
   handleReportOpen: () => {},
   resetSetupIntentClientSecret: () => {},
   handleCloseAndGoBack: () => {},
@@ -104,7 +98,6 @@ const PostModalInnerContext = createContext<{
 });
 
 interface IPostModalContextProvider {
-  open: boolean;
   modalContainerRef: MutableRefObject<HTMLDivElement | undefined>;
   isMyPost: boolean;
   postParsed:
@@ -126,8 +119,6 @@ interface IPostModalContextProvider {
   handleSetIsFollowingDecision: (v: boolean) => void;
   handleGoBackInsidePost: () => void;
   handleUpdatePostStatus: (newStatus: number | string) => void;
-  handleRemoveFromStateUnfavorited: (() => void) | undefined;
-  handleAddPostToStateFavorited: (() => void) | undefined;
   resetSetupIntentClientSecret: () => void;
   handleCloseAndGoBack: () => void;
   handleFollowDecision: () => Promise<void>;
@@ -141,7 +132,6 @@ interface IPostModalContextProvider {
 const PostModalContextProvider: React.FunctionComponent<
   IPostModalContextProvider
 > = ({
-  open,
   modalContainerRef,
   isMyPost,
   postParsed,
@@ -160,8 +150,6 @@ const PostModalContextProvider: React.FunctionComponent<
   handleSetIsFollowingDecision,
   handleGoBackInsidePost,
   handleUpdatePostStatus,
-  handleRemoveFromStateUnfavorited,
-  handleAddPostToStateFavorited,
   resetSetupIntentClientSecret,
   handleFollowDecision,
   deletePostOpen,
@@ -221,7 +209,6 @@ const PostModalContextProvider: React.FunctionComponent<
 
   const contextValueMemo = useMemo(
     () => ({
-      open,
       modalContainerRef,
       isMyPost,
       postParsed,
@@ -243,8 +230,6 @@ const PostModalContextProvider: React.FunctionComponent<
       handleSetIsFollowingDecision,
       handleGoBackInsidePost,
       handleUpdatePostStatus,
-      handleRemoveFromStateUnfavorited,
-      handleAddPostToStateFavorited,
       handleReportOpen,
       resetSetupIntentClientSecret,
       handleCloseAndGoBack,
@@ -261,7 +246,6 @@ const PostModalContextProvider: React.FunctionComponent<
       handleCloseDeletePostModal,
     }),
     [
-      open,
       modalContainerRef,
       isMyPost,
       postParsed,
@@ -282,8 +266,6 @@ const PostModalContextProvider: React.FunctionComponent<
       handleSetIsFollowingDecision,
       handleGoBackInsidePost,
       handleUpdatePostStatus,
-      handleRemoveFromStateUnfavorited,
-      handleAddPostToStateFavorited,
       handleReportOpen,
       resetSetupIntentClientSecret,
       handleCloseAndGoBack,

@@ -42,7 +42,6 @@ interface ICardSection {
   tutorialCard?: ReactElement;
   seeMoreLink?: string;
   padding?: 'small' | 'large';
-  handlePostClicked: (post: newnewapi.Post) => void;
   onReachEnd?: () => void;
 }
 
@@ -57,7 +56,6 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     tutorialCard,
     seeMoreLink,
     onReachEnd,
-    handlePostClicked,
     ...restProps
   }) => {
     const { t } = useTranslation('page-Home');
@@ -173,7 +171,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     const renderItem = (item: any, index: number) => {
       const handleItemClick = () => {
         if (!isDragging) {
-          handlePostClicked(item);
+          router.push(`/post/${switchPostType(item)[0].postUuid}`);
         }
       };
 

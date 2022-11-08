@@ -66,9 +66,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollTop = document?.getElementById(
-        'post-modal-container'
-      )?.scrollTop;
+      const scrollTop = document?.documentElement?.scrollTop;
       if (scrollTop && scrollTop > 200) {
         setIsScrolledDown(true);
       } else {
@@ -77,16 +75,12 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     };
 
     if (isBrowser()) {
-      document
-        ?.getElementById('post-modal-container')
-        ?.addEventListener('scroll', handleScroll);
+      document?.addEventListener('scroll', handleScroll);
     }
 
     return () => {
       if (isBrowser()) {
-        document
-          ?.getElementById('post-modal-container')
-          ?.removeEventListener('scroll', handleScroll);
+        document?.removeEventListener('scroll', handleScroll);
       }
     };
   }, []);
@@ -187,6 +181,9 @@ const SContainer = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     background-color: transparent;
+
+    margin-top: auto;
+    margin-bottom: auto;
   }
 `;
 
