@@ -268,7 +268,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               ? {
                   overflow: 'hidden',
                   width:
-                    options.length > 4
+                    options.length >= 4
                       ? 'calc(100% + 10px)'
                       : 'calc(100% + 14px)',
                 }

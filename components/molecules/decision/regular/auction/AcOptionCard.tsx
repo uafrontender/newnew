@@ -470,7 +470,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                         ? t('me')
                         : t('my')
                       : getDisplayname(option.creator!!)}
-                    {option.creator.options?.isVerified && (
+                    {!isMyBid && option.creator.options?.isVerified && (
                       <SInlineSvgVerificationIcon
                         svg={
                           !isBlue

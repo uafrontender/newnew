@@ -919,6 +919,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
+  const user = useAppSelector((state) => state.user);
 
   if (isCreatorsBid && !isSupportedByMe) {
     return (
@@ -989,17 +990,23 @@ export const RenderSupportersInfo: React.FunctionComponent<{
       <>
         {supporterCount > 0 ? (
           <>
-            <SSpanBiddersHighlighted className='spanHighlighted'>
-              {supporterCountSubtracted > 0 ? t('me') : t('I')}
-              {amIVerified && (
-                <SInlineSvgVerificationIcon
-                  svg={VerificationCheckmark}
-                  width='14px'
-                  height='14px'
-                  fill='none'
-                />
-              )}
-            </SSpanBiddersHighlighted>
+            <Link
+              href={`/profile${
+                user.userData?.options?.isCreator ? '/my-posts' : ''
+              }`}
+            >
+              <SSpanBiddersHighlighted
+                className='spanHighlighted'
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                style={{
+                  cursor: 'pointer',
+                }}
+              >
+                {supporterCountSubtracted > 0 ? t('me') : t('I')}
+              </SSpanBiddersHighlighted>
+            </Link>
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>
@@ -1142,9 +1149,23 @@ export const RenderSupportersInfo: React.FunctionComponent<{
             </SSpanBiddersHighlighted>
           </Link>
         )}
-        <SSpanBiddersHighlighted className='spanHighlighted'>
+        <SSpanBiddersHighlighted
+          className='spanHighlighted'
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          style={{
+            cursor: 'pointer',
+          }}
+        >
           {', '}
-          {`${t('me')}`}
+          <Link
+            href={`/profile${
+              user.userData?.options?.isCreator ? '/my-posts' : ''
+            }`}
+          >
+            {`${t('me')}`}
+          </Link>
         </SSpanBiddersHighlighted>
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubtracted - 1 > 0 ? ` & ` : ''}
