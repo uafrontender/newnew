@@ -133,7 +133,7 @@ const ChatList: React.FC<IFunctionProps> = ({
         setLoadingRooms(true);
         const payload = new newnewapi.GetMyRoomsRequest({
           // if I am not creator get only rooms with creators I am subscriber to
-          // myRole: user.userData?.options?.isOfferingSubscription ? null : 1,
+          // myRole: user.userData?.options?.isOfferingBundles ? null : 1,
           paging: {
             limit: 50,
             pageToken,
@@ -143,6 +143,7 @@ const ChatList: React.FC<IFunctionProps> = ({
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
+
         if (res.data && res.data.rooms.length > 0) {
           setChatRooms((curr) => {
             const arr = curr ? [...curr] : [];
@@ -158,7 +159,7 @@ const ChatList: React.FC<IFunctionProps> = ({
             return arr;
           });
           // if I am not creator get only rooms with creators I am subscriber to
-          if (user.userData?.options?.isOfferingSubscription) {
+          if (user.userData?.options?.isOfferingBundles) {
             if (displayAllRooms) setDisplayAllRooms(false);
 
             setChatRoomsCreators((curr) => {
@@ -171,6 +172,9 @@ const ChatList: React.FC<IFunctionProps> = ({
                     arr.push(chat);
                 }
               });
+              if (arr.length < 1) {
+                setDisplayAllRooms(true);
+              }
               return arr;
             });
 
@@ -183,7 +187,6 @@ const ChatList: React.FC<IFunctionProps> = ({
                 )
                   arr.push(chat);
               });
-
               return arr;
             });
           } else {
@@ -203,7 +206,7 @@ const ChatList: React.FC<IFunctionProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       loadingRooms,
-      user.userData?.options?.isOfferingSubscription,
+      user.userData?.options?.isOfferingBundles,
       chatRoomsNextPageToken,
       displayAllRooms,
     ]
@@ -422,8 +425,8 @@ const ChatList: React.FC<IFunctionProps> = ({
         const arr = [] as newnewapi.IChatRoom[];
         chatRooms.forEach((chat) => {
           if (
-            chat.visavis?.nickname?.includes(searchText) ||
-            chat.visavis?.username?.includes(searchText)
+            chat.visavis?.user?.nickname?.includes(searchText) ||
+            chat.visavis?.user?.username?.includes(searchText)
           ) {
             arr.push(chat);
           }
@@ -470,6 +473,7 @@ const ChatList: React.FC<IFunctionProps> = ({
           );
         } else {
           openChat({ chatRoom: chatRoomsCreators[0], showChatList: null });
+
           setActiveChatIndex(
             chatRoomsCreators[0].id ? chatRoomsCreators[0].id.toString() : null
           );
@@ -556,12 +560,12 @@ const ChatList: React.FC<IFunctionProps> = ({
 
       let avatar = (
         <SUserAvatar>
-          <UserAvatar avatarUrl={chat.visavis?.avatarUrl ?? ''} />
+          <UserAvatar avatarUrl={chat.visavis?.user?.avatarUrl ?? ''} />
         </SUserAvatar>
       );
-      let chatName = chat.visavis?.nickname
-        ? chat.visavis?.nickname
-        : chat.visavis?.username;
+      let chatName = chat.visavis?.user?.nickname
+        ? chat.visavis?.user?.nickname
+        : chat.visavis?.user?.username;
 
       if (chat.kind === 4) {
         avatar = (
@@ -585,14 +589,15 @@ const ChatList: React.FC<IFunctionProps> = ({
           });
         } else {
           chatName = t('announcement.title', {
-            username: chat.visavis?.nickname || chat.visavis?.username,
+            username:
+              chat.visavis?.user?.nickname || chat.visavis?.user?.username,
           });
         }
       }
 
       let lastMsg = chat.lastMessage?.content?.text;
 
-      if (chat.myRole === 2 && !lastMsg) {
+      if (!lastMsg) {
         if (chat.kind === 4) {
           lastMsg = textTrim(t('newAnnouncement.created'));
         } else {
@@ -614,14 +619,15 @@ const ChatList: React.FC<IFunctionProps> = ({
               <SChatItemContentWrapper>
                 <SChatItemText variant={3} weight={600}>
                   {chatName}
-                  {chat.visavis?.options?.isVerified && chat.kind !== 4 && (
-                    <SInlineSVG
-                      svg={VerificationCheckmark}
-                      width='16px'
-                      height='16px'
-                      fill='none'
-                    />
-                  )}
+                  {chat.visavis?.user?.options?.isVerified &&
+                    chat.kind !== 4 && (
+                      <SInlineSVG
+                        svg={VerificationCheckmark}
+                        width='16px'
+                        height='16px'
+                        fill='none'
+                      />
+                    )}
                 </SChatItemText>
                 <SChatItemTime variant={3} weight={600}>
                   {chat.updatedAt &&

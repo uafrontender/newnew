@@ -95,7 +95,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
           )}
           <SText>
             <STitle>
-              {content?.relatedUser?.nicknameOrUsername}
+              {content?.relatedUser?.username}
               {content?.relatedUser?.isVerified && (
                 <SInlineSVG
                   svg={VerificationCheckmark}

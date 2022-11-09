@@ -73,13 +73,13 @@ export const Chat: React.FC<IChat> = ({
   const openChat = useCallback(
     ({ chatRoom }: IChatData) => {
       let route = '';
-      if (chatRoom?.visavis?.username) {
+      if (chatRoom?.visavis?.user?.username) {
         chatRoom.kind === 1
           ? (route =
               chatRoom.myRole === 2
-                ? chatRoom?.visavis?.username
-                : `${chatRoom?.visavis?.username}-cr`)
-          : (route = `${chatRoom?.visavis?.username}-announcement`);
+                ? chatRoom?.visavis?.user?.username
+                : `${chatRoom?.visavis?.user?.username}-cr`)
+          : (route = `${chatRoom?.visavis?.user?.username}-announcement`);
       } else {
         chatRoom && chatRoom.kind === 4 && chatRoom.myRole === 2
           ? (route = `${user.userData?.username}-announcement`)

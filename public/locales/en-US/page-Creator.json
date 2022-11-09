@@ -184,7 +184,7 @@
     "noMessagesFirstLine": "No messages here yet...",
     "typing": "Typing...",
     "toolbar": {
-      "searchPlaceholder": "Search for messages or users"
+      "searchPlaceholder": "Search for users"
     },
     "modal": {
       "newMessage": {

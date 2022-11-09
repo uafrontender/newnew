@@ -10,7 +10,7 @@ import Button from '../../atoms/Button';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
 interface IBlockUserModal {
-  user: newnewapi.IUser;
+  user: newnewapi.IVisavisUser;
   confirmBlockUser: boolean;
   onUserBlock?: () => void;
   closeModal: () => void;
@@ -32,12 +32,12 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
     try {
       const payload = new newnewapi.MarkUserRequest({
         markAs: 3,
-        userUuid: user.uuid,
+        userUuid: user.user?.uuid,
       });
       const res = await markUser(payload);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
-      if (user.uuid) blockUser(user.uuid);
+      if (user.user?.uuid) blockUser(user.user?.uuid);
       onUserBlock?.();
       closeModal();
     } catch (err) {
@@ -55,12 +55,12 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
           <SModalTitle>
             {isAnnouncement
               ? t('modal.blockGroup.title')
-              : `${t('modal.blockUser.title')} ${user.username}`}
+              : `${t('modal.blockUser.title')} ${user.user?.username}`}
           </SModalTitle>
           <SModalMessage>
-            {`${t('modal.blockUser.messageFirstPart')} ${user.username} ${t(
-              'modal.blockUser.messageSecondPart'
-            )}`}
+            {`${t('modal.blockUser.messageFirstPart')} ${
+              user.user?.username
+            } ${t('modal.blockUser.messageSecondPart')}`}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>

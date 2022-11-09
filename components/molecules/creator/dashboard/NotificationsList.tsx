@@ -192,11 +192,11 @@ export const NotificationsList: React.FC<IFunction> = ({
 
       if (
         notification.content.relatedUser &&
-        notification.content.relatedUser.nicknameOrUsername &&
+        notification.content.relatedUser.username &&
         notification.content.relatedUser.isVerified
       ) {
         const usernameIndex = notification.content.message.indexOf(
-          notification.content.relatedUser.nicknameOrUsername
+          notification.content.relatedUser.username
         );
         if (usernameIndex > -1) {
           const beforeName = notification.content.message.slice(
@@ -204,13 +204,12 @@ export const NotificationsList: React.FC<IFunction> = ({
             usernameIndex
           );
           const afterName = notification.content.message.slice(
-            usernameIndex +
-              notification.content.relatedUser.nicknameOrUsername.length
+            usernameIndex + notification.content.relatedUser.username.length
           );
           return (
             <>
               {beforeName}
-              {notification.content.relatedUser.nicknameOrUsername}
+              {notification.content.relatedUser.username}
               <SInlineSvg
                 svg={VerificationCheckmark}
                 width='16px'

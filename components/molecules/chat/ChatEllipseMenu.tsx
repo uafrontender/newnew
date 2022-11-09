@@ -8,7 +8,7 @@ import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 import Text from '../../atoms/Text';
 
 interface IChatEllipseMenu {
-  user: newnewapi.IUser;
+  user: newnewapi.IVisavisUser;
   isVisible: boolean;
   handleClose: () => void;
   onUserBlock: () => void;
@@ -44,7 +44,7 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
   };
 
   const viewUserProfile = () => {
-    router.push(`/${user.username}`);
+    router.push(`/${user.user?.username}`);
   };
 
   return (
