@@ -395,13 +395,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         )}
       {post.creator?.options?.isOfferingBundles && (
         <SBundlesContainer highlighted={bundle?.votesLeft === 0}>
-          {bundle?.votesLeft === 0 && (
-            <STicketSet numberOFTickets={3} size={36} shift={11} />
-          )}
+          {bundle && <STicketSet numberOFTickets={3} size={36} shift={11} />}
           <SBundlesText>
-            {t('mcPost.optionsTab.actionSection.offersBundles', {
-              creator: postCreatorName,
-            })}
+            {bundle
+              ? t('mcPost.optionsTab.actionSection.getMoreBundles')
+              : t('mcPost.optionsTab.actionSection.offersBundles', {
+                  creator: postCreatorName,
+                })}
           </SBundlesText>
           <SHighlightedButton
             size='small'
@@ -409,7 +409,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               setBuyBundleModalOpen(true);
             }}
           >
-            {t('mcPost.optionsTab.actionSection.viewBundles')}
+            {bundle
+              ? t('mcPost.optionsTab.actionSection.getBundles')
+              : t('mcPost.optionsTab.actionSection.viewBundles')}
           </SHighlightedButton>
         </SBundlesContainer>
       )}

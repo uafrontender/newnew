@@ -444,7 +444,9 @@
         "suggestionPlaceholderDesktop": "添加選……",
         "placeABidButton": "添加我的選項",
         "offersBundles": "{{creator}} 提供Superpoll Bundle",
-        "viewBundles": "查看Bundle"
+        "viewBundles": "查看Bundle",
+        "getMoreBundles_NEED_TRANSLATION": "Get another Superpoll Bundle",
+        "getBundles_NEED_TRANSLATION": "Get it"
       }
     },
     "winnerTab": {

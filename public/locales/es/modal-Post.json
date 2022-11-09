@@ -444,7 +444,9 @@
         "suggestionPlaceholderDesktop": "Agregar opción...",
         "placeABidButton": "Agregar mi opción",
         "offersBundles": "{{creator}} ofrece Bundles de Superpoll",
-        "viewBundles": "Ver Bundles"
+        "viewBundles": "Ver Bundles",
+        "getMoreBundles_NEED_TRANSLATION": "Get another Superpoll Bundle",
+        "getBundles_NEED_TRANSLATION": "Get it"
       }
     },
     "winnerTab": {
