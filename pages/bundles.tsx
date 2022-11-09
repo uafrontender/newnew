@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import { NextPage, NextPageContext } from 'next';
 import Head from 'next/head';
@@ -88,6 +88,31 @@ export const Bundles: NextPage<IBundlesPage> = ({
   );
 
   const paginatedCreators = usePagination(loadCreatorsData, 10);
+  // Quick fix for sorting creators with bundles
+  // Quick fix for not showing user in the list
+  // TODO: add sorting and filtering options on BE
+  const sortedCreators = useMemo(
+    () =>
+      paginatedCreators.data
+        .filter((creator) => creator.uuid !== user.userData?.userUuid)
+        .sort((a, b) => {
+          const aBundle = bundles?.find(
+            (bundle) => bundle.creator?.uuid === a.uuid
+          );
+          const bBundle = bundles?.find(
+            (bundle) => bundle.creator?.uuid === b.uuid
+          );
+          if (aBundle && !bBundle) {
+            return -1;
+          }
+
+          if (!aBundle && bBundle) {
+            return 1;
+          }
+          return 0;
+        }),
+    [paginatedCreators, user.userData?.userUuid, bundles]
+  );
 
   const buyBundleAfterStripeRedirect = useCallback(async () => {
     if (!stripeSetupIntentClientSecret) {
@@ -257,7 +282,7 @@ export const Bundles: NextPage<IBundlesPage> = ({
           {/* TODO: add no results message (otherwise there is an empty space) */}
           <CreatorsList
             loading={paginatedCreators.loading}
-            collection={paginatedCreators.data}
+            collection={sortedCreators}
             onBuyBundleClicked={(creator) => {
               const creatorsBundle = bundles?.find(
                 (bundle) => bundle.creator?.uuid === creator.uuid
