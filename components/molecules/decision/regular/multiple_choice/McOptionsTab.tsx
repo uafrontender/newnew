@@ -40,8 +40,6 @@ import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import BuyBundleModal from '../../../bundles/BuyBundleModal';
 import McConfirmCustomOptionModal from './McConfirmCustomOptionModal';
-import HighlightedButton from '../../../../atoms/bundles/HighlightedButton';
-import TicketSet from '../../../../atoms/bundles/TicketSet';
 import OptionActionMobileModal from '../../common/OptionActionMobileModal';
 
 interface IMcOptionsTab {
@@ -391,26 +389,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             )}
           </SActionSection>
         )}
-      {post.creator?.options?.isOfferingBundles && (
-        <SBundlesContainer highlighted={bundle?.votesLeft === 0}>
-          {bundle?.votesLeft === 0 && (
-            <STicketSet numberOFTickets={3} size={36} shift={11} />
-          )}
-          <SBundlesText>
-            {t('mcPost.optionsTab.actionSection.offersBundles', {
-              creator: postCreatorName,
-            })}
-          </SBundlesText>
-          <SHighlightedButton
-            size='small'
-            onClick={() => {
-              setBuyBundleModalOpen(true);
-            }}
-          >
-            {t('mcPost.optionsTab.actionSection.viewBundles')}
-          </SHighlightedButton>
-        </SBundlesContainer>
-      )}
       {/* Suggest new Modal */}
       {isMobile &&
       !optionCreatedByMe &&
@@ -715,55 +693,4 @@ const STutorialTooltipTextAreaHolder = styled.div`
   div {
     width: 190px;
   }
-`;
-
-const SBundlesContainer = styled.div<{ highlighted: boolean }>`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  padding: 16px;
-  border-radius: 16px;
-  border-width: 1px;
-  border-style: solid;
-  border-color: ${({ theme, highlighted }) =>
-    highlighted
-      ? theme.colorsThemed.accent.yellow
-      : // TODO: standardize color
-      theme.name === 'light'
-      ? '#E5E9F1'
-      : '#2C2C33'};
-  margin-top: 32px;
-
-  ${({ theme }) => theme.media.tablet} {
-    flex-direction: row;
-    margin-top: initial;
-  }
-`;
-
-const STicketSet = styled(TicketSet)`
-  margin-right: 8px;
-`;
-
-const SBundlesText = styled.p`
-  flex-grow: 1;
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  font-weight: 600;
-  text-align: center;
-  font-size: 16px;
-  line-height: 24px;
-  margin-bottom: 16px;
-  margin-right: 8px;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 0px;
-    text-align: start;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-`;
-
-const SHighlightedButton = styled(HighlightedButton)`
-  width: auto;
 `;
