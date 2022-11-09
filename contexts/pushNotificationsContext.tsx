@@ -19,6 +19,7 @@ import { useAppSelector } from '../redux-store/store';
 export const PushNotificationsContext = createContext<{
   inSubscribed: boolean;
   isPermissionRequestModalOpen: boolean;
+  isLoading: boolean;
   subscribe: (callback?: () => void) => void;
   unsubscribe: () => void;
   showPermissionRequestModal: () => void;
@@ -27,6 +28,7 @@ export const PushNotificationsContext = createContext<{
 }>({
   inSubscribed: false,
   isPermissionRequestModalOpen: false,
+  isLoading: false,
   subscribe: () => {},
   unsubscribe: () => {},
   showPermissionRequestModal: () => {},
@@ -46,6 +48,7 @@ const PushNotificationsContextProvider: React.FC<
 > = ({ children }) => {
   const user = useAppSelector((state) => state.user);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [isPermissionRequestModalOpen, setIsPermissionRequestModalOpen] =
     useState<boolean>(false);
 
@@ -56,55 +59,62 @@ const PushNotificationsContextProvider: React.FC<
   useEffect(() => {
     const getWebConfig = async () => {
       try {
+        setIsLoading(true);
         const payload = new newnewapi.EmptyRequest({});
 
         const response = await webPushConfig(payload);
+
+        console.log(response, 'response');
 
         setPublicKey(response.data?.publicKey || '');
         setHasWebPush(response.data?.hasWebPush || false);
       } catch (err) {
         console.error(err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     getWebConfig();
   }, []);
 
+  // Check initial push notification permission
   useEffect(() => {
-    const checkSubscription = async () => {
-      if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-        const swReg = await navigator.serviceWorker.register('/sw.js');
+    const checkSubscriptionSafari = () => {
+      const permissionData = (window as any).safari.pushNotification.permission(
+        process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
+      );
 
-        if (
-          'safari' in window &&
-          !swReg.pushManager &&
-          'pushNotification' in (window as any).safari
-        ) {
-          // Safari 15 and lower
-          const permissionData = (
-            window as any
-          ).safari.pushNotification.permission(
-            process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
-          );
+      if (permissionData.permission === 'granted') {
+        setIsSubscribed(hasWebPush);
+      }
+    };
 
-          if (permissionData.permission === 'granted') {
-            setIsSubscribed(hasWebPush);
-          }
-        } else if (Notification.permission === 'granted') {
-          const subscription = await swReg.pushManager.getSubscription();
+    const checkSubscriptionNonSafari = async () => {
+      const swReg = await navigator.serviceWorker.register('/sw.js');
 
-          if (subscription) {
-            setIsSubscribed(hasWebPush);
-          } else {
-            setIsSubscribed(false);
-          }
+      if (Notification.permission === 'granted') {
+        console.log(hasWebPush, 'hasWebPush');
+        const subscription = await swReg.pushManager.getSubscription();
+
+        if (subscription) {
+          setIsSubscribed(hasWebPush);
+        } else {
+          setIsSubscribed(false);
         }
       }
     };
 
-    checkSubscription();
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      if ('safari' in window && 'pushNotification' in (window as any).safari) {
+        checkSubscriptionSafari();
+      } else {
+        checkSubscriptionNonSafari();
+      }
+    }
   }, [hasWebPush]);
 
+  // Permission Modal
   const showPermissionRequestModal = useCallback(() => {
     setIsPermissionRequestModalOpen(true);
   }, []);
@@ -138,19 +148,80 @@ const PushNotificationsContextProvider: React.FC<
     };
   }, [promptUserWithPushNotificationsPermissionModal, user.loggedIn]);
 
+  // Subscribe to push notifications
   const checkPermissionSafari = useCallback(
-    async (permissionData: any) => {
+    async (permissionData: any, onSuccess?: () => void) => {
       if (permissionData.permission === 'default') {
         (window as any).safari.pushNotification.requestPermission(
           `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari`,
           process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID,
-          { publicKey, access_token: cookiesInstance.get('accessToken') },
+          {
+            publicKey,
+            access_token: cookiesInstance && cookiesInstance.get('accessToken'),
+          },
           checkPermissionSafari
         );
       } else if (permissionData.permission === 'denied') {
         // The user said no.
       } else if (permissionData.permission === 'granted') {
+        onSuccess?.();
         setIsSubscribed(true);
+      }
+    },
+    [publicKey]
+  );
+
+  const subscribeSafari = useCallback(
+    (onSuccess?: () => void) => {
+      try {
+        const permissionData = (
+          window as any
+        ).safari.pushNotification.permission(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari`,
+          process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
+        );
+
+        checkPermissionSafari(permissionData, onSuccess);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [checkPermissionSafari]
+  );
+
+  const subscribeNonSafari = useCallback(
+    async (onSuccess?: () => void) => {
+      try {
+        const swReg = await navigator.serviceWorker.register('/sw.js');
+
+        const notificationPermission = await Notification.requestPermission();
+
+        if (notificationPermission === 'granted') {
+          const subscription = await swReg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: publicKey,
+          });
+          const sub = subscription?.toJSON();
+
+          if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
+            throw new Error('Something goes wrong');
+          }
+
+          const payload = new newnewapi.RegisterForWebPushRequest({
+            name: navigator.userAgent,
+            expiration: `${sub.expirationTime}`,
+            endpoint: sub.endpoint,
+            p256dh: sub.keys.p256dh,
+            auth: sub.keys.auth,
+          });
+
+          await webPushRegister(payload);
+
+          onSuccess?.();
+          setIsSubscribed(true);
+        }
+      } catch (err) {
+        console.error(err);
       }
     },
     [publicKey]
@@ -158,74 +229,21 @@ const PushNotificationsContextProvider: React.FC<
 
   const subscribe = useCallback(
     async (onSuccess?: () => void) => {
-      try {
-        if (
-          'safari' in window &&
-          // !swReg.pushManager &&
-          'pushNotification' in (window as any).safari
-        ) {
-          // Safari 15 and lower
-          const permissionData = (
-            window as any
-          ).safari.pushNotification.permission(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari`,
-            process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
-          );
-
-          checkPermissionSafari(permissionData);
-        } else {
-          const swReg = await navigator.serviceWorker.register('/sw.js');
-
-          const notificationPermission = await Notification.requestPermission();
-
-          if (notificationPermission === 'granted') {
-            try {
-              const subscription = await swReg.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: publicKey,
-              });
-              const sub = subscription?.toJSON();
-
-              if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
-                throw new Error('Something goes wrong');
-              }
-
-              const payload = new newnewapi.RegisterForWebPushRequest({
-                name: navigator.userAgent,
-                expiration: `${sub.expirationTime}`,
-                endpoint: sub.endpoint,
-                p256dh: sub.keys.p256dh,
-                auth: sub.keys.auth,
-              });
-
-              await webPushRegister(payload);
-
-              onSuccess?.();
-              setIsSubscribed(true);
-            } catch (err) {
-              console.error(err);
-            }
-          }
-        }
-      } catch (err) {
-        console.error(err);
+      if ('safari' in window && 'pushNotification' in (window as any).safari) {
+        subscribeSafari(onSuccess);
+      } else {
+        subscribeNonSafari(onSuccess);
       }
     },
-    [checkPermissionSafari, publicKey]
+    [subscribeSafari, subscribeNonSafari]
   );
 
-  const unsubscribe = useCallback(async () => {
+  // Unsubscribe from push notifications
+  const unsubscribeSafari = useCallback(() => {}, []);
+
+  const unsubscribeNonSafari = useCallback(async () => {
     try {
       const swReg = await navigator.serviceWorker.register('/sw.js');
-
-      if (
-        'safari' in window &&
-        !swReg.pushManager &&
-        'pushNotification' in (window as any).safari
-      ) {
-        setIsSubscribed(false);
-        return;
-      }
 
       const subscription = await swReg.pushManager.getSubscription();
       const sub = subscription?.toJSON();
@@ -247,10 +265,19 @@ const PushNotificationsContextProvider: React.FC<
     }
   }, []);
 
+  const unsubscribe = useCallback(async () => {
+    if ('safari' in window && 'pushNotification' in (window as any).safari) {
+      unsubscribeSafari();
+    } else {
+      unsubscribeNonSafari();
+    }
+  }, [unsubscribeSafari, unsubscribeNonSafari]);
+
   const contextValue = useMemo(
     () => ({
       isPermissionRequestModalOpen,
       inSubscribed,
+      isLoading,
       subscribe,
       unsubscribe,
       showPermissionRequestModal,
@@ -260,6 +287,7 @@ const PushNotificationsContextProvider: React.FC<
     [
       inSubscribed,
       isPermissionRequestModalOpen,
+      isLoading,
       showPermissionRequestModal,
       closePermissionRequestModal,
       subscribe,

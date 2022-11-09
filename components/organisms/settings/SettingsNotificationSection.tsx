@@ -22,8 +22,12 @@ const SettingsNotificationsSection = () => {
     newnewapi.INotificationState[] | null
   >(null);
 
-  const { inSubscribed, showPermissionRequestModal, unsubscribe } =
-    usePushNotifications();
+  const {
+    inSubscribed,
+    isLoading: isStateLoading,
+    showPermissionRequestModal,
+    unsubscribe,
+  } = usePushNotifications();
 
   const fetchMyNotificationState = async () => {
     if (isLoading) return;
@@ -82,7 +86,7 @@ const SettingsNotificationsSection = () => {
 
   return (
     <SWrapper>
-      {isLoading !== false ? (
+      {isLoading !== false || isStateLoading ? (
         <Lottie
           width={64}
           height={64}
@@ -93,40 +97,42 @@ const SettingsNotificationsSection = () => {
           }}
         />
       ) : (
-        myNotificationState !== null &&
-        myNotificationState.map((subsection, idx) => (
-          <SSubsection
-            key={`notificationsource-${subsection.notificationSource}`}
-          >
+        <>
+          {myNotificationState !== null &&
+            myNotificationState.map((subsection, idx) => (
+              <SSubsection
+                key={`notificationsource-${subsection.notificationSource}`}
+              >
+                <Text variant={2} weight={600}>
+                  {subsection.notificationSource &&
+                  subsection.notificationSource === 1
+                    ? t('Settings.sections.notifications.email')
+                    : t('Settings.sections.notifications.inApp')}
+                </Text>
+                <Toggle
+                  title={
+                    subsection.notificationSource &&
+                    subsection.notificationSource === 1
+                      ? t('Settings.sections.notifications.email')
+                      : t('Settings.sections.notifications.inApp')
+                  }
+                  checked={subsection.isEnabled ?? false}
+                  onChange={() => handleUpdateItem(idx)}
+                />
+              </SSubsection>
+            ))}
+          <SSubsection>
             <Text variant={2} weight={600}>
-              {subsection.notificationSource &&
-              subsection.notificationSource === 1
-                ? t('Settings.sections.notifications.email')
-                : t('Settings.sections.notifications.inApp')}
+              {t('Settings.sections.notifications.push')}
             </Text>
             <Toggle
-              title={
-                subsection.notificationSource &&
-                subsection.notificationSource === 1
-                  ? t('Settings.sections.notifications.email')
-                  : t('Settings.sections.notifications.inApp')
-              }
-              checked={subsection.isEnabled ?? false}
-              onChange={() => handleUpdateItem(idx)}
+              title={t('Settings.sections.notifications.push')}
+              checked={inSubscribed}
+              onChange={inSubscribed ? unsubscribe : showPermissionRequestModal}
             />
           </SSubsection>
-        ))
+        </>
       )}
-      <SSubsection>
-        <Text variant={2} weight={600}>
-          {t('Settings.sections.notifications.push')}
-        </Text>
-        <Toggle
-          title={t('Settings.sections.notifications.push')}
-          checked={inSubscribed}
-          onChange={inSubscribed ? unsubscribe : showPermissionRequestModal}
-        />
-      </SSubsection>
     </SWrapper>
   );
 };
