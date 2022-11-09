@@ -124,6 +124,7 @@ const SVotesAvailable = styled.h2`
   font-weight: 700;
 
   margin-bottom: 24px;
+  text-align: center;
 `;
 
 const VotesNumberSpan = styled.span`
