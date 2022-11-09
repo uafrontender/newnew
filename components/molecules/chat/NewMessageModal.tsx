@@ -94,7 +94,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const loadData = useCallback(
     async (paging: Paging): Promise<PaginatedResponse<newnewapi.IChatRoom>> => {
       const payload = new newnewapi.GetMyRoomsRequest({
-        myRole: user.userData?.options?.isOfferingSubscription ? null : 1,
+        myRole: user.userData?.options?.isOfferingBundles ? null : 1,
         paging,
       });
 
@@ -115,7 +115,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         nextPageToken: res.data.paging?.nextPageToken,
       };
     },
-    [user.userData?.options?.isOfferingSubscription]
+    [user.userData?.options?.isOfferingBundles]
   );
 
   const { data, loading, hasMore, loadMore } = usePagination(
@@ -316,7 +316,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
                 )
               ) : (
                 <SSectionContent ref={scrollRef}>
-                  {user.userData?.options?.isOfferingSubscription && (
+                  {user.userData?.options?.isOfferingBundles && (
                     <NewAnnouncement handleClick={createNewAnnouncement} />
                   )}
                   {chatroomsSortedList.length > 0 &&
