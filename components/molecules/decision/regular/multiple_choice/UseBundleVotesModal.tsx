@@ -33,7 +33,7 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
     if (!show) {
       setVotesToUse(bundleVotesLeft);
     }
-  }, [show]);
+  }, [show, bundleVotesLeft]);
 
   return (
     <Modal show={show} overlaydim additionalz={12} onClose={onClose}>
