@@ -19,23 +19,23 @@ import Button from '../../../../atoms/Button';
 import InlineSvg from '../../../../atoms/InlineSVG';
 import AcConfirmDeleteOptionModal from './AcConfirmDeleteOptionModal';
 import AcPickWinningOptionModal from './AcPickWinningOptionModal';
+import BlockUserModalPost from '../../common/BlockUserModalPost';
+import ReportModal, { ReportData } from '../../../chat/ReportModal';
 import AcOptionCardModerationEllipseMenu from './AcOptionCardModerationEllipseMenu';
+import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
 
 import { formatNumber } from '../../../../../utils/format';
 import { deleteAcOption } from '../../../../../api/endpoints/auction';
+import { reportEventOption } from '../../../../../api/endpoints/report';
+import getDisplayname from '../../../../../utils/getDisplayname';
 
 // Icons
 import BidIconLight from '../../../../../public/images/decision/bid-icon-light.png';
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
-
-import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
-import BlockUserModalPost from '../../common/BlockUserModalPost';
-import { reportEventOption } from '../../../../../api/endpoints/report';
-import ReportModal, { ReportData } from '../../../chat/ReportModal';
-import getDisplayname from '../../../../../utils/getDisplayname';
-import isBrowser from '../../../../../utils/isBrowser';
+import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
+import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -154,6 +154,18 @@ const AcOptionCardModeration: React.FunctionComponent<
                       }}
                     >
                       {getDisplayname(option.creator!!)}
+                      {option.creator.options?.isVerified && (
+                        <SInlineSvgVerificationIcon
+                          svg={
+                            !isWinner
+                              ? VerificationCheckmark
+                              : VerificationCheckmarkInverted
+                          }
+                          width='14px'
+                          height='14px'
+                          fill='none'
+                        />
+                      )}
                     </SSpanBiddersHighlighted>
                   </Link>
                 ) : (
@@ -172,6 +184,18 @@ const AcOptionCardModeration: React.FunctionComponent<
                     }}
                   >
                     {getDisplayname(option.creator!!)}
+                    {option.creator?.options?.isVerified && (
+                      <SInlineSvgVerificationIcon
+                        svg={
+                          !isWinner
+                            ? VerificationCheckmark
+                            : VerificationCheckmarkInverted
+                        }
+                        width='14px'
+                        height='14px'
+                        fill='none'
+                      />
+                    )}
                   </SSpanBiddersHighlighted>
                 )
               ) : (
@@ -192,6 +216,18 @@ const AcOptionCardModeration: React.FunctionComponent<
                     }}
                   >
                     {getDisplayname(option.whitelistSupporter!!)}
+                    {option.whitelistSupporter.options?.isVerified && (
+                      <SInlineSvgVerificationIcon
+                        svg={
+                          !isWinner
+                            ? VerificationCheckmark
+                            : VerificationCheckmarkInverted
+                        }
+                        width='14px'
+                        height='14px'
+                        fill='none'
+                      />
+                    )}
                   </SSpanBiddersHighlighted>
                 </Link>
               )}
@@ -748,4 +784,12 @@ const SBidDetailsModal = styled.div`
       'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
   }
+`;
+
+const SInlineSvgVerificationIcon = styled(InlineSvg)`
+  display: inline-flex;
+  margin-left: 3px;
+
+  position: relative;
+  top: 3px;
 `;

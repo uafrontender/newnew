@@ -277,6 +277,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         setOptionsLoading(false);
         setLoadingOptionsError((err as Error).message);
         console.error(err);
+      } finally {
+        setTriedLoading(true);
       }
     },
     [optionsLoading, loadingModalOpen, post.postUuid, sortOptions]
@@ -401,7 +403,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       setOptions([]);
       setOptionsNextPageToken('');
       fetchBids();
-      setTriedLoading(true);
     });
     return () => {
       clearTimeout(timer);

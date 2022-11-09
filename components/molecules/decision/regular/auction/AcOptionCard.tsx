@@ -40,12 +40,14 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import getDisplayname from '../../../../../utils/getDisplayname';
 import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
-
 import { reportEventOption } from '../../../../../api/endpoints/report';
 import {
   deleteAcOption,
   placeBidOnAuction,
 } from '../../../../../api/endpoints/auction';
+import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
+import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
+import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 
 // Icons
 import assets from '../../../../../constants/assets';
@@ -53,9 +55,8 @@ import BidIconLight from '../../../../../public/images/decision/bid-icon-light.p
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
-import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
-import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
-import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
+import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -469,6 +470,18 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                         ? t('me')
                         : t('my')
                       : getDisplayname(option.creator!!)}
+                    {option.creator.options?.isVerified && (
+                      <SInlineSvgVerificationIcon
+                        svg={
+                          !isBlue
+                            ? VerificationCheckmark
+                            : VerificationCheckmarkInverted
+                        }
+                        width='14px'
+                        height='14px'
+                        fill='none'
+                      />
+                    )}
                   </SSpanBiddersHighlighted>
                 </Link>
               ) : (
@@ -522,18 +535,39 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                     cursor: 'pointer',
                   }}
                 >
-                  {isMyBid
-                    ? option.supporterCount > 1
-                      ? t('me')
-                      : t('my')
-                    : getDisplayname(option.whitelistSupporter!!)}
+                  {getDisplayname(option.whitelistSupporter!!)}
+                  {option.whitelistSupporter.options?.isVerified && (
+                    <SInlineSvgVerificationIcon
+                      svg={
+                        !isBlue
+                          ? VerificationCheckmark
+                          : VerificationCheckmarkInverted
+                      }
+                      width='14px'
+                      height='14px'
+                      fill='none'
+                    />
+                  )}
                 </SSpanBiddersHighlighted>
               </Link>
             )}
-            {isSupportedByMe && !isMyBid ? (
-              <SSpanBiddersHighlighted className='spanHighlighted'>{`, ${t(
-                'me'
-              )}`}</SSpanBiddersHighlighted>
+            {(isSupportedByMe && !isMyBid) ||
+            (isSupportedByMe && !!option.whitelistSupporter) ? (
+              <Link
+                href={`/profile${
+                  user.userData?.options?.isCreator ? '/my-posts' : ''
+                }`}
+              >
+                <SSpanBiddersHighlighted
+                  className='spanHighlighted'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                >{`, ${t('me')}`}</SSpanBiddersHighlighted>
+              </Link>
             ) : null}
             {option.supporterCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? (
               <>
@@ -1222,4 +1256,12 @@ const SEllipseButtonMobile = styled(Button)`
   &:focus:enabled {
     background: transparent;
   }
+`;
+
+const SInlineSvgVerificationIcon = styled(InlineSvg)`
+  display: inline-flex;
+  margin-left: 3px;
+
+  position: relative;
+  top: 3px;
 `;

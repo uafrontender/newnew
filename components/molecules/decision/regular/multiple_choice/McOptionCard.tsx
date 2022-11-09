@@ -31,6 +31,9 @@ import { formatNumber } from '../../../../../utils/format';
 // Icons
 import VoteIconLight from '../../../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.png';
+import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
+import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
+
 import McOptionCardSelectVotesMenu from './McOptionCardSelectVotesMenu';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import McOptionCardSelectVotesModal from './McOptionCardSelectVotesModal';
@@ -537,6 +540,16 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubtracted}
                 amISubscribed={!!bundle}
+                amIVerified={user.userData?.options?.isVerified ?? false}
+                isOptionCreatorVerified={
+                  option.creator?.options?.isVerified ?? false
+                }
+                isFirstVoterVerified={
+                  option.firstVoter?.options?.isVerified ?? false
+                }
+                isWhitelistSupporterVerified={
+                  option.whitelistSupporter?.options?.isVerified ?? false
+                }
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -782,6 +795,16 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   supporterCount={option.supporterCount}
                   supporterCountSubtracted={supporterCountSubtracted}
                   amISubscribed={!!bundle}
+                  amIVerified={user.userData?.options?.isVerified ?? false}
+                  isOptionCreatorVerified={
+                    option.creator?.options?.isVerified ?? false
+                  }
+                  isFirstVoterVerified={
+                    option.firstVoter?.options?.isVerified ?? false
+                  }
+                  isWhitelistSupporterVerified={
+                    option.whitelistSupporter?.options?.isVerified ?? false
+                  }
                 />
               </SBiddersInfo>
             </SBidDetails>
@@ -873,6 +896,10 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   whiteListedSupporter?: string;
   whiteListedSupporterUsername?: string;
   amISubscribed?: boolean;
+  amIVerified?: boolean;
+  isOptionCreatorVerified?: boolean;
+  isFirstVoterVerified?: boolean;
+  isWhitelistSupporterVerified?: boolean;
 }> = ({
   isCreatorsBid,
   isSupportedByMe,
@@ -886,6 +913,10 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   whiteListedSupporter,
   whiteListedSupporterUsername,
   amISubscribed,
+  amIVerified,
+  isOptionCreatorVerified,
+  isFirstVoterVerified,
+  isWhitelistSupporterVerified,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-Post');
@@ -905,6 +936,14 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   }}
                 >
                   {whiteListedSupporter}
+                  {isWhitelistSupporterVerified && (
+                    <SInlineSvgVerificationIcon
+                      svg={VerificationCheckmark}
+                      width='14px'
+                      height='14px'
+                      fill='none'
+                    />
+                  )}
                 </SSpanBiddersHighlighted>
               </Link>
             ) : firstVoter ? (
@@ -917,6 +956,14 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   }}
                 >
                   {firstVoter}
+                  {isFirstVoterVerified && (
+                    <SInlineSvgVerificationIcon
+                      svg={VerificationCheckmark}
+                      width='14px'
+                      height='14px'
+                      fill='none'
+                    />
+                  )}
                 </SSpanBiddersHighlighted>
               </Link>
             ) : null}
@@ -954,6 +1001,14 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               }}
             >
               {supporterCountSubtracted > 0 ? t('me') : t('I')}
+              {amIVerified && (
+                <SInlineSvgVerificationIcon
+                  svg={VerificationCheckmarkInverted}
+                  width='14px'
+                  height='14px'
+                  fill='none'
+                />
+              )}
             </SSpanBiddersHighlighted>
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
@@ -992,6 +1047,14 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               }}
             >
               {optionCreator}
+              {isOptionCreatorVerified && (
+                <SInlineSvgVerificationIcon
+                  svg={VerificationCheckmark}
+                  width='14px'
+                  height='14px'
+                  fill='none'
+                />
+              )}
             </SSpanBiddersHighlighted>
           </Link>
         ) : (
@@ -1010,6 +1073,14 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               }}
             >
               {whiteListedSupporter}
+              {isWhitelistSupporterVerified && (
+                <SInlineSvgVerificationIcon
+                  svg={VerificationCheckmark}
+                  width='14px'
+                  height='14px'
+                  fill='none'
+                />
+              )}
             </SSpanBiddersHighlighted>
           </Link>
         )}
@@ -1047,6 +1118,14 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               }}
             >
               {optionCreator}
+              {isOptionCreatorVerified && (
+                <SInlineSvgVerificationIcon
+                  svg={VerificationCheckmarkInverted}
+                  width='14px'
+                  height='14px'
+                  fill='none'
+                />
+              )}
             </SSpanBiddersHighlighted>
           </Link>
         ) : (
@@ -1062,6 +1141,14 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               }}
             >
               {whiteListedSupporter}
+              {isWhitelistSupporterVerified && (
+                <SInlineSvgVerificationIcon
+                  svg={VerificationCheckmarkInverted}
+                  width='14px'
+                  height='14px'
+                  fill='none'
+                />
+              )}
             </SSpanBiddersHighlighted>
           </Link>
         )}
@@ -1139,7 +1226,7 @@ const SContainer = styled(motion.div)<{
 
   background-color: ${({ theme, $isBlue }) =>
     $isBlue
-      ? theme.colorsThemed.accent.blue
+      ? theme.colorsThemed.accent.yellow
       : theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
@@ -1176,15 +1263,16 @@ const SBidDetails = styled.div<{
     isBlue
       ? css`
           div {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
           }
 
           .spanRegular {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
+
             opacity: 0.6;
           }
           .spanHighlighted {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
           }
         `
       : null}
@@ -1199,7 +1287,7 @@ const SBidDetails = styled.div<{
 
     background-color: ${({ theme, isBlue }) =>
       isBlue
-        ? theme.colorsThemed.accent.blue
+        ? theme.colorsThemed.accent.yellow
         : theme.colorsThemed.background.tertiary};
 
     border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -1369,18 +1457,19 @@ const SSelectVotesModalCard = styled.div<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          background: ${({ theme }) => theme.colorsThemed.accent.blue};
+          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
           div {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
           }
 
           .spanRegular {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
+
             opacity: 0.6;
           }
           .spanHighlighted {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
           }
         `
       : null}
@@ -1482,4 +1571,12 @@ const SEllipseButtonMobile = styled(Button)`
   &:focus:enabled {
     background: transparent;
   }
+`;
+
+const SInlineSvgVerificationIcon = styled(InlineSvg)`
+  display: inline-flex;
+  margin-left: 3px;
+
+  position: relative;
+  top: 3px;
 `;
