@@ -649,7 +649,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         {/* Use Bundle votes vote modal */}
         {bundle?.votesLeft ? (
           <UseBundleVotesModal
-            isVisible={bundleVotesModalOpen}
+            show={bundleVotesModalOpen}
             bundleVotesLeft={bundle.votesLeft}
             optionText={option.text}
             handleVoteWithBundleVotes={handleVoteWithBundleVotes}
