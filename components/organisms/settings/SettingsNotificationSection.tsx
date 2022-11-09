@@ -14,6 +14,7 @@ import loadingAnimation from '../../../public/animations/logo-loading-blue.json'
 import Toggle from '../../atoms/Toggle';
 
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
+import PushNotificationAlert from '../PushNotificationsAlert';
 
 const SettingsNotificationsSection = () => {
   const { t } = useTranslation('page-Profile');
@@ -24,10 +25,14 @@ const SettingsNotificationsSection = () => {
 
   const {
     inSubscribed,
+    permission,
     isLoading: isStateLoading,
     showPermissionRequestModal,
     unsubscribe,
   } = usePushNotifications();
+
+  const [isPushNotificationAlertShown, setIsPushNotificationAlertShown] =
+    useState(false);
 
   const fetchMyNotificationState = async () => {
     if (isLoading) return;
@@ -84,6 +89,14 @@ const SettingsNotificationsSection = () => {
     });
   };
 
+  const turnOnNotification = () => {
+    if (permission === 'denied') {
+      setIsPushNotificationAlertShown(true);
+    } else {
+      showPermissionRequestModal();
+    }
+  };
+
   return (
     <SWrapper>
       {isLoading !== false || isStateLoading ? (
@@ -128,11 +141,15 @@ const SettingsNotificationsSection = () => {
             <Toggle
               title={t('Settings.sections.notifications.push')}
               checked={inSubscribed}
-              onChange={inSubscribed ? unsubscribe : showPermissionRequestModal}
+              onChange={inSubscribed ? unsubscribe : turnOnNotification}
             />
           </SSubsection>
         </>
       )}
+      <PushNotificationAlert
+        show={isPushNotificationAlertShown}
+        onClose={() => setIsPushNotificationAlertShown(false)}
+      />
     </SWrapper>
   );
 };

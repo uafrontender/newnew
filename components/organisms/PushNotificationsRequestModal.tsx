@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'next-i18next';
 
 import Modal from './Modal';
 import ModalPaper from './ModalPaper';
@@ -20,6 +21,7 @@ const PushNotificationsRequestModal: React.FC<
   IPushNotificationsRequestModal
 > = ({ isOpen, onClose, onConfirm }) => {
   const theme = useTheme();
+  const { t } = useTranslation('common');
 
   return (
     <Modal show={isOpen} overlaydim onClose={onClose}>
@@ -36,14 +38,11 @@ const PushNotificationsRequestModal: React.FC<
                 alt='NewNew logo'
               />
               <STitle variant={1} weight={700}>
-                Turn on notifications
+                {t('requestModal.title')}
               </STitle>
-              <SHint weight={600}>
-                Turn on web notifications and get alerts about new posts on
-                NewNew.
-              </SHint>
+              <SHint weight={600}>{t('requestModal.description')}</SHint>
               <Button view='primaryGrad' onClick={onConfirm}>
-                Turn on
+                {t('requestModal.button')}
               </Button>
             </SContent>
           </SModalPaper>
@@ -111,6 +110,7 @@ const STitle = styled(Text)`
 
   font-size: 24px;
   line-height: 32px;
+  text-align: center;
 `;
 
 const SHint = styled(Text)`

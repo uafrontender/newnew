@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'next-i18next';
 
 import Modal from './Modal';
 import ModalPaper from './ModalPaper';
@@ -19,6 +20,7 @@ const PushNotificationsSuccessModal: React.FC<
   IPushNotificationsSuccessModal
 > = ({ isOpen, onClose }) => {
   const theme = useTheme();
+  const { t } = useTranslation('common');
 
   return (
     <Modal show={isOpen} overlaydim onClose={onClose}>
@@ -35,13 +37,11 @@ const PushNotificationsSuccessModal: React.FC<
                 alt='NewNew logo'
               />
               <STitle variant={1} weight={700}>
-                Cheers!
+                {t('successModal.title')}
               </STitle>
-              <SHint weight={600}>
-                Thank you, we will keep you updated about new posts on NewNew.
-              </SHint>
+              <SHint weight={600}>{t('successModal.description')}</SHint>
               <Button view='primaryGrad' onClick={onClose}>
-                Cool!
+                {t('successModal.button')}
               </Button>
             </SContent>
           </SModalPaper>

@@ -243,5 +243,25 @@
       "dark": "深色",
       "auto": "自動"
     }
+  },
+  "pushNotification_NEED_TRANSLATION": {
+    "alert": {
+      "title": "Turn on web notifications by clicking the lock",
+      "titleSafari": "Web notifications can be chanched in Safari Notification preferences.",
+      "button": {
+        "more": "More",
+        "close": "Close"
+      }
+    },
+    "requestModal": {
+      "title": "Turn on notifications",
+      "description": "Turn on web notifications and get alerts about new posts on NewNew.",
+      "button": "Turn on"
+    },
+    "successModal": {
+      "title": "Cheers!",
+      "description": "Thank you, we will keep you updated about new posts on NewNew.",
+      "button": "Cool!"
+    }
   }
 }

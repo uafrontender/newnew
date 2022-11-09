@@ -11,6 +11,7 @@ const PushNotificationModalContainer: React.FC = React.memo(() => {
     closePermissionRequestModal,
     subscribe,
   } = usePushNotifications();
+
   const [
     isPushNotificationSuccessModalOpen,
     setIsPushNotificationSuccessModalOpen,
