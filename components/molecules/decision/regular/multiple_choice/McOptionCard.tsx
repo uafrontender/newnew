@@ -32,7 +32,6 @@ import { formatNumber } from '../../../../../utils/format';
 import VoteIconLight from '../../../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.png';
 import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
-import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
 
 import McOptionCardSelectVotesMenu from './McOptionCardSelectVotesMenu';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
@@ -990,20 +989,11 @@ export const RenderSupportersInfo: React.FunctionComponent<{
       <>
         {supporterCount > 0 ? (
           <>
-            <SSpanBiddersHighlighted
-              className='spanHighlighted'
-              style={{
-                ...(isSuggestedByMe || amISubscribed
-                  ? {
-                      color: theme.colorsThemed.accent.yellow,
-                    }
-                  : {}),
-              }}
-            >
+            <SSpanBiddersHighlighted className='spanHighlighted'>
               {supporterCountSubtracted > 0 ? t('me') : t('I')}
               {amIVerified && (
                 <SInlineSvgVerificationIcon
-                  svg={VerificationCheckmarkInverted}
+                  svg={VerificationCheckmark}
                   width='14px'
                   height='14px'
                   fill='none'
@@ -1120,7 +1110,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               {optionCreator}
               {isOptionCreatorVerified && (
                 <SInlineSvgVerificationIcon
-                  svg={VerificationCheckmarkInverted}
+                  svg={VerificationCheckmark}
                   width='14px'
                   height='14px'
                   fill='none'
@@ -1143,7 +1133,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               {whiteListedSupporter}
               {isWhitelistSupporterVerified && (
                 <SInlineSvgVerificationIcon
-                  svg={VerificationCheckmarkInverted}
+                  svg={VerificationCheckmark}
                   width='14px'
                   height='14px'
                   fill='none'
@@ -1184,7 +1174,6 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               e.stopPropagation();
             }}
             style={{
-              color: theme.colorsThemed.accent.yellow,
               cursor: 'pointer',
             }}
           >
@@ -1431,7 +1420,9 @@ const SSupportButtonDesktop = styled(Button)<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          border-left: #ffffff 1px solid;
+          border-left: ${({ theme }) => theme.colors.dark} 1px solid;
+          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+          color: ${({ theme }) => theme.colors.dark};
         `
       : null}
 
