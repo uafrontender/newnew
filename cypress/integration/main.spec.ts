@@ -19,9 +19,6 @@ context('Main flow', () => {
 
   before(() => {
     cy.task('log', `test seed is ${testSeed}`);
-    cy.intercept(`https://api-dev.newnew.co/**`, (req) => {
-      req.headers['x-from'] = Cypress.env('NEXT_PUBLIC_X_FROM_HEADER');
-    });
   });
 
   describe('Creator', () => {
@@ -100,7 +97,7 @@ context('Main flow', () => {
       cy.url().should('include', '/creator/dashboard');
     });
 
-    /*it('can navigate to creation panel', () => {
+    it('can navigate to creation panel', () => {
       cy.get('#create').should('be.enabled').click();
       cy.url().should('include', '/creation');
     });
@@ -198,7 +195,7 @@ context('Main flow', () => {
         });
     });
 
-    /*it('can create a crowdfunding', () => {
+    /* it('can create a crowdfunding', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creation`);
 
       // Waiting for an element to be attached to the DOM
@@ -239,9 +236,9 @@ context('Main flow', () => {
           const chunks = urlstring.split('/');
           crowdfundingId = chunks[chunks.length - 1];
         });
-    });*/
+    }); */
 
-    /*it('can enable bundles', () => {
+    it('can enable bundles', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creator/dashboard`);
       // Waiting for an element to be attached to the DOM
       cy.wait(2000);
@@ -383,17 +380,17 @@ context('Main flow', () => {
         USER_CARD_POSTAL_CODE
       ); */
 
-    /* cy.get('#paymentSuccess', {
+      /* cy.get('#paymentSuccess', {
         timeout: 15000,
       }).click(); */
 
-    // cy.get('#support-button-0').click();
-    // Click pay with bundle
+      // cy.get('#support-button-0').click();
+      // Click pay with bundle
 
-    // cy.get('#support-button-supported').click();
-  });
+      // cy.get('#support-button-supported').click();
+    });
 
-  /*it('can enter another post page and contribute to an event', () => {
+    it('can enter another post page and contribute to an event', () => {
       // Check that card is added just fine
     });
   });
@@ -592,5 +589,5 @@ context('Main flow', () => {
 
     // Can buy a bundle with the same card
     // Can spend votes from bundle
-  });*/
+  });
 });
