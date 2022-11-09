@@ -153,8 +153,8 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
         const arr = [] as newnewapi.IChatRoom[];
         chatRooms.forEach((chat) => {
           if (
-            chat.visavis?.nickname?.startsWith(searchText) ||
-            chat.visavis?.username?.startsWith(searchText)
+            chat.visavis?.user?.nickname?.startsWith(searchText) ||
+            chat.visavis?.user?.username?.startsWith(searchText)
           ) {
             arr.push(chat);
           }
@@ -198,12 +198,12 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
 
       let avatar = (
         <SUserAvatar>
-          <UserAvatar avatarUrl={chat.visavis?.avatarUrl ?? ''} />
+          <UserAvatar avatarUrl={chat.visavis?.user?.avatarUrl ?? ''} />
         </SUserAvatar>
       );
-      let chatName = chat.visavis?.nickname
-        ? chat.visavis?.nickname
-        : chat.visavis?.username;
+      let chatName = chat.visavis?.user?.nickname
+        ? chat.visavis?.user?.nickname
+        : chat.visavis?.user?.username;
 
       if (chat.kind === 4 && chat.myRole === 2) {
         avatar = (
@@ -247,7 +247,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
                 {chatName}
-                {chat.visavis?.options?.isVerified && chat.kind !== 4 && (
+                {chat.visavis?.user?.options?.isVerified && chat.kind !== 4 && (
                   <SInlineSVG
                     svg={VerificationCheckmark}
                     width='16px'

@@ -422,8 +422,8 @@ const ChatList: React.FC<IFunctionProps> = ({
         const arr = [] as newnewapi.IChatRoom[];
         chatRooms.forEach((chat) => {
           if (
-            chat.visavis?.nickname?.includes(searchText) ||
-            chat.visavis?.username?.includes(searchText)
+            chat.visavis?.user?.nickname?.includes(searchText) ||
+            chat.visavis?.user?.username?.includes(searchText)
           ) {
             arr.push(chat);
           }
@@ -556,12 +556,12 @@ const ChatList: React.FC<IFunctionProps> = ({
 
       let avatar = (
         <SUserAvatar>
-          <UserAvatar avatarUrl={chat.visavis?.avatarUrl ?? ''} />
+          <UserAvatar avatarUrl={chat.visavis?.user?.avatarUrl ?? ''} />
         </SUserAvatar>
       );
-      let chatName = chat.visavis?.nickname
-        ? chat.visavis?.nickname
-        : chat.visavis?.username;
+      let chatName = chat.visavis?.user?.nickname
+        ? chat.visavis?.user?.nickname
+        : chat.visavis?.user?.username;
 
       if (chat.kind === 4) {
         avatar = (
@@ -585,7 +585,8 @@ const ChatList: React.FC<IFunctionProps> = ({
           });
         } else {
           chatName = t('announcement.title', {
-            username: chat.visavis?.nickname || chat.visavis?.username,
+            username:
+              chat.visavis?.user?.nickname || chat.visavis?.user?.username,
           });
         }
       }
@@ -614,14 +615,15 @@ const ChatList: React.FC<IFunctionProps> = ({
               <SChatItemContentWrapper>
                 <SChatItemText variant={3} weight={600}>
                   {chatName}
-                  {chat.visavis?.options?.isVerified && chat.kind !== 4 && (
-                    <SInlineSVG
-                      svg={VerificationCheckmark}
-                      width='16px'
-                      height='16px'
-                      fill='none'
-                    />
-                  )}
+                  {chat.visavis?.user?.options?.isVerified &&
+                    chat.kind !== 4 && (
+                      <SInlineSVG
+                        svg={VerificationCheckmark}
+                        width='16px'
+                        height='16px'
+                        fill='none'
+                      />
+                    )}
                 </SChatItemText>
                 <SChatItemTime variant={3} weight={600}>
                   {chat.updatedAt &&

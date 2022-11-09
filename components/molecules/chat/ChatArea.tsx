@@ -120,13 +120,13 @@ const ChatArea: React.FC<IChatData> = ({
       try {
         const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
           creatorUuid:
-            chatRoom && chatRoom.visavis ? chatRoom.visavis.uuid : null,
+            chatRoom && chatRoom.visavis ? chatRoom.visavis.user?.uuid : null,
         });
 
         const res = await getSubscriptionStatus(getStatusPayload);
 
         if (res.data?.status?.notSubscribed) {
-          chatRoom!!.visavis?.options?.isOfferingSubscription
+          chatRoom!!.visavis?.user?.options?.isOfferingSubscription
             ? setIsSubscriptionExpired(true)
             : setIsMessagingDisabled(true);
         } else {
@@ -142,7 +142,7 @@ const ChatArea: React.FC<IChatData> = ({
       } else {
         // TODO: Load active sold bundles? Or abandon?
         const isMyActiveSub = mySubscribers.find(
-          (sub) => sub.user?.uuid === chatRoom.visavis?.uuid
+          (sub) => sub.user?.uuid === chatRoom.visavis?.user?.uuid
         );
         if (!isMyActiveSub) setIsMessagingDisabled(true);
       }
@@ -255,7 +255,7 @@ const ChatArea: React.FC<IChatData> = ({
   useEffect(() => {
     if (usersIBlocked.length > 0 && chatRoom) {
       const isBlocked = usersIBlocked.find(
-        (i) => i === chatRoom?.visavis?.uuid
+        (i) => i === chatRoom?.visavis?.user?.uuid
       );
 
       if (isBlocked) {
@@ -271,7 +271,7 @@ const ChatArea: React.FC<IChatData> = ({
   useEffect(() => {
     if (usersBlockedMe.length > 0 && chatRoom) {
       const isBlocked = usersBlockedMe.find(
-        (i) => i === chatRoom?.visavis?.uuid
+        (i) => i === chatRoom?.visavis?.user?.uuid
       );
       if (isBlocked) {
         setIsMessagingDisabled(true);
@@ -298,12 +298,13 @@ const ChatArea: React.FC<IChatData> = ({
     try {
       const payload = new newnewapi.MarkUserRequest({
         markAs: 4,
-        userUuid: chatRoom?.visavis?.uuid,
+        userUuid: chatRoom?.visavis?.user?.uuid,
       });
       const res = await markUser(payload);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
-      if (chatRoom?.visavis?.uuid) unblockUser(chatRoom.visavis.uuid);
+      if (chatRoom?.visavis?.user?.uuid)
+        unblockUser(chatRoom.visavis.user?.uuid);
     } catch (err) {
       console.error(err);
     }
@@ -415,11 +416,11 @@ const ChatArea: React.FC<IChatData> = ({
                 avatarUrl={user.userData?.avatarUrl ?? ''}
               />
             ) : (
-              <Link href={`/${chatRoom?.visavis?.username}`}>
+              <Link href={`/${chatRoom?.visavis?.user?.username}`}>
                 <a>
                   <SUserAvatar
                     mine={isMine}
-                    avatarUrl={chatRoom?.visavis?.avatarUrl ?? ''}
+                    avatarUrl={chatRoom?.visavis?.user?.avatarUrl ?? ''}
                   />
                 </a>
               </Link>
@@ -573,26 +574,28 @@ const ChatArea: React.FC<IChatData> = ({
                   ? t('announcement.title', {
                       username: isMyAnnouncement
                         ? user.userData?.nickname || user.userData?.username
-                        : chatRoom.visavis?.nickname ||
-                          chatRoom.visavis?.username,
+                        : chatRoom.visavis?.user?.nickname ||
+                          chatRoom.visavis?.user?.username,
                     })
                   : isMyAnnouncement
                   ? user.userData?.nickname || user.userData?.username
-                  : chatRoom.visavis?.nickname || chatRoom.visavis?.username
+                  : chatRoom.visavis?.user?.nickname ||
+                    chatRoom.visavis?.user?.username
               }
-              {chatRoom.visavis?.options?.isVerified && !isAnnouncement && (
-                <SInlineSVG
-                  svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
-                  fill='none'
-                />
-              )}
+              {chatRoom.visavis?.user?.options?.isVerified &&
+                !isAnnouncement && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                    fill='none'
+                  />
+                )}
             </SUserName>
             {!isAnnouncement && (
-              <Link href={`/${chatRoom?.visavis?.username}`}>
+              <Link href={`/${chatRoom?.visavis?.user?.username}`}>
                 <a style={{ display: 'flex' }}>
-                  <SUserAlias>{`@${chatRoom.visavis?.username}`}</SUserAlias>
+                  <SUserAlias>{`@${chatRoom.visavis?.user?.username}`}</SUserAlias>
                 </a>
               </Link>
             )}
@@ -659,7 +662,9 @@ const ChatArea: React.FC<IChatData> = ({
         <SAnnouncementHeader>
           <SAnnouncementText>
             {t('announcement.topMessageStart')}{' '}
-            <SAnnouncementName>{chatRoom.visavis?.username}</SAnnouncementName>{' '}
+            <SAnnouncementName>
+              {chatRoom.visavis?.user?.username}
+            </SAnnouncementName>{' '}
             {t('announcement.topMessageEnd')}
           </SAnnouncementText>
         </SAnnouncementHeader>
@@ -677,7 +682,9 @@ const ChatArea: React.FC<IChatData> = ({
           (chatRoom.myRole === 1 ? (
             <WelcomeMessage
               userAlias={
-                chatRoom.visavis?.username ? chatRoom.visavis?.username : ''
+                chatRoom.visavis?.user?.username
+                  ? chatRoom.visavis?.user?.username
+                  : ''
               }
             />
           ) : (
@@ -709,8 +716,8 @@ const ChatArea: React.FC<IChatData> = ({
           <AccountDeleted />
         ) : chatRoom && chatRoom.visavis ? (
           isMessagingDisabled ? (
-            <MessagingDisabled user={chatRoom.visavis} />
-          ) : isSubscriptionExpired && chatRoom.visavis?.uuid ? (
+            <MessagingDisabled user={chatRoom.visavis.user!!} />
+          ) : isSubscriptionExpired && chatRoom.visavis?.user?.uuid ? (
             <SubscriptionExpired />
           ) : null
         ) : null}
@@ -748,13 +755,15 @@ const ChatArea: React.FC<IChatData> = ({
       {chatRoom?.visavis && (
         <ReportModal
           show={confirmReportUser}
-          reportedDisplayname={getDisplayname(chatRoom.visavis)}
+          reportedDisplayname={getDisplayname(chatRoom.visavis?.user!!)}
           onClose={() => setConfirmReportUser(false)}
           onSubmit={async ({ reasons, message }) => {
-            if (chatRoom?.visavis?.uuid) {
-              await reportUser(chatRoom.visavis.uuid, reasons, message).catch(
-                (e) => console.error(e)
-              );
+            if (chatRoom?.visavis?.user?.uuid) {
+              await reportUser(
+                chatRoom.visavis.user?.uuid,
+                reasons,
+                message
+              ).catch((e) => console.error(e));
             }
           }}
         />
