@@ -384,11 +384,11 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
   // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, !!messages, true);
 
   const handleUserClick = useCallback(() => {
-    if (chatRoom?.visavis?.username) {
-      router.push(`/${chatRoom?.visavis?.username}`);
+    if (chatRoom?.visavis?.user?.username) {
+      router.push(`/${chatRoom?.visavis?.user?.username}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageText, chatRoom?.visavis?.username]);
+  }, [messageText, chatRoom?.visavis?.user?.username]);
 
   return (
     <SContainer>
@@ -407,7 +407,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           <SUserAvatar
             withClick
             onClick={handleUserClick}
-            avatarUrl={chatRoom?.visavis?.avatarUrl ?? ''}
+            avatarUrl={chatRoom?.visavis?.user?.avatarUrl ?? ''}
           />
         )}
         {chatRoom?.kind === 4 ? (
@@ -432,10 +432,10 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         ) : (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
-              {chatRoom?.visavis?.nickname
-                ? chatRoom?.visavis?.nickname
-                : chatRoom?.visavis?.username}
-              {chatRoom?.visavis?.options?.isVerified && (
+              {chatRoom?.visavis?.user?.nickname
+                ? chatRoom?.visavis?.user?.nickname
+                : chatRoom?.visavis?.user?.username}
+              {chatRoom?.visavis?.user?.options?.isVerified && (
                 <SInlineSVG
                   svg={VerificationCheckmark}
                   width='16px'
@@ -444,12 +444,12 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
                 />
               )}
             </SUserNickName>
-            <Link href={`/${chatRoom?.visavis?.username}`}>
+            <Link href={`/${chatRoom?.visavis?.user?.username}`}>
               <a>
                 <SUserName variant={2} weight={600}>
-                  {chatRoom?.visavis?.username
-                    ? `@${chatRoom?.visavis?.username}`
-                    : chatRoom?.visavis?.nickname}
+                  {chatRoom?.visavis?.user?.username
+                    ? `@${chatRoom?.visavis?.user?.username}`
+                    : chatRoom?.visavis?.user?.nickname}
                 </SUserName>
               </a>
             </Link>

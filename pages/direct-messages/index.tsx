@@ -52,13 +52,13 @@ export const Chat = () => {
         const chatRoom = res.data.rooms[0];
         let route = '';
 
-        if (chatRoom?.visavis?.username) {
+        if (chatRoom?.visavis?.user?.username) {
           route =
             chatRoom.kind === 1
               ? chatRoom.myRole === 1
-                ? `${chatRoom.visavis.username}-cr`
-                : chatRoom.visavis.username
-              : `${chatRoom.visavis.username}-announcement`;
+                ? `${chatRoom.visavis.user.username}-cr`
+                : chatRoom.visavis.user.username
+              : `${chatRoom.visavis.user.username}-announcement`;
         } else {
           route =
             chatRoom.kind === 4 && chatRoom.myRole === 2

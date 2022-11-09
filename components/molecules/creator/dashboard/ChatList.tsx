@@ -151,8 +151,8 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
         setSearchedRooms(null);
         const arr = chatRooms.filter(
           (chat) =>
-            chat.visavis?.nickname?.startsWith(searchText) ||
-            chat.visavis?.username?.startsWith(searchText)
+            chat.visavis?.user?.nickname?.startsWith(searchText) ||
+            chat.visavis?.user?.username?.startsWith(searchText)
         );
         setSearchedRooms(arr);
       }
@@ -175,12 +175,12 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
 
       let avatar = (
         <SUserAvatar>
-          <UserAvatar avatarUrl={chat.visavis?.avatarUrl ?? ''} />
+          <UserAvatar avatarUrl={chat.visavis?.user?.avatarUrl ?? ''} />
         </SUserAvatar>
       );
-      let chatName = chat.visavis?.nickname
-        ? chat.visavis?.nickname
-        : chat.visavis?.username;
+      let chatName = chat.visavis?.user?.nickname
+        ? chat.visavis?.user?.nickname
+        : chat.visavis?.user?.username;
 
       if (chat.kind === 4 && chat.myRole === 2) {
         avatar = (
@@ -203,7 +203,8 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
       }
       if (chat.kind === 4 && chat.myRole === 1) {
         chatName = t('announcement.title', {
-          username: chat.visavis?.nickname || chat.visavis?.username,
+          username:
+            chat.visavis?.user?.nickname || chat.visavis?.user?.username,
         });
       }
 
@@ -229,7 +230,7 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
                 {chatName}
-                {chat.visavis?.options?.isVerified && (
+                {chat.visavis?.user?.options?.isVerified && (
                   <SInlineSVG
                     svg={VerificationCheckmark}
                     width='16px'
