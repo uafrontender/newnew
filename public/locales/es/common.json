@@ -139,7 +139,7 @@
       "customOptions": "agregar opciones personalizadas a cualquier Superpoll",
       "chat": "chat privado 1 a 1",
       "buy": "Comprar por ${{amount}}",
-      "terms": "*los votos de los Bundles nunca expiran",
+      "terms": "*los votos de los bundles nunca expiran",
       "unit": {
         "month": "mes",
         "months": "meses"
