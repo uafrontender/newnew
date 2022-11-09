@@ -12,6 +12,8 @@ import { formatNumber } from '../../../utils/format';
 import BulletLine from './BulletLine';
 import Button from '../../atoms/Button';
 import AnimatedBackground from '../../atoms/AnimationBackground';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import InlineSvg from '../../atoms/InlineSVG';
 
 interface IBuyBundleModal {
   show: boolean;
@@ -66,6 +68,14 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
                       { creator: creator?.username },
                     ]}
                   />
+                  {creator.options?.isVerified && (
+                    <InlineSvg
+                      svg={VerificationCheckmark}
+                      width='24px'
+                      height='24px'
+                      fill='none'
+                    />
+                  )}
                 </SUsername>
               </SUserInfo>
               <SBundleInfo>
@@ -150,11 +160,15 @@ const SUserAvatar = styled(UserAvatar)`
   margin-right: 8px;
 `;
 
-const SUsername = styled.p`
+const SUsername = styled.div`
+  display: inline-flex;
+  align-items: center;
   color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
+
+  white-space: pre;
 `;
 
 const SLink = styled.a`
