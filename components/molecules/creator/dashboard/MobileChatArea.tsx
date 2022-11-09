@@ -235,8 +235,8 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
             <SUserAvatar
               mine={isMine}
               avatarUrl={
-                !isMine && chatRoom && chatRoom.visavis?.avatarUrl
-                  ? chatRoom.visavis?.avatarUrl
+                !isMine && chatRoom && chatRoom.visavis?.user?.avatarUrl
+                  ? chatRoom.visavis?.user?.avatarUrl
                   : user.userData?.avatarUrl
               }
             />
@@ -366,24 +366,26 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                   ? t('announcement.title', {
                       username: isMyAnnouncement
                         ? user.userData?.nickname || user.userData?.username
-                        : chatRoom.visavis?.nickname ||
-                          chatRoom.visavis?.username,
+                        : chatRoom.visavis?.user?.nickname ||
+                          chatRoom.visavis?.user?.username,
                     })
                   : isMyAnnouncement
                   ? user.userData?.nickname || user.userData?.username
-                  : chatRoom.visavis?.nickname || chatRoom.visavis?.username
+                  : chatRoom.visavis?.user?.nickname ||
+                    chatRoom.visavis?.user?.username
               }
-              {chatRoom.visavis?.options?.isVerified && !isAnnouncement && (
-                <SInlineSVG
-                  svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
-                />
-              )}
+              {chatRoom.visavis?.user?.options?.isVerified &&
+                !isAnnouncement && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                  />
+                )}
             </SUserName>
             <SUserAlias>
               {!isAnnouncement
-                ? `@${chatRoom.visavis?.username}`
+                ? `@${chatRoom.visavis?.user?.username}`
                 : `${
                     chatRoom.memberCount && chatRoom.memberCount > 0
                       ? chatRoom.memberCount

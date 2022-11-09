@@ -176,7 +176,7 @@ export const General: React.FC<IGeneral> = (props) => {
   };
 
   const chatButtonVisible =
-    isMobile && withChat && user.userData?.options?.isOfferingSubscription;
+    isMobile && withChat && user.userData?.options?.isOfferingBundles;
 
   const mobileNavigationVisible =
     isMobile && scrollDirection !== 'down' && !noMobieNavigation;

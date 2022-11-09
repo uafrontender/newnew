@@ -35,8 +35,8 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
           {`${t(
             `Settings.sections.transactions.actions.${transaction.transactionType}`
           )} `}
-          <Link href={`/${transaction.relatedCreator?.nicknameOrUsername}`}>
-            {`@${transaction.relatedCreator?.nicknameOrUsername}`}
+          <Link href={`/${transaction.relatedCreator?.username}`}>
+            {`@${transaction.relatedCreator?.username}`}
           </Link>
         </SAction>
       ) : (
@@ -44,8 +44,8 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
           {`${t(
             `Settings.sections.transactions.actions.${transaction.transactionType}`
           )} `}
-          <Link href={`/${transaction.relatedCreator?.nicknameOrUsername}`}>
-            {`@${transaction.relatedCreator?.nicknameOrUsername}`}
+          <Link href={`/${transaction.relatedCreator?.username}`}>
+            {`@${transaction.relatedCreator?.username}`}
           </Link>
           {`'s ${t(
             `Settings.sections.transactions.type.${transaction.transactionType}`

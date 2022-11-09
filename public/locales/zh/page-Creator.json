@@ -184,7 +184,7 @@
     "noMessagesFirstLine": "沒有訊息......",
     "typing": "正在輸入......",
     "toolbar": {
-      "searchPlaceholder": "搜索訊息或用戶"
+      "searchPlaceholder_NEED_TRANSLATION": "Search for users"
     },
     "modal": {
       "newMessage": {
