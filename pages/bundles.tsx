@@ -17,6 +17,7 @@ import GoBackButton from '../components/molecules/GoBackButton';
 import { useAppSelector } from '../redux-store/store';
 import InlineSvg from '../components/atoms/InlineSVG';
 import searchIcon from '../public/images/svg/icons/outlined/Search.svg';
+import closeIcon from '../public/images/svg/icons/outlined/Close.svg';
 import CreatorsList from '../components/organisms/search/CreatorsList';
 import usePagination, {
   PaginatedResponse,
@@ -234,6 +235,17 @@ export const Bundles: NextPage<IBundlesPage> = ({
               setSearchValue(e.target.value);
             }}
             placeholder={t('search.searchInputPlaceholder')}
+          />
+          <SRightInlineSVG
+            clickable
+            svg={closeIcon}
+            fill={theme.colorsThemed.text.secondary}
+            width={isMobile ? '20px' : '24px'}
+            height={isMobile ? '20px' : '24px'}
+            visible={searchValue !== ''}
+            onClick={() => {
+              setSearchValue('');
+            }}
           />
         </SInputWrapper>
         <SearchResultsTitle>
@@ -463,6 +475,16 @@ const SInputWrapper = styled.div`
   }
 `;
 
+const SLeftInlineSVG = styled(InlineSvg)`
+  min-width: 20px;
+  min-height: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    min-width: 24px;
+    min-height: 24px;
+  }
+`;
+
 const SInput = styled.input`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   width: 100%;
@@ -479,7 +501,8 @@ const SInput = styled.input`
   }
 `;
 
-const SLeftInlineSVG = styled(InlineSvg)`
+const SRightInlineSVG = styled(InlineSvg)<{ visible: boolean }>`
+  opacity: ${({ visible }) => (visible ? 1 : 0)};
   min-width: 20px;
   min-height: 20px;
 
