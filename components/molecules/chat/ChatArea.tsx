@@ -36,7 +36,6 @@ import { SocketContext } from '../../../contexts/socketContext';
 import { reportUser } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
 import isBrowser from '../../../utils/isBrowser';
-import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
 import validateInputText from '../../../utils/validateMessageText';
 
 const UserAvatar = dynamic(() => import('../UserAvatar'));
@@ -90,8 +89,6 @@ const ChatArea: React.FC<IChatData> = ({
   const [newMessage, setNewMessage] = useState<
     newnewapi.IChatMessage | null | undefined
   >();
-  // TODO: replace or abandon
-  const mySubscribers: any[] = [];
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
@@ -114,41 +111,6 @@ const ChatArea: React.FC<IChatData> = ({
   const [messagesLoading, setMessagesLoading] = useState(false);
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
-
-  useEffect(() => {
-    async function fetchIsSubscribed() {
-      try {
-        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-          creatorUuid:
-            chatRoom && chatRoom.visavis ? chatRoom.visavis.user?.uuid : null,
-        });
-
-        const res = await getSubscriptionStatus(getStatusPayload);
-
-        if (res.data?.status?.notSubscribed) {
-          chatRoom!!.visavis?.user?.options?.isOfferingSubscription
-            ? setIsSubscriptionExpired(true)
-            : setIsMessagingDisabled(true);
-        } else {
-          setIsSubscriptionExpired(false);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    if (chatRoom && chatRoom.visavis) {
-      if (chatRoom.myRole === 1) {
-        fetchIsSubscribed();
-      } else {
-        // TODO: Load active sold bundles? Or abandon?
-        const isMyActiveSub = mySubscribers.find(
-          (sub) => sub.user?.uuid === chatRoom.visavis?.user?.uuid
-        );
-        if (!isMyActiveSub) setIsMessagingDisabled(true);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatRoom]);
 
   const getChatMessages = useCallback(
     async (pageToken?: string) => {
@@ -193,6 +155,11 @@ const ChatArea: React.FC<IChatData> = ({
   useEffect(() => {
     if (chatRoom) {
       setLocalUserData((data) => ({ ...data, ...chatRoom.visavis }));
+      if (chatRoom && chatRoom.visavis) {
+        if (!chatRoom.visavis.isSubscriptionActive) {
+          setIsSubscriptionExpired(true);
+        }
+      }
 
       if (!chatRoom.lastMessage)
         setLocalUserData({ ...localUserData, justSubscribed: true });
@@ -718,7 +685,10 @@ const ChatArea: React.FC<IChatData> = ({
           isMessagingDisabled ? (
             <MessagingDisabled user={chatRoom.visavis.user!!} />
           ) : isSubscriptionExpired && chatRoom.visavis?.user?.uuid ? (
-            <SubscriptionExpired />
+            <SubscriptionExpired
+              user={chatRoom.visavis.user!!}
+              myRole={chatRoom.myRole!!}
+            />
           ) : null
         ) : null}
 

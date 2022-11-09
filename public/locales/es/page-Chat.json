@@ -5,7 +5,7 @@
   "chat": {
     "today": "Hoy",
     "placeholder": "Escribe un mensaje...",
-    "welcomeMessage": "¡Te has suscrito con éxito! Ahora puedes enviar un mensaje a",
+    "welcomeMessage_NEED_TRANSLATION": "You can now message",
     "noMessagesFirstLine": "No hay mensajes aquí todavía...",
     "noMessagesSecondLine": "Envia un mensaje para iniciar la conversación.",
     "typing": "Escribiendo..."
@@ -21,13 +21,13 @@
     "buttonText": "Desbloquear"
   },
   "subscriptionExpired": {
-    "title": "Suscripción caducada",
-    "message": "Solo los suscriptores pueden enviar mensajes. Renueva tu suscripción.",
-    "buttonText": "Renovar suscripción"
+    "title_NEED_TRANSLATION": "Private Messaging is expired",
+    "message_NEED_TRANSLATION": "Buy a new Superpoll bundle to message",
+    "buttonText_NEED_TRANSLATION": "Buy a bundle"
   },
   "messagingDisabled": {
     "title": "Mensajería desactivada",
-    "message": " desactivó temporalmente su suscripción. Vuelve a visitarnos pronto."
+    "message_NEED_TRANSLATION": " temporarily turned off their private messages. Check back soon!"
   },
   "accountDeleted": {
     "title": "Cuenta eliminada",
@@ -35,7 +35,7 @@
     "buttonText": "Eliminar conversación"
   },
   "toolbar": {
-    "searchPlaceholder": "Buscar mensajes o usuarios"
+    "searchPlaceholder": "Buscar usuarios"
   },
   "modal": {
     "blockUser": {
