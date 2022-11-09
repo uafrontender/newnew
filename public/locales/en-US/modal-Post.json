@@ -54,12 +54,13 @@
   },
   "paymentSuccessModal": {
     "title": {
-      "ac": "Your bid is in!",
-      "mc": "Your vote is in!",
+      "ac": "Bid is in!",
+      "mc": "Votes are in!",
+      "mc-single": "Vote is in!",
       "cf": "You’re backing this goal!"
     },
     "doneButton": "Sounds good!",
-    "ac": "{{postCreator}} will pick their favorite bid once time is up.",
+    "ac": "{{postCreator}} will pick their favorite one once the Bid is over.",
     "mc": "{{postCreator}} will do the option with the most amount of votes when the superpoll is over.",
     "cf": "{{postCreator}} will do the goal once it gets enough backers."
   },

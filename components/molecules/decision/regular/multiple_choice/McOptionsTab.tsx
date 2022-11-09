@@ -117,7 +117,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const [confirmCustomOptionModalOpen, setConfirmCustomOptionModalOpen] =
     useState(false);
-  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
+  const [paymentSuccessValue, setPaymentSuccessValue] = useState<
+    number | undefined
+  >(undefined);
 
   // Bundle modal
   const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
@@ -200,7 +202,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       setNewOptionText('');
       setSuggestNewMobileOpen(false);
       setLoadingModalOpen(false);
-      setPaymentSuccessModalOpen(true);
+      setPaymentSuccessValue(1);
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
@@ -291,8 +293,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 !option.creator || option.creator?.uuid === post.creator?.uuid
               }
               noAction={postStatus === 'failed'}
-              handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
-                setPaymentSuccessModalOpen(newValue)
+              handleSetPaymentSuccessValue={(newValue: number) =>
+                setPaymentSuccessValue(newValue)
               }
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
@@ -465,8 +467,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='mc'
-        isVisible={paymentSuccessModalOpen}
-        closeModal={() => setPaymentSuccessModalOpen(false)}
+        value={paymentSuccessValue}
+        isVisible={paymentSuccessValue !== undefined}
+        closeModal={() => setPaymentSuccessValue(undefined)}
       >
         {t('paymentSuccessModal.mc', {
           postCreator: postCreatorName,
