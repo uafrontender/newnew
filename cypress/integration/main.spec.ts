@@ -567,7 +567,7 @@ context('Main flow', () => {
       );
 
       cy.get('#submit-card').click();
-      cy.get('#add-card-success').click();
+      cy.get('#add-card-success', { timeout: 60000 }).click();
     });
 
     it('can enter a post page and contribute to a superpoll', () => {
