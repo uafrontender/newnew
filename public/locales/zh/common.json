@@ -147,11 +147,6 @@
       "payment": {
         "header": "{{creator}}的Superpoll Bundle"
       },
-      "paymentModalFooter": {
-        "body": "你的銀行卡信息將被暫時保留。只有當{{creator}}選擇了你的出價時，你才會被扣款。",
-        "terms": "條款",
-        "apply": "適用"
-      },
       "error": {
         "requestFailed": "請求失敗"
       }

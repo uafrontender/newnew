@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import { NextPage, NextPageContext } from 'next';
 import Head from 'next/head';
@@ -17,6 +17,7 @@ import GoBackButton from '../components/molecules/GoBackButton';
 import { useAppSelector } from '../redux-store/store';
 import InlineSvg from '../components/atoms/InlineSVG';
 import searchIcon from '../public/images/svg/icons/outlined/Search.svg';
+import closeIcon from '../public/images/svg/icons/outlined/Close.svg';
 import CreatorsList from '../components/organisms/search/CreatorsList';
 import usePagination, {
   PaginatedResponse,
@@ -78,15 +79,42 @@ export const Bundles: NextPage<IBundlesPage> = ({
         throw new Error(res.error?.message ?? 'Request failed');
       }
 
+      // Do not pass data about creator themselves to pagination controller
+      const filteredData = res.data.creators.filter(
+        (creator) => creator.uuid !== user.userData?.userUuid
+      );
+
       return {
-        nextData: res.data.creators,
+        nextData: filteredData,
         nextPageToken: res.data.paging?.nextPageToken,
       };
     },
-    [searchValue]
+    [searchValue, user.userData?.userUuid]
   );
 
   const paginatedCreators = usePagination(loadCreatorsData, 10);
+  // Quick fix for sorting creators with bundles
+  // TODO: add sorting and filtering options on BE
+  const sortedCreators = useMemo(
+    () =>
+      paginatedCreators.data.sort((a, b) => {
+        const aBundle = bundles?.find(
+          (bundle) => bundle.creator?.uuid === a.uuid
+        );
+        const bBundle = bundles?.find(
+          (bundle) => bundle.creator?.uuid === b.uuid
+        );
+        if (aBundle && !bBundle) {
+          return -1;
+        }
+
+        if (!aBundle && bBundle) {
+          return 1;
+        }
+        return 0;
+      }),
+    [paginatedCreators, bundles]
+  );
 
   const buyBundleAfterStripeRedirect = useCallback(async () => {
     if (!stripeSetupIntentClientSecret) {
@@ -235,14 +263,28 @@ export const Bundles: NextPage<IBundlesPage> = ({
             }}
             placeholder={t('search.searchInputPlaceholder')}
           />
+          <SRightInlineSVG
+            clickable
+            svg={closeIcon}
+            fill={theme.colorsThemed.text.secondary}
+            width={isMobile ? '20px' : '24px'}
+            height={isMobile ? '20px' : '24px'}
+            visible={searchValue !== ''}
+            onClick={() => {
+              setSearchValue('');
+            }}
+          />
         </SInputWrapper>
-        <SearchResultsTitle>{t('search.resultsTitle')}</SearchResultsTitle>
+        <SearchResultsTitle>
+          {/* TODO: add search results for... line? */}
+          {searchValue === '' && t('search.resultsTitle')}
+        </SearchResultsTitle>
         <SCardsSection>
           {/* Changes in number of Creators in the search result causes change in page height (Fix?) */}
           {/* TODO: add no results message (otherwise there is an empty space) */}
           <CreatorsList
             loading={paginatedCreators.loading}
-            collection={paginatedCreators.data}
+            collection={sortedCreators}
             onBuyBundleClicked={(creator) => {
               const creatorsBundle = bundles?.find(
                 (bundle) => bundle.creator?.uuid === creator.uuid
@@ -460,6 +502,16 @@ const SInputWrapper = styled.div`
   }
 `;
 
+const SLeftInlineSVG = styled(InlineSvg)`
+  min-width: 20px;
+  min-height: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    min-width: 24px;
+    min-height: 24px;
+  }
+`;
+
 const SInput = styled.input`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   width: 100%;
@@ -476,7 +528,8 @@ const SInput = styled.input`
   }
 `;
 
-const SLeftInlineSVG = styled(InlineSvg)`
+const SRightInlineSVG = styled(InlineSvg)<{ visible: boolean }>`
+  opacity: ${({ visible }) => (visible ? 1 : 0)};
   min-width: 20px;
   min-height: 20px;
 
