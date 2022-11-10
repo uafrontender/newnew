@@ -79,39 +79,41 @@ export const Bundles: NextPage<IBundlesPage> = ({
         throw new Error(res.error?.message ?? 'Request failed');
       }
 
+      // Do not pass data about creator themselves to pagination controller
+      const filteredData = res.data.creators.filter(
+        (creator) => creator.uuid !== user.userData?.userUuid
+      );
+
       return {
-        nextData: res.data.creators,
+        nextData: filteredData,
         nextPageToken: res.data.paging?.nextPageToken,
       };
     },
-    [searchValue]
+    [searchValue, user.userData?.userUuid]
   );
 
   const paginatedCreators = usePagination(loadCreatorsData, 10);
   // Quick fix for sorting creators with bundles
-  // Quick fix for not showing user in the list
   // TODO: add sorting and filtering options on BE
   const sortedCreators = useMemo(
     () =>
-      paginatedCreators.data
-        .filter((creator) => creator.uuid !== user.userData?.userUuid)
-        .sort((a, b) => {
-          const aBundle = bundles?.find(
-            (bundle) => bundle.creator?.uuid === a.uuid
-          );
-          const bBundle = bundles?.find(
-            (bundle) => bundle.creator?.uuid === b.uuid
-          );
-          if (aBundle && !bBundle) {
-            return -1;
-          }
+      paginatedCreators.data.sort((a, b) => {
+        const aBundle = bundles?.find(
+          (bundle) => bundle.creator?.uuid === a.uuid
+        );
+        const bBundle = bundles?.find(
+          (bundle) => bundle.creator?.uuid === b.uuid
+        );
+        if (aBundle && !bBundle) {
+          return -1;
+        }
 
-          if (!aBundle && bBundle) {
-            return 1;
-          }
-          return 0;
-        }),
-    [paginatedCreators, user.userData?.userUuid, bundles]
+        if (!aBundle && bBundle) {
+          return 1;
+        }
+        return 0;
+      }),
+    [paginatedCreators, bundles]
   );
 
   const buyBundleAfterStripeRedirect = useCallback(async () => {
