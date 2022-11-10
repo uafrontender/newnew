@@ -106,11 +106,12 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
 
       // pay with primary card
       if (
-        selectedPaymentMethod === PaymentMethodTypes.PrimaryCard &&
-        primaryCard
+        (selectedPaymentMethod === PaymentMethodTypes.PrimaryCard &&
+          primaryCard) ||
+        userData?.options?.isWhiteListed
       ) {
         await handlePayWithCard?.({
-          cardUuid: primaryCard.cardUuid as string,
+          cardUuid: primaryCard!!.cardUuid as string,
         });
 
         // pay with new card
@@ -181,7 +182,17 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   );
 
   return (
-    <SForm id='checkout-form' onSubmit={submitWithRecaptchaProtection}>
+    <SForm
+      id='checkout-form'
+      onSubmit={(e: React.ChangeEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (userData?.options?.isWhiteListed) {
+          handleSubmit();
+        } else {
+          submitWithRecaptchaProtection(e);
+        }
+      }}
+    >
       {/* Payment method */}
       <Text variant='subtitle'>{t('paymentMethodTitle')}</Text>
       {primaryCard && (
