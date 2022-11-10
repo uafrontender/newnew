@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
@@ -9,7 +9,7 @@ import ModalPaper from '../../../../organisms/ModalPaper';
 import { formatNumber } from '../../../../../utils/format';
 
 interface IUseBundleVotesModal {
-  isVisible: boolean;
+  show: boolean;
   optionText: string;
   bundleVotesLeft: number;
   handleVoteWithBundleVotes: (voteCount: number) => void;
@@ -17,7 +17,7 @@ interface IUseBundleVotesModal {
 }
 
 const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
-  isVisible,
+  show,
   optionText,
   bundleVotesLeft,
   handleVoteWithBundleVotes,
@@ -28,8 +28,15 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
     bundleVotesLeft
   );
 
+  // Clean when hidden
+  useEffect(() => {
+    if (!show) {
+      setVotesToUse(bundleVotesLeft);
+    }
+  }, [show, bundleVotesLeft]);
+
   return (
-    <Modal show={isVisible} overlaydim additionalz={12} onClose={onClose}>
+    <Modal show={show} overlaydim additionalz={12} onClose={onClose}>
       <SModalPaper onClose={onClose} isCloseButton>
         <SContainer>
           <BundleIcon src={assets.common.vote} alt='votes' />

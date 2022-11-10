@@ -9,6 +9,7 @@ import logo from '../../../../public/images/dashboard/logo-modal.png';
 import Headline from '../../../atoms/Headline';
 import Text from '../../../atoms/Text';
 import assets from '../../../../constants/assets';
+import AnimatedBackground from '../../../atoms/AnimationBackground';
 
 interface IFunction {
   show: boolean;
@@ -22,13 +23,10 @@ const SuccessBundleModal: React.FC<IFunction> = React.memo(
     const { t } = useTranslation('page-Creator');
     return (
       <>
-        <SModal
-          show={show}
-          additionalz={zIndex}
-          onClose={onClose}
-          overlaydim
-          isBundlesEnabled={isBundlesEnabled || false}
-        >
+        <Modal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
+          {isBundlesEnabled ? (
+            <AnimatedBackground src={assets.common.vote} alt='vote' />
+          ) : null}
           <SModalPaper onClose={onClose}>
             <Content id='success-bundle-modal'>
               <SImgHolder>
@@ -49,29 +47,13 @@ const SuccessBundleModal: React.FC<IFunction> = React.memo(
               </SDoneButton>
             </Content>
           </SModalPaper>
-        </SModal>
+        </Modal>
       </>
     );
   }
 );
 
 export default SuccessBundleModal;
-
-interface ISModal {
-  isBundlesEnabled: boolean;
-}
-
-const SModal = styled(Modal)<ISModal>`
-  // TODO: replace with animated background?
-  background: ${(props) =>
-    props.isBundlesEnabled ? `url(${assets.bundles.votesBackground})` : 'none'};
-  background-size: cover;
-  background-repeat: no-repeat;
-  &:before {
-    backdrop-filter: blur(100px);
-    -webkit-backdrop-filter: blur(100px);
-  }
-`;
 
 const SModalPaper = styled(ModalPaper)`
   width: 100%;

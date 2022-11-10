@@ -222,7 +222,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
+  const [paymentSuccessValue, setPaymentSuccessValue] = useState<
+    number | undefined
+  >();
 
   // Handlers
   const handleTogglePaymentModalOpen = () => {
@@ -322,7 +324,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-        setPaymentSuccessModalOpen(true);
+        setPaymentSuccessValue(paymentAmountInCents);
         handleSetSupportedBid('');
         setSupportBidAmount('');
         setIsSupportFormOpen(false);
@@ -342,6 +344,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       handleAddOrUpdateOptionFromResponse,
       t,
       setupIntent,
+      paymentAmountInCents,
     ]
   );
 
@@ -775,8 +778,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='ac'
-        isVisible={paymentSuccessModalOpen}
-        closeModal={() => setPaymentSuccessModalOpen(false)}
+        value={paymentSuccessValue}
+        isVisible={paymentSuccessValue !== undefined}
+        closeModal={() => setPaymentSuccessValue(undefined)}
       >
         {t('paymentSuccessModal.ac', {
           postCreator: postCreatorName,
