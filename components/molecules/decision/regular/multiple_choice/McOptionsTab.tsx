@@ -770,5 +770,7 @@ const SBundlesText = styled.p`
 `;
 
 const SHighlightedButton = styled(HighlightedButton)`
-  width: auto;
+  ${({ theme }) => theme.media.tablet} {
+    width: auto;
+  }
 `;
