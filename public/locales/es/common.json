@@ -139,18 +139,13 @@
       "customOptions": "agregar opciones personalizadas a cualquier Superpoll",
       "chat": "chat privado 1 a 1",
       "buy": "Comprar por ${{amount}}",
-      "terms": "*los votos de los Bundles nunca expiran",
+      "terms": "*los votos de los bundles nunca expiran",
       "unit": {
         "month": "mes",
         "months": "meses"
       },
       "payment": {
         "header": "Bundle de Superpoll de {{creator}}"
-      },
-      "paymentModalFooter": {
-        "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el {{creator}} elige tu oferta.",
-        "terms": "Términos",
-        "apply": "aplicar"
       },
       "error": {
         "requestFailed": "La solicitud ha fallado"

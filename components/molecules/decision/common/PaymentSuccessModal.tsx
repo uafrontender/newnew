@@ -4,26 +4,18 @@ import styled, { css, useTheme } from 'styled-components';
 
 import Button from '../../../atoms/Button';
 import Modal from '../../../organisms/Modal';
-import Headline from '../../../atoms/Headline';
 
 import { TPostType } from '../../../../utils/switchPostType';
 
 import assets from '../../../../constants/assets';
 import AnimatedBackground from '../../../atoms/AnimationBackground';
+import TicketSet from '../../../atoms/bundles/TicketSet';
+import { formatNumber } from '../../../../utils/format';
 
-const DARK_IMAGES: any = {
-  ac: assets.creation.darkAcStatic,
-  cf: assets.creation.darkCfStatic,
-  mc: assets.floatingAssets.darkVotes,
-};
-
-const LIGHT_IMAGES: any = {
-  ac: assets.creation.lightAcStatic,
-  cf: assets.creation.lightCfStatic,
-  mc: assets.floatingAssets.lightVotes,
-};
 interface IPaymentSuccessModal {
   postType: TPostType;
+  // TODO: add information about value for guest buying stuff related cases (no data now). Make field mandatory.
+  value?: number;
   isVisible: boolean;
   children: React.ReactNode;
   closeModal: () => void;
@@ -31,12 +23,63 @@ interface IPaymentSuccessModal {
 
 const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
   postType,
+  value,
   isVisible,
   children,
   closeModal,
 }) => {
   const { t } = useTranslation('modal-Post');
   const theme = useTheme();
+
+  function getModalImage(type: TPostType) {
+    switch (type) {
+      case 'ac':
+        return (
+          <SImageWrapper>
+            <SImg
+              src={
+                theme.name === 'light'
+                  ? assets.creation.lightAcStatic
+                  : assets.creation.darkAcStatic
+              }
+              alt='Post type'
+              postType={postType}
+            />
+          </SImageWrapper>
+        );
+      case 'mc':
+        return <STicketSet numberOFTickets={3} size={100} shift={27} />;
+      case 'cf':
+        return (
+          <SImageWrapper>
+            <SImg
+              src={
+                theme.name === 'light'
+                  ? assets.creation.lightCfStatic
+                  : assets.creation.darkCfStatic
+              }
+              alt='Post type'
+              postType={postType}
+            />
+          </SImageWrapper>
+        );
+      default:
+        throw new Error(`unknown post type ${type}`);
+    }
+  }
+
+  function getFormattedValue(valueToFormat: number, type: TPostType) {
+    switch (type) {
+      case 'ac':
+        return `$${formatNumber(valueToFormat / 100, true)}`;
+      case 'mc':
+        return `${formatNumber(valueToFormat, true)}`;
+      case 'cf':
+        return `$${formatNumber(valueToFormat / 100, true)}`;
+      default:
+        throw new Error(`unknown post type ${type}`);
+    }
+  }
 
   return (
     <Modal show={isVisible} additionalz={14} onClose={closeModal}>
@@ -47,19 +90,18 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
       )}
       <SContainer onClick={(e) => e.stopPropagation()}>
         <SModal>
-          <SImageWrapper>
-            <SImg
-              src={
-                theme.name === 'light'
-                  ? LIGHT_IMAGES[postType]
-                  : DARK_IMAGES[postType]
-              }
-              alt='Post type'
-              postType={postType}
-            />
-          </SImageWrapper>
-          <SModalTitle variant={6}>
-            {t(`paymentSuccessModal.title.${postType}`)}
+          {getModalImage(postType)}
+          {value && (
+            <SModalValue highlighted={postType === 'mc'}>
+              {getFormattedValue(value, postType)}
+            </SModalValue>
+          )}
+          <SModalTitle>
+            {t(
+              `paymentSuccessModal.title.${postType}${
+                postType === 'mc' && value === 1 ? '-single' : ''
+              }`
+            )}
           </SModalTitle>
           <SModalMessage>{children}</SModalMessage>
           <SDoneButton
@@ -105,9 +147,25 @@ const SModal = styled.div`
   line-height: 24px;
 `;
 
-const SModalTitle = styled(Headline)`
-  margin-bottom: 16px;
+const SModalValue = styled.h1<{ highlighted: boolean }>`
   text-align: center;
+  color: ${({ theme, highlighted }) =>
+    highlighted && theme.name === 'dark'
+      ? theme.colorsThemed.accent.yellow
+      : theme.colorsThemed.text.primary};
+  font-weight: 700;
+  font-size: 46px;
+  line-height: 64px;
+  margin-bottom: 6px;
+`;
+
+const SModalTitle = styled.h3`
+  text-align: center;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  margin-bottom: 16px;
 `;
 
 const SModalMessage = styled.p`
@@ -120,7 +178,14 @@ const SModalMessage = styled.p`
 `;
 
 const SDoneButton = styled(Button)`
-  width: 100%;
+  width: min-content;
+  margin: auto;
+`;
+
+const STicketSet = styled(TicketSet)`
+  margin-right: auto;
+  margin-bottom: 16px;
+  margin-left: auto;
 `;
 
 const SImageWrapper = styled.div`
