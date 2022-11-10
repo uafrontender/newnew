@@ -14,7 +14,7 @@ interface IChatEllipseModal {
   onUserBlock: () => void;
   onUserReport: () => void;
   isAnnouncement?: boolean;
-  visavis: newnewapi.IUser | null | undefined;
+  visavis: newnewapi.IVisavisUser | null | undefined;
 }
 
 const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
@@ -43,7 +43,7 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
   return (
     <EllipseModal show={isOpen} zIndex={zIndex} onClose={onClose}>
       {user.userData?.options?.isCreator && !isAnnouncement && visavis && (
-        <Link href={`/${visavis.username}`}>
+        <Link href={`/${visavis.user?.username}`}>
           <a>
             <EllipseModalButton>{t('ellipse.view')}</EllipseModalButton>
           </a>

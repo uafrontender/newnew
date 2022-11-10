@@ -5,7 +5,7 @@
   "chat": {
     "today": "Today",
     "placeholder": "Type a message...",
-    "welcomeMessage": "You successfully subscribed! Now you can send a message to",
+    "welcomeMessage": "You can now message",
     "noMessagesFirstLine": "No messages here yet...",
     "noMessagesSecondLine": "Send a message to start conversation.",
     "typing": "Typing..."
@@ -21,13 +21,13 @@
     "buttonText": "Unblock"
   },
   "subscriptionExpired": {
-    "title": "Subscription expired",
-    "message": "Only subscribers can send messages. Renew subscription.",
-    "buttonText": "Renew subscription"
+    "title": "Private Messaging is expired",
+    "message": "Buy a new Superpoll bundle to message",
+    "buttonText": "Buy a bundle"
   },
   "messagingDisabled": {
     "title": "Messaging turned off",
-    "message": " temporarily turned off their subscription. Check back soon!"
+    "message": " temporarily turned off their private messages. Check back soon!"
   },
   "accountDeleted": {
     "title": "Account deleted",
@@ -35,7 +35,7 @@
     "buttonText": "Delete chat"
   },
   "toolbar": {
-    "searchPlaceholder": "Search for messages or users"
+    "searchPlaceholder": "Search for users"
   },
   "modal": {
     "blockUser": {
