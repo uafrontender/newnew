@@ -1399,8 +1399,8 @@ const SSupportButton = styled(Button)<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          color: ${({ theme }) => theme.colors.dark};
-          background: #ffffff;
+          color: #ffffff;
+          background: ${({ theme }) => theme.colors.dark};
         `
       : null}
 `;
