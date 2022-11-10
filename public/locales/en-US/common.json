@@ -258,11 +258,12 @@
   },
   "pushNotification": {
     "alert": {
-      "title": "Turn on web notifications by clicking the lock",
-      "titleSafari": "Web notifications can be chanched in Safari Notification preferences.",
-      "button": {
-        "more": "More",
-        "close": "Close"
+      "safari": {
+        "title": "Turn on web notifications",
+        "subtitle": " Safari > Preferences > Notification."
+      },
+      "nonSafari": {
+        "title": "Turn on web notifications by clicking the lock"
       }
     },
     "requestModal": {

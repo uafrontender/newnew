@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
-import { useTranslation } from 'next-i18next';
+import { useTranslation, withTranslation } from 'next-i18next';
 
 import Modal from './Modal';
 import ModalPaper from './ModalPaper';
@@ -35,14 +35,16 @@ const PushNotificationsRequestModal: React.FC<
                     ? assets.common.lightAnimatedLogo
                     : assets.common.darkAnimatedLogo
                 }
-                alt='NewNew logo'
+                alt='NewNew'
               />
               <STitle variant={1} weight={700}>
-                {t('requestModal.title')}
+                {t('pushNotification.requestModal.title')}
               </STitle>
-              <SHint weight={600}>{t('requestModal.description')}</SHint>
+              <SHint weight={600}>
+                {t('pushNotification.requestModal.description')}
+              </SHint>
               <Button view='primaryGrad' onClick={onConfirm}>
-                {t('requestModal.button')}
+                {t('pushNotification.requestModal.button')}
               </Button>
             </SContent>
           </SModalPaper>
@@ -52,7 +54,7 @@ const PushNotificationsRequestModal: React.FC<
   );
 };
 
-export default PushNotificationsRequestModal;
+export default withTranslation(['common'])(PushNotificationsRequestModal);
 
 const MInitial = {
   opacity: 0,

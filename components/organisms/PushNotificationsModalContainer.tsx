@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
+import PushNotificationAlert from './PushNotificationsAlert';
 
 import PushNotificationsRequestModal from './PushNotificationsRequestModal';
 import PushNotificationsSuccessModal from './PushNotificationsSuccessModal';
@@ -8,7 +9,9 @@ import PushNotificationsSuccessModal from './PushNotificationsSuccessModal';
 const PushNotificationModalContainer: React.FC = React.memo(() => {
   const {
     isPermissionRequestModalOpen,
+    isPushNotificationAlertShown,
     closePermissionRequestModal,
+    closePushNotificationAlert,
     subscribe,
   } = usePushNotifications();
 
@@ -39,6 +42,10 @@ const PushNotificationModalContainer: React.FC = React.memo(() => {
           onClose={() => setIsPushNotificationSuccessModalOpen(false)}
         />
       )}
+      <PushNotificationAlert
+        show={isPushNotificationAlertShown}
+        onClose={closePushNotificationAlert}
+      />
     </>
   );
 });

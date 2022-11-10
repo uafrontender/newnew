@@ -240,7 +240,6 @@ const MyApp = (props: IMyApp): ReactElement => {
                                           <GlobalTheme initialTheme={colorMode}>
                                             <>
                                               <ToastContainer containerId='toast-container' />
-                                              <PushNotificationModalContainer />
                                               <VideoProcessingWrapper>
                                                 <ErrorBoundary>
                                                   {!pageProps.error ? (
@@ -260,6 +259,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                                                       }
                                                     />
                                                   )}
+                                                  <PushNotificationModalContainer />
                                                 </ErrorBoundary>
                                               </VideoProcessingWrapper>
                                               <ReCaptchaBadgeModal />

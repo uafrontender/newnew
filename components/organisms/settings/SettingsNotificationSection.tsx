@@ -14,7 +14,7 @@ import loadingAnimation from '../../../public/animations/logo-loading-blue.json'
 import Toggle from '../../atoms/Toggle';
 
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
-import PushNotificationAlert from '../PushNotificationsAlert';
+import isIOS from '../../../utils/isIOS';
 
 const SettingsNotificationsSection = () => {
   const { t } = useTranslation('page-Profile');
@@ -25,14 +25,10 @@ const SettingsNotificationsSection = () => {
 
   const {
     inSubscribed,
-    permission,
     isLoading: isStateLoading,
-    showPermissionRequestModal,
     unsubscribe,
+    requestPermission,
   } = usePushNotifications();
-
-  const [isPushNotificationAlertShown, setIsPushNotificationAlertShown] =
-    useState(false);
 
   const fetchMyNotificationState = async () => {
     if (isLoading) return;
@@ -90,11 +86,7 @@ const SettingsNotificationsSection = () => {
   };
 
   const turnOnNotification = () => {
-    if (permission === 'denied') {
-      setIsPushNotificationAlertShown(true);
-    } else {
-      showPermissionRequestModal();
-    }
+    requestPermission();
   };
 
   return (
@@ -134,22 +126,20 @@ const SettingsNotificationsSection = () => {
                 />
               </SSubsection>
             ))}
-          <SSubsection>
-            <Text variant={2} weight={600}>
-              {t('Settings.sections.notifications.push')}
-            </Text>
-            <Toggle
-              title={t('Settings.sections.notifications.push')}
-              checked={inSubscribed}
-              onChange={inSubscribed ? unsubscribe : turnOnNotification}
-            />
-          </SSubsection>
+          {!isIOS() && (
+            <SSubsection>
+              <Text variant={2} weight={600}>
+                {t('Settings.sections.notifications.push')}
+              </Text>
+              <Toggle
+                title={t('Settings.sections.notifications.push')}
+                checked={inSubscribed}
+                onChange={inSubscribed ? unsubscribe : turnOnNotification}
+              />
+            </SSubsection>
+          )}
         </>
       )}
-      <PushNotificationAlert
-        show={isPushNotificationAlertShown}
-        onClose={() => setIsPushNotificationAlertShown(false)}
-      />
     </SWrapper>
   );
 };

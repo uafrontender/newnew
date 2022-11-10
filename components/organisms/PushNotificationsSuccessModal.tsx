@@ -34,14 +34,16 @@ const PushNotificationsSuccessModal: React.FC<
                     ? assets.common.lightAnimatedLogo
                     : assets.common.darkAnimatedLogo
                 }
-                alt='NewNew logo'
+                alt='NewNew'
               />
               <STitle variant={1} weight={700}>
-                {t('successModal.title')}
+                {t('pushNotification.successModal.title')}
               </STitle>
-              <SHint weight={600}>{t('successModal.description')}</SHint>
+              <SHint weight={600}>
+                {t('pushNotification.successModal.description')}
+              </SHint>
               <Button view='primaryGrad' onClick={onClose}>
-                {t('successModal.button')}
+                {t('pushNotification.successModal.button')}
               </Button>
             </SContent>
           </SModalPaper>

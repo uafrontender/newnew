@@ -73,7 +73,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
       if (redirect === 'settings') {
         router.push('/profile/settings');
       } else {
-        router.push('/creator/dashboard');
+        router.push('/creator/dashboard?askPushNotificationPermission=true');
       }
     };
 

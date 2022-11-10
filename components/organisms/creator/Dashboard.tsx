@@ -5,7 +5,9 @@ import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import moment from 'moment';
+
 import { useAppSelector } from '../../../redux-store/store';
 import Lottie from '../../atoms/Lottie';
 import Headline from '../../atoms/Headline';
@@ -36,6 +38,7 @@ const AboutBundles = dynamic(
 
 export const Dashboard: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
+  const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -59,8 +62,11 @@ export const Dashboard: React.FC = React.memo(() => {
   const [hasMyPosts, setHasMyPosts] = useState(false);
 
   useEffect(() => {
-    promptUserWithPushNotificationsPermissionModal();
-  }, [promptUserWithPushNotificationsPermissionModal]);
+    if (router.query.askPushNotificationPermission === 'true') {
+      setTimeout(() => promptUserWithPushNotificationsPermissionModal(), 200);
+      router.replace(router.pathname);
+    }
+  }, [promptUserWithPushNotificationsPermissionModal, router]);
 
   useEffect(() => {
     if (user.creatorData?.isLoaded) {

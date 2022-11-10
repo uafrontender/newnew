@@ -16,6 +16,7 @@ import {
 import { cookiesInstance } from '../api/apiConfigs';
 import { useAppSelector } from '../redux-store/store';
 import isSafari from '../utils/isSafari';
+import isIOS from '../utils/isIOS';
 
 const WEB_PUSH_PROMPT_KEY =
   'isUserPromptedWithPushNotificationsPermissionModal';
@@ -26,21 +27,23 @@ export const PushNotificationsContext = createContext<{
   inSubscribed: boolean;
   isPermissionRequestModalOpen: boolean;
   isLoading: boolean;
-  permission: PermissionType;
+  isPushNotificationAlertShown: boolean;
   subscribe: (callback?: () => void) => void;
   unsubscribe: () => void;
-  showPermissionRequestModal: () => void;
+  requestPermission: () => void;
   closePermissionRequestModal: () => void;
+  closePushNotificationAlert: () => void;
   promptUserWithPushNotificationsPermissionModal: () => void;
 }>({
   inSubscribed: false,
   isPermissionRequestModalOpen: false,
   isLoading: false,
-  permission: 'default',
+  isPushNotificationAlertShown: false,
   subscribe: () => {},
   unsubscribe: () => {},
-  showPermissionRequestModal: () => {},
+  requestPermission: () => {},
   closePermissionRequestModal: () => {},
+  closePushNotificationAlert: () => {},
   promptUserWithPushNotificationsPermissionModal: () => {},
 });
 
@@ -57,13 +60,17 @@ const PushNotificationsContextProvider: React.FC<
 
   const [isLoading, setIsLoading] = useState(false);
   const [isPermissionRequestModalOpen, setIsPermissionRequestModalOpen] =
-    useState<boolean>(false);
+    useState(false);
+
+  const [isPushNotificationAlertShown, setIsPushNotificationAlertShown] =
+    useState(false);
 
   const [inSubscribed, setIsSubscribed] = useState(false);
   const [publicKey, setPublicKey] = useState('');
   const [hasWebPush, setHasWebPush] = useState(false);
-  const [permission, setPermission] = useState<PermissionType>('default');
+  const [permission, setPermission] = useState<PermissionType | null>(null);
 
+  // Get config
   useEffect(() => {
     const getWebConfig = async () => {
       try {
@@ -115,7 +122,11 @@ const PushNotificationsContextProvider: React.FC<
     };
 
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      if (isSafari() && 'pushNotification' in (window as any).safari) {
+      if (
+        isSafari() &&
+        (window as any).safari &&
+        'pushNotification' in (window as any).safari
+      ) {
         checkSubscriptionSafari();
       } else {
         checkSubscriptionNonSafari();
@@ -124,24 +135,29 @@ const PushNotificationsContextProvider: React.FC<
   }, [hasWebPush]);
 
   // Permission Modal
-  const showPermissionRequestModal = useCallback(() => {
+  const openPermissionRequestModal = useCallback(() => {
+    console.log('openPermissionRequestModal');
     setIsPermissionRequestModalOpen(true);
   }, []);
+
+  console.log(isPermissionRequestModalOpen, 'isPermissionRequestModalOpen');
 
   const closePermissionRequestModal = useCallback(() => {
     setIsPermissionRequestModalOpen(false);
   }, []);
 
   const promptUserWithPushNotificationsPermissionModal = useCallback(() => {
+    console.log(permission, 'permission');
     if (
       localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' &&
       permission === 'default' &&
-      user.loggedIn
+      user.loggedIn &&
+      !isIOS()
     ) {
       localStorage.setItem(WEB_PUSH_PROMPT_KEY, 'true');
-      showPermissionRequestModal();
+      openPermissionRequestModal();
     }
-  }, [showPermissionRequestModal, permission, user.loggedIn]);
+  }, [openPermissionRequestModal, permission, user.loggedIn]);
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -182,6 +198,24 @@ const PushNotificationsContextProvider: React.FC<
     permission,
   ]);
 
+  // Push notification alert
+  const openPushNotificationAlert = useCallback(() => {
+    setIsPushNotificationAlertShown(true);
+  }, []);
+
+  const closePushNotificationAlert = useCallback(() => {
+    setIsPushNotificationAlertShown(false);
+  }, []);
+
+  // Request permission
+  const requestPermission = useCallback(() => {
+    if (permission === 'denied') {
+      openPushNotificationAlert();
+    } else {
+      openPermissionRequestModal();
+    }
+  }, [openPushNotificationAlert, openPermissionRequestModal, permission]);
+
   // Subscribe to push notifications
   const checkPermissionSafari = useCallback(
     async (permissionData: any, onSuccess?: () => void) => {
@@ -207,13 +241,13 @@ const PushNotificationsContextProvider: React.FC<
         }
       } catch (err: any) {
         if (err.message === 'Push notification prompting has been disabled.') {
-          // TODO: show alert
+          openPushNotificationAlert();
         } else {
           console.error(err);
         }
       }
     },
-    [publicKey]
+    [publicKey, openPushNotificationAlert]
   );
 
   const subscribeSafari = useCallback(
@@ -222,7 +256,6 @@ const PushNotificationsContextProvider: React.FC<
         const permissionData = (
           window as any
         ).safari.pushNotification.permission(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari`,
           process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
         );
 
@@ -240,6 +273,8 @@ const PushNotificationsContextProvider: React.FC<
         const swReg = await navigator.serviceWorker.register('/sw.js');
 
         const notificationPermission = await Notification.requestPermission();
+
+        console.log(notificationPermission, 'notificationPermission');
 
         if (notificationPermission === 'granted') {
           const subscription = await swReg.pushManager.subscribe({
@@ -268,6 +303,7 @@ const PushNotificationsContextProvider: React.FC<
 
         setPermission(notificationPermission);
       } catch (err) {
+        alert(err.message);
         console.error(err);
       }
     },
@@ -276,7 +312,11 @@ const PushNotificationsContextProvider: React.FC<
 
   const subscribe = useCallback(
     async (onSuccess?: () => void) => {
-      if (isSafari() && 'pushNotification' in (window as any).safari) {
+      if (
+        isSafari() &&
+        (window as any).safari &&
+        'pushNotification' in (window as any).safari
+      ) {
         subscribeSafari(onSuccess);
       } else {
         subscribeNonSafari(onSuccess);
@@ -286,7 +326,22 @@ const PushNotificationsContextProvider: React.FC<
   );
 
   // Unsubscribe from push notifications
-  const unsubscribeSafari = useCallback(() => {}, []);
+  const unsubscribeSafari = useCallback(async () => {
+    try {
+      const permissionData = (window as any).safari.pushNotification.permission(
+        process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
+      );
+
+      const payload = new newnewapi.UnRegisterForWebPushRequest({
+        endpoint: permissionData.deviceToken,
+      });
+      await webPushUnRegister(payload);
+
+      setIsSubscribed(false);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
 
   const unsubscribeNonSafari = useCallback(async () => {
     try {
@@ -313,7 +368,11 @@ const PushNotificationsContextProvider: React.FC<
   }, []);
 
   const unsubscribe = useCallback(async () => {
-    if (isSafari() && 'pushNotification' in (window as any).safari) {
+    if (
+      isSafari() &&
+      (window as any).safari &&
+      'pushNotification' in (window as any).safari
+    ) {
       unsubscribeSafari();
     } else {
       unsubscribeNonSafari();
@@ -322,23 +381,25 @@ const PushNotificationsContextProvider: React.FC<
 
   const contextValue = useMemo(
     () => ({
-      isPermissionRequestModalOpen,
       inSubscribed,
       isLoading,
-      permission,
+      isPermissionRequestModalOpen,
+      isPushNotificationAlertShown,
+      requestPermission,
       subscribe,
       unsubscribe,
-      showPermissionRequestModal,
       closePermissionRequestModal,
+      closePushNotificationAlert,
       promptUserWithPushNotificationsPermissionModal,
     }),
     [
       inSubscribed,
-      isPermissionRequestModalOpen,
       isLoading,
-      permission,
-      showPermissionRequestModal,
+      isPermissionRequestModalOpen,
+      isPushNotificationAlertShown,
+      requestPermission,
       closePermissionRequestModal,
+      closePushNotificationAlert,
       subscribe,
       unsubscribe,
       promptUserWithPushNotificationsPermissionModal,

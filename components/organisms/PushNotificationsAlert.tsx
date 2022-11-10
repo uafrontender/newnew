@@ -5,8 +5,6 @@ import { useTranslation } from 'next-i18next';
 import Text from '../atoms/Text';
 import InlineSVG from '../atoms/InlineSVG';
 
-import { useAppSelector } from '../../redux-store/store';
-
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import lockIcon from '../../public/images/svg/icons/filled/Lock.svg';
 import arrowIcon from '../../public/images/svg/icons/outlined/ArrowRight.svg';
@@ -25,14 +23,7 @@ const PushNotificationAlert: React.FC<IPushNotificationAlert> = ({
   onClose,
 }) => {
   const { t } = useTranslation('common');
-  const { resizeMode } = useAppSelector((state) => state.ui);
   const theme = useTheme();
-
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
-
-  console.log(isMobile);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -76,48 +67,38 @@ const PushNotificationAlert: React.FC<IPushNotificationAlert> = ({
             onClick={onClose}
           />
         </SLockIconHolder>
-        <SText variant={3} weight={600}>
-          {isSafari()
-            ? t('pushNotification.alert.titleSafari')
-            : t('pushNotification.alert.title')}
-        </SText>
-        {!isSafari() && (
-          <SCloseIconHolder>
-            <InlineSVG
-              clickable
-              scaleOnClick
-              svg={closeIcon}
-              fill={theme.colors.white}
-              width='16px'
-              height='16px'
-              onClick={onClose}
-            />
-          </SCloseIconHolder>
-        )}
-        {isSafari() && (
-          <SButtonsWrapper>
-            <a
-              href='https://support.apple.com/en-gb/guide/safari/sfri40734/mac'
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              <SButton>{t('pushNotification.alert.button.more')}</SButton>
-            </a>
-            <SSeparator />
-            <SButton onClick={onClose}>
-              {t('pushNotification.alert.button.close')}
-            </SButton>
-          </SButtonsWrapper>
-        )}
+        <SContent>
+          <STitle variant={3} weight={600}>
+            {isSafari()
+              ? t('pushNotification.alert.safari.title')
+              : t('pushNotification.alert.nonSafari.title')}
+          </STitle>
+          {isSafari() && (
+            <SSubtitle variant='subtitle'>
+              {t('pushNotification.alert.safari.subtitle')}
+            </SSubtitle>
+          )}
+        </SContent>
+        <SCloseIconHolder>
+          <InlineSVG
+            clickable
+            scaleOnClick
+            svg={closeIcon}
+            fill={theme.colors.white}
+            width='16px'
+            height='16px'
+            onClick={onClose}
+          />
+        </SCloseIconHolder>
       </SAlert>
-      <SArrowIconHolder alertWidth={containerRef?.current?.offsetWidth || 0}>
+      <SArrowIconHolder>
         <InlineSVG
           clickable
           scaleOnClick
           svg={arrowIcon}
           fill={theme.colors.blue}
-          width='140px'
-          height='190px'
+          width='200px'
+          height='200px'
           onClick={onClose}
         />
       </SArrowIconHolder>
@@ -143,13 +124,15 @@ const SContainer = styled.div`
 
 const SAlert = styled.div`
   position: fixed;
-  top: 22px;
-  left: 85px;
+  top: 16px;
+  left: 16px;
+  max-width: calc(100% - 32px);
   display: flex;
   align-items: center;
   justify-content: center;
   height: 64px;
   padding-left: 25px;
+  padding-right: 40px;
   overflow: hidden;
   z-index: 6;
 
@@ -158,19 +141,41 @@ const SAlert = styled.div`
       ? theme.colorsThemed.background.secondary
       : theme.colors.white};
   border-radius: ${({ theme }) => theme.borderRadius.small};
-  border-left: ${({ theme }) => `8px solid ${theme.colorsThemed.accent.blue}`};
+
+  &:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+
+    background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
+  }
 
   ${({ theme }) => theme.media.tablet} {
     min-width: 422px;
     max-width: 422px;
+
+    top: 22px;
+    left: 85px;
   }
 `;
 
-const SText = styled(Text)`
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  z-index: 2;
+const SContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+`;
+
+const STitle = styled(Text)`
   overflow: hidden;
-  position: relative;
+  text-overflow: ellipsis;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+`;
+
+const SSubtitle = styled(Text)`
+  overflow: hidden;
   text-overflow: ellipsis;
 `;
 
@@ -197,52 +202,13 @@ const SLockIconHolder = styled.div`
   margin-right: 10px;
 `;
 
-const SArrowIconHolder = styled.div<{ alertWidth: number }>`
+const SArrowIconHolder = styled.div`
   position: absolute;
   top: 86px;
   transform: rotate(-90deg) translateY(-50%);
-  left: ${({ alertWidth }) => `calc(85px + ${alertWidth}px/ 2)`};
-`;
+  left: 50%;
 
-const SButtonsWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  border-left: ${({ theme }) =>
-    `1px solid ${theme.colorsThemed.background.outlines2}`};
-`;
-
-const SButton = styled.button`
-  background: transparent;
-  border: none;
-
-  width: 81px;
-  height: 32px;
-
-  font-size: 12px;
-  line-height: 16px;
-  font-weight: bold;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  opacity: 0.6;
-
-  transition: 0.2s linear;
-  cursor: pointer;
-
-  &:first-child {
-    border-top-right-radius: ${({ theme }) => theme.borderRadius.small};
+  ${({ theme }) => theme.media.tablet} {
+    left: calc(85px + 422px / 2);
   }
-
-  &:last-child {
-    border-bottom-right-radius: ${({ theme }) => theme.borderRadius.small};
-  }
-
-  &:hover {
-    opacity: 1;
-  }
-`;
-
-const SSeparator = styled.div`
-  height: 1px;
-  width: 100%;
-  background: ${({ theme }) => theme.colorsThemed.background.outlines2};
 `;
