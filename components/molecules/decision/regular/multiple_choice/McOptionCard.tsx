@@ -917,7 +917,6 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   isFirstVoterVerified,
   isWhitelistSupporterVerified,
 }) => {
-  const theme = useTheme();
   const { t } = useTranslation('modal-Post');
   const user = useAppSelector((state) => state.user);
 
@@ -1036,10 +1035,6 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 e.stopPropagation();
               }}
               style={{
-                color:
-                  theme.name === 'dark'
-                    ? theme.colorsThemed.accent.yellow
-                    : theme.colors.dark,
                 cursor: 'pointer',
               }}
             >
@@ -1062,10 +1057,6 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 e.stopPropagation();
               }}
               style={{
-                color:
-                  theme.name === 'dark'
-                    ? theme.colorsThemed.accent.yellow
-                    : theme.colors.dark,
                 cursor: 'pointer',
               }}
             >
@@ -1110,7 +1101,6 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 e.stopPropagation();
               }}
               style={{
-                color: theme.colorsThemed.accent.yellow,
                 cursor: 'pointer',
               }}
             >
@@ -1133,7 +1123,6 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 e.stopPropagation();
               }}
               style={{
-                color: theme.colorsThemed.accent.yellow,
                 cursor: 'pointer',
               }}
             >

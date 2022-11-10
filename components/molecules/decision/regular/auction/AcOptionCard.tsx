@@ -450,18 +450,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                       e.stopPropagation();
                     }}
                     style={{
-                      ...(!isMyBid && option.isCreatedBySubscriber
-                        ? {
-                            color:
-                              theme.name === 'dark'
-                                ? theme.colorsThemed.accent.yellow
-                                : theme.colors.dark,
-                          }
-                        : isMyBid && option.isCreatedBySubscriber
-                        ? {
-                            color: theme.colorsThemed.accent.yellow,
-                          }
-                        : {}),
                       cursor: 'pointer',
                     }}
                   >
@@ -490,20 +478,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                   onClick={(e) => {
                     e.stopPropagation();
                   }}
-                  style={{
-                    ...(!isMyBid && option.isCreatedBySubscriber
-                      ? {
-                          color:
-                            theme.name === 'dark'
-                              ? theme.colorsThemed.accent.yellow
-                              : theme.colors.dark,
-                        }
-                      : isMyBid && option.isCreatedBySubscriber
-                      ? {
-                          color: theme.colorsThemed.accent.yellow,
-                        }
-                      : {}),
-                  }}
                 >
                   {isMyBid
                     ? option.supporterCount > 1
@@ -520,18 +494,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                     e.stopPropagation();
                   }}
                   style={{
-                    ...(!isMyBid && option.isCreatedBySubscriber
-                      ? {
-                          color:
-                            theme.name === 'dark'
-                              ? theme.colorsThemed.accent.yellow
-                              : theme.colors.dark,
-                        }
-                      : isMyBid && option.isCreatedBySubscriber
-                      ? {
-                          color: theme.colorsThemed.accent.yellow,
-                        }
-                      : {}),
                     cursor: 'pointer',
                   }}
                 >

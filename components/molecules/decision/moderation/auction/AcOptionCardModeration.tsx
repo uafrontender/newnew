@@ -142,15 +142,7 @@ const AcOptionCardModeration: React.FunctionComponent<
                       className='spanHighlighted'
                       onClick={(e) => e.stopPropagation()}
                       style={{
-                        ...(!isWinner && option.isCreatedBySubscriber
-                          ? {
-                              color:
-                                theme.name === 'dark'
-                                  ? theme.colorsThemed.accent.yellow
-                                  : theme.colors.dark,
-                              cursor: 'pointer',
-                            }
-                          : {}),
+                        cursor: 'pointer',
                       }}
                     >
                       {getDisplayname(option.creator!!)}
@@ -172,16 +164,6 @@ const AcOptionCardModeration: React.FunctionComponent<
                   <SSpanBiddersHighlighted
                     className='spanHighlighted'
                     onClick={(e) => e.stopPropagation()}
-                    style={{
-                      ...(!isWinner && option.isCreatedBySubscriber
-                        ? {
-                            color:
-                              theme.name === 'dark'
-                                ? theme.colorsThemed.accent.yellow
-                                : theme.colors.dark,
-                          }
-                        : {}),
-                    }}
                   >
                     {getDisplayname(option.creator!!)}
                     {option.creator?.options?.isVerified && (
@@ -204,15 +186,7 @@ const AcOptionCardModeration: React.FunctionComponent<
                     className='spanHighlighted'
                     onClick={(e) => e.stopPropagation()}
                     style={{
-                      ...(!isWinner && option.isCreatedBySubscriber
-                        ? {
-                            color:
-                              theme.name === 'dark'
-                                ? theme.colorsThemed.accent.yellow
-                                : theme.colors.dark,
-                            cursor: 'pointer',
-                          }
-                        : {}),
+                      cursor: 'pointer',
                     }}
                   >
                     {getDisplayname(option.whitelistSupporter!!)}
@@ -367,15 +341,7 @@ const AcOptionCardModeration: React.FunctionComponent<
                   className='spanHighlighted'
                   onClick={(e) => e.stopPropagation()}
                   style={{
-                    ...(!isWinner && option.isCreatedBySubscriber
-                      ? {
-                          color:
-                            theme.name === 'dark'
-                              ? theme.colorsThemed.accent.yellow
-                              : theme.colors.dark,
-                          cursor: 'pointer',
-                        }
-                      : {}),
+                    cursor: 'pointer',
                   }}
                 >
                   {option.creator?.nickname ?? option.creator?.username}
@@ -385,16 +351,6 @@ const AcOptionCardModeration: React.FunctionComponent<
               <SSpanBiddersHighlighted
                 className='spanHighlighted'
                 onClick={(e) => e.stopPropagation()}
-                style={{
-                  ...(!isWinner && option.isCreatedBySubscriber
-                    ? {
-                        color:
-                          theme.name === 'dark'
-                            ? theme.colorsThemed.accent.yellow
-                            : theme.colors.dark,
-                      }
-                    : {}),
-                }}
               >
                 {option.creator?.nickname ?? option.creator?.username}
               </SSpanBiddersHighlighted>
