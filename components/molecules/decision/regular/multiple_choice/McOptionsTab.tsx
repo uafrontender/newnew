@@ -117,7 +117,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const [confirmCustomOptionModalOpen, setConfirmCustomOptionModalOpen] =
     useState(false);
-  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
+  const [paymentSuccessValue, setPaymentSuccessValue] = useState<
+    number | undefined
+  >(undefined);
 
   // Bundle modal
   const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
@@ -200,7 +202,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       setNewOptionText('');
       setSuggestNewMobileOpen(false);
       setLoadingModalOpen(false);
-      setPaymentSuccessModalOpen(true);
+      setPaymentSuccessValue(1);
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
@@ -291,8 +293,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 !option.creator || option.creator?.uuid === post.creator?.uuid
               }
               noAction={postStatus === 'failed'}
-              handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
-                setPaymentSuccessModalOpen(newValue)
+              handleSetPaymentSuccessValue={(newValue: number) =>
+                setPaymentSuccessValue(newValue)
               }
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
@@ -393,13 +395,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         )}
       {post.creator?.options?.isOfferingBundles && (
         <SBundlesContainer highlighted={bundle?.votesLeft === 0}>
-          {bundle?.votesLeft === 0 && (
-            <STicketSet numberOFTickets={3} size={36} shift={11} />
-          )}
+          {bundle && <STicketSet numberOFTickets={3} size={36} shift={11} />}
           <SBundlesText>
-            {t('mcPost.optionsTab.actionSection.offersBundles', {
-              creator: postCreatorName,
-            })}
+            {bundle
+              ? t('mcPost.optionsTab.actionSection.getMoreBundles')
+              : t('mcPost.optionsTab.actionSection.offersBundles', {
+                  creator: postCreatorName,
+                })}
           </SBundlesText>
           <SHighlightedButton
             size='small'
@@ -407,7 +409,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               setBuyBundleModalOpen(true);
             }}
           >
-            {t('mcPost.optionsTab.actionSection.viewBundles')}
+            {bundle
+              ? t('mcPost.optionsTab.actionSection.getBundles')
+              : t('mcPost.optionsTab.actionSection.viewBundles')}
           </SHighlightedButton>
         </SBundlesContainer>
       )}
@@ -465,8 +469,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='mc'
-        isVisible={paymentSuccessModalOpen}
-        closeModal={() => setPaymentSuccessModalOpen(false)}
+        value={paymentSuccessValue}
+        isVisible={paymentSuccessValue !== undefined}
+        closeModal={() => setPaymentSuccessValue(undefined)}
       >
         {t('paymentSuccessModal.mc', {
           postCreator: postCreatorName,

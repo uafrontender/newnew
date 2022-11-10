@@ -37,7 +37,7 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
   const { t } = useTranslation('modal-Post');
   const containerRef = useRef<HTMLDivElement>();
 
-  const [bottom, setBottom] = useState<number | undefined>(undefined);
+  const [bottom, setBottom] = useState<number | undefined>();
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
@@ -141,9 +141,9 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
                   }}
                   onClick={() => handleOpenBundleVotesModal()}
                 >
-                  <Text variant={3}>
+                  <SUseVotesText variant={3}>
                     {t('mcPost.optionsTab.optionCard.selectVotesMenu.useVotes')}
-                  </Text>
+                  </SUseVotesText>
                 </SUseVotesButton>
               </SUseVotesContainer>
             )}
@@ -244,7 +244,6 @@ const SUseVotesButton = styled.button`
 
   cursor: pointer;
 
-  color: ${({ theme }) => theme.colors.black};
   background: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
   width: 100%;
@@ -261,4 +260,8 @@ const SUseVotesButton = styled.button`
   &:active {
     outline: none;
   }
+`;
+
+const SUseVotesText = styled(Text)`
+  color: ${({ theme }) => theme.colors.black};
 `;

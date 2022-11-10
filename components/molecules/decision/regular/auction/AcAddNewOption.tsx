@@ -102,7 +102,9 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   // Payment modal
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
+  const [paymentSuccessValue, setPaymentSuccessValue] = useState<
+    number | undefined
+  >();
 
   const goToNextStep = (currentStep: newnewapi.AcTutorialStep) => {
     if (user.userTutorialsProgress.remainingAcSteps && currentStep) {
@@ -266,7 +268,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-        setPaymentSuccessModalOpen(true);
+        setPaymentSuccessValue(paymentAmountInCents);
         setNewBidAmount('');
         setNewBidText('');
         setSuggestNewMobileOpen(false);
@@ -279,7 +281,14 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         setupIntent.destroy();
       }
     },
-    [postId, handleAddOrUpdateOptionFromResponse, setupIntent, router, t]
+    [
+      postId,
+      handleAddOrUpdateOptionFromResponse,
+      paymentAmountInCents,
+      setupIntent,
+      router,
+      t,
+    ]
   );
 
   return (
@@ -502,8 +511,9 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='ac'
-        isVisible={paymentSuccessModalOpen}
-        closeModal={() => setPaymentSuccessModalOpen(false)}
+        value={paymentSuccessValue}
+        isVisible={paymentSuccessValue !== undefined}
+        closeModal={() => setPaymentSuccessValue(undefined)}
       >
         {t('paymentSuccessModal.ac', {
           postCreator,

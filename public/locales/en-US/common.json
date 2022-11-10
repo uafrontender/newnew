@@ -147,11 +147,6 @@
       "payment": {
         "header": "{{creator}}'s Superpoll Bundle"
       },
-      "paymentModalFooter": {
-        "body": "A temporary hold will be placed on your card. You’ll only get charged if {{creator}} reaches their goal.",
-        "terms": "Terms",
-        "apply": "apply"
-      },
       "error": {
         "requestFailed": "Request failed"
       }

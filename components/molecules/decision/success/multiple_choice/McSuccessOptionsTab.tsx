@@ -214,7 +214,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
             postText=''
             index={i}
             noAction
-            handleSetPaymentSuccessModalOpen={() => {}}
+            handleSetPaymentSuccessValue={() => {}}
             handleAddOrUpdateOptionFromResponse={() => {}}
           />
         ))}
