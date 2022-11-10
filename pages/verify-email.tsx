@@ -92,6 +92,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { to } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
+    'page-SignUp',
     'page-VerifyEmail',
   ]);
 
