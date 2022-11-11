@@ -40,9 +40,15 @@ import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import BuyBundleModal from '../../../bundles/BuyBundleModal';
 import McConfirmCustomOptionModal from './McConfirmCustomOptionModal';
-import HighlightedButton from '../../../../atoms/bundles/HighlightedButton';
-import TicketSet from '../../../../atoms/bundles/TicketSet';
 import OptionActionMobileModal from '../../common/OptionActionMobileModal';
+import Modal from '../../../../organisms/Modal';
+import Headline from '../../../../atoms/Headline';
+import InlineSvg from '../../../../atoms/InlineSVG';
+
+import AddOptionIcon from '../../../../../public/images/svg/icons/filled/AddOption.svg';
+import CloseIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
+import TicketSet from '../../../../atoms/bundles/TicketSet';
+import HighlightedButton from '../../../../atoms/bundles/HighlightedButton';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -272,7 +278,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               ? {
                   overflow: 'hidden',
                   width:
-                    options.length > 4
+                    options.length >= 4
                       ? 'calc(100% + 10px)'
                       : 'calc(100% + 14px)',
                 }
@@ -348,35 +354,17 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         postStatus === 'voting' &&
         (post.creator?.options?.isOfferingBundles || bundle) && (
           <SActionSection>
-            <SuggestionTextArea
-              value={newOptionText}
-              placeholder={t(
-                'mcPost.optionsTab.actionSection.suggestionPlaceholder'
-              )}
-              onChange={handleUpdateNewOptionText}
-            />
-            <SAddOptionButton
-              size='sm'
-              disabled={!newOptionText || !newOptionTextValid}
-              style={{
-                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-              }}
-              onClick={() => {
-                Mixpanel.track('Click Add Free Option', {
-                  _stage: 'Post',
-                  _postUuid: post.postUuid,
-                  _component: 'McOptionsTab',
-                });
-
-                if (bundle) {
-                  setConfirmCustomOptionModalOpen(true);
-                } else {
-                  setBuyBundleModalOpen(true);
-                }
-              }}
+            <SAddOptionButtonDesktop
+              onClick={() => setSuggestNewMobileOpen(true)}
             >
-              {t('mcPost.optionsTab.actionSection.placeABidButton')}
-            </SAddOptionButton>
+              <InlineSvg
+                svg={AddOptionIcon}
+                width='24px'
+                height='24px'
+                fill='none'
+              />
+              {t('mcPost.optionsTab.actionSection.suggestionPlaceholder')}
+            </SAddOptionButtonDesktop>
             {user.userTutorialsProgress.remainingMcSteps && (
               <STutorialTooltipTextAreaHolder>
                 <TutorialTooltip
@@ -416,47 +404,98 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         </SBundlesContainer>
       )}
       {/* Suggest new Modal */}
-      {isMobile &&
-      !optionCreatedByMe &&
+      {!optionCreatedByMe &&
       postStatus === 'voting' &&
       (post.creator?.options?.isOfferingBundles || bundle) ? (
-        <OptionActionMobileModal
-          isOpen={suggestNewMobileOpen}
-          onClose={() => setSuggestNewMobileOpen(false)}
-          zIndex={12}
-        >
-          <SSuggestNewContainer>
-            <SuggestionTextArea
-              value={newOptionText}
-              autofocus={suggestNewMobileOpen}
-              placeholder={t(
-                'mcPost.optionsTab.actionSection.suggestionPlaceholderDesktop'
-              )}
-              onChange={handleUpdateNewOptionText}
-            />
-            <SAddOptionButton
-              size='sm'
-              disabled={!newOptionText || !newOptionTextValid}
-              style={{
-                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-              }}
-              onClick={() => {
-                Mixpanel.track('Click Add Free Option', {
-                  _stage: 'Post',
-                  _postUuid: post.postUuid,
-                  _component: 'McOptionsTab',
-                });
-                if (bundle) {
-                  setConfirmCustomOptionModalOpen(true);
-                } else {
-                  setBuyBundleModalOpen(true);
-                }
-              }}
-            >
-              {t('mcPost.optionsTab.actionSection.placeABidButton')}
-            </SAddOptionButton>
-          </SSuggestNewContainer>
-        </OptionActionMobileModal>
+        isMobile ? (
+          <OptionActionMobileModal
+            isOpen={suggestNewMobileOpen}
+            onClose={() => setSuggestNewMobileOpen(false)}
+            zIndex={12}
+          >
+            <SSuggestNewContainer>
+              <SuggestionTextArea
+                value={newOptionText}
+                autofocus={suggestNewMobileOpen}
+                placeholder={t(
+                  'mcPost.optionsTab.actionSection.suggestionPlaceholderDesktop'
+                )}
+                onChange={handleUpdateNewOptionText}
+              />
+              <SAddOptionButton
+                size='sm'
+                disabled={!newOptionText || !newOptionTextValid}
+                style={{
+                  ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+                }}
+                onClick={() => {
+                  Mixpanel.track('Click Add Free Option', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'McOptionsTab',
+                  });
+                  if (bundle) {
+                    setConfirmCustomOptionModalOpen(true);
+                  } else {
+                    setBuyBundleModalOpen(true);
+                  }
+                }}
+              >
+                {t('mcPost.optionsTab.actionSection.placeABidButton')}
+              </SAddOptionButton>
+            </SSuggestNewContainer>
+          </OptionActionMobileModal>
+        ) : (
+          <Modal
+            show={suggestNewMobileOpen}
+            onClose={() => setSuggestNewMobileOpen(false)}
+            overlaydim
+            additionalz={12}
+          >
+            <SSuggestNewContainer>
+              <SCloseButton onClick={() => setSuggestNewMobileOpen(false)}>
+                <InlineSvg
+                  svg={CloseIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </SCloseButton>
+              <SHeadlineSuggestNew variant={5}>
+                {t('mcPost.optionsTab.actionSection.suggestionPlaceholder')}
+              </SHeadlineSuggestNew>
+              <SuggestionTextArea
+                value={newOptionText}
+                autofocus={suggestNewMobileOpen}
+                placeholder={t(
+                  'mcPost.optionsTab.actionSection.suggestionPlaceholder'
+                )}
+                onChange={handleUpdateNewOptionText}
+              />
+              <SAddOptionButton
+                size='sm'
+                disabled={!newOptionText || !newOptionTextValid}
+                style={{
+                  ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+                }}
+                onClick={() => {
+                  Mixpanel.track('Click Add Free Option', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'McOptionsTab',
+                  });
+                  if (bundle) {
+                    setConfirmCustomOptionModalOpen(true);
+                  } else {
+                    setBuyBundleModalOpen(true);
+                  }
+                }}
+              >
+                {t('mcPost.optionsTab.optionCard.placeABidButton')}
+              </SAddOptionButton>
+            </SSuggestNewContainer>
+          </Modal>
+        )
       ) : null}
       {/* Add a custom option Modal */}
       <McConfirmCustomOptionModal
@@ -519,6 +558,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <BuyBundleModal
           show
           creator={post.creator}
+          additionalZ={13}
           onClose={() => {
             setBuyBundleModalOpen(false);
           }}
@@ -627,6 +667,21 @@ const SSuggestNewContainer = styled.div`
   textarea {
     width: 100%;
   }
+
+  ${({ theme }) => theme.media.tablet} {
+    position: absolute;
+    top: calc(50% - 160px);
+    left: calc(50% - 220px);
+    width: 440px;
+
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+    padding: 72px 40px 40px 40px;
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+`;
+
+const SHeadlineSuggestNew = styled(Headline)`
+  text-align: center;
 `;
 
 const SAddOptionButton = styled(Button)`
@@ -659,37 +714,47 @@ const SActionSection = styled.div`
     z-index: 5;
 
     padding-top: 8px;
-
-    background-color: ${({ theme }) =>
-      theme.name === 'dark'
-        ? theme.colorsThemed.background.secondary
-        : theme.colorsThemed.background.primary};
-
-    border-top: 1.5px solid
-      ${({ theme }) => theme.colorsThemed.background.outlines1};
-
-    textarea {
-      width: 100%;
-    }
   }
 `;
 
-// const SBottomPlaceholder = styled.div`
-//   display: none;
+const SCloseButton = styled.div`
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  cursor: pointer;
+`;
 
-//   ${({ theme }) => theme.media.laptop} {
-//     display: block;
+const SAddOptionButtonDesktop = styled.button`
+  width: 100%;
+  height: 84px;
+  border: transparent;
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-//     position: absolute;
-//     bottom: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 
-//     font-weight: 600;
-//     font-size: 12px;
-//     line-height: 16px;
-//     color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-//     width: max-content;
-//   }
-// `;
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+
+  cursor: pointer;
+  transition: 0.1s linear;
+
+  &:hover:enabled,
+  &:focus:enabled,
+  &:active:enabled {
+    outline: none;
+  }
+
+  &:hover:enabled,
+  &:focus:enabled {
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  }
+`;
 
 const STutorialTooltipHolder = styled.div`
   position: absolute;

@@ -40,6 +40,7 @@ interface IAcOptionsTab {
   options: newnewapi.Auction.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
+  triedLoading: boolean;
   handleLoadBids: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.Auction.Option
@@ -56,6 +57,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   options,
   optionsLoading,
   pagingToken,
+  triedLoading,
   handleLoadBids,
   handleAddOrUpdateOptionFromResponse,
   handleRemoveOption,
@@ -75,7 +77,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
-  const [triedLoading, setTriedLoading] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>();
   const { showTopGradient, showBottomGradient } = useScrollGradients(
@@ -125,7 +126,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
       handleLoadBids(pagingToken);
-      setTriedLoading(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pagingToken, optionsLoading]);

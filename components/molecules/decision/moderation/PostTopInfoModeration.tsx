@@ -167,7 +167,7 @@ const PostTopInfoModeration: React.FunctionComponent<
         ) : null}
         {postType === 'mc' && totalVotes ? (
           <SBidsAmount>
-            <span>{formatNumber(totalVotes, true).replaceAll(/,/g, ' ')}</span>{' '}
+            <span>{formatNumber(totalVotes, true)}</span>{' '}
             {totalVotes > 1
               ? t('mcPost.postTopInfo.votes')
               : t('mcPost.postTopInfo.vote')}

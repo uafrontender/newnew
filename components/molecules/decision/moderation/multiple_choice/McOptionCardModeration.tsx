@@ -192,6 +192,14 @@ const McOptionCardModeration: React.FunctionComponent<
                 }
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubstracted}
+                amIVerified={false}
+                isOptionCreatorVerified={
+                  option.creator?.options?.isVerified ?? false
+                }
+                isFirstVoterVerified={
+                  option.firstVoter?.options?.isVerified ?? false
+                }
+                isWhitelistSupporterVerified={!!option.whitelistSupporter}
               />
             </SBiddersInfo>
           </SBidDetails>

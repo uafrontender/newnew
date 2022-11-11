@@ -41,6 +41,7 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 import { useBundles } from '../../../../contexts/bundlesContext';
+import BuyBundleModal from '../../../molecules/bundles/BuyBundleModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -159,6 +160,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   // Total votes
   const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
+
+  // Bundle modal
+  const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
 
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
@@ -826,6 +830,16 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           />
         </SCommentsSection>
       )}
+      {/* Buy bundles */}
+      {buyBundleModalOpen && post.creator && (
+        <BuyBundleModal
+          show
+          creator={post.creator}
+          onClose={() => {
+            setBuyBundleModalOpen(false);
+          }}
+        />
+      )}
     </>
   );
 });
@@ -842,7 +856,7 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 648px;
+    height: 506px;
     min-height: 0;
     align-items: flex-start;
 
