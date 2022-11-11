@@ -230,7 +230,8 @@ const McOptionCardModeration: React.FunctionComponent<
             <McOptionCardModerationEllipseMenu
               isVisible={isEllipseMenuOpen}
               isBySubscriber={!isCreatorsBid}
-              canBeDeleted={canBeDeleted && !isWinner}
+              canDeleteOptionInitial={canBeDeleted && !isWinner}
+              optionId={option.id as number}
               handleClose={() => {
                 setIsEllipseMenuOpen(false);
                 handleUnsetScrollBlocked?.();
@@ -257,7 +258,8 @@ const McOptionCardModeration: React.FunctionComponent<
           zIndex={16}
           onClose={() => setIsEllipseMenuOpen(false)}
           isBySubscriber={!isCreatorsBid}
-          canBeDeleted={canBeDeleted && !isWinner}
+          canDeleteOptionInitial={canBeDeleted && !isWinner}
+          optionId={option.id as number}
           handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
           handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
           handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
@@ -484,6 +486,5 @@ const SEllipseButtonMobile = styled.button`
   &:focus,
   &:hover {
     outline: none;
-    background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
   }
 `;
