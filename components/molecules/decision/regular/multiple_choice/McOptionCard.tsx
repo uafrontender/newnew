@@ -401,6 +401,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           .option as newnewapi.MultipleChoice.Option;
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        setIsSupportMenuOpen(false);
         setLoadingModalOpen(false);
         handleSetPaymentSuccessValue(votesCount);
       } catch (err) {
