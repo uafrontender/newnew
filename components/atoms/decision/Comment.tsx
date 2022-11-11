@@ -141,8 +141,8 @@ const Comment: React.FC<IComment> = ({
               comment.sender.options.isVerified && (
                 <SInlineSvg
                   svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
+                  width='20px'
+                  height='20px'
                   fill='none'
                 />
               )}
