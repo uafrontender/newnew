@@ -486,6 +486,5 @@ const SEllipseButtonMobile = styled.button`
   &:focus,
   &:hover {
     outline: none;
-    background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
   }
 `;
