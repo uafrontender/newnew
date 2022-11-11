@@ -41,11 +41,12 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import BuyBundleModal from '../../../bundles/BuyBundleModal';
 import McConfirmCustomOptionModal from './McConfirmCustomOptionModal';
 import OptionActionMobileModal from '../../common/OptionActionMobileModal';
+import Modal from '../../../../organisms/Modal';
+import Headline from '../../../../atoms/Headline';
 import InlineSvg from '../../../../atoms/InlineSVG';
 
 import AddOptionIcon from '../../../../../public/images/svg/icons/filled/AddOption.svg';
-import Modal from '../../../../organisms/Modal';
-import Headline from '../../../../atoms/Headline';
+import CloseIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -360,7 +361,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 height='24px'
                 fill='none'
               />
-              {t('mcPost.optionsTab.actionSection.placeABidButton')}
+              {t('mcPost.optionsTab.actionSection.suggestionPlaceholder')}
             </SAddOptionButtonDesktop>
             {user.userTutorialsProgress.remainingMcSteps && (
               <STutorialTooltipTextAreaHolder>
@@ -424,19 +425,26 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           <Modal
             show={suggestNewMobileOpen}
             onClose={() => setSuggestNewMobileOpen(false)}
+            overlaydim
             additionalz={12}
           >
             <SSuggestNewContainer>
-              <Headline variant={5}>
-                {t(
-                  'mcPost.optionsTab.actionSection.suggestionPlaceholderDesktop'
-                )}
-              </Headline>
+              <SCloseButton onClick={() => setSuggestNewMobileOpen(false)}>
+                <InlineSvg
+                  svg={CloseIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </SCloseButton>
+              <SHeadlineSuggestNew variant={5}>
+                {t('mcPost.optionsTab.actionSection.suggestionPlaceholder')}
+              </SHeadlineSuggestNew>
               <SuggestionTextArea
                 value={newOptionText}
                 autofocus={suggestNewMobileOpen}
                 placeholder={t(
-                  'mcPost.optionsTab.actionSection.suggestionPlaceholderDesktop'
+                  'mcPost.optionsTab.actionSection.suggestionPlaceholder'
                 )}
                 onChange={handleUpdateNewOptionText}
               />
@@ -459,7 +467,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   }
                 }}
               >
-                {t('mcPost.optionsTab.actionSection.placeABidButton')}
+                {t('mcPost.optionsTab.optionCard.placeABidButton')}
               </SAddOptionButton>
             </SSuggestNewContainer>
           </Modal>
@@ -641,7 +649,15 @@ const SSuggestNewContainer = styled.div`
     top: 50%;
     left: calc(50% - 220px);
     width: 440px;
+
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+    padding: 72px 40px 40px 40px;
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
+`;
+
+const SHeadlineSuggestNew = styled(Headline)`
+  text-align: center;
 `;
 
 const SAddOptionButton = styled(Button)`
@@ -675,6 +691,13 @@ const SActionSection = styled.div`
 
     padding-top: 8px;
   }
+`;
+
+const SCloseButton = styled.div`
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  cursor: pointer;
 `;
 
 const SAddOptionButtonDesktop = styled.button`

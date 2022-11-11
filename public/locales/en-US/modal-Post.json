@@ -440,7 +440,7 @@
             "vote": "vote"
           }
         },
-        "suggestionPlaceholder": "Add your own option...",
+        "suggestionPlaceholder": "Add your own option",
         "suggestionPlaceholderDesktop": "Add an option ...",
         "placeABidButton": "Add my option",
         "offersBundles": "{{creator}} offers Superpoll Bundles",
