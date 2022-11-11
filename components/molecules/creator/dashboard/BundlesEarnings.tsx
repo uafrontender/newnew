@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -7,6 +7,8 @@ import Headline from '../../../atoms/Headline';
 import Text from '../../../atoms/Text';
 import { getMyBundleEarnings } from '../../../../api/endpoints/bundles';
 import dateToTimestamp from '../../../../utils/dateToTimestamp';
+import { formatNumber } from '../../../../utils/format';
+import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 
 interface IFunctionProps {
   isBundlesEnabled: boolean;
@@ -15,11 +17,9 @@ interface IFunctionProps {
 export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
   ({ isBundlesEnabled }) => {
     const { t } = useTranslation('page-Creator');
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [totalEarned, setTotalEarned] = useState<string>('1,825');
-    // const [hasEarnings, setHasEarnings] = useState<boolean>(true);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [totalEarned, setTotalEarned] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean | null>(null);
+    const { appConstants } = useGetAppConstants();
     const [myEarnings, setMyEarnings] = useState<
       newnewapi.GetMyBundleEarningsResponse | undefined
     >();
@@ -33,71 +33,64 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
             endDate: dateToTimestamp(new Date()),
           });
           const res = await getMyBundleEarnings(payload);
-          console.log(payload, res.data);
 
           if (!res.data || res.error)
             throw new Error(res.error?.message ?? 'Request failed');
           setMyEarnings(res.data);
-
+          if (res.data.totalBundleEarnings?.usdCents)
+            setTotalEarned(res.data.totalBundleEarnings.usdCents);
           setIsLoading(false);
         } catch (err) {
           console.error(err);
           setIsLoading(null);
         }
       }
-      if (myEarnings === undefined) {
+      if (isLoading === null) {
         fetchMyEarnings();
       }
-    }, [myEarnings]);
-
-    interface IBundleEarnings {
-      id: number;
-      price: string;
-      earnedAmount: string;
-    }
-
-    // TODO: use real data
-    const collection: IBundleEarnings[] = useMemo(
-      () => [
-        {
-          id: 1,
-          price: '5',
-          earnedAmount: '250',
-        },
-        {
-          id: 2,
-          price: '25',
-          earnedAmount: '1,050',
-        },
-        {
-          id: 3,
-          price: '50',
-          earnedAmount: '1,850',
-        },
-        {
-          id: 4,
-          price: '75',
-          earnedAmount: '675',
-        },
-      ],
-      []
-    );
+    }, [myEarnings, isLoading]);
 
     const renderListItem = useCallback(
-      (item: IBundleEarnings) => (
-        <SBundle key={`superpoll-bundle-${item.id}`}>
-          <SBundleTitle>
-            ${item.price} {t('myBundles.earnings.unitName')}
-          </SBundleTitle>
-          <div>
-            <SBundlePrice isBundlesEnabled={isBundlesEnabled}>
-              ${item.earnedAmount}
-            </SBundlePrice>
-            <SText variant={3}>{t('myBundles.earnings.earned')}</SText>
-          </div>
-        </SBundle>
-      ),
-      [isBundlesEnabled, t]
+      (item: newnewapi.IBundleOffer) => {
+        let soldBundle;
+        if (myEarnings?.soldBundles && myEarnings?.soldBundles.length > 0) {
+          soldBundle = myEarnings?.soldBundles.find(
+            (el) => el.pricePerUnit?.usdCents === item.price?.usdCents
+          );
+        }
+        const price = soldBundle?.pricePerUnit?.usdCents
+          ? soldBundle.pricePerUnit?.usdCents
+          : item.price?.usdCents!!;
+        const quantitySold = soldBundle?.quantitySold
+          ? soldBundle.quantitySold
+          : 0;
+        const totalEarnings = soldBundle?.totalEarnings?.usdCents
+          ? soldBundle.totalEarnings?.usdCents
+          : 0;
+
+        return (
+          <SBundle key={`superpoll-bundle-${price}`}>
+            <div>
+              <SBundleTitle>
+                $
+                {`${formatNumber(price / 100 ?? 0, true)} ${t(
+                  'myBundles.earnings.unitName'
+                )}`}
+              </SBundleTitle>
+              <SText variant={3}>
+                {`${quantitySold} ${t('myBundles.earnings.sold')}`}
+              </SText>
+            </div>
+            <div>
+              <SBundlePrice isBundlesEnabled={isBundlesEnabled}>
+                ${formatNumber(totalEarnings / 100 ?? 0, true)}
+              </SBundlePrice>
+              <SText variant={3}>{t('myBundles.earnings.earned')}</SText>
+            </div>
+          </SBundle>
+        );
+      },
+      [isBundlesEnabled, t, myEarnings?.soldBundles]
     );
 
     return (
@@ -113,13 +106,15 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
           <>
             <STotal>
               <STotalEarned isBundlesEnabled={isBundlesEnabled}>
-                ${totalEarned}
+                ${formatNumber(totalEarned / 100 ?? 0, false)}
               </STotalEarned>
               <STotalEarnedText>
                 {t('myBundles.earnings.payPeriod')}
               </STotalEarnedText>
             </STotal>
-            <SBundles>{collection.map(renderListItem)}</SBundles>
+            <SBundles>
+              {appConstants.bundleOffers?.map(renderListItem)}
+            </SBundles>
           </>
         )}
       </SBlock>
@@ -155,7 +150,7 @@ const SBlock = styled.section<ISBlock>`
 
 const SHeaderLine = styled.div`
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   flex-direction: column;
   margin-bottom: 24px;
 
@@ -203,7 +198,7 @@ const STotalEarned = styled.div<ISTotalEarned>`
   color: ${(props) =>
     props.theme.name === 'light'
       ? props.theme.colorsThemed.text.primary
-      : props.isBundlesEnabled
+      : !props.isBundlesEnabled
       ? props.theme.colorsThemed.text.primary
       : props.theme.colorsThemed.accent.yellow};
 `;
@@ -215,18 +210,18 @@ const STotalEarnedText = styled.div`
 const SBundles = styled.div`
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
   margin-bottom: -16px;
+  justify-content: space-between;
 `;
 
 const SBundle = styled.div`
-  width: 100%;
-  margin: 0 0 16px;
+  width: 49%;
+  margin: 0 0 16px 0;
   padding: 16px;
   border-radius: ${(props) => props.theme.borderRadius.medium};
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   color: ${(props) => props.theme.colorsThemed.text.primary};
-  height: 130px;
+  height: 148px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -236,11 +231,9 @@ const SBundle = styled.div`
 `;
 
 const SBundleTitle = styled.div`
-  color: ${({ theme }) =>
-    theme.name === 'light'
-      ? theme.colorsThemed.text.primary
-      : theme.colorsThemed.text.secondary};
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
   font-size: 16px;
+  margin-bottom: 4px;
 `;
 
 interface ISBundlePrice {
@@ -250,7 +243,7 @@ const SBundlePrice = styled.div<ISBundlePrice>`
   color: ${(props) =>
     props.theme.name === 'light'
       ? props.theme.colorsThemed.text.primary
-      : props.isBundlesEnabled
+      : !props.isBundlesEnabled
       ? props.theme.colorsThemed.text.primary
       : props.theme.colorsThemed.accent.yellow};
   font-size: 24px;

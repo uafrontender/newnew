@@ -25,7 +25,9 @@
       "insights": "深入瞭解",
       "insightsTablet": "轉至深入瞭解",
       "cashOut": {
-        "amount": "你的下一次付款",
+        "amount_NEED_TRANSLATION": "Your Stripe earning are",
+        "amountSecondLine_NEED_TRANSLATION": "Manage your balance on Stripe.",
+        "stripeButton_NEED_TRANSLATION": "Take me to Stripe",
         "date": "將於{{date}}自動發送,",
         "submit": "瞭解更多",
         "noPayouts": "沒有任何即將支付的款項"
@@ -116,7 +118,8 @@
       "payPeriod_NEED_TRANSLATION": "this pay period",
       "unitName_NEED_TRANSLATION": "bundle",
       "earned_NEED_TRANSLATION": "earned",
-      "noSoldYet_NEED_TRANSLATION": "No bundles sold yet"
+      "noSoldYet_NEED_TRANSLATION": "No bundles sold yet",
+      "sold_NEED_TRANSLATION": "sold"
     },
     "bundlesSet": {
       "title_NEED_TRANSLATION": "Superpoll Bundles",
@@ -181,7 +184,7 @@
     "noMessagesFirstLine": "沒有訊息......",
     "typing": "正在輸入......",
     "toolbar": {
-      "searchPlaceholder": "搜索訊息或用戶"
+      "searchPlaceholder_NEED_TRANSLATION": "Search for users"
     },
     "modal": {
       "newMessage": {

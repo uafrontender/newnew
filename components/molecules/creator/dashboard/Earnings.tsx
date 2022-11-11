@@ -59,10 +59,9 @@ export const Earnings: React.FC<IFunctionProps> = ({
               )
               .startOf('day')
           ),
-          endDate: dateToTimestamp(new Date()),
+          endDate: dateToTimestamp(new Date('November 10, 2022 00:0:00')),
         });
         const res = await getMyEarnings(payload);
-
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
         setMyEarnings(res.data);
@@ -88,12 +87,10 @@ export const Earnings: React.FC<IFunctionProps> = ({
       let sum = 0;
       if (myEarnings.auEarnings?.usdCents)
         sum += myEarnings.auEarnings?.usdCents;
-      // if (myEarnings.cfEarnings?.usdCents)
-      //   sum += myEarnings.cfEarnings?.usdCents;
       if (myEarnings.mcEarnings?.usdCents)
         sum += myEarnings.mcEarnings?.usdCents;
-      if (myEarnings.subsEarnings?.usdCents)
-        sum += myEarnings.subsEarnings?.usdCents;
+      if (myEarnings.bundleEarnings?.usdCents)
+        sum += myEarnings.bundleEarnings?.usdCents;
       setTotalEarnings(sum);
     }
   }, [myEarnings]);
@@ -103,11 +100,11 @@ export const Earnings: React.FC<IFunctionProps> = ({
       {
         id: 'ac',
       },
-      // {
-      //   id: 'cf',
-      // },
       {
         id: 'mc',
+      },
+      {
+        id: 'bundles',
       },
     ],
     []
@@ -157,6 +154,14 @@ export const Earnings: React.FC<IFunctionProps> = ({
           return myEarnings?.cfEarnings?.usdCents
             ? `$${formatNumber(
                 myEarnings.cfEarnings.usdCents / 100 ?? 0,
+                false
+              )}`
+            : '$0.00';
+
+        case 'bundles':
+          return myEarnings?.bundleEarnings?.usdCents
+            ? `$${formatNumber(
+                myEarnings.bundleEarnings.usdCents / 100 ?? 0,
                 false
               )}`
             : '$0.00';
@@ -226,15 +231,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
           <STotalText weight={600}>{splitPeriod()}</STotalText>
         </STotalTextWrapper>
       </STotalLine>
-      <SListHolder>
-        {collection.map(renderListItem)}
-        <SListItem key='list-item-earnings-bundles'>
-          <SListItemTitle variant={2} weight={700}>
-            {t(`dashboard.earnings.list.bundles`)}
-          </SListItemTitle>
-          <SListItemValue variant={6}>$0.00</SListItemValue>
-        </SListItem>
-      </SListHolder>
+      <SListHolder>{collection.map(renderListItem)}</SListHolder>
       {isLoading || initialLoad ? (
         <Lottie
           width={64}

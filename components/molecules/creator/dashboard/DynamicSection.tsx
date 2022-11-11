@@ -212,7 +212,7 @@ export const DynamicSection = () => {
                 </STabsWrapper>
                 <SSectionTopLineButtons>
                   {tab === 'notifications' ||
-                  !user.userData?.options?.isOfferingSubscription ? (
+                  !user.userData?.options?.isOfferingBundles ? (
                     <>
                       {unreadNotificationCount > 0 && (
                         <STopLineButton

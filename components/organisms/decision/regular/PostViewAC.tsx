@@ -150,6 +150,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   >('');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
+  const [triedLoading, setTriedLoading] = useState(false);
 
   // const currLocation = `/post/${post.postUuid}`;
 
@@ -279,6 +280,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         setOptionsLoading(false);
         setLoadingOptionsError((err as Error).message);
         console.error(err);
+      } finally {
+        setTriedLoading(true);
       }
     },
     [optionsLoading, loadingModalOpen, post.postUuid, sortOptions]
@@ -780,6 +783,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             options={options}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
+            triedLoading={triedLoading}
             handleLoadBids={fetchBids}
             handleAddOrUpdateOptionFromResponse={
               handleAddOrUpdateOptionFromResponse

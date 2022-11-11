@@ -89,7 +89,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
               </SButton>
             </SLink>
           </Link>
-          {user.userData?.options?.isOfferingSubscription && (
+          {user.userData?.options?.isOfferingBundles && (
             <SMyLinkButton onClick={handlerCopy}>
               <InlineSvg svg={copyIcon} width='24px' height='24px' />
               {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}

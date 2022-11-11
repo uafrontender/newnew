@@ -304,8 +304,6 @@ const PostPage: NextPage<IPostPage> = ({
       return;
     }
 
-    console.log(window.history.state && window.history.state.idx > 0);
-
     if (window.history.state && window.history.state.idx > 0) {
       router.back();
     } else {
@@ -601,12 +599,7 @@ export default PostPage;
 (PostPage as NextPageWithLayout).getLayout = (page: ReactElement) => (
   <GeneralLayout noMobieNavigation noPaddingMobile>
     <CommentFromUrlContextProvider>
-      <AnimatePresence
-        // exitBeforeEnter
-        onExitComplete={() => {
-          console.log('EXIT COMPLETE');
-        }}
-      >
+      <AnimatePresence>
         <React.Fragment key={page.props.postUuid}>{page}</React.Fragment>
       </AnimatePresence>
     </CommentFromUrlContextProvider>

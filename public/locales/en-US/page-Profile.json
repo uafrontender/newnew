@@ -5,7 +5,7 @@
       "description": "Customize your NewNew profile with username, display name, bio and more"
     },
     "noContent": {
-      "description": "Posts you’re actively bidding on, voting\non, or backing will be shown here"
+      "description": "Posts you’re actively bidding on\nor voting on will be shown here"
     }
   },
   "MyPosts": {

@@ -40,12 +40,15 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import getDisplayname from '../../../../../utils/getDisplayname';
 import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
-
 import { reportEventOption } from '../../../../../api/endpoints/report';
 import {
   deleteAcOption,
   placeBidOnAuction,
 } from '../../../../../api/endpoints/auction';
+import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
+import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
+import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
 
 // Icons
 import assets from '../../../../../constants/assets';
@@ -53,10 +56,8 @@ import BidIconLight from '../../../../../public/images/decision/bid-icon-light.p
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
-import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
-import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
-import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
-import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
+import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
+import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -225,7 +226,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
+  const [paymentSuccessValue, setPaymentSuccessValue] = useState<
+    number | undefined
+  >();
 
   // Handlers
   const handleTogglePaymentModalOpen = () => {
@@ -325,7 +328,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-        setPaymentSuccessModalOpen(true);
+        setPaymentSuccessValue(paymentAmountInCents);
         handleSetSupportedBid('');
         setSupportBidAmount('');
         setIsSupportFormOpen(false);
@@ -345,6 +348,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       handleAddOrUpdateOptionFromResponse,
       t,
       setupIntent,
+      paymentAmountInCents,
     ]
   );
 
@@ -443,7 +447,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             {option.title}
           </SOptionInfo>
           <SBiddersInfo onClick={(e) => e.preventDefault()} variant={3}>
-            {!option.whitelistSupporter ? (
+            {!option.whitelistSupporter ||
+            option.whitelistSupporter?.uuid === user.userData?.userUuid ? (
               option.creator?.username ? (
                 <Link href={`/${option.creator?.username}`}>
                   <SSpanBiddersHighlighted
@@ -452,18 +457,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                       e.stopPropagation();
                     }}
                     style={{
-                      ...(!isMyBid && option.isCreatedBySubscriber
-                        ? {
-                            color:
-                              theme.name === 'dark'
-                                ? theme.colorsThemed.accent.yellow
-                                : theme.colors.dark,
-                          }
-                        : isMyBid && option.isCreatedBySubscriber
-                        ? {
-                            color: theme.colorsThemed.accent.yellow,
-                          }
-                        : {}),
                       cursor: 'pointer',
                     }}
                   >
@@ -472,6 +465,18 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                         ? t('me')
                         : t('my')
                       : getDisplayname(option.creator!!)}
+                    {!isMyBid && option.creator.options?.isVerified && (
+                      <SInlineSvgVerificationIcon
+                        svg={
+                          !isBlue
+                            ? VerificationCheckmark
+                            : VerificationCheckmarkInverted
+                        }
+                        width='14px'
+                        height='14px'
+                        fill='none'
+                      />
+                    )}
                   </SSpanBiddersHighlighted>
                 </Link>
               ) : (
@@ -479,20 +484,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                   className='spanHighlighted'
                   onClick={(e) => {
                     e.stopPropagation();
-                  }}
-                  style={{
-                    ...(!isMyBid && option.isCreatedBySubscriber
-                      ? {
-                          color:
-                            theme.name === 'dark'
-                              ? theme.colorsThemed.accent.yellow
-                              : theme.colors.dark,
-                        }
-                      : isMyBid && option.isCreatedBySubscriber
-                      ? {
-                          color: theme.colorsThemed.accent.yellow,
-                        }
-                      : {}),
                   }}
                 >
                   {isMyBid
@@ -510,41 +501,55 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                     e.stopPropagation();
                   }}
                   style={{
-                    ...(!isMyBid && option.isCreatedBySubscriber
-                      ? {
-                          color:
-                            theme.name === 'dark'
-                              ? theme.colorsThemed.accent.yellow
-                              : theme.colors.dark,
-                        }
-                      : isMyBid && option.isCreatedBySubscriber
-                      ? {
-                          color: theme.colorsThemed.accent.yellow,
-                        }
-                      : {}),
                     cursor: 'pointer',
                   }}
                 >
-                  {isMyBid
-                    ? option.supporterCount > 1
-                      ? t('me')
-                      : t('my')
-                    : getDisplayname(option.whitelistSupporter!!)}
+                  {getDisplayname(option.whitelistSupporter!!)}
+                  <SInlineSvgVerificationIcon
+                    svg={
+                      !isBlue
+                        ? VerificationCheckmark
+                        : VerificationCheckmarkInverted
+                    }
+                    width='14px'
+                    height='14px'
+                    fill='none'
+                  />
                 </SSpanBiddersHighlighted>
               </Link>
             )}
-            {isSupportedByMe && !isMyBid ? (
-              <SSpanBiddersHighlighted className='spanHighlighted'>{`, ${t(
-                'me'
-              )}`}</SSpanBiddersHighlighted>
+            {(isSupportedByMe && !isMyBid) ||
+            (isSupportedByMe && !!option.whitelistSupporter) ? (
+              <Link
+                href={`/profile${
+                  user.userData?.options?.isCreator ? '/my-posts' : ''
+                }`}
+              >
+                <SSpanBiddersHighlighted
+                  className='spanHighlighted'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                >{`, ${t('me')}`}</SSpanBiddersHighlighted>
+              </Link>
             ) : null}
-            {option.supporterCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? (
+            {option.supporterCount >
+            ((isSupportedByMe && !isMyBid) ||
+            (isSupportedByMe && isMyBid && option.whitelistSupporter)
+              ? 2
+              : 1) ? (
               <>
                 <SSpanBiddersRegular className='spanRegular'>{` & `}</SSpanBiddersRegular>
                 <SSpanBiddersHighlighted className='spanHighlighted'>
                   {formatNumber(
                     option.supporterCount -
-                      (isSupportedByMe && !isMyBid ? 2 : 1),
+                      ((isSupportedByMe && !isMyBid) ||
+                      (isSupportedByMe && isMyBid && option.whitelistSupporter)
+                        ? 2
+                        : 1),
                     true
                   )}{' '}
                   {t('acPost.optionsTab.optionCard.others')}
@@ -778,9 +783,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='ac'
-        isVisible={paymentSuccessModalOpen}
+        value={paymentSuccessValue}
+        isVisible={paymentSuccessValue !== undefined}
         closeModal={() => {
-          setPaymentSuccessModalOpen(false);
+          setPaymentSuccessValue(undefined);
           promptUserWithPushNotificationsPermissionModal();
         }}
       >
@@ -1228,4 +1234,12 @@ const SEllipseButtonMobile = styled(Button)`
   &:focus:enabled {
     background: transparent;
   }
+`;
+
+const SInlineSvgVerificationIcon = styled(InlineSvg)`
+  display: inline-flex;
+  margin-left: 3px;
+
+  position: relative;
+  top: 3px;
 `;

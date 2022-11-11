@@ -54,12 +54,13 @@
   },
   "paymentSuccessModal": {
     "title": {
-      "ac": "你已出價！",
-      "mc": "你已投票！",
+      "ac_NEED_TRANSLATION": "Bid is in!",
+      "mc_NEED_TRANSLATION": "Votes are in!",
+      "mc-single_NEED_TRANSLATION": "Vote is in!",
       "cf": "你選擇支持這個Goal！"
     },
     "doneButton": "聽起來不錯！",
-    "ac": "{{postCreator}} 到時間後就會選出他們最喜歡的bid。",
+    "ac_NEED_TRANSLATION": "{{postCreator}} will pick their favorite one once the Bid is over.",
     "mc": "{{postCreator}}將在Superpoll結束後完成得票數最多的選項。",
     "cf": "{{postCreator}}在獲得足夠的支持者后，就會完成這個Goal。"
   },
@@ -439,11 +440,13 @@
             "vote": "票"
           }
         },
-        "suggestionPlaceholder": "添加你自己的選項……",
+        "suggestionPlaceholder": "添加你自己的選項",
         "suggestionPlaceholderDesktop": "添加選……",
         "placeABidButton": "添加我的選項",
         "offersBundles": "{{creator}} 提供Superpoll Bundle",
-        "viewBundles": "查看Bundle"
+        "viewBundles": "查看Bundle",
+        "getMoreBundles_NEED_TRANSLATION": "Get another Superpoll Bundle",
+        "getBundles_NEED_TRANSLATION": "Get it"
       }
     },
     "winnerTab": {

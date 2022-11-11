@@ -4,8 +4,8 @@
       "title": "NewNew個人資料頁",
       "description": "自定義用戶名、顯示名稱、個人簡介和更多內容，定制你的NewNew個人資料"
     },
-    "noContent": {
-      "description": "你出價、投票或\n支持的帖子將在這裡顯示"
+    "noContent_NEED_TRANSLATION": {
+      "description": "Posts you’re actively bidding on\nor voting on will be shown here"
     }
   },
   "MyPosts": {

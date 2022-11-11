@@ -25,7 +25,9 @@
       "insights": "Estadísticas",
       "insightsTablet": "Ir a estadísticas",
       "cashOut": {
-        "amount": "Tu próximo pago de",
+        "amount_NEED_TRANSLATION": "Your Stripe earning are",
+        "amountSecondLine_NEED_TRANSLATION": "Manage your balance on Stripe.",
+        "stripeButton_NEED_TRANSLATION": "Take me to Stripe",
         "date": "se enviará automáticamente el {{date}}.",
         "submit": "Más información",
         "noPayouts": "No tienes ningún pago pendiente"
@@ -116,7 +118,8 @@
       "payPeriod_NEED_TRANSLATION": "this pay period",
       "unitName_NEED_TRANSLATION": "bundle",
       "earned_NEED_TRANSLATION": "earned",
-      "noSoldYet_NEED_TRANSLATION": "No bundles sold yet"
+      "noSoldYet_NEED_TRANSLATION": "No bundles sold yet",
+      "sold_NEED_TRANSLATION": "sold"
     },
     "bundlesSet": {
       "title_NEED_TRANSLATION": "Superpoll Bundles",
@@ -181,7 +184,7 @@
     "noMessagesFirstLine": "Todavía no hay mensajes aquí...",
     "typing": "Escribiendo...",
     "toolbar": {
-      "searchPlaceholder": "Busca mensajes o usuarios"
+      "searchPlaceholder": "Busca usuarios"
     },
     "modal": {
       "newMessage": {

@@ -4,12 +4,16 @@ import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
+import { toast } from 'react-toastify';
 
 import Headline from '../../atoms/Headline';
 import { useAppSelector } from '../../../redux-store/store';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
-import { getBundleStatus } from '../../../api/endpoints/bundles';
+import {
+  getBundleStatus,
+  setBundleStatus,
+} from '../../../api/endpoints/bundles';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
@@ -40,6 +44,7 @@ export const Bundles: React.FC = React.memo(() => {
 
   const [turnBundleModalOpen, setTurnBundleModalOpen] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const [isBundlesEnabled, setIsBundlesEnabled] = useState<boolean | undefined>(
     undefined
@@ -49,14 +54,37 @@ export const Bundles: React.FC = React.memo(() => {
     setTurnBundleModalOpen((prevState) => !prevState);
   }, []);
 
-  const toggleIsBundlesEnabled = useCallback(() => {
-    if (isBundlesEnabled === undefined) {
+  const toggleIsBundlesEnabled = useCallback(async () => {
+    if (busy) {
       return;
     }
-    setIsBundlesEnabled((prevState) => !prevState);
-    setTurnBundleModalOpen(false);
-    setSuccessModalOpen(true);
-  }, [isBundlesEnabled]);
+
+    setBusy(true);
+
+    try {
+      const payload = new newnewapi.SetBundleStatusRequest({
+        bundleStatus: isBundlesEnabled
+          ? newnewapi.CreatorBundleStatus.DISABLED
+          : newnewapi.CreatorBundleStatus.ENABLED,
+      });
+
+      const res = await setBundleStatus(payload);
+
+      // TODO: add translation
+      if (!res.data || res.error) {
+        throw new Error('Request failed');
+      }
+
+      setIsBundlesEnabled(!isBundlesEnabled);
+      setTurnBundleModalOpen(false);
+      setSuccessModalOpen(true);
+    } catch (err) {
+      console.error(err);
+      toast.error('toastErrors.generic');
+    } finally {
+      setBusy(false);
+    }
+  }, [busy, isBundlesEnabled]);
 
   const renderListItem = useCallback(
     (item: newnewapi.IBundleOffer, index: number) => (
@@ -112,6 +140,7 @@ export const Bundles: React.FC = React.memo(() => {
                   </SText>
                 </STextHolder>
                 <SButton
+                  id='turn-on-bundles-button'
                   onClick={toggleTurnBundleModalOpen}
                   enabled={isBundlesEnabled}
                   disabled={isBundlesEnabled === undefined}
@@ -122,7 +151,7 @@ export const Bundles: React.FC = React.memo(() => {
                 </SButton>
               </SHeaderLine>
               <SBundles>
-                {appConstants.bundleOffers.map(renderListItem)}
+                {appConstants.bundleOffers?.map(renderListItem)}
               </SBundles>
             </SBlock>
             {!isBundlesEnabled && (
@@ -136,7 +165,7 @@ export const Bundles: React.FC = React.memo(() => {
           show
           zIndex={1001}
           isBundlesEnabled={isBundlesEnabled}
-          onBundlesStatusChange={toggleIsBundlesEnabled}
+          onToggleBundles={toggleIsBundlesEnabled}
           onClose={toggleTurnBundleModalOpen}
         />
       )}

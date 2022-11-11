@@ -25,7 +25,9 @@
       "insights": "Insights",
       "insightsTablet": "Go to insights",
       "cashOut": {
-        "amount": "Your next payout of",
+        "amount": "Your Stripe earning are",
+        "amountSecondLine": "Manage your balance on Stripe.",
+        "stripeButton": "Take me to Stripe",
         "date": "will automatically be sent on {{date}}.",
         "submit": "Learn More",
         "noPayouts": "You don’t have any upcoming payouts"
@@ -116,7 +118,8 @@
       "payPeriod": "this pay period",
       "unitName": "bundle",
       "earned": "earned",
-      "noSoldYet": "No bundles sold yet"
+      "noSoldYet": "No bundles sold yet",
+      "sold": "sold"
     },
     "bundlesSet": {
       "title": "Superpoll Bundles",
@@ -181,7 +184,7 @@
     "noMessagesFirstLine": "No messages here yet...",
     "typing": "Typing...",
     "toolbar": {
-      "searchPlaceholder": "Search for messages or users"
+      "searchPlaceholder": "Search for users"
     },
     "modal": {
       "newMessage": {

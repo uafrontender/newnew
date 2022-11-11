@@ -54,12 +54,13 @@
   },
   "paymentSuccessModal": {
     "title": {
-      "ac": "¡Tu oferta está en marcha!",
-      "mc": "¡Tu voto está dentro!",
+      "ac_NEED_TRANSLATION": "Bid is in!",
+      "mc_NEED_TRANSLATION": "Votes are in!",
+      "mc-single_NEED_TRANSLATION": "Vote is in!",
       "cf": "¡Estás patrocinando este Goal!"
     },
     "doneButton": "¡Suena bien!",
-    "ac": "{{postCreator}} elegirá su oferta favorita cuando se acabe el tiempo.",
+    "ac_NEED_TRANSLATION": "{{postCreator}} will pick their favorite one once the Bid is over.",
     "mc": "{{postCreator}} hará la opción con la mayor cantidad de votos cuando termine la Superpoll.",
     "cf": "{{postCreator}} hará el objetivo una vez que consiga suficientes patrocinadores."
   },
@@ -439,11 +440,13 @@
             "vote": "voto"
           }
         },
-        "suggestionPlaceholder": "Agregar tu propia opción...",
+        "suggestionPlaceholder": "Agregar tu propia opción",
         "suggestionPlaceholderDesktop": "Agregar opción...",
         "placeABidButton": "Agregar mi opción",
         "offersBundles": "{{creator}} ofrece Bundles de Superpoll",
-        "viewBundles": "Ver Bundles"
+        "viewBundles": "Ver Bundles",
+        "getMoreBundles_NEED_TRANSLATION": "Get another Superpoll Bundle",
+        "getBundles_NEED_TRANSLATION": "Get it"
       }
     },
     "winnerTab": {

@@ -20,7 +20,7 @@ interface IBlockedUser {
   confirmBlockUser: boolean;
   isBlocked?: boolean;
   isAnnouncement?: boolean;
-  user: newnewapi.IUser;
+  user: newnewapi.IVisavisUser;
 }
 
 const BlockedUser: React.FC<IBlockedUser> = ({
@@ -43,7 +43,7 @@ const BlockedUser: React.FC<IBlockedUser> = ({
               <SBottomActionTitle>
                 {isAnnouncement
                   ? t('groupBlocked.title')
-                  : `${t('userBlocked.title')} ${user.username}`}
+                  : `${t('userBlocked.title')} ${user.user?.username}`}
               </SBottomActionTitle>
               <SBottomActionMessage>
                 {isAnnouncement

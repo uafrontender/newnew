@@ -1,6 +1,5 @@
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -11,10 +10,8 @@ import { usePushNotifications } from '../../../contexts/pushNotificationsContext
 import { useAppSelector } from '../../../redux-store/store';
 import { formatNumber } from '../../../utils/format';
 import getCustomerPaymentFee from '../../../utils/getCustomerPaymentFee';
-import getDisplayname from '../../../utils/getDisplayname';
 import useStripeSetupIntent from '../../../utils/hooks/useStripeSetupIntent';
 import { Mixpanel } from '../../../utils/mixpanel';
-import Text from '../../atoms/Text';
 import PaymentModal from '../checkout/PaymentModal';
 import LoadingModal from '../LoadingModal';
 import BulletLine from './BulletLine';
@@ -151,26 +148,6 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         redirectUrl='bundles'
         onClose={onClose}
         handlePayWithCard={handlePayWithCard}
-        bottomCaption={
-          (!appConstants.minHoldAmount?.usdCents ||
-            paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
-            <SPaymentSign variant='subtitle'>
-              {t('modal.buyBundle.paymentModalFooter.body', {
-                creator: getDisplayname(creator),
-              })}
-              *
-              <Link href='https://terms.newnew.co'>
-                <SPaymentTermsLink
-                  href='https://terms.newnew.co'
-                  target='_blank'
-                >
-                  {t('modal.buyBundle.paymentModalFooter.terms')}
-                </SPaymentTermsLink>
-              </Link>{' '}
-              {t('modal.buyBundle.paymentModalFooter.apply')}
-            </SPaymentSign>
-          )
-        }
       >
         <ModalTitle>
           {t('modal.buyBundle.payment.header', { creator: creator.username })}
@@ -223,18 +200,6 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
 };
 
 export default BundlePaymentModal;
-
-const SPaymentSign = styled(Text)`
-  margin-top: 24px;
-
-  text-align: center;
-  white-space: pre-wrap;
-  word-break: break-word;
-`;
-
-const SPaymentTermsLink = styled.a`
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-`;
 
 const ModalTitle = styled.h4`
   font-weight: 600;

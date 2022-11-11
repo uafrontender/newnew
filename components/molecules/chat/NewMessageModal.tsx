@@ -94,7 +94,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const loadData = useCallback(
     async (paging: Paging): Promise<PaginatedResponse<newnewapi.IChatRoom>> => {
       const payload = new newnewapi.GetMyRoomsRequest({
-        myRole: user.userData?.options?.isOfferingSubscription ? null : 1,
+        myRole: user.userData?.options?.isOfferingBundles ? null : 1,
         paging,
       });
 
@@ -115,7 +115,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         nextPageToken: res.data.paging?.nextPageToken,
       };
     },
-    [user.userData?.options?.isOfferingSubscription]
+    [user.userData?.options?.isOfferingBundles]
   );
 
   const { data, loading, hasMore, loadMore } = usePagination(
@@ -132,7 +132,8 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         }
 
         const existingRoomIndex = list.findIndex(
-          (currChat) => currChat.visavis?.username === chat.visavis?.username
+          (currChat) =>
+            currChat.visavis?.user?.username === chat.visavis?.user?.username
         );
 
         if (existingRoomIndex < 0) {
@@ -160,8 +161,10 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
   useEffect(() => {
     const obj = chatRooms.reduce((acc: { [key: string]: any }, c) => {
-      if (c.visavis && c.visavis.username) {
-        const letter = clearNameFromEmoji(c.visavis.username)[0].toLowerCase();
+      if (c.visavis && c.visavis.user?.username) {
+        const letter = clearNameFromEmoji(
+          c.visavis.user?.username
+        )[0].toLowerCase();
         acc[letter] = (acc[letter] || []).concat(c);
       }
       return acc;
@@ -193,16 +196,16 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       chatRooms.forEach((chat: IChatRoomUserNameWithoutEmoji) => {
         if (!chat.userNameWithoutEmoji) {
           /* eslint-disable no-param-reassign */
-          if (chat.visavis && chat.visavis.username)
+          if (chat.visavis && chat.visavis.user?.username)
             chat.userNameWithoutEmoji = clearNameFromEmoji(
-              chat.visavis.username
+              chat.visavis.user?.username
             ).toLowerCase();
         } else {
           // eslint-disable-next-line no-lonely-if
           if (
             chat.userNameWithoutEmoji.includes(searchValue) ||
-            (chat.visavis?.nickname &&
-              chat.visavis?.nickname.includes(searchValue))
+            (chat.visavis?.user?.nickname &&
+              chat.visavis?.user?.nickname.includes(searchValue))
           )
             arr.push(chat);
         }
@@ -241,23 +244,24 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       return (
         <SChatItemContainer key={chat.id?.toString()}>
           <SChatItemM onClick={handleItemClick}>
-            {chat.visavis?.avatarUrl && (
+            {chat.visavis?.user?.avatarUrl && (
               <SUserAvatar>
-                <UserAvatar avatarUrl={chat.visavis?.avatarUrl} />
+                <UserAvatar avatarUrl={chat.visavis?.user?.avatarUrl} />
               </SUserAvatar>
             )}
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
-                {chat.visavis?.nickname || chat.visavis?.username}
-                {chat.visavis?.options && chat.visavis?.options.isVerified && (
-                  <SInlineSVG
-                    svg={VerificationCheckmark}
-                    width='16px'
-                    height='16px'
-                  />
-                )}
+                {chat.visavis?.user?.nickname || chat.visavis?.user?.username}
+                {chat.visavis?.user?.options &&
+                  chat.visavis?.user?.options.isVerified && (
+                    <SInlineSVG
+                      svg={VerificationCheckmark}
+                      width='16px'
+                      height='16px'
+                    />
+                  )}
               </SChatItemText>
-              <SUserAlias>@{chat.visavis?.username}</SUserAlias>
+              <SUserAlias>@{chat.visavis?.user?.username}</SUserAlias>
             </SChatItemCenter>
           </SChatItemM>
           {filteredChatrooms.length > 0
@@ -312,7 +316,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
                 )
               ) : (
                 <SSectionContent ref={scrollRef}>
-                  {user.userData?.options?.isOfferingSubscription && (
+                  {user.userData?.options?.isOfferingBundles && (
                     <NewAnnouncement handleClick={createNewAnnouncement} />
                   )}
                   {chatroomsSortedList.length > 0 &&
