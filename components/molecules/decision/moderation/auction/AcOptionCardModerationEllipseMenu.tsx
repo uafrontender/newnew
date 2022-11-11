@@ -1,14 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
+import { newnewapi } from 'newnew-api';
+
+import isBrowser from '../../../../../utils/isBrowser';
+import { checkCanDeleteAcOption } from '../../../../../api/endpoints/auction';
 
 import EllipseMenu, { EllipseMenuButton } from '../../../../atoms/EllipseMenu';
 
-import isBrowser from '../../../../../utils/isBrowser';
-
 interface IAcOptionCardModerationEllipseMenu {
   isVisible: boolean;
-  canDeleteOption: boolean;
+  optionId: number;
+  canDeleteOptionInitial: boolean;
   handleClose: () => void;
   handleOpenReportOptionModal: () => void;
   handleOpenBlockUserModal: () => void;
@@ -20,7 +23,8 @@ const AcOptionCardModerationEllipseMenu: React.FunctionComponent<
   IAcOptionCardModerationEllipseMenu
 > = ({
   isVisible,
-  canDeleteOption,
+  optionId,
+  canDeleteOptionInitial,
   handleClose,
   handleOpenReportOptionModal,
   handleOpenBlockUserModal,
@@ -28,6 +32,37 @@ const AcOptionCardModerationEllipseMenu: React.FunctionComponent<
   anchorElement,
 }) => {
   const { t } = useTranslation('common');
+
+  const [canDeleteOption, setCanDeleteOption] = useState(false);
+  const [isCanDeleteOptionLoading, setIsCanDeleteOptionLoading] =
+    useState(false);
+
+  useEffect(() => {
+    async function fetchCanDelete() {
+      setIsCanDeleteOptionLoading(true);
+      try {
+        let canDelete = false;
+        const payload = new newnewapi.CanDeleteAcOptionRequest({
+          optionId,
+        });
+
+        const res = await checkCanDeleteAcOption(payload);
+
+        if (res.data) {
+          canDelete = res.data.canDelete;
+        }
+
+        setCanDeleteOption(canDelete);
+      } catch (err) {
+        console.error(err);
+      }
+      setIsCanDeleteOptionLoading(false);
+    }
+
+    if (isVisible && canDeleteOption) {
+      fetchCanDelete();
+    }
+  }, [isVisible, canDeleteOption, optionId]);
 
   useEffect(() => {
     if (isBrowser()) {
@@ -71,7 +106,11 @@ const AcOptionCardModerationEllipseMenu: React.FunctionComponent<
       </EllipseMenuButton>
       <EllipseMenuButton
         variant={3}
-        disabled={!canDeleteOption}
+        disabled={
+          !canDeleteOption ||
+          isCanDeleteOptionLoading ||
+          !canDeleteOptionInitial
+        }
         onClick={() => {
           handleOpenRemoveOptionModal();
           handleClose();
