@@ -70,6 +70,11 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
                   setVotesToUse(newValue);
                 }
               }}
+              onBlur={() => {
+                if (votesToUse && votesToUse > bundleVotesLeft) {
+                  setVotesToUse(bundleVotesLeft);
+                }
+              }}
             />
           </SInputWrapper>
           <SDoneButton
