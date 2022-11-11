@@ -151,7 +151,19 @@
         "requestFailed": "請求失敗"
       }
     },
-    "creatorsBundleModal": {
+    "buyBundleSuccess_NEED_TRANSLATION": {
+      "votes": "<0>{{amount}}</0> votes unlocked",
+      "for": "為",
+      "access": "剩餘{{amount}} {{unit}}:",
+      "customOptions": "adding custom superpoll options",
+      "chat": "一對一私聊",
+      "button": "Sounds good!",
+      "unit": {
+        "month": "月",
+        "months": "月"
+      }
+    },
+    "creatorsBundle": {
       "votesLeft": "剩餘<0>{{amount}}</0> 票",
       "for": "為 <0>{{creator}}</0>",
       "access": "剩餘{{amount}} {{unit}}:",

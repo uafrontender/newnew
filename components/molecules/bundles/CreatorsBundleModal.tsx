@@ -3,6 +3,7 @@ import React from 'react';
 import { Trans, useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import Link from 'next/link';
 
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
@@ -60,17 +61,12 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                 <SUserAvatar
                   avatarUrl={creatorBundle?.creator?.avatarUrl ?? ''}
                 />
-                <SUsername>
-                  <Trans
-                    t={t}
-                    i18nKey='modal.creatorsBundle.for'
-                    // @ts-ignore
-                    components={[
-                      <SLink href={`/${creatorBundle?.creator?.username}`} />,
-                      { creator: creatorBundle?.creator?.username },
-                    ]}
-                  />
-                </SUsername>
+                <SForLine>
+                  {t('modal.creatorsBundle.for')}
+                  <Link href={`/${creatorBundle?.creator?.username}`}>
+                    <SUserName>{creatorBundle?.creator?.username}</SUserName>
+                  </Link>
+                </SForLine>
               </SUserInfo>
               <SBundleInfo>
                 <AccessDescription>
@@ -153,14 +149,17 @@ const SUserAvatar = styled(UserAvatar)`
   margin-right: 8px;
 `;
 
-const SUsername = styled.p`
+const SForLine = styled.p`
+  display: inline-flex;
+  white-space: pre;
   color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
 `;
 
-const SLink = styled.a`
+const SUserName = styled.p`
+  cursor: pointer;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
 
   &:hover {
