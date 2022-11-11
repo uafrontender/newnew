@@ -440,7 +440,7 @@
             "vote": "票"
           }
         },
-        "suggestionPlaceholder": "添加你自己的選項……",
+        "suggestionPlaceholder": "添加你自己的選項",
         "suggestionPlaceholderDesktop": "添加選……",
         "placeABidButton": "添加我的選項",
         "offersBundles": "{{creator}} 提供Superpoll Bundle",

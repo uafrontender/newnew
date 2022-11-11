@@ -18,11 +18,12 @@ import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verif
 interface IBuyBundleModal {
   show: boolean;
   creator: newnewapi.IUser;
+  additionalZ?: number;
   onClose: () => void;
 }
 
 const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
-  ({ show, creator, onClose }) => {
+  ({ show, creator, additionalZ, onClose }) => {
     const { t } = useTranslation('common');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const { appConstants } = useGetAppConstants();
@@ -36,7 +37,15 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
 
     return (
       <>
-        <Modal show={show} onClose={onClose}>
+        <Modal
+          show={show}
+          {...(additionalZ
+            ? {
+                additionalz: additionalZ,
+              }
+            : {})}
+          onClose={onClose}
+        >
           <SModalPaper
             title={!isMobile ? t('modal.buyBundle.title') : undefined}
             onClose={onClose}

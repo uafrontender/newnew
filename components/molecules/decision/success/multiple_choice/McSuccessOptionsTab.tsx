@@ -177,9 +177,9 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
 
   return (
     <SWrapper>
-      <GoBackButton onClick={handleGoBack}>
+      <SGoBackButton onClick={handleGoBack}>
         {t('acPostSuccess.optionsTab.backButton')}
-      </GoBackButton>
+      </SGoBackButton>
       {!isMobile && <SSeparator />}
       <SBidsContainer
         ref={(el) => {
@@ -241,6 +241,12 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
 };
 
 export default McSuccessOptionsTab;
+
+const SGoBackButton = styled(GoBackButton)`
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 16px;
+  }
+`;
 
 const SWrapper = styled.div``;
 

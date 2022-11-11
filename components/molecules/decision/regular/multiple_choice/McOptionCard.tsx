@@ -31,6 +31,8 @@ import { formatNumber } from '../../../../../utils/format';
 // Icons
 import VoteIconLight from '../../../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.png';
+import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
+
 import McOptionCardSelectVotesMenu from './McOptionCardSelectVotesMenu';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import McOptionCardSelectVotesModal from './McOptionCardSelectVotesModal';
@@ -399,6 +401,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           .option as newnewapi.MultipleChoice.Option;
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        setIsSupportMenuOpen(false);
         setLoadingModalOpen(false);
         handleSetPaymentSuccessValue(votesCount);
       } catch (err) {
@@ -538,6 +541,14 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubtracted}
                 amISubscribed={!!bundle}
+                amIVerified={user.userData?.options?.isVerified ?? false}
+                isOptionCreatorVerified={
+                  option.creator?.options?.isVerified ?? false
+                }
+                isFirstVoterVerified={
+                  option.firstVoter?.options?.isVerified ?? false
+                }
+                isWhitelistSupporterVerified={!!option.whitelistSupporter}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -783,6 +794,14 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   supporterCount={option.supporterCount}
                   supporterCountSubtracted={supporterCountSubtracted}
                   amISubscribed={!!bundle}
+                  amIVerified={user.userData?.options?.isVerified ?? false}
+                  isOptionCreatorVerified={
+                    option.creator?.options?.isVerified ?? false
+                  }
+                  isFirstVoterVerified={
+                    option.firstVoter?.options?.isVerified ?? false
+                  }
+                  isWhitelistSupporterVerified={!!option.whitelistSupporter}
                 />
               </SBiddersInfo>
             </SBidDetails>
@@ -874,6 +893,10 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   whiteListedSupporter?: string;
   whiteListedSupporterUsername?: string;
   amISubscribed?: boolean;
+  amIVerified?: boolean;
+  isOptionCreatorVerified?: boolean;
+  isFirstVoterVerified?: boolean;
+  isWhitelistSupporterVerified?: boolean;
 }> = ({
   isCreatorsBid,
   isSupportedByMe,
@@ -887,9 +910,13 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   whiteListedSupporter,
   whiteListedSupporterUsername,
   amISubscribed,
+  amIVerified,
+  isOptionCreatorVerified,
+  isFirstVoterVerified,
+  isWhitelistSupporterVerified,
 }) => {
-  const theme = useTheme();
   const { t } = useTranslation('modal-Post');
+  const user = useAppSelector((state) => state.user);
 
   if (isCreatorsBid && !isSupportedByMe) {
     return (
@@ -906,6 +933,14 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   }}
                 >
                   {whiteListedSupporter}
+                  {isWhitelistSupporterVerified && (
+                    <SInlineSvgVerificationIcon
+                      svg={VerificationCheckmark}
+                      width='14px'
+                      height='14px'
+                      fill='none'
+                    />
+                  )}
                 </SSpanBiddersHighlighted>
               </Link>
             ) : firstVoter ? (
@@ -918,6 +953,14 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   }}
                 >
                   {firstVoter}
+                  {isFirstVoterVerified && (
+                    <SInlineSvgVerificationIcon
+                      svg={VerificationCheckmark}
+                      width='14px'
+                      height='14px'
+                      fill='none'
+                    />
+                  )}
                 </SSpanBiddersHighlighted>
               </Link>
             ) : null}
@@ -944,18 +987,23 @@ export const RenderSupportersInfo: React.FunctionComponent<{
       <>
         {supporterCount > 0 ? (
           <>
-            <SSpanBiddersHighlighted
-              className='spanHighlighted'
-              style={{
-                ...(isSuggestedByMe || amISubscribed
-                  ? {
-                      color: theme.colorsThemed.accent.yellow,
-                    }
-                  : {}),
-              }}
+            <Link
+              href={`/profile${
+                user.userData?.options?.isCreator ? '/my-posts' : ''
+              }`}
             >
-              {supporterCountSubtracted > 0 ? t('me') : t('I')}
-            </SSpanBiddersHighlighted>
+              <SSpanBiddersHighlighted
+                className='spanHighlighted'
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                style={{
+                  cursor: 'pointer',
+                }}
+              >
+                {supporterCountSubtracted > 0 ? t('me') : t('I')}
+              </SSpanBiddersHighlighted>
+            </Link>
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>
@@ -985,14 +1033,18 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 e.stopPropagation();
               }}
               style={{
-                color:
-                  theme.name === 'dark'
-                    ? theme.colorsThemed.accent.yellow
-                    : theme.colors.dark,
                 cursor: 'pointer',
               }}
             >
               {optionCreator}
+              {isOptionCreatorVerified && (
+                <SInlineSvgVerificationIcon
+                  svg={VerificationCheckmark}
+                  width='14px'
+                  height='14px'
+                  fill='none'
+                />
+              )}
             </SSpanBiddersHighlighted>
           </Link>
         ) : (
@@ -1003,14 +1055,18 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 e.stopPropagation();
               }}
               style={{
-                color:
-                  theme.name === 'dark'
-                    ? theme.colorsThemed.accent.yellow
-                    : theme.colors.dark,
                 cursor: 'pointer',
               }}
             >
               {whiteListedSupporter}
+              {isWhitelistSupporterVerified && (
+                <SInlineSvgVerificationIcon
+                  svg={VerificationCheckmark}
+                  width='14px'
+                  height='14px'
+                  fill='none'
+                />
+              )}
             </SSpanBiddersHighlighted>
           </Link>
         )}
@@ -1043,11 +1099,18 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 e.stopPropagation();
               }}
               style={{
-                color: theme.colorsThemed.accent.yellow,
                 cursor: 'pointer',
               }}
             >
               {optionCreator}
+              {isOptionCreatorVerified && (
+                <SInlineSvgVerificationIcon
+                  svg={VerificationCheckmark}
+                  width='14px'
+                  height='14px'
+                  fill='none'
+                />
+              )}
             </SSpanBiddersHighlighted>
           </Link>
         ) : (
@@ -1058,17 +1121,38 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 e.stopPropagation();
               }}
               style={{
-                color: theme.colorsThemed.accent.yellow,
                 cursor: 'pointer',
               }}
             >
               {whiteListedSupporter}
+              {isWhitelistSupporterVerified && (
+                <SInlineSvgVerificationIcon
+                  svg={VerificationCheckmark}
+                  width='14px'
+                  height='14px'
+                  fill='none'
+                />
+              )}
             </SSpanBiddersHighlighted>
           </Link>
         )}
-        <SSpanBiddersHighlighted className='spanHighlighted'>
+        <SSpanBiddersHighlighted
+          className='spanHighlighted'
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          style={{
+            cursor: 'pointer',
+          }}
+        >
           {', '}
-          {`${t('me')}`}
+          <Link
+            href={`/profile${
+              user.userData?.options?.isCreator ? '/my-posts' : ''
+            }`}
+          >
+            {`${t('me')}`}
+          </Link>
         </SSpanBiddersHighlighted>
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubtracted - 1 > 0 ? ` & ` : ''}
@@ -1098,7 +1182,6 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               e.stopPropagation();
             }}
             style={{
-              color: theme.colorsThemed.accent.yellow,
               cursor: 'pointer',
             }}
           >
@@ -1140,7 +1223,7 @@ const SContainer = styled(motion.div)<{
 
   background-color: ${({ theme, $isBlue }) =>
     $isBlue
-      ? theme.colorsThemed.accent.blue
+      ? theme.colorsThemed.accent.yellow
       : theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
@@ -1177,15 +1260,16 @@ const SBidDetails = styled.div<{
     isBlue
       ? css`
           div {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
           }
 
           .spanRegular {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
+
             opacity: 0.6;
           }
           .spanHighlighted {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
           }
         `
       : null}
@@ -1200,7 +1284,7 @@ const SBidDetails = styled.div<{
 
     background-color: ${({ theme, isBlue }) =>
       isBlue
-        ? theme.colorsThemed.accent.blue
+        ? theme.colorsThemed.accent.yellow
         : theme.colorsThemed.background.tertiary};
 
     border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -1302,8 +1386,8 @@ const SSupportButton = styled(Button)<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          color: ${({ theme }) => theme.colors.dark};
-          background: #ffffff;
+          color: #ffffff;
+          background: ${({ theme }) => theme.colors.dark};
         `
       : null}
 `;
@@ -1344,7 +1428,9 @@ const SSupportButtonDesktop = styled(Button)<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          border-left: #ffffff 1px solid;
+          border-left: ${({ theme }) => theme.colors.dark} 1px solid;
+          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+          color: ${({ theme }) => theme.colors.dark};
         `
       : null}
 
@@ -1370,18 +1456,19 @@ const SSelectVotesModalCard = styled.div<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          background: ${({ theme }) => theme.colorsThemed.accent.blue};
+          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
           div {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
           }
 
           .spanRegular {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
+
             opacity: 0.6;
           }
           .spanHighlighted {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
           }
         `
       : null}
@@ -1483,4 +1570,12 @@ const SEllipseButtonMobile = styled(Button)`
   &:focus:enabled {
     background: transparent;
   }
+`;
+
+const SInlineSvgVerificationIcon = styled(InlineSvg)`
+  display: inline-flex;
+  margin-left: 3px;
+
+  position: relative;
+  top: 3px;
 `;
