@@ -83,7 +83,7 @@ const SHeadline = styled(Headline)`
   margin-bottom: 18px;
 `;
 
-const SModalMessage = styled.p`
+const SModalMessage = styled.div`
   text-align: center;
   margin-bottom: 24px;
 `;

@@ -94,7 +94,7 @@ interface IMcOptionCard {
   noAction: boolean;
   isCreatorsBid: boolean;
   bundle?: newnewapi.IBundle;
-  handleSetPaymentSuccessModalOpen: (newValue: boolean) => void;
+  handleSetPaymentSuccessValue: (newValue: number) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
   ) => void;
@@ -114,7 +114,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   isCreatorsBid,
   bundle,
   handleRemoveOption,
-  handleSetPaymentSuccessModalOpen,
+  handleSetPaymentSuccessValue,
   handleAddOrUpdateOptionFromResponse,
   handleSetScrollBlocked,
   handleUnsetScrollBlocked,
@@ -352,7 +352,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-        handleSetPaymentSuccessModalOpen(true);
+        handleSetPaymentSuccessValue(supportVoteOffer?.amountOfVotes || 0);
         setPaymentModalOpen(false);
         setSupportVoteOffer(null);
         setIsSupportMenuOpen(false);
@@ -365,8 +365,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       }
     },
     [
-      handleSetPaymentSuccessModalOpen,
+      handleSetPaymentSuccessValue,
       handleAddOrUpdateOptionFromResponse,
+      supportVoteOffer?.amountOfVotes,
       postId,
       setupIntent,
       router,
@@ -401,7 +402,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
         setLoadingModalOpen(false);
-        handleSetPaymentSuccessModalOpen(true);
+        handleSetPaymentSuccessValue(votesCount);
       } catch (err) {
         console.error(err);
         setLoadingModalOpen(false);
@@ -412,7 +413,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       postId,
       option.id,
       handleAddOrUpdateOptionFromResponse,
-      handleSetPaymentSuccessModalOpen,
+      handleSetPaymentSuccessValue,
     ]
   );
 
@@ -546,9 +547,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 isFirstVoterVerified={
                   option.firstVoter?.options?.isVerified ?? false
                 }
-                isWhitelistSupporterVerified={
-                  option.whitelistSupporter?.options?.isVerified ?? false
-                }
+                isWhitelistSupporterVerified={!!option.whitelistSupporter}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -661,7 +660,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         {/* Use Bundle votes vote modal */}
         {bundle?.votesLeft ? (
           <UseBundleVotesModal
-            isVisible={bundleVotesModalOpen}
+            show={bundleVotesModalOpen}
             bundleVotesLeft={bundle.votesLeft}
             optionText={option.text}
             handleVoteWithBundleVotes={handleVoteWithBundleVotes}
@@ -801,9 +800,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   isFirstVoterVerified={
                     option.firstVoter?.options?.isVerified ?? false
                   }
-                  isWhitelistSupporterVerified={
-                    option.whitelistSupporter?.options?.isVerified ?? false
-                  }
+                  isWhitelistSupporterVerified={!!option.whitelistSupporter}
                 />
               </SBiddersInfo>
             </SBidDetails>

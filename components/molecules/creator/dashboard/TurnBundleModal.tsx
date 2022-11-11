@@ -1,8 +1,7 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
-import { newnewapi } from 'newnew-api';
 
 import Modal from '../../../organisms/Modal';
 import ModalPaper from '../../../organisms/ModalPaper';
@@ -10,34 +9,18 @@ import Button from '../../../atoms/Button';
 import votes from '../../../../public/images/dashboard/double-votes.png';
 import Headline from '../../../atoms/Headline';
 import Text from '../../../atoms/Text';
-import { setBundleStatus } from '../../../../api/endpoints/bundles';
 
 interface ITurnBundleModal {
   show: boolean;
   isBundlesEnabled: boolean | undefined;
   zIndex?: number;
-  onBundlesStatusChange: () => void;
+  onToggleBundles: () => void;
   onClose: () => void;
 }
 
 const TurnBundleModal: React.FC<ITurnBundleModal> = React.memo(
-  ({ show, isBundlesEnabled, zIndex, onClose, onBundlesStatusChange }) => {
+  ({ show, isBundlesEnabled, zIndex, onClose, onToggleBundles }) => {
     const { t } = useTranslation('page-Creator');
-
-    const toggleBundlesEnabled = useCallback(async () => {
-      const payload = new newnewapi.SetBundleStatusRequest({
-        bundleStatus: isBundlesEnabled
-          ? newnewapi.CreatorBundleStatus.DISABLED
-          : newnewapi.CreatorBundleStatus.ENABLED,
-      });
-
-      const res = await setBundleStatus(payload);
-
-      // TODO: add translation
-      if (!res.data || res.error) throw new Error('Request failed');
-
-      onBundlesStatusChange();
-    }, [isBundlesEnabled, onBundlesStatusChange]);
 
     return (
       <>
@@ -65,7 +48,7 @@ const TurnBundleModal: React.FC<ITurnBundleModal> = React.memo(
               </SText>
               <SButton
                 id='turn-on-bundles-modal-button'
-                onClick={toggleBundlesEnabled}
+                onClick={onToggleBundles}
                 enabled={isBundlesEnabled}
                 disabled={isBundlesEnabled === undefined}
               >

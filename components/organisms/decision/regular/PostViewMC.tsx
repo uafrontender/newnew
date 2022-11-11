@@ -821,16 +821,19 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       </SWrapper>
       {post.creator?.options?.isOfferingBundles && (
         <SBundlesContainer
-          highlighted={(creatorsBundle?.bundle ?? undefined)?.votesLeft === 0}
+          highlighted={creatorsBundle?.bundle?.votesLeft === 0}
         >
-          {(creatorsBundle?.bundle ?? undefined)?.votesLeft === 0 && (
+          {creatorsBundle?.bundle && (
             <STicketSet numberOFTickets={3} size={36} shift={11} />
           )}
           <SBundlesText>
-            {t('mcPost.optionsTab.actionSection.offersBundles', {
-              creator:
-                (post.creator?.nickname as string) ?? post.creator?.username,
-            })}
+            {creatorsBundle?.bundle
+              ? t('mcPost.optionsTab.actionSection.getMoreBundles')
+              : t('mcPost.optionsTab.actionSection.offersBundles', {
+                  creator:
+                    (post.creator?.nickname as string) ??
+                    post.creator?.username,
+                })}
           </SBundlesText>
           <SHighlightedButton
             size='small'
@@ -838,7 +841,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
               setBuyBundleModalOpen(true);
             }}
           >
-            {t('mcPost.optionsTab.actionSection.viewBundles')}
+            {creatorsBundle?.bundle
+              ? t('mcPost.optionsTab.actionSection.getBundles')
+              : t('mcPost.optionsTab.actionSection.viewBundles')}
           </SHighlightedButton>
         </SBundlesContainer>
       )}

@@ -199,9 +199,7 @@ const McOptionCardModeration: React.FunctionComponent<
                 isFirstVoterVerified={
                   option.firstVoter?.options?.isVerified ?? false
                 }
-                isWhitelistSupporterVerified={
-                  option.whitelistSupporter?.options?.isVerified ?? false
-                }
+                isWhitelistSupporterVerified={!!option.whitelistSupporter}
               />
             </SBiddersInfo>
           </SBidDetails>
