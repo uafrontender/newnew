@@ -12,8 +12,6 @@ self.addEventListener('push', (event) => {
 });
 
 self.addEventListener('notificationclick', (event) => {
-  console.log('On notification click: ', event);
-
   event.notification.close();
 
   // This looks to see if the current is already open and
@@ -26,12 +24,7 @@ self.addEventListener('notificationclick', (event) => {
       .then((clientList) => {
         for (let i = 0; i < clientList.length; i += 1) {
           const client = clientList[i];
-          console.log(
-            client.url,
-            event.notification.data?.message?.url,
-            client.url.includes(event.notification.data?.message?.url)
-          );
-          console.log('focus' in client, 'focus');
+
           if (
             client.url.includes(event.notification.data?.message?.url) &&
             'focus' in client

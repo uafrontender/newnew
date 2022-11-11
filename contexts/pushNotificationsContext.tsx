@@ -136,18 +136,14 @@ const PushNotificationsContextProvider: React.FC<
 
   // Permission Modal
   const openPermissionRequestModal = useCallback(() => {
-    console.log('openPermissionRequestModal');
     setIsPermissionRequestModalOpen(true);
   }, []);
-
-  console.log(isPermissionRequestModalOpen, 'isPermissionRequestModalOpen');
 
   const closePermissionRequestModal = useCallback(() => {
     setIsPermissionRequestModalOpen(false);
   }, []);
 
   const promptUserWithPushNotificationsPermissionModal = useCallback(() => {
-    console.log(permission, 'permission');
     if (
       localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' &&
       permission === 'default' &&
@@ -274,8 +270,6 @@ const PushNotificationsContextProvider: React.FC<
 
         const notificationPermission = await Notification.requestPermission();
 
-        console.log(notificationPermission, 'notificationPermission');
-
         if (notificationPermission === 'granted') {
           const subscription = await swReg.pushManager.subscribe({
             userVisibleOnly: true,
@@ -303,7 +297,6 @@ const PushNotificationsContextProvider: React.FC<
 
         setPermission(notificationPermission);
       } catch (err) {
-        alert(err.message);
         console.error(err);
       }
     },
