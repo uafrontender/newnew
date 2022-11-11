@@ -646,7 +646,7 @@ const SSuggestNewContainer = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     position: absolute;
-    top: 50%;
+    top: calc(50% - 160px);
     left: calc(50% - 220px);
     width: 440px;
 
