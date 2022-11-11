@@ -166,7 +166,9 @@
     "creatorsBundle": {
       "votesLeft": "Quedan <0>{{amount}}</0> votos",
       "for": "para ",
-      "access": "Quedan {{amount}} {{unit}} de:",
+      "access": "Quedan <0/> de:",
+      "unitPair": "{{amount}} {{unit}}",
+      "and": " y las ",
       "customOptions": "agregar opciones personalizadas a cualquier Superpoll",
       "chat": "chat privado 1 a 1",
       "buyButton": "Comprar más votos",
@@ -174,7 +176,9 @@
         "day": "día",
         "days": "días",
         "month": "mes",
-        "months": "meses"
+        "months": "meses",
+        "year": "año",
+        "years": "años"
       }
     }
   },

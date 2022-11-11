@@ -74,10 +74,24 @@ const BundleCard: React.FC<IBundleCard> = ({
         />
       </SVotesLeft>
       <AccessDescription>
-        {t('bundle.access', {
-          amount: formattedTimeLeft.value,
-          unit: t(`bundle.unit.${formattedTimeLeft.unit}`),
-        })}
+        <Trans
+          t={t}
+          i18nKey='bundle.access'
+          // @ts-ignore
+          components={[
+            <>
+              {formattedTimeLeft.map((time, index) => (
+                <>
+                  {index > 0 ? t('bundle.and') : null}
+                  {t('bundle.unitPair', {
+                    amount: time.value,
+                    unit: t(`bundle.unit.${time.unit}`),
+                  })}
+                </>
+              ))}
+            </>,
+          ]}
+        />
       </AccessDescription>
       <BundleFeatures>
         <BulletLine>{t('bundle.customOptions')}</BulletLine>

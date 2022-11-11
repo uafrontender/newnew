@@ -70,12 +70,24 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
               </SUserInfo>
               <SBundleInfo>
                 <AccessDescription>
-                  {t('modal.creatorsBundle.access', {
-                    amount: formattedTimeLeft.value,
-                    unit: t(
-                      `modal.creatorsBundle.unit.${formattedTimeLeft.unit}`
-                    ),
-                  })}
+                  <Trans
+                    t={t}
+                    i18nKey='modal.creatorsBundle.access'
+                    // @ts-ignore
+                    components={[
+                      <>
+                        {formattedTimeLeft.map((time, index) => (
+                          <>
+                            {index > 0 ? t('modal.creatorsBundle.and') : null}
+                            {t('modal.creatorsBundle.unitPair', {
+                              amount: time.value,
+                              unit: t(`modal.creatorsBundle.unit.${time.unit}`),
+                            })}
+                          </>
+                        ))}
+                      </>,
+                    ]}
+                  />
                 </AccessDescription>
                 <BulletLine>
                   {t('modal.creatorsBundle.customOptions')}
