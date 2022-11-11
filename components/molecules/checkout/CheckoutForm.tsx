@@ -202,7 +202,11 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
               setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard)
             }
             selected={selectedPaymentMethod === PaymentMethodTypes.PrimaryCard}
-            label={`${t('primaryCard')} **** ${primaryCard.last4}`}
+            label={
+              userData?.options?.isWhiteListed
+                ? t('primaryCard')
+                : `${t('primaryCard')} **** ${primaryCard.last4}`
+            }
           />
           {!userData?.options?.isWhiteListed && (
             <OptionCard
