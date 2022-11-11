@@ -296,7 +296,8 @@ const AcOptionCardModeration: React.FunctionComponent<
           {!isMobile && (
             <AcOptionCardModerationEllipseMenu
               isVisible={isEllipseMenuOpen}
-              canDeleteOption={!isWinner}
+              optionId={option.id as number}
+              canDeleteOptionInitial={!isWinner}
               handleClose={() => {
                 setIsEllipseMenuOpen(false);
                 handleUnsetScrollBlocked?.();
@@ -383,7 +384,8 @@ const AcOptionCardModeration: React.FunctionComponent<
         <AcOptionCardModerationEllipseModal
           isOpen={isEllipseMenuOpen}
           zIndex={16}
-          canDeleteOption={!isWinner}
+          optionId={option.id as number}
+          canDeleteOptionInitial={!isWinner}
           onClose={() => setIsEllipseMenuOpen(false)}
           handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
           handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
