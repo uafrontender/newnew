@@ -5,27 +5,45 @@ self.addEventListener('push', (event) => {
     body: message.text,
     badge: './favicon.png',
     icon: './favicon.png',
+    data: {
+      message,
+    },
   });
 });
 
 self.addEventListener('notificationclick', (event) => {
-  console.log('On notification click: ', event.notification);
+  console.log('On notification click: ', event);
 
   event.notification.close();
-  clients.openWindow('/');
 
   // This looks to see if the current is already open and
   // focuses if it is
-  // event.waitUntil(clients.matchAll({
-  //   type: "window"
-  // }).then((clientList) => {
-  //   console.log(clientList, 'clientList');
-  //   for (var i = 0; i < clientList.length; i++) {
-  //     var client = clientList[i];
-  //     if (client.url == '/' && 'focus' in client)
-  //       return client.focus();
-  //   }
-  //   if (clients.openWindow)
-  //     return clients.openWindow('/');
-  // }));
+  event.waitUntil(
+    clients
+      .matchAll({
+        type: 'window',
+      })
+      .then((clientList) => {
+        for (let i = 0; i < clientList.length; i += 1) {
+          const client = clientList[i];
+          console.log(
+            client.url,
+            event.notification.data?.message?.url,
+            client.url.includes(event.notification.data?.message?.url)
+          );
+          console.log('focus' in client, 'focus');
+          if (
+            client.url.includes(event.notification.data?.message?.url) &&
+            'focus' in client
+          ) {
+            return client.focus();
+          }
+        }
+        if (clients.openWindow) {
+          return clients.openWindow(
+            event.notification.data?.message?.url || '/'
+          );
+        }
+      })
+  );
 });
