@@ -60,6 +60,11 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
           }px`;
         }
       }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+        }
+      }}
       onChange={onChange}
     />
   );

@@ -60,6 +60,7 @@ interface ICard {
   lastFourDigits: string;
   backgroundImg: string;
   cardId: string;
+  disabledForActions: boolean;
   onChangePrimaryCard: (cardUuid: string) => void;
   onCardDelete: () => void;
 }
@@ -70,6 +71,7 @@ const Card: React.FunctionComponent<ICard> = ({
   funding,
   lastFourDigits,
   cardId,
+  disabledForActions,
   backgroundImg,
   onChangePrimaryCard,
   onCardDelete,
@@ -131,14 +133,16 @@ const Card: React.FunctionComponent<ICard> = ({
             </SCardPrimaryText>
           </SLabel>
         )}
-        <SMoreButton
-          view='quaternary'
-          iconOnly
-          onClick={() => setIsEllipseMenuOpen(true)}
-          ref={moreButtonRef as any}
-        >
-          <InlineSvg svg={MoreIconFilled} width='14px' height='14px' />
-        </SMoreButton>
+        {!disabledForActions && (
+          <SMoreButton
+            view='quaternary'
+            iconOnly
+            onClick={() => setIsEllipseMenuOpen(true)}
+            ref={moreButtonRef as any}
+          >
+            <InlineSvg svg={MoreIconFilled} width='14px' height='14px' />
+          </SMoreButton>
+        )}
 
         {!isMobile && (
           <CardEllipseMenu

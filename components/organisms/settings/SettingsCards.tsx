@@ -14,6 +14,7 @@ import addIconFilled from '../../../public/images/svg/icons/filled/Create.svg';
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 import assets from '../../../constants/assets';
 import { useCards } from '../../../contexts/cardsContext';
+import { useAppSelector } from '../../../redux-store/store';
 
 interface ISettingsCards {}
 
@@ -22,6 +23,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   const theme = useTheme();
   const { cards, isCardsLoading, handleSetCards, fetchCards } = useCards();
   const [isAddCardModal, setIsAddCardModal] = useState(false);
+  const user = useAppSelector((state) => state.user);
 
   useEffect(() => {
     fetchCards();
@@ -86,7 +88,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
         >
           {t('Settings.sections.cards.myPaymentMethods')}
         </STitle>
-        {!!cards?.length && (
+        {!!cards?.length && !user.userData?.options?.isWhiteListed && (
           <>
             <SButtonSecondaryDesktop
               view='secondary'
@@ -156,7 +158,11 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
                   isPrimary={!!card.isPrimary}
                   brand={card.brand as newnewapi.Card.CardBrand}
                   funding={card.funding as newnewapi.Card.CardFunding}
-                  lastFourDigits={card.last4 as string}
+                  lastFourDigits={
+                    !user.userData?.options?.isWhiteListed
+                      ? (card.last4 as string)
+                      : ''
+                  }
                   backgroundImg={
                     backgroundsByCardUuid
                       ? backgroundsByCardUuid[card.cardUuid! as string]
@@ -164,6 +170,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
                           index % assets.cards.background.length
                         ]
                   }
+                  disabledForActions={!!user.userData?.options?.isWhiteListed}
                   onChangePrimaryCard={changePrimaryCard}
                   onCardDelete={fetchCards}
                 />
