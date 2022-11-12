@@ -257,11 +257,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             : scrollContainerRef.current.scrollLeft;
 
         // setVisibleListItem(+(currentScrollPosition / childWidth).toFixed(0));
-        setVisibleListItem(
-          +Math.floor(currentScrollPosition / childWidth) > 0
-            ? +Math.floor(currentScrollPosition / childWidth) + 1
-            : +Math.floor(currentScrollPosition / childWidth)
-        );
+        setVisibleListItem(Math.round(currentScrollPosition / childWidth));
       }
 
       const scrollContainerElement = scrollContainerRef.current;
@@ -276,7 +272,8 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
 
       setCanScrollRight(
         visibleListItem <
-          (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) -
+          (collection?.length || 0) +
+            (TutorialCard !== undefined ? 1 : 0) -
             scrollStep
       );
     }, [visibleListItem, collection, scrollStep]);
