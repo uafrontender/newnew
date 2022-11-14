@@ -161,9 +161,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
   useEffect(() => {
     const obj = chatRooms.reduce((acc: { [key: string]: any }, c) => {
-      if (c.visavis && c.visavis.user?.username) {
+      if (c.visavis && c.visavis?.user?.username) {
         const letter = clearNameFromEmoji(
-          c.visavis.user?.username
+          c.visavis.user.username
         )[0].toLowerCase();
         acc[letter] = (acc[letter] || []).concat(c);
       }
@@ -198,7 +198,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
           /* eslint-disable no-param-reassign */
           if (chat.visavis && chat.visavis.user?.username)
             chat.userNameWithoutEmoji = clearNameFromEmoji(
-              chat.visavis.user?.username
+              chat.visavis.user.username
             ).toLowerCase();
         } else {
           // eslint-disable-next-line no-lonely-if

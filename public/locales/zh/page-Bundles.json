@@ -17,7 +17,9 @@
   },
   "bundle": {
     "votesLeft": "剩餘<0>{{amount}}</0> 票",
-    "access": "另有{{amount}} {{unit}} ：",
+    "access": "另有<0/>：",
+    "unitPair": "{{amount}}{{unit}}",
+    "and": "和",
     "customOptions": "添加定制Superpoll選項",
     "chat": "一對一私聊",
     "expiation": "投票永不過期",
@@ -25,7 +27,9 @@
       "day": "天",
       "days": "天",
       "month": "月",
-      "months": "月"
+      "months": "月",
+      "year": "年",
+      "years": "年"
     }
   },
   "search": {

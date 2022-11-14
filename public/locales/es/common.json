@@ -151,10 +151,24 @@
         "requestFailed": "La solicitud ha fallado"
       }
     },
-    "creatorsBundleModal": {
-      "votesLeft": "Quedan <0>{{amount}}</0> votos",
+    "buyBundleSuccess_NEED_TRANSLATION": {
+      "votes": "<0>{{amount}}</0> votes unlocked",
       "for": "para <0>{{creator}}</0>",
       "access": "Quedan {{amount}} {{unit}} de:",
+      "customOptions": "adding custom superpoll options",
+      "chat": "chat privado 1 a 1",
+      "button": "Sounds good!",
+      "unit": {
+        "month": "mes",
+        "months": "meses"
+      }
+    },
+    "creatorsBundle": {
+      "votesLeft": "Quedan <0>{{amount}}</0> votos",
+      "for": "para ",
+      "access": "Quedan <0/> de:",
+      "unitPair": "{{amount}} {{unit}}",
+      "and": " y las ",
       "customOptions": "agregar opciones personalizadas a cualquier Superpoll",
       "chat": "chat privado 1 a 1",
       "buyButton": "Comprar más votos",
@@ -162,7 +176,9 @@
         "day": "día",
         "days": "días",
         "month": "mes",
-        "months": "meses"
+        "months": "meses",
+        "year": "año",
+        "years": "años"
       }
     }
   },

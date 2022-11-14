@@ -41,10 +41,10 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 import { useBundles } from '../../../../contexts/bundlesContext';
+import BuyBundleModal from '../../../molecules/bundles/BuyBundleModal';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../atoms/bundles/TicketSet';
-import BuyBundleModal from '../../../molecules/bundles/BuyBundleModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));

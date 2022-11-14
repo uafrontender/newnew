@@ -17,7 +17,9 @@
   },
   "bundle": {
     "votesLeft": "<0>{{amount}}</0> votes left",
-    "access": "plus {{amount}} {{unit}} of:",
+    "access": "plus <0/> of:",
+    "unitPair": "{{amount}} {{unit}}",
+    "and": " and ",
     "customOptions": "adding custom superpoll options",
     "chat": "1-on-1 private chat",
     "expiation": "votes never expire",
@@ -25,7 +27,9 @@
       "day": "day",
       "days": "days",
       "month": "month",
-      "months": "months"
+      "months": "months",
+      "year": "year",
+      "years": "years"
     }
   },
   "search": {
