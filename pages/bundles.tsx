@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
 import { toast } from 'react-toastify';
+import { useEffectOnce } from 'react-use';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
@@ -73,6 +74,13 @@ export const Bundles: NextPage<IBundlesPage> = ({
 
   const loadCreatorsData = useCallback(
     async (paging: Paging): Promise<PaginatedResponse<newnewapi.IUser>> => {
+      if (!user.userData?.userUuid) {
+        return {
+          nextData: [],
+          nextPageToken: undefined,
+        };
+      }
+
       const payload = new newnewapi.SearchCreatorsRequest({
         query: searchValue,
         paging,
@@ -161,10 +169,11 @@ export const Bundles: NextPage<IBundlesPage> = ({
       ) {
         throw new Error(res.error?.message ?? t('error.requestFailed'));
       }
-      // TODO: replace url to avoid same stripe setup intent triggered on back button pressed
     } catch (err: any) {
       console.error(err);
       toast.error(err.message);
+    } finally {
+      router.replace('/bundles');
     }
   }, [
     stripeSetupIntentClientSecret,
@@ -175,12 +184,13 @@ export const Bundles: NextPage<IBundlesPage> = ({
     t,
   ]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (stripeSetupIntentClientSecret) {
       buyBundleAfterStripeRedirect();
-      return;
     }
+  });
 
+  useEffect(() => {
     if (
       (!user.loggedIn && user._persist?.rehydrated) ||
       (bundles?.length === 0 && !stripeSetupIntentClientSecretFromRedirect)
@@ -189,7 +199,6 @@ export const Bundles: NextPage<IBundlesPage> = ({
     }
   }, [
     stripeSetupIntentClientSecretFromRedirect,
-    stripeSetupIntentClientSecret,
     user.loggedIn,
     user._persist?.rehydrated,
     bundles,
@@ -244,7 +253,7 @@ export const Bundles: NextPage<IBundlesPage> = ({
             bundles
               .slice(0, visibleBundlesNumber)
               .map((bundle, index) => (
-                <BundleCard key={`${index}`} creatorBundle={bundle} />
+                <BundleCard key={index} creatorBundle={bundle} />
               ))}
 
           {!isMobile &&
