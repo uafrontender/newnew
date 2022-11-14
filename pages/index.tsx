@@ -319,7 +319,7 @@ const Home: NextPage<IHome> = ({
             </SHeading>
           )}
           {/* Recent activity */}
-          {collectionRAInitialLoading || collectionRA?.length > 0 ? (
+          {collectionRAInitialLoading && collectionRA?.length > 0 ? (
             <CardsSection
               title={t('cardsSection.title.recent-activity')}
               category='recent-activity'
@@ -340,6 +340,7 @@ const Home: NextPage<IHome> = ({
               }
               padding={user.loggedIn ? 'small' : 'large'}
               onReachEnd={loadMore}
+              seeMoreLink='/profile/purchases'
             />
           ) : null}
         </>

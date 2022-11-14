@@ -20,7 +20,6 @@ import { useAppSelector } from '../../../redux-store/store';
 import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
-import TutorialCard from '../../molecules/TutorialCard';
 import { usePostModalState } from '../../../contexts/postModalContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
@@ -111,10 +110,10 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
         scrollTo = 0;
       } else if (
         scrollTo >
-        (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1
+        (collection?.length || 0 + (tutorialCard !== undefined ? 1 : 0)) - 1
       ) {
         scrollTo =
-          (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1;
+          (collection?.length || 0 + (tutorialCard !== undefined ? 1 : 0)) - 1;
       }
 
       scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
@@ -257,11 +256,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             : scrollContainerRef.current.scrollLeft;
 
         // setVisibleListItem(+(currentScrollPosition / childWidth).toFixed(0));
-        setVisibleListItem(
-          +Math.floor(currentScrollPosition / childWidth) > 0
-            ? +Math.floor(currentScrollPosition / childWidth) + 1
-            : +Math.floor(currentScrollPosition / childWidth)
-        );
+        setVisibleListItem(Math.round(currentScrollPosition / childWidth));
       }
 
       const scrollContainerElement = scrollContainerRef.current;
@@ -276,10 +271,11 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
 
       setCanScrollRight(
         visibleListItem <
-          (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) -
+          (collection?.length || 0) +
+            (tutorialCard !== undefined ? 1 : 0) -
             scrollStep
       );
-    }, [visibleListItem, collection, scrollStep]);
+    }, [visibleListItem, collection, scrollStep, tutorialCard]);
 
     useEffect(() => {
       if (!canScrollRight && collection?.length > 0 && onReachEnd) {
