@@ -303,8 +303,6 @@ const MyProfileSettingsIndex = () => {
           }
         }
 
-        console.log(users);
-
         setBlockedUsers(() => users);
       } catch (err) {
         console.error(err);
