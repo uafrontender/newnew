@@ -34,6 +34,8 @@ export const PushNotificationsContext = createContext<{
   closePermissionRequestModal: () => void;
   closePushNotificationAlert: () => void;
   promptUserWithPushNotificationsPermissionModal: () => void;
+  pauseNotification: () => void;
+  resumePushNotification: () => void;
 }>({
   inSubscribed: false,
   isPermissionRequestModalOpen: false,
@@ -45,9 +47,11 @@ export const PushNotificationsContext = createContext<{
   closePermissionRequestModal: () => {},
   closePushNotificationAlert: () => {},
   promptUserWithPushNotificationsPermissionModal: () => {},
+  pauseNotification: () => {},
+  resumePushNotification: () => {},
 });
 
-type PermissionType = 'default' | 'denied' | 'granted';
+// type PermissionType = 'default' | 'denied' | 'granted';
 
 interface IPushNotificationsContextProvider {
   children: React.ReactNode;
@@ -90,7 +94,8 @@ const PushNotificationsContextProvider: React.FC<
     getWebConfig();
   }, []);
 
-  const getPermission: () => PermissionType = useCallback(() => {
+  // Get browser permission
+  const getPermissionData = useCallback(() => {
     if (
       isSafari() &&
       (window as any).safari &&
@@ -100,26 +105,38 @@ const PushNotificationsContextProvider: React.FC<
         process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
       );
 
-      return permissionData.permission;
+      return permissionData;
     }
 
-    return Notification.permission;
+    return Notification;
   }, []);
 
   // Check initial push notification permission
   useEffect(() => {
-    const permission = getPermission();
+    const permissionData = getPermissionData();
 
-    const checkSubscriptionSafari = () => {
-      if (permission === 'granted') {
-        setIsSubscribed(true);
+    const checkSubscriptionSafari = async () => {
+      if (permissionData.permission === 'granted') {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari/check?token=${
+              permissionData.deviceToken
+            }&access_token=${cookiesInstance.get('accessToken')}`
+          );
+
+          const test = await response.json();
+
+          setIsSubscribed(!!test.endpoint);
+        } catch (err) {
+          setIsSubscribed(false);
+        }
       }
     };
 
     const checkSubscriptionNonSafari = async () => {
       const swReg = await navigator.serviceWorker.register('/sw.js');
 
-      if (permission === 'granted') {
+      if (permissionData.permission === 'granted') {
         const subscription = await swReg.pushManager.getSubscription();
 
         if (subscription) {
@@ -141,7 +158,7 @@ const PushNotificationsContextProvider: React.FC<
         checkSubscriptionNonSafari();
       }
     }
-  }, [hasWebPush, getPermission]);
+  }, [hasWebPush, getPermissionData]);
 
   // Permission Modal
   const openPermissionRequestModal = useCallback(() => {
@@ -155,22 +172,23 @@ const PushNotificationsContextProvider: React.FC<
   const promptUserWithPushNotificationsPermissionModal = useCallback(() => {
     if (
       localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' &&
-      getPermission() === 'default' &&
+      getPermissionData().permission === 'default' &&
       user.loggedIn &&
       !isIOS()
     ) {
       localStorage.setItem(WEB_PUSH_PROMPT_KEY, 'true');
       openPermissionRequestModal();
     }
-  }, [openPermissionRequestModal, user.loggedIn, getPermission]);
+  }, [openPermissionRequestModal, user.loggedIn, getPermissionData]);
 
+  // Prompt user after 4 min session on site
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
     const shouldShowModal =
       localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' &&
       user.loggedIn &&
-      getPermission() === 'default';
+      getPermissionData().permission === 'default';
 
     if (shouldShowModal) {
       timeoutId = setTimeout(
@@ -200,7 +218,7 @@ const PushNotificationsContextProvider: React.FC<
   }, [
     promptUserWithPushNotificationsPermissionModal,
     user.loggedIn,
-    getPermission,
+    getPermissionData,
   ]);
 
   // Push notification alert
@@ -212,17 +230,8 @@ const PushNotificationsContextProvider: React.FC<
     setIsPushNotificationAlertShown(false);
   }, []);
 
-  // Request permission
-  const requestPermission = useCallback(() => {
-    if (getPermission() === 'denied') {
-      openPushNotificationAlert();
-    } else {
-      openPermissionRequestModal();
-    }
-  }, [openPushNotificationAlert, openPermissionRequestModal, getPermission]);
-
   // Subscribe to push notifications
-  const checkPermissionSafari = useCallback(
+  const requestPermissionSafari = useCallback(
     async (permissionData: any, onSuccess?: () => void) => {
       try {
         if (permissionData.permission === 'default') {
@@ -231,10 +240,9 @@ const PushNotificationsContextProvider: React.FC<
             process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID,
             {
               publicKey,
-              access_token:
-                cookiesInstance && cookiesInstance.get('accessToken'),
+              access_token: cookiesInstance.get('accessToken'),
             },
-            checkPermissionSafari
+            requestPermissionSafari
           );
         } else if (permissionData.permission === 'denied') {
           // The user said no.
@@ -253,21 +261,55 @@ const PushNotificationsContextProvider: React.FC<
     [publicKey, openPushNotificationAlert]
   );
 
-  const subscribeSafari = useCallback(
-    (onSuccess?: () => void) => {
-      try {
-        const permissionData = (
-          window as any
-        ).safari.pushNotification.permission(
-          process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
-        );
+  const register = useCallback(
+    async (subscriptionData: {
+      expiration?: string;
+      endpoint?: string;
+      p256dh?: string;
+      auth?: string;
+    }) => {
+      const payload = new newnewapi.RegisterForWebPushRequest({
+        name: navigator.userAgent,
+        expiration: subscriptionData.expiration,
+        endpoint: subscriptionData.endpoint,
+        p256dh: subscriptionData.p256dh,
+        auth: subscriptionData.auth,
+      });
 
-        checkPermissionSafari(permissionData, onSuccess);
+      await webPushRegister(payload);
+    },
+    []
+  );
+
+  const unregister = useCallback(async (endpoint: string) => {
+    const payload = new newnewapi.UnRegisterForWebPushRequest({
+      endpoint,
+    });
+
+    await webPushUnRegister(payload);
+  }, []);
+
+  const subscribeSafari = useCallback(
+    async (onSuccess?: () => void) => {
+      try {
+        const permissionData = getPermissionData();
+
+        if (permissionData.permission === 'default') {
+          requestPermissionSafari(permissionData, onSuccess);
+        } else {
+          await register({
+            endpoint: permissionData.deviceToken,
+            p256dh: 'safari',
+            auth: process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID,
+          });
+
+          setIsSubscribed(true);
+        }
       } catch (err) {
         console.error(err);
       }
     },
-    [checkPermissionSafari]
+    [requestPermissionSafari, getPermissionData, register]
   );
 
   const subscribeNonSafari = useCallback(
@@ -282,21 +324,19 @@ const PushNotificationsContextProvider: React.FC<
             userVisibleOnly: true,
             applicationServerKey: publicKey,
           });
+
           const sub = subscription?.toJSON();
 
           if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
             throw new Error('Something goes wrong');
           }
 
-          const payload = new newnewapi.RegisterForWebPushRequest({
-            name: navigator.userAgent,
+          await register({
             expiration: `${sub.expirationTime}`,
             endpoint: sub.endpoint,
             p256dh: sub.keys.p256dh,
             auth: sub.keys.auth,
           });
-
-          await webPushRegister(payload);
 
           onSuccess?.();
           setIsSubscribed(true);
@@ -305,7 +345,7 @@ const PushNotificationsContextProvider: React.FC<
         console.error(err);
       }
     },
-    [publicKey]
+    [publicKey, register]
   );
 
   const subscribe = useCallback(
@@ -326,20 +366,15 @@ const PushNotificationsContextProvider: React.FC<
   // Unsubscribe from push notifications
   const unsubscribeSafari = useCallback(async () => {
     try {
-      const permissionData = (window as any).safari.pushNotification.permission(
-        process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
-      );
+      const permissionData = getPermissionData();
 
-      const payload = new newnewapi.UnRegisterForWebPushRequest({
-        endpoint: permissionData.deviceToken,
-      });
-      await webPushUnRegister(payload);
+      await unregister(permissionData.deviceToken);
 
       setIsSubscribed(false);
     } catch (err) {
       console.error(err);
     }
-  }, []);
+  }, [unregister, getPermissionData]);
 
   const unsubscribeNonSafari = useCallback(async () => {
     try {
@@ -348,14 +383,11 @@ const PushNotificationsContextProvider: React.FC<
       const subscription = await swReg.pushManager.getSubscription();
       const sub = subscription?.toJSON();
 
-      if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
+      if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth || !sub.endpoint) {
         throw new Error('No active subscription');
       }
 
-      const payload = new newnewapi.UnRegisterForWebPushRequest({
-        endpoint: sub.endpoint,
-      });
-      await webPushUnRegister(payload);
+      await unregister(sub.endpoint);
 
       await subscription?.unsubscribe();
 
@@ -363,7 +395,7 @@ const PushNotificationsContextProvider: React.FC<
     } catch (err) {
       console.error(err);
     }
-  }, []);
+  }, [unregister]);
 
   const unsubscribe = useCallback(async () => {
     if (
@@ -377,6 +409,124 @@ const PushNotificationsContextProvider: React.FC<
     }
   }, [unsubscribeSafari, unsubscribeNonSafari]);
 
+  // Pause and resume notifications
+  const pauseNotificationNonSafari = useCallback(async () => {
+    try {
+      const swReg = await navigator.serviceWorker.register('/sw.js');
+
+      const subscription = await swReg.pushManager.getSubscription();
+      const sub = subscription?.toJSON();
+
+      if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth || !sub.endpoint) {
+        throw new Error('No active subscription');
+      }
+
+      await unregister(sub.endpoint);
+
+      setIsSubscribed(false);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [unregister]);
+
+  const pauseNotification = useCallback(() => {
+    if (
+      isSafari() &&
+      (window as any).safari &&
+      'pushNotification' in (window as any).safari
+    ) {
+      unsubscribeSafari();
+    } else {
+      pauseNotificationNonSafari();
+    }
+  }, [unsubscribeSafari, pauseNotificationNonSafari]);
+
+  const resumePushNotificationSafari = useCallback(async () => {
+    try {
+      const permissionData = getPermissionData();
+
+      if (permissionData.permission !== 'granted') {
+        return;
+      }
+
+      await register({
+        endpoint: permissionData.deviceToken,
+        p256dh: 'safari',
+        auth: process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }, [register, getPermissionData]);
+
+  const resumePushNotificationNonSafari = useCallback(
+    async (onSuccess?: () => void) => {
+      try {
+        const swReg = await navigator.serviceWorker.register('/sw.js');
+        const permissionData = getPermissionData();
+
+        if (permissionData.permission !== 'granted') {
+          return;
+        }
+
+        const subscription = await swReg.pushManager.getSubscription();
+
+        if (!subscription) {
+          return;
+        }
+
+        const sub = subscription?.toJSON();
+
+        if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
+          throw new Error('Something goes wrong');
+        }
+
+        await register({
+          expiration: `${sub.expirationTime}`,
+          endpoint: sub.endpoint,
+          p256dh: sub.keys.p256dh,
+          auth: sub.keys.auth,
+        });
+
+        onSuccess?.();
+        setIsSubscribed(true);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [getPermissionData, register]
+  );
+
+  const resumePushNotification = useCallback(() => {
+    if (
+      isSafari() &&
+      (window as any).safari &&
+      'pushNotification' in (window as any).safari
+    ) {
+      resumePushNotificationSafari();
+    } else {
+      resumePushNotificationNonSafari();
+    }
+  }, [resumePushNotificationSafari, resumePushNotificationNonSafari]);
+
+  // Request permission
+  const requestPermission = useCallback(() => {
+    const permissionData = getPermissionData();
+
+    if (permissionData.permission === 'granted') {
+      subscribe();
+    } else if (permissionData.permission === 'default') {
+      openPermissionRequestModal();
+    } else {
+      openPushNotificationAlert();
+    }
+  }, [
+    openPushNotificationAlert,
+    openPermissionRequestModal,
+    getPermissionData,
+    subscribe,
+  ]);
+
   const contextValue = useMemo(
     () => ({
       inSubscribed,
@@ -389,6 +539,8 @@ const PushNotificationsContextProvider: React.FC<
       closePermissionRequestModal,
       closePushNotificationAlert,
       promptUserWithPushNotificationsPermissionModal,
+      pauseNotification,
+      resumePushNotification,
     }),
     [
       inSubscribed,
@@ -401,6 +553,8 @@ const PushNotificationsContextProvider: React.FC<
       subscribe,
       unsubscribe,
       promptUserWithPushNotificationsPermissionModal,
+      pauseNotification,
+      resumePushNotification,
     ]
   );
 

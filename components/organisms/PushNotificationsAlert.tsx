@@ -6,7 +6,8 @@ import Text from '../atoms/Text';
 import InlineSVG from '../atoms/InlineSVG';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
-import lockIcon from '../../public/images/svg/icons/filled/Lock.svg';
+import lockIcon from '../../public/images/svg/icons/filled/BrowserLock.svg';
+import infoIcon from '../../public/images/svg/icons/filled/Info.svg';
 import arrowIcon from '../../public/images/svg/icons/outlined/ArrowRight.svg';
 
 import { useOverlayMode } from '../../contexts/overlayModeContext';
@@ -57,15 +58,21 @@ const PushNotificationAlert: React.FC<IPushNotificationAlert> = ({
     <SContainer>
       <SAlert ref={containerRef}>
         <SLockIconHolder>
-          <InlineSVG
-            clickable
-            scaleOnClick
-            svg={lockIcon}
-            fill={theme.colors.blue}
-            width='20px'
-            height='20px'
-            onClick={onClose}
-          />
+          {isSafari() ? (
+            <InlineSVG
+              svg={infoIcon}
+              fill={theme.colors.blue}
+              width='18px'
+              height='18px'
+            />
+          ) : (
+            <InlineSVG
+              svg={lockIcon}
+              fill={theme.colors.blue}
+              width='12px'
+              height='18px'
+            />
+          )}
         </SLockIconHolder>
         <SContent>
           <STitle variant={3} weight={600}>
@@ -157,8 +164,8 @@ const SAlert = styled.div`
     min-width: 422px;
     max-width: 422px;
 
-    top: 22px;
-    left: 85px;
+    top: 10px;
+    left: 95px;
   }
 `;
 

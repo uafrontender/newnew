@@ -30,6 +30,7 @@ import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmail
 // Utils
 import AnimatedPresence from '../atoms/AnimatedPresence';
 import { Mixpanel } from '../../utils/mixpanel';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 export interface ICodeVerificationMenu {
   expirationTime: number;
@@ -42,6 +43,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 }) => {
   const router = useRouter();
   const { t } = useTranslation('page-VerifyEmail');
+  const { resumePushNotification } = usePushNotifications();
 
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
@@ -145,6 +147,8 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         setIsSignInWithEmailLoading(false);
         setIsSuccess(true);
 
+        resumePushNotification();
+
         if (data.redirectUrl) {
           router.push(data.redirectUrl);
         } else if (data.me?.options?.isCreator) {
@@ -163,6 +167,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       setIsSignInWithEmailLoading,
       setSubmitError,
       setCookie,
+      resumePushNotification,
       signupEmailInput,
       dispatch,
       router,

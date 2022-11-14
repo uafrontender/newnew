@@ -45,12 +45,14 @@ import SettingsCardsSection from '../../../components/organisms/settings/Setting
 import TransactionsSection from '../../../components/organisms/settings/TransactionsSection';
 import PrivacySection from '../../../components/organisms/settings/PrivacySection';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
+import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 import { getMyTransactions } from '../../../api/endpoints/payments';
 import assets from '../../../constants/assets';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
+  const { pauseNotification } = usePushNotifications();
 
   // Translations
   const { t } = useTranslation('page-Profile');
@@ -117,6 +119,8 @@ const MyProfileSettingsIndex = () => {
 
       const payload = new newnewapi.EmptyRequest({});
 
+      await pauseNotification();
+
       const res = await logout(payload);
 
       if (!res.data || res.error)
@@ -146,7 +150,7 @@ const MyProfileSettingsIndex = () => {
         );
       }
     }
-  }, [dispatch, setIsLogoutLoading, removeCookie]);
+  }, [dispatch, setIsLogoutLoading, removeCookie, pauseNotification]);
 
   const [spendingHidden, setSpendingHidden] = useState(false);
 

@@ -9,6 +9,7 @@ import { useUpdateEffect } from 'react-use';
 import Lottie from '../../components/atoms/Lottie';
 
 import { signInWithTwitter } from '../../api/endpoints/auth';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import {
@@ -33,6 +34,8 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const { resumePushNotification } = usePushNotifications();
 
   useEffect(() => {
     setMounted(true);
@@ -104,6 +107,8 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
         });
 
         dispatch(setUserLoggedIn(true));
+
+        resumePushNotification();
 
         setIsLoading(false);
         if (data.redirectUrl) {
