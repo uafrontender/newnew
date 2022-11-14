@@ -70,6 +70,8 @@ import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 import getChunks from '../../../../utils/getChunks/getChunks';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import InlineSvg from '../../../atoms/InlineSVG';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -1216,12 +1218,22 @@ export const CreationSecondStepContent: React.FC<
                       </SFloatingSubSectionPlayer>
                       <SFloatingSubSectionUser>
                         <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
-                        <SUserTitle variant={3} weight={600}>
-                          {user.userData?.nickname &&
-                          user.userData?.nickname?.length > 8
-                            ? `${user.userData?.nickname?.substring(0, 8)}...`
-                            : user.userData?.nickname}
-                        </SUserTitle>
+                        <SUserTitleContainer>
+                          <SUserTitle variant={3} weight={600}>
+                            {user.userData?.nickname &&
+                            user.userData?.nickname?.length > 8
+                              ? `${user.userData?.nickname?.substring(0, 8)}...`
+                              : user.userData?.nickname}
+                          </SUserTitle>
+                          {user.userData?.options?.isVerified && (
+                            <InlineSvg
+                              svg={VerificationCheckmark}
+                              width='20px'
+                              height='20px'
+                              fill='none'
+                            />
+                          )}
+                        </SUserTitleContainer>
                         <SCaption variant={2} weight={700}>
                           {t('secondStep.card.left', {
                             time: formatExpiresAtNoStartsAt().fromNow(true),
@@ -1496,12 +1508,19 @@ const SUserAvatar = styled(UserAvatar)`
   min-height: 24px;
 `;
 
+const SUserTitleContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
 const SUserTitle = styled(Text)`
   max-width: 188px;
   display: -webkit-box;
   overflow: hidden;
   position: relative;
   padding-left: 12px;
+  margin-right: 2px;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 `;

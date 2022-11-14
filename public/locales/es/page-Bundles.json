@@ -17,7 +17,9 @@
   },
   "bundle": {
     "votesLeft": "Quedan <0>{{amount}}</0> votos",
-    "access": "y {{amount}} {{unit}} de:",
+    "access": "y <0/> de:",
+    "unitPair": "{{amount}} {{unit}}",
+    "and": " y las ",
     "customOptions": "añadir opciones personalizadas a las superpolls",
     "chat": "chat privado 1 a 1",
     "expiation": "los votos nunca caducan",
@@ -25,7 +27,9 @@
       "day": "día",
       "days": "días",
       "month": "mes",
-      "months": "meses"
+      "months": "meses",
+      "year": "año",
+      "years": "años"
     }
   },
   "search": {
