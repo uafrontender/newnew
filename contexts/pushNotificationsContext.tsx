@@ -68,7 +68,6 @@ const PushNotificationsContextProvider: React.FC<
   const [inSubscribed, setIsSubscribed] = useState(false);
   const [publicKey, setPublicKey] = useState('');
   const [hasWebPush, setHasWebPush] = useState(false);
-  const [permission, setPermission] = useState<PermissionType | null>(null);
 
   // Get config
   useEffect(() => {
@@ -91,24 +90,36 @@ const PushNotificationsContextProvider: React.FC<
     getWebConfig();
   }, []);
 
-  // Check initial push notification permission
-  useEffect(() => {
-    const checkSubscriptionSafari = () => {
+  const getPermission: () => PermissionType = useCallback(() => {
+    if (
+      isSafari() &&
+      (window as any).safari &&
+      'pushNotification' in (window as any).safari
+    ) {
       const permissionData = (window as any).safari.pushNotification.permission(
         process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
       );
 
-      if (permissionData.permission === 'granted') {
+      return permissionData.permission;
+    }
+
+    return Notification.permission;
+  }, []);
+
+  // Check initial push notification permission
+  useEffect(() => {
+    const permission = getPermission();
+
+    const checkSubscriptionSafari = () => {
+      if (permission === 'granted') {
         setIsSubscribed(true);
       }
-
-      setPermission(permissionData.permission);
     };
 
     const checkSubscriptionNonSafari = async () => {
       const swReg = await navigator.serviceWorker.register('/sw.js');
 
-      if (Notification.permission === 'granted') {
+      if (permission === 'granted') {
         const subscription = await swReg.pushManager.getSubscription();
 
         if (subscription) {
@@ -117,8 +128,6 @@ const PushNotificationsContextProvider: React.FC<
           setIsSubscribed(false);
         }
       }
-
-      setPermission(Notification.permission);
     };
 
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
@@ -132,7 +141,7 @@ const PushNotificationsContextProvider: React.FC<
         checkSubscriptionNonSafari();
       }
     }
-  }, [hasWebPush]);
+  }, [hasWebPush, getPermission]);
 
   // Permission Modal
   const openPermissionRequestModal = useCallback(() => {
@@ -146,14 +155,14 @@ const PushNotificationsContextProvider: React.FC<
   const promptUserWithPushNotificationsPermissionModal = useCallback(() => {
     if (
       localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' &&
-      permission === 'default' &&
+      getPermission() === 'default' &&
       user.loggedIn &&
       !isIOS()
     ) {
       localStorage.setItem(WEB_PUSH_PROMPT_KEY, 'true');
       openPermissionRequestModal();
     }
-  }, [openPermissionRequestModal, permission, user.loggedIn]);
+  }, [openPermissionRequestModal, user.loggedIn, getPermission]);
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -161,7 +170,7 @@ const PushNotificationsContextProvider: React.FC<
     const shouldShowModal =
       localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' &&
       user.loggedIn &&
-      permission === 'default';
+      getPermission() === 'default';
 
     if (shouldShowModal) {
       timeoutId = setTimeout(
@@ -191,7 +200,7 @@ const PushNotificationsContextProvider: React.FC<
   }, [
     promptUserWithPushNotificationsPermissionModal,
     user.loggedIn,
-    permission,
+    getPermission,
   ]);
 
   // Push notification alert
@@ -205,19 +214,17 @@ const PushNotificationsContextProvider: React.FC<
 
   // Request permission
   const requestPermission = useCallback(() => {
-    if (permission === 'denied') {
+    if (getPermission() === 'denied') {
       openPushNotificationAlert();
     } else {
       openPermissionRequestModal();
     }
-  }, [openPushNotificationAlert, openPermissionRequestModal, permission]);
+  }, [openPushNotificationAlert, openPermissionRequestModal, getPermission]);
 
   // Subscribe to push notifications
   const checkPermissionSafari = useCallback(
     async (permissionData: any, onSuccess?: () => void) => {
       try {
-        setPermission(permissionData.permission);
-
         if (permissionData.permission === 'default') {
           (window as any).safari.pushNotification.requestPermission(
             `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari`,
@@ -294,8 +301,6 @@ const PushNotificationsContextProvider: React.FC<
           onSuccess?.();
           setIsSubscribed(true);
         }
-
-        setPermission(notificationPermission);
       } catch (err) {
         console.error(err);
       }
