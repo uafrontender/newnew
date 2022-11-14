@@ -35,13 +35,13 @@ import { Mixpanel } from '../utils/mixpanel';
 import { buyCreatorsBundle } from '../api/endpoints/bundles';
 
 interface IBundlesPage {
-  stripeSetupIntentClientSecret?: string;
-  saveCard?: boolean;
+  stripeSetupIntentClientSecretFromRedirect?: string;
+  saveCardFromRedirect?: boolean;
 }
 
 export const Bundles: NextPage<IBundlesPage> = ({
-  stripeSetupIntentClientSecret,
-  saveCard,
+  stripeSetupIntentClientSecretFromRedirect,
+  saveCardFromRedirect,
 }) => {
   const router = useRouter();
   const { t } = useTranslation('page-Bundles');
@@ -51,6 +51,13 @@ export const Bundles: NextPage<IBundlesPage> = ({
     ui.resizeMode
   );
   const isTablet = ['tablet'].includes(ui.resizeMode);
+
+  const [stripeSetupIntentClientSecret, setStripeSetupIntentClientSecret] =
+    useState(() => stripeSetupIntentClientSecretFromRedirect ?? undefined);
+
+  const [saveCard, setSaveCard] = useState(
+    () => saveCardFromRedirect ?? undefined
+  );
 
   const [allBundlesModalOpen, setAllBundlesModalOpen] = useState(false);
   const [shownCreatorBundle, setShownCreatorBundle] = useState<
@@ -142,11 +149,11 @@ export const Bundles: NextPage<IBundlesPage> = ({
         }
       );
 
-      // What fore? can use Refs here if needed
-      // resetSetupIntentClientSecret();
+      // Reset
+      setStripeSetupIntentClientSecret(undefined);
+      setSaveCard(undefined);
 
       const res = await buyCreatorsBundle(stripeContributionRequest);
-
       if (
         !res.data ||
         res.error ||
@@ -154,6 +161,7 @@ export const Bundles: NextPage<IBundlesPage> = ({
       ) {
         throw new Error(res.error?.message ?? t('error.requestFailed'));
       }
+      // TODO: replace url to avoid same stripe setup intent triggered on back button pressed
     } catch (err: any) {
       console.error(err);
       toast.error(err.message);
@@ -175,11 +183,12 @@ export const Bundles: NextPage<IBundlesPage> = ({
 
     if (
       (!user.loggedIn && user._persist?.rehydrated) ||
-      bundles?.length === 0
+      (bundles?.length === 0 && !stripeSetupIntentClientSecretFromRedirect)
     ) {
       router.replace('/');
     }
   }, [
+    stripeSetupIntentClientSecretFromRedirect,
     stripeSetupIntentClientSecret,
     user.loggedIn,
     user._persist?.rehydrated,
@@ -359,15 +368,16 @@ export const getServerSideProps = async (context: NextPageContext) => {
       // eslint-disable-next-line camelcase, object-shorthand
       ...(setup_intent_client_secret
         ? {
-            // eslint-disable-next-line camelcase, object-shorthand
-            setup_intent_client_secret,
+            stripeSetupIntentClientSecretFromRedirect:
+              // eslint-disable-next-line camelcase
+              setup_intent_client_secret,
           }
         : {}),
       // eslint-disable-next-line camelcase, object-shorthand
       ...(save_card
         ? {
-            // eslint-disable-next-line camelcase, object-shorthand
-            save_card: save_card === 'true',
+            // eslint-disable-next-line camelcase
+            saveCardFromRedirect: save_card === 'true',
           }
         : {}),
     },
