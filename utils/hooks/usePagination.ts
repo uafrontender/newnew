@@ -34,7 +34,7 @@ function usePagination<T>(
   const savedPageToken = useRef<string | undefined>(undefined);
 
   const loadMoreData = useCallback(
-    async (limit?: number) => {
+    async (limit?: number, initial?: boolean) => {
       setLoading(true);
 
       const paging = {
@@ -56,7 +56,11 @@ function usePagination<T>(
         return;
       }
 
-      setData((curr) => [...curr, ...nextData]);
+      if (initial) {
+        setData(nextData);
+      } else {
+        setData((curr) => [...curr, ...nextData]);
+      }
 
       if (nextPageToken) {
         savedPageToken.current = nextPageToken;
@@ -80,12 +84,11 @@ function usePagination<T>(
     if (delayed) {
       return;
     }
-
-    setData([]);
+    setInitialLoadDone(false);
     setHasMore(true);
     setLoading(false);
 
-    loadMoreData()
+    loadMoreData(undefined, true)
       .then(() => {
         setInitialLoadDone(true);
       })

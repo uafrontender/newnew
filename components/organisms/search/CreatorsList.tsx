@@ -121,7 +121,7 @@ const SListWrapper = styled.div`
 
   .skeletonsContainer {
     display: block;
-    height: 400px;
+    height: 229px;
 
     width: 100vw;
     margin: 16px 0;
