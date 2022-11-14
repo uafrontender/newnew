@@ -2,6 +2,8 @@ import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 import React from 'react';
 import styled from 'styled-components';
+import Link from 'next/link';
+
 import UserAvatar from '../UserAvatar';
 import formatTimeLeft from '../../../utils/formatTimeLeft';
 import BulletLine from './BulletLine';
@@ -50,7 +52,9 @@ const BundleCard: React.FC<IBundleCard> = ({
               />
             )}
           </SDisplayNameContainer>
-          <SUserName>@{creatorBundle.creator?.username}</SUserName>
+          <Link href={`/${creatorBundle.creator?.username}`}>
+            <SUserName>{`@${creatorBundle.creator?.username}`}</SUserName>
+          </Link>
         </SUserData>
       </SUserInfo>
       <SVotesLeft small={small}>
@@ -70,10 +74,24 @@ const BundleCard: React.FC<IBundleCard> = ({
         />
       </SVotesLeft>
       <AccessDescription>
-        {t('bundle.access', {
-          amount: formattedTimeLeft.value,
-          unit: t(`bundle.unit.${formattedTimeLeft.unit}`),
-        })}
+        <Trans
+          t={t}
+          i18nKey='bundle.access'
+          // @ts-ignore
+          components={[
+            <>
+              {formattedTimeLeft.map((time, index) => (
+                <>
+                  {index > 0 ? t('bundle.and') : null}
+                  {t('bundle.unitPair', {
+                    amount: time.value,
+                    unit: t(`bundle.unit.${time.unit}`),
+                  })}
+                </>
+              ))}
+            </>,
+          ]}
+        />
       </AccessDescription>
       <BundleFeatures>
         <BulletLine>{t('bundle.customOptions')}</BulletLine>
@@ -161,6 +179,7 @@ const SUserName = styled.p`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
 `;
 
 const SVotesLeft = styled.p<{ small: boolean }>`

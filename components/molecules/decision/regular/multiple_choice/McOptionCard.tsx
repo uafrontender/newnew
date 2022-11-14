@@ -404,6 +404,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         setIsSupportMenuOpen(false);
         setLoadingModalOpen(false);
         handleSetPaymentSuccessValue(votesCount);
+        setIsSupportMenuOpen(false);
       } catch (err) {
         console.error(err);
         setLoadingModalOpen(false);
