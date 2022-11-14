@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import InlineSvg from '../InlineSVG';
@@ -19,6 +19,7 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
   onChange,
   ...rest
 }) => {
+  const textareaRef = useRef<HTMLTextAreaElement>();
   const [charCounter, setCharCounter] = useState((value as string).length);
 
   const [errorBordersShown, setErrorBordersShown] = useState(false);
@@ -37,13 +38,35 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
     setCharCounter((value as string).length);
   }, [value, setCharCounter]);
 
+  useEffect(() => {
+    if (!value && textareaRef?.current) {
+      textareaRef.current.style.height = '';
+    } else if (value && textareaRef?.current) {
+      textareaRef.current.style.height = `${
+        textareaRef.current.scrollHeight + 3
+      }px`;
+    }
+  }, [value]);
+
   return (
     <SWrapper>
       <SBioTextareaDiv errorBordersShown={errorBordersShown}>
         <textarea
+          ref={(el) => {
+            textareaRef.current = el!!;
+          }}
           value={value}
           maxLength={maxChars}
+          rows={2}
           onChange={onChange}
+          onChangeCapture={() => {
+            if (textareaRef?.current) {
+              textareaRef.current.style.height = '';
+              textareaRef.current.style.height = `${
+                textareaRef.current.scrollHeight + 3
+              }px`;
+            }
+          }}
           onPaste={(e) => {
             const data = e.clipboardData.getData('Text');
 
@@ -109,9 +132,9 @@ const SBioTextareaDiv = styled.div<ISBioTextareaDiv>`
     display: block;
 
     width: 100%;
-    height: 104px;
 
-    padding: 12px 20px 12px 20px;
+    padding: 12.5px 20px;
+
     padding-bottom: 36px;
 
     font-weight: 500;
@@ -167,27 +190,19 @@ const SBioTextareaDiv = styled.div<ISBioTextareaDiv>`
     &:disabled {
       opacity: 0.5;
     }
-
-    ${({ theme }) => theme.media.tablet} {
-      height: 120px;
-    }
   }
 `;
 
 const SCharCounter = styled.div`
   position: absolute;
-  right: 24px;
-  bottom: 24px;
+  right: 12px;
+  bottom: 6px;
 
   font-weight: 500;
   font-size: 16px;
   line-height: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  /* background: ${({ theme }) =>
-    theme.name === 'light'
-      ? 'rgba(241, 243, 249, 0.8)'
-      : 'rgba(20, 21, 31, 0.8)'}; */
-  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  user-select: none;
 `;
 
 const SErrorDiv = styled.div`
