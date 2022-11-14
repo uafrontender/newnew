@@ -10,7 +10,7 @@ import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
-import InlineSVG from '../../atoms/InlineSVG';
+import InlineSVG, { InlineSvg } from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
@@ -23,6 +23,7 @@ import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.sv
 import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
 import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -237,11 +238,21 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
           </SPlayerWrapper>
           <SUserBlock>
             <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
-            <SUserTitle variant={3} weight={600}>
-              {user.userData?.nickname && user.userData?.nickname?.length > 8
-                ? `${user.userData?.nickname?.substring(0, 8)}...`
-                : user.userData?.nickname}
-            </SUserTitle>
+            <SUserTitleContainer>
+              <SUserTitle variant={3} weight={600}>
+                {user.userData?.nickname && user.userData?.nickname?.length > 8
+                  ? `${user.userData?.nickname?.substring(0, 8)}...`
+                  : user.userData?.nickname}
+              </SUserTitle>
+              {user.userData?.options?.isVerified && (
+                <InlineSvg
+                  svg={VerificationCheckmark}
+                  width='20px'
+                  height='20px'
+                  fill='none'
+                />
+              )}
+            </SUserTitleContainer>
             <SCaption variant={2} weight={700}>
               {post.startsAt.type === 'right-away'
                 ? t('secondStep.card.left', {
@@ -398,6 +409,12 @@ const SUserAvatar = styled(UserAvatar)`
   height: 36px;
   min-width: 36px;
   min-height: 36px;
+`;
+
+const SUserTitleContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `;
 
 const SUserTitle = styled(Text)`
