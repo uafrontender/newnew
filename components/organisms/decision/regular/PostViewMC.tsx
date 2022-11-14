@@ -42,6 +42,8 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
 import { useBundles } from '../../../../contexts/bundlesContext';
 import BuyBundleModal from '../../../molecules/bundles/BuyBundleModal';
+import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
+import TicketSet from '../../../atoms/bundles/TicketSet';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -817,6 +819,34 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           />
         )}
       </SWrapper>
+      {post.creator?.options?.isOfferingBundles && (
+        <SBundlesContainer
+          highlighted={creatorsBundle?.bundle?.votesLeft === 0}
+        >
+          {creatorsBundle?.bundle && (
+            <STicketSet numberOFTickets={3} size={36} shift={11} />
+          )}
+          <SBundlesText>
+            {creatorsBundle?.bundle
+              ? t('mcPost.optionsTab.actionSection.getMoreBundles')
+              : t('mcPost.optionsTab.actionSection.offersBundles', {
+                  creator:
+                    (post.creator?.nickname as string) ??
+                    post.creator?.username,
+                })}
+          </SBundlesText>
+          <SHighlightedButton
+            size='small'
+            onClick={() => {
+              setBuyBundleModalOpen(true);
+            }}
+          >
+            {creatorsBundle?.bundle
+              ? t('mcPost.optionsTab.actionSection.getBundles')
+              : t('mcPost.optionsTab.actionSection.viewBundles')}
+          </SHighlightedButton>
+        </SBundlesContainer>
+      )}
       {post.isCommentsAllowed && (
         <SCommentsSection id='comments'>
           <SCommentsHeadline variant={4}>
@@ -927,6 +957,60 @@ const SCommentsHeadline = styled(Headline)`
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 16px;
   }
+`;
+
+// Offering bundles
+const SBundlesContainer = styled.div<{ highlighted: boolean }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: ${({ theme, highlighted }) =>
+    highlighted
+      ? theme.colorsThemed.accent.yellow
+      : // TODO: standardize color
+      theme.name === 'light'
+      ? '#E5E9F1'
+      : '#2C2C33'};
+  margin-top: 32px;
+
+  margin-bottom: 40px;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex-direction: row;
+    margin-bottom: 48px;
+  }
+`;
+
+const STicketSet = styled(TicketSet)`
+  margin-right: 8px;
+`;
+
+const SBundlesText = styled.p`
+  flex-grow: 1;
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  font-weight: 600;
+  text-align: center;
+  font-size: 16px;
+  line-height: 24px;
+  margin-bottom: 16px;
+  margin-right: 8px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 0px;
+    text-align: start;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+`;
+
+const SHighlightedButton = styled(HighlightedButton)`
+  width: auto;
 `;
 
 const SCommentsSection = styled.div``;
