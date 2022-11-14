@@ -58,6 +58,18 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
             setFocused(true);
             setErrorBordersShown(false);
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && (value as string)?.length > 0) {
+              const localValue = value as string;
+              if (localValue.charCodeAt(localValue.length - 1) === 10) {
+                onChange?.({
+                  target: {
+                    value: localValue.slice(0, -1),
+                  },
+                } as any);
+              }
+            }
+          }}
           {...rest}
         />
         <SCharCounter>
