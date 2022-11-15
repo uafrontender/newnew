@@ -18,7 +18,7 @@ const PostVotingTab: React.FunctionComponent<IPostVotingTab> = ({
   bundleVotes,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   return (
     <STabs>
@@ -122,7 +122,10 @@ const STab = styled.div`
 `;
 
 const SBundleVotes = styled.p`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
+  color: ${(props) =>
+    props.theme.name === 'dark'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colorsThemed.text.tertiary};
   font-weight: 700;
   font-size: 14px;
   line-height: 24px;

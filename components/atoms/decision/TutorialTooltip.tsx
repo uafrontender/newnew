@@ -25,7 +25,7 @@ export const TutorialTooltip: React.FC<ITutorialTooltip> = ({
   closeTooltip,
   dotPosition,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   return isTooltipVisible ? (
     <SContainer>
       <STitle>{title}</STitle>

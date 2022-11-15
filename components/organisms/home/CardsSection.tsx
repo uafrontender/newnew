@@ -20,7 +20,6 @@ import { useAppSelector } from '../../../redux-store/store';
 import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
-import { usePostModalState } from '../../../contexts/postModalContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 const SCROLL_STEP = {
@@ -70,8 +69,6 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     const [scrollX, setScrollX] = useState<number>(0);
     const [isDragging, setIsDragging] = useState(false);
     const [mouseIsDown, setMouseIsDown] = useState(false);
-
-    const { postOverlayOpen } = usePostModalState();
 
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -188,7 +185,6 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             >
               <PostCard
                 item={item}
-                shouldStop={postOverlayOpen}
                 index={tutorialCard !== undefined ? index + 1 : index}
                 width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
                 height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
@@ -209,7 +205,6 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
         >
           <PostCard
             item={item}
-            shouldStop={postOverlayOpen}
             index={tutorialCard !== undefined ? index + 1 : index}
             width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
             height={isMobile ? '564px' : isTablet ? '270px' : '336px'}

@@ -41,7 +41,7 @@ interface IPostAwaitingResponseMC {
 
 const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
   React.memo(({ post }) => {
-    const { t } = useTranslation('modal-Post');
+    const { t } = useTranslation('page-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { mutedMode } = useAppSelector((state) => state.ui);

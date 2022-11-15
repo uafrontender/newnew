@@ -23,7 +23,7 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
   handleVoteWithBundleVotes,
   onClose,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const [votesToUse, setVotesToUse] = useState<number | undefined>(
     bundleVotesLeft
   );
