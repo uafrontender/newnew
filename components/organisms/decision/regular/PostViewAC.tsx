@@ -38,7 +38,7 @@ import CommentsBottomSection from '../../../molecules/decision/common/CommentsBo
 import Headline from '../../../atoms/Headline';
 import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import AcAddNewOption from '../../../molecules/decision/regular/auction/AcAddNewOption';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -104,7 +104,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     handleGoBackInsidePost,
     handleUpdatePostStatus,
     resetSetupIntentClientSecret,
-  } = usePostModalInnerState();
+  } = usePostInnerState();
   const post = useMemo(() => postParsed as newnewapi.Auction, [postParsed]);
 
   // Socket

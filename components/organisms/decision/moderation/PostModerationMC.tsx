@@ -35,7 +35,7 @@ import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 import PostResponseTabModeration from '../../../molecules/decision/moderation/PostResponseTabModeration';
 
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import PostModerationResponsesContextProvider from '../../../../contexts/postModerationResponsesContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -84,7 +84,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       postStatus,
       handleGoBackInsidePost,
       handleUpdatePostStatus,
-    } = usePostModalInnerState();
+    } = usePostInnerState();
     const post = useMemo(
       () => postParsed as newnewapi.MultipleChoice,
       [postParsed]

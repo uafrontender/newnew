@@ -13,7 +13,6 @@ import { newnewapi } from 'newnew-api';
 
 import { TVideoProcessingData } from '../redux-store/slices/creationStateSlice';
 import { SocketContext } from './socketContext';
-import { usePostModalState } from './postModalContext';
 import {
   getVideoUploadUrl,
   removeUploadedFile,
@@ -26,7 +25,7 @@ import {
   uploadPostResponse,
 } from '../api/endpoints/post';
 import waitResourceIsAvailable from '../utils/checkResourceAvailable';
-import { usePostModalInnerState } from './postModalInnerContext';
+import { usePostInnerState } from './postInnerContext';
 
 interface IPostModerationResponsesContext {
   // Tabs
@@ -132,8 +131,12 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   const { t: tCommon } = useTranslation('common');
   const socketConnection = useContext(SocketContext);
 
-  const { postParsed, postStatus, handleUpdatePostStatus } =
-    usePostModalInnerState();
+  const {
+    postParsed,
+    postStatus,
+    handleUpdatePostStatus,
+    handleSetIsConfirmToClosePost,
+  } = usePostInnerState();
   const postId = useMemo(() => postParsed?.postUuid, [postParsed?.postUuid]);
 
   // Core response
@@ -233,8 +236,6 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   // Updating Post data
   const [coreResponseUploading, setCoreResponseUploading] = useState(false);
   const [responseUploadSuccess, setResponseUploadSuccess] = useState(false);
-
-  const { handleSetIsConfirmToClosePost } = usePostModalState();
 
   const cannotLeavePage = useMemo(() => {
     if (

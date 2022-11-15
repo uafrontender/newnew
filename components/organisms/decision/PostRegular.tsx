@@ -1,26 +1,25 @@
 /* eslint-disable no-param-reassign */
 import React from 'react';
-import Head from 'next/head';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
-import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
-import { Mixpanel } from '../../../utils/mixpanel';
-
-import ModerationView from './moderation';
-
-// Icons
-import GoBackButton from '../../molecules/GoBackButton';
+import { usePostInnerState } from '../../../contexts/postInnerContext';
 import { useAppSelector } from '../../../redux-store/store';
+import getDisplayname from '../../../utils/getDisplayname';
+
+import RegularView from './regular';
+import Headline from '../../atoms/Headline';
 
 // Icons
 import assets from '../../../constants/assets';
+import GoBackButton from '../../molecules/GoBackButton';
 
+const ListPostPage = dynamic(() => import('../see-more/ListPostPage'));
 const PostFailedBox = dynamic(
   () => import('../../molecules/decision/common/PostFailedBox')
 );
+const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -34,19 +33,16 @@ const LIGHT_IMAGES = {
   mc: assets.creation.lightMcAnimated,
 };
 
-interface IPostModalModeration {}
+interface IPostRegular {}
 
-const PostModalModeration: React.FunctionComponent<
-  IPostModalModeration
-> = () => {
+const PostRegular: React.FunctionComponent<IPostRegular> = () => {
   const theme = useTheme();
-  const router = useRouter();
   const { t } = useTranslation('page-Post');
+  const { t: tCommon } = useTranslation('common');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-
   const {
     modalContainerRef,
     isMyPost,
@@ -55,23 +51,18 @@ const PostModalModeration: React.FunctionComponent<
     postStatus,
     deletedByCreator,
     recommendedPosts,
+    handleSeeNewDeletedBox,
+    handleOpenRecommendedPost,
+    loadingRef,
+    recommendedPostsLoading,
+    reportPostOpen,
+    handleReportSubmit,
+    handleReportClose,
     handleCloseAndGoBack,
-  } = usePostModalInnerState();
+  } = usePostInnerState();
 
   return (
     <>
-      <Head>
-        <title>{t(`meta.${typeOfPost}.title`)}</title>
-        <meta
-          name='description'
-          content={t(`meta.${typeOfPost}.description`)}
-        />
-        <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-        <meta
-          property='og:description'
-          content={t(`meta.${typeOfPost}.description`)}
-        />
-      </Head>
       {!isMobile && (
         <SGoBackButtonContainer>
           <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
@@ -80,7 +71,7 @@ const PostModalModeration: React.FunctionComponent<
         </SGoBackButtonContainer>
       )}
       {postParsed && typeOfPost ? (
-        <SPostModalContainer
+        <SPostContainer
           loaded={recommendedPosts && recommendedPosts.length > 0}
           id='post-container'
           isMyPost={isMyPost}
@@ -91,44 +82,85 @@ const PostModalModeration: React.FunctionComponent<
         >
           {postStatus !== 'deleted_by_admin' &&
           postStatus !== 'deleted_by_creator' ? (
-            <ModerationView />
+            <RegularView />
           ) : (
             <PostFailedBox
-              title={t('postDeletedByMe.title', {
+              title={t('postDeleted.title', {
                 postType: t(`postType.${typeOfPost}`),
               })}
               body={
                 deletedByCreator
-                  ? t('postDeletedByMe.body.byCreator', {
+                  ? t('postDeleted.body.byCreator', {
+                      creator: getDisplayname(postParsed.creator!!),
                       postType: t(`postType.${typeOfPost}`),
                     })
-                  : t('postDeletedByMe.body.byAdmin', {
+                  : t('postDeleted.body.byAdmin', {
+                      creator: getDisplayname(postParsed.creator!!),
                       postType: t(`postType.${typeOfPost}`),
                     })
               }
+              buttonCaption={tCommon('button.takeMeHome')}
               imageSrc={
                 theme.name === 'light'
                   ? LIGHT_IMAGES[typeOfPost]
                   : DARK_IMAGES[typeOfPost]
               }
-              buttonCaption={t('postDeletedByMe.buttonText')}
-              handleButtonClick={() => {
-                Mixpanel.track('Post Failed Redirect to Creation', {
-                  _stage: 'Post',
-                });
-                router.push('/creation');
+              style={{
+                marginBottom: '24px',
               }}
+              handleButtonClick={handleSeeNewDeletedBox}
             />
           )}
-        </SPostModalContainer>
+          <SRecommendationsSection
+            id='recommendations-section-heading'
+            loaded={recommendedPosts && recommendedPosts.length > 0}
+          >
+            <Headline variant={4}>
+              {recommendedPosts.length > 0
+                ? t('recommendationsSection.heading')
+                : null}
+            </Headline>
+            {recommendedPosts && (
+              <ListPostPage
+                loading={recommendedPostsLoading}
+                collection={recommendedPosts}
+                skeletonsBgColor={theme.colorsThemed.background.tertiary}
+                skeletonsHighlightColor={
+                  theme.colorsThemed.background.secondary
+                }
+                handlePostClicked={handleOpenRecommendedPost}
+              />
+            )}
+            <div
+              ref={loadingRef}
+              style={{
+                position: 'relative',
+                bottom: '10px',
+                ...(recommendedPostsLoading
+                  ? {
+                      display: 'none',
+                    }
+                  : {}),
+              }}
+            />
+          </SRecommendationsSection>
+        </SPostContainer>
       ) : null}
+      {postParsed?.creator && reportPostOpen && (
+        <ReportModal
+          show={reportPostOpen}
+          reportedDisplayname={getDisplayname(postParsed?.creator)}
+          onSubmit={handleReportSubmit}
+          onClose={handleReportClose}
+        />
+      )}
     </>
   );
 };
 
-export default PostModalModeration;
+export default PostRegular;
 
-const SPostModalContainer = styled.div<{
+const SPostContainer = styled.div<{
   isMyPost: boolean;
   loaded: boolean;
 }>`
@@ -162,6 +194,12 @@ const SPostModalContainer = styled.div<{
     padding: 24px;
     padding-bottom: 24px;
   }
+`;
+
+const SRecommendationsSection = styled.div<{
+  loaded: boolean;
+}>`
+  min-height: ${({ loaded }) => (loaded ? '600px' : '0')};
 `;
 
 const SGoBackButtonContainer = styled.div`

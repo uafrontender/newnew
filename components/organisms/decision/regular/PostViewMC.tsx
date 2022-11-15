@@ -38,7 +38,7 @@ import switchPostType from '../../../../utils/switchPostType';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { useBundles } from '../../../../contexts/bundlesContext';
 import BuyBundleModal from '../../../molecules/bundles/BuyBundleModal';
 import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
@@ -116,7 +116,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     handleGoBackInsidePost,
     handleUpdatePostStatus,
     resetSetupIntentClientSecret,
-  } = usePostModalInnerState();
+  } = usePostInnerState();
   const post = useMemo(
     () => postParsed as newnewapi.MultipleChoice,
     [postParsed]

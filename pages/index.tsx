@@ -136,8 +136,6 @@ const Home: NextPage<IHome> = ({
   //   }
 
   //   return () => {
-  //     setPostModalOpen(false);
-  //     setDisplayedPost(undefined);
   //   };
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, []);

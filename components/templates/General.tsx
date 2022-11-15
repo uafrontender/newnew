@@ -26,7 +26,6 @@ import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
 import { useNotifications } from '../../contexts/notificationsContext';
 import { useGetChats } from '../../contexts/chatContext';
 import ReportBugButton from '../molecules/ReportBugButton';
-import { usePostModalState } from '../../contexts/postModalContext';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
@@ -62,7 +61,6 @@ export const General: React.FC<IGeneral> = (props) => {
   const { unreadNotificationCount } = useNotifications();
   const { bundles } = useBundles();
   const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
-  const { postOverlayOpen } = usePostModalState();
 
   const hasMounted = useHasMounted();
 
@@ -257,9 +255,7 @@ export const General: React.FC<IGeneral> = (props) => {
           <ReportBugButton
             bottom={
               (isMobile ? 24 : 16) +
-              (isMobile &&
-              (mobileNavigationVisible || postOverlayOpen) &&
-              !mobileChatOpened
+              (isMobile && mobileNavigationVisible && !mobileChatOpened
                 ? 56
                 : 0) +
               (chatButtonVisible && !mobileChatOpened ? 72 : 0)

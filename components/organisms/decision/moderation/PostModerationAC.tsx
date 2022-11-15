@@ -36,7 +36,7 @@ import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import PostModerationResponsesContextProvider from '../../../../contexts/postModerationResponsesContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -85,7 +85,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       postStatus,
       handleGoBackInsidePost,
       handleUpdatePostStatus,
-    } = usePostModalInnerState();
+    } = usePostInnerState();
     const post = useMemo(() => postParsed as newnewapi.Auction, [postParsed]);
 
     // Additional responses

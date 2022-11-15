@@ -7,7 +7,7 @@ import { useTranslation } from 'next-i18next';
 
 import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
 import Text from '../../../atoms/Text';
 import Headline from '../../../atoms/Headline';
@@ -82,7 +82,7 @@ const PostTopInfoModeration: React.FunctionComponent<
     handleOpenEllipseMenu,
     handleOpenDeletePostModal,
     handleCloseDeletePostModal,
-  } = usePostModalInnerState();
+  } = usePostInnerState();
 
   const postId = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
   const title = useMemo(() => postParsed?.title ?? '', [postParsed]);

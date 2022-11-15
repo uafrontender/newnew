@@ -5,7 +5,7 @@ import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { useAppSelector } from '../../../../redux-store/store';
 
 import Text from '../../../atoms/Text';
@@ -48,7 +48,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
   );
 
   const { postParsed, typeOfPost, handleGoBackInsidePost } =
-    usePostModalInnerState();
+    usePostInnerState();
   const post = useMemo(
     () =>
       postParsed as

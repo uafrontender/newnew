@@ -5,7 +5,7 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
 // Utils
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { markPost } from '../../../../api/endpoints/post';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
@@ -36,7 +36,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
     );
 
     const { postParsed, typeOfPost, handleGoBackInsidePost } =
-      usePostModalInnerState();
+      usePostInnerState();
     const post = useMemo(
       () =>
         postParsed as

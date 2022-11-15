@@ -26,7 +26,7 @@ const PostSkeleton = () => {
           {t('back')}
         </SGoBackButton>
       )}
-      <SPostModalContainer>
+      <SPostContainer>
         <SWrapper>
           {isMobile && (
             <>
@@ -89,7 +89,7 @@ const PostSkeleton = () => {
             />
           </SActivitiesContainer>
         </SWrapper>
-      </SPostModalContainer>
+      </SPostContainer>
     </>
   );
 };
@@ -191,7 +191,7 @@ const SGoBackButtonMobile = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SPostModalContainer = styled.div`
+const SPostContainer = styled.div`
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
   height: 100%;

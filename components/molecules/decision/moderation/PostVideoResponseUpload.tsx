@@ -28,7 +28,7 @@ import {
 } from '../../../../api/endpoints/upload';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -42,7 +42,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   id,
 }) => {
   const { t } = useTranslation('page-Post');
-  const { postStatus } = usePostModalInnerState();
+  const { postStatus } = usePostInnerState();
   const {
     videoProcessing,
     responseFileUploadETA,

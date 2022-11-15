@@ -12,7 +12,6 @@ import Lottie from '../../atoms/Lottie';
 import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import { usePostModalState } from '../../../contexts/postModalContext';
 
 const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
@@ -33,7 +32,6 @@ export const PostList: React.FC<IList> = ({
   skeletonsBgColor,
   skeletonsHighlightColor,
 }) => {
-  const { postOverlayOpen } = usePostModalState();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -56,7 +54,6 @@ export const PostList: React.FC<IList> = ({
           index={index + 1}
           width='100%'
           height={isMobile ? '564px' : '336px'}
-          shouldStop={postOverlayOpen}
         />
       </SItemWrapper>
     );

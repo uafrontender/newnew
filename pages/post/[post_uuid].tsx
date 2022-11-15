@@ -26,25 +26,24 @@ import {
   markPost,
 } from '../../api/endpoints/post';
 import switchPostType, { TPostType } from '../../utils/switchPostType';
-
-import { NextPageWithLayout } from '../_app';
-import GeneralLayout from '../../components/templates/General';
-import PostSkeleton from '../../components/organisms/decision/PostSkeleton';
+import { ChannelsContext } from '../../contexts/channelsContext';
+import { SocketContext } from '../../contexts/socketContext';
 import switchPostStatusString from '../../utils/switchPostStatusString';
 import switchPostStatus, {
   TPostStatusStringified,
 } from '../../utils/switchPostStatus';
 import { useAppSelector } from '../../redux-store/store';
-import { usePostModalState } from '../../contexts/postModalContext';
 import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 import { Mixpanel } from '../../utils/mixpanel';
 import CommentFromUrlContextProvider, {
   CommentFromUrlContext,
 } from '../../contexts/commentFromUrlContext';
-import PostModalInnerContextProvider from '../../contexts/postModalInnerContext';
-import PostModal from '../../components/organisms/decision';
-import { ChannelsContext } from '../../contexts/channelsContext';
-import { SocketContext } from '../../contexts/socketContext';
+import PostInnerContextProvider from '../../contexts/postInnerContext';
+
+import { NextPageWithLayout } from '../_app';
+import GeneralLayout from '../../components/templates/General';
+import PostSkeleton from '../../components/organisms/decision/PostSkeleton';
+import Post from '../../components/organisms/decision';
 
 interface IPostPage {
   postUuid: string;
@@ -88,13 +87,18 @@ const PostPage: NextPage<IPostPage> = ({
     [comment_content]
   );
 
-  const { isConfirmToClosePost } = usePostModalState();
+  const [isConfirmToClosePost, setIsConfirmToClosePost] = useState(false);
+
+  const handleSetIsConfirmToClosePost = useCallback((newState: boolean) => {
+    setIsConfirmToClosePost(newState);
+  }, []);
 
   useLeavePageConfirm(
     isConfirmToClosePost,
     t('postVideo.cannotLeavePageMsg'),
     []
   );
+
   const [postFromAjax, setPostFromAjax] = useState<newnewapi.Post | undefined>(
     undefined
   );
@@ -539,7 +543,7 @@ const PostPage: NextPage<IPostPage> = ({
         },
       }}
     >
-      <PostModalInnerContextProvider
+      <PostInnerContextProvider
         key={postUuid}
         postParsed={postParsed}
         typeOfPost={typeOfPost}
@@ -565,6 +569,7 @@ const PostPage: NextPage<IPostPage> = ({
         handleDeletePost={handleDeletePost}
         handleOpenDeletePostModal={handleOpenDeletePostModal}
         handleCloseDeletePostModal={handleCloseDeletePostModal}
+        handleSetIsConfirmToClosePost={handleSetIsConfirmToClosePost}
       >
         <Head>
           <title>{t(`meta.${typeOfPost}.title`)}</title>
@@ -623,7 +628,7 @@ const PostPage: NextPage<IPostPage> = ({
                 },
               }}
             >
-              <PostModal
+              <Post
                 isMyPost={isMyPost}
                 shouldRenderVotingFinishedModal={
                   shouldRenderVotingFinishedModal
@@ -632,7 +637,7 @@ const PostPage: NextPage<IPostPage> = ({
             </motion.div>
           )}
         </AnimatePresence>
-      </PostModalInnerContextProvider>
+      </PostInnerContextProvider>
     </motion.div>
   );
 };

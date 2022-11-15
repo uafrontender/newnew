@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
-import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../contexts/postInnerContext';
 import { useAppSelector } from '../../../redux-store/store';
 import getDisplayname from '../../../utils/getDisplayname';
 
@@ -16,10 +16,10 @@ import GoBackButton from '../../molecules/GoBackButton';
 
 const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 
-interface IPostModalAwaitingSuccess {}
+interface IPostAwaitingSuccess {}
 
-const PostModalAwaitingSuccess: React.FunctionComponent<
-  IPostModalAwaitingSuccess
+const PostAwaitingSuccess: React.FunctionComponent<
+  IPostAwaitingSuccess
 > = () => {
   const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -46,7 +46,7 @@ const PostModalAwaitingSuccess: React.FunctionComponent<
     handleShareClose,
     handleOpenShareMenu,
     handleOpenEllipseMenu,
-  } = usePostModalInnerState();
+  } = usePostInnerState();
 
   return (
     <>
@@ -70,7 +70,7 @@ const PostModalAwaitingSuccess: React.FunctionComponent<
         </SGoBackButtonContainer>
       )}
       {postParsed && typeOfPost ? (
-        <SPostModalContainer
+        <SPostContainer
           id='post-container'
           isMyPost={isMyPost}
           loaded={recommendedPosts && recommendedPosts.length > 0}
@@ -113,7 +113,7 @@ const PostModalAwaitingSuccess: React.FunctionComponent<
               handleOpenEllipseMenu={handleOpenEllipseMenu}
             />
           )}
-        </SPostModalContainer>
+        </SPostContainer>
       ) : null}
       {postParsed?.creator && reportPostOpen && (
         <ReportModal
@@ -127,9 +127,9 @@ const PostModalAwaitingSuccess: React.FunctionComponent<
   );
 };
 
-export default PostModalAwaitingSuccess;
+export default PostAwaitingSuccess;
 
-const SPostModalContainer = styled.div<{
+const SPostContainer = styled.div<{
   isMyPost: boolean;
   loaded: boolean;
 }>`
