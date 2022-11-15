@@ -1,14 +1,12 @@
 /* eslint-disable no-lonely-if */
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { useAppSelector } from '../../../../redux-store/store';
-import { SocketContext } from '../../../../contexts/socketContext';
-import { ChannelsContext } from '../../../../contexts/channelsContext';
 
 import Text from '../../../atoms/Text';
 import PostTopInfo from '../../../molecules/decision/common/PostTopInfo';
@@ -41,7 +39,7 @@ interface IPostViewProcessingAnnouncement {
 const PostViewProcessingAnnouncement: React.FunctionComponent<
   IPostViewProcessingAnnouncement
 > = ({ variant }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const theme = useTheme();
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -49,12 +47,8 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
     resizeMode
   );
 
-  const {
-    postParsed,
-    typeOfPost,
-    handleGoBackInsidePost,
-    handleUpdatePostStatus,
-  } = usePostModalInnerState();
+  const { postParsed, typeOfPost, handleGoBackInsidePost } =
+    usePostInnerState();
   const post = useMemo(
     () =>
       postParsed as
@@ -63,55 +57,6 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
         | newnewapi.MultipleChoice,
     [postParsed]
   );
-
-  // Socket
-  const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } = useContext(ChannelsContext);
-
-  // Increment channel subs after mounting
-  // Decrement when unmounting
-  useEffect(() => {
-    addChannel(post.postUuid, {
-      postUpdates: {
-        postUuid: post.postUuid,
-      },
-    });
-
-    return () => {
-      removeChannel(post.postUuid);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const socketHandlerPostStatus = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostStatusUpdated.decode(arr);
-
-      if (!decoded) return;
-      if (decoded.postUuid === post.postUuid) {
-        if (decoded.auction) {
-          handleUpdatePostStatus(decoded.auction);
-        } else if (decoded.multipleChoice) {
-          handleUpdatePostStatus(decoded.multipleChoice);
-        } else {
-          if (decoded.crowdfunding)
-            handleUpdatePostStatus(decoded.crowdfunding);
-        }
-      }
-    };
-
-    if (socketConnection) {
-      socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
-    }
-
-    return () => {
-      if (socketConnection && socketConnection?.connected) {
-        socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, post, user.userData?.userUuid]);
 
   return (
     <SWrapper>

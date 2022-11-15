@@ -136,8 +136,6 @@ const Home: NextPage<IHome> = ({
   //   }
 
   //   return () => {
-  //     setPostModalOpen(false);
-  //     setDisplayedPost(undefined);
   //   };
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, []);
@@ -319,7 +317,7 @@ const Home: NextPage<IHome> = ({
             </SHeading>
           )}
           {/* Recent activity */}
-          {collectionRAInitialLoading || collectionRA?.length > 0 ? (
+          {collectionRAInitialLoading && collectionRA?.length > 0 ? (
             <CardsSection
               title={t('cardsSection.title.recent-activity')}
               category='recent-activity'
@@ -340,6 +338,7 @@ const Home: NextPage<IHome> = ({
               }
               padding={user.loggedIn ? 'small' : 'large'}
               onReachEnd={loadMore}
+              seeMoreLink='/profile/purchases'
             />
           ) : null}
         </>
@@ -520,7 +519,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'common',
     'page-Home',
     'component-PostCard',
-    'modal-Post',
+    'page-Post',
     'modal-PaymentModal',
     'modal-ResponseSuccessModal',
     'page-Chat',

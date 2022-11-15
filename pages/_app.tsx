@@ -55,7 +55,6 @@ import CardsContextProvider from '../contexts/cardsContext';
 import assets from '../constants/assets';
 
 // Landing
-import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
@@ -233,33 +232,31 @@ const MyApp = (props: IMyApp): ReactElement => {
                                 <ChatsProvider>
                                   <OverlayModeProvider>
                                     <ResizeMode>
-                                      <PostModalContextProvider>
-                                        <GlobalTheme initialTheme={colorMode}>
-                                          <>
-                                            <ToastContainer containerId='toast-container' />
-                                            <VideoProcessingWrapper>
-                                              <ErrorBoundary>
-                                                {!pageProps.error ? (
-                                                  getLayout(
-                                                    <Component {...pageProps} />
-                                                  )
-                                                ) : (
-                                                  <Error
-                                                    title={
-                                                      pageProps.error?.message
-                                                    }
-                                                    statusCode={
-                                                      pageProps.error
-                                                        ?.statusCode ?? 500
-                                                    }
-                                                  />
-                                                )}
-                                              </ErrorBoundary>
-                                            </VideoProcessingWrapper>
-                                            <ReCaptchaBadgeModal />
-                                          </>
-                                        </GlobalTheme>
-                                      </PostModalContextProvider>
+                                      <GlobalTheme initialTheme={colorMode}>
+                                        <>
+                                          <ToastContainer containerId='toast-container' />
+                                          <VideoProcessingWrapper>
+                                            <ErrorBoundary>
+                                              {!pageProps.error ? (
+                                                getLayout(
+                                                  <Component {...pageProps} />
+                                                )
+                                              ) : (
+                                                <Error
+                                                  title={
+                                                    pageProps.error?.message
+                                                  }
+                                                  statusCode={
+                                                    pageProps.error
+                                                      ?.statusCode ?? 500
+                                                  }
+                                                />
+                                              )}
+                                            </ErrorBoundary>
+                                          </VideoProcessingWrapper>
+                                          <ReCaptchaBadgeModal />
+                                        </>
+                                      </GlobalTheme>
                                     </ResizeMode>
                                   </OverlayModeProvider>
                                 </ChatsProvider>

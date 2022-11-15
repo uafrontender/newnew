@@ -3,7 +3,7 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
 import { useAppSelector } from '../../../../redux-store/store';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
@@ -42,7 +42,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
     'tablet',
   ].includes(resizeMode);
 
-  const { postParsed } = usePostModalInnerState();
+  const { postParsed } = usePostInnerState();
   const {
     coreResponse,
     additionalResponses,

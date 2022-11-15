@@ -3,7 +3,6 @@ import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import isBrowser from '../../../../../utils/isBrowser';
 import { checkCanDeleteAcOption } from '../../../../../api/endpoints/auction';
 
 import EllipseMenu, { EllipseMenuButton } from '../../../../atoms/EllipseMenu';
@@ -63,17 +62,6 @@ const AcOptionCardModerationEllipseMenu: React.FunctionComponent<
       fetchCanDelete();
     }
   }, [isVisible, canDeleteOption, optionId]);
-
-  useEffect(() => {
-    if (isBrowser()) {
-      const postModal = document.getElementById('post-modal-container');
-      if (isVisible && postModal) {
-        postModal.style.overflow = 'hidden';
-      } else if (postModal) {
-        postModal.style.overflow = 'scroll';
-      }
-    }
-  }, [isVisible]);
 
   return (
     <SEllipseMenu

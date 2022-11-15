@@ -37,7 +37,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
   handleSubmit,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const videoThumbs: any = useRef({ ...thumbnails });
   const [chunks, setChunks] = useState<string[]>([]);
   const [videoDuration, setVideoDuration] = useState<number>(0);

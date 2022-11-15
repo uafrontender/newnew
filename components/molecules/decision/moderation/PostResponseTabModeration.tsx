@@ -46,7 +46,7 @@ const PostResponseTabModeration: React.FunctionComponent<
   winningOptionMc,
   moneyBacked,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
 

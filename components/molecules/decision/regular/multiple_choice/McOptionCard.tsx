@@ -121,7 +121,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -916,7 +916,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   isFirstVoterVerified,
   isWhitelistSupporterVerified,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
 
   if (isCreatorsBid && !isSupportedByMe) {

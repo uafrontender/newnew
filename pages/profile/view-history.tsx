@@ -190,7 +190,7 @@ export async function getServerSideProps(
       'common',
       'page-Profile',
       'component-PostCard',
-      'modal-Post',
+      'page-Post',
       'modal-PaymentModal',
       'modal-ResponseSuccessModal',
     ]);

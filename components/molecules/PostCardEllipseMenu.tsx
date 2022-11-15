@@ -13,7 +13,6 @@ import { toast } from 'react-toastify';
 
 import EllipseMenu, { EllipseMenuButton } from '../atoms/EllipseMenu';
 
-import isBrowser from '../../utils/isBrowser';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
 import switchPostType from '../../utils/switchPostType';
 import { useAppSelector } from '../../redux-store/store';
@@ -48,17 +47,6 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       const router = useRouter();
       const { t } = useTranslation('common');
       const user = useAppSelector((state) => state.user);
-
-      useEffect(() => {
-        if (isBrowser()) {
-          const postModal = document.getElementById('post-modal-container');
-          if (isVisible && postModal) {
-            postModal.style.overflow = 'hidden';
-          } else if (postModal) {
-            postModal.style.overflow = 'scroll';
-          }
-        }
-      }, [isVisible]);
 
       // Share
       const [isCopiedUrl, setIsCopiedUrl] = useState(false);

@@ -12,7 +12,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 import CardSkeleton from '../../molecules/CardSkeleton';
 
-interface IListPostModal {
+interface IListPostPage {
   collection: any;
   loading: boolean;
   skeletonsBgColor?: string;
@@ -20,7 +20,7 @@ interface IListPostModal {
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
-export const ListPostModal: React.FC<IListPostModal> = React.memo(
+export const ListPostPage: React.FC<IListPostPage> = React.memo(
   ({
     collection,
     loading,
@@ -57,7 +57,7 @@ export const ListPostModal: React.FC<IListPostModal> = React.memo(
     };
 
     return (
-      <SListPostModalWrapper
+      <SListPostPageWrapper
       // style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
       >
         {collection?.map(renderItem)}
@@ -74,19 +74,19 @@ export const ListPostModal: React.FC<IListPostModal> = React.memo(
                 highlightColor={skeletonsHighlightColor}
               />
             ))}
-      </SListPostModalWrapper>
+      </SListPostPageWrapper>
     );
   }
 );
 
-ListPostModal.defaultProps = {
+ListPostPage.defaultProps = {
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
 };
 
-export default ListPostModal;
+export default ListPostPage;
 
-const SListPostModalWrapper = styled.div`
+const SListPostPageWrapper = styled.div`
   width: 100%;
   display: flex;
   padding: 8px 0 0 0;
