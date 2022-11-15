@@ -64,9 +64,11 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
   return (
     <>
       {!isMobile && (
-        <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
-          {t('back')}
-        </SGoBackButton>
+        <SGoBackButtonContainer>
+          <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
+            {t('back')}
+          </SGoBackButton>
+        </SGoBackButtonContainer>
       )}
       {postParsed && typeOfPost ? (
         <SPostModalContainer
@@ -200,7 +202,7 @@ const SRecommendationsSection = styled.div<{
   min-height: ${({ loaded }) => (loaded ? '600px' : '0')};
 `;
 
-const SGoBackButton = styled(GoBackButton)`
+const SGoBackButtonContainer = styled.div`
   padding-left: 16px;
 
   ${({ theme }) => theme.media.laptopM} {
@@ -210,4 +212,8 @@ const SGoBackButton = styled(GoBackButton)`
     margin-left: auto;
     margin-right: auto;
   }
+`;
+
+const SGoBackButton = styled(GoBackButton)`
+  margin-right: auto;
 `;

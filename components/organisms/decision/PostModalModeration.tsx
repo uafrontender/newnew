@@ -73,9 +73,11 @@ const PostModalModeration: React.FunctionComponent<
         />
       </Head>
       {!isMobile && (
-        <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
-          {t('back')}
-        </SGoBackButton>
+        <SGoBackButtonContainer>
+          <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
+            {t('back')}
+          </SGoBackButton>
+        </SGoBackButtonContainer>
       )}
       {postParsed && typeOfPost ? (
         <SPostModalContainer
@@ -162,7 +164,7 @@ const SPostModalContainer = styled.div<{
   }
 `;
 
-const SGoBackButton = styled(GoBackButton)`
+const SGoBackButtonContainer = styled.div`
   padding-left: 16px;
 
   ${({ theme }) => theme.media.laptopM} {
@@ -172,4 +174,8 @@ const SGoBackButton = styled(GoBackButton)`
     margin-left: auto;
     margin-right: auto;
   }
+`;
+
+const SGoBackButton = styled(GoBackButton)`
+  margin-right: auto;
 `;
