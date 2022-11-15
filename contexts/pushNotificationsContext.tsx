@@ -112,41 +112,61 @@ const PushNotificationsContextProvider: React.FC<
   }, []);
 
   // Check initial push notification permission
-  useEffect(() => {
+  const checkSubscriptionSafari = useCallback(async () => {
     const permissionData = getPermissionData();
 
-    const checkSubscriptionSafari = async () => {
-      if (permissionData.permission === 'granted') {
-        try {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari/check?token=${
-              permissionData.deviceToken
-            }&access_token=${cookiesInstance.get('accessToken')}`
-          );
+    if (permissionData.permission === 'granted') {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari/check?token=${
+            permissionData.deviceToken
+          }&access_token=${cookiesInstance.get('accessToken')}`
+        );
 
-          const test = await response.json();
+        const test = await response.json();
 
-          setIsSubscribed(!!test.endpoint);
-        } catch (err) {
-          setIsSubscribed(false);
-        }
+        setIsSubscribed(!!test.endpoint);
+        return !!test.endpoint;
+      } catch (err) {
+        setIsSubscribed(false);
+        return false;
       }
-    };
+    }
 
-    const checkSubscriptionNonSafari = async () => {
-      const swReg = await navigator.serviceWorker.register('/sw.js');
+    return false;
+  }, [getPermissionData]);
+
+  const checkSubscriptionNonSafari = useCallback(async () => {
+    try {
+      const swReg = await navigator.serviceWorker.getRegistration('/sw.js');
+
+      if (!swReg) {
+        setIsSubscribed(false);
+        return false;
+      }
+
+      const permissionData = getPermissionData();
 
       if (permissionData.permission === 'granted') {
         const subscription = await swReg.pushManager.getSubscription();
 
         if (subscription) {
           setIsSubscribed(hasWebPush);
-        } else {
-          setIsSubscribed(false);
+          return true;
         }
-      }
-    };
 
+        setIsSubscribed(false);
+        return false;
+      }
+
+      return false;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }, [getPermissionData, hasWebPush]);
+
+  useEffect(() => {
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
       if (
         isSafari() &&
@@ -158,7 +178,12 @@ const PushNotificationsContextProvider: React.FC<
         checkSubscriptionNonSafari();
       }
     }
-  }, [hasWebPush, getPermissionData]);
+  }, [
+    hasWebPush,
+    getPermissionData,
+    checkSubscriptionSafari,
+    checkSubscriptionNonSafari,
+  ]);
 
   // Permission Modal
   const openPermissionRequestModal = useCallback(() => {
@@ -378,7 +403,11 @@ const PushNotificationsContextProvider: React.FC<
 
   const unsubscribeNonSafari = useCallback(async () => {
     try {
-      const swReg = await navigator.serviceWorker.register('/sw.js');
+      const swReg = await navigator.serviceWorker.getRegistration('/sw.js');
+
+      if (!swReg) {
+        throw new Error('No active service worker');
+      }
 
       const subscription = await swReg.pushManager.getSubscription();
       const sub = subscription?.toJSON();
@@ -412,7 +441,11 @@ const PushNotificationsContextProvider: React.FC<
   // Pause and resume notifications
   const pauseNotificationNonSafari = useCallback(async () => {
     try {
-      const swReg = await navigator.serviceWorker.register('/sw.js');
+      const swReg = await navigator.serviceWorker.getRegistration('/sw.js');
+
+      if (!swReg) {
+        throw new Error('No active service worker');
+      }
 
       const subscription = await swReg.pushManager.getSubscription();
       const sub = subscription?.toJSON();
@@ -449,6 +482,12 @@ const PushNotificationsContextProvider: React.FC<
         return;
       }
 
+      const isDeviceSubscribed = await checkSubscriptionSafari();
+
+      if (!isDeviceSubscribed) {
+        return;
+      }
+
       await register({
         endpoint: permissionData.deviceToken,
         p256dh: 'safari',
@@ -457,12 +496,17 @@ const PushNotificationsContextProvider: React.FC<
     } catch (err) {
       console.error(err);
     }
-  }, [register, getPermissionData]);
+  }, [register, getPermissionData, checkSubscriptionSafari]);
 
   const resumePushNotificationNonSafari = useCallback(
     async (onSuccess?: () => void) => {
       try {
-        const swReg = await navigator.serviceWorker.register('/sw.js');
+        const swReg = await navigator.serviceWorker.getRegistration('/sw.js');
+
+        if (!swReg) {
+          throw new Error('No active service worker');
+        }
+
         const permissionData = getPermissionData();
 
         if (permissionData.permission !== 'granted') {
