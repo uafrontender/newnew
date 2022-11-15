@@ -1318,12 +1318,6 @@ const SButtonFirst = styled(Button)`
     }
   }
 
-  ${(props) => props.theme.media.laptop} {
-    span {
-      font-size: 16px;
-    }
-  }
-
   &:hover,
   &:active,
   &:focus {
