@@ -15,7 +15,7 @@ const PostVideoProcessingHolder: React.FunctionComponent<
   IPostVideoProcessingHolder
 > = ({ holderText }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   return (
     <SVideoWrapper>
       <SHourglassCard>

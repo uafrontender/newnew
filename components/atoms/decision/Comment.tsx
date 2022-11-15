@@ -59,7 +59,7 @@ const Comment: React.FC<IComment> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

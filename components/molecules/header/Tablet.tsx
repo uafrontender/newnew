@@ -77,10 +77,6 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                         />
                       </SIconButtonContent>
                     </Button>
-                    <MoreMenuTablet
-                      isVisible={moreMenuOpen}
-                      handleClose={() => setMoreMenuOpen(false)}
-                    />
                   </a>
                 </Link>
               </SItemWithMargin>

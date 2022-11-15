@@ -2,34 +2,34 @@
 import React from 'react';
 
 // Views
-import PostModalRegular from './PostModalRegular';
-import PostModalModeration from './PostModalModeration';
-import PostModalAwaitingSuccess from './PostModalAwaitingSuccess';
+import PostRegular from './PostRegular';
+import PostModeration from './PostModeration';
+import PostAwaitingSuccess from './PostAwaitingSuccess';
 
-interface IPostModal {
+interface IPost {
   isMyPost: boolean;
   shouldRenderVotingFinishedModal: boolean;
 }
 
 // Memorization does not work
-const PostModal: React.FunctionComponent<IPostModal> = ({
+const Post: React.FunctionComponent<IPost> = ({
   isMyPost,
   shouldRenderVotingFinishedModal,
 }) => (
   <>
     {isMyPost ? (
       // Render Moderation view
-      <PostModalModeration />
+      <PostModeration />
     ) : shouldRenderVotingFinishedModal ? (
       // Render awaiting response or success view
-      <PostModalAwaitingSuccess />
+      <PostAwaitingSuccess />
     ) : (
       // Render regular view
-      <PostModalRegular />
+      <PostRegular />
     )}
   </>
 );
 
-PostModal.defaultProps = {};
+Post.defaultProps = {};
 
-export default PostModal;
+export default Post;

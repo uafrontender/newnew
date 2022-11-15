@@ -92,7 +92,6 @@ interface ICard {
   width?: string;
   height?: string;
   maxWidthTablet?: string;
-  shouldStop?: boolean;
   handleRemovePostFromState?: () => void;
   handleAddPostToState?: () => void;
 }
@@ -105,7 +104,6 @@ export const PostCard: React.FC<ICard> = React.memo(
     width,
     height,
     maxWidthTablet,
-    shouldStop,
     handleRemovePostFromState,
     handleAddPostToState,
   }) => {
@@ -779,7 +777,6 @@ PostCard.defaultProps = {
   type: 'outside',
   width: '',
   height: '',
-  shouldStop: false,
 };
 
 interface ISWrapper {
@@ -1318,12 +1315,6 @@ const SButtonFirst = styled(Button)`
 
     span {
       font-size: 14px;
-    }
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    span {
-      font-size: 16px;
     }
   }
 

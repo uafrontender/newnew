@@ -18,7 +18,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { useAppSelector } from '../../../../redux-store/store';
 import { setPostThumbnail } from '../../../../api/endpoints/post';
 import { TThumbnailParameters } from '../../../../redux-store/slices/creationStateSlice';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
 import EllipseMenu, { EllipseMenuButton } from '../../../atoms/EllipseMenu';
@@ -59,7 +59,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   isMuted,
   handleToggleMuted,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
     'mobile',
@@ -72,7 +72,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     resizeMode
   );
 
-  const { postStatus } = usePostModalInnerState();
+  const { postStatus } = usePostInnerState();
   const {
     coreResponse,
     openedTab,

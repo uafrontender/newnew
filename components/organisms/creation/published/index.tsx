@@ -123,7 +123,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
             }
 
             router.push(url).then(() => {
-              dispatch(clearCreation({}));
+              dispatch(clearCreation(undefined));
             });
           }
         }
@@ -172,6 +172,12 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       dateValue.add(5, 'd');
     } else if (post.expiresAt === '7-days') {
       dateValue.add(7, 'd');
+    } else if (post.expiresAt === '2-minutes') {
+      dateValue.add(2, 'm');
+    } else if (post.expiresAt === '5-minutes') {
+      dateValue.add(5, 'm');
+    } else if (post.expiresAt === '10-minutes') {
+      dateValue.add(10, 'm');
     }
 
     return dateValue;

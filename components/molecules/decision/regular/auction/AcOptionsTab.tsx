@@ -62,7 +62,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   handleAddOrUpdateOptionFromResponse,
   handleRemoveOption,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const { resizeMode } = useAppSelector((state) => state.ui);

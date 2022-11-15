@@ -136,8 +136,6 @@ const Home: NextPage<IHome> = ({
   //   }
 
   //   return () => {
-  //     setPostModalOpen(false);
-  //     setDisplayedPost(undefined);
   //   };
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, []);
@@ -521,7 +519,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     'common',
     'page-Home',
     'component-PostCard',
-    'modal-Post',
+    'page-Post',
     'modal-PaymentModal',
     'modal-ResponseSuccessModal',
     'page-Chat',

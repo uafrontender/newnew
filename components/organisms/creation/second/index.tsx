@@ -319,6 +319,12 @@ export const CreationSecondStepContent: React.FC<
       dateValue.add(5, 'd');
     } else if (post.expiresAt === '7-days') {
       dateValue.add(7, 'd');
+    } else if (post.expiresAt === '2-minutes') {
+      dateValue.add(2, 'm');
+    } else if (post.expiresAt === '5-minutes') {
+      dateValue.add(5, 'm');
+    } else if (post.expiresAt === '10-minutes') {
+      dateValue.add(10, 'm');
     }
 
     return dateValue;
@@ -343,6 +349,12 @@ export const CreationSecondStepContent: React.FC<
       dateValue.add(5, 'd');
     } else if (post.expiresAt === '7-days') {
       dateValue.add(7, 'd');
+    } else if (post.expiresAt === '2-minutes') {
+      dateValue.add(2, 'm');
+    } else if (post.expiresAt === '5-minutes') {
+      dateValue.add(5, 'm');
+    } else if (post.expiresAt === '10-minutes') {
+      dateValue.add(10, 'm');
     }
 
     return dateValue;
@@ -604,6 +616,22 @@ export const CreationSecondStepContent: React.FC<
   );
   const expireOptions = useMemo(
     () => [
+      ...(process.env.NEXT_PUBLIC_ENVIRONMENT !== 'production'
+        ? [
+            {
+              id: '2-minutes',
+              title: t('secondStep.field.expiresAt.options.2-minutes'),
+            },
+            {
+              id: '5-minutes',
+              title: t('secondStep.field.expiresAt.options.5-minutes'),
+            },
+            {
+              id: '10-minutes',
+              title: t('secondStep.field.expiresAt.options.10-minutes'),
+            },
+          ]
+        : []),
       {
         id: '1-hour',
         title: t('secondStep.field.expiresAt.options.1-hour'),
@@ -674,12 +702,13 @@ export const CreationSecondStepContent: React.FC<
                 type='input'
                 value={auction.minimalBid}
                 onChange={handleItemChange}
-                formattedDescription={auction.minimalBid}
+                formattedDescription={(appConstants.minAcBid / 100).toFixed(0)}
                 inputProps={{
-                  min: 5,
+                  min: appConstants.minAcBid ? appConstants.minAcBid / 100 : 2,
                   max: 10000,
                   type: 'number',
                   pattern: '[0-9]*',
+                  customPlaceholder: (appConstants.minAcBid / 100).toFixed(0),
                 }}
               />
             </SItemWrapper>
@@ -719,6 +748,7 @@ export const CreationSecondStepContent: React.FC<
       validateMcOption,
       isMobile,
       auction.minimalBid,
+      appConstants.minAcBid,
       crowdfunding.targetBackerCount,
       cfFormattedDescription,
     ]
@@ -736,12 +766,19 @@ export const CreationSecondStepContent: React.FC<
                     type='input'
                     value={auction.minimalBid}
                     onChange={handleItemChange}
-                    formattedDescription={auction.minimalBid}
+                    formattedDescription={(appConstants.minAcBid / 100).toFixed(
+                      0
+                    )}
                     inputProps={{
-                      min: 5,
+                      min: appConstants.minAcBid
+                        ? appConstants.minAcBid / 100
+                        : 2,
                       max: 10000,
                       type: 'number',
                       pattern: '[0-9]*',
+                      customPlaceholder: (appConstants.minAcBid / 100).toFixed(
+                        0
+                      ),
                     }}
                   />
                 </SFieldWrapper>
@@ -833,6 +870,7 @@ export const CreationSecondStepContent: React.FC<
       tab,
       auction.minimalBid,
       handleItemChange,
+      appConstants.minAcBid,
       crowdfunding.targetBackerCount,
       cfFormattedDescription,
       post.expiresAt,
@@ -1220,20 +1258,17 @@ export const CreationSecondStepContent: React.FC<
                         <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
                         <SUserTitleContainer>
                           <SUserTitle variant={3} weight={600}>
-                            {user.userData?.nickname &&
-                            user.userData?.nickname?.length > 8
-                              ? `${user.userData?.nickname?.substring(0, 8)}...`
-                              : user.userData?.nickname}
+                            {user.userData?.nickname}
                           </SUserTitle>
-                          {user.userData?.options?.isVerified && (
-                            <InlineSvg
-                              svg={VerificationCheckmark}
-                              width='20px'
-                              height='20px'
-                              fill='none'
-                            />
-                          )}
                         </SUserTitleContainer>
+                        {user.userData?.options?.isVerified && (
+                          <SInlineSvg
+                            svg={VerificationCheckmark}
+                            width='20px'
+                            height='20px'
+                            fill='none'
+                          />
+                        )}
                         <SCaption variant={2} weight={700}>
                           {t('secondStep.card.left', {
                             time: formatExpiresAtNoStartsAt().fromNow(true),
@@ -1344,7 +1379,7 @@ const SFloatingSubSectionUser = styled.div`
   align-items: center;
   flex-direction: row;
 
-  grid-template-columns: 48px 1fr 1fr;
+  grid-template-columns: 24px min-content 20px max-content;
 `;
 
 const SFloatingSubSectionPlayer = styled.div`
@@ -1502,27 +1537,27 @@ const STabletBlockPreviewTitle = styled(Caption)`
 const STabletBlockSubTitle = styled(Text)``;
 
 const SUserAvatar = styled(UserAvatar)`
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  min-height: 24px;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
 `;
 
 const SUserTitleContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+  max-width: 82px;
 `;
 
 const SUserTitle = styled(Text)`
-  max-width: 188px;
-  display: -webkit-box;
-  overflow: hidden;
-  position: relative;
   padding-left: 12px;
   margin-right: 2px;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const SInlineSvg = styled(InlineSvg)`
+  flex-shrink: 0;
 `;
 
 const SBottomEnd = styled.div`

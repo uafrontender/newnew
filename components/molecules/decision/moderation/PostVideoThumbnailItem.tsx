@@ -22,7 +22,7 @@ interface IPostVideoThumbnailItemHelperModal {
 const PostVideoThumbnailItemHelperModal: React.FunctionComponent<
   IPostVideoThumbnailItemHelperModal
 > = ({ top, left }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   return ReactDOM.createPortal(
     <AnimatePresence>

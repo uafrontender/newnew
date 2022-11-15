@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
-import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../contexts/postInnerContext';
 import { useAppSelector } from '../../../redux-store/store';
 import getDisplayname from '../../../utils/getDisplayname';
 
@@ -15,7 +15,7 @@ import Headline from '../../atoms/Headline';
 import assets from '../../../constants/assets';
 import GoBackButton from '../../molecules/GoBackButton';
 
-const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
+const ListPostPage = dynamic(() => import('../see-more/ListPostPage'));
 const PostFailedBox = dynamic(
   () => import('../../molecules/decision/common/PostFailedBox')
 );
@@ -33,11 +33,11 @@ const LIGHT_IMAGES = {
   mc: assets.creation.lightMcAnimated,
 };
 
-interface IPostModalRegular {}
+interface IPostRegular {}
 
-const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
+const PostRegular: React.FunctionComponent<IPostRegular> = () => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { t: tCommon } = useTranslation('common');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -59,19 +59,21 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
     handleReportSubmit,
     handleReportClose,
     handleCloseAndGoBack,
-  } = usePostModalInnerState();
+  } = usePostInnerState();
 
   return (
     <>
       {!isMobile && (
-        <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
-          {t('back')}
-        </SGoBackButton>
+        <SGoBackButtonContainer>
+          <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
+            {t('back')}
+          </SGoBackButton>
+        </SGoBackButtonContainer>
       )}
       {postParsed && typeOfPost ? (
-        <SPostModalContainer
+        <SPostContainer
           loaded={recommendedPosts && recommendedPosts.length > 0}
-          id='post-modal-container'
+          id='post-container'
           isMyPost={isMyPost}
           onClick={(e) => e.stopPropagation()}
           ref={(el) => {
@@ -119,7 +121,7 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
                 : null}
             </Headline>
             {recommendedPosts && (
-              <ListPostModal
+              <ListPostPage
                 loading={recommendedPostsLoading}
                 collection={recommendedPosts}
                 skeletonsBgColor={theme.colorsThemed.background.tertiary}
@@ -142,7 +144,7 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
               }}
             />
           </SRecommendationsSection>
-        </SPostModalContainer>
+        </SPostContainer>
       ) : null}
       {postParsed?.creator && reportPostOpen && (
         <ReportModal
@@ -156,9 +158,9 @@ const PostModalRegular: React.FunctionComponent<IPostModalRegular> = () => {
   );
 };
 
-export default PostModalRegular;
+export default PostRegular;
 
-const SPostModalContainer = styled.div<{
+const SPostContainer = styled.div<{
   isMyPost: boolean;
   loaded: boolean;
 }>`
@@ -200,7 +202,7 @@ const SRecommendationsSection = styled.div<{
   min-height: ${({ loaded }) => (loaded ? '600px' : '0')};
 `;
 
-const SGoBackButton = styled(GoBackButton)`
+const SGoBackButtonContainer = styled.div`
   padding-left: 16px;
 
   ${({ theme }) => theme.media.laptopM} {
@@ -210,4 +212,8 @@ const SGoBackButton = styled(GoBackButton)`
     margin-left: auto;
     margin-right: auto;
   }
+`;
+
+const SGoBackButton = styled(GoBackButton)`
+  margin-right: auto;
 `;

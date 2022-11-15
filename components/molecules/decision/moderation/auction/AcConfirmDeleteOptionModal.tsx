@@ -15,7 +15,7 @@ const AcConfirmDeleteOptionModal: React.FC<IAcConfirmDeleteOptionModal> = ({
   closeModal,
   handleConfirmDelete,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   return (
     <Modal show={isVisible} additionalz={12} onClose={closeModal}>

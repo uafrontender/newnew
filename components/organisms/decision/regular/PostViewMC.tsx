@@ -17,7 +17,6 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
-import { ChannelsContext } from '../../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../../api/endpoints/post';
@@ -39,7 +38,7 @@ import switchPostType from '../../../../utils/switchPostType';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { useBundles } from '../../../../contexts/bundlesContext';
 import BuyBundleModal from '../../../molecules/bundles/BuyBundleModal';
 import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
@@ -92,7 +91,7 @@ export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
 interface IPostViewMC {}
 
 const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -117,7 +116,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     handleGoBackInsidePost,
     handleUpdatePostStatus,
     resetSetupIntentClientSecret,
-  } = usePostModalInnerState();
+  } = usePostInnerState();
   const post = useMemo(
     () => postParsed as newnewapi.MultipleChoice,
     [postParsed]
@@ -125,7 +124,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   // Socket
   const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Bundle
   const { bundles } = useBundles();
@@ -362,23 +360,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     }
   };
 
-  // Increment channel subs after mounting
-  // Decrement when unmounting
-  useEffect(() => {
-    if (socketConnection?.connected) {
-      addChannel(post.postUuid, {
-        postUpdates: {
-          postUuid: post.postUuid,
-        },
-      });
-    }
-
-    return () => {
-      removeChannel(post.postUuid);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection?.connected]);
-
   // Mark post as viewed if logged in
   useEffect(() => {
     async function markAsViewed() {
@@ -475,16 +456,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       }
     };
 
-    const socketHandlerPostStatus = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostStatusUpdated.decode(arr);
-
-      if (!decoded) return;
-      if (decoded.postUuid === post.postUuid && decoded.multipleChoice) {
-        handleUpdatePostStatus(decoded.multipleChoice);
-      }
-    };
-
     if (socketConnection) {
       socketConnection?.on(
         'McOptionCreatedOrUpdated',
@@ -492,7 +463,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       );
       socketConnection?.on('McOptionDeleted', socketHandlerOptionDeleted);
       socketConnection?.on('PostUpdated', socketHandlerPostData);
-      socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
     }
 
     return () => {
@@ -503,7 +473,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         );
         socketConnection?.off('McOptionDeleted', socketHandlerOptionDeleted);
         socketConnection?.off('PostUpdated', socketHandlerPostData);
-        socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
