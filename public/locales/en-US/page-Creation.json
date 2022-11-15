@@ -97,6 +97,9 @@
         "value": "{{value}}",
         "description": "{{value}}",
         "options": {
+          "2-minutes": "2 minutes",
+          "5-minutes": "5 minutes",
+          "10-minutes": "10 minutes",
           "1-hour": "1 hour",
           "3-hours": "3 hours",
           "6-hours": "6 hours",

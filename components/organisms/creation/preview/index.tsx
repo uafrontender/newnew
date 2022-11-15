@@ -188,6 +188,15 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       } else if (post.expiresAt === '7-days') {
         seconds = 604800;
         dateValue.add(7, 'd');
+      } else if (post.expiresAt === '2-minutes') {
+        seconds = 120;
+        dateValue.add(2, 'm');
+      } else if (post.expiresAt === '5-minutes') {
+        seconds = 300;
+        dateValue.add(5, 'm');
+      } else if (post.expiresAt === '10-minutes') {
+        seconds = 600;
+        dateValue.add(10, 'm');
       }
 
       return inSeconds ? seconds : dateValue;

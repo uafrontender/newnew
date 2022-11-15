@@ -319,6 +319,12 @@ export const CreationSecondStepContent: React.FC<
       dateValue.add(5, 'd');
     } else if (post.expiresAt === '7-days') {
       dateValue.add(7, 'd');
+    } else if (post.expiresAt === '2-minutes') {
+      dateValue.add(2, 'm');
+    } else if (post.expiresAt === '5-minutes') {
+      dateValue.add(5, 'm');
+    } else if (post.expiresAt === '10-minutes') {
+      dateValue.add(10, 'm');
     }
 
     return dateValue;
@@ -343,6 +349,12 @@ export const CreationSecondStepContent: React.FC<
       dateValue.add(5, 'd');
     } else if (post.expiresAt === '7-days') {
       dateValue.add(7, 'd');
+    } else if (post.expiresAt === '2-minutes') {
+      dateValue.add(2, 'm');
+    } else if (post.expiresAt === '5-minutes') {
+      dateValue.add(5, 'm');
+    } else if (post.expiresAt === '10-minutes') {
+      dateValue.add(10, 'm');
     }
 
     return dateValue;
@@ -604,6 +616,22 @@ export const CreationSecondStepContent: React.FC<
   );
   const expireOptions = useMemo(
     () => [
+      ...(process.env.NEXT_PUBLIC_ENVIRONMENT !== 'production'
+        ? [
+            {
+              id: '2-minutes',
+              title: t('secondStep.field.expiresAt.options.2-minutes'),
+            },
+            {
+              id: '5-minutes',
+              title: t('secondStep.field.expiresAt.options.5-minutes'),
+            },
+            {
+              id: '10-minutes',
+              title: t('secondStep.field.expiresAt.options.10-minutes'),
+            },
+          ]
+        : []),
       {
         id: '1-hour',
         title: t('secondStep.field.expiresAt.options.1-hour'),
