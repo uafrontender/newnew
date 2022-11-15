@@ -111,7 +111,7 @@ const PushNotificationsContextProvider: React.FC<
     return Notification;
   }, []);
 
-  // Check initial push notification permission
+  // Check push notification subscription
   const checkSubscriptionSafari = useCallback(async () => {
     const permissionData = getPermissionData();
 
@@ -178,12 +178,7 @@ const PushNotificationsContextProvider: React.FC<
         checkSubscriptionNonSafari();
       }
     }
-  }, [
-    hasWebPush,
-    getPermissionData,
-    checkSubscriptionSafari,
-    checkSubscriptionNonSafari,
-  ]);
+  }, [checkSubscriptionSafari, checkSubscriptionNonSafari]);
 
   // Permission Modal
   const openPermissionRequestModal = useCallback(() => {
