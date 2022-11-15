@@ -26,7 +26,7 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
   timestampSeconds,
   onTimeExpired,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

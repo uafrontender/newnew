@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
 // Views
 import { PostSkeletonView } from '../PostSkeleton';
@@ -12,7 +12,7 @@ import PostViewProcessingAnnouncement from '../common/PostViewProcessingAnnounce
 interface IRegularView {}
 
 const RegularView: React.FunctionComponent<IRegularView> = () => {
-  const { postParsed, postStatus, typeOfPost } = usePostModalInnerState();
+  const { postParsed, postStatus, typeOfPost } = usePostInnerState();
 
   if (postStatus === 'scheduled' && postParsed) {
     return <PostViewScheduled key={postParsed.postUuid} variant='decision' />;

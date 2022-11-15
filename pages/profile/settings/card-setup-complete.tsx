@@ -18,7 +18,7 @@ const CardSetupCompleteModal = dynamic(
 
 const CardSetupComplete: NextPage = () => {
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   const clientSecret = router.query.setup_intent_client_secret as string;
   const setupIntentId = router.query.setup_intent as string;

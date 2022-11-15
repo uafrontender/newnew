@@ -3,7 +3,6 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import isBrowser from '../../../../utils/isBrowser';
 import { checkCanDeleteMcOption } from '../../../../api/endpoints/multiple_choice';
 import { checkCanDeleteAcOption } from '../../../../api/endpoints/auction';
 
@@ -40,18 +39,6 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
   const [canDeleteOption, setCanDeleteOption] = useState(false);
   const [isCanDeleteOptionLoading, setIsCanDeleteOptionLoading] =
     useState(false);
-
-  useEffect(() => {
-    if (isBrowser()) {
-      const container = document.getElementById('post-modal-container');
-      if (container)
-        if (isVisible) {
-          container.style.overflowY = 'hidden';
-        } else {
-          container.style.overflowY = '';
-        }
-    }
-  }, [isVisible]);
 
   useEffect(() => {
     async function fetchCanDelete() {

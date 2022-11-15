@@ -52,7 +52,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   handleToggleMuted,
   handleToggleEditingStories,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const {
     coreResponse,
     additionalResponses,

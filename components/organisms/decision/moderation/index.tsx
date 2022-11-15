@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
 // Views
 import { PostSkeletonView } from '../PostSkeleton';
@@ -12,7 +12,7 @@ import PostViewProcessingAnnouncement from '../common/PostViewProcessingAnnounce
 interface IModerationView {}
 
 const ModerationView: React.FunctionComponent<IModerationView> = () => {
-  const { postParsed, postStatus, typeOfPost } = usePostModalInnerState();
+  const { postParsed, postStatus, typeOfPost } = usePostInnerState();
 
   if (postStatus === 'processing_announcement' && postParsed) {
     return (

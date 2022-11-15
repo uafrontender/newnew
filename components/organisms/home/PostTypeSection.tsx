@@ -10,7 +10,6 @@ import type { TStaticPost } from '../../molecules/home/StaticPostCard';
 import Text from '../../atoms/Text';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 
-import { usePostModalState } from '../../../contexts/postModalContext';
 import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 
@@ -36,7 +35,6 @@ const PostTypeSection = ({
   padding,
 }: IPostTypeSectionProps) => {
   const router = useRouter();
-  const { postOverlayOpen } = usePostModalState();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const isDesktop = ['laptop', 'laptopM', 'laptopL'].includes(resizeMode);
@@ -45,18 +43,17 @@ const PostTypeSection = ({
   );
 
   const renderPosts = (post: newnewapi.Post, index: number) => {
-    const handleOpenPostModal = () => {
+    const handleOpenPost = () => {
       router.push(`/post/${switchPostType(post)[0].postUuid}`);
     };
     return (
       <SItemWrapper
         key={switchPostType(post)[0].postUuid}
         index={index}
-        onClick={handleOpenPostModal}
+        onClick={handleOpenPost}
       >
         <PostCard
           item={post}
-          shouldStop={postOverlayOpen}
           index={index}
           width={isDesktop ? '204px' : '100%'}
           maxWidthTablet='100%'
