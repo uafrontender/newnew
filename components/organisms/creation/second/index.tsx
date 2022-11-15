@@ -702,12 +702,13 @@ export const CreationSecondStepContent: React.FC<
                 type='input'
                 value={auction.minimalBid}
                 onChange={handleItemChange}
-                formattedDescription={auction.minimalBid}
+                formattedDescription={(appConstants.minAcBid / 100).toFixed(0)}
                 inputProps={{
-                  min: 5,
+                  min: appConstants.minAcBid ? appConstants.minAcBid / 100 : 2,
                   max: 10000,
                   type: 'number',
                   pattern: '[0-9]*',
+                  customPlaceholder: (appConstants.minAcBid / 100).toFixed(0),
                 }}
               />
             </SItemWrapper>
@@ -747,6 +748,7 @@ export const CreationSecondStepContent: React.FC<
       validateMcOption,
       isMobile,
       auction.minimalBid,
+      appConstants.minAcBid,
       crowdfunding.targetBackerCount,
       cfFormattedDescription,
     ]
@@ -764,12 +766,19 @@ export const CreationSecondStepContent: React.FC<
                     type='input'
                     value={auction.minimalBid}
                     onChange={handleItemChange}
-                    formattedDescription={auction.minimalBid}
+                    formattedDescription={(appConstants.minAcBid / 100).toFixed(
+                      0
+                    )}
                     inputProps={{
-                      min: 5,
+                      min: appConstants.minAcBid
+                        ? appConstants.minAcBid / 100
+                        : 2,
                       max: 10000,
                       type: 'number',
                       pattern: '[0-9]*',
+                      customPlaceholder: (appConstants.minAcBid / 100).toFixed(
+                        0
+                      ),
                     }}
                   />
                 </SFieldWrapper>
@@ -861,6 +870,7 @@ export const CreationSecondStepContent: React.FC<
       tab,
       auction.minimalBid,
       handleItemChange,
+      appConstants.minAcBid,
       crowdfunding.targetBackerCount,
       cfFormattedDescription,
       post.expiresAt,

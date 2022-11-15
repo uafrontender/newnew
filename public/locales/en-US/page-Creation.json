@@ -46,7 +46,7 @@
         "floating": "Preview"
       },
       "subTitle": {
-        "votesInfo": "People will spend a minimum of $2 to vote",
+        "votesInfo": "People will spend a minimum of $1 to vote",
         "floating": "Upload your video to preview it here",
         "floatingProcessing": "Preview will be available after processing"
       }

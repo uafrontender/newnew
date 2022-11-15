@@ -155,7 +155,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             }
 
             router.push(url).then(() => {
-              dispatch(clearCreation({}));
+              dispatch(clearCreation(undefined));
             });
           }
         }

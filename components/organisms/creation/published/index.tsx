@@ -123,7 +123,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
             }
 
             router.push(url).then(() => {
-              dispatch(clearCreation({}));
+              dispatch(clearCreation(undefined));
             });
           }
         }

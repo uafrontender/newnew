@@ -212,7 +212,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const handleCloseModal = useCallback(() => {
     setShowModal(false);
     router.push('/');
-    dispatch(clearCreation({}));
+    dispatch(clearCreation(undefined));
   }, [dispatch, router]);
 
   const handleSubmit = useCallback(async () => {
