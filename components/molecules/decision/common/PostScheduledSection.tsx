@@ -87,6 +87,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
 
   return (
     <SContainer
+      isModeration={variant === 'moderation'}
       style={{
         ...(isMobile && !isScrolledDown
           ? {
@@ -166,13 +167,16 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
 
 export default PostScheduledSection;
 
-const SContainer = styled.div`
+const SContainer = styled.div<{
+  isModeration: boolean;
+}>`
   left: 16px;
   bottom: 16px;
 
   width: calc(100% - 32px);
 
   padding: 16px;
+  margin-top: ${({ isModeration }) => (isModeration ? '126px' : 'unset')};
 
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
