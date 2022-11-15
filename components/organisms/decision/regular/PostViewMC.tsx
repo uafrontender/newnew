@@ -17,7 +17,6 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
-import { ChannelsContext } from '../../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../../api/endpoints/post';
@@ -125,7 +124,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   // Socket
   const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Bundle
   const { bundles } = useBundles();
@@ -362,23 +360,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     }
   };
 
-  // Increment channel subs after mounting
-  // Decrement when unmounting
-  useEffect(() => {
-    if (socketConnection?.connected) {
-      addChannel(post.postUuid, {
-        postUpdates: {
-          postUuid: post.postUuid,
-        },
-      });
-    }
-
-    return () => {
-      removeChannel(post.postUuid);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection?.connected]);
-
   // Mark post as viewed if logged in
   useEffect(() => {
     async function markAsViewed() {
@@ -475,16 +456,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       }
     };
 
-    const socketHandlerPostStatus = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostStatusUpdated.decode(arr);
-
-      if (!decoded) return;
-      if (decoded.postUuid === post.postUuid && decoded.multipleChoice) {
-        handleUpdatePostStatus(decoded.multipleChoice);
-      }
-    };
-
     if (socketConnection) {
       socketConnection?.on(
         'McOptionCreatedOrUpdated',
@@ -492,7 +463,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       );
       socketConnection?.on('McOptionDeleted', socketHandlerOptionDeleted);
       socketConnection?.on('PostUpdated', socketHandlerPostData);
-      socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
     }
 
     return () => {
@@ -503,7 +473,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         );
         socketConnection?.off('McOptionDeleted', socketHandlerOptionDeleted);
         socketConnection?.off('PostUpdated', socketHandlerPostData);
-        socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

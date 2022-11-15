@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 /* eslint-disable camelcase */
 /* eslint-disable no-nested-ternary */
 import React, {
@@ -42,6 +43,8 @@ import CommentFromUrlContextProvider, {
 } from '../../contexts/commentFromUrlContext';
 import PostModalInnerContextProvider from '../../contexts/postModalInnerContext';
 import PostModal from '../../components/organisms/decision';
+import { ChannelsContext } from '../../contexts/channelsContext';
+import { SocketContext } from '../../contexts/socketContext';
 
 interface IPostPage {
   postUuid: string;
@@ -65,6 +68,10 @@ const PostPage: NextPage<IPostPage> = ({
   const router = useRouter();
   const { t } = useTranslation('modal-Post');
   const { user, ui } = useAppSelector((state) => state);
+
+  // Socket
+  const socketConnection = useContext(SocketContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     ui.resizeMode
@@ -457,6 +464,56 @@ const PostPage: NextPage<IPostPage> = ({
       return 'processing_announcement';
     });
   }, [postParsed, typeOfPost]);
+
+  // Increment channel subs after mounting
+  // Decrement when unmounting
+  useEffect(() => {
+    if (postParsed?.postUuid && socketConnection?.connected) {
+      addChannel(postParsed.postUuid, {
+        postUpdates: {
+          postUuid: postParsed.postUuid,
+        },
+      });
+    }
+
+    return () => {
+      if (postParsed?.postUuid) {
+        removeChannel(postParsed.postUuid);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [postParsed?.postUuid, socketConnection?.connected]);
+
+  // Listen for Post status updates
+  useEffect(() => {
+    const socketHandlerPostStatus = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+
+      if (!decoded) return;
+      if (decoded.postUuid === postParsed?.postUuid) {
+        if (decoded.auction) {
+          handleUpdatePostStatus(decoded.auction);
+        } else if (decoded.multipleChoice) {
+          handleUpdatePostStatus(decoded.multipleChoice);
+        } else {
+          if (decoded.crowdfunding)
+            handleUpdatePostStatus(decoded.crowdfunding);
+        }
+      }
+    };
+
+    if (socketConnection) {
+      socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection, postParsed, user.userData?.userUuid]);
 
   // Try to pre-fetch the content
   useEffect(() => {

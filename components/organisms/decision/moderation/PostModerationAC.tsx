@@ -16,7 +16,6 @@ import { useTranslation } from 'next-i18next';
 import moment from 'moment';
 
 import { SocketContext } from '../../../../contexts/socketContext';
-import { ChannelsContext } from '../../../../contexts/channelsContext';
 import {
   fetchAcOptionById,
   fetchCurrentBidsForPost,
@@ -97,7 +96,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
 
     // Socket
     const socketConnection = useContext(SocketContext);
-    const { addChannel, removeChannel } = useContext(ChannelsContext);
 
     const [winningOptionId, setWinningOptionId] = useState(
       post.winningOptionId ?? undefined
@@ -355,21 +353,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       }
     };
 
-    // Increment channel subs after mounting
-    // Decrement when unmounting
-    useEffect(() => {
-      addChannel(post.postUuid, {
-        postUpdates: {
-          postUuid: post.postUuid,
-        },
-      });
-
-      return () => {
-        removeChannel(post.postUuid);
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     useEffect(() => {
       setOptions([]);
       setOptionsNextPageToken('');
@@ -451,16 +434,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         }
       };
 
-      const socketHandlerPostStatus = async (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostStatusUpdated.decode(arr);
-
-        if (!decoded) return;
-        if (decoded.postUuid === post.postUuid && decoded.auction) {
-          handleUpdatePostStatus(decoded.auction);
-        }
-      };
-
       if (socketConnection) {
         socketConnection?.on(
           'AcOptionCreatedOrUpdated',
@@ -468,7 +441,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         );
         socketConnection?.on('AcOptionDeleted', socketHandlerOptionDeleted);
         socketConnection?.on('PostUpdated', socketHandlerPostData);
-        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
 
       return () => {
@@ -479,7 +451,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           );
           socketConnection?.off('AcOptionDeleted', socketHandlerOptionDeleted);
           socketConnection?.off('PostUpdated', socketHandlerPostData);
-          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
