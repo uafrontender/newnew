@@ -70,7 +70,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { t: tCommon } = useTranslation('common');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);

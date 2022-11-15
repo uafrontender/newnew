@@ -21,7 +21,7 @@ const CoverImageEdit: React.FunctionComponent<ICoverImageEdit> = ({
   handleSetCustomCoverImageUrl,
   handleUnsetCustomCoverImageUrl,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   const imageInputRef = useRef<HTMLInputElement>();
 

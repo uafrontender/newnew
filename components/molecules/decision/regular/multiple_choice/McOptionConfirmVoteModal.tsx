@@ -33,7 +33,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
   handleOpenPaymentModal,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>

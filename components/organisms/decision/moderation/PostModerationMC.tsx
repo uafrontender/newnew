@@ -63,7 +63,7 @@ interface IPostModerationMC {}
 
 const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
   () => {
-    const { t } = useTranslation('modal-Post');
+    const { t } = useTranslation('page-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);

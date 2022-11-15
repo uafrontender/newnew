@@ -65,7 +65,7 @@ interface IPostModerationAC {}
 const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
   () => {
     const dispatch = useAppDispatch();
-    const { t } = useTranslation('modal-Post');
+    const { t } = useTranslation('page-Post');
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

@@ -41,7 +41,7 @@ interface IPostVideoResponseUpload {
 export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   id,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { postStatus } = usePostModalInnerState();
   const {
     videoProcessing,

@@ -66,7 +66,7 @@ const PostPage: NextPage<IPostPage> = ({
   isServerSide,
 }) => {
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { user, ui } = useAppSelector((state) => state);
 
   // Socket
@@ -658,7 +658,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'modal-Post',
+    'page-Post',
     'modal-ResponseSuccessModal',
     'component-PostCard',
     'modal-PaymentModal',

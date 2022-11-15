@@ -28,7 +28,7 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
   children,
   closeModal,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const theme = useTheme();
 
   function getModalImage(type: TPostType) {

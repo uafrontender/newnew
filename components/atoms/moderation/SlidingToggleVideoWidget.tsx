@@ -14,7 +14,7 @@ interface ISlidingToggleVideoWidget {
 const SlidingToggleVideoWidget: React.FunctionComponent<
   ISlidingToggleVideoWidget
 > = ({ disabled, wrapperCSS }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   const { postParsed } = usePostModalInnerState();
   const { openedTab, handleChangeTab } = usePostModerationResponsesContext();

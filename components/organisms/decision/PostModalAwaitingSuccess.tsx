@@ -21,7 +21,7 @@ interface IPostModalAwaitingSuccess {}
 const PostModalAwaitingSuccess: React.FunctionComponent<
   IPostModalAwaitingSuccess
 > = () => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

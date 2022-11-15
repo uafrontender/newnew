@@ -43,7 +43,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
   handleOpenEllipseMenu,
   handleToggleMuted,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
     'mobile',

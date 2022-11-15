@@ -39,7 +39,7 @@ interface IPostViewProcessingAnnouncement {
 const PostViewProcessingAnnouncement: React.FunctionComponent<
   IPostViewProcessingAnnouncement
 > = ({ variant }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const theme = useTheme();
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);

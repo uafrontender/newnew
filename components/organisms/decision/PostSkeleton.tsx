@@ -12,7 +12,7 @@ import GoBackButton from '../../molecules/GoBackButton';
 const PostSkeleton = () => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

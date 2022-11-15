@@ -91,7 +91,7 @@ export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
 interface IPostViewMC {}
 
 const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);

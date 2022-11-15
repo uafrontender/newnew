@@ -128,7 +128,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   handleChangeTab,
   children,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { t: tCommon } = useTranslation('common');
   const socketConnection = useContext(SocketContext);
 

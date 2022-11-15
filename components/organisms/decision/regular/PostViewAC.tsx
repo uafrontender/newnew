@@ -79,7 +79,7 @@ export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
 interface IPostViewAC {}
 
 const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);

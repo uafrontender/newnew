@@ -18,7 +18,7 @@ const PostVotingTab: React.FunctionComponent<IPostVotingTab> = ({
   bundleVotes,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   return (
     <STabs>
