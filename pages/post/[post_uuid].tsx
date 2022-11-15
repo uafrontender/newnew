@@ -331,13 +331,6 @@ const PostPage: NextPage<IPostPage> = ({
     Mixpanel.track('Post Failed Button Click', {
       _stage: 'Post',
     });
-    // if (recommendedPosts.length > 0) {
-    //   document.getElementById('post-modal-container')?.scrollTo({
-    //     top: document.getElementById('recommendations-section-heading')
-    //       ?.offsetTop,
-    //     behavior: 'smooth',
-    //   });
-    // } else {
     if (router.pathname === '/') {
       handleCloseAndGoBack();
     } else {

@@ -69,7 +69,7 @@ const PostModalAwaitingSuccess: React.FunctionComponent<
       )}
       {postParsed && typeOfPost ? (
         <SPostModalContainer
-          id='post-modal-container'
+          id='post-container'
           isMyPost={isMyPost}
           loaded={recommendedPosts && recommendedPosts.length > 0}
           style={{

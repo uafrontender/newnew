@@ -220,13 +220,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       _postUuid: postId,
       _component: 'PostTopInfo',
     });
-    // if (hasRecommendations) {
-    //   document.getElementById('post-modal-container')?.scrollTo({
-    //     top: document.getElementById('recommendations-section-heading')
-    //       ?.offsetTop,
-    //     behavior: 'smooth',
-    //   });
-    // } else {
     if (router.pathname === '/') {
       handleCloseAndGoBack();
     } else {

@@ -80,7 +80,7 @@ const PostModalModeration: React.FunctionComponent<
       {postParsed && typeOfPost ? (
         <SPostModalContainer
           loaded={recommendedPosts && recommendedPosts.length > 0}
-          id='post-modal-container'
+          id='post-container'
           isMyPost={isMyPost}
           onClick={(e) => e.stopPropagation()}
           ref={(el) => {
