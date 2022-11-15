@@ -28,6 +28,7 @@ import PostShareEllipseMenu from '../common/PostShareEllipseMenu';
 import { useAppSelector } from '../../../../redux-store/store';
 import PostConfirmDeleteModal from './PostConfirmDeleteModal';
 import isBrowser from '../../../../utils/isBrowser';
+import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -67,6 +68,8 @@ const PostTopInfoModeration: React.FunctionComponent<
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  const { overlayModeEnabled } = useOverlayMode();
 
   const {
     postParsed,
@@ -290,7 +293,10 @@ const PostTopInfoModeration: React.FunctionComponent<
           <PostTitleContent>{title}</PostTitleContent>
         </SPostTitle>
         {showWinnerOption ? (
-          <SSelectWinnerOption isScrolledDown={isScrolledDown}>
+          <SSelectWinnerOption
+            hidden={isMobile && overlayModeEnabled}
+            isScrolledDown={isScrolledDown}
+          >
             <SHeadline variant={4}>
               {t('acPostModeration.postTopInfo.selectWinner.title')}
             </SHeadline>
@@ -442,6 +448,7 @@ const SBidsAmount = styled.div`
 // Winner option
 const SSelectWinnerOption = styled.div<{
   isScrolledDown: boolean;
+  hidden: boolean;
 }>`
   grid-area: selectWinner;
 
@@ -452,19 +459,19 @@ const SSelectWinnerOption = styled.div<{
           bottom: 16px;
           left: 16;
           width: calc(100% - 48px);
+          z-index: 20;
         `
       : css`
           position: relative;
           margin-top: 16px;
           margin-bottom: 16px;
           width: 100%;
+          z-index: initial;
         `};
 
-  display: flex;
+  display: ${({ hidden }) => (!hidden ? 'flex' : 'none')};
   flex-direction: column;
   justify-content: center;
-
-  z-index: 20;
 
   height: 130px;
 
