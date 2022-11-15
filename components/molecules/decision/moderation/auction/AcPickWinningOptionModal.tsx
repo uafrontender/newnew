@@ -18,7 +18,7 @@ const AcPickWinningOptionModal: React.FC<IAcPickWinningOptionModal> = ({
   closeModal,
   handleConfirm,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   return (
     <Modal show={isVisible} additionalz={12} onClose={closeModal}>

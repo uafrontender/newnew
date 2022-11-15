@@ -39,7 +39,7 @@ export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
       '/creation/crowdfunding/published',
     ],
     () => {
-      dispatch(clearCreation({}));
+      dispatch(clearCreation(undefined));
     }
   );
 

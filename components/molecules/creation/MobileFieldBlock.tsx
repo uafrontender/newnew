@@ -34,6 +34,7 @@ interface IMobileFieldBlock {
     type?: 'text' | 'number' | 'tel';
     pattern?: string;
     max?: number;
+    customPlaceholder?: string;
   };
   formattedValue?: any;
   formattedDescription?: any;
@@ -299,7 +300,10 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
               onFocus={handleFocus}
               onChange={handleChange}
               withLabel={!!inputLabel}
-              placeholder={t(`secondStep.field.${id}.placeholder`)}
+              placeholder={
+                inputProps?.customPlaceholder ??
+                t(`secondStep.field.${id}.placeholder`)
+              }
               {...inputProps}
             />
           </SInputWrapper>

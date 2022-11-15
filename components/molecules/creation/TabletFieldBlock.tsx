@@ -20,6 +20,7 @@ interface ITabletFieldBlock {
     type?: 'text' | 'number' | 'tel';
     pattern?: string;
     max?: number;
+    customPlaceholder?: string;
   };
   formattedValue?: any;
   formattedDescription?: any;
@@ -79,7 +80,10 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
                   onChange(id, e?.target?.value);
                 }}
                 withLabel={!!inputLabel}
-                placeholder={t(`secondStep.field.${id}.placeholder`)}
+                placeholder={
+                  inputProps?.customPlaceholder ??
+                  t(`secondStep.field.${id}.placeholder`)
+                }
                 {...inputProps}
               />
             </SInputContent>

@@ -16,7 +16,7 @@ import { useAppSelector } from '../redux-store/store';
 import { TPostStatusStringified } from '../utils/switchPostStatus';
 import { TPostType } from '../utils/switchPostType';
 
-const PostModalInnerContext = createContext<{
+const PostInnerContext = createContext<{
   modalContainerRef: MutableRefObject<HTMLDivElement | undefined>;
   isMyPost: boolean;
   postParsed:
@@ -56,6 +56,7 @@ const PostModalInnerContext = createContext<{
   handleOpenShareMenu: () => void;
   handleOpenEllipseMenu: () => void;
   handleCloseDeletePostModal: () => void;
+  handleSetIsConfirmToClosePost: (newState: boolean) => void;
 }>({
   modalContainerRef: {} as MutableRefObject<HTMLDivElement | undefined>,
   isMyPost: false,
@@ -95,9 +96,10 @@ const PostModalInnerContext = createContext<{
   handleOpenShareMenu: () => {},
   handleOpenEllipseMenu: () => {},
   handleCloseDeletePostModal: () => {},
+  handleSetIsConfirmToClosePost: (newState: boolean) => {},
 });
 
-interface IPostModalContextProvider {
+interface IPostContextProvider {
   modalContainerRef: MutableRefObject<HTMLDivElement | undefined>;
   isMyPost: boolean;
   postParsed:
@@ -126,12 +128,11 @@ interface IPostModalContextProvider {
   handleDeletePost: () => Promise<void>;
   handleOpenDeletePostModal: () => void;
   handleCloseDeletePostModal: () => void;
+  handleSetIsConfirmToClosePost: (newState: boolean) => void;
   children: React.ReactNode;
 }
 
-const PostModalContextProvider: React.FunctionComponent<
-  IPostModalContextProvider
-> = ({
+const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   modalContainerRef,
   isMyPost,
   postParsed,
@@ -156,6 +157,7 @@ const PostModalContextProvider: React.FunctionComponent<
   handleDeletePost,
   handleOpenDeletePostModal,
   handleCloseDeletePostModal,
+  handleSetIsConfirmToClosePost,
   children,
 }) => {
   const router = useRouter();
@@ -244,6 +246,7 @@ const PostModalContextProvider: React.FunctionComponent<
       handleOpenShareMenu,
       handleOpenEllipseMenu,
       handleCloseDeletePostModal,
+      handleSetIsConfirmToClosePost,
     }),
     [
       modalContainerRef,
@@ -280,23 +283,24 @@ const PostModalContextProvider: React.FunctionComponent<
       handleOpenShareMenu,
       handleOpenEllipseMenu,
       handleCloseDeletePostModal,
+      handleSetIsConfirmToClosePost,
     ]
   );
 
   return (
-    <PostModalInnerContext.Provider value={contextValueMemo}>
+    <PostInnerContext.Provider value={contextValueMemo}>
       {children}
-    </PostModalInnerContext.Provider>
+    </PostInnerContext.Provider>
   );
 };
 
-export default PostModalContextProvider;
+export default PostContextProvider;
 
-export function usePostModalInnerState() {
-  const context = useContext(PostModalInnerContext);
+export function usePostInnerState() {
+  const context = useContext(PostInnerContext);
   if (!context)
     throw new Error(
-      'usePostModalInnerState must be used inside a `PostModalInnerContextProvider`'
+      'usePostInnerState must be used inside a `PostInnerContextProvider`'
     );
   return context;
 }

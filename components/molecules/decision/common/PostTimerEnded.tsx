@@ -14,7 +14,7 @@ const PostTimerEnded: React.FunctionComponent<IPostTimerEnded> = ({
   timestampSeconds,
   postType,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   return (
     <SWrapper>

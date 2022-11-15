@@ -18,7 +18,6 @@ import { useAppSelector } from '../../../redux-store/store';
 import { SCROLL_TOP_10 } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
 import GradientMaskHorizontal from '../../atoms/GradientMaskHorizontal';
-import { usePostModalState } from '../../../contexts/postModalContext';
 
 const SCROLL_STEP = {
   mobile: 1,
@@ -45,8 +44,6 @@ export const TopSection: React.FC<ITopSection> = React.memo(
     const [scrollX, setScrollX] = useState<number>(0);
     const [isDragging, setIsDragging] = useState(false);
     const [mouseIsDown, setMouseIsDown] = useState(false);
-
-    const { postOverlayOpen } = usePostModalState();
 
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -123,12 +120,7 @@ export const TopSection: React.FC<ITopSection> = React.memo(
           name={`top-section-${index}`}
           onClick={handleItemClick}
         >
-          <PostCard
-            shouldStop={postOverlayOpen}
-            type='inside'
-            item={item}
-            index={index + 1}
-          />
+          <PostCard type='inside' item={item} index={index + 1} />
         </SItemWrapper>
       );
     };
