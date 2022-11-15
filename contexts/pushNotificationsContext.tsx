@@ -102,7 +102,7 @@ const PushNotificationsContextProvider: React.FC<
       'pushNotification' in (window as any).safari
     ) {
       const permissionData = (window as any).safari.pushNotification.permission(
-        process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID
+        process.env.NEXT_PUBLIC_WEB_PUSH_ID
       );
 
       return permissionData;
@@ -237,7 +237,7 @@ const PushNotificationsContextProvider: React.FC<
         if (permissionData.permission === 'default') {
           (window as any).safari.pushNotification.requestPermission(
             `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari`,
-            process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID,
+            process.env.NEXT_PUBLIC_WEB_PUSH_ID,
             {
               publicKey,
               access_token: cookiesInstance.get('accessToken'),
@@ -300,7 +300,7 @@ const PushNotificationsContextProvider: React.FC<
           await register({
             endpoint: permissionData.deviceToken,
             p256dh: 'safari',
-            auth: process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID,
+            auth: process.env.NEXT_PUBLIC_WEB_PUSH_ID,
           });
 
           setIsSubscribed(true);
@@ -452,7 +452,7 @@ const PushNotificationsContextProvider: React.FC<
       await register({
         endpoint: permissionData.deviceToken,
         p256dh: 'safari',
-        auth: process.env.NEXT_PUBLIC_WEBSITE_PUSH_ID,
+        auth: process.env.NEXT_PUBLIC_WEB_PUSH_ID,
       });
     } catch (err) {
       console.error(err);
