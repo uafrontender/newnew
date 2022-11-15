@@ -687,7 +687,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       postUuid: post_uuid,
     });
 
-    const res = await fetchPostByUUID(getPostPayload);
+    const res = await fetchPostByUUID(
+      getPostPayload,
+      undefined,
+      context.req.cookies?.accessToken ?? undefined
+    );
 
     if (!res.data || res.error) {
       return {
