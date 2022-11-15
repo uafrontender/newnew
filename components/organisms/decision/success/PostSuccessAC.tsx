@@ -194,15 +194,15 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                       </a>
                     </SCreator>
                     {post.totalAmount?.usdCents &&
-                      post.totalAmount?.usdCents > 0 && (
-                        <STotal>
-                          {`$${formatNumber(
-                            post.totalAmount.usdCents / 100 ?? 0,
-                            true
-                          )}`}{' '}
-                          <span>{t('acPostSuccess.inTotalBids')}</span>
-                        </STotal>
-                      )}
+                    post.totalAmount?.usdCents > 0 ? (
+                      <STotal>
+                        {`$${formatNumber(
+                          post.totalAmount.usdCents / 100 ?? 0,
+                          true
+                        )}`}{' '}
+                        <span>{t('acPostSuccess.inTotalBids')}</span>
+                      </STotal>
+                    ) : null}
                   </SCreatorInfoDiv>
                   <SPostTitle variant={4}>
                     <PostTitleContent>{post.title}</PostTitleContent>
