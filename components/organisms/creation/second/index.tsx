@@ -1258,20 +1258,17 @@ export const CreationSecondStepContent: React.FC<
                         <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
                         <SUserTitleContainer>
                           <SUserTitle variant={3} weight={600}>
-                            {user.userData?.nickname &&
-                            user.userData?.nickname?.length > 8
-                              ? `${user.userData?.nickname?.substring(0, 8)}...`
-                              : user.userData?.nickname}
+                            {user.userData?.nickname}
                           </SUserTitle>
-                          {user.userData?.options?.isVerified && (
-                            <InlineSvg
-                              svg={VerificationCheckmark}
-                              width='20px'
-                              height='20px'
-                              fill='none'
-                            />
-                          )}
                         </SUserTitleContainer>
+                        {user.userData?.options?.isVerified && (
+                          <SInlineSvg
+                            svg={VerificationCheckmark}
+                            width='20px'
+                            height='20px'
+                            fill='none'
+                          />
+                        )}
                         <SCaption variant={2} weight={700}>
                           {t('secondStep.card.left', {
                             time: formatExpiresAtNoStartsAt().fromNow(true),
@@ -1382,7 +1379,7 @@ const SFloatingSubSectionUser = styled.div`
   align-items: center;
   flex-direction: row;
 
-  grid-template-columns: 48px 1fr 1fr;
+  grid-template-columns: 24px min-content 20px max-content;
 `;
 
 const SFloatingSubSectionPlayer = styled.div`
@@ -1540,27 +1537,27 @@ const STabletBlockPreviewTitle = styled(Caption)`
 const STabletBlockSubTitle = styled(Text)``;
 
 const SUserAvatar = styled(UserAvatar)`
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  min-height: 24px;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
 `;
 
 const SUserTitleContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+  max-width: 82px;
 `;
 
 const SUserTitle = styled(Text)`
-  max-width: 188px;
-  display: -webkit-box;
-  overflow: hidden;
-  position: relative;
   padding-left: 12px;
   margin-right: 2px;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const SInlineSvg = styled(InlineSvg)`
+  flex-shrink: 0;
 `;
 
 const SBottomEnd = styled.div`
