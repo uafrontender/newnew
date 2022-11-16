@@ -47,9 +47,11 @@ const useRecaptcha = (
         return { isPassed: true };
       }
 
+      console.error(`Recaptcha v2 failed. Status: ${res.status}`);
+
       return { isPassed: false };
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error(`Recaptcha v2 failed. ${err?.message}`);
       return { isPassed: false };
     }
   }, []);
@@ -79,6 +81,12 @@ const useRecaptcha = (
         return { isPassed: true, score: jsonRes?.score };
       }
 
+      console.error(
+        `Recaptcha v3 failed. score:${jsonRes.score}, error codes: ${jsonRes[
+          'error-codes'
+        ]?.toString()}`
+      );
+
       return {
         isPassed: false,
         // eslint-disable-next-line no-nested-ternary
@@ -87,9 +95,10 @@ const useRecaptcha = (
             ? jsonRes.errors[0]?.toString()
             : jsonRes.errors?.toString()
           : 'ReCaptcha failed',
+        errorCodes: jsonRes['error-codes'],
       };
     } catch (err: any) {
-      console.error(err);
+      console.error(`Recaptcha v3 failed. ${err?.message}`);
 
       return {
         isPassed: false,
@@ -121,7 +130,7 @@ const useRecaptcha = (
       }
 
       // reCaptcha v3
-      const { isPassed, score, error } = await executeRecaptchaV3();
+      const { isPassed, score, error, errorCodes } = await executeRecaptchaV3();
 
       if (
         process.env.NEXT_PUBLIC_ENVIRONMENT === 'test' ||
@@ -134,6 +143,17 @@ const useRecaptcha = (
 
       // show reCaptcha v2 if score for v3 is between minDoubleCheckScore and minSuccessScore
       if (isPassed && score && score >= minDoubleCheckScore) {
+        setIsRecaptchaV2Required(true);
+        setIsSubmitting(false);
+        return;
+      }
+
+      // show reCaptcha v2 when incorrect-captcha-sol error appears
+      if (
+        errorCodes &&
+        errorCodes.length === 1 &&
+        errorCodes.includes('incorrect-captcha-sol')
+      ) {
         setIsRecaptchaV2Required(true);
         setIsSubmitting(false);
         return;
