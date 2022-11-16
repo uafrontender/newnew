@@ -1,5 +1,5 @@
 /* eslint-disable react/require-default-props */
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 
 const AnimatedBackground: React.FunctionComponent<{
@@ -8,7 +8,18 @@ const AnimatedBackground: React.FunctionComponent<{
   alt: string;
   noBlur?: boolean;
 }> = React.memo(({ className, src, alt, noBlur }) => {
+  const [delayed, setDelayed] = useState(true);
   const elements = useMemo(() => [1, 2, 3], []);
+
+  const DELAY = 1500;
+  useEffect(() => {
+    setDelayed(true);
+    setTimeout(() => setDelayed(false), DELAY);
+  }, []);
+
+  if (delayed) {
+    return null;
+  }
 
   return (
     <SContainer className={className}>
@@ -113,7 +124,6 @@ const SContainer = styled.div`
   /* background-color: blue; */
   width: 100vw;
   height: 100%;
-  min-height: 100vh;
 `;
 
 interface IFloatingAsset {
@@ -167,10 +177,18 @@ const FloatingAsset: React.FunctionComponent<IFloatingAsset> = ({
 
 const RainingAnimation = (transform: string) => keyframes`
   0% {
+    opacity:0;
     top: -300px;
     transform: ${transform};// translateY(-100px);
   }
+  10% {
+    opacity:1;
+  }
+  90% {
+    opacity:1;
+  }
   100% {
+    opacity:0;
     top: 100%;
     transform: ${transform};// translateY(140vh);
   }
