@@ -35,7 +35,8 @@
   "search": {
     "title": "Search creators offering Bundles",
     "searchInputPlaceholder": "Search creators",
-    "resultsTitle": "Top Creators"
+    "topCreators": "Top Creators",
+    "resultsFor": "Results for"
   },
   "button": {
     "back": "Back"
