@@ -739,13 +739,13 @@
       "ac": {
         "numBiddersChoseSingular": "{{amount}} bidder chose",
         "numBiddersChose": "{{amount}} bidders chose",
-        "optionCreator": "<0>{{nickname}}</0>'s bid"
+        "optionCreator": "<0>{{nickname}}</0>'s<1/> bid"
       },
       "mc": {
         "numBiddersChoseSingular": "{{amount}} voter chose",
         "numBiddersChose": "{{amount}} voters chose",
         "optionOwn": "the option",
-        "optionCreator": "<0>{{nickname}}</0>'s option"
+        "optionCreator": "<0>{{nickname}}</0>'s<1/> option"
       }
     }
   },

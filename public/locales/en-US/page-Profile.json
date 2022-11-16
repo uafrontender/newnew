@@ -263,7 +263,8 @@
           "1": "bid on",
           "2": "voted on",
           "3": "backed on",
-          "5": "subscribed to"
+          "5": "subscribed to",
+          "6": "purchased bundle from"
         }
       },
       "privacy": {

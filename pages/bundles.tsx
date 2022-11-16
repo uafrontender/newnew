@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
 import { toast } from 'react-toastify';
+import { useEffectOnce } from 'react-use';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
@@ -35,13 +36,13 @@ import { Mixpanel } from '../utils/mixpanel';
 import { buyCreatorsBundle } from '../api/endpoints/bundles';
 
 interface IBundlesPage {
-  stripeSetupIntentClientSecret?: string;
-  saveCard?: boolean;
+  stripeSetupIntentClientSecretFromRedirect?: string;
+  saveCardFromRedirect?: boolean;
 }
 
 export const Bundles: NextPage<IBundlesPage> = ({
-  stripeSetupIntentClientSecret,
-  saveCard,
+  stripeSetupIntentClientSecretFromRedirect,
+  saveCardFromRedirect,
 }) => {
   const router = useRouter();
   const { t } = useTranslation('page-Bundles');
@@ -51,6 +52,13 @@ export const Bundles: NextPage<IBundlesPage> = ({
     ui.resizeMode
   );
   const isTablet = ['tablet'].includes(ui.resizeMode);
+
+  const [stripeSetupIntentClientSecret, setStripeSetupIntentClientSecret] =
+    useState(() => stripeSetupIntentClientSecretFromRedirect ?? undefined);
+
+  const [saveCard, setSaveCard] = useState(
+    () => saveCardFromRedirect ?? undefined
+  );
 
   const [allBundlesModalOpen, setAllBundlesModalOpen] = useState(false);
   const [shownCreatorBundle, setShownCreatorBundle] = useState<
@@ -66,6 +74,13 @@ export const Bundles: NextPage<IBundlesPage> = ({
 
   const loadCreatorsData = useCallback(
     async (paging: Paging): Promise<PaginatedResponse<newnewapi.IUser>> => {
+      if (!user.userData?.userUuid) {
+        return {
+          nextData: [],
+          nextPageToken: undefined,
+        };
+      }
+
       const payload = new newnewapi.SearchCreatorsRequest({
         query: searchValue,
         paging,
@@ -142,11 +157,11 @@ export const Bundles: NextPage<IBundlesPage> = ({
         }
       );
 
-      // What fore? can use Refs here if needed
-      // resetSetupIntentClientSecret();
+      // Reset
+      setStripeSetupIntentClientSecret(undefined);
+      setSaveCard(undefined);
 
       const res = await buyCreatorsBundle(stripeContributionRequest);
-
       if (
         !res.data ||
         res.error ||
@@ -157,6 +172,8 @@ export const Bundles: NextPage<IBundlesPage> = ({
     } catch (err: any) {
       console.error(err);
       toast.error(err.message);
+    } finally {
+      router.replace('/bundles');
     }
   }, [
     stripeSetupIntentClientSecret,
@@ -167,20 +184,21 @@ export const Bundles: NextPage<IBundlesPage> = ({
     t,
   ]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (stripeSetupIntentClientSecret) {
       buyBundleAfterStripeRedirect();
-      return;
     }
+  });
 
+  useEffect(() => {
     if (
       (!user.loggedIn && user._persist?.rehydrated) ||
-      bundles?.length === 0
+      (bundles?.length === 0 && !stripeSetupIntentClientSecretFromRedirect)
     ) {
       router.replace('/');
     }
   }, [
-    stripeSetupIntentClientSecret,
+    stripeSetupIntentClientSecretFromRedirect,
     user.loggedIn,
     user._persist?.rehydrated,
     bundles,
@@ -235,7 +253,7 @@ export const Bundles: NextPage<IBundlesPage> = ({
             bundles
               .slice(0, visibleBundlesNumber)
               .map((bundle, index) => (
-                <BundleCard key={`${index}`} creatorBundle={bundle} />
+                <BundleCard key={index} creatorBundle={bundle} />
               ))}
 
           {!isMobile &&
@@ -359,15 +377,16 @@ export const getServerSideProps = async (context: NextPageContext) => {
       // eslint-disable-next-line camelcase, object-shorthand
       ...(setup_intent_client_secret
         ? {
-            // eslint-disable-next-line camelcase, object-shorthand
-            setup_intent_client_secret,
+            stripeSetupIntentClientSecretFromRedirect:
+              // eslint-disable-next-line camelcase
+              setup_intent_client_secret,
           }
         : {}),
       // eslint-disable-next-line camelcase, object-shorthand
       ...(save_card
         ? {
-            // eslint-disable-next-line camelcase, object-shorthand
-            save_card: save_card === 'true',
+            // eslint-disable-next-line camelcase
+            saveCardFromRedirect: save_card === 'true',
           }
         : {}),
     },
