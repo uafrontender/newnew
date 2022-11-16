@@ -16,8 +16,8 @@
     "title": "Tus bundles actuales"
   },
   "bundle": {
-    "votesLeft": "Quedan <0>{{amount}}</0> votos",
-    "access": "y <0/> de:",
+    "votesLeft": "<0>{{amount}}</0> votos",
+    "access": "y quedan <0/> de:",
     "unitPair": "{{amount}} {{unit}}",
     "and": " y las ",
     "customOptions": "añadir opciones personalizadas a las superpolls",
@@ -35,7 +35,8 @@
   "search": {
     "title": "Buscar creadores que ofrezcan Bundles",
     "searchInputPlaceholder": "Buscar creadores",
-    "resultsTitle": "Creadores destacados"
+    "topCreators": "Creadores destacados",
+    "resultsFor": "Resultados para"
   },
   "button": {
     "back": "Regresar"

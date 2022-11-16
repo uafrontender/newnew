@@ -81,7 +81,7 @@ const BundleCard: React.FC<IBundleCard> = ({
           components={[
             <>
               {formattedTimeLeft.map((time, index) => (
-                <React.Fragment key={`formatted-${time}`}>
+                <React.Fragment key={time.unit}>
                   {index > 0 ? t('bundle.and') : null}
                   {t('bundle.unitPair', {
                     amount: time.value,

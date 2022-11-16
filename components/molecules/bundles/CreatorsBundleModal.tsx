@@ -14,6 +14,8 @@ import formatTimeLeft from '../../../utils/formatTimeLeft';
 import BulletLine from './BulletLine';
 import { formatNumber } from '../../../utils/format';
 import HighlightedButton from '../../atoms/bundles/HighlightedButton';
+import InlineSvg from '../../atoms/InlineSVG';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 interface ICreatorsBundleModal {
   show: boolean;
@@ -66,6 +68,14 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                   <Link href={`/${creatorBundle?.creator?.username}`}>
                     <SUserName>{creatorBundle?.creator?.username}</SUserName>
                   </Link>
+                  {creatorBundle?.creator?.options?.isVerified && (
+                    <SInlineSvg
+                      svg={VerificationCheckmark}
+                      width='24px'
+                      height='24px'
+                      fill='none'
+                    />
+                  )}
                 </SForLine>
               </SUserInfo>
               <SBundleInfo>
@@ -177,6 +187,10 @@ const SUserName = styled.p`
   &:hover {
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
+`;
+
+const SInlineSvg = styled(InlineSvg)`
+  margin-left: 2px;
 `;
 
 const SBundleInfo = styled.div`
