@@ -433,22 +433,22 @@ const OnboardingSectionDetails: React.FunctionComponent<
         countryCode: selectedCountry,
         ...(fieldsToBeUpdated.firstName
           ? {
-              firstName: firstNameInEdit,
+              firstName: firstNameInEdit.trim(),
             }
           : {}),
         ...(fieldsToBeUpdated.lastName
           ? {
-              lastName: lastNameInEdit,
+              lastName: lastNameInEdit.trim(),
             }
           : {}),
         ...(fieldsToBeUpdated.username
           ? {
-              username: usernameInEdit,
+              username: usernameInEdit.trim(),
             }
           : {}),
         ...(fieldsToBeUpdated.nickname
           ? {
-              nickname: nicknameInEdit,
+              nickname: nicknameInEdit.trim(),
             }
           : {}),
         ...(fieldsToBeUpdated.dateOfBirth
@@ -702,10 +702,10 @@ const OnboardingSectionDetails: React.FunctionComponent<
     setFieldsValid((curr) => {
       const working = { ...curr };
 
-      working.firstName = firstNameInEdit.length > 1 && !firstNameError;
-      working.lastName = lastNameInEdit.length > 1 && !lastNameError;
-      working.username = usernameInEdit.length > 0 && !usernameError;
-      working.nickname = nicknameInEdit.length > 0 && !nicknameError;
+      working.firstName = firstNameInEdit.trim().length > 1 && !firstNameError;
+      working.lastName = lastNameInEdit.trim().length > 1 && !lastNameError;
+      working.username = usernameInEdit.trim().length > 0 && !usernameError;
+      working.nickname = nicknameInEdit.trim().length > 0 && !nicknameError;
       working.email = validator.isEmail(emailInEdit) && !emailError;
       working.dateOfBirth = !Object.values(dateInEdit).some(
         (v) => v === undefined
