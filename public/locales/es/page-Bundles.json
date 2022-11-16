@@ -35,7 +35,8 @@
   "search": {
     "title": "Buscar creadores que ofrezcan Bundles",
     "searchInputPlaceholder": "Buscar creadores",
-    "resultsTitle": "Creadores destacados"
+    "topCreators": "Creadores destacados",
+    "resultsFor": "Resultados para"
   },
   "button": {
     "back": "Regresar"

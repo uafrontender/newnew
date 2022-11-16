@@ -62,24 +62,17 @@ function usePagination<T>(
         return;
       }
 
-      if (nextData.length === 0) {
-        savedPageToken.current = undefined;
-        setHasMore(false);
-        setLoading(false);
-        return;
-      }
-
       if (initial) {
         setData(nextData);
       } else {
         setData((curr) => [...curr, ...nextData]);
       }
 
-      if (nextPageToken) {
-        savedPageToken.current = nextPageToken;
-      } else {
+      if (nextData.length === 0 || !nextPageToken) {
         savedPageToken.current = undefined;
         setHasMore(false);
+      } else {
+        savedPageToken.current = nextPageToken;
       }
 
       setLoading(false);
@@ -117,6 +110,7 @@ function usePagination<T>(
       if (
         delayed ||
         loading ||
+        data.length === 0 ||
         !hasMore ||
         !initialLoadDone ||
         !lifeCycleIdRef.current
@@ -126,7 +120,7 @@ function usePagination<T>(
 
       return loadMoreData(lifeCycleIdRef.current, limit);
     },
-    [delayed, loading, hasMore, initialLoadDone, loadMoreData]
+    [delayed, loading, data, hasMore, initialLoadDone, loadMoreData]
   );
 
   return {

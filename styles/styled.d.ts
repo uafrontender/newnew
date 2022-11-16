@@ -194,11 +194,13 @@ declare module 'styled-components' {
         primary: string;
         secondary: string;
         tertiary: string;
+        quaternary: string;
       };
       listBottom: {
         primary: string;
         secondary: string;
         tertiary: string;
+        quaternary: string;
       };
       listLeft: {
         primary: string;
