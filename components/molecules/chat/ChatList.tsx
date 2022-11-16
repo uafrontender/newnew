@@ -251,6 +251,7 @@ const ChatList: React.FC<IFunctionProps> = ({
             setUpdatedChat(room);
             return room;
           }
+
           if (room.myRole === 1) {
             setActiveTab('chatRoomsCreators');
           } else {
@@ -276,6 +277,7 @@ const ChatList: React.FC<IFunctionProps> = ({
   const getRoomByUserName = useCallback(
     (uname: string) => {
       const isComplicatedRequest = uname.split('-');
+
       if (
         isComplicatedRequest.length > 0 &&
         isComplicatedRequest[isComplicatedRequest.length - 1] === 'announcement'
@@ -294,8 +296,7 @@ const ChatList: React.FC<IFunctionProps> = ({
       ) {
         return fetchRoomByUsername(isComplicatedRequest[0], 1, 1);
       }
-
-      return fetchRoomByUsername(uname, 1);
+      return fetchRoomByUsername(uname, 2);
     },
     [user.userData?.username, fetchRoomByUsername]
   );
