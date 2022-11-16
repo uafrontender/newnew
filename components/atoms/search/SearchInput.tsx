@@ -73,6 +73,9 @@ const SearchInput: React.FC = React.memo(() => {
       router.push(`/search?query=${firstChunk.text}&type=hashtags&tab=posts`);
     } else {
       const clearedQuery = encodeURIComponent(query);
+      if (resultsPosts.length === 0 && resultsCreators.length > 0) {
+        router.push(`/search?query=${clearedQuery}&tab=creators`);
+      }
       router.push(`/search?query=${clearedQuery}&tab=posts`);
     }
   };
