@@ -217,7 +217,6 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
 
         if (!res.data || res.error) {
           console.error('Unable to get sms notifications status');
-          toast.error(t('smsNotifications.error.requestFailed'));
           throw new Error('Request failed');
         }
 
@@ -246,7 +245,6 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
         (res) => {
           if (!res.data || res.error) {
             console.error('Unable to get sms notifications status');
-            toast.error(t('smsNotifications.errors.requestFailed'));
             return;
           }
 
