@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
+import { useRouter } from 'next/router';
 import InlineSVG from '../InlineSVG';
 import { useAppSelector } from '../../../redux-store/store';
 import searchIcon from '../../../public/images/svg/icons/outlined/Search.svg';
@@ -26,10 +27,18 @@ const SearchInput: React.FC<ISearchInput> = ({
   const [searchValue, setSearchValue] = useState('');
   const [focusedInput, setFocusedInput] = useState<boolean>(false);
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const router = useRouter();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  useEffect(() => {
+    if (searchValue.length > 0) {
+      setSearchValue('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);

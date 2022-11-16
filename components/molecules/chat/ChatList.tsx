@@ -237,10 +237,9 @@ const ChatList: React.FC<IFunctionProps> = ({
         const payload = new newnewapi.GetMyRoomsRequest({
           searchQuery: name,
           roomKind,
-          myRole,
+          myRole: myRole || 2,
         });
         const res = await getMyRooms(payload);
-
         if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
         }
@@ -251,7 +250,6 @@ const ChatList: React.FC<IFunctionProps> = ({
             setUpdatedChat(room);
             return room;
           }
-
           if (room.myRole === 1) {
             setActiveTab('chatRoomsCreators');
           } else {
@@ -277,7 +275,6 @@ const ChatList: React.FC<IFunctionProps> = ({
   const getRoomByUserName = useCallback(
     (uname: string) => {
       const isComplicatedRequest = uname.split('-');
-
       if (
         isComplicatedRequest.length > 0 &&
         isComplicatedRequest[isComplicatedRequest.length - 1] === 'announcement'
@@ -296,7 +293,8 @@ const ChatList: React.FC<IFunctionProps> = ({
       ) {
         return fetchRoomByUsername(isComplicatedRequest[0], 1, 1);
       }
-      return fetchRoomByUsername(uname, 2);
+
+      return fetchRoomByUsername(uname, 1);
     },
     [user.userData?.username, fetchRoomByUsername]
   );
