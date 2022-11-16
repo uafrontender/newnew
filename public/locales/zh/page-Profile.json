@@ -263,7 +263,8 @@
           "1": "出價",
           "2": "投票表決",
           "3": "支持的",
-          "5": "訂閱了"
+          "5": "訂閱了",
+          "6_NEED_TRANSLATION": "purchased bundle from"
         }
       },
       "privacy": {

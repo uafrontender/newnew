@@ -22,6 +22,8 @@ import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import PostResponseSuccessModal from './PostResponseSuccessModal';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import InlineSvg from '../../../atoms/InlineSVG';
 
 interface IPostResponseTabModeration {
   postId: string;
@@ -263,6 +265,14 @@ const PostResponseTabModeration: React.FunctionComponent<
                         <SCreatorLink
                           href={`/${winningOptionAc.creator?.username}`}
                         />,
+                        winningOptionAc.creator?.options?.isVerified ? (
+                          <InlineSvg
+                            svg={VerificationCheckmark}
+                            width='24px'
+                            height='24px'
+                            fill='none'
+                          />
+                        ) : null,
                         { nickname: getDisplayname(winningOptionAc.creator!!) },
                       ]}
                     />
@@ -718,7 +728,9 @@ const SText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
 
-const SSpan = styled.span``;
+const SSpan = styled.span`
+  display: inline-flex;
+`;
 
 const SUserAvatar = styled.img`
   position: relative;
