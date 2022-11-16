@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
-import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../contexts/postInnerContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 import ModerationView from './moderation';
@@ -34,14 +34,12 @@ const LIGHT_IMAGES = {
   mc: assets.creation.lightMcAnimated,
 };
 
-interface IPostModalModeration {}
+interface IPostModeration {}
 
-const PostModalModeration: React.FunctionComponent<
-  IPostModalModeration
-> = () => {
+const PostModeration: React.FunctionComponent<IPostModeration> = () => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -56,7 +54,7 @@ const PostModalModeration: React.FunctionComponent<
     deletedByCreator,
     recommendedPosts,
     handleCloseAndGoBack,
-  } = usePostModalInnerState();
+  } = usePostInnerState();
 
   return (
     <>
@@ -73,14 +71,16 @@ const PostModalModeration: React.FunctionComponent<
         />
       </Head>
       {!isMobile && (
-        <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
-          {t('back')}
-        </SGoBackButton>
+        <SGoBackButtonContainer>
+          <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
+            {t('back')}
+          </SGoBackButton>
+        </SGoBackButtonContainer>
       )}
       {postParsed && typeOfPost ? (
-        <SPostModalContainer
+        <SPostContainer
           loaded={recommendedPosts && recommendedPosts.length > 0}
-          id='post-modal-container'
+          id='post-container'
           isMyPost={isMyPost}
           onClick={(e) => e.stopPropagation()}
           ref={(el) => {
@@ -118,15 +118,15 @@ const PostModalModeration: React.FunctionComponent<
               }}
             />
           )}
-        </SPostModalContainer>
+        </SPostContainer>
       ) : null}
     </>
   );
 };
 
-export default PostModalModeration;
+export default PostModeration;
 
-const SPostModalContainer = styled.div<{
+const SPostContainer = styled.div<{
   isMyPost: boolean;
   loaded: boolean;
 }>`
@@ -162,7 +162,7 @@ const SPostModalContainer = styled.div<{
   }
 `;
 
-const SGoBackButton = styled(GoBackButton)`
+const SGoBackButtonContainer = styled.div`
   padding-left: 16px;
 
   ${({ theme }) => theme.media.laptopM} {
@@ -172,4 +172,8 @@ const SGoBackButton = styled(GoBackButton)`
     margin-left: auto;
     margin-right: auto;
   }
+`;
+
+const SGoBackButton = styled(GoBackButton)`
+  margin-right: auto;
 `;

@@ -21,7 +21,7 @@ const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
   user,
   closeModal,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   const { blockUser } = useGetBlockedUsers();
 

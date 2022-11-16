@@ -1,21 +1,13 @@
 /* eslint-disable no-lonely-if */
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
 // Utils
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { markPost } from '../../../../api/endpoints/post';
-import { SocketContext } from '../../../../contexts/socketContext';
-import { ChannelsContext } from '../../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 
@@ -46,12 +38,8 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
     const { promptUserWithPushNotificationsPermissionModal } =
       usePushNotifications();
 
-    const {
-      postParsed,
-      typeOfPost,
-      handleGoBackInsidePost,
-      handleUpdatePostStatus,
-    } = usePostModalInnerState();
+    const { postParsed, typeOfPost, handleGoBackInsidePost } =
+      usePostInnerState();
     const post = useMemo(
       () =>
         postParsed as
@@ -61,10 +49,6 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
       [postParsed]
     );
     const postType = useMemo(() => typeOfPost ?? 'ac', [typeOfPost]);
-
-    // Socket
-    const socketConnection = useContext(SocketContext);
-    const { addChannel, removeChannel } = useContext(ChannelsContext);
 
     const [isFollowing, setIsFollowing] = useState(
       post.isFavoritedByMe ?? false
@@ -102,51 +86,6 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
         console.error(err);
       }
     };
-
-    // Increment channel subs after mounting
-    // Decrement when unmounting
-    useEffect(() => {
-      addChannel(post.postUuid, {
-        postUpdates: {
-          postUuid: post.postUuid,
-        },
-      });
-
-      return () => {
-        removeChannel(post.postUuid);
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
-      const socketHandlerPostStatus = (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostStatusUpdated.decode(arr);
-
-        if (!decoded) return;
-        if (decoded.postUuid === post.postUuid) {
-          if (decoded.auction) {
-            handleUpdatePostStatus(decoded.auction);
-          } else if (decoded.multipleChoice) {
-            handleUpdatePostStatus(decoded.multipleChoice);
-          } else {
-            if (decoded.crowdfunding)
-              handleUpdatePostStatus(decoded.crowdfunding);
-          }
-        }
-      };
-
-      if (socketConnection) {
-        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
-      }
-
-      return () => {
-        if (socketConnection && socketConnection?.connected) {
-          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
-        }
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection, post, user.userData?.userUuid]);
 
     return (
       <SWrapper>

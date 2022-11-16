@@ -185,7 +185,7 @@ const SBlockedUserCard = styled.div`
   grid-template-areas:
     'avatar nickname unblock'
     'avatar username unblock';
-  grid-template-columns: 52px 2fr 4fr;
+  grid-template-columns: 52px 1fr min-content;
 `;
 
 const SAvatar = styled.div`
@@ -212,6 +212,7 @@ const SAvatar = styled.div`
 
 const SNickname = styled(Text)`
   display: flex;
+  align-items: center;
   grid-area: nickname;
 `;
 

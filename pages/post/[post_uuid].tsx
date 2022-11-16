@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 /* eslint-disable camelcase */
 /* eslint-disable no-nested-ternary */
 import React, {
@@ -25,24 +26,25 @@ import {
   markPost,
 } from '../../api/endpoints/post';
 import switchPostType, { TPostType } from '../../utils/switchPostType';
-
-import { NextPageWithLayout } from '../_app';
-import GeneralLayout from '../../components/templates/General';
-import PostSkeleton from '../../components/organisms/decision/PostSkeleton';
+import { ChannelsContext } from '../../contexts/channelsContext';
+import { SocketContext } from '../../contexts/socketContext';
 import switchPostStatusString from '../../utils/switchPostStatusString';
 import switchPostStatus, {
   TPostStatusStringified,
 } from '../../utils/switchPostStatus';
 import { useAppSelector } from '../../redux-store/store';
-import { usePostModalState } from '../../contexts/postModalContext';
 import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 import { Mixpanel } from '../../utils/mixpanel';
 import CommentFromUrlContextProvider, {
   CommentFromUrlContext,
 } from '../../contexts/commentFromUrlContext';
-import PostModalInnerContextProvider from '../../contexts/postModalInnerContext';
-import PostModal from '../../components/organisms/decision';
+import PostInnerContextProvider from '../../contexts/postInnerContext';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
+
+import { NextPageWithLayout } from '../_app';
+import GeneralLayout from '../../components/templates/General';
+import PostSkeleton from '../../components/organisms/decision/PostSkeleton';
+import Post from '../../components/organisms/decision';
 
 interface IPostPage {
   postUuid: string;
@@ -64,10 +66,14 @@ const PostPage: NextPage<IPostPage> = ({
   isServerSide,
 }) => {
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { user, ui } = useAppSelector((state) => state);
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
+
+  // Socket
+  const socketConnection = useContext(SocketContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     ui.resizeMode
@@ -84,13 +90,18 @@ const PostPage: NextPage<IPostPage> = ({
     [comment_content]
   );
 
-  const { isConfirmToClosePost } = usePostModalState();
+  const [isConfirmToClosePost, setIsConfirmToClosePost] = useState(false);
+
+  const handleSetIsConfirmToClosePost = useCallback((newState: boolean) => {
+    setIsConfirmToClosePost(newState);
+  }, []);
 
   useLeavePageConfirm(
     isConfirmToClosePost,
     t('postVideo.cannotLeavePageMsg'),
     []
   );
+
   const [postFromAjax, setPostFromAjax] = useState<newnewapi.Post | undefined>(
     undefined
   );
@@ -332,13 +343,6 @@ const PostPage: NextPage<IPostPage> = ({
     Mixpanel.track('Post Failed Button Click', {
       _stage: 'Post',
     });
-    // if (recommendedPosts.length > 0) {
-    //   document.getElementById('post-modal-container')?.scrollTo({
-    //     top: document.getElementById('recommendations-section-heading')
-    //       ?.offsetTop,
-    //     behavior: 'smooth',
-    //   });
-    // } else {
     if (router.pathname === '/') {
       handleCloseAndGoBack();
     } else {
@@ -466,6 +470,56 @@ const PostPage: NextPage<IPostPage> = ({
     });
   }, [postParsed, typeOfPost]);
 
+  // Increment channel subs after mounting
+  // Decrement when unmounting
+  useEffect(() => {
+    if (postParsed?.postUuid && socketConnection?.connected) {
+      addChannel(postParsed.postUuid, {
+        postUpdates: {
+          postUuid: postParsed.postUuid,
+        },
+      });
+    }
+
+    return () => {
+      if (postParsed?.postUuid) {
+        removeChannel(postParsed.postUuid);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [postParsed?.postUuid, socketConnection?.connected]);
+
+  // Listen for Post status updates
+  useEffect(() => {
+    const socketHandlerPostStatus = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+
+      if (!decoded) return;
+      if (decoded.postUuid === postParsed?.postUuid) {
+        if (decoded.auction) {
+          handleUpdatePostStatus(decoded.auction);
+        } else if (decoded.multipleChoice) {
+          handleUpdatePostStatus(decoded.multipleChoice);
+        } else {
+          if (decoded.crowdfunding)
+            handleUpdatePostStatus(decoded.crowdfunding);
+        }
+      }
+    };
+
+    if (socketConnection) {
+      socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection, postParsed, user.userData?.userUuid]);
+
   // Try to pre-fetch the content
   useEffect(() => {
     router.prefetch('/sign-up');
@@ -497,7 +551,7 @@ const PostPage: NextPage<IPostPage> = ({
         },
       }}
     >
-      <PostModalInnerContextProvider
+      <PostInnerContextProvider
         key={postUuid}
         postParsed={postParsed}
         typeOfPost={typeOfPost}
@@ -523,6 +577,7 @@ const PostPage: NextPage<IPostPage> = ({
         handleDeletePost={handleDeletePost}
         handleOpenDeletePostModal={handleOpenDeletePostModal}
         handleCloseDeletePostModal={handleCloseDeletePostModal}
+        handleSetIsConfirmToClosePost={handleSetIsConfirmToClosePost}
       >
         <Head>
           <title>{t(`meta.${typeOfPost}.title`)}</title>
@@ -581,7 +636,7 @@ const PostPage: NextPage<IPostPage> = ({
                 },
               }}
             >
-              <PostModal
+              <Post
                 isMyPost={isMyPost}
                 shouldRenderVotingFinishedModal={
                   shouldRenderVotingFinishedModal
@@ -590,7 +645,7 @@ const PostPage: NextPage<IPostPage> = ({
             </motion.div>
           )}
         </AnimatePresence>
-      </PostModalInnerContextProvider>
+      </PostInnerContextProvider>
     </motion.div>
   );
 };
@@ -616,7 +671,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'common',
-    'modal-Post',
+    'page-Post',
     'modal-ResponseSuccessModal',
     'component-PostCard',
     'modal-PaymentModal',
@@ -638,7 +693,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       postUuid: post_uuid,
     });
 
-    const res = await fetchPostByUUID(getPostPayload);
+    const res = await fetchPostByUUID(
+      getPostPayload,
+      undefined,
+      context.req.cookies?.accessToken ?? undefined
+    );
 
     if (!res.data || res.error) {
       return {

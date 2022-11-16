@@ -34,7 +34,7 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
   handleOpenBundleVotesModal,
   handleSetVoteOfferAndOpenModal,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const containerRef = useRef<HTMLDivElement>();
 
   const [bottom, setBottom] = useState<number | undefined>();

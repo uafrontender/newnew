@@ -1,3 +1,5 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable no-await-in-loop */
 /* eslint-disable react/jsx-no-target-blank */
 import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
@@ -293,9 +295,9 @@ const MyProfileSettingsIndex = () => {
       try {
         const users: newnewapi.User[] = [];
 
-        usersIBlockedIds.forEach(async (uuid) => {
+        for (let i = 0; i < usersIBlockedIds.length; i++) {
           const payload = new newnewapi.GetUserRequest({
-            uuid,
+            uuid: usersIBlockedIds[i],
           });
 
           const res = await getUserByUsername(payload);
@@ -303,7 +305,7 @@ const MyProfileSettingsIndex = () => {
           if (res.data) {
             users.push(res.data);
           }
-        });
+        }
 
         setBlockedUsers(() => users);
       } catch (err) {

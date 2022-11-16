@@ -784,6 +784,10 @@ const SSendButton = styled(Button)`
 const SBioText = styled(Text)`
   text-align: center;
   overflow-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: break-all;
+
+  user-select: unset;
 
   padding-left: 16px;
   padding-right: 16px;

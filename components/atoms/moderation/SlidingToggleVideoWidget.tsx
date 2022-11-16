@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next';
 
 import { Mixpanel } from '../../../utils/mixpanel';
 import { usePostModerationResponsesContext } from '../../../contexts/postModerationResponsesContext';
-import { usePostModalInnerState } from '../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../contexts/postInnerContext';
 
 interface ISlidingToggleVideoWidget {
   disabled?: boolean;
@@ -14,9 +14,9 @@ interface ISlidingToggleVideoWidget {
 const SlidingToggleVideoWidget: React.FunctionComponent<
   ISlidingToggleVideoWidget
 > = ({ disabled, wrapperCSS }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
-  const { postParsed } = usePostModalInnerState();
+  const { postParsed } = usePostInnerState();
   const { openedTab, handleChangeTab } = usePostModerationResponsesContext();
 
   return (

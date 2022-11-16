@@ -39,7 +39,7 @@ import getDisplayname from '../../../../utils/getDisplayname';
 import assets from '../../../../constants/assets';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 
 const DARK_IMAGES = {
@@ -71,7 +71,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { t: tCommon } = useTranslation('common');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -90,7 +90,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     handleReportOpen,
     handleSetIsFollowingDecision,
     handleCloseAndGoBack,
-  } = usePostModalInnerState();
+  } = usePostInnerState();
 
   const postId = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
   const title = useMemo(() => postParsed?.title ?? '', [postParsed]);
@@ -228,13 +228,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       _postUuid: postId,
       _component: 'PostTopInfo',
     });
-    // if (hasRecommendations) {
-    //   document.getElementById('post-modal-container')?.scrollTo({
-    //     top: document.getElementById('recommendations-section-heading')
-    //       ?.offsetTop,
-    //     behavior: 'smooth',
-    //   });
-    // } else {
     if (router.pathname === '/') {
       handleCloseAndGoBack();
     } else {
