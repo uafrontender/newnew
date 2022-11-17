@@ -237,10 +237,9 @@ const ChatList: React.FC<IFunctionProps> = ({
         const payload = new newnewapi.GetMyRoomsRequest({
           searchQuery: name,
           roomKind,
-          myRole,
+          myRole: myRole || 2,
         });
         const res = await getMyRooms(payload);
-
         if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
         }
