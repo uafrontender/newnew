@@ -33,7 +33,11 @@ const PostResponseSuccessModal: React.FunctionComponent<
     resizeMode
   );
 
-  const handleGoToDashboard = () => router?.push('/creator/dashboard');
+  const handleGoToDashboard = () => {
+    router?.push('/creator/dashboard', undefined, {
+      scroll: true,
+    });
+  };
 
   return (
     <Modal show={isOpen} additionalz={zIndex}>
@@ -75,12 +79,14 @@ const PostResponseSuccessModal: React.FunctionComponent<
             {t('youMade')}
           </SText>
           <SHeadline variant={1}>{amount}</SHeadline>
-          <SMakeAnotherPostButton onClick={() => router?.push('/creation')}>
-            <SCoinImage src={assets.decision.gold} />
-            <SButtonText variant={2} weight={600}>
-              {t('makeNewPostButton')}
-            </SButtonText>
-            <SButtonSubtitle variant={3}>{t('subtitle')}</SButtonSubtitle>
+          <SMakeAnotherPostButton>
+            <a href='/creation'>
+              <SCoinImage src={assets.decision.gold} />
+              <SButtonText variant={2} weight={600}>
+                {t('makeNewPostButton')}
+              </SButtonText>
+              <SButtonSubtitle variant={3}>{t('subtitle')}</SButtonSubtitle>
+            </a>
           </SMakeAnotherPostButton>
         </SContentContainer>
       </SWrapper>
