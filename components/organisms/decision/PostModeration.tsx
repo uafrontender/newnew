@@ -91,32 +91,41 @@ const PostModeration: React.FunctionComponent<IPostModeration> = () => {
           postStatus !== 'deleted_by_creator' ? (
             <ModerationView />
           ) : (
-            <PostFailedBox
-              title={t('postDeletedByMe.title', {
-                postType: t(`postType.${typeOfPost}`),
-              })}
-              body={
-                deletedByCreator
-                  ? t('postDeletedByMe.body.byCreator', {
-                      postType: t(`postType.${typeOfPost}`),
-                    })
-                  : t('postDeletedByMe.body.byAdmin', {
-                      postType: t(`postType.${typeOfPost}`),
-                    })
-              }
-              imageSrc={
-                theme.name === 'light'
-                  ? LIGHT_IMAGES[typeOfPost]
-                  : DARK_IMAGES[typeOfPost]
-              }
-              buttonCaption={t('postDeletedByMe.buttonText')}
-              handleButtonClick={() => {
-                Mixpanel.track('Post Failed Redirect to Creation', {
-                  _stage: 'Post',
-                });
-                router.push('/creation');
-              }}
-            />
+            <>
+              {isMobile ? (
+                <SGoBackButtonContainer>
+                  <SGoBackButton onClick={() => handleCloseAndGoBack()}>
+                    {t('back')}
+                  </SGoBackButton>
+                </SGoBackButtonContainer>
+              ) : null}
+              <PostFailedBox
+                title={t('postDeletedByMe.title', {
+                  postType: t(`postType.${typeOfPost}`),
+                })}
+                body={
+                  deletedByCreator
+                    ? t('postDeletedByMe.body.byCreator', {
+                        postType: t(`postType.${typeOfPost}`),
+                      })
+                    : t('postDeletedByMe.body.byAdmin', {
+                        postType: t(`postType.${typeOfPost}`),
+                      })
+                }
+                imageSrc={
+                  theme.name === 'light'
+                    ? LIGHT_IMAGES[typeOfPost]
+                    : DARK_IMAGES[typeOfPost]
+                }
+                buttonCaption={t('postDeletedByMe.buttonText')}
+                handleButtonClick={() => {
+                  Mixpanel.track('Post Failed Redirect to Creation', {
+                    _stage: 'Post',
+                  });
+                  router.push('/creation');
+                }}
+              />
+            </>
           )}
         </SPostContainer>
       ) : null}
@@ -163,7 +172,12 @@ const SPostContainer = styled.div<{
 `;
 
 const SGoBackButtonContainer = styled.div`
-  padding-left: 16px;
+  margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding-left: 16px;
+    margin-bottom: initial;
+  }
 
   ${({ theme }) => theme.media.laptopM} {
     padding-left: 24px;
