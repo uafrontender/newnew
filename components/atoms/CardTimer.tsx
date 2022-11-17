@@ -32,24 +32,19 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
     const interval = useRef<number>();
 
     const parsedString = useMemo(() => {
-      if (parsedSeconds.hours !== '0') {
+      if (parsedSeconds.days !== '0') {
         return `
-    ${
-      parsedSeconds.days !== '0'
-        ? `${parsedSeconds.days}${t('timer.daysLeft')}`
-        : ''
-    }
-    ${
-      parsedSeconds.hours !== '0'
-        ? `${parsedSeconds.hours}${t('timer.hoursLeft')}`
-        : ''
-    }
-    ${
-      parsedSeconds.minutes !== '0'
-        ? `${parsedSeconds.minutes}${t('timer.minutesLeft')}`
-        : ''
-    }
-  `;
+          ${`${parsedSeconds.days}${t('timer.daysLeft')}`}
+          ${`${parsedSeconds.hours}${t('timer.hoursLeft')}`}
+          ${`${parsedSeconds.minutes}${t('timer.minutesLeft')}`}
+        `;
+      }
+
+      if (parsedSeconds.days === '0' && parsedSeconds.hours !== '0') {
+        return `
+          ${`${parsedSeconds.hours}${t('timer.hoursLeft')}`}
+          ${`${parsedSeconds.minutes}${t('timer.minutesLeft')}`}
+        `;
       }
 
       return `
@@ -62,7 +57,8 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
         parsedSeconds.seconds !== '0'
           ? `${parsedSeconds.seconds}${t('timer.secondsLeft')}`
           : ''
-      }`;
+      }
+      `;
     }, [
       parsedSeconds.days,
       parsedSeconds.hours,
