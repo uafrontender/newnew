@@ -35,29 +35,30 @@ interface ICalendarScrollableVertically {
   selectedDate?: any | null;
 }
 
-export const CalendarScrollableVertically: React.FC<ICalendarScrollableVertically> =
-  (props) => {
-    const { minDate, maxDate, onSelect, selectedDate } = props;
+export const CalendarScrollableVertically: React.FC<
+  ICalendarScrollableVertically
+> = (props) => {
+  const { minDate, maxDate, onSelect, selectedDate } = props;
 
-    const handleSelectedDate = (e: any, value: any) => {
-      if (e) {
-        e.preventDefault();
-      }
+  const handleSelectedDate = (e: any, value: any) => {
+    if (e) {
+      e.preventDefault();
+    }
 
-      if (onSelect) {
-        onSelect(value);
-      }
-    };
-
-    return (
-      <RenderCalendarYear
-        minDate={minDate}
-        maxDate={maxDate}
-        selectedDate={selectedDate}
-        handleSelect={handleSelectedDate}
-      />
-    );
+    if (onSelect) {
+      onSelect(value);
+    }
   };
+
+  return (
+    <RenderCalendarYear
+      minDate={minDate}
+      maxDate={maxDate}
+      selectedDate={selectedDate}
+      handleSelect={handleSelectedDate}
+    />
+  );
+};
 
 CalendarScrollableVertically.defaultProps = {
   selectedDate: null,
@@ -200,7 +201,7 @@ const SDay = styled(Text)<ISDay>`
   display: inline-block;
   background: ${(props) =>
     props.isActive ? props.theme.colorsThemed.accent.blue : 'transparent'};
-  line-height: 46px;
+  line-height: 46px !important;
   border-radius: 22px;
   pointer-events: ${(props) =>
     props.isDisabled || props.isActive ? 'none' : 'unset'};

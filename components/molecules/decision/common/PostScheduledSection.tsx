@@ -8,6 +8,7 @@ import isBrowser from '../../../../utils/isBrowser';
 import { useAppSelector } from '../../../../redux-store/store';
 import secondsToDHMS, { DHMS } from '../../../../utils/secondsToDHMS';
 import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
+import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -37,6 +38,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     resizeMode
   );
   const isPageVisible = usePageVisibility();
+  const { overlayModeEnabled } = useOverlayMode();
 
   const [isScrolledDown, setIsScrolledDown] = useState(false);
 
@@ -89,9 +91,15 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     <SContainer
       isModeration={variant === 'moderation'}
       style={{
-        ...(isMobile && !isScrolledDown
+        ...(isMobile && !isScrolledDown && !overlayModeEnabled
           ? {
               position: 'fixed',
+            }
+          : {}),
+        ...(isMobile && overlayModeEnabled
+          ? {
+              opacity: 0,
+              position: 'static',
             }
           : {}),
       }}
@@ -183,8 +191,11 @@ const SContainer = styled.div<{
 
   z-index: 9;
 
+  transition: 0.3s linear;
+
   ${({ theme }) => theme.media.tablet} {
     background-color: transparent;
+    transition: initial;
 
     margin-top: auto;
     margin-bottom: auto;

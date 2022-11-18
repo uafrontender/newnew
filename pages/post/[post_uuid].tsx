@@ -270,6 +270,11 @@ const PostPage: NextPage<IPostPage> = ({
       if (!res.error) {
         handleUpdatePostStatus('DELETED_BY_CREATOR');
         handleCloseDeletePostModal();
+        if (document?.documentElement) {
+          document?.documentElement?.scrollTo({
+            top: 0,
+          });
+        }
       }
     } catch (err) {
       console.error(err);
