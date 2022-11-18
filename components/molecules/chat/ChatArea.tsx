@@ -549,15 +549,14 @@ const ChatArea: React.FC<IChatData> = ({
                   : chatRoom.visavis?.user?.nickname ||
                     chatRoom.visavis?.user?.username
               }
-              {chatRoom.visavis?.user?.options?.isVerified &&
-                !isAnnouncement && (
-                  <SInlineSVG
-                    svg={VerificationCheckmark}
-                    width='16px'
-                    height='16px'
-                    fill='none'
-                  />
-                )}
+              {chatRoom.visavis?.user?.options?.isVerified && (
+                <SVerificationSVG
+                  svg={VerificationCheckmark}
+                  width='18px'
+                  height='18px'
+                  fill='none'
+                />
+              )}
             </SUserName>
             {!isAnnouncement && (
               <Link href={`/${chatRoom?.visavis?.user?.username}`}>
@@ -845,6 +844,11 @@ const SUserAvatar = styled(UserAvatar)<ISUserAvatar>`
   ${(props) => props.theme.media.tablet} {
     display: block;
   }
+`;
+
+const SVerificationSVG = styled(InlineSVG)`
+  margin-left: 4px;
+  flex-shrink: 0;
 `;
 
 const SInlineSVG = styled(InlineSVG)`

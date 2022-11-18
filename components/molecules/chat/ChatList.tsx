@@ -25,6 +25,7 @@ import {
   SChatItemTime,
   SChatSeparator,
   SUserAvatar,
+  SVerificationSVG,
 } from '../../atoms/chat/styles';
 import { getMyRooms, markRoomAsRead } from '../../../api/endpoints/chat';
 import { useAppSelector } from '../../../redux-store/store';
@@ -618,15 +619,14 @@ const ChatList: React.FC<IFunctionProps> = ({
               <SChatItemContentWrapper>
                 <SChatItemText variant={3} weight={600}>
                   {chatName}
-                  {chat.visavis?.user?.options?.isVerified &&
-                    chat.kind !== 4 && (
-                      <SInlineSVG
-                        svg={VerificationCheckmark}
-                        width='16px'
-                        height='16px'
-                        fill='none'
-                      />
-                    )}
+                  {chat.visavis?.user?.options?.isVerified && (
+                    <SVerificationSVG
+                      svg={VerificationCheckmark}
+                      width='16px'
+                      height='16px'
+                      fill='none'
+                    />
+                  )}
                 </SChatItemText>
                 <SChatItemTime variant={3} weight={600}>
                   {chat.updatedAt &&
@@ -817,7 +817,6 @@ const STab = styled.div<ISTab>`
 const SInlineSVG = styled(InlineSVG)`
   min-width: 24px;
   min-height: 24px;
-  margin-right: 14px;
 `;
 
 const SRef = styled.span`

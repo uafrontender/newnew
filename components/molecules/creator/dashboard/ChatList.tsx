@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import moment from 'moment';
-import { SUserAvatar } from '../../../atoms/chat/styles';
+import { SUserAvatar, SVerificationSVG } from '../../../atoms/chat/styles';
 
 import Text from '../../../atoms/Text';
 import UserAvatar from '../../UserAvatar';
@@ -231,7 +231,7 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
               <SChatItemText variant={3} weight={600}>
                 {chatName}
                 {chat.visavis?.user?.options?.isVerified && (
-                  <SInlineSVG
+                  <SVerificationSVG
                     svg={VerificationCheckmark}
                     width='16px'
                     height='16px'
