@@ -568,25 +568,33 @@ const SDatePicker = styled.div`
               .react-datepicker__day {
                 color: ${({ theme }) => theme.colorsThemed.text.primary};
 
-                &:hover {
-                  position: relative;
-                  color: #ffffff;
-                  background: transparent;
+                @media (hover: hover) {
+                  &:hover {
+                    position: relative;
+                    color: #ffffff;
+                    background: transparent;
 
-                  &:before {
-                    position: absolute;
-                    top: calc(50% - 22px);
-                    left: calc(50% - 22px);
-                    content: '';
+                    &:before {
+                      position: absolute;
+                      top: calc(50% - 22px);
+                      left: calc(50% - 22px);
+                      content: '';
 
-                    width: 44px;
-                    height: 44px;
-                    border-radius: 50%;
+                      width: 44px;
+                      height: 44px;
+                      border-radius: 50%;
 
-                    background: ${({ theme }) =>
-                      theme.colorsThemed.accent.blue};
+                      background: ${({ theme }) =>
+                        theme.colorsThemed.accent.blue};
 
-                    z-index: -1;
+                      z-index: -1;
+                    }
+                  }
+                }
+
+                @media (hover: none) {
+                  &:hover {
+                    background: transparent;
                   }
                 }
               }
