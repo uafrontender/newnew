@@ -144,6 +144,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
   );
   const isTablet = ['tablet'].includes(resizeMode);
 
+  const onlySpacesRegex = /^\s+$/;
+
   // Firstname
   const [firstNameInEdit, setFirstnameInEdit] = useState('');
   // TODO: improve firstName validation
@@ -152,10 +154,14 @@ const OnboardingSectionDetails: React.FunctionComponent<
     if (firstNameError) {
       setFirstnameError('');
     }
-    setFirstnameInEdit(e.target.value);
+
+    if (onlySpacesRegex.test(e.target.value)) {
+      setFirstnameInEdit('');
+    } else {
+      setFirstnameInEdit(e.target.value);
+    }
   };
 
-  // Lastname
   const [lastNameInEdit, setLastnameInEdit] = useState('');
   // TODO: improve lastName validation
   const [lastNameError, setLastnameError] = useState('');
@@ -163,7 +169,12 @@ const OnboardingSectionDetails: React.FunctionComponent<
     if (lastNameError) {
       setLastnameError('');
     }
-    setLastnameInEdit(e.target.value);
+
+    if (onlySpacesRegex.test(e.target.value)) {
+      setLastnameInEdit('');
+    } else {
+      setLastnameInEdit(e.target.value);
+    }
   };
 
   // Username
@@ -184,7 +195,11 @@ const OnboardingSectionDetails: React.FunctionComponent<
   );
   const [nicknameError, setNicknameError] = useState('');
   const handleUpdateNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNicknameInEdit(e.target.value);
+    if (onlySpacesRegex.test(e.target.value)) {
+      setNicknameInEdit('');
+    } else {
+      setNicknameInEdit(e.target.value);
+    }
 
     validateNicknameViaAPIDebounced(e.target.value);
   };
@@ -194,7 +209,15 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const validateUsernameViaAPI = useCallback(
     async (text: string) => {
       setIsAPIValidateLoading(true);
+
       try {
+        // skip validation if username is equal to current username
+        if (text === user.userData?.username) {
+          setUsernameError('');
+
+          return;
+        }
+
         const payload = new newnewapi.ValidateUsernameRequest({
           username: text,
         });
@@ -224,7 +247,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
         }
       }
     },
-    [setUsernameError, dispatch]
+    [setUsernameError, dispatch, user.userData?.username]
   );
 
   const validateUsernameViaAPIDebounced = useMemo(
@@ -433,22 +456,22 @@ const OnboardingSectionDetails: React.FunctionComponent<
         countryCode: selectedCountry,
         ...(fieldsToBeUpdated.firstName
           ? {
-              firstName: firstNameInEdit,
+              firstName: firstNameInEdit.trim(),
             }
           : {}),
         ...(fieldsToBeUpdated.lastName
           ? {
-              lastName: lastNameInEdit,
+              lastName: lastNameInEdit.trim(),
             }
           : {}),
         ...(fieldsToBeUpdated.username
           ? {
-              username: usernameInEdit,
+              username: usernameInEdit.trim(),
             }
           : {}),
         ...(fieldsToBeUpdated.nickname
           ? {
-              nickname: nicknameInEdit,
+              nickname: nicknameInEdit.trim(),
             }
           : {}),
         ...(fieldsToBeUpdated.dateOfBirth
@@ -702,10 +725,10 @@ const OnboardingSectionDetails: React.FunctionComponent<
     setFieldsValid((curr) => {
       const working = { ...curr };
 
-      working.firstName = firstNameInEdit.length > 1 && !firstNameError;
-      working.lastName = lastNameInEdit.length > 1 && !lastNameError;
-      working.username = usernameInEdit.length > 0 && !usernameError;
-      working.nickname = nicknameInEdit.length > 0 && !nicknameError;
+      working.firstName = firstNameInEdit.trim().length > 1 && !firstNameError;
+      working.lastName = lastNameInEdit.trim().length > 1 && !lastNameError;
+      working.username = usernameInEdit.trim().length > 0 && !usernameError;
+      working.nickname = nicknameInEdit.trim().length > 0 && !nicknameError;
       working.email = validator.isEmail(emailInEdit) && !emailError;
       working.dateOfBirth = !Object.values(dateInEdit).some(
         (v) => v === undefined

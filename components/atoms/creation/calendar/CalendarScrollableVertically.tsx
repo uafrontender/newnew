@@ -198,7 +198,9 @@ const SDay = styled(Text)<ISDay>`
   cursor: ${(props) =>
     props.isDisabled || props.isActive ? 'not-allowed' : 'pointer'};
   height: 44px;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: ${(props) =>
     props.isActive ? props.theme.colorsThemed.accent.blue : 'transparent'};
   line-height: 46px !important;
