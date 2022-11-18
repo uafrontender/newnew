@@ -287,20 +287,6 @@ const MyAppWithTranslationAndRedux = wrapper.withRedux(MyAppWithTranslation);
 MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
   const appProps = await App.getInitialProps(appContext);
 
-  const isFirstLoad = !appContext?.ctx?.req.url?.startsWith('/_next');
-  const asPath = appContext?.ctx?.asPath;
-  const urlLocale = appContext?.ctx?.locale;
-  const preferredLocale = appContext?.ctx?.req?.cookies?.preferredLocale;
-
-  // Redirect server-side to the preferred locale, if it is a first load, and
-  // selected locale is defined and doesn't match
-  if (isFirstLoad && preferredLocale && preferredLocale !== urlLocale) {
-    appContext?.ctx?.res?.writeHead(307, {
-      location: `${preferredLocale}${asPath}`,
-    });
-    appContext?.ctx?.res?.end();
-  }
-
   return {
     ...appProps,
     colorMode: appContext.ctx?.req.cookies?.colorMode ?? 'auto',
