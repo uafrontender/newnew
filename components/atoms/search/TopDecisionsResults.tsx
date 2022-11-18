@@ -64,7 +64,11 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
                 <SPostType>{postTypeConverted}</SPostType>
                 <SPostEnded>
                   {parsed.days !== '00' && `${parsed.days}d`}{' '}
-                  {`${parsed.hours}h ${parsed.minutes}m ${parsed.seconds}s `}
+                  {(parsed.hours !== '00' ||
+                    (parsed.days !== '00' && parsed.hours === '00')) &&
+                    `${parsed.hours}h`}{' '}
+                  {`${parsed.minutes}m `}
+                  {parsed.days === '00' && `${parsed.seconds}s`}
                 </SPostEnded>
               </SPostDetails>
             </SPost>

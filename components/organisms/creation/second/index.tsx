@@ -1260,15 +1260,15 @@ export const CreationSecondStepContent: React.FC<
                           <SUserTitle variant={3} weight={600}>
                             {user.userData?.nickname}
                           </SUserTitle>
+                          {user.userData?.options?.isVerified && (
+                            <SInlineSvg
+                              svg={VerificationCheckmark}
+                              width='20px'
+                              height='20px'
+                              fill='none'
+                            />
+                          )}
                         </SUserTitleContainer>
-                        {user.userData?.options?.isVerified && (
-                          <SInlineSvg
-                            svg={VerificationCheckmark}
-                            width='20px'
-                            height='20px'
-                            fill='none'
-                          />
-                        )}
                         <SCaption variant={2} weight={700}>
                           {t('secondStep.card.left', {
                             time: formatExpiresAtNoStartsAt().fromNow(true),
@@ -1369,6 +1369,7 @@ const SFloatingSubSection = styled.div`
 const SFloatingSubSectionWithPlayer = styled.div`
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 const SFloatingSubSectionUser = styled.div`
@@ -1379,7 +1380,7 @@ const SFloatingSubSectionUser = styled.div`
   align-items: center;
   flex-direction: row;
 
-  grid-template-columns: 24px min-content 20px max-content;
+  grid-template-columns: 24px 1fr max-content;
 `;
 
 const SFloatingSubSectionPlayer = styled.div`
@@ -1544,7 +1545,8 @@ const SUserAvatar = styled(UserAvatar)`
 `;
 
 const SUserTitleContainer = styled.div`
-  max-width: 82px;
+  display: flex;
+  overflow: hidden;
 `;
 
 const SUserTitle = styled(Text)`

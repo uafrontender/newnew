@@ -203,7 +203,7 @@ const SDay = styled(Text)<ISDay>`
   justify-content: center;
   background: ${(props) =>
     props.isActive ? props.theme.colorsThemed.accent.blue : 'transparent'};
-  line-height: 46px;
+  line-height: 46px !important;
   border-radius: 22px;
   pointer-events: ${(props) =>
     props.isDisabled || props.isActive ? 'none' : 'unset'};

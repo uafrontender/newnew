@@ -35,7 +35,8 @@
   "search": {
     "title": "查找提供Bundle的創作者",
     "searchInputPlaceholder": "查找創作者",
-    "resultsTitle": "熱門創作者"
+    "topCreators": "熱門創作者",
+    "resultsFor": "結果"
   },
   "button": {
     "back": "返回"
