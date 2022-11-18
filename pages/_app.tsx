@@ -47,6 +47,7 @@ import FollowingsContextProvider from '../contexts/followingContext';
 import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
 import SyncUserWrapper from '../contexts/syncUserWrapper';
+import LanguageWrapper from '../contexts/languageWrapper';
 import AppConstantsContextProvider from '../contexts/appConstantsContext';
 import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
 import CardsContextProvider from '../contexts/cardsContext';
@@ -218,59 +219,61 @@ const MyApp = (props: IMyApp): ReactElement => {
             },
           }}
         >
-          <AppConstantsContextProvider>
-            <SocketContextProvider>
-              <ChannelsContextProvider>
-                <PersistanceProvider store={store}>
-                  <SyncUserWrapper>
-                    <NotificationsProvider>
-                      <ModalNotificationsContextProvider>
-                        <BlockedUsersProvider>
-                          <FollowingsContextProvider>
-                            <CardsContextProvider>
-                              <BundlesContextProvider>
-                                <ChatsProvider>
-                                  <OverlayModeProvider>
-                                    <ResizeMode>
-                                      <GlobalTheme initialTheme={colorMode}>
-                                        <>
-                                          <ToastContainer containerId='toast-container' />
-                                          <VideoProcessingWrapper>
-                                            <ErrorBoundary>
-                                              {!pageProps.error ? (
-                                                getLayout(
-                                                  <Component {...pageProps} />
-                                                )
-                                              ) : (
-                                                <Error
-                                                  title={
-                                                    pageProps.error?.message
-                                                  }
-                                                  statusCode={
-                                                    pageProps.error
-                                                      ?.statusCode ?? 500
-                                                  }
-                                                />
-                                              )}
-                                            </ErrorBoundary>
-                                          </VideoProcessingWrapper>
-                                          <ReCaptchaBadgeModal />
-                                        </>
-                                      </GlobalTheme>
-                                    </ResizeMode>
-                                  </OverlayModeProvider>
-                                </ChatsProvider>
-                              </BundlesContextProvider>
-                            </CardsContextProvider>
-                          </FollowingsContextProvider>
-                        </BlockedUsersProvider>
-                      </ModalNotificationsContextProvider>
-                    </NotificationsProvider>
-                  </SyncUserWrapper>
-                </PersistanceProvider>
-              </ChannelsContextProvider>
-            </SocketContextProvider>
-          </AppConstantsContextProvider>
+          <LanguageWrapper>
+            <AppConstantsContextProvider>
+              <SocketContextProvider>
+                <ChannelsContextProvider>
+                  <PersistanceProvider store={store}>
+                    <SyncUserWrapper>
+                      <NotificationsProvider>
+                        <ModalNotificationsContextProvider>
+                          <BlockedUsersProvider>
+                            <FollowingsContextProvider>
+                              <CardsContextProvider>
+                                <BundlesContextProvider>
+                                  <ChatsProvider>
+                                    <OverlayModeProvider>
+                                      <ResizeMode>
+                                        <GlobalTheme initialTheme={colorMode}>
+                                          <>
+                                            <ToastContainer containerId='toast-container' />
+                                            <VideoProcessingWrapper>
+                                              <ErrorBoundary>
+                                                {!pageProps.error ? (
+                                                  getLayout(
+                                                    <Component {...pageProps} />
+                                                  )
+                                                ) : (
+                                                  <Error
+                                                    title={
+                                                      pageProps.error?.message
+                                                    }
+                                                    statusCode={
+                                                      pageProps.error
+                                                        ?.statusCode ?? 500
+                                                    }
+                                                  />
+                                                )}
+                                              </ErrorBoundary>
+                                            </VideoProcessingWrapper>
+                                            <ReCaptchaBadgeModal />
+                                          </>
+                                        </GlobalTheme>
+                                      </ResizeMode>
+                                    </OverlayModeProvider>
+                                  </ChatsProvider>
+                                </BundlesContextProvider>
+                              </CardsContextProvider>
+                            </FollowingsContextProvider>
+                          </BlockedUsersProvider>
+                        </ModalNotificationsContextProvider>
+                      </NotificationsProvider>
+                    </SyncUserWrapper>
+                  </PersistanceProvider>
+                </ChannelsContextProvider>
+              </SocketContextProvider>
+            </AppConstantsContextProvider>
+          </LanguageWrapper>
         </GoogleReCaptchaProvider>
       </CookiesProvider>
     </>
