@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable react/jsx-pascal-case */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 
@@ -181,7 +181,7 @@ const PostResponseTabModeration: React.FunctionComponent<
           }
         >
           <SHeaderDiv>
-            <SHeaderHeadline variant={3}>
+            <SHeaderHeadline variant={3} successVariant>
               {t('postResponseTabModeration.succeeded.topHeader')}
             </SHeaderHeadline>
             <SCoin_1
@@ -637,9 +637,22 @@ const SHeaderDiv = styled.div`
   }
 `;
 
-const SHeaderHeadline = styled(Headline)`
+const SHeaderHeadline = styled(Headline)<{
+  successVariant?: boolean;
+}>`
   color: #ffffff;
   white-space: pre;
+
+  ${({ theme }) => theme.media.laptopL} {
+    font-size: 56px;
+    line-height: 64px;
+    ${({ successVariant }) =>
+      successVariant
+        ? css`
+            white-space: initial;
+          `
+        : null}
+  }
 `;
 
 const SCoin_1 = styled.img`
