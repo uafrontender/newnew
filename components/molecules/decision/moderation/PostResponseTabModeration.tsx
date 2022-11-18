@@ -266,7 +266,7 @@ const PostResponseTabModeration: React.FunctionComponent<
                           href={`/${winningOptionAc.creator?.username}`}
                         />,
                         winningOptionAc.creator?.options?.isVerified ? (
-                          <InlineSvg
+                          <SInlineSvg
                             svg={VerificationCheckmark}
                             width='24px'
                             height='24px'
@@ -319,6 +319,14 @@ const PostResponseTabModeration: React.FunctionComponent<
                             <SCreatorLink
                               href={`/${winningOptionMc.creator?.username}`}
                             />,
+                            winningOptionMc.creator?.options?.isVerified ? (
+                              <SInlineSvg
+                                svg={VerificationCheckmark}
+                                width='24px'
+                                height='24px'
+                                fill='none'
+                              />
+                            ) : null,
                             {
                               nickname: getDisplayname(
                                 winningOptionMc.creator!!
@@ -485,6 +493,14 @@ const PostResponseTabModeration: React.FunctionComponent<
                     <SCreatorLink
                       href={`/${winningOptionAc.creator?.username}`}
                     />,
+                    winningOptionAc.creator?.options?.isVerified ? (
+                      <SInlineSvg
+                        svg={VerificationCheckmark}
+                        width='24px'
+                        height='24px'
+                        fill='none'
+                      />
+                    ) : null,
                     { nickname: getDisplayname(winningOptionAc.creator!!) },
                   ]}
                 />
@@ -527,6 +543,14 @@ const PostResponseTabModeration: React.FunctionComponent<
                         <SCreatorLink
                           href={`/${winningOptionMc.creator?.username}`}
                         />,
+                        winningOptionMc.creator?.options?.isVerified ? (
+                          <SInlineSvg
+                            svg={VerificationCheckmark}
+                            width='24px'
+                            height='24px'
+                            fill='none'
+                          />
+                        ) : null,
                         {
                           nickname: getDisplayname(winningOptionMc.creator!!),
                         },
@@ -577,6 +601,10 @@ const SCreatorLink = styled.a`
   &:hover {
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
+`;
+
+const SInlineSvg = styled(InlineSvg)`
+  margin-right: 4px;
 `;
 
 const SContainer = styled.div`
