@@ -34,9 +34,9 @@ import { useGetChats } from '../../../contexts/chatContext';
 import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import NoResults from '../../atoms/chat/NoResults';
 
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
+const NoResults = dynamic(() => import('../../atoms/chat/NoResults'));
 
 interface IFunctionProps {
   openChat: (arg: IChatData) => void;
@@ -431,13 +431,11 @@ const ChatList: React.FC<IFunctionProps> = ({
         throw new Error(res.error?.message ?? 'Request failed');
 
       if (res.data.rooms) {
-        const arr = res.data.rooms;
-
         // reducer filters rooms if user has
         // two rooms with same visavis (as creator and as subscriber)
         // in this case we display only rooms where current user is subscriber
 
-        const filterArray = arr.reduce(
+        const filterArray = res.data.rooms.reduce(
           (accumulator: newnewapi.IChatRoom[], current) => {
             const arrIndex = accumulator.findIndex(
               (element: newnewapi.IChatRoom) =>
@@ -451,7 +449,6 @@ const ChatList: React.FC<IFunctionProps> = ({
             } else {
               accumulator.push(current);
             }
-
             return accumulator;
           },
           []
