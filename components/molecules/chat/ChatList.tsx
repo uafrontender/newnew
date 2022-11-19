@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-expressions */
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
@@ -36,6 +34,7 @@ import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verif
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
+const NoResults = dynamic(() => import('../../atoms/chat/NoResults'));
 
 interface IFunctionProps {
   openChat: (arg: IChatData) => void;
@@ -415,33 +414,65 @@ const ChatList: React.FC<IFunctionProps> = ({
     }
   }, [inView, loadingRooms, chatRoomsNextPageToken, fetchMyRooms]);
 
+  const searchRoom = useCallback(async (text: string) => {
+    try {
+      const payload = new newnewapi.GetMyRoomsRequest({
+        searchQuery: text,
+        roomKind: 1,
+        paging: {
+          limit: 50,
+        },
+      });
+      const res = await getMyRooms(payload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+
+      if (res.data.rooms) {
+        // reducer filters rooms if user has
+        // two rooms with same visavis (as creator and as subscriber)
+        // in this case we display only rooms where current user is subscriber
+
+        const filterArray = res.data.rooms.reduce(
+          (accumulator: newnewapi.IChatRoom[], current) => {
+            const arrIndex = accumulator.findIndex(
+              (element: newnewapi.IChatRoom) =>
+                element.visavis?.user?.uuid === current.visavis?.user?.uuid
+            );
+
+            if (arrIndex > -1) {
+              if (current.myRole === 1) {
+                accumulator.splice(arrIndex, 1);
+              }
+            } else {
+              accumulator.push(current);
+            }
+            return accumulator;
+          },
+          []
+        );
+
+        filterArray.length > 0
+          ? setSearchedRooms(filterArray)
+          : setSearchedRooms([]);
+      }
+      setSearchedRoomsLoading(false);
+    } catch (err) {
+      console.error(err);
+      setSearchedRoomsLoading(false);
+    }
+  }, []);
+
   useUpdateEffect(() => {
-    if (searchText && searchText !== prevSearchText && chatRooms) {
-      if (searchedRooms) setSearchedRooms(null);
+    if (searchText && searchText !== prevSearchText) {
       setPrevSearchText(searchText);
       if (!searchedRoomsLoading) {
         setSearchedRoomsLoading(true);
-        const arr = [] as newnewapi.IChatRoom[];
-        chatRooms.forEach((chat) => {
-          if (
-            chat.visavis?.user?.nickname?.includes(searchText) ||
-            chat.visavis?.user?.username?.includes(searchText)
-          ) {
-            arr.push(chat);
-          }
-        });
-        if (arr.length > 0) setSearchedRooms(arr);
-        setSearchedRoomsLoading(false);
+        searchRoom(searchText);
       }
     }
     if (searchedRooms && !searchText) setSearchedRooms(null);
-  }, [
-    searchText,
-    chatRooms,
-    searchedRooms,
-    prevSearchText,
-    searchedRoomsLoading,
-  ]);
+  }, [searchText, searchedRooms, prevSearchText, searchedRoomsLoading]);
 
   useEffect(() => {
     if (elContainer && activeChatIndex) {
@@ -703,13 +734,21 @@ const ChatList: React.FC<IFunctionProps> = ({
           {chatRooms && chatRooms.length > 0 ? (
             <>
               {!displayAllRooms && !searchedRooms && <Tabs />}
-              {!searchedRooms
-                ? !displayAllRooms
-                  ? activeTab === 'chatRoomsSubs'
-                    ? chatRoomsSubs.map(renderChatItem)
-                    : chatRoomsCreators.map(renderChatItem)
-                  : chatRooms.map(renderChatItem)
-                : searchedRooms.map(renderChatItem)}
+              {!searchedRooms ? (
+                !displayAllRooms ? (
+                  activeTab === 'chatRoomsSubs' ? (
+                    chatRoomsSubs.map(renderChatItem)
+                  ) : (
+                    chatRoomsCreators.map(renderChatItem)
+                  )
+                ) : (
+                  chatRooms.map(renderChatItem)
+                )
+              ) : searchedRooms.length > 0 ? (
+                searchedRooms.map(renderChatItem)
+              ) : (
+                <NoResults text={searchText} />
+              )}
               {chatRoomsNextPageToken && !loadingRooms && !searchedRooms && (
                 <SRef ref={scrollRef}>Loading...</SRef>
               )}
