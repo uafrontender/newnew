@@ -321,7 +321,6 @@ const ChatArea: React.FC<IChatData> = ({
 
   const handleSubmit = useCallback(() => {
     if (!sendingMessage) submitMessage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sendingMessage, submitMessage]);
 
   const handleChange = useCallback(

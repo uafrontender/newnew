@@ -735,7 +735,7 @@ const SAddOptionButtonDesktop = styled.button`
 const STutorialTooltipHolder = styled.div`
   position: absolute;
   left: 25%;
-  bottom: 120%;
+  bottom: 110%;
   text-align: left;
   div {
     width: 190px;

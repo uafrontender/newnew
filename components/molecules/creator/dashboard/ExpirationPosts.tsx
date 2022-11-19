@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable prefer-template */
 import React, { useCallback, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -17,7 +18,10 @@ import { useAppSelector } from '../../../../redux-store/store';
 
 import shareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
 import { formatNumber } from '../../../../utils/format';
-import secondsToDHMS from '../../../../utils/secondsToDHMS';
+
+const ResponseTimer = dynamic(
+  () => import('../../../atoms/dashboard/ResponseTimer')
+);
 
 interface IExpirationPosts {
   expirationPosts: newnewapi.IPost[];
@@ -46,40 +50,6 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
       setPosts(expirationPosts);
     }
   }, [expirationPosts]);
-
-  const getCountdown = (
-    data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice
-  ) => {
-    const end = (data.responseUploadDeadline?.seconds as number) * 1000;
-    const parsed = (end - Date.now()) / 1000;
-    const dhms = secondsToDHMS(parsed);
-
-    let countdownsrt = `${dhms.days}${t(
-      'dashboard.expirationPosts.expiresTime.days'
-    )} ${dhms.hours}${t('dashboard.expirationPosts.expiresTime.hours')}`;
-
-    if (dhms.days === '0') {
-      countdownsrt = `${dhms.hours}${t(
-        'dashboard.expirationPosts.expiresTime.hours'
-      )} ${dhms.minutes}${t('dashboard.expirationPosts.expiresTime.minutes')}`;
-      if (dhms.hours === '0') {
-        countdownsrt = `${dhms.minutes}${t(
-          'dashboard.expirationPosts.expiresTime.minutes'
-        )} ${dhms.seconds}${t(
-          'dashboard.expirationPosts.expiresTime.seconds'
-        )}`;
-        if (dhms.minutes === '0') {
-          countdownsrt = `${dhms.seconds}${t(
-            'dashboard.expirationPosts.expiresTime.seconds'
-          )}`;
-        }
-      }
-    }
-    countdownsrt = `${countdownsrt} ${t(
-      'dashboard.expirationPosts.expiresTime.leftToRespond'
-    )}`;
-    return countdownsrt;
-  };
 
   const getAmountValue = (
     postType: string,
@@ -125,7 +95,6 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
         }
       };
 
-      const countdownsrt = getCountdown(data);
       const money = getAmountValue(postType, data);
 
       return (
@@ -151,7 +120,12 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                       {data.title}
                     </SListItemTitle>
                     <SListItemDate variant={2} weight={600}>
-                      {countdownsrt}
+                      <ResponseTimer
+                        timestampSeconds={new Date(
+                          (data.responseUploadDeadline?.seconds as number) *
+                            1000
+                        ).getTime()}
+                      />
                     </SListItemDate>
                   </SListItemTitleWrapper>
                 </SListBodyItem>
@@ -197,7 +171,11 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                     {data.title}
                   </SListItemTitle>
                   <SListItemDate variant={2} weight={600}>
-                    {countdownsrt}
+                    <ResponseTimer
+                      timestampSeconds={new Date(
+                        (data.responseUploadDeadline?.seconds as number) * 1000
+                      ).getTime()}
+                    />
                   </SListItemDate>
                 </SListItemTitleWrapper>
                 <SListShareButton view='secondary' onClick={handleShareClick}>
