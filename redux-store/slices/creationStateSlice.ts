@@ -205,7 +205,6 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
     clearCreation(state, { payload }: PayloadAction<number | undefined>) {
       state.post = { ...defaultUIState.post };
       state.auction = { ...defaultUIState.auction };
-      console.log(payload)
       if (payload) {
         state.auction.minimalBid = payload;
       }
