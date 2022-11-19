@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import InlineSVG from '../InlineSVG';
 import { useAppSelector } from '../../../redux-store/store';
 import searchIcon from '../../../public/images/svg/icons/outlined/Search.svg';
+import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
 interface ISearchInput {
   placeholderText: string;
@@ -44,6 +45,10 @@ const SearchInput: React.FC<ISearchInput> = ({
     setSearchValue(e.target.value);
   };
 
+  const handleCloseIconClick = () => {
+    setSearchValue('');
+  };
+
   useEffect(() => {
     if (passInputValue) passInputValue(searchValue);
   }, [searchValue, passInputValue]);
@@ -70,6 +75,16 @@ const SearchInput: React.FC<ISearchInput> = ({
           onChange={handleInputChange}
           placeholder={placeholderText}
         />
+        {searchValue.length > 0 && (
+          <SRightInlineSVG
+            clickable
+            svg={closeIcon}
+            fill={theme.colorsThemed.text.primary}
+            width={isMobile ? '20px' : '24px'}
+            height={isMobile ? '20px' : '24px'}
+            onClick={handleCloseIconClick}
+          />
+        )}
       </SInputWrapper>
     </SContainer>
   );
@@ -138,7 +153,7 @@ const SInput = styled.input<ISInput>`
   width: 100%;
   height: 100%;
   border: none;
-  padding: 0 8px;
+  padding: 0 0 0 8px;
   height: 44px;
   outline: none;
   font-size: ${(props) => {
@@ -159,6 +174,17 @@ const SInput = styled.input<ISInput>`
 const SLeftInlineSVG = styled(InlineSVG)`
   min-width: 20px;
   min-height: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    min-width: 24px;
+    min-height: 24px;
+  }
+`;
+
+const SRightInlineSVG = styled(InlineSVG)`
+  min-width: 20px;
+  min-height: 20px;
+  margin-right: 8px;
 
   ${({ theme }) => theme.media.tablet} {
     min-width: 24px;
