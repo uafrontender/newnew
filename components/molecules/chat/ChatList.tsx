@@ -34,6 +34,7 @@ import { useGetChats } from '../../../contexts/chatContext';
 import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import NoResults from '../../atoms/chat/NoResults';
 
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
 
@@ -456,7 +457,9 @@ const ChatList: React.FC<IFunctionProps> = ({
           []
         );
 
-        if (filterArray.length > 0) setSearchedRooms(filterArray);
+        filterArray.length > 0
+          ? setSearchedRooms(filterArray)
+          : setSearchedRooms([]);
       }
       setSearchedRoomsLoading(false);
     } catch (err) {
@@ -736,13 +739,21 @@ const ChatList: React.FC<IFunctionProps> = ({
           {chatRooms && chatRooms.length > 0 ? (
             <>
               {!displayAllRooms && !searchedRooms && <Tabs />}
-              {!searchedRooms
-                ? !displayAllRooms
-                  ? activeTab === 'chatRoomsSubs'
-                    ? chatRoomsSubs.map(renderChatItem)
-                    : chatRoomsCreators.map(renderChatItem)
-                  : chatRooms.map(renderChatItem)
-                : searchedRooms.map(renderChatItem)}
+              {!searchedRooms ? (
+                !displayAllRooms ? (
+                  activeTab === 'chatRoomsSubs' ? (
+                    chatRoomsSubs.map(renderChatItem)
+                  ) : (
+                    chatRoomsCreators.map(renderChatItem)
+                  )
+                ) : (
+                  chatRooms.map(renderChatItem)
+                )
+              ) : searchedRooms.length > 0 ? (
+                searchedRooms.map(renderChatItem)
+              ) : (
+                <NoResults text={searchText} />
+              )}
               {chatRoomsNextPageToken && !loadingRooms && !searchedRooms && (
                 <SRef ref={scrollRef}>Loading...</SRef>
               )}
