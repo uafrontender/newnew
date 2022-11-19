@@ -49,7 +49,6 @@ export const Earnings: React.FC<IFunctionProps> = ({
   useEffect(() => {
     async function fetchMyEarnings() {
       try {
-        setIsLoading(true);
         const payload = new newnewapi.GetMyEarningsRequest({
           beginDate: dateToTimestamp(
             moment()
@@ -59,11 +58,12 @@ export const Earnings: React.FC<IFunctionProps> = ({
               )
               .startOf('day')
           ),
-          endDate: dateToTimestamp(new Date('November 10, 2022 00:0:00')),
+          endDate: dateToTimestamp(new Date()),
         });
         const res = await getMyEarnings(payload);
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
+
         setMyEarnings(res.data);
 
         setIsLoading(false);
@@ -91,6 +91,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
         sum += myEarnings.mcEarnings?.usdCents;
       if (myEarnings.bundleEarnings?.usdCents)
         sum += myEarnings.bundleEarnings?.usdCents;
+
       setTotalEarnings(sum);
     }
   }, [myEarnings]);
@@ -146,14 +147,6 @@ export const Earnings: React.FC<IFunctionProps> = ({
           return myEarnings?.auEarnings?.usdCents
             ? `$${formatNumber(
                 myEarnings.auEarnings.usdCents / 100 ?? 0,
-                false
-              )}`
-            : '$0.00';
-
-        case 'cf':
-          return myEarnings?.cfEarnings?.usdCents
-            ? `$${formatNumber(
-                myEarnings.cfEarnings.usdCents / 100 ?? 0,
                 false
               )}`
             : '$0.00';
