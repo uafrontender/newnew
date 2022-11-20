@@ -42,6 +42,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   const router = useRouter();
 
   const [posts, setPosts] = useState<newnewapi.IPost[]>([]);
+  const [isCopiedUrlIndex, setIsCopiedUrlIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (expirationPosts) {
@@ -71,13 +72,13 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
     return `$${formatNumber(centsQty / 100 ?? 0, false)}`;
   };
 
-  async function copyPostUrlToClipboard(url: string) {
+  const copyPostUrlToClipboard = useCallback(async (url: string) => {
     if ('clipboard' in navigator) {
       await navigator.clipboard.writeText(url);
     } else {
       document.execCommand('copy', true, url);
     }
-  }
+  }, []);
 
   const renderItem = useCallback(
     (item: newnewapi.IPost, index: number) => {
@@ -86,12 +87,19 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
         | newnewapi.Auction
         | newnewapi.Crowdfunding
         | newnewapi.MultipleChoice;
-
       const handleShareClick = () => {
-        let url;
         if (window) {
-          url = `${window.location.origin}/post/${data.postUuid}`;
-          copyPostUrlToClipboard(url);
+          const url = `${window.location.origin}/post/${data.postUuid}`;
+          copyPostUrlToClipboard(url)
+            .then(() => {
+              setIsCopiedUrlIndex(index);
+              setTimeout(() => {
+                setIsCopiedUrlIndex(null);
+              }, 1000);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         }
       };
 
@@ -179,12 +187,16 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                   </SListItemDate>
                 </SListItemTitleWrapper>
                 <SListShareButton view='secondary' onClick={handleShareClick}>
-                  <InlineSVG
-                    svg={shareIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width='20px'
-                    height='20px'
-                  />
+                  {isCopiedUrlIndex === index ? (
+                    t('dashboard.expirationPosts.linkCopied')
+                  ) : (
+                    <InlineSVG
+                      svg={shareIcon}
+                      fill={theme.colorsThemed.text.primary}
+                      width='20px'
+                      height='20px'
+                    />
+                  )}
                 </SListShareButton>
                 <Link href={`/post/${data.postUuid}`}>
                   <a>
@@ -208,6 +220,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
       posts.length,
       theme.colorsThemed.text.primary,
       router,
+      isCopiedUrlIndex,
     ]
   );
 
@@ -416,11 +429,24 @@ const SListItemDate = styled(Caption)`
 
 const SListShareButton = styled(Button)`
   padding: 8px;
-  min-width: 36px;
+  /* min-width: 36px; */
   margin-right: 12px;
   border-radius: 12px;
   overflow: visible;
+  position: relative;
 `;
+
+// const SCopiedTooltip = styled.div`
+//   position: absolute;
+//   left: -25px;
+//   top: -45px;
+//   background: ${(props) =>
+//     props.theme.name === 'light'
+//       ? props.theme.colorsThemed.background.secondary
+//       : props.theme.colorsThemed.background.tertiary};
+//   border-radius: ${({ theme }) => theme.borderRadius.medium};
+//   padding: 8px;
+// `;
 
 const SListDecideButton = styled(Button)`
   min-width: 94px;
