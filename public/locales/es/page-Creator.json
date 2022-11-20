@@ -82,7 +82,8 @@
         "minutes": "m",
         "seconds": "s",
         "leftToRespond": "restantes para responder"
-      }
+      },
+      "linkCopied": "¡Enlace copiado!"
     },
     "toDos": {
       "title": "Completa estos pasos para recibir tu pago",

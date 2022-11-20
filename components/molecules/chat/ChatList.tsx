@@ -142,7 +142,6 @@ const ChatList: React.FC<IFunctionProps> = ({
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        console.log(res.data.rooms);
 
         if (res.data && res.data.rooms.length > 0) {
           setChatRooms((curr) => {

@@ -21,6 +21,7 @@ import {
 } from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import validateInputText from '../../../utils/validateMessageText';
+import isSafari from '../../../utils/isSafari';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -170,6 +171,22 @@ const OnboardingSectionAbout: React.FunctionComponent<
     }
   }, [bioError, bioInEdit]);
 
+  // fix issue with gap while keyboard is active on iOS
+  function preventScroll(e: any) {
+    e.preventDefault();
+  }
+  const handleBlur = useCallback(() => {
+    if (isSafari() && isMobile)
+      document.body.removeEventListener('touchmove', preventScroll);
+  }, [isMobile]);
+
+  const handleFocus = useCallback(() => {
+    if (isSafari() && isMobile)
+      document.body.addEventListener('touchmove', preventScroll, {
+        passive: false,
+      });
+  }, [isMobile]);
+
   return (
     <>
       <SContainer>
@@ -184,6 +201,8 @@ const OnboardingSectionAbout: React.FunctionComponent<
               placeholder={t('aboutSection.bio.placeholder')}
               maxChars={150}
               onChange={(e) => handleUpdateBioInEdit(e.target.value)}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
             />
           </SFormItemContainer>
         </STopContainer>
