@@ -228,7 +228,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
   const handleSubmit = useCallback(() => {
     if (!sendingMessage) submitMessage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageText]);
+  }, [messageText, sendingMessage]);
 
   const handleChange = useCallback(
     (id: string, value: string, isShiftEnter: boolean) => {
@@ -251,23 +251,24 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
   );
 
   const submitMessage = useCallback(async () => {
-    if (messageTextValid) {
+    if (chatRoom && messageTextValid) {
+      const tmpMsgText = messageText.trim();
       try {
         setSendingMessage(true);
-        const trimmedMessageText = messageText.trim();
+        setMessageText('');
         const payload = new newnewapi.SendMessageRequest({
-          roomId: toNumber(roomID),
+          roomId: chatRoom.id,
           content: {
-            text: trimmedMessageText,
+            text: tmpMsgText,
           },
         });
         const res = await sendMessage(payload);
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data.message) setMessages([res.data.message].concat(messages));
 
-        setMessageTextValid(false);
-        setMessageText('');
+        if (res.data.message) {
+          setMessages([res.data.message].concat(messages));
+        }
         setSendingMessage(false);
       } catch (err) {
         console.error(err);
@@ -275,7 +276,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageTextValid, roomID, messageText]);
+  }, [chatRoom?.id, messageTextValid, messageText]);
 
   const handleGoBack = useCallback(() => {
     router.push('/creator/dashboard?tab=chat');
