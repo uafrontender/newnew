@@ -482,6 +482,7 @@ const ChatArea: React.FC<IChatData> = ({
 
   const clickHandler = () => {
     if (showChatList) {
+      setMessageText('');
       showChatList();
     }
   };
