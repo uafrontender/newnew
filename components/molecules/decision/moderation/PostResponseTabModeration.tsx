@@ -301,7 +301,7 @@ const PostResponseTabModeration: React.FunctionComponent<
                             ),
                           }
                         )}
-                  </SSpan>
+                  </SSpan>{' '}
                   {winningOptionMc.creator &&
                   winningOptionMc?.creator?.uuid !== user.userData?.userUuid ? (
                     <>
@@ -526,7 +526,7 @@ const PostResponseTabModeration: React.FunctionComponent<
                         true
                       ),
                     })}
-              </SSpan>
+              </SSpan>{' '}
               {winningOptionMc.creator &&
               winningOptionMc?.creator?.uuid !== user.userData?.userUuid ? (
                 <>

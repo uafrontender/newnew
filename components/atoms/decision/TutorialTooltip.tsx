@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
 // eslint-disable-next-line no-shadow
 export enum DotPositionEnum {
@@ -26,7 +27,8 @@ export const TutorialTooltip: React.FC<ITutorialTooltip> = ({
   dotPosition,
 }) => {
   const { t } = useTranslation('page-Post');
-  return isTooltipVisible ? (
+  const { overlayModeEnabled } = useOverlayMode();
+  return isTooltipVisible && !overlayModeEnabled ? (
     <SContainer>
       <STitle>{title}</STitle>
       {text && <SText>{text}</SText>}
