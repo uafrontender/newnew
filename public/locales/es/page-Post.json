@@ -744,7 +744,7 @@
       "mc": {
         "numBiddersChoseSingular": "{{amount}} votante escogió",
         "numBiddersChose": "{{amount}} votantes escogieron",
-        "optionOwn": "la opción",
+        "optionOwn": " la opción",
         "optionCreator": "la opción de <0>{{nickname}}</0><1/>"
       }
     }

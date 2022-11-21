@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Button from '../Button';
+import InlineSvg from '../InlineSVG';
 import Text from '../Text';
 
 export const SBottomAction = styled.div`
@@ -115,10 +116,18 @@ export const SChatItemContentWrapper = styled.div`
 
 export const SChatItemText = styled(Text)`
   margin-bottom: 4px;
+  margin-right: 14px;
   max-width: 228px;
   overflow: hidden;
-  display: flex;
+  display: inline;
   align-items: center;
+`;
+
+export const SVerificationSVG = styled(InlineSvg)`
+  display: inline-flex;
+  transform: translateY(4px);
+  margin-top: -2px;
+  margin-left: 4px;
 `;
 
 export const SChatItemLastMessage = styled(Text)`

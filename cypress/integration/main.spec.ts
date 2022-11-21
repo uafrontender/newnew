@@ -251,7 +251,7 @@ context('Main flow', () => {
     });
   });
 
-  describe('Guest willing to buy a vote', () => {
+  describe('Guest willing to contribute', () => {
     const USER_EMAIL = `test-user-${testSeed}0@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
@@ -366,36 +366,76 @@ context('Main flow', () => {
       storage.save();
     });
 
-    it('can enter the post page, buy a bundle and contribute to a superpoll without prior authentication', () => {
+    it('can enter the post page, buy a bundle without prior authentication and contribute to a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
       cy.url().should('include', '/post');
 
-      // Buy a bundle
+      cy.get('#buy-bundle-button').click();
+      cy.get('#buy-bundle-1-button').click();
 
-      /* cy.get('#email-input').type(USER_EMAIL);
+      cy.get('#email-input').type(USER_EMAIL);
       enterCardInfo(
         USER_CARD_NUMBER,
         USER_CARD_EXPIRY,
         USER_CARD_CVC,
         USER_CARD_POSTAL_CODE
-      ); */
+      );
 
-      /* cy.get('#paymentSuccess', {
+      cy.get('#pay').click();
+
+      cy.url().should('include', 'verify-email');
+      cy.contains(USER_EMAIL);
+      enterVerificationCode(VERIFICATION_CODE);
+
+      cy.url().should('include', '/bundles');
+
+      // TODO: fix test below
+      // wait and reload the page as WS is broken
+      cy.wait(5000);
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
+      cy.url().should('include', '/post');
+
+      cy.get('#support-button-0').click();
+      cy.get('#vote-option-bundle').click();
+      cy.get('#bundle-votes-number').clear().type('10');
+      cy.get('#use-bundle-votes').click();
+
+      cy.get('#paymentSuccess', {
         timeout: 15000,
-      }).click(); */
+      }).click();
 
-      // cy.get('#support-button-0').click();
-      // Click pay with bundle
-
-      // cy.get('#support-button-supported').click();
+      cy.get('#support-button-supported').click();
     });
 
-    it('can enter another post page and contribute to an event', () => {
-      // Check that card is added just fine
+    it('can add a custom option to the same superpoll', () => {
+      const CUSTOM_OPTION = 'new option';
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
+      cy.url().should('include', '/post');
+
+      cy.get('#add-option-button').click();
+      cy.get('#add-option-input').type(CUSTOM_OPTION);
+      cy.get('#add-option-submit').click();
+
+      cy.contains(CUSTOM_OPTION);
+    });
+
+    it('can contribute to the same superpoll with the card payment', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
+      cy.url().should('include', '/post');
+
+      cy.get('#support-button-supported').click();
+      cy.get('#vote-option-0').click();
+      cy.get('#confirm-vote').click();
+
+      cy.get('#pay').click();
+
+      cy.get('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
     });
   });
 
-  describe('User willing to buy a vote', () => {
+  describe('User willing to contribute', () => {
     const USER_EMAIL = `test-user-${testSeed}2@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
@@ -425,7 +465,7 @@ context('Main flow', () => {
       storage.save();
     });
 
-    it('can enter sign in page', () => {
+    it('can sign in', () => {
       cy.get('#log-in').click();
       cy.url().should('include', '/sign-up');
 
@@ -496,9 +536,107 @@ context('Main flow', () => {
     const USER_CARD_CVC = '123';
     const USER_CARD_POSTAL_CODE = '90210';
 
-    // Can buy and use a bundle
-    // Can access chat
-    // Can add a custom option
+    const defaultStorage = {
+      userTutorialsProgress:
+        '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
+    };
+    const storage = createStorage(defaultStorage);
+
+    before(() => {
+      cy.clearCookies();
+      cy.clearLocalStorage();
+    });
+
+    beforeEach(() => {
+      storage.restore();
+      Cypress.Cookies.preserveOnce('accessToken');
+      Cypress.Cookies.preserveOnce('refreshToken');
+      cy.visit(Cypress.env('NEXT_PUBLIC_APP_URL'));
+    });
+
+    afterEach(() => {
+      storage.save();
+    });
+
+    it('can sign in', () => {
+      cy.get('#log-in').click();
+      cy.url().should('include', '/sign-up');
+
+      cy.get('#authenticate-input').type(USER_EMAIL);
+      cy.get('#authenticate-form').submit();
+      cy.url().should('include', 'verify-email');
+      cy.contains(USER_EMAIL);
+
+      enterVerificationCode(VERIFICATION_CODE);
+      cy.url().should('eq', `${Cypress.env('NEXT_PUBLIC_APP_URL')}/`, {
+        timeout: 15000,
+      });
+    });
+
+    it('can enter the post page, buy a bundle and contribute to a superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
+      cy.url().should('include', '/post');
+
+      cy.get('#buy-bundle-button').click();
+      cy.get('#buy-bundle-1-button').click();
+
+      cy.wait(4000);
+      enterCardInfo(
+        USER_CARD_NUMBER,
+        USER_CARD_EXPIRY,
+        USER_CARD_CVC,
+        USER_CARD_POSTAL_CODE
+      );
+
+      cy.get('#pay').click();
+
+      cy.get('#bundleSuccess', {
+        timeout: 15000,
+      }).click();
+
+      // TODO: remove step below
+      // wait and reload the page as WS is broken
+      cy.wait(5000);
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
+
+      cy.get('#support-button-0').click();
+      cy.get('#vote-option-bundle').click();
+      cy.get('#bundle-votes-number').clear().type('10');
+      cy.get('#use-bundle-votes').click();
+
+      cy.get('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
+
+      cy.get('#support-button-supported').click();
+    });
+
+    it('can add a custom option to the same superpoll', () => {
+      const CUSTOM_OPTION = 'new option';
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
+      cy.url().should('include', '/post');
+
+      cy.get('#add-option-button').click();
+      cy.get('#add-option-input').type(CUSTOM_OPTION);
+      cy.get('#add-option-submit').click();
+
+      cy.contains(CUSTOM_OPTION);
+    });
+
+    it('can contribute to the same superpoll with the card payment', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
+      cy.url().should('include', '/post');
+
+      cy.get('#support-button-supported').click();
+      cy.get('#vote-option-0').click();
+      cy.get('#confirm-vote').click();
+
+      cy.get('#pay').click();
+
+      cy.get('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
+    });
   });
 
   describe('User willing to add card first', () => {
@@ -531,7 +669,7 @@ context('Main flow', () => {
       storage.save();
     });
 
-    it('can enter sign in page', () => {
+    it('can sign in', () => {
       cy.get('#log-in').click();
       cy.url().should('include', '/sign-up');
 
@@ -571,7 +709,7 @@ context('Main flow', () => {
       // cy.get('#add-card-success', { timeout: 60000 }).click();
       // TODO: Re-enable part of the test above when WS updates work in test
       // Avoid WS update (temp)
-      cy.wait(30000);
+      cy.wait(20000);
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/profile/settings`);
       cy.get('#cards').click();
       cy.contains('8210');
@@ -594,7 +732,32 @@ context('Main flow', () => {
       cy.get('#support-button-supported').click();
     });
 
-    // Can buy a bundle with the same card
-    // Can spend votes from bundle
+    it('can enter the post page, buy a bundle and contribute to a superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
+      cy.url().should('include', '/post');
+
+      cy.get('#buy-bundle-button').click();
+      cy.get('#buy-bundle-1-button').click();
+
+      cy.get('#pay').click();
+
+      cy.get('#bundleSuccess', {
+        timeout: 15000,
+      }).click();
+
+      // TODO: remove step below
+      // wait and reload the page as WS is broken
+      cy.wait(5000);
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
+
+      cy.get('#support-button-supported').click();
+      cy.get('#vote-option-bundle').click();
+      cy.get('#bundle-votes-number').clear().type('10');
+      cy.get('#use-bundle-votes').click();
+
+      cy.get('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
+    });
   });
 });

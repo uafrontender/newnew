@@ -446,4 +446,6 @@ const SRef = styled.span`
 const SInlineSvg = styled(InlineSvg)`
   display: inline-flex;
   transform: translateY(4px);
+  margin-left: 2px;
+  margin-top: -2px;
 `;
