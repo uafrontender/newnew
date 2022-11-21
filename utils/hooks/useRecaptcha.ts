@@ -113,6 +113,13 @@ const useRecaptcha = (
 
       setIsSubmitting(true);
 
+      // skip reCaptcha for tests
+      if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'test') {
+        await callback();
+        setIsSubmitting(false);
+        return;
+      }
+
       // call callback if reCaptcha v2 is passed if v3 score was low that minSuccessScore
       if (isRecaptchaV2Required && recaptchaTokenV2) {
         const { isPassed: isReCaptchaV2Passed } = await checkRecaptchaV2(
@@ -132,10 +139,7 @@ const useRecaptcha = (
       // reCaptcha v3
       const { isPassed, score, error, errorCodes } = await executeRecaptchaV3();
 
-      if (
-        process.env.NEXT_PUBLIC_ENVIRONMENT === 'test' ||
-        (isPassed && score && score >= minSuccessScore)
-      ) {
+      if (isPassed && score && score >= minSuccessScore) {
         await callback();
         setIsSubmitting(false);
         return;

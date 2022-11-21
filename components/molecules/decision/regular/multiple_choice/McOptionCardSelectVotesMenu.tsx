@@ -133,6 +133,7 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
             {handleOpenBundleVotesModal && (
               <SUseVotesContainer>
                 <SUseVotesButton
+                  id='vote-option-bundle'
                   onClickCapture={() => {
                     Mixpanel.track('Open Bundle Votes', {
                       _stage: 'Post',

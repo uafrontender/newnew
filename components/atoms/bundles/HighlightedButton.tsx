@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface IHighlightedButton {
+  id?: string;
   className?: string;
   size?: 'small' | 'normal';
   children: string;
@@ -12,12 +13,13 @@ interface IHighlightedButton {
 // And design not following Button specs
 // TODO: Refactor buttons
 const HighlightedButton: React.FC<IHighlightedButton> = ({
+  id,
   className,
   size = 'normal',
   children,
   onClick,
 }) => (
-  <SButton className={className} size={size} onClick={onClick}>
+  <SButton id={id} className={className} size={size} onClick={onClick}>
     {children}
   </SButton>
 );
