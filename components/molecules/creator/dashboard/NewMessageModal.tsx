@@ -14,6 +14,7 @@ import {
   SChatSeparator,
   SUserAlias,
   SUserAvatar,
+  SVerificationSVG,
 } from '../../../atoms/chat/styles';
 import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 import Modal from '../../../organisms/Modal';
@@ -199,14 +200,13 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
                 {chat.visavis?.user?.nickname || chat.visavis?.user?.username}
-                {chat.visavis?.user?.options &&
-                  chat.visavis?.user?.options.isVerified && (
-                    <SInlineSVG
-                      svg={VerificationCheckmark}
-                      width='16px'
-                      height='16px'
-                    />
-                  )}
+                {chat.visavis?.user?.options?.isVerified && (
+                  <SVerificationSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                  />
+                )}
               </SChatItemText>
               <SUserAlias>@{chat.visavis?.user?.username}</SUserAlias>
             </SChatItemCenter>
