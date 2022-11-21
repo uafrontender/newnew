@@ -168,23 +168,14 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
       chatRooms.forEach((chat: newnewapi.IVisavisListItem) => {
         if (
-          (chat.user?.username && chat.user?.username.includes(searchValue)) ||
-          (chat.user?.nickname && chat.user?.nickname.includes(searchValue))
+          (chat.user?.username &&
+            chat.user?.username.toLowerCase().includes(searchValue)) ||
+          (chat.user?.nickname &&
+            chat.user?.nickname.toLowerCase().includes(searchValue))
         )
           arr.push(chat);
       });
 
-      // arr.sort((a, b) => {
-      //   if (a.userNameWithoutEmoji && b.userNameWithoutEmoji) {
-      //     if (a.userNameWithoutEmoji < b.userNameWithoutEmoji) {
-      //       return -1;
-      //     }
-      //     if (a.userNameWithoutEmoji > b.userNameWithoutEmoji) {
-      //       return 1;
-      //     }
-      //   }
-      //   return 0;
-      // });
       setFilteredChatrooms(arr);
     } else {
       setFilteredChatrooms([]);
