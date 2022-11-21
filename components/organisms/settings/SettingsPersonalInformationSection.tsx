@@ -57,6 +57,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<
 
   const handleResetModifications = () => {
     setDateInEdit(currentDate ?? undefined);
+    setDateError('');
   };
 
   const handleSaveModifications = async () => {

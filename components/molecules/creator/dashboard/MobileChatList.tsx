@@ -1,11 +1,13 @@
-/* eslint-disable no-unsafe-optional-chaining */
+/* eslint-disable no-nested-ternary */
 import React, { useCallback, useState, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import moment from 'moment';
+import dynamic from 'next/dynamic';
 import { toNumber } from 'lodash';
+import { useUpdateEffect } from 'react-use';
 
 import { SUserAvatar } from '../../../atoms/chat/styles';
 
@@ -20,6 +22,8 @@ import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
 import { IChatData } from '../../../interfaces/ichat';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+
+const NoResults = dynamic(() => import('../../../atoms/chat/NoResults'));
 
 interface IFunctionProps {
   openChat: (arg: IChatData) => void;
@@ -70,7 +74,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
         if (res.data?.rooms.length > 0) {
           setChatRooms((curr) => {
             const arr =
-              curr && res.data?.rooms ? [...curr, ...res.data?.rooms] : [];
+              curr && res.data?.rooms ? [...curr, ...res.data.rooms] : [];
             return arr;
           });
           setChatRoomsNextPageToken(res.data.paging?.nextPageToken);
@@ -144,33 +148,43 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, loadingRooms, chatRoomsNextPageToken]);
 
-  useEffect(() => {
-    if (searchText && searchText !== prevSearchText && chatRooms) {
-      if (searchedRooms) setSearchedRooms(null);
+  const searchRoom = useCallback(async (text: string) => {
+    try {
+      const payload = new newnewapi.GetMyRoomsRequest({
+        searchQuery: text,
+        roomKind: 1,
+        myRole: 2,
+        paging: {
+          limit: 50,
+        },
+      });
+      const res = await getMyRooms(payload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+
+      if (res.data.rooms && res.data.rooms.length > 0) {
+        setSearchedRooms(res.data.rooms);
+      } else {
+        setSearchedRooms([]);
+      }
+      setSearchedRoomsLoading(false);
+    } catch (err) {
+      console.error(err);
+      setSearchedRoomsLoading(false);
+    }
+  }, []);
+
+  useUpdateEffect(() => {
+    if (searchText && searchText !== prevSearchText) {
       setPrevSearchText(searchText);
       if (!searchedRoomsLoading) {
         setSearchedRoomsLoading(true);
-        const arr = [] as newnewapi.IChatRoom[];
-        chatRooms.forEach((chat) => {
-          if (
-            chat.visavis?.user?.nickname?.startsWith(searchText) ||
-            chat.visavis?.user?.username?.startsWith(searchText)
-          ) {
-            arr.push(chat);
-          }
-        });
-        if (arr.length > 0) setSearchedRooms(arr);
-        setSearchedRoomsLoading(false);
+        searchRoom(searchText);
       }
     }
     if (searchedRooms && !searchText) setSearchedRooms(null);
-  }, [
-    searchText,
-    chatRooms,
-    searchedRooms,
-    prevSearchText,
-    searchedRoomsLoading,
-  ]);
+  }, [searchText, searchedRooms, prevSearchText, searchedRoomsLoading]);
 
   async function markChatAsRead(id: number) {
     try {
@@ -279,16 +293,21 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
 
   return (
     <>
-      {chatRooms && !searchedRooms && (
+      {chatRooms && (
         <>
-          <SSectionContent>{chatRooms.map(renderChatItem)}</SSectionContent>
+          <SSectionContent>
+            {!searchedRooms ? (
+              chatRooms.map(renderChatItem)
+            ) : searchedRooms.length > 0 ? (
+              searchedRooms.map(renderChatItem)
+            ) : (
+              <NoResults text={searchText} />
+            )}
+          </SSectionContent>
           {chatRoomsNextPageToken && !searchedRooms && (
             <SRef ref={scrollRef}>Loading...</SRef>
           )}
         </>
-      )}
-      {searchedRooms && (
-        <SSectionContent>{searchedRooms.map(renderChatItem)}</SSectionContent>
       )}
     </>
   );

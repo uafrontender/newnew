@@ -126,14 +126,14 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const getModal = useCallback(() => {
     if (type === 'select') {
       return (
-        <Modal show={focused} onClose={handleBlur}>
+        <SModal show={focused} onClose={handleBlur}>
           <SMobileListContainer focused={focused}>
             <SMobileList>{options?.map(renderItem)}</SMobileList>
             <SCancelButton view='modalSecondary' onClick={handleBlur}>
               {t('secondStep.button.cancel')}
             </SCancelButton>
           </SMobileListContainer>
-        </Modal>
+        </SModal>
       );
     }
 
@@ -186,7 +186,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       };
 
       return (
-        <Modal show={focused} onClose={handleBlur}>
+        <SModal show={focused} onClose={handleBlur}>
           <SMobileDateContainer focused={focused}>
             <SMobileDateContent onClick={preventCLick}>
               <SModalTopLine>
@@ -254,7 +254,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
               </SScheduleButton>
             </SMobileDateContent>
           </SMobileDateContainer>
-        </Modal>
+        </SModal>
       );
     }
 
@@ -426,6 +426,12 @@ const SInput = styled.input<ISInput>`
   }
 `;
 
+const SModal = styled(Modal)`
+  & > div:first-child {
+    z-index: 2;
+  }
+`;
+
 interface ISMobileListContainer {
   focused: boolean;
 }
@@ -464,6 +470,7 @@ const SMobileDateContent = styled.div`
     props.theme.colorsThemed.background.backgroundDD};
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
+  z-index: 3;
 `;
 
 const SMobileList = styled.div`
@@ -474,6 +481,8 @@ const SMobileList = styled.div`
   flex-direction: column;
   background-color: ${(props) =>
     props.theme.colorsThemed.background.backgroundDD};
+
+  z-index: 3;
 `;
 
 interface ISButton {
@@ -493,6 +502,8 @@ const SButton = styled(Button)<ISButton>`
 const SCancelButton = styled(Button)`
   padding: 16px 32px;
   margin-top: 4px;
+
+  z-index: 3;
 `;
 
 const SScheduleButton = styled(Button)`

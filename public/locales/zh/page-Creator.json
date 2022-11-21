@@ -82,7 +82,8 @@
         "minutes": "分鐘",
         "seconds": "秒",
         "leftToRespond": "內回應"
-      }
+      },
+      "linkCopied": "連結已複製！"
     },
     "toDos": {
       "title": "完成這些步驟以獲得報酬",
