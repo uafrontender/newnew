@@ -268,8 +268,8 @@ const PostResponseTabModeration: React.FunctionComponent<
                         winningOptionAc.creator?.options?.isVerified ? (
                           <SInlineSvg
                             svg={VerificationCheckmark}
-                            width='24px'
-                            height='24px'
+                            width='22px'
+                            height='22px'
                             fill='none'
                           />
                         ) : null,
@@ -322,8 +322,8 @@ const PostResponseTabModeration: React.FunctionComponent<
                             winningOptionMc.creator?.options?.isVerified ? (
                               <SInlineSvg
                                 svg={VerificationCheckmark}
-                                width='24px'
-                                height='24px'
+                                width='22px'
+                                height='22px'
                                 fill='none'
                               />
                             ) : null,
@@ -338,7 +338,6 @@ const PostResponseTabModeration: React.FunctionComponent<
                     </>
                   ) : (
                     <SSpan>
-                      {` `}
                       {t('postResponseTabModeration.winner.mc.optionOwn')}
                     </SSpan>
                   )}
@@ -496,8 +495,8 @@ const PostResponseTabModeration: React.FunctionComponent<
                     winningOptionAc.creator?.options?.isVerified ? (
                       <SInlineSvg
                         svg={VerificationCheckmark}
-                        width='24px'
-                        height='24px'
+                        width='22px'
+                        height='22px'
                         fill='none'
                       />
                     ) : null,
@@ -546,8 +545,8 @@ const PostResponseTabModeration: React.FunctionComponent<
                         winningOptionMc.creator?.options?.isVerified ? (
                           <SInlineSvg
                             svg={VerificationCheckmark}
-                            width='24px'
-                            height='24px'
+                            width='22px'
+                            height='22px'
                             fill='none'
                           />
                         ) : null,
@@ -560,7 +559,6 @@ const PostResponseTabModeration: React.FunctionComponent<
                 </>
               ) : (
                 <SSpan>
-                  {` `}
                   {t('postResponseTabModeration.winner.mc.optionOwn')}
                 </SSpan>
               )}
@@ -771,6 +769,7 @@ const SText = styled(Text)`
 
 const SSpan = styled.span`
   display: inline-flex;
+  white-space: pre;
 `;
 
 const SUserAvatar = styled.img`
