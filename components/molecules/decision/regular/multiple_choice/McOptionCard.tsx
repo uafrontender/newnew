@@ -6,7 +6,6 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { toast } from 'react-toastify';
 
 import {
   useAppDispatch,
@@ -123,7 +122,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('page-Post');
-  const { showErrorToastPredefined } = useErrorToasts();
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -360,20 +359,21 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         setIsSupportMenuOpen(false);
       } catch (err: any) {
         console.error(err);
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
       } finally {
         setLoadingModalOpen(false);
         setupIntent.destroy();
       }
     },
     [
-      handleSetPaymentSuccessValue,
-      handleAddOrUpdateOptionFromResponse,
-      supportVoteOffer?.amountOfVotes,
-      postId,
       setupIntent,
+      postId,
       router,
+      handleAddOrUpdateOptionFromResponse,
+      handleSetPaymentSuccessValue,
+      supportVoteOffer?.amountOfVotes,
       t,
+      showErrorToastCustom,
     ]
   );
 
@@ -410,14 +410,15 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       } catch (err) {
         console.error(err);
         setLoadingModalOpen(false);
-        toast.error('toastErrors.generic');
+        showErrorToastCustom('toastErrors.generic');
       }
     },
     [
-      postId,
       option.id,
+      postId,
       handleAddOrUpdateOptionFromResponse,
       handleSetPaymentSuccessValue,
+      showErrorToastCustom,
     ]
   );
 

@@ -87,6 +87,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   handleCancelVideoUpload,
 }) => {
   const { t } = useTranslation('page-Creation');
+  const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const { post, videoProcessing } = useAppSelector((state) => state.creation);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -209,22 +210,22 @@ const FileUpload: React.FC<IFileUpload> = ({
       });
 
       if (file.size > MAX_VIDEO_SIZE) {
-        toast.error(t('secondStep.video.error.maxSize'));
+        showErrorToastCustom(t('secondStep.video.error.maxSize'));
       } else {
         const media: any = await loadVideo(file);
         Mixpanel.track('Video Loading', { _stage: 'Creation' });
 
         if (media.duration < MIN_VIDEO_DURATION) {
-          toast.error(t('secondStep.video.error.minLength'));
+          showErrorToastCustom(t('secondStep.video.error.minLength'));
         } else if (media.duration > MAX_VIDEO_DURATION) {
-          toast.error(t('secondStep.video.error.maxLength'));
+          showErrorToastCustom(t('secondStep.video.error.maxLength'));
         } else {
           setLocalFile(file);
           onChange(id, file);
         }
       }
     },
-    [id, onChange, t]
+    [id, onChange, showErrorToastCustom, t]
   );
 
   const handleRetryVideoUpload = useCallback(() => {

@@ -29,6 +29,7 @@ import PostVideoResponseUploadedTab from './PostVideoResponseUploadedTab';
 import PostVideoAnnouncementTab from './PostVideoAnnouncementTab';
 import PostVideoResponseUpload from './PostVideoResponseUpload';
 import PostVideoCoverImageEdit from './PostVideoCoverImageEdit';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 const PostBitmovinPlayer = dynamic(
   () => import('../common/PostBitmovinPlayer'),
@@ -60,6 +61,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   handleToggleMuted,
 }) => {
   const { t } = useTranslation('page-Post');
+  const { showErrorToastCustom } = useErrorToasts();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
     'mobile',
@@ -173,7 +175,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       toast.success(t('postVideoThumbnailEdit.toast.success'));
     } catch (err) {
       console.error(err);
-      toast.error(t('postVideoThumbnailEdit.toast.error'));
+      showErrorToastCustom(t('postVideoThumbnailEdit.toast.error'));
     }
   };
 

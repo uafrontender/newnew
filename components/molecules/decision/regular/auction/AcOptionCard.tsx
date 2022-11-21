@@ -8,7 +8,6 @@ import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
-import { toast } from 'react-toastify';
 
 import {
   useAppDispatch,
@@ -116,6 +115,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
+  const { showErrorToastCustom } = useErrorToasts();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -334,20 +334,21 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         setPaymentModalOpen(false);
       } catch (err: any) {
         console.error(err);
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
       } finally {
         setLoadingModalOpen(false);
         setupIntent.destroy();
       }
     },
     [
-      handleSetSupportedBid,
+      setupIntent,
       postId,
       router,
       handleAddOrUpdateOptionFromResponse,
-      t,
-      setupIntent,
       paymentAmountInCents,
+      handleSetSupportedBid,
+      t,
+      showErrorToastCustom,
     ]
   );
 
