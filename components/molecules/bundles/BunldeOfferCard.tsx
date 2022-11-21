@@ -50,7 +50,7 @@ const BundleOfferCard: React.FC<IBundleOfferCard> = ({
         <BulletLine>{t('modal.buyBundle.customOptions')}</BulletLine>
         <BulletLine>{t('modal.buyBundle.chat')}</BulletLine>
       </BundleFeatures>
-      <BuyButton onClick={onClick}>
+      <BuyButton id={`buy-bundle-${bundleLevel}-button`} onClick={onClick}>
         {t('modal.buyBundle.buy', {
           amount: bundleOffer.price!.usdCents! / 100,
         })}
