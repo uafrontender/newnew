@@ -8,6 +8,6 @@ const getDisplayname = (user: newnewapi.IUser) => {
   }
 
   return 'Private user';
-}
+};
 
 export default getDisplayname;

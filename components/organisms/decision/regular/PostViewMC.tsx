@@ -807,6 +807,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                 })}
           </SBundlesText>
           <SHighlightedButton
+            id='buy-bundle-button'
             size='small'
             onClick={() => {
               setBuyBundleModalOpen(true);
