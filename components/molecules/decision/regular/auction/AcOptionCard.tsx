@@ -57,6 +57,7 @@ import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.sv
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
 import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -122,6 +123,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     resizeMode
   );
   const { appConstants } = useGetAppConstants();
+  const { showErrorToastPredefined } = useErrorToasts();
 
   // const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const isSupportedByMe = useMemo(
@@ -192,9 +194,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       }
     } catch (err) {
       console.error(err);
-      toast.error(t('toastErrors.generic'));
+      showErrorToastPredefined(undefined);
     }
-  }, [handleRemoveOption, option.id, t]);
+  }, [handleRemoveOption, option.id, showErrorToastPredefined]);
 
   const handleOpenRemoveForm = useCallback(() => {
     setIsRemoveModalOpen(true);

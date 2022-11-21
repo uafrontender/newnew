@@ -16,6 +16,7 @@ import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
 
 import { loadVideo } from '../../../utils/loadVideo';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import {
@@ -94,6 +95,8 @@ const FileUpload: React.FC<IFileUpload> = ({
   );
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
+
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const inputRef = useRef<HTMLInputElement>(null);
   const playerRef: any = useRef();
@@ -270,13 +273,14 @@ const FileUpload: React.FC<IFileUpload> = ({
       dispatch(setCreationFileProcessingProgress(0));
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   }, [
     dispatch,
     id,
     onChange,
     post?.announcementVideoUrl,
+    showErrorToastPredefined,
     videoProcessing?.taskUuid,
   ]);
 

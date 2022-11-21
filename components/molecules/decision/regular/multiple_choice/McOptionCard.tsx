@@ -56,6 +56,7 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -122,6 +123,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('page-Post');
+  const { showErrorToastPredefined } = useErrorToasts();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -204,9 +206,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
-  }, [handleRemoveOption, option.id]);
+  }, [handleRemoveOption, option.id, showErrorToastPredefined]);
 
   const handleOpenRemoveForm = useCallback(() => {
     setIsRemoveModalOpen(true);
