@@ -57,6 +57,7 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
           <OptionText>{optionText}</OptionText>
           <SInputWrapper>
             <SInput
+              id='bundle-votes-number'
               value={votesToUse}
               onChange={(e: any) => {
                 if (e.target.value === '') {
@@ -78,6 +79,7 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
             />
           </SInputWrapper>
           <SDoneButton
+            id='use-bundle-votes'
             view='primaryGrad'
             disabled={
               !(votesToUse && votesToUse > 0 && votesToUse <= bundleVotesLeft)

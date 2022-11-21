@@ -353,6 +353,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         (post.creator?.options?.isOfferingBundles || bundle) && (
           <SActionSection>
             <SAddOptionButtonDesktop
+              id='add-option-button'
               onClick={() => setSuggestNewMobileOpen(true)}
             >
               <InlineSvg
@@ -441,6 +442,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 {t('mcPost.optionsTab.actionSection.suggestionPlaceholder')}
               </SHeadlineSuggestNew>
               <SuggestionTextArea
+                id='add-option-input'
                 value={newOptionText}
                 autofocus={suggestNewMobileOpen}
                 placeholder={t(
@@ -449,6 +451,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 onChange={handleUpdateNewOptionText}
               />
               <SAddOptionButton
+                id='add-option-submit'
                 size='sm'
                 disabled={!newOptionText || !newOptionTextValid}
                 style={{
