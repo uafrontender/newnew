@@ -51,7 +51,7 @@ export const PushNotificationsContext = createContext<{
   resumePushNotification: () => {},
 });
 
-// type PermissionType = 'default' | 'denied' | 'granted';
+type PermissionType = 'default' | 'denied' | 'granted';
 
 interface IPushNotificationsContextProvider {
   children: React.ReactNode;
@@ -95,7 +95,10 @@ const PushNotificationsContextProvider: React.FC<
   }, []);
 
   // Get browser permission
-  const getPermissionData = useCallback(() => {
+  const getPermissionData: () => {
+    permission: PermissionType;
+    deviceToken?: string;
+  } = useCallback(() => {
     if (
       isSafari() &&
       (window as any).safari &&
@@ -108,7 +111,7 @@ const PushNotificationsContextProvider: React.FC<
       return permissionData;
     }
 
-    return Notification;
+    return { permission: Notification.permission };
   }, []);
 
   // Check push notification subscription
@@ -138,7 +141,7 @@ const PushNotificationsContextProvider: React.FC<
 
   const checkSubscriptionNonSafari = useCallback(async () => {
     try {
-      const swReg = await navigator.serviceWorker.getRegistration('/sw.js');
+      const swReg = await navigator.serviceWorker.register('/sw.js');
 
       if (!swReg) {
         setIsSubscribed(false);
@@ -388,6 +391,10 @@ const PushNotificationsContextProvider: React.FC<
     try {
       const permissionData = getPermissionData();
 
+      if (!permissionData.deviceToken) {
+        throw new Error('No active subscription');
+      }
+
       await unregister(permissionData.deviceToken);
 
       setIsSubscribed(false);
@@ -398,7 +405,7 @@ const PushNotificationsContextProvider: React.FC<
 
   const unsubscribeNonSafari = useCallback(async () => {
     try {
-      const swReg = await navigator.serviceWorker.getRegistration('/sw.js');
+      const swReg = await navigator.serviceWorker.register('/sw.js');
 
       if (!swReg) {
         throw new Error('No active service worker');
@@ -436,7 +443,7 @@ const PushNotificationsContextProvider: React.FC<
   // Pause and resume notifications
   const pauseNotificationNonSafari = useCallback(async () => {
     try {
-      const swReg = await navigator.serviceWorker.getRegistration('/sw.js');
+      const swReg = await navigator.serviceWorker.register('/sw.js');
 
       if (!swReg) {
         throw new Error('No active service worker');
@@ -496,7 +503,7 @@ const PushNotificationsContextProvider: React.FC<
   const resumePushNotificationNonSafari = useCallback(
     async (onSuccess?: () => void) => {
       try {
-        const swReg = await navigator.serviceWorker.getRegistration('/sw.js');
+        const swReg = await navigator.serviceWorker.register('/sw.js');
 
         if (!swReg) {
           throw new Error('No active service worker');
@@ -549,7 +556,7 @@ const PushNotificationsContextProvider: React.FC<
   }, [resumePushNotificationSafari, resumePushNotificationNonSafari]);
 
   // Request permission
-  const requestPermission = useCallback(() => {
+  const requestPermission = useCallback(async () => {
     const permissionData = getPermissionData();
 
     if (permissionData.permission === 'granted') {
