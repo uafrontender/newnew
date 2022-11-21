@@ -9,7 +9,7 @@ import dynamic from 'next/dynamic';
 import { toNumber } from 'lodash';
 import { useUpdateEffect } from 'react-use';
 
-import { SUserAvatar } from '../../../atoms/chat/styles';
+import { SUserAvatar, SVerificationSVG } from '../../../atoms/chat/styles';
 
 import Text from '../../../atoms/Text';
 import UserAvatar from '../../UserAvatar';
@@ -261,8 +261,8 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
                 {chatName}
-                {chat.visavis?.user?.options?.isVerified && chat.kind !== 4 && (
-                  <SInlineSVG
+                {chat.visavis?.user?.options?.isVerified && (
+                  <SVerificationSVG
                     svg={VerificationCheckmark}
                     width='16px'
                     height='16px'
