@@ -90,7 +90,7 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
                 </BulletLine>
                 <BulletLine>{t('modal.buyBundleSuccess.chat')}</BulletLine>
               </SBundleInfo>
-              <SDoneButton onClick={onClose}>
+              <SDoneButton id='bundleSuccess' onClick={onClose}>
                 {t('modal.buyBundleSuccess.button')}
               </SDoneButton>
             </Content>
