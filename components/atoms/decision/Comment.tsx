@@ -127,25 +127,27 @@ const Comment: React.FC<IComment> = ({
         <SCommentContent>
           <SCommentHeader>
             {!comment.isDeleted ? (
-              <Link href={`/${comment.sender?.username}`}>
-                <SNickname>
-                  {comment.sender?.uuid === user.userData?.userUuid
-                    ? t('comments.me')
-                    : comment.sender?.nickname ?? comment.sender?.username}
-                </SNickname>
-              </Link>
+              <>
+                <Link href={`/${comment.sender?.username}`}>
+                  <SNickname>
+                    {comment.sender?.uuid === user.userData?.userUuid
+                      ? t('comments.me')
+                      : comment.sender?.nickname ?? comment.sender?.username}
+                  </SNickname>
+                </Link>
+                {comment.sender?.options?.isCreator &&
+                  comment.sender.options.isVerified && (
+                    <SInlineSvg
+                      svg={VerificationCheckmark}
+                      width='20px'
+                      height='20px'
+                      fill='none'
+                    />
+                  )}
+              </>
             ) : (
               <SNickname noHover>{t('comments.commentDeleted')}</SNickname>
             )}
-            {comment.sender?.options?.isCreator &&
-              comment.sender.options.isVerified && (
-                <SInlineSvg
-                  svg={VerificationCheckmark}
-                  width='20px'
-                  height='20px'
-                  fill='none'
-                />
-              )}
             <SBid> </SBid>
             {!comment.isDeleted && (
               <SDate>
