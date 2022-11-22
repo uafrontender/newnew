@@ -8,7 +8,6 @@ import React, {
 } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 import { useTranslation } from 'next-i18next';
 
 import loadVideo from '../../../../utils/loadVideo';
@@ -32,6 +31,7 @@ import PostVideoResponseUploaded from './PostVideoResponseUploaded';
 import PostVideoEditStoryButton from '../../../atoms/decision/PostVideoEditStoryButton';
 
 import errorIcon from '../../../../public/images/svg/icons/filled/Alert.svg';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 interface IPostVideoResponseUploadedTab {
   id: string;
@@ -53,6 +53,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   handleToggleEditingStories,
 }) => {
   const { t } = useTranslation('page-Post');
+  const { showErrorToastCustom } = useErrorToasts();
   const {
     coreResponse,
     additionalResponses,
@@ -152,14 +153,20 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       const file = files[0];
 
       if (file.size > MAX_VIDEO_SIZE) {
-        toast.error(t('postVideo.uploadResponseForm.video.error.maxSize'));
+        showErrorToastCustom(
+          t('postVideo.uploadResponseForm.video.error.maxSize')
+        );
       } else {
         const media: any = await loadVideo(file);
 
         if (media.duration < MIN_VIDEO_DURATION) {
-          toast.error(t('postVideo.uploadResponseForm.video.error.minLength'));
+          showErrorToastCustom(
+            t('postVideo.uploadResponseForm.video.error.minLength')
+          );
         } else if (media.duration > MAX_VIDEO_DURATION) {
-          toast.error(t('postVideo.uploadResponseForm.video.error.maxLength'));
+          showErrorToastCustom(
+            t('postVideo.uploadResponseForm.video.error.maxLength')
+          );
         } else {
           setLocalFile(file);
           handleItemChange(id, file);
@@ -170,6 +177,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     [
       localFile,
       handleDeleteLocalFile,
+      showErrorToastCustom,
       t,
       handleItemChange,
       id,

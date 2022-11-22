@@ -2,9 +2,9 @@ import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../redux-store/store';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { setPrimaryCard, deleteCard } from '../../../api/endpoints/card';
 
 import Button from '../../atoms/Button';
@@ -77,6 +77,7 @@ const Card: React.FunctionComponent<ICard> = ({
   onCardDelete,
 }) => {
   const { t } = useTranslation('page-Profile');
+  const { showErrorToastCustom } = useErrorToasts();
 
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -102,7 +103,7 @@ const Card: React.FunctionComponent<ICard> = ({
       onChangePrimaryCard(cardId);
     } catch (err: any) {
       console.error(err);
-      toast.error(err.message);
+      showErrorToastCustom(err.message);
     }
   };
 
@@ -119,7 +120,7 @@ const Card: React.FunctionComponent<ICard> = ({
       onCardDelete();
     } catch (err: any) {
       console.error(err);
-      toast.error(err.message);
+      showErrorToastCustom(err.message);
     }
   };
 

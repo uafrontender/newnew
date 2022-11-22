@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable no-nested-ternary */
+import React, { useEffect, useRef, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
-import { useCookies } from 'react-cookie';
+import { useRouter } from 'next/router';
 
 import GlobalStyle from './globalStyles';
 
@@ -18,27 +19,55 @@ const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
   initialTheme,
   children,
 }) => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { colorMode } = useAppSelector((state) => state.ui);
-  const [cookies] = useCookies();
+  const colorModeMemo = useRef('');
 
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    if (!cookies?.colorMode) {
-      dispatch(setColorMode('auto'));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cookies.colorMode]);
+  const [autoThemeMatched, setAutoThemeMatched] = useState(
+    initialTheme !== 'auto'
+  );
 
   useEffect(() => {
+    colorModeMemo.current = colorMode;
     setMounted(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    // Change theme when routing to a new page
+    const handleRouteChange = (url: string) => {
+      dispatch(setColorMode('auto'));
+      setAutoThemeMatched(true);
+    };
+
+    if (!autoThemeMatched) {
+      router.events.on('routeChangeComplete', handleRouteChange);
+    } else {
+      router.events.off('routeChangeComplete', handleRouteChange);
+    }
+
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange);
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoThemeMatched]);
+
+  useEffect(() => {
+    if (colorModeMemo.current !== colorMode) {
+      setAutoThemeMatched(true);
+    }
+  }, [colorMode]);
 
   return (
     <ThemeProvider
       theme={
-        getColorMode(!mounted ? initialTheme : colorMode) === 'light'
+        !autoThemeMatched && (initialTheme === 'auto' || colorMode === 'auto')
+          ? darkTheme
+          : getColorMode(!mounted ? initialTheme : colorMode) === 'light'
           ? lightTheme
           : darkTheme
       }
