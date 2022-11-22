@@ -71,6 +71,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
   const [bioInEdit, setBioInEdit] = useState(user.userData?.bio ?? '');
   const [bioError, setBioError] = useState('');
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+
   const validateBioViaApi = useCallback(
     async (text: string) => {
       setIsAPIValidateLoading(true);
@@ -144,7 +145,12 @@ const OnboardingSectionAbout: React.FunctionComponent<
         })
       );
 
-      router.push('/creator-onboarding-stripe');
+      // redirect user to dashboard if Stripe is already connected
+      if (user.creatorData?.options?.stripeConnectStatus === 2) {
+        router.push('/creator/dashboard');
+      } else {
+        router.push('/creator-onboarding-stripe');
+      }
 
       setLoadingModalOpen(false);
     } catch (err) {
@@ -161,7 +167,12 @@ const OnboardingSectionAbout: React.FunctionComponent<
         );
       }
     }
-  }, [bioInEdit, dispatch, router]);
+  }, [
+    bioInEdit,
+    dispatch,
+    router,
+    user.creatorData?.options?.stripeConnectStatus,
+  ]);
 
   useEffect(() => {
     if (validateInputText(bioInEdit) && bioError === '') {
