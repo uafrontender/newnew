@@ -18,6 +18,7 @@ import TitleBlock from '../components/organisms/see-more/TitleBlock';
 import HomeLayout from '../components/templates/HomeLayout';
 
 import { useAppSelector } from '../redux-store/store';
+import useErrorToasts from '../utils/hooks/useErrorToasts';
 import {
   fetchBiggestPosts,
   fetchCuratedPosts,
@@ -49,6 +50,8 @@ interface ISearch {
 const Search: NextPage<ISearch> = ({ top10posts }) => {
   const { t } = useTranslation('page-SeeMore');
   const { loggedIn, _persist } = useAppSelector((state) => state.user);
+
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const router = useRouter();
   const categoryRef = useRef(router.query.category?.toString() ?? 'ac');
@@ -291,9 +294,10 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
       } catch (err) {
         console.error(err);
         setIsCollectionLoading(false);
-        toast.error('toastErrors.generic');
+        showErrorToastPredefined(undefined);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [setCollectionLoaded, loggedIn, isCollectionLoading]
   );
 

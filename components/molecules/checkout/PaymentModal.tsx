@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../redux-store/store';
 import { useCards } from '../../../contexts/cardsContext';
@@ -16,6 +15,7 @@ import Lottie from '../../atoms/Lottie';
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import logoAnimation from '../../../public/animations/mobile_logo.json';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 interface IPaymentModal {
   isOpen: boolean;
@@ -47,6 +47,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
+  const { showErrorToastCustom } = useErrorToasts();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -62,7 +63,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
       const { errorKey } = await setupIntent.init();
 
       if (errorKey) {
-        toast.error(t(errorKey));
+        showErrorToastCustom(t(errorKey));
       }
 
       setIsLoadingSetupIntent(false);
@@ -71,6 +72,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
     if (!setupIntent.setupIntentClientSecret && setupIntent) {
       getSetupIntent();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setupIntent, setupIntent.setupIntentClientSecret, t]);
 
   return (

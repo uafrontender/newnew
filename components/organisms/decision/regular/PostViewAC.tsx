@@ -11,7 +11,6 @@ import React, {
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -40,6 +39,7 @@ import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import AcAddNewOption from '../../../molecules/decision/regular/auction/AcAddNewOption';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -80,6 +80,7 @@ interface IPostViewAC {}
 
 const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const { t } = useTranslation('page-Post');
+  const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -533,7 +534,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         setPaymentSuccessModalOpen(true);
       } catch (err: any) {
         console.error(err);
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
 
         setLoadingModalOpen(false);
       }
@@ -568,8 +569,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
 
   useEffect(() => {
     if (loadingOptionsError) {
-      toast.error(loadingOptionsError);
+      showErrorToastCustom(loadingOptionsError);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadingOptionsError]);
 
   const [isPopupVisible, setIsPopupVisible] = useState(false);

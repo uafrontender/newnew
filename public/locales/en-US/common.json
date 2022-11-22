@@ -224,7 +224,8 @@
     "numbers-of-bids-most-first": "Most first"
   },
   "toastErrors": {
-    "generic": "An error occurred, please try again later"
+    "generic": "An error occurred, please try again later",
+    "server-error": "A server-side error occurred, please try again later"
   },
   "smsNotifications": {
     "title": "What's your number?",
