@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { toast } from 'react-toastify';
 
 import Button from '../../atoms/Button';
 import Sorting from '../Sorting';
@@ -14,6 +13,7 @@ import Sorting from '../Sorting';
 import { searchPosts } from '../../../api/endpoints/search';
 import { useAppSelector } from '../../../redux-store/store';
 import SortOption from '../../atoms/SortOption';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const PostList = dynamic(() => import('./PostList'));
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
@@ -85,6 +85,7 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
   type,
 }) => {
   const { t: tCommon } = useTranslation('common');
+  const { showErrorToastPredefined } = useErrorToasts();
   const router = useRouter();
 
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -171,11 +172,12 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
         setLoadingPosts(false);
       } catch (err) {
         setLoadingPosts(false);
-        toast.error('toastErrors.generic');
+        showErrorToastPredefined(undefined);
         console.error(err);
       }
     },
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [postSorting, query, type, initialLoad, activeTabs, hasNoResults]
   );
 

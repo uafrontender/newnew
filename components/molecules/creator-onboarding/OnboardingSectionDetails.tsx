@@ -43,6 +43,7 @@ import OnboardingSectionNicknameInput from './OnboardingNicknameInput';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import resizeImage from '../../../utils/resizeImage';
 import isSafari from '../../../utils/isSafari';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const OnboardingEditProfileImageModal = dynamic(
   () => import('./OnboardingEditProfileImageModal')
@@ -144,6 +145,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
+
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const onlySpacesRegex = /^\s+$/;
 
@@ -569,7 +572,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
         // } else if ((err as Error).message === 'Too young') {
         // TODO: fix error handling, not all other errors are DoB related
       } else if ((err as Error).message === 'Request failed') {
-        toast.error('toastErrors.generic');
+        showErrorToastPredefined(undefined);
       } else if ((err as Error).message) {
         setDateError('tooYoung');
       }

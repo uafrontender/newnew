@@ -15,7 +15,6 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
-import { toast } from 'react-toastify';
 
 import GradientMask from '../../../atoms/GradientMask';
 import Comment from '../../../atoms/decision/Comment';
@@ -39,6 +38,7 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 interface ICommentsBottomSection {
   postUuid: string;
@@ -64,6 +64,7 @@ const CommentsBottomSection: React.FunctionComponent<
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { showErrorToastPredefined } = useErrorToasts();
 
   // Comment from URL
   const { commentIdFromUrl, handleResetCommentIdFromUrl } = useContext(
@@ -234,9 +235,10 @@ const CommentsBottomSection: React.FunctionComponent<
         }
       } catch (err) {
         console.error(err);
-        toast.error('toastErrors.generic');
+        showErrorToastPredefined(undefined);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [commentsRoomId, postUuid]
   );
 
@@ -304,12 +306,12 @@ const CommentsBottomSection: React.FunctionComponent<
         }
       } catch (err) {
         console.error(err);
-        toast.error('toastErrors.generic');
+        showErrorToastPredefined(undefined);
       } finally {
         setIsDeletingComment(false);
       }
     },
-    [markCommentAsDeleted, postUuid]
+    [markCommentAsDeleted, postUuid, showErrorToastPredefined]
   );
 
   useEffect(() => {

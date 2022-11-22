@@ -16,6 +16,7 @@ import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
 
 import { loadVideo } from '../../../utils/loadVideo';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import {
@@ -86,6 +87,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   handleCancelVideoUpload,
 }) => {
   const { t } = useTranslation('page-Creation');
+  const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const { post, videoProcessing } = useAppSelector((state) => state.creation);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -94,6 +96,8 @@ const FileUpload: React.FC<IFileUpload> = ({
   );
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
+
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const inputRef = useRef<HTMLInputElement>(null);
   const playerRef: any = useRef();
@@ -206,22 +210,22 @@ const FileUpload: React.FC<IFileUpload> = ({
       });
 
       if (file.size > MAX_VIDEO_SIZE) {
-        toast.error(t('secondStep.video.error.maxSize'));
+        showErrorToastCustom(t('secondStep.video.error.maxSize'));
       } else {
         const media: any = await loadVideo(file);
         Mixpanel.track('Video Loading', { _stage: 'Creation' });
 
         if (media.duration < MIN_VIDEO_DURATION) {
-          toast.error(t('secondStep.video.error.minLength'));
+          showErrorToastCustom(t('secondStep.video.error.minLength'));
         } else if (media.duration > MAX_VIDEO_DURATION) {
-          toast.error(t('secondStep.video.error.maxLength'));
+          showErrorToastCustom(t('secondStep.video.error.maxLength'));
         } else {
           setLocalFile(file);
           onChange(id, file);
         }
       }
     },
-    [id, onChange, t]
+    [id, onChange, showErrorToastCustom, t]
   );
 
   const handleRetryVideoUpload = useCallback(() => {
@@ -270,13 +274,14 @@ const FileUpload: React.FC<IFileUpload> = ({
       dispatch(setCreationFileProcessingProgress(0));
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   }, [
     dispatch,
     id,
     onChange,
     post?.announcementVideoUrl,
+    showErrorToastPredefined,
     videoProcessing?.taskUuid,
   ]);
 

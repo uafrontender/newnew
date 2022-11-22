@@ -5,7 +5,6 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { debounce } from 'lodash';
 import Link from 'next/link';
-import { toast } from 'react-toastify';
 
 import {
   useAppDispatch,
@@ -36,6 +35,7 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -83,6 +83,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter();
   const { t } = useTranslation('page-Post');
+  const { showErrorToastCustom } = useErrorToasts();
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -275,19 +276,20 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         setPaymentModalOpen(false);
       } catch (err: any) {
         console.error(err);
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
       } finally {
         setLoadingModalOpen(false);
         setupIntent.destroy();
       }
     },
     [
+      setupIntent,
       postId,
+      router,
       handleAddOrUpdateOptionFromResponse,
       paymentAmountInCents,
-      setupIntent,
-      router,
       t,
+      showErrorToastCustom,
     ]
   );
 
