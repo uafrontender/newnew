@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import { useCookies } from 'react-cookie';
 
 import Text from './Text';
 import Modal from '../organisms/Modal';
@@ -18,9 +19,11 @@ interface IChangeLanguage {}
 export const ChangeLanguage: React.FC<IChangeLanguage> = (props) => {
   const { t } = useTranslation('common');
   const ref: any = useRef();
-  const { push, locale, asPath, pathname } = useRouter();
+  const { locale } = useRouter();
   const [focused, setFocused] = useState(false);
   const { resizeMode } = useAppSelector((state) => state.ui);
+
+  const [, setCookie] = useCookies();
 
   const options = SUPPORTED_LANGUAGES;
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -41,7 +44,11 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = (props) => {
 
   const renderItem = (item: string) => {
     const handleItemClick = () => {
-      push(pathname, asPath, { locale: item });
+      setCookie('preferredLocale', item, {
+        // Expire in 10 years
+        maxAge: 10 * 365 * 24 * 60 * 60,
+        path: '/',
+      });
     };
 
     return (
