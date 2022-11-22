@@ -132,10 +132,10 @@
       "subtitle": "感謝告知,我們會儘快調查此事，並採取適當的措施，確保每個人的安全。",
       "button": "知道了"
     },
-    "buyBundle_NEED_TRANSLATION": {
+    "buyBundle": {
       "title": "購買一個Superpoll bundle 的價格:",
-      "votes": "<0>{{amount}}</0> votes",
-      "access": "plus get {{amount}} {{unit}} of:",
+      "votes_NEED_TRANSLATION": "<0>{{amount}}</0> votes",
+      "access_NEED_TRANSLATION": "plus get {{amount}} {{unit}} of:",
       "customOptions": "在任何Superpoll中添加定制選項",
       "chat": "一對一私聊",
       "buy": "購買金額${{amount}}",
@@ -151,11 +151,11 @@
         "requestFailed": "請求失敗"
       }
     },
-    "buyBundleSuccess_NEED_TRANSLATION": {
-      "votes": "<0>{{amount}}</0> votes unlocked",
+    "buyBundleSuccess": {
+      "votes_NEED_TRANSLATION": "<0>{{amount}}</0> votes unlocked",
       "for": "為",
       "access": "剩餘{{amount}} {{unit}}:",
-      "customOptions": "adding custom superpoll options",
+      "customOptions_NEED_TRANSLATION": "adding custom superpoll options",
       "chat": "一對一私聊",
       "button": "Sounds good!",
       "unit": {
