@@ -14,7 +14,6 @@ import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
-import { toast } from 'react-toastify';
 import { useEffectOnce } from 'react-use';
 
 import { NextPageWithLayout } from './_app';
@@ -40,6 +39,7 @@ import CreatorsBundleModal from '../components/molecules/bundles/CreatorsBundleM
 import AnimatedBackground from '../components/atoms/AnimationBackground';
 import { Mixpanel } from '../utils/mixpanel';
 import { buyCreatorsBundle } from '../api/endpoints/bundles';
+import useErrorToasts from '../utils/hooks/useErrorToasts';
 
 interface IBundlesPage {
   stripeSetupIntentClientSecretFromRedirect?: string;
@@ -60,6 +60,8 @@ export const Bundles: NextPage<IBundlesPage> = ({
     ui.resizeMode
   );
   const isTablet = ['tablet'].includes(ui.resizeMode);
+
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
 
   const [stripeSetupIntentClientSecret, setStripeSetupIntentClientSecret] =
     useState(() => stripeSetupIntentClientSecretFromRedirect ?? undefined);
@@ -100,7 +102,7 @@ export const Bundles: NextPage<IBundlesPage> = ({
       const res = await searchCreators(payload);
 
       if (!res.data || res.error) {
-        toast.error('toastErrors.generic');
+        showErrorToastPredefined(undefined);
         throw new Error(res.error?.message ?? 'Request failed');
       }
 
@@ -114,6 +116,7 @@ export const Bundles: NextPage<IBundlesPage> = ({
         nextPageToken: res.data.paging?.nextPageToken,
       };
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchValue, user.userData?.userUuid]
   );
 
@@ -181,17 +184,18 @@ export const Bundles: NextPage<IBundlesPage> = ({
       }
     } catch (err: any) {
       console.error(err);
-      toast.error(err.message);
+      showErrorToastCustom(err.message);
     } finally {
       router.replace('/bundles');
     }
   }, [
     stripeSetupIntentClientSecret,
-    saveCard,
     user._persist?.rehydrated,
     user.loggedIn,
     router,
+    saveCard,
     t,
+    showErrorToastCustom,
   ]);
 
   useEffectOnce(() => {

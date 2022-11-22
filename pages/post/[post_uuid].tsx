@@ -271,9 +271,11 @@ const PostPage: NextPage<IPostPage> = ({
         handleUpdatePostStatus('DELETED_BY_CREATOR');
         handleCloseDeletePostModal();
         if (document?.documentElement) {
-          document?.documentElement?.scrollTo({
-            top: 0,
-          });
+          setTimeout(() => {
+            document?.documentElement?.scrollTo({
+              top: 0,
+            });
+          }, 100);
         }
       }
     } catch (err) {
