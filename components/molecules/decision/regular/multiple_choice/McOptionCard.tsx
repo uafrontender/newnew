@@ -46,7 +46,7 @@ import Headline from '../../../../atoms/Headline';
 import assets from '../../../../../constants/assets';
 import OptionEllipseMenu from '../../common/OptionEllipseMenu';
 import ReportModal, { ReportData } from '../../../chat/ReportModal';
-import { reportEventOption } from '../../../../../api/endpoints/report';
+import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 import InlineSvg from '../../../../atoms/InlineSVG';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import OptionEllipseModal from '../../common/OptionEllipseModal';
@@ -165,7 +165,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
-      await reportEventOption(option.id, reasons, message);
+      await reportSuperpollOption(option.id, reasons, message);
       setIsReportModalOpen(false);
     },
     [option.id]
