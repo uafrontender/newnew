@@ -10,7 +10,6 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import moment from 'moment';
@@ -38,6 +37,7 @@ import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import PostModerationResponsesContextProvider from '../../../../contexts/postModerationResponsesContext';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
@@ -66,6 +66,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
   () => {
     const dispatch = useAppDispatch();
     const { t } = useTranslation('page-Post');
+    const { showErrorToastCustom } = useErrorToasts();
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -465,8 +466,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
 
     useEffect(() => {
       if (loadingOptionsError) {
-        toast.error(loadingOptionsError);
+        showErrorToastCustom(loadingOptionsError);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loadingOptionsError]);
 
     const goToNextStep = () => {

@@ -84,32 +84,41 @@ const PostRegular: React.FunctionComponent<IPostRegular> = () => {
           postStatus !== 'deleted_by_creator' ? (
             <RegularView />
           ) : (
-            <PostFailedBox
-              title={t('postDeleted.title', {
-                postType: t(`postType.${typeOfPost}`),
-              })}
-              body={
-                deletedByCreator
-                  ? t('postDeleted.body.byCreator', {
-                      creator: getDisplayname(postParsed.creator!!),
-                      postType: t(`postType.${typeOfPost}`),
-                    })
-                  : t('postDeleted.body.byAdmin', {
-                      creator: getDisplayname(postParsed.creator!!),
-                      postType: t(`postType.${typeOfPost}`),
-                    })
-              }
-              buttonCaption={tCommon('button.takeMeHome')}
-              imageSrc={
-                theme.name === 'light'
-                  ? LIGHT_IMAGES[typeOfPost]
-                  : DARK_IMAGES[typeOfPost]
-              }
-              style={{
-                marginBottom: '24px',
-              }}
-              handleButtonClick={handleSeeNewDeletedBox}
-            />
+            <>
+              {isMobile ? (
+                <SGoBackButtonContainer>
+                  <SGoBackButton onClick={() => handleCloseAndGoBack()}>
+                    {t('back')}
+                  </SGoBackButton>
+                </SGoBackButtonContainer>
+              ) : null}
+              <PostFailedBox
+                title={t('postDeleted.title', {
+                  postType: t(`postType.${typeOfPost}`),
+                })}
+                body={
+                  deletedByCreator
+                    ? t('postDeleted.body.byCreator', {
+                        creator: getDisplayname(postParsed.creator!!),
+                        postType: t(`postType.${typeOfPost}`),
+                      })
+                    : t('postDeleted.body.byAdmin', {
+                        creator: getDisplayname(postParsed.creator!!),
+                        postType: t(`postType.${typeOfPost}`),
+                      })
+                }
+                buttonCaption={tCommon('button.takeMeHome')}
+                imageSrc={
+                  theme.name === 'light'
+                    ? LIGHT_IMAGES[typeOfPost]
+                    : DARK_IMAGES[typeOfPost]
+                }
+                style={{
+                  marginBottom: '24px',
+                }}
+                handleButtonClick={handleSeeNewDeletedBox}
+              />
+            </>
           )}
           <SRecommendationsSection
             id='recommendations-section-heading'
@@ -203,7 +212,12 @@ const SRecommendationsSection = styled.div<{
 `;
 
 const SGoBackButtonContainer = styled.div`
-  padding-left: 16px;
+  margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding-left: 16px;
+    margin-bottom: initial;
+  }
 
   ${({ theme }) => theme.media.laptopM} {
     padding-left: 24px;

@@ -82,7 +82,8 @@
         "minutes": "m",
         "seconds": "s",
         "leftToRespond": "left to respond"
-      }
+      },
+      "linkCopied": "Link copied!"
     },
     "toDos": {
       "title": "Complete these steps to get paid",

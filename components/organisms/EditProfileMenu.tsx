@@ -14,7 +14,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { debounce, isEqual } from 'lodash';
 import validator from 'validator';
 import { Area, Point } from 'react-easy-crop/types';
-import { toast } from 'react-toastify';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
@@ -56,6 +55,7 @@ import resizeImage from '../../utils/resizeImage';
 import genderPronouns from '../../constants/genderPronouns';
 import getGenderPronouns from '../../utils/genderPronouns';
 import validateInputText from '../../utils/validateMessageText';
+import useErrorToasts from '../../utils/hooks/useErrorToasts';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -156,6 +156,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const dispatch = useAppDispatch();
   const { user, ui } = useAppSelector((state) => state);
@@ -517,24 +518,26 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
       } else {
-        toast.error(tCommon('toastErrors.generic'));
+        showErrorToastPredefined(undefined);
       }
     }
   }, [
-    setIsLoading,
-    handleClose,
-    tCommon,
-    dispatch,
-    dataInEdit,
-    avatarUrlInEdit,
+    isAPIValidateLoading,
     coverUrlInEdit,
+    user.userData?.coverUrl,
+    user.userData?.avatarUrl,
+    user.userData?.username,
+    user.userData?.options,
+    dataInEdit.nickname,
+    dataInEdit.bio,
+    dataInEdit.username,
+    dataInEdit.genderPronouns,
+    avatarUrlInEdit,
+    dispatch,
+    handleClose,
     coverUrlInEditAnimated,
     croppedAreaCoverImage,
-    user.userData?.username,
-    user.userData?.avatarUrl,
-    user.userData?.coverUrl,
-    user.userData?.options,
-    isAPIValidateLoading,
+    showErrorToastPredefined,
   ]);
 
   // Profile image editing

@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 import { useTheme } from 'styled-components';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -12,6 +11,7 @@ import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
 import { useAppSelector } from '../../redux-store/store';
 import EllipseModal, { EllipseModalButton } from '../atoms/EllipseModal';
 import { Mixpanel } from '../../utils/mixpanel';
+import useErrorToasts from '../../utils/hooks/useErrorToasts';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 interface IPostCardEllipseModal {
@@ -41,8 +41,11 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   const theme = useTheme();
   const { t } = useTranslation('common');
   const user = useAppSelector((state) => state.user);
+
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
+
+  const { showErrorToastPredefined } = useErrorToasts();
 
   // Share
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -117,17 +120,18 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   }, [
-    handleAddPostToState,
-    handleRemovePostFromState,
-    promptUserWithPushNotificationsPermissionModal,
-    isFollowingDecision,
     postUuid,
-    router,
     user.loggedIn,
     user._persist?.rehydrated,
+    isFollowingDecision,
+    router,
+    handleRemovePostFromState,
+    handleAddPostToState,
+    showErrorToastPredefined,
+    promptUserWithPushNotificationsPermissionModal,
   ]);
 
   useEffect(() => {

@@ -1,5 +1,11 @@
 /* eslint-disable react/no-array-index-key */
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import { NextPage, NextPageContext } from 'next';
 import Head from 'next/head';
@@ -8,7 +14,7 @@ import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
-import { toast } from 'react-toastify';
+import { useEffectOnce } from 'react-use';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
@@ -33,15 +39,18 @@ import CreatorsBundleModal from '../components/molecules/bundles/CreatorsBundleM
 import AnimatedBackground from '../components/atoms/AnimationBackground';
 import { Mixpanel } from '../utils/mixpanel';
 import { buyCreatorsBundle } from '../api/endpoints/bundles';
+import useErrorToasts from '../utils/hooks/useErrorToasts';
 
 interface IBundlesPage {
-  stripeSetupIntentClientSecret?: string;
-  saveCard?: boolean;
+  stripeSetupIntentClientSecretFromRedirect?: string;
+  saveCardFromRedirect?: boolean;
 }
 
+// TODO: refactor: move Content to separate component
+// TODO: refactor: separate out some of the components
 export const Bundles: NextPage<IBundlesPage> = ({
-  stripeSetupIntentClientSecret,
-  saveCard,
+  stripeSetupIntentClientSecretFromRedirect,
+  saveCardFromRedirect,
 }) => {
   const router = useRouter();
   const { t } = useTranslation('page-Bundles');
@@ -51,6 +60,15 @@ export const Bundles: NextPage<IBundlesPage> = ({
     ui.resizeMode
   );
   const isTablet = ['tablet'].includes(ui.resizeMode);
+
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
+
+  const [stripeSetupIntentClientSecret, setStripeSetupIntentClientSecret] =
+    useState(() => stripeSetupIntentClientSecretFromRedirect ?? undefined);
+
+  const [saveCard, setSaveCard] = useState(
+    () => saveCardFromRedirect ?? undefined
+  );
 
   const [allBundlesModalOpen, setAllBundlesModalOpen] = useState(false);
   const [shownCreatorBundle, setShownCreatorBundle] = useState<
@@ -63,9 +81,18 @@ export const Bundles: NextPage<IBundlesPage> = ({
 
   const [searchValue, setSearchValue] = useState('');
   const { ref: loadingRef, inView } = useInView();
+  const searchContainerRef = useRef<HTMLDivElement | undefined>();
+  const [shadeVisible, setShadeVisible] = useState<boolean>(false);
 
   const loadCreatorsData = useCallback(
     async (paging: Paging): Promise<PaginatedResponse<newnewapi.IUser>> => {
+      if (!user.userData?.userUuid) {
+        return {
+          nextData: [],
+          nextPageToken: undefined,
+        };
+      }
+
       const payload = new newnewapi.SearchCreatorsRequest({
         query: searchValue,
         paging,
@@ -75,7 +102,7 @@ export const Bundles: NextPage<IBundlesPage> = ({
       const res = await searchCreators(payload);
 
       if (!res.data || res.error) {
-        toast.error('toastErrors.generic');
+        showErrorToastPredefined(undefined);
         throw new Error(res.error?.message ?? 'Request failed');
       }
 
@@ -89,6 +116,7 @@ export const Bundles: NextPage<IBundlesPage> = ({
         nextPageToken: res.data.paging?.nextPageToken,
       };
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchValue, user.userData?.userUuid]
   );
 
@@ -142,11 +170,11 @@ export const Bundles: NextPage<IBundlesPage> = ({
         }
       );
 
-      // What fore? can use Refs here if needed
-      // resetSetupIntentClientSecret();
+      // Reset
+      setStripeSetupIntentClientSecret(undefined);
+      setSaveCard(undefined);
 
       const res = await buyCreatorsBundle(stripeContributionRequest);
-
       if (
         !res.data ||
         res.error ||
@@ -156,31 +184,35 @@ export const Bundles: NextPage<IBundlesPage> = ({
       }
     } catch (err: any) {
       console.error(err);
-      toast.error(err.message);
+      showErrorToastCustom(err.message);
+    } finally {
+      router.replace('/bundles');
     }
   }, [
     stripeSetupIntentClientSecret,
-    saveCard,
     user._persist?.rehydrated,
     user.loggedIn,
     router,
+    saveCard,
     t,
+    showErrorToastCustom,
   ]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (stripeSetupIntentClientSecret) {
       buyBundleAfterStripeRedirect();
-      return;
     }
+  });
 
+  useEffect(() => {
     if (
       (!user.loggedIn && user._persist?.rehydrated) ||
-      bundles?.length === 0
+      (bundles?.length === 0 && !stripeSetupIntentClientSecretFromRedirect)
     ) {
       router.replace('/');
     }
   }, [
-    stripeSetupIntentClientSecret,
+    stripeSetupIntentClientSecretFromRedirect,
     user.loggedIn,
     user._persist?.rehydrated,
     bundles,
@@ -189,10 +221,30 @@ export const Bundles: NextPage<IBundlesPage> = ({
   ]);
 
   useEffect(() => {
-    if (inView && !paginatedCreators.loading && paginatedCreators.hasMore) {
+    if (inView) {
       paginatedCreators.loadMore().catch((e) => console.error(e));
     }
   }, [inView, paginatedCreators]);
+
+  useEffect(() => {
+    if (!searchContainerRef.current) {
+      return;
+    }
+
+    const scrollable =
+      searchContainerRef.current.scrollHeight >
+      searchContainerRef.current.clientHeight;
+    const scrolledToTheBottom =
+      searchContainerRef.current.scrollTop >=
+      searchContainerRef.current.scrollHeight -
+        searchContainerRef.current.clientHeight;
+
+    if (scrollable && !scrolledToTheBottom) {
+      setShadeVisible(true);
+    } else {
+      setShadeVisible(false);
+    }
+  }, [searchContainerRef, paginatedCreators.data]);
 
   const visibleBundlesNumber = isMobile || isTablet ? 3 : 4;
 
@@ -206,44 +258,46 @@ export const Bundles: NextPage<IBundlesPage> = ({
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <Container>
-        <SAnimationBackground src={assets.common.vote} alt='vote' />
-        <SubNavigation>
-          {isMobile ? (
-            <SBackButton onClick={() => router.back()} />
-          ) : (
-            <GoBackButton longArrow onClick={() => router.back()}>
-              {t('button.back')}
-            </GoBackButton>
-          )}
-        </SubNavigation>
-        <STitle>{t('header.title')}</STitle>
-
-        <SBundlesTitle>
-          <SectionTitle>{t('bundlesSection.title')}</SectionTitle>
-          {bundles && bundles.length > visibleBundlesNumber && (
-            <SSeeAllButton
-              onClick={() => {
-                setAllBundlesModalOpen(true);
-              }}
-            >
-              {t('bundlesSection.seeAll')}
-            </SSeeAllButton>
-          )}
-        </SBundlesTitle>
-        <SBundlesContainer>
-          {bundles &&
-            bundles
-              .slice(0, visibleBundlesNumber)
-              .map((bundle, index) => (
-                <BundleCard key={`${index}`} creatorBundle={bundle} />
-              ))}
-
-          {!isMobile &&
-            bundles &&
-            [...Array(Math.max(visibleBundlesNumber - bundles.length, 0))].map(
-              (v, index) => <BundleCard key={`${index}-holder`} />
+        <SAnimationContainer>
+          <SAnimationBackground src={assets.common.vote} alt='vote' />
+          <SubNavigation>
+            {isMobile ? (
+              <SBackButton onClick={() => router.back()} />
+            ) : (
+              <GoBackButton longArrow onClick={() => router.back()}>
+                {t('button.back')}
+              </GoBackButton>
             )}
-        </SBundlesContainer>
+          </SubNavigation>
+          <STitle>{t('header.title')}</STitle>
+
+          <SBundlesTitle>
+            <SectionTitle>{t('bundlesSection.title')}</SectionTitle>
+            {bundles && bundles.length > visibleBundlesNumber && (
+              <SSeeAllButton
+                onClick={() => {
+                  setAllBundlesModalOpen(true);
+                }}
+              >
+                {t('bundlesSection.seeAll')}
+              </SSeeAllButton>
+            )}
+          </SBundlesTitle>
+          <SBundlesContainer>
+            {bundles &&
+              bundles
+                .slice(0, visibleBundlesNumber)
+                .map((bundle, index) => (
+                  <BundleCard key={index} creatorBundle={bundle} />
+                ))}
+
+            {!isMobile &&
+              bundles &&
+              [
+                ...Array(Math.max(visibleBundlesNumber - bundles.length, 0)),
+              ].map((v, index) => <BundleCard key={`${index}-holder`} />)}
+          </SBundlesContainer>
+        </SAnimationContainer>
         <SectionTitle>{t('search.title')}</SectionTitle>
         <SInputWrapper>
           <SLeftInlineSVG
@@ -275,31 +329,51 @@ export const Bundles: NextPage<IBundlesPage> = ({
             }}
           />
         </SInputWrapper>
-        <SearchResultsTitle>
-          {/* TODO: add search results for... line? */}
-          {searchValue === '' && t('search.resultsTitle')}
-        </SearchResultsTitle>
+        <SSearchResultsTitle>
+          {searchValue !== ''
+            ? t('search.resultsFor')
+            : t('search.topCreators')}
+          {searchValue !== '' ? <SQuerySpan>{searchValue}</SQuerySpan> : null}
+        </SSearchResultsTitle>
         <SCardsSection>
-          {/* Changes in number of Creators in the search result causes change in page height (Fix?) */}
-          {/* TODO: add no results message (otherwise there is an empty space) */}
-          <CreatorsList
-            loading={paginatedCreators.loading}
-            collection={sortedCreators}
-            onBuyBundleClicked={(creator) => {
-              const creatorsBundle = bundles?.find(
-                (bundle) => bundle.creator?.uuid === creator.uuid
-              );
-
-              if (creatorsBundle) {
-                setShownCreatorBundle(creatorsBundle);
-              } else {
-                setOfferedCreator(creator);
+          <SCardsSectionContent
+            ref={(e) => {
+              if (e) {
+                searchContainerRef.current = e;
               }
             }}
-          />
-          {paginatedCreators.hasMore && !paginatedCreators.loading && (
-            <SRef ref={loadingRef}>Loading...</SRef>
-          )}
+            onScroll={(e: any) => {
+              const scrollable = e.target.scrollHeight > e.target.clientHeight;
+              const scrolledToTheBottom =
+                e.target.scrollTop >=
+                e.target.scrollHeight - e.target.clientHeight;
+              setShadeVisible(scrollable && !scrolledToTheBottom);
+            }}
+          >
+            {/* Changes in number of Creators in the search result causes change in page height (Fix?) */}
+            {/* TODO: add no results message (otherwise there is an empty space) */}
+            <CreatorsList
+              loading={paginatedCreators.loading}
+              collection={sortedCreators}
+              onBuyBundleClicked={(creator) => {
+                const creatorsBundle = bundles?.find(
+                  (bundle) => bundle.creator?.uuid === creator.uuid
+                );
+
+                if (creatorsBundle) {
+                  setShownCreatorBundle(creatorsBundle);
+                } else {
+                  setOfferedCreator(creator);
+                }
+              }}
+            />
+            {paginatedCreators.data.length > 0 &&
+              paginatedCreators.hasMore &&
+              !paginatedCreators.loading && (
+                <SRef ref={loadingRef}>Loading...</SRef>
+              )}
+          </SCardsSectionContent>
+          <SBottomShade visible={shadeVisible} />
         </SCardsSection>
       </Container>
       {bundles && (
@@ -359,15 +433,16 @@ export const getServerSideProps = async (context: NextPageContext) => {
       // eslint-disable-next-line camelcase, object-shorthand
       ...(setup_intent_client_secret
         ? {
-            // eslint-disable-next-line camelcase, object-shorthand
-            setup_intent_client_secret,
+            stripeSetupIntentClientSecretFromRedirect:
+              // eslint-disable-next-line camelcase
+              setup_intent_client_secret,
           }
         : {}),
       // eslint-disable-next-line camelcase, object-shorthand
       ...(save_card
         ? {
-            // eslint-disable-next-line camelcase, object-shorthand
-            save_card: save_card === 'true',
+            // eslint-disable-next-line camelcase
+            saveCardFromRedirect: save_card === 'true',
           }
         : {}),
     },
@@ -390,6 +465,13 @@ const Container = styled.div`
   ${({ theme }) => theme.media.laptop} {
     padding-top: 12px;
   }
+`;
+
+const SAnimationContainer = styled.div`
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 `;
 
 const SAnimationBackground = styled(AnimatedBackground)`
@@ -476,6 +558,7 @@ const SBundlesContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-height: 256px;
   gap: 16px;
   margin-bottom: 64px;
 
@@ -539,7 +622,7 @@ const SRightInlineSVG = styled(InlineSvg)<{ visible: boolean }>`
   }
 `;
 
-const SearchResultsTitle = styled.h4`
+const SSearchResultsTitle = styled.h4`
   color: ${({ theme }) =>
     theme.name === 'light'
       ? theme.colorsThemed.text.primary
@@ -551,6 +634,11 @@ const SearchResultsTitle = styled.h4`
   margin-bottom: 24px;
 `;
 
+const SQuerySpan = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  margin-left: 6px;
+`;
+
 const SRef = styled.span`
   text-indent: -9999px;
   height: 0;
@@ -558,8 +646,60 @@ const SRef = styled.span`
 `;
 
 const SCardsSection = styled.div`
+  position: relative;
+  height: 600px;
+  width: 100%;
+  overflow: hidden;
+`;
+
+const SCardsSectionContent = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  min-height: 280px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1;
+
+  // Scrollbar
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  scrollbar-width: none;
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+    transition: 0.2s linear;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+    transition: 0.2s linear;
+  }
+
+  &:hover {
+    scrollbar-width: thin;
+    &::-webkit-scrollbar-track {
+      background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+    }
+  }
+`;
+
+const SBottomShade = styled.div<{ visible: boolean }>`
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 228px;
+
+  // TODO: standardize
+  background: ${({ theme }) => theme.gradients.listBottom.quaternary};
+  transform: matrix(1, 0, 0, -1, 0, 0);
+  z-index: 2;
+  opacity: ${({ visible }) => (visible ? 1 : 0)};
+  transition: opacity 0.2s linear;
+  pointer-events: none;
 `;

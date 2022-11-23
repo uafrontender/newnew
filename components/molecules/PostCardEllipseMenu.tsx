@@ -9,11 +9,11 @@ import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { toast } from 'react-toastify';
 
 import EllipseMenu, { EllipseMenuButton } from '../atoms/EllipseMenu';
 
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
+import useErrorToasts from '../../utils/hooks/useErrorToasts';
 import switchPostType from '../../utils/switchPostType';
 import { useAppSelector } from '../../redux-store/store';
 import { Mixpanel } from '../../utils/mixpanel';
@@ -48,8 +48,11 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       const router = useRouter();
       const { t } = useTranslation('common');
       const user = useAppSelector((state) => state.user);
+
       const { promptUserWithPushNotificationsPermissionModal } =
         usePushNotifications();
+
+      const { showErrorToastPredefined } = useErrorToasts();
 
       // Share
       const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -124,17 +127,18 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           }
         } catch (err) {
           console.error(err);
-          toast.error('toastErrors.generic');
+          showErrorToastPredefined(undefined);
         }
       }, [
-        handleAddPostToState,
-        handleRemovePostFromState,
-        promptUserWithPushNotificationsPermissionModal,
-        isFollowingDecision,
         postUuid,
-        router,
         user.loggedIn,
         user._persist?.rehydrated,
+        isFollowingDecision,
+        router,
+        handleRemovePostFromState,
+        handleAddPostToState,
+        showErrorToastPredefined,
+        promptUserWithPushNotificationsPermissionModal,
       ]);
 
       useEffect(() => {

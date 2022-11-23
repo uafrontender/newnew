@@ -1,12 +1,14 @@
-/* eslint-disable no-unsafe-optional-chaining */
-import React, { useCallback, useState, useEffect, useRef } from 'react';
+/* eslint-disable no-nested-ternary */
+import React, { useCallback, useState, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
+import { useUpdateEffect } from 'react-use';
 import moment from 'moment';
-import { SUserAvatar } from '../../../atoms/chat/styles';
+import { SUserAvatar, SVerificationSVG } from '../../../atoms/chat/styles';
 
 import Text from '../../../atoms/Text';
 import UserAvatar from '../../UserAvatar';
@@ -21,6 +23,9 @@ import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg'
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 
+const EmptyInbox = dynamic(() => import('../../../atoms/chat/EmptyInbox'));
+const NoResults = dynamic(() => import('../../../atoms/chat/NoResults'));
+
 interface IChatList {
   searchText: string;
 }
@@ -33,7 +38,9 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
   const { unreadCountForCreator } = useGetChats();
   const { ref: scrollRef, inView } = useInView();
 
-  const prevSearchText = useRef('');
+  const [prevSearchText, setPrevSearchText] = useState<string>('');
+  const [searchedRoomsLoading, setSearchedRoomsLoading] =
+    useState<boolean>(false);
 
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
   const [chatRooms, setChatRooms] = useState<newnewapi.IChatRoom[] | null>(
@@ -143,26 +150,43 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, loadingRooms, chatRoomsNextPageToken]);
 
-  useEffect(() => {
-    if (searchText && searchText !== prevSearchText.current && chatRooms) {
-      prevSearchText.current = searchText;
+  const searchRoom = useCallback(async (text: string) => {
+    try {
+      const payload = new newnewapi.GetMyRoomsRequest({
+        searchQuery: text,
+        roomKind: 1,
+        myRole: 2,
+        paging: {
+          limit: 50,
+        },
+      });
+      const res = await getMyRooms(payload);
 
-      if (chatRooms) {
-        setSearchedRooms(null);
-        const arr = chatRooms.filter(
-          (chat) =>
-            chat.visavis?.user?.nickname?.startsWith(searchText) ||
-            chat.visavis?.user?.username?.startsWith(searchText)
-        );
-        setSearchedRooms(arr);
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+
+      if (res.data.rooms && res.data.rooms.length > 0) {
+        setSearchedRooms(res.data.rooms);
+      } else {
+        setSearchedRooms([]);
+      }
+      setSearchedRoomsLoading(false);
+    } catch (err) {
+      console.error(err);
+      setSearchedRoomsLoading(false);
+    }
+  }, []);
+
+  useUpdateEffect(() => {
+    if (searchText && searchText !== prevSearchText) {
+      setPrevSearchText(searchText);
+      if (!searchedRoomsLoading) {
+        setSearchedRoomsLoading(true);
+        searchRoom(searchText);
       }
     }
-
-    if (searchedRooms && !searchText) {
-      setSearchedRooms(null);
-      prevSearchText.current = '';
-    }
-  }, [searchText, chatRooms, searchedRooms]);
+    if (searchedRooms && !searchText) setSearchedRooms(null);
+  }, [searchText, searchedRooms, prevSearchText, searchedRoomsLoading]);
 
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom) => {
@@ -231,7 +255,7 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
               <SChatItemText variant={3} weight={600}>
                 {chatName}
                 {chat.visavis?.user?.options?.isVerified && (
-                  <SInlineSVG
+                  <SVerificationSVG
                     svg={VerificationCheckmark}
                     width='16px'
                     height='16px'
@@ -260,14 +284,9 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchedRooms, chatRooms, updatedChat, router, t]
   );
-
-  // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
-
-  const displayedRooms = searchText ? searchedRooms : chatRooms;
-
   return (
     <>
-      {loadingRooms && (
+      {loadingRooms ? (
         <SLoader>
           <Lottie
             width={64}
@@ -279,19 +298,28 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
             }}
           />
         </SLoader>
+      ) : (
+        chatRooms && (
+          <>
+            <SSectionContent>
+              {!searchedRooms ? (
+                chatRooms.length > 0 ? (
+                  chatRooms.map(renderChatItem)
+                ) : (
+                  <EmptyInbox />
+                )
+              ) : searchedRooms.length > 0 ? (
+                searchedRooms.map(renderChatItem)
+              ) : (
+                <NoResults text={searchText} />
+              )}
+            </SSectionContent>
+            {chatRoomsNextPageToken && !searchedRooms && (
+              <SRef ref={scrollRef}>Loading...</SRef>
+            )}
+          </>
+        )
       )}
-      {chatRooms && (
-        <>
-          <SSectionContent>
-            {(displayedRooms || []).map(renderChatItem)}
-          </SSectionContent>
-          {chatRoomsNextPageToken && !searchedRooms && (
-            <SRef ref={scrollRef}>Loading...</SRef>
-          )}
-        </>
-      )}
-      {/* <GradientMask positionTop active={showTopGradient} />
-      <GradientMask active={showBottomGradient} /> */}
     </>
   );
 };

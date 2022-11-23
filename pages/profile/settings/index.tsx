@@ -10,7 +10,6 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useUpdateEffect } from 'react-use';
-import { toast } from 'react-toastify';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
@@ -31,6 +30,8 @@ import {
   markUser,
   updateMe,
 } from '../../../api/endpoints/user';
+
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 import { NextPageWithLayout } from '../../_app';
 import MyProfileSettingsLayout from '../../../components/templates/MyProfileSettingsLayout';
@@ -55,6 +56,8 @@ const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
   const { pauseNotification } = usePushNotifications();
+
+  const { showErrorToastPredefined } = useErrorToasts();
 
   // Translations
   const { t } = useTranslation('page-Profile');
@@ -101,7 +104,7 @@ const MyProfileSettingsIndex = () => {
       unblockUser(uuid);
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 
@@ -180,7 +183,7 @@ const MyProfileSettingsIndex = () => {
       );
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 
@@ -310,11 +313,12 @@ const MyProfileSettingsIndex = () => {
         setBlockedUsers(() => users);
       } catch (err) {
         console.error(err);
-        toast.error('toastErrors.generic');
+        showErrorToastPredefined(undefined);
       }
     }
 
     fetchUsersIBlocked();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usersIBlockedIds]);
 
   return (

@@ -402,7 +402,7 @@ const SButtonTitle = styled.div`
 
 const SUserBlock = styled.div`
   width: 224px;
-  margin: 16px auto 0 auto;
+  margin: 16px auto 16px auto;
   display: grid;
   align-items: center;
   flex-direction: row;
@@ -421,17 +421,16 @@ const SUserTitleContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  overflow: hidden;
 `;
 
 const SUserTitle = styled(Text)`
-  max-width: 188px;
-  display: -webkit-box;
-  overflow: hidden;
-  position: relative;
   padding-left: 12px;
-  word-break: break-word;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  margin-right: 2px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const SText = styled(Text)`

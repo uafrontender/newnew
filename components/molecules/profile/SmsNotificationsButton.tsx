@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { newnewapi } from 'newnew-api';
 import { v4 as uuidv4 } from 'uuid';
-import { toast } from 'react-toastify';
 import { useTranslation } from 'next-i18next';
 
 import styled, { useTheme } from 'styled-components';
@@ -21,6 +20,7 @@ import {
   unsubscribeGuestFromCreatorSmsNotifications,
 } from '../../../api/endpoints/phone';
 import { useAppSelector } from '../../../redux-store/store';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const SAVED_PHONE_COUNTRY_CODE_KEY = 'savedPhoneCountryCode';
 const SAVED_PHONE_NUMBER_KEY = 'savedPhoneNumber';
@@ -44,6 +44,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   subscription,
 }) => {
   const { t } = useTranslation('page-Profile');
+  const { showErrorToastCustom } = useErrorToasts();
   const theme = useTheme();
   const socketConnection = useContext(SocketContext);
   const currentUser = useAppSelector((state) => state.user);
@@ -123,12 +124,18 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
         return phoneNumber.number;
       } catch (err: any) {
         console.error(err);
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
         // Rethrow for a child
         throw err;
       }
     },
-    [currentUser.loggedIn, getGuestId, subscription.userId, t]
+    [
+      currentUser.loggedIn,
+      getGuestId,
+      showErrorToastCustom,
+      subscription.userId,
+      t,
+    ]
   );
 
   const handleSmsNotificationButtonClicked = useCallback(async () => {
@@ -142,7 +149,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
 
         if (!res.data || res.error) {
           console.error('Unsubscribe from SMS failed');
-          toast.error(t('smsNotifications.error.requestFailed'));
+          showErrorToastCustom(t('smsNotifications.error.requestFailed'));
         }
       } else {
         const res = await unsubscribeFromCreatorSmsNotifications(
@@ -151,7 +158,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
 
         if (!res.data || res.error) {
           console.error('Unsubscribe from SMS failed');
-          toast.error(t('smsNotifications.error.requestFailed'));
+          showErrorToastCustom(t('smsNotifications.error.requestFailed'));
         }
       }
     } else if (!currentUser.loggedIn) {
@@ -187,18 +194,19 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
         }
       } catch (err: any) {
         console.error(err);
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
       }
     } else {
       setSmsNotificationModalOpen(true);
     }
   }, [
+    subscribedToSmsNotifications,
     currentUser.loggedIn,
     currentUser.userData?.options?.isPhoneNumberConfirmed,
-    subscribedToSmsNotifications,
-    subscription.userId,
-    t,
     getGuestId,
+    subscription.userId,
+    showErrorToastCustom,
+    t,
     submitPhoneSmsNotificationsRequest,
   ]);
 
@@ -217,7 +225,6 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
 
         if (!res.data || res.error) {
           console.error('Unable to get sms notifications status');
-          toast.error(t('smsNotifications.error.requestFailed'));
           throw new Error('Request failed');
         }
 
@@ -246,7 +253,6 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
         (res) => {
           if (!res.data || res.error) {
             console.error('Unable to get sms notifications status');
-            toast.error(t('smsNotifications.errors.requestFailed'));
             return;
           }
 

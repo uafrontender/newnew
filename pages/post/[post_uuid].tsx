@@ -278,6 +278,13 @@ const PostPage: NextPage<IPostPage> = ({
       if (!res.error) {
         handleUpdatePostStatus('DELETED_BY_CREATOR');
         handleCloseDeletePostModal();
+        if (document?.documentElement) {
+          setTimeout(() => {
+            document?.documentElement?.scrollTo({
+              top: 0,
+            });
+          }, 100);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -328,6 +335,7 @@ const PostPage: NextPage<IPostPage> = ({
     });
     if (
       isConfirmToClosePost &&
+      // eslint-disable-next-line no-alert
       !window.confirm(t('postVideo.cannotLeavePageMsg'))
     ) {
       return;

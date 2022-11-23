@@ -34,6 +34,7 @@ import BlockUserModalPost from '../../common/BlockUserModalPost';
 import ReportModal, { ReportData } from '../../../chat/ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 import { RenderSupportersInfo } from '../../regular/multiple_choice/McOptionCard';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -66,6 +67,7 @@ const McOptionCardModeration: React.FunctionComponent<
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const supporterCountSubstracted = useMemo(() => {
     if (option.supporterCount === 0) {
@@ -94,7 +96,7 @@ const McOptionCardModeration: React.FunctionComponent<
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 

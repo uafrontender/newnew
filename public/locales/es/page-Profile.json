@@ -264,7 +264,8 @@
           "1": "hizo una oferta en",
           "2": "votó en",
           "3": "patrocinó",
-          "5": "se suscribió a"
+          "5": "se suscribió a",
+          "6_NEED_TRANSLATION": "purchased bundle from"
         }
       },
       "privacy": {

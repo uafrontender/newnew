@@ -2,7 +2,6 @@ import { newnewapi } from 'newnew-api';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { toast } from 'react-toastify';
 
 import {
   getMyNotificationsState,
@@ -12,12 +11,15 @@ import Lottie from '../../atoms/Lottie';
 import Text from '../../atoms/Text';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import Toggle from '../../atoms/Toggle';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 import isIOS from '../../../utils/isIOS';
 
 const SettingsNotificationsSection = () => {
   const { t } = useTranslation('page-Profile');
+  const { showErrorToastPredefined } = useErrorToasts();
+
   const [isLoading, setLoading] = useState<boolean | null>(null);
   const [myNotificationState, setMyNotificationState] = useState<
     newnewapi.INotificationState[] | null
@@ -60,7 +62,7 @@ const SettingsNotificationsSection = () => {
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 

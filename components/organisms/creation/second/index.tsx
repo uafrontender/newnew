@@ -10,7 +10,6 @@ import React, {
 } from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
-import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -72,6 +71,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -101,6 +101,7 @@ export const CreationSecondStepContent: React.FC<
 > = () => {
   const { t: tCommon } = useTranslation();
   const { t } = useTranslation('page-Creation');
+  const { showErrorToastPredefined } = useErrorToasts();
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -417,9 +418,15 @@ export const CreationSecondStepContent: React.FC<
       dispatch(setCreationFileProcessingLoading(false));
       dispatch(setCreationFileProcessingProgress(0));
     } catch (error: any) {
-      toast.error(error?.message);
+      showErrorToastPredefined(undefined);
     }
-  }, [dispatch, post?.announcementVideoUrl, videoProcessing?.taskUuid]);
+  }, [
+    dispatch,
+    post?.announcementVideoUrl,
+    showErrorToastPredefined,
+    videoProcessing?.taskUuid,
+  ]);
+
   const handleVideoUpload = useCallback(
     async (value: File) => {
       Mixpanel.track('Video Uploading', {
@@ -522,7 +529,7 @@ export const CreationSecondStepContent: React.FC<
       } catch (error: any) {
         if (error.message === 'Upload failed') {
           dispatch(setCreationFileUploadError(true));
-          toast.error(error?.message);
+          showErrorToastPredefined(undefined);
         } else {
           console.log('Upload aborted');
         }
@@ -530,8 +537,9 @@ export const CreationSecondStepContent: React.FC<
         dispatch(setCreationFileUploadLoading(false));
       }
     },
-    [dispatch]
+    [dispatch, showErrorToastPredefined]
   );
+
   const handleItemFocus = useCallback((key: string) => {
     if (key === 'title') {
       setTitleError('');
@@ -919,16 +927,17 @@ export const CreationSecondStepContent: React.FC<
             dispatch(setCreationFileProcessingLoading(false));
           } else {
             dispatch(setCreationFileUploadError(true));
-            toast.error('An error occurred');
+            showErrorToastPredefined(undefined);
           }
         } else if (
           decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
         ) {
           dispatch(setCreationFileUploadError(true));
-          toast.error('An error occurred');
+          showErrorToastPredefined(undefined);
         }
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [videoProcessing, fileProcessing, dispatch]
   );
 
@@ -944,7 +953,7 @@ export const CreationSecondStepContent: React.FC<
         dispatch(setCreationFileProcessingLoading(false));
       } else {
         dispatch(setCreationFileUploadError(true));
-        toast.error('An error occurred');
+        showErrorToastPredefined(undefined);
       }
     }
 
@@ -1260,15 +1269,15 @@ export const CreationSecondStepContent: React.FC<
                           <SUserTitle variant={3} weight={600}>
                             {user.userData?.nickname}
                           </SUserTitle>
+                          {user.userData?.options?.isVerified && (
+                            <SInlineSvg
+                              svg={VerificationCheckmark}
+                              width='20px'
+                              height='20px'
+                              fill='none'
+                            />
+                          )}
                         </SUserTitleContainer>
-                        {user.userData?.options?.isVerified && (
-                          <SInlineSvg
-                            svg={VerificationCheckmark}
-                            width='20px'
-                            height='20px'
-                            fill='none'
-                          />
-                        )}
                         <SCaption variant={2} weight={700}>
                           {t('secondStep.card.left', {
                             time: formatExpiresAtNoStartsAt().fromNow(true),
@@ -1369,6 +1378,7 @@ const SFloatingSubSection = styled.div`
 const SFloatingSubSectionWithPlayer = styled.div`
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 const SFloatingSubSectionUser = styled.div`
@@ -1379,7 +1389,7 @@ const SFloatingSubSectionUser = styled.div`
   align-items: center;
   flex-direction: row;
 
-  grid-template-columns: 24px min-content 20px max-content;
+  grid-template-columns: 24px 1fr max-content;
 `;
 
 const SFloatingSubSectionPlayer = styled.div`
@@ -1544,7 +1554,8 @@ const SUserAvatar = styled(UserAvatar)`
 `;
 
 const SUserTitleContainer = styled.div`
-  max-width: 82px;
+  display: flex;
+  overflow: hidden;
 `;
 
 const SUserTitle = styled(Text)`

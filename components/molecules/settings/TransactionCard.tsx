@@ -30,7 +30,10 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
       <SActor variant={3} weight={600}>
         {t('Settings.sections.transactions.you')}
       </SActor>
-      {transaction.transactionType === 5 ? (
+      {transaction.transactionType ===
+        newnewapi.Transaction.TransactionType.SUBSCRIPTION ||
+      transaction.transactionType ===
+        newnewapi.Transaction.TransactionType.BUNDLE ? (
         <SAction variant={2}>
           {`${t(
             `Settings.sections.transactions.actions.${transaction.transactionType}`

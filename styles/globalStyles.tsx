@@ -9,7 +9,13 @@ const GlobalStyle = createGlobalStyle`
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -webkit-tap-highlight-color:  rgba(255, 255, 255, 0); 
+    -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
+  }
+
+  /* Smooth theme transitions */
+  html.theming,
+  html.theming * {
+    transition: all 0.15s linear !important;
   }
 
   *, *:before, *:after {

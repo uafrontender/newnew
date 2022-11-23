@@ -11,7 +11,6 @@ import React, {
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -44,6 +43,7 @@ import BuyBundleModal from '../../../molecules/bundles/BuyBundleModal';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../atoms/bundles/TicketSet';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -93,6 +93,7 @@ interface IPostViewMC {}
 
 const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const { t } = useTranslation('page-Post');
+  const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -547,7 +548,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         setPaymentSuccessModalOpen(true);
       } catch (err: any) {
         console.error(err);
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
         setLoadingModalOpen(false);
       }
     };
@@ -581,8 +582,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   useEffect(() => {
     if (loadingOptionsError) {
-      toast.error(loadingOptionsError);
+      showErrorToastCustom(loadingOptionsError);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadingOptionsError]);
 
   const [isPopupVisible, setIsPopupVisible] = useState(false);
@@ -809,6 +811,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                 })}
           </SBundlesText>
           <SHighlightedButton
+            id='buy-bundle-button'
             size='small'
             onClick={() => {
               setBuyBundleModalOpen(true);

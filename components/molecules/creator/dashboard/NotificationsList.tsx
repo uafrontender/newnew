@@ -184,6 +184,33 @@ export const NotificationsList: React.FC<IFunction> = ({
     return '/direct-messages';
   };
 
+  const findName = useCallback(
+    (message: string, author: newnewapi.ITinyUser) => {
+      if (author.nickname) {
+        const nicknameIndex = message.indexOf(author.nickname);
+        if (nicknameIndex > -1) {
+          return {
+            text: author.nickname,
+            startsAtIndex: nicknameIndex,
+          };
+        }
+      }
+
+      if (author.username) {
+        const usernameIndex = message.indexOf(author.username);
+        if (usernameIndex > -1) {
+          return {
+            text: author.username,
+            startsAtIndex: usernameIndex,
+          };
+        }
+      }
+
+      return undefined;
+    },
+    []
+  );
+
   const getEnrichedNotificationMessage = useCallback(
     (notification: newnewapi.INotification) => {
       if (!notification.content?.message) {
@@ -192,24 +219,25 @@ export const NotificationsList: React.FC<IFunction> = ({
 
       if (
         notification.content.relatedUser &&
-        notification.content.relatedUser.username &&
         notification.content.relatedUser.isVerified
       ) {
-        const usernameIndex = notification.content.message.indexOf(
-          notification.content.relatedUser.username
+        const name = findName(
+          notification.content.message,
+          notification.content.relatedUser
         );
-        if (usernameIndex > -1) {
+
+        if (name) {
           const beforeName = notification.content.message.slice(
             0,
-            usernameIndex
+            name.startsAtIndex
           );
           const afterName = notification.content.message.slice(
-            usernameIndex + notification.content.relatedUser.username.length
+            name.startsAtIndex + name.text.length
           );
           return (
             <>
               {beforeName}
-              {notification.content.relatedUser.username}
+              {notification.content.relatedUser.nickname}
               <SInlineSvg
                 svg={VerificationCheckmark}
                 width='16px'
@@ -223,7 +251,7 @@ export const NotificationsList: React.FC<IFunction> = ({
 
       return notification.content.message;
     },
-    []
+    [findName]
   );
 
   const renderNotificationItem = useCallback(
@@ -418,4 +446,6 @@ const SRef = styled.span`
 const SInlineSvg = styled(InlineSvg)`
   display: inline-flex;
   transform: translateY(4px);
+  margin-left: 2px;
+  margin-top: -2px;
 `;

@@ -8,7 +8,6 @@ import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
-import { toast } from 'react-toastify';
 
 import {
   useAppDispatch,
@@ -58,6 +57,7 @@ import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.sv
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
 import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -116,6 +116,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
+  const { showErrorToastCustom } = useErrorToasts();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -123,6 +124,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     resizeMode
   );
   const { appConstants } = useGetAppConstants();
+  const { showErrorToastPredefined } = useErrorToasts();
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
 
@@ -195,9 +197,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       }
     } catch (err) {
       console.error(err);
-      toast.error(t('toastErrors.generic'));
+      showErrorToastPredefined(undefined);
     }
-  }, [handleRemoveOption, option.id, t]);
+  }, [handleRemoveOption, option.id, showErrorToastPredefined]);
 
   const handleOpenRemoveForm = useCallback(() => {
     setIsRemoveModalOpen(true);
@@ -335,20 +337,21 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         setPaymentModalOpen(false);
       } catch (err: any) {
         console.error(err);
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
       } finally {
         setLoadingModalOpen(false);
         setupIntent.destroy();
       }
     },
     [
-      handleSetSupportedBid,
+      setupIntent,
       postId,
       router,
       handleAddOrUpdateOptionFromResponse,
-      t,
-      setupIntent,
       paymentAmountInCents,
+      handleSetSupportedBid,
+      t,
+      showErrorToastCustom,
     ]
   );
 
@@ -1179,8 +1182,7 @@ const SPaymentModalHeadingPostCreator = styled(Text)`
 `;
 
 const SPaymentModalPostText = styled(Text)`
-  display: flex;
-  align-items: center;
+  display: inline-block;
   gap: 8px;
   white-space: pre-wrap;
   word-break: break-word;

@@ -21,6 +21,7 @@ import {
 } from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import validateInputText from '../../../utils/validateMessageText';
+import isSafari from '../../../utils/isSafari';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -70,6 +71,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
   const [bioInEdit, setBioInEdit] = useState(user.userData?.bio ?? '');
   const [bioError, setBioError] = useState('');
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+
   const validateBioViaApi = useCallback(
     async (text: string) => {
       setIsAPIValidateLoading(true);
@@ -143,7 +145,12 @@ const OnboardingSectionAbout: React.FunctionComponent<
         })
       );
 
-      router.push('/creator-onboarding-stripe');
+      // redirect user to dashboard if Stripe is already connected
+      if (user.creatorData?.options?.stripeConnectStatus === 2) {
+        router.push('/creator/dashboard');
+      } else {
+        router.push('/creator-onboarding-stripe');
+      }
 
       setLoadingModalOpen(false);
     } catch (err) {
@@ -160,7 +167,12 @@ const OnboardingSectionAbout: React.FunctionComponent<
         );
       }
     }
-  }, [bioInEdit, dispatch, router]);
+  }, [
+    bioInEdit,
+    dispatch,
+    router,
+    user.creatorData?.options?.stripeConnectStatus,
+  ]);
 
   useEffect(() => {
     if (validateInputText(bioInEdit) && bioError === '') {
@@ -169,6 +181,22 @@ const OnboardingSectionAbout: React.FunctionComponent<
       setIsFormValid(false);
     }
   }, [bioError, bioInEdit]);
+
+  // fix issue with gap while keyboard is active on iOS
+  function preventScroll(e: any) {
+    e.preventDefault();
+  }
+  const handleBlur = useCallback(() => {
+    if (isSafari() && isMobile)
+      document.body.removeEventListener('touchmove', preventScroll);
+  }, [isMobile]);
+
+  const handleFocus = useCallback(() => {
+    if (isSafari() && isMobile)
+      document.body.addEventListener('touchmove', preventScroll, {
+        passive: false,
+      });
+  }, [isMobile]);
 
   return (
     <>
@@ -184,6 +212,8 @@ const OnboardingSectionAbout: React.FunctionComponent<
               placeholder={t('aboutSection.bio.placeholder')}
               maxChars={150}
               onChange={(e) => handleUpdateBioInEdit(e.target.value)}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
             />
           </SFormItemContainer>
         </STopContainer>

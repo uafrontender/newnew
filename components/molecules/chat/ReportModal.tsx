@@ -146,7 +146,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
 
     return (
       <>
-        <Modal show={show} onClose={handleClose}>
+        <Modal show={show} onClose={handleClose} additionalz={1000}>
           <ModalPaper
             title={`${t('modal.reportUser.title')} ${reportedDisplayname}`}
             onClose={handleClose}
@@ -207,7 +207,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             </SModalButtons>
           </ModalPaper>
         </Modal>
-        <Modal show={reportSent} onClose={handleClose}>
+        <Modal show={reportSent} onClose={handleClose} additionalz={1001}>
           <SConformationModal
             onClose={handleClose}
             isCloseButton

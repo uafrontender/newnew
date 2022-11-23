@@ -13,7 +13,6 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
-import { toast } from 'react-toastify';
 
 import {
   useAppDispatch,
@@ -48,6 +47,7 @@ import InlineSvg from '../../../../atoms/InlineSVG';
 
 import AddOptionIcon from '../../../../../public/images/svg/icons/filled/AddOption.svg';
 import CloseIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -82,6 +82,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
+  const { showErrorToastPredefined } = useErrorToasts();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -214,9 +215,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
-  }, [newOptionText, post.postUuid, handleAddOrUpdateOptionFromResponse]);
+  }, [
+    post.postUuid,
+    newOptionText,
+    handleAddOrUpdateOptionFromResponse,
+    showErrorToastPredefined,
+  ]);
 
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
@@ -357,6 +363,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         (post.creator?.options?.isOfferingBundles || bundle) && (
           <SActionSection>
             <SAddOptionButtonDesktop
+              id='add-option-button'
               onClick={() => setSuggestNewMobileOpen(true)}
             >
               <InlineSvg
@@ -445,6 +452,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 {t('mcPost.optionsTab.actionSection.suggestionPlaceholder')}
               </SHeadlineSuggestNew>
               <SuggestionTextArea
+                id='add-option-input'
                 value={newOptionText}
                 autofocus={suggestNewMobileOpen}
                 placeholder={t(
@@ -453,6 +461,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 onChange={handleUpdateNewOptionText}
               />
               <SAddOptionButton
+                id='add-option-submit'
                 size='sm'
                 disabled={!newOptionText || !newOptionTextValid}
                 style={{
@@ -742,7 +751,7 @@ const SAddOptionButtonDesktop = styled.button`
 const STutorialTooltipHolder = styled.div`
   position: absolute;
   left: 25%;
-  bottom: 120%;
+  bottom: 110%;
   text-align: left;
   div {
     width: 190px;

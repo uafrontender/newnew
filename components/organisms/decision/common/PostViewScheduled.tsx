@@ -184,6 +184,8 @@ const SExpiresSection = styled.div`
 `;
 
 const SActivitiesContainer = styled.div`
+  min-height: 180px;
+
   ${({ theme }) => theme.media.tablet} {
     align-items: flex-start;
 
@@ -193,6 +195,7 @@ const SActivitiesContainer = styled.div`
 
     height: 506px;
     max-height: 506px;
+    min-height: unset;
     width: 100%;
   }
 

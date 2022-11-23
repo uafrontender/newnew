@@ -8,7 +8,6 @@ import React, {
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
-import { toast } from 'react-toastify';
 import {
   PaymentElement,
   useElements,
@@ -29,6 +28,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 import useRecaptcha from '../../../utils/hooks/useRecaptcha';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 // eslint-disable-next-line no-shadow
 enum PaymentMethodTypes {
@@ -58,6 +58,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
+  const { showErrorToastCustom } = useErrorToasts();
   const { loggedIn, userData } = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
 
@@ -148,7 +149,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       }
     } catch (err: any) {
       if ((err.type && err.type === 'card_error') || !err.type) {
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
       }
       console.error(err, 'err');
     }
@@ -166,8 +167,9 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
-      toast.error(recaptchaErrorMessage);
+      showErrorToastCustom(recaptchaErrorMessage);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recaptchaErrorMessage]);
 
   const paymentElementOptions: StripePaymentElementOptions = useMemo(

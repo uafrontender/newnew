@@ -2,7 +2,6 @@ import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React, { useCallback, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { buyCreatorsBundle } from '../../../api/endpoints/bundles';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
@@ -10,6 +9,7 @@ import { usePushNotifications } from '../../../contexts/pushNotificationsContext
 import { useAppSelector } from '../../../redux-store/store';
 import { formatNumber } from '../../../utils/format';
 import getCustomerPaymentFee from '../../../utils/getCustomerPaymentFee';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import useStripeSetupIntent from '../../../utils/hooks/useStripeSetupIntent';
 import { Mixpanel } from '../../../utils/mixpanel';
 import PaymentModal from '../checkout/PaymentModal';
@@ -20,6 +20,7 @@ import BundlePaymentSuccessModal from './BundlePaymentSuccessModal';
 interface IBundlePaymentModal {
   creator: newnewapi.IUser;
   bundleOffer: newnewapi.IBundleOffer;
+  additionalZ?: number;
   onClose: () => void;
   onCloseSuccessModal?: () => void;
 }
@@ -27,10 +28,12 @@ interface IBundlePaymentModal {
 const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   creator,
   bundleOffer,
+  additionalZ,
   onClose,
   onCloseSuccessModal,
 }) => {
   const { t } = useTranslation('common');
+  const { showErrorToastCustom } = useErrorToasts();
   const router = useRouter();
   const { appConstants } = useGetAppConstants();
   const user = useAppSelector((state) => state.user);
@@ -119,13 +122,13 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         setPaymentSuccessModalOpen(true);
       } catch (err: any) {
         console.error(err);
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
       } finally {
         setLoadingModalOpen(false);
         setupIntent.destroy();
       }
     },
-    [setupIntent, router, t, setPaymentSuccessModalOpen]
+    [setupIntent, router, t, showErrorToastCustom]
   );
 
   const paymentWithFeeInCents = useMemo(
@@ -140,7 +143,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   return (
     <>
       <PaymentModal
-        zIndex={12}
+        zIndex={additionalZ ?? 12}
         isOpen
         amount={paymentWithFeeInCents}
         setupIntent={setupIntent}
