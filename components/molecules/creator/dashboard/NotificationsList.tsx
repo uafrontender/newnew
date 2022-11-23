@@ -20,10 +20,13 @@ import {
   markAllAsRead,
 } from '../../../../api/endpoints/notification';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
-import { useNotifications } from '../../../../contexts/notificationsContext';
 import mobileLogo from '../../../../public/images/svg/mobile-logo.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import usePagination, {
+  PaginatedResponse,
+  Paging,
+} from '../../../../utils/hooks/usePagination';
 
 interface IFunction {
   markReadNotifications: boolean;
@@ -35,89 +38,53 @@ export const NotificationsList: React.FC<IFunction> = ({
   const scrollRef: any = useRef();
   const { ref: scrollRefNotifications, inView } = useInView();
   const user = useAppSelector((state) => state.user);
-  const [notifications, setNotifications] = useState<
-    newnewapi.INotification[] | null
-  >(null);
   const [unreadNotifications, setUnreadNotifications] = useState<
     number[] | null
   >(null);
-  const [notificationsNextPageToken, setNotificationsNextPageToken] = useState<
-    string | undefined | null
-  >('');
-  const [loading, setLoading] = useState<boolean | undefined>(undefined);
-  const [initialLoad, setInitialLoad] = useState<boolean>(true);
-  const [defaultLimit, setDefaultLimit] = useState<number>(11);
-  const { unreadNotificationCount } = useNotifications();
-  const [localUnreadNotificationCount, setLocalUnreadNotificationCount] =
-    useState<number>(0);
 
-  const fetchNotification = useCallback(
-    async (args?: any) => {
-      if (loading) return;
-      setLoading(true);
-      const limit: number = args && args.limit ? args.limit : defaultLimit;
-      const pageToken: string = args && args.pageToken ? args.pageToken : null;
-      try {
-        if (!pageToken && limit === defaultLimit) setNotifications([]);
-        const payload = new newnewapi.GetMyNotificationsRequest({
-          paging: {
-            limit,
-            pageToken,
-          },
-        });
-        const res = await getMyNotifications(payload);
+  // TODO: return a list of new notifications once WS message can be used
+  // const [newNotifications, setNewNotifications] = useState<
+  //   newnewapi.INotification[]
+  // >([]);
 
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data.notifications.length > 0) {
-          if (limit === defaultLimit) {
-            setNotifications((curr) => {
-              const arr = curr ? [...curr] : [];
-              res.data?.notifications.forEach((item) => {
-                arr.push(item);
-              });
-              return arr;
-            });
-            setUnreadNotifications((curr) => {
-              const arr = curr ? [...curr] : [];
-              res.data?.notifications.forEach((item) => {
-                if (!item.isRead) {
-                  arr.push(item.id as number);
-                }
-              });
-              return arr;
-            });
-            setNotificationsNextPageToken(res.data.paging?.nextPageToken);
-          } else {
-            setNotifications((curr) => {
-              const arr = curr ? [...curr] : [];
-              if (res.data) arr.unshift(res.data.notifications[0]);
-              return arr;
-            });
-            setUnreadNotifications((curr) => {
-              const arr = curr ? [...curr] : [];
-              if (res.data) arr.push(res.data.notifications[0].id as number);
-              return arr;
-            });
-            // We don`t update token since we only loaded the new first items
-          }
-        } else {
-          // If there is no results then there is no more pages to load
-          setNotificationsNextPageToken(null);
-        }
+  const loadData = useCallback(
+    async (
+      paging: Paging
+    ): Promise<PaginatedResponse<newnewapi.INotification>> => {
+      const payload = new newnewapi.GetMyNotificationsRequest({
+        paging,
+      });
 
-        if (!res.data.paging?.nextPageToken) {
-          setNotificationsNextPageToken(null);
-        }
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setLoading(false);
+      const res = await getMyNotifications(payload);
+
+      if (!res.data || res.error) {
+        throw new Error(res.error?.message ?? 'Request failed');
       }
+
+      setUnreadNotifications((curr) => {
+        const arr = curr ? [...curr] : [];
+        res.data?.notifications.forEach((item) => {
+          if (!item.isRead) {
+            arr.push(item.id as number);
+          }
+        });
+        return arr;
+      });
+
+      return {
+        nextData: res.data.notifications,
+        nextPageToken: res.data.paging?.nextPageToken,
+      };
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loading]
+    []
   );
+
+  const {
+    data: notifications,
+    loading,
+    hasMore,
+    loadMore,
+  } = usePagination(loadData, 6);
 
   const markAllNotifications = useCallback(async () => {
     try {
@@ -132,37 +99,16 @@ export const NotificationsList: React.FC<IFunction> = ({
   }, []);
 
   useEffect(() => {
-    if (!notifications) {
-      fetchNotification();
-    }
-  }, [notifications, fetchNotification]);
-
-  useEffect(() => {
     if (markReadNotifications) {
       markAllNotifications();
     }
   }, [markReadNotifications, markAllNotifications]);
 
   useEffect(() => {
-    if (inView && !loading && notificationsNextPageToken) {
-      fetchNotification({ pageToken: notificationsNextPageToken });
+    if (inView && !loading && hasMore) {
+      loadMore().catch((e) => console.error(e));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, loading, notificationsNextPageToken]);
-
-  useEffect(() => {
-    if (initialLoad) {
-      setLocalUnreadNotificationCount(unreadNotificationCount);
-      setInitialLoad(false);
-    } else {
-      if (unreadNotificationCount > localUnreadNotificationCount) {
-        fetchNotification({ limit: 1 });
-      } else {
-        setLocalUnreadNotificationCount(unreadNotificationCount);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialLoad, unreadNotificationCount]);
+  }, [inView, loading, hasMore, loadMore]);
 
   const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
     if (target) {
@@ -307,6 +253,11 @@ export const NotificationsList: React.FC<IFunction> = ({
     ]
   );
 
+  // TODO: return a list of new notifications once WS message can be used
+  // const displayedNotifications: newnewapi.INotification[] = useMemo(() => {
+  //   return  [...newNotifications, ...notifications];
+  // }, [notifications, newNotifications]);
+
   return (
     <>
       <SSectionContent ref={scrollRef}>
@@ -335,7 +286,7 @@ export const NotificationsList: React.FC<IFunction> = ({
         ) : (
           notifications && notifications.map(renderNotificationItem)
         )}
-        {notificationsNextPageToken && !loading && (
+        {hasMore && !loading && (
           <SRef ref={scrollRefNotifications}>
             <Lottie
               width={64}

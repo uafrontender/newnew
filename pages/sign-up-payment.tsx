@@ -56,8 +56,6 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
           controller.signal
         );
 
-        console.log(res);
-
         if (!res!! || res!!.error || !res.data)
           throw new Error(res!!.error?.message ?? 'An error occurred');
 
