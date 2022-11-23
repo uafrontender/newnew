@@ -19,6 +19,7 @@ import BundlePaymentSuccessModal from './BundlePaymentSuccessModal';
 interface IBundlePaymentModal {
   creator: newnewapi.IUser;
   bundleOffer: newnewapi.IBundleOffer;
+  additionalZ?: number;
   onClose: () => void;
   onCloseSuccessModal?: () => void;
 }
@@ -26,6 +27,7 @@ interface IBundlePaymentModal {
 const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   creator,
   bundleOffer,
+  additionalZ,
   onClose,
   onCloseSuccessModal,
 }) => {
@@ -138,7 +140,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   return (
     <>
       <PaymentModal
-        zIndex={12}
+        zIndex={additionalZ ?? 12}
         isOpen
         amount={paymentWithFeeInCents}
         setupIntent={setupIntent}
