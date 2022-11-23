@@ -15,6 +15,7 @@ import {
   SChatItemM,
   SUserAvatar,
   SVerificationSVG,
+  SChatItemLine,
 } from '../../atoms/chat/styles';
 import UserAvatar from '../UserAvatar';
 import useScrollGradients from '../../../utils/hooks/useScrollGradients';
@@ -231,16 +232,18 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
               </SUserAvatar>
             )}
             <SChatItemCenter>
-              <SChatItemText variant={3} weight={600}>
-                {chat.user?.nickname || chat.user?.username}
+              <SChatItemLine>
+                <SChatItemText variant={3} weight={600}>
+                  {chat.user?.nickname || chat.user?.username}
+                </SChatItemText>
                 {chat.user?.isVerified && (
                   <SVerificationSVG
                     svg={VerificationCheckmark}
-                    width='16px'
-                    height='16px'
+                    width='20px'
+                    height='20px'
                   />
                 )}
-              </SChatItemText>
+              </SChatItemLine>
               <SUserAlias>@{chat.user?.username}</SUserAlias>
             </SChatItemCenter>
           </SChatItemM>
