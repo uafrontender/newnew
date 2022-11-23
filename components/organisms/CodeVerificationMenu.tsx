@@ -175,7 +175,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     submitWithRecaptchaProtection: signInWithRecaptchaProtection,
     isSubmitting: isSignInWithEmailLoading,
     errorMessage: recaptchaErrorMessage,
-  } = useRecaptcha(handleSignIn, 1, 0.1, recaptchaRef);
+  } = useRecaptcha(handleSignIn, 0.5, 0.1, recaptchaRef);
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
