@@ -320,11 +320,15 @@ const PushNotificationsContextProvider: React.FC<
         if (permissionData.permission === 'default') {
           requestPermissionSafari(permissionData, onSuccess);
         } else {
-          await register({
+          const response = await register({
             endpoint: permissionData.deviceToken,
             p256dh: 'safari',
             auth: process.env.NEXT_PUBLIC_WEB_PUSH_ID,
           });
+
+          if (response.error) {
+            throw response.error;
+          }
 
           setIsSubscribed(true);
         }
@@ -345,7 +349,7 @@ const PushNotificationsContextProvider: React.FC<
         if (notificationPermission === 'granted') {
           const oldSubscription = await swReg.pushManager.getSubscription();
           if (oldSubscription) {
-            await oldSubscription.unsubscribe()
+            await oldSubscription.unsubscribe();
           }
 
           const subscription = await swReg.pushManager.subscribe({
@@ -358,19 +362,19 @@ const PushNotificationsContextProvider: React.FC<
           if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
             throw new Error('Something goes wrong');
           }
-          const result = await register({
+          const response = await register({
             expiration: `${sub.expirationTime}`,
             endpoint: sub.endpoint,
             p256dh: sub.keys.p256dh,
             auth: sub.keys.auth,
           });
 
-          if(result.error) {
-            console.log(result)
-          } else {
-            onSuccess?.();
-            setIsSubscribed(true);
+          if (response.error) {
+            throw response.error;
           }
+
+          onSuccess?.();
+          setIsSubscribed(true);
         }
       } catch (err) {
         console.error(err);
@@ -386,9 +390,9 @@ const PushNotificationsContextProvider: React.FC<
         (window as any).safari &&
         'pushNotification' in (window as any).safari
       ) {
-        subscribeSafari(onSuccess);
+        await subscribeSafari(onSuccess);
       } else {
-        subscribeNonSafari(onSuccess);
+        await subscribeNonSafari(onSuccess);
       }
     },
     [subscribeSafari, subscribeNonSafari]
@@ -442,9 +446,9 @@ const PushNotificationsContextProvider: React.FC<
       (window as any).safari &&
       'pushNotification' in (window as any).safari
     ) {
-      unsubscribeSafari();
+      await unsubscribeSafari();
     } else {
-      unsubscribeNonSafari();
+      await unsubscribeNonSafari();
     }
   }, [unsubscribeSafari, unsubscribeNonSafari]);
 
@@ -498,11 +502,15 @@ const PushNotificationsContextProvider: React.FC<
         return;
       }
 
-      await register({
+      const response = await register({
         endpoint: permissionData.deviceToken,
         p256dh: 'safari',
         auth: process.env.NEXT_PUBLIC_WEB_PUSH_ID,
       });
+
+      if (response.error) {
+        throw response.error;
+      }
     } catch (err) {
       console.error(err);
     }
@@ -535,12 +543,16 @@ const PushNotificationsContextProvider: React.FC<
           throw new Error('Something goes wrong');
         }
 
-        await register({
+        const response = await register({
           expiration: `${sub.expirationTime}`,
           endpoint: sub.endpoint,
           p256dh: sub.keys.p256dh,
           auth: sub.keys.auth,
         });
+
+        if (response.error) {
+          throw response.error;
+        }
 
         onSuccess?.();
         setIsSubscribed(true);
