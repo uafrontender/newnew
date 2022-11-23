@@ -4,9 +4,9 @@ import ReCAPTCHA from 'react-google-recaptcha';
 
 import { IReCaptchaRes } from '../../components/interfaces/reCaptcha';
 
-// first executes reCaptcha v3 if the score is lower that minSuccessScore, reCaptca v2 is shown
+// first executes reCaptcha v3 if the score is lower that minSuccessScore, reCaptcha v2 is shown
 const useRecaptcha = (
-  callback: () => Promise<void>,
+  callback: (args: any) => Promise<void>,
   minSuccessScore: number,
   minDoubleCheckScore: number,
   recaptchaV2Ref: RefObject<ReCAPTCHA>
@@ -108,14 +108,12 @@ const useRecaptcha = (
   }, [executeGoogleRecaptchaV3]);
 
   const submitWithRecaptchaProtection = useCallback(
-    async (e: React.ChangeEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
+    async (callbackArgs?: any) => {
       setIsSubmitting(true);
 
       // skip reCaptcha for tests
       if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'test') {
-        await callback();
+        await callback(callbackArgs);
         setIsSubmitting(false);
         return;
       }
@@ -127,7 +125,7 @@ const useRecaptcha = (
         );
 
         if (isReCaptchaV2Passed) {
-          await callback();
+          await callback(callbackArgs);
         } else {
           setErrorMessage('Recaptcha failed');
         }
@@ -140,7 +138,7 @@ const useRecaptcha = (
       const { isPassed, score, error, errorCodes } = await executeRecaptchaV3();
 
       if (isPassed && score && score >= minSuccessScore) {
-        await callback();
+        await callback(callbackArgs);
         setIsSubmitting(false);
         return;
       }

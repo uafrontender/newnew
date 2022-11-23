@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import {
   useStripe,
   useElements,
@@ -8,7 +8,6 @@ import {
 } from '@stripe/react-stripe-js';
 import { SetupIntent } from '@stripe/stripe-js';
 import { newnewapi } from 'newnew-api';
-import ReCAPTCHA from 'react-google-recaptcha';
 import { toast } from 'react-toastify';
 
 import { createStripeSetupIntent } from '../../../api/endpoints/payments';
@@ -25,6 +24,7 @@ import Lottie from '../../atoms/Lottie';
 import CardSetupCompleteModal from '../../organisms/settings/CardSetupCompleteModal';
 
 import logoAnimation from '../../../public/animations/mobile_logo.json';
+import ReCaptchaV2 from '../../atoms/ReCaptchaV2';
 
 interface IAddCardForm {
   onCancel: () => void;
@@ -32,7 +32,6 @@ interface IAddCardForm {
 }
 
 const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
-  const theme = useTheme();
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
 
@@ -98,7 +97,12 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
   );
 
   return (
-    <SForm onSubmit={submitWithRecaptchaProtection}>
+    <SForm
+      onSubmit={(e: React.ChangeEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        submitWithRecaptchaProtection();
+      }}
+    >
       <PaymentElement
         id='stripePayment'
         onReady={() => {
@@ -115,15 +119,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
         }}
       />
       {isRecaptchaV2Required && (
-        <SRecaptchaWrapper>
-          <ReCAPTCHA
-            ref={recaptchaRef}
-            size='normal'
-            theme={theme.name === 'dark' ? 'dark' : 'light'}
-            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY ?? ''}
-            onChange={onChangeRecaptchaV2}
-          />
-        </SRecaptchaWrapper>
+        <SReCaptchaV2 onChange={onChangeRecaptchaV2} ref={recaptchaRef} />
       )}
 
       {errorMessage && (
@@ -275,7 +271,7 @@ const SModalPaper = styled(ModalPaper)`
   }
 `;
 
-const SRecaptchaWrapper = styled.div`
+const SReCaptchaV2 = styled(ReCaptchaV2)`
   margin-top: 20px;
 `;
 

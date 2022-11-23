@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import {
   PaymentElement,
@@ -15,7 +15,6 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js';
 import { StripePaymentElementOptions } from '@stripe/stripe-js';
-import ReCAPTCHA from 'react-google-recaptcha';
 
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
@@ -29,6 +28,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 import useRecaptcha from '../../../utils/hooks/useRecaptcha';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import ReCaptchaV2 from '../../atoms/ReCaptchaV2';
 
 // eslint-disable-next-line no-shadow
 enum PaymentMethodTypes {
@@ -56,7 +56,6 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   bottomCaption,
   handlePayWithCard,
 }) => {
-  const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
   const { loggedIn, userData } = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
@@ -189,7 +188,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         if (userData?.options?.isWhiteListed) {
           handleSubmit();
         } else {
-          submitWithRecaptchaProtection(e);
+          submitWithRecaptchaProtection();
         }
       }}
     >
@@ -255,15 +254,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       )}
 
       {isRecaptchaV2Required && (
-        <SRecaptchaWrapper>
-          <ReCAPTCHA
-            ref={recaptchaRef}
-            size='normal'
-            theme={theme.name === 'dark' ? 'dark' : 'light'}
-            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY ?? ''}
-            onChange={onChangeRecaptchaV2}
-          />
-        </SRecaptchaWrapper>
+        <SReCaptchaV2 onChange={onChangeRecaptchaV2} ref={recaptchaRef} />
       )}
 
       <SPayButtonDiv>
@@ -358,7 +349,7 @@ const SEmailInput = styled(Input)`
   }
 `;
 
-const SRecaptchaWrapper = styled.div`
+const SReCaptchaV2 = styled(ReCaptchaV2)`
   margin-top: 20px;
 `;
 
