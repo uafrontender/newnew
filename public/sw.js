@@ -1,6 +1,8 @@
 self.addEventListener('push', (event) => {
   const message = event.data.json();
-
+  if(message.silent) {
+    return console.log(message)
+  }
   self.registration.showNotification(message.title, {
     body: message.text,
     badge: './favicon.png',

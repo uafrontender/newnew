@@ -299,7 +299,7 @@ const PushNotificationsContextProvider: React.FC<
         auth: subscriptionData.auth,
       });
 
-      await webPushRegister(payload);
+      return webPushRegister(payload);
     },
     []
   );
@@ -343,6 +343,11 @@ const PushNotificationsContextProvider: React.FC<
         const notificationPermission = await Notification.requestPermission();
 
         if (notificationPermission === 'granted') {
+          const oldSubscription = await swReg.pushManager.getSubscription();
+          if (oldSubscription) {
+            await oldSubscription.unsubscribe()
+          }
+
           const subscription = await swReg.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: publicKey,
@@ -353,16 +358,19 @@ const PushNotificationsContextProvider: React.FC<
           if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
             throw new Error('Something goes wrong');
           }
-
-          await register({
+          const result = await register({
             expiration: `${sub.expirationTime}`,
             endpoint: sub.endpoint,
             p256dh: sub.keys.p256dh,
             auth: sub.keys.auth,
           });
 
-          onSuccess?.();
-          setIsSubscribed(true);
+          if(result.error) {
+            console.log(result)
+          } else {
+            onSuccess?.();
+            setIsSubscribed(true);
+          }
         }
       } catch (err) {
         console.error(err);
