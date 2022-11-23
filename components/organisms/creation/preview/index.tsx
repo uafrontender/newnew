@@ -490,7 +490,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             {fileProcessing.progress === 100 ? (
               <BitmovinPlayer
                 id='preview-mobile'
-                muted={false}
+                withMuteControl
                 resources={videoProcessing?.targetUrls}
                 showPlayButton
               />
