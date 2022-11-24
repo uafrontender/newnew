@@ -76,7 +76,10 @@
     "searchPlaceholder": "搜索"
   },
   "announcement": {
-    "title": "{{username}}的公告",
+    "comment_DON_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "",
+    "suffix": "",
+    "afterName": "的公告",
     "topMessageStart": "只有",
     "topMessageEnd": "可以發送訊息"
   },

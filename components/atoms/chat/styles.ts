@@ -114,19 +114,33 @@ export const SChatItemContentWrapper = styled.div`
   justify-content: space-between;
 `;
 
-export const SChatItemText = styled(Text)`
+export const SChatItemInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   margin-bottom: 4px;
   margin-right: 14px;
   max-width: 228px;
-  overflow: hidden;
-  display: inline;
+`;
+
+export const SChatItemLine = styled.div`
+  display: flex;
+  flex-direction: row;
   align-items: center;
+  overflow: hidden;
+`;
+
+export const SChatItemText = styled(Text)`
+  display: inline;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const SVerificationSVG = styled(InlineSvg)`
-  display: inline-flex;
-  transform: translateY(4px);
-  margin-top: -2px;
+  display: flex;
+  flex-shrink: 0;
   margin-left: 4px;
 `;
 
