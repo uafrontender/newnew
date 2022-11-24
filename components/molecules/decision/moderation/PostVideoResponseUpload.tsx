@@ -530,6 +530,8 @@ const SLoadingBottomBlockButton = styled(Button)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   padding: 0;
 
+  background: transparent;
+
   &:focus:enabled,
   &:hover:enabled {
     background: transparent;
