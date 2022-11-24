@@ -16,9 +16,6 @@ const useRecaptcha = (
   const { executeRecaptcha: executeGoogleRecaptchaV3 } = useGoogleReCaptcha();
   const { minSuccessScore = 0.5, minDoubleCheckScore = 0.1 } = options || {};
 
-  console.log(minSuccessScore, 'minSuccessScore');
-  console.log(minDoubleCheckScore, 'minDoubleCheckScore');
-
   const [isRecaptchaV2Required, setIsRecaptchaV2Required] =
     useState<boolean>(false);
   const [recaptchaTokenV2, setRecaptchaTokenV2] = useState<string | null>(null);
