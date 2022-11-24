@@ -94,7 +94,7 @@ const CashOut: React.FC<ICashOut> = ({
               <SButtons>
                 {stripeLink?.link && (
                   <a href={stripeLink.link} target='_blank'>
-                    <SButton view='primaryGrad'>
+                    <SButton view='common'>
                       {t('dashboard.earnings.cashOut.stripeButton')}
                     </SButton>
                   </a>
@@ -124,7 +124,7 @@ const CashOut: React.FC<ICashOut> = ({
       </SCashOutTopBlock>
       {!stripeLink ? (
         <a href='https://creatorpayouts.newnew.co/' target='_blank'>
-          <SButton view='primaryGrad'>
+          <SButton view='common'>
             {t('dashboard.earnings.cashOut.submit')}
           </SButton>
         </a>
@@ -191,16 +191,6 @@ const SButton = styled(Button)`
   color: ${(props) => props.theme.colors.black};
   padding: 16px 20px;
   margin-top: 16px;
-  background: ${(props) => props.theme.colors.white};
-
-  &:after {
-    display: none;
-  }
-
-  &:focus:enabled,
-  &:hover:enabled {
-    background: ${(props) => props.theme.colors.white};
-  }
 
   ${(props) => props.theme.media.tablet} {
     width: unset;
