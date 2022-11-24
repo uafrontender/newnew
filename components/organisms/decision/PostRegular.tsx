@@ -1,8 +1,9 @@
 /* eslint-disable no-param-reassign */
-import React from 'react';
+import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import { useInView } from 'react-intersection-observer';
 
 import { usePostInnerState } from '../../../contexts/postInnerContext';
 import { useAppSelector } from '../../../redux-store/store';
@@ -14,6 +15,7 @@ import Headline from '../../atoms/Headline';
 // Icons
 import assets from '../../../constants/assets';
 import GoBackButton from '../../molecules/GoBackButton';
+import isBrowser from '../../../utils/isBrowser';
 
 const ListPostPage = dynamic(() => import('../see-more/ListPostPage'));
 const PostFailedBox = dynamic(
@@ -60,6 +62,27 @@ const PostRegular: React.FunctionComponent<IPostRegular> = () => {
     handleReportClose,
     handleCloseAndGoBack,
   } = usePostInnerState();
+
+  const { ref: recommendationsSectionRef, inView } = useInView({});
+
+  useEffect(() => {
+    if (
+      isBrowser() &&
+      inView &&
+      isMobile &&
+      !!document.getElementById('action-button-mobile')
+    ) {
+      document.getElementById('action-button-mobile')!!.style.display = 'none';
+    }
+    if (
+      isBrowser() &&
+      !inView &&
+      isMobile &&
+      !!document.getElementById('action-button-mobile')
+    ) {
+      document.getElementById('action-button-mobile')!!.style.display = '';
+    }
+  }, [inView, isMobile]);
 
   return (
     <>
@@ -122,6 +145,7 @@ const PostRegular: React.FunctionComponent<IPostRegular> = () => {
           )}
           <SRecommendationsSection
             id='recommendations-section-heading'
+            ref={recommendationsSectionRef}
             loaded={recommendedPosts && recommendedPosts.length > 0}
           >
             <Headline variant={4}>

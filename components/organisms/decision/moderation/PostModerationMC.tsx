@@ -505,7 +505,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         const parsedHash = hash.substring(1);
 
         if (parsedHash === 'comments') {
-          document.getElementById('comments')?.scrollIntoView();
+          setTimeout(() => {
+            document.getElementById('comments')?.scrollIntoView();
+          }, 100);
         }
       };
 

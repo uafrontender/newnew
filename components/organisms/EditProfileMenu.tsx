@@ -313,8 +313,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       key: T,
       value: ModalMenuUserData[T]
     ) => {
-      setIsDataValid(false);
-
       const workingData: ModalMenuUserData = { ...dataInEdit };
       workingData[key] = value;
 
@@ -352,7 +350,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setDataInEdit,
       validateTextViaAPIDebounced,
       validateUsernameViaAPIDebounced,
-      setIsDataValid,
     ]
   );
 
