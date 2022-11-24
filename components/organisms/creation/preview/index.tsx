@@ -345,9 +345,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     submitWithRecaptchaProtection: handleSubmitWithRecaptchaProtection,
     errorMessage: recaptchaErrorMessage,
     isSubmitting,
-  } = useRecaptcha(handleSubmit, recaptchaRef, {
-    minSuccessScore: 1,
-  });
+  } = useRecaptcha(handleSubmit, recaptchaRef);
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
