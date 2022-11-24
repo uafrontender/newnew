@@ -10,6 +10,7 @@ import {
 } from './styles';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { useAppSelector } from '../../../redux-store/store';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface IChatName {
   chat: newnewapi.IChatRoom;
@@ -20,8 +21,8 @@ const ChatName: React.FC<IChatName> = ({ chat }) => {
 
   const visaviName =
     chat.kind === 4 && chat.myRole === 2
-      ? user.userData?.nickname || user.userData?.username
-      : chat.visavis?.user?.nickname || chat.visavis?.user?.username;
+      ? getDisplayname(user.userData)
+      : getDisplayname(chat.visavis?.user);
 
   const beforeName = chat.kind === 4 ? t('announcement.beforeName') : '';
   const suffix = chat.kind === 4 ? t('announcement.suffix') : '';

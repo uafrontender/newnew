@@ -32,6 +32,7 @@ import {
 import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { IChatData } from '../../interfaces/ichat';
+import getDisplayname from '../../../utils/getDisplayname';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/chat/CloseModalButton')
@@ -234,7 +235,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             <SChatItemCenter>
               <SChatItemLine>
                 <SChatItemText variant={3} weight={600}>
-                  {chat.user?.nickname || chat.user?.username}
+                  {getDisplayname(chat.user)}
                 </SChatItemText>
                 {chat.user?.isVerified && (
                   <SVerificationSVG

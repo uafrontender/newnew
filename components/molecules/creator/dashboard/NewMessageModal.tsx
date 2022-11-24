@@ -28,6 +28,7 @@ import NewAnnouncement from '../../../atoms/dashboard/NewAnnouncement';
 import NoResults from '../../../atoms/chat/NoResults';
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 interface INewMessageModal {
   showModal: boolean;
@@ -201,7 +202,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             <SChatItemCenter>
               <SChatItemLine>
                 <SChatItemText variant={3} weight={600}>
-                  {chat.visavis?.user?.nickname || chat.visavis?.user?.username}
+                  {getDisplayname(chat.visavis?.user)}
                 </SChatItemText>
                 {chat.visavis?.user?.options?.isVerified && (
                   <SVerificationSVG
