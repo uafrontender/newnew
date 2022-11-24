@@ -114,7 +114,9 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
         const parsedHash = hash.substring(1);
 
         if (parsedHash === 'comments') {
-          document.getElementById('comments')?.scrollIntoView();
+          setTimeout(() => {
+            document.getElementById('comments')?.scrollIntoView();
+          }, 100);
         }
       };
 
