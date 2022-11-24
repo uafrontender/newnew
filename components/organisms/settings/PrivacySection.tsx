@@ -102,7 +102,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
                 )}
               </SNickname>
 
-              <SUsername variant={2}>{user.username}</SUsername>
+              <SUsername variant={2}>{`@${user.username}`}</SUsername>
               <SUnblockButton
                 onClick={() => handleUnblockUser(user.uuid)}
                 view='secondary'
