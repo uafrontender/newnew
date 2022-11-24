@@ -465,7 +465,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           {/* Favorites and more options buttons */}
           <SBackButton
             onClick={() => {
-              router.push('/');
+              router.back();
             }}
           />
           {/* <SFavoritesButton
