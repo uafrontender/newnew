@@ -72,6 +72,8 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import useRecaptcha from '../../../../utils/hooks/useRecaptcha';
+import ReCaptchaV2 from '../../../atoms/ReCaptchaV2';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -379,6 +381,21 @@ export const CreationSecondStepContent: React.FC<
 
     router.push(`/creation/${tab}/preview`);
   }, [tab, router, post?.title, validateT]);
+
+  const recaptchaRef = useRef(null);
+
+  const {
+    onChangeRecaptchaV2,
+    isRecaptchaV2Required,
+    submitWithRecaptchaProtection: handleSubmitWithRecaptchaProtection,
+    errorMessage: recaptchaErrorMessage,
+  } = useRecaptcha(handleSubmit, recaptchaRef);
+
+  useEffect(() => {
+    if (recaptchaErrorMessage) {
+      toast.error(recaptchaErrorMessage);
+    }
+  }, [recaptchaErrorMessage]);
 
   const handleCloseClick = useCallback(() => {
     Mixpanel.track('Creation Close', { _stage: 'Creation' });
@@ -1197,12 +1214,19 @@ export const CreationSecondStepContent: React.FC<
                 </TabletFieldWrapper>
               </SItemWrapper>
             )}
+
             {isMobile ? (
               <SButtonWrapper>
                 <SButtonContent>
+                  {isRecaptchaV2Required && (
+                    <SReCaptchaV2
+                      ref={recaptchaRef}
+                      onChange={onChangeRecaptchaV2}
+                    />
+                  )}
                   <SButton
                     view='primaryGrad'
-                    onClick={handleSubmit}
+                    onClick={handleSubmitWithRecaptchaProtection}
                     disabled={disabled}
                   >
                     {t('secondStep.button.preview')}
@@ -1211,6 +1235,12 @@ export const CreationSecondStepContent: React.FC<
               </SButtonWrapper>
             ) : (
               <SItemWrapper>
+                {isRecaptchaV2Required && (
+                  <SReCaptchaV2
+                    ref={recaptchaRef}
+                    onChange={onChangeRecaptchaV2}
+                  />
+                )}
                 <STabletButtonsWrapper>
                   <div>
                     <SButton view='secondary' onClick={handleCloseClick}>
@@ -1221,7 +1251,7 @@ export const CreationSecondStepContent: React.FC<
                     <SButton
                       id='review'
                       view='primaryGrad'
-                      onClick={handleSubmit}
+                      onClick={handleSubmitWithRecaptchaProtection}
                       disabled={disabled}
                     >
                       {t('secondStep.button.preview')}
@@ -1598,4 +1628,15 @@ const SInputLabel = styled.label`
   margin-bottom: 6px;
   font-size: 12px;
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
+`;
+
+const SReCaptchaV2 = styled(ReCaptchaV2)`
+  margin-bottom: 10px;
+  position: relative;
+  left: calc((100vw - 304px) / 2);
+
+  ${({ theme }) => theme.media.tablet} {
+    position: static;
+    left: 0;
+  }
 `;

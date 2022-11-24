@@ -7,11 +7,17 @@ import { IReCaptchaRes } from '../../components/interfaces/reCaptcha';
 // first executes reCaptcha v3 if the score is lower that minSuccessScore, reCaptcha v2 is shown
 const useRecaptcha = (
   callback: (args: any) => Promise<void>,
-  minSuccessScore: number,
-  minDoubleCheckScore: number,
-  recaptchaV2Ref: RefObject<ReCAPTCHA>
+  recaptchaV2Ref: RefObject<ReCAPTCHA>,
+  options?: {
+    minSuccessScore?: number;
+    minDoubleCheckScore?: number;
+  }
 ) => {
   const { executeRecaptcha: executeGoogleRecaptchaV3 } = useGoogleReCaptcha();
+  const { minSuccessScore = 0.5, minDoubleCheckScore = 0.1 } = options || {};
+
+  console.log(minSuccessScore, 'minSuccessScore');
+  console.log(minDoubleCheckScore, 'minDoubleCheckScore');
 
   const [isRecaptchaV2Required, setIsRecaptchaV2Required] =
     useState<boolean>(false);

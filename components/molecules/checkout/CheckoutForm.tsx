@@ -161,7 +161,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     submitWithRecaptchaProtection,
     isSubmitting,
     errorMessage: recaptchaErrorMessage,
-  } = useRecaptcha(handleSubmit, 0.5, 0.1, recaptchaRef);
+  } = useRecaptcha(handleSubmit, recaptchaRef);
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
