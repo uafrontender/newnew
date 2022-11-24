@@ -538,16 +538,14 @@ const ChatArea: React.FC<IChatData> = ({
               {
                 // eslint-disable-next-line no-nested-ternary
                 isAnnouncement
-                  ? t('announcement.title', {
-                      username: isMyAnnouncement
-                        ? user.userData?.nickname || user.userData?.username
-                        : chatRoom.visavis?.user?.nickname ||
-                          chatRoom.visavis?.user?.username,
-                    })
+                  ? `${t('announcement.beforeName')} ${
+                      isMyAnnouncement
+                        ? getDisplayname(user.userData)
+                        : getDisplayname(chatRoom.visavis?.user)
+                    }${t('announcement.suffix')} ${t('announcement.afterName')}`
                   : isMyAnnouncement
-                  ? user.userData?.nickname || user.userData?.username
-                  : chatRoom.visavis?.user?.nickname ||
-                    chatRoom.visavis?.user?.username
+                  ? getDisplayname(user.userData)
+                  : getDisplayname(chatRoom.visavis?.user)
               }
               {chatRoom.visavis?.user?.options?.isVerified && (
                 <SVerificationSVG
@@ -629,7 +627,7 @@ const ChatArea: React.FC<IChatData> = ({
           <SAnnouncementText>
             {t('announcement.topMessageStart')}{' '}
             <SAnnouncementName>
-              {chatRoom.visavis?.user?.username}
+              {getDisplayname(chatRoom.visavis?.user)}
             </SAnnouncementName>{' '}
             {t('announcement.topMessageEnd')}
           </SAnnouncementText>
