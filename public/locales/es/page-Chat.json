@@ -76,7 +76,10 @@
     "searchPlaceholder": "Buscar"
   },
   "announcement": {
-    "title": "El anuncio de {{username}}",
+    "comment_DON_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "El anuncio de",
+    "suffix": "",
+    "afterName": "",
     "topMessageStart": "Solamente",
     "topMessageEnd": "puede mandar mensajes"
   },

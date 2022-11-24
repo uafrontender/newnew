@@ -27,6 +27,7 @@ import usePagination, {
   PaginatedResponse,
   Paging,
 } from '../../../../utils/hooks/usePagination';
+import findName from '../../../../utils/findName';
 
 interface IFunction {
   markReadNotifications: boolean;
@@ -130,33 +131,6 @@ export const NotificationsList: React.FC<IFunction> = ({
     return '/direct-messages';
   };
 
-  const findName = useCallback(
-    (message: string, author: newnewapi.ITinyUser) => {
-      if (author.nickname) {
-        const nicknameIndex = message.indexOf(author.nickname);
-        if (nicknameIndex > -1) {
-          return {
-            text: author.nickname,
-            startsAtIndex: nicknameIndex,
-          };
-        }
-      }
-
-      if (author.username) {
-        const usernameIndex = message.indexOf(author.username);
-        if (usernameIndex > -1) {
-          return {
-            text: author.username,
-            startsAtIndex: usernameIndex,
-          };
-        }
-      }
-
-      return undefined;
-    },
-    []
-  );
-
   const getEnrichedNotificationMessage = useCallback(
     (notification: newnewapi.INotification) => {
       if (!notification.content?.message) {
@@ -197,7 +171,7 @@ export const NotificationsList: React.FC<IFunction> = ({
 
       return notification.content.message;
     },
-    [findName]
+    []
   );
 
   const renderNotificationItem = useCallback(
