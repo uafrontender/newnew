@@ -15,6 +15,7 @@ import {
   SChatItemM,
   SUserAvatar,
   SVerificationSVG,
+  SChatItemLine,
 } from '../../atoms/chat/styles';
 import UserAvatar from '../UserAvatar';
 import useScrollGradients from '../../../utils/hooks/useScrollGradients';
@@ -31,6 +32,7 @@ import {
 import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { IChatData } from '../../interfaces/ichat';
+import getDisplayname from '../../../utils/getDisplayname';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/chat/CloseModalButton')
@@ -231,16 +233,18 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
               </SUserAvatar>
             )}
             <SChatItemCenter>
-              <SChatItemText variant={3} weight={600}>
-                {chat.user?.nickname || chat.user?.username}
+              <SChatItemLine>
+                <SChatItemText variant={3} weight={600}>
+                  {getDisplayname(chat.user)}
+                </SChatItemText>
                 {chat.user?.isVerified && (
                   <SVerificationSVG
                     svg={VerificationCheckmark}
-                    width='16px'
-                    height='16px'
+                    width='20px'
+                    height='20px'
                   />
                 )}
-              </SChatItemText>
+              </SChatItemLine>
               <SUserAlias>@{chat.user?.username}</SUserAlias>
             </SChatItemCenter>
           </SChatItemM>

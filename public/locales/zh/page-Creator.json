@@ -215,7 +215,10 @@
     "members": "成員"
   },
   "announcement": {
-    "title": "{{username}}的公告"
+    "comment_DON_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "",
+    "suffix": "",
+    "afterName": "的公告"
   },
   "stripe": {
     "meta": {

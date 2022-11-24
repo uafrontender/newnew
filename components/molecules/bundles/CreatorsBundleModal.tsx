@@ -4,6 +4,7 @@ import { Trans, useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
@@ -27,6 +28,7 @@ interface ICreatorsBundleModal {
 const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
   ({ show, creatorBundle, onBuyMore, onClose }) => {
     const { t } = useTranslation('common');
+    const router = useRouter();
 
     const timeLeft =
       (creatorBundle.bundle!.accessExpiresAt!.seconds as number) * 1000 -
@@ -66,7 +68,18 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                 <SForLine>
                   {t('modal.creatorsBundle.for')}
                   <Link href={`/${creatorBundle?.creator?.username}`}>
-                    <SUserName>{creatorBundle?.creator?.username}</SUserName>
+                    <SUserName
+                      onClick={() => {
+                        if (
+                          router.asPath ===
+                          `/${creatorBundle?.creator?.username}`
+                        ) {
+                          onClose();
+                        }
+                      }}
+                    >
+                      {creatorBundle?.creator?.username}
+                    </SUserName>
                   </Link>
                   {creatorBundle?.creator?.options?.isVerified && (
                     <SInlineSvg

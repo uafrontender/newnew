@@ -17,13 +17,11 @@ import {
   SChatItem,
   SChatItemContent,
   SChatItemContentWrapper,
-  SChatItemText,
   SChatItemLastMessage,
   SChatItemRight,
   SChatItemTime,
   SChatSeparator,
   SUserAvatar,
-  SVerificationSVG,
 } from '../../atoms/chat/styles';
 import { getMyRooms, markRoomAsRead } from '../../../api/endpoints/chat';
 import { useAppSelector } from '../../../redux-store/store';
@@ -31,8 +29,8 @@ import textTrim from '../../../utils/textTrim';
 import { IChatData } from '../../interfaces/ichat';
 import { useGetChats } from '../../../contexts/chatContext';
 import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import ChatName from '../../atoms/chat/ChatName';
 
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
 const NoResults = dynamic(() => import('../../atoms/chat/NoResults'));
@@ -594,9 +592,6 @@ const ChatList: React.FC<IFunctionProps> = ({
           <UserAvatar avatarUrl={chat.visavis?.user?.avatarUrl ?? ''} />
         </SUserAvatar>
       );
-      let chatName = chat.visavis?.user?.nickname
-        ? chat.visavis?.user?.nickname
-        : chat.visavis?.user?.username;
 
       if (chat.kind === 4) {
         avatar = (
@@ -613,17 +608,6 @@ const ChatList: React.FC<IFunctionProps> = ({
             />
           </SMyAvatarMassupdate>
         );
-
-        if (chat.myRole === 2) {
-          chatName = t('announcement.title', {
-            username: user.userData?.nickname || user.userData?.username,
-          });
-        } else {
-          chatName = t('announcement.title', {
-            username:
-              chat.visavis?.user?.nickname || chat.visavis?.user?.username,
-          });
-        }
       }
 
       let lastMsg = chat.lastMessage?.content?.text;
@@ -648,17 +632,7 @@ const ChatList: React.FC<IFunctionProps> = ({
             {avatar}
             <SChatItemContent>
               <SChatItemContentWrapper>
-                <SChatItemText variant={3} weight={600}>
-                  {chatName}
-                  {chat.visavis?.user?.options?.isVerified && (
-                    <SVerificationSVG
-                      svg={VerificationCheckmark}
-                      width='16px'
-                      height='16px'
-                      fill='none'
-                    />
-                  )}
-                </SChatItemText>
+                <ChatName chat={chat} />
                 <SChatItemTime variant={3} weight={600}>
                   {chat.updatedAt &&
                     moment(

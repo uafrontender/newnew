@@ -9,6 +9,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 import {
   SChatItemCenter,
   SChatItemContainer,
+  SChatItemLine,
   SChatItemM,
   SChatItemText,
   SChatSeparator,
@@ -27,6 +28,7 @@ import NewAnnouncement from '../../../atoms/dashboard/NewAnnouncement';
 import NoResults from '../../../atoms/chat/NoResults';
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 interface INewMessageModal {
   showModal: boolean;
@@ -198,16 +200,18 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
               />
             </SUserAvatar>
             <SChatItemCenter>
-              <SChatItemText variant={3} weight={600}>
-                {chat.visavis?.user?.nickname || chat.visavis?.user?.username}
+              <SChatItemLine>
+                <SChatItemText variant={3} weight={600}>
+                  {getDisplayname(chat.visavis?.user)}
+                </SChatItemText>
                 {chat.visavis?.user?.options?.isVerified && (
                   <SVerificationSVG
                     svg={VerificationCheckmark}
-                    width='16px'
-                    height='16px'
+                    width='20px'
+                    height='20px'
                   />
                 )}
-              </SChatItemText>
+              </SChatItemLine>
               <SUserAlias>@{chat.visavis?.user?.username}</SUserAlias>
             </SChatItemCenter>
           </SChatItemM>
