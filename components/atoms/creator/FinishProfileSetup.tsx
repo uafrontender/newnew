@@ -79,7 +79,7 @@ export const FinishProfileSetup = () => {
         }
       >
         <a>
-          <SButton view='primaryGrad'>
+          <SButton view='common'>
             {t('dashboard.earnings.toDosIssue.button')}
           </SButton>
         </a>
@@ -129,19 +129,8 @@ const SButton = styled(Button)`
   width: auto;
   display: block;
   flex-shrink: 0;
-  color: #2c2c33;
   padding: 16px 20px;
   margin-top: 16px;
-  background: ${(props) => props.theme.colors.white};
-
-  &:after {
-    display: none;
-  }
-
-  &:focus:enabled,
-  &:hover:enabled {
-    background: ${(props) => props.theme.colors.white};
-  }
 
   ${(props) => props.theme.media.tablet} {
     width: unset;

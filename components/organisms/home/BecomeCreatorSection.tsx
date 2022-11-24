@@ -25,7 +25,7 @@ const BecomeCreatorSection = () => {
     <SContainer>
       <SHeadline variant={4}>{t('becomeCreator.title')}</SHeadline>
       <SButton
-        view='transparent'
+        view='common'
         onClick={() => {
           Mixpanel.track('Navigation Item Clicked', {
             _button: 'Create now',
@@ -133,18 +133,10 @@ const SHeadline = styled(Headline)`
 
 const SButton = styled(Button)`
   padding: 12px 24px;
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.darkGray};
 
   font-size: 16px;
   line-height: 24px;
   text-transform: capitalize;
-
-  &:focus:enabled,
-  &:hover:enabled {
-    color: ${({ theme }) => theme.colors.white};
-    background-color: ${({ theme }) => theme.colors.dark};
-  }
 `;
 
 const FloatingImage = styled.img`
