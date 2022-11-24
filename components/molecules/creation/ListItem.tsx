@@ -147,8 +147,11 @@ const SWrapper = styled.div`
   justify-content: center;
   background-color: ${(props) => props.theme.colorsThemed.background.secondary};
 
-  :hover {
-    background-color: ${(props) => props.theme.colorsThemed.background.quinary};
+  @media (hover: hover) {
+    :hover {
+      background-color: ${(props) =>
+        props.theme.colorsThemed.background.quinary};
+    }
   }
 
   ${(props) => props.theme.media.tablet} {
