@@ -233,7 +233,7 @@ const SCreateFirstContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
     height: 280px;
 
-    margin-bottom: 80px;
+    margin-bottom: 70px;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -242,7 +242,7 @@ const SCreateFirstContainer = styled.div`
 
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
-    margin: 0 auto;
+    margin: 0 auto 80px;
   }
 `;
 
@@ -293,6 +293,7 @@ const SNoPostsView = styled.div`
   justify-content: center;
   height: 198px;
   margin-top: 32px;
+  margin-bottom: 40px;
 
   border: 2px solid
     ${({ theme }) =>
@@ -304,11 +305,13 @@ const SNoPostsView = styled.div`
   ${({ theme }) => theme.media.tablet} {
     height: 280px;
     margin-top: 24px;
+    margin-bottom: 70px;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: 364px;
     margin-top: 32px;
+    margin-bottom: 80px;
   }
 `;
 
