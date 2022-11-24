@@ -182,7 +182,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                 <WaitingForResponseBox
                   title={t('mcPostAwaiting.hero.title')}
                   body={t('mcPostAwaiting.hero.body', {
-                    creator: post.creator?.nickname,
+                    creator: getDisplayname(post.creator),
                     time: waitingTime,
                   })}
                 />
@@ -207,7 +207,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                                   fill='none'
                                 />
                               ) : null,
-                              { creator: post.creator?.nickname },
+                              { creator: getDisplayname(post.creator) },
                             ]}
                           />
                         </SWantsToKnow>

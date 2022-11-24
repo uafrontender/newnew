@@ -157,7 +157,7 @@ export const NotificationsList: React.FC<IFunction> = ({
           return (
             <>
               {beforeName}
-              {notification.content.relatedUser.nickname}
+              {name.text}
               <SInlineSvg
                 svg={VerificationCheckmark}
                 width='16px'

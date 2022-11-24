@@ -539,7 +539,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           <SUserData>
             <SUsernameWrapper>
               <SUsername variant={4}>
-                {user.nickname}
+                {getDisplayname(user)}
                 {user.options?.isVerified && (
                   <SInlineSVG
                     svg={VerificationCheckmark}
