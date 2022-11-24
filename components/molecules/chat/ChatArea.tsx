@@ -645,11 +645,7 @@ const ChatArea: React.FC<IChatData> = ({
           !isAnnouncement &&
           (chatRoom.myRole === 1 ? (
             <WelcomeMessage
-              userAlias={
-                chatRoom.visavis?.user?.username
-                  ? chatRoom.visavis?.user?.username
-                  : ''
-              }
+              userAlias={getDisplayname(chatRoom.visavis?.user)}
             />
           ) : (
             <NoMessagesYet />

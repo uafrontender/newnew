@@ -48,6 +48,7 @@ import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal
 import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
 import { useBundles } from '../../contexts/bundlesContext';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
+import getDisplayname from '../../utils/getDisplayname';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -653,9 +654,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       />
       <ReportModal
         show={confirmReportUser}
-        reportedDisplayname={
-          user.nickname ? user.nickname || `@${user.username}` : ''
-        }
+        reportedDisplayname={getDisplayname(user)}
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />

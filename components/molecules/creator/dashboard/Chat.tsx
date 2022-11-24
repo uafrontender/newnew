@@ -434,9 +434,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         ) : (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
-              {chatRoom?.visavis?.user?.nickname
-                ? chatRoom?.visavis?.user?.nickname
-                : chatRoom?.visavis?.user?.username}
+              {getDisplayname(chatRoom?.visavis?.user)}
               {chatRoom?.visavis?.user?.options?.isVerified && (
                 <SInlineSVG
                   svg={VerificationCheckmark}
@@ -449,9 +447,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
             <Link href={`/${chatRoom?.visavis?.user?.username}`}>
               <a>
                 <SUserName variant={2} weight={600}>
-                  {chatRoom?.visavis?.user?.username
-                    ? `@${chatRoom?.visavis?.user?.username}`
-                    : chatRoom?.visavis?.user?.nickname}
+                  {getDisplayname(chatRoom?.visavis?.user)}
                 </SUserName>
               </a>
             </Link>

@@ -21,6 +21,7 @@ import UserEllipseModal from '../profile/UserEllipseModal';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { useBundles } from '../../../contexts/bundlesContext';
 import { formatNumber } from '../../../utils/format';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
@@ -205,9 +206,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       />
       <ReportModal
         show={confirmReportUser}
-        reportedDisplayname={
-          creator.nickname ? creator.nickname || `@${creator.username}` : ''
-        }
+        reportedDisplayname={getDisplayname(creator)}
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />

@@ -43,6 +43,7 @@ import BuyBundleModal from '../../../molecules/bundles/BuyBundleModal';
 import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../atoms/bundles/TicketSet';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -735,9 +736,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             post={post}
             postLoading={postLoading}
             postStatus={postStatus}
-            postCreatorName={
-              (post.creator?.nickname as string) ?? post.creator?.username
-            }
+            postCreatorName={getDisplayname(post.creator)}
             postDeadline={moment(
               (post.responseUploadDeadline?.seconds as number) * 1000
             )
@@ -772,8 +771,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             }}
           >
             {t('paymentSuccessModal.mc', {
-              postCreator:
-                (post.creator?.nickname as string) ?? post.creator?.username,
+              postCreator: getDisplayname(post.creator),
               postDeadline: moment(
                 (post.responseUploadDeadline?.seconds as number) * 1000
               )
@@ -801,9 +799,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             {creatorsBundle?.bundle
               ? t('mcPost.optionsTab.actionSection.getMoreBundles')
               : t('mcPost.optionsTab.actionSection.offersBundles', {
-                  creator:
-                    (post.creator?.nickname as string) ??
-                    post.creator?.username,
+                  creator: getDisplayname(post.creator),
                 })}
           </SBundlesText>
           <SHighlightedButton
