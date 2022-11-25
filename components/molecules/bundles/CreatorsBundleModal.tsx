@@ -17,6 +17,7 @@ import { formatNumber } from '../../../utils/format';
 import HighlightedButton from '../../atoms/bundles/HighlightedButton';
 import InlineSvg from '../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface ICreatorsBundleModal {
   show: boolean;
@@ -78,7 +79,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                         }
                       }}
                     >
-                      {creatorBundle?.creator?.username}
+                      {getDisplayname(creatorBundle?.creator)}
                     </SUserName>
                   </Link>
                   {creatorBundle?.creator?.options?.isVerified && (
