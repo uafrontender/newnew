@@ -593,7 +593,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                 {t(
                   `genderPronouns.${
                     getGenderPronouns(user.userData?.genderPronouns!!).name
-                  }`
+                  }` as any
                 )}
               </SGenderPronouns>
             )}

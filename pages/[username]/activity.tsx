@@ -19,6 +19,7 @@ import InlineSvg from '../../components/atoms/InlineSVG';
 import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
 interface IUserPageActivity {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -213,14 +214,19 @@ export default UserPageActivity;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Profile',
-    'component-PostCard',
-    'page-Post',
-    'modal-PaymentModal',
-    'modal-ResponseSuccessModal',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    [
+      'common',
+      'page-Profile',
+      'component-PostCard',
+      'page-Post',
+      'modal-PaymentModal',
+      'modal-ResponseSuccessModal',
+    ],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   if (!username || Array.isArray(username)) {
     return {

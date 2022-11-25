@@ -155,7 +155,7 @@ export const CreationSecondStepContent: React.FC<
   const [titleError, setTitleError] = useState('');
 
   const [isTutorialVisible, setIsTutorialVisible] = useState(false);
-  const [tutorialType, setTutorialType] = useState('AC');
+  const [tutorialType, setTutorialType] = useState<'AC' | 'MC' | 'CF'>('AC');
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -815,7 +815,7 @@ export const CreationSecondStepContent: React.FC<
                   options={expireOptions}
                   onChange={handleItemChange}
                   formattedValue={t(
-                    `secondStep.field.expiresAt.options.${post.expiresAt}`
+                    `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                   )}
                   formattedDescription={formatExpiresAt().format(
                     'DD MMM [at] hh:mm A'
@@ -829,7 +829,7 @@ export const CreationSecondStepContent: React.FC<
                   value={post.startsAt}
                   onChange={handleItemChange}
                   formattedValue={t(
-                    `secondStep.field.startsAt.modal.type.${post.startsAt?.type}`
+                    `secondStep.field.startsAt.modal.type.${post.startsAt?.type}` as any
                   )}
                   formattedDescription={formatStartsAt().format(
                     'DD MMM [at] hh:mm A'
@@ -850,7 +850,7 @@ export const CreationSecondStepContent: React.FC<
                 maxItems={5}
                 onChange={handleItemChange}
                 formattedValue={t(
-                  `secondStep.field.expiresAt.options.${post.expiresAt}`
+                  `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                 )}
                 formattedDescription={formatExpiresAt().format(
                   'DD MMM [at] hh:mm A'

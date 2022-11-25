@@ -535,28 +535,31 @@ const ChatArea: React.FC<IChatData> = ({
           {isMobileOrTablet && <GoBackButton onClick={clickHandler} />}
           <SUserData>
             <SUserName>
-              {
-                // eslint-disable-next-line no-nested-ternary
-                isAnnouncement
-                  ? t('announcement.title', {
-                      username: isMyAnnouncement
-                        ? user.userData?.nickname || user.userData?.username
-                        : chatRoom.visavis?.user?.nickname ||
-                          chatRoom.visavis?.user?.username,
-                    })
-                  : isMyAnnouncement
-                  ? user.userData?.nickname || user.userData?.username
-                  : chatRoom.visavis?.user?.nickname ||
-                    chatRoom.visavis?.user?.username
-              }
-              {chatRoom.visavis?.user?.options?.isVerified && (
-                <SVerificationSVG
-                  svg={VerificationCheckmark}
-                  width='18px'
-                  height='18px'
-                  fill='none'
-                />
-              )}
+              <>
+                {
+                  // eslint-disable-next-line no-nested-ternary
+                  isAnnouncement
+                    ? // @ts-ignore
+                      t('announcement.title', {
+                        username: isMyAnnouncement
+                          ? user.userData?.nickname || user.userData?.username
+                          : chatRoom.visavis?.user?.nickname ||
+                            chatRoom.visavis?.user?.username,
+                      })
+                    : isMyAnnouncement
+                    ? user.userData?.nickname || user.userData?.username
+                    : chatRoom.visavis?.user?.nickname ||
+                      chatRoom.visavis?.user?.username
+                }
+                {chatRoom.visavis?.user?.options?.isVerified && (
+                  <SVerificationSVG
+                    svg={VerificationCheckmark}
+                    width='18px'
+                    height='18px'
+                    fill='none'
+                  />
+                )}
+              </>
             </SUserName>
             {!isAnnouncement && (
               <Link href={`/${chatRoom?.visavis?.user?.username}`}>

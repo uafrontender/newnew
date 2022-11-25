@@ -23,6 +23,7 @@ import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.s
 import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import { I18nNamespaces } from '../../../../@types/i18next';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -206,7 +207,11 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       >
         {item.key === 'copy' && isCopiedUrl
           ? t(`published.socials.copied`)
-          : t(`published.socials.${item.key}`)}
+          : t(
+              `published.socials.${
+                item.key as keyof I18nNamespaces['page-Creation']['published']['socials']
+              }`
+            )}
       </SItemTitle>
     </SItem>
   );

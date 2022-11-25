@@ -360,28 +360,31 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           <GoBackButton onClick={clickHandler} />
           <SUserData>
             <SUserName>
-              {
-                // eslint-disable-next-line no-nested-ternary
-                isAnnouncement
-                  ? t('announcement.title', {
-                      username: isMyAnnouncement
-                        ? user.userData?.nickname || user.userData?.username
-                        : chatRoom.visavis?.user?.nickname ||
-                          chatRoom.visavis?.user?.username,
-                    })
-                  : isMyAnnouncement
-                  ? user.userData?.nickname || user.userData?.username
-                  : chatRoom.visavis?.user?.nickname ||
-                    chatRoom.visavis?.user?.username
-              }
-              {chatRoom.visavis?.user?.options?.isVerified &&
-                !isAnnouncement && (
-                  <SInlineSVG
-                    svg={VerificationCheckmark}
-                    width='16px'
-                    height='16px'
-                  />
-                )}
+              <>
+                {
+                  // eslint-disable-next-line no-nested-ternary
+                  isAnnouncement
+                    ? // @ts-ignore
+                      t('announcement.title', {
+                        username: isMyAnnouncement
+                          ? user.userData?.nickname || user.userData?.username
+                          : chatRoom.visavis?.user?.nickname ||
+                            chatRoom.visavis?.user?.username,
+                      })
+                    : isMyAnnouncement
+                    ? user.userData?.nickname || user.userData?.username
+                    : chatRoom.visavis?.user?.nickname ||
+                      chatRoom.visavis?.user?.username
+                }
+                {chatRoom.visavis?.user?.options?.isVerified &&
+                  !isAnnouncement && (
+                    <SInlineSVG
+                      svg={VerificationCheckmark}
+                      width='16px'
+                      height='16px'
+                    />
+                  )}
+              </>
             </SUserName>
             <SUserAlias>
               {!isAnnouncement

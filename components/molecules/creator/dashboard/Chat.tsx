@@ -414,6 +414,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         {chatRoom?.kind === 4 ? (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
+              {/* @ts-ignore */}
               {t('announcement.title', {
                 username: user.userData?.nickname || user.userData?.username,
               })}

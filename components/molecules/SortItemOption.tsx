@@ -39,7 +39,7 @@ export const SortItemOption: React.FC<ISortItemOption> = (props) => {
           item.key === 'num_bids' && ['ac', 'mc', 'cf'].includes(category)
             ? `-${category}`
             : ''
-        }`
+        }` as any
       )}
       selected={selected}
       handleChange={onChange}

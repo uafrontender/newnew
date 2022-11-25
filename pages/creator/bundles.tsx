@@ -10,6 +10,7 @@ import Content from '../../components/organisms/creator/Bundles';
 
 import { NextPageWithLayout } from '../_app';
 import assets from '../../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
 export const Bundles = () => {
   const { t } = useTranslation('page-Creator');
@@ -38,10 +39,12 @@ export const Bundles = () => {
 export default Bundles;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Creator',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-Creator'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const { req } = context;
 
