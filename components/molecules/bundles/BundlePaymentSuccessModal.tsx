@@ -14,6 +14,7 @@ import Button from '../../atoms/Button';
 import AnimatedBackground from '../../atoms/AnimationBackground';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../atoms/InlineSVG';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface IBuyBundleModal {
   show: boolean;
@@ -65,7 +66,7 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
                     // @ts-ignore
                     components={[
                       <SLink href={`/${creator?.username}`} />,
-                      { creator: creator?.username },
+                      { creator: getDisplayname(creator) },
                     ]}
                   />
                   {creator.options?.isVerified && (

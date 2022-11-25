@@ -45,7 +45,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   );
 
   // When user logs out, clear the state
-  // Don't clean localhost in tests
+  // Don't clean local storage in tests
   useEffect(() => {
     if (
       userWasLoggedIn.current &&

@@ -35,6 +35,7 @@ import {
 } from '../../../../api/endpoints/chat';
 import isBrowser from '../../../../utils/isBrowser';
 import validateInputText from '../../../../utils/validateMessageText';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 interface IChat {
   roomID: string;
@@ -414,9 +415,9 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         {chatRoom?.kind === 4 ? (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
-              {t('announcement.title', {
-                username: user.userData?.nickname || user.userData?.username,
-              })}
+              {`${t('announcement.beforeName')} ${getDisplayname(
+                user.userData
+              )}${t('announcement.suffix')} ${t('announcement.afterName')}`}
             </SUserNickName>
             <SUserName variant={2} weight={600}>
               {`${
@@ -433,9 +434,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         ) : (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
-              {chatRoom?.visavis?.user?.nickname
-                ? chatRoom?.visavis?.user?.nickname
-                : chatRoom?.visavis?.user?.username}
+              {getDisplayname(chatRoom?.visavis?.user)}
               {chatRoom?.visavis?.user?.options?.isVerified && (
                 <SInlineSVG
                   svg={VerificationCheckmark}
@@ -448,9 +447,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
             <Link href={`/${chatRoom?.visavis?.user?.username}`}>
               <a>
                 <SUserName variant={2} weight={600}>
-                  {chatRoom?.visavis?.user?.username
-                    ? `@${chatRoom?.visavis?.user?.username}`
-                    : chatRoom?.visavis?.user?.nickname}
+                  {getDisplayname(chatRoom?.visavis?.user)}
                 </SUserName>
               </a>
             </Link>

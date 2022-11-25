@@ -17,6 +17,7 @@ import AcOptionCard from '../../regular/auction/AcOptionCard';
 import Button from '../../../../atoms/Button';
 import GradientMask from '../../../../atoms/GradientMask';
 import { Mixpanel } from '../../../../../utils/mixpanel';
+import getDisplayname from '../../../../../utils/getDisplayname';
 
 interface IAcSuccessOptionsTab {
   post: newnewapi.Auction;
@@ -222,11 +223,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
             key={option.id.toString()}
             option={option as TAcOptionWithHighestField}
             postId={post.postUuid}
-            postCreatorName={
-              post.creator?.nickname
-                ? post.creator?.nickname
-                : post.creator?.username ?? ''
-            }
+            postCreatorName={getDisplayname(post.creator)}
             postText=''
             postDeadline=''
             index={i}

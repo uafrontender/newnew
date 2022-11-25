@@ -10,6 +10,7 @@ import BulletLine from './BulletLine';
 import { formatNumber } from '../../../utils/format';
 import InlineSvg from '../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface IBundleCard {
   className?: string;
@@ -42,7 +43,7 @@ const BundleCard: React.FC<IBundleCard> = ({
         />
         <SUserData>
           <SDisplayNameContainer>
-            <SDisplayName>{creatorBundle.creator?.nickname}</SDisplayName>
+            <SDisplayName>{getDisplayname(creatorBundle.creator)}</SDisplayName>
             {creatorBundle.creator.options?.isVerified && (
               <SInlineSvg
                 svg={VerificationCheckmark}
