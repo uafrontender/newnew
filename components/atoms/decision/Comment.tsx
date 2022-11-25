@@ -132,7 +132,7 @@ const Comment: React.FC<IComment> = ({
                   <SNickname>
                     {comment.sender?.uuid === user.userData?.userUuid
                       ? t('comments.me')
-                      : comment.sender?.nickname ?? comment.sender?.username}
+                      : getDisplayname(comment.sender)}
                   </SNickname>
                 </Link>
                 {comment.sender?.options?.isCreator &&

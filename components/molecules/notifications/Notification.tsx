@@ -14,6 +14,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { markAsRead } from '../../../api/endpoints/notification';
+import getDisplayname from '../../../utils/getDisplayname';
 
 const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
   if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
@@ -137,7 +138,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
           )}
           <SText>
             <STitle ref={ref}>
-              {content?.relatedUser?.username}
+              {getDisplayname(content?.relatedUser)}
               {content?.relatedUser?.isVerified && (
                 <SInlineSVG
                   svg={VerificationCheckmark}

@@ -28,6 +28,7 @@ import UserAvatar from '../../UserAvatar';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import isBrowser from '../../../../utils/isBrowser';
 import validateInputText from '../../../../utils/validateMessageText';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
@@ -363,16 +364,12 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
               {
                 // eslint-disable-next-line no-nested-ternary
                 isAnnouncement
-                  ? t('announcement.title', {
-                      username: isMyAnnouncement
-                        ? user.userData?.nickname || user.userData?.username
-                        : chatRoom.visavis?.user?.nickname ||
-                          chatRoom.visavis?.user?.username,
-                    })
-                  : isMyAnnouncement
-                  ? user.userData?.nickname || user.userData?.username
-                  : chatRoom.visavis?.user?.nickname ||
-                    chatRoom.visavis?.user?.username
+                  ? `${t('announcement.beforeName')} ${
+                      isMyAnnouncement
+                        ? getDisplayname(user.userData)
+                        : getDisplayname(chatRoom.visavis?.user)
+                    }${t('announcement.suffix')} ${t('announcement.afterName')}`
+                  : getDisplayname(chatRoom.visavis?.user)
               }
               {chatRoom.visavis?.user?.options?.isVerified &&
                 !isAnnouncement && (

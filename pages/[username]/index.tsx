@@ -157,7 +157,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
             </SPrivateLock>
             <SAccountPrivateText variant={1}>
               {t('accountPrivate', {
-                username: user.nickname ?? user.username,
+                username: getDisplayname(user),
               })}
             </SAccountPrivateText>
           </SAccountPrivate>
