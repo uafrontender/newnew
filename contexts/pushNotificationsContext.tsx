@@ -71,7 +71,7 @@ const PushNotificationsContextProvider: React.FC<
 
   const [inSubscribed, setIsSubscribed] = useState(false);
   const [publicKey, setPublicKey] = useState('');
-  const [hasWebPush, setHasWebPush] = useState(false);
+  // const [hasWebPush, setHasWebPush] = useState(false);
 
   // Get config
   useEffect(() => {
@@ -83,7 +83,7 @@ const PushNotificationsContextProvider: React.FC<
         const response = await webPushConfig(payload);
 
         setPublicKey(response.data?.publicKey || '');
-        setHasWebPush(response.data?.hasWebPush || false);
+        // setHasWebPush(response.data?.hasWebPush || false);
       } catch (err) {
         console.error(err);
       } finally {
@@ -114,22 +114,51 @@ const PushNotificationsContextProvider: React.FC<
     return { permission: Notification.permission };
   }, []);
 
+  // register and unregister
+  const register = useCallback(
+    async (subscriptionData: {
+      expiration?: string;
+      endpoint?: string;
+      p256dh?: string;
+      auth?: string;
+    }) => {
+      const payload = new newnewapi.RegisterForWebPushRequest({
+        name: navigator.userAgent,
+        expiration: subscriptionData.expiration,
+        endpoint: subscriptionData.endpoint,
+        p256dh: subscriptionData.p256dh,
+        auth: subscriptionData.auth,
+      });
+
+      return webPushRegister(payload);
+    },
+    []
+  );
+
+  const unregister = useCallback(async (endpoint: string) => {
+    const payload = new newnewapi.UnRegisterForWebPushRequest({
+      endpoint,
+    });
+
+    await webPushUnRegister(payload);
+  }, []);
+
   // Check push notification subscription
   const checkSubscriptionSafari = useCallback(async () => {
     const permissionData = getPermissionData();
 
     if (permissionData.permission === 'granted') {
       try {
-        const response = await fetch(
+        const res = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari/check?token=${
             permissionData.deviceToken
           }&access_token=${cookiesInstance.get('accessToken')}`
         );
 
-        const test = await response.json();
+        const response = await res.json();
 
-        setIsSubscribed(!!test.endpoint);
-        return !!test.endpoint;
+        setIsSubscribed(!(Object.keys(response).length === 0));
+        return !!response.endpoint;
       } catch (err) {
         setIsSubscribed(false);
         return false;
@@ -154,7 +183,35 @@ const PushNotificationsContextProvider: React.FC<
         const subscription = await swReg.pushManager.getSubscription();
 
         if (subscription) {
-          setIsSubscribed(hasWebPush);
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari/check?token=${
+              subscription.endpoint
+            }&access_token=${cookiesInstance.get('accessToken')}`
+          );
+
+          const response = await res.json();
+
+          console.log(response, 'response');
+
+          // renew subscription if it has been updated
+          if (Object.keys(response).length === 0) {
+            const sub = subscription.toJSON();
+            if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
+              throw new Error('Something goes wrong');
+            }
+
+            await register({
+              expiration: `${sub.expirationTime}`,
+              endpoint: sub.endpoint,
+              p256dh: sub.keys.p256dh,
+              auth: sub.keys.auth,
+            });
+
+            setIsSubscribed(true);
+            return true;
+          }
+
+          setIsSubscribed(true);
           return true;
         }
 
@@ -167,7 +224,7 @@ const PushNotificationsContextProvider: React.FC<
       console.error(err);
       return false;
     }
-  }, [getPermissionData, hasWebPush]);
+  }, [getPermissionData, register]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
@@ -283,34 +340,6 @@ const PushNotificationsContextProvider: React.FC<
     },
     [publicKey, openPushNotificationAlert]
   );
-
-  const register = useCallback(
-    async (subscriptionData: {
-      expiration?: string;
-      endpoint?: string;
-      p256dh?: string;
-      auth?: string;
-    }) => {
-      const payload = new newnewapi.RegisterForWebPushRequest({
-        name: navigator.userAgent,
-        expiration: subscriptionData.expiration,
-        endpoint: subscriptionData.endpoint,
-        p256dh: subscriptionData.p256dh,
-        auth: subscriptionData.auth,
-      });
-
-      return webPushRegister(payload);
-    },
-    []
-  );
-
-  const unregister = useCallback(async (endpoint: string) => {
-    const payload = new newnewapi.UnRegisterForWebPushRequest({
-      endpoint,
-    });
-
-    await webPushUnRegister(payload);
-  }, []);
 
   const subscribeSafari = useCallback(
     async (onSuccess?: () => void) => {

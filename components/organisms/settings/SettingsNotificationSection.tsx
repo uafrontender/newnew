@@ -106,28 +106,29 @@ const SettingsNotificationsSection = () => {
       ) : (
         <>
           {myNotificationState !== null &&
-            myNotificationState.map((subsection, idx) => (
-              <SSubsection
-                key={`notificationsource-${subsection.notificationSource}`}
-              >
-                <Text variant={2} weight={600}>
-                  {subsection.notificationSource &&
-                  subsection.notificationSource === 1
-                    ? t('Settings.sections.notifications.email')
-                    : t('Settings.sections.notifications.inApp')}
-                </Text>
-                <Toggle
-                  title={
-                    subsection.notificationSource &&
-                    subsection.notificationSource === 1
-                      ? t('Settings.sections.notifications.email')
-                      : t('Settings.sections.notifications.inApp')
-                  }
-                  checked={subsection.isEnabled ?? false}
-                  onChange={() => handleUpdateItem(idx)}
-                />
-              </SSubsection>
-            ))}
+            myNotificationState.map((subsection, idx) => {
+              if (
+                subsection.notificationSource &&
+                subsection.notificationSource === 1
+              ) {
+                return (
+                  <SSubsection
+                    key={`notificationsource-${subsection.notificationSource}`}
+                  >
+                    <Text variant={2} weight={600}>
+                      {t('Settings.sections.notifications.email')}
+                    </Text>
+                    <Toggle
+                      title={t('Settings.sections.notifications.email')}
+                      checked={subsection.isEnabled ?? false}
+                      onChange={() => handleUpdateItem(idx)}
+                    />
+                  </SSubsection>
+                );
+              }
+
+              return null;
+            })}
           {!isIOS() && (
             <SSubsection>
               <Text variant={2} weight={600}>
