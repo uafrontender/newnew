@@ -21,7 +21,8 @@ export type TView =
   | 'quaternary'
   | 'changeLanguage'
   | 'transparent'
-  | 'danger';
+  | 'danger'
+  | 'common';
 type TSize = 'sm' | 'lg';
 
 interface IButton {
@@ -327,19 +328,33 @@ const SButton = styled.button<ISButton>`
   &:hover:enabled {
     outline: none;
 
-    ${(props) =>
-      props.view === 'primaryGrad'
-        ? css`
+    ${(props) => {
+      switch (props.view) {
+        case 'primaryGrad': {
+          return css`
             // for gradient button background animation on hover
             :after {
               opacity: 1;
             }
-          `
-        : css`
+          `;
+        }
+        case 'common': {
+          return css`
+            color: ${({ theme }) => theme.colors.white};
             background: ${props.theme.colorsThemed.button.hover[
               props.view ?? 'primary'
             ]};
-          `}
+          `;
+        }
+        default: {
+          return css`
+            background: ${props.theme.colorsThemed.button.hover[
+              props.view ?? 'primary'
+            ]};
+          `;
+        }
+      }
+    }}
 
     ${(props) =>
       props.withShadow &&
