@@ -197,7 +197,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                                   fill='none'
                                 />
                               ) : null,
-                              { creator: post.creator?.nickname },
+                              { creator: getDisplayname(post.creator) },
                             ]}
                           />
                         </SWantsToKnow>
