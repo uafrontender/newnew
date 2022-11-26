@@ -29,6 +29,7 @@ import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Ve
 import isBrowser from '../../../../utils/isBrowser';
 import validateInputText from '../../../../utils/validateMessageText';
 import getDisplayname from '../../../../utils/getDisplayname';
+import isSafari from '../../../../utils/isSafari';
 
 const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
@@ -339,6 +340,20 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       }, 100);
     }
   }, [newMessage]);
+
+  // fix for container scrolling on Safari iOS
+  useEffect(() => {
+    if (
+      messages.length > 0 &&
+      messagesScrollContainerRef.current &&
+      isSafari()
+    ) {
+      messagesScrollContainerRef.current.style.cssText = `flex: 0 0 300px;`;
+      setTimeout(() => {
+        messagesScrollContainerRef.current!!.style.cssText = `flex:1;`;
+      }, 5);
+    }
+  }, [messages]);
 
   return (
     <SContainer>

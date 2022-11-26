@@ -534,7 +534,11 @@ const ChatArea: React.FC<IChatData> = ({
           chatRoom &&
           messages.map((item, index) => {
             if (index === messages.length - 2) {
-              return <SRef ref={scrollRef}>Loading...</SRef>;
+              return (
+                <SRef key={`sref-${item.id}`} ref={scrollRef}>
+                  Loading...
+                </SRef>
+              );
             }
 
             if (index < messages.length) {
