@@ -45,8 +45,13 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   );
 
   // When user logs out, clear the state
+  // Don't clean local storage in tests
   useEffect(() => {
-    if (userWasLoggedIn.current && !user.loggedIn) {
+    if (
+      userWasLoggedIn.current &&
+      !user.loggedIn &&
+      process.env.NEXT_PUBLIC_ENVIRONMENT !== 'test'
+    ) {
       setCreatorDataSteps(0);
       removeStateLS('userTutorialsProgress');
       userWasLoggedIn.current = false;

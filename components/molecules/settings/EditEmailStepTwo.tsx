@@ -3,7 +3,6 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import validator from 'validator';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 
 import InlineSvg from '../../atoms/InlineSVG';
 import Headline from '../../atoms/Headline';
@@ -13,6 +12,7 @@ import Button from '../../atoms/Button';
 import { sendVerificationNewEmail } from '../../../api/endpoints/user';
 
 import Logo from '../../../public/images/svg/mobile-logo.svg';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 interface IEditEmailStepTwoModal {
   onComplete: (email: string) => void;
@@ -21,7 +21,7 @@ interface IEditEmailStepTwoModal {
 const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
   const { t } = useTranslation('page-Profile');
   const { t: tVerify } = useTranslation('page-VerifyEmail');
-  const { t: tCommon } = useTranslation('common');
+  const { showErrorToastPredefined } = useErrorToasts();
   const theme = useTheme();
 
   const [newEmail, setNewEmail] = useState('');
@@ -86,7 +86,7 @@ const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
           data?.status !==
           newnewapi.SendVerificationEmailResponse.Status.SUCCESS
         ) {
-          toast.error(tCommon('toastErrors.generic'));
+          showErrorToastPredefined(undefined);
           throw new Error(error?.message ?? 'Request failed');
         }
 
@@ -97,7 +97,7 @@ const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
         setIsLoading(false);
       }
     },
-    [onComplete, newEmail, tVerify, tCommon]
+    [newEmail, onComplete, tVerify, showErrorToastPredefined]
   );
 
   return (

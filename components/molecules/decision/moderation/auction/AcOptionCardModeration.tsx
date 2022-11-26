@@ -1,14 +1,11 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import { motion } from 'framer-motion';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
-import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
@@ -36,6 +33,7 @@ import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.s
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
 import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
 import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -62,6 +60,7 @@ const AcOptionCardModeration: React.FunctionComponent<
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
+  const { showErrorToastPredefined } = useErrorToasts();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -87,7 +86,7 @@ const AcOptionCardModeration: React.FunctionComponent<
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 
@@ -345,7 +344,7 @@ const AcOptionCardModeration: React.FunctionComponent<
                     cursor: 'pointer',
                   }}
                 >
-                  {option.creator?.nickname ?? option.creator?.username}
+                  {getDisplayname(option.creator)}
                 </SSpanBiddersHighlighted>
               </Link>
             ) : (
@@ -353,7 +352,7 @@ const AcOptionCardModeration: React.FunctionComponent<
                 className='spanHighlighted'
                 onClick={(e) => e.stopPropagation()}
               >
-                {option.creator?.nickname ?? option.creator?.username}
+                {getDisplayname(option.creator)}
               </SSpanBiddersHighlighted>
             )}
             {option.supporterCount > 1 ? (

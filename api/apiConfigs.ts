@@ -1,3 +1,4 @@
+/* eslint-disable no-async-promise-executor */
 // Configuration & helper functions file for the RESTful API endpoints
 import { newnewapi } from 'newnew-api';
 import * as $protobuf from 'protobufjs';

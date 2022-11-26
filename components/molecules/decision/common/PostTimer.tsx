@@ -11,6 +11,7 @@ import styled, { css } from 'styled-components';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import useHasMounted from '../../../../utils/hooks/useHasMounted';
 import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 import isBrowser from '../../../../utils/isBrowser';
 import secondsToDHMS, { DHMS } from '../../../../utils/secondsToDHMS';
@@ -46,6 +47,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
     'tablet',
   ].includes(resizeMode);
   const isPageVisible = usePageVisibility();
+  const hasMounted = useHasMounted();
 
   const parsed = (timestampSeconds - Date.now()) / 1000;
   const hasEnded = Date.now() > timestampSeconds;
@@ -189,6 +191,8 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
       onTimeExpired();
     }
   }, [seconds]);
+
+  if (!hasMounted) return null;
 
   return (
     <SWrapper shouldTurnRed={shouldTurnRed}>

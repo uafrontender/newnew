@@ -9,45 +9,53 @@ import React, {
   useContext,
   useRef,
 } from 'react';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
-import Link from 'next/link';
 
+/* Contexts */
+import { SocketContext } from '../../../contexts/socketContext';
+import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
-import Button from '../../atoms/Button';
-import TextArea from '../../atoms/chat/TextArea';
-import InlineSVG from '../../atoms/InlineSVG';
-import { IChatData } from '../../interfaces/ichat';
-import { useAppSelector } from '../../../redux-store/store';
-import { SUserAlias } from '../../atoms/chat/styles';
+
+/* API */
+import { markUser } from '../../../api/endpoints/user';
+import { reportUser } from '../../../api/endpoints/report';
 import { sendMessage, getMessages } from '../../../api/endpoints/chat';
 
+/* Utils */
+import isSafari from '../../../utils/isSafari';
+import isBrowser from '../../../utils/isBrowser';
+import { IChatData } from '../../interfaces/ichat';
+import { SUserAlias } from '../../atoms/chat/styles';
+import getDisplayname from '../../../utils/getDisplayname';
+import { useAppSelector } from '../../../redux-store/store';
+import validateInputText from '../../../utils/validateMessageText';
+
+/* Icons */
+import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
-import { markUser } from '../../../api/endpoints/user';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import { SocketContext } from '../../../contexts/socketContext';
-import { reportUser } from '../../../api/endpoints/report';
-import getDisplayname from '../../../utils/getDisplayname';
-import isBrowser from '../../../utils/isBrowser';
-import validateInputText from '../../../utils/validateMessageText';
-import ChatMessage from '../../atoms/chat/ChatMessage';
-import isSafari from '../../../utils/isSafari';
 
+/* Components */
+import Button from '../../atoms/Button';
+import InlineSVG from '../../atoms/InlineSVG';
+import TextArea from '../../atoms/chat/TextArea';
+import ChatMessage from '../../atoms/chat/ChatMessage';
+
+const ReportModal = dynamic(() => import('./ReportModal'));
+const BlockedUser = dynamic(() => import('./BlockedUser'));
+const GoBackButton = dynamic(() => import('../GoBackButton'));
+const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
+const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
+const AccountDeleted = dynamic(() => import('./AccountDeleted'));
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
-const BlockedUser = dynamic(() => import('./BlockedUser'));
-const AccountDeleted = dynamic(() => import('./AccountDeleted'));
-const SubscriptionExpired = dynamic(() => import('./SubscriptionExpired'));
 const MessagingDisabled = dynamic(() => import('./MessagingDisabled'));
-const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
-const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
-const ReportModal = dynamic(() => import('./ReportModal'));
-const GoBackButton = dynamic(() => import('../GoBackButton'));
+const SubscriptionExpired = dynamic(() => import('./SubscriptionExpired'));
 
 const ChatArea: React.FC<IChatData> = ({
   chatRoom,
@@ -56,8 +64,11 @@ const ChatArea: React.FC<IChatData> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Chat');
-
   const { ref: scrollRef, inView } = useInView();
+
+  const socketConnection = useContext(SocketContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
+
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
@@ -70,9 +81,6 @@ const ChatArea: React.FC<IChatData> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-
-  const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
   const [messageText, setMessageText] = useState<string>('');
@@ -98,16 +106,12 @@ const ChatArea: React.FC<IChatData> = ({
 
   const [isAnnouncement, setIsAnnouncement] = useState<boolean>(false);
   const [isMyAnnouncement, setIsMyAnnouncement] = useState<boolean>(false);
-
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
-
   const [messagesNextPageToken, setMessagesNextPageToken] = useState<
     string | undefined | null
   >('');
   const [messagesLoading, setMessagesLoading] = useState(false);
-  const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
-  const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
   const getChatMessages = useCallback(
     async (pageToken?: string) => {
@@ -156,7 +160,6 @@ const ChatArea: React.FC<IChatData> = ({
           setIsSubscriptionExpired(true);
         }
       }
-
       getChatMessages();
       if (chatRoom.kind === 4) {
         setIsAnnouncement(true);
@@ -221,6 +224,7 @@ const ChatArea: React.FC<IChatData> = ({
     }
   }, [messages, isMobile]);
 
+  /* loading next page of messages */
   useEffect(() => {
     if (inView && !messagesLoading && messagesNextPageToken) {
       getChatMessages(messagesNextPageToken);
@@ -228,11 +232,25 @@ const ChatArea: React.FC<IChatData> = ({
   }, [inView, messagesLoading, messagesNextPageToken, getChatMessages]);
 
   useEffect(() => {
+    if (newMessage && newMessage.roomId === chatRoom?.id) {
+      setMessages((curr) => {
+        if (curr.length === 0) {
+          return [newMessage, ...curr];
+        }
+        if (curr[0]?.id !== newMessage.id) {
+          return [newMessage, ...curr];
+        }
+        return curr;
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newMessage]);
+
+  useEffect(() => {
     if (usersIBlocked.length > 0 && chatRoom) {
       const isBlocked = usersIBlocked.find(
         (i) => i === chatRoom?.visavis?.user?.uuid
       );
-
       if (isBlocked) {
         setIsVisavisBlocked(true);
       } else {
@@ -254,22 +272,15 @@ const ChatArea: React.FC<IChatData> = ({
     }
   }, [usersBlockedMe, chatRoom]);
 
-  useEffect(() => {
-    if (newMessage && newMessage.roomId === chatRoom?.id) {
-      setMessages((curr) => {
-        if (curr.length === 0) {
-          return [newMessage, ...curr];
-        }
-        if (curr[0]?.id !== newMessage.id) {
-          return [newMessage, ...curr];
-        }
-        return curr;
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newMessage]);
+  const handleOpenEllipseMenu = useCallback(() => {
+    setEllipseMenuOpen(true);
+  }, []);
 
-  async function unblockUserRequest() {
+  const handleCloseEllipseMenu = useCallback(() => {
+    setEllipseMenuOpen(false);
+  }, []);
+
+  const unblockUserRequest = useCallback(async () => {
     try {
       const payload = new newnewapi.MarkUserRequest({
         markAs: 4,
@@ -283,19 +294,19 @@ const ChatArea: React.FC<IChatData> = ({
     } catch (err) {
       console.error(err);
     }
-  }
+  }, [chatRoom, unblockUser]);
 
-  const onUserBlock = () => {
+  const onUserBlock = useCallback(() => {
     if (!isVisavisBlocked) {
       if (!confirmBlockUser) setConfirmBlockUser(true);
     } else {
       unblockUserRequest();
     }
-  };
+  }, [isVisavisBlocked, confirmBlockUser, unblockUserRequest]);
 
-  const onUserReport = () => {
+  const onUserReport = useCallback(() => {
     setConfirmReportUser(true);
-  };
+  }, []);
 
   const submitMessage = useCallback(async () => {
     if (chatRoom && messageTextValid) {
@@ -358,23 +369,6 @@ const ChatArea: React.FC<IChatData> = ({
     }
   };
 
-  const chatUsernameTitle = useCallback(() => {
-    let name = '';
-    if (chatRoom) {
-      const username = user.userData?.nickname || user.userData?.username;
-      const visavisUsername =
-        chatRoom.visavis?.user?.nickname || chatRoom.visavis?.user?.username;
-      if (isAnnouncement) {
-        name = t('announcement.title', {
-          username: isMyAnnouncement ? username : visavisUsername,
-        });
-      } else {
-        name = isMyAnnouncement ? username!! : visavisUsername!!;
-      }
-    }
-    return name;
-  }, [chatRoom, isAnnouncement, isMyAnnouncement, t, user]);
-
   const isTextareaVisible = useCallback(() => {
     if (
       isMessagingDisabled ||
@@ -422,7 +416,18 @@ const ChatArea: React.FC<IChatData> = ({
           {isMobileOrTablet && <GoBackButton onClick={clickHandler} />}
           <SUserData>
             <SUserName>
-              {chatUsernameTitle()}
+              {
+                // eslint-disable-next-line no-nested-ternary
+                isAnnouncement
+                  ? `${t('announcement.beforeName')} ${
+                      isMyAnnouncement
+                        ? getDisplayname(user.userData)
+                        : getDisplayname(chatRoom.visavis?.user)
+                    }${t('announcement.suffix')} ${t('announcement.afterName')}`
+                  : isMyAnnouncement
+                  ? getDisplayname(user.userData)
+                  : getDisplayname(chatRoom.visavis?.user)
+              }
               {chatRoom.visavis?.user?.options?.isVerified && (
                 <SVerificationSVG
                   svg={VerificationCheckmark}
@@ -503,7 +508,7 @@ const ChatArea: React.FC<IChatData> = ({
           <SAnnouncementText>
             {t('announcement.topMessageStart')}{' '}
             <SAnnouncementName>
-              {chatRoom.visavis?.user?.username}
+              {getDisplayname(chatRoom.visavis?.user)}
             </SAnnouncementName>{' '}
             {t('announcement.topMessageEnd')}
           </SAnnouncementText>
@@ -519,7 +524,9 @@ const ChatArea: React.FC<IChatData> = ({
           messages.length === 0 &&
           !isAnnouncement &&
           (chatRoom.myRole === 1 ? (
-            <WelcomeMessage userAlias={chatRoom.visavis?.user?.username!!} />
+            <WelcomeMessage
+              userAlias={getDisplayname(chatRoom.visavis?.user)}
+            />
           ) : (
             <NoMessagesYet />
           ))}

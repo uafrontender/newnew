@@ -10,7 +10,6 @@ import React, {
 } from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
-import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -72,6 +71,8 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -101,6 +102,7 @@ export const CreationSecondStepContent: React.FC<
 > = () => {
   const { t: tCommon } = useTranslation();
   const { t } = useTranslation('page-Creation');
+  const { showErrorToastPredefined } = useErrorToasts();
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -417,9 +419,15 @@ export const CreationSecondStepContent: React.FC<
       dispatch(setCreationFileProcessingLoading(false));
       dispatch(setCreationFileProcessingProgress(0));
     } catch (error: any) {
-      toast.error(error?.message);
+      showErrorToastPredefined(undefined);
     }
-  }, [dispatch, post?.announcementVideoUrl, videoProcessing?.taskUuid]);
+  }, [
+    dispatch,
+    post?.announcementVideoUrl,
+    showErrorToastPredefined,
+    videoProcessing?.taskUuid,
+  ]);
+
   const handleVideoUpload = useCallback(
     async (value: File) => {
       Mixpanel.track('Video Uploading', {
@@ -522,7 +530,7 @@ export const CreationSecondStepContent: React.FC<
       } catch (error: any) {
         if (error.message === 'Upload failed') {
           dispatch(setCreationFileUploadError(true));
-          toast.error(error?.message);
+          showErrorToastPredefined(undefined);
         } else {
           console.log('Upload aborted');
         }
@@ -530,8 +538,9 @@ export const CreationSecondStepContent: React.FC<
         dispatch(setCreationFileUploadLoading(false));
       }
     },
-    [dispatch]
+    [dispatch, showErrorToastPredefined]
   );
+
   const handleItemFocus = useCallback((key: string) => {
     if (key === 'title') {
       setTitleError('');
@@ -919,16 +928,17 @@ export const CreationSecondStepContent: React.FC<
             dispatch(setCreationFileProcessingLoading(false));
           } else {
             dispatch(setCreationFileUploadError(true));
-            toast.error('An error occurred');
+            showErrorToastPredefined(undefined);
           }
         } else if (
           decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
         ) {
           dispatch(setCreationFileUploadError(true));
-          toast.error('An error occurred');
+          showErrorToastPredefined(undefined);
         }
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [videoProcessing, fileProcessing, dispatch]
   );
 
@@ -944,7 +954,7 @@ export const CreationSecondStepContent: React.FC<
         dispatch(setCreationFileProcessingLoading(false));
       } else {
         dispatch(setCreationFileUploadError(true));
-        toast.error('An error occurred');
+        showErrorToastPredefined(undefined);
       }
     }
 
@@ -1258,7 +1268,7 @@ export const CreationSecondStepContent: React.FC<
                         <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
                         <SUserTitleContainer>
                           <SUserTitle variant={3} weight={600}>
-                            {user.userData?.nickname}
+                            {getDisplayname(user.userData)}
                           </SUserTitle>
                           {user.userData?.options?.isVerified && (
                             <SInlineSvg

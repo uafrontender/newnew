@@ -16,6 +16,7 @@ import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSucce
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -114,7 +115,9 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
         const parsedHash = hash.substring(1);
 
         if (parsedHash === 'comments') {
-          document.getElementById('comments')?.scrollIntoView();
+          setTimeout(() => {
+            document.getElementById('comments')?.scrollIntoView();
+          }, 100);
         }
       };
 
@@ -139,7 +142,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
             <WaitingForResponseBox
               title={t('acPostAwaiting.hero.title')}
               body={t('acPostAwaiting.hero.body', {
-                creator: post.creator?.nickname,
+                creator: getDisplayname(post.creator),
                 time: waitingTime,
               })}
             />
@@ -163,7 +166,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
                             fill='none'
                           />
                         ) : null,
-                        { creator: post.creator?.nickname },
+                        { creator: getDisplayname(post.creator) },
                       ]}
                     />
                   </SWantsToKnow>

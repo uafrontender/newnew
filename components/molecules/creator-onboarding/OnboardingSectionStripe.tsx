@@ -5,10 +5,9 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../redux-store/store';
-
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { fetchSetStripeLinkCreator } from '../../../api/endpoints/payments';
 
 import Headline from '../../atoms/Headline';
@@ -30,6 +29,8 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const [stripeProcessing, setStripeProcessing] = useState(false);
   const [isConnectedToStripe, setIsConnectedToStripe] = useState(false);
@@ -67,7 +68,7 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
       window.location.href = url;
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 

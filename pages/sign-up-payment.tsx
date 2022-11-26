@@ -3,16 +3,15 @@ import React, { useEffect, useState } from 'react';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
-// import { useTranslation } from 'next-i18next';
 
 import Lottie from '../components/atoms/Lottie';
 
+import useErrorToasts from '../utils/hooks/useErrorToasts';
 import { sendVerificationEmail } from '../api/endpoints/auth';
+import { useAppDispatch, useAppSelector } from '../redux-store/store';
+import { setSignupEmailInput } from '../redux-store/slices/userStateSlice';
 
 import logoAnimation from '../public/animations/logo-loading-blue.json';
-import { setSignupEmailInput } from '../redux-store/slices/userStateSlice';
-import { useAppDispatch, useAppSelector } from '../redux-store/store';
 
 interface IEmailAuthRedirectPage {
   stripe_setup_intent_client_secret: string;
@@ -23,7 +22,8 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  // const { t } = useTranslation('common');
+
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,8 +56,6 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
           controller.signal
         );
 
-        console.log(res);
-
         if (!res!! || res!!.error || !res.data)
           throw new Error(res!!.error?.message ?? 'An error occurred');
 
@@ -81,8 +79,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
         // check if request wasn't aborted
         if (err.message !== 'The user aborted a request.') {
-          console.error(err.message);
-          toast.error(err.message);
+          showErrorToastPredefined(undefined);
         }
 
         // router.push('/');
