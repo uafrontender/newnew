@@ -2,7 +2,6 @@
 /* eslint-disable no-lonely-if */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-nested-ternary */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useState,
   useEffect,
@@ -37,6 +36,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import isBrowser from '../../../utils/isBrowser';
 import validateInputText from '../../../utils/validateMessageText';
 import ChatMessage from '../../atoms/chat/ChatMessage';
+import isSafari from '../../../utils/isSafari';
 
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
@@ -205,6 +205,21 @@ const ChatArea: React.FC<IChatData> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
+
+  // fix for container scrolling on Safari iOS
+  useEffect(() => {
+    if (
+      messages.length > 0 &&
+      messagesScrollContainerRef.current &&
+      isMobile &&
+      isSafari()
+    ) {
+      messagesScrollContainerRef.current.style.cssText = `flex: 0 0 300px;`;
+      setTimeout(() => {
+        messagesScrollContainerRef.current!!.style.cssText = `flex:1;`;
+      }, 5);
+    }
+  }, [messages, isMobile]);
 
   useEffect(() => {
     if (inView && !messagesLoading && messagesNextPageToken) {
@@ -511,6 +526,10 @@ const ChatArea: React.FC<IChatData> = ({
         {messages.length > 0 &&
           chatRoom &&
           messages.map((item, index) => {
+            if (index === messages.length - 2) {
+              return <SRef ref={scrollRef}>Loading...</SRef>;
+            }
+
             if (index < messages.length) {
               return (
                 <ChatMessage
@@ -522,9 +541,9 @@ const ChatArea: React.FC<IChatData> = ({
                 />
               );
             }
+
             return null;
           })}
-        {/* <SRef ref={scrollRef}>Loading...</SRef> */}
       </SCenterPart>
       <SBottomPart>
         {(isVisavisBlocked === true || confirmBlockUser) &&

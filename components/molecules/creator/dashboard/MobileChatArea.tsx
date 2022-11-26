@@ -97,7 +97,6 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
   useEffect(() => {
     if (chatRoom) {
-      setLocalUserData((data) => ({ ...data, ...chatRoom.visavis }));
       getChatMessages();
       if (chatRoom.kind === 4) {
         setIsAnnouncement(true);
