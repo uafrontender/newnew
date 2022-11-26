@@ -23,6 +23,7 @@ import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.s
 import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -231,6 +232,8 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const displayName = getDisplayname(user.userData);
+
   return (
     <>
       <SContent>
@@ -251,9 +254,9 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
           <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
           <SUserTitleContainer>
             <SUserTitle variant={3} weight={600}>
-              {user.userData?.nickname && user.userData?.nickname?.length > 8
-                ? `${user.userData?.nickname?.substring(0, 8)}...`
-                : user.userData?.nickname}
+              {displayName && displayName.length > 8
+                ? `${displayName.substring(0, 8)}...`
+                : displayName}
             </SUserTitle>
             {user.userData?.options?.isVerified && (
               <InlineSvg

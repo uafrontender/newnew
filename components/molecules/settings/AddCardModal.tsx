@@ -9,12 +9,12 @@ import {
 import { SetupIntent } from '@stripe/stripe-js';
 import { newnewapi } from 'newnew-api';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { toast } from 'react-toastify';
 
 import { createStripeSetupIntent } from '../../../api/endpoints/payments';
 import { useAppSelector } from '../../../redux-store/store';
 import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
 import useRecaptcha from '../../../utils/hooks/useRecaptcha';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 // Components
 import Modal from '../../organisms/Modal';
@@ -34,6 +34,7 @@ interface IAddCardForm {
 const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
+  const { showErrorToastCustom } = useErrorToasts();
   const { t: tCommon } = useTranslation('common');
 
   const stripe = useStripe();
@@ -85,8 +86,9 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
-      toast.error(recaptchaErrorMessage);
+      showErrorToastCustom(recaptchaErrorMessage);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recaptchaErrorMessage]);
 
   useEffect(

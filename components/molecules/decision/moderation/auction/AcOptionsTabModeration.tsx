@@ -6,7 +6,6 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 
@@ -23,6 +22,7 @@ import NoContentYetImg from '../../../../../public/images/decision/no-content-ye
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import { selectWinningOption } from '../../../../../api/endpoints/auction';
 import { Mixpanel } from '../../../../../utils/mixpanel';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 interface IAcOptionsTabModeration {
   postId: string;
@@ -56,6 +56,8 @@ const AcOptionsTabModeration: React.FunctionComponent<
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { showErrorToastPredefined } = useErrorToasts();
+
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
 
@@ -87,7 +89,7 @@ const AcOptionsTabModeration: React.FunctionComponent<
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 

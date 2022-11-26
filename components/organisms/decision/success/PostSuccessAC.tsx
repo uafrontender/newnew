@@ -102,6 +102,8 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     useEffect(() => {
       const handleCommentsInitialHash = () => {
         const { hash } = window.location;
+        console.log(hash);
+
         if (!hash) {
           return;
         }
@@ -109,7 +111,9 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
         const parsedHash = hash.substring(1);
 
         if (parsedHash === 'comments') {
-          document.getElementById('comments')?.scrollIntoView();
+          setTimeout(() => {
+            document.getElementById('comments')?.scrollIntoView();
+          }, 100);
         }
       };
 
@@ -187,7 +191,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                                   fill='none'
                                 />
                               ) : null,
-                              { creator: post.creator?.nickname },
+                              { creator: getDisplayname(post.creator) },
                             ]}
                           />
                         </SWantsToKnow>

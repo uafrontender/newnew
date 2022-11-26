@@ -4,6 +4,7 @@ import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 
 import { SocketContext } from './socketContext';
+import useErrorToasts from '../utils/hooks/useErrorToasts';
 
 interface IVideoProcessingWrapper {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ const VideoProcessingWrapper: React.FunctionComponent<
   IVideoProcessingWrapper
 > = ({ children }) => {
   const router = useRouter();
+  const { showErrorToastCustom } = useErrorToasts();
   const socketConnection = useContext(SocketContext);
 
   const handlerSocketUpdated = useCallback(
@@ -60,13 +62,14 @@ const VideoProcessingWrapper: React.FunctionComponent<
         decoded.postUuid &&
         decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
       ) {
-        toast.error('An error occurred when processing your video', {
+        showErrorToastCustom('An error occurred when processing your video', {
           onClick: () => {
             router.push(`/post/${decoded.postUuid}`);
           },
         });
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [router]
   );
 

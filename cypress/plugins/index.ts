@@ -34,6 +34,7 @@ module.exports = (on, config) => {
     },
   });
 
+  // Enable to see logs for failed posts
   require('cypress-terminal-report/src/installLogsPrinter')(on);
 
   // do not forget to return the changed config object!

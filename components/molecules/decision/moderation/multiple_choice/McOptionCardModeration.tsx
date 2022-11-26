@@ -34,6 +34,7 @@ import BlockUserModalPost from '../../common/BlockUserModalPost';
 import ReportModal, { ReportData } from '../../../chat/ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 import { RenderSupportersInfo } from '../../regular/multiple_choice/McOptionCard';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -66,6 +67,7 @@ const McOptionCardModeration: React.FunctionComponent<
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const supporterCountSubstracted = useMemo(() => {
     if (option.supporterCount === 0) {
@@ -94,7 +96,7 @@ const McOptionCardModeration: React.FunctionComponent<
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 
@@ -221,6 +223,7 @@ const McOptionCardModeration: React.FunctionComponent<
           ) : (
             <SEllipseButtonMobile
               ref={ellipseMenuButton}
+              isWhite={!!isWinner}
               onClick={() => setIsEllipseMenuOpen(true)}
             >
               {t('mcPost.optionsTab.optionCard.moreButton')}
@@ -466,16 +469,20 @@ const SEllipseButton = styled(Button)`
   }
 `;
 
-const SEllipseButtonMobile = styled.button`
+const SEllipseButtonMobile = styled.button<{
+  isWhite?: boolean;
+}>`
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  color: ${({ theme, isWhite }) =>
+    isWhite ? theme.colors.dark : theme.colorsThemed.text.primary};
 
   padding: 16px 16px;
   height: 56px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+  background-color: ${({ theme, isWhite }) =>
+    isWhite ? '#FFFFFF' : theme.colorsThemed.background.quinary};
 
   border-radius: 16px;
   border: transparent;

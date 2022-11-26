@@ -3,6 +3,7 @@
 // TODO: adjust eslint no-param-reassign for Slices
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 import { cookiesInstance } from '../../api/apiConfigs';
+import isBrowser from '../../utils/isBrowser';
 import { AppThunk } from '../store';
 
 // This slice will be responsible for major UI state data:
@@ -96,6 +97,17 @@ export const setColorMode =
       maxAge: 10 * 365 * 24 * 60 * 60,
       path: '/',
     });
+
+    // Smooth theming
+    if (isBrowser()) {
+      document?.documentElement?.classList?.add('theming');
+      document?.documentElement?.addEventListener('transitionend', () => {
+        if (document?.documentElement) {
+          document?.documentElement?.classList?.remove('theming');
+        }
+      }, {once: true});
+      // document?.documentElement?.classList?.toggle('theme-change');
+    }
   };
 
 export default uiSlice.reducer;

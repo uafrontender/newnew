@@ -11,7 +11,6 @@ import React, {
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -43,6 +42,8 @@ import { useBundles } from '../../../../contexts/bundlesContext';
 import BuyBundleModal from '../../../molecules/bundles/BuyBundleModal';
 import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../atoms/bundles/TicketSet';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -92,6 +93,7 @@ interface IPostViewMC {}
 
 const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const { t } = useTranslation('page-Post');
+  const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -544,7 +546,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         setPaymentSuccessModalOpen(true);
       } catch (err: any) {
         console.error(err);
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
         setLoadingModalOpen(false);
       }
     };
@@ -578,8 +580,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   useEffect(() => {
     if (loadingOptionsError) {
-      toast.error(loadingOptionsError);
+      showErrorToastCustom(loadingOptionsError);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadingOptionsError]);
 
   const [isPopupVisible, setIsPopupVisible] = useState(false);
@@ -607,7 +610,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       const parsedHash = hash.substring(1);
 
       if (parsedHash === 'comments') {
-        document.getElementById('comments')?.scrollIntoView();
+        setTimeout(() => {
+          document.getElementById('comments')?.scrollIntoView();
+        }, 100);
       }
     };
 
@@ -733,9 +738,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             post={post}
             postLoading={postLoading}
             postStatus={postStatus}
-            postCreatorName={
-              (post.creator?.nickname as string) ?? post.creator?.username
-            }
+            postCreatorName={getDisplayname(post.creator)}
             postDeadline={moment(
               (post.responseUploadDeadline?.seconds as number) * 1000
             )
@@ -770,8 +773,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             }}
           >
             {t('paymentSuccessModal.mc', {
-              postCreator:
-                (post.creator?.nickname as string) ?? post.creator?.username,
+              postCreator: getDisplayname(post.creator),
               postDeadline: moment(
                 (post.responseUploadDeadline?.seconds as number) * 1000
               )
@@ -799,9 +801,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             {creatorsBundle?.bundle
               ? t('mcPost.optionsTab.actionSection.getMoreBundles')
               : t('mcPost.optionsTab.actionSection.offersBundles', {
-                  creator:
-                    (post.creator?.nickname as string) ??
-                    post.creator?.username,
+                  creator: getDisplayname(post.creator),
                 })}
           </SBundlesText>
           <SHighlightedButton

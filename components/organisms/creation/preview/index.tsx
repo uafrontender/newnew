@@ -9,7 +9,6 @@ import React, {
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import _compact from 'lodash/compact';
-import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -44,6 +43,7 @@ import urltoFile from '../../../../utils/urlToFile';
 import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -57,6 +57,7 @@ interface IPreviewContent {}
 export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { t: tCommon } = useTranslation();
   const { t } = useTranslation('page-Creation');
+  const { showErrorToastCustom } = useErrorToasts();
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -323,10 +324,11 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         setShowModal(true);
       }
     } catch (err: any) {
-      toast.error(err);
+      showErrorToastCustom(err);
       setLoading(false);
     }
   }, [
+    loading,
     customCoverImageUrl,
     post.title,
     post.options,
@@ -334,18 +336,19 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     post.thumbnailParameters.startTime,
     post.thumbnailParameters.endTime,
     post.announcementVideoUrl,
-    userData?.options?.isOfferingBundles,
-    loading,
-    tab,
-    router,
-    auction,
-    isMobile,
-    dispatch,
-    crowdfunding,
-    multiplechoice,
     formatStartsAt,
     formatExpiresAt,
+    tab,
+    dispatch,
+    isMobile,
+    auction.minimalBid,
+    multiplechoice.choices,
+    userData?.options?.isOfferingBundles,
+    crowdfunding.targetBackerCount,
+    router,
+    showErrorToastCustom,
   ]);
+
   const settings: any = useMemo(
     () =>
       _compact([
@@ -487,7 +490,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             {fileProcessing.progress === 100 ? (
               <BitmovinPlayer
                 id='preview-mobile'
-                muted={false}
+                withMuteControl
                 resources={videoProcessing?.targetUrls}
                 showPlayButton
               />

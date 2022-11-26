@@ -4,7 +4,6 @@ import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 
 import Headline from '../../atoms/Headline';
 import { useAppSelector } from '../../../redux-store/store';
@@ -15,6 +14,7 @@ import {
   setBundleStatus,
 } from '../../../api/endpoints/bundles';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -37,6 +37,7 @@ export const Bundles: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const { appConstants } = useGetAppConstants();
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -80,10 +81,11 @@ export const Bundles: React.FC = React.memo(() => {
       setSuccessModalOpen(true);
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     } finally {
       setBusy(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [busy, isBundlesEnabled]);
 
   const renderListItem = useCallback(

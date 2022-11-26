@@ -10,7 +10,6 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -48,6 +47,8 @@ import SmsNotificationsButton from '../molecules/profile/SmsNotificationsButton'
 import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
 import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
 import { useBundles } from '../../contexts/bundlesContext';
+import useErrorToasts from '../../utils/hooks/useErrorToasts';
+import getDisplayname from '../../utils/getDisplayname';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -81,6 +82,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -150,7 +152,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       unblockUser(uuid);
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 
@@ -439,7 +441,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         }
       } catch (err) {
         console.error(err);
-        toast.error('toastErrors.generic');
       }
     }
 
@@ -465,7 +466,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           {/* Favorites and more options buttons */}
           <SBackButton
             onClick={() => {
-              router.push('/');
+              router.back();
             }}
           />
           {/* <SFavoritesButton
@@ -538,7 +539,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           <SUserData>
             <SUsernameWrapper>
               <SUsername variant={4}>
-                {user.nickname}
+                {getDisplayname(user)}
                 {user.options?.isVerified && (
                   <SInlineSVG
                     svg={VerificationCheckmark}
@@ -653,9 +654,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       />
       <ReportModal
         show={confirmReportUser}
-        reportedDisplayname={
-          user.nickname ? user.nickname || `@${user.username}` : ''
-        }
+        reportedDisplayname={getDisplayname(user)}
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />

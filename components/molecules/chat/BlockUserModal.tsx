@@ -2,12 +2,14 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
-import { toast } from 'react-toastify';
 
 import { markUser } from '../../../api/endpoints/user';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
+
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
-import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface IBlockUserModal {
   user: newnewapi.IVisavisUser;
@@ -25,6 +27,7 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
   isAnnouncement,
 }) => {
   const { t } = useTranslation('page-Chat');
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const { blockUser } = useGetBlockedUsers();
 
@@ -42,7 +45,7 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
       closeModal();
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   }
   const handleConfirmClick = () => {
@@ -55,12 +58,12 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
           <SModalTitle>
             {isAnnouncement
               ? t('modal.blockGroup.title')
-              : `${t('modal.blockUser.title')} ${user.user?.username}`}
+              : `${t('modal.blockUser.title')} ${getDisplayname(user.user)}`}
           </SModalTitle>
           <SModalMessage>
-            {`${t('modal.blockUser.messageFirstPart')} ${
-              user.user?.username
-            } ${t('modal.blockUser.messageSecondPart')}`}
+            {`${t('modal.blockUser.messageFirstPart')} ${getDisplayname(
+              user.user
+            )} ${t('modal.blockUser.messageSecondPart')}`}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>

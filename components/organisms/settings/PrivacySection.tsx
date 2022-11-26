@@ -11,6 +11,7 @@ import Button from '../../atoms/Button';
 import ConfirmDeleteAccountModal from '../../molecules/settings/ConfirmDeleteAccountModal';
 import InlineSvg from '../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import getDisplayname from '../../../utils/getDisplayname';
 
 type TPrivacySection = {
   isSpendingHidden: boolean;
@@ -91,7 +92,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
                 <img alt={user.username} src={user.avatarUrl} />
               </SAvatar>
               <SNickname variant={3}>
-                {user.nickname}
+                {getDisplayname(user)}
                 {user.options?.isVerified && (
                   <SInlineSVG
                     svg={VerificationCheckmark}
@@ -102,7 +103,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
                 )}
               </SNickname>
 
-              <SUsername variant={2}>{user.username}</SUsername>
+              <SUsername variant={2}>{`@${user.username}`}</SUsername>
               <SUnblockButton
                 onClick={() => handleUnblockUser(user.uuid)}
                 view='secondary'

@@ -252,7 +252,7 @@ context('Main flow', () => {
   });
 
   describe('Guest willing to contribute', () => {
-    const USER_EMAIL = `test-user-${testSeed}0@newnew.co`;
+    let USER_EMAIL;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
@@ -282,10 +282,19 @@ context('Main flow', () => {
     });
 
     it('can enter the post page and contribute to an event without prior authentication', () => {
+      // Clear auth, use new email
+      cy.setCookie('accessToken', '');
+      cy.setCookie('refreshToken', '');
+      storage.restart();
+      cy.log(localStorage.getItem('remainingAcSteps'));
+      cy.reload();
+      cy.wait(4000);
+
+      const attemptSeed = Math.floor(Math.random() * 100);
+      USER_EMAIL = `test-user-${testSeed}${attemptSeed}0@newnew.co`;
       const BID_OPTION_TEXT = 'something';
       const BID_OPTION_AMOUNT = '10';
-      // Let post finish processing
-      cy.wait(40000);
+
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${eventId}`);
       cy.url().should('include', '/post');
 
@@ -337,7 +346,7 @@ context('Main flow', () => {
   });
 
   describe('Guest willing to buy a bundle', () => {
-    const USER_EMAIL = `test-user-${testSeed}1@newnew.co`;
+    let USER_EMAIL;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
@@ -367,6 +376,17 @@ context('Main flow', () => {
     });
 
     it('can enter the post page, buy a bundle without prior authentication and contribute to a superpoll', () => {
+      // Clear auth, use new email
+      cy.setCookie('accessToken', '');
+      cy.setCookie('refreshToken', '');
+      storage.restart();
+      cy.log(localStorage.getItem('remainingAcSteps'));
+      cy.reload();
+      cy.wait(4000);
+
+      const attemptSeed = Math.floor(Math.random() * 100);
+      USER_EMAIL = `test-user-${testSeed}${attemptSeed}0@newnew.co`;
+
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
       cy.url().should('include', '/post');
 
