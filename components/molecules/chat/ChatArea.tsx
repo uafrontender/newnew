@@ -2,6 +2,7 @@
 /* eslint-disable no-lonely-if */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-nested-ternary */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useState,
   useEffect,
@@ -10,15 +11,13 @@ import React, {
   useRef,
 } from 'react';
 import dynamic from 'next/dynamic';
-import moment from 'moment';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import Link from 'next/link';
 
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
-import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import TextArea from '../../atoms/chat/TextArea';
 import InlineSVG from '../../atoms/InlineSVG';
@@ -37,8 +36,8 @@ import { reportUser } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
 import isBrowser from '../../../utils/isBrowser';
 import validateInputText from '../../../utils/validateMessageText';
+import ChatMessage from '../../atoms/chat/ChatMessage';
 
-const UserAvatar = dynamic(() => import('../UserAvatar'));
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
 const BlockedUser = dynamic(() => import('./BlockedUser'));
@@ -91,11 +90,9 @@ const ChatArea: React.FC<IChatData> = ({
   >();
 
   const [localUserData, setLocalUserData] = useState({
-    justSubscribed: false,
     blockedUser: false,
     isAnnouncement: false,
     subscriptionExpired: false,
-    // messagingDisabled: false,
     accountDeleted: false,
   });
 
@@ -141,7 +138,6 @@ const ChatArea: React.FC<IChatData> = ({
             return arr;
           });
           setMessagesNextPageToken(res.data.paging?.nextPageToken);
-          setLocalUserData({ ...localUserData, justSubscribed: false });
         }
         setMessagesLoading(false);
       } catch (err) {
@@ -149,7 +145,7 @@ const ChatArea: React.FC<IChatData> = ({
         setMessagesLoading(false);
       }
     },
-    [messagesLoading, chatRoom, localUserData]
+    [messagesLoading, chatRoom]
   );
 
   useEffect(() => {
@@ -161,12 +157,9 @@ const ChatArea: React.FC<IChatData> = ({
         }
       }
 
-      if (!chatRoom.lastMessage)
-        setLocalUserData({ ...localUserData, justSubscribed: true });
       getChatMessages();
       if (chatRoom.kind === 4) {
         setIsAnnouncement(true);
-        /* eslint-disable no-unused-expressions */
         chatRoom.myRole === 2
           ? setIsMyAnnouncement(true)
           : setIsMyAnnouncement(false);
@@ -343,149 +336,29 @@ const ChatArea: React.FC<IChatData> = ({
     [messageText, isMobileOrTablet, handleSubmit]
   );
 
-  const renderMessage = useCallback(
-    (item: newnewapi.IChatMessage, index: number) => {
-      const prevElement = messages[index - 1];
-      const nextElement = messages[index + 1];
-
-      const isMine = item.sender?.uuid === user.userData?.userUuid;
-
-      const prevSameUser = prevElement?.sender?.uuid === item.sender?.uuid;
-      const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
-
-      const prevSameDay =
-        !!prevElement?.createdAt &&
-        !!item.createdAt &&
-        moment((prevElement?.createdAt.seconds as number) * 1000).isSame(
-          (item.createdAt.seconds as number) * 1000,
-          'day'
-        );
-
-      const nextSameDay =
-        !!nextElement?.createdAt &&
-        !!item.createdAt &&
-        moment((nextElement?.createdAt.seconds as number) * 1000).isSame(
-          (item.createdAt.seconds as number) * 1000,
-          'day'
-        );
-
-      const content = (
-        <SMessage
-          id={item.id?.toString()}
-          mine={isMine}
-          prevSameUser={prevSameUser}
-        >
-          {(!prevSameUser || !prevSameDay) &&
-            (isMine ? (
-              <SUserAvatar
-                mine={isMine}
-                avatarUrl={user.userData?.avatarUrl ?? ''}
-              />
-            ) : (
-              <Link href={`/${chatRoom?.visavis?.user?.username}`}>
-                <a>
-                  <SUserAvatar
-                    mine={isMine}
-                    avatarUrl={chatRoom?.visavis?.user?.avatarUrl ?? ''}
-                  />
-                </a>
-              </Link>
-            ))}
-          <SMessageContent
-            mine={isMine}
-            prevSameUser={prevSameUser}
-            nextSameUser={nextSameUser}
-            prevSameDay={prevSameDay}
-            nextSameDay={nextSameDay}
-          >
-            <SMessageText mine={isMine} weight={600} variant={3}>
-              {item.content?.text}
-            </SMessageText>
-          </SMessageContent>
-          {index === messages.length - 2 && (
-            <SRef ref={scrollRef}>Loading...</SRef>
-          )}
-        </SMessage>
-      );
-      if (
-        item.createdAt?.seconds &&
-        nextElement?.createdAt?.seconds &&
-        moment((item.createdAt?.seconds as number) * 1000).format(
-          'DD.MM.YYYY'
-        ) !==
-          moment((nextElement?.createdAt?.seconds as number) * 1000).format(
-            'DD.MM.YYYY'
-          )
-      ) {
-        let date = moment((item.createdAt?.seconds as number) * 1000).format(
-          'MMM DD'
-        );
-
-        if (date === moment().format('MMM DD')) {
-          date = t('chat.today');
-        }
-
-        return (
-          <React.Fragment key={item.id?.toString()}>
-            {content}
-            <SMessage type='info'>
-              <SMessageContent
-                type='info'
-                prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}
-                nextSameUser={nextElement?.sender?.uuid === item.sender?.uuid}
-              >
-                <SMessageText type='info' weight={600} variant={3}>
-                  {date}
-                </SMessageText>
-              </SMessageContent>
-            </SMessage>
-          </React.Fragment>
-        );
-      }
-      if (!nextElement) {
-        let date = moment((item.createdAt?.seconds as number) * 1000).format(
-          'MMM DD'
-        );
-        if (date === moment().format('MMM DD')) {
-          date = t('chat.today');
-        }
-        return (
-          <React.Fragment key={item.id?.toString()}>
-            {content}
-            <SMessage type='info'>
-              <SMessageContent
-                type='info'
-                prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}
-              >
-                <SMessageText type='info' weight={600} variant={3}>
-                  {date}
-                </SMessageText>
-              </SMessageContent>
-            </SMessage>
-          </React.Fragment>
-        );
-      }
-
-      return (
-        <React.Fragment key={item.id?.toString()}>{content}</React.Fragment>
-      );
-    },
-    [
-      chatRoom,
-      t,
-      user.userData?.avatarUrl,
-      user.userData?.userUuid,
-      messages,
-      scrollRef,
-    ]
-  );
-
   const clickHandler = () => {
     if (showChatList) {
       setMessageText('');
       showChatList();
     }
   };
+
+  const chatUsernameTitle = useCallback(() => {
+    let name = '';
+    if (chatRoom) {
+      const username = user.userData?.nickname || user.userData?.username;
+      const visavisUsername =
+        chatRoom.visavis?.user?.nickname || chatRoom.visavis?.user?.username;
+      if (isAnnouncement) {
+        name = t('announcement.title', {
+          username: isMyAnnouncement ? username : visavisUsername,
+        });
+      } else {
+        name = isMyAnnouncement ? username!! : visavisUsername!!;
+      }
+    }
+    return name;
+  }, [chatRoom, isAnnouncement, isMyAnnouncement, t, user]);
 
   const isTextareaVisible = useCallback(() => {
     if (
@@ -514,7 +387,6 @@ const ChatArea: React.FC<IChatData> = ({
   ]);
 
   const moreButtonRef: any = useRef();
-
   const messagesScrollContainerRef = useRef<HTMLDivElement>();
 
   useEffect(() => {
@@ -535,20 +407,7 @@ const ChatArea: React.FC<IChatData> = ({
           {isMobileOrTablet && <GoBackButton onClick={clickHandler} />}
           <SUserData>
             <SUserName>
-              {
-                // eslint-disable-next-line no-nested-ternary
-                isAnnouncement
-                  ? t('announcement.title', {
-                      username: isMyAnnouncement
-                        ? user.userData?.nickname || user.userData?.username
-                        : chatRoom.visavis?.user?.nickname ||
-                          chatRoom.visavis?.user?.username,
-                    })
-                  : isMyAnnouncement
-                  ? user.userData?.nickname || user.userData?.username
-                  : chatRoom.visavis?.user?.nickname ||
-                    chatRoom.visavis?.user?.username
-              }
+              {chatUsernameTitle()}
               {chatRoom.visavis?.user?.options?.isVerified && (
                 <SVerificationSVG
                   svg={VerificationCheckmark}
@@ -641,28 +500,31 @@ const ChatArea: React.FC<IChatData> = ({
           messagesScrollContainerRef.current = el!!;
         }}
       >
-        {localUserData?.justSubscribed &&
-          chatRoom &&
+        {chatRoom &&
           messages.length === 0 &&
           !isAnnouncement &&
           (chatRoom.myRole === 1 ? (
-            <WelcomeMessage
-              userAlias={
-                chatRoom.visavis?.user?.username
-                  ? chatRoom.visavis?.user?.username
-                  : ''
-              }
-            />
+            <WelcomeMessage userAlias={chatRoom.visavis?.user?.username!!} />
           ) : (
             <NoMessagesYet />
           ))}
         {messages.length > 0 &&
+          chatRoom &&
           messages.map((item, index) => {
             if (index < messages.length) {
-              return renderMessage(item, index);
+              return (
+                <ChatMessage
+                  key={`${chatRoom}-${item.id}`}
+                  chatRoom={chatRoom}
+                  item={item}
+                  nextElement={messages[index + 1]}
+                  prevElement={messages[index - 1]}
+                />
+              );
             }
             return null;
           })}
+        {/* <SRef ref={scrollRef}>Loading...</SRef> */}
       </SCenterPart>
       <SBottomPart>
         {(isVisavisBlocked === true || confirmBlockUser) &&
@@ -827,25 +689,6 @@ const STextArea = styled.div`
   flex: 1;
 `;
 
-interface ISUserAvatar {
-  mine?: boolean;
-}
-const SUserAvatar = styled(UserAvatar)<ISUserAvatar>`
-  position: absolute;
-  bottom: 0;
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
-  padding: 0;
-  display: none;
-  left: 0;
-
-  ${(props) => props.theme.media.tablet} {
-    display: block;
-  }
-`;
-
 const SVerificationSVG = styled(InlineSVG)`
   margin-left: 4px;
   flex-shrink: 0;
@@ -864,222 +707,6 @@ const SButton = styled(Button)`
       props.theme.name === 'light'
         ? props.theme.colors.white
         : props.theme.colorsThemed.button.background.secondary};
-  }
-`;
-
-interface ISMessage {
-  type?: string;
-  mine?: boolean;
-  prevSameUser?: boolean;
-}
-
-const SMessage = styled.div<ISMessage>`
-  width: 100%;
-  position: relative;
-
-  ${(props) => {
-    if (props.type !== 'info') {
-      if (props.mine) {
-        return css`
-          ${props.theme.media.mobile} {
-            justify-content: flex-end;
-          }
-          ${props.theme.media.tablet} {
-            padding-right: 0;
-            padding-left: 44px;
-            justify-content: flex-start;
-          }
-        `;
-      }
-      return css`
-        ${props.theme.media.mobile} {
-          padding-left: 0;
-        }
-        ${props.theme.media.tablet} {
-          justify-content: flex-start;
-          padding-left: 44px;
-        }
-      `;
-    }
-    return css`
-      justify-content: center;
-    `;
-  }}
-
-  ${(props) => {
-    if (!props.prevSameUser && props.type !== 'info') {
-      return css`
-        margin-bottom: 8px;
-      `;
-    }
-    return css`
-      margin-bottom: 0;
-    `;
-  }}
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 8px;
-`;
-
-interface ISMessageContent {
-  type?: string;
-  mine?: boolean;
-  prevSameUser?: boolean;
-  nextSameUser?: boolean;
-  prevSameDay?: boolean;
-  nextSameDay?: boolean;
-}
-
-const SMessageContent = styled.div<ISMessageContent>`
-  padding: ${(props) => (props.type === 'info' ? '12px 0 0' : '12px 16px')};
-  background: ${(props) => {
-    if (props.type === 'info') {
-      return 'transparent';
-    }
-    if (props.mine) {
-      return props.theme.colorsThemed.accent.blue;
-    }
-    if (props.theme.name === 'light') {
-      return props.theme.colors.white;
-    }
-
-    return props.theme.colorsThemed.background.tertiary;
-  }};
-  ${(props) => {
-    if (props.mine) {
-      if (props.prevSameUser && props.prevSameDay) {
-        if (props.nextSameUser && props.nextSameDay) {
-          if (props.type === 'info') {
-            return css`
-              margin: 8px 0;
-            `;
-          }
-
-          return css`
-            border-radius: 16px;
-          `;
-        }
-
-        if (props.type === 'info') {
-          return css`
-            margin-top: 8px;
-          `;
-        }
-
-        return css`
-          margin-top: 8px;
-          border-radius: 16px 16px 8px 16px;
-
-          ${props.theme.media.tablet} {
-            border-radius: 16px;
-          }
-        `;
-      }
-
-      if (props.nextSameUser) {
-        if (props.type === 'info') {
-          return css`
-            margin: 8px 0;
-          `;
-        }
-
-        return css`
-          border-radius: 16px 8px 16px 16px;
-
-          ${props.theme.media.tablet} {
-            border-radius: 16px 16px 16px 8px;
-          }
-        `;
-      }
-    } else {
-      if (props.prevSameUser && props.prevSameDay) {
-        if (props.nextSameUser && props.nextSameDay) {
-          if (props.type === 'info') {
-            return css`
-              margin: 8px 0;
-            `;
-          }
-          return css`
-            border-radius: 16px;
-          `;
-        }
-
-        if (props.type === 'info') {
-          return css`
-            margin-top: 8px;
-          `;
-        }
-
-        return css`
-          margin-top: 8px;
-          border-radius: 16px 16px 16px 8px;
-
-          ${props.theme.media.tablet} {
-            border-radius: 16px;
-          }
-        `;
-      }
-
-      if (props.nextSameUser) {
-        if (props.type === 'info') {
-          return css`
-            margin: 8px 0;
-          `;
-        }
-
-        return css`
-          border-radius: 8px 16px 16px 16px;
-
-          ${props.theme.media.tablet} {
-            border-radius: 16px 16px 16px 8px;
-          }
-        `;
-      }
-      return css`
-        border-radius: 16px 16px 16px 8px;
-      `;
-    }
-
-    if (props.type === 'info') {
-      return css`
-        margin: 8px 0;
-      `;
-    }
-
-    return css`
-      border-radius: 16px 16px 8px 16px;
-
-      ${props.theme.media.tablet} {
-        border-radius: 16px 16px 16px 8px;
-      }
-    `;
-  }}
-`;
-
-interface ISMessageText {
-  type?: string;
-  mine?: boolean;
-}
-
-const SMessageText = styled(Text)<ISMessageText>`
-  line-height: 20px;
-  max-width: 80vw;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  color: ${(props) => {
-    if (props.type === 'info') {
-      return props.theme.colorsThemed.text.tertiary;
-    }
-
-    if (props.mine && props.theme.name === 'light') {
-      return props.theme.colors.white;
-    }
-
-    return props.theme.colorsThemed.text.primary;
-  }};
-
-  ${({ theme }) => theme.media.tablet} {
-    max-width: 412px;
   }
 `;
 

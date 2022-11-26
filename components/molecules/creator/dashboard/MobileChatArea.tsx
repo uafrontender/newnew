@@ -46,15 +46,6 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     newnewapi.IChatMessage | null | undefined
   >();
 
-  const [localUserData, setLocalUserData] = useState({
-    justSubscribed: false,
-    blockedUser: false,
-    isAnnouncement: false,
-    subscriptionExpired: false,
-    messagingDisabled: false,
-    accountDeleted: false,
-  });
-
   const [isAnnouncement, setIsAnnouncement] = useState<boolean>(false);
   const [isMyAnnouncement, setIsMyAnnouncement] = useState<boolean>(false);
 
@@ -94,7 +85,6 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
             return arr;
           });
           setMessagesNextPageToken(res.data.paging?.nextPageToken);
-          setLocalUserData({ ...localUserData, justSubscribed: false });
         }
         setMessagesLoading(false);
       } catch (err) {
@@ -102,15 +92,12 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         setMessagesLoading(false);
       }
     },
-    [messagesLoading, chatRoom, localUserData]
+    [messagesLoading, chatRoom]
   );
 
   useEffect(() => {
     if (chatRoom) {
       setLocalUserData((data) => ({ ...data, ...chatRoom.visavis }));
-
-      if (!chatRoom.lastMessage)
-        setLocalUserData({ ...localUserData, justSubscribed: true });
       getChatMessages();
       if (chatRoom.kind === 4) {
         setIsAnnouncement(true);
