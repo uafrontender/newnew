@@ -15,11 +15,11 @@ import { useInView } from 'react-intersection-observer';
 import Link from 'next/link';
 
 import Text from '../../../atoms/Text';
+import UserAvatar from '../../UserAvatar';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
-import TextArea from '../../../atoms/chat/TextArea';
 import InlineSVG from '../../../atoms/InlineSVG';
-import UserAvatar from '../../UserAvatar';
+import TextArea from '../../../atoms/chat/TextArea';
 import { useAppSelector } from '../../../../redux-store/store';
 
 import sendIcon from '../../../../public/images/svg/icons/filled/Send.svg';
@@ -34,8 +34,8 @@ import {
   sendMessage,
 } from '../../../../api/endpoints/chat';
 import isBrowser from '../../../../utils/isBrowser';
-import validateInputText from '../../../../utils/validateMessageText';
 import getDisplayname from '../../../../utils/getDisplayname';
+import validateInputText from '../../../../utils/validateMessageText';
 
 interface IChat {
   roomID: string;
@@ -383,8 +383,6 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     ]
   );
 
-  // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, !!messages, true);
-
   const handleUserClick = useCallback(() => {
     if (chatRoom?.visavis?.user?.username) {
       router.push(`/${chatRoom?.visavis?.user?.username}`);
@@ -491,8 +489,6 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           </SButton>
         </SBottomTextarea>
       </SBottomPart>
-      {/* <GradientMask positionTop active={showTopGradient} />
-      <GradientMask active={showBottomGradient} /> */}
     </SContainer>
   );
 };
