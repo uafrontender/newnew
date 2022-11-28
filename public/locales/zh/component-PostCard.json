@@ -8,7 +8,7 @@
     },
     "withoutActivity": {
       "ac": "現在出價",
-      "mc": "現在投票",
+      "mc_NEED_TRANSLATION": "Be the first to vote!",
       "cf": "支持該Goal"
     },
     "seeResults": {
@@ -18,11 +18,11 @@
     }
   },
   "timer": {
-    "timeLeft": "剩餘{{time}}",
-    "daysLeft": "d",
-    "hoursLeft": "h",
-    "minutesLeft": "m",
-    "secondsLeft_NEED_TRANSLATION": "s",
+    "timeLeft": "{{time}}",
+    "daysLeft": "天",
+    "hoursLeft": "小時",
+    "minutesLeft": "分鐘",
+    "secondsLeft": "秒",
     "endedOn": "結束於",
     "soon": "即將開始"
   }

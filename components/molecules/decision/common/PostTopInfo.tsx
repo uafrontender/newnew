@@ -39,7 +39,8 @@ import getDisplayname from '../../../../utils/getDisplayname';
 import assets from '../../../../constants/assets';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import { I18nNamespaces } from '../../../../@types/i18next';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -70,7 +71,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
+  const { t: tCommon } = useTranslation('common');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -83,11 +85,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     postStatus,
     isFollowingDecision,
     hasRecommendations,
-    handleRemoveFromStateUnfavorited,
-    handleAddPostToStateFavorited,
     handleReportOpen,
     handleSetIsFollowingDecision,
-  } = usePostModalInnerState();
+    handleCloseAndGoBack,
+  } = usePostInnerState();
 
   const postId = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
   const title = useMemo(() => postParsed?.title ?? '', [postParsed]);
@@ -201,19 +202,11 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
       if (!res.error) {
         handleSetIsFollowingDecision(!isFollowingDecision);
-
-        if (isFollowingDecision) {
-          handleRemoveFromStateUnfavorited?.();
-        } else {
-          handleAddPostToStateFavorited?.();
-        }
       }
     } catch (err) {
       console.error(err);
     }
   }, [
-    handleAddPostToStateFavorited,
-    handleRemoveFromStateUnfavorited,
     handleSetIsFollowingDecision,
     isFollowingDecision,
     postId,
@@ -228,16 +221,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       _postUuid: postId,
       _component: 'PostTopInfo',
     });
-    if (hasRecommendations) {
-      document.getElementById('post-modal-container')?.scrollTo({
-        top: document.getElementById('recommendations-section-heading')
-          ?.offsetTop,
-        behavior: 'smooth',
-      });
+    if (router.pathname === '/') {
+      handleCloseAndGoBack();
     } else {
-      router.push(`/see-more?category=${postType}`);
+      router.push('/');
     }
-  }, [hasRecommendations, postType, router, postId]);
+    // }
+  }, [router, postId, handleCloseAndGoBack]);
 
   const moreButtonRef: any = useRef();
   const shareButtonRef: any = useRef();
@@ -253,13 +243,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         ) : null}
         {postType === 'mc' && totalVotes ? (
           <SBidsAmount>
-            <span>{formatNumber(totalVotes, true).replaceAll(/,/g, ' ')}</span>{' '}
+            <span>{formatNumber(totalVotes, true)}</span>{' '}
             {totalVotes > 1
               ? t('mcPost.postTopInfo.votes')
               : t('mcPost.postTopInfo.vote')}
           </SBidsAmount>
         ) : null}
-        <CreatorCard>
+        <SCreatorCard>
           <a
             href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
               creator.username
@@ -288,19 +278,21 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               });
             }}
           >
-            <SUsername className='username'>
-              {creator.nickname ?? `@${creator.username}`}{' '}
+            <SUserInfo>
+              <SUsername className='username'>
+                {getDisplayname(creator)}
+              </SUsername>
               {creator.options?.isVerified && (
                 <SInlineSVG
                   svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
+                  width='20px'
+                  height='20px'
                   fill='none'
                 />
               )}
-            </SUsername>
+            </SUserInfo>
           </a>
-        </CreatorCard>
+        </SCreatorCard>
         <SActionsDiv>
           <SShareButton
             view='transparent'
@@ -353,7 +345,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           {/* Ellipse menu */}
           {!isMobile && (
             <PostEllipseMenu
-              postType={postType as string}
+              postType={postType as TPostType}
               isFollowingDecision={isFollowingDecision}
               isVisible={ellipseMenuOpen}
               handleFollowDecision={handleFollowDecision}
@@ -364,7 +356,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           )}
           {isMobile && ellipseMenuOpen ? (
             <PostEllipseModal
-              postType={postType as string}
+              postType={postType as TPostType}
               isFollowingDecision={isFollowingDecision}
               zIndex={11}
               isOpen={ellipseMenuOpen}
@@ -394,12 +386,15 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           title={t('postFailedBox.title', {
             postType: t(`postType.${postType}`),
           })}
-          body={t(`postFailedBox.reason.${failureReason}`, {
-            creator: getDisplayname(creator),
-          })}
-          buttonCaption={t('postFailedBox.buttonText', {
-            postTypeMultiple: t(`postType.multiple.${postType}`),
-          })}
+          body={t(
+            `postFailedBox.reason.${
+              failureReason as keyof I18nNamespaces['page-Post']['postFailedBox']['reason']
+            }`,
+            {
+              creator: getDisplayname(creator),
+            }
+          )}
+          buttonCaption={tCommon('button.takeMeHome')}
           imageSrc={
             postType
               ? theme.name === 'light'
@@ -480,14 +475,10 @@ const SPostTitle = styled(Headline)`
     margin-top: initial;
     margin-bottom: initial;
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    min-height: 64px;
-  }
 `;
 
 // Creator card
-const CreatorCard = styled.div`
+const SCreatorCard = styled.div`
   grid-area: userCard;
 
   display: grid;
@@ -533,10 +524,16 @@ const SAvatarArea = styled.div`
   }
 `;
 
-const SUsername = styled.div`
+const SUserInfo = styled.div`
   grid-area: username;
   display: flex;
+  flex-direction: row;
   align-items: center;
+`;
+
+const SUsername = styled.div`
+  display: inline;
+  flex-shrink: 1;
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;

@@ -13,7 +13,7 @@
   },
   "superpolls": {
     "title": "Superpoll",
-    "text_NEED_TRANSLATION": "These are paid polls. You vote on your favorite option and the creator will upload a video doing the option with the most amount of votes"
+    "text": "這些是付費調查。創作者發起Superpoll，你投票選擇你喜歡的選項，創作者將完成得到最多票數的選項並上傳相關視頻。"
   },
   "goals": {
     "title": "Goal",

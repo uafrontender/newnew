@@ -8,15 +8,17 @@ import isBrowser from '../../../../utils/isBrowser';
 import { useAppSelector } from '../../../../redux-store/store';
 import secondsToDHMS, { DHMS } from '../../../../utils/secondsToDHMS';
 import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
+import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 
 import assets from '../../../../constants/assets';
+import { TPostType } from '../../../../utils/switchPostType';
 
 interface IPostScheduledSection {
-  postType: string;
+  postType: TPostType;
   timestampSeconds: number;
   isFollowing: boolean;
   variant: 'decision' | 'moderation';
@@ -31,12 +33,13 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   handleFollowDecision,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isPageVisible = usePageVisibility();
+  const { overlayModeEnabled } = useOverlayMode();
 
   const [isScrolledDown, setIsScrolledDown] = useState(false);
 
@@ -66,9 +69,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollTop = document?.getElementById(
-        'post-modal-container'
-      )?.scrollTop;
+      const scrollTop = document?.documentElement?.scrollTop;
       if (scrollTop && scrollTop > 200) {
         setIsScrolledDown(true);
       } else {
@@ -77,26 +78,29 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     };
 
     if (isBrowser()) {
-      document
-        ?.getElementById('post-modal-container')
-        ?.addEventListener('scroll', handleScroll);
+      document?.addEventListener('scroll', handleScroll);
     }
 
     return () => {
       if (isBrowser()) {
-        document
-          ?.getElementById('post-modal-container')
-          ?.removeEventListener('scroll', handleScroll);
+        document?.removeEventListener('scroll', handleScroll);
       }
     };
   }, []);
 
   return (
     <SContainer
+      isModeration={variant === 'moderation'}
       style={{
-        ...(isMobile && !isScrolledDown
+        ...(isMobile && !isScrolledDown && !overlayModeEnabled
           ? {
               position: 'fixed',
+            }
+          : {}),
+        ...(isMobile && overlayModeEnabled
+          ? {
+              opacity: 0,
+              position: 'static',
             }
           : {}),
       }}
@@ -172,21 +176,30 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
 
 export default PostScheduledSection;
 
-const SContainer = styled.div`
+const SContainer = styled.div<{
+  isModeration: boolean;
+}>`
   left: 16px;
   bottom: 16px;
 
   width: calc(100% - 32px);
 
   padding: 16px;
+  margin-top: ${({ isModeration }) => (isModeration ? '126px' : 'unset')};
 
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   z-index: 9;
 
+  transition: 0.3s linear;
+
   ${({ theme }) => theme.media.tablet} {
     background-color: transparent;
+    transition: initial;
+
+    margin-top: auto;
+    margin-bottom: auto;
   }
 `;
 

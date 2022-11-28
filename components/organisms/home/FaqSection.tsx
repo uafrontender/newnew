@@ -10,7 +10,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 import { useAppSelector } from '../../../redux-store/store';
 import assets from '../../../constants/assets';
 
-import CheckmarkIcon from '../../../public/images/svg/icons/filled/Checkmark.svg';
+import CheckmarkIcon from '../../../public/images/svg/icons/outlined/Checkmark.svg';
 import PlayIcon from '../../../public/images/svg/icons/filled/Play.svg';
 
 interface IEmbedLink {
@@ -54,15 +54,15 @@ const FaqSection = () => {
     <SContainer>
       <SHeadline variant={4}>{t('faq.title')}</SHeadline>
       <SList>
-        {new Array(6).fill('').map((_, i) => (
-          <SListItem key={t(`faq.items.${i}.question`)}>
+        {new Array(7).fill('').map((_, i) => (
+          <SListItem key={t(`faq.items.${i}.question` as any)}>
             <STitle variant={2} weight={600}>
-              {t(`faq.items.${i}.question`)}
+              {t(`faq.items.${i}.question` as any)}
             </STitle>
             <SText variant={3} weight={600}>
               <Trans
                 key={`trans-${user.loggedIn}`}
-                i18nKey={`faq.items.${i}.answer`}
+                i18nKey={`faq.items.${i}.answer` as any}
                 t={t}
                 components={[
                   // @ts-ignore
@@ -168,8 +168,13 @@ const SContainer = styled.section`
   position: relative;
   padding: 20px 0;
 
+  ${(props) => props.theme.media.tablet} {
+    margin-top: 50px;
+  }
+
   ${(props) => props.theme.media.laptop} {
     padding: 60px 128px;
+    margin-top: 0;
   }
 
   ${(props) => props.theme.media.laptopM} {
@@ -246,7 +251,7 @@ const SFloatingImage = styled.img`
 
   visibility: hidden;
 
-  ${({ theme }) => theme.media.tablet} {
+  ${({ theme }) => theme.media.laptop} {
     visibility: visible;
   }
 `;
@@ -258,6 +263,10 @@ const SSubImageLeftTop = styled(SFloatingImage)`
   top: -3.2%;
   transform: rotate(19deg);
   opacity: 0.8;
+
+  ${({ theme }) => theme.media.tablet} {
+    visibility: visible;
+  }
 
   ${({ theme }) => theme.media.laptop} {
     width: ${({ theme }) => (theme.name === 'dark' ? '86px' : '42px')};
@@ -307,6 +316,10 @@ const SSubImageRightTop = styled(SFloatingImage)`
   right: -4%;
   top: 0;
   transform: scaleX(-1) rotate(17deg);
+
+  ${({ theme }) => theme.media.tablet} {
+    visibility: visible;
+  }
 
   ${({ theme }) => theme.media.laptop} {
     width: ${({ theme }) => (theme.name === 'dark' ? '112px' : '56px')};
@@ -368,8 +381,10 @@ const SPoint = styled.span<{ variant: 1 | 2 }>`
             align-items: center;
             justify-content: center;
             margin-right: 8px;
-            width: 12px;
-            height: 12px;
+            max-width: 12px;
+            max-height: 12px;
+            min-width: 12px;
+            min-height: 12px;
             border-radius: 50%;
             background-color: ${({ theme }) =>
               theme.colorsThemed.accent.yellow};

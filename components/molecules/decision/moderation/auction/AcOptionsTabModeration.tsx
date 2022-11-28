@@ -1,12 +1,11 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
-import React, { useEffect, useRef } from 'react';
-import styled, { useTheme } from 'styled-components';
+import React, { useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 
@@ -23,6 +22,7 @@ import NoContentYetImg from '../../../../../public/images/decision/no-content-ye
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import { selectWinningOption } from '../../../../../api/endpoints/auction';
 import { Mixpanel } from '../../../../../utils/mixpanel';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 interface IAcOptionsTabModeration {
   postId: string;
@@ -51,18 +51,24 @@ const AcOptionsTabModeration: React.FunctionComponent<
   handleUpdatePostStatus,
   handleUpdateWinningOption,
 }) => {
-  const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { showErrorToastPredefined } = useErrorToasts();
+
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
 
+  // Scroll block
+  const [isScrollBlocked, setIsScrollBlocked] = useState(false);
+
   const containerRef = useRef<HTMLDivElement>();
-  const { showTopGradient, showBottomGradient } =
-    useScrollGradients(containerRef);
+  const { showTopGradient, showBottomGradient } = useScrollGradients(
+    containerRef,
+    options.length > 0
+  );
 
   const mainContainer = useRef<HTMLDivElement>();
 
@@ -83,7 +89,7 @@ const AcOptionsTabModeration: React.FunctionComponent<
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 
@@ -105,6 +111,20 @@ const AcOptionsTabModeration: React.FunctionComponent<
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
+        {!isMobile ? (
+          <>
+            <GradientMask
+              gradientType='primary'
+              positionTop
+              active={showTopGradient}
+            />
+            <GradientMask
+              gradientType='primary'
+              positionBottom={0}
+              active={showBottomGradient}
+            />
+          </>
+        ) : null}
         {options.length === 0 && !optionsLoading && postStatus !== 'failed' ? (
           <SNoOptionsYet>
             <SNoOptionsImgContainer>
@@ -120,21 +140,18 @@ const AcOptionsTabModeration: React.FunctionComponent<
             ref={(el) => {
               containerRef.current = el!!;
             }}
+            style={{
+              ...(isScrollBlocked
+                ? {
+                    overflow: 'hidden',
+                    width:
+                      options.length > 4
+                        ? 'calc(100% + 10px)'
+                        : 'calc(100% + 14px)',
+                  }
+                : {}),
+            }}
           >
-            {!isMobile ? (
-              <>
-                <GradientMask
-                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                  positionTop
-                  active={showTopGradient}
-                />
-                <GradientMask
-                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                  positionBottom={0}
-                  active={showBottomGradient}
-                />
-              </>
-            ) : null}
             {options.map((option, i) => (
               <AcOptionCardModeration
                 index={i}
@@ -146,6 +163,8 @@ const AcOptionsTabModeration: React.FunctionComponent<
                 handleConfirmWinningOption={() =>
                   handleConfirmWinningOption(option)
                 }
+                handleSetScrollBlocked={() => setIsScrollBlocked(true)}
+                handleUnsetScrollBlocked={() => setIsScrollBlocked(false)}
               />
             ))}
             {!isMobile ? (
@@ -179,7 +198,14 @@ export default AcOptionsTabModeration;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  height: calc(100% - 56px);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex: 1 1 auto;
+  }
 `;
 
 const SBidsContainer = styled.div`
@@ -193,11 +219,19 @@ const SBidsContainer = styled.div`
   padding-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+
     padding-top: 0px;
     padding-right: 12px;
     margin-right: -14px;
     width: calc(100% + 14px);
+    height: initial;
+    flex: 1 1 auto;
 
     // Scrollbar
     &::-webkit-scrollbar {

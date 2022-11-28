@@ -28,7 +28,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
   handleGoBack,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -177,9 +177,9 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
 
   return (
     <SWrapper>
-      <GoBackButton onClick={handleGoBack}>
+      <SGoBackButton onClick={handleGoBack}>
         {t('acPostSuccess.optionsTab.backButton')}
-      </GoBackButton>
+      </SGoBackButton>
       {!isMobile && <SSeparator />}
       <SBidsContainer
         ref={(el) => {
@@ -207,19 +207,14 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
             option={option as TMcOptionWithHighestField}
             creator={option.creator ?? post.creator!!}
             postId={post.postUuid}
-            votingAllowed={false}
-            canVoteForFree={false}
             isCreatorsBid={
               !option.creator || option.creator?.uuid === post.creator?.uuid
             }
-            postCreator=''
-            postCreatorUuid={post.creator?.uuid ?? ''}
+            postCreatorName=''
             postText=''
             index={i}
             noAction
-            handleResetFreeVote={() => {}}
-            handleSetSupportedBid={() => {}}
-            handleSetPaymentSuccessModalOpen={() => {}}
+            handleSetPaymentSuccessValue={() => {}}
             handleAddOrUpdateOptionFromResponse={() => {}}
           />
         ))}
@@ -246,6 +241,12 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
 };
 
 export default McSuccessOptionsTab;
+
+const SGoBackButton = styled(GoBackButton)`
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 16px;
+  }
+`;
 
 const SWrapper = styled.div``;
 

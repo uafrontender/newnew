@@ -5,6 +5,7 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
+import getDisplayname from '../../../utils/getDisplayname';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
 import textTrim from '../../../utils/textTrim';
 import UserAvatar from '../../molecules/UserAvatar';
@@ -57,14 +58,20 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
                   {data.title && (
                     <SPostTitle>{textTrim(data.title, 28)}</SPostTitle>
                   )}
-                  <SCreatorUsername>{data.creator?.nickname}</SCreatorUsername>
+                  <SCreatorUsername>
+                    {getDisplayname(data.creator)}
+                  </SCreatorUsername>
                 </SPostData>
               </SLeftSide>
               <SPostDetails>
                 <SPostType>{postTypeConverted}</SPostType>
                 <SPostEnded>
                   {parsed.days !== '00' && `${parsed.days}d`}{' '}
-                  {`${parsed.hours}h ${parsed.minutes}m ${parsed.seconds}s `}
+                  {(parsed.hours !== '00' ||
+                    (parsed.days !== '00' && parsed.hours === '00')) &&
+                    `${parsed.hours}h`}{' '}
+                  {`${parsed.minutes}m `}
+                  {parsed.days === '00' && `${parsed.seconds}s`}
                 </SPostEnded>
               </SPostDetails>
             </SPost>

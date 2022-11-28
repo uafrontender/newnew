@@ -15,165 +15,162 @@ interface ITimePickerMobileModal {
   handleClose: () => void;
 }
 
-const TimePickerMobileModal: React.FunctionComponent<ITimePickerMobileModal> =
-  ({ currentTime, hours, minutes, handleChangeTime, handleClose }) => {
-    const theme = useTheme();
-    const [innerTime, setInnerDate] = useState(
-      currentTime.hours && currentTime.minutes
-        ? currentTime
-        : {
-            hours: '00',
-            minutes: '00',
-          }
-    );
-
-    const handleUpdateHours = useCallback(
-      (newHours: string) => {
-        const working = { ...innerTime };
-        working.hours = newHours;
-        setInnerDate(working);
-      },
-      [innerTime]
-    );
-
-    const handleUpdateMinutes = useCallback(
-      (newMinutes: string) => {
-        const working = { ...innerTime };
-        working.minutes = newMinutes;
-        setInnerDate(working);
-      },
-      [innerTime]
-    );
-
-    const hoursScrollerRef = useRef<HTMLDivElement>();
-    const minutesScrollerRef = useRef<HTMLDivElement>();
-
-    const hoursRefs = useRef<HTMLDivElement[]>(new Array(12));
-    const minutesRefs = useRef<HTMLDivElement[]>(new Array(60));
-
-    useEffect(() => {
-      const updateHours = () => {
-        const boundingRect = hoursScrollerRef.current?.getBoundingClientRect();
-        for (let i = 0; i < hoursRefs.current.length; i++) {
-          const itemRect = hoursRefs.current[i]?.getBoundingClientRect();
-          if (!itemRect) continue;
-          const pos = itemRect.top - boundingRect!!.top!!;
-          if (pos > 48 && pos < 72) {
-            handleUpdateHours(hours[i].value);
-            break;
-          }
+const TimePickerMobileModal: React.FunctionComponent<
+  ITimePickerMobileModal
+> = ({ currentTime, hours, minutes, handleChangeTime, handleClose }) => {
+  const theme = useTheme();
+  const [innerTime, setInnerDate] = useState(
+    currentTime.hours && currentTime.minutes
+      ? currentTime
+      : {
+          hours: '00',
+          minutes: '00',
         }
-      };
+  );
 
-      const updateMinutes = () => {
-        const boundingRect =
-          minutesScrollerRef.current?.getBoundingClientRect();
-        for (let i = 0; i < minutesRefs.current.length; i++) {
-          const pos =
-            minutesRefs.current[i].getBoundingClientRect().top -
-            boundingRect!!.top!!;
-          if (pos > 48 && pos < 72) {
-            handleUpdateMinutes(minutes[i].value);
-            break;
-          }
+  const handleUpdateHours = useCallback(
+    (newHours: string) => {
+      const working = { ...innerTime };
+      working.hours = newHours;
+      setInnerDate(working);
+    },
+    [innerTime]
+  );
+
+  const handleUpdateMinutes = useCallback(
+    (newMinutes: string) => {
+      const working = { ...innerTime };
+      working.minutes = newMinutes;
+      setInnerDate(working);
+    },
+    [innerTime]
+  );
+
+  const hoursScrollerRef = useRef<HTMLDivElement>();
+  const minutesScrollerRef = useRef<HTMLDivElement>();
+
+  const hoursRefs = useRef<HTMLDivElement[]>(new Array(12));
+  const minutesRefs = useRef<HTMLDivElement[]>(new Array(60));
+
+  useEffect(() => {
+    const updateHours = () => {
+      const boundingRect = hoursScrollerRef.current?.getBoundingClientRect();
+      for (let i = 0; i < hoursRefs.current.length; i++) {
+        const itemRect = hoursRefs.current[i]?.getBoundingClientRect();
+        if (!itemRect) continue;
+        const pos = itemRect.top - boundingRect!!.top!!;
+        if (pos > 48 && pos < 72) {
+          handleUpdateHours(hours[i].value);
+          break;
         }
-      };
-
-      hoursScrollerRef.current?.addEventListener('scroll', updateHours);
-      minutesScrollerRef.current?.addEventListener('scroll', updateMinutes);
-
-      return () => {
-        hoursScrollerRef.current?.removeEventListener('scroll', updateHours);
-        minutesScrollerRef.current?.removeEventListener(
-          'scroll',
-          updateMinutes
-        );
-      };
-    }, [hours, minutes, handleUpdateHours, handleUpdateMinutes]);
-
-    useEffect(() => {
-      hoursScrollerRef.current?.scrollBy({
-        top: hours.findIndex((i) => i.value === currentTime.hours) * 28,
-      });
-      minutesScrollerRef.current?.scrollBy({
-        top: minutes.findIndex((i) => i.value === currentTime.minutes) * 28,
-      });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
-      if (
-        innerTime?.hours &&
-        hours.findIndex((o) => o.value === innerTime.hours) === -1
-      ) {
-        hoursScrollerRef.current?.scrollTo({
-          top: hoursRefs.current[hours.length - 1].offsetTop,
-        });
       }
-    }, [hours, innerTime.hours]);
+    };
 
-    return (
-      <SContainer onClick={(e) => e.stopPropagation()}>
-        <SDateInputContainer>
-          <SScroller
-            ref={(el) => {
-              hoursScrollerRef.current = el!!;
-            }}
-          >
-            {hours.map((d, i) => (
-              <SScrollerItem
-                ref={(el) => {
-                  hoursRefs.current[i] = el!!;
-                }}
-                key={d.value}
-                style={{
-                  ...(innerTime.hours === d.value
-                    ? {
-                        color: theme.colorsThemed.text.primary,
-                      }
-                    : {}),
-                }}
-              >
-                {d.value}
-              </SScrollerItem>
-            ))}
-          </SScroller>
-          <SScroller
-            ref={(el) => {
-              minutesScrollerRef.current = el!!;
-            }}
-          >
-            {minutes.map((m, i) => (
-              <SScrollerItem
-                ref={(el) => {
-                  minutesRefs.current[i] = el!!;
-                }}
-                key={m.value}
-                style={{
-                  ...(innerTime.minutes === m.value
-                    ? {
-                        color: theme.colorsThemed.text.primary,
-                      }
-                    : {}),
-                }}
-              >
-                {m.name}
-              </SScrollerItem>
-            ))}
-          </SScroller>
-        </SDateInputContainer>
-        <SButton
-          view='primaryGrad'
-          onClick={() => {
-            handleChangeTime(innerTime);
-            handleClose();
+    const updateMinutes = () => {
+      const boundingRect = minutesScrollerRef.current?.getBoundingClientRect();
+      for (let i = 0; i < minutesRefs.current.length; i++) {
+        const pos =
+          minutesRefs.current[i].getBoundingClientRect().top -
+          boundingRect!!.top!!;
+        if (pos > 48 && pos < 72) {
+          handleUpdateMinutes(minutes[i].value);
+          break;
+        }
+      }
+    };
+
+    hoursScrollerRef.current?.addEventListener('scroll', updateHours);
+    minutesScrollerRef.current?.addEventListener('scroll', updateMinutes);
+
+    return () => {
+      hoursScrollerRef.current?.removeEventListener('scroll', updateHours);
+      minutesScrollerRef.current?.removeEventListener('scroll', updateMinutes);
+    };
+  }, [hours, minutes, handleUpdateHours, handleUpdateMinutes]);
+
+  useEffect(() => {
+    hoursScrollerRef.current?.scrollBy({
+      top: hours.findIndex((i) => i.value === currentTime.hours) * 28,
+    });
+    minutesScrollerRef.current?.scrollBy({
+      top: minutes.findIndex((i) => i.value === currentTime.minutes) * 28,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (
+      innerTime?.hours &&
+      hours.findIndex((o) => o.value === innerTime.hours) === -1
+    ) {
+      hoursScrollerRef.current?.scrollTo({
+        top: 0,
+      });
+    }
+  }, [hours, innerTime.hours]);
+
+  return (
+    <SContainer onClick={(e) => e.stopPropagation()}>
+      <SDateInputContainer>
+        <SScroller
+          ref={(el) => {
+            hoursScrollerRef.current = el!!;
           }}
         >
-          Save
-        </SButton>
-      </SContainer>
-    );
-  };
+          {hours.map((d, i) => (
+            <SScrollerItem
+              ref={(el) => {
+                hoursRefs.current[i] = el!!;
+              }}
+              key={d.value}
+              style={{
+                ...(innerTime.hours === d.value
+                  ? {
+                      color: theme.colorsThemed.text.primary,
+                    }
+                  : {}),
+              }}
+            >
+              {d.value}
+            </SScrollerItem>
+          ))}
+        </SScroller>
+        <SScroller
+          ref={(el) => {
+            minutesScrollerRef.current = el!!;
+          }}
+        >
+          {minutes.map((m, i) => (
+            <SScrollerItem
+              ref={(el) => {
+                minutesRefs.current[i] = el!!;
+              }}
+              key={m.value}
+              style={{
+                ...(innerTime.minutes === m.value
+                  ? {
+                      color: theme.colorsThemed.text.primary,
+                    }
+                  : {}),
+              }}
+            >
+              {m.name}
+            </SScrollerItem>
+          ))}
+        </SScroller>
+      </SDateInputContainer>
+      <SButton
+        view='primaryGrad'
+        onClick={() => {
+          handleChangeTime(innerTime);
+          handleClose();
+        }}
+      >
+        Save
+      </SButton>
+    </SContainer>
+  );
+};
 
 export default TimePickerMobileModal;
 

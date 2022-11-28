@@ -10,7 +10,7 @@ import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/search/SearchInput';
 import Text from '../../atoms/Text';
 import NavigationItem from '../NavigationItem';
-// import { useGetChats } from '../../../contexts/chatContext';
+import { useGetChats } from '../../../contexts/chatContext';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -18,16 +18,20 @@ import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useBundles } from '../../../contexts/bundlesContext';
+import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
+import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 
 interface ITablet {}
 
 export const Tablet: React.FC<ITablet> = React.memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
-  // const { unreadCount } = useGetChats();
+  const { unreadCount } = useGetChats();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
+  const { bundles } = useBundles();
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
@@ -50,19 +54,45 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 </a>
               </Link>
             )}
-            {
-              // TODO: re-enable, repurpose for bundles
-              /*
+            {bundles && bundles.length > 0 && (
               <SItemWithMargin>
-              <NavigationItem
-                item={{
-                  url: '/direct-messages',
-                  key: 'directMessages',
-                  counter: unreadCount,
-                }}
-              />
-              </SItemWithMargin> */
-            }
+                <Link href='/bundles'>
+                  <a>
+                    <Button
+                      iconOnly
+                      view='quaternary'
+                      onClick={() => {
+                        Mixpanel.track('Navigation Item Clicked', {
+                          _button: 'Bundles',
+                        });
+                      }}
+                    >
+                      <SIconButtonContent>
+                        <SBundleIcon
+                          src={
+                            theme.name === 'light'
+                              ? VoteIconLight.src
+                              : VoteIconDark.src
+                          }
+                        />
+                      </SIconButtonContent>
+                    </Button>
+                  </a>
+                </Link>
+              </SItemWithMargin>
+            )}
+            {(user.userData?.options?.isCreator ||
+              (bundles && bundles?.length > 0)) && (
+              <SItemWithMargin>
+                <NavigationItem
+                  item={{
+                    url: '/direct-messages',
+                    key: 'directMessages',
+                    counter: unreadCount,
+                  }}
+                />
+              </SItemWithMargin>
+            )}
             <SItemWithMargin>
               <NavigationItem
                 item={{
@@ -216,6 +246,15 @@ const SItemWithMargin = styled.div`
   ${({ theme }) => theme.media.laptop} {
     margin-left: 16px;
   }
+`;
+
+const SIconButtonContent = styled.div`
+  display: flex;
+`;
+
+const SBundleIcon = styled.img`
+  width: 24px;
+  height: 24px;
 `;
 
 const SNavText = styled(Text)`

@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable react/jsx-pascal-case */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 
@@ -22,6 +22,8 @@ import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import PostResponseSuccessModal from './PostResponseSuccessModal';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import InlineSvg from '../../../atoms/InlineSVG';
 
 interface IPostResponseTabModeration {
   postId: string;
@@ -44,7 +46,7 @@ const PostResponseTabModeration: React.FunctionComponent<
   winningOptionMc,
   moneyBacked,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
 
@@ -179,7 +181,7 @@ const PostResponseTabModeration: React.FunctionComponent<
           }
         >
           <SHeaderDiv>
-            <SHeaderHeadline variant={3}>
+            <SHeaderHeadline variant={3} successVariant>
               {t('postResponseTabModeration.succeeded.topHeader')}
             </SHeaderHeadline>
             <SCoin_1
@@ -263,6 +265,14 @@ const PostResponseTabModeration: React.FunctionComponent<
                         <SCreatorLink
                           href={`/${winningOptionAc.creator?.username}`}
                         />,
+                        winningOptionAc.creator?.options?.isVerified ? (
+                          <SInlineSvg
+                            svg={VerificationCheckmark}
+                            width='22px'
+                            height='22px'
+                            fill='none'
+                          />
+                        ) : null,
                         { nickname: getDisplayname(winningOptionAc.creator!!) },
                       ]}
                     />
@@ -291,7 +301,7 @@ const PostResponseTabModeration: React.FunctionComponent<
                             ),
                           }
                         )}
-                  </SSpan>
+                  </SSpan>{' '}
                   {winningOptionMc.creator &&
                   winningOptionMc?.creator?.uuid !== user.userData?.userUuid ? (
                     <>
@@ -309,6 +319,14 @@ const PostResponseTabModeration: React.FunctionComponent<
                             <SCreatorLink
                               href={`/${winningOptionMc.creator?.username}`}
                             />,
+                            winningOptionMc.creator?.options?.isVerified ? (
+                              <SInlineSvg
+                                svg={VerificationCheckmark}
+                                width='22px'
+                                height='22px'
+                                fill='none'
+                              />
+                            ) : null,
                             {
                               nickname: getDisplayname(
                                 winningOptionMc.creator!!
@@ -320,7 +338,6 @@ const PostResponseTabModeration: React.FunctionComponent<
                     </>
                   ) : (
                     <SSpan>
-                      {` `}
                       {t('postResponseTabModeration.winner.mc.optionOwn')}
                     </SSpan>
                   )}
@@ -475,6 +492,14 @@ const PostResponseTabModeration: React.FunctionComponent<
                     <SCreatorLink
                       href={`/${winningOptionAc.creator?.username}`}
                     />,
+                    winningOptionAc.creator?.options?.isVerified ? (
+                      <SInlineSvg
+                        svg={VerificationCheckmark}
+                        width='22px'
+                        height='22px'
+                        fill='none'
+                      />
+                    ) : null,
                     { nickname: getDisplayname(winningOptionAc.creator!!) },
                   ]}
                 />
@@ -500,7 +525,7 @@ const PostResponseTabModeration: React.FunctionComponent<
                         true
                       ),
                     })}
-              </SSpan>
+              </SSpan>{' '}
               {winningOptionMc.creator &&
               winningOptionMc?.creator?.uuid !== user.userData?.userUuid ? (
                 <>
@@ -517,6 +542,14 @@ const PostResponseTabModeration: React.FunctionComponent<
                         <SCreatorLink
                           href={`/${winningOptionMc.creator?.username}`}
                         />,
+                        winningOptionMc.creator?.options?.isVerified ? (
+                          <SInlineSvg
+                            svg={VerificationCheckmark}
+                            width='22px'
+                            height='22px'
+                            fill='none'
+                          />
+                        ) : null,
                         {
                           nickname: getDisplayname(winningOptionMc.creator!!),
                         },
@@ -526,7 +559,6 @@ const PostResponseTabModeration: React.FunctionComponent<
                 </>
               ) : (
                 <SSpan>
-                  {` `}
                   {t('postResponseTabModeration.winner.mc.optionOwn')}
                 </SSpan>
               )}
@@ -569,11 +601,17 @@ const SCreatorLink = styled.a`
   }
 `;
 
+const SInlineSvg = styled(InlineSvg)`
+  margin-right: 4px;
+`;
+
 const SContainer = styled.div`
   height: 100%;
+  width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
     display: grid;
+    flex: 1 1 auto;
   }
 `;
 
@@ -581,11 +619,13 @@ const SSucceededContainer = styled.div<{
   dimmed?: boolean;
 }>`
   height: 100%;
+  width: 100%;
 
   opacity: ${({ dimmed }) => (dimmed ? 0.3 : 1)};
 
   ${({ theme }) => theme.media.tablet} {
     display: grid;
+    flex: 1 1 auto;
   }
 `;
 
@@ -623,9 +663,22 @@ const SHeaderDiv = styled.div`
   }
 `;
 
-const SHeaderHeadline = styled(Headline)`
+const SHeaderHeadline = styled(Headline)<{
+  successVariant?: boolean;
+}>`
   color: #ffffff;
   white-space: pre;
+
+  ${({ theme }) => theme.media.laptopL} {
+    font-size: 56px;
+    line-height: 64px;
+    ${({ successVariant }) =>
+      successVariant
+        ? css`
+            white-space: initial;
+          `
+        : null}
+  }
 `;
 
 const SCoin_1 = styled.img`
@@ -714,7 +767,10 @@ const SText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
 
-const SSpan = styled.span``;
+const SSpan = styled.span`
+  display: inline-flex;
+  white-space: pre;
+`;
 
 const SUserAvatar = styled.img`
   position: relative;
@@ -759,6 +815,10 @@ const SUploadButton = styled(Button)`
     align-self: end;
     position: relative;
     width: 100%;
+
+    bottom: 1px;
+
+    z-index: initial;
 
     &:disabled {
       opacity: 0.5;

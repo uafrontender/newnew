@@ -15,7 +15,6 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
-import { toast } from 'react-toastify';
 
 import GradientMask from '../../../atoms/GradientMask';
 import Comment from '../../../atoms/decision/Comment';
@@ -39,7 +38,7 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import isBrowser from '../../../../utils/isBrowser';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 interface ICommentsBottomSection {
   postUuid: string;
@@ -59,12 +58,13 @@ const CommentsBottomSection: React.FunctionComponent<
   onFormBlur,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { showErrorToastPredefined } = useErrorToasts();
 
   // Comment from URL
   const { commentIdFromUrl, handleResetCommentIdFromUrl } = useContext(
@@ -235,9 +235,10 @@ const CommentsBottomSection: React.FunctionComponent<
         }
       } catch (err) {
         console.error(err);
-        toast.error('toastErrors.generic');
+        showErrorToastPredefined(undefined);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [commentsRoomId, postUuid]
   );
 
@@ -305,12 +306,12 @@ const CommentsBottomSection: React.FunctionComponent<
         }
       } catch (err) {
         console.error(err);
-        toast.error('toastErrors.generic');
+        showErrorToastPredefined(undefined);
       } finally {
         setIsDeletingComment(false);
       }
     },
-    [markCommentAsDeleted, postUuid]
+    [markCommentAsDeleted, postUuid, showErrorToastPredefined]
   );
 
   useEffect(() => {
@@ -327,7 +328,7 @@ const CommentsBottomSection: React.FunctionComponent<
   }, [inView, commentsNextPageToken, commentsLoading]);
 
   useEffect(() => {
-    if (commentsRoomId && socketConnection) {
+    if (commentsRoomId && socketConnection?.connected) {
       addChannel(`comments_${commentsRoomId.toString()}`, {
         chatRoomUpdates: {
           chatRoomId: commentsRoomId,
@@ -335,7 +336,7 @@ const CommentsBottomSection: React.FunctionComponent<
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection]);
+  }, [socketConnection?.connected, commentsRoomId]);
 
   useEffect(() => {
     const socketHandlerMessageCreated = (data: any) => {
@@ -404,11 +405,13 @@ const CommentsBottomSection: React.FunctionComponent<
 
   // Cleanup
   useEffect(
-    () => () => {
-      if (commentsRoomId) {
-        if (commentsRoomId)
-          removeChannel(`comments_${commentsRoomId.toString()}`);
-      }
+    () => {
+      return () => {
+        if (commentsRoomId) {
+          if (commentsRoomId)
+            removeChannel(`comments_${commentsRoomId.toString()}`);
+        }
+      };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -536,6 +539,7 @@ const CommentsBottomSection: React.FunctionComponent<
         exit={{ opacity: 0 }}
       >
         <SActionSection
+          id='comments-scrolling-container'
           ref={(el) => {
             scrollRef.current = el!!;
           }}
@@ -616,27 +620,15 @@ const CommentsBottomSection: React.FunctionComponent<
           </SCommentsWrapper>
         </SActionSection>
         <GradientMask
-          gradientType={
-            isMobile
-              ? 'primary'
-              : theme.name === 'dark'
-              ? 'secondary'
-              : 'primary'
-          }
+          gradientType='primary'
           positionTop={heightDelta}
           active={showTopGradient}
-          width='calc(100% - 16px)'
+          width='calc(100% - 4px)'
         />
         <GradientMask
-          gradientType={
-            isMobile
-              ? 'primary'
-              : theme.name === 'dark'
-              ? 'secondary'
-              : 'primary'
-          }
+          gradientType='primary'
           active={showBottomGradient}
-          width='calc(100% - 16px)'
+          width='calc(100% - 4px)'
         />
       </STabContainer>
     </>

@@ -1,9 +1,10 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unneeded-ternary */
 import React, { useRef, useMemo, useState } from 'react';
 import Head from 'next/head';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 
 import Row from '../atoms/Grid/Row';
@@ -25,16 +26,18 @@ import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
 import { useNotifications } from '../../contexts/notificationsContext';
 import { useGetChats } from '../../contexts/chatContext';
 import ReportBugButton from '../molecules/ReportBugButton';
-import { usePostModalState } from '../../contexts/postModalContext';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
+import { useBundles } from '../../contexts/bundlesContext';
 
 interface IGeneral {
   className?: string;
   withChat?: boolean;
   specialStatusBarColor?: string;
   restrictMaxWidth?: boolean;
+  noMobieNavigation?: boolean;
+  noPaddingMobile?: boolean;
   children: React.ReactNode;
 }
 
@@ -44,6 +47,8 @@ export const General: React.FC<IGeneral> = (props) => {
     withChat,
     specialStatusBarColor,
     restrictMaxWidth,
+    noMobieNavigation,
+    noPaddingMobile,
     children,
   } = props;
   const user = useAppSelector((state) => state.user);
@@ -54,9 +59,8 @@ export const General: React.FC<IGeneral> = (props) => {
   const [cookies] = useCookies();
   const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
-  const { /* unreadCount, */ setMobileChatOpened, mobileChatOpened } =
-    useGetChats();
-  const { postOverlayOpen } = usePostModalState();
+  const { bundles } = useBundles();
+  const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
 
   const hasMounted = useHasMounted();
 
@@ -64,12 +68,11 @@ export const General: React.FC<IGeneral> = (props) => {
 
   // TODO: fix an issue when scroll position is set before resizing of the wrapper
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const bottomNavigation = useMemo(() => {
+  const bottomNavigation: TBottomNavigationItem[] = useMemo(() => {
     let bottomNavigationShadow: TBottomNavigationItem[] = [
       {
         key: 'home',
         url: '/',
-        width: '100%',
       },
     ];
 
@@ -79,57 +82,64 @@ export const General: React.FC<IGeneral> = (props) => {
           {
             key: 'home',
             url: '/',
-            width: '20%',
           },
           {
             key: 'dashboard',
             url: '/creator/dashboard',
-            width: '20%',
           },
           {
             key: 'add',
             url: '/creation',
-            width: '20%',
           },
-          {
-            key: 'notifications',
-            url: '/notifications',
-            width: '20%',
-            counter: unreadNotificationCount,
-          },
+          bundles && bundles.length > 0
+            ? {
+                key: 'bundles',
+                url: '/bundles',
+              }
+            : {
+                key: 'notifications',
+                url: '/notifications',
+                counter: unreadNotificationCount,
+              },
           {
             key: 'more',
             url: '/more',
-            width: '20%',
             actionHandler: () => setMoreMenuMobileOpen(true),
           },
         ];
       } else {
-        bottomNavigationShadow = [
-          {
-            key: 'home',
-            url: '/',
-            width: '33%',
-          },
-          {
-            key: 'add',
-            url: '/creator-onboarding',
-            width: '33%',
-          },
-          {
-            key: 'notifications',
-            url: '/notifications',
-            width: '33%',
-            counter: unreadNotificationCount,
-          },
-          // TODO: re-enable, repurpose for bundles
-          /* {
-            key: 'dms',
-            url: '/direct-messages',
-            width: '33%',
-            counter: unreadCount,
-          }, */
-        ];
+        bottomNavigationShadow = (
+          [
+            {
+              key: 'home',
+              url: '/',
+            },
+            {
+              key: 'add',
+              url: '/creator-onboarding',
+            },
+            bundles && bundles.length > 0
+              ? {
+                  key: 'bundles',
+                  url: '/bundles',
+                }
+              : {
+                  key: 'notifications',
+                  url: '/notifications',
+                  counter: unreadNotificationCount,
+                },
+          ] as TBottomNavigationItem[]
+        ).concat(
+          user.userData?.options?.isCreator || (bundles && bundles.length > 0)
+            ? [
+                {
+                  key: 'dms',
+                  url: '/direct-messages',
+                  counter: unreadCount,
+                } as TBottomNavigationItem,
+              ]
+            : []
+        );
       }
     }
 
@@ -138,7 +148,8 @@ export const General: React.FC<IGeneral> = (props) => {
     user.loggedIn,
     unreadNotificationCount,
     user.userData?.options?.isCreator,
-    // unreadCount,
+    unreadCount,
+    bundles,
   ]);
 
   useScrollPosition();
@@ -165,9 +176,10 @@ export const General: React.FC<IGeneral> = (props) => {
   };
 
   const chatButtonVisible =
-    isMobile && withChat && user.userData?.options?.isOfferingSubscription;
+    isMobile && withChat && user.userData?.options?.isOfferingBundles;
 
-  const mobileNavigationVisible = isMobile && scrollDirection !== 'down';
+  const mobileNavigationVisible =
+    isMobile && scrollDirection !== 'down' && !noMobieNavigation;
 
   return (
     <SBaseLayout
@@ -175,6 +187,7 @@ export const General: React.FC<IGeneral> = (props) => {
       className={className}
       containerRef={wrapperRef}
       withBanner={!!banner?.show}
+      noPaddingTop={!!noMobieNavigation}
     >
       <SkeletonTheme
         baseColor={theme.colorsThemed.background.secondary}
@@ -193,7 +206,7 @@ export const General: React.FC<IGeneral> = (props) => {
         <Header
           visible={!isMobile || mobileNavigationVisible || globalSearchActive}
         />
-        <SContent>
+        <SContent noPaddingTop={!!noMobieNavigation}>
           <Container
             {...(restrictMaxWidth
               ? {}
@@ -201,8 +214,8 @@ export const General: React.FC<IGeneral> = (props) => {
                   noMaxContent: true,
                 })}
           >
-            <Row>
-              <Col>{children}</Col>
+            <Row noPaddingMobile={noPaddingMobile}>
+              <Col noPaddingMobile={noPaddingMobile}>{children}</Col>
             </Row>
           </Container>
         </SContent>
@@ -244,9 +257,7 @@ export const General: React.FC<IGeneral> = (props) => {
           <ReportBugButton
             bottom={
               (isMobile ? 24 : 16) +
-              (isMobile &&
-              (mobileNavigationVisible || postOverlayOpen) &&
-              !mobileChatOpened
+              (isMobile && mobileNavigationVisible && !mobileChatOpened
                 ? 56
                 : 0) +
               (chatButtonVisible && !mobileChatOpened ? 72 : 0)
@@ -271,12 +282,14 @@ General.defaultProps = {
 
 interface ISWrapper {
   withBanner: boolean;
+  noPaddingTop: boolean;
 }
 
 const SBaseLayout = styled(BaseLayout)<ISWrapper>`
   display: flex;
   transition: padding ease 0.5s;
-  padding-top: ${(props) => (props.withBanner ? 96 : 56)}px;
+  padding-top: ${(props) =>
+    !props.noPaddingTop ? (props.withBanner ? 96 : 56) : 0}px;
   padding-bottom: 56px;
   flex-direction: column;
   justify-content: space-between;
@@ -297,8 +310,17 @@ const SBaseLayout = styled(BaseLayout)<ISWrapper>`
   }
 `;
 
-const SContent = styled.main`
+const SContent = styled.main<{
+  noPaddingTop?: boolean;
+}>`
   padding: 40px 0;
+
+  ${({ noPaddingTop }) =>
+    noPaddingTop
+      ? css`
+          padding-top: 0;
+        `
+      : null}
 
   ${(props) => props.theme.media.tablet} {
     padding: 32px 0;

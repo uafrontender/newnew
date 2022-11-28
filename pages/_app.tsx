@@ -43,11 +43,11 @@ import { cookiesInstance } from '../api/apiConfigs';
 
 import 'react-toastify/dist/ReactToastify.css';
 import ChannelsContextProvider from '../contexts/channelsContext';
-import { SubscriptionsProvider } from '../contexts/subscriptionsContext';
 import FollowingsContextProvider from '../contexts/followingContext';
 import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
 import SyncUserWrapper from '../contexts/syncUserWrapper';
+import LanguageWrapper from '../contexts/languageWrapper';
 import AppConstantsContextProvider from '../contexts/appConstantsContext';
 import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
 import CardsContextProvider from '../contexts/cardsContext';
@@ -56,7 +56,6 @@ import CardsContextProvider from '../contexts/cardsContext';
 import assets from '../constants/assets';
 
 // Landing
-import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
@@ -65,6 +64,8 @@ import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
 import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
+import useScrollRestoration from '../utils/hooks/useScrollRestoration';
+import { BundlesContextProvider } from '../contexts/bundlesContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -83,6 +84,8 @@ const MyApp = (props: IMyApp): ReactElement => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
+
+  useScrollRestoration();
 
   // Shared layouts
   const getLayout = useMemo(
@@ -216,21 +219,21 @@ const MyApp = (props: IMyApp): ReactElement => {
             },
           }}
         >
-          <AppConstantsContextProvider>
-            <SocketContextProvider>
-              <ChannelsContextProvider>
-                <PersistanceProvider store={store}>
-                  <SyncUserWrapper>
-                    <NotificationsProvider>
-                      <ModalNotificationsContextProvider>
-                        <BlockedUsersProvider>
-                          <FollowingsContextProvider>
-                            <CardsContextProvider>
-                              <SubscriptionsProvider>
-                                <ChatsProvider>
-                                  <OverlayModeProvider>
-                                    <ResizeMode>
-                                      <PostModalContextProvider>
+          <LanguageWrapper>
+            <AppConstantsContextProvider>
+              <SocketContextProvider>
+                <ChannelsContextProvider>
+                  <PersistanceProvider store={store}>
+                    <SyncUserWrapper>
+                      <NotificationsProvider>
+                        <ModalNotificationsContextProvider>
+                          <BlockedUsersProvider>
+                            <FollowingsContextProvider>
+                              <CardsContextProvider>
+                                <BundlesContextProvider>
+                                  <ChatsProvider>
+                                    <OverlayModeProvider>
+                                      <ResizeMode>
                                         <GlobalTheme initialTheme={colorMode}>
                                           <>
                                             <ToastContainer containerId='toast-container' />
@@ -256,21 +259,21 @@ const MyApp = (props: IMyApp): ReactElement => {
                                             <ReCaptchaBadgeModal />
                                           </>
                                         </GlobalTheme>
-                                      </PostModalContextProvider>
-                                    </ResizeMode>
-                                  </OverlayModeProvider>
-                                </ChatsProvider>
-                              </SubscriptionsProvider>
-                            </CardsContextProvider>
-                          </FollowingsContextProvider>
-                        </BlockedUsersProvider>
-                      </ModalNotificationsContextProvider>
-                    </NotificationsProvider>
-                  </SyncUserWrapper>
-                </PersistanceProvider>
-              </ChannelsContextProvider>
-            </SocketContextProvider>
-          </AppConstantsContextProvider>
+                                      </ResizeMode>
+                                    </OverlayModeProvider>
+                                  </ChatsProvider>
+                                </BundlesContextProvider>
+                              </CardsContextProvider>
+                            </FollowingsContextProvider>
+                          </BlockedUsersProvider>
+                        </ModalNotificationsContextProvider>
+                      </NotificationsProvider>
+                    </SyncUserWrapper>
+                  </PersistanceProvider>
+                </ChannelsContextProvider>
+              </SocketContextProvider>
+            </AppConstantsContextProvider>
+          </LanguageWrapper>
         </GoogleReCaptchaProvider>
       </CookiesProvider>
     </>
@@ -358,6 +361,8 @@ const PRE_FETCH_LINKS_COMMON = (
       as='image'
       media='(min-width: 760px)'
     />
+    {/* Common */}
+    <link rel='prefetch' href={assets.common.vote} as='image' />
   </>
 );
 

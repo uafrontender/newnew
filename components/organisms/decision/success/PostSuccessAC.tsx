@@ -1,16 +1,12 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, { useCallback, useEffect, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
 import styled, { useTheme } from 'styled-components';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
@@ -25,8 +21,9 @@ import { formatNumber } from '../../../../utils/format';
 import getDisplayname from '../../../../utils/getDisplayname';
 import assets from '../../../../constants/assets';
 import { fetchPostByUUID } from '../../../../api/endpoints/post';
-import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import PostTitleContent from '../../../atoms/PostTitleContent';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import InlineSvg from '../../../atoms/InlineSVG';
 
 const AcSuccessOptionsTab = dynamic(
   () =>
@@ -42,7 +39,7 @@ interface IPostSuccessAC {
 
 const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
   ({ post }) => {
-    const { t } = useTranslation('modal-Post');
+    const { t } = useTranslation('page-Post');
     const theme = useTheme();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
@@ -50,9 +47,6 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
-    const router = useRouter();
-
-    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
@@ -98,11 +92,6 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
       'main'
     );
 
-    // Comments
-    const { ref: commentsSectionRef, inView } = useInView({
-      threshold: 0.8,
-    });
-
     // Check if the response has been viewed
     useEffect(() => {
       fetchPostLatestData();
@@ -113,6 +102,8 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     useEffect(() => {
       const handleCommentsInitialHash = () => {
         const { hash } = window.location;
+        console.log(hash);
+
         if (!hash) {
           return;
         }
@@ -120,32 +111,14 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
         const parsedHash = hash.substring(1);
 
         if (parsedHash === 'comments') {
-          document.getElementById('comments')?.scrollIntoView();
+          setTimeout(() => {
+            document.getElementById('comments')?.scrollIntoView();
+          }, 100);
         }
       };
 
       handleCommentsInitialHash();
     }, []);
-
-    // Replace hash once scrolled to comments
-    useEffect(() => {
-      if (inView) {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#comments`
-        );
-      } else {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }`
-        );
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid, router.locale]);
 
     // Load winning option
     useEffect(() => {
@@ -185,7 +158,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
-          <SActivitesContainer dimmedBackground={openedMainSection === 'main'}>
+          <SActivitiesContainer dimmedBackground={openedMainSection === 'main'}>
             {openedMainSection === 'main' ? (
               <>
                 <DecisionEndedBox
@@ -205,22 +178,35 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                       </a>
                       <a href={`/${post.creator?.username}`}>
                         <SWantsToKnow>
-                          {t('acPostSuccess.wantsToKnow', {
-                            creator: post.creator?.nickname,
-                          })}
+                          <Trans
+                            t={t}
+                            i18nKey='acPostSuccess.wantsToKnow'
+                            // @ts-ignore
+                            components={[
+                              post.creator?.options?.isVerified ? (
+                                <SInlineSVG
+                                  svg={VerificationCheckmark}
+                                  width='16px'
+                                  height='16px'
+                                  fill='none'
+                                />
+                              ) : null,
+                              { creator: getDisplayname(post.creator) },
+                            ]}
+                          />
                         </SWantsToKnow>
                       </a>
                     </SCreator>
                     {post.totalAmount?.usdCents &&
-                      post.totalAmount?.usdCents > 0 && (
-                        <STotal>
-                          {`$${formatNumber(
-                            post.totalAmount.usdCents / 100 ?? 0,
-                            true
-                          )}`}{' '}
-                          <span>{t('acPostSuccess.inTotalBids')}</span>
-                        </STotal>
-                      )}
+                    post.totalAmount?.usdCents > 0 ? (
+                      <STotal>
+                        {`$${formatNumber(
+                          post.totalAmount.usdCents / 100 ?? 0,
+                          true
+                        )}`}{' '}
+                        <span>{t('acPostSuccess.inTotalBids')}</span>
+                      </STotal>
+                    ) : null}
                   </SCreatorInfoDiv>
                   <SPostTitle variant={4}>
                     <PostTitleContent>{post.title}</PostTitleContent>
@@ -325,10 +311,10 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                 handleGoBack={() => setOpenedMainSection('main')}
               />
             )}
-          </SActivitesContainer>
+          </SActivitiesContainer>
         </SWrapper>
         {post.isCommentsAllowed && (
-          <SCommentsSection id='comments' ref={commentsSectionRef}>
+          <SCommentsSection id='comments'>
             <SCommentsHeadline variant={4}>
               {t('successCommon.comments.heading')}
             </SCommentsHeadline>
@@ -368,10 +354,11 @@ const SWrapper = styled.div`
 
     grid-template-areas: 'video activities';
     grid-template-columns: 410px 1fr;
+    grid-column-gap: 32px;
   }
 `;
 
-const SActivitesContainer = styled.div<{
+const SActivitiesContainer = styled.div<{
   dimmedBackground: boolean;
 }>`
   grid-area: activities;
@@ -466,6 +453,8 @@ const SCreatorImage = styled.img`
 
 const SWantsToKnow = styled.span`
   position: relative;
+  display: inline-flex;
+  align-items: center;
   top: -6px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
@@ -478,6 +467,10 @@ const SWantsToKnow = styled.span`
     font-size: 16px;
     line-height: 24px;
   }
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  margin-right: 2px;
 `;
 
 const STotal = styled.div`

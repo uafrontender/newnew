@@ -4,7 +4,7 @@ import Head from 'next/head';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { GetServerSideProps } from 'next';
-// import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useEffectOnce, useUpdateEffect } from 'react-use';
@@ -17,6 +17,7 @@ import { getMyRooms } from '../../api/endpoints/chat';
 import EmptyInbox from '../../components/atoms/chat/EmptyInbox';
 import Lottie from '../../components/atoms/Lottie';
 import loadingAnimation from '../../public/animations/logo-loading-blue.json';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
 export const Chat = () => {
   const { t } = useTranslation('page-Chat');
@@ -52,13 +53,13 @@ export const Chat = () => {
         const chatRoom = res.data.rooms[0];
         let route = '';
 
-        if (chatRoom?.visavis?.username) {
+        if (chatRoom?.visavis?.user?.username) {
           route =
             chatRoom.kind === 1
               ? chatRoom.myRole === 1
-                ? `${chatRoom.visavis.username}-cr`
-                : chatRoom.visavis.username
-              : `${chatRoom.visavis.username}-announcement`;
+                ? `${chatRoom.visavis.user.username}-cr`
+                : chatRoom.visavis.user.username
+              : `${chatRoom.visavis.user.username}-announcement`;
         } else {
           route =
             chatRoom.kind === 4 && chatRoom.myRole === 2
@@ -126,11 +127,12 @@ export const Chat = () => {
 export default Chat;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  /* const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Chat',
-    'modal-PaymentModal',
-  ]); */
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-Chat', 'modal-PaymentModal'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const { req } = context;
 
@@ -145,20 +147,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  // TODO: remove when bundles are added
-  // No entry until bundles are up and running
   return {
-    redirect: {
-      permanent: false,
-      destination: '/',
-    },
-  };
-  // TODO: re-enable, repurpose for bundles
-  /* return {
     props: {
       ...translationContext,
     },
-  }; */
+  };
 };
 
 const SGeneral = styled(General)`

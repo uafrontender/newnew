@@ -33,7 +33,11 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
   }, [value]);
 
   useEffect(() => {
-    if (autofocus) textareaRef.current?.focus();
+    if (autofocus) {
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
+    }
   }, [autofocus]);
 
   return (
@@ -54,6 +58,11 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
             textareaRef.current.scrollHeight -
             (textareaRef.current.scrollHeight % 24)
           }px`;
+        }
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
         }
       }}
       onChange={onChange}

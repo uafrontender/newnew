@@ -54,10 +54,12 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
       const h = moment().hour();
 
       if (isTimeOfTheDaySame && localTimeOfTheDay === 'pm') {
-        const hCorrected = h - 11;
+        const hCorrected = h - 12;
 
-        offset = 12 - hCorrected;
-      } else if (isTimeOfTheDaySame && localTimeOfTheDay === 'am') {
+        return HOURS.slice(hCorrected);
+      }
+
+      if (isTimeOfTheDaySame && localTimeOfTheDay === 'am') {
         offset = h - 1;
       }
     }

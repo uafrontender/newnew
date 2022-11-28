@@ -120,6 +120,7 @@ declare module 'styled-components' {
           transparent: string;
           changeLanguage: string;
           danger: string;
+          common: string;
         };
         background: {
           primary: string;
@@ -133,6 +134,7 @@ declare module 'styled-components' {
           transparent: string;
           changeLanguage: string;
           danger: string;
+          common: string;
         };
         hover: {
           primary: string;
@@ -146,6 +148,7 @@ declare module 'styled-components' {
           transparent: string;
           changeLanguage: string;
           danger: string;
+          common: string;
         };
         active: {
           primary: string;
@@ -194,11 +197,13 @@ declare module 'styled-components' {
         primary: string;
         secondary: string;
         tertiary: string;
+        quaternary: string;
       };
       listBottom: {
         primary: string;
         secondary: string;
         tertiary: string;
+        quaternary: string;
       };
       listLeft: {
         primary: string;

@@ -133,6 +133,7 @@ export const lightTheme: DefaultTheme = {
         transparent: '#FFFFFF',
         changeLanguage: '#2C2C33',
         danger: '#FFFFFF',
+        common: '#2C2C33',
       },
       background: {
         primary: '#1D6AFF',
@@ -147,6 +148,7 @@ export const lightTheme: DefaultTheme = {
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: 'rgba(0, 21, 128, 0.06)',
         danger: '#F12C46',
+        common: '#FFFFFF',
       },
       hover: {
         primary: '#1D6AFF',
@@ -161,6 +163,7 @@ export const lightTheme: DefaultTheme = {
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#E2E7F3',
         danger: '#F12C46',
+        common: '#000000',
       },
       active: {
         primary: '#0950DA',
@@ -225,6 +228,8 @@ export const lightTheme: DefaultTheme = {
         'linear-gradient(180deg, rgba(241, 243, 249, 0.8) 0%, rgba(241, 243, 249, 0) 100%)',
       tertiary:
         'linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%)',
+      quaternary:
+        'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);',
     },
     listBottom: {
       primary:
@@ -233,6 +238,8 @@ export const lightTheme: DefaultTheme = {
         'linear-gradient(180deg, rgba(241, 243, 249, 0) 0%, rgba(241, 243, 249, 0.8) 100%)',
       tertiary:
         'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)',
+      quaternary:
+        'linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);',
     },
     listLeft: {
       primary:
@@ -366,6 +373,7 @@ export const darkTheme: DefaultTheme = {
         transparent: '#FFFFFF',
         changeLanguage: '#FFFFFF',
         danger: '#FFFFFF',
+        common: '#2C2C33',
       },
       background: {
         primary: '#1D6AFF',
@@ -380,6 +388,7 @@ export const darkTheme: DefaultTheme = {
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#14151F',
         danger: '#F12C46',
+        common: '#FFFFFF',
       },
       hover: {
         primary: '#1D6AFF',
@@ -394,6 +403,7 @@ export const darkTheme: DefaultTheme = {
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#1E1F29',
         danger: '#F12C46',
+        common: '#000000',
       },
       active: {
         primary: '#0950DA',
@@ -456,6 +466,8 @@ export const darkTheme: DefaultTheme = {
         'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
       tertiary:
         'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
+      quaternary:
+        'linear-gradient(180deg, rgba(11, 10, 19, 0) 0%, rgba(11, 10, 19, 1) 100%)',
     },
     listBottom: {
       primary:
@@ -464,6 +476,8 @@ export const darkTheme: DefaultTheme = {
         'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
       tertiary:
         'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
+      quaternary:
+        'linear-gradient(180deg, rgba(11, 10, 19, 1) 0%, rgba(11, 10, 19, 0) 100%)',
     },
     listLeft: {
       primary:

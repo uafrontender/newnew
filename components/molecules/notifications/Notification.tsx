@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import moment from 'moment';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
+import { useInView } from 'react-intersection-observer';
+
 import UserAvatar from '../UserAvatar';
 import { InlineSvg } from '../../atoms/InlineSVG';
-
 import MessageIcon from '../../../public/images/svg/icons/filled/MessageIcon.svg';
 import MessageCircle from '../../../public/images/svg/icons/filled/MessageCircle.svg';
 import NotificationsIcon from '../../../public/images/svg/icons/filled/Notifications.svg';
 import { useAppSelector } from '../../../redux-store/store';
 import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import { markAsRead } from '../../../api/endpoints/notification';
+import getDisplayname from '../../../utils/getDisplayname';
 
 const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
   if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
@@ -25,6 +29,7 @@ const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
 };
 
 const Notification: React.FC<newnewapi.INotification> = ({
+  id,
   content,
   createdAt,
   target,
@@ -38,14 +43,30 @@ const Notification: React.FC<newnewapi.INotification> = ({
   const user = useAppSelector((state) => state.user);
   const [url, setUrl] = useState('/direct-messages');
 
+  const [isUnread, setIsUnread] = useState(!isRead);
+  const { ref, inView } = useInView();
+  const markAsReadTimeoutRef = useRef<NodeJS.Timer | null>(null);
+
+  const markNotificationAsRead = useCallback(async () => {
+    if (!id) {
+      return;
+    }
+    const payload = new newnewapi.MarkAsReadRequest({
+      notificationIds: [id],
+    });
+
+    const res = await markAsRead(payload);
+
+    if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+  }, [id]);
+
   useEffect(() => {
     if (url === '/direct-messages' && target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 1)
         setUrl('/creator/subscribers');
 
       if (target.userProfile && target?.userProfile.userUsername) {
-        // TODO: re-enable, repurpose for bundles
-        // setUrl(`/direct-messages/${target.userProfile.userUsername}`);
+        setUrl(`/direct-messages/${target.userProfile.userUsername}`);
       }
 
       if (target.postResponse && target?.postResponse.postUuid)
@@ -55,6 +76,28 @@ const Notification: React.FC<newnewapi.INotification> = ({
         setUrl(`/post/${target.postAnnounce.postUuid}`);
     }
   }, [url, target]);
+
+  useEffect(() => {
+    if (inView && isUnread && !markAsReadTimeoutRef.current) {
+      const MARK_AS_READ_DELAY = 3000;
+      markAsReadTimeoutRef.current = setTimeout(() => {
+        markNotificationAsRead();
+        setIsUnread(false);
+      }, MARK_AS_READ_DELAY);
+      return () => {
+        if (markAsReadTimeoutRef.current) {
+          clearTimeout(markAsReadTimeoutRef.current);
+        }
+      };
+    }
+
+    if (markAsReadTimeoutRef.current) {
+      clearTimeout(markAsReadTimeoutRef.current);
+      markAsReadTimeoutRef.current = null;
+    }
+
+    return () => {};
+  }, [inView, isUnread, markNotificationAsRead]);
 
   return (
     <Link href={url}>
@@ -94,9 +137,16 @@ const Notification: React.FC<newnewapi.INotification> = ({
             </SAvatarHolder>
           )}
           <SText>
-            <STitle>
-              {content?.relatedUser?.nicknameOrUsername}{' '}
-              {!isRead && <SBullet />}
+            <STitle ref={ref}>
+              {getDisplayname(content?.relatedUser)}
+              {content?.relatedUser?.isVerified && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                />
+              )}{' '}
+              {isUnread && <SBullet />}
             </STitle>
             <p>{content?.message}</p>
             <SDate>

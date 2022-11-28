@@ -44,7 +44,7 @@ import moreIcon from '../../public/images/svg/icons/filled/More.svg';
 import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
 // Utils
-import switchPostType from '../../utils/switchPostType';
+import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { SocketContext } from '../../contexts/socketContext';
 import { ChannelsContext } from '../../contexts/channelsContext';
 import CardTimer from '../atoms/CardTimer';
@@ -92,7 +92,6 @@ interface ICard {
   width?: string;
   height?: string;
   maxWidthTablet?: string;
-  shouldStop?: boolean;
   handleRemovePostFromState?: () => void;
   handleAddPostToState?: () => void;
 }
@@ -105,7 +104,6 @@ export const PostCard: React.FC<ICard> = React.memo(
     width,
     height,
     maxWidthTablet,
-    shouldStop,
     handleRemovePostFromState,
     handleAddPostToState,
   }) => {
@@ -440,6 +438,11 @@ export const PostCard: React.FC<ICard> = React.memo(
       };
     }, []);
 
+    useEffect(() => {
+      router.prefetch(`/post/${switchPostType(item)[0].postUuid}`);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const moreButtonInsideRef: any = useRef();
     const moreButtonRef: any = useRef();
 
@@ -522,10 +525,10 @@ export const PostCard: React.FC<ICard> = React.memo(
                     height='20px'
                   />
                 </SButtonIcon>
-                {!isMobile && (
+                {!isMobile && isEllipseMenuOpen && (
                   <PostCardEllipseMenu
                     postUuid={postParsed.postUuid}
-                    postType={typeOfPost as string}
+                    postType={typeOfPost as TPostType}
                     isVisible={isEllipseMenuOpen}
                     postCreator={postParsed.creator as newnewapi.User}
                     handleReportOpen={handleReportOpen}
@@ -561,12 +564,12 @@ export const PostCard: React.FC<ICard> = React.memo(
               onClose={handleReportClose}
             />
           )}
-          {isMobile && (
+          {isMobile && isEllipseMenuOpen && (
             <PostCardEllipseModal
               isOpen={isEllipseMenuOpen}
               zIndex={11}
               postUuid={postParsed.postUuid}
-              postType={typeOfPost as string}
+              postType={typeOfPost as TPostType}
               postCreator={postParsed.creator as newnewapi.User}
               handleReportOpen={handleReportOpen}
               onClose={handleEllipseMenuClose}
@@ -628,7 +631,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               {!isMobile && (
                 <PostCardEllipseMenu
                   postUuid={postParsed.postUuid}
-                  postType={typeOfPost as string}
+                  postType={typeOfPost as TPostType}
                   isVisible={isEllipseMenuOpen}
                   postCreator={postParsed.creator as newnewapi.User}
                   handleReportOpen={handleReportOpen}
@@ -665,7 +668,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   handleUserClick(postParsed.creator?.username!!);
                 }}
               >
-                {postParsed.creator?.nickname}
+                {getDisplayname(postParsed.creator)}
               </SUsername>
               {postParsed.creator?.options?.isVerified && (
                 <SInlineSVG
@@ -755,7 +758,7 @@ export const PostCard: React.FC<ICard> = React.memo(
             isOpen={isEllipseMenuOpen}
             zIndex={11}
             postUuid={postParsed.postUuid}
-            postType={typeOfPost as string}
+            postType={typeOfPost as TPostType}
             postCreator={postParsed.creator as newnewapi.User}
             handleReportOpen={handleReportOpen}
             onClose={handleEllipseMenuClose}
@@ -774,7 +777,6 @@ PostCard.defaultProps = {
   type: 'outside',
   width: '',
   height: '',
-  shouldStop: false,
 };
 
 interface ISWrapper {
@@ -1198,6 +1200,7 @@ const SUsernameContainer = styled.div`
   flex-shrink: 1;
   flex-grow: 1;
   overflow: hidden;
+  margin-right: 2px;
 `;
 
 const SUsername = styled(Text)`
@@ -1312,12 +1315,6 @@ const SButtonFirst = styled(Button)`
 
     span {
       font-size: 14px;
-    }
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    span {
-      font-size: 16px;
     }
   }
 

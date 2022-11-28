@@ -8,7 +8,6 @@ import React, {
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
-import { toast } from 'react-toastify';
 import {
   PaymentElement,
   useElements,
@@ -29,6 +28,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 import useRecaptcha from '../../../utils/hooks/useRecaptcha';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 // eslint-disable-next-line no-shadow
 enum PaymentMethodTypes {
@@ -58,7 +58,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
-  const { loggedIn } = useAppSelector((state) => state.user);
+  const { showErrorToastCustom } = useErrorToasts();
+  const { loggedIn, userData } = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
 
   const [isStripeReady, setIsStripeReady] = useState(false);
@@ -106,11 +107,12 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
 
       // pay with primary card
       if (
-        selectedPaymentMethod === PaymentMethodTypes.PrimaryCard &&
-        primaryCard
+        (selectedPaymentMethod === PaymentMethodTypes.PrimaryCard &&
+          primaryCard) ||
+        userData?.options?.isWhiteListed
       ) {
         await handlePayWithCard?.({
-          cardUuid: primaryCard.cardUuid as string,
+          cardUuid: primaryCard!!.cardUuid as string,
         });
 
         // pay with new card
@@ -125,7 +127,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           });
 
           if (errorKey) {
-            throw new Error(t(errorKey));
+            throw new Error(t(errorKey as any));
           }
         }
 
@@ -147,7 +149,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       }
     } catch (err: any) {
       if ((err.type && err.type === 'card_error') || !err.type) {
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
       }
       console.error(err, 'err');
     }
@@ -165,19 +167,34 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
-      toast.error(recaptchaErrorMessage);
+      showErrorToastCustom(recaptchaErrorMessage);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recaptchaErrorMessage]);
 
   const paymentElementOptions: StripePaymentElementOptions = useMemo(
     () => ({
       terms: { card: 'never' },
+      wallets: {
+        googlePay: 'never',
+        applePay: 'never',
+      },
     }),
     []
   );
 
   return (
-    <SForm id='checkout-form' onSubmit={submitWithRecaptchaProtection}>
+    <SForm
+      id='checkout-form'
+      onSubmit={(e: React.ChangeEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (userData?.options?.isWhiteListed) {
+          handleSubmit();
+        } else {
+          submitWithRecaptchaProtection(e);
+        }
+      }}
+    >
       {/* Payment method */}
       <Text variant='subtitle'>{t('paymentMethodTitle')}</Text>
       {primaryCard && (
@@ -187,15 +204,21 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
               setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard)
             }
             selected={selectedPaymentMethod === PaymentMethodTypes.PrimaryCard}
-            label={`${t('primaryCard')} **** ${primaryCard.last4}`}
-          />
-          <OptionCard
-            handleClick={() =>
-              setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
+            label={
+              userData?.options?.isWhiteListed
+                ? t('primaryCard')
+                : `${t('primaryCard')} **** ${primaryCard.last4}`
             }
-            selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
-            label={t('newCard')}
           />
+          {!userData?.options?.isWhiteListed && (
+            <OptionCard
+              handleClick={() =>
+                setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
+              }
+              selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
+              label={t('newCard')}
+            />
+          )}
         </>
       )}
 

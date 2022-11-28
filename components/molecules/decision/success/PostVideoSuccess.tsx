@@ -45,7 +45,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
   handleSetResponseViewed,
   handleToggleMuted,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
@@ -102,6 +102,8 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         const delta = window.innerHeight - videoRect.bottom;
         if (delta < 0) {
           setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+        } else {
+          setSoundBtnBottomOverriden(undefined);
         }
       }
     };
@@ -119,21 +121,19 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         if (!isInViewPort) {
           const delta = window.innerHeight - rect.bottom;
           setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+        } else {
+          setSoundBtnBottomOverriden(undefined);
         }
       }
 
-      document
-        ?.getElementById('post-modal-container')
-        ?.addEventListener('scroll', handleScroll);
+      document?.addEventListener('scroll', handleScroll);
     }
 
     return () => {
       setSoundBtnBottomOverriden(undefined);
 
       if (isBrowser() && !isMobileOrTablet) {
-        document
-          ?.getElementById('post-modal-container')
-          ?.removeEventListener('scroll', handleScroll);
+        document?.removeEventListener('scroll', handleScroll);
       }
     };
   }, [isMobileOrTablet, postId]);
@@ -261,6 +261,8 @@ const SVideoWrapper = styled.div`
     width: 284px;
     height: 506px;
     margin-left: initial;
+
+    flex-shrink: 0;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 

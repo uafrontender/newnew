@@ -2,7 +2,6 @@
 /* eslint-disable consistent-return */
 import React, {
   useCallback,
-  // useContext,
   useEffect,
   useMemo,
   useRef,
@@ -14,15 +13,13 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
-import { toast } from 'react-toastify';
 
 import {
   useAppDispatch,
   useAppSelector,
 } from '../../../../../redux-store/store';
 import { validateText } from '../../../../../api/endpoints/infrastructure';
-// import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
-import { doFreeVote } from '../../../../../api/endpoints/multiple_choice';
+import { createCustomOption } from '../../../../../api/endpoints/multiple_choice';
 
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
@@ -30,36 +27,37 @@ import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import Button from '../../../../atoms/Button';
 import McOptionCard from './McOptionCard';
 import SuggestionTextArea from '../../../../atoms/decision/SuggestionTextArea';
-// import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
 import LoadingModal from '../../../LoadingModal';
 import GradientMask from '../../../../atoms/GradientMask';
-import OptionActionMobileModal from '../../common/OptionActionMobileModal';
 import PaymentSuccessModal from '../../common/PaymentSuccessModal';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
-import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
-import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../../utils/mixpanel';
+import BuyBundleModal from '../../../bundles/BuyBundleModal';
+import McConfirmCustomOptionModal from './McConfirmCustomOptionModal';
+import OptionActionMobileModal from '../../common/OptionActionMobileModal';
+import Modal from '../../../../organisms/Modal';
+import Headline from '../../../../atoms/Headline';
+import InlineSvg from '../../../../atoms/InlineSVG';
+
+import AddOptionIcon from '../../../../../public/images/svg/icons/filled/AddOption.svg';
+import CloseIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
   postLoading: boolean;
   postStatus: TPostStatusStringified;
-  postCreator: string;
+  postCreatorName: string;
   postDeadline: string;
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
-  minAmount: number;
-  votePrice: number;
-  canVoteForFree: boolean;
-  hasVotedOptionId?: number;
-  canSubscribe: boolean;
-  handleResetFreeVote: () => void;
+  bundle?: newnewapi.IBundle;
   handleLoadOptions: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
@@ -71,67 +69,65 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   post,
   postLoading,
   postStatus,
-  postCreator,
+  postCreatorName,
   postDeadline,
   options,
   optionsLoading,
   pagingToken,
-  minAmount,
-  votePrice,
-  canVoteForFree,
-  hasVotedOptionId,
-  canSubscribe,
+  bundle,
   handleLoadOptions,
-  handleResetFreeVote,
   handleRemoveOption,
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
+  const { showErrorToastPredefined } = useErrorToasts();
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const dispatch = useAppDispatch();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
 
-  const { appConstants } = useGetAppConstants();
+  // Scroll block
+  const [isScrollBlocked, setIsScrollBlocked] = useState(false);
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
 
   const containerRef = useRef<HTMLDivElement>();
-  const { showTopGradient, showBottomGradient } =
-    useScrollGradients(containerRef);
-
-  const [heightDelta, setHeightDelta] = useState(
-    post.isSuggestionsAllowed && !hasVotedOptionId && postStatus === 'voting'
-      ? 56
-      : 0
+  const { showTopGradient, showBottomGradient } = useScrollGradients(
+    containerRef,
+    options.length > 0
   );
-  const actionSectionContainer = useRef<HTMLDivElement>();
+
+  const optionCreatedByMe = useMemo(
+    () =>
+      options.find(
+        (option) => option.creator?.uuid === user.userData?.userUuid
+      ),
+    [options, user.userData?.userUuid]
+  );
 
   const mainContainer = useRef<HTMLDivElement>();
-
-  const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
 
   // New option/bid
   const [newOptionText, setNewOptionText] = useState('');
   const [newOptionTextValid, setNewOptionTextValid] = useState(true);
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+
   // Mobile modal for new option
   const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
   // Payment modal
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [useFreeVoteModalOpen, setUseFreeVoteModalOpen] = useState(false);
-  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
+  const [confirmCustomOptionModalOpen, setConfirmCustomOptionModalOpen] =
+    useState(false);
+  const [paymentSuccessValue, setPaymentSuccessValue] = useState<
+    number | undefined
+  >(undefined);
+
+  // Bundle modal
+  const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
 
   // Handlers
   const validateTextViaAPI = useCallback(async (text: string) => {
@@ -179,26 +175,26 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     [setNewOptionText, validateTextViaAPIDebounced]
   );
 
-  const handleVoteForFree = useCallback(async () => {
-    setUseFreeVoteModalOpen(false);
+  const handleAddNewOption = useCallback(async () => {
+    setConfirmCustomOptionModalOpen(false);
     setLoadingModalOpen(true);
-    Mixpanel.track('Vote For Free', {
+    Mixpanel.track('Add Free Option', {
       _stage: 'Post',
       _postUuid: post.postUuid,
       _component: 'McOptionsTab',
     });
     try {
-      const payload = new newnewapi.VoteOnPostRequest({
-        votesCount: appConstants.mcFreeVoteCount,
-        optionText: newOptionText,
+      const payload = new newnewapi.CreateCustomMcOptionRequest({
         postUuid: post.postUuid,
+        optionText: newOptionText,
       });
 
-      const res = await doFreeVote(payload);
+      const res = await createCustomOption(payload);
 
       if (
         !res.data ||
-        res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+        res.data.status !==
+          newnewapi.CreateCustomMcOptionResponse.Status.SUCCESS ||
         res.error
       ) {
         throw new Error(res.error?.message ?? 'Request failed');
@@ -207,25 +203,21 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       const optionFromResponse = (res.data
         .option as newnewapi.MultipleChoice.Option)!!;
       optionFromResponse.isSupportedByMe = true;
-      // optionFromResponse.isCreatedBySubscriber = true;
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
       setNewOptionText('');
       setSuggestNewMobileOpen(false);
       setLoadingModalOpen(false);
-      handleResetFreeVote();
-      setPaymentSuccessModalOpen(true);
+      setPaymentSuccessValue(1);
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   }, [
-    newOptionText,
     post.postUuid,
-    appConstants.mcFreeVoteCount,
-    handleResetFreeVote,
+    newOptionText,
     handleAddOrUpdateOptionFromResponse,
+    showErrorToastPredefined,
   ]);
 
   useEffect(() => {
@@ -234,39 +226,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pagingToken, optionsLoading]);
-
-  useEffect(() => {
-    const resizeObserver = new ResizeObserver((entry: any) => {
-      const size = entry[0]?.borderBoxSize
-        ? entry[0]?.borderBoxSize[0]?.blockSize
-        : entry[0]?.contentRect.height;
-      if (size) {
-        setHeightDelta(size);
-      }
-    });
-
-    if (
-      post.isSuggestionsAllowed &&
-      !postLoading &&
-      !hasVotedOptionId &&
-      postStatus === 'voting' &&
-      actionSectionContainer.current
-    ) {
-      resizeObserver.observe(actionSectionContainer.current!!);
-    } else {
-      setHeightDelta(0);
-    }
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [
-    hasVotedOptionId,
-    postLoading,
-    post.isSuggestionsAllowed,
-    postStatus,
-    isMobileOrTablet,
-  ]);
 
   const goToNextStep = () => {
     if (
@@ -300,53 +259,52 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
+        {!isMobile ? (
+          <>
+            <GradientMask
+              gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+              positionTop
+              active={showTopGradient}
+            />
+            <GradientMask
+              gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+              positionBottom={0}
+              active={showBottomGradient}
+            />
+          </>
+        ) : null}
         <SBidsContainer
           ref={(el) => {
             containerRef.current = el!!;
           }}
-          heightDelta={heightDelta}
+          style={{
+            ...(isScrollBlocked
+              ? {
+                  overflow: 'hidden',
+                  width:
+                    options.length >= 4
+                      ? 'calc(100% + 10px)'
+                      : 'calc(100% + 14px)',
+                }
+              : {}),
+          }}
         >
-          {!isMobile ? (
-            <>
-              <GradientMask
-                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                positionTop
-                active={showTopGradient}
-              />
-              <GradientMask
-                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                positionBottom={heightDelta}
-                active={showBottomGradient}
-              />
-            </>
-          ) : null}
           {options.map((option, i) => (
             <McOptionCard
               key={option.id.toString()}
               option={option as TMcOptionWithHighestField}
               creator={option.creator ?? post.creator!!}
-              postCreator={postCreator}
-              postCreatorUuid={post.creator?.uuid ?? ''}
+              postCreatorName={postCreatorName}
               postText={post.title}
               postId={post.postUuid}
               index={i}
-              optionBeingSupported={optionBeingSupported}
-              votingAllowed={postStatus === 'voting'}
-              canVoteForFree={canVoteForFree}
+              bundle={bundle}
               isCreatorsBid={
                 !option.creator || option.creator?.uuid === post.creator?.uuid
               }
-              handleResetFreeVote={handleResetFreeVote}
-              noAction={
-                (hasVotedOptionId !== undefined &&
-                  hasVotedOptionId !== option.id) ||
-                postStatus === 'failed'
-              }
-              handleSetSupportedBid={(id: string) =>
-                setOptionBeingSupported(id)
-              }
-              handleSetPaymentSuccessModalOpen={(newValue: boolean) =>
-                setPaymentSuccessModalOpen(newValue)
+              noAction={postStatus === 'failed'}
+              handleSetPaymentSuccessValue={(newValue: number) =>
+                setPaymentSuccessValue(newValue)
               }
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
@@ -359,6 +317,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 });
                 handleRemoveOption(option);
               }}
+              handleSetScrollBlocked={() => setIsScrollBlocked(true)}
+              handleUnsetScrollBlocked={() => setIsScrollBlocked(false)}
             />
           ))}
           {!isMobile ? (
@@ -378,60 +338,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
-        {post.isSuggestionsAllowed &&
-          !hasVotedOptionId &&
-          canVoteForFree &&
-          postStatus === 'voting' && (
-            <SActionSection
-              ref={(el) => {
-                actionSectionContainer.current = el!!;
-              }}
-            >
-              <SuggestionTextArea
-                value={newOptionText}
-                disabled={optionBeingSupported !== ''}
-                placeholder={t(
-                  'mcPost.optionsTab.actionSection.suggestionPlaceholder'
-                )}
-                onChange={handleUpdateNewOptionText}
-              />
-              <SAddFreeVoteButton
-                size='sm'
-                disabled={
-                  !newOptionText ||
-                  optionBeingSupported !== '' ||
-                  !newOptionTextValid
-                }
-                style={{
-                  ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-                }}
-                onClick={() => {
-                  Mixpanel.track('Click Add Free Option', {
-                    _stage: 'Post',
-                    _postUuid: post.postUuid,
-                    _component: 'McOptionsTab',
-                  });
-                  setUseFreeVoteModalOpen(true);
-                }}
-              >
-                {t('mcPost.optionsTab.actionSection.placeABidButton')}
-              </SAddFreeVoteButton>
-              {user.userTutorialsProgress.remainingMcSteps && (
-                <STutorialTooltipTextAreaHolder>
-                  <TutorialTooltip
-                    isTooltipVisible={
-                      user.userTutorialsProgress.remainingMcSteps[0] ===
-                      newnewapi.McTutorialStep.MC_TEXT_FIELD
-                    }
-                    closeTooltip={goToNextStep}
-                    title={t('tutorials.mc.createYourBid.title')}
-                    text={t('tutorials.mc.createYourBid.text')}
-                    dotPosition={DotPositionEnum.BottomRight}
-                  />
-                </STutorialTooltipTextAreaHolder>
-              )}
-            </SActionSection>
-          )}
         {user.userTutorialsProgress.remainingMcSteps && (
           <STutorialTooltipHolder>
             <TutorialTooltip
@@ -447,73 +353,161 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           </STutorialTooltipHolder>
         )}
       </STabContainer>
-      {/* Suggest new Modal */}
-      {isMobile && !hasVotedOptionId ? (
-        <OptionActionMobileModal
-          isOpen={suggestNewMobileOpen}
-          onClose={() => setSuggestNewMobileOpen(false)}
-          zIndex={12}
-        >
-          <SSuggestNewContainer>
-            <SuggestionTextArea
-              value={newOptionText}
-              disabled={optionBeingSupported !== ''}
-              autofocus={suggestNewMobileOpen}
-              placeholder={t(
-                'mcPost.optionsTab.actionSection.suggestionPlaceholderDesktop'
-              )}
-              onChange={handleUpdateNewOptionText}
-            />
-            <SAddFreeVoteButton
-              size='sm'
-              disabled={
-                !newOptionText ||
-                optionBeingSupported !== '' ||
-                !newOptionTextValid
-              }
-              style={{
-                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-              }}
-              onClick={() => {
-                Mixpanel.track('Click Add Free Option', {
-                  _stage: 'Post',
-                  _postUuid: post.postUuid,
-                  _component: 'McOptionsTab',
-                });
-                setUseFreeVoteModalOpen(true);
-              }}
+      {/* Suggest new form */}
+      {!optionCreatedByMe &&
+        postStatus === 'voting' &&
+        (post.creator?.options?.isOfferingBundles || bundle) && (
+          <SActionSection>
+            <SAddOptionButtonDesktop
+              id='add-option-button'
+              onClick={() => setSuggestNewMobileOpen(true)}
             >
-              {t('mcPost.optionsTab.actionSection.placeABidButton')}
-            </SAddFreeVoteButton>
-          </SSuggestNewContainer>
-        </OptionActionMobileModal>
+              <InlineSvg
+                svg={AddOptionIcon}
+                width='24px'
+                height='24px'
+                fill='none'
+              />
+              {t('mcPost.optionsTab.actionSection.suggestionPlaceholder')}
+            </SAddOptionButtonDesktop>
+            {user.userTutorialsProgress.remainingMcSteps && (
+              <STutorialTooltipTextAreaHolder>
+                <TutorialTooltip
+                  isTooltipVisible={
+                    user.userTutorialsProgress.remainingMcSteps[0] ===
+                    newnewapi.McTutorialStep.MC_TEXT_FIELD
+                  }
+                  closeTooltip={goToNextStep}
+                  title={t('tutorials.mc.createYourBid.title')}
+                  text={t('tutorials.mc.createYourBid.text')}
+                  dotPosition={DotPositionEnum.BottomRight}
+                />
+              </STutorialTooltipTextAreaHolder>
+            )}
+          </SActionSection>
+        )}
+      {/* Suggest new Modal */}
+      {!optionCreatedByMe &&
+      postStatus === 'voting' &&
+      (post.creator?.options?.isOfferingBundles || bundle) ? (
+        isMobile ? (
+          <OptionActionMobileModal
+            isOpen={suggestNewMobileOpen}
+            onClose={() => setSuggestNewMobileOpen(false)}
+            zIndex={12}
+          >
+            <SSuggestNewContainer>
+              <SuggestionTextArea
+                value={newOptionText}
+                autofocus={suggestNewMobileOpen}
+                placeholder={t(
+                  'mcPost.optionsTab.actionSection.suggestionPlaceholderDesktop'
+                )}
+                onChange={handleUpdateNewOptionText}
+              />
+              <SAddOptionButton
+                size='sm'
+                disabled={!newOptionText || !newOptionTextValid}
+                style={{
+                  ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+                }}
+                onClick={() => {
+                  Mixpanel.track('Click Add Free Option', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'McOptionsTab',
+                  });
+                  if (bundle) {
+                    setConfirmCustomOptionModalOpen(true);
+                  } else {
+                    setBuyBundleModalOpen(true);
+                  }
+                }}
+              >
+                {t('mcPost.optionsTab.actionSection.placeABidButton')}
+              </SAddOptionButton>
+            </SSuggestNewContainer>
+          </OptionActionMobileModal>
+        ) : (
+          <Modal
+            show={suggestNewMobileOpen}
+            onClose={() => setSuggestNewMobileOpen(false)}
+            overlaydim
+            additionalz={12}
+          >
+            <SSuggestNewContainer>
+              <SCloseButton onClick={() => setSuggestNewMobileOpen(false)}>
+                <InlineSvg
+                  svg={CloseIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </SCloseButton>
+              <SHeadlineSuggestNew variant={5}>
+                {t('mcPost.optionsTab.actionSection.suggestionPlaceholder')}
+              </SHeadlineSuggestNew>
+              <SuggestionTextArea
+                id='add-option-input'
+                value={newOptionText}
+                autofocus={suggestNewMobileOpen}
+                placeholder={t(
+                  'mcPost.optionsTab.actionSection.suggestionPlaceholder'
+                )}
+                onChange={handleUpdateNewOptionText}
+              />
+              <SAddOptionButton
+                id='add-option-submit'
+                size='sm'
+                disabled={!newOptionText || !newOptionTextValid}
+                style={{
+                  ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+                }}
+                onClick={() => {
+                  Mixpanel.track('Click Add Free Option', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'McOptionsTab',
+                  });
+                  if (bundle) {
+                    setConfirmCustomOptionModalOpen(true);
+                  } else {
+                    setBuyBundleModalOpen(true);
+                  }
+                }}
+              >
+                {t('mcPost.optionsTab.optionCard.placeABidButton')}
+              </SAddOptionButton>
+            </SSuggestNewContainer>
+          </Modal>
+        )
       ) : null}
-      {/* Use Free vote modal */}
-      <McConfirmUseFreeVoteModal
-        isVisible={useFreeVoteModalOpen}
-        handleMakeFreeVote={handleVoteForFree}
-        closeModal={() => setUseFreeVoteModalOpen(false)}
+      {/* Add a custom option Modal */}
+      <McConfirmCustomOptionModal
+        isVisible={confirmCustomOptionModalOpen}
+        handleAddCustomOption={handleAddNewOption}
+        closeModal={() => setConfirmCustomOptionModalOpen(false)}
       />
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='mc'
-        isVisible={paymentSuccessModalOpen}
-        closeModal={() => setPaymentSuccessModalOpen(false)}
+        value={paymentSuccessValue}
+        isVisible={paymentSuccessValue !== undefined}
+        closeModal={() => setPaymentSuccessValue(undefined)}
       >
         {t('paymentSuccessModal.mc', {
-          postCreator,
+          postCreator: postCreatorName,
           postDeadline,
         })}
       </PaymentSuccessModal>
       {/* Mobile floating button */}
       {isMobile &&
       !suggestNewMobileOpen &&
-      !hasVotedOptionId &&
+      !optionCreatedByMe &&
       postStatus === 'voting' &&
-      post.isSuggestionsAllowed &&
-      canVoteForFree ? (
+      (post.creator?.options?.isOfferingBundles || bundle) ? (
         <>
           <SActionButton
             id='action-button-mobile'
@@ -545,6 +539,16 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           )}
         </>
       ) : null}
+      {buyBundleModalOpen && post.creator && (
+        <BuyBundleModal
+          show
+          creator={post.creator}
+          additionalZ={13}
+          onClose={() => {
+            setBuyBundleModalOpen(false);
+          }}
+        />
+      )}
     </>
   );
 };
@@ -556,22 +560,17 @@ export default McOptionsTab;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  /* height: calc(100% - 50px); */
 
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
 
   ${({ theme }) => theme.media.tablet} {
-    display: initial;
-
-    height: calc(100% - 56px);
-    height: 100%;
+    flex: 1 1 auto;
   }
 `;
 
-const SBidsContainer = styled.div<{
-  heightDelta: number;
-}>`
+const SBidsContainer = styled.div`
   width: 100%;
   height: 100%;
   overflow-y: auto;
@@ -582,11 +581,19 @@ const SBidsContainer = styled.div<{
   padding-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+
     padding-top: 0px;
     padding-right: 12px;
     margin-right: -14px;
     width: calc(100% + 14px);
+    height: initial;
+    flex: 1 1 auto;
 
     // Scrollbar
     &::-webkit-scrollbar {
@@ -645,18 +652,33 @@ const SSuggestNewContainer = styled.div`
   textarea {
     width: 100%;
   }
+
+  ${({ theme }) => theme.media.tablet} {
+    position: absolute;
+    top: calc(50% - 160px);
+    left: calc(50% - 220px);
+    width: 440px;
+
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+    padding: 72px 40px 40px 40px;
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
 `;
 
-const SAddFreeVoteButton = styled(Button)`
+const SHeadlineSuggestNew = styled(Headline)`
+  text-align: center;
+`;
+
+const SAddOptionButton = styled(Button)`
   width: 100%;
 
-  color: ${({ theme }) => theme.colors.dark};
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+  color: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colorsThemed.accent.blue};
 
   &:active:enabled,
   &:hover:enabled,
   &:focus:enabled {
-    background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+    background: ${({ theme }) => theme.colorsThemed.accent.blue};
   }
 `;
 
@@ -677,42 +699,52 @@ const SActionSection = styled.div`
     z-index: 5;
 
     padding-top: 8px;
-
-    background-color: ${({ theme }) =>
-      theme.name === 'dark'
-        ? theme.colorsThemed.background.secondary
-        : theme.colorsThemed.background.primary};
-
-    border-top: 1.5px solid
-      ${({ theme }) => theme.colorsThemed.background.outlines1};
-
-    textarea {
-      width: 100%;
-    }
   }
 `;
 
-// const SBottomPlaceholder = styled.div`
-//   display: none;
+const SCloseButton = styled.div`
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  cursor: pointer;
+`;
 
-//   ${({ theme }) => theme.media.laptop} {
-//     display: block;
+const SAddOptionButtonDesktop = styled.button`
+  width: 100%;
+  height: 84px;
+  border: transparent;
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-//     position: absolute;
-//     bottom: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 
-//     font-weight: 600;
-//     font-size: 12px;
-//     line-height: 16px;
-//     color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-//     width: max-content;
-//   }
-// `;
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+
+  cursor: pointer;
+  transition: 0.1s linear;
+
+  &:hover:enabled,
+  &:focus:enabled,
+  &:active:enabled {
+    outline: none;
+  }
+
+  &:hover:enabled,
+  &:focus:enabled {
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  }
+`;
 
 const STutorialTooltipHolder = styled.div`
   position: absolute;
-  left: 40%;
-  bottom: 90%;
+  left: 25%;
+  bottom: 110%;
   text-align: left;
   div {
     width: 190px;

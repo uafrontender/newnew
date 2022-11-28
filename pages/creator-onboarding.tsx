@@ -22,6 +22,7 @@ import {
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import { setCreatorData } from '../redux-store/slices/userStateSlice';
 import assets from '../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 const OnboardingSectionDetails = dynamic(
   () =>
@@ -141,10 +142,12 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
 export default CreatorOnboarding;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-CreatorOnboarding',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-CreatorOnboarding'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   try {
     const countriesPayload = new newnewapi.EmptyRequest({});

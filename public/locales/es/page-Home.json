@@ -10,7 +10,7 @@
       "ac": "Los Bids más grandes",
       "mc": "Superpolls populares",
       "cf": "Goals populares",
-      "recent-activity_NEED_TRANSLATION": "Recent Activity"
+      "recent-activity": "Actividad reciente"
     },
     "button": {
       "showMore": "Ver más",
@@ -18,18 +18,18 @@
       "creatorOnTheRise": "En ascenso"
     }
   },
-  "section_NEED_TRANSLATION": {
-    "your": "Your posts",
-    "explore": "Explore"
+  "section": {
+    "your": "Tus publicaciones",
+    "explore": "Explorar"
   },
   "tutorial": {
     "ac": {
       "title": "Bids",
-      "caption_NEED_TRANSLATION": "Send creators custom bids and see if they choose yours."
+      "caption": "Envía a los creadores ofertas personalizadas y mira si eligen la tuya."
     },
     "mc": {
       "title": "Superpolls",
-      "caption_NEED_TRANSLATION": "Vote on what a creator should do, then watch them do the option with the most amount of votes."
+      "caption": "Participa y vota sobre lo que crees que debería hacer un creador y observa cómo realiza la opción con la mayor cantidad de votos."
     },
     "cf": {
       "title": "Goals",
@@ -37,55 +37,61 @@
     },
     "for-you": {
       "title": "Para ti",
-      "caption_NEED_TRANSLATION": "This section will display posts recommended to you."
+      "caption": "Esta sección mostrará las publicaciones recomendadas para ti."
     },
     "biggest": {
       "title": "Lo mejor de todos los tiempos",
-      "caption_NEED_TRANSLATION": "This section will display the greatest of all time posts."
+      "caption": "Esta sección mostrará las mejores publicaciones de todos los tiempos."
     },
-    "recent-activity_NEED_TRANSLATION": {
-      "title": "Recent Activity",
-      "caption": "This section will display posts you are participating in"
+    "recent-activity": {
+      "title": "Actividad reciente",
+      "caption": "Esta sección mostrará las publicaciones en las que participas"
     }
   },
-  "faq_NEED_TRANSLATION": {
-    "title": "FAQs",
-    "learMore": "Want to learn more? Visit <0>NewNew Support</0>",
+  "faq": {
+    "title": "Preguntas frecuentes",
+    "learMore": "¿Quieres conocer más información? Visita el <0>Soporte de NewNew</0>",
     "items": [
       {
-        "question": "What is NewNew?",
-        "answer": "NewNew is an interactive marketplace where you bid and vote on the outcomes of people’s lives. People make money letting others have a say in their life decisions."
+        "question": "¿Qué es NewNew?",
+        "answer": "NewNew es un mercado interactivo en el que realizas ofertas y votas sobre los acontecimientos de la vida de las personas. Los creadores ganan dinero dejando que otros opinen sobre sus decisiones de vida."
       },
       {
-        "question": "Can I make money on NewNew?",
-        "answer": "Yes! <0>Sign up to become a creator</0> and have people pay to vote and bid on your life decisions!"
+        "question": "¿Puedo ganar dinero en NewNew?",
+        "answer": "¡Sí! <0>Regístrate para volverte un creador</0> y  permita que las personas paguen por votar y ofertas por tus decisiones de vida."
       },
       {
-        "question": "How do Bids work?",
-        "answer": "The audience sends you different bids on what you should do, and how much they’ll pay to see you do it.\nYou’ll choose your favorite bid and upload a video of yourself doing it! Don’t worry... you don’t have to choose the highest priced bid (but you can if you want to)! You can choose any bid you feel comfortable doing."
+        "question": "¿Cómo funcionan las ofertas?",
+        "answer": "El público te envía diferentes ofertas sobre lo que ellos creen que deberías hacer y cuánto pagarían por verte hacerlo.\n¡Elegirás tu oferta favorita y subirás un video de ti mismo haciéndolo! No te preocupes... ¡no tienes que elegir la oferta de mayor precio (pero puedes hacerlo si quieres)! Puedes elegir cualquier oferta con la que te sientas cómodo."
       },
       {
-        "question": "How do Superpolls work?",
-        "answer": "Post a video poll with different options for the audience to choose from.\nPeople pay to vote on their favorite option and you upload a video of yourself doing the option that got the most votes!"
+        "question": "¿Cómo funcionan los Superpolls?",
+        "answer": "Publica una encuesta en video con diferentes opciones de las que el público podrá elegir. \nLa gente paga para votar por su opción favorita y tú subirás un video de ti mismo haciendo la opción que obtuvo más votos."
       },
       {
-        "question": "What are Superpoll Bundles?",
-        "answer": "Creators can offer discounted bundles for their Superpolls. Buying a bundle is optional, but with buying a bundle you get: <2>A big discount on votes + more voting power to use in upcoming Superpolls</2> <2>The ability to add your own custom option to the creator’s Superpolls</2> <2>1-on-1 messages with the creator</2>"
+        "question": "¿Qué son los Bundles de Superpoll?",
+        "answer": "Los creadores pueden ofrecer Bundles con descuento para sus Superpolls. La compra de un bundle es opcional, pero con la compra de un bundle obtienes <2>Un gran descuento en la compra de votos + más poder de voto para usar en las próximas Superpolls</2> <2>La posibilidad de añadir tu propia opción personalizada a las Superpolls del creador</2> <2>Mensajes 1 a 1 con el creador</2>"
       },
       {
-        "question": "What if the creator doesn’t do what was voted on or bid on?",
-        "answer": "You won’t be charged if: <1>The creator never uploads a response video to a Superpoll or Bid</1> <1>The creator doesn’t choose your specific Bid</1> <1>The creator doesn’t choose the option you voted on in a Superpoll</1>"
+        "question_NEED_TRANSLATION": "Can brands use NewNew?",
+        "answer_NEED_TRANSLATION": "Yes! Brands are creators too. NewNew is a great place to engage with your customers on a hyper-interactive level. Your customers can help make major decisions for your brand and feel included and heard in the process of your next big product, launch etc. Besides, there’s no one better to get feedback from than those who are invested in your brand."
+      },
+      {
+        "question": "¿Y si el creador no hace por lo que se ha votado u ofertado?",
+        "answer": "No se te cobrará si <1>El creador nunca sube un video de respuesta a una Superpoll o Bid</1> <1>El creador no elige tu Bid en específico</1>"
       }
     ]
   },
-  "becomeCreator_NEED_TRANSLATION": {
-    "title": "Ready to create?"
+  "becomeCreator": {
+    "title": "¿Estás listo para crear algo emocionante?"
   },
-  "createFirstPost_NEED_TRANSLATION": {
-    "title": "Post your first Bid or Superpoll",
+  "createFirstPost": {
+    "title": "Publica tu primer oferta o Superpoll",
     "filter": {
-      "active": "Active",
-      "ended": "Ended"
+      "active": "Activo",
+      "ended": "Concluido"
     }
-  }
+  },
+  "ooops": "¡Ups!",
+  "noPosts": "No hemos encontrado ninguna publicación"
 }

@@ -26,11 +26,12 @@ import {
   setColorMode,
   TColorMode,
 } from '../../redux-store/slices/uiStateSlice';
+import { I18nNamespaces } from '../../@types/i18next';
 
 interface IFooter {}
 
 type TItem = {
-  key: string;
+  key: keyof I18nNamespaces['common']['footer'];
   url: string;
   iconSrc?: string;
   email?: boolean;
@@ -78,7 +79,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
       iconSrc: twitterIcon,
     }, */
     {
-      key: 'email',
+      key: 'email' as any,
       url: 'hi@newnew.co',
       // external: true,
       email: true,
@@ -151,14 +152,13 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
         <Row>
           <Col>
             <SContent>
-              <SIconHolder>
+              <SIconHolder onClick={handleLogoClick}>
                 <InlineSvg
                   clickable
                   svg={mobileLogo}
                   fill='#1D6AFF'
                   width='48px'
                   height='48px'
-                  onClick={handleLogoClick}
                 />
               </SIconHolder>
               <STopContent>
@@ -403,6 +403,9 @@ const SIconHolder = styled.div`
   top: 32px;
   right: 0;
   position: absolute;
+  z-index: 1;
+
+  cursor: pointer;
 `;
 
 const SLeftBlock = styled.div`

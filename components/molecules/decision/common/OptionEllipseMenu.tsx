@@ -3,7 +3,6 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import isBrowser from '../../../../utils/isBrowser';
 import { checkCanDeleteMcOption } from '../../../../api/endpoints/multiple_choice';
 import { checkCanDeleteAcOption } from '../../../../api/endpoints/auction';
 
@@ -40,18 +39,6 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
   const [canDeleteOption, setCanDeleteOption] = useState(false);
   const [isCanDeleteOptionLoading, setIsCanDeleteOptionLoading] =
     useState(false);
-
-  useEffect(() => {
-    if (isBrowser()) {
-      const container = document.getElementById('post-modal-container');
-      if (container)
-        if (isVisible) {
-          container.style.overflowY = 'hidden';
-        } else {
-          container.style.overflowY = '';
-        }
-    }
-  }, [isVisible]);
 
   useEffect(() => {
     async function fetchCanDelete() {
@@ -95,40 +82,43 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
   if (!isVisible) return null;
 
   return (
-    <SEllipseMenu
-      isOpen={isVisible}
-      onClose={handleClose}
-      style={{
-        left: `${xy.x}px`,
-        top: `${xy.y}px`,
-      }}
-    >
-      {isMyOption && (
-        <SEllipseMenuButton
-          variant={3}
-          tone='error'
-          onClick={() => {
-            handleOpenRemoveOptionModal?.();
-            handleClose();
-          }}
-          disabled={!canDeleteOption || isCanDeleteOptionLoading}
-        >
-          {t('ellipse.delete')}
-        </SEllipseMenuButton>
-      )}
-      {!isMyOption && (
-        <SEllipseMenuButton
-          variant={3}
-          tone='error'
-          onClick={() => {
-            handleOpenReportOptionModal();
-            handleClose();
-          }}
-        >
-          {t('ellipse.report')}
-        </SEllipseMenuButton>
-      )}
-    </SEllipseMenu>
+    <>
+      <SBgDiv />
+      <SEllipseMenu
+        isOpen={isVisible}
+        onClose={handleClose}
+        style={{
+          left: `${xy.x}px`,
+          top: `${xy.y}px`,
+        }}
+      >
+        {isMyOption && (
+          <SEllipseMenuButton
+            variant={3}
+            tone='error'
+            onClick={() => {
+              handleOpenRemoveOptionModal?.();
+              handleClose();
+            }}
+            disabled={!canDeleteOption || isCanDeleteOptionLoading}
+          >
+            {t('ellipse.delete')}
+          </SEllipseMenuButton>
+        )}
+        {!isMyOption && (
+          <SEllipseMenuButton
+            variant={3}
+            tone='error'
+            onClick={() => {
+              handleOpenReportOptionModal();
+              handleClose();
+            }}
+          >
+            {t('ellipse.report')}
+          </SEllipseMenuButton>
+        )}
+      </SEllipseMenu>
+    </>
   );
 };
 
@@ -152,4 +142,12 @@ const SEllipseMenuButton = styled(EllipseMenuButton)`
     opacity: 0.5;
     cursor: default;
   }
+`;
+
+const SBgDiv = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 `;

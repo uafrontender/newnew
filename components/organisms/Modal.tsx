@@ -7,6 +7,7 @@ import isBrowser from '../../utils/isBrowser';
 import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 interface IModal {
+  className?: string;
   show: boolean;
   transitionspeed?: number;
   overlaydim?: boolean;
@@ -18,6 +19,7 @@ interface IModal {
 
 const Modal: React.FC<IModal> = React.memo((props) => {
   const {
+    className,
     show,
     transitionspeed,
     overlaydim,
@@ -53,6 +55,7 @@ const Modal: React.FC<IModal> = React.memo((props) => {
   return ReactDOM.createPortal(
     <AnimatePresence>
       <StyledModalOverlay
+        className={className}
         key='modal-overlay'
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

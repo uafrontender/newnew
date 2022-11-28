@@ -4,7 +4,7 @@ import Head from 'next/head';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import type { GetServerSideProps, NextPage } from 'next';
-// import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useUpdateEffect } from 'react-use';
 
@@ -13,6 +13,7 @@ import Content from '../../../components/organisms/Chat';
 
 import { NextPageWithLayout } from '../../_app';
 import { useAppSelector } from '../../../redux-store/store';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 
 interface IChat {
   username: string;
@@ -72,13 +73,13 @@ export default Chat;
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  /* const { username, setup_intent_client_secret, save_card } = context.query;
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Chat',
-    'modal-PaymentModal',
-    'page-SubscribeToUser',
-  ]); */
+  const { username, setup_intent_client_secret, save_card } = context.query;
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-Chat', 'modal-PaymentModal', 'page-SubscribeToUser'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const { req } = context;
 
@@ -93,16 +94,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  // TODO: remove when bundles are added
-  // No entry until bundles are up and running
-  return {
-    redirect: {
-      permanent: false,
-      destination: '/',
-    },
-  };
-  // TODO: re-enable, repurpose for bundles
-  /*
   return {
     props: {
       username,
@@ -118,7 +109,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           }
         : {}),
     },
-  }; */
+  };
 };
 
 const SGeneral = styled(General)`

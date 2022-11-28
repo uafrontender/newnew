@@ -14,13 +14,10 @@ import { getMyPosts } from '../../api/endpoints/user';
 // import { TTokenCookie } from '../../api/apiConfigs';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
-// import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
-import switchPostType from '../../utils/switchPostType';
 import assets from '../../constants/assets';
-import { Mixpanel } from '../../utils/mixpanel';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
-const PostModal = dynamic(() => import('../../components/organisms/decision'));
 const PostList = dynamic(
   () => import('../../components/organisms/see-more/PostList')
 );
@@ -55,47 +52,11 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
   handleUpdateFilter,
   handleSetPosts,
 }) => {
-  // Display post
-  const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<
-    newnewapi.IPost | undefined
-  >();
-
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
   const { t } = useTranslation('page-Profile');
   const [triedLoading, setTriedLoading] = useState(false);
-
-  const handleOpenPostModal = (post: newnewapi.IPost) => {
-    Mixpanel.track('Open Post Modal', {
-      _stage: 'Profile Page',
-      _postUuid: switchPostType(post)[0].postUuid,
-    });
-    setDisplayedPost(post);
-    setPostModalOpen(true);
-  };
-
-  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-  }, []);
-
-  const handleClosePostModal = () => {
-    Mixpanel.track('Close Post Modal', {
-      _stage: 'Profile Page',
-    });
-    setPostModalOpen(false);
-    setDisplayedPost(undefined);
-  };
-
-  const handleRemovePostFromState = (postUuid: string) => {
-    handleSetPosts((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-  };
 
   // TODO: filters and other parameters
   const loadPosts = useCallback(
@@ -181,7 +142,6 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
               wrapperStyle={{
                 left: 0,
               }}
-              handlePostClicked={handleOpenPostModal}
             />
           )}
           {posts && posts.length === 0 && !isLoading && (
@@ -194,17 +154,6 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
         </SCardsSection>
         <div ref={loadingRef} />
       </SMain>
-      {displayedPost && (
-        <PostModal
-          isOpen={postModalOpen}
-          post={displayedPost}
-          handleClose={() => handleClosePostModal()}
-          handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemoveFromStateDeleted={() =>
-            handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
-          }
-        />
-      )}
     </div>
   );
 };
@@ -231,14 +180,19 @@ export async function getServerSideProps(
   context: GetServerSidePropsContext
 ): Promise<any> {
   try {
-    const translationContext = await serverSideTranslations(context.locale!!, [
-      'common',
-      'page-Profile',
-      'component-PostCard',
-      'modal-Post',
-      'modal-PaymentModal',
-      'modal-ResponseSuccessModal',
-    ]);
+    const translationContext = await serverSideTranslations(
+      context.locale!!,
+      [
+        'common',
+        'page-Profile',
+        'component-PostCard',
+        'page-Post',
+        'modal-PaymentModal',
+        'modal-ResponseSuccessModal',
+      ],
+      null,
+      SUPPORTED_LANGUAGES
+    );
 
     // const { req } = context;
     // // Try to fetch only if actual SSR needed

@@ -1,15 +1,9 @@
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
-} from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import { useUpdateEffect } from 'react-use';
+import { toNumber } from 'lodash';
 import Modal from '../../organisms/Modal';
 import SearchInput from '../../atoms/chat/SearchInput';
 import {
@@ -20,23 +14,25 @@ import {
   SUserAlias,
   SChatItemM,
   SUserAvatar,
+  SVerificationSVG,
+  SChatItemLine,
 } from '../../atoms/chat/styles';
 import UserAvatar from '../UserAvatar';
 import useScrollGradients from '../../../utils/hooks/useScrollGradients';
 import GradientMask from '../../atoms/GradientMask';
-import clearNameFromEmoji from '../../../utils/clearNameFromEmoji';
 import { useAppSelector } from '../../../redux-store/store';
 import InlineSVG from '../../atoms/InlineSVG';
 
-import { getMyRooms } from '../../../api/endpoints/chat';
+import {
+  getMyRooms,
+  getRoom,
+  getVisavisList,
+} from '../../../api/endpoints/chat';
 
 import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { IChatData } from '../../interfaces/ichat';
-import usePagination, {
-  PaginatedResponse,
-  Paging,
-} from '../../../utils/hooks/usePagination';
+import getDisplayname from '../../../utils/getDisplayname';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/chat/CloseModalButton')
@@ -51,14 +47,9 @@ interface INewMessageModal {
   closeModal: () => void;
   openChat: (arg: IChatData) => void;
 }
-
-interface IChatRoomUserNameWithoutEmoji extends newnewapi.IChatRoom {
-  userNameWithoutEmoji?: string;
-}
-
 interface IChatroomsSorted {
   letter: string;
-  chats: IChatRoomUserNameWithoutEmoji[];
+  chats: newnewapi.IVisavisListItem[];
 }
 
 const NewMessageModal: React.FC<INewMessageModal> = ({
@@ -81,87 +72,74 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const [searchValue, setSearchValue] = useState('');
 
   const [filteredChatrooms, setFilteredChatrooms] = useState<
-    IChatRoomUserNameWithoutEmoji[]
+    newnewapi.IVisavisListItem[]
   >([]);
 
   const [myAnnouncement, setMyAnnouncement] =
     useState<newnewapi.IChatRoom | null>(null);
 
+  const [loading, setLoading] = useState(false);
+  const [loadingAnnouncement, setLoadingAnnouncement] =
+    useState<boolean>(false);
+  const [chatRoomLoading, setChatRoomLoading] = useState<boolean>(false);
+  const [chatRooms, setChatRooms] = useState<newnewapi.IVisavisListItem[]>([]);
+
   const passInputValue = (str: string) => {
     setSearchValue(str);
   };
 
-  const loadData = useCallback(
-    async (paging: Paging): Promise<PaginatedResponse<newnewapi.IChatRoom>> => {
-      const payload = new newnewapi.GetMyRoomsRequest({
-        myRole: user.userData?.options?.isOfferingSubscription ? null : 1,
-        paging,
-      });
+  const loadData = useCallback(async () => {
+    if (loading) return;
+    try {
+      setLoading(true);
+      const payload = new newnewapi.EmptyRequest();
 
-      const res = await getMyRooms(payload);
+      const res = await getVisavisList(payload);
+
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
-      // Find own announcement chat
-      const myAnnouncementChat = res.data.rooms.find(
-        (chat) => chat.kind === 4 && chat.myRole === 2
-      );
-      if (myAnnouncementChat) {
-        setMyAnnouncement(myAnnouncementChat);
-      }
-
-      return {
-        nextData: res.data.rooms,
-        nextPageToken: res.data.paging?.nextPageToken,
-      };
-    },
-    [user.userData?.options?.isOfferingSubscription]
-  );
-
-  const { data, loading, hasMore, loadMore } = usePagination(
-    loadData,
-    50,
-    !showModal
-  );
-
-  const chatRooms: IChatRoomUserNameWithoutEmoji[] = useMemo(
-    () =>
-      data.reduce<newnewapi.IChatRoom[]>((list, chat) => {
-        if (chat.kind === 4) {
-          return list;
-        }
-
-        const existingRoomIndex = list.findIndex(
-          (currChat) => currChat.visavis?.username === chat.visavis?.username
-        );
-
-        if (existingRoomIndex < 0) {
-          return [...list, chat];
-        }
-
-        if (chat.myRole === 2) {
-          return [
-            ...list.slice(0, existingRoomIndex),
-            chat,
-            ...list.slice(existingRoomIndex + 1),
-          ];
-        }
-
-        return list;
-      }, []),
-    [data]
-  );
-
-  useUpdateEffect(() => {
-    if (data.length > 0 && !loading && hasMore) {
-      loadMore().catch((e) => console.error(e));
+      setChatRooms(res.data.visavis);
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
     }
-  }, [data, loading, hasMore, loadMore]);
+  }, [loading]);
+
+  const getMyAnnouncement = useCallback(async () => {
+    if (loadingAnnouncement) return;
+    try {
+      setLoadingAnnouncement(true);
+      const payload = new newnewapi.GetMyRoomsRequest({
+        roomKind: 4,
+        myRole: 2,
+      });
+      const res = await getMyRooms(payload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+
+      if (res.data.rooms[0]) setMyAnnouncement(res.data.rooms[0]);
+      setLoadingAnnouncement(false);
+    } catch (err) {
+      console.error(err);
+      setLoadingAnnouncement(false);
+    }
+  }, [loadingAnnouncement]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  useEffect(() => {
+    if (!myAnnouncement) getMyAnnouncement();
+  }, [getMyAnnouncement, myAnnouncement]);
 
   useEffect(() => {
     const obj = chatRooms.reduce((acc: { [key: string]: any }, c) => {
-      if (c.visavis && c.visavis.username) {
-        const letter = clearNameFromEmoji(c.visavis.username)[0].toLowerCase();
+      if (c.user && c.user.username) {
+        const letter = c.user.username[0];
         acc[letter] = (acc[letter] || []).concat(c);
       }
       return acc;
@@ -188,37 +166,18 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
   useEffect(() => {
     if (searchValue.length > 0) {
-      const arr: IChatRoomUserNameWithoutEmoji[] = [];
+      const arr: newnewapi.IVisavisListItem[] = [];
 
-      chatRooms.forEach((chat: IChatRoomUserNameWithoutEmoji) => {
-        if (!chat.userNameWithoutEmoji) {
-          /* eslint-disable no-param-reassign */
-          if (chat.visavis && chat.visavis.username)
-            chat.userNameWithoutEmoji = clearNameFromEmoji(
-              chat.visavis.username
-            ).toLowerCase();
-        } else {
-          // eslint-disable-next-line no-lonely-if
-          if (
-            chat.userNameWithoutEmoji.includes(searchValue) ||
-            (chat.visavis?.nickname &&
-              chat.visavis?.nickname.includes(searchValue))
-          )
-            arr.push(chat);
-        }
+      chatRooms.forEach((chat: newnewapi.IVisavisListItem) => {
+        if (
+          (chat.user?.username &&
+            chat.user?.username.toLowerCase().includes(searchValue)) ||
+          (chat.user?.nickname &&
+            chat.user?.nickname.toLowerCase().includes(searchValue))
+        )
+          arr.push(chat);
       });
 
-      arr.sort((a, b) => {
-        if (a.userNameWithoutEmoji && b.userNameWithoutEmoji) {
-          if (a.userNameWithoutEmoji < b.userNameWithoutEmoji) {
-            return -1;
-          }
-          if (a.userNameWithoutEmoji > b.userNameWithoutEmoji) {
-            return 1;
-          }
-        }
-        return 0;
-      });
       setFilteredChatrooms(arr);
     } else {
       setFilteredChatrooms([]);
@@ -231,33 +190,62 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
     closeModal();
   };
 
+  const fetchChatRoom = useCallback(
+    async (roomID: number | Long.Long | null | undefined) => {
+      if (chatRoomLoading) return;
+      try {
+        setChatRoomLoading(true);
+        const payload = new newnewapi.GetRoomRequest({
+          roomId: toNumber(roomID),
+        });
+        const res = await getRoom(payload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+
+        if (res.data) {
+          console.log(res.data);
+
+          openChat({ chatRoom: res.data, showChatList: null });
+          closeModal();
+        }
+        setChatRoomLoading(false);
+      } catch (err) {
+        console.error(err);
+        setChatRoomLoading(false);
+      }
+    },
+    [chatRoomLoading, closeModal, openChat]
+  );
+
   const renderChatItem = useCallback(
-    (chat: IChatRoomUserNameWithoutEmoji, index: number) => {
+    (chat: newnewapi.IVisavisListItem, index: number) => {
       const handleItemClick = () => {
-        openChat({ chatRoom: chat, showChatList: null });
-        closeModal();
+        fetchChatRoom(chat.chatroomId);
       };
 
       return (
-        <SChatItemContainer key={chat.id?.toString()}>
+        <SChatItemContainer key={`visavis-list-item-${chat.chatroomId}`}>
           <SChatItemM onClick={handleItemClick}>
-            {chat.visavis?.avatarUrl && (
+            {chat.user?.thumbnailAvatarUrl && (
               <SUserAvatar>
-                <UserAvatar avatarUrl={chat.visavis?.avatarUrl} />
+                <UserAvatar avatarUrl={chat.user?.thumbnailAvatarUrl} />
               </SUserAvatar>
             )}
             <SChatItemCenter>
-              <SChatItemText variant={3} weight={600}>
-                {chat.visavis?.nickname || chat.visavis?.username}
-                {chat.visavis?.options && chat.visavis?.options.isVerified && (
-                  <SInlineSVG
+              <SChatItemLine>
+                <SChatItemText variant={3} weight={600}>
+                  {getDisplayname(chat.user)}
+                </SChatItemText>
+                {chat.user?.isVerified && (
+                  <SVerificationSVG
                     svg={VerificationCheckmark}
-                    width='16px'
-                    height='16px'
+                    width='20px'
+                    height='20px'
                   />
                 )}
-              </SChatItemText>
-              <SUserAlias>@{chat.visavis?.username}</SUserAlias>
+              </SChatItemLine>
+              <SUserAlias>@{chat.user?.username}</SUserAlias>
             </SChatItemCenter>
           </SChatItemM>
           {filteredChatrooms.length > 0
@@ -266,7 +254,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         </SChatItemContainer>
       );
     },
-    [chatRooms, closeModal, openChat, filteredChatrooms]
+    [chatRooms, fetchChatRoom, filteredChatrooms]
   );
 
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
@@ -312,9 +300,10 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
                 )
               ) : (
                 <SSectionContent ref={scrollRef}>
-                  {user.userData?.options?.isOfferingSubscription && (
-                    <NewAnnouncement handleClick={createNewAnnouncement} />
-                  )}
+                  {user.userData?.options?.isOfferingBundles &&
+                    myAnnouncement && (
+                      <NewAnnouncement handleClick={createNewAnnouncement} />
+                    )}
                   {chatroomsSortedList.length > 0 &&
                     chatroomsSortedList.map((section: IChatroomsSorted) => (
                       <SSection key={section.letter}>

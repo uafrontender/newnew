@@ -20,6 +20,7 @@ interface ITabletFieldBlock {
     type?: 'text' | 'number' | 'tel';
     pattern?: string;
     max?: number;
+    customPlaceholder?: string;
   };
   formattedValue?: any;
   formattedDescription?: any;
@@ -56,12 +57,12 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
       value: item.id,
     })) || [];
 
-  const inputLabel = t(`secondStep.field.${id}.label`);
+  const inputLabel = t(`secondStep.field.${id}.label` as any);
 
   return (
     <SContainer>
       <STitle variant={2} weight={600}>
-        {t(`secondStep.field.${id}.title`)}
+        {t(`secondStep.field.${id}.title` as any)}
       </STitle>
       <SContentPart>
         {type === 'input' ? (
@@ -79,7 +80,10 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
                   onChange(id, e?.target?.value);
                 }}
                 withLabel={!!inputLabel}
-                placeholder={t(`secondStep.field.${id}.placeholder`)}
+                placeholder={
+                  inputProps?.customPlaceholder ??
+                  t(`secondStep.field.${id}.placeholder` as any)
+                }
                 {...inputProps}
               />
             </SInputContent>
@@ -88,7 +92,7 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
           <DropdownSelect<number>
             closeOnSelect
             width={isTablet ? '200px' : '208px'}
-            label={t(`secondStep.field.${id}.value`, {
+            label={t(`secondStep.field.${id}.value` as any, {
               value: formattedValue || value,
             })}
             options={getSelectOptions()}
@@ -100,7 +104,7 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
           />
         )}
         <SDescription variant={3} weight={600}>
-          {t(`secondStep.field.${id}.description`, {
+          {t(`secondStep.field.${id}.description` as any, {
             value: formattedDescription || value,
           })}
         </SDescription>

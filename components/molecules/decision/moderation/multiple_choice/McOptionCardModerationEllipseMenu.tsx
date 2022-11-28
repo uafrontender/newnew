@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
+import { newnewapi } from 'newnew-api';
+
+import { checkCanDeleteMcOption } from '../../../../../api/endpoints/multiple_choice';
 
 import EllipseMenu, { EllipseMenuButton } from '../../../../atoms/EllipseMenu';
-
-import isBrowser from '../../../../../utils/isBrowser';
 
 interface IMcOptionCardModerationEllipseMenu {
   isVisible: boolean;
   isBySubscriber: boolean;
-  canBeDeleted: boolean;
+  optionId: number;
+  canDeleteOptionInitial: boolean;
   handleClose: () => void;
   handleOpenReportOptionModal: () => void;
   handleOpenBlockUserModal: () => void;
@@ -22,7 +24,8 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<
 > = ({
   isVisible,
   isBySubscriber,
-  canBeDeleted,
+  optionId,
+  canDeleteOptionInitial,
   handleClose,
   handleOpenReportOptionModal,
   handleOpenBlockUserModal,
@@ -31,16 +34,36 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<
 }) => {
   const { t } = useTranslation('common');
 
+  const [canDeleteOption, setCanDeleteOption] = useState(false);
+  const [isCanDeleteOptionLoading, setIsCanDeleteOptionLoading] =
+    useState(false);
+
   useEffect(() => {
-    if (isBrowser()) {
-      const postModal = document.getElementById('post-modal-container');
-      if (isVisible && postModal) {
-        postModal.style.overflow = 'hidden';
-      } else if (postModal) {
-        postModal.style.overflow = 'scroll';
+    async function fetchCanDelete() {
+      setIsCanDeleteOptionLoading(true);
+      try {
+        let canDelete = false;
+        const payload = new newnewapi.CanDeleteMcOptionRequest({
+          optionId,
+        });
+
+        const res = await checkCanDeleteMcOption(payload);
+
+        if (res.data) {
+          canDelete = res.data.canDelete;
+        }
+
+        setCanDeleteOption(canDelete);
+      } catch (err) {
+        console.error(err);
       }
+      setIsCanDeleteOptionLoading(false);
     }
-  }, [isVisible]);
+
+    if (isVisible && canDeleteOption) {
+      fetchCanDelete();
+    }
+  }, [isVisible, canDeleteOption, optionId]);
 
   return (
     <SEllipseMenu
@@ -77,7 +100,11 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<
       ) : null}
       <EllipseMenuButton
         variant={3}
-        disabled={!canBeDeleted}
+        disabled={
+          !canDeleteOption ||
+          isCanDeleteOptionLoading ||
+          !canDeleteOptionInitial
+        }
         onClick={() => {
           handleOpenRemoveOptionModal();
           handleClose();

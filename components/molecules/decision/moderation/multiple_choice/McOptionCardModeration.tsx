@@ -34,6 +34,7 @@ import BlockUserModalPost from '../../common/BlockUserModalPost';
 import ReportModal, { ReportData } from '../../../chat/ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 import { RenderSupportersInfo } from '../../regular/multiple_choice/McOptionCard';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -43,6 +44,8 @@ interface IMcOptionCardModeration {
   isCreatorsBid: boolean;
   isWinner?: boolean;
   handleRemoveOption?: () => void;
+  handleSetScrollBlocked?: () => void;
+  handleUnsetScrollBlocked?: () => void;
 }
 
 const McOptionCardModeration: React.FunctionComponent<
@@ -55,13 +58,16 @@ const McOptionCardModeration: React.FunctionComponent<
   isCreatorsBid,
   isWinner,
   handleRemoveOption,
+  handleSetScrollBlocked,
+  handleUnsetScrollBlocked,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const supporterCountSubstracted = useMemo(() => {
     if (option.supporterCount === 0) {
@@ -90,7 +96,7 @@ const McOptionCardModeration: React.FunctionComponent<
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 
@@ -176,14 +182,35 @@ const McOptionCardModeration: React.FunctionComponent<
                     ? (option.firstVoter.username as string)
                     : undefined
                 }
+                whiteListedSupporter={
+                  option.whitelistSupporter
+                    ? getDisplayname(option.whitelistSupporter)
+                    : undefined
+                }
+                whiteListedSupporterUsername={
+                  option.whitelistSupporter
+                    ? (option.whitelistSupporter.username as string)
+                    : undefined
+                }
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubstracted}
+                amIVerified={false}
+                isOptionCreatorVerified={
+                  option.creator?.options?.isVerified ?? false
+                }
+                isFirstVoterVerified={
+                  option.firstVoter?.options?.isVerified ?? false
+                }
+                isWhitelistSupporterVerified={!!option.whitelistSupporter}
               />
             </SBiddersInfo>
           </SBidDetails>
           {!isMobile ? (
             <SEllipseButton
-              onClick={() => setIsEllipseMenuOpen(true)}
+              onClick={() => {
+                setIsEllipseMenuOpen(true);
+                handleSetScrollBlocked?.();
+              }}
               ref={ellipseMenuButton}
             >
               <InlineSvg
@@ -196,6 +223,7 @@ const McOptionCardModeration: React.FunctionComponent<
           ) : (
             <SEllipseButtonMobile
               ref={ellipseMenuButton}
+              isWhite={!!isWinner}
               onClick={() => setIsEllipseMenuOpen(true)}
             >
               {t('mcPost.optionsTab.optionCard.moreButton')}
@@ -205,8 +233,12 @@ const McOptionCardModeration: React.FunctionComponent<
             <McOptionCardModerationEllipseMenu
               isVisible={isEllipseMenuOpen}
               isBySubscriber={!isCreatorsBid}
-              canBeDeleted={canBeDeleted && !isWinner}
-              handleClose={() => setIsEllipseMenuOpen(false)}
+              canDeleteOptionInitial={canBeDeleted && !isWinner}
+              optionId={option.id as number}
+              handleClose={() => {
+                setIsEllipseMenuOpen(false);
+                handleUnsetScrollBlocked?.();
+              }}
               handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
               handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
               handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
@@ -229,7 +261,8 @@ const McOptionCardModeration: React.FunctionComponent<
           zIndex={16}
           onClose={() => setIsEllipseMenuOpen(false)}
           isBySubscriber={!isCreatorsBid}
-          canBeDeleted={canBeDeleted && !isWinner}
+          canDeleteOptionInitial={canBeDeleted && !isWinner}
+          optionId={option.id as number}
           handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
           handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
           handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
@@ -436,16 +469,20 @@ const SEllipseButton = styled(Button)`
   }
 `;
 
-const SEllipseButtonMobile = styled.button`
+const SEllipseButtonMobile = styled.button<{
+  isWhite?: boolean;
+}>`
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  color: ${({ theme, isWhite }) =>
+    isWhite ? theme.colors.dark : theme.colorsThemed.text.primary};
 
   padding: 16px 16px;
   height: 56px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+  background-color: ${({ theme, isWhite }) =>
+    isWhite ? '#FFFFFF' : theme.colorsThemed.background.quinary};
 
   border-radius: 16px;
   border: transparent;
@@ -456,6 +493,5 @@ const SEllipseButtonMobile = styled.button`
   &:focus,
   &:hover {
     outline: none;
-    background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
   }
 `;

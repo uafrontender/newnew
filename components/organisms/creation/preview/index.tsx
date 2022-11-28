@@ -9,7 +9,6 @@ import React, {
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import _compact from 'lodash/compact';
-import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -44,6 +43,8 @@ import urltoFile from '../../../../utils/urlToFile';
 import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import { I18nNamespaces } from '../../../../@types/i18next';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -57,6 +58,7 @@ interface IPreviewContent {}
 export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { t: tCommon } = useTranslation();
   const { t } = useTranslation('page-Creation');
+  const { showErrorToastCustom } = useErrorToasts();
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -188,6 +190,15 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       } else if (post.expiresAt === '7-days') {
         seconds = 604800;
         dateValue.add(7, 'd');
+      } else if (post.expiresAt === '2-minutes') {
+        seconds = 120;
+        dateValue.add(2, 'm');
+      } else if (post.expiresAt === '5-minutes') {
+        seconds = 300;
+        dateValue.add(5, 'm');
+      } else if (post.expiresAt === '10-minutes') {
+        seconds = 600;
+        dateValue.add(10, 'm');
       }
 
       return inSeconds ? seconds : dateValue;
@@ -203,7 +214,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const handleCloseModal = useCallback(() => {
     setShowModal(false);
     router.push('/');
-    dispatch(clearCreation({}));
+    dispatch(clearCreation(undefined));
   }, [dispatch, router]);
 
   const handleSubmit = useCallback(async () => {
@@ -287,7 +298,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               text: choice.text,
             })
           ),
-          isSuggestionsAllowed: multiplechoice.options.allowSuggestions,
+          // TODO: remove as unused
+          isSuggestionsAllowed: userData?.options?.isOfferingBundles,
         };
       } else if (tab === 'crowdfunding') {
         body.crowdfunding = {
@@ -313,10 +325,11 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         setShowModal(true);
       }
     } catch (err: any) {
-      toast.error(err);
+      showErrorToastCustom(err);
       setLoading(false);
     }
   }, [
+    loading,
     customCoverImageUrl,
     post.title,
     post.options,
@@ -324,17 +337,19 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     post.thumbnailParameters.startTime,
     post.thumbnailParameters.endTime,
     post.announcementVideoUrl,
-    loading,
-    tab,
-    router,
-    auction,
-    isMobile,
-    dispatch,
-    crowdfunding,
-    multiplechoice,
     formatStartsAt,
     formatExpiresAt,
+    tab,
+    dispatch,
+    isMobile,
+    auction.minimalBid,
+    multiplechoice.choices,
+    userData?.options?.isOfferingBundles,
+    crowdfunding.targetBackerCount,
+    router,
+    showErrorToastCustom,
   ]);
+
   const settings: any = useMemo(
     () =>
       _compact([
@@ -375,15 +390,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           ),
         },
         tab === 'multiple-choice' &&
-          userData?.options?.isOfferingSubscription && {
+          userData?.options?.isOfferingBundles && {
             key: 'allowSuggestions',
-            value: t(
-              `preview.values.${
-                multiplechoice.options.allowSuggestions
-                  ? 'allowSuggestions-allowed'
-                  : 'allowSuggestions-forbidden'
-              }`
-            ),
+            value: t(`preview.values.allowSuggestions-allowed`),
           },
       ]),
     [
@@ -393,8 +402,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       post.options.commentsEnabled,
       auction.minimalBid,
       crowdfunding.targetBackerCount,
-      multiplechoice?.options?.allowSuggestions,
-      userData?.options?.isOfferingSubscription,
+      userData?.options?.isOfferingBundles,
       formatExpiresAt,
     ]
   );
@@ -405,7 +413,11 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const renderSetting = (item: any) => (
     <SItem key={item.key}>
       <SItemTitle variant={2} weight={600}>
-        {t(`preview.settings.${item.key}`)}
+        {t(
+          `preview.settings.${
+            item.key as keyof I18nNamespaces['page-Creation']['preview']['settings']
+          }`
+        )}
       </SItemTitle>
       <SItemValue variant={2} weight={600}>
         {item.value}
@@ -483,7 +495,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             {fileProcessing.progress === 100 ? (
               <BitmovinPlayer
                 id='preview-mobile'
-                muted={false}
+                withMuteControl
                 resources={videoProcessing?.targetUrls}
                 showPlayButton
               />
@@ -531,7 +543,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         </SLeftPart>
         <SRightPart>
           <SHeadLine variant={3} weight={600}>
-            {t(`preview.title-${router?.query?.tab}`)}
+            {t(`preview.title-${router?.query?.tab}` as any)}
           </SHeadLine>
           <SHeadline variant={5}>
             <PostTitleContent>{post.title}</PostTitleContent>

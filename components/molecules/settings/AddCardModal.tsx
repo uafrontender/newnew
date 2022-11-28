@@ -9,12 +9,12 @@ import {
 import { SetupIntent } from '@stripe/stripe-js';
 import { newnewapi } from 'newnew-api';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { toast } from 'react-toastify';
 
 import { createStripeSetupIntent } from '../../../api/endpoints/payments';
 import { useAppSelector } from '../../../redux-store/store';
 import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
 import useRecaptcha from '../../../utils/hooks/useRecaptcha';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 // Components
 import Modal from '../../organisms/Modal';
@@ -34,6 +34,7 @@ interface IAddCardForm {
 const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
+  const { showErrorToastCustom } = useErrorToasts();
   const { t: tCommon } = useTranslation('common');
 
   const stripe = useStripe();
@@ -85,8 +86,9 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
-      toast.error(recaptchaErrorMessage);
+      showErrorToastCustom(recaptchaErrorMessage);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recaptchaErrorMessage]);
 
   useEffect(
@@ -98,7 +100,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
   );
 
   return (
-    <form onSubmit={submitWithRecaptchaProtection}>
+    <SForm onSubmit={submitWithRecaptchaProtection}>
       <PaymentElement
         id='stripePayment'
         onReady={() => {
@@ -107,6 +109,10 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
         options={{
           terms: {
             card: 'never',
+          },
+          wallets: {
+            googlePay: 'never',
+            applePay: 'never',
           },
         }}
       />
@@ -129,9 +135,6 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
       )}
       {isStripeReady && (
         <SModalButtons>
-          <SCancelButton onClick={onCancel} view='secondary'>
-            {tCommon('button.cancel')}
-          </SCancelButton>
           <SAddButton
             id='submit-card'
             view='primary'
@@ -144,9 +147,12 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
           >
             {t('Settings.sections.cards.button.addCard')}
           </SAddButton>
+          <SCancelButton onClick={onCancel} view='secondary'>
+            {tCommon('button.cancel')}
+          </SCancelButton>
         </SModalButtons>
       )}
-    </form>
+    </SForm>
   );
 };
 
@@ -261,28 +267,49 @@ AddCardModal.defaultProps = {};
 
 const SModalPaper = styled(ModalPaper)`
   min-height: 200px;
+
+  & > div {
+    overflow-x: hidden;
+
+    &:not(:first-child) {
+      height: 100%;
+    }
+  }
 `;
 
 const SRecaptchaWrapper = styled.div`
   margin-top: 20px;
 `;
 
+const SForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
+
 const SModalButtons = styled.div`
   display: flex;
-  margin-top: 32px;
+  flex-direction: column;
+  margin-top: auto;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex-direction: row-reverse;
+    margin-top: 32px;
+  }
 `;
 
 const SCancelButton = styled(Button)`
-  display: none;
-
   padding: 12px 24px;
-  line-height: 24px;
-  font-size: 14px;
-  margin-right: auto;
+  margin-top: 16px;
   flex-shrink: 0;
+
+  font-size: 14px;
+  line-height: 24px;
 
   ${({ theme }) => theme.media.tablet} {
     display: block;
+    margin-right: auto;
+    margin-top: 0;
   }
 `;
 

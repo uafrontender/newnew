@@ -1,25 +1,28 @@
-/* eslint-disable no-unsafe-optional-chaining */
+/* eslint-disable no-nested-ternary */
 import React, { useCallback, useState, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import moment from 'moment';
+import dynamic from 'next/dynamic';
 import { toNumber } from 'lodash';
+import { useUpdateEffect } from 'react-use';
 
 import { SUserAvatar } from '../../../atoms/chat/styles';
 
 import Text from '../../../atoms/Text';
 import UserAvatar from '../../UserAvatar';
 
-import { useAppSelector } from '../../../../redux-store/store';
 import { getMyRooms, markRoomAsRead } from '../../../../api/endpoints/chat';
 import { useGetChats } from '../../../../contexts/chatContext';
 import textTrim from '../../../../utils/textTrim';
 import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
 import { IChatData } from '../../../interfaces/ichat';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import ChatName from '../../../atoms/chat/ChatName';
+
+const NoResults = dynamic(() => import('../../../atoms/chat/NoResults'));
 
 interface IFunctionProps {
   openChat: (arg: IChatData) => void;
@@ -29,7 +32,6 @@ interface IFunctionProps {
 const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
   const { t } = useTranslation('page-Chat');
   const theme = useTheme();
-  const user = useAppSelector((state) => state.user);
   const { unreadCountForCreator } = useGetChats();
   const { ref: scrollRef, inView } = useInView();
 
@@ -70,7 +72,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
         if (res.data?.rooms.length > 0) {
           setChatRooms((curr) => {
             const arr =
-              curr && res.data?.rooms ? [...curr, ...res.data?.rooms] : [];
+              curr && res.data?.rooms ? [...curr, ...res.data.rooms] : [];
             return arr;
           });
           setChatRoomsNextPageToken(res.data.paging?.nextPageToken);
@@ -144,33 +146,43 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, loadingRooms, chatRoomsNextPageToken]);
 
-  useEffect(() => {
-    if (searchText && searchText !== prevSearchText && chatRooms) {
-      if (searchedRooms) setSearchedRooms(null);
+  const searchRoom = useCallback(async (text: string) => {
+    try {
+      const payload = new newnewapi.GetMyRoomsRequest({
+        searchQuery: text,
+        roomKind: 1,
+        myRole: 2,
+        paging: {
+          limit: 50,
+        },
+      });
+      const res = await getMyRooms(payload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+
+      if (res.data.rooms && res.data.rooms.length > 0) {
+        setSearchedRooms(res.data.rooms);
+      } else {
+        setSearchedRooms([]);
+      }
+      setSearchedRoomsLoading(false);
+    } catch (err) {
+      console.error(err);
+      setSearchedRoomsLoading(false);
+    }
+  }, []);
+
+  useUpdateEffect(() => {
+    if (searchText && searchText !== prevSearchText) {
       setPrevSearchText(searchText);
       if (!searchedRoomsLoading) {
         setSearchedRoomsLoading(true);
-        const arr = [] as newnewapi.IChatRoom[];
-        chatRooms.forEach((chat) => {
-          if (
-            chat.visavis?.nickname?.startsWith(searchText) ||
-            chat.visavis?.username?.startsWith(searchText)
-          ) {
-            arr.push(chat);
-          }
-        });
-        if (arr.length > 0) setSearchedRooms(arr);
-        setSearchedRoomsLoading(false);
+        searchRoom(searchText);
       }
     }
     if (searchedRooms && !searchText) setSearchedRooms(null);
-  }, [
-    searchText,
-    chatRooms,
-    searchedRooms,
-    prevSearchText,
-    searchedRoomsLoading,
-  ]);
+  }, [searchText, searchedRooms, prevSearchText, searchedRoomsLoading]);
 
   async function markChatAsRead(id: number) {
     try {
@@ -198,12 +210,9 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
 
       let avatar = (
         <SUserAvatar>
-          <UserAvatar avatarUrl={chat.visavis?.avatarUrl ?? ''} />
+          <UserAvatar avatarUrl={chat.visavis?.user?.avatarUrl ?? ''} />
         </SUserAvatar>
       );
-      let chatName = chat.visavis?.nickname
-        ? chat.visavis?.nickname
-        : chat.visavis?.username;
 
       if (chat.kind === 4 && chat.myRole === 2) {
         avatar = (
@@ -220,9 +229,6 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
             />
           </SMyAvatarMassupdate>
         );
-        chatName = t('announcement.title', {
-          username: user.userData?.nickname || user.userData?.username,
-        });
       }
 
       let lastMsg = chat.lastMessage?.content?.text;
@@ -245,16 +251,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
           <SChatItem onClick={handleItemClick}>
             {avatar}
             <SChatItemCenter>
-              <SChatItemText variant={3} weight={600}>
-                {chatName}
-                {chat.visavis?.options?.isVerified && chat.kind !== 4 && (
-                  <SInlineSVG
-                    svg={VerificationCheckmark}
-                    width='16px'
-                    height='16px'
-                  />
-                )}
-              </SChatItemText>
+              <ChatName chat={chat} />
               <SChatItemLastMessage variant={3} weight={600}>
                 {lastMsg}
               </SChatItemLastMessage>
@@ -279,16 +276,21 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
 
   return (
     <>
-      {chatRooms && !searchedRooms && (
+      {chatRooms && (
         <>
-          <SSectionContent>{chatRooms.map(renderChatItem)}</SSectionContent>
+          <SSectionContent>
+            {!searchedRooms ? (
+              chatRooms.map(renderChatItem)
+            ) : searchedRooms.length > 0 ? (
+              searchedRooms.map(renderChatItem)
+            ) : (
+              <NoResults text={searchText} />
+            )}
+          </SSectionContent>
           {chatRoomsNextPageToken && !searchedRooms && (
             <SRef ref={scrollRef}>Loading...</SRef>
           )}
         </>
-      )}
-      {searchedRooms && (
-        <SSectionContent>{searchedRooms.map(renderChatItem)}</SSectionContent>
       )}
     </>
   );
@@ -315,12 +317,6 @@ const SChatItemCenter = styled.div`
   display: flex;
   padding: 2px 12px;
   flex-direction: column;
-`;
-
-const SChatItemText = styled(Text)`
-  margin-bottom: 4px;
-  display: inline-flex;
-  align-items: center;
 `;
 
 const SChatItemLastMessage = styled(Text)`

@@ -28,13 +28,16 @@ const InfoTooltipItem: React.FC<IInfoTooltipItem> = ({
       <SInfoTooltipItem>
         <Image
           src={coin}
-          alt={t('dashboard.expirationPosts.table.header.contributions')}
+          // alt={t('dashboard.expirationPosts.table.header.contributions')}
+          alt=''
           width={22}
           height={24}
         />
         <SInfoTooltipText>
-          {t('dashboard.expirationPosts.table.header.contributions')}:{' '}
-          {contributions}
+          <>
+            {/* {t('dashboard.ex÷pirationPosts.table.header.contributions')}:{' '} */}
+            {contributions}
+          </>
         </SInfoTooltipText>
       </SInfoTooltipItem>
       <SInfoTooltipItem>

@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { GetServerSideProps } from 'next';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import loadingAnimation from '../../public/animations/logo-loading-blue.json';
@@ -14,6 +15,7 @@ import { NextPageWithLayout } from '../_app';
 import Lottie from '../../components/atoms/Lottie';
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import { setCreatorData } from '../../redux-store/slices/userStateSlice';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
 const DashboardSectionStripe = dynamic(
   () => import('../../components/organisms/creator/DashboardSectionStripe')
@@ -89,18 +91,30 @@ const GetPaid = () => {
 
 export default GetPaid;
 
-export async function getStaticProps(context: {
-  locale: string;
-}): Promise<any> {
-  const translationContext = await serverSideTranslations(context.locale, [
-    'common',
-    'page-Creator',
-    'page-Chat',
-  ]);
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-Creator', 'page-Chat'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
+
+  const { req } = context;
+
+  const accessToken = req.cookies?.accessToken;
+
+  if (!accessToken) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/',
+      },
+    };
+  }
 
   return {
     props: {
       ...translationContext,
     },
   };
-}
+};

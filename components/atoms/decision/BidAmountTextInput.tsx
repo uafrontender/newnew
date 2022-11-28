@@ -60,7 +60,11 @@ const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
   };
 
   useEffect(() => {
-    if (autofocus) inputRef.current?.focus();
+    if (autofocus) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
   }, [autofocus]);
 
   return (

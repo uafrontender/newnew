@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title_NEED_TRANSLATION": "NewNew",
+    "title": "NewNew",
     "description": "帖子人們接下來做什麼，與社區一起投票、出價投標和眾籌，觀看人們在NewNew上實際做的事情"
   },
   "cardsSection": {
@@ -10,7 +10,7 @@
       "ac": "超大Bid",
       "mc": "熱門Superpoll",
       "cf": "熱門Goal",
-      "recent-activity_NEED_TRANSLATION": "Recent Activity"
+      "recent-activity": "最近活動"
     },
     "button": {
       "showMore": "查看更多",
@@ -18,18 +18,18 @@
       "creatorOnTheRise": "冉冉上升"
     }
   },
-  "section_NEED_TRANSLATION": {
-    "your": "Your posts",
-    "explore": "Explore"
+  "section": {
+    "your": "你的帖子",
+    "explore": "探索"
   },
   "tutorial": {
     "ac": {
-      "title": "Bids",
-      "caption_NEED_TRANSLATION": "Send creators custom bids and see if they choose yours."
+      "title": "出價",
+      "caption": "向創作者發送定制出價，看看他們是否會選擇你的出價。"
     },
     "mc": {
       "title": "Superpolls",
-      "caption_NEED_TRANSLATION": "Vote on what a creator should do, then watch them do the option with the most amount of votes."
+      "caption": "投票選擇讓創作者做什麼，然後觀看他們按得票最多的選項照做。"
     },
     "cf": {
       "title": "Goals",
@@ -37,55 +37,61 @@
     },
     "for-you": {
       "title": "為你而設",
-      "caption_NEED_TRANSLATION": "This section will display posts recommended to you."
+      "caption": "向你推薦的帖子將顯示在此處。"
     },
     "biggest": {
       "title": "史上最棒",
-      "caption_NEED_TRANSLATION": "This section will display the greatest of all time posts."
+      "caption": "最棒的帖子將顯示在此處。"
     },
-    "recent-activity_NEED_TRANSLATION": {
-      "title": "Recent Activity",
-      "caption": "This section will display posts you are participating in"
+    "recent-activity": {
+      "title": "最近活動",
+      "caption": "你参与的帖子将显示在這裏"
     }
   },
-  "faq_NEED_TRANSLATION": {
-    "title": "FAQs",
-    "learMore": "Want to learn more? Visit <0>NewNew Support</0>",
+  "faq": {
+    "title": "常見問題",
+    "learMore": "想了解更多？请访问<0>NewNew支持</0>",
     "items": [
       {
-        "question": "What is NewNew?",
-        "answer": "NewNew is an interactive marketplace where you bid and vote on the outcomes of people’s lives. People make money letting others have a say in their life decisions."
+        "question": "NewNew是什麽？",
+        "answer": "NewNew是一個互動市場，你在這裡對人們的生活結果進行投標和投票。人們讓別人參與自己的生活決定，以此來賺錢。"
       },
       {
-        "question": "Can I make money on NewNew?",
-        "answer": "Yes! <0>Sign up to become a creator</0> and have people pay to vote and bid on your life decisions!"
+        "question": "我可以在NewNew上掙錢嗎？",
+        "answer": "當然可以! <0>註冊成為創作者</0>，讓人們付費為你的生活決定投票或出價！</0>"
       },
       {
-        "question": "How do Bids work?",
-        "answer": "The audience sends you different bids on what you should do, and how much they’ll pay to see you do it.\nYou’ll choose your favorite bid and upload a video of yourself doing it! Don’t worry... you don’t have to choose the highest priced bid (but you can if you want to)! You can choose any bid you feel comfortable doing."
+        "question": "出價是怎麽回事？",
+        "answer": "觀眾向你發出不同的出價，告訴你應該做什麼，以及他們願意付多少錢看你做這件事。由你選擇你最喜歡的出價，並上傳你做這件事的視頻 不要擔心......你不必選擇價格最高的出價（但如果你想的話，你可以選擇）！你可以選擇任何你覺得合適的出價，選擇任何你覺得舒服的出價。"
       },
       {
-        "question": "How do Superpolls work?",
-        "answer": "Post a video poll with different options for the audience to choose from.\nPeople pay to vote on their favorite option and you upload a video of yourself doing the option that got the most votes!"
+        "question": "Superpoll是怎麽回事？",
+        "answer": "你可以發佈有不同選項的視頻投票，讓觀眾選擇。\n人們付費投票給他們最喜歡的選項，而你則上傳一段自己按照的票最多的選項的執行的視頻!"
       },
       {
-        "question": "What are Superpoll Bundles?",
-        "answer": "Creators can offer discounted bundles for their Superpolls. Buying a bundle is optional, but with buying a bundle you get: <2>A big discount on votes + more voting power to use in upcoming Superpolls</2> <2>The ability to add your own custom option to the creator’s Superpolls</2> <2>1-on-1 messages with the creator</2>"
+        "question": "什麽是Superpoll Bundles？",
+        "answer": "創作者可以為他們的Superpoll提供優惠的捆綁服務。購買Bundle產品是可選的，但如果你購買了Bundle產品，你可以享受的是：<2>票數上的巨大折扣+更多的投票，並可以在即將到來的Superpoll中使用</2> <2>可以在創作者的Superpoll中添加你的自訂選項</2> <2>與創作者進行1對1的交流</2>"
       },
       {
-        "question": "What if the creator doesn’t do what was voted on or bid on?",
-        "answer": "You won’t be charged if: <1>The creator never uploads a response video to a Superpoll or Bid</1> <1>The creator doesn’t choose your specific Bid</1> <1>The creator doesn’t choose the option you voted on in a Superpoll</1>"
+        "question_NEED_TRANSLATION": "Can brands use NewNew?",
+        "answer_NEED_TRANSLATION": "Yes! Brands are creators too. NewNew is a great place to engage with your customers on a hyper-interactive level. Your customers can help make major decisions for your brand and feel included and heard in the process of your next big product, launch etc. Besides, there’s no one better to get feedback from than those who are invested in your brand."
+      },
+      {
+        "question": "如果創作者不按照出價選出的選項執行怎麼辦？",
+        "answer": "如果有以下情況，不會向你收費。<1>創作者未向Superpoll或出價競標上傳回應視頻</1> <1>創作者沒有選擇你的出價</1>"
       }
     ]
   },
-  "becomeCreator_NEED_TRANSLATION": {
-    "title": "Ready to create?"
+  "becomeCreator": {
+    "title": "準備好創作了嗎？"
   },
-  "createFirstPost_NEED_TRANSLATION": {
-    "title": "Post your first Bid or Superpoll",
+  "createFirstPost": {
+    "title": "貼出你的出價或是Superpoll",
     "filter": {
-      "active": "Active",
-      "ended": "Ended"
+      "active": "進行中",
+      "ended": "已結束"
     }
-  }
+  },
+  "ooops": "哎呀！",
+  "noPosts": "沒有找到帖子"
 }

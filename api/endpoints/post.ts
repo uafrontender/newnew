@@ -118,16 +118,20 @@ export const deleteAdditionalPostResponse = (
     signal ?? undefined,
   );
 
-export const fetchPostByUUID = (payload: newnewapi.GetPostRequest, signal?: RequestInit['signal']) =>
+export const fetchPostByUUID = (
+  payload: newnewapi.GetPostRequest,
+  signal?: RequestInit['signal'],
+  accessTokenFromSSRCookie?: string,
+) =>
   fetchProtobuf<newnewapi.GetPostRequest, newnewapi.Post>(
     newnewapi.GetPostRequest,
     newnewapi.Post,
     `${BASE_URL_POST}/get_post`,
     'post',
     payload,
-    cookiesInstance.get('accessToken')
+    (cookiesInstance.get('accessToken') || accessTokenFromSSRCookie)
       ? {
-          'x-auth-token': cookiesInstance.get('accessToken'),
+          'x-auth-token': cookiesInstance.get('accessToken') || accessTokenFromSSRCookie,
         }
       : {},
       'cors',

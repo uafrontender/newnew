@@ -11,6 +11,7 @@ import { NextPageWithLayout } from '../../_app';
 
 import assets from '../../../constants/assets';
 import isBrowser from '../../../utils/isBrowser';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 
 const CardSetupCompleteModal = dynamic(
   () => import('../../../components/organisms/settings/CardSetupCompleteModal')
@@ -18,7 +19,7 @@ const CardSetupCompleteModal = dynamic(
 
 const CardSetupComplete: NextPage = () => {
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Profile');
 
   const clientSecret = router.query.setup_intent_client_secret as string;
   const setupIntentId = router.query.setup_intent as string;
@@ -63,10 +64,12 @@ export default CardSetupComplete;
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Profile',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-Profile'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {

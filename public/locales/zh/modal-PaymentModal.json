@@ -29,7 +29,7 @@
     "wrongEmail": "電子郵件無法使用",
     "paymentFailed": "付款失敗",
     "requestFailed": "請求失敗",
-    "invalidFee_NEED_TRANSLATION": "Something went wrong. Please reload the page and try again"
+    "invalidFee": "出錯了。請重新載入此頁面並重試"
   },
-  "processingFee_NEED_TRANSLATION": "Processing fee"
+  "processingFee": "處理費"
 }

@@ -18,7 +18,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { useAppSelector } from '../../../../redux-store/store';
 import { setPostThumbnail } from '../../../../api/endpoints/post';
 import { TThumbnailParameters } from '../../../../redux-store/slices/creationStateSlice';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
 import EllipseMenu, { EllipseMenuButton } from '../../../atoms/EllipseMenu';
@@ -29,6 +29,7 @@ import PostVideoResponseUploadedTab from './PostVideoResponseUploadedTab';
 import PostVideoAnnouncementTab from './PostVideoAnnouncementTab';
 import PostVideoResponseUpload from './PostVideoResponseUpload';
 import PostVideoCoverImageEdit from './PostVideoCoverImageEdit';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 const PostBitmovinPlayer = dynamic(
   () => import('../common/PostBitmovinPlayer'),
@@ -59,7 +60,8 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   isMuted,
   handleToggleMuted,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
+  const { showErrorToastCustom } = useErrorToasts();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
     'mobile',
@@ -72,7 +74,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     resizeMode
   );
 
-  const { postStatus } = usePostModalInnerState();
+  const { postStatus } = usePostInnerState();
   const {
     coreResponse,
     openedTab,
@@ -173,7 +175,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       toast.success(t('postVideoThumbnailEdit.toast.success'));
     } catch (err) {
       console.error(err);
-      toast.error(t('postVideoThumbnailEdit.toast.error'));
+      showErrorToastCustom(t('postVideoThumbnailEdit.toast.error'));
     }
   };
 
@@ -197,6 +199,8 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         const delta = window.innerHeight - videoRect.bottom;
         if (delta < 0) {
           setBottomOffset(Math.abs(delta) + 24);
+        } else {
+          setBottomOffset(undefined);
         }
       }
     };
@@ -214,21 +218,19 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         if (!isInViewPort) {
           const delta = window.innerHeight - rect.bottom;
           setBottomOffset(Math.abs(delta) + 24);
+        } else {
+          setBottomOffset(undefined);
         }
       }
 
-      document
-        ?.getElementById('post-modal-container')
-        ?.addEventListener('scroll', handleScroll);
+      document?.addEventListener('scroll', handleScroll);
     }
 
     return () => {
       setBottomOffset(undefined);
 
       if (isBrowser() && !isMobileOrTablet) {
-        document
-          ?.getElementById('post-modal-container')
-          ?.removeEventListener('scroll', handleScroll);
+        document?.removeEventListener('scroll', handleScroll);
       }
     };
   }, [isMobileOrTablet, postId]);
@@ -420,6 +422,8 @@ const SVideoWrapper = styled.div`
     width: 284px;
     height: 506px;
     margin-left: initial;
+
+    flex-shrink: 0;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 

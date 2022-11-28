@@ -45,8 +45,13 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   );
 
   // When user logs out, clear the state
+  // Don't clean local storage in tests
   useEffect(() => {
-    if (userWasLoggedIn.current && !user.loggedIn) {
+    if (
+      userWasLoggedIn.current &&
+      !user.loggedIn &&
+      process.env.NEXT_PUBLIC_ENVIRONMENT !== 'test'
+    ) {
       setCreatorDataSteps(0);
       removeStateLS('userTutorialsProgress');
       userWasLoggedIn.current = false;
@@ -115,8 +120,8 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    user.creatorData?.options.isCreatorConnectedToStripe,
-    user.creatorData?.options.stripeConnectStatus,
+    user.creatorData?.options?.isCreatorConnectedToStripe,
+    user.creatorData?.options?.stripeConnectStatus,
     user.creatorData?.options,
     socketConnection,
   ]);
@@ -154,8 +159,9 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
                 isVerified: data.me?.options?.isVerified,
                 creatorStatus: data.me?.options?.creatorStatus,
                 birthDateUpdatesLeft: data.me?.options?.birthDateUpdatesLeft,
-                isOfferingSubscription: data.me.options?.isOfferingSubscription,
+                isOfferingBundles: data.me.options?.isOfferingBundles,
                 isPhoneNumberConfirmed: data.me.options?.isPhoneNumberConfirmed,
+                isWhiteListed: data.me.options?.isWhiteListed,
               },
             } as TUserData)
           );

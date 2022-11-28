@@ -11,19 +11,8 @@ import FilterButton from '../../atoms/FilterButton';
 import Text from '../../atoms/Text';
 
 import { getMyPosts } from '../../../api/endpoints/user';
-import switchPostType from '../../../utils/switchPostType';
 
-interface IYourPostsSection {
-  onPostOpen: (post: newnewapi.Post) => void;
-  postToRemove?: string;
-  resetPostToRemove?: () => void;
-}
-
-const YourPostsSection = ({
-  onPostOpen,
-  postToRemove,
-  resetPostToRemove,
-}: IYourPostsSection) => {
+const YourPostsSection = () => {
   const { t: tCommon } = useTranslation('common');
   const { t } = useTranslation('page-Home');
 
@@ -133,27 +122,6 @@ const YourPostsSection = ({
     }
   }, [statusFilter, initialFetch]);
 
-  useEffect(() => {
-    if (postToRemove) {
-      let isPostFounded = false;
-      setPosts((curr) => {
-        const updated = curr.filter((post) => {
-          if (switchPostType(post)[0].postUuid !== postToRemove) {
-            return true;
-          }
-
-          isPostFounded = true;
-          return false;
-        });
-        return updated;
-      });
-
-      if (isPostFounded) {
-        resetPostToRemove?.();
-      }
-    }
-  }, [postToRemove, resetPostToRemove]);
-
   if (
     isPostsRequested.current &&
     posts.length === 0 &&
@@ -211,15 +179,14 @@ const YourPostsSection = ({
           category='my-posts'
           collection={posts}
           loading={isLoading}
-          handlePostClicked={onPostOpen}
           onReachEnd={loadMorePosts}
           seeMoreLink='/profile/my-posts'
         />
       )}
       {!isLoading && posts.length === 0 && (
         <SNoPostsView>
-          <Headline variant={4}>Ooops!</Headline>
-          <SHint variant='subtitle'>No posts found</SHint>
+          <Headline variant={4}>{t('ooops')}</Headline>
+          <SHint variant='subtitle'>{t('noPosts')}</SHint>
           <Link href='/creation'>
             <a>
               <Button>{tCommon('button.createDecision')}</Button>
@@ -266,7 +233,7 @@ const SCreateFirstContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
     height: 280px;
 
-    margin-bottom: 80px;
+    margin-bottom: 70px;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -275,7 +242,7 @@ const SCreateFirstContainer = styled.div`
 
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
-    margin: 0 auto;
+    margin: 0 auto 80px;
   }
 `;
 
@@ -312,8 +279,8 @@ const SFilterContainer = styled.div`
   margin-bottom: 8px;
 
   ${({ theme }) => theme.media.tablet} {
-    position: absolute;
-    top: -10px;
+    /* position: absolute;
+    top: -10px; */
 
     margin-bottom: 0;
   }
@@ -325,6 +292,8 @@ const SNoPostsView = styled.div`
   align-items: center;
   justify-content: center;
   height: 198px;
+  margin-top: 32px;
+  margin-bottom: 40px;
 
   border: 2px solid
     ${({ theme }) =>
@@ -335,10 +304,14 @@ const SNoPostsView = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     height: 280px;
+    margin-top: 24px;
+    margin-bottom: 70px;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: 364px;
+    margin-top: 32px;
+    margin-bottom: 80px;
   }
 `;
 

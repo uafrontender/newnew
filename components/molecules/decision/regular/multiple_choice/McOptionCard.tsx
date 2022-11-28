@@ -1,12 +1,11 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { toast } from 'react-toastify';
 
 import {
   useAppDispatch,
@@ -14,7 +13,7 @@ import {
 } from '../../../../../redux-store/store';
 import {
   deleteMcOption,
-  doFreeVote,
+  voteWithBundleVotes,
   voteOnPost,
 } from '../../../../../api/endpoints/multiple_choice';
 
@@ -31,11 +30,13 @@ import { formatNumber } from '../../../../../utils/format';
 // Icons
 import VoteIconLight from '../../../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.png';
+import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
+
 import McOptionCardSelectVotesMenu from './McOptionCardSelectVotesMenu';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import McOptionCardSelectVotesModal from './McOptionCardSelectVotesModal';
 import getDisplayname from '../../../../../utils/getDisplayname';
-import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
+import UseBundleVotesModal from './UseBundleVotesModal';
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../../atoms/decision/TutorialTooltip';
@@ -45,16 +46,16 @@ import Headline from '../../../../atoms/Headline';
 import assets from '../../../../../constants/assets';
 import OptionEllipseMenu from '../../common/OptionEllipseMenu';
 import ReportModal, { ReportData } from '../../../chat/ReportModal';
-import { reportEventOption } from '../../../../../api/endpoints/report';
+import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 import InlineSvg from '../../../../atoms/InlineSVG';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import OptionEllipseModal from '../../common/OptionEllipseModal';
 import McConfirmDeleteOptionModal from '../../moderation/multiple_choice/McConfirmDeleteOptionModal';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
-import { getSubscriptionStatus } from '../../../../../api/endpoints/subscription';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -87,46 +88,41 @@ interface IMcOptionCard {
   option: TMcOptionWithHighestField;
   creator: newnewapi.IUser;
   postId: string;
-  postCreator: string;
-  postCreatorUuid: string;
+  postCreatorName: string;
   postText: string;
   index: number;
   noAction: boolean;
-  votingAllowed: boolean;
-  canVoteForFree: boolean;
   isCreatorsBid: boolean;
-  optionBeingSupported?: string;
-  handleResetFreeVote: () => void;
-  handleSetSupportedBid: (id: string) => void;
-  handleSetPaymentSuccessModalOpen: (newValue: boolean) => void;
+  bundle?: newnewapi.IBundle;
+  handleSetPaymentSuccessValue: (newValue: number) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
   ) => void;
   handleRemoveOption?: () => void;
+  handleSetScrollBlocked?: () => void;
+  handleUnsetScrollBlocked?: () => void;
 }
 
 const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   option,
   creator,
   postId,
-  postCreator,
-  postCreatorUuid,
+  postCreatorName,
   postText,
   index,
   noAction,
-  votingAllowed,
-  canVoteForFree,
   isCreatorsBid,
-  optionBeingSupported,
-  handleResetFreeVote,
-  handleSetSupportedBid,
+  bundle,
   handleRemoveOption,
-  handleSetPaymentSuccessModalOpen,
+  handleSetPaymentSuccessValue,
   handleAddOrUpdateOptionFromResponse,
+  handleSetScrollBlocked,
+  handleUnsetScrollBlocked,
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -135,8 +131,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   );
 
   const { appConstants } = useGetAppConstants();
-
-  const [amISubscribed, setAmISubscribed] = useState(false);
 
   const isSuggestedByMe = useMemo(
     () =>
@@ -171,7 +165,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
-      await reportEventOption(option.id, reasons, message);
+      await reportSuperpollOption(option.id, reasons, message);
       setIsReportModalOpen(false);
     },
     [option.id]
@@ -211,9 +205,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
-  }, [handleRemoveOption, option.id]);
+  }, [handleRemoveOption, option.id, showErrorToastPredefined]);
 
   const handleOpenRemoveForm = useCallback(() => {
     setIsRemoveModalOpen(true);
@@ -233,28 +227,26 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const [supportVoteOffer, setSupportVoteOffer] =
     useState<newnewapi.McVoteOffer | null>(null);
 
-  const disabled =
-    optionBeingSupported !== '' &&
-    optionBeingSupported !== option.id.toString();
-
   const handleOpenSupportForm = () => {
     setIsSupportMenuOpen(true);
-    handleSetSupportedBid(option.id.toString());
   };
 
   const handleCloseSupportForm = () => {
     setIsSupportMenuOpen(false);
-    handleSetSupportedBid('');
   };
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [useFreeVoteModalOpen, setUseFreeVoteModalOpen] = useState(false);
+  const [bundleVotesModalOpen, setBundleVotesModalOpen] = useState(false);
 
   // Handlers
   const handleTogglePaymentModalOpen = () => {
     setPaymentModalOpen(true);
+  };
+
+  const handleOpenBundleVotesModal = () => {
+    setBundleVotesModalOpen(true);
   };
 
   const handleSetVoteOfferAndOpenModal = (
@@ -361,70 +353,74 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-        handleSetPaymentSuccessModalOpen(true);
+        handleSetPaymentSuccessValue(supportVoteOffer?.amountOfVotes || 0);
         setPaymentModalOpen(false);
-        handleSetSupportedBid('');
         setSupportVoteOffer(null);
         setIsSupportMenuOpen(false);
       } catch (err: any) {
         console.error(err);
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
       } finally {
         setLoadingModalOpen(false);
         setupIntent.destroy();
       }
     },
     [
-      handleSetPaymentSuccessModalOpen,
-      handleSetSupportedBid,
-      handleAddOrUpdateOptionFromResponse,
-      postId,
       setupIntent,
+      postId,
       router,
+      handleAddOrUpdateOptionFromResponse,
+      handleSetPaymentSuccessValue,
+      supportVoteOffer?.amountOfVotes,
       t,
+      showErrorToastCustom,
     ]
   );
 
-  const handleVoteForFree = useCallback(async () => {
-    setUseFreeVoteModalOpen(false);
-    setLoadingModalOpen(true);
-    try {
-      const payload = new newnewapi.VoteOnPostRequest({
-        votesCount: appConstants.mcFreeVoteCount,
-        optionId: option.id,
-        postUuid: postId,
-      });
+  const handleVoteWithBundleVotes = useCallback(
+    async (votesCount: number) => {
+      setBundleVotesModalOpen(false);
+      setLoadingModalOpen(true);
 
-      const res = await doFreeVote(payload);
+      try {
+        const payload = new newnewapi.VoteOnPostRequest({
+          votesCount,
+          optionId: option.id,
+          postUuid: postId,
+        });
 
-      if (
-        !res.data ||
-        res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
-        res.error
-      ) {
-        throw new Error(res.error?.message ?? 'Request failed');
+        const res = await voteWithBundleVotes(payload);
+
+        if (
+          !res.data ||
+          res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+          res.error
+        ) {
+          throw new Error(res.error?.message ?? 'Request failed');
+        }
+
+        const optionFromResponse = res.data
+          .option as newnewapi.MultipleChoice.Option;
+        optionFromResponse.isSupportedByMe = true;
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        setIsSupportMenuOpen(false);
+        setLoadingModalOpen(false);
+        handleSetPaymentSuccessValue(votesCount);
+        setIsSupportMenuOpen(false);
+      } catch (err) {
+        console.error(err);
+        setLoadingModalOpen(false);
+        showErrorToastCustom('toastErrors.generic');
       }
-
-      const optionFromResponse = res.data
-        .option as newnewapi.MultipleChoice.Option;
-      optionFromResponse.isSupportedByMe = true;
-      handleAddOrUpdateOptionFromResponse(optionFromResponse);
-      setLoadingModalOpen(false);
-      handleResetFreeVote();
-      handleSetPaymentSuccessModalOpen(true);
-    } catch (err) {
-      console.error(err);
-      setLoadingModalOpen(false);
-      toast.error('toastErrors.generic');
-    }
-  }, [
-    postId,
-    option.id,
-    appConstants.mcFreeVoteCount,
-    handleAddOrUpdateOptionFromResponse,
-    handleSetPaymentSuccessModalOpen,
-    handleResetFreeVote,
-  ]);
+    },
+    [
+      option.id,
+      postId,
+      handleAddOrUpdateOptionFromResponse,
+      handleSetPaymentSuccessValue,
+      showErrorToastCustom,
+    ]
+  );
 
   const goToNextStep = () => {
     if (
@@ -446,33 +442,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       );
     }
   };
-
-  // Check if the user is subscribed
-  useEffect(() => {
-    async function checkAmISubscribed() {
-      try {
-        const payload = new newnewapi.SubscriptionStatusRequest({
-          creatorUuid: postCreatorUuid,
-        });
-
-        const res = await getSubscriptionStatus(payload);
-
-        if (
-          res.data &&
-          (res.data?.status?.activeRenewsAt ||
-            res.data?.status?.activeCancelsAt)
-        ) {
-          setAmISubscribed(true);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    if (option.isSupportedByMe) {
-      checkAmISubscribed();
-    }
-  }, [option.isSupportedByMe, postCreatorUuid]);
 
   return (
     <>
@@ -498,11 +467,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             damping: 20,
             stiffness: 300,
           }}
-          $isDisabled={disabled && votingAllowed}
+          $isDisabled={false}
           $isBlue={isBlue}
           onClick={(e) => {
-            if (!isMobile && !disabled && !isEllipseMenuOpen) {
+            if (!isMobile && !isEllipseMenuOpen) {
               setIsEllipseMenuOpen(true);
+              handleSetScrollBlocked?.();
 
               setOptionMenuXY({
                 x: e.clientX,
@@ -562,9 +532,27 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                     ? (option.firstVoter.username as string)
                     : undefined
                 }
+                whiteListedSupporter={
+                  option.whitelistSupporter
+                    ? getDisplayname(option.whitelistSupporter)
+                    : undefined
+                }
+                whiteListedSupporterUsername={
+                  option.whitelistSupporter
+                    ? (option.whitelistSupporter.username as string)
+                    : undefined
+                }
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubtracted}
-                amISubscribed={amISubscribed}
+                amISubscribed={!!bundle}
+                amIVerified={user.userData?.options?.isVerified ?? false}
+                isOptionCreatorVerified={
+                  option.creator?.options?.isVerified ?? false
+                }
+                isFirstVoterVerified={
+                  option.firstVoter?.options?.isVerified ?? false
+                }
+                isWhitelistSupporterVerified={!!option.whitelistSupporter}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -572,9 +560,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             <>
               <SSupportButton
                 view='primary'
-                disabled={disabled}
                 isBlue={isBlue}
-                canVoteForFree={canVoteForFree}
                 onClickCapture={() => {
                   Mixpanel.track('Vote Click', {
                     _stage: 'Post',
@@ -584,17 +570,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (canVoteForFree) {
-                    setUseFreeVoteModalOpen(true);
-                  } else {
-                    handleOpenSupportForm();
-                  }
+                  handleOpenSupportForm();
                 }}
               >
                 <div>
-                  {canVoteForFree
-                    ? t('mcPost.optionsTab.optionCard.freeVoteButton')
-                    : isBlue
+                  {isBlue
                     ? t('mcPost.optionsTab.optionCard.supportAgainButton')
                     : t('mcPost.optionsTab.optionCard.raiseBidButton')}
                 </div>
@@ -623,9 +603,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
               <SSupportButtonDesktop
                 id={`support-button-${isBlue ? 'supported' : index}`}
                 active={isSupportMenuOpen}
-                canVoteForFree={canVoteForFree}
                 view='secondary'
-                disabled={disabled}
                 isBlue={isBlue}
                 onClickCapture={() => {
                   Mixpanel.track('Vote Click', {
@@ -637,19 +615,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   if (!isSupportMenuOpen) {
-                    if (canVoteForFree) {
-                      setUseFreeVoteModalOpen(true);
-                      e.stopPropagation();
-                    } else {
-                      setSelectVotesMenuTop(e.clientY);
-                      handleOpenSupportForm();
-                    }
+                    setSelectVotesMenuTop(e.clientY);
+                    handleOpenSupportForm();
                   }
                 }}
               >
-                {canVoteForFree
-                  ? t('mcPost.optionsTab.optionCard.freeVoteButton')
-                  : !isBlue
+                {!isBlue
                   ? t('mcPost.optionsTab.optionCard.supportButton')
                   : t('mcPost.optionsTab.optionCard.supportAgainButton')}
               </SSupportButtonDesktop>
@@ -674,6 +645,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             </>
           )}
         </SContainer>
+        {/* TODO: Move these modals one level above as it is unwise to render multiple instances of them */}
         {/* Confirm vote modal */}
         {isConfirmVoteModalOpen ? (
           <McOptionConfirmVoteModal
@@ -682,20 +654,22 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             supportVotesAmount={(
               supportVoteOffer?.amountOfVotes || 0
             ).toString()}
-            postCreator={
-              creator.nickname ? creator.nickname : creator.username ?? ''
-            }
+            postCreatorName={getDisplayname(creator)}
             optionText={option.text}
             onClose={() => handleCloseConfirmVoteModal()}
             handleOpenPaymentModal={() => handleTogglePaymentModalOpen()}
           />
         ) : null}
-        {/* Use Free vote modal */}
-        <McConfirmUseFreeVoteModal
-          isVisible={useFreeVoteModalOpen}
-          handleMakeFreeVote={handleVoteForFree}
-          closeModal={() => setUseFreeVoteModalOpen(false)}
-        />
+        {/* Use Bundle votes vote modal */}
+        {bundle?.votesLeft ? (
+          <UseBundleVotesModal
+            show={bundleVotesModalOpen}
+            bundleVotesLeft={bundle.votesLeft}
+            optionText={option.text}
+            handleVoteWithBundleVotes={handleVoteWithBundleVotes}
+            onClose={() => setBundleVotesModalOpen(false)}
+          />
+        ) : null}
         {/* Payment Modal */}
         {paymentModalOpen ? (
           <PaymentModal
@@ -712,7 +686,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   appConstants.minHoldAmount?.usdCents) && (
                 <SPaymentSign variant='subtitle'>
                   {t('mcPost.paymentModalFooter.body', {
-                    creator: postCreator,
+                    creator: postCreatorName,
                   })}
                   *
                   <Link href='https://terms.newnew.co'>
@@ -737,7 +711,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 </SPaymentModalHeadingPostSymbol>
                 <SPaymentModalHeadingPostCreator variant={3}>
                   {t('mcPost.paymentModalHeader.title', {
-                    creator: postCreator,
+                    creator: postCreatorName,
                   })}
                 </SPaymentModalHeadingPostCreator>
               </SPaymentModalHeading>
@@ -767,6 +741,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             handleCloseSupportForm();
           }}
           handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
+          handleOpenBundleVotesModal={handleOpenBundleVotesModal}
         >
           <SSelectVotesModalCard isBlue={isBlue}>
             <SBidDetails isBlue={isBlue} noAction={noAction}>
@@ -808,9 +783,27 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                       ? (option.firstVoter.username as string)
                       : undefined
                   }
+                  whiteListedSupporter={
+                    option.whitelistSupporter
+                      ? getDisplayname(option.whitelistSupporter)
+                      : undefined
+                  }
+                  whiteListedSupporterUsername={
+                    option.whitelistSupporter
+                      ? (option.whitelistSupporter.username as string)
+                      : undefined
+                  }
                   supporterCount={option.supporterCount}
                   supporterCountSubtracted={supporterCountSubtracted}
-                  amISubscribed={amISubscribed}
+                  amISubscribed={!!bundle}
+                  amIVerified={user.userData?.options?.isVerified ?? false}
+                  isOptionCreatorVerified={
+                    option.creator?.options?.isVerified ?? false
+                  }
+                  isFirstVoterVerified={
+                    option.firstVoter?.options?.isVerified ?? false
+                  }
+                  isWhitelistSupporterVerified={!!option.whitelistSupporter}
                 />
               </SBiddersInfo>
             </SBidDetails>
@@ -828,6 +821,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             handleCloseSupportForm();
             setSelectVotesMenuTop(undefined);
           }}
+          handleOpenBundleVotesModal={
+            bundle?.votesLeft ? handleOpenBundleVotesModal : undefined
+          }
           handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
         />
       )}
@@ -853,7 +849,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           optionType='mc'
           optionId={option.id as number}
           optionCreatorUuid={option.creator?.uuid ?? ''}
-          handleClose={() => setIsEllipseMenuOpen(false)}
+          handleClose={() => {
+            setIsEllipseMenuOpen(false);
+            handleUnsetScrollBlocked?.();
+          }}
           handleOpenReportOptionModal={() => handleOpenReportForm()}
           handleOpenRemoveOptionModal={() => handleOpenRemoveForm()}
         />
@@ -878,7 +877,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 };
 
 McOptionCard.defaultProps = {
-  optionBeingSupported: undefined,
   handleRemoveOption: undefined,
 };
 
@@ -894,7 +892,13 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   optionCreatorUsername?: string;
   firstVoter?: string;
   firstVoterUsername?: string;
+  whiteListedSupporter?: string;
+  whiteListedSupporterUsername?: string;
   amISubscribed?: boolean;
+  amIVerified?: boolean;
+  isOptionCreatorVerified?: boolean;
+  isFirstVoterVerified?: boolean;
+  isWhitelistSupporterVerified?: boolean;
 }> = ({
   isCreatorsBid,
   isSupportedByMe,
@@ -905,17 +909,43 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   optionCreatorUsername,
   firstVoter,
   firstVoterUsername,
+  whiteListedSupporter,
+  whiteListedSupporterUsername,
   amISubscribed,
+  amIVerified,
+  isOptionCreatorVerified,
+  isFirstVoterVerified,
+  isWhitelistSupporterVerified,
 }) => {
-  const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
+  const user = useAppSelector((state) => state.user);
 
   if (isCreatorsBid && !isSupportedByMe) {
     return (
       <>
         {supporterCount > 0 ? (
           <>
-            {firstVoter && (
+            {whiteListedSupporter ? (
+              <Link href={`/${whiteListedSupporterUsername}`}>
+                <SSpanBiddersHighlighted
+                  onClick={(e) => e.stopPropagation()}
+                  className='spanHighlighted'
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                >
+                  {whiteListedSupporter}
+                  {isWhitelistSupporterVerified && (
+                    <SInlineSvgVerificationIcon
+                      svg={VerificationCheckmark}
+                      width='14px'
+                      height='14px'
+                      fill='none'
+                    />
+                  )}
+                </SSpanBiddersHighlighted>
+              </Link>
+            ) : firstVoter ? (
               <Link href={`/${firstVoterUsername}`}>
                 <SSpanBiddersHighlighted
                   onClick={(e) => e.stopPropagation()}
@@ -925,9 +955,17 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   }}
                 >
                   {firstVoter}
+                  {isFirstVoterVerified && (
+                    <SInlineSvgVerificationIcon
+                      svg={VerificationCheckmark}
+                      width='14px'
+                      height='14px'
+                      fill='none'
+                    />
+                  )}
                 </SSpanBiddersHighlighted>
               </Link>
-            )}
+            ) : null}
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>
@@ -945,23 +983,29 @@ export const RenderSupportersInfo: React.FunctionComponent<{
       </>
     );
   }
+
   if (isCreatorsBid && isSupportedByMe) {
     return (
       <>
         {supporterCount > 0 ? (
           <>
-            <SSpanBiddersHighlighted
-              className='spanHighlighted'
-              style={{
-                ...(isSuggestedByMe || amISubscribed
-                  ? {
-                      color: theme.colorsThemed.accent.yellow,
-                    }
-                  : {}),
-              }}
+            <Link
+              href={`/profile${
+                user.userData?.options?.isCreator ? '/my-posts' : ''
+              }`}
             >
-              {supporterCount > 1 ? t('me') : t('I')}
-            </SSpanBiddersHighlighted>
+              <SSpanBiddersHighlighted
+                className='spanHighlighted'
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                style={{
+                  cursor: 'pointer',
+                }}
+              >
+                {supporterCountSubtracted > 0 ? t('me') : t('I')}
+              </SSpanBiddersHighlighted>
+            </Link>
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>
@@ -983,23 +1027,51 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && !isSuggestedByMe && !isSupportedByMe) {
     return (
       <>
-        <Link href={`/${optionCreatorUsername}`}>
-          <SSpanBiddersHighlighted
-            className='spanHighlighted'
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            style={{
-              color:
-                theme.name === 'dark'
-                  ? theme.colorsThemed.accent.yellow
-                  : theme.colors.dark,
-              cursor: 'pointer',
-            }}
-          >
-            {optionCreator}
-          </SSpanBiddersHighlighted>
-        </Link>
+        {!whiteListedSupporter ? (
+          <Link href={`/${optionCreatorUsername}`}>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              style={{
+                cursor: 'pointer',
+              }}
+            >
+              {optionCreator}
+              {isOptionCreatorVerified && (
+                <SInlineSvgVerificationIcon
+                  svg={VerificationCheckmark}
+                  width='14px'
+                  height='14px'
+                  fill='none'
+                />
+              )}
+            </SSpanBiddersHighlighted>
+          </Link>
+        ) : (
+          <Link href={`/${whiteListedSupporterUsername}`}>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              style={{
+                cursor: 'pointer',
+              }}
+            >
+              {whiteListedSupporter}
+              {isWhitelistSupporterVerified && (
+                <SInlineSvgVerificationIcon
+                  svg={VerificationCheckmark}
+                  width='14px'
+                  height='14px'
+                  fill='none'
+                />
+              )}
+            </SSpanBiddersHighlighted>
+          </Link>
+        )}
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubtracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
@@ -1021,23 +1093,68 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && !isSuggestedByMe && isSupportedByMe) {
     return (
       <>
-        <Link href={`/${optionCreatorUsername}`}>
-          <SSpanBiddersHighlighted
-            className='spanHighlighted'
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            style={{
-              color: theme.colorsThemed.accent.yellow,
-              cursor: 'pointer',
-            }}
-          >
-            {optionCreator}
-          </SSpanBiddersHighlighted>
-        </Link>
-        <SSpanBiddersHighlighted className='spanHighlighted'>
+        {!whiteListedSupporter ? (
+          <Link href={`/${optionCreatorUsername}`}>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              style={{
+                cursor: 'pointer',
+              }}
+            >
+              {optionCreator}
+              {isOptionCreatorVerified && (
+                <SInlineSvgVerificationIcon
+                  svg={VerificationCheckmark}
+                  width='14px'
+                  height='14px'
+                  fill='none'
+                />
+              )}
+            </SSpanBiddersHighlighted>
+          </Link>
+        ) : (
+          <Link href={`/${whiteListedSupporterUsername}`}>
+            <SSpanBiddersHighlighted
+              className='spanHighlighted'
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              style={{
+                cursor: 'pointer',
+              }}
+            >
+              {whiteListedSupporter}
+              {isWhitelistSupporterVerified && (
+                <SInlineSvgVerificationIcon
+                  svg={VerificationCheckmark}
+                  width='14px'
+                  height='14px'
+                  fill='none'
+                />
+              )}
+            </SSpanBiddersHighlighted>
+          </Link>
+        )}
+        <SSpanBiddersHighlighted
+          className='spanHighlighted'
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          style={{
+            cursor: 'pointer',
+          }}
+        >
           {', '}
-          {`${t('me')}`}
+          <Link
+            href={`/profile${
+              user.userData?.options?.isCreator ? '/my-posts' : ''
+            }`}
+          >
+            {`${t('me')}`}
+          </Link>
         </SSpanBiddersHighlighted>
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubtracted - 1 > 0 ? ` & ` : ''}
@@ -1067,7 +1184,6 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               e.stopPropagation();
             }}
             style={{
-              color: theme.colorsThemed.accent.yellow,
               cursor: 'pointer',
             }}
           >
@@ -1109,7 +1225,7 @@ const SContainer = styled(motion.div)<{
 
   background-color: ${({ theme, $isBlue }) =>
     $isBlue
-      ? theme.colorsThemed.accent.blue
+      ? theme.colorsThemed.accent.yellow
       : theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
@@ -1146,15 +1262,16 @@ const SBidDetails = styled.div<{
     isBlue
       ? css`
           div {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
           }
 
           .spanRegular {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
+
             opacity: 0.6;
           }
           .spanHighlighted {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
           }
         `
       : null}
@@ -1169,7 +1286,7 @@ const SBidDetails = styled.div<{
 
     background-color: ${({ theme, isBlue }) =>
       isBlue
-        ? theme.colorsThemed.accent.blue
+        ? theme.colorsThemed.accent.yellow
         : theme.colorsThemed.background.tertiary};
 
     border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -1246,7 +1363,6 @@ const SSpanBiddersRegular = styled.span`
 
 const SSupportButton = styled(Button)<{
   isBlue: boolean;
-  canVoteForFree: boolean;
 }>`
   width: 100%;
 
@@ -1272,16 +1388,8 @@ const SSupportButton = styled(Button)<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          color: ${({ theme }) => theme.colors.dark};
-          background: #ffffff;
-        `
-      : null}
-
-  ${({ canVoteForFree }) =>
-    canVoteForFree
-      ? css`
-          color: ${({ theme }) => theme.colors.dark};
-          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+          color: #ffffff;
+          background: ${({ theme }) => theme.colors.dark};
         `
       : null}
 `;
@@ -1289,7 +1397,6 @@ const SSupportButton = styled(Button)<{
 const SSupportButtonDesktop = styled(Button)<{
   isBlue: boolean;
   active: boolean;
-  canVoteForFree: boolean;
 }>`
   height: 100%;
   width: 60px;
@@ -1323,7 +1430,9 @@ const SSupportButtonDesktop = styled(Button)<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          border-left: #ffffff 1px solid;
+          border-left: ${({ theme }) => theme.colors.dark} 1px solid;
+          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+          color: ${({ theme }) => theme.colors.dark};
         `
       : null}
 
@@ -1332,14 +1441,6 @@ const SSupportButtonDesktop = styled(Button)<{
       ? css`
           color: ${({ theme }) => theme.colors.dark};
           background: #ffffff;
-        `
-      : null}
-
-  ${({ canVoteForFree }) =>
-    canVoteForFree
-      ? css`
-          color: ${({ theme }) => theme.colors.dark};
-          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
         `
       : null}
 `;
@@ -1357,18 +1458,19 @@ const SSelectVotesModalCard = styled.div<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          background: ${({ theme }) => theme.colorsThemed.accent.blue};
+          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
           div {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
           }
 
           .spanRegular {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
+
             opacity: 0.6;
           }
           .spanHighlighted {
-            color: #ffffff;
+            color: ${({ theme }) => theme.colors.dark};
           }
         `
       : null}
@@ -1412,8 +1514,7 @@ const SPaymentModalHeadingPostCreator = styled(Text)`
 `;
 
 const SPaymentModalPostText = styled(Text)`
-  display: flex;
-  align-items: center;
+  display: inline-block;
   white-space: pre-wrap;
   word-break: break-word;
   gap: 8px;
@@ -1470,4 +1571,12 @@ const SEllipseButtonMobile = styled(Button)`
   &:focus:enabled {
     background: transparent;
   }
+`;
+
+const SInlineSvgVerificationIcon = styled(InlineSvg)`
+  display: inline-flex;
+  margin-left: 3px;
+
+  position: relative;
+  top: 3px;
 `;

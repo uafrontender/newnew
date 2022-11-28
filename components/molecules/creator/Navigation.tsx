@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -9,10 +10,13 @@ import dashboardFilledIcon from '../../../public/images/svg/icons/filled/Dashboa
 import dashboardOutlinedIcon from '../../../public/images/svg/icons/outlined/Dashboard.svg';
 import walletFilledIcon from '../../../public/images/svg/icons/filled/Wallet.svg';
 import walletOutlinedIcon from '../../../public/images/svg/icons/outlined/Wallet.svg';
+import bundlesFilledIcon from '../../../public/images/svg/icons/filled/Bundles.svg';
+import bundlesOutlinedIcon from '../../../public/images/svg/icons/outlined/Bundles.svg';
 import Button from '../../atoms/Button';
 import { useAppSelector } from '../../../redux-store/store';
 
 interface NavigationItem {
+  id?: string;
   url: string;
   label: string;
   iconFilled: any;
@@ -34,16 +38,31 @@ export const Navigation = () => {
         iconOutlined: dashboardOutlinedIcon,
       },
       {
-        url: '/creator/get-paid',
-        label:
-          user.creatorData?.options?.isCreatorConnectedToStripe === true
-            ? t('navigation.getPaidEdit')
-            : t('navigation.getPaid'),
-        iconFilled: walletFilledIcon,
-        iconOutlined: walletOutlinedIcon,
+        id: 'bundles-navigation',
+        url: '/creator/bundles',
+        label: t('navigation.bundles'),
+        iconFilled: bundlesFilledIcon,
+        iconOutlined: bundlesOutlinedIcon,
       },
+      ...(!user.userData?.options?.isWhiteListed
+        ? [
+            {
+              url: '/creator/get-paid',
+              label:
+                user.creatorData?.options?.isCreatorConnectedToStripe === true
+                  ? t('navigation.getPaidEdit')
+                  : t('navigation.getPaid'),
+              iconFilled: walletFilledIcon,
+              iconOutlined: walletOutlinedIcon,
+            },
+          ]
+        : [])
     ],
-    [t, user.creatorData]
+    [
+      t,
+      user.creatorData?.options?.isCreatorConnectedToStripe,
+      user.userData?.options?.isWhiteListed,
+    ]
   );
 
   const renderItem = useCallback(
@@ -51,13 +70,19 @@ export const Navigation = () => {
       const active = router.route.includes(item.url);
       return (
         <Link href={item.url} key={item.url}>
-          <SItem active={active}>
+          <SItem
+            id={item.id}
+            active={active}
+            isfill={item.url !== '/creator/bundles'}
+          >
             <SInlineSVG
               svg={active ? item.iconFilled : item.iconOutlined}
               fill={
-                active
-                  ? theme.colorsThemed.accent.blue
-                  : theme.colorsThemed.text.tertiary
+                item.url !== '/creator/bundles'
+                  ? active
+                    ? theme.colorsThemed.accent.blue
+                    : theme.colorsThemed.text.tertiary
+                  : 'none'
               }
               width='24px'
               height='24px'
@@ -105,6 +130,7 @@ const SContainer = styled.aside`
 
 interface ISItem {
   active: boolean;
+  isfill: boolean;
 }
 
 const SItem = styled.a<ISItem>`
@@ -117,9 +143,12 @@ const SItem = styled.a<ISItem>`
 
   svg {
     fill: ${(props) =>
-      props.active
-        ? props.theme.colorsThemed.accent.blue
-        : props.theme.colorsThemed.text.tertiary};
+      props.isfill
+        ? props.active
+          ? props.theme.colorsThemed.accent.blue
+          : props.theme.colorsThemed.text.tertiary
+        : 'none'};
+
     cursor: ${(props) => (props.active ? 'not-allowed' : 'pointer')};
   }
 

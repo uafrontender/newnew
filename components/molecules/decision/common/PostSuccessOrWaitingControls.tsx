@@ -116,7 +116,7 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
       {/* Ellipse menu */}
       {!isMobile && (
         <PostEllipseMenu
-          postType={typeOfPost as string}
+          postType={typeOfPost as TPostType}
           isFollowingDecision={isFollowingDecision}
           isVisible={ellipseMenuOpen}
           handleFollowDecision={handleFollowDecision}
@@ -127,7 +127,7 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
       )}
       {isMobile && ellipseMenuOpen ? (
         <PostEllipseModal
-          postType={typeOfPost as string}
+          postType={typeOfPost as TPostType}
           isFollowingDecision={isFollowingDecision}
           zIndex={11}
           isOpen={ellipseMenuOpen}

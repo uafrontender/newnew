@@ -47,19 +47,22 @@
     "share": "Share",
     "dashboard": "Dashboard",
     "dms": "DMs",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "bundles": "Bundles"
   },
   "mobileTopNavigation": {
     "myBalance": "My Balance: ${{value}}",
     "profile": "Profile"
   },
   "button": {
+    "bundles": "Bundles",
     "createDecision": "New post",
     "create": "Create",
     "signIn": "Sign in",
     "dashboard": "Dashboard",
     "createOnNewnew": "Create now",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "takeMeHome": "Take me home"
   },
   "footer": {
     "topTitle": "NewNew",
@@ -128,6 +131,55 @@
       "title": "We’re on it!",
       "subtitle": "We appreciate you letting us know. We’ll take a look into this ASAP and take the appropriate steps to ensure everyone’s safety.",
       "button": "Got it"
+    },
+    "buyBundle": {
+      "title": "Buy a Superpoll bundle for:",
+      "votes": "<0>{{amount}}</0> votes",
+      "access": "plus get {{amount}} {{unit}} of:",
+      "customOptions": "adding custom options to any Superpoll",
+      "chat": "1-on-1 private chat",
+      "buy": "Buy for ${{amount}}",
+      "terms": "*votes in a bundle never expire",
+      "unit": {
+        "month": "month",
+        "months": "months"
+      },
+      "payment": {
+        "header": "{{creator}}'s Superpoll Bundle"
+      },
+      "error": {
+        "requestFailed": "Request failed"
+      }
+    },
+    "buyBundleSuccess": {
+      "votes": "<0>{{amount}}</0> votes unlocked",
+      "for": "for <0>{{creator}}</0>",
+      "access": "plus {{amount}} {{unit}} of:",
+      "customOptions": "adding custom superpoll options",
+      "chat": "1-on-1 private chat",
+      "button": "Sounds good!",
+      "unit": {
+        "month": "month",
+        "months": "months"
+      }
+    },
+    "creatorsBundle": {
+      "votesLeft": "<0>{{amount}}</0> votes left",
+      "for": "for ",
+      "access": "<0/> left of:",
+      "unitPair": "{{amount}} {{unit}}",
+      "and": " and ",
+      "customOptions": "adding custom options to any Superpoll",
+      "chat": "1-on-1 private chat",
+      "buyButton": "Buy more votes",
+      "unit": {
+        "day": "day",
+        "days": "days",
+        "month": "month",
+        "months": "months",
+        "year": "year",
+        "years": "years"
+      }
     }
   },
   "myLink": {
@@ -172,7 +224,8 @@
     "numbers-of-bids-most-first": "Most first"
   },
   "toastErrors": {
-    "generic": "An error occurred, please try again later"
+    "generic": "An error occurred, please try again later",
+    "server-error": "A server-side error occurred, please try again later"
   },
   "smsNotifications": {
     "title": "What's your number?",
@@ -191,6 +244,10 @@
     "error": {
       "requestFailed": "Request failed"
     }
+  },
+  "creatorCard": {
+    "buyBundle": "Buy Bundle",
+    "purchasedVotes": "{{value}} votes"
   },
   "colorModeSwitch": {
     "options": {

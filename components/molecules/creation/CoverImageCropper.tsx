@@ -91,13 +91,6 @@ const SCropperWrapper = styled.div<{
       height: 100%;
 
       z-index: 12;
-
-      ${({ theme }) => theme.media.tablet} {
-        transform: ${({ x, y, zoom }) =>
-          `translate(${x}px, ${y}px) scale(${zoom})`};
-        box-shadow: 0 0 0 9999em;
-        color: ${({ theme }) => theme.colorsThemed.background.primary};
-      }
     }
   }
 

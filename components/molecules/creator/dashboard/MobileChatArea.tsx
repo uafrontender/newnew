@@ -28,6 +28,8 @@ import UserAvatar from '../../UserAvatar';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import isBrowser from '../../../../utils/isBrowser';
 import validateInputText from '../../../../utils/validateMessageText';
+import getDisplayname from '../../../../utils/getDisplayname';
+import isSafari from '../../../../utils/isSafari';
 
 const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
@@ -45,15 +47,6 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const [newMessage, setNewMessage] = useState<
     newnewapi.IChatMessage | null | undefined
   >();
-
-  const [localUserData, setLocalUserData] = useState({
-    justSubscribed: false,
-    blockedUser: false,
-    isAnnouncement: false,
-    subscriptionExpired: false,
-    messagingDisabled: false,
-    accountDeleted: false,
-  });
 
   const [isAnnouncement, setIsAnnouncement] = useState<boolean>(false);
   const [isMyAnnouncement, setIsMyAnnouncement] = useState<boolean>(false);
@@ -94,7 +87,6 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
             return arr;
           });
           setMessagesNextPageToken(res.data.paging?.nextPageToken);
-          setLocalUserData({ ...localUserData, justSubscribed: false });
         }
         setMessagesLoading(false);
       } catch (err) {
@@ -102,15 +94,11 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         setMessagesLoading(false);
       }
     },
-    [messagesLoading, chatRoom, localUserData]
+    [messagesLoading, chatRoom]
   );
 
   useEffect(() => {
     if (chatRoom) {
-      setLocalUserData((data) => ({ ...data, ...chatRoom.visavis }));
-
-      if (!chatRoom.lastMessage)
-        setLocalUserData({ ...localUserData, justSubscribed: true });
       getChatMessages();
       if (chatRoom.kind === 4) {
         setIsAnnouncement(true);
@@ -235,8 +223,8 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
             <SUserAvatar
               mine={isMine}
               avatarUrl={
-                !isMine && chatRoom && chatRoom.visavis?.avatarUrl
-                  ? chatRoom.visavis?.avatarUrl
+                !isMine && chatRoom && chatRoom.visavis?.user?.avatarUrl
+                  ? chatRoom.visavis?.user?.avatarUrl
                   : user.userData?.avatarUrl
               }
             />
@@ -353,6 +341,20 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     }
   }, [newMessage]);
 
+  // fix for container scrolling on Safari iOS
+  useEffect(() => {
+    if (
+      messages.length > 0 &&
+      messagesScrollContainerRef.current &&
+      isSafari()
+    ) {
+      messagesScrollContainerRef.current.style.cssText = `flex: 0 0 300px;`;
+      setTimeout(() => {
+        messagesScrollContainerRef.current!!.style.cssText = `flex:1;`;
+      }, 5);
+    }
+  }, [messages]);
+
   return (
     <SContainer>
       {chatRoom && (
@@ -363,27 +365,25 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
               {
                 // eslint-disable-next-line no-nested-ternary
                 isAnnouncement
-                  ? t('announcement.title', {
-                      username: isMyAnnouncement
-                        ? user.userData?.nickname || user.userData?.username
-                        : chatRoom.visavis?.nickname ||
-                          chatRoom.visavis?.username,
-                    })
-                  : isMyAnnouncement
-                  ? user.userData?.nickname || user.userData?.username
-                  : chatRoom.visavis?.nickname || chatRoom.visavis?.username
+                  ? `${t('announcement.beforeName')} ${
+                      isMyAnnouncement
+                        ? getDisplayname(user.userData)
+                        : getDisplayname(chatRoom.visavis?.user)
+                    }${t('announcement.suffix')} ${t('announcement.afterName')}`
+                  : getDisplayname(chatRoom.visavis?.user)
               }
-              {chatRoom.visavis?.options?.isVerified && !isAnnouncement && (
-                <SInlineSVG
-                  svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
-                />
-              )}
+              {chatRoom.visavis?.user?.options?.isVerified &&
+                !isAnnouncement && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                  />
+                )}
             </SUserName>
             <SUserAlias>
               {!isAnnouncement
-                ? `@${chatRoom.visavis?.username}`
+                ? `@${chatRoom.visavis?.user?.username}`
                 : `${
                     chatRoom.memberCount && chatRoom.memberCount > 0
                       ? chatRoom.memberCount

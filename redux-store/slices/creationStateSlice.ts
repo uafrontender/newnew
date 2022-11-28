@@ -202,9 +202,12 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
     unsetCustomCoverImageUrl(state) {
       state.customCoverImageUrl = undefined;
     },
-    clearCreation(state) {
+    clearCreation(state, { payload }: PayloadAction<number | undefined>) {
       state.post = { ...defaultUIState.post };
       state.auction = { ...defaultUIState.auction };
+      if (payload) {
+        state.auction.minimalBid = payload;
+      }
       state.crowdfunding = { ...defaultUIState.crowdfunding };
       state.multiplechoice = { ...defaultUIState.multiplechoice };
       state.fileUpload = { ...defaultUIState.fileUpload };

@@ -15,11 +15,11 @@ import { useInView } from 'react-intersection-observer';
 import Link from 'next/link';
 
 import Text from '../../../atoms/Text';
+import UserAvatar from '../../UserAvatar';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
-import TextArea from '../../../atoms/chat/TextArea';
 import InlineSVG from '../../../atoms/InlineSVG';
-import UserAvatar from '../../UserAvatar';
+import TextArea from '../../../atoms/chat/TextArea';
 import { useAppSelector } from '../../../../redux-store/store';
 
 import sendIcon from '../../../../public/images/svg/icons/filled/Send.svg';
@@ -34,6 +34,7 @@ import {
   sendMessage,
 } from '../../../../api/endpoints/chat';
 import isBrowser from '../../../../utils/isBrowser';
+import getDisplayname from '../../../../utils/getDisplayname';
 import validateInputText from '../../../../utils/validateMessageText';
 
 interface IChat {
@@ -228,7 +229,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
   const handleSubmit = useCallback(() => {
     if (!sendingMessage) submitMessage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageText]);
+  }, [messageText, sendingMessage]);
 
   const handleChange = useCallback(
     (id: string, value: string, isShiftEnter: boolean) => {
@@ -251,23 +252,24 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
   );
 
   const submitMessage = useCallback(async () => {
-    if (messageTextValid) {
+    if (chatRoom && messageTextValid) {
+      const tmpMsgText = messageText.trim();
       try {
         setSendingMessage(true);
-        const trimmedMessageText = messageText.trim();
+        setMessageText('');
         const payload = new newnewapi.SendMessageRequest({
-          roomId: toNumber(roomID),
+          roomId: chatRoom.id,
           content: {
-            text: trimmedMessageText,
+            text: tmpMsgText,
           },
         });
         const res = await sendMessage(payload);
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data.message) setMessages([res.data.message].concat(messages));
 
-        setMessageTextValid(false);
-        setMessageText('');
+        if (res.data.message) {
+          setMessages([res.data.message].concat(messages));
+        }
         setSendingMessage(false);
       } catch (err) {
         console.error(err);
@@ -275,7 +277,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageTextValid, roomID, messageText]);
+  }, [chatRoom?.id, messageTextValid, messageText]);
 
   const handleGoBack = useCallback(() => {
     router.push('/creator/dashboard?tab=chat');
@@ -381,14 +383,12 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     ]
   );
 
-  // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
-
   const handleUserClick = useCallback(() => {
-    if (chatRoom?.visavis?.username) {
-      router.push(`/${chatRoom?.visavis?.username}`);
+    if (chatRoom?.visavis?.user?.username) {
+      router.push(`/${chatRoom?.visavis?.user?.username}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageText, chatRoom?.visavis?.username]);
+  }, [messageText, chatRoom?.visavis?.user?.username]);
 
   return (
     <SContainer>
@@ -407,15 +407,15 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           <SUserAvatar
             withClick
             onClick={handleUserClick}
-            avatarUrl={chatRoom?.visavis?.avatarUrl ?? ''}
+            avatarUrl={chatRoom?.visavis?.user?.avatarUrl ?? ''}
           />
         )}
         {chatRoom?.kind === 4 ? (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
-              {t('announcement.title', {
-                username: user.userData?.nickname || user.userData?.username,
-              })}
+              {`${t('announcement.beforeName')} ${getDisplayname(
+                user.userData
+              )}${t('announcement.suffix')} ${t('announcement.afterName')}`}
             </SUserNickName>
             <SUserName variant={2} weight={600}>
               {`${
@@ -432,10 +432,8 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         ) : (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
-              {chatRoom?.visavis?.nickname
-                ? chatRoom?.visavis?.nickname
-                : chatRoom?.visavis?.username}
-              {chatRoom?.visavis?.options?.isVerified && (
+              {getDisplayname(chatRoom?.visavis?.user)}
+              {chatRoom?.visavis?.user?.options?.isVerified && (
                 <SInlineSVG
                   svg={VerificationCheckmark}
                   width='16px'
@@ -444,12 +442,10 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
                 />
               )}
             </SUserNickName>
-            <Link href={`/${chatRoom?.visavis?.username}`}>
+            <Link href={`/${chatRoom?.visavis?.user?.username}`}>
               <a>
                 <SUserName variant={2} weight={600}>
-                  {chatRoom?.visavis?.username
-                    ? `@${chatRoom?.visavis?.username}`
-                    : chatRoom?.visavis?.nickname}
+                  {getDisplayname(chatRoom?.visavis?.user)}
                 </SUserName>
               </a>
             </Link>
@@ -493,8 +489,6 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           </SButton>
         </SBottomTextarea>
       </SBottomPart>
-      {/* <GradientMask positionTop active={showTopGradient} />
-      <GradientMask active={showBottomGradient} /> */}
     </SContainer>
   );
 };

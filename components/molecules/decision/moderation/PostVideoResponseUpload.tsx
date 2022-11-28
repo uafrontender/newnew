@@ -1,7 +1,6 @@
 import React, { useRef, useState, useCallback, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import dynamic from 'next/dynamic';
-import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
@@ -28,7 +27,8 @@ import {
 } from '../../../../api/endpoints/upload';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -41,8 +41,9 @@ interface IPostVideoResponseUpload {
 export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   id,
 }) => {
-  const { t } = useTranslation('modal-Post');
-  const { postStatus } = usePostModalInnerState();
+  const { t } = useTranslation('page-Post');
+  const { showErrorToastCustom } = useErrorToasts();
+  const { postStatus } = usePostInnerState();
   const {
     videoProcessing,
     responseFileUploadETA,
@@ -97,21 +98,27 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
       const file = files[0];
 
       if (file.size > MAX_VIDEO_SIZE) {
-        toast.error(t('postVideo.uploadResponseForm.video.error.maxSize'));
+        showErrorToastCustom(
+          t('postVideo.uploadResponseForm.video.error.maxSize')
+        );
       } else {
         const media: any = await loadVideo(file);
 
         if (media.duration < MIN_VIDEO_DURATION) {
-          toast.error(t('postVideo.uploadResponseForm.video.error.minLength'));
+          showErrorToastCustom(
+            t('postVideo.uploadResponseForm.video.error.minLength')
+          );
         } else if (media.duration > MAX_VIDEO_DURATION) {
-          toast.error(t('postVideo.uploadResponseForm.video.error.maxLength'));
+          showErrorToastCustom(
+            t('postVideo.uploadResponseForm.video.error.maxLength')
+          );
         } else {
           setLocalFile(file);
           handleItemChange(id, file);
         }
       }
     },
-    [id, handleItemChange, t]
+    [showErrorToastCustom, t, handleItemChange, id]
   );
   const handleRetryVideoUpload = useCallback(() => {
     handleItemChange(id, localFile);
@@ -522,6 +529,8 @@ const SLoadingBottomBlock = styled.div`
 const SLoadingBottomBlockButton = styled(Button)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   padding: 0;
+
+  background: transparent;
 
   &:focus:enabled,
   &:hover:enabled {

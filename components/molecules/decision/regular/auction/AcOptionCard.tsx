@@ -1,22 +1,13 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable quotes */
-/* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, {
-  useCallback,
-  // useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
-import { toast } from 'react-toastify';
 
 import {
   useAppDispatch,
@@ -48,12 +39,14 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import getDisplayname from '../../../../../utils/getDisplayname';
 import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
-
 import { reportEventOption } from '../../../../../api/endpoints/report';
 import {
   deleteAcOption,
   placeBidOnAuction,
 } from '../../../../../api/endpoints/auction';
+import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
+import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
+import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 
 // Icons
 import assets from '../../../../../constants/assets';
@@ -61,9 +54,9 @@ import BidIconLight from '../../../../../public/images/decision/bid-icon-light.p
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
-import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
-import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
-import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
+import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -86,10 +79,9 @@ const getPayWithCardErrorMessage = (
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
-  // shouldAnimate: boolean;
   votingAllowed: boolean;
   postId: string;
-  postCreator: string;
+  postCreatorName: string;
   postDeadline: string;
   postText: string;
   index: number;
@@ -100,14 +92,15 @@ interface IAcOptionCard {
     newOption: newnewapi.Auction.Option
   ) => void;
   handleRemoveOption?: () => void;
+  handleSetScrollBlocked?: () => void;
+  handleUnsetScrollBlocked?: () => void;
 }
 
 const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   option,
-  // shouldAnimate,
   votingAllowed,
   postId,
-  postCreator,
+  postCreatorName,
   postDeadline,
   postText,
   index,
@@ -116,10 +109,13 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   handleSetSupportedBid,
   handleAddOrUpdateOptionFromResponse,
   handleRemoveOption,
+  handleSetScrollBlocked,
+  handleUnsetScrollBlocked,
 }) => {
   const router = useRouter();
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
+  const { showErrorToastCustom } = useErrorToasts();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -127,6 +123,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     resizeMode
   );
   const { appConstants } = useGetAppConstants();
+  const { showErrorToastPredefined } = useErrorToasts();
 
   // const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const isSupportedByMe = useMemo(
@@ -143,9 +140,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     () => isSupportedByMe || isMyBid,
     [isSupportedByMe, isMyBid]
   );
-
-  // Tutorials
-  // const [isTooltipVisible, setIsTooltipVisible] = useState(true);
 
   // Ellipse menu
   const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
@@ -200,9 +194,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       }
     } catch (err) {
       console.error(err);
-      toast.error(t('toastErrors.generic'));
+      showErrorToastPredefined(undefined);
     }
-  }, [handleRemoveOption, option.id, t]);
+  }, [handleRemoveOption, option.id, showErrorToastPredefined]);
 
   const handleOpenRemoveForm = useCallback(() => {
     setIsRemoveModalOpen(true);
@@ -231,7 +225,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
+  const [paymentSuccessValue, setPaymentSuccessValue] = useState<
+    number | undefined
+  >();
 
   // Handlers
   const handleTogglePaymentModalOpen = () => {
@@ -331,26 +327,28 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-        setPaymentSuccessModalOpen(true);
+        setPaymentSuccessValue(paymentAmountInCents);
         handleSetSupportedBid('');
         setSupportBidAmount('');
         setIsSupportFormOpen(false);
         setPaymentModalOpen(false);
       } catch (err: any) {
         console.error(err);
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
       } finally {
         setLoadingModalOpen(false);
         setupIntent.destroy();
       }
     },
     [
-      handleSetSupportedBid,
+      setupIntent,
       postId,
       router,
       handleAddOrUpdateOptionFromResponse,
+      paymentAmountInCents,
+      handleSetSupportedBid,
       t,
-      setupIntent,
+      showErrorToastCustom,
     ]
   );
 
@@ -401,8 +399,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         $isDisabled={disabled && votingAllowed}
         $isBlue={isBlue}
         onClick={(e) => {
-          if (!isMobile && !isEllipseMenuOpen) {
+          if (
+            !isMobile &&
+            !isEllipseMenuOpen &&
+            !disabled &&
+            !isSupportFormOpen
+          ) {
             setIsEllipseMenuOpen(true);
+            handleSetScrollBlocked?.();
 
             setOptionMenuXY({
               x: e.clientX,
@@ -426,19 +430,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           active={!!optionBeingSupported && !disabled}
           noAction={!votingAllowed}
         >
-          <SLottieAnimationContainer>
-            {/* {shouldAnimate ? (
-              <Lottie
-                width={80}
-                height={80}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: highest ? CoinsSampleAnimation : HeartsSampleAnimation,
-                }}
-              />
-            ) : null} */}
-          </SLottieAnimationContainer>
           <SBidAmount isWhite={isSupportedByMe || isMyBid}>
             <OptionActionIcon
               src={theme.name === 'light' ? BidIconLight.src : BidIconDark.src}
@@ -456,80 +447,109 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             {option.title}
           </SOptionInfo>
           <SBiddersInfo onClick={(e) => e.preventDefault()} variant={3}>
-            {option.creator?.username ? (
-              <Link href={`/${option.creator?.username}`}>
+            {!option.whitelistSupporter ||
+            option.whitelistSupporter?.uuid === user.userData?.userUuid ? (
+              option.creator?.username ? (
+                <Link href={`/${option.creator?.username}`}>
+                  <SSpanBiddersHighlighted
+                    className='spanHighlighted'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    style={{
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {isMyBid
+                      ? option.supporterCount > 1
+                        ? t('me')
+                        : t('my')
+                      : getDisplayname(option.creator!!)}
+                    {!isMyBid && option.creator.options?.isVerified && (
+                      <SInlineSvgVerificationIcon
+                        svg={
+                          !isBlue
+                            ? VerificationCheckmark
+                            : VerificationCheckmarkInverted
+                        }
+                        width='14px'
+                        height='14px'
+                        fill='none'
+                      />
+                    )}
+                  </SSpanBiddersHighlighted>
+                </Link>
+              ) : (
+                <SSpanBiddersHighlighted
+                  className='spanHighlighted'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  {isMyBid
+                    ? option.supporterCount > 1
+                      ? t('me')
+                      : t('my')
+                    : getDisplayname(option.creator!!)}
+                </SSpanBiddersHighlighted>
+              )
+            ) : (
+              <Link href={`/${option.whitelistSupporter?.username}`}>
                 <SSpanBiddersHighlighted
                   className='spanHighlighted'
                   onClick={(e) => {
                     e.stopPropagation();
                   }}
                   style={{
-                    ...(!isMyBid && option.isCreatedBySubscriber
-                      ? {
-                          color:
-                            theme.name === 'dark'
-                              ? theme.colorsThemed.accent.yellow
-                              : theme.colors.dark,
-                        }
-                      : isMyBid && option.isCreatedBySubscriber
-                      ? {
-                          color: theme.colorsThemed.accent.yellow,
-                        }
-                      : {}),
-                    ...(!isMyBid
-                      ? {
-                          cursor: 'pointer',
-                        }
-                      : {}),
+                    cursor: 'pointer',
                   }}
                 >
-                  {isMyBid
-                    ? option.supporterCount > 2
-                      ? t('me')
-                      : t('my')
-                    : getDisplayname(option.creator!!)}
+                  {getDisplayname(option.whitelistSupporter!!)}
+                  <SInlineSvgVerificationIcon
+                    svg={
+                      !isBlue
+                        ? VerificationCheckmark
+                        : VerificationCheckmarkInverted
+                    }
+                    width='14px'
+                    height='14px'
+                    fill='none'
+                  />
                 </SSpanBiddersHighlighted>
               </Link>
-            ) : (
-              <SSpanBiddersHighlighted
-                className='spanHighlighted'
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                style={{
-                  ...(!isMyBid && option.isCreatedBySubscriber
-                    ? {
-                        color:
-                          theme.name === 'dark'
-                            ? theme.colorsThemed.accent.yellow
-                            : theme.colors.dark,
-                      }
-                    : isMyBid && option.isCreatedBySubscriber
-                    ? {
-                        color: theme.colorsThemed.accent.yellow,
-                      }
-                    : {}),
-                }}
-              >
-                {isMyBid
-                  ? option.supporterCount > 2
-                    ? t('me')
-                    : t('my')
-                  : getDisplayname(option.creator!!)}
-              </SSpanBiddersHighlighted>
             )}
-            {isSupportedByMe && !isMyBid ? (
-              <SSpanBiddersHighlighted className='spanHighlighted'>{`, ${t(
-                'me'
-              )}`}</SSpanBiddersHighlighted>
+            {(isSupportedByMe && !isMyBid) ||
+            (isSupportedByMe && !!option.whitelistSupporter) ? (
+              <Link
+                href={`/profile${
+                  user.userData?.options?.isCreator ? '/my-posts' : ''
+                }`}
+              >
+                <SSpanBiddersHighlighted
+                  className='spanHighlighted'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                >{`, ${t('me')}`}</SSpanBiddersHighlighted>
+              </Link>
             ) : null}
-            {option.supporterCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? (
+            {option.supporterCount >
+            ((isSupportedByMe && !isMyBid) ||
+            (isSupportedByMe && isMyBid && option.whitelistSupporter)
+              ? 2
+              : 1) ? (
               <>
                 <SSpanBiddersRegular className='spanRegular'>{` & `}</SSpanBiddersRegular>
                 <SSpanBiddersHighlighted className='spanHighlighted'>
                   {formatNumber(
                     option.supporterCount -
-                      (isSupportedByMe && !isMyBid ? 2 : 1),
+                      ((isSupportedByMe && !isMyBid) ||
+                      (isSupportedByMe && isMyBid && option.whitelistSupporter)
+                        ? 2
+                        : 1),
                     true
                   )}{' '}
                   {t('acPost.optionsTab.optionCard.others')}
@@ -714,7 +734,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             (!appConstants.minHoldAmount?.usdCents ||
               paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
               <SPaymentSign variant='subtitle'>
-                {t('acPost.paymentModalFooter.body', { creator: postCreator })}*
+                {t('acPost.paymentModalFooter.body', {
+                  creator: postCreatorName,
+                })}
+                *
                 <Link href='https://terms.newnew.co'>
                   <SPaymentTermsLink
                     href='https://terms.newnew.co'
@@ -740,7 +763,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
-                {t('acPost.paymentModalHeader.title', { creator: postCreator })}
+                {t('acPost.paymentModalHeader.title', {
+                  creator: postCreatorName,
+                })}
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
@@ -758,11 +783,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='ac'
-        isVisible={paymentSuccessModalOpen}
-        closeModal={() => setPaymentSuccessModalOpen(false)}
+        value={paymentSuccessValue}
+        isVisible={paymentSuccessValue !== undefined}
+        closeModal={() => setPaymentSuccessValue(undefined)}
       >
         {t('paymentSuccessModal.ac', {
-          postCreator,
+          postCreator: postCreatorName,
           postDeadline,
         })}
       </PaymentSuccessModal>
@@ -777,7 +803,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           optionType='ac'
           optionId={option.id as number}
           optionCreatorUuid={option.creator?.uuid ?? ''}
-          onClose={() => setIsEllipseMenuOpen(false)}
+          onClose={() => {
+            setIsEllipseMenuOpen(false);
+            handleUnsetScrollBlocked?.();
+          }}
           handleOpenReportOptionModal={() => handleOpenReportForm()}
           handleOpenRemoveOptionModal={() => handleOpenRemoveForm()}
         />
@@ -790,7 +819,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           optionType='ac'
           optionId={option.id as number}
           optionCreatorUuid={option.creator?.uuid ?? ''}
-          handleClose={() => setIsEllipseMenuOpen(false)}
+          handleClose={() => {
+            setIsEllipseMenuOpen(false);
+            handleUnsetScrollBlocked?.();
+          }}
           handleOpenReportOptionModal={() => handleOpenReportForm()}
           handleOpenRemoveOptionModal={() => handleOpenRemoveForm()}
         />
@@ -986,14 +1018,6 @@ const SSpanBiddersRegular = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
-const SLottieAnimationContainer = styled.div`
-  position: absolute;
-  top: -29px;
-  left: -20px;
-
-  z-index: 100;
-`;
-
 const SSupportButton = styled(Button)<{
   isBlue: boolean;
 }>`
@@ -1152,8 +1176,7 @@ const SPaymentModalHeadingPostCreator = styled(Text)`
 `;
 
 const SPaymentModalPostText = styled(Text)`
-  display: flex;
-  align-items: center;
+  display: inline-block;
   gap: 8px;
   white-space: pre-wrap;
   word-break: break-word;
@@ -1207,4 +1230,12 @@ const SEllipseButtonMobile = styled(Button)`
   &:focus:enabled {
     background: transparent;
   }
+`;
+
+const SInlineSvgVerificationIcon = styled(InlineSvg)`
+  display: inline-flex;
+  margin-left: 3px;
+
+  position: relative;
+  top: 3px;
 `;

@@ -77,7 +77,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
     (el: any) => (
       <SDay key={el.value}>
         <SDayLabel variant={2} weight={500}>
-          {t(`secondStep.field.startsAt.modal.days.${el.value}`)}
+          {t(`secondStep.field.startsAt.modal.days.${el.value}` as any)}
         </SDayLabel>
       </SDay>
     ),

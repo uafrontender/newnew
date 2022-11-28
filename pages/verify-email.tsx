@@ -16,6 +16,7 @@ import AuthLayout, {
 import CodeVerificationMenu from '../components/organisms/CodeVerificationMenu';
 import assets from '../constants/assets';
 import { useAppSelector } from '../redux-store/store';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 interface IVerifyEmail {
   goal?: string;
@@ -90,10 +91,12 @@ export default VerifyEmail;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { to } = context.query;
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-VerifyEmail',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-SignUp', 'page-VerifyEmail'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const goal = to && !Array.isArray(to) ? to : '';
 

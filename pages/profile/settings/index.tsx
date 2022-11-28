@@ -1,3 +1,5 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable no-await-in-loop */
 /* eslint-disable react/jsx-no-target-blank */
 import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
@@ -8,7 +10,6 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useUpdateEffect } from 'react-use';
-import { toast } from 'react-toastify';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
@@ -30,6 +31,8 @@ import {
   updateMe,
 } from '../../../api/endpoints/user';
 
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+
 import { NextPageWithLayout } from '../../_app';
 import MyProfileSettingsLayout from '../../../components/templates/MyProfileSettingsLayout';
 
@@ -47,10 +50,13 @@ import PrivacySection from '../../../components/organisms/settings/PrivacySectio
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { getMyTransactions } from '../../../api/endpoints/payments';
 import assets from '../../../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
+
+  const { showErrorToastPredefined } = useErrorToasts();
 
   // Translations
   const { t } = useTranslation('page-Profile');
@@ -97,7 +103,7 @@ const MyProfileSettingsIndex = () => {
       unblockUser(uuid);
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 
@@ -174,7 +180,7 @@ const MyProfileSettingsIndex = () => {
       );
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 
@@ -289,9 +295,9 @@ const MyProfileSettingsIndex = () => {
       try {
         const users: newnewapi.User[] = [];
 
-        usersIBlockedIds.forEach(async (uuid) => {
+        for (let i = 0; i < usersIBlockedIds.length; i++) {
           const payload = new newnewapi.GetUserRequest({
-            uuid,
+            uuid: usersIBlockedIds[i],
           });
 
           const res = await getUserByUsername(payload);
@@ -299,16 +305,17 @@ const MyProfileSettingsIndex = () => {
           if (res.data) {
             users.push(res.data);
           }
-        });
+        }
 
         setBlockedUsers(() => users);
       } catch (err) {
         console.error(err);
-        toast.error('toastErrors.generic');
+        showErrorToastPredefined(undefined);
       }
     }
 
     fetchUsersIBlocked();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usersIBlockedIds]);
 
   return (
@@ -479,11 +486,12 @@ const SBlockOption = styled.a`
 export async function getServerSideProps(context: {
   locale: string;
 }): Promise<any> {
-  const translationContext = await serverSideTranslations(context.locale, [
-    'common',
-    'page-Profile',
-    'page-VerifyEmail',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale,
+    ['common', 'page-Profile', 'page-VerifyEmail'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   // @ts-ignore
   if (!context?.req?.cookies?.accessToken) {
