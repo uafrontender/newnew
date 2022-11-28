@@ -10,6 +10,8 @@ import CreationLayout from '../../../components/templates/CreationLayout';
 import PreviewContent from '../../../components/organisms/creation/preview';
 
 import { NextPageWithLayout } from '../../_app';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
+import { I18nNamespaces } from '../../../@types/i18next';
 
 interface ICreationPreview {}
 
@@ -20,7 +22,13 @@ export const CreationPreview: React.FC<ICreationPreview> = (props) => {
   return (
     <SWrapper>
       <Head>
-        <title>{t(`preview.meta.title-${router?.query?.tab}`)}</title>
+        <title>
+          {t(
+            `preview.meta.${
+              `title-${router?.query?.tab}` as keyof I18nNamespaces['page-Creation']['preview']['meta']
+            }`
+          )}
+        </title>
       </Head>
       <PreviewContent {...props} />
     </SWrapper>
@@ -38,7 +46,9 @@ export async function getServerSideProps(
 ): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'page-Creation']
+    ['common', 'page-Creation'],
+    null,
+    SUPPORTED_LANGUAGES
   );
 
   // @ts-ignore

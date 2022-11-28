@@ -1,19 +1,24 @@
 /* eslint-disable no-unsafe-optional-chaining */
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
+import { Trans, useTranslation } from 'next-i18next';
 
 import InlineSvg from '../../../atoms/InlineSVG';
 
 import StatisticsIconFilled from '../../../../public/images/svg/icons/filled/Statistics.svg';
+import { formatNumber } from '../../../../utils/format';
 
 interface IPostVotingTab {
   children: string;
+  bundleVotes?: number;
 }
 
 const PostVotingTab: React.FunctionComponent<IPostVotingTab> = ({
   children,
+  bundleVotes,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation('page-Post');
 
   return (
     <STabs>
@@ -27,6 +32,19 @@ const PostVotingTab: React.FunctionComponent<IPostVotingTab> = ({
           />
           <div>{children}</div>
         </STab>
+        {bundleVotes ? (
+          <SBundleVotes>
+            <Trans
+              t={t}
+              i18nKey='optionsTabLine.bundleVotes'
+              // @ts-ignore
+              components={[
+                <VotesNumberSpan />,
+                { amount: formatNumber(bundleVotes as number, true) },
+              ]}
+            />
+          </SBundleVotes>
+        ) : null}
       </STabsContainer>
     </STabs>
   );
@@ -47,7 +65,7 @@ const STabs = styled.div`
 
 const STabsContainer = styled.div`
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 24px;
 
   width: 100%;
@@ -101,4 +119,21 @@ const STab = styled.div`
   ${({ theme }) => theme.media.tablet} {
     padding-bottom: 12px;
   }
+`;
+
+const SBundleVotes = styled.p`
+  color: ${(props) =>
+    props.theme.name === 'dark'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colorsThemed.text.tertiary};
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 24px;
+`;
+
+const VotesNumberSpan = styled.span`
+  color: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colorsThemed.text.primary
+      : theme.colorsThemed.accent.yellow};
 `;

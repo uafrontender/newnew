@@ -8,37 +8,40 @@ import router from 'next/router';
 import dynamic from 'next/dynamic';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import { CreatorCardWithSubscriptionPrice } from './CreatorCardWithSubscriptionPrice';
+import CreatorCard from '../../molecules/search/CreatorCard';
 
 const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
 interface IList {
-  collection: any;
+  collection: newnewapi.IUser[];
   loading: boolean;
-  subscribedTo?: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
   withEllipseMenu?: boolean;
+  onBuyBundleClicked?: (creator: newnewapi.IUser) => void;
 }
 
 export const CreatorsList: React.FC<IList> = ({
   collection,
   loading,
-  subscribedTo = false,
   skeletonsBgColor,
   skeletonsHighlightColor,
   withEllipseMenu = false,
+  onBuyBundleClicked,
 }) => {
   const renderItem = (creator: newnewapi.IUser) => {
     const handleItemClick = () => {
-      router.push(`/${creator.username}`);
+      if (creator) {
+        router.push(`/${creator.username}`);
+      }
     };
 
     return (
       <SItemWrapper key={creator.uuid} onClick={handleItemClick}>
-        <CreatorCardWithSubscriptionPrice
-          item={creator}
+        <CreatorCard
+          creator={creator}
           withEllipseMenu={withEllipseMenu ?? false}
+          onBundleClicked={onBuyBundleClicked}
         />
       </SItemWrapper>
     );
@@ -83,9 +86,9 @@ export const CreatorsList: React.FC<IList> = ({
 };
 
 CreatorsList.defaultProps = {
-  subscribedTo: false,
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
+  onBuyBundleClicked: undefined,
 };
 
 export default CreatorsList;
@@ -95,13 +98,13 @@ const SListWrapper = styled.div`
   cursor: grab;
   display: flex;
   padding: 8px 0 0 0;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
   position: relative;
   flex-wrap: wrap;
   flex-direction: row;
 
   ${(props) => props.theme.media.tablet} {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
     width: calc(100% + 26px);
     padding: 0;
   }
@@ -118,7 +121,7 @@ const SListWrapper = styled.div`
 
   .skeletonsContainer {
     display: block;
-    height: 400px;
+    height: 229px;
 
     width: 100vw;
     margin: 16px 0;

@@ -25,13 +25,17 @@
       "insights": "Insights",
       "insightsTablet": "Go to insights",
       "cashOut": {
-        "amount": "Your next payout of",
+        "amount": "Your Stripe earning are",
+        "amountSecondLine": "Manage your balance on Stripe.",
+        "stripeButton": "Take me to Stripe",
         "date": "will automatically be sent on {{date}}.",
         "submit": "Learn More",
         "noPayouts": "You don’t have any upcoming payouts"
       },
       "toDosIssue": {
         "text": "Add a bio and your bank info to withdraw your earnings",
+        "textBio": "Add a bio to withdraw your earnings",
+        "textBank": "Add your bank info to withdraw your earnings",
         "button": "Add"
       },
       "makeDecision": {
@@ -41,7 +45,8 @@
       "list": {
         "ac": "Bids",
         "cf": "Goals",
-        "mc": "Superpolls"
+        "mc": "Superpolls",
+        "bundles": "Bundles"
       },
       "filter": {
         "today": "Today",
@@ -77,7 +82,8 @@
         "minutes": "m",
         "seconds": "s",
         "leftToRespond": "left to respond"
-      }
+      },
+      "linkCopied": "Link copied!"
     },
     "toDos": {
       "title": "Complete these steps to get paid",
@@ -87,6 +93,11 @@
       "completeProfileButton": "Add",
       "addCashOutMethod": "Add bank info",
       "addCashOutMethodButton": "Add"
+    },
+    "aboutBundles": {
+      "title": "Superpoll Bundles",
+      "text": "Make more money. Have more fun.\nSuperpoll Bundles are a win-win for everyone!",
+      "button": "Tell me more!"
     }
   },
   "earnings": {
@@ -94,6 +105,52 @@
       "title": "Creator Earnings"
     },
     "title": "Earnings"
+  },
+  "myBundles": {
+    "meta": {
+      "title": "My Bundles",
+      "description": "View your NewNew Bundles"
+    },
+    "title": "My Bundles",
+    "buttonTurnOn": "Turn on bundles",
+    "buttonTurnOff": "Turn off bundles",
+    "earnings": {
+      "title": "Bundles Earnings",
+      "payPeriod": "this pay period",
+      "unitName": "bundle",
+      "earned": "earned",
+      "noSoldYet": "No bundles sold yet",
+      "sold": "sold"
+    },
+    "bundlesSet": {
+      "title": "Superpoll Bundles",
+      "subTitle": "Offer Superpoll bundles to increase your earnings and get closer to your audience. ",
+      "votes": "votes",
+      "description": "plus people get {{duration}} months of:",
+      "descriptionSingular": "plus people get 1 month of:",
+      "firstOption": "adding custom options to your Superpolls",
+      "secondOption": "sending you private chats",
+      "perBundle": "per bundle"
+    },
+    "modals": {
+      "turnon": {
+        "title": "Turn On bundles",
+        "text": "Are you sure you want to activate bundles?"
+      },
+      "turnoff": {
+        "title": "Turn Off bundles",
+        "text": "Are you sure you want to deactivate bundles?"
+      },
+      "activated": {
+        "title": "Congratulations!",
+        "text": "You are successfully activated bundles"
+      },
+      "deactivated": {
+        "title": "So sad!",
+        "text": "But you can activate bundles at any time"
+      },
+      "button": "Sounds good!"
+    }
   },
   "getPaid": {
     "meta": {
@@ -112,10 +169,11 @@
     "myPosts": "My Posts",
     "insights": "Insights",
     "earnings": "Earnings",
+    "bundles": "Bundles",
     "getPaid": "Add Bank",
     "getPaidEdit": "Edit Bank",
     "transactions": "Transactions",
-    "newPost": "New post"
+    "newPost": "Make Decision"
   },
   "tabs": {
     "chat": "DMs",
@@ -127,7 +185,7 @@
     "noMessagesFirstLine": "No messages here yet...",
     "typing": "Typing...",
     "toolbar": {
-      "searchPlaceholder": "Search for messages or users"
+      "searchPlaceholder": "Search for users"
     },
     "modal": {
       "newMessage": {
@@ -157,7 +215,10 @@
     "members": "members"
   },
   "announcement": {
-    "title": "{{username}}'s announcement"
+    "comment_DON_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "",
+    "suffix": "'s",
+    "afterName": "announcement"
   },
   "stripe": {
     "meta": {

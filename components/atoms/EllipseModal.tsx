@@ -68,7 +68,7 @@ interface IEllipseModalButton {
   tone?: 'neutral' | 'error';
   disabled?: boolean;
   onClick?: () => void;
-  children: string;
+  children: string | React.ReactNode;
 }
 
 export const EllipseModalButton: React.FC<IEllipseModalButton> = ({

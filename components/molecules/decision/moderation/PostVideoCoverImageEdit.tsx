@@ -3,7 +3,6 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { Area, Point } from 'react-easy-crop';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 
 import Text from '../../../atoms/Text';
 import Modal from '../../../organisms/Modal';
@@ -24,6 +23,7 @@ import chevronLeft from '../../../../public/images/svg/icons/outlined/ChevronLef
 
 import { setPostCoverImage } from '../../../../api/endpoints/post';
 import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 interface IPostVideoCoverImageEdit {
   open: boolean;
@@ -37,7 +37,8 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
   IPostVideoCoverImageEdit
 > = ({ open, postId, originalCoverUrl, handleClose, handleSubmit }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
+  const { showErrorToastPredefined } = useErrorToasts();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
@@ -170,7 +171,7 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     } finally {
       setUpdateCoverImageLoading(false);
     }

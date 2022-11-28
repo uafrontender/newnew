@@ -2,7 +2,7 @@
   "welcome": "Bienvenido a {{NEXT_PUBLIC_APP_NAME}}!",
   "topSectionTitle": "Top 10 en {{country}}",
   "heroSection": {
-    "title": "¡Únete y \nmoldea la realidad!",
+    "title": "¡Únete y moldea\n la realidad!",
     "subTitle": "Haz ofertas y vota por lo que sucederá a continuación en el mundo",
     "signIn": "Iniciar sesión",
     "explore": "Explorar Ahora",
@@ -47,19 +47,22 @@
     "share": "Compartir",
     "dashboard": "Panel",
     "dms": "Mensajes directos",
-    "notifications": "Notificaciones"
+    "notifications": "Notificaciones",
+    "bundles": "Bundles"
   },
   "mobileTopNavigation": {
     "myBalance": "Mi balance: ${{value}}",
     "profile": "Perfil"
   },
   "button": {
+    "bundles": "Bundles",
     "createDecision": "Nueva publicación",
     "create": "Crear",
     "signIn": "Iniciar sesión",
     "dashboard": "Panel",
     "createOnNewnew": "Crear ahora",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "takeMeHome_NEED_TRANSLATION": "Take me home"
   },
   "footer": {
     "topTitle": "NewNew",
@@ -128,6 +131,55 @@
       "title": "¡Estamos en ello!",
       "subtitle": "Te agradecemos que te pongas en contacto con nosotros. Investigaremos tu reporte lo antes posible y tomaremos las medidas necesarias para garantizar la seguridad de todos.",
       "button": "Aceptar"
+    },
+    "buyBundle": {
+      "title": "Comprar un bundle de Superpoll por:",
+      "votes": "<0>{{amount}}</0> votos",
+      "access": "además obtén {{amount}} {{unit}} de:",
+      "customOptions": "agregar opciones personalizadas a cualquier Superpoll",
+      "chat": "chat privado 1 a 1",
+      "buy": "Comprar por ${{amount}}",
+      "terms": "*los votos de los bundles nunca expiran",
+      "unit": {
+        "month": "mes",
+        "months": "meses"
+      },
+      "payment": {
+        "header": "Bundle de Superpoll de {{creator}}"
+      },
+      "error": {
+        "requestFailed": "La solicitud ha fallado"
+      }
+    },
+    "buyBundleSuccess": {
+      "votes_NEED_TRANSLATION": "<0>{{amount}}</0> votes unlocked",
+      "for": "para <0>{{creator}}</0>",
+      "access": "Quedan {{amount}} {{unit}} de:",
+      "customOptions_NEED_TRANSLATION": "adding custom superpoll options",
+      "chat": "chat privado 1 a 1",
+      "button_NEED_TRANSLATION": "Sounds good!",
+      "unit": {
+        "month": "mes",
+        "months": "meses"
+      }
+    },
+    "creatorsBundle": {
+      "votesLeft": "Quedan <0>{{amount}}</0> votos",
+      "for": "para ",
+      "access": "Quedan <0/> de:",
+      "unitPair": "{{amount}} {{unit}}",
+      "and": " y las ",
+      "customOptions": "agregar opciones personalizadas a cualquier Superpoll",
+      "chat": "chat privado 1 a 1",
+      "buyButton": "Comprar más votos",
+      "unit": {
+        "day": "día",
+        "days": "días",
+        "month": "mes",
+        "months": "meses",
+        "year": "año",
+        "years": "años"
+      }
     }
   },
   "myLink": {
@@ -174,23 +226,27 @@
   "toastErrors": {
     "generic": "Se ha producido un error, inténtalo de nuevo más tarde"
   },
-  "smsNotifications_NEED_TRANSLATION": {
-    "title": "What's your number?",
-    "success": "Success",
-    "description": "This way, we can send you new updates from <0>{{subject}}</0>!",
-    "confirmation": "Confirmation SMS was sent to {{phoneNumber}} number.",
-    "tos": "I accept NewNew’s <0>Terms</0> & <1>Privacy</1>. I opt-in and agree to receive updates from NewNew at the phone number provided. SMS and data rates may apply.",
-    "button": { "continue": "Continue", "close": "Cool!" },
+  "smsNotifications": {
+    "title": "¿Cuál es tu número telefónico?",
+    "success": "Éxito",
+    "description": "De esta manera, podemos enviarte nuevas actualizaciones de <0>{{subject}}</0>!",
+    "confirmation": "Se ha enviado un SMS de confirmación al número {{phoneNumber}}.",
+    "tos": "Acepto los <0>Términos</0> & <1>Condiciones de privacidad</1> de NewNew. Acepto recibir actualizaciones de NewNew en el número de teléfono proporcionado. Pueden aplicarse tarifas de SMS y datos.",
+    "button": { "continue": "Continuar", "close": "¡Genial!" },
     "phoneError": {
-      "0": "Invalid phone number",
-      "1": "Invalid country code",
-      "2": "The phone number is too short",
-      "3": "The phone number is too long",
-      "4": "Invalid phone number"
+      "0": "Número teléfonico inválido",
+      "1": "Código de país inválido",
+      "2": "El número de teléfono es demasiado corto",
+      "3": "El número de teléfono es demasiado largo",
+      "4": "Número de teléfono inválido"
     },
     "error": {
-      "requestFailed": "Request failed"
+      "requestFailed": "La solicitud ha fallado"
     }
+  },
+  "creatorCard": {
+    "buyBundle": "Comprar bundle",
+    "purchasedVotes": "{{value}} votos"
   },
   "colorModeSwitch": {
     "options": {

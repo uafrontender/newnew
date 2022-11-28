@@ -3,9 +3,10 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import Modal from '../../../organisms/Modal';
 import Button from '../../../atoms/Button';
+import { TPostType } from '../../../../utils/switchPostType';
 
 interface IPostConfirmDeleteModal {
-  postType: string;
+  postType: TPostType;
   isVisible: boolean;
   closeModal: () => void;
   handleConfirmDelete: () => void;
@@ -17,7 +18,7 @@ const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
   closeModal,
   handleConfirmDelete,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   return (
     <Modal show={isVisible} additionalz={12} onClose={closeModal}>

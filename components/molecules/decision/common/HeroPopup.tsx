@@ -24,7 +24,7 @@ const LIGHT_IMAGES: any = {
 
 interface IHeroPopup {
   isPopupVisible: boolean;
-  postType: string;
+  postType: 'AC' | 'MC' | 'CF';
   closeModal: () => void;
 }
 
@@ -33,7 +33,7 @@ const HeroPopup: React.FC<IHeroPopup> = ({
   postType,
   closeModal,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const theme = useTheme();
 
   return (

@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "title": "Bundles de Superpoll",
+    "description": ""
+  },
+  "header": {
+    "title": "Bundles de Superpoll"
+  },
+  "bundlesSection": {
+    "title": "Tus bundles actuales",
+    "seeAll": "Ver todos",
+    "noBundles": "Ni tienes ningún bundle. Intenta buscar por creador o compra un bundle",
+    "search": "Buscar"
+  },
+  "bundlesModal": {
+    "title": "Tus bundles actuales"
+  },
+  "bundle": {
+    "votesLeft": "<0>{{amount}}</0> votos",
+    "access": "y quedan <0/> de:",
+    "unitPair": "{{amount}} {{unit}}",
+    "and": " y las ",
+    "customOptions": "añadir opciones personalizadas a las superpolls",
+    "chat": "chat privado 1 a 1",
+    "expiation": "los votos nunca caducan",
+    "unit": {
+      "day": "día",
+      "days": "días",
+      "month": "mes",
+      "months": "meses",
+      "year": "año",
+      "years": "años"
+    }
+  },
+  "search": {
+    "title": "Buscar creadores que ofrezcan Bundles",
+    "searchInputPlaceholder": "Buscar creadores",
+    "topCreators": "Creadores destacados",
+    "resultsFor": "Resultados para"
+  },
+  "button": {
+    "back": "Regresar"
+  },
+  "error": {
+    "requestFailed": "La solicitud ha fallado"
+  }
+}

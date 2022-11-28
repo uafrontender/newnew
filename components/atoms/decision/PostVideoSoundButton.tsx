@@ -76,6 +76,8 @@ const SSoundButton = styled(Button)`
 
   border-radius: ${({ theme }) => theme.borderRadius.small};
 
+  transition: unset;
+
   ${({ theme }) => theme.media.tablet} {
     width: 36px;
     height: 36px;

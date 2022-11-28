@@ -39,11 +39,15 @@ const CommentEllipseMenu: React.FC<ICommentEllipseMenu> = ({
 
   useEffect(() => {
     if (isBrowser()) {
-      const postModal = document.getElementById('post-modal-container');
-      if (isVisible && postModal) {
-        postModal.style.overflow = 'hidden';
-      } else if (postModal) {
-        postModal.style.overflow = 'scroll';
+      const commentsContainer = document.getElementById(
+        'comments-scrolling-container'
+      );
+      if (isVisible && commentsContainer) {
+        commentsContainer.style.overflow = 'hidden';
+        commentsContainer.style.width = 'calc(100% - 4px)';
+      } else if (commentsContainer) {
+        commentsContainer.style.overflow = 'auto';
+        commentsContainer.style.width = '';
       }
     }
   }, [isVisible]);

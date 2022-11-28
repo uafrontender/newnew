@@ -43,6 +43,7 @@ export default class MyDocument extends Document {
     return (
       <Html translate='no'>
         <Head>
+          <meta name='google' content='notranslate' />
           {/* Fonts */}
           <link href='/fonts/font-gilroy.css' rel='stylesheet' />
           <link

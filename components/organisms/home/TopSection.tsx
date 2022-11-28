@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 
 import PostCard from '../../molecules/PostCard';
 import Headline from '../../atoms/Headline';
@@ -17,7 +18,6 @@ import { useAppSelector } from '../../../redux-store/store';
 import { SCROLL_TOP_10 } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
 import GradientMaskHorizontal from '../../atoms/GradientMaskHorizontal';
-import { usePostModalState } from '../../../contexts/postModalContext';
 
 const SCROLL_STEP = {
   mobile: 1,
@@ -27,11 +27,11 @@ const SCROLL_STEP = {
 
 interface ITopSection {
   collection: newnewapi.Post[];
-  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
 export const TopSection: React.FC<ITopSection> = React.memo(
-  ({ collection, handlePostClicked }) => {
+  ({ collection }) => {
+    const router = useRouter();
     const { t } = useTranslation('common');
     const ref: any = useRef();
     const scrollContainerRef: any = useRef();
@@ -44,8 +44,6 @@ export const TopSection: React.FC<ITopSection> = React.memo(
     const [scrollX, setScrollX] = useState<number>(0);
     const [isDragging, setIsDragging] = useState(false);
     const [mouseIsDown, setMouseIsDown] = useState(false);
-
-    const { postOverlayOpen } = usePostModalState();
 
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -112,7 +110,7 @@ export const TopSection: React.FC<ITopSection> = React.memo(
     const renderItem = (item: newnewapi.Post, index: number) => {
       const handleItemClick = () => {
         if (!isDragging) {
-          handlePostClicked(item);
+          router.push(`/post/${switchPostType(item)[0].postUuid}`);
         }
       };
 
@@ -122,12 +120,7 @@ export const TopSection: React.FC<ITopSection> = React.memo(
           name={`top-section-${index}`}
           onClick={handleItemClick}
         >
-          <PostCard
-            shouldStop={postOverlayOpen}
-            type='inside'
-            item={item}
-            index={index + 1}
-          />
+          <PostCard type='inside' item={item} index={index + 1} />
         </SItemWrapper>
       );
     };

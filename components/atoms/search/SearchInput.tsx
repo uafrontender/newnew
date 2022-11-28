@@ -7,7 +7,6 @@ import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 
 import InlineSVG from '../InlineSVG';
 
@@ -29,12 +28,15 @@ import NoResults from './NoResults';
 import PopularTagsResults from './PopularTagsResults';
 import getChunks from '../../../utils/getChunks/getChunks';
 import { useOverlayMode } from '../../../contexts/overlayModeContext';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
+  const { showErrorToastPredefined } = useErrorToasts();
+
   const inputRef: any = useRef();
   const inputContainerRef: any = useRef();
   const [searchValue, setSearchValue] = useState('');
@@ -73,6 +75,9 @@ const SearchInput: React.FC = React.memo(() => {
       router.push(`/search?query=${firstChunk.text}&type=hashtags&tab=posts`);
     } else {
       const clearedQuery = encodeURIComponent(query);
+      if (resultsPosts.length === 0 && resultsCreators.length > 0) {
+        router.push(`/search?query=${clearedQuery}&tab=creators`);
+      }
       router.push(`/search?query=${clearedQuery}&tab=posts`);
     }
   };
@@ -172,7 +177,7 @@ const SearchInput: React.FC = React.memo(() => {
     } catch (err) {
       console.error(err);
       setIsLoading(false);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   }
 
@@ -184,6 +189,7 @@ const SearchInput: React.FC = React.memo(() => {
       setIsResultsDropVisible(false);
       resetResults();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, isMobileOrTablet]);
 
   function closeSearch() {

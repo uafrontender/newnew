@@ -1,14 +1,11 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import { motion } from 'framer-motion';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
-import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
@@ -19,23 +16,24 @@ import Button from '../../../../atoms/Button';
 import InlineSvg from '../../../../atoms/InlineSVG';
 import AcConfirmDeleteOptionModal from './AcConfirmDeleteOptionModal';
 import AcPickWinningOptionModal from './AcPickWinningOptionModal';
+import BlockUserModalPost from '../../common/BlockUserModalPost';
+import ReportModal, { ReportData } from '../../../chat/ReportModal';
 import AcOptionCardModerationEllipseMenu from './AcOptionCardModerationEllipseMenu';
+import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
 
 import { formatNumber } from '../../../../../utils/format';
 import { deleteAcOption } from '../../../../../api/endpoints/auction';
+import { reportEventOption } from '../../../../../api/endpoints/report';
+import getDisplayname from '../../../../../utils/getDisplayname';
 
 // Icons
 import BidIconLight from '../../../../../public/images/decision/bid-icon-light.png';
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
-
-import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
-import BlockUserModalPost from '../../common/BlockUserModalPost';
-import { reportEventOption } from '../../../../../api/endpoints/report';
-import ReportModal, { ReportData } from '../../../chat/ReportModal';
-import getDisplayname from '../../../../../utils/getDisplayname';
-import isBrowser from '../../../../../utils/isBrowser';
+import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
+import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -44,6 +42,8 @@ interface IAcOptionCardModeration {
   isWinner?: boolean;
   handleConfirmWinningOption: () => void;
   handleRemoveOption: (optionToDelete: newnewapi.Auction.Option) => void;
+  handleSetScrollBlocked?: () => void;
+  handleUnsetScrollBlocked?: () => void;
 }
 
 const AcOptionCardModeration: React.FunctionComponent<
@@ -55,9 +55,12 @@ const AcOptionCardModeration: React.FunctionComponent<
   isWinner,
   handleConfirmWinningOption,
   handleRemoveOption,
+  handleSetScrollBlocked,
+  handleUnsetScrollBlocked,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
+  const { showErrorToastPredefined } = useErrorToasts();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -83,7 +86,7 @@ const AcOptionCardModeration: React.FunctionComponent<
       }
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 
@@ -99,26 +102,6 @@ const AcOptionCardModeration: React.FunctionComponent<
   }, []);
 
   const ellipseButtonRef: any = useRef();
-
-  useEffect(() => {
-    if (isBrowser()) {
-      const scrollArea = document.getElementById(
-        'acOptionsTabModeration__bidsContainer'
-      );
-      if (isEllipseMenuOpen && scrollArea) {
-        scrollArea.style.overflow = 'hidden';
-      } else if (scrollArea) {
-        scrollArea.style.overflow = 'auto';
-      }
-    }
-
-    return () => {
-      const scrollArea = document.getElementById(
-        'acOptionsTabModeration__bidsContainer'
-      );
-      if (scrollArea) scrollArea.style.overflow = 'auto';
-    };
-  }, [isEllipseMenuOpen]);
 
   return (
     <>
@@ -151,43 +134,75 @@ const AcOptionCardModeration: React.FunctionComponent<
               {option.title}
             </SOptionInfo>
             <SBiddersInfo variant={3}>
-              {option.creator?.username ? (
-                <Link href={`/${option.creator?.username}`}>
+              {!option.whitelistSupporter ? (
+                option.creator?.username ? (
+                  <Link href={`/${option.creator?.username}`}>
+                    <SSpanBiddersHighlighted
+                      className='spanHighlighted'
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {getDisplayname(option.creator!!)}
+                      {option.creator.options?.isVerified && (
+                        <SInlineSvgVerificationIcon
+                          svg={
+                            !isWinner
+                              ? VerificationCheckmark
+                              : VerificationCheckmarkInverted
+                          }
+                          width='14px'
+                          height='14px'
+                          fill='none'
+                        />
+                      )}
+                    </SSpanBiddersHighlighted>
+                  </Link>
+                ) : (
+                  <SSpanBiddersHighlighted
+                    className='spanHighlighted'
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {getDisplayname(option.creator!!)}
+                    {option.creator?.options?.isVerified && (
+                      <SInlineSvgVerificationIcon
+                        svg={
+                          !isWinner
+                            ? VerificationCheckmark
+                            : VerificationCheckmarkInverted
+                        }
+                        width='14px'
+                        height='14px'
+                        fill='none'
+                      />
+                    )}
+                  </SSpanBiddersHighlighted>
+                )
+              ) : (
+                <Link href={`/${option.whitelistSupporter?.username}`}>
                   <SSpanBiddersHighlighted
                     className='spanHighlighted'
                     onClick={(e) => e.stopPropagation()}
                     style={{
-                      ...(!isWinner && option.isCreatedBySubscriber
-                        ? {
-                            color:
-                              theme.name === 'dark'
-                                ? theme.colorsThemed.accent.yellow
-                                : theme.colors.dark,
-                            cursor: 'pointer',
-                          }
-                        : {}),
+                      cursor: 'pointer',
                     }}
                   >
-                    {option.creator?.nickname ?? option.creator?.username}
+                    {getDisplayname(option.whitelistSupporter!!)}
+                    {option.whitelistSupporter.options?.isVerified && (
+                      <SInlineSvgVerificationIcon
+                        svg={
+                          !isWinner
+                            ? VerificationCheckmark
+                            : VerificationCheckmarkInverted
+                        }
+                        width='14px'
+                        height='14px'
+                        fill='none'
+                      />
+                    )}
                   </SSpanBiddersHighlighted>
                 </Link>
-              ) : (
-                <SSpanBiddersHighlighted
-                  className='spanHighlighted'
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    ...(!isWinner && option.isCreatedBySubscriber
-                      ? {
-                          color:
-                            theme.name === 'dark'
-                              ? theme.colorsThemed.accent.yellow
-                              : theme.colors.dark,
-                        }
-                      : {}),
-                  }}
-                >
-                  {option.creator?.nickname ?? option.creator?.username}
-                </SSpanBiddersHighlighted>
               )}
               {option.supporterCount > 1 ? (
                 <>
@@ -220,7 +235,10 @@ const AcOptionCardModeration: React.FunctionComponent<
                     : t('acPostModeration.optionsTab.optionCard.pickButton')}
                 </SPickOptionButton>
                 <SDropdownButton
-                  onClick={() => setIsEllipseMenuOpen(true)}
+                  onClick={() => {
+                    setIsEllipseMenuOpen(true);
+                    handleSetScrollBlocked?.();
+                  }}
                   ref={ellipseButtonRef}
                 >
                   <InlineSvg
@@ -256,7 +274,10 @@ const AcOptionCardModeration: React.FunctionComponent<
             )
           ) : !isMobile ? (
             <SEllipseButton
-              onClick={() => setIsEllipseMenuOpen(true)}
+              onClick={() => {
+                setIsEllipseMenuOpen(true);
+                handleSetScrollBlocked?.();
+              }}
               ref={ellipseButtonRef}
             >
               <InlineSvg
@@ -274,8 +295,12 @@ const AcOptionCardModeration: React.FunctionComponent<
           {!isMobile && (
             <AcOptionCardModerationEllipseMenu
               isVisible={isEllipseMenuOpen}
-              canDeleteOption={!isWinner}
-              handleClose={() => setIsEllipseMenuOpen(false)}
+              optionId={option.id as number}
+              canDeleteOptionInitial={!isWinner}
+              handleClose={() => {
+                setIsEllipseMenuOpen(false);
+                handleUnsetScrollBlocked?.();
+              }}
               handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
               handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
               handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
@@ -316,36 +341,18 @@ const AcOptionCardModeration: React.FunctionComponent<
                   className='spanHighlighted'
                   onClick={(e) => e.stopPropagation()}
                   style={{
-                    ...(!isWinner && option.isCreatedBySubscriber
-                      ? {
-                          color:
-                            theme.name === 'dark'
-                              ? theme.colorsThemed.accent.yellow
-                              : theme.colors.dark,
-                          cursor: 'pointer',
-                        }
-                      : {}),
+                    cursor: 'pointer',
                   }}
                 >
-                  {option.creator?.nickname ?? option.creator?.username}
+                  {getDisplayname(option.creator)}
                 </SSpanBiddersHighlighted>
               </Link>
             ) : (
               <SSpanBiddersHighlighted
                 className='spanHighlighted'
                 onClick={(e) => e.stopPropagation()}
-                style={{
-                  ...(!isWinner && option.isCreatedBySubscriber
-                    ? {
-                        color:
-                          theme.name === 'dark'
-                            ? theme.colorsThemed.accent.yellow
-                            : theme.colors.dark,
-                      }
-                    : {}),
-                }}
               >
-                {option.creator?.nickname ?? option.creator?.username}
+                {getDisplayname(option.creator)}
               </SSpanBiddersHighlighted>
             )}
             {option.supporterCount > 1 ? (
@@ -376,7 +383,8 @@ const AcOptionCardModeration: React.FunctionComponent<
         <AcOptionCardModerationEllipseModal
           isOpen={isEllipseMenuOpen}
           zIndex={16}
-          canDeleteOption={!isWinner}
+          optionId={option.id as number}
+          canDeleteOptionInitial={!isWinner}
           onClose={() => setIsEllipseMenuOpen(false)}
           handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
           handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
@@ -704,7 +712,6 @@ const SEllipseButtonMobile = styled.button`
   &:focus,
   &:hover {
     outline: none;
-    background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
   }
 `;
 
@@ -733,4 +740,12 @@ const SBidDetailsModal = styled.div`
       'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
   }
+`;
+
+const SInlineSvgVerificationIcon = styled(InlineSvg)`
+  display: inline-flex;
+  margin-left: 3px;
+
+  position: relative;
+  top: 3px;
 `;

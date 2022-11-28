@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "title": "Superpoll Bundles",
+    "description": ""
+  },
+  "header": {
+    "title": "Superpoll Bundles"
+  },
+  "bundlesSection": {
+    "title": "你當前的bundle",
+    "seeAll": "查看所有",
+    "noBundles": "你沒有bundle。請嘗試搜尋創作者，會購買bundle",
+    "search": "搜索 "
+  },
+  "bundlesModal": {
+    "title": "你當前的bundle"
+  },
+  "bundle": {
+    "votesLeft": "剩餘<0>{{amount}}</0> 票",
+    "access": "另有<0/>：",
+    "unitPair": "{{amount}}{{unit}}",
+    "and": "和",
+    "customOptions": "添加定制Superpoll選項",
+    "chat": "一對一私聊",
+    "expiation": "投票永不過期",
+    "unit": {
+      "day": "天",
+      "days": "天",
+      "month": "月",
+      "months": "月",
+      "year": "年",
+      "years": "年"
+    }
+  },
+  "search": {
+    "title": "查找提供Bundle的創作者",
+    "searchInputPlaceholder": "查找創作者",
+    "topCreators": "熱門創作者",
+    "resultsFor": "結果"
+  },
+  "button": {
+    "back": "返回"
+  },
+  "error": {
+    "requestFailed": "請求失敗"
+  }
+}

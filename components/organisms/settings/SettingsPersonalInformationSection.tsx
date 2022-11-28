@@ -9,7 +9,6 @@ import { useTranslation } from 'next-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 
 import Button from '../../atoms/Button';
 import SettingsBirthDateInput from '../../molecules/profile/SettingsBirthDateInput';
@@ -19,6 +18,7 @@ import EditEmailModal from '../../molecules/settings/EditEmailModal';
 import { updateMe } from '../../../api/endpoints/user';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { setUserData } from '../../../redux-store/slices/userStateSlice';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const maxDate = new Date();
 
@@ -36,6 +36,8 @@ const SettingsPersonalInformationSection: React.FunctionComponent<
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { t } = useTranslation('page-Profile');
+  const { showErrorToastPredefined } = useErrorToasts();
+
   const user = useAppSelector((state) => state.user);
   const { editEmail } = router.query;
 
@@ -57,6 +59,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<
 
   const handleResetModifications = () => {
     setDateInEdit(currentDate ?? undefined);
+    setDateError('');
   };
 
   const handleSaveModifications = async () => {
@@ -107,7 +110,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<
       if ((err as Error).message === 'Date update error') {
         setDateError('tooYoung');
       } else {
-        toast.error('toastErrors.generic');
+        showErrorToastPredefined(undefined);
       }
     }
   };
@@ -155,7 +158,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<
           submitError={
             dateError
               ? t(
-                  `Settings.sections.personalInformation.birthDateInput.errors.${dateError}`
+                  `Settings.sections.personalInformation.birthDateInput.errors.${dateError}` as any
                 )
               : undefined
           }

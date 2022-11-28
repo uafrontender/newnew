@@ -11,6 +11,7 @@ import CloseIcon from '../../public/images/svg/icons/outlined/Close.svg';
 const GoBackButton = dynamic(() => import('../molecules/GoBackButton'));
 
 interface IModalPaper {
+  className?: string;
   title?: string;
   onClose: () => void;
   children: React.ReactNode;
@@ -21,6 +22,7 @@ interface IModalPaper {
 
 const ModalPaper: React.FC<IModalPaper> = React.memo(
   ({
+    className,
     title,
     children,
     onClose,
@@ -36,7 +38,11 @@ const ModalPaper: React.FC<IModalPaper> = React.memo(
 
     return (
       <SModalWrapper>
-        <SModal {...otherProps} $isMobileFullScreen={isMobileFullScreen}>
+        <SModal
+          className={className}
+          {...otherProps}
+          $isMobileFullScreen={isMobileFullScreen}
+        >
           {isMobileFullScreen && isMobile && (
             <SFullScreenHeader>
               {isMobile && isMobileFullScreen && (
@@ -153,6 +159,7 @@ const SCloseButton = styled.div`
   right: 24px;
   color: white;
   cursor: pointer;
+  z-index: 1;
 `;
 
 const SModalTitleFullScreen = styled.strong`

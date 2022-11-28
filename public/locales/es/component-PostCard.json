@@ -8,7 +8,7 @@
     },
     "withoutActivity": {
       "ac": "Ofertar ahora",
-      "mc": "Votar ahora",
+      "mc_NEED_TRANSLATION": "Be the first to vote!",
       "cf": "Patrocinar este Goal"
     },
     "seeResults": {
@@ -22,7 +22,7 @@
     "daysLeft": "d",
     "hoursLeft": "h",
     "minutesLeft": "m",
-    "secondsLeft_NEED_TRANSLATION": "s",
+    "secondsLeft": "s",
     "endedOn": "Terminó el ",
     "soon": "Próximamente"
   }

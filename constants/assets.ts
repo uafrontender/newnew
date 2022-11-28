@@ -157,6 +157,7 @@ const assets = {
     darkAnimatedLogo: `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.webp`,
     darkAc: `${APP_ASSETS_ORIGIN}/common/dark-ac.png`,
     goldBig: `${APP_ASSETS_ORIGIN}/common/gold-big.png`,
+    vote: `${APP_ASSETS_ORIGIN}/common/vote.png`,
   },
   cards: {
     background: [
@@ -171,6 +172,10 @@ const assets = {
     regular: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-Regular.otf`,
     medium: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-Medium.otf`,
     semiBold: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-SemiBold.otf`,
+  },
+  // TODO: remove as unused
+  bundles: {
+    votesBackground: `${APP_ASSETS_ORIGIN}/bundles/votes-background.png`,
   },
 };
 

@@ -1,13 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 
 import EllipseMenu, { EllipseMenuButton } from '../../../atoms/EllipseMenu';
-
-import isBrowser from '../../../../utils/isBrowser';
+import { TPostType } from '../../../../utils/switchPostType';
 
 interface IPostEllipseMenu {
-  postType: string;
+  postType: TPostType;
   isVisible: boolean;
   isFollowingDecision: boolean;
   handleFollowDecision: () => void;
@@ -27,17 +26,6 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = React.memo(
     anchorElement,
   }) => {
     const { t } = useTranslation('common');
-
-    useEffect(() => {
-      if (isBrowser()) {
-        const postModal = document.getElementById('post-modal-container');
-        if (isVisible && postModal) {
-          postModal.style.overflow = 'hidden';
-        } else if (postModal) {
-          postModal.style.overflow = 'scroll';
-        }
-      }
-    }, [isVisible]);
 
     return (
       <SEllipseMenu

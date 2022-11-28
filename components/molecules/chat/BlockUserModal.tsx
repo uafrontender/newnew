@@ -2,15 +2,17 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
-import { toast } from 'react-toastify';
 
 import { markUser } from '../../../api/endpoints/user';
-import Modal from '../../organisms/Modal';
-import Button from '../../atoms/Button';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
+import Modal from '../../organisms/Modal';
+import Button from '../../atoms/Button';
+import getDisplayname from '../../../utils/getDisplayname';
+
 interface IBlockUserModal {
-  user: newnewapi.IUser;
+  user: newnewapi.IVisavisUser;
   confirmBlockUser: boolean;
   onUserBlock?: () => void;
   closeModal: () => void;
@@ -25,6 +27,7 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
   isAnnouncement,
 }) => {
   const { t } = useTranslation('page-Chat');
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const { blockUser } = useGetBlockedUsers();
 
@@ -32,35 +35,35 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
     try {
       const payload = new newnewapi.MarkUserRequest({
         markAs: 3,
-        userUuid: user.uuid,
+        userUuid: user.user?.uuid,
       });
       const res = await markUser(payload);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
-      if (user.uuid) blockUser(user.uuid);
+      if (user.user?.uuid) blockUser(user.user?.uuid);
       onUserBlock?.();
       closeModal();
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   }
   const handleConfirmClick = () => {
     blockUserRequest();
   };
   return (
-    <Modal show={confirmBlockUser} onClose={closeModal}>
+    <Modal show={confirmBlockUser} onClose={closeModal} additionalz={1000}>
       <SContainer>
         <SModal>
           <SModalTitle>
             {isAnnouncement
               ? t('modal.blockGroup.title')
-              : `${t('modal.blockUser.title')} ${user.username}`}
+              : `${t('modal.blockUser.title')} ${getDisplayname(user.user)}`}
           </SModalTitle>
           <SModalMessage>
-            {`${t('modal.blockUser.messageFirstPart')} ${user.username} ${t(
-              'modal.blockUser.messageSecondPart'
-            )}`}
+            {`${t('modal.blockUser.messageFirstPart')} ${getDisplayname(
+              user.user
+            )} ${t('modal.blockUser.messageSecondPart')}`}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>

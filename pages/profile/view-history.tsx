@@ -18,10 +18,8 @@ import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
 import assets from '../../constants/assets';
-import { Mixpanel } from '../../utils/mixpanel';
-import switchPostType from '../../utils/switchPostType';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
-const PostModal = dynamic(() => import('../../components/organisms/decision'));
 const PostList = dynamic(
   () => import('../../components/organisms/see-more/PostList')
 );
@@ -57,38 +55,11 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
   handleSetPosts,
   handleSetFavoritePosts,
 }) => {
-  // Display post
-  const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<
-    newnewapi.IPost | undefined
-  >();
-
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
   const { t } = useTranslation('page-Profile');
   const [triedLoading, setTriedLoading] = useState(false);
-
-  const handleOpenPostModal = (post: newnewapi.IPost) => {
-    Mixpanel.track('Open Post Modal', {
-      _stage: 'Profile Page',
-      _postUuid: switchPostType(post)[0].postUuid,
-    });
-    setDisplayedPost(post);
-    setPostModalOpen(true);
-  };
-
-  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-  }, []);
-
-  const handleClosePostModal = () => {
-    Mixpanel.track('Close Post Modal', {
-      _stage: 'Profile Page',
-    });
-    setPostModalOpen(false);
-    setDisplayedPost(undefined);
-  };
 
   // TODO: filters and other parameters
   const loadPosts = useCallback(
@@ -153,39 +124,6 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
 
-  const handleRemovePostFromFavorites = (postUuid: string) => {
-    handleSetFavoritePosts((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-  };
-
-  const handleAddPostToFavorites = (postToAdd: newnewapi.Post) => {
-    handleSetFavoritePosts((curr) => {
-      // need for initial load favorites on favorites tab
-      if (curr.length === 0) {
-        return [];
-      }
-
-      const newArr = [...curr];
-
-      const alreadyAdded = curr.findIndex(
-        (p) =>
-          switchPostType(p)[0].postUuid ===
-          switchPostType(postToAdd)[0].postUuid
-      );
-
-      if (alreadyAdded !== -1) {
-        return newArr;
-      }
-
-      const updated = [postToAdd, ...newArr];
-      return updated;
-    });
-  };
-
   return (
     <div>
       <Head>
@@ -211,9 +149,6 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
               wrapperStyle={{
                 left: 0,
               }}
-              handlePostClicked={handleOpenPostModal}
-              handleRemovePostFromState={handleRemovePostFromFavorites}
-              handleAddPostToState={handleAddPostToFavorites}
             />
           )}
           {posts && posts.length === 0 && !isLoading && (
@@ -226,14 +161,6 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
         </SCardsSection>
         <div ref={loadingRef} />
       </SMain>
-      {displayedPost && postModalOpen && (
-        <PostModal
-          isOpen={postModalOpen}
-          post={displayedPost}
-          handleClose={() => handleClosePostModal()}
-          handleOpenAnotherPost={handleSetDisplayedPost}
-        />
-      )}
     </div>
   );
 };
@@ -260,14 +187,19 @@ export async function getServerSideProps(
   context: GetServerSidePropsContext
 ): Promise<any> {
   try {
-    const translationContext = await serverSideTranslations(context.locale!!, [
-      'common',
-      'page-Profile',
-      'component-PostCard',
-      'modal-Post',
-      'modal-PaymentModal',
-      'modal-ResponseSuccessModal',
-    ]);
+    const translationContext = await serverSideTranslations(
+      context.locale!!,
+      [
+        'common',
+        'page-Profile',
+        'component-PostCard',
+        'page-Post',
+        'modal-PaymentModal',
+        'modal-ResponseSuccessModal',
+      ],
+      null,
+      SUPPORTED_LANGUAGES
+    );
 
     // const { req } = context;
     // // Try to fetch only if actual SSR needed

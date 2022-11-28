@@ -22,9 +22,13 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
 
   const renderItem = useCallback(
     (item: TBottomNavigationItem) => (
-      <BottomNavigationItem key={item.key} item={item} />
+      <BottomNavigationItem
+        key={item.key}
+        item={item}
+        width={`${100 / collection.length}%`}
+      />
     ),
-    []
+    [collection.length]
   );
 
   useEffect(() => {

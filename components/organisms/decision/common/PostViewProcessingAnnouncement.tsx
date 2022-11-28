@@ -1,14 +1,12 @@
 /* eslint-disable no-lonely-if */
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { useAppSelector } from '../../../../redux-store/store';
-import { SocketContext } from '../../../../contexts/socketContext';
-import { ChannelsContext } from '../../../../contexts/channelsContext';
 
 import Text from '../../../atoms/Text';
 import PostTopInfo from '../../../molecules/decision/common/PostTopInfo';
@@ -41,7 +39,7 @@ interface IPostViewProcessingAnnouncement {
 const PostViewProcessingAnnouncement: React.FunctionComponent<
   IPostViewProcessingAnnouncement
 > = ({ variant }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const theme = useTheme();
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -49,12 +47,8 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
     resizeMode
   );
 
-  const {
-    postParsed,
-    typeOfPost,
-    handleGoBackInsidePost,
-    handleUpdatePostStatus,
-  } = usePostModalInnerState();
+  const { postParsed, typeOfPost, handleGoBackInsidePost } =
+    usePostInnerState();
   const post = useMemo(
     () =>
       postParsed as
@@ -64,67 +58,18 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
     [postParsed]
   );
 
-  // Socket
-  const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } = useContext(ChannelsContext);
-
-  // Increment channel subs after mounting
-  // Decrement when unmounting
-  useEffect(() => {
-    addChannel(post.postUuid, {
-      postUpdates: {
-        postUuid: post.postUuid,
-      },
-    });
-
-    return () => {
-      removeChannel(post.postUuid);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const socketHandlerPostStatus = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostStatusUpdated.decode(arr);
-
-      if (!decoded) return;
-      if (decoded.postUuid === post.postUuid) {
-        if (decoded.auction) {
-          handleUpdatePostStatus(decoded.auction);
-        } else if (decoded.multipleChoice) {
-          handleUpdatePostStatus(decoded.multipleChoice);
-        } else {
-          if (decoded.crowdfunding)
-            handleUpdatePostStatus(decoded.crowdfunding);
-        }
-      }
-    };
-
-    if (socketConnection) {
-      socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
-    }
-
-    return () => {
-      if (socketConnection && socketConnection?.connected) {
-        socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, post, user.userData?.userUuid]);
-
   return (
     <SWrapper>
-      <SExpiresSection>
-        {isMobile && (
+      {isMobile && (
+        <SExpiresSection>
           <GoBackButton
             style={{
               gridArea: 'closeBtnMobile',
             }}
             onClick={handleGoBackInsidePost}
           />
-        )}
-      </SExpiresSection>
+        </SExpiresSection>
+      )}
       <PostVideoProcessingHolder
         holderText={
           user.loggedIn && user.userData?.userUuid === post.postUuid
@@ -132,24 +77,51 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
             : 'decision'
         }
       />
-      {variant === 'decision' ? (
-        <PostTopInfo hasWinner={false} />
-      ) : (
-        <PostTopInfoModeration hasWinner={false} />
-      )}
+      {isMobile &&
+        (variant === 'decision' ? (
+          <PostTopInfo hasWinner={false} />
+        ) : (
+          <PostTopInfoModeration hasWinner={false} />
+        ))}
       <SActivitiesContainer>
-        <SDecisionImage
-          src={
-            theme.name === 'light'
-              ? /* @ts-ignore */
-                LIGHT_IMAGES[typeOfPost]
-              : /* @ts-ignore */
-                DARK_IMAGES[typeOfPost]
-          }
-        />
-        <SText variant={2} weight={600}>
-          {t(`postViewProcessingAnnouncement.stayTuned.${typeOfPost}`)}
-        </SText>
+        <div
+          style={{
+            flex: '0 0 auto',
+            width: '100%',
+          }}
+        >
+          {!isMobile &&
+            (variant === 'decision' ? (
+              <PostTopInfo hasWinner={false} />
+            ) : (
+              <PostTopInfoModeration hasWinner={false} />
+            ))}
+        </div>
+        <div
+          style={{
+            flex: '1 1 auto',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <SDecisionImage
+            src={
+              theme.name === 'light'
+                ? /* @ts-ignore */
+                  LIGHT_IMAGES[typeOfPost]
+                : /* @ts-ignore */
+                  DARK_IMAGES[typeOfPost]
+            }
+          />
+          <SText variant={2} weight={600}>
+            {typeOfPost
+              ? t(`postViewProcessingAnnouncement.stayTuned.${typeOfPost}`)
+              : ''}
+          </SText>
+        </div>
       </SActivitiesContainer>
     </SWrapper>
   );
@@ -158,33 +130,24 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
 export default PostViewProcessingAnnouncement;
 
 const SWrapper = styled.div`
-  display: grid;
-
-  grid-template-areas:
-    'expires'
-    'video'
-    'title'
-    'activities';
+  width: 100%;
 
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    grid-template-areas:
-      'title title'
-      'video activities';
-    grid-template-columns: 284px 1fr;
-    grid-template-rows: min-content 1fr;
-    grid-column-gap: 16px;
-
+    height: 648px;
+    min-height: 0;
     align-items: flex-start;
+
+    display: flex;
+    gap: 16px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    grid-template-areas:
-      'video title'
-      'video activities'
-      'video activities';
-    grid-template-columns: 410px 538px;
+    height: 728px;
+
+    display: flex;
+    gap: 32px;
   }
 `;
 
@@ -206,31 +169,22 @@ const SExpiresSection = styled.div`
 `;
 
 const SActivitiesContainer = styled.div`
-  grid-area: activities;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  align-self: bottom;
-
-  height: 100%;
-  min-height: 300px;
-
   ${({ theme }) => theme.media.tablet} {
-    min-height: initial;
-    max-height: calc(728px - 46px - 64px - 40px - 72px);
+    align-items: flex-start;
 
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
 
-    padding-bottom: 88px;
+    height: 506px;
+    max-height: 506px;
+    width: 100%;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    max-height: calc(728px - 46px - 64px);
+    height: 728px;
+    max-height: 728px;
+    width: 100%;
   }
 `;
 

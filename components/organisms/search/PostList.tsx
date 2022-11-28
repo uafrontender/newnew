@@ -3,7 +3,7 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
-import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 
 import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
@@ -13,14 +13,12 @@ import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import { usePostModalState } from '../../../contexts/postModalContext';
 
 interface IList {
   collection: any;
   loading: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
-  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
 export const PostList: React.FC<IList> = ({
@@ -28,9 +26,8 @@ export const PostList: React.FC<IList> = ({
   loading,
   skeletonsBgColor,
   skeletonsHighlightColor,
-  handlePostClicked,
 }) => {
-  const { postOverlayOpen } = usePostModalState();
+  const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -45,7 +42,7 @@ export const PostList: React.FC<IList> = ({
 
   const renderItem = (item: any, index: number) => {
     const handleItemClick = () => {
-      handlePostClicked(item);
+      router.push(`/post/${switchPostType(item)[0].postUuid}`);
     };
 
     return (
@@ -58,7 +55,6 @@ export const PostList: React.FC<IList> = ({
           index={index + 1}
           width='100%'
           height={isMobile ? '564px' : '336px'}
-          shouldStop={postOverlayOpen}
         />
       </SItemWrapper>
     );

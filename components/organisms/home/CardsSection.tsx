@@ -8,7 +8,7 @@ import { newnewapi } from 'newnew-api';
 
 import PostCard from '../../molecules/PostCard';
 import Button from '../../atoms/Button';
-import Caption from '../../atoms/Caption';
+// import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import UserAvatar from '../../molecules/UserAvatar';
 import ScrollArrowPermanent from '../../atoms/ScrollArrowPermanent';
@@ -20,8 +20,6 @@ import { useAppSelector } from '../../../redux-store/store';
 import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
-import TutorialCard from '../../molecules/TutorialCard';
-import { usePostModalState } from '../../../contexts/postModalContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 const SCROLL_STEP = {
@@ -37,12 +35,11 @@ interface ICardSection {
   type?: 'default' | 'creator';
   title?: string;
   category: string;
-  collection: newnewapi.Post[];
+  collection: newnewapi.IPost[];
   loading?: boolean;
   tutorialCard?: ReactElement;
   seeMoreLink?: string;
   padding?: 'small' | 'large';
-  handlePostClicked: (post: newnewapi.Post) => void;
   onReachEnd?: () => void;
 }
 
@@ -57,7 +54,6 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     tutorialCard,
     seeMoreLink,
     onReachEnd,
-    handlePostClicked,
     ...restProps
   }) => {
     const { t } = useTranslation('page-Home');
@@ -73,8 +69,6 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     const [scrollX, setScrollX] = useState<number>(0);
     const [isDragging, setIsDragging] = useState(false);
     const [mouseIsDown, setMouseIsDown] = useState(false);
-
-    const { postOverlayOpen } = usePostModalState();
 
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -101,7 +95,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       router.push(`/${username}`);
     };
     const handleLeftClick = () => {
-      scrollListTo(visibleListItem - scrollStep - 1);
+      scrollListTo(visibleListItem - scrollStep);
     };
     const handleRightClick = () => {
       scrollListTo(visibleListItem + scrollStep);
@@ -113,18 +107,18 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
         scrollTo = 0;
       } else if (
         scrollTo >
-        (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1
+        (collection?.length || 0 + (tutorialCard !== undefined ? 1 : 0)) - 1
       ) {
         scrollTo =
-          (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1;
+          (collection?.length || 0 + (tutorialCard !== undefined ? 1 : 0)) - 1;
       }
 
       scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
-        offset: -32,
+        offset: -16,
         smooth: 'easeOutQuad',
         duration:
-          SCROLL_CARDS_SECTIONS *
-          (collection.length > 30 ? Math.round(collection.length / 30) : 1),
+          SCROLL_CARDS_SECTIONS +
+          ((SCROLL_CARDS_SECTIONS / 10) * collection.length) / 40,
         horizontal: true,
         containerId: `${category}-scrollContainer`,
       });
@@ -173,7 +167,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     const renderItem = (item: any, index: number) => {
       const handleItemClick = () => {
         if (!isDragging) {
-          handlePostClicked(item);
+          router.push(`/post/${switchPostType(item)[0].postUuid}`);
         }
       };
 
@@ -191,7 +185,6 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             >
               <PostCard
                 item={item}
-                shouldStop={postOverlayOpen}
                 index={tutorialCard !== undefined ? index + 1 : index}
                 width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
                 height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
@@ -212,7 +205,6 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
         >
           <PostCard
             item={item}
-            shouldStop={postOverlayOpen}
             index={tutorialCard !== undefined ? index + 1 : index}
             width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
             height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
@@ -224,14 +216,16 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
 
     const handleSeeMoreClick = () => {
       Mixpanel.track('See More in Category Clicked');
-      if (type === 'default') {
-        router.push(seeMoreLink || `/see-more?category=${category}`);
+      if (type === 'default' && seeMoreLink) {
+        router.push(seeMoreLink);
       }
     };
 
     // Try to pre-fetch the content
     useEffect(() => {
-      router.prefetch(seeMoreLink || `/see-more?category=${category}`);
+      if (seeMoreLink) {
+        router.prefetch(seeMoreLink);
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -241,7 +235,6 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
           return;
         }
 
-        const currentScrollPosition = scrollContainerRef.current.scrollLeft;
         const { firstChild } = scrollContainerRef.current;
 
         if (!firstChild) {
@@ -250,10 +243,15 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
 
         // Add margin to the equation
         const childWidth =
-          (firstChild as Element).getBoundingClientRect().width + 16;
+          (firstChild as Element).getBoundingClientRect().width + 32;
+
+        const currentScrollPosition =
+          scrollContainerRef.current.scrollLeft > childWidth
+            ? scrollContainerRef.current.scrollLeft - 16
+            : scrollContainerRef.current.scrollLeft;
 
         // setVisibleListItem(+(currentScrollPosition / childWidth).toFixed(0));
-        setVisibleListItem(+Math.floor(currentScrollPosition / childWidth));
+        setVisibleListItem(Math.round(currentScrollPosition / childWidth));
       }
 
       const scrollContainerElement = scrollContainerRef.current;
@@ -267,17 +265,18 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       setCanScrollLeft(visibleListItem !== 0);
 
       setCanScrollRight(
-        visibleListItem + 1 <=
-          (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) -
+        visibleListItem <
+          (collection?.length || 0) +
+            (tutorialCard !== undefined ? 1 : 0) -
             scrollStep
       );
-    }, [visibleListItem, collection, scrollStep]);
+    }, [visibleListItem, collection, scrollStep, tutorialCard]);
 
     useEffect(() => {
-      if (!canScrollRight && collection.length > 0 && onReachEnd) {
+      if (!canScrollRight && collection?.length > 0 && onReachEnd) {
         onReachEnd();
       }
-    }, [canScrollRight, onReachEnd, collection.length]);
+    }, [canScrollRight, onReachEnd, collection?.length]);
 
     return (
       <SWrapper name={category} {...restProps}>
@@ -312,7 +311,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
               </SHeadline>
             </AnimatedPresence>
           )}
-          {!isMobile && type === 'default' && (
+          {/* {!isMobile && type === 'default' && (
             <SCaption weight={700} onClick={handleSeeMoreClick}>
               {t(
                 type === 'default'
@@ -321,7 +320,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
                 { name: formatString(user?.username, true) }
               )}
             </SCaption>
-          )}
+          )} */}
         </STopWrapper>
         <SListContainer ref={ref}>
           <SListWrapper
@@ -542,15 +541,15 @@ const STopWrapper = styled.div`
   }
 `;
 
-const SCaption = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
-  cursor: pointer;
-  transition: color ease 0.5s;
+// const SCaption = styled(Caption)`
+//   color: ${(props) => props.theme.colorsThemed.text.secondary};
+//   cursor: pointer;
+//   transition: color ease 0.5s;
 
-  &:hover {
-    color: ${(props) => props.theme.colorsThemed.text.primary};
-  }
-`;
+//   &:hover {
+//     color: ${(props) => props.theme.colorsThemed.text.primary};
+//   }
+// `;
 
 const SHeadline = styled(Headline)`
   display: flex;

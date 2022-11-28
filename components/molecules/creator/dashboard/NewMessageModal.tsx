@@ -9,11 +9,13 @@ import { useAppSelector } from '../../../../redux-store/store';
 import {
   SChatItemCenter,
   SChatItemContainer,
+  SChatItemLine,
   SChatItemM,
   SChatItemText,
   SChatSeparator,
   SUserAlias,
   SUserAvatar,
+  SVerificationSVG,
 } from '../../../atoms/chat/styles';
 import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 import Modal from '../../../organisms/Modal';
@@ -25,6 +27,8 @@ import InlineSVG from '../../../atoms/InlineSVG';
 import NewAnnouncement from '../../../atoms/dashboard/NewAnnouncement';
 import NoResults from '../../../atoms/chat/NoResults';
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 interface INewMessageModal {
   showModal: boolean;
@@ -109,9 +113,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   useEffect(() => {
     if (chatRooms) {
       const obj = chatRooms.reduce((acc: { [key: string]: any }, c) => {
-        if (c.visavis && c.visavis.username) {
+        if (c.visavis && c.visavis.user?.username) {
           const letter = clearNameFromEmoji(
-            c.visavis.username
+            c.visavis.user?.username
           )[0].toLowerCase();
           acc[letter] = (acc[letter] || []).concat(c);
         }
@@ -145,9 +149,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       chatRooms.forEach((chat: IChatRoomUserNameWithoutEmoji) => {
         if (!chat.userNameWithoutEmoji) {
           /* eslint-disable no-param-reassign */
-          if (chat.visavis && chat.visavis.username)
+          if (chat.visavis && chat.visavis.user?.username)
             chat.userNameWithoutEmoji = clearNameFromEmoji(
-              chat.visavis.username
+              chat.visavis.user?.username
             ).toLowerCase();
         } else {
           // eslint-disable-next-line no-lonely-if
@@ -192,14 +196,23 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
           <SChatItemM onClick={handleItemClick}>
             <SUserAvatar>
               <UserAvatar
-                avatarUrl={(chat.visavis && chat.visavis.avatarUrl) ?? ''}
+                avatarUrl={(chat.visavis && chat.visavis.user?.avatarUrl) ?? ''}
               />
             </SUserAvatar>
             <SChatItemCenter>
-              <SChatItemText variant={3} weight={600}>
-                {chat.visavis?.nickname || chat.visavis?.username}
-              </SChatItemText>
-              <SUserAlias>@{chat.visavis?.username}</SUserAlias>
+              <SChatItemLine>
+                <SChatItemText variant={3} weight={600}>
+                  {getDisplayname(chat.visavis?.user)}
+                </SChatItemText>
+                {chat.visavis?.user?.options?.isVerified && (
+                  <SVerificationSVG
+                    svg={VerificationCheckmark}
+                    width='20px'
+                    height='20px'
+                  />
+                )}
+              </SChatItemLine>
+              <SUserAlias>@{chat.visavis?.user?.username}</SUserAlias>
             </SChatItemCenter>
           </SChatItemM>
           {chatRooms && index !== chatRooms.length - 1 && <SChatSeparator />}

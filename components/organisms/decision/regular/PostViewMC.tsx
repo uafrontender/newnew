@@ -9,16 +9,13 @@ import React, {
   useState,
 } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
-import { useInView } from 'react-intersection-observer';
 import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
-import { ChannelsContext } from '../../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../../api/endpoints/post';
@@ -37,13 +34,16 @@ import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 
 // Utils
 import switchPostType from '../../../../utils/switchPostType';
-import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
-import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
-import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import { useBundles } from '../../../../contexts/bundlesContext';
+import BuyBundleModal from '../../../molecules/bundles/BuyBundleModal';
+import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
+import TicketSet from '../../../atoms/bundles/TicketSet';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -92,13 +92,22 @@ export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
 interface IPostViewMC {}
 
 const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
+  const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
   const router = useRouter();
 
   const {
@@ -109,28 +118,29 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     handleGoBackInsidePost,
     handleUpdatePostStatus,
     resetSetupIntentClientSecret,
-  } = usePostModalInnerState();
+  } = usePostInnerState();
   const post = useMemo(
     () => postParsed as newnewapi.MultipleChoice,
     [postParsed]
   );
 
-  const { syncedHistoryReplaceState } = useSynchronizedHistory();
-
-  const { appConstants } = useGetAppConstants();
   // Socket
   const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } = useContext(ChannelsContext);
+
+  // Bundle
+  const { bundles } = useBundles();
+  const creatorsBundle = useMemo(
+    () =>
+      bundles?.find(
+        (bundle) => bundle.creator?.uuid === postParsed?.creator?.uuid
+      ),
+    [bundles, postParsed?.creator?.uuid]
+  );
 
   // Response viewed
   const [responseViewed, setResponseViewed] = useState(
     post.isResponseViewedByMe ?? false
   );
-
-  // Comments
-  const { ref: commentsSectionRef, inView } = useInView({
-    threshold: 0.8,
-  });
 
   const handleCommentFocus = () => {
     if (isMobile && !!document.getElementById('action-button-mobile')) {
@@ -153,31 +163,16 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   // Total votes
   const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
 
-  // Free votes
-  const [hasFreeVote, setHasFreeVote] = useState(post.canVoteForFree ?? false);
-  const handleResetFreeVote = () => setHasFreeVote(false);
-
-  const [canSubscribe, setCanSubscribe] = useState(
-    post.creator?.options?.isOfferingSubscription
-  );
+  // Bundle modal
+  const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
 
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
-  const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
-    post.optionCount ?? ''
-  );
   const [optionsNextPageToken, setOptionsNextPageToken] = useState<
     string | undefined | null
   >('');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
-
-  const hasVotedOptionId = useMemo(() => {
-    const supportedOption = options.find((o) => o.isSupportedByMe);
-
-    if (supportedOption) return supportedOption.id;
-    return undefined;
-  }, [options]);
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -347,27 +342,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
       }
-
-      setHasFreeVote(res.data.multipleChoice?.canVoteForFree ?? false);
       setTotalVotes(res.data.multipleChoice?.totalVotes as number);
-      setNumberOfOptions(res.data.multipleChoice?.optionCount as number);
       if (res.data.multipleChoice?.status)
         handleUpdatePostStatus(res.data.multipleChoice?.status);
-
-      if (user.loggedIn && post.creator?.options?.isOfferingSubscription) {
-        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-          creatorUuid: post.creator?.uuid,
-        });
-
-        const responseSubStatus = await getSubscriptionStatus(getStatusPayload);
-
-        if (
-          responseSubStatus.data?.status?.activeRenewsAt ||
-          responseSubStatus.data?.status?.activeCancelsAt
-        ) {
-          setCanSubscribe(false);
-        }
-      }
 
       setPostLoading(false);
     } catch (err) {
@@ -384,23 +361,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       handleUpdatePostStatus('FAILED');
     }
   };
-
-  // Increment channel subs after mounting
-  // Decrement when unmounting
-  useEffect(() => {
-    if (socketConnection?.connected) {
-      addChannel(post.postUuid, {
-        postUpdates: {
-          postUuid: post.postUuid,
-        },
-      });
-    }
-
-    return () => {
-      removeChannel(post.postUuid);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection?.connected]);
 
   // Mark post as viewed if logged in
   useEffect(() => {
@@ -495,18 +455,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       if (decodedParsed.postUuid === post.postUuid) {
         if (decoded.post?.multipleChoice?.totalVotes)
           setTotalVotes(decoded.post?.multipleChoice?.totalVotes);
-        if (decoded.post?.multipleChoice?.optionCount)
-          setNumberOfOptions(decoded.post?.multipleChoice?.optionCount);
-      }
-    };
-
-    const socketHandlerPostStatus = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostStatusUpdated.decode(arr);
-
-      if (!decoded) return;
-      if (decoded.postUuid === post.postUuid && decoded.multipleChoice) {
-        handleUpdatePostStatus(decoded.multipleChoice);
       }
     };
 
@@ -517,7 +465,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       );
       socketConnection?.on('McOptionDeleted', socketHandlerOptionDeleted);
       socketConnection?.on('PostUpdated', socketHandlerPostData);
-      socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
     }
 
     return () => {
@@ -528,7 +475,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         );
         socketConnection?.off('McOptionDeleted', socketHandlerOptionDeleted);
         socketConnection?.off('PostUpdated', socketHandlerPostData);
-        socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -597,11 +543,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         await fetchPostLatestData();
 
         setLoadingModalOpen(false);
-        handleResetFreeVote();
         setPaymentSuccessModalOpen(true);
       } catch (err: any) {
         console.error(err);
-        toast.error(err.message);
+        showErrorToastCustom(err.message);
         setLoadingModalOpen(false);
       }
     };
@@ -635,8 +580,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   useEffect(() => {
     if (loadingOptionsError) {
-      toast.error(loadingOptionsError);
+      showErrorToastCustom(loadingOptionsError);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadingOptionsError]);
 
   const [isPopupVisible, setIsPopupVisible] = useState(false);
@@ -664,62 +610,78 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       const parsedHash = hash.substring(1);
 
       if (parsedHash === 'comments') {
-        document.getElementById('comments')?.scrollIntoView();
+        setTimeout(() => {
+          document.getElementById('comments')?.scrollIntoView();
+        }, 100);
       }
     };
 
     handleCommentsInitialHash();
   }, []);
 
-  // Replace hash once scrolled to comments
-  useEffect(() => {
-    if (inView) {
-      syncedHistoryReplaceState(
-        {},
-        `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-          post.postUuid
-        }#comments`
-      );
-    } else {
-      syncedHistoryReplaceState(
-        {},
-        `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-          post.postUuid
-        }`
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, post.postUuid, router.locale]);
-
   return (
     <>
+      {isTablet && (
+        <>
+          <SExpiresSection>
+            {postStatus === 'voting' ? (
+              <>
+                <PostTimer
+                  timestampSeconds={new Date(
+                    (post.expiresAt?.seconds as number) * 1000
+                  ).getTime()}
+                  postType='mc'
+                  onTimeExpired={handleOnVotingTimeExpired}
+                />
+                <SEndDate>
+                  {t('expires.end_date')}{' '}
+                  {moment((post.expiresAt?.seconds as number) * 1000).format(
+                    'DD MMM YYYY [at] hh:mm A'
+                  )}
+                </SEndDate>
+              </>
+            ) : (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='mc'
+              />
+            )}
+          </SExpiresSection>
+          <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
+        </>
+      )}
       <SWrapper>
-        <SExpiresSection>
-          {isMobile && (
-            <SGoBackButton
-              style={{
-                gridArea: 'closeBtnMobile',
-              }}
-              onClick={handleGoBackInsidePost}
-            />
-          )}
-          {postStatus === 'voting' ? (
-            <PostTimer
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='mc'
-              onTimeExpired={handleOnVotingTimeExpired}
-            />
-          ) : (
-            <PostTimerEnded
-              timestampSeconds={new Date(
-                (post.expiresAt?.seconds as number) * 1000
-              ).getTime()}
-              postType='mc'
-            />
-          )}
-        </SExpiresSection>
+        {isMobile && (
+          <SExpiresSection>
+            <SGoBackButton onClick={handleGoBackInsidePost} />
+            {postStatus === 'voting' ? (
+              <>
+                <PostTimer
+                  timestampSeconds={new Date(
+                    (post.expiresAt?.seconds as number) * 1000
+                  ).getTime()}
+                  postType='mc'
+                  onTimeExpired={handleOnVotingTimeExpired}
+                />
+                <SEndDate>
+                  {t('expires.end_date')}{' '}
+                  {moment((post.expiresAt?.seconds as number) * 1000).format(
+                    'DD MMM YYYY [at] hh:mm A'
+                  )}
+                </SEndDate>
+              </>
+            ) : (
+              <PostTimerEnded
+                timestampSeconds={new Date(
+                  (post.expiresAt?.seconds as number) * 1000
+                ).getTime()}
+                postType='mc'
+              />
+            )}
+          </SExpiresSection>
+        )}
         <PostVideo
           postId={post.postUuid}
           announcement={post.announcement!!}
@@ -729,28 +691,54 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           isMuted={mutedMode}
           handleToggleMuted={() => handleToggleMutedMode()}
         />
-        <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
-        <SActivitesContainer
-          shorterSection={
-            postStatus === 'failed' ||
-            (post.isSuggestionsAllowed &&
-              !hasVotedOptionId &&
-              hasFreeVote &&
-              postStatus === 'voting')
-          }
-        >
-          <PostVotingTab>
-            {`${t('tabs.options')} ${
-              !!numberOfOptions && numberOfOptions > 0 ? numberOfOptions : ''
-            }`}
-          </PostVotingTab>
+        {isMobile && <PostTopInfo totalVotes={totalVotes} hasWinner={false} />}
+        <SActivitiesContainer>
+          <div
+            style={{
+              flex: '0 0 auto',
+              width: '100%',
+            }}
+          >
+            {!isMobileOrTablet && (
+              <>
+                <SExpiresSection>
+                  {postStatus === 'voting' ? (
+                    <>
+                      <PostTimer
+                        timestampSeconds={new Date(
+                          (post.expiresAt?.seconds as number) * 1000
+                        ).getTime()}
+                        postType='mc'
+                        onTimeExpired={handleOnVotingTimeExpired}
+                      />
+                      <SEndDate>
+                        {t('expires.end_date')}{' '}
+                        {moment(
+                          (post.expiresAt?.seconds as number) * 1000
+                        ).format('DD MMM YYYY [at] hh:mm A')}
+                      </SEndDate>
+                    </>
+                  ) : (
+                    <PostTimerEnded
+                      timestampSeconds={new Date(
+                        (post.expiresAt?.seconds as number) * 1000
+                      ).getTime()}
+                      postType='mc'
+                    />
+                  )}
+                </SExpiresSection>
+                <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
+              </>
+            )}
+            <PostVotingTab
+              bundleVotes={creatorsBundle?.bundle?.votesLeft ?? undefined}
+            >{`${t('tabs.options')}`}</PostVotingTab>
+          </div>
           <McOptionsTab
             post={post}
             postLoading={postLoading}
             postStatus={postStatus}
-            postCreator={
-              (post.creator?.nickname as string) ?? post.creator?.username
-            }
+            postCreatorName={getDisplayname(post.creator)}
             postDeadline={moment(
               (post.responseUploadDeadline?.seconds as number) * 1000
             )
@@ -759,23 +747,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             options={options}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
-            minAmount={appConstants?.minMcVotes ?? 2}
-            votePrice={
-              appConstants?.mcVotePrice
-                ? Math.floor(appConstants?.mcVotePrice)
-                : 1
-            }
-            canSubscribe={!!canSubscribe}
-            canVoteForFree={hasFreeVote}
-            hasVotedOptionId={(hasVotedOptionId as number) ?? undefined}
+            bundle={creatorsBundle?.bundle ?? undefined}
             handleLoadOptions={fetchOptions}
-            handleResetFreeVote={handleResetFreeVote}
             handleAddOrUpdateOptionFromResponse={
               handleAddOrUpdateOptionFromResponse
             }
             handleRemoveOption={handleRemoveOption}
           />
-        </SActivitesContainer>
+        </SActivitiesContainer>
         {/* Loading Modal */}
         {loadingModalOpen && (
           <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
@@ -794,8 +773,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             }}
           >
             {t('paymentSuccessModal.mc', {
-              postCreator:
-                (post.creator?.nickname as string) ?? post.creator?.username,
+              postCreator: getDisplayname(post.creator),
               postDeadline: moment(
                 (post.responseUploadDeadline?.seconds as number) * 1000
               )
@@ -812,8 +790,35 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           />
         )}
       </SWrapper>
+      {post.creator?.options?.isOfferingBundles && (
+        <SBundlesContainer
+          highlighted={creatorsBundle?.bundle?.votesLeft === 0}
+        >
+          {creatorsBundle?.bundle && (
+            <STicketSet numberOFTickets={3} size={36} shift={11} />
+          )}
+          <SBundlesText>
+            {creatorsBundle?.bundle
+              ? t('mcPost.optionsTab.actionSection.getMoreBundles')
+              : t('mcPost.optionsTab.actionSection.offersBundles', {
+                  creator: getDisplayname(post.creator),
+                })}
+          </SBundlesText>
+          <SHighlightedButton
+            id='buy-bundle-button'
+            size='small'
+            onClick={() => {
+              setBuyBundleModalOpen(true);
+            }}
+          >
+            {creatorsBundle?.bundle
+              ? t('mcPost.optionsTab.actionSection.getBundles')
+              : t('mcPost.optionsTab.actionSection.viewBundles')}
+          </SHighlightedButton>
+        </SBundlesContainer>
+      )}
       {post.isCommentsAllowed && (
-        <SCommentsSection id='comments' ref={commentsSectionRef}>
+        <SCommentsSection id='comments'>
           <SCommentsHeadline variant={4}>
             {t('successCommon.comments.heading')}
           </SCommentsHeadline>
@@ -824,6 +829,16 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             onFormFocus={handleCommentFocus}
           />
         </SCommentsSection>
+      )}
+      {/* Buy bundles */}
+      {buyBundleModalOpen && post.creator && (
+        <BuyBundleModal
+          show
+          creator={post.creator}
+          onClose={() => {
+            setBuyBundleModalOpen(false);
+          }}
+        />
       )}
     </>
   );
@@ -841,48 +856,42 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 648px;
-
-    display: grid;
-    grid-template-areas:
-      'expires expires'
-      'title title'
-      'video activities';
-    grid-template-columns: 284px 1fr;
-    grid-template-rows: max-content max-content minmax(0, 1fr);
-
-    grid-column-gap: 16px;
-
+    height: 506px;
+    min-height: 0;
     align-items: flex-start;
+
+    display: flex;
+    gap: 16px;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas:
-      'video expires'
-      'video title'
-      'video activities';
-    grid-template-columns: 410px 1fr;
+    display: flex;
+    gap: 32px;
   }
 `;
 
 const SExpiresSection = styled.div`
-  grid-area: expires;
-
   position: relative;
 
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 
   width: 100%;
   margin-bottom: 6px;
+`;
 
-  padding-left: 24px;
+const SEndDate = styled.div`
+  width: 100%;
+  text-align: center;
+  padding: 8px 0px;
 
-  ${({ theme }) => theme.media.tablet} {
-    padding-left: initial;
-  }
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.quaternary};
 `;
 
 const SGoBackButton = styled(GoBackButton)`
@@ -891,32 +900,23 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div<{
-  shorterSection: boolean;
-}>`
-  grid-area: activities;
-
-  display: flex;
-  flex-direction: column;
-
-  align-self: bottom;
-
-  height: 100%;
-  width: 100%;
-
+const SActivitiesContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
-    max-height: calc(452px);
+    align-items: flex-start;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    height: 506px;
+    max-height: 506px;
+    width: 100%;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    ${({ shorterSection }) =>
-      !shorterSection
-        ? css`
-            max-height: 500px;
-          `
-        : css`
-            max-height: calc(580px - 120px);
-          `}
+    height: 728px;
+    max-height: 728px;
+    width: 100%;
   }
 `;
 
@@ -927,6 +927,60 @@ const SCommentsHeadline = styled(Headline)`
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 16px;
   }
+`;
+
+// Offering bundles
+const SBundlesContainer = styled.div<{ highlighted: boolean }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: ${({ theme, highlighted }) =>
+    highlighted
+      ? theme.colorsThemed.accent.yellow
+      : // TODO: standardize color
+      theme.name === 'light'
+      ? '#E5E9F1'
+      : '#2C2C33'};
+  margin-top: 32px;
+
+  margin-bottom: 40px;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex-direction: row;
+    margin-bottom: 48px;
+  }
+`;
+
+const STicketSet = styled(TicketSet)`
+  margin-right: 8px;
+`;
+
+const SBundlesText = styled.p`
+  flex-grow: 1;
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  font-weight: 600;
+  text-align: center;
+  font-size: 16px;
+  line-height: 24px;
+  margin-bottom: 16px;
+  margin-right: 8px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 0px;
+    text-align: start;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+`;
+
+const SHighlightedButton = styled(HighlightedButton)`
+  width: auto;
 `;
 
 const SCommentsSection = styled.div``;

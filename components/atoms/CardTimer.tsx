@@ -9,6 +9,7 @@ import Caption from './Caption';
 import isBrowser from '../../utils/isBrowser';
 import secondsToDHMS, { DHMS } from '../../utils/secondsToDHMS';
 import usePageVisibility from '../../utils/hooks/usePageVisibility';
+import useHasMounted from '../../utils/hooks/useHasMounted';
 
 interface ICardTimer {
   startsAt: number;
@@ -20,6 +21,8 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
   ({ startsAt, endsAt }) => {
     const { t } = useTranslation('component-PostCard');
     const isPageVisible = usePageVisibility();
+    const hasMounted = useHasMounted();
+
     const parsed = (endsAt - Date.now()) / 1000;
     const hasStarted = Date.now() > startsAt;
     const hasEnded = Date.now() > endsAt;
@@ -32,24 +35,19 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
     const interval = useRef<number>();
 
     const parsedString = useMemo(() => {
-      if (parsedSeconds.hours !== '0') {
+      if (parsedSeconds.days !== '0') {
         return `
-    ${
-      parsedSeconds.days !== '0'
-        ? `${parsedSeconds.days}${t('timer.daysLeft')}`
-        : ''
-    }
-    ${
-      parsedSeconds.hours !== '0'
-        ? `${parsedSeconds.hours}${t('timer.hoursLeft')}`
-        : ''
-    }
-    ${
-      parsedSeconds.minutes !== '0'
-        ? `${parsedSeconds.minutes}${t('timer.minutesLeft')}`
-        : ''
-    }
-  `;
+          ${`${parsedSeconds.days}${t('timer.daysLeft')}`}
+          ${`${parsedSeconds.hours}${t('timer.hoursLeft')}`}
+          ${`${parsedSeconds.minutes}${t('timer.minutesLeft')}`}
+        `;
+      }
+
+      if (parsedSeconds.days === '0' && parsedSeconds.hours !== '0') {
+        return `
+          ${`${parsedSeconds.hours}${t('timer.hoursLeft')}`}
+          ${`${parsedSeconds.minutes}${t('timer.minutesLeft')}`}
+        `;
       }
 
       return `
@@ -62,7 +60,8 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
         parsedSeconds.seconds !== '0'
           ? `${parsedSeconds.seconds}${t('timer.secondsLeft')}`
           : ''
-      }`;
+      }
+      `;
     }, [
       parsedSeconds.days,
       parsedSeconds.hours,
@@ -85,6 +84,8 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
     useEffect(() => {
       setParsedSeconds(secondsToDHMS(seconds));
     }, [seconds]);
+
+    if (!hasMounted) return null;
 
     if (!hasStarted) {
       return (

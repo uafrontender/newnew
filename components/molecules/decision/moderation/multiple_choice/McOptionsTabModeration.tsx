@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -40,11 +40,15 @@ const McOptionsTabModeration: React.FunctionComponent<
   handleRemoveOption,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  // Scroll block
+  const [isScrollBlocked, setIsScrollBlocked] = useState(false);
+
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
 
@@ -67,25 +71,36 @@ const McOptionsTabModeration: React.FunctionComponent<
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
+        {!isMobile ? (
+          <>
+            <GradientMask
+              gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+              positionTop
+              active={showTopGradient}
+            />
+            <GradientMask
+              gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+              positionBottom={0}
+              active={showBottomGradient}
+            />
+          </>
+        ) : null}
         <SBidsContainer
           ref={(el) => {
             containerRef.current = el!!;
           }}
+          style={{
+            ...(isScrollBlocked
+              ? {
+                  overflow: 'hidden',
+                  width:
+                    options.length > 4
+                      ? 'calc(100% + 10px)'
+                      : 'calc(100% + 14px)',
+                }
+              : {}),
+          }}
         >
-          {!isMobile ? (
-            <>
-              <GradientMask
-                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                positionTop
-                active={showTopGradient}
-              />
-              <GradientMask
-                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-                positionBottom={0}
-                active={showBottomGradient}
-              />
-            </>
-          ) : null}
           {/* Seems like every option has a creator now. */}
           {/* TODO: confirm, update types, remove unnecessary parameter 'creator'. */}
           {options.map((option, i) => (
@@ -100,6 +115,8 @@ const McOptionsTabModeration: React.FunctionComponent<
                 !option.creator || option.creator?.uuid === post.creator?.uuid
               }
               handleRemoveOption={() => handleRemoveOption(option)}
+              handleSetScrollBlocked={() => setIsScrollBlocked(true)}
+              handleUnsetScrollBlocked={() => setIsScrollBlocked(false)}
             />
           ))}
           {!isMobile ? (
@@ -131,7 +148,14 @@ export default McOptionsTabModeration;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  height: calc(100% - 56px);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex: 1 1 auto;
+  }
 `;
 
 const SBidsContainer = styled.div`
@@ -142,30 +166,48 @@ const SBidsContainer = styled.div`
   display: flex;
   flex-direction: column;
 
-  // Scrollbar
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  scrollbar-width: none;
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 4px;
-    transition: 0.2s linear;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: transparent;
-    border-radius: 4px;
-    transition: 0.2s linear;
-  }
+  padding-top: 16px;
 
-  &:hover {
-    scrollbar-width: thin;
+  ${({ theme }) => theme.media.tablet} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+
+    padding-top: 0px;
+    padding-right: 12px;
+    margin-right: -14px;
+    width: calc(100% + 14px);
+    height: initial;
+    flex: 1 1 auto;
+
+    // Scrollbar
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    scrollbar-width: none;
     &::-webkit-scrollbar-track {
-      background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+      background: transparent;
+      border-radius: 4px;
+      transition: 0.2s linear;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 4px;
+      transition: 0.2s linear;
     }
 
-    &::-webkit-scrollbar-thumb {
-      background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+    &:hover {
+      scrollbar-width: thin;
+      &::-webkit-scrollbar-track {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+      }
     }
   }
 `;

@@ -26,7 +26,7 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
   timestampSeconds,
   onTimeExpired,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -107,14 +107,13 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
 export default ResponseTimer;
 
 const SContainer = styled.div`
-  width: 100%;
-
   position: relative;
   top: 4px;
 
   margin-bottom: 8px;
 
   ${({ theme }) => theme.media.tablet} {
+    width: 100%;
     position: initial;
     margin-bottom: 14px;
   }

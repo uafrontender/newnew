@@ -10,7 +10,6 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -29,7 +28,6 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
 // import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 // import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
-// import { getSubscriptionStatus } from '../../api/endpoints/subscription';
 // import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
 
@@ -44,10 +42,13 @@ import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
 import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
-// import CustomLink from '../atoms/CustomLink';
-// import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+import CustomLink from '../atoms/CustomLink';
 import SmsNotificationsButton from '../molecules/profile/SmsNotificationsButton';
 import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
+import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
+import { useBundles } from '../../contexts/bundlesContext';
+import useErrorToasts from '../../utils/hooks/useErrorToasts';
+import getDisplayname from '../../utils/getDisplayname';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -81,6 +82,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -94,9 +96,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
-  // const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
-  // const [wasSubscribed, setWasSubscribed] = useState<boolean | null>(null);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
+  const { bundles } = useBundles();
+  const creatorsBundle = useMemo(
+    () => bundles?.find((bundle) => bundle.creator?.uuid === user.uuid),
+    [bundles, user.uuid]
+  );
 
   // Share
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -147,7 +152,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       unblockUser(uuid);
     } catch (err) {
       console.error(err);
-      toast.error('toastErrors.generic');
+      showErrorToastPredefined(undefined);
     }
   };
 
@@ -202,8 +207,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const [activityDecisionsCount, setActivityDecisionsCount] = useState(
     postsCachedActivityCount
   );
-
-  // const { creatorsImSubscribedTo } = useGetSubscriptions();
 
   const handleSetPostsCreatorsDecisions: React.Dispatch<
     React.SetStateAction<newnewapi.Post[]>
@@ -438,7 +441,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         }
       } catch (err) {
         console.error(err);
-        toast.error('toastErrors.generic');
       }
     }
 
@@ -464,7 +466,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           {/* Favorites and more options buttons */}
           <SBackButton
             onClick={() => {
-              router.push('/');
+              router.back();
             }}
           />
           {/* <SFavoritesButton
@@ -497,18 +499,23 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             ) : (
               <div />
             )}
-            <SIconButton
-              active={ellipseMenuOpen}
-              ref={moreButtonRef}
-              onClick={() => setIsEllipseMenuOpen(true)}
-            >
-              <InlineSvg
-                svg={MoreIconFilled}
-                fill={theme.colorsThemed.text.primary}
-                width='24px'
-                height='24px'
-              />
-            </SIconButton>
+            <RightSideButtons>
+              {!isMobile && (
+                <SSeeBundleButton user={user} creatorBundle={creatorsBundle} />
+              )}
+              <SIconButton
+                active={ellipseMenuOpen}
+                ref={moreButtonRef}
+                onClick={() => setIsEllipseMenuOpen(true)}
+              >
+                <InlineSvg
+                  svg={MoreIconFilled}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </SIconButton>
+            </RightSideButtons>
           </SSideButtons>
           {!isMobile && (
             <UserEllipseMenu
@@ -532,7 +539,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           <SUserData>
             <SUsernameWrapper>
               <SUsername variant={4}>
-                {user.nickname}
+                {getDisplayname(user)}
                 {user.options?.isVerified && (
                   <SInlineSVG
                     svg={VerificationCheckmark}
@@ -547,7 +554,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                   {t(
                     `genderPronouns.${
                       getGenderPronouns(user.genderPronouns!!).name
-                    }`
+                    }` as any
                   )}
                 </SGenderPronouns>
               )}
@@ -596,22 +603,21 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 )}
               </SShareButton>
             </SShareDiv>
-            {
-              // TODO: re-enable, repurpose for bundles (or remove it?)
-              /* user.options?.isOfferingSubscription &&
-              user.uuid !== currentUser.userData?.userUuid &&
-              (isSubscribed || wasSubscribed) && (
-                <CustomLink
-                  href={`/direct-messages/${user.username}-cr`}
-                  disabled={isSubscribed === null || wasSubscribed === null}
-                >
-                  <SSendButton withShadow view='primaryGrad'>
-                    {t('profileLayout.buttons.sendMessage')}
-                  </SSendButton>
-                </CustomLink>
-              ) */
-            }
+
+            {creatorsBundle && (
+              <CustomLink href={`/direct-messages/${user.username}-cr`}>
+                <SSendButton withShadow view='primaryGrad'>
+                  {t('profileLayout.buttons.sendMessage')}
+                </SSendButton>
+              </CustomLink>
+            )}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
+            {isMobile && (
+              <SMobileSeeBundleButton
+                user={user}
+                creatorBundle={creatorsBundle}
+              />
+            )}
           </SUserData>
           {/* Temp, all creactors for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
@@ -648,9 +654,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       />
       <ReportModal
         show={confirmReportUser}
-        reportedDisplayname={
-          user.nickname ? user.nickname || `@${user.username}` : ''
-        }
+        reportedDisplayname={getDisplayname(user)}
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />
@@ -677,12 +681,32 @@ const SGeneral = styled(General)`
   header {
     z-index: 6;
   }
+
+  @media (max-width: 768px) {
+    main {
+      > div:first-child {
+        padding-left: 0;
+        padding-right: 0;
+
+        > div:first-child {
+          padding-left: 0;
+          padding-right: 0;
+
+          > div:first-child {
+            padding-left: 0;
+            padding-right: 0;
+          }
+        }
+      }
+    }
+  }
 `;
 
 const SUserData = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
+  margin-bottom: 36px;
 `;
 
 const SUsernameWrapper = styled.div`
@@ -741,7 +765,7 @@ const SShareButton = styled(Button)`
   }
 `;
 
-/* const SSendButton = styled(Button)`
+const SSendButton = styled(Button)`
   margin: 0 auto 16px;
   background: ${(props) => props.theme.colorsThemed.accent.yellow};
   color: #2c2c33;
@@ -754,19 +778,38 @@ const SShareButton = styled(Button)`
     background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
     box-shadow: none !important;
   }
-`; */
+`;
 
 const SBioText = styled(Text)`
   text-align: center;
   overflow-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: break-all;
+
+  user-select: unset;
 
   padding-left: 16px;
   padding-right: 16px;
-  margin: 0 auto 54px;
+  margin: 0 auto 16px;
   width: 100%;
   max-width: 480px;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+const RightSideButtons = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+`;
+
+const SSeeBundleButton = styled(SeeBundlesButton)`
+  margin-right: 16px;
+`;
+
+const SMobileSeeBundleButton = styled(SeeBundlesButton)`
+  margin: auto;
+  margin-bottom: 16px;
 `;
 
 const SIconButton = styled.div<{

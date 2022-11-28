@@ -1,7 +1,9 @@
+/* eslint-disable no-async-promise-executor */
 // Configuration & helper functions file for the RESTful API endpoints
 import { newnewapi } from 'newnew-api';
 import * as $protobuf from 'protobufjs';
 import { Cookies } from 'react-cookie';
+import isBrowser from '../utils/isBrowser';
 
 const logsOn = process.env.NEXT_PUBLIC_PROTOBUF_LOGS === 'true';
 
@@ -9,6 +11,41 @@ export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 // Initialize global Cookies instance available throughout the whole app
 export const cookiesInstance = new Cookies();
+
+// eslint-disable-next-line import/no-mutable-exports
+export let fetchInitialized = false;
+let fetchInitializationTriggered = false;
+
+// eslint-disable-next-line no-async-promise-executor
+const customFetch = async (...args: any): Promise<any> =>
+  new Promise(async (resolve) => {
+    const [resource, config] = args;
+
+    // request interceptor starts
+    if (!fetchInitialized) {
+      if (!fetchInitializationTriggered) {
+        try {
+          fetchInitializationTriggered = true;
+          await fetch(process.env.NEXT_PUBLIC_SOCKET_URL!!);
+        } catch (err) {
+          console.error(err);
+        } finally {
+          // set global state
+          fetchInitialized = true;
+        }
+      }
+
+      setTimeout(() => {
+        resolve(customFetch(...args));
+      }, 500);
+    } else {
+      try {
+        resolve(await fetch(resource, config));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  });
 
 /**
  * Universal interface for RESTful API responses
@@ -96,10 +133,16 @@ export async function fetchProtobuf<
   const encoded = payload ? reqT.encode(payload).finish() : undefined;
 
   try {
-    const buff: ArrayBuffer = await fetch(url, {
+    const buff: ArrayBuffer = await customFetch(url, {
       method,
       headers: {
         'Content-type': 'application/x-protobuf',
+        ...(!isBrowser() || process.env.NEXT_PUBLIC_ENVIRONMENT === 'test'
+          ? {
+              // TODO: should it come from env var and be a secret?
+              'x-from': 'web',
+            }
+          : {}),
         ...headers,
       },
       mode,

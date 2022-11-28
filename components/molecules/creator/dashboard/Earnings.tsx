@@ -49,7 +49,6 @@ export const Earnings: React.FC<IFunctionProps> = ({
   useEffect(() => {
     async function fetchMyEarnings() {
       try {
-        setIsLoading(true);
         const payload = new newnewapi.GetMyEarningsRequest({
           beginDate: dateToTimestamp(
             moment()
@@ -62,9 +61,9 @@ export const Earnings: React.FC<IFunctionProps> = ({
           endDate: dateToTimestamp(new Date()),
         });
         const res = await getMyEarnings(payload);
-
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
+
         setMyEarnings(res.data);
 
         setIsLoading(false);
@@ -88,12 +87,11 @@ export const Earnings: React.FC<IFunctionProps> = ({
       let sum = 0;
       if (myEarnings.auEarnings?.usdCents)
         sum += myEarnings.auEarnings?.usdCents;
-      // if (myEarnings.cfEarnings?.usdCents)
-      //   sum += myEarnings.cfEarnings?.usdCents;
       if (myEarnings.mcEarnings?.usdCents)
         sum += myEarnings.mcEarnings?.usdCents;
-      if (myEarnings.subsEarnings?.usdCents)
-        sum += myEarnings.subsEarnings?.usdCents;
+      if (myEarnings.bundleEarnings?.usdCents)
+        sum += myEarnings.bundleEarnings?.usdCents;
+
       setTotalEarnings(sum);
     }
   }, [myEarnings]);
@@ -103,11 +101,11 @@ export const Earnings: React.FC<IFunctionProps> = ({
       {
         id: 'ac',
       },
-      // {
-      //   id: 'cf',
-      // },
       {
         id: 'mc',
+      },
+      {
+        id: 'bundles',
       },
     ],
     []
@@ -153,10 +151,10 @@ export const Earnings: React.FC<IFunctionProps> = ({
               )}`
             : '$0.00';
 
-        case 'cf':
-          return myEarnings?.cfEarnings?.usdCents
+        case 'bundles':
+          return myEarnings?.bundleEarnings?.usdCents
             ? `$${formatNumber(
-                myEarnings.cfEarnings.usdCents / 100 ?? 0,
+                myEarnings.bundleEarnings.usdCents / 100 ?? 0,
                 false
               )}`
             : '$0.00';
@@ -180,7 +178,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
     (item: { id: string }) => (
       <SListItem key={`list-item-earnings-${item.id}`}>
         <SListItemTitle variant={2} weight={700}>
-          {t(`dashboard.earnings.list.${item.id}`)}
+          {t(`dashboard.earnings.list.${item.id}` as any)}
         </SListItemTitle>
         <SListItemValue variant={6}>{getValue(item.id)}</SListItemValue>
       </SListItem>
@@ -200,7 +198,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
     if (arr[0] === '0') return t('dashboard.earnings.earnedToday');
     if (arr[0] === '1') return t('dashboard.earnings.earnedYesterday');
     return `${t('dashboard.earnings.earned')} ${arr[0]} ${t(
-      `dashboard.earnings.units.${arr[1]}`
+      `dashboard.earnings.units.${arr[1]}` as any
     )}`;
   };
   /* eslint-disable no-nested-ternary */

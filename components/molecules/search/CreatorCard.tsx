@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
+import { useTranslation } from 'next-i18next';
 
 import UserAvatar from '../UserAvatar';
 import InlineSvg from '../../atoms/InlineSVG';
@@ -18,17 +19,22 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { markUser } from '../../../api/endpoints/user';
 import UserEllipseModal from '../profile/UserEllipseModal';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import { useBundles } from '../../../contexts/bundlesContext';
+import { formatNumber } from '../../../utils/format';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
-  // TODO: make sign creator specific, get more data
   withEllipseMenu?: boolean;
+  onBundleClicked?: (creator: newnewapi.IUser) => void;
 }
 
 export const CreatorCard: React.FC<ICreatorCard> = ({
   creator,
   withEllipseMenu,
+  onBundleClicked,
 }) => {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -42,11 +48,17 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
 
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
-  const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+  const [confirmReportUser, setConfirmReportUser] = useState(false);
   const { usersIBlocked, unblockUser } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(creator.uuid as string),
     [usersIBlocked, creator.uuid]
+  );
+
+  const { bundles } = useBundles();
+  const creatorsBundle = useMemo(
+    () => bundles?.find((bundle) => bundle.creator?.uuid === creator.uuid),
+    [bundles, creator.uuid]
   );
 
   const unblockUserAsync = async (uuid: string) => {
@@ -135,7 +147,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         </SUserAvatar>
       </SUserAvatarContainer>
       <SDisplayNameContainer isVerified={!!creator.options?.isVerified}>
-        <SDisplayName>{creator.nickname}</SDisplayName>
+        <SDisplayName>{getDisplayname(creator)}</SDisplayName>
         {creator.options?.isVerified && (
           <SInlineSVG
             svg={VerificationCheckmark}
@@ -146,6 +158,24 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         )}
       </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>
+      {onBundleClicked && (
+        <SButton
+          highlighted={!!creatorsBundle}
+          onClick={(e) => {
+            e.stopPropagation();
+            onBundleClicked(creator);
+          }}
+        >
+          {creatorsBundle
+            ? t('creatorCard.purchasedVotes', {
+                value: formatNumber(
+                  creatorsBundle.bundle?.votesLeft || 0,
+                  true
+                ),
+              })
+            : t('creatorCard.buyBundle')}
+        </SButton>
+      )}
       <SBackground>
         <Image src={creator.coverUrl ?? ''} layout='fill' />
       </SBackground>
@@ -176,9 +206,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       />
       <ReportModal
         show={confirmReportUser}
-        reportedDisplayname={
-          creator.nickname ? creator.nickname || `@${creator.username}` : ''
-        }
+        reportedDisplayname={getDisplayname(creator)}
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />
@@ -196,8 +224,9 @@ const SCard = styled.div`
   align-items: center;
   border: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
   position: relative;
-  height: 160px;
+  height: auto;
   cursor: pointer;
   transition: 0.2s linear;
   &:hover {
@@ -271,6 +300,43 @@ const SUserName = styled.p`
   font-size: 12px;
   line-height: 16px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SButton = styled.button<{ highlighted: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  white-space: nowrap;
+
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: bold;
+
+  padding: 8px 16px;
+  margin-top: 16px;
+  margin-bottom: 10px;
+
+  color: ${({ theme, highlighted }) =>
+    highlighted
+      ? theme.colors.darkGray
+      : theme.colorsThemed.button.color.primary};
+  background: ${({ theme, highlighted }) =>
+    highlighted
+      ? theme.colorsThemed.accent.yellow
+      : theme.colorsThemed.button.background.primaryGrad};
+  border-radius: ${(props) => props.theme.borderRadius.medium};
+  border: transparent;
+
+  cursor: pointer;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 `;
 
 const SMoreButton = styled(Button)`

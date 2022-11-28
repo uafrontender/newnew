@@ -34,6 +34,7 @@ interface IMobileFieldBlock {
     type?: 'text' | 'number' | 'tel';
     pattern?: string;
     max?: number;
+    customPlaceholder?: string;
   };
   formattedValue?: any;
   formattedDescription?: any;
@@ -125,14 +126,14 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const getModal = useCallback(() => {
     if (type === 'select') {
       return (
-        <Modal show={focused} onClose={handleBlur}>
+        <SModal show={focused} onClose={handleBlur}>
           <SMobileListContainer focused={focused}>
             <SMobileList>{options?.map(renderItem)}</SMobileList>
             <SCancelButton view='modalSecondary' onClick={handleBlur}>
               {t('secondStep.button.cancel')}
             </SCancelButton>
           </SMobileListContainer>
-        </Modal>
+        </SModal>
       );
     }
 
@@ -159,7 +160,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       ];
       const renderDay = (el: any) => (
         <SDay key={el.value} variant={1} weight={500}>
-          {t(`secondStep.field.startsAt.modal.days.${el.value}`)}
+          {t(`secondStep.field.startsAt.modal.days.${el.value}` as any)}
         </SDay>
       );
       const handleScheduleChange = (selectedId: string) => {
@@ -185,7 +186,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       };
 
       return (
-        <Modal show={focused} onClose={handleBlur}>
+        <SModal show={focused} onClose={handleBlur}>
           <SMobileDateContainer focused={focused}>
             <SMobileDateContent onClick={preventCLick}>
               <SModalTopLine>
@@ -253,7 +254,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
               </SScheduleButton>
             </SMobileDateContent>
           </SMobileDateContainer>
-        </Modal>
+        </SModal>
       );
     }
 
@@ -279,14 +280,14 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       inputRef.current.focus();
     }
   }, [focused, inputRef]);
-  const inputLabel = t(`secondStep.field.${id}.label`);
+  const inputLabel = t(`secondStep.field.${id}.label` as any);
 
   return (
     <>
       {getModal()}
       <SContainer onClick={handleClick}>
         <STitle variant={2} weight={700}>
-          {t(`secondStep.field.${id}.title`)}
+          {t(`secondStep.field.${id}.title` as any)}
         </STitle>
         {type === 'input' ? (
           <SInputWrapper>
@@ -299,19 +300,22 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
               onFocus={handleFocus}
               onChange={handleChange}
               withLabel={!!inputLabel}
-              placeholder={t(`secondStep.field.${id}.placeholder`)}
+              placeholder={
+                inputProps?.customPlaceholder ??
+                t(`secondStep.field.${id}.placeholder` as any)
+              }
               {...inputProps}
             />
           </SInputWrapper>
         ) : (
           <SValue variant={6}>
-            {t(`secondStep.field.${id}.value`, {
+            {t(`secondStep.field.${id}.value` as any, {
               value: formattedValue || value,
             })}
           </SValue>
         )}
         <SDescription variant={2} weight={700}>
-          {t(`secondStep.field.${id}.description`, {
+          {t(`secondStep.field.${id}.description` as any, {
             value: formattedDescription || value,
           })}
         </SDescription>
@@ -422,6 +426,12 @@ const SInput = styled.input<ISInput>`
   }
 `;
 
+const SModal = styled(Modal)`
+  & > div:first-child {
+    z-index: 2;
+  }
+`;
+
 interface ISMobileListContainer {
   focused: boolean;
 }
@@ -460,6 +470,7 @@ const SMobileDateContent = styled.div`
     props.theme.colorsThemed.background.backgroundDD};
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
+  z-index: 3;
 `;
 
 const SMobileList = styled.div`
@@ -470,6 +481,8 @@ const SMobileList = styled.div`
   flex-direction: column;
   background-color: ${(props) =>
     props.theme.colorsThemed.background.backgroundDD};
+
+  z-index: 3;
 `;
 
 interface ISButton {
@@ -489,6 +502,8 @@ const SButton = styled(Button)<ISButton>`
 const SCancelButton = styled(Button)`
   padding: 16px 32px;
   margin-top: 4px;
+
+  z-index: 3;
 `;
 
 const SScheduleButton = styled(Button)`

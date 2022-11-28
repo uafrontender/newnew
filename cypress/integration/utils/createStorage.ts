@@ -1,6 +1,7 @@
 function createStorage(defaultState?: {}): {
   save: () => void;
   restore: () => void;
+  restart: () => void;
 } {
   const LOCAL_STORAGE_MEMORY = Object.assign({}, defaultState);
 
@@ -17,7 +18,14 @@ function createStorage(defaultState?: {}): {
     });
   }
 
-  return { save, restore };
+  function restart() {
+    Object.keys(defaultState).forEach((key) => {
+      LOCAL_STORAGE_MEMORY[key] = defaultState[key];
+      localStorage.setItem(key, defaultState[key]);
+    });
+  }
+
+  return { save, restore, restart };
 }
 
 export default createStorage;

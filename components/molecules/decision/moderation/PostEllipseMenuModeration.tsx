@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 
 import EllipseMenu, { EllipseMenuButton } from '../../../atoms/EllipseMenu';
+import { TPostType } from '../../../../utils/switchPostType';
 
 interface IPostEllipseMenuModeration {
-  postType: string;
+  postType: TPostType;
   isVisible: boolean;
   canDeletePost: boolean;
   handleClose: () => void;
@@ -24,15 +25,6 @@ const PostEllipseMenuModeration: React.FunctionComponent<IPostEllipseMenuModerat
       anchorElement,
     }) => {
       const { t } = useTranslation('common');
-
-      useEffect(() => {
-        const postModal = document.getElementById('post-modal-container');
-        if (isVisible && postModal) {
-          postModal.style.overflow = 'hidden';
-        } else if (postModal) {
-          postModal.style.overflow = 'scroll';
-        }
-      }, [isVisible]);
 
       return (
         <SEllipseMenu

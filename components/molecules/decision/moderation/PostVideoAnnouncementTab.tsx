@@ -43,7 +43,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
   handleOpenEllipseMenu,
   handleToggleMuted,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
     'mobile',
@@ -135,6 +135,8 @@ const SSetThumbnailButtonIconOnly = styled(Button)`
 
   border-radius: ${({ theme }) => theme.borderRadius.small};
 
+  transition: bottom 0s linear;
+
   ${({ theme }) => theme.media.tablet} {
     right: initial;
     left: 16px;
@@ -159,6 +161,8 @@ const SSetThumbnailButton = styled(Button)`
 
   padding: 8px;
   height: 36px;
+
+  transition: bottom 0s linear;
 
   border-radius: ${({ theme }) => theme.borderRadius.small};
 

@@ -47,19 +47,22 @@
     "share": "分享",
     "dashboard": "儀錶板",
     "dms": "私訊",
-    "notifications": "通知"
+    "notifications": "通知",
+    "bundles": "Bundles"
   },
   "mobileTopNavigation": {
-    "myBalance": "我的餘額以${{value}}",
+    "myBalance": "我的餘額${{value}}",
     "profile": "個人資料"
   },
   "button": {
+    "bundles": "Bundles",
     "createDecision": "新帖子",
     "create": "創建",
     "signIn": "登入",
     "dashboard": "儀錶板",
     "createOnNewnew": "開始創建",
-    "cancel": "取消"
+    "cancel": "取消",
+    "takeMeHome_NEED_TRANSLATION": "Take me home"
   },
   "footer": {
     "topTitle": "NewNew",
@@ -128,6 +131,55 @@
       "title": "我們馬上處理！",
       "subtitle": "感謝告知,我們會儘快調查此事，並採取適當的措施，確保每個人的安全。",
       "button": "知道了"
+    },
+    "buyBundle": {
+      "title": "購買一個Superpoll bundle 的價格:",
+      "votes_NEED_TRANSLATION": "<0>{{amount}}</0> votes",
+      "access_NEED_TRANSLATION": "plus get {{amount}} {{unit}} of:",
+      "customOptions": "在任何Superpoll中添加定制選項",
+      "chat": "一對一私聊",
+      "buy": "購買金額${{amount}}",
+      "terms": "*bundle中的投票不會過期",
+      "unit": {
+        "month": "月",
+        "months": "月"
+      },
+      "payment": {
+        "header": "{{creator}}的Superpoll Bundle"
+      },
+      "error": {
+        "requestFailed": "請求失敗"
+      }
+    },
+    "buyBundleSuccess": {
+      "votes_NEED_TRANSLATION": "<0>{{amount}}</0> votes unlocked",
+      "for": "為",
+      "access": "剩餘{{amount}} {{unit}}:",
+      "customOptions_NEED_TRANSLATION": "adding custom superpoll options",
+      "chat": "一對一私聊",
+      "button": "Sounds good!",
+      "unit": {
+        "month": "月",
+        "months": "月"
+      }
+    },
+    "creatorsBundle": {
+      "votesLeft": "剩餘<0>{{amount}}</0> 票",
+      "for": "為 <0>{{creator}}</0>",
+      "access": "剩餘<0/>:",
+      "unitPair": "{{amount}}{{unit}}",
+      "and": "和",
+      "customOptions": "在任何Superpoll中添加定制選項",
+      "chat": "一對一私聊",
+      "buyButton": "購買更多投票",
+      "unit": {
+        "day": "天",
+        "days": "天",
+        "month": "月",
+        "months": "月",
+        "year": "年",
+        "years": "年"
+      }
     }
   },
   "myLink": {
@@ -172,25 +224,29 @@
     "numbers-of-bids-most-first": "最先"
   },
   "toastErrors": {
-    "generic": "发生错误，请稍后再试"
+    "generic": "發生錯誤，請稍後再試"
   },
-  "smsNotifications_NEED_TRANSLATION": {
-    "title": "What's your number?",
-    "success": "Success",
-    "description": "This way, we can send you new updates from <0>{{subject}}</0>!",
-    "confirmation": "Confirmation SMS was sent to {{phoneNumber}} number.",
-    "tos": "I accept NewNew’s <0>Terms</0> & <1>Privacy</1>. I opt-in and agree to receive updates from NewNew at the phone number provided. SMS and data rates may apply.",
-    "button": { "continue": "Continue", "close": "Cool!" },
+  "smsNotifications": {
+    "title": "你的號碼是多少？",
+    "success": "成功了",
+    "description": "這樣，我們就可以從<0>{{subject}}</0>向你發送更新！",
+    "confirmation": "確認短信已發送至號碼{{phoneNumber}}。",
+    "tos": "我接受NewNew <0>Terms</0> & <1>Privacy</1>. 我選擇加入，並同意使用提供的電話號碼接收來自NewNew的更新資訊。短信和資料流程量費可能適用。",
+    "button": { "continue": "繼續", "close": "酷！" },
     "phoneError": {
-      "0": "Invalid phone number",
-      "1": "Invalid country code",
-      "2": "The phone number is too short",
-      "3": "The phone number is too long",
-      "4": "Invalid phone number"
+      "0": "無效的電話號碼",
+      "1": "無效的國家代碼",
+      "2": "電話號碼位數不足",
+      "3": "電話號碼位數過長",
+      "4": "無效的電話號碼"
     },
     "error": {
-      "requestFailed": "Request failed"
+      "requestFailed": "請求失敗"
     }
+  },
+  "creatorCard": {
+    "buyBundle": "購買Bundle",
+    "purchasedVotes": "{{value}} 投票"
   },
   "colorModeSwitch": {
     "options": {

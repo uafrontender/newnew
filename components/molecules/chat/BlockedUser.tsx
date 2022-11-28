@@ -11,6 +11,7 @@ import {
   SBottomActionText,
   SBottomActionTitle,
 } from '../../atoms/chat/styles';
+import getDisplayname from '../../../utils/getDisplayname';
 
 const BlockUserModal = dynamic(() => import('./BlockUserModal'));
 
@@ -20,7 +21,7 @@ interface IBlockedUser {
   confirmBlockUser: boolean;
   isBlocked?: boolean;
   isAnnouncement?: boolean;
-  user: newnewapi.IUser;
+  user: newnewapi.IVisavisUser;
 }
 
 const BlockedUser: React.FC<IBlockedUser> = ({
@@ -43,7 +44,7 @@ const BlockedUser: React.FC<IBlockedUser> = ({
               <SBottomActionTitle>
                 {isAnnouncement
                   ? t('groupBlocked.title')
-                  : `${t('userBlocked.title')} ${user.username}`}
+                  : `${t('userBlocked.title')} ${getDisplayname(user.user)}`}
               </SBottomActionTitle>
               <SBottomActionMessage>
                 {isAnnouncement

@@ -10,10 +10,10 @@ import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 import InlineSvg from '../../../atoms/InlineSVG';
 import Modal from '../../../organisms/Modal';
-import PostSuccessAnimationBackground from '../success/PostSuccessAnimationBackground';
 
 import assets from '../../../../constants/assets';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+import AnimatedBackground from '../../../atoms/AnimationBackground';
 
 interface IPostResponseSuccessModal {
   isOpen: boolean;
@@ -33,11 +33,17 @@ const PostResponseSuccessModal: React.FunctionComponent<
     resizeMode
   );
 
-  const handleGoToDashboard = () => router?.push('/creator/dashboard');
+  const handleGoToDashboard = () => {
+    router?.push('/creator/dashboard', undefined, {
+      scroll: true,
+    });
+  };
 
   return (
     <Modal show={isOpen} additionalz={zIndex}>
-      {!isMobile && <PostSuccessAnimationBackground noBlur />}
+      {!isMobile && (
+        <AnimatedBackground src={assets.decision.gold} alt='coin' noBlur />
+      )}
       {!isMobile && (
         <SCloseButton
           view='secondary'
@@ -73,12 +79,14 @@ const PostResponseSuccessModal: React.FunctionComponent<
             {t('youMade')}
           </SText>
           <SHeadline variant={1}>{amount}</SHeadline>
-          <SMakeAnotherPostButton onClick={() => router?.push('/creation')}>
-            <SCoinImage src={assets.decision.gold} />
-            <SButtonText variant={2} weight={600}>
-              {t('makeNewPostButton')}
-            </SButtonText>
-            <SButtonSubtitle variant={3}>{t('subtitle')}</SButtonSubtitle>
+          <SMakeAnotherPostButton>
+            <a href='/creation'>
+              <SCoinImage src={assets.decision.gold} />
+              <SButtonText variant={2} weight={600}>
+                {t('makeNewPostButton')}
+              </SButtonText>
+              <SButtonSubtitle variant={3}>{t('subtitle')}</SButtonSubtitle>
+            </a>
           </SMakeAnotherPostButton>
         </SContentContainer>
       </SWrapper>

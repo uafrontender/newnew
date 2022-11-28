@@ -8,12 +8,11 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
-import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
+import moment from 'moment';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
@@ -24,10 +23,8 @@ import {
 import switchPostType from '../../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import { SocketContext } from '../../../../contexts/socketContext';
-import { ChannelsContext } from '../../../../contexts/channelsContext';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
-import useSynchronizedHistory from '../../../../utils/hooks/useSynchronizedHistory';
 
 import PostVideoModeration from '../../../molecules/decision/moderation/PostVideoModeration';
 import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTopInfoModeration';
@@ -38,7 +35,7 @@ import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 import PostResponseTabModeration from '../../../molecules/decision/moderation/PostResponseTabModeration';
 
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { usePostModalInnerState } from '../../../../contexts/postModalInnerContext';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import PostModerationResponsesContextProvider from '../../../../contexts/postModerationResponsesContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -66,27 +63,32 @@ interface IPostModerationMC {}
 
 const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
   () => {
-    const { t } = useTranslation('modal-Post');
+    const { t } = useTranslation('page-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
-    const router = useRouter();
+    const isTablet = ['tablet'].includes(resizeMode);
+    const isMobileOrTablet = [
+      'mobile',
+      'mobileS',
+      'mobileM',
+      'mobileL',
+      'tablet',
+    ].includes(resizeMode);
 
     const {
       postParsed,
       postStatus,
       handleGoBackInsidePost,
       handleUpdatePostStatus,
-    } = usePostModalInnerState();
+    } = usePostInnerState();
     const post = useMemo(
       () => postParsed as newnewapi.MultipleChoice,
       [postParsed]
     );
-
-    const { syncedHistoryReplaceState } = useSynchronizedHistory();
 
     // Additional responses
     const [
@@ -96,15 +98,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
 
     // Socket
     const socketConnection = useContext(SocketContext);
-    const { addChannel, removeChannel } = useContext(ChannelsContext);
 
     // Announcement
     const [announcement, setAnnouncement] = useState(post.announcement);
-
-    // Comments
-    const { ref: commentsSectionRef, inView } = useInView({
-      threshold: 0.8,
-    });
 
     const handleCommentFocus = () => {
       if (isMobile && !!document.getElementById('action-button-mobile')) {
@@ -138,6 +134,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
 
     // Options
     const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
       post.optionCount ?? ''
     );
@@ -339,21 +336,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       }
     };
 
-    // Increment channel subs after mounting
-    // Decrement when unmounting
-    useEffect(() => {
-      addChannel(post.postUuid, {
-        postUpdates: {
-          postUuid: post.postUuid,
-        },
-      });
-
-      return () => {
-        removeChannel(post.postUuid);
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     useEffect(() => {
       setOptions([]);
       setOptionsNextPageToken('');
@@ -448,16 +430,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         }
       };
 
-      const socketHandlerPostStatus = async (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostStatusUpdated.decode(arr);
-
-        if (!decoded) return;
-        if (decoded.postUuid === post.postUuid && decoded.multipleChoice) {
-          handleUpdatePostStatus(decoded.multipleChoice);
-        }
-      };
-
       if (socketConnection) {
         socketConnection?.on(
           'McOptionCreatedOrUpdated',
@@ -465,7 +437,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         );
         socketConnection?.on('McOptionDeleted', socketHandlerOptionDeleted);
         socketConnection?.on('PostUpdated', socketHandlerPostData);
-        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
 
       return () => {
@@ -476,7 +447,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           );
           socketConnection?.off('McOptionDeleted', socketHandlerOptionDeleted);
           socketConnection?.off('PostUpdated', socketHandlerPostData);
-          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -535,52 +505,22 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         const parsedHash = hash.substring(1);
 
         if (parsedHash === 'comments') {
-          document.getElementById('comments')?.scrollIntoView();
+          setTimeout(() => {
+            document.getElementById('comments')?.scrollIntoView();
+          }, 100);
         }
       };
 
       handleCommentsInitialHash();
     }, []);
 
-    // Replace hash once scrolled to comments
-    useEffect(() => {
-      if (inView) {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }#comments`
-        );
-      } else {
-        syncedHistoryReplaceState(
-          {},
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/post/${
-            post.postUuid
-          }`
-        );
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inView, post.postUuid, router.locale]);
-
     return (
       <>
-        <SWrapper>
-          <PostModerationResponsesContextProvider
-            openedTab={openedTab}
-            handleChangeTab={handleChangeTab}
-            coreResponseInitial={post.response ?? undefined}
-            additionalResponsesInitial={additionalResponsesFreshlyLoaded}
-          >
+        {isTablet && (
+          <>
             <SExpiresSection>
-              {isMobile && (
-                <SGoBackButton
-                  style={{
-                    gridArea: 'closeBtnMobile',
-                  }}
-                  onClick={handleGoBackInsidePost}
-                />
-              )}
-              {postStatus === 'waiting_for_response' ? (
+              {postStatus === 'waiting_for_response' ||
+              postStatus === 'waiting_for_decision' ? (
                 <ResponseTimer
                   timestampSeconds={new Date(
                     (post.responseUploadDeadline?.seconds as number) * 1000
@@ -595,15 +535,81 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
                   postType='mc'
                 />
               ) : (
-                <PostTimer
-                  timestampSeconds={new Date(
-                    (post.expiresAt?.seconds as number) * 1000
-                  ).getTime()}
-                  postType='mc'
-                  onTimeExpired={handleOnVotingTimeExpired}
-                />
+                <>
+                  <PostTimer
+                    timestampSeconds={new Date(
+                      (post.expiresAt?.seconds as number) * 1000
+                    ).getTime()}
+                    postType='mc'
+                    isTutorialVisible={options.length > 0}
+                    onTimeExpired={handleOnVotingTimeExpired}
+                  />
+                  <SEndDate>
+                    {t('expires.end_date')}{' '}
+                    {moment((post.expiresAt?.seconds as number) * 1000).format(
+                      'DD MMM YYYY [at] hh:mm A'
+                    )}
+                  </SEndDate>
+                </>
               )}
             </SExpiresSection>
+            <PostTopInfoModeration
+              totalVotes={totalVotes}
+              hasWinner={false}
+              hidden={openedTab === 'response'}
+            />
+          </>
+        )}
+        <SWrapper>
+          <PostModerationResponsesContextProvider
+            openedTab={openedTab}
+            handleChangeTab={handleChangeTab}
+            coreResponseInitial={post.response ?? undefined}
+            additionalResponsesInitial={additionalResponsesFreshlyLoaded}
+          >
+            {isMobile && (
+              <SExpiresSection>
+                <SGoBackButton
+                  style={{
+                    gridArea: 'closeBtnMobile',
+                  }}
+                  onClick={handleGoBackInsidePost}
+                />
+                {postStatus === 'waiting_for_response' ||
+                postStatus === 'waiting_for_decision' ? (
+                  <ResponseTimer
+                    timestampSeconds={new Date(
+                      (post.responseUploadDeadline?.seconds as number) * 1000
+                    ).getTime()}
+                    onTimeExpired={handleOnResponseTimeExpired}
+                  />
+                ) : Date.now() > (post.expiresAt?.seconds as number) * 1000 ? (
+                  <PostTimerEnded
+                    timestampSeconds={new Date(
+                      (post.expiresAt?.seconds as number) * 1000
+                    ).getTime()}
+                    postType='mc'
+                  />
+                ) : (
+                  <>
+                    <PostTimer
+                      timestampSeconds={new Date(
+                        (post.expiresAt?.seconds as number) * 1000
+                      ).getTime()}
+                      postType='mc'
+                      isTutorialVisible={options.length > 0}
+                      onTimeExpired={handleOnVotingTimeExpired}
+                    />
+                    <SEndDate>
+                      {t('expires.end_date')}{' '}
+                      {moment(
+                        (post.expiresAt?.seconds as number) * 1000
+                      ).format('DD MMM YYYY [at] hh:mm A')}
+                    </SEndDate>
+                  </>
+                )}
+              </SExpiresSection>
+            )}
             <PostVideoModeration
               key={`key_${announcement?.coverImageUrl}`}
               postId={post.postUuid}
@@ -615,21 +621,69 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
               isMuted={mutedMode}
               handleToggleMuted={() => handleToggleMutedMode()}
             />
-            <PostTopInfoModeration
-              totalVotes={totalVotes}
-              hasWinner={false}
-              hidden={openedTab === 'response'}
-            />
-            <SActivitesContainer decisionFailed={postStatus === 'failed'}>
+            {isMobile && (
+              <PostTopInfoModeration
+                totalVotes={totalVotes}
+                hasWinner={false}
+                hidden={openedTab === 'response'}
+              />
+            )}
+            <SActivitiesContainer>
               {openedTab === 'announcement' ? (
                 <>
-                  <PostVotingTab>
-                    {`${t('tabs.options')} ${
-                      !!numberOfOptions && numberOfOptions > 0
-                        ? numberOfOptions
-                        : ''
-                    }`}
-                  </PostVotingTab>
+                  <div
+                    style={{
+                      flex: '0 0 auto',
+                      width: '100%',
+                    }}
+                  >
+                    {!isMobileOrTablet && (
+                      <>
+                        <SExpiresSection>
+                          {postStatus === 'waiting_for_response' ||
+                          postStatus === 'waiting_for_decision' ? (
+                            <ResponseTimer
+                              timestampSeconds={new Date(
+                                (post.responseUploadDeadline
+                                  ?.seconds as number) * 1000
+                              ).getTime()}
+                              onTimeExpired={handleOnResponseTimeExpired}
+                            />
+                          ) : Date.now() >
+                            (post.expiresAt?.seconds as number) * 1000 ? (
+                            <PostTimerEnded
+                              timestampSeconds={new Date(
+                                (post.expiresAt?.seconds as number) * 1000
+                              ).getTime()}
+                              postType='mc'
+                            />
+                          ) : (
+                            <>
+                              <PostTimer
+                                timestampSeconds={new Date(
+                                  (post.expiresAt?.seconds as number) * 1000
+                                ).getTime()}
+                                postType='mc'
+                                isTutorialVisible={options.length > 0}
+                                onTimeExpired={handleOnVotingTimeExpired}
+                              />
+                              <SEndDate>
+                                {t('expires.end_date')}{' '}
+                                {moment(
+                                  (post.expiresAt?.seconds as number) * 1000
+                                ).format('DD MMM YYYY [at] hh:mm A')}
+                              </SEndDate>
+                            </>
+                          )}
+                        </SExpiresSection>
+                        <PostTopInfoModeration
+                          totalVotes={totalVotes}
+                          hasWinner={false}
+                        />
+                      </>
+                    )}
+                    <PostVotingTab>{`${t('tabs.options')}`}</PostVotingTab>
+                  </div>
                   <McOptionsTabModeration
                     post={post}
                     options={options}
@@ -649,7 +703,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
                   winningOptionMc={winningOption}
                 />
               )}
-            </SActivitesContainer>
+            </SActivitiesContainer>
             {isPopupVisible && (
               <HeroPopup
                 isPopupVisible={isPopupVisible}
@@ -660,7 +714,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           </PostModerationResponsesContextProvider>
         </SWrapper>
         {post.isCommentsAllowed && (
-          <SCommentsSection id='comments' ref={commentsSectionRef}>
+          <SCommentsSection id='comments'>
             <SCommentsHeadline variant={4}>
               {t('successCommon.comments.heading')}
             </SCommentsHeadline>
@@ -687,46 +741,42 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    display: grid;
-    grid-template-areas:
-      'expires expires'
-      'title title'
-      'video activities';
-    grid-template-columns: 284px 1fr;
-    grid-template-rows: max-content max-content minmax(0, 1fr);
-
-    grid-column-gap: 16px;
-
+    height: 648px;
+    min-height: 0;
     align-items: flex-start;
+
+    display: flex;
+    gap: 16px;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas:
-      'video expires'
-      'video title'
-      'video activities';
-    grid-template-columns: 410px 1fr;
+    display: flex;
+    gap: 32px;
   }
 `;
 
 const SExpiresSection = styled.div`
-  grid-area: expires;
-
   position: relative;
 
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 
   width: 100%;
   margin-bottom: 6px;
+`;
 
-  padding-left: 24px;
+const SEndDate = styled.div`
+  width: 100%;
+  text-align: center;
+  padding: 8px 0px;
 
-  ${({ theme }) => theme.media.tablet} {
-    padding-left: initial;
-  }
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.quaternary};
 `;
 
 const SGoBackButton = styled(GoBackButton)`
@@ -735,39 +785,23 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div<{
-  decisionFailed: boolean;
-}>`
-  grid-area: activities;
-
-  display: flex;
-  flex-direction: column;
-
-  align-self: bottom;
-
-  height: 100%;
-  width: 100%;
-
+const SActivitiesContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
-    ${({ decisionFailed }) =>
-      !decisionFailed
-        ? css`
-            max-height: 500px;
-          `
-        : css`
-            max-height: 500px;
-          `}
+    align-items: flex-start;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    height: 506px;
+    max-height: 506px;
+    width: 100%;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    ${({ decisionFailed }) =>
-      !decisionFailed
-        ? css`
-            max-height: unset;
-          `
-        : css`
-            max-height: calc(580px - 120px);
-          `}
+    height: 728px;
+    max-height: 728px;
+    width: 100%;
   }
 `;
 

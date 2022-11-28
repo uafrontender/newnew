@@ -13,7 +13,6 @@ import { newnewapi } from 'newnew-api';
 
 import { TVideoProcessingData } from '../redux-store/slices/creationStateSlice';
 import { SocketContext } from './socketContext';
-import { usePostModalState } from './postModalContext';
 import {
   getVideoUploadUrl,
   removeUploadedFile,
@@ -26,7 +25,8 @@ import {
   uploadPostResponse,
 } from '../api/endpoints/post';
 import waitResourceIsAvailable from '../utils/checkResourceAvailable';
-import { usePostModalInnerState } from './postModalInnerContext';
+import { usePostInnerState } from './postInnerContext';
+import useErrorToasts from '../utils/hooks/useErrorToasts';
 
 interface IPostModerationResponsesContext {
   // Tabs
@@ -128,12 +128,17 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   handleChangeTab,
   children,
 }) => {
-  const { t } = useTranslation('modal-Post');
-  const { t: tCommon } = useTranslation('common');
+  const { t } = useTranslation('page-Post');
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
+
   const socketConnection = useContext(SocketContext);
 
-  const { postParsed, postStatus, handleUpdatePostStatus } =
-    usePostModalInnerState();
+  const {
+    postParsed,
+    postStatus,
+    handleUpdatePostStatus,
+    handleSetIsConfirmToClosePost,
+  } = usePostInnerState();
   const postId = useMemo(() => postParsed?.postUuid, [postParsed?.postUuid]);
 
   // Core response
@@ -191,10 +196,10 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         });
       } catch (err) {
         console.error(err);
-        toast.error(tCommon('toastErrors.generic'));
+        showErrorToastPredefined(undefined);
       }
     },
-    [tCommon]
+    [showErrorToastPredefined]
   );
 
   const handleSetUploadingAdditionalResponse = useCallback(
@@ -233,8 +238,6 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   // Updating Post data
   const [coreResponseUploading, setCoreResponseUploading] = useState(false);
   const [responseUploadSuccess, setResponseUploadSuccess] = useState(false);
-
-  const { handleSetIsConfirmToClosePost } = usePostModalState();
 
   const cannotLeavePage = useMemo(() => {
     if (
@@ -344,13 +347,14 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     } catch (error: any) {
       if (error.message === 'Upload failed') {
         setResponseFileUploadError(true);
-        toast.error(error?.message);
+        showErrorToastCustom(error?.message);
       } else {
         console.log('Upload aborted');
       }
       xhrRef.current = undefined;
       setResponseFileUploadLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleVideoDelete = useCallback(async () => {
@@ -391,8 +395,9 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       setResponseFileProcessingLoading(false);
       setResponseFileProcessingProgress(0);
     } catch (error: any) {
-      toast.error(error?.message);
+      showErrorToastCustom(error?.message);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uploadedResponseVideoUrl, videoProcessing?.taskUuid]);
 
   const handleItemChange = useCallback(
@@ -438,7 +443,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       }
     } catch (err) {
       console.error(err);
-      toast.error(tCommon('toastErrors.generic'));
+      showErrorToastPredefined(undefined);
     } finally {
       setCoreResponseUploading(false);
     }
@@ -447,7 +452,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     uploadedResponseVideoUrl,
     handleUpdateResponseVideo,
     handleUpdatePostStatus,
-    tCommon,
+    showErrorToastPredefined,
   ]);
 
   const handleUploadVideoNotProcessed = useCallback(async () => {
@@ -466,9 +471,15 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       }
     } catch (err) {
       console.error(err);
-      toast.error(tCommon('toastErrors.generic'));
+      showErrorToastPredefined(undefined);
     }
-  }, [postId, uploadedResponseVideoUrl, t, handleUpdatePostStatus, tCommon]);
+  }, [
+    postId,
+    uploadedResponseVideoUrl,
+    t,
+    handleUpdatePostStatus,
+    showErrorToastPredefined,
+  ]);
 
   const handleUploadAdditionalVideoProcessed = useCallback(async () => {
     setUploadingAdditionalResponse(true);
@@ -535,11 +546,16 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       }
     } catch (err) {
       console.error(err);
-      toast.error(tCommon('toastErrors.generic'));
+      showErrorToastPredefined(undefined);
     } finally {
       setUploadingAdditionalResponse(false);
     }
-  }, [handleAddAdditonalResponse, postId, tCommon, uploadedResponseVideoUrl]);
+  }, [
+    handleAddAdditonalResponse,
+    postId,
+    showErrorToastPredefined,
+    uploadedResponseVideoUrl,
+  ]);
 
   const handlerSocketUpdated = useCallback(
     async (data: any) => {
@@ -578,13 +594,13 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
             setResponseFileProcessingLoading(false);
           } else {
             setResponseFileUploadError(true);
-            toast.error(tCommon('toastErrors.generic'));
+            showErrorToastPredefined(undefined);
           }
         } else if (
           decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
         ) {
           setResponseFileUploadError(true);
-          toast.error(tCommon('toastErrors.generic'));
+          showErrorToastPredefined(undefined);
         }
       }
     },
@@ -593,7 +609,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       videoProcessing.targetUrls?.hlsStreamUrl,
       postId,
       responseFileProcessingProgress,
-      tCommon,
+      showErrorToastPredefined,
     ]
   );
 
@@ -638,7 +654,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         setResponseFileProcessingLoading(false);
       } else {
         setResponseFileUploadError(true);
-        toast.error(tCommon('toastErrors.generic'));
+        showErrorToastPredefined(undefined);
       }
     }
 

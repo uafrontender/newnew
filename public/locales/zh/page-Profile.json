@@ -4,8 +4,8 @@
       "title": "NewNew個人資料頁",
       "description": "自定義用戶名、顯示名稱、個人簡介和更多內容，定制你的NewNew個人資料"
     },
-    "noContent": {
-      "description": "你出價、投票或\n支持的帖子將在這裡顯示"
+    "noContent_NEED_TRANSLATION": {
+      "description": "Posts you’re actively bidding on\nor voting on will be shown here"
     }
   },
   "MyPosts": {
@@ -97,8 +97,10 @@
     },
     "buttons": {
       "favorites": "收藏",
-      "enableSmsNotifications_NEED_TRANSLATION": "Notify me",
-      "disableSmsNotifications_NEED_TRANSLATION": "Notifications ON",
+      "enableSmsNotifications": "通知我",
+      "disableSmsNotifications": "開啟通知",
+      "buyBundles": "購買Bundle",
+      "votesLeft": "剩餘{{amount}} 票",
       "sendMessage": "發送消息",
       "copied": "連結已複製！"
     }
@@ -261,7 +263,8 @@
           "1": "出價",
           "2": "投票表決",
           "3": "支持的",
-          "5": "訂閱了"
+          "5": "訂閱了",
+          "6_NEED_TRANSLATION": "purchased bundle from"
         }
       },
       "privacy": {
@@ -269,11 +272,11 @@
         "privacySubsections": {
           "spendings": {
             "title": "不讓別人查看我的消費",
-            "caption_NEED_TRANSLATION": "People will not be able to see how much you spent on bids and superpolls"
+            "caption": "其他人看不到你為出價或Superpoll上花了多少錢"
           },
           "private": {
             "title": "將我的活動設為隱秘",
-            "caption_NEED_TRANSLATION": "People will not be able to see any of your activity on bids and superpolls"
+            "caption": "其他人看不到你在出價或Superpoll上的活動"
           }
         },
         "blockedUsers": {

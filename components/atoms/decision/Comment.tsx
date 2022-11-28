@@ -17,12 +17,13 @@ import moment from 'moment';
 import Button from '../Button';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import { useAppSelector } from '../../../redux-store/store';
-import InlineSVG from '../InlineSVG';
+import InlineSVG, { InlineSvg } from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
 import CommentForm from './CommentForm';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { reportMessage } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -58,7 +59,7 @@ const Comment: React.FC<IComment> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -126,22 +127,37 @@ const Comment: React.FC<IComment> = ({
         <SCommentContent>
           <SCommentHeader>
             {!comment.isDeleted ? (
-              <Link href={`/${comment.sender?.username}`}>
-                <SNickname>
-                  {comment.sender?.uuid === user.userData?.userUuid
-                    ? t('comments.me')
-                    : comment.sender?.nickname ?? comment.sender?.username}
-                </SNickname>
-              </Link>
+              <>
+                <Link href={`/${comment.sender?.username}`}>
+                  <SNickname>
+                    {comment.sender?.uuid === user.userData?.userUuid
+                      ? t('comments.me')
+                      : getDisplayname(comment.sender)}
+                  </SNickname>
+                </Link>
+                {comment.sender?.options?.isCreator &&
+                  comment.sender.options.isVerified && (
+                    <SInlineSvg
+                      svg={VerificationCheckmark}
+                      width='20px'
+                      height='20px'
+                      fill='none'
+                    />
+                  )}
+              </>
             ) : (
               <SNickname noHover>{t('comments.commentDeleted')}</SNickname>
             )}
             <SBid> </SBid>
-            <SDate>
-              {/* &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')} */}
-              &bull;{' '}
-              {moment((comment.createdAt?.seconds as number) * 1000).fromNow()}
-            </SDate>
+            {!comment.isDeleted && (
+              <SDate>
+                {/* &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')} */}
+                &bull;{' '}
+                {moment(
+                  (comment.createdAt?.seconds as number) * 1000
+                ).fromNow()}
+              </SDate>
+            )}
             <SActionsDiv>
               {!comment.isDeleted && (
                 <SMoreButton
@@ -353,7 +369,6 @@ const SNickname = styled.span<{
 }>`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
-  margin-right: 5px;
 
   transition: 0.2s linear;
 
@@ -365,8 +380,13 @@ const SNickname = styled.span<{
   }
 `;
 
+const SInlineSvg = styled(InlineSvg)`
+  margin-left: 2px;
+`;
+
 const SBid = styled.span`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  margin-left: 5px;
   span {
     color: ${(props) => props.theme.colors.white};
     margin: 0 5px;
@@ -377,12 +397,17 @@ const SDate = styled.span`
   font-size: 12px;
 `;
 
-const SText = styled.p`
+const SText = styled.div`
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
   margin-bottom: 14px;
   cursor: text;
+
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-all;
+  user-select: text;
 `;
 
 const SReply = styled.div`

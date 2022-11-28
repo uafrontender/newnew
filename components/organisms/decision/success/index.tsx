@@ -1,13 +1,12 @@
 import React from 'react';
-import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 
 import { TPostType } from '../../../../utils/switchPostType';
 
 // Views
-const PostSuccessAC = dynamic(() => import('./PostSuccessAC'));
-const PostSuccessMC = dynamic(() => import('./PostSuccessMC'));
-const PostSuccessCF = dynamic(() => import('./PostSuccessCF'));
+import PostSuccessMC from './PostSuccessMC';
+import PostSuccessAC from './PostSuccessAC';
+import { PostSkeletonView } from '../PostSkeleton';
 
 interface ISuccessView {
   postParsed:
@@ -39,16 +38,7 @@ const SuccessView: React.FunctionComponent<ISuccessView> = ({
     );
   }
 
-  if (typeOfPost === 'cf' && postParsed) {
-    return (
-      <PostSuccessCF
-        key={postParsed.postUuid}
-        post={postParsed as newnewapi.Crowdfunding}
-      />
-    );
-  }
-
-  return null;
+  return <PostSkeletonView />;
 };
 
 export default SuccessView;

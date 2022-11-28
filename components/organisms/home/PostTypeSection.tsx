@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 
 import Headline from '../../atoms/Headline';
 import PostCard from '../../molecules/PostCard';
@@ -9,7 +10,6 @@ import type { TStaticPost } from '../../molecules/home/StaticPostCard';
 import Text from '../../atoms/Text';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 
-import { usePostModalState } from '../../../contexts/postModalContext';
 import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 
@@ -22,7 +22,6 @@ interface IPostTypeSectionProps {
   loading?: boolean;
   isStatic?: boolean;
   padding?: 'small' | 'large';
-  openPostModal: (post: newnewapi.Post) => void;
 }
 
 const PostTypeSection = ({
@@ -34,9 +33,8 @@ const PostTypeSection = ({
   loading,
   isStatic,
   padding,
-  openPostModal,
 }: IPostTypeSectionProps) => {
-  const { postOverlayOpen } = usePostModalState();
+  const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const isDesktop = ['laptop', 'laptopM', 'laptopL'].includes(resizeMode);
@@ -45,18 +43,17 @@ const PostTypeSection = ({
   );
 
   const renderPosts = (post: newnewapi.Post, index: number) => {
-    const handleOpenPostModal = () => {
-      openPostModal(post);
+    const handleOpenPost = () => {
+      router.push(`/post/${switchPostType(post)[0].postUuid}`);
     };
     return (
       <SItemWrapper
         key={switchPostType(post)[0].postUuid}
         index={index}
-        onClick={handleOpenPostModal}
+        onClick={handleOpenPost}
       >
         <PostCard
           item={post}
-          shouldStop={postOverlayOpen}
           index={index}
           width={isDesktop ? '204px' : '100%'}
           maxWidthTablet='100%'
@@ -243,12 +240,12 @@ const SItemWrapper = styled.div<{ index: number }>`
 
   ${(props) => props.theme.media.laptopL} {
     transform: ${({ index }) => (index !== 1 ? `translateY(25%)` : 0)};
-    height: 386px;
+    height: 390px;
 
     & > div {
       min-width: 204px;
       max-width: 204px;
-      height: 386px;
+      height: 390px;
       background: ${({ theme }) => theme.colorsThemed.background.backgroundDD};
       border-color: ${({ theme }) =>
         theme.name === 'dark'
@@ -301,7 +298,7 @@ const SCardSkeletonSection = styled(CardSkeletonSection)`
       & > span > div {
         min-width: 204px;
         max-width: 204px;
-        height: 386px;
+        height: 390px;
 
         &:not(:nth-child(2)) {
           transform: translateY(25%);

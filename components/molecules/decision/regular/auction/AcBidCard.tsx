@@ -12,7 +12,7 @@ interface IAcBidCard {
 
 const AcBidCard: React.FunctionComponent<IAcBidCard> = ({ bid }) => {
   const router = useRouter();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const createdAtParsed = new Date((bid.createdAt?.seconds as number) * 1000);
 
@@ -53,7 +53,7 @@ const AcBidCard: React.FunctionComponent<IAcBidCard> = ({ bid }) => {
           <SUsernameSpan onClick={() => handleRedirectToUser()}>
             {bid.bidder?.uuid !== user.userData?.userUuid
               ? bid.bidder?.username
-              : t('acPost.me')}
+              : t('me')}
           </SUsernameSpan>
           <SDidABidSpan>{t('acPost.optionsTab.bidCard.didABid')}</SDidABidSpan>
           <SAmountSpan>

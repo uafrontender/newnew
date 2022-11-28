@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useMemo, useEffect, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 
@@ -35,17 +35,6 @@ interface IPostShareEllipseMenu {
 const PostShareEllipseMenu: React.FunctionComponent<IPostShareEllipseMenu> =
   React.memo(({ postId, isVisible, onClose, anchorElement }) => {
     const { t } = useTranslation('common');
-
-    useEffect(() => {
-      if (isBrowser()) {
-        const postModal = document.getElementById('post-modal-container');
-        if (isVisible && postModal) {
-          postModal.style.overflow = 'hidden';
-        } else if (postModal) {
-          postModal.style.overflow = 'scroll';
-        }
-      }
-    }, [isVisible]);
 
     // const socialButtons = useMemo(
     //   () => [

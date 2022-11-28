@@ -9,19 +9,18 @@ import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { toast } from 'react-toastify';
 
 import EllipseMenu, { EllipseMenuButton } from '../atoms/EllipseMenu';
 
-import isBrowser from '../../utils/isBrowser';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
-import switchPostType from '../../utils/switchPostType';
+import useErrorToasts from '../../utils/hooks/useErrorToasts';
+import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { useAppSelector } from '../../redux-store/store';
 import { Mixpanel } from '../../utils/mixpanel';
 
 interface IPostCardEllipseMenu {
   postUuid: string;
-  postType: string;
+  postType: TPostType;
   isVisible: boolean;
   postCreator: newnewapi.User;
   handleReportOpen: () => void;
@@ -49,16 +48,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       const { t } = useTranslation('common');
       const user = useAppSelector((state) => state.user);
 
-      useEffect(() => {
-        if (isBrowser()) {
-          const postModal = document.getElementById('post-modal-container');
-          if (isVisible && postModal) {
-            postModal.style.overflow = 'hidden';
-          } else if (postModal) {
-            postModal.style.overflow = 'scroll';
-          }
-        }
-      }, [isVisible]);
+      const { showErrorToastPredefined } = useErrorToasts();
 
       // Share
       const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -132,16 +122,17 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           }
         } catch (err) {
           console.error(err);
-          toast.error('toastErrors.generic');
+          showErrorToastPredefined(undefined);
         }
       }, [
-        handleAddPostToState,
-        handleRemovePostFromState,
-        isFollowingDecision,
         postUuid,
-        router,
         user.loggedIn,
         user._persist?.rehydrated,
+        isFollowingDecision,
+        router,
+        handleRemovePostFromState,
+        handleAddPostToState,
+        showErrorToastPredefined,
       ]);
 
       useEffect(() => {
@@ -166,7 +157,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           }
         }
 
-        if (user.loggedIn) {
+        if (user.loggedIn && isVisible) {
           // setTimeout used to fix the React memory leak warning
           const timer = setTimeout(() => {
             fetchIsFollowing();
@@ -175,7 +166,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
             clearTimeout(timer);
           };
         }
-      }, [user.loggedIn, postUuid]);
+      }, [user.loggedIn, postUuid, isVisible]);
 
       return (
         <SEllipseMenu
@@ -202,7 +193,8 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
                 <Skeleton
                   count={1}
                   height='100%'
-                  width='100px'
+                  width='120px'
+                  wrapper={SSkeletonWrapper}
                   highlightColor={theme.colorsThemed.background.primary}
                 />
               )}
@@ -235,4 +227,10 @@ const SEllipseMenu = styled(EllipseMenu)`
 
 const SEllipseMenuButton = styled(EllipseMenuButton)`
   text-align: right;
+`;
+
+const SSkeletonWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  padding: 8px;
 `;

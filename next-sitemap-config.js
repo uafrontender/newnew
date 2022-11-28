@@ -28,7 +28,6 @@ const disallow = [
   '/verify-email',
   '/verify-new-email',
   '/404',
-  '/es/*',
   '/zh/*',
 ];
 
@@ -47,7 +46,7 @@ module.exports = {
     ],
     additionalSitemaps: [
       `${process.env.NEXT_PUBLIC_APP_URL}/sitemap.xml`,
-      `${process.env.NEXT_PUBLIC_APP_URL}/server-sitemap.xml`,
+      // `${process.env.NEXT_PUBLIC_APP_URL}/server-sitemap.xml`,
     ],
   },
 };

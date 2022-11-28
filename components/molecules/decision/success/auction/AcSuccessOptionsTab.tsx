@@ -17,6 +17,7 @@ import AcOptionCard from '../../regular/auction/AcOptionCard';
 import Button from '../../../../atoms/Button';
 import GradientMask from '../../../../atoms/GradientMask';
 import { Mixpanel } from '../../../../../utils/mixpanel';
+import getDisplayname from '../../../../../utils/getDisplayname';
 
 interface IAcSuccessOptionsTab {
   post: newnewapi.Auction;
@@ -28,7 +29,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
   handleGoBack,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -222,11 +223,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
             key={option.id.toString()}
             option={option as TAcOptionWithHighestField}
             postId={post.postUuid}
-            postCreator={
-              post.creator?.nickname
-                ? post.creator?.nickname
-                : post.creator?.username ?? ''
-            }
+            postCreatorName={getDisplayname(post.creator)}
             postText=''
             postDeadline=''
             index={i}

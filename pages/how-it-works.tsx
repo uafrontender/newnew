@@ -15,6 +15,7 @@ import Text from '../components/atoms/Text';
 import assets from '../constants/assets';
 import Button from '../components/atoms/Button';
 import { useAppSelector } from '../redux-store/store';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 export const HowItWorks = () => {
   const { t } = useTranslation('page-HowItWorks');
@@ -160,10 +161,12 @@ export const HowItWorks = () => {
 export default HowItWorks;
 
 export const getServerSideProps = async (context: NextPageContext) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-HowItWorks',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-HowItWorks'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {

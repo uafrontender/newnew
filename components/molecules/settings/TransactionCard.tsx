@@ -30,25 +30,28 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
       <SActor variant={3} weight={600}>
         {t('Settings.sections.transactions.you')}
       </SActor>
-      {transaction.transactionType === 5 ? (
+      {transaction.transactionType ===
+        newnewapi.Transaction.TransactionType.SUBSCRIPTION ||
+      transaction.transactionType ===
+        newnewapi.Transaction.TransactionType.BUNDLE ? (
         <SAction variant={2}>
           {`${t(
             `Settings.sections.transactions.actions.${transaction.transactionType}`
           )} `}
-          <Link href={`/${transaction.relatedCreator?.nicknameOrUsername}`}>
-            {`@${transaction.relatedCreator?.nicknameOrUsername}`}
+          <Link href={`/${transaction.relatedCreator?.username}`}>
+            {`@${transaction.relatedCreator?.username}`}
           </Link>
         </SAction>
       ) : (
         <SAction variant={2}>
           {`${t(
-            `Settings.sections.transactions.actions.${transaction.transactionType}`
+            `Settings.sections.transactions.actions.${transaction.transactionType}` as any
           )} `}
-          <Link href={`/${transaction.relatedCreator?.nicknameOrUsername}`}>
-            {`@${transaction.relatedCreator?.nicknameOrUsername}`}
+          <Link href={`/${transaction.relatedCreator?.username}`}>
+            {`@${transaction.relatedCreator?.username}`}
           </Link>
           {`'s ${t(
-            `Settings.sections.transactions.type.${transaction.transactionType}`
+            `Settings.sections.transactions.type.${transaction.transactionType}` as any
           )}`}
         </SAction>
       )}

@@ -25,13 +25,17 @@
       "insights": "Estadísticas",
       "insightsTablet": "Ir a estadísticas",
       "cashOut": {
-        "amount": "Tu próximo pago de",
+        "amount_NEED_TRANSLATION": "Your Stripe earning are",
+        "amountSecondLine_NEED_TRANSLATION": "Manage your balance on Stripe.",
+        "stripeButton_NEED_TRANSLATION": "Take me to Stripe",
         "date": "se enviará automáticamente el {{date}}.",
         "submit": "Más información",
         "noPayouts": "No tienes ningún pago pendiente"
       },
       "toDosIssue": {
         "text": "Añade una biografía y tus datos bancarios para retirar tus ganancias",
+        "textBio": "Añade una biografía para retirar tus ganancias",
+        "textBank": "Añade tus datos bancarios para retirar tus ganancias",
         "button": "Añadir"
       },
       "makeDecision": {
@@ -41,7 +45,8 @@
       "list": {
         "ac": "Bids",
         "cf": "Superpolls",
-        "mc": "Goals"
+        "mc": "Goals",
+        "bundles": "Bundles"
       },
       "filter": {
         "today": "Hoy",
@@ -77,7 +82,8 @@
         "minutes": "m",
         "seconds": "s",
         "leftToRespond": "restantes para responder"
-      }
+      },
+      "linkCopied": "¡Enlace copiado!"
     },
     "toDos": {
       "title": "Completa estos pasos para recibir tu pago",
@@ -87,6 +93,11 @@
       "completeProfileButton": "Añádir",
       "addCashOutMethod": "Añadir información bancaria",
       "addCashOutMethodButton": "Añadir"
+    },
+    "aboutBundles": {
+      "title_NEED_TRANSLATION": "Superpoll Bundles",
+      "text_NEED_TRANSLATION": "Make more money. Have more fun.\nSuperpoll Bundles are a win-win for everyone!",
+      "button_NEED_TRANSLATION": "Tell me more!"
     }
   },
   "earnings": {
@@ -94,6 +105,52 @@
       "title": "Ganancias del creador"
     },
     "title": "Ganancias"
+  },
+  "myBundles": {
+    "meta": {
+      "title_NEED_TRANSLATION": "My Bundles",
+      "description_NEED_TRANSLATION": "View your NewNew Bundles"
+    },
+    "title_NEED_TRANSLATION": "My Bundles",
+    "buttonTurnOn_NEED_TRANSLATION": "Turn on bundles",
+    "buttonTurnOff_NEED_TRANSLATION": "Turn off bundles",
+    "earnings_NEED_TRANSLATION": {
+      "title_NEED_TRANSLATION": "Bundles Earnings",
+      "payPeriod_NEED_TRANSLATION": "this pay period",
+      "unitName_NEED_TRANSLATION": "bundle",
+      "earned_NEED_TRANSLATION": "earned",
+      "noSoldYet_NEED_TRANSLATION": "No bundles sold yet",
+      "sold_NEED_TRANSLATION": "sold"
+    },
+    "bundlesSet": {
+      "title_NEED_TRANSLATION": "Superpoll Bundles",
+      "subTitle_NEED_TRANSLATION": "Offer Superpoll bundles to increase your earnings and get closer to your audience. ",
+      "votes_NEED_TRANSLATION": "votes",
+      "description_NEED_TRANSLATION": "plus people get {{duration}} months of:",
+      "descriptionSingular_NEED_TRANSLATION": "plus people get 1 month of:",
+      "firstOption_NEED_TRANSLATION": "adding custom options to your Superpolls",
+      "secondOption_NEED_TRANSLATION": "sending you private chats",
+      "perBundle_NEED_TRANSLATION": "per bundle"
+    },
+    "modals": {
+      "turnon": {
+        "title_NEED_TRANSLATION": "Turn On bundles",
+        "text_NEED_TRANSLATION": "Are you sure you want to activate bundles?"
+      },
+      "turnoff": {
+        "title_NEED_TRANSLATION": "Turn Off bundles",
+        "text_NEED_TRANSLATION": "Are you sure you want to deactivate bundles?"
+      },
+      "activated": {
+        "title_NEED_TRANSLATION": "Congratulations!",
+        "text_NEED_TRANSLATION": "You are successfully activated bundles"
+      },
+      "deactivated": {
+        "title_NEED_TRANSLATION": "So sad!",
+        "text_NEED_TRANSLATION": "But you can activate bundles at any time"
+      },
+      "button_NEED_TRANSLATION": "Sounds good!"
+    }
   },
   "getPaid": {
     "meta": {
@@ -112,6 +169,7 @@
     "myPosts": "Mis publicaciones",
     "insights": "Estadísticas",
     "earnings": "Ingresos",
+    "bundles": "Bundles",
     "getPaid": "Añadir información bancaria",
     "getPaidEdit": "Editar información bancaria",
     "transactions": "Transacciones",
@@ -127,7 +185,7 @@
     "noMessagesFirstLine": "Todavía no hay mensajes aquí...",
     "typing": "Escribiendo...",
     "toolbar": {
-      "searchPlaceholder": "Busca mensajes o usuarios"
+      "searchPlaceholder": "Busca usuarios"
     },
     "modal": {
       "newMessage": {
@@ -157,7 +215,10 @@
     "members": "miembros"
   },
   "announcement": {
-    "title": "El anuncio de {{username}}"
+    "comment_DON_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "El anuncio de",
+    "suffix": "",
+    "afterName": ""
   },
   "stripe": {
     "meta": {

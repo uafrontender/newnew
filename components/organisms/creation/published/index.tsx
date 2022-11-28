@@ -10,7 +10,7 @@ import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
-import InlineSVG from '../../../atoms/InlineSVG';
+import InlineSVG, { InlineSvg } from '../../../atoms/InlineSVG';
 import UserAvatar from '../../../molecules/UserAvatar';
 
 import { clearCreation } from '../../../../redux-store/slices/creationStateSlice';
@@ -22,6 +22,9 @@ import twitterIcon from '../../../../public/images/svg/icons/socials/Twitter.svg
 import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
 import PostTitleContent from '../../../atoms/PostTitleContent';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import { I18nNamespaces } from '../../../../@types/i18next';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -122,7 +125,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
             }
 
             router.push(url).then(() => {
-              dispatch(clearCreation({}));
+              dispatch(clearCreation(undefined));
             });
           }
         }
@@ -171,6 +174,12 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       dateValue.add(5, 'd');
     } else if (post.expiresAt === '7-days') {
       dateValue.add(7, 'd');
+    } else if (post.expiresAt === '2-minutes') {
+      dateValue.add(2, 'm');
+    } else if (post.expiresAt === '5-minutes') {
+      dateValue.add(5, 'm');
+    } else if (post.expiresAt === '10-minutes') {
+      dateValue.add(10, 'm');
     }
 
     return dateValue;
@@ -199,7 +208,11 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       >
         {item.key === 'copy' && isCopiedUrl
           ? t(`published.socials.copied`)
-          : t(`published.socials.${item.key}`)}
+          : t(
+              `published.socials.${
+                item.key as keyof I18nNamespaces['page-Creation']['published']['socials']
+              }`
+            )}
       </SItemTitle>
     </SItem>
   );
@@ -224,6 +237,8 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const displayName = getDisplayname(user.userData);
+
   return (
     <>
       <SContent>
@@ -242,11 +257,21 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
         </SPlayerWrapper>
         <SUserBlock>
           <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
-          <SUserTitle variant={3} weight={600}>
-            {user.userData?.nickname && user.userData?.nickname?.length > 8
-              ? `${user.userData?.nickname?.substring(0, 8)}...`
-              : user.userData?.nickname}
-          </SUserTitle>
+          <SUserTitleContainer>
+            <SUserTitle variant={3} weight={600}>
+              {displayName && displayName.length > 8
+                ? `${displayName.substring(0, 8)}...`
+                : displayName}
+            </SUserTitle>
+            {user.userData?.options?.isVerified && (
+              <InlineSvg
+                svg={VerificationCheckmark}
+                width='20px'
+                height='20px'
+                fill='none'
+              />
+            )}
+          </SUserTitleContainer>
           <SCaption variant={2} weight={700}>
             {post.startsAt.type === 'right-away'
               ? t('secondStep.card.left', {
@@ -352,7 +377,7 @@ const STitle = styled(Headline)`
 
 const SUserBlock = styled.div`
   width: 224px;
-  margin: 16px auto 0 auto;
+  margin: 16px auto 16px auto;
   display: grid;
   align-items: center;
   flex-direction: row;
@@ -367,14 +392,20 @@ const SUserAvatar = styled(UserAvatar)`
   min-height: 36px;
 `;
 
-const SUserTitle = styled(Text)`
-  max-width: 188px;
-  display: -webkit-box;
+const SUserTitleContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   overflow: hidden;
-  position: relative;
+`;
+
+const SUserTitle = styled(Text)`
   padding-left: 12px;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  margin-right: 2px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const SSocials = styled.div`

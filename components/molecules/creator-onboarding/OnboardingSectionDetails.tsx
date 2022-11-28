@@ -42,6 +42,8 @@ import OnboardingSectionUsernameInput from './OnboardingUsernameInput';
 import OnboardingSectionNicknameInput from './OnboardingNicknameInput';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import resizeImage from '../../../utils/resizeImage';
+import isSafari from '../../../utils/isSafari';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const OnboardingEditProfileImageModal = dynamic(
   () => import('./OnboardingEditProfileImageModal')
@@ -144,6 +146,10 @@ const OnboardingSectionDetails: React.FunctionComponent<
   );
   const isTablet = ['tablet'].includes(resizeMode);
 
+  const { showErrorToastPredefined } = useErrorToasts();
+
+  const onlySpacesRegex = /^\s+$/;
+
   // Firstname
   const [firstNameInEdit, setFirstnameInEdit] = useState('');
   // TODO: improve firstName validation
@@ -152,10 +158,14 @@ const OnboardingSectionDetails: React.FunctionComponent<
     if (firstNameError) {
       setFirstnameError('');
     }
-    setFirstnameInEdit(e.target.value);
+
+    if (onlySpacesRegex.test(e.target.value)) {
+      setFirstnameInEdit('');
+    } else {
+      setFirstnameInEdit(e.target.value);
+    }
   };
 
-  // Lastname
   const [lastNameInEdit, setLastnameInEdit] = useState('');
   // TODO: improve lastName validation
   const [lastNameError, setLastnameError] = useState('');
@@ -163,7 +173,12 @@ const OnboardingSectionDetails: React.FunctionComponent<
     if (lastNameError) {
       setLastnameError('');
     }
-    setLastnameInEdit(e.target.value);
+
+    if (onlySpacesRegex.test(e.target.value)) {
+      setLastnameInEdit('');
+    } else {
+      setLastnameInEdit(e.target.value);
+    }
   };
 
   // Username
@@ -184,7 +199,11 @@ const OnboardingSectionDetails: React.FunctionComponent<
   );
   const [nicknameError, setNicknameError] = useState('');
   const handleUpdateNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNicknameInEdit(e.target.value);
+    if (onlySpacesRegex.test(e.target.value)) {
+      setNicknameInEdit('');
+    } else {
+      setNicknameInEdit(e.target.value);
+    }
 
     validateNicknameViaAPIDebounced(e.target.value);
   };
@@ -194,7 +213,15 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const validateUsernameViaAPI = useCallback(
     async (text: string) => {
       setIsAPIValidateLoading(true);
+
       try {
+        // skip validation if username is equal to current username
+        if (text === user.userData?.username) {
+          setUsernameError('');
+
+          return;
+        }
+
         const payload = new newnewapi.ValidateUsernameRequest({
           username: text,
         });
@@ -224,7 +251,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
         }
       }
     },
-    [setUsernameError, dispatch]
+    [setUsernameError, dispatch, user.userData?.username]
   );
 
   const validateUsernameViaAPIDebounced = useMemo(
@@ -433,22 +460,22 @@ const OnboardingSectionDetails: React.FunctionComponent<
         countryCode: selectedCountry,
         ...(fieldsToBeUpdated.firstName
           ? {
-              firstName: firstNameInEdit,
+              firstName: firstNameInEdit.trim(),
             }
           : {}),
         ...(fieldsToBeUpdated.lastName
           ? {
-              lastName: lastNameInEdit,
+              lastName: lastNameInEdit.trim(),
             }
           : {}),
         ...(fieldsToBeUpdated.username
           ? {
-              username: usernameInEdit,
+              username: usernameInEdit.trim(),
             }
           : {}),
         ...(fieldsToBeUpdated.nickname
           ? {
-              nickname: nicknameInEdit,
+              nickname: nicknameInEdit.trim(),
             }
           : {}),
         ...(fieldsToBeUpdated.dateOfBirth
@@ -545,7 +572,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
         // } else if ((err as Error).message === 'Too young') {
         // TODO: fix error handling, not all other errors are DoB related
       } else if ((err as Error).message === 'Request failed') {
-        toast.error('toastErrors.generic');
+        showErrorToastPredefined(undefined);
       } else if ((err as Error).message) {
         setDateError('tooYoung');
       }
@@ -702,10 +729,10 @@ const OnboardingSectionDetails: React.FunctionComponent<
     setFieldsValid((curr) => {
       const working = { ...curr };
 
-      working.firstName = firstNameInEdit.length > 1 && !firstNameError;
-      working.lastName = lastNameInEdit.length > 1 && !lastNameError;
-      working.username = usernameInEdit.length > 0 && !usernameError;
-      working.nickname = nicknameInEdit.length > 0 && !nicknameError;
+      working.firstName = firstNameInEdit.trim().length > 1 && !firstNameError;
+      working.lastName = lastNameInEdit.trim().length > 1 && !lastNameError;
+      working.username = usernameInEdit.trim().length > 0 && !usernameError;
+      working.nickname = nicknameInEdit.trim().length > 0 && !nicknameError;
       working.email = validator.isEmail(emailInEdit) && !emailError;
       working.dateOfBirth = !Object.values(dateInEdit).some(
         (v) => v === undefined
@@ -731,6 +758,22 @@ const OnboardingSectionDetails: React.FunctionComponent<
     setFieldsValid,
   ]);
 
+  // fix issue with gap while keyboard is active on iOS
+  function preventScroll(e: any) {
+    e.preventDefault();
+  }
+  const handleBlur = useCallback(() => {
+    if (isSafari() && isMobile)
+      document.body.removeEventListener('touchmove', preventScroll);
+  }, [isMobile]);
+
+  const handleFocus = useCallback(() => {
+    if (isSafari() && isMobile)
+      document.body.addEventListener('touchmove', preventScroll, {
+        passive: false,
+      });
+  }, [isMobile]);
+
   return (
     <>
       <SContainer isMobile={isMobile}>
@@ -745,6 +788,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
               placeholder={t('detailsSection.form.firstName.placeholder')}
               onChange={handleFirstnameInput}
               errorCaption={t('detailsSection.form.firstName.errors.tooShort')}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
             />
             <OnboardingInput
               id='settings_last_name_input'
@@ -754,6 +799,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
               placeholder={t('detailsSection.form.lastName.placeholder')}
               onChange={handleLastnameInput}
               errorCaption={t('detailsSection.form.lastName.errors.tooShort')}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
             />
           </SFieldPairContainer>
           <SFieldPairContainer>
@@ -790,11 +837,13 @@ const OnboardingSectionDetails: React.FunctionComponent<
                 'detailsSection.form.username.frequencyCaption'
               )}
               errorCaption={t(
-                `detailsSection.form.username.errors.${usernameError}`
+                `detailsSection.form.username.errors.${usernameError}` as any
               )}
               placeholder={t('detailsSection.form.username.placeholder')}
               isValid={usernameError === ''}
               onChange={handleUpdateUsername}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
             />
             <OnboardingSectionNicknameInput
               type='text'
@@ -802,10 +851,12 @@ const OnboardingSectionDetails: React.FunctionComponent<
               disabled={loadingModalOpen}
               placeholder={t('detailsSection.form.nickname.placeholder')}
               errorCaption={t(
-                `detailsSection.form.nickname.errors.${nicknameError}`
+                `detailsSection.form.nickname.errors.${nicknameError}` as any
               )}
               isValid={nicknameError === ''}
               onChange={handleUpdateNickname}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
             />
           </SFieldPairContainer>
           <SFieldPairContainer marginBottom={34}>
@@ -825,6 +876,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
                   : t('detailsSection.form.email.errors.invalidEmail')
               }
               onChange={handleEmailInput}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
             />
             <OnboardingCountrySelect
               width='100%'

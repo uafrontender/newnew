@@ -16,7 +16,7 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 interface IMcConfirmVoteModal {
   isOpen: boolean;
   zIndex: number;
-  postCreator: string;
+  postCreatorName: string;
   optionText: string;
   supportVotesAmount: string;
   onClose: () => void;
@@ -26,14 +26,14 @@ interface IMcConfirmVoteModal {
 const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
   isOpen,
   zIndex,
-  postCreator,
+  postCreatorName,
   optionText,
   supportVotesAmount,
   onClose,
   handleOpenPaymentModal,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
@@ -74,11 +74,11 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
             {parseInt(supportVotesAmount) === 1
               ? t(
                   'mcPost.optionsTab.optionCard.confirmVoteModal.buySingleVote',
-                  { creator: postCreator }
+                  { creator: postCreatorName }
                 )
               : t(
                   'mcPost.optionsTab.optionCard.confirmVoteModal.buyMultipleVotes',
-                  { creator: postCreator, amount: supportVotesAmount }
+                  { creator: postCreatorName, amount: supportVotesAmount }
                 )}
           </SCreatorsText>
           <SCaption variant={3}>

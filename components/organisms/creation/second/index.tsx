@@ -10,7 +10,6 @@ import React, {
 } from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
-import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -48,7 +47,6 @@ import {
   setCreationFileUploadError,
   setCreationVideoThumbnails,
   setCreationVideoProcessing,
-  setCreationAllowSuggestions,
   setCreationTargetBackerCount,
   setCreationFileUploadLoading,
   setCreationFileUploadProgress,
@@ -71,6 +69,10 @@ import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 import getChunks from '../../../../utils/getChunks/getChunks';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import InlineSvg from '../../../atoms/InlineSVG';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -100,6 +102,7 @@ export const CreationSecondStepContent: React.FC<
 > = () => {
   const { t: tCommon } = useTranslation();
   const { t } = useTranslation('page-Creation');
+  const { showErrorToastPredefined } = useErrorToasts();
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -153,7 +156,7 @@ export const CreationSecondStepContent: React.FC<
   const [titleError, setTitleError] = useState('');
 
   const [isTutorialVisible, setIsTutorialVisible] = useState(false);
-  const [tutorialType, setTutorialType] = useState('AC');
+  const [tutorialType, setTutorialType] = useState<'AC' | 'MC' | 'CF'>('AC');
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -318,6 +321,12 @@ export const CreationSecondStepContent: React.FC<
       dateValue.add(5, 'd');
     } else if (post.expiresAt === '7-days') {
       dateValue.add(7, 'd');
+    } else if (post.expiresAt === '2-minutes') {
+      dateValue.add(2, 'm');
+    } else if (post.expiresAt === '5-minutes') {
+      dateValue.add(5, 'm');
+    } else if (post.expiresAt === '10-minutes') {
+      dateValue.add(10, 'm');
     }
 
     return dateValue;
@@ -342,6 +351,12 @@ export const CreationSecondStepContent: React.FC<
       dateValue.add(5, 'd');
     } else if (post.expiresAt === '7-days') {
       dateValue.add(7, 'd');
+    } else if (post.expiresAt === '2-minutes') {
+      dateValue.add(2, 'm');
+    } else if (post.expiresAt === '5-minutes') {
+      dateValue.add(5, 'm');
+    } else if (post.expiresAt === '10-minutes') {
+      dateValue.add(10, 'm');
     }
 
     return dateValue;
@@ -404,9 +419,15 @@ export const CreationSecondStepContent: React.FC<
       dispatch(setCreationFileProcessingLoading(false));
       dispatch(setCreationFileProcessingProgress(0));
     } catch (error: any) {
-      toast.error(error?.message);
+      showErrorToastPredefined(undefined);
     }
-  }, [dispatch, post?.announcementVideoUrl, videoProcessing?.taskUuid]);
+  }, [
+    dispatch,
+    post?.announcementVideoUrl,
+    showErrorToastPredefined,
+    videoProcessing?.taskUuid,
+  ]);
+
   const handleVideoUpload = useCallback(
     async (value: File) => {
       Mixpanel.track('Video Uploading', {
@@ -509,7 +530,7 @@ export const CreationSecondStepContent: React.FC<
       } catch (error: any) {
         if (error.message === 'Upload failed') {
           dispatch(setCreationFileUploadError(true));
-          toast.error(error?.message);
+          showErrorToastPredefined(undefined);
         } else {
           console.log('Upload aborted');
         }
@@ -517,8 +538,9 @@ export const CreationSecondStepContent: React.FC<
         dispatch(setCreationFileUploadLoading(false));
       }
     },
-    [dispatch]
+    [dispatch, showErrorToastPredefined]
   );
+
   const handleItemFocus = useCallback((key: string) => {
     if (key === 'title') {
       setTitleError('');
@@ -565,12 +587,6 @@ export const CreationSecondStepContent: React.FC<
           _value: value,
         });
         dispatch(setCreationComments(value));
-      } else if (key === 'allowSuggestions') {
-        Mixpanel.track('Post Allow Suggestions Change', {
-          _stage: 'Creation',
-          _value: value,
-        });
-        dispatch(setCreationAllowSuggestions(value));
       } else if (key === 'expiresAt') {
         Mixpanel.track('Post expiresAt Change', {
           _stage: 'Creation',
@@ -609,6 +625,22 @@ export const CreationSecondStepContent: React.FC<
   );
   const expireOptions = useMemo(
     () => [
+      ...(process.env.NEXT_PUBLIC_ENVIRONMENT !== 'production'
+        ? [
+            {
+              id: '2-minutes',
+              title: t('secondStep.field.expiresAt.options.2-minutes'),
+            },
+            {
+              id: '5-minutes',
+              title: t('secondStep.field.expiresAt.options.5-minutes'),
+            },
+            {
+              id: '10-minutes',
+              title: t('secondStep.field.expiresAt.options.10-minutes'),
+            },
+          ]
+        : []),
       {
         id: '1-hour',
         title: t('secondStep.field.expiresAt.options.1-hour'),
@@ -679,12 +711,13 @@ export const CreationSecondStepContent: React.FC<
                 type='input'
                 value={auction.minimalBid}
                 onChange={handleItemChange}
-                formattedDescription={auction.minimalBid}
+                formattedDescription={(appConstants.minAcBid / 100).toFixed(0)}
                 inputProps={{
-                  min: 5,
+                  min: appConstants.minAcBid ? appConstants.minAcBid / 100 : 2,
                   max: 10000,
                   type: 'number',
                   pattern: '[0-9]*',
+                  customPlaceholder: (appConstants.minAcBid / 100).toFixed(0),
                 }}
               />
             </SItemWrapper>
@@ -724,6 +757,7 @@ export const CreationSecondStepContent: React.FC<
       validateMcOption,
       isMobile,
       auction.minimalBid,
+      appConstants.minAcBid,
       crowdfunding.targetBackerCount,
       cfFormattedDescription,
     ]
@@ -741,12 +775,19 @@ export const CreationSecondStepContent: React.FC<
                     type='input'
                     value={auction.minimalBid}
                     onChange={handleItemChange}
-                    formattedDescription={auction.minimalBid}
+                    formattedDescription={(appConstants.minAcBid / 100).toFixed(
+                      0
+                    )}
                     inputProps={{
-                      min: 5,
+                      min: appConstants.minAcBid
+                        ? appConstants.minAcBid / 100
+                        : 2,
                       max: 10000,
                       type: 'number',
                       pattern: '[0-9]*',
+                      customPlaceholder: (appConstants.minAcBid / 100).toFixed(
+                        0
+                      ),
                     }}
                   />
                 </SFieldWrapper>
@@ -775,7 +816,7 @@ export const CreationSecondStepContent: React.FC<
                   options={expireOptions}
                   onChange={handleItemChange}
                   formattedValue={t(
-                    `secondStep.field.expiresAt.options.${post.expiresAt}`
+                    `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                   )}
                   formattedDescription={formatExpiresAt().format(
                     'DD MMM [at] hh:mm A'
@@ -789,7 +830,7 @@ export const CreationSecondStepContent: React.FC<
                   value={post.startsAt}
                   onChange={handleItemChange}
                   formattedValue={t(
-                    `secondStep.field.startsAt.modal.type.${post.startsAt?.type}`
+                    `secondStep.field.startsAt.modal.type.${post.startsAt?.type}` as any
                   )}
                   formattedDescription={formatStartsAt().format(
                     'DD MMM [at] hh:mm A'
@@ -810,7 +851,7 @@ export const CreationSecondStepContent: React.FC<
                 maxItems={5}
                 onChange={handleItemChange}
                 formattedValue={t(
-                  `secondStep.field.expiresAt.options.${post.expiresAt}`
+                  `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                 )}
                 formattedDescription={formatExpiresAt().format(
                   'DD MMM [at] hh:mm A'
@@ -825,17 +866,6 @@ export const CreationSecondStepContent: React.FC<
             <SSeparator margin='16px 0' />
           </>
         )}
-        {tab === 'multiple-choice' &&
-          user?.userData?.options?.isOfferingSubscription && (
-            <SMobileFieldWrapper>
-              <MobileField
-                id='allowSuggestions'
-                type='toggle'
-                value={multiplechoice.options.allowSuggestions}
-                onChange={handleItemChange}
-              />
-            </SMobileFieldWrapper>
-          )}
         <MobileField
           id='comments'
           type='toggle'
@@ -849,6 +879,7 @@ export const CreationSecondStepContent: React.FC<
       tab,
       auction.minimalBid,
       handleItemChange,
+      appConstants.minAcBid,
       crowdfunding.targetBackerCount,
       cfFormattedDescription,
       post.expiresAt,
@@ -858,8 +889,6 @@ export const CreationSecondStepContent: React.FC<
       t,
       formatExpiresAt,
       formatStartsAt,
-      user?.userData?.options?.isOfferingSubscription,
-      multiplechoice.options.allowSuggestions,
     ]
   );
 
@@ -899,16 +928,17 @@ export const CreationSecondStepContent: React.FC<
             dispatch(setCreationFileProcessingLoading(false));
           } else {
             dispatch(setCreationFileUploadError(true));
-            toast.error('An error occurred');
+            showErrorToastPredefined(undefined);
           }
         } else if (
           decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
         ) {
           dispatch(setCreationFileUploadError(true));
-          toast.error('An error occurred');
+          showErrorToastPredefined(undefined);
         }
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [videoProcessing, fileProcessing, dispatch]
   );
 
@@ -924,7 +954,7 @@ export const CreationSecondStepContent: React.FC<
         dispatch(setCreationFileProcessingLoading(false));
       } else {
         dispatch(setCreationFileUploadError(true));
-        toast.error('An error occurred');
+        showErrorToastPredefined(undefined);
       }
     }
 
@@ -1072,13 +1102,6 @@ export const CreationSecondStepContent: React.FC<
     if (payload) markTutorialStepAsCompleted(payload);
     setIsTutorialVisible(false);
   };
-
-  useEffect(() => {
-    if (!user?.userData?.options?.isOfferingSubscription) {
-      dispatch(setCreationAllowSuggestions(false));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.userData?.options?.isOfferingSubscription]);
 
   // This effect results in the form re-rendering every second
   // However, it re renders after every letter typed anyway
@@ -1243,12 +1266,19 @@ export const CreationSecondStepContent: React.FC<
                       </SFloatingSubSectionPlayer>
                       <SFloatingSubSectionUser>
                         <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
-                        <SUserTitle variant={3} weight={600}>
-                          {user.userData?.nickname &&
-                          user.userData?.nickname?.length > 8
-                            ? `${user.userData?.nickname?.substring(0, 8)}...`
-                            : user.userData?.nickname}
-                        </SUserTitle>
+                        <SUserTitleContainer>
+                          <SUserTitle variant={3} weight={600}>
+                            {getDisplayname(user.userData)}
+                          </SUserTitle>
+                          {user.userData?.options?.isVerified && (
+                            <SInlineSvg
+                              svg={VerificationCheckmark}
+                              width='20px'
+                              height='20px'
+                              fill='none'
+                            />
+                          )}
+                        </SUserTitleContainer>
                         <SCaption variant={2} weight={700}>
                           {t('secondStep.card.left', {
                             time: formatExpiresAtNoStartsAt().fromNow(true),
@@ -1349,6 +1379,7 @@ const SFloatingSubSection = styled.div`
 const SFloatingSubSectionWithPlayer = styled.div`
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 const SFloatingSubSectionUser = styled.div`
@@ -1359,7 +1390,7 @@ const SFloatingSubSectionUser = styled.div`
   align-items: center;
   flex-direction: row;
 
-  grid-template-columns: 48px 1fr 1fr;
+  grid-template-columns: 24px 1fr max-content;
 `;
 
 const SFloatingSubSectionPlayer = styled.div`
@@ -1468,10 +1499,6 @@ const SFieldWrapper = styled.div`
   margin: 8px;
 `;
 
-const SMobileFieldWrapper = styled.div`
-  margin-bottom: 16px;
-`;
-
 const SButtonWrapper = styled.div`
   left: 0;
   width: 100%;
@@ -1521,20 +1548,28 @@ const STabletBlockPreviewTitle = styled(Caption)`
 const STabletBlockSubTitle = styled(Text)``;
 
 const SUserAvatar = styled(UserAvatar)`
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  min-height: 24px;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+`;
+
+const SUserTitleContainer = styled.div`
+  display: flex;
+  overflow: hidden;
 `;
 
 const SUserTitle = styled(Text)`
-  max-width: 188px;
-  display: -webkit-box;
-  overflow: hidden;
-  position: relative;
   padding-left: 12px;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  margin-right: 2px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const SInlineSvg = styled(InlineSvg)`
+  flex-shrink: 0;
 `;
 
 const SBottomEnd = styled.div`

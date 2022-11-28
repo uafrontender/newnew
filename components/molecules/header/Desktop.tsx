@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 
@@ -11,17 +11,22 @@ import SearchInput from '../../atoms/search/SearchInput';
 import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
-// import { useGetChats } from '../../../contexts/chatContext';
+import { useGetChats } from '../../../contexts/chatContext';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useBundles } from '../../../contexts/bundlesContext';
+import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
+import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 
 export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.user);
-
-  // const { unreadCount } = useGetChats();
-  const { unreadNotificationCount } = useNotifications();
   const { globalSearchActive } = useAppSelector((state) => state.ui);
+  const theme = useTheme();
+
+  const { unreadCount } = useGetChats();
+  const { unreadNotificationCount } = useNotifications();
+  const { bundles } = useBundles();
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
@@ -64,28 +69,27 @@ export const Desktop: React.FC = React.memo(() => {
                 </SNavText>
               </SItemWithMargin>
             )}
-            {
-              // TODO: re-enable, repurpose for bundles
-              /*
-              <SItemWithMargin>
-              <NavigationItem
-                item={{
-                  url: '/direct-messages',
-                  key: 'directMessages',
-                  counter: unreadCount,
-                }}
-              />
-            </SItemWithMargin> */
+            {(user.userData?.options?.isCreator ||
+              (bundles && bundles?.length > 0)) && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{
-                    url: '/notifications',
-                    key: 'notifications',
-                    counter: unreadNotificationCount,
+                    url: '/direct-messages',
+                    key: 'directMessages',
+                    counter: unreadCount,
                   }}
                 />
               </SItemWithMargin>
-            }
+            )}
+            <SItemWithMargin>
+              <NavigationItem
+                item={{
+                  url: '/notifications',
+                  key: 'notifications',
+                  counter: unreadNotificationCount,
+                }}
+              />
+            </SItemWithMargin>
           </>
         )}
         <SItemWithMargin>
@@ -93,24 +97,53 @@ export const Desktop: React.FC = React.memo(() => {
         </SItemWithMargin>
         {user.loggedIn ? (
           <>
-            {user.userData?.options?.isCreator ? (
+            {user.userData?.options?.isCreator && (
+              <SItemWithMargin>
+                <Link href='/creator/dashboard'>
+                  <a>
+                    <Button
+                      view='quaternary'
+                      onClick={() => {
+                        Mixpanel.track('Navigation Item Clicked', {
+                          _button: 'Dashboard',
+                        });
+                      }}
+                    >
+                      {t('button.dashboard')}
+                    </Button>
+                  </a>
+                </Link>
+              </SItemWithMargin>
+            )}
+            {bundles && bundles.length > 0 && (
+              <SItemWithMargin>
+                <Link href='/bundles'>
+                  <a>
+                    <SButton
+                      view='quaternary'
+                      onClick={() => {
+                        Mixpanel.track('Navigation Item Clicked', {
+                          _button: 'Bundles',
+                        });
+                      }}
+                    >
+                      <SButtonContent>
+                        <SBundleIcon
+                          src={
+                            theme.name === 'light'
+                              ? VoteIconLight.src
+                              : VoteIconDark.src
+                          }
+                        />
+                        {t('button.bundles')}
+                      </SButtonContent>
+                    </SButton>
+                  </a>
+                </Link>
+              </SItemWithMargin>
+            )}
+            {user.userData?.options?.isCreator && (
               <>
-                <SItemWithMargin>
-                  <Link href='/creator/dashboard'>
-                    <a>
-                      <Button
-                        view='quaternary'
-                        onClick={() => {
-                          Mixpanel.track('Navigation Item Clicked', {
-                            _button: 'Dashboard',
-                          });
-                        }}
-                      >
-                        {t('button.dashboard')}
-                      </Button>
-                    </a>
-                  </Link>
-                </SItemWithMargin>
                 <SItemWithMargin>
                   <Link
                     href={
@@ -146,7 +179,8 @@ export const Desktop: React.FC = React.memo(() => {
                   </Link>
                 </SItemWithMargin>
               </>
-            ) : (
+            )}
+            {!user.userData?.options?.isCreator && (
               <>
                 <SItemWithMargin>
                   <Link
@@ -247,4 +281,20 @@ const SNavText = styled(Text)`
   opacity: 0.5;
   transition: opacity ease 0.5s;
   cursor: pointer;
+`;
+
+const SButton = styled(Button)`
+  padding: 12px 16px;
+`;
+
+const SButtonContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const SBundleIcon = styled.img`
+  width: 24px;
+  height: 24px;
+  margin-right: 4px;
 `;

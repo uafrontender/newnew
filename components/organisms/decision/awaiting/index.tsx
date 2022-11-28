@@ -1,19 +1,12 @@
 import React from 'react';
-import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 
 import { TPostType } from '../../../../utils/switchPostType';
 
 // Views
-const PostAwaitingResponseAC = dynamic(
-  () => import('./PostAwaitingResponseAC')
-);
-const PostAwaitingResponseMC = dynamic(
-  () => import('./PostAwaitingResponseMC')
-);
-const PostAwaitingResponseCF = dynamic(
-  () => import('./PostAwaitingResponseCF')
-);
+import { PostSkeletonView } from '../PostSkeleton';
+import PostAwaitingResponseAC from './PostAwaitingResponseAC';
+import PostAwaitingResponseMC from './PostAwaitingResponseMC';
 
 interface IWaitingForResponseView {
   postParsed:
@@ -44,16 +37,7 @@ const WaitingForResponseView: React.FunctionComponent<
     );
   }
 
-  if (typeOfPost === 'cf' && postParsed) {
-    return (
-      <PostAwaitingResponseCF
-        key={postParsed.postUuid}
-        post={postParsed as newnewapi.Crowdfunding}
-      />
-    );
-  }
-
-  return null;
+  return <PostSkeletonView />;
 };
 
 export default WaitingForResponseView;
