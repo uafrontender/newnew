@@ -4,8 +4,8 @@
       "title": "Página de perfil de NewNew",
       "description": "Personaliza tu perfil de NewNew con un nombre de usuario, un nombre para mostrar, tu biografía y mucho más"
     },
-    "noContent_NEED_TRANSLATION": {
-      "description": "Posts you’re actively bidding on\nor voting on will be shown here"
+    "noContent": {
+      "description": "Las publicaciones en las que estés\n ofertando o votando activamente se mostrarán aquí"
     }
   },
   "MyPosts": {
@@ -264,7 +264,7 @@
           "2": "votó en",
           "3": "patrocinó",
           "5": "se suscribió a",
-          "6_NEED_TRANSLATION": "purchased bundle from"
+          "6": "bundle comprado en"
         }
       },
       "privacy": {
