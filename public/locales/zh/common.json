@@ -62,7 +62,7 @@
     "dashboard": "儀錶板",
     "createOnNewnew": "開始創建",
     "cancel": "取消",
-    "takeMeHome_NEED_TRANSLATION": "Take me home"
+    "takeMeHome": "回到首頁"
   },
   "footer": {
     "topTitle": "NewNew",
@@ -134,8 +134,8 @@
     },
     "buyBundle": {
       "title": "購買一個Superpoll bundle 的價格:",
-      "votes_NEED_TRANSLATION": "<0>{{amount}}</0> votes",
-      "access_NEED_TRANSLATION": "plus get {{amount}} {{unit}} of:",
+      "votes": "<0>{{amount}}</0>投票",
+      "access": "另可獲{{amount}}{{unit}}的：",
       "customOptions": "在任何Superpoll中添加定制選項",
       "chat": "一對一私聊",
       "buy": "購買金額${{amount}}",
@@ -155,7 +155,7 @@
       "votes_NEED_TRANSLATION": "<0>{{amount}}</0> votes unlocked",
       "for": "為",
       "access": "剩餘{{amount}} {{unit}}:",
-      "customOptions_NEED_TRANSLATION": "adding custom superpoll options",
+      "customOptions": "添加定制Superpoll選項",
       "chat": "一對一私聊",
       "button": "Sounds good!",
       "unit": {
