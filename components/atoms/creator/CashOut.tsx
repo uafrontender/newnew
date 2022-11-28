@@ -188,7 +188,6 @@ const SDescription = styled(Text)`
 
 const SButton = styled(Button)`
   width: 100%;
-  color: ${(props) => props.theme.colors.black};
   padding: 16px 20px;
   margin-top: 16px;
 
