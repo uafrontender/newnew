@@ -22,6 +22,7 @@ import assets from '../../../constants/assets';
 import { useAppSelector } from '../../../redux-store/store';
 import { confirmMyEmail } from '../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 
 const EditEmailLoadingModal = dynamic(
   () => import('../../../components/molecules/settings/EditEmailLoadingModal')
@@ -151,11 +152,12 @@ export default ConfirmEmail;
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-VerifyEmail',
-    'page-Profile',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-VerifyEmail', 'page-Profile'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const { email_address, token } = context.query;
 

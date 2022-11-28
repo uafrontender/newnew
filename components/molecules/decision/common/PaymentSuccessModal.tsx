@@ -100,7 +100,7 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
             {t(
               `paymentSuccessModal.title.${postType}${
                 postType === 'mc' && value === 1 ? '-single' : ''
-              }`
+              }` as any
             )}
           </SModalTitle>
           <SModalMessage>{children}</SModalMessage>

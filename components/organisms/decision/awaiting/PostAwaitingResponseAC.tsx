@@ -55,7 +55,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
           ? dhms.hours === '1'
             ? 'acPostAwaiting.hero.expires.hours_singular'
             : 'acPostAwaiting.hero.expires.hours'
-          : ''
+          : ('' as any)
       )}`;
 
       if (dhms.days === '0') {

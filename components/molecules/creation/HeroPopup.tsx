@@ -24,7 +24,7 @@ const LIGHT_IMAGES: any = {
 
 interface IHeroPopup {
   isPopupVisible: boolean;
-  postType: string;
+  postType: 'AC' | 'MC' | 'CF';
   closeModal: () => void;
 }
 

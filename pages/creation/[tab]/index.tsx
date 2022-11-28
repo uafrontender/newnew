@@ -15,6 +15,8 @@ import { NextPageWithLayout } from '../../_app';
 import { useAppDispatch } from '../../../redux-store/store';
 import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
 import assets from '../../../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
+import { I18nNamespaces } from '../../../@types/i18next';
 
 interface ICreationSecondStep {}
 
@@ -46,18 +48,36 @@ export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
   return (
     <SWrapper>
       <Head>
-        <title>{t(`secondStep.meta.title-${router?.query?.tab}`)}</title>
+        <title>
+          {t(
+            `secondStep.meta.${
+              `title-${router?.query?.tab}` as keyof I18nNamespaces['page-Creation']['secondStep']['meta']
+            }`
+          )}
+        </title>
         <meta
           name='description'
-          content={t(`secondStep.meta.description-${router?.query?.tab}`)}
+          content={t(
+            `secondStep.meta.${
+              `description-${router?.query?.tab}` as keyof I18nNamespaces['page-Creation']['secondStep']['meta']
+            }`
+          )}
         />
         <meta
           property='og:title'
-          content={t(`secondStep.meta.title-${router?.query?.tab}`)}
+          content={t(
+            `secondStep.meta.${
+              `title-${router?.query?.tab}` as keyof I18nNamespaces['page-Creation']['secondStep']['meta']
+            }`
+          )}
         />
         <meta
           property='og:description'
-          content={t(`secondStep.meta.description-${router?.query?.tab}`)}
+          content={t(
+            `secondStep.meta.${
+              `description-${router?.query?.tab}` as keyof I18nNamespaces['page-Creation']['secondStep']['meta']
+            }`
+          )}
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
@@ -77,7 +97,9 @@ export async function getServerSideProps(
 ): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'page-Creation']
+    ['common', 'page-Creation'],
+    null,
+    SUPPORTED_LANGUAGES
   );
 
   // @ts-ignore

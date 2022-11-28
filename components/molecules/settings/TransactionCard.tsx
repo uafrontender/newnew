@@ -45,13 +45,13 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
       ) : (
         <SAction variant={2}>
           {`${t(
-            `Settings.sections.transactions.actions.${transaction.transactionType}`
+            `Settings.sections.transactions.actions.${transaction.transactionType}` as any
           )} `}
           <Link href={`/${transaction.relatedCreator?.username}`}>
             {`@${transaction.relatedCreator?.username}`}
           </Link>
           {`'s ${t(
-            `Settings.sections.transactions.type.${transaction.transactionType}`
+            `Settings.sections.transactions.type.${transaction.transactionType}` as any
           )}`}
         </SAction>
       )}

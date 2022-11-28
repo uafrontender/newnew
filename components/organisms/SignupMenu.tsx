@@ -45,6 +45,7 @@ import isBrowser from '../../utils/isBrowser';
 import { AuthLayoutContext } from '../templates/AuthLayout';
 import isSafari from '../../utils/isSafari';
 import { Mixpanel } from '../../utils/mixpanel';
+import { I18nNamespaces } from '../../@types/i18next';
 
 export interface ISignupMenu {
   goal?: string;
@@ -81,7 +82,9 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
   // NB! We won't have 'already exists' errors, but will probably
   // need some case for banned users, etc.
-  const [submitError, setSubmitError] = useState<string>('');
+  const [submitError, setSubmitError] = useState<
+    keyof I18nNamespaces['page-SignUp']['error'] | ''
+  >('');
 
   const handleSubmitEmail = async () => {
     setIsSubmitLoading(true);
@@ -166,7 +169,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
         </SSignInBackButton>
         <SHeadline variant={3}>
           {reason && reason !== 'session_expired'
-            ? `${t('heading.sign-in-to')} ${t(`heading.reason.${reason}`)}`
+            ? `${t('heading.sign-in-to')} ${t(
+                `heading.reason.${
+                  reason as keyof I18nNamespaces['page-SignUp']['heading']['reason']
+                }`
+              )}`
             : t('heading.sign-in')}
         </SHeadline>
         <SSubheading variant={2} weight={600}>
@@ -287,8 +294,10 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
             {submitError ? (
               <AnimatedPresence animateWhenInView={false} animation='t-09'>
                 <SErrorDiv>
-                  <InlineSvg svg={AlertIcon} width='16px' height='16px' />
-                  {t(`error.${submitError}`)}
+                  <>
+                    <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+                    {t(`error.${submitError}`)}
+                  </>
                 </SErrorDiv>
               </AnimatedPresence>
             ) : null}

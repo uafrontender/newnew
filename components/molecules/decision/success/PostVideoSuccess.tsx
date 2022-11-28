@@ -102,6 +102,8 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         const delta = window.innerHeight - videoRect.bottom;
         if (delta < 0) {
           setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+        } else {
+          setSoundBtnBottomOverriden(undefined);
         }
       }
     };
@@ -119,6 +121,8 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         if (!isInViewPort) {
           const delta = window.innerHeight - rect.bottom;
           setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+        } else {
+          setSoundBtnBottomOverriden(undefined);
         }
       }
 

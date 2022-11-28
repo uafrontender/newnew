@@ -26,15 +26,17 @@ const SortOption: React.FC<ISortOption> = React.memo(
             disabled={disabled}
             onClick={onClick}
           >
-            {t(`sortingOption.${key}`)} (
-            {t(
-              `sortingOption.${key}-${option}${
-                option === 'num_bids' && ['ac', 'mc', 'cf'].includes(category)
-                  ? `-${category}`
-                  : ''
-              }`
-            )}
-            )
+            <>
+              {t(`sortingOption.${key}` as any)} (
+              {t(
+                `sortingOption.${key}-${option}${
+                  option === 'num_bids' && ['ac', 'mc', 'cf'].includes(category)
+                    ? `-${category}`
+                    : ''
+                }` as any
+              )}
+              )
+            </>
             <InlineSvg svg={closeCircleIcon} width='16px' height='16px' />
           </SButton>
         ))}

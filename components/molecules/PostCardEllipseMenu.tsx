@@ -14,13 +14,13 @@ import EllipseMenu, { EllipseMenuButton } from '../atoms/EllipseMenu';
 
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
-import switchPostType from '../../utils/switchPostType';
+import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { useAppSelector } from '../../redux-store/store';
 import { Mixpanel } from '../../utils/mixpanel';
 
 interface IPostCardEllipseMenu {
   postUuid: string;
-  postType: string;
+  postType: TPostType;
   isVisible: boolean;
   postCreator: newnewapi.User;
   handleReportOpen: () => void;

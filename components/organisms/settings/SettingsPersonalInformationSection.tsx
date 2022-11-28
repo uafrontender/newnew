@@ -158,7 +158,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<
           submitError={
             dateError
               ? t(
-                  `Settings.sections.personalInformation.birthDateInput.errors.${dateError}`
+                  `Settings.sections.personalInformation.birthDateInput.errors.${dateError}` as any
                 )
               : undefined
           }

@@ -44,19 +44,19 @@ const ModalNotifications: React.FC = React.memo(() => {
               <NotificationImage src={assets.common.goldBig} />
               <Title>
                 {t(
-                  currentNotification.titleKey,
+                  currentNotification.titleKey as any,
                   currentNotification.titleProps
                 )}
               </Title>
               <Description>
                 {t(
-                  currentNotification.descriptionKey,
+                  currentNotification.descriptionKey as any,
                   currentNotification.descriptionProps
                 )}
               </Description>
             </DataContainer>
             <SButton onClick={handleClose}>
-              {t(currentNotification.buttonTextKey)}
+              {t(currentNotification.buttonTextKey as any)}
             </SButton>
           </Content>
         </Container>

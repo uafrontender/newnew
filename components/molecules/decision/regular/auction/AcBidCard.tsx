@@ -53,7 +53,7 @@ const AcBidCard: React.FunctionComponent<IAcBidCard> = ({ bid }) => {
           <SUsernameSpan onClick={() => handleRedirectToUser()}>
             {bid.bidder?.uuid !== user.userData?.userUuid
               ? bid.bidder?.username
-              : t('acPost.me')}
+              : t('me')}
           </SUsernameSpan>
           <SDidABidSpan>{t('acPost.optionsTab.bidCard.didABid')}</SDidABidSpan>
           <SAmountSpan>

@@ -22,6 +22,7 @@ import {
 import { validateText } from '../../../api/endpoints/infrastructure';
 import validateInputText from '../../../utils/validateMessageText';
 import isSafari from '../../../utils/isSafari';
+import { I18nNamespaces } from '../../../@types/i18next';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -208,7 +209,11 @@ const OnboardingSectionAbout: React.FunctionComponent<
             <OnboardingBioTextarea
               value={bioInEdit}
               isValid={bioError === ''}
-              errorCaption={t(`aboutSection.bio.errors.${bioError}`)}
+              errorCaption={t(
+                `aboutSection.bio.errors.${
+                  bioError as keyof I18nNamespaces['page-CreatorOnboarding']['aboutSection']['bio']['errors']
+                }`
+              )}
               placeholder={t('aboutSection.bio.placeholder')}
               maxChars={150}
               onChange={(e) => handleUpdateBioInEdit(e.target.value)}

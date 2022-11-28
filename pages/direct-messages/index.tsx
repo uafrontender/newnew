@@ -17,6 +17,7 @@ import { getMyRooms } from '../../api/endpoints/chat';
 import EmptyInbox from '../../components/atoms/chat/EmptyInbox';
 import Lottie from '../../components/atoms/Lottie';
 import loadingAnimation from '../../public/animations/logo-loading-blue.json';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
 export const Chat = () => {
   const { t } = useTranslation('page-Chat');
@@ -126,11 +127,12 @@ export const Chat = () => {
 export default Chat;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Chat',
-    'modal-PaymentModal',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-Chat', 'modal-PaymentModal'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const { req } = context;
 

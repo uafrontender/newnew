@@ -8,6 +8,7 @@ import General from '../components/templates/General';
 import SearchResults from '../components/organisms/search/SearchResults';
 
 import { NextPageWithLayout } from './_app';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 export const Search = () => {
   const { t } = useTranslation('page-Search');
@@ -29,16 +30,21 @@ export const Search = () => {
 export default Search;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Search',
-    'page-Profile',
-    'component-PostCard',
-    'page-SeeMore',
-    'modal-PaymentModal',
-    'page-Post',
-    'modal-ResponseSuccessModal',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    [
+      'common',
+      'page-Search',
+      'page-Profile',
+      'component-PostCard',
+      'page-SeeMore',
+      'modal-PaymentModal',
+      'page-Post',
+      'modal-ResponseSuccessModal',
+    ],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {

@@ -10,6 +10,7 @@ import Content from '../../components/organisms/creator/Dashboard';
 
 import { NextPageWithLayout } from '../_app';
 import assets from '../../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
 export const Dashboard = () => {
   const { t } = useTranslation('page-Creator');
@@ -38,11 +39,12 @@ export const Dashboard = () => {
 export default Dashboard;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Creator',
-    'page-Chat',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-Creator', 'page-Chat'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const { req } = context;
 
