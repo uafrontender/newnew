@@ -37,6 +37,7 @@ const McConfirmCustomOptionModal: React.FC<IMcConfirmCustomOptionModal> = ({
             </Text>
           </SModalMessage>
           <SDoneButton
+            id='add-option-confirm'
             view='primaryGrad'
             onClick={() => handleAddCustomOption()}
           >
