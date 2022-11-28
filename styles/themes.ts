@@ -373,7 +373,7 @@ export const darkTheme: DefaultTheme = {
         transparent: '#FFFFFF',
         changeLanguage: '#FFFFFF',
         danger: '#FFFFFF',
-        common: '#000000',
+        common: '#2C2C33',
       },
       background: {
         primary: '#1D6AFF',
@@ -388,7 +388,7 @@ export const darkTheme: DefaultTheme = {
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#14151F',
         danger: '#F12C46',
-        common: '#2C2C33',
+        common: '#FFFFFF',
       },
       hover: {
         primary: '#1D6AFF',
