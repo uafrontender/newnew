@@ -15,9 +15,10 @@ import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 
 import assets from '../../../../constants/assets';
+import { TPostType } from '../../../../utils/switchPostType';
 
 interface IPostScheduledSection {
-  postType: string;
+  postType: TPostType;
   timestampSeconds: number;
   isFollowing: boolean;
   variant: 'decision' | 'moderation';

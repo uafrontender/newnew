@@ -218,7 +218,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
       >
         {item.key === 'copy' && isCopiedUrl
           ? t(`published.socials.copied`)
-          : t(`published.socials.${item.key}`)}
+          : t(`published.socials.${item.key}` as any)}
       </SItemTitle>
     </SItem>
   );

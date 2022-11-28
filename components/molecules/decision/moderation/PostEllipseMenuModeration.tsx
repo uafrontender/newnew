@@ -3,9 +3,10 @@ import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 
 import EllipseMenu, { EllipseMenuButton } from '../../../atoms/EllipseMenu';
+import { TPostType } from '../../../../utils/switchPostType';
 
 interface IPostEllipseMenuModeration {
-  postType: string;
+  postType: TPostType;
   isVisible: boolean;
   canDeletePost: boolean;
   handleClose: () => void;

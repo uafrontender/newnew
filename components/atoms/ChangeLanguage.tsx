@@ -49,6 +49,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = (props) => {
         maxAge: 10 * 365 * 24 * 60 * 60,
         path: '/',
       });
+      handleCloseClick();
     };
 
     return (
@@ -59,7 +60,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = (props) => {
         selected={item === locale}
       >
         <SItemTitle variant={3} weight={600}>
-          {t(`language.ddLanguageTitle.${item}`)}
+          {t(`language.ddLanguageTitle.${item as 'en-US' | 'zh' | 'es'}`)}
         </SItemTitle>
       </SButton>
     );
@@ -79,7 +80,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = (props) => {
   return (
     <SContainer ref={ref} {...props}>
       <Button view='changeLanguage' onClick={handleChangeLanguageClick}>
-        {t(`language.selectedLanguageTitle.${locale}`)}
+        {t(`language.selectedLanguageTitle.${locale as 'en-US' | 'zh' | 'es'}`)}
       </Button>
       {isMobile ? (
         <Modal show={focused} onClose={handleCloseClick}>

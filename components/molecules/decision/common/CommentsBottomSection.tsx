@@ -328,7 +328,7 @@ const CommentsBottomSection: React.FunctionComponent<
   }, [inView, commentsNextPageToken, commentsLoading]);
 
   useEffect(() => {
-    if (commentsRoomId && socketConnection) {
+    if (commentsRoomId && socketConnection?.connected) {
       addChannel(`comments_${commentsRoomId.toString()}`, {
         chatRoomUpdates: {
           chatRoomId: commentsRoomId,
@@ -336,7 +336,7 @@ const CommentsBottomSection: React.FunctionComponent<
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection]);
+  }, [socketConnection?.connected, commentsRoomId]);
 
   useEffect(() => {
     const socketHandlerMessageCreated = (data: any) => {
@@ -405,11 +405,13 @@ const CommentsBottomSection: React.FunctionComponent<
 
   // Cleanup
   useEffect(
-    () => () => {
-      if (commentsRoomId) {
-        if (commentsRoomId)
-          removeChannel(`comments_${commentsRoomId.toString()}`);
-      }
+    () => {
+      return () => {
+        if (commentsRoomId) {
+          if (commentsRoomId)
+            removeChannel(`comments_${commentsRoomId.toString()}`);
+        }
+      };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []

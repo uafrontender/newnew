@@ -127,7 +127,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           });
 
           if (errorKey) {
-            throw new Error(t(errorKey));
+            throw new Error(t(errorKey as any));
           }
         }
 

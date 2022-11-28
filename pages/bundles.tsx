@@ -40,6 +40,7 @@ import AnimatedBackground from '../components/atoms/AnimationBackground';
 import { Mixpanel } from '../utils/mixpanel';
 import { buyCreatorsBundle } from '../api/endpoints/bundles';
 import useErrorToasts from '../utils/hooks/useErrorToasts';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 interface IBundlesPage {
   stripeSetupIntentClientSecretFromRedirect?: string;
@@ -418,11 +419,12 @@ export const Bundles: NextPage<IBundlesPage> = ({
 export default Bundles;
 
 export const getServerSideProps = async (context: NextPageContext) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Bundles',
-    'modal-PaymentModal',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-Bundles', 'modal-PaymentModal'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   // eslint-disable-next-line camelcase
   const { setup_intent_client_secret, save_card } = context.query;

@@ -178,7 +178,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
     (item: { id: string }) => (
       <SListItem key={`list-item-earnings-${item.id}`}>
         <SListItemTitle variant={2} weight={700}>
-          {t(`dashboard.earnings.list.${item.id}`)}
+          {t(`dashboard.earnings.list.${item.id}` as any)}
         </SListItemTitle>
         <SListItemValue variant={6}>{getValue(item.id)}</SListItemValue>
       </SListItem>
@@ -198,7 +198,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
     if (arr[0] === '0') return t('dashboard.earnings.earnedToday');
     if (arr[0] === '1') return t('dashboard.earnings.earnedYesterday');
     return `${t('dashboard.earnings.earned')} ${arr[0]} ${t(
-      `dashboard.earnings.units.${arr[1]}`
+      `dashboard.earnings.units.${arr[1]}` as any
     )}`;
   };
   /* eslint-disable no-nested-ternary */

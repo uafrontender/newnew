@@ -11,6 +11,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
 import assets from '../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 const OnboardingSectionAbout = dynamic(
   () =>
@@ -52,10 +53,12 @@ const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = () => {
 export default CreatorOnboardingAbout;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-CreatorOnboarding',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-CreatorOnboarding'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {

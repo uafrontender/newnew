@@ -55,14 +55,14 @@ const FaqSection = () => {
       <SHeadline variant={4}>{t('faq.title')}</SHeadline>
       <SList>
         {new Array(7).fill('').map((_, i) => (
-          <SListItem key={t(`faq.items.${i}.question`)}>
+          <SListItem key={t(`faq.items.${i}.question` as any)}>
             <STitle variant={2} weight={600}>
-              {t(`faq.items.${i}.question`)}
+              {t(`faq.items.${i}.question` as any)}
             </STitle>
             <SText variant={3} weight={600}>
               <Trans
                 key={`trans-${user.loggedIn}`}
-                i18nKey={`faq.items.${i}.answer`}
+                i18nKey={`faq.items.${i}.answer` as any}
                 t={t}
                 components={[
                   // @ts-ignore

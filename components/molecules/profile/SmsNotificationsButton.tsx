@@ -43,7 +43,8 @@ interface ISmsNotificationsButton {
 const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   subscription,
 }) => {
-  const { t } = useTranslation('page-Profile');
+  const { t } = useTranslation();
+  const { t: tProfile } = useTranslation('page-Profile');
   const { showErrorToastCustom } = useErrorToasts();
   const theme = useTheme();
   const socketConnection = useContext(SocketContext);
@@ -96,7 +97,11 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
           ) {
             throw new Error(
               res.error?.message ??
-                t(getSmsNotificationSubscriptionErrorMessage(res.data?.status))
+                t(
+                  getSmsNotificationSubscriptionErrorMessage(
+                    res.data?.status
+                  ) as any
+                )
             );
           }
 
@@ -121,7 +126,11 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
           ) {
             throw new Error(
               res.error?.message ??
-                t(getSmsNotificationSubscriptionErrorMessage(res.data?.status))
+                t(
+                  getSmsNotificationSubscriptionErrorMessage(
+                    res.data?.status
+                  ) as any
+                )
             );
           }
         }
@@ -194,7 +203,11 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
         ) {
           throw new Error(
             res.error?.message ??
-              t(getSmsNotificationSubscriptionErrorMessage(res.data?.status))
+              t(
+                getSmsNotificationSubscriptionErrorMessage(
+                  res.data?.status
+                ) as any
+              )
           );
         }
       } catch (err: any) {
@@ -372,7 +385,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
             width='24px'
             height='24px'
           />
-          {t(
+          {tProfile(
             subscribedToSmsNotifications
               ? 'profileLayout.buttons.disableSmsNotifications'
               : 'profileLayout.buttons.enableSmsNotifications'

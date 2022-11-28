@@ -21,6 +21,7 @@ import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import { CommentFromUrlContext } from '../../../contexts/commentFromUrlContext';
 import validateInputText from '../../../utils/validateMessageText';
+import { I18nNamespaces } from '../../../@types/i18next';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -231,7 +232,13 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
             value={commentText}
             focus={focusedInput}
             error={
-              commentTextError ? t(`comments.errors.${commentTextError}`) : ''
+              commentTextError
+                ? t(
+                    `comments.errors.${
+                      commentTextError as keyof I18nNamespaces['page-Post']['comments']['errors']
+                    }`
+                  )
+                : ''
             }
             onFocus={() => {
               setFocusedInput(true);

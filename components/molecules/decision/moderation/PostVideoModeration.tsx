@@ -199,6 +199,8 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         const delta = window.innerHeight - videoRect.bottom;
         if (delta < 0) {
           setBottomOffset(Math.abs(delta) + 24);
+        } else {
+          setBottomOffset(undefined);
         }
       }
     };
@@ -216,6 +218,8 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         if (!isInViewPort) {
           const delta = window.innerHeight - rect.bottom;
           setBottomOffset(Math.abs(delta) + 24);
+        } else {
+          setBottomOffset(undefined);
         }
       }
 

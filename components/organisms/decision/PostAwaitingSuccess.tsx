@@ -50,18 +50,20 @@ const PostAwaitingSuccess: React.FunctionComponent<
 
   return (
     <>
-      <Head>
-        <title>{t(`meta.${typeOfPost}.title`)}</title>
-        <meta
-          name='description'
-          content={t(`meta.${typeOfPost}.description`)}
-        />
-        <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-        <meta
-          property='og:description'
-          content={t(`meta.${typeOfPost}.description`)}
-        />
-      </Head>
+      {typeOfPost ? (
+        <Head>
+          <title>{t(`meta.${typeOfPost}.title`)}</title>
+          <meta
+            name='description'
+            content={t(`meta.${typeOfPost}.description`)}
+          />
+          <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
+          <meta
+            property='og:description'
+            content={t(`meta.${typeOfPost}.description`)}
+          />
+        </Head>
+      ) : null}
       {!isMobile && (
         <SGoBackButtonContainer>
           <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>

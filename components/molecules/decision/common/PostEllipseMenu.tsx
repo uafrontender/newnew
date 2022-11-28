@@ -3,9 +3,10 @@ import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 
 import EllipseMenu, { EllipseMenuButton } from '../../../atoms/EllipseMenu';
+import { TPostType } from '../../../../utils/switchPostType';
 
 interface IPostEllipseMenu {
-  postType: string;
+  postType: TPostType;
   isVisible: boolean;
   isFollowingDecision: boolean;
   handleFollowDecision: () => void;
