@@ -13,6 +13,7 @@ import Content from '../../../components/organisms/Chat';
 
 import { NextPageWithLayout } from '../../_app';
 import { useAppSelector } from '../../../redux-store/store';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 
 interface IChat {
   username: string;
@@ -73,12 +74,12 @@ export default Chat;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username, setup_intent_client_secret, save_card } = context.query;
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Chat',
-    'modal-PaymentModal',
-    'page-SubscribeToUser',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-Chat', 'modal-PaymentModal', 'page-SubscribeToUser'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const { req } = context;
 

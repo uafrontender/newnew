@@ -15,6 +15,8 @@ import PostTypeSection from '../components/organisms/home/PostTypeSection';
 import BecomeCreatorSection from '../components/organisms/home/BecomeCreatorSection';
 import Text from '../components/atoms/Text';
 
+import { SUPPORTED_LANGUAGES } from '../constants/general';
+
 import { useAppSelector } from '../redux-store/store';
 import {
   fetchPostByUUID,
@@ -515,15 +517,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const assumeLoggedIn = !!accessToken && !Array.isArray(accessToken);
 
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Home',
-    'component-PostCard',
-    'page-Post',
-    'modal-PaymentModal',
-    'modal-ResponseSuccessModal',
-    'page-Chat',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    [
+      'common',
+      'page-Home',
+      'component-PostCard',
+      'page-Post',
+      'modal-PaymentModal',
+      'modal-ResponseSuccessModal',
+      'page-Chat',
+    ],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const staticSuperpolls = [
     {

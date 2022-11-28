@@ -44,7 +44,7 @@ import moreIcon from '../../public/images/svg/icons/filled/More.svg';
 import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
 // Utils
-import switchPostType from '../../utils/switchPostType';
+import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { SocketContext } from '../../contexts/socketContext';
 import { ChannelsContext } from '../../contexts/channelsContext';
 import CardTimer from '../atoms/CardTimer';
@@ -528,7 +528,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 {!isMobile && isEllipseMenuOpen && (
                   <PostCardEllipseMenu
                     postUuid={postParsed.postUuid}
-                    postType={typeOfPost as string}
+                    postType={typeOfPost as TPostType}
                     isVisible={isEllipseMenuOpen}
                     postCreator={postParsed.creator as newnewapi.User}
                     handleReportOpen={handleReportOpen}
@@ -569,7 +569,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               isOpen={isEllipseMenuOpen}
               zIndex={11}
               postUuid={postParsed.postUuid}
-              postType={typeOfPost as string}
+              postType={typeOfPost as TPostType}
               postCreator={postParsed.creator as newnewapi.User}
               handleReportOpen={handleReportOpen}
               onClose={handleEllipseMenuClose}
@@ -631,7 +631,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               {!isMobile && (
                 <PostCardEllipseMenu
                   postUuid={postParsed.postUuid}
-                  postType={typeOfPost as string}
+                  postType={typeOfPost as TPostType}
                   isVisible={isEllipseMenuOpen}
                   postCreator={postParsed.creator as newnewapi.User}
                   handleReportOpen={handleReportOpen}
@@ -758,7 +758,7 @@ export const PostCard: React.FC<ICard> = React.memo(
             isOpen={isEllipseMenuOpen}
             zIndex={11}
             postUuid={postParsed.postUuid}
-            postType={typeOfPost as string}
+            postType={typeOfPost as TPostType}
             postCreator={postParsed.creator as newnewapi.User}
             handleReportOpen={handleReportOpen}
             onClose={handleEllipseMenuClose}

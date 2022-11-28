@@ -15,6 +15,7 @@ import { NextPageWithLayout } from '../_app';
 import Lottie from '../../components/atoms/Lottie';
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import { setCreatorData } from '../../redux-store/slices/userStateSlice';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
 const DashboardSectionStripe = dynamic(
   () => import('../../components/organisms/creator/DashboardSectionStripe')
@@ -91,11 +92,12 @@ const GetPaid = () => {
 export default GetPaid;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Creator',
-    'page-Chat',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-Creator', 'page-Chat'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const { req } = context;
 

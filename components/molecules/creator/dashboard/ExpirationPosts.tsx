@@ -140,7 +140,9 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
 
                 <SListBodyItem width='100px' align='flex-start'>
                   <SListBodyItemText variant={3} weight={600}>
-                    {t(`dashboard.expirationPosts.postTypes.${postType}`)}
+                    {t(
+                      `dashboard.expirationPosts.postTypes.${postType}` as any
+                    )}
                   </SListBodyItemText>
                 </SListBodyItem>
 

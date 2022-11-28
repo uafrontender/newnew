@@ -23,6 +23,7 @@ import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { setMyEmail } from '../../../api/endpoints/user';
 import { setUserData } from '../../../redux-store/slices/userStateSlice';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 
 const EditEmailLoadingModal = dynamic(
   () => import('../../../components/molecules/settings/EditEmailLoadingModal')
@@ -159,11 +160,12 @@ export default UdpateEmail;
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-VerifyEmail',
-    'page-Profile',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-VerifyEmail', 'page-Profile'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const { email_address, token } = context.query;
 

@@ -44,6 +44,7 @@ import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import { I18nNamespaces } from '../../../../@types/i18next';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -412,7 +413,11 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const renderSetting = (item: any) => (
     <SItem key={item.key}>
       <SItemTitle variant={2} weight={600}>
-        {t(`preview.settings.${item.key}`)}
+        {t(
+          `preview.settings.${
+            item.key as keyof I18nNamespaces['page-Creation']['preview']['settings']
+          }`
+        )}
       </SItemTitle>
       <SItemValue variant={2} weight={600}>
         {item.value}
@@ -538,7 +543,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         </SLeftPart>
         <SRightPart>
           <SHeadLine variant={3} weight={600}>
-            {t(`preview.title-${router?.query?.tab}`)}
+            {t(`preview.title-${router?.query?.tab}` as any)}
           </SHeadLine>
           <SHeadline variant={5}>
             <PostTitleContent>{post.title}</PostTitleContent>

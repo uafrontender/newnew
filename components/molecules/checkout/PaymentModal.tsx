@@ -63,7 +63,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
       const { errorKey } = await setupIntent.init();
 
       if (errorKey) {
-        showErrorToastCustom(t(errorKey));
+        showErrorToastCustom(t(errorKey as any));
       }
 
       setIsLoadingSetupIntent(false);

@@ -17,6 +17,7 @@ import { SocketContext } from '../contexts/socketContext';
 import { setUserData } from '../redux-store/slices/userStateSlice';
 import { becomeCreator } from '../api/endpoints/user';
 import assets from '../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 interface IVerifyNewEmail {}
 
@@ -122,10 +123,12 @@ export default VerifyNewEmail;
 export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
-  const translationContext = await serverSideTranslations(context.locale, [
-    'common',
-    'page-VerifyEmail',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale,
+    ['common', 'page-VerifyEmail'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {

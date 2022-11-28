@@ -16,6 +16,7 @@ import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { setCreatorData } from '../redux-store/slices/userStateSlice';
 import assets from '../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 const OnboardingSectionStripe = dynamic(
   () =>
@@ -98,10 +99,12 @@ export default CreatorOnboardingStripe;
 export async function getStaticProps(context: {
   locale: string;
 }): Promise<any> {
-  const translationContext = await serverSideTranslations(context.locale, [
-    'common',
-    'page-CreatorOnboarding',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale,
+    ['common', 'page-CreatorOnboarding'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {

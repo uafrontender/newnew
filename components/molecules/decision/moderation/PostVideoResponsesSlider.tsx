@@ -263,6 +263,7 @@ const SDotsContainer = styled.div<{
   gap: 4px;
 
   transition: 0.1s linear;
+  transition: bottom 0s linear;
 
   ${({ theme }) => theme.media.tablet} {
     bottom: 45px;

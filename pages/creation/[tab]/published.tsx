@@ -11,6 +11,7 @@ import PublishedContent from '../../../components/organisms/creation/published';
 
 import { useAppSelector } from '../../../redux-store/store';
 import { NextPageWithLayout } from '../../_app';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 
 interface ICreationPublished {}
 
@@ -30,7 +31,7 @@ export const CreationPublished: React.FC<ICreationPublished> = (props) => {
           {t(
             `published.meta.title-${router?.query?.tab}-${
               type === 'right-away' ? 'published' : 'scheduled'
-            }`
+            }` as any
           )}
         </title>
       </Head>
@@ -50,7 +51,9 @@ export async function getServerSideProps(
 ): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'page-Creation']
+    ['common', 'page-Creation'],
+    null,
+    SUPPORTED_LANGUAGES
   );
 
   // @ts-ignore
