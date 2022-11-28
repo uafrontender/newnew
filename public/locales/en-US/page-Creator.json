@@ -143,7 +143,7 @@
       },
       "activated": {
         "title": "Congratulations!",
-        "text": "You are successfully activated bundles"
+        "text": "You have successfully activated bundles"
       },
       "deactivated": {
         "title": "So sad!",
@@ -215,7 +215,7 @@
     "members": "members"
   },
   "announcement": {
-    "comment_DON_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
     "beforeName": "",
     "suffix": "'s",
     "afterName": "announcement"
