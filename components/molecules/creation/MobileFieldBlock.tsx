@@ -160,7 +160,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       ];
       const renderDay = (el: any) => (
         <SDay key={el.value} variant={1} weight={500}>
-          {t(`secondStep.field.startsAt.modal.days.${el.value}`)}
+          {t(`secondStep.field.startsAt.modal.days.${el.value}` as any)}
         </SDay>
       );
       const handleScheduleChange = (selectedId: string) => {
@@ -280,14 +280,14 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       inputRef.current.focus();
     }
   }, [focused, inputRef]);
-  const inputLabel = t(`secondStep.field.${id}.label`);
+  const inputLabel = t(`secondStep.field.${id}.label` as any);
 
   return (
     <>
       {getModal()}
       <SContainer onClick={handleClick}>
         <STitle variant={2} weight={700}>
-          {t(`secondStep.field.${id}.title`)}
+          {t(`secondStep.field.${id}.title` as any)}
         </STitle>
         {type === 'input' ? (
           <SInputWrapper>
@@ -302,20 +302,20 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
               withLabel={!!inputLabel}
               placeholder={
                 inputProps?.customPlaceholder ??
-                t(`secondStep.field.${id}.placeholder`)
+                t(`secondStep.field.${id}.placeholder` as any)
               }
               {...inputProps}
             />
           </SInputWrapper>
         ) : (
           <SValue variant={6}>
-            {t(`secondStep.field.${id}.value`, {
+            {t(`secondStep.field.${id}.value` as any, {
               value: formattedValue || value,
             })}
           </SValue>
         )}
         <SDescription variant={2} weight={700}>
-          {t(`secondStep.field.${id}.description`, {
+          {t(`secondStep.field.${id}.description` as any, {
             value: formattedDescription || value,
           })}
         </SDescription>

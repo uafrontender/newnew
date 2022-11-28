@@ -17,6 +17,7 @@ import LT404 from '../public/images/404/404-Light-Tablet.webp';
 import LM404 from '../public/images/404/404-Light-Mobile.webp';
 import Button from '../components/atoms/Button';
 import assets from '../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 // No sense to memorize
 const Custom404 = () => {
@@ -66,10 +67,12 @@ const Custom404 = () => {
 export default Custom404;
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-404',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-404'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {

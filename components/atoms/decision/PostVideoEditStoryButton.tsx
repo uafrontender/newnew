@@ -67,6 +67,8 @@ const SPostVideoEditStoryButton = styled(Button)<{
   width: 36px;
   height: 36px;
 
+  transition: bottom 0s linear;
+
   border-radius: ${({ theme }) => theme.borderRadius.small};
 
   &:focus:enabled,

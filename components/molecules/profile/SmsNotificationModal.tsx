@@ -10,6 +10,7 @@ import Modal from '../../organisms/Modal';
 import PhoneNumberInput from './PhoneNumberInput';
 import CloseIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import CheckMark from '../CheckMark';
+import { I18nNamespaces } from '../../../@types/i18next';
 
 export interface SubscriptionToCreator {
   userId: string;
@@ -122,7 +123,13 @@ const RequestStepContent: React.FC<IRequestStepContent> = ({
   const handlePhoneNumberChanged = useCallback(
     (countryCode: string, phoneNumber: string, errorCode?: number) => {
       if (phoneNumber && phoneNumber.length > 5 && errorCode) {
-        setPhoneNumberError(t(`smsNotifications.phoneError.${errorCode}`));
+        setPhoneNumberError(
+          t(
+            `smsNotifications.phoneError.${
+              errorCode as unknown as string as keyof I18nNamespaces['common']['smsNotifications']['phoneError']
+            }`
+          )
+        );
       } else {
         setPhoneNumberError(undefined);
       }

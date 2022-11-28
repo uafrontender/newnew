@@ -2,9 +2,10 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 
 import EllipseModal, { EllipseModalButton } from '../../../atoms/EllipseModal';
+import { TPostType } from '../../../../utils/switchPostType';
 
 interface IPostEllipseModal {
-  postType: string;
+  postType: TPostType;
   isFollowingDecision: boolean;
   isOpen: boolean;
   zIndex: number;

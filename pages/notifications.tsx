@@ -26,6 +26,7 @@ import usePagination, {
   PaginatedResponse,
   Paging,
 } from '../utils/hooks/usePagination';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 const NoResults = dynamic(
   () => import('../components/molecules/notifications/NoResults')
@@ -173,10 +174,12 @@ export const Notifications = () => {
 export default Notifications;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Notifications',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-Notifications'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {

@@ -6,7 +6,7 @@ import { useTheme } from 'styled-components';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-import switchPostType from '../../utils/switchPostType';
+import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
 import { useAppSelector } from '../../redux-store/store';
 import EllipseModal, { EllipseModalButton } from '../atoms/EllipseModal';
@@ -17,7 +17,7 @@ interface IPostCardEllipseModal {
   isOpen: boolean;
   zIndex: number;
   postUuid: string;
-  postType: string;
+  postType: TPostType;
   postCreator: newnewapi.User;
   handleReportOpen: () => void;
   onClose: () => void;

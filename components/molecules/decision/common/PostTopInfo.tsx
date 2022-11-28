@@ -40,6 +40,7 @@ import assets from '../../../../constants/assets';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import { I18nNamespaces } from '../../../../@types/i18next';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -344,7 +345,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           {/* Ellipse menu */}
           {!isMobile && (
             <PostEllipseMenu
-              postType={postType as string}
+              postType={postType as TPostType}
               isFollowingDecision={isFollowingDecision}
               isVisible={ellipseMenuOpen}
               handleFollowDecision={handleFollowDecision}
@@ -355,7 +356,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           )}
           {isMobile && ellipseMenuOpen ? (
             <PostEllipseModal
-              postType={postType as string}
+              postType={postType as TPostType}
               isFollowingDecision={isFollowingDecision}
               zIndex={11}
               isOpen={ellipseMenuOpen}
@@ -385,9 +386,14 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           title={t('postFailedBox.title', {
             postType: t(`postType.${postType}`),
           })}
-          body={t(`postFailedBox.reason.${failureReason}`, {
-            creator: getDisplayname(creator),
-          })}
+          body={t(
+            `postFailedBox.reason.${
+              failureReason as keyof I18nNamespaces['page-Post']['postFailedBox']['reason']
+            }`,
+            {
+              creator: getDisplayname(creator),
+            }
+          )}
           buttonCaption={tCommon('button.takeMeHome')}
           imageSrc={
             postType

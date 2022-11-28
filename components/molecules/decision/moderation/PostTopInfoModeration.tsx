@@ -29,6 +29,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 import PostConfirmDeleteModal from './PostConfirmDeleteModal';
 import isBrowser from '../../../../utils/isBrowser';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
+import { TPostType } from '../../../../utils/switchPostType';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -270,7 +271,7 @@ const PostTopInfoModeration: React.FunctionComponent<
           {/* Ellipse menu */}
           {!isMobile && (
             <PostEllipseMenuModeration
-              postType={typeOfPost as string}
+              postType={typeOfPost as TPostType}
               isVisible={ellipseMenuOpen}
               canDeletePost={postStatus !== 'succeeded'}
               handleClose={handleEllipseMenuClose}
@@ -280,7 +281,7 @@ const PostTopInfoModeration: React.FunctionComponent<
           )}
           {isMobile && ellipseMenuOpen ? (
             <PostEllipseModalModeration
-              postType={typeOfPost as string}
+              postType={typeOfPost as TPostType}
               zIndex={11}
               canDeletePost={postStatus !== 'succeeded'}
               isOpen={ellipseMenuOpen}
@@ -312,7 +313,11 @@ const PostTopInfoModeration: React.FunctionComponent<
           title={t('postFailedBoxModeration.title', {
             postType: t(`postType.${postType}`),
           })}
-          body={t(`postFailedBoxModeration.reason.${failureReason}`)}
+          body={
+            failureReason
+              ? t(`postFailedBoxModeration.reason.${failureReason}`)
+              : ''
+          }
           imageSrc={
             postType
               ? theme.name === 'light'
@@ -342,7 +347,7 @@ const PostTopInfoModeration: React.FunctionComponent<
       )}
       {/* Confirm delete post */}
       <PostConfirmDeleteModal
-        postType={typeOfPost as string}
+        postType={typeOfPost as TPostType}
         isVisible={deletePostOpen}
         closeModal={handleCloseDeletePostModal}
         handleConfirmDelete={handleDeletePost}

@@ -29,7 +29,7 @@ const MobileField: React.FC<IMobileField> = (props) => {
   return (
     <SContainer>
       <STitle variant={3} weight={600}>
-        {t(`secondStep.field.${id}.title`)}
+        {t(`secondStep.field.${id}.title` as any)}
       </STitle>
       <SRightPart>
         {type === 'toggle' ? (

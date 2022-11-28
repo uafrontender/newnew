@@ -108,33 +108,35 @@ export const General: React.FC<IGeneral> = (props) => {
           },
         ];
       } else {
-        bottomNavigationShadow = [
-          {
-            key: 'home',
-            url: '/',
-          },
-          {
-            key: 'add',
-            url: '/creator-onboarding',
-          },
-          bundles && bundles.length > 0
-            ? {
-                key: 'bundles',
-                url: '/bundles',
-              }
-            : {
-                key: 'notifications',
-                url: '/notifications',
-                counter: unreadNotificationCount,
-              },
-        ].concat(
+        bottomNavigationShadow = (
+          [
+            {
+              key: 'home',
+              url: '/',
+            },
+            {
+              key: 'add',
+              url: '/creator-onboarding',
+            },
+            bundles && bundles.length > 0
+              ? {
+                  key: 'bundles',
+                  url: '/bundles',
+                }
+              : {
+                  key: 'notifications',
+                  url: '/notifications',
+                  counter: unreadNotificationCount,
+                },
+          ] as TBottomNavigationItem[]
+        ).concat(
           user.userData?.options?.isCreator || (bundles && bundles.length > 0)
             ? [
                 {
                   key: 'dms',
                   url: '/direct-messages',
                   counter: unreadCount,
-                },
+                } as TBottomNavigationItem,
               ]
             : []
         );
