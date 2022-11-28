@@ -40,6 +40,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import AcAddNewOption from '../../../molecules/decision/regular/auction/AcAddNewOption';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -742,9 +743,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             postId={post.postUuid}
             postStatus={postStatus}
             postText={post.title}
-            postCreatorName={
-              (post.creator?.nickname as string) ?? post.creator?.username
-            }
+            postCreatorName={getDisplayname(post.creator)}
             postDeadline={moment(
               (post.responseUploadDeadline?.seconds as number) * 1000
             )
@@ -765,9 +764,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
               postId={post.postUuid}
               postStatus={postStatus}
               postText={post.title}
-              postCreator={
-                (post.creator?.nickname as string) ?? post.creator?.username
-              }
+              postCreator={getDisplayname(post.creator)}
               postDeadline={moment(
                 (post.responseUploadDeadline?.seconds as number) * 1000
               )
@@ -803,8 +800,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             }}
           >
             {t('paymentSuccessModal.ac', {
-              postCreator:
-                (post.creator?.nickname as string) ?? post.creator?.username,
+              postCreator: getDisplayname(post.creator),
               postDeadline: moment(
                 (post.responseUploadDeadline?.seconds as number) * 1000
               )

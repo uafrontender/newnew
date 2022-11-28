@@ -12,12 +12,12 @@ const WelcomeMessage: React.FC<IWelcomeMessage> = React.memo(
 
     return (
       <SWelcomeMessage>
-        <div>
-          <span>🎉</span>
+        <SWelcomeMessageInner>
+          <SEmoji>🎉</SEmoji>
           <p>
-            {t('chat.welcomeMessage')} @{userAlias}.
+            {t('chat.welcomeMessage')} {userAlias}
           </p>
-        </div>
+        </SWelcomeMessageInner>
       </SWelcomeMessage>
     );
   }
@@ -34,15 +34,15 @@ const SWelcomeMessage = styled.div`
   display: flex;
   text-align: center;
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  div {
-    max-width: 352px;
-    margin: 0 auto;
-  }
-  span {
-    font-size: 48px;
-  }
   p {
     margin: 12px 0 0;
   }
+`;
+const SWelcomeMessageInner = styled.div`
+  max-width: 352px;
+  margin: 0 auto;
+`;
+const SEmoji = styled.span`
+  font-size: 48px;
 `;
 export default WelcomeMessage;

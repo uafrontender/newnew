@@ -18,6 +18,7 @@ import AcOptionCard from '../../regular/auction/AcOptionCard';
 import GradientMask from '../../../../atoms/GradientMask';
 
 import loadingAnimation from '../../../../../public/animations/logo-loading-blue.json';
+import getDisplayname from '../../../../../utils/getDisplayname';
 
 interface IAcWaitingOptionsSection {
   post: newnewapi.Auction;
@@ -258,11 +259,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<
             option={option as TAcOptionWithHighestField}
             optionBeingSupported=''
             postId={post.postUuid}
-            postCreatorName={
-              post.creator?.nickname
-                ? post.creator?.nickname
-                : post.creator?.username ?? ''
-            }
+            postCreatorName={getDisplayname(post.creator)}
             postDeadline=''
             postText=''
             index={i}

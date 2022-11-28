@@ -72,6 +72,7 @@ import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -1267,7 +1268,7 @@ export const CreationSecondStepContent: React.FC<
                         <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
                         <SUserTitleContainer>
                           <SUserTitle variant={3} weight={600}>
-                            {user.userData?.nickname}
+                            {getDisplayname(user.userData)}
                           </SUserTitle>
                           {user.userData?.options?.isVerified && (
                             <SInlineSvg

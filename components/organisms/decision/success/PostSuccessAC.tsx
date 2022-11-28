@@ -191,7 +191,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                                   fill='none'
                                 />
                               ) : null,
-                              { creator: post.creator?.nickname },
+                              { creator: getDisplayname(post.creator) },
                             ]}
                           />
                         </SWantsToKnow>

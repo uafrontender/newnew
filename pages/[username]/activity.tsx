@@ -20,6 +20,7 @@ import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import getDisplayname from '../../utils/getDisplayname';
 
 interface IUserPageActivity {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -144,7 +145,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
             </SPrivateLock>
             <SAccountPrivateText variant={1}>
               {t('accountPrivate', {
-                username: user.nickname ?? user.username,
+                username: getDisplayname(user),
               })}
             </SAccountPrivateText>
           </SAccountPrivate>

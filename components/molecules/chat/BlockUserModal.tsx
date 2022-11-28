@@ -9,6 +9,7 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface IBlockUserModal {
   user: newnewapi.IVisavisUser;
@@ -57,12 +58,12 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
           <SModalTitle>
             {isAnnouncement
               ? t('modal.blockGroup.title')
-              : `${t('modal.blockUser.title')} ${user.user?.username}`}
+              : `${t('modal.blockUser.title')} ${getDisplayname(user.user)}`}
           </SModalTitle>
           <SModalMessage>
-            {`${t('modal.blockUser.messageFirstPart')} ${
-              user.user?.username
-            } ${t('modal.blockUser.messageSecondPart')}`}
+            {`${t('modal.blockUser.messageFirstPart')} ${getDisplayname(
+              user.user
+            )} ${t('modal.blockUser.messageSecondPart')}`}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>

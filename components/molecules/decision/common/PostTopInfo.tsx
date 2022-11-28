@@ -278,17 +278,19 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               });
             }}
           >
-            <SUsername className='username'>
-              {creator.nickname ?? `@${creator.username}`}{' '}
+            <SUserInfo>
+              <SUsername className='username'>
+                {getDisplayname(creator)}
+              </SUsername>
               {creator.options?.isVerified && (
                 <SInlineSVG
                   svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
+                  width='20px'
+                  height='20px'
                   fill='none'
                 />
               )}
-            </SUsername>
+            </SUserInfo>
           </a>
         </SCreatorCard>
         <SActionsDiv>
@@ -522,10 +524,16 @@ const SAvatarArea = styled.div`
   }
 `;
 
-const SUsername = styled.div`
+const SUserInfo = styled.div`
   grid-area: username;
   display: flex;
+  flex-direction: row;
   align-items: center;
+`;
+
+const SUsername = styled.div`
+  display: inline;
+  flex-shrink: 1;
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;

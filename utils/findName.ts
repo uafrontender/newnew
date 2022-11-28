@@ -22,7 +22,7 @@ function findName(text?: string | null, author?: IAuthor | null) {
     const usernameIndex = text.indexOf(author.username);
     if (usernameIndex > -1) {
       return {
-        text: author.username,
+        text: `@${author.username}`,
         startsAtIndex: usernameIndex,
       };
     }

@@ -344,7 +344,7 @@ const AcOptionCardModeration: React.FunctionComponent<
                     cursor: 'pointer',
                   }}
                 >
-                  {option.creator?.nickname ?? option.creator?.username}
+                  {getDisplayname(option.creator)}
                 </SSpanBiddersHighlighted>
               </Link>
             ) : (
@@ -352,7 +352,7 @@ const AcOptionCardModeration: React.FunctionComponent<
                 className='spanHighlighted'
                 onClick={(e) => e.stopPropagation()}
               >
-                {option.creator?.nickname ?? option.creator?.username}
+                {getDisplayname(option.creator)}
               </SSpanBiddersHighlighted>
             )}
             {option.supporterCount > 1 ? (

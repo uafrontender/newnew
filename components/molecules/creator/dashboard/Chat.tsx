@@ -15,11 +15,11 @@ import { useInView } from 'react-intersection-observer';
 import Link from 'next/link';
 
 import Text from '../../../atoms/Text';
+import UserAvatar from '../../UserAvatar';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
-import TextArea from '../../../atoms/chat/TextArea';
 import InlineSVG from '../../../atoms/InlineSVG';
-import UserAvatar from '../../UserAvatar';
+import TextArea from '../../../atoms/chat/TextArea';
 import { useAppSelector } from '../../../../redux-store/store';
 
 import sendIcon from '../../../../public/images/svg/icons/filled/Send.svg';
@@ -34,6 +34,7 @@ import {
   sendMessage,
 } from '../../../../api/endpoints/chat';
 import isBrowser from '../../../../utils/isBrowser';
+import getDisplayname from '../../../../utils/getDisplayname';
 import validateInputText from '../../../../utils/validateMessageText';
 
 interface IChat {
@@ -382,8 +383,6 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     ]
   );
 
-  // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, !!messages, true);
-
   const handleUserClick = useCallback(() => {
     if (chatRoom?.visavis?.user?.username) {
       router.push(`/${chatRoom?.visavis?.user?.username}`);
@@ -414,10 +413,9 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         {chatRoom?.kind === 4 ? (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
-              {/* @ts-ignore */}
-              {t('announcement.title', {
-                username: user.userData?.nickname || user.userData?.username,
-              })}
+              {`${t('announcement.beforeName')} ${getDisplayname(
+                user.userData
+              )}${t('announcement.suffix')} ${t('announcement.afterName')}`}
             </SUserNickName>
             <SUserName variant={2} weight={600}>
               {`${
@@ -434,9 +432,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         ) : (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
-              {chatRoom?.visavis?.user?.nickname
-                ? chatRoom?.visavis?.user?.nickname
-                : chatRoom?.visavis?.user?.username}
+              {getDisplayname(chatRoom?.visavis?.user)}
               {chatRoom?.visavis?.user?.options?.isVerified && (
                 <SInlineSVG
                   svg={VerificationCheckmark}
@@ -449,9 +445,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
             <Link href={`/${chatRoom?.visavis?.user?.username}`}>
               <a>
                 <SUserName variant={2} weight={600}>
-                  {chatRoom?.visavis?.user?.username
-                    ? `@${chatRoom?.visavis?.user?.username}`
-                    : chatRoom?.visavis?.user?.nickname}
+                  {getDisplayname(chatRoom?.visavis?.user)}
                 </SUserName>
               </a>
             </Link>
@@ -495,8 +489,6 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           </SButton>
         </SBottomTextarea>
       </SBottomPart>
-      {/* <GradientMask positionTop active={showTopGradient} />
-      <GradientMask active={showBottomGradient} /> */}
     </SContainer>
   );
 };

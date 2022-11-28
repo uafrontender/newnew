@@ -14,6 +14,7 @@ import BundlePaymentModal from './BundlePaymentModal';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import InlineSvg from '../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface IBuyBundleModal {
   show: boolean;
@@ -59,7 +60,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
               )}
               <SUserAvatar avatarUrl={creator.avatarUrl ?? ''} />
               <SUserData>
-                <SUsername>{creator.username}</SUsername>
+                <SUsername>{getDisplayname(creator)}</SUsername>
                 {creator.options?.isVerified && (
                   <InlineSvg
                     svg={VerificationCheckmark}

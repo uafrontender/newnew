@@ -668,7 +668,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   handleUserClick(postParsed.creator?.username!!);
                 }}
               >
-                {postParsed.creator?.nickname}
+                {getDisplayname(postParsed.creator)}
               </SUsername>
               {postParsed.creator?.options?.isVerified && (
                 <SInlineSVG

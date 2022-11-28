@@ -9,6 +9,7 @@ import {
   SBottomActionText,
   SBottomActionTitle,
 } from '../../atoms/chat/styles';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface IMessagingDisabled {
   user: newnewapi.IUser;
@@ -26,8 +27,7 @@ const MessagingDisabled: React.FC<IMessagingDisabled> = React.memo(
               {t('messagingDisabled.title')}
             </SBottomActionTitle>
             <SBottomActionMessage>
-              {user.username ? user.username : user.nickname}{' '}
-              {t('messagingDisabled.message')}
+              {`${getDisplayname(user)}${t('messagingDisabled.message')}`}
             </SBottomActionMessage>
           </SBottomActionText>
         </SBottomActionLeft>
