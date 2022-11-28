@@ -34,7 +34,7 @@
     "minutes": "m",
     "seconds": "s",
     "ended_on": "acabó el",
-    "end_date_NEED_TRANSLATION": "End date:"
+    "end_date": "Fecha de finalización:"
   },
   "expiresResponse": {
     "days": "d",
@@ -54,13 +54,13 @@
   },
   "paymentSuccessModal": {
     "title": {
-      "ac_NEED_TRANSLATION": "Bid is in!",
-      "mc_NEED_TRANSLATION": "Votes are in!",
-      "mc-single_NEED_TRANSLATION": "Vote is in!",
+      "ac": "¡Tu oferta está dentro!",
+      "mc": "¡Tus votos están dentro!",
+      "mc-single": "¡Tu voto está dentro!",
       "cf": "¡Estás patrocinando este Goal!"
     },
     "doneButton": "¡Suena bien!",
-    "ac_NEED_TRANSLATION": "{{postCreator}} will pick their favorite one once the Bid is over.",
+    "ac": "{{postCreator}} elegirá su favorito una vez terminada la subasta.",
     "mc": "{{postCreator}} hará la opción con la mayor cantidad de votos cuando termine la Superpoll.",
     "cf": "{{postCreator}} hará el objetivo una vez que consiga suficientes patrocinadores."
   },
@@ -422,11 +422,11 @@
           "voteButton": "Votar"
         }
       },
-      "confirmCustomOptionModal_NEED_TRANSLATION": {
-        "title": "Add your custom option",
-        "line_1": "Ready to add your free custom option to this post?",
-        "line_2": "Once you do, you won't be able to add another one.",
-        "useFreeVoteButton": "Add custom option"
+      "confirmCustomOptionModal": {
+        "title": "Añade tu opción personalizada",
+        "line_1": "¿Listo para añadir tu opción personalizada gratuita a esta publicación?",
+        "line_2": "Una vez que lo hagas, no podrás añadir otra.",
+        "useFreeVoteButton": "Añadir opción personalizada"
       },
       "useBundleVotesModal": {
         "votesAvailable": "<0>{{amount}}</0> votos disponibles",
@@ -445,8 +445,8 @@
         "placeABidButton": "Agregar mi opción",
         "offersBundles": "{{creator}} ofrece Bundles de Superpoll",
         "viewBundles": "Ver Bundles",
-        "getMoreBundles_NEED_TRANSLATION": "Get another Superpoll Bundle",
-        "getBundles_NEED_TRANSLATION": "Get it"
+        "getMoreBundles": "Obtener otro bundle de Superpoll",
+        "getBundles": "Obtenerlo"
       }
     },
     "winnerTab": {
