@@ -138,7 +138,7 @@ export const Notifications = () => {
         ) : !hasMore ? (
           <NoResults />
         ) : !initialLoadDone ? (
-          <Lottie
+          <SLottie
             width={64}
             height={64}
             options={{
@@ -200,8 +200,12 @@ const SGeneral = styled(General)`
 `;
 
 const SContent = styled.div`
-  max-width: 600px;
   margin: 0 auto;
+  max-width: 704px;
+
+  ${({ theme }) => theme.media.laptop} {
+    max-width: 608px;
+  }
 `;
 
 const SHeadingWrapper = styled.div`
@@ -233,4 +237,8 @@ const SButton = styled(Button)`
 const SRef = styled.span`
   overflow: hidden;
   text-align: center;
+`;
+
+const SLottie = styled(Lottie)`
+  align-self: center;
 `;
