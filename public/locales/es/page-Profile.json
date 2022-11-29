@@ -198,6 +198,9 @@
         "title": "Mis tarjetas",
         "myPaymentMethods": "Mis métodos de pago",
         "hint": "Necesitarás tener una tarjeta guardada para participar en las publicaciones",
+        "adding_NEED_TRANSLATION": "Adding a new card...",
+        "ooops": "¡Ups!",
+        "success": "¡Felicidades!",
         "button": {
           "addNewCard": "Agregar nueva tarjeta",
           "addCard": "Agregar tarjeta"
