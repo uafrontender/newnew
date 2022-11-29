@@ -161,6 +161,7 @@ const McOptionCardModeration: React.FunctionComponent<
             </SOptionInfo>
             <SBiddersInfo variant={3}>
               <RenderSupportersInfo
+                isBlue={!!isWinner}
                 isCreatorsBid
                 isSuggestedByMe={false}
                 isSupportedByMe={false}
