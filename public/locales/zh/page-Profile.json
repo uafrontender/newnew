@@ -198,7 +198,7 @@
         "title": "我的銀行卡",
         "myPaymentMethods": "我的付款方式",
         "hint": "你的檔案中須有銀行卡才能參加帖子",
-        "adding_NEED_TRANSLATION": "Adding a new card...",
+        "adding": "添加新卡......",
         "ooops": "哎呀！",
         "success": "恭喜！",
         "button": {
