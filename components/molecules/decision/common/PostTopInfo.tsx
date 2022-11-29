@@ -13,6 +13,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../../redux-store/store';
 
@@ -250,48 +251,51 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           </SBidsAmount>
         ) : null}
         <SCreatorCard>
-          <a
-            href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
-              creator.username
-            }`}
-            onClickCapture={() => {
-              Mixpanel.track('Click on creator avatar', {
-                _stage: 'Post',
-                _postUuid: postId,
-                _component: 'PostTopInfo',
-              });
-            }}
-          >
-            <SAvatarArea>
-              <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
-            </SAvatarArea>
-          </a>
-          <a
-            href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
-              creator.username
-            }`}
-            onClickCapture={() => {
-              Mixpanel.track('Click on creator username', {
-                _stage: 'Post',
-                _postUuid: postId,
-                _component: 'PostTopInfo',
-              });
-            }}
-          >
-            <SUserInfo>
-              <SUsername className='username'>
-                {getDisplayname(creator)}
-              </SUsername>
-              {creator.options?.isVerified && (
-                <SInlineSVG
-                  svg={VerificationCheckmark}
-                  width='20px'
-                  height='20px'
-                  fill='none'
+          <Link href={`/${creator.username}`}>
+            <a
+              href={`/${creator.username}`}
+              onClickCapture={() => {
+                Mixpanel.track('Click on creator avatar', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'PostTopInfo',
+                });
+              }}
+            >
+              <SAvatarArea>
+                <img
+                  src={creator.avatarUrl ?? ''}
+                  alt={creator.username ?? ''}
                 />
-              )}
-            </SUserInfo>
-          </a>
+              </SAvatarArea>
+            </a>
+          </Link>
+          <Link href={`/${creator.username}`}>
+            <a
+              href={`/${creator.username}`}
+              onClickCapture={() => {
+                Mixpanel.track('Click on creator username', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'PostTopInfo',
+                });
+              }}
+            >
+              <SUserInfo>
+                <SUsername className='username'>
+                  {getDisplayname(creator)}
+                </SUsername>
+                {creator.options?.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='20px'
+                    height='20px'
+                    fill='none'
+                  />
+                )}
+              </SUserInfo>
+            </a>
+          </Link>
         </SCreatorCard>
         <SActionsDiv>
           <SShareButton
