@@ -41,7 +41,7 @@ function usePagination<T>(
 
       const paging = {
         limit: limit || pageSize,
-        pageToken: savedPageToken.current,
+        pageToken: initial ? undefined : savedPageToken.current,
       };
 
       const tokenAtStart = savedPageToken.current;

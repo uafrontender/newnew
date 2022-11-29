@@ -13,7 +13,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { useInView } from 'react-intersection-observer';
 import { useEffectOnce } from 'react-use';
 
 import { NextPageWithLayout } from './_app';
@@ -81,9 +80,9 @@ export const Bundles: NextPage<IBundlesPage> = ({
   const { bundles } = useBundles();
 
   const [searchValue, setSearchValue] = useState('');
-  const { ref: loadingRef, inView } = useInView();
   const searchContainerRef = useRef<HTMLDivElement | undefined>();
-  const [shadeVisible, setShadeVisible] = useState<boolean>(false);
+  const [scrolledToBottom, setScrolledToBottom] = useState<boolean>(false);
+  const [shadeVisible, setShadeVisible] = useState<boolean>(true);
 
   const loadCreatorsData = useCallback(
     async (paging: Paging): Promise<PaginatedResponse<newnewapi.IUser>> => {
@@ -222,13 +221,13 @@ export const Bundles: NextPage<IBundlesPage> = ({
   ]);
 
   useEffect(() => {
-    if (inView) {
+    if (scrolledToBottom) {
       paginatedCreators.loadMore().catch((e) => console.error(e));
     }
-  }, [inView, paginatedCreators]);
+  }, [scrolledToBottom, paginatedCreators]);
 
   useEffect(() => {
-    if (!searchContainerRef.current) {
+    if (!searchContainerRef.current || !paginatedCreators.initialLoadDone) {
       return;
     }
 
@@ -240,12 +239,16 @@ export const Bundles: NextPage<IBundlesPage> = ({
       searchContainerRef.current.scrollHeight -
         searchContainerRef.current.clientHeight;
 
-    if (scrollable && !scrolledToTheBottom) {
-      setShadeVisible(true);
-    } else {
-      setShadeVisible(false);
-    }
-  }, [searchContainerRef, paginatedCreators.data]);
+    setScrolledToBottom(scrolledToTheBottom);
+    setShadeVisible(
+      scrollable && (!scrolledToTheBottom || paginatedCreators.hasMore)
+    );
+  }, [
+    searchContainerRef,
+    paginatedCreators.data,
+    paginatedCreators.hasMore,
+    paginatedCreators.initialLoadDone,
+  ]);
 
   const visibleBundlesNumber = isMobile || isTablet ? 3 : 4;
 
@@ -348,7 +351,11 @@ export const Bundles: NextPage<IBundlesPage> = ({
               const scrolledToTheBottom =
                 e.target.scrollTop >=
                 e.target.scrollHeight - e.target.clientHeight;
-              setShadeVisible(scrollable && !scrolledToTheBottom);
+              setScrolledToBottom(!scrollable || scrolledToTheBottom);
+              setShadeVisible(
+                scrollable &&
+                  (!scrolledToTheBottom || paginatedCreators.hasMore)
+              );
             }}
           >
             {/* Changes in number of Creators in the search result causes change in page height (Fix?) */}
@@ -368,11 +375,6 @@ export const Bundles: NextPage<IBundlesPage> = ({
                 }
               }}
             />
-            {paginatedCreators.data.length > 0 &&
-              paginatedCreators.hasMore &&
-              !paginatedCreators.loading && (
-                <SRef ref={loadingRef}>Loading...</SRef>
-              )}
           </SCardsSectionContent>
           <SBottomShade visible={shadeVisible} />
         </SCardsSection>
@@ -639,12 +641,6 @@ const SSearchResultsTitle = styled.h4`
 const SQuerySpan = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   margin-left: 6px;
-`;
-
-const SRef = styled.span`
-  text-indent: -9999px;
-  height: 0;
-  overflow: hidden;
 `;
 
 const SCardsSection = styled.div`
