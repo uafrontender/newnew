@@ -237,6 +237,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         _stage: 'Post',
         _postUuid: postId,
         _component: 'AcOptionsTab',
+        _paymentMethod: cardUuid ? 'Primary card' : 'New card',
       });
 
       try {
