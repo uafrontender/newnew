@@ -539,7 +539,7 @@ const PostPage: NextPage<IPostPage> = ({
         x: isMobile && !isServerSide ? 500 : 0,
         opacity: 0,
         transition: {
-          duration: isMobile ? 0.3 : 0.3,
+          duration: isMobile ? 0.3 : 0,
         },
       }}
       animate={{
