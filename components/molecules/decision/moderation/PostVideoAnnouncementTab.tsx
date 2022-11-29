@@ -109,7 +109,9 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
               : {}),
           }}
         >
-          {t('postVideo.setThumbnail')}
+          {announcement.coverImageUrl
+            ? t('postVideo.changeThumbnail')
+            : t('postVideo.setThumbnail')}
         </SSetThumbnailButton>
       )}
       <PostVideoSoundButton
