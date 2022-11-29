@@ -177,6 +177,9 @@ const assets = {
   bundles: {
     votesBackground: `${APP_ASSETS_ORIGIN}/bundles/votes-background.png`,
   },
+  test: {
+    newMC: `${APP_ASSETS_ORIGIN}/test/new-mc.png`,
+  },
 };
 
 export default assets;
