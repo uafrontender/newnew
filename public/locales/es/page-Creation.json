@@ -32,7 +32,7 @@
       "description-crowdfunding": "Utiliza campañas de crowdfunding para financiar tus metas de vida y gana dinero"
     },
     "input": {
-      "label_NEED_TRANSLATION": "Title",
+      "label": "Título",
       "placeholder": "ej. ¿Dónde debería hacerme mi primer tatuaje? \uD83D\uDE4A"
     },
     "fileUpload": {
