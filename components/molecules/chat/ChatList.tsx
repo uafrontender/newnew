@@ -30,8 +30,8 @@ import { IChatData } from '../../interfaces/ichat';
 import { useGetChats } from '../../../contexts/chatContext';
 import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import ChatName from '../../atoms/chat/ChatName';
 
+const ChatName = dynamic(() => import('../../atoms/chat/ChatName'));
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
 const NoResults = dynamic(() => import('../../atoms/chat/NoResults'));
 
