@@ -179,6 +179,7 @@ const assets = {
   },
   test: {
     newMC: `${APP_ASSETS_ORIGIN}/test/new-mc.png`,
+    newMCSmall: `${APP_ASSETS_ORIGIN}/test/new-mc-small.png`,
   },
 };
 

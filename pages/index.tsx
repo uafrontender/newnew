@@ -351,7 +351,11 @@ const Home: NextPage<IHome> = ({
         headingPosition='right'
         title={t('tutorial.mc.title')}
         caption={t('tutorial.mc.caption')}
-        iconSrc={theme.name === 'light' ? assets.test.newMC : assets.test.newMC}
+        iconSrc={
+          theme.name === 'light'
+            ? assets.test.newMCSmall
+            : assets.test.newMCSmall
+        }
         posts={staticSuperpolls}
         isStatic
         // loading={collectionMCInitialLoading}
