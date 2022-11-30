@@ -284,11 +284,11 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
             width: window?.innerWidth ?? 0,
             height: window?.innerHeight ?? 0,
           });
-        }, 1500);
+        }, 250);
 
         timeoutResizing = setTimeout(() => {
           setIsResizing(false);
-        }, 2000);
+        }, 500);
       }
     };
 
@@ -302,10 +302,10 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
     const boundingRect =
       tabRefs.current[activeTabIndex].getBoundingClientRect();
 
-    if (boundingRect.left < 0) {
+    if (boundingRect.left < 0 && !isResizing) {
       setPosLeft((curr) => curr + (0 - boundingRect.left) + 12);
       setPrevLeft((curr) => curr + (0 - boundingRect.left) + 12);
-    } else if (boundingRect.right > windowSize.width) {
+    } else if (boundingRect.right > windowSize.width && !isResizing) {
       setPosLeft((curr) => curr + windowSize.width - boundingRect.right - 12);
       setPrevLeft((curr) => curr + windowSize.width - boundingRect.right - 12);
     }
@@ -320,6 +320,7 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
   }, [
     activeTabIndex,
     windowSize,
+    isResizing,
     setPrevLeft,
     setPosLeft,
     setActiveTabIndicator,
