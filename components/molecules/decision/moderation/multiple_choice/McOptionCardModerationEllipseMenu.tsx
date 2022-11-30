@@ -34,7 +34,9 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<
 }) => {
   const { t } = useTranslation('common');
 
-  const [canDeleteOption, setCanDeleteOption] = useState(false);
+  const [canDeleteOption, setCanDeleteOption] = useState(
+    canDeleteOptionInitial
+  );
   const [isCanDeleteOptionLoading, setIsCanDeleteOptionLoading] =
     useState(false);
 
