@@ -25,9 +25,9 @@
       "insights": "Estadísticas",
       "insightsTablet": "Ir a estadísticas",
       "cashOut": {
-        "amount_NEED_TRANSLATION": "Your Stripe earning are",
-        "amountSecondLine_NEED_TRANSLATION": "Manage your balance on Stripe.",
-        "stripeButton_NEED_TRANSLATION": "Take me to Stripe",
+        "amount": "Tus ganancias en Stripe son",
+        "amountSecondLine": "Gestiona tu saldo en Stripe.",
+        "stripeButton": "Dirígeme a Stripe",
         "date": "se enviará automáticamente el {{date}}.",
         "submit": "Más información",
         "noPayouts": "No tienes ningún pago pendiente"
@@ -95,9 +95,9 @@
       "addCashOutMethodButton": "Añadir"
     },
     "aboutBundles": {
-      "title_NEED_TRANSLATION": "Superpoll Bundles",
-      "text_NEED_TRANSLATION": "Make more money. Have more fun.\nSuperpoll Bundles are a win-win for everyone!",
-      "button_NEED_TRANSLATION": "Tell me more!"
+      "title": "Bundles de Superpoll",
+      "text": "Gana más dinero. Diviértete más.\n¡Los bundles de Superpoll benefician a todos!",
+      "button": "¡Cuéntame más!"
     }
   },
   "earnings": {
@@ -108,48 +108,48 @@
   },
   "myBundles": {
     "meta": {
-      "title_NEED_TRANSLATION": "My Bundles",
-      "description_NEED_TRANSLATION": "View your NewNew Bundles"
+      "title": "Mis Bundles",
+      "description": "Ver tus Bundles de NewNew"
     },
-    "title_NEED_TRANSLATION": "My Bundles",
-    "buttonTurnOn_NEED_TRANSLATION": "Turn on bundles",
-    "buttonTurnOff_NEED_TRANSLATION": "Turn off bundles",
-    "earnings_NEED_TRANSLATION": {
-      "title_NEED_TRANSLATION": "Bundles Earnings",
-      "payPeriod_NEED_TRANSLATION": "this pay period",
-      "unitName_NEED_TRANSLATION": "bundle",
-      "earned_NEED_TRANSLATION": "earned",
-      "noSoldYet_NEED_TRANSLATION": "No bundles sold yet",
-      "sold_NEED_TRANSLATION": "sold"
+    "title": "Mis Bundles",
+    "buttonTurnOn": "Activar bundles",
+    "buttonTurnOff": "Desactivar bundles",
+    "earnings": {
+      "title": "Ganancias de Bundles",
+      "payPeriod": "este periodo de pago",
+      "unitName": "bundle",
+      "earned": "ha generado",
+      "noSoldYet": "Todavía no se ha vendido ningún BUNDLE",
+      "sold": "vendidos"
     },
     "bundlesSet": {
-      "title_NEED_TRANSLATION": "Superpoll Bundles",
-      "subTitle_NEED_TRANSLATION": "Offer Superpoll bundles to increase your earnings and get closer to your audience. ",
-      "votes_NEED_TRANSLATION": "votes",
-      "description_NEED_TRANSLATION": "plus people get {{duration}} months of:",
-      "descriptionSingular_NEED_TRANSLATION": "plus people get 1 month of:",
-      "firstOption_NEED_TRANSLATION": "adding custom options to your Superpolls",
-      "secondOption_NEED_TRANSLATION": "sending you private chats",
-      "perBundle_NEED_TRANSLATION": "per bundle"
+      "title": "Bundles de Superpoll",
+      "subTitle": "Ofrece bundles de Superpoll para aumentar tus ganancias y acercarte a tu audiencia. ",
+      "votes": "votos",
+      "description": "Además, la gente obtiene {{duration}} meses de:",
+      "descriptionSingular": "Además, la gente obtiene 1 mes de:",
+      "firstOption": "añadir opciones personalizadas a tus Superpolls",
+      "secondOption": "enviarte chats privados",
+      "perBundle": "por bundle"
     },
     "modals": {
       "turnon": {
-        "title_NEED_TRANSLATION": "Turn On bundles",
-        "text_NEED_TRANSLATION": "Are you sure you want to activate bundles?"
+        "title": "Activar bundles",
+        "text": "¿Estás seguro de que quieres activar los bundles?"
       },
       "turnoff": {
-        "title_NEED_TRANSLATION": "Turn Off bundles",
-        "text_NEED_TRANSLATION": "Are you sure you want to deactivate bundles?"
+        "title": "Desactivar bundles",
+        "text": "¿Estás seguro de que quieres desactivar los bundles?"
       },
       "activated": {
-        "title_NEED_TRANSLATION": "Congratulations!",
-        "text_NEED_TRANSLATION": "You are successfully activated bundles"
+        "title": "¡Felicidades!",
+        "text": "Has activado correctamente los bundles"
       },
       "deactivated": {
-        "title_NEED_TRANSLATION": "So sad!",
-        "text_NEED_TRANSLATION": "But you can activate bundles at any time"
+        "title": "¡Qué triste!",
+        "text": "Pero puedes activar los bundles en cualquier momento"
       },
-      "button_NEED_TRANSLATION": "Sounds good!"
+      "button": "¡Suena bien!"
     }
   },
   "getPaid": {
@@ -215,7 +215,7 @@
     "members": "miembros"
   },
   "announcement": {
-    "comment_DON_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
     "beforeName": "El anuncio de",
     "suffix": "",
     "afterName": ""

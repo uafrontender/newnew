@@ -320,6 +320,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         _stage: 'Post',
         _postUuid: postId,
         _component: 'McOptionCard',
+        _paymentMethod: cardUuid ? 'Primary card' : 'New card',
       });
 
       try {
@@ -601,7 +602,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           ) : (
             <>
               <SSupportButtonDesktop
-                id={`support-button-${isBlue ? 'supported' : index}`}
+                id={`support-button-${
+                  isBlue ? (isSuggestedByMe ? 'suggested' : 'supported') : index
+                }`}
                 active={isSupportMenuOpen}
                 view='secondary'
                 isBlue={isBlue}

@@ -5,7 +5,7 @@
   "chat": {
     "today": "Hoy",
     "placeholder": "Escribe un mensaje...",
-    "welcomeMessage_NEED_TRANSLATION": "You can now message",
+    "welcomeMessage": "Ahora puedes enviar un mensaje",
     "noMessagesFirstLine": "No hay mensajes aquí todavía...",
     "noMessagesSecondLine": "Envia un mensaje para iniciar la conversación.",
     "typing": "Escribiendo..."
@@ -21,13 +21,13 @@
     "buttonText": "Desbloquear"
   },
   "subscriptionExpired": {
-    "title_NEED_TRANSLATION": "Private Messaging is expired",
-    "message_NEED_TRANSLATION": "Buy a new Superpoll bundle to message",
-    "buttonText_NEED_TRANSLATION": "Buy a bundle"
+    "title": "La mensajería privada ha caducado",
+    "message": "Compra un nuevo bundle de Superpoll para enviar un mensaje",
+    "buttonText": "Comprar un bundle"
   },
   "messagingDisabled": {
     "title": "Mensajería desactivada",
-    "message_NEED_TRANSLATION": " temporarily turned off their private messages. Check back soon!"
+    "message": " desactivó temporalmente sus mensajes privados. ¡Regresa pronto!"
   },
   "accountDeleted": {
     "title": "Cuenta eliminada",
@@ -76,7 +76,7 @@
     "searchPlaceholder": "Buscar"
   },
   "announcement": {
-    "comment_DON_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
     "beforeName": "El anuncio de",
     "suffix": "",
     "afterName": "",
@@ -85,7 +85,7 @@
   },
   "userTypes": {
     "all": "Todos",
-    "subscribers_NEED_TRANSLATION": "Bundle Owners",
+    "subscribers": "Poseedores de bundles",
     "subscribing": "Creadores"
   },
   "dates": {
