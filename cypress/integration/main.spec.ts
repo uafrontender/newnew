@@ -428,15 +428,19 @@ context('Main flow', () => {
     });
 
     it('can add a custom option to the same superpoll', () => {
-      const CUSTOM_OPTION = 'new option';
+      const CUSTOM_OPTION = `new option ${testSeed}0`;
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
       cy.url().should('include', '/post');
 
       cy.get('#add-option-button').click();
       cy.get('#add-option-input').type(CUSTOM_OPTION);
       cy.get('#add-option-submit').click();
+      cy.get('#add-option-confirm').click();
+      cy.get('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
 
-      cy.contains(CUSTOM_OPTION);
+      cy.get('#support-button-suggested').click();
     });
 
     it('can contribute to the same superpoll with the card payment', () => {
@@ -632,15 +636,19 @@ context('Main flow', () => {
     });
 
     it('can add a custom option to the same superpoll', () => {
-      const CUSTOM_OPTION = 'new option';
+      const CUSTOM_OPTION = `new option ${testSeed}1`;
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/post/${superpollId}`);
       cy.url().should('include', '/post');
 
       cy.get('#add-option-button').click();
       cy.get('#add-option-input').type(CUSTOM_OPTION);
       cy.get('#add-option-submit').click();
+      cy.get('#add-option-confirm').click();
+      cy.get('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
 
-      cy.contains(CUSTOM_OPTION);
+      cy.get('#support-button-suggested').click();
     });
 
     it('can contribute to the same superpoll with the card payment', () => {

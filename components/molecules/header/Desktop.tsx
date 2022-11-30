@@ -60,6 +60,7 @@ export const Desktop: React.FC = React.memo(() => {
     <SContainer>
       <Logo />
       <SRightBlock>
+        {process.env.NEXT_PUBLIC_ENVIRONMENT === 'test' && 'TEST'}
         {user.loggedIn && !globalSearchActive && (
           <>
             {user.userData?.options?.isCreator && (
