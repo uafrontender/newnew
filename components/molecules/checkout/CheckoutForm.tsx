@@ -362,6 +362,7 @@ const SEmailInput = styled(Input)`
 
 const SRecaptchaWrapper = styled.div`
   margin-top: 20px;
+  z-index: 20;
 `;
 
 const SPayButtonDiv = styled.div`

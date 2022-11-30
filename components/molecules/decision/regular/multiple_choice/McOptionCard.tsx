@@ -321,6 +321,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         _stage: 'Post',
         _postUuid: postId,
         _component: 'McOptionCard',
+        _paymentMethod: cardUuid ? 'Primary card' : 'New card',
       });
 
       try {
