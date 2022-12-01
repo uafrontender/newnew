@@ -54,9 +54,14 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
     null
   );
 
+  // TODO: caused issues, rework to use usePagination hook
+  // TODO: add scrollable container to load more when scrolled to bottom (callback)
   const fetchMyRooms = useCallback(
     async (pageToken?: string) => {
-      if (loadingRooms) return;
+      if (loadingRooms) {
+        return;
+      }
+
       try {
         if (!pageToken) setChatRooms([]);
         setLoadingRooms(true);
@@ -183,13 +188,18 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
         searchRoom(searchText);
       }
     }
-    if (searchedRooms && !searchText) setSearchedRooms(null);
+
+    if (searchedRooms && !searchText) {
+      setSearchedRooms(null);
+    }
   }, [searchText, searchedRooms, prevSearchText, searchedRoomsLoading]);
 
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom) => {
       const handleItemClick = async () => {
-        if (searchedRooms) setSearchedRooms(null);
+        if (searchedRooms) {
+          setSearchedRooms(null);
+        }
 
         router.push(`/creator/dashboard?tab=direct-messages&roomID=${chat.id}`);
         return null;
@@ -260,9 +270,10 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchedRooms, chatRooms, updatedChat, router, t]
   );
+
   return (
     <>
-      {loadingRooms ? (
+      {loadingRooms && (!chatRooms || chatRooms.length === 0) ? (
         <SLoader>
           <Lottie
             width={64}
@@ -289,10 +300,10 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
               ) : (
                 <NoResults text={searchText} />
               )}
+              {chatRoomsNextPageToken && !searchedRooms && (
+                <SRef ref={scrollRef}>Loading...</SRef>
+              )}
             </SSectionContent>
-            {chatRoomsNextPageToken && !searchedRooms && (
-              <SRef ref={scrollRef}>Loading...</SRef>
-            )}
           </>
         )
       )}
@@ -397,7 +408,8 @@ const SUnreadCount = styled.span`
 `;
 const SRef = styled.span`
   text-indent: -9999px;
-  height: 0;
+  height: 1px;
+  flex-shrink: 0;
   overflow: hidden;
 `;
 const SInlineSVG = styled(InlineSVG)`

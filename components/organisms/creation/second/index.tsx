@@ -678,7 +678,9 @@ export const CreationSecondStepContent: React.FC<
       <>
         <SItemWrapper>
           {/* TODO: move to locales */}
-          <SInputLabel htmlFor='title'>Title</SInputLabel>
+          <SInputLabel htmlFor='title'>
+            {t('secondStep.input.label')}
+          </SInputLabel>
           <RichTextArea
             id='title'
             value={post?.title}
