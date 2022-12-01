@@ -175,7 +175,9 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
                 }
                 alt='NewNew logo'
               />
-              <Headline variant={6}>Adding a new card...</Headline>
+              <Headline variant={6}>
+                {t('Settings.sections.cards.adding')}
+              </Headline>
             </SContentWrapper>
           )}
 
@@ -183,7 +185,9 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           {isError && (
             <SContentWrapper>
               <SEmoji src={pensiveIcon.src} alt='Pensive' />
-              <SHeadline variant={6}>Ooops!</SHeadline>
+              <SHeadline variant={6}>
+                {t('Settings.sections.cards.ooops')}
+              </SHeadline>
               <SText variant={2} weight={600}>
                 {message}
               </SText>
@@ -198,7 +202,10 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
                 alt='Parting'
                 style={{ width: '77px' }}
               />
-              <Headline variant={6}>Congratulations!</Headline>
+              <Headline variant={6}>
+                {' '}
+                {t('Settings.sections.cards.success')}
+              </Headline>
               <SText variant={2} weight={600}>
                 {message}
               </SText>
