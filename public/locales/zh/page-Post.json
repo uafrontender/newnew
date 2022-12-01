@@ -422,11 +422,11 @@
           "voteButton": "投票"
         }
       },
-      "confirmCustomOptionModal_NEED_TRANSLATION": {
-        "title": "Add your custom option",
-        "line_1": "Ready to add your free custom option to this post?",
-        "line_2": "Once you do, you won't be able to add another one.",
-        "useFreeVoteButton": "Add custom option"
+      "confirmCustomOptionModal": {
+        "title": "添加自訂選項",
+        "line_1": "添加自訂選項",
+        "line_2": "一旦添加，就不能再次添加其他的了。",
+        "useFreeVoteButton": "添加自訂選項"
       },
       "useBundleVotesModal": {
         "votesAvailable": "還有<0>{{amount}}</0> 票",
