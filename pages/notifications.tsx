@@ -200,8 +200,12 @@ const SGeneral = styled(General)`
 `;
 
 const SContent = styled.div`
-  max-width: 600px;
   margin: 0 auto;
+  max-width: 704px;
+
+  ${({ theme }) => theme.media.laptop} {
+    max-width: 608px;
+  }
 `;
 
 const SHeadingWrapper = styled.div`
