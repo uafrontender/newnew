@@ -353,8 +353,8 @@ const Home: NextPage<IHome> = ({
         caption={t('tutorial.mc.caption')}
         iconSrc={
           theme.name === 'light'
-            ? assets.test.newMCSmallest
-            : assets.test.newMCSmallest
+            ? assets.test.newMCOptimal
+            : assets.test.newMCOptimal
         }
         posts={staticSuperpolls}
         isStatic

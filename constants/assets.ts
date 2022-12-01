@@ -181,6 +181,7 @@ const assets = {
     newMC: `${APP_ASSETS_ORIGIN}/test/new-mc.png`,
     newMCSmall: `${APP_ASSETS_ORIGIN}/test/new-mc-small.png`,
     newMCSmallest: `${APP_ASSETS_ORIGIN}/test/new-mc-smallest.png`,
+    newMCOptimal: `${APP_ASSETS_ORIGIN}/test/new-mc-optimal.png`,
   },
 };
 
