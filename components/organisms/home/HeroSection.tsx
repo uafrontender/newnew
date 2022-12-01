@@ -3,6 +3,7 @@ import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
@@ -20,6 +21,7 @@ export const HeroSection = React.memo(() => {
   const { t } = useTranslation('common');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
+  const { locale } = useRouter();
 
   const [animateTitle, setAnimateTitle] = useState(false);
   const [animateSubTitle, setAnimateSubTitle] = useState(false);
@@ -42,6 +44,12 @@ export const HeroSection = React.memo(() => {
     }, 0);
   }, []);
 
+  // reset animation on locale change
+  useEffect(() => {
+    setAnimateSubTitle(false);
+    setAnimateButton(false);
+  }, [locale]);
+
   return (
     <SWrapper
       // I believe can be commented out now as there's no need for an animation
@@ -59,6 +67,7 @@ export const HeroSection = React.memo(() => {
               animation='t-08'
               delay={0.4}
               onAnimationEnd={handleTitleAnimationEnd}
+              key={locale}
             >
               {t('heroSection.title') as string}
             </AnimatedPresence>
@@ -68,11 +77,12 @@ export const HeroSection = React.memo(() => {
               start={animateSubTitle}
               animation='t-02'
               onAnimationEnd={handleSubTitleAnimationEnd}
+              key={locale}
             >
               {t('heroSection.subTitle')}
             </AnimatedPresence>
           </SSubTitle>
-          <AnimatedPresence start={animateButton} animation='t-01'>
+          <AnimatedPresence start={animateButton} animation='t-01' key={locale}>
             <SButtonsHolder>
               <Link
                 href={
