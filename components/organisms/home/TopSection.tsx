@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import PostCard from '../../molecules/PostCard';
 import Headline from '../../atoms/Headline';
@@ -31,7 +31,6 @@ interface ITopSection {
 
 export const TopSection: React.FC<ITopSection> = React.memo(
   ({ collection }) => {
-    const router = useRouter();
     const { t } = useTranslation('common');
     const ref: any = useRef();
     const scrollContainerRef: any = useRef();
@@ -107,23 +106,22 @@ export const TopSection: React.FC<ITopSection> = React.memo(
       }
     };
 
-    const renderItem = (item: newnewapi.Post, index: number) => {
-      const handleItemClick = () => {
-        if (!isDragging) {
-          router.push(`/post/${switchPostType(item)[0].postUuid}`);
-        }
-      };
-
-      return (
+    const renderItem = (item: newnewapi.Post, index: number) => (
+      <Link href={`/post/${switchPostType(item)[0].postUuid}`}>
         <SItemWrapper
           key={switchPostType(item)[0].postUuid}
           name={`top-section-${index}`}
-          onClick={handleItemClick}
+          onClick={(e) => {
+            if (isDragging) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }}
         >
           <PostCard type='inside' item={item} index={index + 1} />
         </SItemWrapper>
-      );
-    };
+      </Link>
+    );
 
     const { renderLeftArrow, renderRightArrow } = useHoverArrows(ref);
     const { showLeftGradient, showRightGradient } =

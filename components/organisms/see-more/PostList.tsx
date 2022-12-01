@@ -4,7 +4,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
@@ -37,18 +37,9 @@ export const PostList: React.FC<IList> = ({
     resizeMode
   );
 
-  const router = useRouter();
-
-  const renderItem = (item: any, index: number) => {
-    const handleItemClick = () => {
-      router.push(`/post/${switchPostType(item)[0].postUuid}`);
-    };
-
-    return (
-      <SItemWrapper
-        key={switchPostType(item)[0].postUuid}
-        onClick={handleItemClick}
-      >
+  const renderItem = (item: any, index: number) => (
+    <Link href={`/post/${switchPostType(item)[0].postUuid}`}>
+      <SItemWrapper key={switchPostType(item)[0].postUuid}>
         <PostCard
           item={item}
           index={index + 1}
@@ -56,8 +47,8 @@ export const PostList: React.FC<IList> = ({
           height={isMobile ? '564px' : '336px'}
         />
       </SItemWrapper>
-    );
-  };
+    </Link>
+  );
 
   return (
     <SListWrapper
