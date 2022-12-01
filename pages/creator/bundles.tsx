@@ -6,7 +6,7 @@ import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import General from '../../components/templates/General';
-import Content from '../../components/organisms/creator/Bundles';
+import Content from '../../components/organisms/creator/DashboardBundles';
 
 import { NextPageWithLayout } from '../_app';
 import assets from '../../constants/assets';

@@ -4,8 +4,8 @@
       "title": "NewNew個人資料頁",
       "description": "自定義用戶名、顯示名稱、個人簡介和更多內容，定制你的NewNew個人資料"
     },
-    "noContent_NEED_TRANSLATION": {
-      "description": "Posts you’re actively bidding on\nor voting on will be shown here"
+    "noContent": {
+      "description": "你正在出價中或投票中的\n帖子將顯示在這裡"
     }
   },
   "MyPosts": {
@@ -198,6 +198,9 @@
         "title": "我的銀行卡",
         "myPaymentMethods": "我的付款方式",
         "hint": "你的檔案中須有銀行卡才能參加帖子",
+        "adding": "添加新卡......",
+        "ooops": "哎呀！",
+        "success": "恭喜！",
         "button": {
           "addNewCard": "添加一張新卡",
           "addCard": "添加銀行卡"
