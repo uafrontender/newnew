@@ -445,7 +445,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
             <Link href={`/${chatRoom?.visavis?.user?.username}`}>
               <a>
                 <SUserName variant={2} weight={600}>
-                  {getDisplayname(chatRoom?.visavis?.user)}
+                  @{chatRoom?.visavis?.user?.username}
                 </SUserName>
               </a>
             </Link>
