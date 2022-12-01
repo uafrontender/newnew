@@ -22,6 +22,7 @@ interface IList {
   wrapperStyle?: React.CSSProperties;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
+  handleRemovePostFromState?: (uuid: string) => void;
 }
 
 export const PostList: React.FC<IList> = ({
@@ -31,6 +32,7 @@ export const PostList: React.FC<IList> = ({
   wrapperStyle,
   skeletonsBgColor,
   skeletonsHighlightColor,
+  handleRemovePostFromState,
 }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -45,6 +47,9 @@ export const PostList: React.FC<IList> = ({
           index={index + 1}
           width='100%'
           height={isMobile ? '564px' : '336px'}
+          handleRemovePostFromState={() =>
+            handleRemovePostFromState?.(switchPostType(item)[0].postUuid)
+          }
         />
       </SItemWrapper>
     </Link>
