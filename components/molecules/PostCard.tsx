@@ -1,4 +1,5 @@
 /* eslint-disable no-nested-ternary */
+/* eslint-disable react/no-array-index-key */
 import React, {
   useCallback,
   useContext,
@@ -6,6 +7,7 @@ import React, {
   useMemo,
   useRef,
   useState,
+  Fragment,
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
@@ -449,12 +451,12 @@ export const PostCard: React.FC<ICard> = React.memo(
     function getTitleContent(title: string) {
       return (
         <>
-          {getChunks(title).map((chunk) => {
+          {getChunks(title).map((chunk, chunkIndex) => {
             if (chunk.type === 'hashtag') {
-              return <SHashtag>#{chunk.text}</SHashtag>;
+              return <SHashtag key={chunkIndex}>#{chunk.text}</SHashtag>;
             }
 
-            return chunk.text;
+            return <Fragment key={chunkIndex}>{chunk.text}</Fragment>;
           })}
         </>
       );

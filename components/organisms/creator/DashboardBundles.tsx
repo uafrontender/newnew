@@ -33,7 +33,7 @@ const SuccessBundleModal = dynamic(
   () => import('../../molecules/creator/dashboard/SuccessBundleModal')
 );
 
-export const Bundles: React.FC = React.memo(() => {
+export const DashboardBundles: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const { appConstants } = useGetAppConstants();
@@ -183,7 +183,7 @@ export const Bundles: React.FC = React.memo(() => {
   );
 });
 
-export default Bundles;
+export default DashboardBundles;
 
 const SContainer = styled.div`
   position: relative;
