@@ -32,6 +32,7 @@
       "description-crowdfunding": "Use crowdfunding campaigns to fund your life goals and earn money"
     },
     "input": {
+      "label": "Title",
       "placeholder": "ex. Where should I get my first tattoo \uD83D\uDE4A"
     },
     "fileUpload": {
