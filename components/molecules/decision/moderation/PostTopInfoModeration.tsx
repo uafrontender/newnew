@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import Link from 'next/link';
 
 import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
@@ -178,46 +179,49 @@ const PostTopInfoModeration: React.FunctionComponent<
           </SBidsAmount>
         ) : null}
         <SCreatorCard>
-          <a
-            href={`${
-              router.locale !== 'en-US' ? `/${router.locale}` : ''
-            }/profile/my-posts`}
-            onClickCapture={() => {
-              Mixpanel.track('Click on own avatar', {
-                _stage: 'Post',
-                _postUuid: postId,
-                _component: 'PostTopInfo',
-              });
-            }}
-          >
-            <SAvatarArea>
-              <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
-            </SAvatarArea>
-          </a>
-          <a
-            href={`${
-              router.locale !== 'en-US' ? `/${router.locale}` : ''
-            }/profile/my-posts`}
-            onClickCapture={() => {
-              Mixpanel.track('Click on own username', {
-                _stage: 'Post',
-                _postUuid: postId,
-                _component: 'PostTopInfo',
-              });
-            }}
-          >
-            <SUsername className='username'>
-              {t('me')}
-              {creator.options?.isVerified && (
-                <SInlineSVG
-                  svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
-                  fill='none'
+          <Link href='/profile/my-posts'>
+            <a
+              href='/profile/my-posts'
+              onClickCapture={() => {
+                Mixpanel.track('Click on own avatar', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'PostTopInfo',
+                });
+              }}
+            >
+              <SAvatarArea>
+                <img
+                  src={creator.avatarUrl ?? ''}
+                  alt={creator.username ?? ''}
                 />
-              )}
-            </SUsername>
-          </a>
+              </SAvatarArea>
+            </a>
+          </Link>
+          <Link href='/profile/my-posts'>
+            <a
+              href='/profile/my-posts'
+              onClickCapture={() => {
+                Mixpanel.track('Click on own username', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'PostTopInfo',
+                });
+              }}
+            >
+              <SUsername className='username'>
+                {t('me')}
+                {creator.options?.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                    fill='none'
+                  />
+                )}
+              </SUsername>
+            </a>
+          </Link>
         </SCreatorCard>
         <SActionsDiv>
           <SShareButton

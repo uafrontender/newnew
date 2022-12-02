@@ -23,6 +23,7 @@ const PostBitmovinPlayer = dynamic(
 interface IPostVideoAnnouncementTab {
   postId: string;
   announcement: newnewapi.IVideoUrls;
+  hasCoverImage: boolean;
   isMuted: boolean;
   isSetThumbnailButtonIconOnly: boolean;
   ellipseButtonRef: any;
@@ -36,6 +37,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
 > = ({
   postId,
   announcement,
+  hasCoverImage,
   isMuted,
   isSetThumbnailButtonIconOnly,
   ellipseButtonRef,
@@ -109,7 +111,9 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
               : {}),
           }}
         >
-          {t('postVideo.setThumbnail')}
+          {hasCoverImage
+            ? t('postVideo.changeThumbnail')
+            : t('postVideo.setThumbnail')}
         </SSetThumbnailButton>
       )}
       <PostVideoSoundButton

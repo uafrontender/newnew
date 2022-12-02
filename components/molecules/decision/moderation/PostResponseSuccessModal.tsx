@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../../redux-store/store';
 
@@ -80,13 +81,15 @@ const PostResponseSuccessModal: React.FunctionComponent<
           </SText>
           <SHeadline variant={1}>{amount}</SHeadline>
           <SMakeAnotherPostButton>
-            <a href='/creation'>
-              <SCoinImage src={assets.decision.gold} />
-              <SButtonText variant={2} weight={600}>
-                {t('makeNewPostButton')}
-              </SButtonText>
-              <SButtonSubtitle variant={3}>{t('subtitle')}</SButtonSubtitle>
-            </a>
+            <Link href='/creation' scroll>
+              <a href='/creation'>
+                <SCoinImage src={assets.decision.gold} />
+                <SButtonText variant={2} weight={600}>
+                  {t('makeNewPostButton')}
+                </SButtonText>
+                <SButtonSubtitle variant={3}>{t('subtitle')}</SButtonSubtitle>
+              </a>
+            </Link>
           </SMakeAnotherPostButton>
         </SContentContainer>
       </SWrapper>

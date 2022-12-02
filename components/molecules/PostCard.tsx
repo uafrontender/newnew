@@ -307,37 +307,14 @@ export const PostCard: React.FC<ICard> = React.memo(
           fetch(decoded.thumbnailUrl)
             .then((res) => res.blob())
             .then((blobFromFetch) => {
-              const reader = new FileReader();
+              const url = URL.createObjectURL(blobFromFetch);
 
-              reader.onloadend = () => {
-                if (!reader.result) return;
-
-                const byteCharacters = atob(
-                  reader.result.slice(
-                    (reader.result as string).indexOf(',') + 1
-                  ) as string
-                );
-
-                const byteNumbers = new Array(byteCharacters.length);
-
-                // eslint-disable-next-line no-plusplus
-                for (let i = 0; i < byteCharacters.length; i++) {
-                  byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: 'video/mp4' });
-                const url = URL.createObjectURL(blob);
-
-                setThumbnailUrl(url);
-              };
-
-              reader.readAsDataURL(blobFromFetch);
+              setThumbnailUrl(url);
             })
             .catch((err) => {
               console.error(err);
             });
-        }, 5000);
+        }, 10000);
       };
 
       const handlerSocketPostCoverImageUpdated = (data: any) => {
@@ -1066,7 +1043,7 @@ const SWrapperOutside = styled.div<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
-    max-width: ${({ maxWidthTablet }) => maxWidthTablet ?? '200px'};
+    max-width: ${({ maxWidthTablet }) => maxWidthTablet ?? '100%'};
 
     transition: transform ease 0.5s;
 

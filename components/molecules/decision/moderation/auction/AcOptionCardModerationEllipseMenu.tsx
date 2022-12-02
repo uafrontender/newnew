@@ -10,11 +10,13 @@ import EllipseMenu, { EllipseMenuButton } from '../../../../atoms/EllipseMenu';
 interface IAcOptionCardModerationEllipseMenu {
   isVisible: boolean;
   optionId: number;
+  isUserBlocked: boolean;
   canDeleteOptionInitial: boolean;
   handleClose: () => void;
   handleOpenReportOptionModal: () => void;
   handleOpenBlockUserModal: () => void;
   handleOpenRemoveOptionModal: () => void;
+  handleUnblockUser: () => void;
   anchorElement?: HTMLElement;
 }
 
@@ -23,16 +25,20 @@ const AcOptionCardModerationEllipseMenu: React.FunctionComponent<
 > = ({
   isVisible,
   optionId,
+  isUserBlocked,
   canDeleteOptionInitial,
   handleClose,
   handleOpenReportOptionModal,
   handleOpenBlockUserModal,
   handleOpenRemoveOptionModal,
+  handleUnblockUser,
   anchorElement,
 }) => {
   const { t } = useTranslation('common');
 
-  const [canDeleteOption, setCanDeleteOption] = useState(false);
+  const [canDeleteOption, setCanDeleteOption] = useState(
+    canDeleteOptionInitial
+  );
   const [isCanDeleteOptionLoading, setIsCanDeleteOptionLoading] =
     useState(false);
 
@@ -86,11 +92,15 @@ const AcOptionCardModerationEllipseMenu: React.FunctionComponent<
       <EllipseMenuButton
         variant={3}
         onClick={() => {
+          if (isUserBlocked) {
+            handleUnblockUser();
+            return;
+          }
           handleOpenBlockUserModal();
           handleClose();
         }}
       >
-        {t('ellipse.blockUser')}
+        {!isUserBlocked ? t('ellipse.blockUser') : t('ellipse.unblockUser')}
       </EllipseMenuButton>
       <EllipseMenuButton
         variant={3}
